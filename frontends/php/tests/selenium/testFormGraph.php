@@ -769,8 +769,8 @@ class testFormGraph extends CLegacyWebTest {
 					'errors' => [
 						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
-						'Value "name" of "yaxismin" has incorrect decimal format.',
-						'Value "name" of "yaxismax" has incorrect decimal format.'
+						'Field "yaxismin" is not correct: a number is expected',
+						'Field "yaxismax" is not correct: a number is expected'
 					]
 				]
 			],
@@ -921,6 +921,7 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]//select[@name='hostid']"));
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
@@ -936,6 +937,7 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]//select[@name='hostid']"));
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 

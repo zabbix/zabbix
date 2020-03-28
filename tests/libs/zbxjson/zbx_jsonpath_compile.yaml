@@ -1035,4 +1035,40 @@ out:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
       data: "'connections'"
       detached: 0
+---
+test case: Compile success $.sum()
+in:
+  path: $.sum()
+out:
+  result: SUCCEED
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "sum()"
+---
+test case: Compile success $.*~
+in:
+  path: $.*~
+out:
+  result: SUCCEED
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_ALL
+      data: "*"
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "~"
+---
+test case: Compile success $.*~.first()
+in:
+  path: $.*~.first()
+out:
+  result: SUCCEED
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_ALL
+      data: "*"
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "~"
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "first()"
 ...

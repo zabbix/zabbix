@@ -84,7 +84,7 @@ function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_N
 
 	if (abs($dx) > abs($dy)) {
 		if ($dx < 0) {
-			zbx_swap($x1, $x2);
+			[$x1, $x2] = [$x2, $x1];
 			$y1 = $y2;
 		}
 		for ($x = $x1, $y = $y1; $x <= $x2; $x++, $y = $y1 + ($x - $x1) * $dy / $dx) {
@@ -115,8 +115,8 @@ function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_N
 	}
 	else {
 		if ($dy < 0) {
-			zbx_swap($y1, $y2);
 			$x1 = $x2;
+			[$y1, $y2] = [$y2, $y1];
 		}
 		for ($y = $y1, $x = $x1; $y <= $y2; $y++, $x = $x1 + ($y - $y1) * $dx / $dy)
 		{

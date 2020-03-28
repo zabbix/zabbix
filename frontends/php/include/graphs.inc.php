@@ -68,24 +68,6 @@ function graph_item_drawtype2str($drawtype) {
 	}
 }
 
-function graph_item_calc_fnc2str($calc_fnc) {
-	switch ($calc_fnc) {
-		case 0:
-			return _('Count');
-		case CALC_FNC_ALL:
-			return _('all');
-		case CALC_FNC_MIN:
-			return _('min');
-		case CALC_FNC_MAX:
-			return _('max');
-		case CALC_FNC_LST:
-			return _('last');
-		case CALC_FNC_AVG:
-		default:
-			return _('avg');
-	}
-}
-
 function graph_item_aggr_fnc2str($calc_fnc) {
 	switch ($calc_fnc) {
 		case GRAPH_AGGREGATE_NONE:
@@ -168,7 +150,7 @@ function getGraphByGraphId($graphId) {
 		return $dbGraph;
 	}
 
-	error(_s('No graph item with graphid "%s".', $graphId));
+	error(_s('No graph item with graphid "%1$s".', $graphId));
 
 	return false;
 }
@@ -538,144 +520,6 @@ function get_next_color($palettetype = 0) {
 	return [$r, $g, $b];
 }
 
-function get_next_palette($palette = 0, $palettetype = 0) {
-	static $prev_color = [0, 0, 0, 0];
-
-	switch ($palette) {
-		case 0:
-			$palettes = [
-				[150, 0, 0], [0, 100, 150], [170, 180, 180], [152, 100, 0], [130, 0, 150],
-				[0, 0, 150], [200, 100, 50], [250, 40, 40], [50, 150, 150], [100, 150, 0]
-			];
-			break;
-		case 1:
-			$palettes = [
-				[0, 100, 150], [153, 0, 30], [100, 150, 0], [130, 0, 150], [0, 0, 100],
-				[200, 100, 50], [152, 100, 0], [0, 100, 0], [170, 180, 180], [50, 150, 150]
-			];
-			break;
-		case 2:
-			$palettes = [
-				[170, 180, 180], [152, 100, 0], [50, 200, 200], [153, 0, 30], [0, 0, 100],
-				[100, 150, 0], [130, 0, 150], [0, 100, 150], [200, 100, 50], [0, 100, 0]
-			];
-			break;
-		case 3:
-		default:
-			return get_next_color($palettetype);
-	}
-
-	if (isset($palettes[$prev_color[$palette]])) {
-		$result = $palettes[$prev_color[$palette]];
-	}
-	else {
-		return get_next_color($palettetype);
-	}
-
-	switch ($palettetype) {
-		case 0:
-			$diff = 0;
-			break;
-		case 1:
-			$diff = -50;
-			break;
-		case 2:
-			$diff = 50;
-			break;
-	}
-
-	foreach ($result as $n => $color) {
-		if (($color + $diff) < 0) {
-			$result[$n] = 0;
-		}
-		elseif (($color + $diff) > 255) {
-			$result[$n] = 255;
-		}
-		else {
-			$result[$n] += $diff;
-		}
-	}
-	$prev_color[$palette]++;
-
-	return $result;
-}
-
-/**
- * Draw trigger recent change markers.
- *
- * @param resource $im
- * @param int      $x
- * @param int      $y
- * @param int      $offset
- * @param string   $color
- * @param string   $marks	"t" - top, "r" - right, "b" - bottom, "l" - left
- */
-function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
-	$polygons = 5;
-	$gims = [
-		't' => [0, 0, -6, -6, -3, -9, 3, -9, 6, -6],
-		'r' => [0, 0, 6, -6, 9, -3, 9, 3, 6, 6],
-		'b' => [0, 0, 6, 6, 3, 9, -3, 9, -6, 6],
-		'l' => [0, 0, -6, 6, -9, 3, -9, -3, -6, -6]
-	];
-
-	foreach ($gims['t'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['t'][$num] = $px + $x;
-		}
-		else {
-			$gims['t'][$num] = $px + $y - $offset;
-		}
-	}
-
-	foreach ($gims['r'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['r'][$num] = $px + $x + $offset;
-		}
-		else {
-			$gims['r'][$num] = $px + $y;
-		}
-	}
-
-	foreach ($gims['b'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['b'][$num] = $px + $x;
-		}
-		else {
-			$gims['b'][$num] = $px + $y + $offset;
-		}
-	}
-
-	foreach ($gims['l'] as $num => $px) {
-		if (($num % 2) == 0) {
-			$gims['l'][$num] = $px + $x - $offset;
-		}
-		else {
-			$gims['l'][$num] = $px + $y;
-		}
-	}
-
-	$color = get_color($im, $color);
-	$polygon_color = get_color($im, '960000');
-
-	if (strpos($marks, 't') !== false) {
-		imagefilledpolygon($im, $gims['t'], $polygons, $color);
-		imagepolygon($im, $gims['t'], $polygons, $polygon_color);
-	}
-	if (strpos($marks, 'r') !== false) {
-		imagefilledpolygon($im, $gims['r'], $polygons, $color);
-		imagepolygon($im, $gims['r'], $polygons, $polygon_color);
-	}
-	if (strpos($marks, 'b') !== false) {
-		imagefilledpolygon($im, $gims['b'], $polygons, $color);
-		imagepolygon($im, $gims['b'], $polygons, $polygon_color);
-	}
-	if (strpos($marks, 'l') !== false) {
-		imagefilledpolygon($im, $gims['l'], $polygons, $color);
-		imagepolygon($im, $gims['l'], $polygons, $polygon_color);
-	}
-}
-
 /**
  * Draws a text on an image. Supports TrueType fonts.
  *
@@ -755,13 +599,6 @@ function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
 
 	imagesetstyle($image, $style);
 	zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
-}
-
-function dashedRectangle($image, $x1, $y1, $x2, $y2, $color) {
-	dashedLine($image, $x1, $y1, $x1, $y2, $color);
-	dashedLine($image, $x1, $y2, $x2, $y2, $color);
-	dashedLine($image, $x2, $y2, $x2, $y1, $color);
-	dashedLine($image, $x2, $y1, $x1, $y1, $color);
 }
 
 function find_period_start($periods, $time) {
@@ -866,129 +703,263 @@ function find_period_end($periods, $time, $max_time) {
 }
 
 /**
- * Converts Base1000 values to Base1024 and calculate pow
- * Example:
- *  204800 (200 KBytes) with '1024' step convert to 209715,2 (0.2MB (204.8 KBytes))
- *
- * @param string|int $value
- * @param string $step
- *
- * @return array
- */
-function convertToBase1024($value, $step = '1000') {
-	if ($value < 0) {
-		$abs = bcmul($value, '-1');
-	}
-	else {
-		$abs = $value;
-	}
+* Yield suitable graph scale intervals.
+*
+* @param float $min        Minimum extreme of the scale.
+* @param float $max        Maximum extreme of the scale.
+* @param bool  $is_binary  Is the scale binary (use 1024 base for units)?
+* @param int   $power      Scale power.
+* @param int   $rows       Number of scale rows.
+*
+* @return iterable
+*/
+function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $power, int $rows): iterable {
+	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
-	// set default values
-	$valData['pow'] = 0;
-	$valData['value'] = 0;
+	$divisor = pow($unit_base, $power);
 
-	// supported pows ('-2' - '8')
-	for ($i = -2; $i < 9; $i++) {
-		$val = bcpow($step, $i);
-		if (bccomp($abs, $val) > -1) {
-			$valData['pow'] = $i;
-			$valData['value'] = $val;
+	// Expression optimized to avoid overflow.
+	$interval = truncateFloat($max / $divisor / $rows - $min / $divisor / $rows);
+
+	while (true) {
+		if ($is_binary && $interval >= 1) {
+			$result = pow(2, ceil(log($interval, 2)));
 		}
 		else {
+			$exponent = floor(log10($interval));
+
+			foreach ([2, 5, 10] as $multiply) {
+				$candidate = truncateFloat(pow(10, $exponent) * $multiply);
+				if ($candidate >= $interval) {
+					$result = $candidate;
+
+					break;
+				}
+			}
+		}
+
+		yield $result * pow($unit_base, $power);
+
+		$interval = $result * 1.5;
+	}
+}
+
+/**
+* Calculate graph scale extremes.
+*
+* @param float $data_min   Minimum extreme of the graph.
+* @param float $data_max   Maximum extreme of the graph.
+* @param bool  $is_binary  Is the scale binary (use 1024 base for units)?
+* @param bool  $calc_min   Should scale minimum be calculated?
+* @param bool  $calc_max   Should scale maximum be calculated?
+* @param int   $rows_min   Minimum number of scale rows.
+* @param int   $rows_max   Maximum number of scale rows.
+*
+* @return array|null
+*/
+function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_binary, bool $calc_min, bool $calc_max,
+		int $rows_min, int $rows_max): ?array {
+	$scale_min = truncateFloat($data_min);
+	$scale_max = truncateFloat($data_max);
+
+	if ($scale_min >= $scale_max) {
+		if ($scale_max > 0) {
+			if ($calc_min) {
+				$scale_min = $scale_max > 0 ? 0 : ($scale_max == 0 ? -1 : $scale_max * 1.25);
+			}
+			elseif ($calc_max) {
+				$scale_max = $scale_min < 0 ? 0 : ($scale_min == 0 ? 1 : $scale_min * 1.25);
+			}
+			else {
+				return null;
+			}
+		}
+		else {
+			if ($calc_max) {
+				$scale_max = $scale_min < 0 ? 0 : ($scale_min == 0 ? 1 : $scale_min * 1.25);
+			}
+			elseif ($calc_min) {
+				$scale_min = $scale_max > 0 ? 0 : ($scale_max == 0 ? -1 : $scale_max * 1.25);
+			}
+			else {
+				return null;
+			}
+		}
+	}
+
+	$power = (int) min(8, max(0, floor(log(max(abs($scale_min), abs($scale_max)), $is_binary ? ZBX_KIBIBYTE : 1000))));
+
+	$best_result_value = null;
+	$best_result = [
+		'min' => $scale_min,
+		'max' => $scale_max,
+		// Expression optimized to avoid overflow.
+		'interval' => $scale_max / 2 - $scale_min / 2,
+		'rows' => 2,
+		'power' => $power
+	];
+
+	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
+		$clearance_min = $rows * 0.05;
+		$clearance_max = $rows * 0.1;
+
+		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows) as $interval) {
+			if ($interval == INF) {
+				break;
+			}
+
+			if ($calc_min) {
+				$min = floor($scale_min / $interval) * $interval;
+				if ($min != 0 && ($scale_min - $min) / $interval < $clearance_min) {
+					$min -= $interval;
+				}
+				$max = $calc_max ? $min + $interval * $rows : $scale_max;
+			}
+			elseif ($calc_max) {
+				$min = $scale_min;
+				$max = ceil($scale_min / $interval + $rows) * $interval;
+				if ($max != 0 && ($max - $scale_max) / $interval < $clearance_max) {
+					$max += $interval;
+				}
+			}
+			else {
+				$min = $scale_min;
+				$max = $scale_max;
+			}
+
+			$min = truncateFloat($min);
+			$max = truncateFloat($max);
+
+			if ($min > $scale_min || $max < $scale_max) {
+				continue;
+			}
+
+			if ($calc_min && $min != 0 && ($scale_min - $min) / $interval < $clearance_min) {
+				continue;
+			}
+
+			if ($calc_max && $max != 0 && ($max - $scale_max) / $interval < $clearance_max) {
+				continue;
+			}
+
+			$result = [
+				'min' => $min,
+				'max' => $max,
+				'interval' => $interval,
+				'rows' => $rows,
+				'power' => $power,
+			];
+
+			$result_value = ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
+
+			if ($best_result_value === null || $result_value < $best_result_value) {
+				$best_result_value = $result_value;
+				$best_result = $result;
+			}
+
 			break;
 		}
 	}
 
-	if ($valData['pow'] >= 0) {
-		if ($valData['value'] != 0) {
-			$valData['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']),
-				ZBX_PRECISION_10);
-
-			$valData['value'] = sprintf('%.10f', round(bcmul($valData['value'], bcpow(ZBX_KIBIBYTE, $valData['pow'])),
-				ZBX_PRECISION_10));
-		}
-	}
-	else {
-		$valData['pow'] = 0;
-		if (round($valData['value'], 6) > 0) {
-			$valData['value'] = $value;
-		}
-		else {
-			$valData['value'] = 0;
-		}
-	}
-
-	return $valData;
+	return $best_result;
 }
 
 /**
- * Calculate interval for base 1024 values.
- * Example:
- * 	Convert 1000 to 1024
- *
- * @param $interval
- * @param $minY
- * @param $maxY
- *
- * @return float|int
- */
-function getBase1024Interval($interval, $minY, $maxY) {
-	$intervalData = convertToBase1024($interval);
-	$interval = $intervalData['value'];
+* Calculate graph scale intermediate values.
+*
+* @param float  $min             Minimum extreme of the scale.
+* @param float  $max             Maximum extreme of the scale.
+* @param bool   $min_calculated  Is minimum extreme of the scale calculated?
+* @param bool   $max_calculated  Is maximum extreme of the scale calculated?
+* @param float  $interval        Scale interval.
+* @param string $units           Scale units.
+* @param bool   $is_binary       Is the scale binary (use 1024 base for units)?
+* @param int    $power           Scale power.
+* @param int    $precision_max   Maximum precision to use for the scale.
+*
+* @return array
+*/
+function calculateGraphScaleValues(float $min, float $max, bool $min_calculated, bool $max_calculated, float $interval,
+		string $units, bool $is_binary, int $power, int $precision_max): array {
+	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
 
-	if ($maxY > 0) {
-		$absMaxY = $maxY;
-	}
-	else {
-		$absMaxY = bcmul($maxY, '-1');
-	}
+	$units_length = ($units === '' && $power == 0) ? 0 : (1 + mb_strlen($units) + ($power > 0 ? 1 : 0));
+	$precision = max(3, $units_length == 0 ? $precision_max : ($precision_max - $units_length - ($min < 0 ? 1 : 0)));
 
-	if ($minY > 0) {
-		$absMinY = $minY;
-	}
-	else {
-		$absMinY = bcmul($minY, '-1');
-	}
+	$decimals = min(ZBX_UNITS_ROUNDOFF_SUFFIXED, $precision - 1);
+	$decimals_exact = false;
 
-	if ($absMaxY > $absMinY) {
-		$sideMaxData = convertToBase1024($maxY);
-	}
-	else {
-		$sideMaxData = convertToBase1024($minY);
-	}
+	$power_interval = $interval / pow($unit_base, $power);
 
-	if ($sideMaxData['pow'] != $intervalData['pow']) {
-		// interval correction, if Max Y have other unit, then interval unit = Max Y unit
-		if ($intervalData['pow'] < 0) {
-			$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
-		}
-		else {
-			$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+	if ($power_interval < 1) {
+		$decimals = getNumDecimals($power_interval);
+		$decimals_exact = true;
+
+		if ($decimals > $precision - 1) {
+			$decimals = $precision - 1;
+			$decimals_exact = false;
 		}
 	}
 
-	return $interval;
-}
+	$rows = [];
 
-/**
- * Returns digit count for the item with most digit after point in given array.
- * Example:
- *	Input: array(0, 0.1, 0.25, 0.005)
- *	Return 3
- *
- * @param array $calcValues
- *
- * @return int
- */
-function calcMaxLengthAfterDot($calcValues) {
-	$maxLength = 0;
+	$clearance = 0.5;
+	for ($row_index = 0;; $row_index++) {
+		$value = ceil($min / $interval + $row_index + $clearance) * $interval;
 
-	foreach ($calcValues as $calcValue) {
-		preg_match('/^-?[0-9].?([0-9]*)\s?/', $calcValue, $matches);
-		if ($matches['1'] != 0 && strlen($matches['1']) > $maxLength) {
-			$maxLength = strlen($matches['1']);
+		if ($value > $max - $interval * $clearance) {
+			break;
 		}
+
+		$rows[] = $value;
 	}
 
-	return $maxLength;
+	$ignore_milliseconds = $min <= 1 || $max >= 1;
+
+	$options = [
+		'units' => $units,
+		'unit_base' => $unit_base,
+		'convert' => ITEM_CONVERT_NO_UNITS,
+		'power' => $power,
+		'ignore_milliseconds' => $ignore_milliseconds
+	];
+	$options_fixed = $options + [
+		'precision' => $precision,
+		'decimals' => $precision - 1,
+		'decimals_exact' => false
+	];
+	$options_calculated = $options + [
+		'precision' => $precision,
+		'decimals' => $decimals,
+		'decimals_exact' => $decimals_exact
+	];
+
+	$scale_values = [];
+
+	$scale_values[] = [
+		'relative_pos' => 0,
+		'value' => convertUnits([
+			'value' => $min,
+		] + ($min_calculated ? $options_calculated : $options_fixed))
+	];
+
+	foreach ($rows as $value) {
+		$scale_values[] = [
+			'relative_pos' => (abs($max - $min) == INF)
+				? ($value / 10 - $min / 10) / ($max / 10 - $min / 10)
+				: ($value - $min) / ($max - $min),
+			'value' => convertUnits([
+				'value' => $value,
+			] + $options_calculated)
+		];
+	}
+
+	$scale_values[] = [
+		'relative_pos' => 1,
+		'value' => convertUnits([
+			'value' => $max,
+		] + ($max_calculated ? $options_calculated : $options_fixed))
+	];
+
+	return $scale_values;
 }

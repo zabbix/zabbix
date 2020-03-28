@@ -214,6 +214,13 @@
 						chkbox_default: true
 					}));
 
+				case '<?= ZBX_PREPROC_STR_REPLACE ?>':
+					return $(preproc_param_double_tmpl.evaluate({
+						rowNum: index,
+						placeholder_0: <?= json_encode(_('search string')) ?>,
+						placeholder_1: <?= json_encode(_('replacement')) ?>
+					}));
+
 				default:
 					return '';
 			}
@@ -306,6 +313,7 @@
 					case '<?= ZBX_PREPROC_THROTTLE_VALUE ?>':
 					case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
 					case '<?= ZBX_PREPROC_SCRIPT ?>':
+					case '<?= ZBX_PREPROC_STR_REPLACE ?>':
 						$on_fail
 							.prop('checked', false)
 							.prop('disabled', true)

@@ -144,18 +144,12 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param string $event['acknowledged']   State of acknowledgement.
  * @param CCOl   $event['opdata']         Operational data with expanded macros.
  * @param string $event['comments']       Trigger description with expanded macros.
- * @param string $backurl                 A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
  */
-function make_event_details($event, $backurl) {
-	$event_update_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'acknowledge.edit')
-		->setArgument('eventids', [$event['eventid']])
-		->setArgument('backurl', $backurl)
-		->getUrl();
-
+function make_event_details(array $event) {
 	$config = select_config();
+	$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	$table = (new CTableInfo())
 		->addRow([
@@ -176,9 +170,14 @@ function make_event_details($event, $backurl) {
 		])
 		->addRow([
 			_('Acknowledged'),
-			(new CLink($event['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $event_update_url))
-				->addClass($event['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			(new CLink($is_acknowledged ? _('Yes') : _('No')))
+				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
+				->onClick('return PopUp("popup.acknowledge.edit",'.
+					json_encode([
+						'eventids' => [$event['eventid']]
+					]).', null, this);'
+				)
 		]);
 
 	if ($event['r_eventid'] != 0) {
@@ -242,7 +241,7 @@ function make_event_details($event, $backurl) {
 	return $table;
 }
 
-function make_small_eventlist($startEvent, $backurl) {
+function make_small_eventlist(array $startEvent) {
 	$config = select_config();
 
 	$table = (new CTableInfo())
@@ -351,20 +350,24 @@ function make_small_eventlist($startEvent, $backurl) {
 			$value_clock = $event['r_clock'];
 		}
 
+		$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$cell_status = new CSpan($value_str);
 
 		/*
 		 * Add colors to span depending on configuration and trigger parameters. No blinking added to status,
 		 * since the page is not on autorefresh.
 		 */
-		addTriggerValueStyle($cell_status, $value, $value_clock, $event['acknowledged'] == EVENT_ACKNOWLEDGED);
+		addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 
-		// Create link to Problem update page.
-		$problem_update_url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'acknowledge.edit')
-			->setArgument('eventids', [$event['eventid']])
-			->setArgument('backurl', $backurl)
-			->getUrl();
+		// Create acknowledge link.
+		$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->onClick('return PopUp("popup.acknowledge.edit",'.
+				json_encode([
+					'eventids' => [$event['eventid']]
+				]).', null, this);'
+			);
 
 		$table->addRow([
 			(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -378,9 +381,7 @@ function make_small_eventlist($startEvent, $backurl) {
 			$cell_status,
 			zbx_date2age($event['clock']),
 			$duration,
-			(new CLink($event['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
-				->addClass($event['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-				->addClass(ZBX_STYLE_LINK_ALT),
+			$problem_update_link,
 			makeEventActionsIcons($event['eventid'], $actions['data'], $mediatypes, $users, $severity_config)
 		]);
 	}
@@ -396,7 +397,6 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $trigger['comments']        Trigger description.
  * @param string $trigger['url']             Trigger URL.
  * @param string $eventid_till
- * @param string $backurl                    URL to return to.
  * @param bool   $show_timeline              Show time line flag.
  * @param int    $show_tags                  Show tags flag. Possible values:
  *                                             - PROBLEMS_SHOW_TAGS_NONE;
@@ -415,9 +415,8 @@ function make_small_eventlist($startEvent, $backurl) {
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline = true,
-		$show_tags = PROBLEMS_SHOW_TAGS_3, array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL,
-		$tag_priority = '') {
+function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $show_tags = PROBLEMS_SHOW_TAGS_3,
+		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '') {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -568,10 +567,11 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline 
 				$cell_r_clock = '';
 			}
 
+			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 			$cell_status = new CSpan($value_str);
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($cell_status, $value, $value_clock, $problem['acknowledged'] == EVENT_ACKNOWLEDGED);
+			addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 
 			if ($show_timeline) {
 				if ($last_clock != 0) {
@@ -596,16 +596,14 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline 
 			}
 
 			// Create acknowledge link.
-			$problem_update_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'acknowledge.edit')
-				->setArgument('eventids', [$problem['eventid']])
-				->setArgument('backurl', $backurl)
-				->getUrl();
-
-			$acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
-			$problem_update_link = (new CLink($acknowledged ? _('Yes') : _('No'), $problem_update_url))
-				->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
-				->addClass(ZBX_STYLE_LINK_ALT);
+			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
+				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->onClick('return PopUp("popup.acknowledge.edit",'.
+					json_encode([
+						'eventids' => [$problem['eventid']]
+					]).', null, this);'
+				);
 
 			$table->addRow(array_merge($row, [
 				$cell_r_clock,

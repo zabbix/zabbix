@@ -65,13 +65,15 @@ class CScreenPlainText extends CScreenBase {
 		foreach ($histories as $history) {
 			switch ($item['value_type']) {
 				case ITEM_VALUE_TYPE_FLOAT:
-					sscanf($history['value'], '%f', $value);
+					$value = formatFloat($history['value'], null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					break;
+
 				case ITEM_VALUE_TYPE_TEXT:
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_LOG:
 					$value = $this->screenitem['style'] ? new CJsScript($history['value']) : $history['value'];
 					break;
+
 				default:
 					$value = $history['value'];
 					break;
@@ -89,7 +91,7 @@ class CScreenPlainText extends CScreenBase {
 		}
 
 		$footer = (new CList())
-			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
 		return $this->getOutput(

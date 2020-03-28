@@ -29,9 +29,6 @@ $form = (new CForm('GET', 'history.php'))
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 
 $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-if (!$data['filter_set']) {
-	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
-}
 
 $toggle_all = (new CColHeader(
 	(new CSimpleButton())
@@ -177,20 +174,23 @@ foreach ($data['items'] as $key => $item) {
 	}
 
 	// change
-	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
-	if ($last_history && $prev_history
-			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& (bcsub($last_history['value'], $prev_history['value'], $digits) != 0)) {
+	if ($last_history && $prev_history && ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT
+			|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
 		$change = '';
-		if ($last_history['value'] - $prev_history['value'] > 0) {
-			$change = '+';
-		}
 
-		// The change must be calculated as uptime for the 'unixtime'.
-		$change .= convert_units([
-			'value' => bcsub($last_history['value'], $prev_history['value'], $digits),
-			'units' => ($item['units'] === 'unixtime') ? 'uptime' : $item['units']
-		]);
+		$history_diff = $last_history['value'] - $prev_history['value'];
+
+		if ($history_diff != 0) {
+			if ($history_diff > 0) {
+				$change = '+';
+			}
+
+			// The change must be calculated as uptime for the 'unixtime'.
+			$change .= convertUnits([
+				'value' => $history_diff,
+				'units' => ($item['units'] === 'unixtime') ? 'uptime' : $item['units']
+			]);
+		}
 	}
 	else {
 		$change = UNKNOWN_VALUE;
@@ -348,20 +348,23 @@ foreach ($data['items'] as $item) {
 	}
 
 	// change
-	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
-	if ($last_history && $prev_history
-			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& (bcsub($last_history['value'], $prev_history['value'], $digits) != 0)) {
+	if ($last_history && $prev_history && ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT
+			|| $item['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
 		$change = '';
-		if ($last_history['value'] - $prev_history['value'] > 0) {
-			$change = '+';
-		}
 
-		// The change must be calculated as uptime for the 'unixtime'.
-		$change .= convert_units([
-			'value' => bcsub($last_history['value'], $prev_history['value'], $digits),
-			'units' => ($item['units'] === 'unixtime') ? 'uptime' : $item['units']
-		]);
+		$history_diff = $last_history['value'] - $prev_history['value'];
+
+		if ($history_diff != 0) {
+			if ($history_diff > 0) {
+				$change = '+';
+			}
+
+			// The change must be calculated as uptime for the 'unixtime'.
+			$change .= convertUnits([
+				'value' => $history_diff,
+				'units' => ($item['units'] === 'unixtime') ? 'uptime' : $item['units']
+			]);
+		}
 	}
 	else {
 		$change = UNKNOWN_VALUE;

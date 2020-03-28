@@ -486,106 +486,14 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'row_snmp_oid'
-	)
-	->addRow(_('Context name'),
-		(new CTextBox('snmpv3_contextname', $data['snmpv3_contextname'], $discovered_item))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_contextname'
-	)
-	->addRow(
-		(new CLabel(_('SNMP community'), 'snmp_community'))->setAsteriskMark(),
-		(new CTextBox('snmp_community', $data['snmp_community'], $discovered_item, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		'row_snmp_community'
-	)
-	->addRow(_('Security name'),
-		(new CTextBox('snmpv3_securityname', $data['snmpv3_securityname'], $discovered_item, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_securityname'
 	);
-
-// Append SNMPv3 security level to form list.
-$security_levels = [
-	ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-];
-if ($discovered_item) {
-	$form->addVar('snmpv3_securitylevel', $data['snmpv3_securitylevel']);
-	$securityLevelComboBox = new CTextBox('snmpv3_securitylevel_name', $security_levels[$data['snmpv3_securitylevel']],
-		true
-	);
-}
-else {
-	$securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $data['snmpv3_securitylevel'], null,
-		$security_levels
-	);
-}
-$form_list->addRow(_('Security level'), $securityLevelComboBox, 'row_snmpv3_securitylevel');
-
-// Append SNMPv3 authentication protocol to form list.
-if ($discovered_item) {
-	$form->addVar('snmpv3_authprotocol', (int) $data['snmpv3_authprotocol']);
-	$snmpv3_authprotocol = (new CRadioButtonList('snmpv3_authprotocol_names', (int) $data['snmpv3_authprotocol']))
-		->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
-		->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
-		->setModern(true)
-		->setEnabled(!$discovered_item);
-}
-else {
-	$snmpv3_authprotocol = (new CRadioButtonList('snmpv3_authprotocol', (int) $data['snmpv3_authprotocol']))
-		->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
-		->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
-		->setModern(true);
-}
 
 $form_list
-	->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
-		$snmpv3_authprotocol,
-		'row_snmpv3_authprotocol'
-	)
-	// Append SNMPv3 authentication passphrase to form list.
-	->addRow(_('Authentication passphrase'),
-		(new CTextBox('snmpv3_authpassphrase', $data['snmpv3_authpassphrase'], $discovered_item, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_authpassphrase'
-	);
 
-// Append SNMPv3 privacy protocol to form list.
-if ($discovered_item) {
-	$form->addVar('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']);
-	$snmpv3_privprotocol = (new CRadioButtonList('snmpv3_privprotocol_names', (int) $data['snmpv3_privprotocol']))
-		->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
-		->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
-		->setModern(true)
-		->setEnabled(!$discovered_item);
-}
-else {
-	$snmpv3_privprotocol = (new CRadioButtonList('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']))
-		->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
-		->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
-		->setModern(true);
-}
-$form_list
-	->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
-		$snmpv3_privprotocol,
-		'row_snmpv3_privprotocol'
-	)
-	// Append SNMPv3 privacy passphrase to form list.
-	->addRow(_('Privacy passphrase'),
-		(new CTextBox('snmpv3_privpassphrase', $data['snmpv3_privpassphrase'], $discovered_item, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_privpassphrase'
-	)
-	->addRow(_('Port'),
-		(new CTextBox('port', $data['port'], $discovered_item, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		'row_port'
-	)
-	->addRow(_('IPMI sensor'),
-		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_ipmi_sensor'
-	);
+->addRow(_('IPMI sensor'),
+	(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	'row_ipmi_sensor'
+);
 
 // Append authentication method to form list.
 $auth_types = [
@@ -977,11 +885,13 @@ if ($data['itemid'] != 0) {
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
 	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$buttons[] = new CButtonQMessage(
-			'del_history',
-			_('Clear history and trends'),
-			_('History clearing can take a long time. Continue?')
-		);
+		$buttons[] = ($data['config']['compression_status'])
+			? new CSubmit('del_history', _('Clear history and trends'))
+			: new CButtonQMessage(
+				'del_history',
+				_('Clear history and trends'),
+				_('History clearing can take a long time. Continue?')
+			);
 	}
 
 	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid'])))

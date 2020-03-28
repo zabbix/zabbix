@@ -34,7 +34,7 @@ class CProfile {
 		$profilesTableSchema = DB::getSchema('profiles');
 		self::$stringProfileMaxLength = $profilesTableSchema['fields']['value_str']['length'];
 		DBselect('SELECT NULL FROM users u WHERE '.dbConditionId('u.userid', (array) self::$userDetails['userid']).
-			' FOR UPDATE;'
+			' FOR UPDATE'
 		);
 	}
 

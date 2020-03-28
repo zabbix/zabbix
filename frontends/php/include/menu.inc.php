@@ -31,22 +31,20 @@ $menu
 			],
 			_('Problems') => [
 				'action' => 'problem.view',
-				'alias' => ['problem.view', 'acknowledge.edit', 'tr_events.php']
+				'alias' => ['problem.view', 'tr_events.php']
+			],
+			_('Hosts') => [
+				'action' => 'host.view',
+				'alias' => ['web.view', 'charts.php', 'chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',
+					'httpdetails.php'
+				]
 			],
 			_('Overview') => [
 				'action' => 'overview.php'
 			],
-			_('Web') => [
-				'action' => 'web.view',
-				'alias' => ['httpdetails.php']
-			],
 			_('Latest data') => [
 				'action' => 'latest.view',
 				'alias' => ['history.php', 'chart.php']
-			],
-			_('Graphs') => [
-				'action' => 'charts.php',
-				'alias' => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']
 			],
 			_('Screens') => [
 				'action' => 'screens.php',

@@ -2445,7 +2445,7 @@ select {
 	box-sizing: border-box;
 	color: $font-color;
 	outline: 0;
-	transition: border-color .2s ease-out;
+	transition: border-color .2s ease-out, box-shadow .2s ease-out;
 
 	&:focus {
 		border-color: $form-border-focus-color;
@@ -2472,7 +2472,7 @@ button {
 	min-height: 24px;
 	cursor: pointer;
 	outline: 0;
-	transition: border-color, background-color .2s ease-out;
+	transition: border-color .2s ease-out, background-color .2s ease-out;
 
 	&:hover {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
@@ -3146,10 +3146,6 @@ $var-icons: (
 			@extend %var-icons;
 		}
 	}
-}
-
-.icon-none {
-	margin-left: 18px;
 }
 
 $trigger-expression-tree-icons: (
@@ -4487,6 +4483,18 @@ $form-icon-btn: (
 			margin: 0;
 			border-left-color: $font-alt-color;
 		}
+
+		&[class*='icon-'] {
+			&::before {
+				position: absolute;
+				top: 0;
+				left: 0;
+				display: block;
+				width: 22px;
+				height: 22px;
+				content: "";
+			}
+		}
 	}
 
 	.menu-popup-item-disabled {
@@ -5630,6 +5638,21 @@ a.link-action {
 	}
 }
 
+%status {
+	padding: 2px 3px 1px;
+	font-size: $font-h3-size;
+	text-transform: $font-transform;
+	text-align: center;
+	min-width: .7em;
+	line-height: 1em;
+	display: inline-block;
+	border-radius: 2px;
+
+	&:not(:last-of-type) {
+		border-right: 0;
+	}
+}
+
 .status-container {
 	display: inline-block;
 	white-space: nowrap;
@@ -5653,6 +5676,17 @@ a.link-action {
 		&:last-of-type:not(:only-child) {
 			border-radius: 0 2px 2px 0;
 		}
+	}
+
+	.status-na-bg,
+	.status-info-bg,
+	.status-warning-bg,
+	.status-average-bg,
+	.status-high-bg,
+	.status-disaster-bg {
+		@extend %status;
+		border: 1px solid rgba($font-color, .2);
+		border-radius: 0;
 	}
 }
 
@@ -5690,16 +5724,6 @@ a.link-action {
 	@extend %status;
 }
 
-.status-na-bg,
-.status-info-bg,
-.status-warning-bg,
-.status-average-bg,
-.status-high-bg,
-.status-disaster-bg {
-	border: 1px solid rgba($font-color, .2);
-	@extend %status;
-}
-
 .status-disabled-bg {
 	color: $form-disabled-font-color;
 	background-color: $form-disabled-bg-color;
@@ -5721,21 +5745,6 @@ a.link-action {
 
 	&:last-child {
 		margin: 0;
-	}
-}
-
-%status {
-	padding: 2px 3px 1px;
-	font-size: $font-h3-size;
-	text-transform: $font-transform;
-	text-align: center;
-	min-width: .7em;
-	line-height: 1em;
-	display: inline-block;
-	border-radius: 2px;
-
-	&:not(:last-of-type) {
-		border-right: 0;
 	}
 }
 
@@ -6776,6 +6785,12 @@ svg {
 .checkbox-list {
 	li {
 		margin-top: 4px;
+		overflow-x: hidden;
+		text-overflow: ellipsis;
+
+		label {
+			vertical-align: middle;
+		}
 	}
 }
 
@@ -7048,24 +7063,10 @@ svg {
 					background-color: $ui-hover-color;
 				}
 
-				> .problems {
+				> .problem-icon-list {
 					float: right;
-					position: relative;
 					padding-left: 10px;
 					margin-right: 10px;
-					background: inherit;
-					display: flex;
-
-					.problems-per-item {
-						flex: 0 0 7px;
-						background: #808080;
-						color: $white;
-						padding: 3px 4px 2px;
-						font-size: 12px;
-						line-height: 1;
-						border-radius: 3px;
-						margin: 0 5px 0 0;
-					}
 				}
 
 				> .tools {
@@ -7222,6 +7223,30 @@ svg {
 		.placeholder {
 			background-color: $ui-placeholder-background-color;
 			animation: fadein .5s;
+		}
+	}
+
+	.problem-icon-list {
+		flex-wrap: nowrap;
+	}
+}
+
+.problem-icon-list {
+	display: flex;
+	flex-wrap: wrap;
+
+	.problem-icon-list-item {
+		border-radius: 3px;
+		color: $btn-font-color;
+		display: inline-block;
+		flex: 0 0 7px;
+		font-size: 12px;
+		line-height: 1;
+		padding: 3px 4px 2px;
+		margin: 1px 0;
+
+		&:not(:last-of-type) {
+			margin-right: 5px;
 		}
 	}
 }
@@ -7642,6 +7667,246 @@ table.preprocessing-test-results {
 	}
 }
 
+// Input group
+
+.input-group {
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	width: 100%;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	input,
+	textarea {
+		flex: 1;
+		border-right: 0;
+
+		&:focus,
+		&:active {
+
+			+ .btn-undo {
+				border-top-color: $form-border-focus-color;
+				border-bottom-color: $form-border-focus-color;
+			}
+		}
+	}
+
+	button {
+		position: relative;
+
+		&.btn-change {
+			border-radius: 0;
+
+			&:disabled {
+				display: none;
+			}
+		}
+
+		&.btn-undo {
+			display: none;
+			width: 24px;
+			border-left: 0;
+			border-right: 0;
+			border-top: 1px solid $form-border-color;
+			border-bottom: 1px solid $form-border-color;
+			border-radius: 0;
+			background-color: $form-bg-color;
+			transition: border-color .2s ease-out, box-shadow .2s ease-out;
+
+			&::before {
+				position: absolute;
+				top: 0;
+				left: 0;
+				display: block;
+				width: 22px;
+				height: 22px;
+				content: '';
+				background: url(../img/icon-sprite.svg) no-repeat -119px -474px;
+			}
+
+			&.is-focused {
+				border-top: 1px solid $form-border-focus-color;
+				border-bottom: 1px solid $form-border-focus-color;
+			}
+
+			&:hover,
+			&:focus,
+			&:active {
+				border-top: 1px solid $form-border-focus-color;
+				border-bottom: 1px solid $form-border-focus-color;
+				@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+				&::before {
+					background-position: -431px -474px;
+				}
+			}
+		}
+
+		&.btn-dropdown-toggle {
+			border-color: $form-border-focus-color;
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+
+			&:disabled {
+				@extend %form-disabled;
+			}
+		}
+	}
+}
+
+.input-secret {
+	position: relative;
+	display: flex;
+	flex: 1;
+
+	input {
+		flex: 1;
+	}
+
+	button {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		opacity: 0;
+
+		&:enabled {
+			&:hover,
+			&:focus,
+			&:active {
+				opacity: 1;
+				animation: fadein .2s;
+			}
+		}
+	}
+}
+
+// Dropdown
+
+.btn-dropdown-container {
+	display: flex;
+}
+
+.icon-text {
+
+	&::before {
+		background: url(../img/icon-sprite.svg) no-repeat -87px -474px;
+	}
+
+	&:not(.highlighted):enabled {
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+
+			&::before {
+				background-position: -399px -474px;
+			}
+		}
+	}
+}
+
+.icon-secret {
+
+	&::before {
+		background: url(../img/icon-sprite.svg) no-repeat -87px -510px;
+	}
+
+	&:not(.highlighted):enabled {
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+
+			&::before {
+				background-position: -399px -510px;
+			}
+		}
+	}
+}
+
+.btn-dropdown-toggle {
+	white-space: nowrap;
+	overflow: hidden;
+	text-indent: -200px;
+
+	&[class*='icon-'] {
+		padding-left: 22px;
+
+		&::before {
+			position: absolute;
+			top: 0;
+			left: 0;
+			display: block;
+			width: 22px;
+			height: 22px;
+			content: '';
+		}
+	}
+
+	&::after {
+		position: absolute;
+		top: 6px;
+		right: 2px;
+		width: 10px;
+		height: 10px;
+		content: '';
+		background: url(../img/icon-sprite.svg) no-repeat -547px -431px;
+	}
+
+	&:enabled {
+		&:hover,
+		&:focus,
+		&:active {
+
+			&::after {
+				background-position: -604px -431px;
+			}
+		}
+	}
+
+	&[aria-expanded="true"] {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		&::after {
+			background: url(../img/icon-sprite.svg) no-repeat -604px -503px;
+		}
+
+		&:hover,
+		&:focus,
+		&:active {
+
+			&::after {
+				background: url(../img/icon-sprite.svg) no-repeat -604px -503px;
+			}
+		}
+	}
+}
+
+// Macros mass update tab.
+
+.checkbox-block {
+	display: none;
+	margin: 10px 0;
+}
+
+#tbl_macros.massupdate-remove {
+	th,
+	td {
+		display: none;
+	}
+
+	th:nth-child(1),
+	td:nth-child(1),
+	td.nowrap {
+		display: table-cell;
+	}
+}
+
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 
 	/* for IE11 only. Fixed cell height if table has 100% height */
@@ -7650,5 +7915,88 @@ table.preprocessing-test-results {
 		td {
 			height: 100%;
 		}
+	}
+}
+
+// HOST INTERFACES
+
+.interface-container {
+	width: fit-content;
+	width: -moz-fit-content;
+	padding-left: 0;
+
+	&:not(.interface-container-header):not(:empty) {
+		margin-bottom: 5px;
+
+		& ~ .interface-container:not(:empty) {
+			border-top: 1px solid $form-border-color;
+			padding-top: 10px;
+		}
+	}
+
+	&:empty {
+		display: none;
+	}
+
+	.interface-row {
+		display: grid;
+		grid-template-columns: 26px 36px 225px 175px 85px 100px 20px 1fr;
+		grid-template-rows: 24px 1fr;
+		gap: 5px;
+
+		&:not(:first-of-type) {
+			margin-top: 5px;
+		}
+
+		&[data-type] .interface-cell-details {
+			display: none;
+		}
+
+		.interface-cell {
+			align-self: center;
+
+			.interface-btn-toggle {
+				display: none;
+				@extend .btn-link;
+			}
+
+			&.interface-cell-header {
+				color: $font-alt-color;
+				text-align: left;
+			}
+
+			.table-forms-td-left,
+			.table-forms-td-right {
+				padding-bottom: 0;
+			}
+		}
+	}
+}
+
+// Host interface accordion for SNMP specific styles.
+.interface-row.list-accordion-item[data-type="2"] {
+	&.list-accordion-item-closed {
+		.interface-btn-toggle {
+			@extend .btn-widget-expand;
+		}
+
+		.list-accordion-item-body {
+			display: none;
+		}
+	}
+
+	&.list-accordion-item-opened {
+		.interface-btn-toggle {
+			@extend .btn-widget-collapse;
+		}
+
+		.list-accordion-item-body {
+			display: block;
+		}
+	}
+
+	.interface-btn-toggle {
+		display: inline-block;
+		@extend %btn-widget;
 	}
 }

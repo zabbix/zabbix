@@ -437,6 +437,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
 		$this->zbxTestDropdownSelectWait('condition_type', $data['select_tag']);
+		COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if ($data['select_tag'] === 'Event tag pair' && array_key_exists('newtag', $data)) {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('newtag'));
@@ -644,6 +645,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.event.corr")]');
 			$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('condition_type'));
 			$this->zbxTestDropdownSelectWait('condition_type', $tag['select_tag']);
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('tag'));
 			$this->zbxTestInputType('tag', $tag['tag_name']);
 

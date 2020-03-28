@@ -311,13 +311,14 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		// Checkbox: Selected items only.
 		$field_show_problems = (new CWidgetFieldCheckBox('show_problems', _('Show problems')))
 			->setAction(
-				'var on = jQuery(this).is(":checked");'.
+				'var on = jQuery(this).is(":checked"),'.
+					'widget = jQuery(this).closest(".ui-widget");'.
 				'jQuery("#graph_item_problems, #problem_name, #problemhosts_select")'.
 					'.prop("disabled", !on);'.
 				'jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");'.
-				'jQuery("[name=\"severities[]\"]").prop("disabled", !on);'.
-				'jQuery("[name=\"evaltype\"]").prop("disabled", !on);'.
-				'jQuery("input, button", jQuery("#tags_table_tags")).prop("disabled", !on);'
+				'jQuery("[name^=\"severities[\"]", widget).prop("disabled", !on);'.
+				'jQuery("[name=\"evaltype\"]", widget).prop("disabled", !on);'.
+				'jQuery("input, button", jQuery("#tags_table_tags", widget)).prop("disabled", !on);'
 			);
 
 		if (array_key_exists('show_problems', $this->data)) {
@@ -472,29 +473,19 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			));
 		}
 
+		$number_parser = new CNumberParser(['with_suffix' => true]);
+
 		// Validate Min/Max values in Axes tab.
 		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_SHOW) {
-			$lefty_min = $this->fields['lefty_min']->getValue();
-			$lefty_max = $this->fields['lefty_max']->getValue();
-			$lefty_min = ($lefty_min !== '') ? convertFunctionValue($lefty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
-			$lefty_max = ($lefty_max !== '') ? convertFunctionValue($lefty_max, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
-			$compare = true;
+			$lefty_min = $number_parser->parse($this->fields['lefty_min']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser->calcValue()
+				: '';
 
-			if (strlen(substr(strrchr($lefty_min, '.'), 1)) > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Min'),
-					_('too many decimal places')
-				);
-				$compare = false;
-			}
-			if (strlen(substr(strrchr($lefty_max, '.'), 1))  > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Max'),
-					_('too many decimal places')
-				);
-				$compare = false;
-			}
+			$lefty_max = $number_parser->parse($this->fields['lefty_max']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser->calcValue()
+				: '';
 
-			if ($compare && $lefty_min !== '' && $lefty_max !== ''
-					&& bccomp($lefty_min, $lefty_max, 4) >= 0) {
+			if ($lefty_min !== '' && $lefty_max !== '' && $lefty_min >= $lefty_max) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
@@ -502,27 +493,15 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		}
 
 		if ($this->fields['righty']->getValue() == SVG_GRAPH_AXIS_SHOW) {
-			$righty_min = $this->fields['righty_min']->getValue();
-			$righty_max = $this->fields['righty_max']->getValue();
-			$righty_min = ($righty_min != '') ? convertFunctionValue($righty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
-			$righty_max = ($righty_max != '') ? convertFunctionValue($righty_max, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
-			$compare = true;
+			$righty_min = $number_parser->parse($this->fields['righty_min']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser->calcValue()
+				: '';
 
-			if (strlen(substr(strrchr($righty_min, '.'), 1)) > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Min'),
-					_('too many decimal places')
-				);
-				$compare = false;
-			}
-			if (strlen(substr(strrchr($righty_max, '.'), 1))  > 4) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Max'),
-					_('too many decimal places')
-				);
-				$compare = false;
-			}
+			$righty_max = $number_parser->parse($this->fields['righty_max']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser->calcValue()
+				: '';
 
-			if ($compare && $righty_min !== '' && $righty_max !== ''
-					&& bccomp($righty_min, $righty_max, 4) >= 0) {
+			if ($righty_min !== '' && $righty_max !== '' && $righty_min >= $righty_max) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);

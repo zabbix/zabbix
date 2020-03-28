@@ -45,15 +45,15 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check layout at Host tab.
 		$this->zbxTestAssertElementValue('host', $name);
 		$this->zbxTestAssertElementValue('name', $visible_name);
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-dns"]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_1" and text()="IP"]/../input[@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_0" and text()="DNS"]/../input[@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-port"]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-default"]/input[@class="mainInterface checkbox-radio"][@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-default")]/input[@disabled]');
 
 		foreach (['SNMP', 'JMX', 'IPMI'] as $interface) {
-			$this->zbxTestAssertElementText('//tr[@id="'.$interface.'InterfacesFooter"]', 'No '.$interface.' interfaces found.');
+			$this->zbxTestAssertElementNotPresentXpath('//div[contains(@class,"interface-cell-type") and contains(text(),"'.$interface.'")]');
 		}
 
 		// Check layout at IPMI tab.
@@ -81,7 +81,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$macro = [];
 			$row = $table->getRow($i);
 			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
-			$macro['value'] = $row->query('xpath:./td[3]/textarea')->one()->getValue();
+			$macro['value'] = $row->query('xpath:./td[2]/div/textarea')->one()->getValue();
 			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
 
 			$macros['frontend'][] = $macro;

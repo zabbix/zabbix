@@ -80,6 +80,8 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_PROMETHEUS_TO_JSON;
 	if (0 == strcmp(str, "ZBX_PREPROC_CSV_TO_JSON"))
 		return ZBX_PREPROC_CSV_TO_JSON;
+	if (0 == strcmp(str, "ZBX_PREPROC_STR_REPLACE"))
+		return ZBX_PREPROC_STR_REPLACE;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;
@@ -224,9 +226,17 @@ void	zbx_mock_test_entry(void **state)
 				if (ZBX_VARIANT_NONE == value.type)
 					fail_msg("preprocessing result was empty value");
 
-				zbx_variant_convert(&value, ZBX_VARIANT_STR);
-				zbx_mock_assert_str_eq("processed value", zbx_mock_get_parameter_string("out.value"),
-						value.data.str);
+				if (ZBX_VARIANT_DBL == value.type)
+				{
+					zbx_mock_assert_double_eq("processed value",
+							atof(zbx_mock_get_parameter_string("out.value")), value.data.dbl);
+				}
+				else
+				{
+					zbx_variant_convert(&value, ZBX_VARIANT_STR);
+					zbx_mock_assert_str_eq("processed value", zbx_mock_get_parameter_string("out.value"),
+							value.data.str);
+				}
 			}
 			else
 			{
