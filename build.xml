@@ -24,6 +24,12 @@
 	 	<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
 	 	<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
 		<property name="screenshot_references_dir" value="${SCREENSHOT_REFERENCES_DIR}"/>
+		<condition property="phpunit_driver_address" value="${PHPUNIT_DRIVER_ADDRESS}" else="localhost">
+			<and>
+				<isset property="PHPUNIT_DRIVER_ADDRESS" />
+				<length string="${PHPUNIT_DRIVER_ADDRESS}" when="greater" length="0"/>
+			</and>
+		</condition>
 		<property environment="env"/>
 
 		<!-- Create bootstrap.php -->
@@ -38,6 +44,7 @@
 		<replace file="frontends/php/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/runtime/"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="frontends/php/tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>
