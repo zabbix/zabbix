@@ -1228,8 +1228,14 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.20rc1
 
 New features:
+..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 
 Bug fixes:
+..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
+A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+........S. [ZBX-9387] fixed incorrect maintenance calculations when DST changed to summer time (akozlovs)
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.19
