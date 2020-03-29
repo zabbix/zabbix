@@ -52,6 +52,12 @@ class testZBX6648 extends CLegacyWebTest {
 					'hostgroup' => 'Zabbix servers',
 					'triggers' => 'no triggers'
 				]
+			],
+			[
+				[
+					'hostgroup' => 'ZBX6648 Group No Hosts',
+					'triggers' => 'no hosts'
+				]
 			]
 		];
 	}
@@ -61,6 +67,7 @@ class testZBX6648 extends CLegacyWebTest {
 	 */
 	public function testZBX6648_eventFilter($zbx_data) {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
 		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
@@ -76,17 +83,17 @@ class testZBX6648 extends CLegacyWebTest {
 				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'disabled' :
+			case 'no hosts' :
 				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
 				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//div[@class="multiselect-control"]'.
-						'//button')->one()->click();
+				COverlayDialogElement::find()->all()->last()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Host groups');
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['hostgroup'].'"]');
 				break;
 			case 'no triggers' :
 				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				COverlayDialogElement::find()->all()->last()->setDataContext(['Host group' => $zbx_data['hostgroup']]);
 				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//div[@class="multiselect-control"]')
-						->asMultiselect()->one()->select($zbx_data['hostgroup']);
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['host'].'"]');
 				break;
 		}

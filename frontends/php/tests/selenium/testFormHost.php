@@ -254,10 +254,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
-		COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="Templates"]')
-				->one()->waitUntilClickable()->click();
+		COverlayDialogElement::find()->one()->setDataContext('Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux by Zabbix agent');
 
 		$this->zbxTestTextPresent('Template OS Linux by Zabbix agent');
@@ -321,10 +318,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
-		COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="Templates"]')
-				->one()->waitUntilClickable()->click();
+		COverlayDialogElement::find()->one()->setDataContext('Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux by Zabbix agent');
 
 		$this->zbxTestTextPresent('Template OS Linux by Zabbix agent');

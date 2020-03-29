@@ -88,7 +88,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=charts.view');
 		$this->zbxTestCheckHeader('Graphs');
 		$this->query('xpath://a[text()="Filter"]')->one()->click();
-		$filter = $this->query('name:zbx_filter')->asForm()->one()->highlight();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->fill([
 			'Host' => [
 				'values' => $this->hostName,

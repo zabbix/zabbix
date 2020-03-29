@@ -58,7 +58,8 @@ class COverlayDialogElement extends CElement {
 			return $this;
 		}
 
-		$form = $this->query('xpath:./div[@class="overlay-dialogue-controls"]/form')->asForm()->waitUntilPresent()->one();
+		$form = $this->query('xpath:./div[@class="overlay-dialogue-controls"]')->asForm(['normalized' => true])
+				->waitUntilPresent()->one();
 		$fields = $form->getFields();
 
 		if (!is_array($context)) {

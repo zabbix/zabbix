@@ -456,10 +456,7 @@ class testFormGraph extends CLegacyWebTest {
 
 			if (isset($data['host'])) {
 				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
-				$host->fill([
-					'values' => $this->host,
-					'context' => $this->hostGroup
-				]);
+				$host->fill($this->host);
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->zbxTestClickLinkText($this->itemSimple);
 			}
@@ -605,6 +602,9 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Hosts')->clear()->fill('Simple form test host');
+		$filter->submit();
 		$this->zbxTestTextPresent([
 			$data['name'],
 			'Graphs'
@@ -844,6 +844,7 @@ class testFormGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 

@@ -271,7 +271,7 @@ class testFormHostTags extends CWebTest {
 		$data['host_name'] = $this->update_host;
 
 		$this->page->login()->open('hosts.php');
-		$this->query('link:'.$this->update_host)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->update_host)->waitUntilPresent()->one()->click();
 		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
@@ -315,7 +315,7 @@ class testFormHostTags extends CWebTest {
 		$new_name = 'Host with tags for cloning - '.$action;
 
 		$this->page->login()->open('hosts.php');
-		$this->query('link:'.$this->clone_host)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->clone_host)->waitUntilPresent()->one()->click();
 		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
 		$form->getField('Host name')->fill($new_name);
 
@@ -334,7 +334,7 @@ class testFormHostTags extends CWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name)));
 
 		// Check created clone.
-		$this->query('link:'.$new_name)->one()->click();
+		$this->query('link,', $new_name)->one()->click();
 		$form->invalidate();
 		$name = $form->getField('Host name')->getValue();
 		$this->assertEquals($new_name, $name);

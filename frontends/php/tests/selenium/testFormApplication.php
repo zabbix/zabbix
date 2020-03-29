@@ -56,12 +56,8 @@ class testFormApplication extends CLegacyWebTest {
 		// Open an application.
 		$this->zbxTestLogin('applications.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-//		$filter->getField('Host groups')->select('Zabbix servers'); // until sunissue 54 in zbxnext-5702 is fixed
-//		$filter->getField('Hosts')->select('Simple form test host');
-		$filter->getField('Hosts')->fill([
-			'values' => 'Simple form test host',
-			'context' => 'Zabbix servers'
-		]);
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->getField('Hosts')->select('Simple form test host');
 		$filter->submit();
 		$this->zbxTestClickLinkTextWait($name);
 
@@ -95,12 +91,8 @@ class testFormApplication extends CLegacyWebTest {
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-//		$filter->getField('Host groups')->select('Zabbix servers'); // until sunissue 54 in zbxnext-5702 is fixed
-//		$filter->getField('Hosts')->select('Simple form test host');
-		$filter->getField('Hosts')->fill([
-			'values' => 'Simple form test host',
-			'context' => 'Zabbix servers'
-		]);
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->getField('Hosts')->select('Simple form test host');
 		$filter->submit();
 		$this->zbxTestContentControlButtonClickTextWait('Create application');
 
@@ -124,12 +116,8 @@ class testFormApplication extends CLegacyWebTest {
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-//		$filter->getField('Host groups')->select('Zabbix servers'); // until sunissue 54 in zbxnext-5702 is fixed
-//		$filter->getField('Hosts')->select('Simple form test host');
-		$filter->getField('Hosts')->fill([
-			'values' => 'Simple form test host',
-			'context' => 'Zabbix servers'
-		]);
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->getField('Hosts')->select('Simple form test host');
 		$filter->submit();
 		$this->zbxTestContentControlButtonClickTextWait('Create application');
 
@@ -180,12 +168,8 @@ class testFormApplication extends CLegacyWebTest {
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-//		$filter->getField('Host groups')->select('Zabbix servers'); // until sunissue 54 in zbxnext-5702 is fixed
-//		$filter->getField('Hosts')->select('Simple form test host');
-		$filter->getField('Hosts')->fill([
-			'values' => 'Simple form test host',
-			'context' => 'Zabbix servers'
-		]);
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->getField('Hosts')->select('Simple form test host');
 		$filter->submit();
 		$this->zbxTestClickLinkTextWait(self::$application);
 
@@ -211,12 +195,8 @@ class testFormApplication extends CLegacyWebTest {
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-//		$filter->getField('Host groups')->select('Zabbix servers'); // until sunissue 54 in zbxnext-5702 is fixed
-//		$filter->getField('Hosts')->select('Simple form test host');
-		$filter->getField('Hosts')->fill([
-			'values' => 'Simple form test host',
-			'context' => 'Zabbix servers'
-		]);
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->getField('Hosts')->select('Simple form test host');
 		$filter->submit();
 		$this->zbxTestClickLinkTextWait($name);
 
@@ -240,12 +220,8 @@ class testFormApplication extends CLegacyWebTest {
 		// Select hostgroup and host, open a form.
 		$this->zbxTestLogin('applications.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-//		$filter->getField('Host groups')->select('Zabbix servers'); // until sunissue 54 in zbxnext-5702 is fixed
-//		$filter->getField('Hosts')->select('Simple form test host');
-		$filter->getField('Hosts')->fill([
-			'values' => 'Simple form test host',
-			'context' => 'Zabbix servers'
-		]);
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->getField('Hosts')->select('Simple form test host');
 		$filter->submit();
 		$this->zbxTestClickLinkTextWait($name);
 

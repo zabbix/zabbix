@@ -85,10 +85,6 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => 'Templates'
 					],
 					[
-						'url' => 'templates.php?form=update&templateid=10001',
-						'text_present' => 'Templates'
-					],
-					[
 						'url' => 'templates.php?form=update&templateid=9999999',
 						'text_not_present' => 'Templates',
 						'text_present' => [
@@ -139,10 +135,6 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => 'Hosts'
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=10084',
-						'text_present' => 'Hosts'
-					],
-					[
 						'url' => 'hosts.php?form=update&hostid=9999999',
 						'text_not_present' => 'Hosts',
 						'text_present' => [
@@ -188,10 +180,6 @@ class testUrlParameters extends CLegacyWebTest {
 				'check_server_name' => true,
 				'server_name_on_page' => true,
 				'test_cases' => [
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=1',
-						'text_present' => 'Maintenance periods'
-					],
 					[
 						'url' => 'maintenance.php?form=update&maintenanceid=1',
 						'text_present' => 'Maintenance periods'

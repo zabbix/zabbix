@@ -56,7 +56,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 
 		foreach (['Available host', 'SLA reports host', 'ЗАББИКС Сервер'] as $host) {
-			$filter->getField('Hosts')->select($host);
+			$filter->getField('Hosts')->fill($host);
 		}
 		$filter->getField('Host groups')->clear();
 		$filter->getField('Hosts')->clear();
@@ -68,7 +68,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 
 		// Check host breadcrumbs text and url.
-		$filter->getField('Hosts')->select($host_name);
+		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
 		$breadcrumbs = [
 			'hosts.php' => 'All hosts',

@@ -676,24 +676,6 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	/**
-	 * Select option for select element inside 'Main filter' area.
-	 *
-	 * @param string $name   Select tag name attribute.
-	 * @param string $value  Option value to select.
-	 *
-	 * @throws NoSuchElementException
-	 */
-	public function zbxTestMainFilterDropdownSelectWait($name, $value) {
-		$xpath = "//div[contains(@class, 'header-title')]".
-					"//form[@aria-label='Main filter']".
-						"//select[@name='{$name}']".
-							"/option[@value='{$value}']";
-
-		$this->zbxTestClickXpathWait($xpath);
-		$this->zbxTestWaitForPageToLoad();
-	}
-
-	/**
 	 * Get dropdown element by id or name.
 	 *
 	 * @param string $id    dropdown id or name

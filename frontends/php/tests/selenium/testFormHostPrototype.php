@@ -572,7 +572,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Host groups');
 			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="Templates"]')
 					->one()->waitUntilClickable()->click();
-			$this->zbxTestClickLinkText($data['template']);
+			$this->query('link', $data['template'])->waitUntilClickable()->one()->click();
 		}
 
 		// Change inventory mode.
