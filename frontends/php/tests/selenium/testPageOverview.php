@@ -107,7 +107,6 @@ class testPageOverview extends CLegacyWebTest {
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
 						'Minimum severity' => 'Warning',
-//						'Severity' => ['Warning', 'Average', 'High', 'Disaster']
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview'
@@ -124,7 +123,6 @@ class testPageOverview extends CLegacyWebTest {
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
 						'Minimum severity' => 'Average',
-//						'Severity' => ['Average', 'High', 'Disaster']
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview'
@@ -140,7 +138,6 @@ class testPageOverview extends CLegacyWebTest {
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
 						'Minimum severity' => 'High',
-//						'Severity' => ['High', 'Disaster']
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview'
@@ -156,7 +153,6 @@ class testPageOverview extends CLegacyWebTest {
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
 						'Minimum severity' => 'Disaster',
-//						'Severity' => ['Disaster']
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview'
@@ -291,7 +287,6 @@ class testPageOverview extends CLegacyWebTest {
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
 						'Minimum severity' => 'Average',
-//						'Severity' => ['Average', 'High', 'Disaster'],
 						'Show' => 'Any',
 						'Application' => '3 application',
 						'Name' => '3_'

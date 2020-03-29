@@ -115,12 +115,14 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('templates.php');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->fill([
 			'Host groups'	=> 'Templates',
-			'Linked templates' => ['values' => 'Template Module ICMP Ping', 'context' => 'Templates']
+			'Linked templates' => 'Template Module ICMP Ping'
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();

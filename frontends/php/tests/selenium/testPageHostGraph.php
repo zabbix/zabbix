@@ -444,10 +444,8 @@ class testPageHostGraph extends CLegacyWebTest {
 				// Select host group.
 				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
 				$this->zbxTestLaunchOverlayDialog('Host groups');
-				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$data['group'].'"]')
-						->one()->waitUntilClickable()->click();
+				COverlayDialogElement::find()->all()->last()->query('link', $data['group'])->waitUntilVisible()->one()->click();
 				$this->query('id:overlay-bg')->waitUntilNotVisible();
-
 				foreach ($data['targets'] as $target) {
 					$result = DBselect('SELECT hostid FROM hosts WHERE host='. zbx_dbstr($target));
 					while ($row = DBfetch($result)) {

@@ -170,8 +170,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		foreach ($data['templates'] as $template) {
 			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
 			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="'.$template['group'].'"]')
-					->one()->waitUntilClickable()->click();
+			COverlayDialogElement::find()->all()->last()->query('link', $template['group'])->one()->waitUntilClickable()->click();
 			$this->zbxTestClickLinkTextWait($template['name']);
 			$this->zbxTestWaitForPageToLoad();
 		}
@@ -338,10 +337,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			foreach ($data['templates'] as $template) {
 				$this->zbxTestClickButtonMultiselect('add_templates_');
 				$this->zbxTestLaunchOverlayDialog('Templates');
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-				$this->zbxTestLaunchOverlayDialog('Host groups');
-				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="Templates"]')
-						->one()->waitUntilClickable()->click();
+				COverlayDialogElement::find()->one()->setDataContext('Templates');
 				$this->zbxTestClickLinkTextWait($template['name']);
 				$this->zbxTestWaitForPageToLoad();
 			}
@@ -461,10 +457,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]//a[text()="Templates"]')
-					->one()->waitUntilClickable()->click();
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 

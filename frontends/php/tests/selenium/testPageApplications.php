@@ -142,6 +142,8 @@ class testPageApplications extends CLegacyWebTest {
 	}
 
 	public function selectApplications($app_names, $host, $hostgroup) {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
 		$this->zbxTestWaitForPageToLoad();
 		// Filter applications by host

@@ -143,6 +143,8 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search by all options in filter
 	 */
 	public function testPageProblems_FilterByAllOptions() {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
@@ -156,9 +158,6 @@ class testPageProblems extends CLegacyWebTest {
 		// Select host
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->query('xpath://a[text()="Zabbix servers"]')->one()->waitUntilClickable()->click();
 		$this->zbxTestClickWait('spanid10084');
 
 		// Type application
@@ -383,15 +382,16 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_SuppressedProblems() {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->query('xpath://a[text()="Host group for suppression"]')->one()->waitUntilClickable()->click();
+		COverlayDialogElement::find()->one()->setDataContext('Host group for suppression');
+
 		$this->zbxTestClickLinkTextWait('Host for suppression');
 		$this->zbxTestClickButtonText('Apply');
 
