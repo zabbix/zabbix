@@ -1,1 +1,0 @@
-...G...... [ZBX-17502] fixed possible hang in agent2 when executing some metrics that forked another process (vso)
