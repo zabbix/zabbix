@@ -97,12 +97,18 @@ void	zbx_mock_test_entry(void **state)
 	{
 		zbx_mock_handle_t	handle;
 		const char		*expected_value;
+		char			*ptr;
+		double			expected_dbl;
 
 		handle = zbx_mock_get_parameter_handle("out.value");
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string_ex(handle, &expected_value)))
 			fail_msg("Cannot read output value: %s", zbx_mock_error_string(err));
 
-		zbx_mock_assert_double_eq("function result", atof(expected_value),atof(returned_value));
+		expected_dbl = strtod(expected_value, &ptr);
+		if (strlen(expected_value) == (size_t)(ptr - expected_value))
+			zbx_mock_assert_double_eq("function result", expected_dbl, atof(returned_value));
+		else
+			zbx_mock_assert_str_eq("function result", expected_value, returned_value);
 	}
 	zbx_free(returned_value);
 
