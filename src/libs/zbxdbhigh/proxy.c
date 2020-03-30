@@ -4653,6 +4653,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 			if (0 < proxy_diff->suppress_win.values_num)
 			{
+				proxy_diff->hostid = proxy->hostid;
 				proxy_diff->flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
 				zbx_dc_update_proxy(proxy_diff);
 			}
