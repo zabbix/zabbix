@@ -176,6 +176,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 
 	while (NULL != (row = DBfetch(result)))
 	{
+
 		condition = (lld_condition_t *)zbx_malloc(NULL, sizeof(lld_condition_t));
 		ZBX_STR2UINT64(condition->id, row[0]);
 		condition->macro = zbx_strdup(NULL, row[1]);
@@ -203,12 +204,11 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item, NULL, NULL,
 					&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
 		}
+
 	}
 	DBfree_result(result);
 
-	if (SUCCEED != ret)
-		lld_conditions_free(&filter->conditions);
-	else if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+	if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 out:
 	DCconfig_clean_items(&item, &errcode, 1);
