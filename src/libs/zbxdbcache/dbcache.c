@@ -2447,9 +2447,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 static void	proxy_subscribtions_increment(zbx_vector_uint64_pair_t *proxy_subscribtions, zbx_uint64_t proxy_hostid)
 {
 	int			i;
-	zbx_uint64_pair_t	phid;
-
-	phid.first = proxy_hostid;
+	zbx_uint64_pair_t	phid = {proxy_hostid, 0};
 
 	if (FAIL == (i = zbx_vector_uint64_pair_search(proxy_subscribtions, phid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 	{
