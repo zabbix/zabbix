@@ -178,4 +178,13 @@ in:
   expression: '{1} < {$A:"x:\"1\""}'
 out:
   expression: '{1} < {$A:"x:\"1\""}'
+---
+test case: Expand '{2000} < {$A}' with {$A}=2e+3
+in:
+  macros:
+    - name: '{$A}'
+      value: 2000
+  expression: '{2000} < {$A}'
+out:
+  expression: '{2000} < 2000'
 ...

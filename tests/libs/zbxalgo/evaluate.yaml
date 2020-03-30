@@ -280,6 +280,78 @@ out:
   value: 0
   return: 'SUCCEED'
 
+# scientific notation tests
+---
+test case: 'scientific notation, simple comparison'
+in:
+  expression: '"1e+0"=1'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, large int number'
+in:
+  expression: '"1e+40"=10000000000000000000000000000000000000000'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, large string number'
+in:
+  expression: '"1e+40"="10000000000000000000000000000000000000000"'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, negative exponent'
+in:
+  expression: '"1e-40"="0.00000000000000000000000000000000000000001"'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, precision limit holds'
+in:
+  expression: '"1e+40"=10000000000000001000000000000000000000000'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, precision limit does not hold'
+in:
+  expression: '"1e+40"=10000000000000000100000000000000000000000'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, precision limit does not hold 2'
+in:
+  expression: '"1e+40"<>10000000000000000000000000000000000000001'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, negative number'
+in:
+  expression: '-10000000000000000000000000000000000000000="-1e+40"'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, negative number 2'
+in:
+  expression: '-10000000000000000000000000000000000000000="1e+40"'
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'scientific notation, addition'
+in:
+  expression: '("-1e+40"+10000000000000000000000000000000000000000)=0'
+out:
+  value: 1
+  return: 'SUCCEED'
+
 # '-' operator tests
 ---
 test case: 'term 8, one on its own'
@@ -1426,9 +1498,9 @@ out:
   value: 1
   return: 'SUCCEED'
 ---
-test case: 'Valid expression "-5 + 10 * -6 - 700 / (49 * (1 / (2 + 5))) = -165"'
+test case: 'Valid expression "-5 + 10 * -6  + 1e+2 + "1e+3" - 700 / (49 * (1 / (2 + 5))) = 935"'
 in:
-  expression: '-5 + 10 * -6 - 700 / (49 * (1 / (2 + 5))) = -165'
+  expression: '-5 + 10 * -6 + 1e+2 + "1e+3" - 700 / (49 * (1 / (2 + 5))) = 935'
 out:
   value: 1
   return: 'SUCCEED'

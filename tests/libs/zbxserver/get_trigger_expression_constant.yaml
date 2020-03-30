@@ -180,4 +180,11 @@ in:
   index: 1
 out:
   return: ''
+---
+test case: 'string constant -10e-10'
+in:
+  expression: '{TRIGGER.VALUE}=1 and {19928}<>"-10e-10"'
+  index: 2
+out:
+  return: '-10e-10'
 ...
