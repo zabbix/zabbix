@@ -586,8 +586,8 @@ static void	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rul
 	}
 	DBfree_result(result);
 
-	//if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
-	//	zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
+	/* if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype) */
+	/*	zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro); */
 
 	DBcommit();
 	zbx_free(sql);
