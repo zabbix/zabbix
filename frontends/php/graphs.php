@@ -53,8 +53,8 @@ $fields = [
 	'yaxismax' =>			[T_ZBX_DBL, O_OPT, null,		null,			'(isset({add}) || isset({update})) && isset({graphtype}) && ({graphtype} == '.GRAPH_TYPE_NORMAL.' || {graphtype} == '.GRAPH_TYPE_STACKED.')'],
 	'ymin_itemid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymin_type}) && {ymin_type} == '.GRAPH_YAXIS_TYPE_ITEM_VALUE],
 	'ymax_itemid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymax_type}) && {ymax_type} == '.GRAPH_YAXIS_TYPE_ITEM_VALUE],
-	'percent_left' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (left)')],
-	'percent_right' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (right)')],
+	'percent_left' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (left)')],
+	'percent_right' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (right)')],
 	'visible' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null],
 	'items' =>				[T_ZBX_STR, O_OPT, null,		null,			null],
 	'show_work_period' =>	[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
@@ -458,8 +458,8 @@ elseif (isset($_REQUEST['form'])) {
 		$data['height'] = $graph['height'];
 		$data['ymin_type'] = $graph['ymin_type'];
 		$data['ymax_type'] = $graph['ymax_type'];
-		$data['yaxismin'] = $graph['yaxismin'];
-		$data['yaxismax'] = $graph['yaxismax'];
+		$data['yaxismin'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismin']);
+		$data['yaxismax'] = sprintf('%.'.ZBX_FLOAT_DIG.'G', $graph['yaxismax']);
 		$data['ymin_itemid'] = $graph['ymin_itemid'];
 		$data['ymax_itemid'] = $graph['ymax_itemid'];
 		$data['show_work_period'] = $graph['show_work_period'];

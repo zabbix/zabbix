@@ -534,7 +534,7 @@ class CImage extends CApiService {
 		// check size
 		if (bccomp(strlen($image), ZBX_MAX_IMAGE_SIZE) == 1) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Image size must be less than %1$s.', convert_units([
+				_s('Image size must be less than %1$s.', convertUnits([
 					'value' => ZBX_MAX_IMAGE_SIZE,
 					'units' => 'B'
 				]))

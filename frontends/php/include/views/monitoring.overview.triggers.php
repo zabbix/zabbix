@@ -120,13 +120,13 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]));
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	// filter
 	$widget->addItem(new CPartial('common.filter.trigger', [
 		'filter' => [
@@ -150,9 +150,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
-	global $page;
-
-	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style']);
+	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $data['view_style']);
 }
 else {
 	$dataTable = new CTableInfo();

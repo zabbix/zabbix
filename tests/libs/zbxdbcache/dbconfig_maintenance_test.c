@@ -23,3 +23,9 @@ int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, cons
 {
 	return dc_maintenance_match_tags(maintenance, tags);
 }
+
+int	dc_check_maintenance_period_test(const zbx_dc_maintenance_t *maintenance,
+		const zbx_dc_maintenance_period_t *period, time_t now, time_t *running_since, time_t *running_until)
+{
+	return dc_check_maintenance_period(maintenance, period, now, running_since, running_until);
+}

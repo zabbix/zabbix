@@ -38,10 +38,10 @@
 				return $('form[name=items]');
 			},
 			addMessages: function(messages) {
-				$('main').prepend(messages);
+				$('.wrapper main').before(messages);
 			},
 			removeMessages: function() {
-				$('main .msg-bad').remove();
+				$('.wrapper .msg-bad').remove();
 			},
 			refresh: function() {
 				this.setLoading();
@@ -274,7 +274,7 @@
 			}
 		};
 
-		window.latest_page = new latestPage(true);
+		window.latest_page = new latestPage();
 		window.latest_page.hydrate();
 	});
 </script>

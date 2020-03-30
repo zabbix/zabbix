@@ -78,7 +78,6 @@ class CTag extends CObject {
 			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= '>';
-//		$res .= ($this->paired) ? '>' : ' />';
 
 		return $res;
 	}

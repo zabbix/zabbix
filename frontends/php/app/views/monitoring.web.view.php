@@ -50,7 +50,7 @@ $web_layout_mode = $this->getLayoutMode();
 					$data['pageFilter']->getHostsCB()
 				])
 			),
-		(new CTag('nav', true, get_icon('fullscreen', ['mode' => $web_layout_mode])))
+		(new CTag('nav', true, get_icon('kioskmode', ['mode' => $web_layout_mode])))
 			->setAttribute('aria-label', _('Content controls'))
 		])))
 	->addItem(

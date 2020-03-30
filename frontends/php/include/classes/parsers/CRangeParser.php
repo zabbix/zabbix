@@ -200,7 +200,7 @@ class CRangeParser extends CParser {
 			return false;
 		}
 
-		if (bccomp($matches[0], ZBX_MAX_INT32) > 0) {
+		if ($matches[0] > ZBX_MAX_INT32) {
 			return false;
 		}
 

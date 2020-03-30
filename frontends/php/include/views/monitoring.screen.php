@@ -27,7 +27,7 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 
 $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$widget
 		->setTitle(_('Screens'))
 		->setTitleSubmenu([
@@ -99,7 +99,7 @@ $controls
 			'elid' => $data['screen']['screenid']
 		]
 	))
-	->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
+	->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 
 $widget->setControls((new CTag('nav', true, (new CList())
 	->addItem((new CForm('get'))

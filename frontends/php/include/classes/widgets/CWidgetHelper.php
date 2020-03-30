@@ -401,6 +401,7 @@ class CWidgetHelper {
 	public static function getSeverities($field) {
 		return (new CSeverityCheckBoxList($field->getName()))
 			->setChecked($field->getValue())
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 

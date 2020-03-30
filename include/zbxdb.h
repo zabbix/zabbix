@@ -94,6 +94,8 @@ int	zbx_db_txn_error(void);
 int	zbx_db_txn_end_error(void);
 const char	*zbx_db_last_strerr(void);
 
+int	zbx_dbms_get_version(void);
+
 #ifdef HAVE_ORACLE
 
 /* context for dynamic parameter binding */
