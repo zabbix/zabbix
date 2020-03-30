@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-26T00:00:00Z</date>
+    <date>2020-03-28T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Redmine</name>
@@ -101,12 +101,12 @@
 &#13;
                 Object.keys(fields)&#13;
                     .forEach(function(field) {&#13;
-                        var field_value;&#13;
-&#13;
                         for (var idx in schema.custom_fields) {&#13;
                             if (schema.custom_fields[idx].id != field) {&#13;
                                 continue;&#13;
                             }&#13;
+&#13;
+                            var field_value;&#13;
 &#13;
                             switch (schema.custom_fields[idx].field_format) {&#13;
                                 case 'string':&#13;
@@ -126,8 +126,6 @@
                                         field_value = fields[field].replace(/\./g, '-');&#13;
                                     }&#13;
                                     break;&#13;
-                                default:&#13;
-                                    field_value = undefined;&#13;
                             }&#13;
 &#13;
                             if (field_value) {&#13;
