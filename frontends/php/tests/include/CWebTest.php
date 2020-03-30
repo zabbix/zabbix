@@ -237,6 +237,8 @@ class CWebTest extends CTest {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		// Reset default fill mode for multiselect elements.
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 		if (!self::$shared_page->cleanup()) {
 			self::closePage();
 		}

@@ -334,7 +334,7 @@ class testFormHostTags extends CWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name)));
 
 		// Check created clone.
-		$this->query('link,', $new_name)->one()->click();
+		$this->query('link', $new_name)->one()->click();
 		$form->invalidate();
 		$name = $form->getField('Host name')->getValue();
 		$this->assertEquals($new_name, $name);
