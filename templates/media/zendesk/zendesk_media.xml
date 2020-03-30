@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-26T16:15:07Z</date>
+    <date>2020-03-30T11:20:56Z</date>
     <media_types>
         <media_type>
             <name>Zendesk</name>
@@ -96,10 +96,7 @@
                     <value>&lt;put your Zendesk URL&gt;</value>
                 </parameter>
             </parameters>
-            <script>var Base64={_keyStr:&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&quot;,encode:function(r){var t,e,a,o,h,n,C,c=&quot;&quot;,i=0;for(r=Base64._utf8_encode(r);i&lt;r.length;)o=(t=r.charCodeAt(i++))&gt;&gt;2,h=(3&amp;t)&lt;&lt;4|(e=r.charCodeAt(i++))&gt;&gt;4,n=(15&amp;e)&lt;&lt;2|(a=r.charCodeAt(i++))&gt;&gt;6,C=63&amp;a,isNaN(e)?(n=64,C=64):isNaN(a)&amp;&amp;(C=64),c=c+this._keyStr.charAt(o)+this._keyStr.charAt(h)+this._keyStr.charAt(n)+this._keyStr.charAt(C);return c},_utf8_encode:function(r){r=r.replace(/\r\n/g,&quot;\n&quot;);for(var t=&quot;&quot;,e=0;e&lt;r.length;e++){var a=r.charCodeAt(e);a&lt;128?t+=String.fromCharCode(a):a&gt;127&amp;&amp;a&lt;2048?(t+=String.fromCharCode(a&gt;&gt;6|192),t+=String.fromCharCode(63&amp;a|128)):(t+=String.fromCharCode(a&gt;&gt;12|224),t+=String.fromCharCode(a&gt;&gt;6&amp;63|128),t+=String.fromCharCode(63&amp;a|128))}return t}};function btoa(s){return Base64.encode(s);}&#13;
-// All the code above this line should be removed after ZBXNEXT-5734 is done.&#13;
-&#13;
-var Zendesk = {&#13;
+            <script>var Zendesk = {&#13;
     params: {},&#13;
 &#13;
     setParams: function (params) {&#13;
@@ -179,11 +176,8 @@ var Zendesk = {&#13;
         if (typeof data !== 'undefined') {&#13;
             data = JSON.stringify(data);&#13;
         }&#13;
-        else {&#13;
-            data = '';&#13;
-        }&#13;
 &#13;
-        Zabbix.Log(4, '[Zendesk Webhook] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));&#13;
+        Zabbix.Log(4, '[Zendesk Webhook] Sending request: ' + url + ((typeof data === 'string') ? (' ' + data) : ''));&#13;
 &#13;
         switch (method) {&#13;
             case 'get':&#13;
@@ -202,7 +196,7 @@ var Zendesk = {&#13;
                 throw 'Unsupported HTTP request method: ' + method;&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[Zendesk Webhook] Received response with status code ' + request.Status() + '\n' + response);&#13;
+        Zabbix.Log(4, '[Zendesk Webhook] Received response with status code ' + request.Status() + '. ' + response);&#13;
 &#13;
         if (response !== null) {&#13;
             try {&#13;
@@ -267,9 +261,9 @@ try {&#13;
         result = {tags: {}},&#13;
         required_params = [&#13;
             'alert_subject',&#13;
+            'alert_message',&#13;
             'event_id',&#13;
             'event_name',&#13;
-            'event_nseverity',&#13;
             'event_source',&#13;
             'event_value',&#13;
             'event_update_status'&#13;
@@ -298,7 +292,7 @@ try {&#13;
             else if (key.startsWith('event_update_')) {&#13;
                 update[key.substring(13)] = params[key];&#13;
             }&#13;
-            else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
+            else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key].trim() === '') {&#13;
                 throw 'Parameter ' + key + ' cannot be empty.';&#13;
             }&#13;
         });&#13;
@@ -333,7 +327,7 @@ try {&#13;
 &#13;
     // Zendesk_issue_key must be a positive integer if an update action is being performed.&#13;
     if (params.event_source === '0' &amp;&amp; ((params.event_value === '1' &amp;&amp; params.event_update_status === '1')&#13;
-        || (params.event_value === '0' &amp;&amp; params.event_update_status === '0'))&#13;
+        || (params.event_value === '0' &amp;&amp; (params.event_update_status === '0' || params.event_update_status === '1')))&#13;
         &amp;&amp; (isNaN(parseInt(params.zendesk_issue_key)) || parseInt(params.zendesk_issue_key) &lt; 1 )) {&#13;
         throw 'Incorrect &quot;zendesk_issue_key&quot; parameter given: ' + params.zendesk_issue_key +&#13;
             '\nMust be positive integer.';&#13;
@@ -432,11 +426,7 @@ Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
 Operational data: {EVENT.OPDATA}&#13;
 Original problem ID: {EVENT.ID}&#13;
-{TRIGGER.URL}&#13;
-event source: {EVENT.SOURCE}&#13;
-event value: {EVENT.VALUE}&#13;
-event upd status: {EVENT.UPDATE.STATUS}&#13;
-event rec value: {EVENT.RECOVERY.VALUE}</message>
+{TRIGGER.URL}&#13;</message>
                 </message_template>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
@@ -448,11 +438,7 @@ Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
 Operational data: {EVENT.OPDATA}&#13;
 Original problem ID: {EVENT.ID}&#13;
-{TRIGGER.URL}&#13;
-event source: {EVENT.SOURCE}&#13;
-event value: {EVENT.VALUE}&#13;
-event upd status: {EVENT.UPDATE.STATUS}&#13;
-event rec value: {EVENT.RECOVERY.VALUE}</message>
+{TRIGGER.URL}&#13;</message>
                 </message_template>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
@@ -461,11 +447,7 @@ event rec value: {EVENT.RECOVERY.VALUE}</message>
                     <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
 {EVENT.UPDATE.MESSAGE}&#13;
 &#13;
-Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.&#13;
-event source: {EVENT.SOURCE}&#13;
-event value: {EVENT.VALUE}&#13;
-event upd status: {EVENT.UPDATE.STATUS}&#13;
-event rec value: {EVENT.RECOVERY.VALUE}</message>
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.&#13;</message>
                 </message_template>
                 <message_template>
                     <event_source>DISCOVERY</event_source>
@@ -481,11 +463,7 @@ Device uptime: {DISCOVERY.DEVICE.UPTIME}&#13;
 Device service name: {DISCOVERY.SERVICE.NAME}&#13;
 Device service port: {DISCOVERY.SERVICE.PORT}&#13;
 Device service status: {DISCOVERY.SERVICE.STATUS}&#13;
-Device service uptime: {DISCOVERY.SERVICE.UPTIME}&#13;
-event source: {EVENT.SOURCE}&#13;
-event value: {EVENT.VALUE}&#13;
-event upd status: {EVENT.UPDATE.STATUS}&#13;
-event rec value: {EVENT.RECOVERY.VALUE}</message>
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}&#13;</message>
                 </message_template>
                 <message_template>
                     <event_source>AUTOREGISTRATION</event_source>
@@ -493,11 +471,7 @@ event rec value: {EVENT.RECOVERY.VALUE}</message>
                     <subject>Autoregistration: {HOST.HOST}</subject>
                     <message>Host name: {HOST.HOST}&#13;
 Host IP: {HOST.IP}&#13;
-Agent port: {HOST.PORT}&#13;
-event source: {EVENT.SOURCE}&#13;
-event value: {EVENT.VALUE}&#13;
-event upd status: {EVENT.UPDATE.STATUS}&#13;
-event rec value: {EVENT.RECOVERY.VALUE}</message>
+Agent port: {HOST.PORT}&#13;</message>
                 </message_template>
                 <message_template>
                     <event_source>INTERNAL</event_source>
@@ -507,11 +481,7 @@ event rec value: {EVENT.RECOVERY.VALUE}</message>
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
 Operational data: {EVENT.OPDATA}&#13;
-Original problem ID: {EVENT.ID}&#13;
-event source: {EVENT.SOURCE}&#13;
-event value: {EVENT.VALUE}&#13;
-event upd status: {EVENT.UPDATE.STATUS}&#13;
-event rec value: {EVENT.RECOVERY.VALUE}</message>
+Original problem ID: {EVENT.ID}&#13;</message>
                 </message_template>
             </message_templates>
         </media_type>
