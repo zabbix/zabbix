@@ -148,38 +148,17 @@ class OracleDbBackend extends DbBackend {
 	public function isDoubleIEEE754() {
 		global $DB;
 
-		$table_columns = [];
-		$table_columns_cnt = 0;
-
-		foreach (DB::getSchema() as $table_name => $table_spec) {
-			foreach ($table_spec['fields'] as $field_name => $field_spec) {
-				if ($field_spec['type'] === DB::FIELD_TYPE_FLOAT) {
-					$table_columns[$table_name][] = zbx_dbstr($field_name);
-					$table_columns_cnt++;
-				}
-			}
-		}
-
-		if (!$table_columns) {
-			return true;
-		}
-
-		$conditions_or = [];
-
-		foreach ($table_columns as $table_name => $fields) {
-			$conditions_or[] = '(LOWER(table_name) LIKE '.zbx_dbstr($table_name).
-				' AND LOWER(column_name) IN ('.implode(', ', $fields).'))';
-		}
+		$conditions_or = [
+			'(table_name=\'HISTORY\' AND column_name=\'VALUE\')',
+			'(table_name=\'TRENDS\' AND column_name IN (\'VALUE_MIN\', \'VALUE_AVG\', \'VALUE_MAX\'))'
+		];
 
 		$sql =
 			'SELECT COUNT(*) cnt FROM user_tab_columns'.
-				' WHERE data_type LIKE '.zbx_dbstr($DB['DATABASE']).
-				' AND column_type LIKE "BINARY_DOUBLE"'.
-				' AND ('.implode(' OR ', $conditions_or).')';
-
+				' WHERE data_type=\'BINARY_DOUBLE\' AND ('.implode(' OR ', $conditions_or).')';
 
 		$result = DBfetch(DBselect($sql));
 
-		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == $table_columns_cnt);
+		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == 4);
 	}
 }
