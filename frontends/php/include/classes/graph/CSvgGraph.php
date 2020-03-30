@@ -454,7 +454,6 @@ class CSvgGraph extends CSvg {
 	 * @return CSvgGraph
 	 */
 	public function draw() {
-		$this->applyMissingDataFunc();
 		$this->calculateDimensions();
 		$this->calculatePaths();
 
@@ -835,13 +834,13 @@ class CSvgGraph extends CSvg {
 
 					if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR
 							|| $metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
-						$paths[] = [$x, ceil($y), convert_units([
+						$paths[] = [$x, ceil($y), convertUnits([
 							'value' => $point,
 							'units' => $metric['units']
 						])];
 					}
 					else {
-						$paths[$path_num][] = [$x, ceil($y), convert_units([
+						$paths[$path_num][] = [$x, ceil($y), convertUnits([
 							'value' => $point,
 							'units' => $metric['units']
 						])];
