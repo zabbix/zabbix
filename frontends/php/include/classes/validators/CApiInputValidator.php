@@ -437,12 +437,12 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ((!is_int($data) && !is_string($data)) || preg_match('/^\-?[0-9]+$/', strval($data)) !== 1) {
+		if ((!is_int($data) && !is_string($data)) || !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
 			return false;
 		}
 
-		if (bccomp($data, ZBX_MIN_INT32) < 0 || bccomp($data, ZBX_MAX_INT32) > 0) {
+		if ($data < ZBX_MIN_INT32 || $data > ZBX_MAX_INT32) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -564,13 +564,30 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (is_int($data) || (is_string($data) && preg_match('/^-?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$/', $data) === 1)) {
-			$data = (float) $data;
+		if (is_int($data) || is_float($data)) {
+			$value = (float) $data;
 		}
-		elseif (!is_float($data)) {
+		elseif (is_string($data)) {
+			$number_parser = new CNumberParser();
+
+			if ($number_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				$value = (float) $number_parser->getMatch();
+			}
+			else {
+				$value = NAN;
+			}
+		}
+		else {
+			$value = NAN;
+		}
+
+		if (is_nan($value)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a floating point value is expected'));
+
 			return false;
 		}
+
+		$data = $value;
 
 		return true;
 	}
@@ -1165,6 +1182,8 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateNumeric($rule, &$data, $path, &$error) {
+		global $DB;
+
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (is_int($data)) {
@@ -1177,6 +1196,7 @@ class CApiInputValidator {
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
 			return false;
 		}
 
@@ -1184,22 +1204,41 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$pattern = '/^(-?)0*(0|[1-9][0-9]*)(\.?[0-9]+)?(['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.'])?$/';
+		$number_parser = new CNumberParser(['with_suffix' => true]);
 
-		if (preg_match($pattern, strval($data)) !== 1) {
+		if ($number_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+
 			return false;
 		}
 
-		$value = convertFunctionValue($data, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+		$value = $number_parser->calcValue();
 
-		if (bccomp($value, ZBX_MIN_INT64) < 0 || bccomp($value, ZBX_MAX_INT64) > 0) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
-			return false;
+		if ($DB['DOUBLE_IEEE754']) {
+			if (abs($value) > ZBX_FLOAT_MAX) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+
+				return false;
+			}
+		}
+		else {
+			if (abs($value) >= 1E+16) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+
+				return false;
+			}
+			elseif ($value != round($value, 4)) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number has too many fractional digits'));
+
+				return false;
+			}
 		}
 
-		// Trim leading zeroes.
-		$data = preg_replace($pattern, '${1}${2}${3}${4}', (string) $data);
+		// Remove leading zeros.
+		$data = preg_replace('/^(-)?(0+)?(\d.*)$/', '${1}${3}', $data);
+
+		// Add leading zero.
+		$data = preg_replace('/^(-)?(\..*)$/', '${1}0${2}', $data);
 
 		return true;
 	}
@@ -1450,7 +1489,7 @@ class CApiInputValidator {
 
 		$seconds = timeUnitToSeconds($data);
 
-		if (bccomp(ZBX_MIN_INT32, $seconds) > 0 || bccomp($seconds, ZBX_MAX_INT32) > 0) {
+		if ($seconds < ZBX_MIN_INT32 || $seconds > ZBX_MAX_INT32) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}

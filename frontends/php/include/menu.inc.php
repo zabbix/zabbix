@@ -33,7 +33,7 @@ function getMainMenu(): CMenu {
 					->setAliases(['dashboard.list']),
 				(new CMenuItem(_('Problems')))
 					->setAction('problem.view')
-					->setAliases(['acknowledge.edit', 'tr_events.php']),
+					->setAliases(['tr_events.php']),
 				(new CMenuItem(_('Hosts')))
 					->setAction('host.view')
 					->setAliases(['web.view', 'charts.php', 'chart2.php', 'chart3.php', 'chart6.php', 'chart7.php',

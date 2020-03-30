@@ -37,6 +37,8 @@ abstract class CControllerLatest extends CController {
 	 * @param string $sort_order                  Sorting order.
 	 */
 	protected function prepareData(array $filter, $sort_field, $sort_order) {
+		$config = select_config();
+
 		$applications = [];
 		$items = [];
 		$child_groups = [];
@@ -66,37 +68,29 @@ abstract class CControllerLatest extends CController {
 			}
 		}
 
-		// Only display the values if the filter is set.
-		$filter_set = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids']
-			|| $filter['hostids']
-		);
+		$groupids = null;
 
-		if ($filter_set) {
-			$groupids = null;
-
-			if ($child_groups) {
-				$filter_groups += API::HostGroup()->get([
-					'output' => ['groupid'],
-					'search' => ['name' => $child_groups],
-					'startSearch' => true,
-					'searchByAny' => true,
-					'preservekeys' => true
-				]);
-
-				$groupids = array_keys($filter_groups);
-			}
-
-			$hosts = API::Host()->get([
-				'output' => ['name', 'hostid', 'status'],
-				'hostids' => $filter['hostids'],
-				'groupids' => $groupids,
-				'with_monitored_items' => true,
+		if ($child_groups) {
+			$filter_groups += API::HostGroup()->get([
+				'output' => [],
+				'search' => ['name' => $child_groups],
+				'startSearch' => true,
+				'searchByAny' => true,
 				'preservekeys' => true
 			]);
+
+			$groupids = array_keys($filter_groups);
 		}
-		else {
-			$hosts = [];
-		}
+
+		$hosts = API::Host()->get([
+			'output' => ['name', 'hostid', 'status'],
+			'hostids' => $filter['hostids'],
+			'groupids' => $groupids,
+			'with_monitored_items' => true,
+			'sortfield' => 'host',
+			'limit' => $config['search_limit'] + 1,
+			'preservekeys' => true
+		]);
 
 		if ($hosts) {
 			foreach ($hosts as &$host) {
@@ -118,8 +112,6 @@ abstract class CControllerLatest extends CController {
 					'preservekeys' => true
 				]);
 			}
-
-			$config = select_config();
 
 			$items = API::Item()->get([
 				'hostids' => array_keys($hosts),
@@ -241,8 +233,7 @@ abstract class CControllerLatest extends CController {
 			'applications' => $applications,
 			'history' => $history,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
-			'multiselect_host_data' => $multiselect_host_data,
-			'filter_set' => $filter_set
+			'multiselect_host_data' => $multiselect_host_data
 		];
 	}
 }

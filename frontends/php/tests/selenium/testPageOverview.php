@@ -672,7 +672,6 @@ class testPageOverview extends CLegacyWebTest {
 					'type' => 'Trigger overview',
 					'links' => [
 						'zabbix.php?action=problem.view&filter_triggerids',
-						'action=acknowledge.edit&eventids',
 						'triggers.php?form=update&triggerid',
 						'action=showgraph&itemid'
 					],

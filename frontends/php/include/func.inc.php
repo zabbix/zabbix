@@ -322,21 +322,6 @@ function zbxDateToTime($strdate) {
 	}
 }
 
-/**
- * Correcting adding one unix timestamp to another.
- *
- * @param int		$sec
- * @param mixed		$unixtime	Can accept values:
- *									1) int - unix timestamp,
- *									2) string - date in YmdHis or YmdHi formats,
- *									3) null - current unixtime stamp will be used
- *
- * @return int
- */
-function zbxAddSecondsToUnixtime($sec, $unixtime) {
-	return strtotime('+'.$sec.' seconds', zbxDateToTime($unixtime));
-}
-
 /*************** CONVERTING ******************/
 /**
  * Convert the Windows new line (CR+LF) to Linux style line feed (LF).
@@ -421,11 +406,10 @@ function zbx_num2bitstr($num, $rev = false) {
 		return 0;
 	}
 
-	$sbin = 0;
 	$strbin = '';
 
 	$len = 32;
-	if (bccomp($num, ZBX_MAX_INT32) > 0) {
+	if ($num > ZBX_MAX_INT32) {
 		$len = 64;
 	}
 
@@ -444,88 +428,95 @@ function zbx_num2bitstr($num, $rev = false) {
 }
 
 /**
- * Converts strings like 2M or 5k to bytes.
+ * Convert suffixed string to decimal bytes ('10K' => 10240).
+ * Note: this function must not depend on optional PHP libraries, since it is used in Zabbix setup.
  *
- * @param string $val
+ * @param string $value
  *
  * @return int
  */
-function str2mem($val) {
-	$val = trim($val);
-	$last = strtolower(substr($val, -1));
-	$val = (int) $val;
+function str2mem($value) {
+	$value = trim($value);
+	$suffix = strtoupper(substr($value, -1));
 
-	switch ($last) {
-		case 'g':
-			$val *= ZBX_GIBIBYTE;
-			break;
-		case 'm':
-			$val *= ZBX_MEBIBYTE;
-			break;
-		case 'k':
-			$val *= ZBX_KIBIBYTE;
-			break;
+	if (ctype_digit($suffix)) {
+		return (int) $value;
 	}
 
-	return $val;
-}
+	$value = (int) substr($value, 0, -1);
 
-/**
- * Converts bytes into human-readable form.
- *
- * @param string|int $size
- *
- * @return string
- */
-function mem2str($size) {
-	$prefix = 'B';
-	if ($size > ZBX_MEBIBYTE) {
-		$size = $size / ZBX_MEBIBYTE;
-		$prefix = 'M';
+	if ($suffix === 'G') {
+		$value *= ZBX_GIBIBYTE;
 	}
-	elseif ($size > ZBX_KIBIBYTE) {
-		$size = $size / ZBX_KIBIBYTE;
-		$prefix = 'K';
+	elseif ($suffix === 'M') {
+		$value *= ZBX_MEBIBYTE;
 	}
-
-	return round($size, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT).$prefix;
-}
-
-function convertUnitsUptime($value) {
-	if (($secs = round($value)) < 0) {
-		$value = '-';
-		$secs = -$secs;
+	elseif ($suffix === 'K') {
+		$value *= ZBX_KIBIBYTE;
 	}
-	else {
-		$value = '';
-	}
-
-	$days = floor($secs / SEC_PER_DAY);
-	$secs -= $days * SEC_PER_DAY;
-
-	$hours = floor($secs / SEC_PER_HOUR);
-	$secs -= $hours * SEC_PER_HOUR;
-
-	$mins = floor($secs / SEC_PER_MIN);
-	$secs -= $mins * SEC_PER_MIN;
-
-	if ($days != 0) {
-		$value .= _n('%1$d day', '%1$d days', $days).', ';
-	}
-	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
 	return $value;
 }
 
 /**
- * Converts a time period to a human-readable format.
+ * Convert decimal bytes to suffixed string (10240 => '10K').
+ * Note: this function must not depend on optional PHP libraries, since it is used in Zabbix setup.
  *
- * The following units are used: years, months, days, hours, minutes, seconds and milliseconds.
+ * @param int $bytes
  *
- * Only the three highest units are displayed: #y #m #d, #m #d #h, #d #h #mm and so on.
- *
- * If some value is equal to zero, it is omitted. For example, if the period is 1y 0m 4d, it will be displayed as
- * 1y 4d, not 1y 0m 4d or 1y 4d #h.
+ * @return string
+ */
+function mem2str($bytes) {
+	if ($bytes > ZBX_GIBIBYTE) {
+		return round($bytes / ZBX_GIBIBYTE, ZBX_UNITS_ROUNDOFF_SUFFIXED).'G';
+	}
+	elseif ($bytes > ZBX_MEBIBYTE) {
+		return round($bytes / ZBX_MEBIBYTE, ZBX_UNITS_ROUNDOFF_SUFFIXED).'M';
+	}
+	elseif ($bytes > ZBX_KIBIBYTE) {
+		return round($bytes / ZBX_KIBIBYTE, ZBX_UNITS_ROUNDOFF_SUFFIXED).'K';
+	}
+	else {
+		return round($bytes).'B';
+	}
+}
+
+function convertUnitsUptime($value) {
+	$value = round($value);
+	$value_abs = abs($value);
+
+	$result = $value < 0 ? '-' : '';
+
+	$days = floor($value_abs / SEC_PER_DAY);
+
+	if ($days != 0) {
+		$result .= _n('%1$d day', '%1$d days', formatFloat($days));
+	}
+
+	// Is original value precise enough for showing detailed data?
+	if (strlen($value_abs) <= ZBX_FLOAT_DIG) {
+		if ($days != 0) {
+			$result .= ', ';
+		}
+
+		$value_abs = $value_abs - $days * SEC_PER_DAY;
+
+		$hours = floor($value_abs / SEC_PER_HOUR);
+		$value_abs -= $hours * SEC_PER_HOUR;
+
+		$minutes = floor($value_abs / SEC_PER_MIN);
+		$seconds = $value_abs - $minutes * SEC_PER_MIN;
+
+		$result .= sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+	}
+
+	return $result;
+}
+
+/**
+ * Convert time period to a human-readable format.
+ * The following units will be used: years, months, days, hours, minutes, seconds and milliseconds.
+ * Only the 3 most significant units will be displayed: #y #m #d, #m #d #h, #d #h #mm and so on, omitting empty ones.
  *
  * @param int  $value            Time period in seconds.
  * @param bool $ignore_millisec  Without ms (1s 200 ms = 1.2s).
@@ -533,107 +524,90 @@ function convertUnitsUptime($value) {
  * @return string
  */
 function convertUnitsS($value, $ignore_millisec = false) {
-	$secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000;
-	if ($secs < 0) {
-		$secs = -$secs;
-		$str = '-';
-	}
-	else {
-		$str = '';
-	}
+	$value = (float) $value;
+	$value_abs = abs($value);
 
-	$values = ['y' => null, 'm' => null, 'd' => null, 'h' => null, 'mm' => null, 's' => null, 'ms' => null];
+	$parts = [];
+	$start = null;
 
-	/*
-	 * $n_unit == 4,	(#y #m #d)
-	 * $n_unit == 3,	(#m #d #h)
-	 * $n_unit == 2,	(#d #h #mm)
-	 * $n_unit == 1,	(#h #mm #s)
-	 * $n_unit == 0,	(#mm #s) or (#mm #s #ms)
-	 */
-	$n_unit = 0;
+	$value_abs_int = floor($value_abs);
 
-	$n = floor($secs / SEC_PER_YEAR);
-	if ($n != 0) {
-		$secs -= $n * SEC_PER_YEAR;
-		$n_unit = 4;
-
-		$values['y'] = $n;
+	if (($v = floor($value_abs_int / SEC_PER_YEAR)) > 0) {
+		$parts['years'] = $v;
+		$value_abs_int -= $v * SEC_PER_YEAR;
+		$start = 0;
 	}
 
-	$n = floor($secs / SEC_PER_MONTH);
-	$secs -= $n * SEC_PER_MONTH;
-
-	if ($n == 12) {
-		$values['y']++;
+	$v = floor($value_abs_int / SEC_PER_MONTH);
+	if ($v == 12) {
+		$parts['years'] = $start === null ? 1 : $parts['years'] + 1;
+		$start = 0;
 	}
-	else {
-		if ($n != 0) {
-			$values['m'] = $n;
-			if ($n_unit == 0) {
-				$n_unit = 3;
+	elseif ($start === null || ceil(log10($parts['years'])) <= ZBX_FLOAT_DIG) {
+		if ($v > 0) {
+			$parts['months'] = $v;
+			$value_abs_int -= $v * SEC_PER_MONTH;
+			$start = $start === null ? 1 : $start;
+		}
+
+		$level = 2;
+		foreach ([
+			'days' => SEC_PER_DAY,
+			'hours' => SEC_PER_HOUR,
+			'minutes' => SEC_PER_MIN,
+		] as $part => $sec_per_part) {
+			$v = floor($value_abs_int / $sec_per_part);
+			if ($v > 0) {
+				$parts[$part] = $v;
+				$value_abs_int -= $v * $sec_per_part;
+				$start = $start === null ? $level : $start;
 			}
-		}
 
-		$n = floor($secs / SEC_PER_DAY);
-		if ($n != 0) {
-			$secs -= $n * SEC_PER_DAY;
-			$values['d'] = $n;
-			if ($n_unit == 0) {
-				$n_unit = 2;
+			if ($start !== null && $level - $start >= 2) {
+				break;
 			}
+
+			$level++;
 		}
 
-		$n = floor($secs / SEC_PER_HOUR);
-		if ($n_unit < 4 && $n != 0) {
-			$secs -= $n * SEC_PER_HOUR;
-			$values['h'] = $n;
-			if ($n_unit == 0) {
-				$n_unit = 1;
+		if ($start === null || $start >= 3) {
+			if ($ignore_millisec) {
+				$v = $value_abs_int + round(fmod($value_abs, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
+
+				if ($v > 0) {
+					$parts['seconds'] = $v;
+				}
 			}
-		}
+			else {
+				$parts['seconds'] = $value_abs_int;
 
-		$n = floor($secs / SEC_PER_MIN);
-		if ($n_unit < 3 && $n != 0) {
-			$secs -= $n * SEC_PER_MIN;
-			$values['mm'] = $n;
-		}
-
-		$n = floor($secs);
-		if ($n_unit < 2 && $n != 0) {
-			$secs -= $n;
-			$values['s'] = $n;
-		}
-
-		if ($ignore_millisec) {
-			$n = round($secs, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
-			if ($n_unit < 1 && $n != 0) {
-				$values['s'] += $n;
-			}
-		}
-		else {
-			$n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
-			if ($n_unit < 1 && $n != 0) {
-				$values['ms'] = $n;
+				if ($start === null || $start >= 4) {
+					$v = round(fmod($value_abs, 1) * 1000);
+					if ($v > 0) {
+						$parts['milliseconds'] = $v;
+					}
+				}
 			}
 		}
 	}
 
 	$units = [
-		'y' => _x('y', 'year short'),
-		'm' => _x('m', 'month short'),
-		'd' => _x('d', 'day short'),
-		'h' => _x('h', 'hour short'),
-		'mm' => _x('m', 'minute short'),
-		's' => _x('s', 'second short'),
-		'ms' => _x('ms', 'millisecond short')
+		'years' => _x('y', 'year short'),
+		'months' => _x('m', 'month short'),
+		'days' => _x('d', 'day short'),
+		'hours' => _x('h', 'hour short'),
+		'minutes' => _x('m', 'minute short'),
+		'seconds' => _x('s', 'second short'),
+		'milliseconds' => _x('ms', 'millisecond short')
 	];
 
-	foreach (array_filter($values) as $unit => $value) {
-		$str .= ' '.$value.$units[$unit];
+	$result = [];
+
+	foreach (array_filter($parts) as $unit => $value) {
+		$result[] = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_SUFFIXED).$units[$unit];
 	}
 
-	return $str ? trim($str) : '0';
+	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
 }
 
 /**
@@ -644,307 +618,138 @@ function convertUnitsS($value, $ignore_millisec = false) {
  * @param array  $options
  * @param string $options['value']
  * @param string $options['units']
- * @param string $options['convert']
- * @param string $options['byteStep']
- * @param string $options['pow']
- * @param bool   $options['ignoreMillisec']
- * @param string $options['length']
+ * @param int    $options['convert']
+ * @param int    $options['power']
+ * @param string $options['unit_base']
+ * @param bool   $options['ignore_milliseconds']
+ * @param int    $options['precision']
+ * @param int    $options['decimals']
+ * @param bool   $options['decimals_exact']
  *
  * @return string
  */
-function convert_units($options = []) {
-	$defOptions = [
-		'value' => null,
-		'units' => null,
+function convertUnits(array $options) {
+	static $power_table = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+
+	$options += [
+		'value' => '',
+		'units' => '',
 		'convert' => ITEM_CONVERT_WITH_UNITS,
-		'byteStep' => false,
-		'pow' => false,
-		'ignoreMillisec' => false,
-		'length' => false
+		'power' => null,
+		'unit_base' => null,
+		'ignore_milliseconds' => false,
+		'precision' => null,
+		'decimals' => null,
+		'decimals_exact' => false
 	];
 
-	$options = zbx_array_merge($defOptions, $options);
+	$value = $options['value'] !== null ? $options['value'] : '';
 
-	// special processing for unix timestamps
-	if ($options['units'] == 'unixtime') {
-		return zbx_date2str(DATE_TIME_FORMAT_SECONDS, $options['value']);
-	}
-
-	// special processing of uptime
-	if ($options['units'] == 'uptime') {
-		return convertUnitsUptime($options['value']);
-	}
-
-	// special processing for seconds
-	if ($options['units'] == 's') {
-		return convertUnitsS($options['value'], $options['ignoreMillisec']);
-	}
-
-	// black list of units that should have no multiplier prefix (K, M, G etc) applied
-	$blackList = ['%', 'ms', 'rpm', 'RPM'];
-
-	// add to the blacklist if unit is prefixed with '!'
-	if ($options['units'] !== null && $options['units'] !== '' && $options['units'][0] === '!') {
-		$options['units'] = substr($options['units'], 1);
-		$blackList[] = $options['units'];
-	}
-
-	// any other unit
-	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
-			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
-		if (preg_match('/\.\d+$/', $options['value'])) {
-			$format = (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
-				? '%.'.ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT.'f'
-				: '%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f';
-			$options['value'] = sprintf($format, $options['value']);
-		}
-		$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $options['value']);
-		$options['value'] = rtrim($options['value'], '.');
-
-		return trim($options['value'].' '.$options['units']);
-	}
-
-	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
-	if ($options['byteStep']) {
-		$step = ZBX_KIBIBYTE;
-	}
-	else {
-		switch ($options['units']) {
-			case 'Bps':
-			case 'B':
-				$step = ZBX_KIBIBYTE;
-				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
-				break;
-			case 'b':
-			case 'bps':
-				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
-			default:
-				$step = 1000;
-		}
-	}
-
-	if ($options['value'] < 0) {
-		$abs = bcmul($options['value'], '-1');
-	}
-	else {
-		$abs = $options['value'];
-	}
-
-	if (bccomp($abs, 1) == -1) {
-		$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
-		$options['value'] = ($options['length'] && $options['value'] != 0)
-			? sprintf('%.'.$options['length'].'f',$options['value']) : $options['value'];
-
-		return trim($options['value'].' '.$options['units']);
-	}
-
-	// init intervals
-	static $digitUnits;
-	if (is_null($digitUnits)) {
-		$digitUnits = [];
-	}
-
-	if (!isset($digitUnits[$step])) {
-		$digitUnits[$step] = [
-			['pow' => 0, 'short' => ''],
-			['pow' => 1, 'short' => 'K'],
-			['pow' => 2, 'short' => 'M'],
-			['pow' => 3, 'short' => 'G'],
-			['pow' => 4, 'short' => 'T'],
-			['pow' => 5, 'short' => 'P'],
-			['pow' => 6, 'short' => 'E'],
-			['pow' => 7, 'short' => 'Z'],
-			['pow' => 8, 'short' => 'Y']
-		];
-
-		foreach ($digitUnits[$step] as $dunit => $data) {
-			// skip milli & micro for values without units
-			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
-		}
-	}
-
-
-	$valUnit = ['pow' => 0, 'short' => '', 'value' => $options['value']];
-
-	if ($options['pow'] === false || $options['value'] == 0) {
-		foreach ($digitUnits[$step] as $dnum => $data) {
-			if (bccomp($abs, $data['value']) > -1) {
-				$valUnit = $data;
-			}
-			else {
-				break;
-			}
-		}
-	}
-	else {
-		foreach ($digitUnits[$step] as $data) {
-			if ($options['pow'] == $data['pow']) {
-				$valUnit = $data;
-				break;
-			}
-		}
-	}
-
-	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT) > 0) {
-		$valUnit['value'] = bcdiv(sprintf('%.10f',$options['value']), sprintf('%.10f', $valUnit['value'])
-			, ZBX_PRECISION_10);
-	}
-	else {
-		$valUnit['value'] = 0;
-	}
-
-	switch ($options['convert']) {
-		case 0: $options['units'] = trim($options['units']);
-		case 1: $desc = $valUnit['short']; break;
-	}
-
-	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],
-		ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-
-	$options['value'] = rtrim($options['value'], '.');
-
-	// fix negative zero
-	if (bccomp($options['value'], 0) == 0) {
-		$options['value'] = 0;
-	}
-
-	return trim(sprintf('%s %s%s', $options['length']
-		? sprintf('%.'.$options['length'].'f',$options['value'])
-		: $options['value'], $desc, $options['units']));
-}
-
-/**
- * Convert time format with suffixes to seconds.
- * Examples:
- *        10m = 600
- *        3d = 259200
- *        -10m = -600
- *
- * @param string $time
- * @param bool $with_year
- *
- * @return null|string
- */
-function timeUnitToSeconds($time, $with_year = false) {
-	preg_match(
-		'/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.
-		($with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES).'])?$/',
-		$time, $matches
-	);
-
-	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
-
-	if (!array_key_exists('number', $matches)) {
-		return null;
-	}
-
-	if (array_key_exists('suffix', $matches)) {
-		$time = $matches['number'];
-
-		switch ($matches['suffix']) {
-			case 's':
-				$sec = $time;
-				break;
-			case 'm':
-				$sec = bcmul($time, SEC_PER_MIN);
-				break;
-			case 'h':
-				$sec = bcmul($time, SEC_PER_HOUR);
-				break;
-			case 'd':
-				$sec = bcmul($time, SEC_PER_DAY);
-				break;
-			case 'w':
-				$sec = bcmul($time, SEC_PER_WEEK);
-				break;
-			case 'M':
-				$sec = bcmul($time, SEC_PER_MONTH);
-				break;
-			case 'y':
-				$sec = bcmul($time, SEC_PER_YEAR);
-				break;
-		}
-	}
-	else {
-		$sec = $matches['number'];
-	}
-
-	return $is_negative ? bcmul($sec, -1) : $sec;
-}
-
-/**
- * Converts value with suffix to actual value.
- * Supported time suffixes: s, m, h, d, w
- * Supported metric suffixes: K, M, G, T
- *
- * @param string $value
- * @param int    $scale  The number of digits after the decimal place in the result.
- *
- * @return string
- */
-function convertFunctionValue($value, $scale = 0) {
-	$suffix = substr($value, -1);
-
-	if (ctype_digit($suffix)) {
+	if (!is_numeric($value)) {
 		return $value;
 	}
 
-	$value = substr($value, 0, -1);
+	$units = $options['units'] !== null ? $options['units'] : '';
 
-	switch ($suffix) {
-		case 'm':
-			return bcmul($value, '60', $scale);
-
-		case 'h':
-			return bcmul($value, '3600', $scale);
-
-		case 'd':
-			return bcmul($value, '86400', $scale);
-
-		case 'w':
-			return bcmul($value, '604800', $scale);
-
-		case 'K':
-			return bcmul($value, ZBX_KIBIBYTE, $scale);
-
-		case 'M':
-			return bcmul($value, ZBX_MEBIBYTE, $scale);
-
-		case 'G':
-			return bcmul($value, ZBX_GIBIBYTE, $scale);
-
-		case 'T':
-			return bcmul($value, '1099511627776', $scale);
-
-		case 's':
-		default:
-			return $value;
+	if ($units === 'unixtime') {
+		return zbx_date2str(DATE_TIME_FORMAT_SECONDS, $value);
 	}
+
+	if ($units === 'uptime') {
+		return convertUnitsUptime($value);
+	}
+
+	if ($units === 's') {
+		return convertUnitsS($value, $options['ignore_milliseconds']);
+	}
+
+	$blacklist = ['%', 'ms', 'rpm', 'RPM'];
+
+	if ($units !== '' && $units[0] === '!') {
+		$units = substr($units, 1);
+		$blacklist[] = $units;
+	}
+
+	$value = (float) $value;
+	$value_abs = abs($value);
+
+	$do_convert = $units !== '' || $options['convert'] == ITEM_CONVERT_NO_UNITS;
+
+	if (in_array($units, $blacklist) || !$do_convert || $value_abs < 1) {
+		$result = formatFloat($value, $options['precision'], $options['decimals'] ?? ZBX_UNITS_ROUNDOFF_UNSUFFIXED,
+			$options['decimals_exact']
+		);
+
+		$result .= ($units === '' ? '' : ' '.$units);
+
+		return $result;
+	}
+
+	$unit_base = $options['unit_base'];
+	if ($unit_base != 1000 && $unit_base != ZBX_KIBIBYTE) {
+		$unit_base = ($units === 'B' || $units === 'Bps') ? ZBX_KIBIBYTE : 1000;
+	}
+
+	if ($options['power'] === null) {
+		$result = null;
+		$unit_prefix = null;
+
+		foreach ($power_table as $power => $prefix) {
+			$result = formatFloat($value / pow($unit_base, $power), $options['precision'],
+				$options['decimals'] ?? ($prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED),
+				$options['decimals_exact']
+			);
+			$unit_prefix = $prefix;
+
+			if (abs($result) < $unit_base) {
+				break;
+			}
+		}
+	}
+	else {
+		if (array_key_exists($options['power'], $power_table) && $value_abs != 0) {
+			$unit_power = $options['power'];
+			$unit_prefix = $power_table[$unit_power];
+		}
+		else {
+			$unit_power = count($power_table);
+			$unit_prefix = $power_table[$unit_power];
+		}
+
+		$result = formatFloat($value / pow($unit_base, $unit_power), $options['precision'], $options['decimals'] ??
+			($unit_prefix === '' ? ZBX_UNITS_ROUNDOFF_UNSUFFIXED : ZBX_UNITS_ROUNDOFF_SUFFIXED), $options['decimals_exact']
+		);
+	}
+
+	$result_units = ($result == 0 ? '' : $unit_prefix).$units;
+
+	$result .= ($result_units === '' ? '' : ' '.$result_units);
+
+	return $result;
+}
+
+/**
+ * Validate and convert time to seconds.
+ * Examples: '100' => '100'; '10m' => '600'; '-10m' => '-600'; '3d' => '259200'.
+ *
+ * @param string $time       Decimal integer with optional time suffix.
+ * @param bool   $with_year  Additionally parse year suffixes.
+ *
+ * @return string|null  Decimal integer seconds or null on error.
+ */
+function timeUnitToSeconds($time, $with_year = false) {
+	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
+
+	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.$suffixes.'])?$/', $time, $matches)) {
+		return null;
+	}
+
+	$suffix = array_key_exists('suffix', $matches) ? $matches['suffix'] : 's';
+
+	return $matches['int'] * ZBX_TIME_SUFFIX_MULTIPLIERS[$suffix];
 }
 
 /************* ZBX MISC *************/
-
-/**
- * Swap two values.
- *
- * @param mixed $a first value
- * @param mixed $b second value
- */
-function zbx_swap(&$a, &$b) {
-	$tmp = $a;
-	$a = $b;
-	$b = $tmp;
-}
-
-function zbx_avg($values) {
-	zbx_value2array($values);
-	$sum = 0;
-	foreach ($values as $value) {
-		$sum = bcadd($sum, $value);
-	}
-
-	return bcdiv($sum, count($values));
-}
 
 /**
  * Check if every character in given string value is a decimal digit.
@@ -1534,37 +1339,130 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 	return new CColHeader(new CLink([$obj, $arrow], $link->getUrl()));
 }
 
-/************* MATH *************/
-function bcfloor($number) {
-	if (strpos($number, '.') !== false) {
-		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number) {
-			$number = $tmp;
-		}
-		elseif ($number[0] != '-') {
-			$number = bcadd($number, 0, 0);
-		}
-		else {
-			$number = bcsub($number, 1, 0);
-		}
+/**
+ * Format floating-point number in best possible way for displaying.
+ *
+ * @param string   $number     Valid number in decimal or scientific notation.
+ * @param int|null $precision  Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
+ * @param int|null $decimals   Max number of first non-zero decimals decimals to display. Default: 0.
+ * @param bool     $exact      Display exaclty this number of decimals instead of first non-zeros.
+ *
+ * Note: $decimals must be less than $precision.
+ *
+ * @return string
+ */
+function formatFloat(float $number, int $precision = null, int $decimals = null, bool $exact = false): string {
+	if ($number == 0) {
+		return '0';
 	}
 
-	return $number == '-0' ? '0' : $number;
+	if ($number == INF) {
+		return _('Infinity');
+	}
+
+	if ($number == -INF) {
+		return '-'._('Infinity');
+	}
+
+	if ($precision === null) {
+		$precision = ZBX_FLOAT_DIG;
+	}
+
+	if ($decimals === null) {
+		$decimals = 0;
+	}
+
+	$number_original = $number;
+
+	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
+
+	if ($exponent < 0) {
+		for ($i = 1; $i >= 0; $i--) {
+			$round_precision = $decimals - $exponent - $i;
+
+			// PHP rounding bug when precision is set more than 294.
+			if ($round_precision > 294) {
+				$decimal_shift = pow(10, $round_precision - 294);
+				$test = round($number * $decimal_shift, 294) / $decimal_shift;
+			}
+			else {
+				$test = round($number, $round_precision);
+			}
+
+			$test_number = sprintf('%.'.($precision - 1).'E', $test);
+			$test_digits = ($precision == 1)
+				? 1
+				: strlen(rtrim(explode('E', $test_number)[0], '0')) - ($test_number[0] === '-' ? 2 : 1);
+
+			if ($test_digits - $exponent <= $precision) {
+				break;
+			}
+		}
+		$number = $test_number;
+		$digits = $test_digits;
+	}
+	else {
+		if ($exponent >= $precision) {
+			if ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
+					|| round($number, $precision - $exponent - 1) != $number) {
+				$number = round($number, $decimals - $exponent);
+			}
+		}
+		else {
+			$number = round($number, min($decimals, $precision - $exponent - 1));
+		}
+
+		$number = sprintf('%.'.($precision - 1).'E', $number);
+		$digits = ($precision == 1) ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
+	}
+
+	if ($number == 0) {
+		return '0';
+	}
+
+	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
+
+	if ($exponent < 0) {
+		if ($digits - $exponent <= ($exact ? min($decimals + 1, $precision) : $precision)) {
+			return sprintf('%.'.($exact ? $decimals : $digits - $exponent - 1).'f', $number);
+		}
+		else {
+			return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+		}
+	}
+	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
+			|| ($exponent >= $precision && $number != $number_original)) {
+		return sprintf('%.'.($exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+	}
+	else {
+		return sprintf('%.'.($exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals))).'f', $number);
+	}
 }
 
-function bcceil($number) {
-	if (strpos($number, '.') !== false) {
-		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number) {
-			$number = $tmp;
-		}
-		elseif ($number[0] != '-') {
-			$number = bcadd($number, 1, 0);
-		}
-		else {
-			$number = bcsub($number, 0, 0);
-		}
-	}
+/**
+* Truncate float to the amount of significant digits, to allow safe float comparison.
+*
+* @param float $number
+*
+* @return float
+*/
+function truncateFloat(float $number): float {
+	return (float) sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number);
+}
 
-	return $number == '-0' ? '0' : $number;
+/**
+ * Get number of digits after the decimal dot.
+ *
+ * @param float $number  Valid number in decimal or scientific notation.
+ *
+ * @return int
+ */
+function getNumDecimals(float $number): int {
+	[$mantissa, $exponent] = explode('E', sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number));
+
+	$significant_size = strlen(rtrim($mantissa, '0')) - ($number < 0 ? 2 : 1);
+
+	return max(0, $significant_size - 1 - $exponent);
 }
 
 /**
@@ -2414,9 +2312,11 @@ function splitPath($path) {
 /**
  * Allocate color for an image.
  *
- * @param resource 	$image
- * @param string	$color		a hexadecimal color identifier like "1F2C33"
- * @param int 		$alpha
+ * @param resource $image
+ * @param string   $color  a hexadecimal color identifier like "1F2C33"
+ * @param int      $alpha
+ *
+ * @return int|false
  */
 function get_color($image, $color, $alpha = 0) {
 	$red = hexdec('0x'.substr($color, 0, 2));
@@ -2513,20 +2413,20 @@ function getTimeUnitFilters($values) {
 
 	$res = [$sec, $sec.'s'];
 
-	if (bcmod($sec, SEC_PER_MIN) == 0) {
-		$res[] = bcdiv($sec, SEC_PER_MIN, 0).'m';
+	if ($sec % SEC_PER_MIN == 0) {
+		$res[] = floor($sec / SEC_PER_MIN).'m';
 	}
 
-	if (bcmod($sec, SEC_PER_HOUR) == 0) {
-		$res[] = bcdiv($sec, SEC_PER_HOUR, 0).'h';
+	if ($sec % SEC_PER_HOUR == 0) {
+		$res[] = floor($sec / SEC_PER_HOUR).'h';
 	}
 
-	if (bcmod($sec, SEC_PER_DAY) == 0) {
-		$res[] = bcdiv($sec, SEC_PER_DAY, 0).'d';
+	if ($sec % SEC_PER_DAY == 0) {
+		$res[] = floor($sec / SEC_PER_DAY).'d';
 	}
 
-	if (bcmod($sec, SEC_PER_WEEK) == 0) {
-		$res[] = bcdiv($sec, SEC_PER_WEEK, 0).'w';
+	if ($sec % SEC_PER_WEEK == 0) {
+		$res[] = floor($sec / SEC_PER_WEEK).'w';
 	}
 
 	return $res;

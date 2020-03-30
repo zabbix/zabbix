@@ -24,6 +24,12 @@
 	 	<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
 	 	<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
 		<property name="screenshot_references_dir" value="${SCREENSHOT_REFERENCES_DIR}"/>
+		<condition property="phpunit_driver_address" value="${PHPUNIT_DRIVER_ADDRESS}" else="localhost">
+			<and>
+				<isset property="PHPUNIT_DRIVER_ADDRESS" />
+				<length string="${PHPUNIT_DRIVER_ADDRESS}" when="greater" length="0"/>
+			</and>
+		</condition>
 		<property environment="env"/>
 
 		<!-- Create bootstrap.php -->
@@ -38,6 +44,7 @@
 		<replace file="frontends/php/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/runtime/"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="frontends/php/tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>
@@ -61,6 +68,7 @@
 			<arg line="--quiet"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
@@ -79,10 +87,12 @@
 			<arg line="--prefix=${basedir}"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
@@ -92,6 +102,7 @@
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
@@ -99,6 +110,7 @@
 		</exec>
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
@@ -106,6 +118,7 @@
 		</exec>
 		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -114,6 +127,7 @@
 		</exec>
 		<exec executable="psql" input="database/postgresql/images.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -122,6 +136,7 @@
 		</exec>
 		<exec executable="psql" input="database/postgresql/data.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -134,6 +149,7 @@
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
@@ -141,6 +157,7 @@
 		</exec>
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
@@ -148,6 +165,7 @@
 		</exec>
 		<exec executable="psql" input="database/postgresql/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -159,6 +177,7 @@
 	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
 		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -170,6 +189,7 @@
 	<target name="init-api-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
 		<exec executable="psql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -181,6 +201,7 @@
 	<target name="init-integration-postgresql" depends="create-configs,init-integration,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
 		<exec executable="psql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -202,10 +223,12 @@
 			<arg line="--prefix=${basedir}"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>

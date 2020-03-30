@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,16 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_HISTORY_COMPRESSION_H
+#define ZABBIX_HISTORY_COMPRESSION_H
 
-/**
- * @var CView $this
- */
-?>
+void	hk_history_compression_init(void);
+void	hk_history_compression_update(zbx_config_db_t *cfg);
 
-<script type="text/javascript">
-	jQuery(document).ready(function($) {
-		$('#acknowledge_form').submit(function() {
-			$(this).trimValues(['#message']);
-		});
-	});
-</script>
+#endif

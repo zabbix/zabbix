@@ -73,7 +73,7 @@ class CSeverity extends CRadioButtonList {
 			$this->addValue(_('all'), -1);
 		}
 
-		foreach (getSeverities(true) as $severity) {
+		foreach (getSeverities() as $severity) {
 			$this->addValue($severity['name'], $severity['value'], $severity['style']);
 		}
 

@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.0.0beta1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050060);
+define('ZABBIX_DB_VERSION',		4050063);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -37,15 +37,21 @@ define('ZBX_SESSION_NAME', 'zbx_sessionid'); // Session cookie name for Zabbix f
 define('ZBX_KIBIBYTE',	'1024');
 define('ZBX_MEBIBYTE',	'1048576');
 define('ZBX_GIBIBYTE',	'1073741824');
+define('ZBX_TEBIBYTE',	'1099511627776');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-define('ZBX_MAX_PERIOD',		63158401); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 1
+// the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1
+define('ZBX_MAX_PERIOD',		63162001);
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
-define('ZBX_MIN_INT64',			'-9223372036854775808');
-define('ZBX_MAX_INT64',			'9223372036854775807');
 define('ZBX_MAX_UINT64',		'18446744073709551615');
-define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
+
+// Double precision 64-bit float.
+define('ZBX_FLOAT_DIG', PHP_FLOAT_DIG);
+define('ZBX_FLOAT_MIN', PHP_FLOAT_MIN);
+define('ZBX_FLOAT_MAX', PHP_FLOAT_MAX);
+
+define('ZBX_MAX_DATE',			ZBX_MAX_INT32); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
@@ -76,12 +82,8 @@ define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
 define('ZBX_MAX_IMAGE_SIZE', ZBX_MEBIBYTE);
 
-define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
-define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
-define('ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT',	4);
-define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
-
-define('ZBX_PRECISION_10',	10);
+define('ZBX_UNITS_ROUNDOFF_SUFFIXED',		2);
+define('ZBX_UNITS_ROUNDOFF_UNSUFFIXED',		4);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
@@ -127,6 +129,8 @@ define('ZBX_AUTH_CASE_SENSITIVE',	1);
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
+
+define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
@@ -1128,18 +1132,43 @@ define('UNKNOWN_VALUE', '');
 define('ZBX_EOL_LF',	0);
 define('ZBX_EOL_CRLF',	1);
 
-// suffixes
-define('ZBX_BYTE_SUFFIXES', 'KMGT');
+// Time intervals.
+define('SEC_PER_MIN',			60);
+define('SEC_PER_HOUR',			3600);
+define('SEC_PER_DAY',			86400);
+define('SEC_PER_WEEK',			604800);
+define('SEC_PER_MONTH',			2592000);
+define('SEC_PER_YEAR',			31536000);
+
+// Time suffixes and multipliers.
 define('ZBX_TIME_SUFFIXES', 'smhdw');
 define('ZBX_TIME_SUFFIXES_WITH_YEAR', 'smhdwMy');
+define('ZBX_TIME_SUFFIX_MULTIPLIERS', [
+	's' => 1,
+	'm' => SEC_PER_MIN,
+	'h' => SEC_PER_HOUR,
+	'd' => SEC_PER_DAY,
+	'w' => SEC_PER_WEEK,
+	'M' => SEC_PER_MONTH,
+	'y' => SEC_PER_YEAR
+]);
 
-// preg
+// Byte suffixes and multipliers.
+define('ZBX_BYTE_SUFFIXES', 'KMGT');
+define('ZBX_BYTE_SUFFIX_MULTIPLIERS', [
+	'K' => ZBX_KIBIBYTE,
+	'M' => ZBX_MEBIBYTE,
+	'G' => ZBX_GIBIBYTE,
+	'T' => ZBX_TEBIBYTE
+]);
+
+// Regular expressions.
 define('ZBX_PREG_PRINT', '^\x00-\x1F');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_MACRO_NAME_LLD', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
-define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)');
-define('ZBX_PREG_INT', '([\-+]?[0-9]+['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)');
+define('ZBX_PREG_NUMBER', '(?<number>-?(\d+(\.\d*)?|\.\d+)([Ee][+-]?\d+)?)');
+define('ZBX_PREG_INT', '(?<int>-?\d+)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
@@ -1300,13 +1329,6 @@ define('ZBX_API_ERROR_NO_METHOD',	300);
 
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
-
-define('SEC_PER_MIN',			60);
-define('SEC_PER_HOUR',			3600);
-define('SEC_PER_DAY',			86400);
-define('SEC_PER_WEEK',			604800);
-define('SEC_PER_MONTH',			2592000);
-define('SEC_PER_YEAR',			31536000);
 
 define('ZBX_JAN_2038', 2145916800);
 

@@ -1,8 +1,44 @@
 Changes for 5.0.0beta1
 
 New features:
+A.F....... [ZBXNEXT-5691] implemented IEEE754 compatible value range for Numeric (float) history data type (averza)
+..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
+........S. [ZBXNEXT-5369] added EVENT.TAGSJSON macro (asestakovs)
+....I..PS. [ZBXNEXT-1736] increased float precision (asestakovs, vso)
+.........T [ZBX-17457] fixed description in Template DB MySQL by Zabbix agent (mchudinov)
+.......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
+.........T [ZBXNEXT-5527] added "Template Server Chassis by IPMI" (mchudinov)
+.........T [ZBXNEXT-5685] added "Template DB MySQL by Zabbix agent 2" (mchudinov)
+.........T [ZBXCTR-3] added SIGNL4 webhook integration (rons4)
+.........T [ZBXNEXT-5821] added "Template App Memcached" (ychukina)
+.........T [ZBXNEXT-5325] added "Template App Docker" template (afayantsev)
+........S. [ZBXNEXT-252] added EVENT.DURATION macro (MVekslers)
+..F....... [ZBXNEXT-5720] implemented displaying latest data if filter is empty (averza)
+A.F....PS. [ZBXNEXT-4712] added new preprocessing type "Replace" for items, item prototypes and LLD rules (agriscenko, mabele)
+..F....... [ZBXNEXT-5786] updated the list of user agents (agriscenko)
+...G...... [ZBXNEXT-5685] added MySQL plugin for Zabbix agent 2 (mchudinov)
+A.F.....S. [ZBXNEXT-5676] added support for TimescaleDB compression (atumilovics, vasilijs)
+.......PS. [ZBXNEXT-5829] replaced uint64 hash function with faster one (wiper)
+..F....... [ZBXNEXT-1169] replaced problem acknowledge page with a modal popup window (agriscenko)
+..F....PS. [ZBXNEXT-2753,ZBXNEXT-5641] added TLS for server, proxy and UI connection to database (mabele, vasilijs)
+........S. [ZBXNEXT-1961] added support for connection string to db.odbc.* items (atumilovics)
 
 Bug fixes:
+..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
+A......... [ZBX-17177] removed "operationid" from lower level properties in Action API (Ivo)
+.......PS. [ZBX-17518] fixed empty parameter handling in GET method of CurlHttpRequest (vso)
+A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
+....I..... [ZBX-17514] fixed db upgrade patch for Oracle (asestakovs)
+...G...... [ZBX-17368] fixed HostMetadataItem and HostInterfaceItem handling in agent2 (esneiders)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+........S. [ZBX-17275] optimized database requests in maintenance update (wiper)
+...G...... [ZBX-17502] fixed possible hang in agent2 when executing some metrics that forked another process (vso)
+........S. [ZBX-17398] fixed server crash when escalating internal events with OPDATA macro (asestakovs)
+........S. [ZBX-9387] fixed incorrect maintenance calculations when DST changed to summer time (akozlovs)
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
+..F....... [ZBX-17469] fixed kiosk button margin in history/graph view of the latest data (averza)
+..F....... [ZBX-17346] fixed button label in item test dialog (miks)
+..F....... [ZBX-17439] fixed macros detection in item test dialog (miks)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.0alpha3
@@ -114,6 +150,31 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 ..F....... [ZBX-402] fixed latest data reloading to updating asynchronously (averza)
 .........T [ZBX-16695] changed default width of various screen elements in Zabbix templates from 500 to 750 pixels (Ivo, talbergs, vasilijs)
 ....I..... [ZBX-11764] fixed automake scripts; thanks to Tomasz Kłoczko for the patch (akozlovs)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.8rc1
+
+New features:
+..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
+.........T [ZBX-17457] fixed description in Template DB MySQL by Zabbix agent (mchudinov)
+.......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
+
+Bug fixes:
+..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
+.......PS. [ZBX-17518] fixed empty parameter handling in GET method of CurlHttpRequest (vso)
+A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+...G...... [ZBX-17368] fixed HostMetadataItem and HostInterfaceItem handling in agent2 (esneiders)
+........S. [ZBX-17275] optimized database requests in maintenance update (wiper)
+...G...... [ZBX-17502] fixed possible hang in agent2 when executing some metrics that forked another process (vso)
+........S. [ZBX-17398] fixed server crash when escalating internal events with OPDATA macro (asestakovs)
+........S. [ZBX-9387] fixed incorrect maintenance calculations when DST changed to summer time (akozlovs)
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.7
+
+4.4.7rc1 was released as 4.4.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.4.7rc1
@@ -344,7 +405,7 @@ A......... [ZBX-16679] fixed username and password fields resetting and saving f
 ...G...... [ZBX-16769] fixed Zabbix agent 2 compilation on i386, arm, ppc64le and s390x architectures (viktors)
 ........S. [ZBX-16843] fixed {TRIGGER.ID} to be supported on trigger level in addition to host level and template level tags (vso)
 ..F....... [ZBX-16812] fixed problems by severity widget problem duplication (talbergs)
-..F....... [ZBX-16815] fixed widget form positioing when changing widget type from Graph to any other type (averza)
+..F....... [ZBX-16815] fixed widget form positioning when changing widget type from Graph to any other type (averza)
 ..F....... [ZBX-16706] fixed unneeded padding for dashboard URL widget (averza)
 ..F....... [ZBX-16784] fixed Oracle performance by using "between" operator in SQL queries (averza)
 ..F....... [ZBX-16579] fixed long text wrapping in the latest data history (averza)
@@ -1204,6 +1265,24 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.20rc1
+
+New features:
+..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
+
+Bug fixes:
+..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
+A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+........S. [ZBX-9387] fixed incorrect maintenance calculations when DST changed to summer time (akozlovs)
+..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.19
+
+4.0.19rc1 was released as 4.0.19 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.19rc1
 
 New features:
@@ -1357,7 +1436,7 @@ A......... [ZBX-16679] fixed username and password fields resetting and saving f
 ..F....... [ZBX-16809] fixed undefined offset error in action operation condition form (miks)
 ...G...... [ZBX-16595] optimized active logs checks monitoring when buffer flushing fails (arimdjonoks)
 ..F....... [ZBX-16682] fixed wrong element label update in map constructor (rlataria)
-..F....... [ZBX-16815] fixed widget form positioing when changing widget type from Graph to any other type (averza)
+..F....... [ZBX-16815] fixed widget form positioning when changing widget type from Graph to any other type (averza)
 ..F....... [ZBX-16706] fixed unneeded padding for dashboard URL widget (averza)
 ..F....... [ZBX-16784] fixed Oracle performance by using "between" operator in SQL queries (averza)
 ..F....... [ZBX-16579] fixed long text wrapping in the latest data history (averza)

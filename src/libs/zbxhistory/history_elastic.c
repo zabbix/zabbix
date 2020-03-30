@@ -118,7 +118,7 @@ static history_value_t	history_str2value(char *str, unsigned char value_type)
 
 static const char	*history_value2str(const ZBX_DC_HISTORY *h)
 {
-	static char	buffer[MAX_ID_LEN + 1];
+	static char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
 	switch (h->value_type)
 	{
@@ -128,7 +128,7 @@ static const char	*history_value2str(const ZBX_DC_HISTORY *h)
 		case ITEM_VALUE_TYPE_LOG:
 			return h->value.log->value;
 		case ITEM_VALUE_TYPE_FLOAT:
-			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, h->value.dbl);
+			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);

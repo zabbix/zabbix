@@ -4666,7 +4666,11 @@ svg {
     display: none; }
 
 .checkbox-list li {
-  margin-top: 4px; }
+  margin-top: 4px;
+  overflow-x: hidden;
+  text-overflow: ellipsis; }
+  .checkbox-list li label {
+    vertical-align: middle; }
 
 .columns-wrapper {
   display: flex;

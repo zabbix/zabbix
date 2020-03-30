@@ -212,14 +212,14 @@ static int	variant_to_ui64(zbx_variant_t *value)
 
 static int	variant_to_str(zbx_variant_t *value)
 {
-	char	*value_str;
+	char	*value_str, buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
 	switch (value->type)
 	{
 		case ZBX_VARIANT_STR:
 			return SUCCEED;
 		case ZBX_VARIANT_DBL:
-			value_str = zbx_dsprintf(NULL, ZBX_FS_DBL, value->data.dbl);
+			value_str = zbx_strdup(NULL, zbx_print_double(buffer, sizeof(buffer), value->data.dbl));
 			del_zeros(value_str);
 			break;
 		case ZBX_VARIANT_UI64:
@@ -288,13 +288,13 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 
 const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 {
-	static ZBX_THREAD_LOCAL char	buffer[ZBX_MAX_UINT64_LEN + 1];
+	static ZBX_THREAD_LOCAL char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 	zbx_uint32_t			size, i, len;
 
 	switch (value->type)
 	{
 		case ZBX_VARIANT_DBL:
-			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, value->data.dbl);
+			zbx_print_double(buffer, sizeof(buffer), value->data.dbl);
 			del_zeros(buffer);
 			return buffer;
 		case ZBX_VARIANT_UI64:
@@ -349,14 +349,13 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 	return zbx_get_variant_type_desc(value->type);
 }
 
-int	zbx_validate_value_dbl(double value)
+int	zbx_validate_value_dbl(double value, int dbl_precision)
 {
-	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
-	const double	pg_min_numeric = -1e12;
-	const double	pg_max_numeric = 1e12;
-
-	if (value <= pg_min_numeric || value >= pg_max_numeric)
+	if ((ZBX_DB_DBL_PRECISION_ENABLED == dbl_precision && (value < -1e+308 || value > 1e+308)) ||
+			(ZBX_DB_DBL_PRECISION_ENABLED != dbl_precision && (value <= -1e12 || value >= 1e12)))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }

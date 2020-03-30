@@ -2867,6 +2867,24 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
+			'compression_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'compression_availability' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'compress_older' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '7d',
+			],
 		],
 	],
 	'triggers' => [
@@ -3082,13 +3100,11 @@ return [
 			'yaxismin' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'yaxismax' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '100',
 			],
 			'templateid' => [
@@ -3131,13 +3147,11 @@ return [
 			'percent_left' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'percent_right' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'ymin_type' => [
@@ -3610,7 +3624,6 @@ return [
 			'goodsla' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '99.9',
 			],
 			'sortorder' => [
@@ -4623,7 +4636,6 @@ return [
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'ns' => [
@@ -5007,19 +5019,16 @@ return [
 			'value_min' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_avg' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_max' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 		],
