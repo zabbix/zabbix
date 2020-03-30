@@ -407,8 +407,8 @@ test case: 'term 8, not_castable_str quotes 4'
 in:
   expression: '3="\"\""'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\"\"".'
-  return: 'FAIL'
+  value: 0
+  return: 'SUCCEED'
 ---
 test case: 'term 8, not_castable_str quotes 5'
 in:
@@ -894,8 +894,8 @@ test case: 'term 3 = str and int empty space'
 in:
   expression: '" 3"=3'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at " 3".'
-  return: 'FAIL'
+  value: 0
+  return: 'SUCCEED'
 ---
 test case: 'term 3 = int and str 1'
 in:
@@ -915,15 +915,15 @@ test case: 'term 3 = int and str  empty space'
 in:
   expression: '0=" 0"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at " 0".'
-  return: 'FAIL'
+  value: 0
+  return: 'SUCCEED'
 ---
 test case: 'term 3 = int and not_castable_str'
 in:
   expression: '3="_______________________"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "_______________________".'
-  return: 'FAIL'
+  value: 0
+  return: 'SUCCEED'
 ---
 test case: 'term 3 <> str and str 1'
 in:
@@ -992,8 +992,8 @@ test case: 'term 3 <> not_castable_str and int'
 in:
   expression: '"&&&&&&&&&&"<>-89'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "&&&&&&&&&&".'
-  return: 'FAIL'
+  value: 1
+  return: 'SUCCEED'
 
 # 'and' operator tests
 ---

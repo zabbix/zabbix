@@ -184,7 +184,14 @@ static void	var_to_double(zbx_variant_t *result)
 	}
 }
 
-static void	expand_suffixes_if_operands_are_castable(zbx_variant_t *result, zbx_variant_t *operand)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: 1) expand suffixes if  both operands are castable to a number     *
+ *          2) if one operand is numeric and another is a string not castable *
+ *             to a number, then cast the numeric operand to a string         *
+ *                                                                            *
+ ******************************************************************************/
+static void	cast_operands(zbx_variant_t *result, zbx_variant_t *operand)
 {
 	zbx_variant_t	tmp_res, tmp_operand;
 	zbx_variant_copy(&tmp_res, result);
@@ -209,7 +216,27 @@ static void	expand_suffixes_if_operands_are_castable(zbx_variant_t *result, zbx_
 		var_to_double(result);
 		var_to_double(operand);
 	}
-
+	else
+	{
+		if (ZBX_INFINITY == tmp_res.data.dbl)
+		{
+			if (ZBX_VARIANT_DBL == operand->type && ZBX_INFINITY != operand->data.dbl)
+			{
+				zbx_variant_convert(operand, ZBX_VARIANT_STR);
+			}
+		}
+		else if (ZBX_INFINITY == tmp_operand.data.dbl)
+		{
+			if (ZBX_VARIANT_DBL == result->type && ZBX_INFINITY != result->data.dbl)
+			{
+				zbx_variant_convert(result, ZBX_VARIANT_STR);
+			}
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
 	zbx_variant_clear(&tmp_res);
 	zbx_variant_clear(&tmp_operand);
 }
@@ -693,7 +720,7 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 
 		operand = evaluate_term4(&oper_idx);
 
-		expand_suffixes_if_operands_are_castable(&res, &operand);
+		cast_operands(&res, &operand);
 
 		if (ZBX_VARIANT_STR == res.type && ZBX_VARIANT_STR == operand.type)
 		{
