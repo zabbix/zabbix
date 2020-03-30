@@ -2436,26 +2436,57 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
+ * Function: proxy_subscribtions_increment                                    *
+ *                                                                            *
+ * Purpose: auxiliary function for calculate values received from proxy       *
+ *                                                                            *
+ * Parameters: proxy_subscribtions - [IN/OUT] array of counters               *
+ *             proxy_hostid        - [IN] the proxy hostid                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	proxy_subscribtions_increment(zbx_vector_uint64_pair_t *proxy_subscribtions, zbx_uint64_t proxy_hostid)
+{
+	int			i;
+	zbx_uint64_pair_t	phid;
+
+	phid.first = proxy_hostid;
+
+	if (FAIL == (i = zbx_vector_uint64_pair_search(proxy_subscribtions, phid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	{
+		zbx_uint64_pair_t	p;
+
+		p.first = proxy_hostid;
+		p.second = 0;
+		zbx_vector_uint64_pair_append(proxy_subscribtions, p);
+		i = proxy_subscribtions->values_num - 1;
+	}
+
+	proxy_subscribtions->values[i].second++;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCmass_prepare_history                                           *
  *                                                                            *
  * Purpose: prepare history data using items from configuration cache and     *
  *          generate item changes to be applied and host inventory values to  *
  *          be added                                                          *
  *                                                                            *
- * Parameters: history          - [IN/OUT] array of history data              *
- *             itemids          - [IN] the item identifiers                   *
- *                                     (used for item lookup)                 *
- *             items            - [IN] the items                              *
- *             errcodes         - [IN] item error codes                       *
- *             history_num      - [IN] number of history structures           *
- *             item_diff        - [OUT] the changes in item data              *
- *             inventory_values - [OUT] the inventory values to add           *
- *             compression_age  - [IN] history compression age                *
+ * Parameters: history             - [IN/OUT] array of history data           *
+ *             itemids             - [IN] the item identifiers                *
+ *                                        (used for item lookup)              *
+ *             items               - [IN] the items                           *
+ *             errcodes            - [IN] item error codes                    *
+ *             history_num         - [IN] number of history structures        *
+ *             item_diff           - [OUT] the changes in item data           *
+ *             inventory_values    - [OUT] the inventory values to add        *
+ *             compression_age     - [IN] history compression age             *
+ *             proxy_subscribtions - [IN] history compression age             *
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
 		const DC_ITEM *items, const int *errcodes, int history_num, zbx_vector_ptr_t *item_diff,
-		zbx_vector_ptr_t *inventory_values, int compression_age)
+		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscribtions)
 {
 	static time_t	last_history_discard = 0;
 	time_t		now;
@@ -2523,19 +2554,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		DCinventory_value_add(inventory_values, item, h);
 
 		if (0 != item->host.proxy_hostid && FAIL == is_item_processed_by_server(item->type, item->key_orig))
-		{
-			zbx_proxy_commdelay_t	commdelay;
-			zbx_proxy_diff_t	diff_proxy;
-
-			if (SUCCEED == DCget_proxy_commdelay(item->host.proxy_hostid, &commdelay) &&
-					0 < commdelay.values_num && commdelay.period_start <= h->ts.sec &&
-					h->ts.sec <= commdelay.period_end)
-			{
-				diff_proxy.hostid = item->host.proxy_hostid;
-				diff_proxy.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_VALNUM;
-				zbx_dc_update_proxy(&diff_proxy);
-			}
-		}
+			proxy_subscribtions_increment(proxy_subscribtions, item->host.proxy_hostid);
 	}
 
 	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -2828,7 +2847,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids, timer_triggerids;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
-	zbx_vector_uint64_pair_t	trends_diff;
+	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
 
 	if (NULL == history_float && NULL != history_float_cbs)
@@ -2867,6 +2886,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_ptr_create(&item_diff);
 	zbx_vector_ptr_create(&trigger_diff);
 	zbx_vector_uint64_pair_create(&trends_diff);
+	zbx_vector_uint64_pair_create(&proxy_subscribtions);
 
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, ZBX_HC_SYNC_MAX);
@@ -2923,7 +2943,10 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
 
 			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
-					&inventory_values, compression_age);
+					&inventory_values, compression_age, &proxy_subscribtions);
+
+			if (0 != proxy_subscribtions.values_num)
+				zbx_dc_subscribe_proxy(&proxy_subscribtions);
 
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
@@ -3004,6 +3027,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			zbx_vector_uint64_clear(&triggerids);
 		}
 
+		if (0 != proxy_subscribtions.values_num)
+		{
+			zbx_dc_unsubscribe_proxy(&proxy_subscribtions);
+			zbx_vector_uint64_pair_clear(&proxy_subscribtions);
+		}
+
 		if (0 != history_num)
 		{
 			LOCK_CACHE;
@@ -3077,6 +3106,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
+	zbx_vector_uint64_pair_destroy(&proxy_subscribtions);
 
 	zbx_vector_uint64_destroy(&timer_triggerids);
 	zbx_vector_uint64_destroy(&triggerids);

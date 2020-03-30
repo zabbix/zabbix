@@ -1682,34 +1682,21 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 
 	if (0 != item->host.proxy_hostid && 0 != lazy)
 	{
-		zbx_proxy_commdelay_t	commdelay;
+		zbx_proxy_suppress_t	suppress_win;
+		int			lastaccess;
 
-		if (SUCCEED != DCget_proxy_commdelay(item->host.proxy_hostid, &commdelay))
+		if (SUCCEED != DCget_proxy_suppress_win(item->host.proxy_hostid, &suppress_win, &lastaccess, NULL))
 		{
-			*error = zbx_strdup(*error, "cannot retrieve proxy commdelay");
+			*error = zbx_strdup(*error, "cannot retrieve proxy last access");
 			goto out;
 		}
 
-		if (0 == commdelay.values_num)
+		if (0 != (suppress_win.flags & ZBX_PROXY_SUPPRESS_SUBSCRIBED))
 		{
-			int	lastaccess, proxy_delay;
-
-			if (SUCCEED != DCget_proxy_lastaccess(item->host.proxy_hostid, &lastaccess))
-			{
-				*error = zbx_strdup(*error, "cannot retrieve proxy lastaccess");
-				goto out;
-			}
-
-			if (SUCCEED != DCget_proxy_delay(item->host.proxy_hostid, &proxy_delay))
-			{
-				*error = zbx_strdup(*error, "cannot retrieve proxy delay");
-				goto out;
-			}
-
-			period = arg1 + proxy_delay + (ts.sec - lastaccess);
+			lastaccess = suppress_win.period_start;
 		}
-		else
-			period = commdelay.period_end - commdelay.period_start + arg1;
+
+		period = arg1 + (ts.sec - lastaccess);
 	}
 	else
 		period = arg1;

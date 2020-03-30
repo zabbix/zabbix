@@ -782,10 +782,10 @@ int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
 
-int	DCget_proxy_commdelay(zbx_uint64_t hostid, zbx_proxy_commdelay_t *commdelay);
+int	DCget_proxy_suppress_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *suppress_win, int *lastaccess,
+		unsigned char *proxy_status);
 int	DCget_proxy_delay(zbx_uint64_t hostid, int *delay);
 int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
-int	DCget_proxy_lastaccess(zbx_uint64_t hostid, int *lastaccess);
 
 unsigned int	DCget_internal_action_count(void);
 
@@ -884,6 +884,8 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 
 void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff);
 void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess);
+void	zbx_dc_subscribe_proxy(zbx_vector_uint64_pair_t *subscriptions);
+void	zbx_dc_unsubscribe_proxy(zbx_vector_uint64_pair_t *subscriptions);
 
 typedef struct
 {

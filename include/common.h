@@ -24,6 +24,7 @@
 #include "zbxtypes.h"
 #include "version.h"
 #include "md5.h"
+#include "zbxalgo.h"
 
 #if defined(__MINGW32__)
 #	define __try
@@ -930,11 +931,22 @@ ZBX_TASK_EX;
 
 typedef struct
 {
-	int	values_num;
-	int	period_start;
-	int	period_end;
+	int			values_num;
+	int			period_start;
+	int			period_end;
+	zbx_vector_uint64_t	subscribe;
+#define ZBX_PROXY_SUPPRESS_DISABLE				0x00
+#define ZBX_PROXY_SUPPRESS_ACTIVE				0x01
+#define ZBX_PROXY_SUPPRESS_BASE_PROXYDELAY			0x02
+#define ZBX_PROXY_SUPPRESS_BASE_VALUE_TS_SINGL_PACKET		0x04
+#define ZBX_PROXY_SUPPRESS_SUBSCRIBED				0x08
+#define ZBX_PROXY_SUPPRESS_ACTIVE_BASE_PROXYDELAY		\
+	(ZBX_PROXY_SUPPRESS_ACTIVE | ZBX_PROXY_SUPPRESS_BASE_PROXYDELAY)
+#define ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET	\
+	(ZBX_PROXY_SUPPRESS_ACTIVE | ZBX_PROXY_SUPPRESS_BASE_VALUE_TS_SINGL_PACKET)
+	int	flags;
 }
-zbx_proxy_commdelay_t;
+zbx_proxy_suppress_t;
 
 #define ZBX_RTC_MSG_SHIFT	0
 #define ZBX_RTC_SCOPE_SHIFT	8

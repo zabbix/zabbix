@@ -31,6 +31,7 @@
 #include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "zbxlld.h"
+#include "cfg.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -2816,25 +2817,25 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  *           manager.                                                         *
  *                                                                            *
  ******************************************************************************/
-static void	process_item_value(const DC_ITEM *item, AGENT_RESULT *result, zbx_timespec_t *ts, int *hval,
+static void	process_item_value(const DC_ITEM *item, AGENT_RESULT *result, zbx_timespec_t *ts, int *h_num,
 		char *error)
 {
 	if (0 == item->host.proxy_hostid)
 	{
 		zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
-		*hval = 0;
+		*h_num = 0;
 	}
 	else
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 		{
 			zbx_lld_process_agent_result(item->itemid, result, ts, error);
-			*hval = 0;
+			*h_num = 0;
 		}
 		else
 		{
 			dc_add_history(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
-			*hval = 1;
+			*h_num = 1;
 		}
 	}
 }
@@ -2853,7 +2854,7 @@ static void	process_item_value(const DC_ITEM *item, AGENT_RESULT *result, zbx_ti
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, int *hval)
+static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, int *h_num)
 {
 	if (ITEM_STATUS_ACTIVE != item->status)
 		return FAIL;
@@ -2881,7 +2882,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
-		process_item_value(item, NULL, &value->ts, hval, value->value);
+		process_item_value(item, NULL, &value->ts, h_num, value->value);
 	}
 	else
 	{
@@ -2930,7 +2931,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 		if (0 != ISSET_VALUE(&result) || 0 != ISSET_META(&result))
 		{
 			item->state = ITEM_STATE_NORMAL;
-			process_item_value(item, &result, &value->ts, hval, NULL);
+			process_item_value(item, &result, &value->ts, h_num, NULL);
 		}
 
 		free_result(&result);
@@ -2952,13 +2953,13 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
  *                                   out - value processing result            *
  *                                      (SUCCEED - processed, FAIL - error)   *
  *             values_num - [IN] the number of items/values to process        *
- *             commdelay  - [IN/OUT] proxy communication delay info           *
+ *             suppress_win - [IN/OUT] proxy communication delay info        *
  *                                                                            *
  * Return value: the number of processed values                               *
  *                                                                            *
  ******************************************************************************/
 int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
-		zbx_proxy_commdelay_t *commdelay)
+		zbx_proxy_suppress_t *suppress_win)
 {
 	size_t	i;
 	int	processed_num = 0, history_num;
@@ -2980,19 +2981,19 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 			continue;
 		}
 
-		if (0 != items[i].host.proxy_hostid && NULL != commdelay && 0 < history_num)
+		if (0 != items[i].host.proxy_hostid && NULL != suppress_win &&
+				0 != (suppress_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) && 0 < history_num)
 		{
-			if (0 == commdelay->period_end)
+			if (0 != (suppress_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET) &&
+					values[i].ts.sec < suppress_win->period_start)
 			{
-				if (0 == commdelay->period_start || values[i].ts.sec < commdelay->period_start)
-					commdelay->period_start = values[i].ts.sec;
-
-				commdelay->values_num++;
+				suppress_win->period_start = values[i].ts.sec;
 			}
-			else if (commdelay->period_start <= values[i].ts.sec &&
-					values[i].ts.sec <= commdelay->period_end)
+
+			if (suppress_win->period_start <= values[i].ts.sec &&
+					values[i].ts.sec <= suppress_win->period_end)
 			{
-				commdelay->values_num++;
+				suppress_win->values_num++;
 			}
 		}
 
@@ -3449,7 +3450,7 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  ******************************************************************************/
 static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
 		void *validator_args, struct zbx_json_parse *jp_data, zbx_data_session_t *session,
-		zbx_proxy_commdelay_t *commdelay, char **info)
+		zbx_proxy_suppress_t *suppress_win, char **info)
 {
 	const char		*pnext = NULL;
 	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
@@ -3498,7 +3499,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 			}
 		}
 
-		processed_num += process_history_data(items, values, errcodes, values_num, commdelay);
+		processed_num += process_history_data(items, values, errcodes, values_num, suppress_win);
 
 		total_num += read_num;
 
@@ -4538,6 +4539,43 @@ static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_off
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_proxy_suppression_mode                                     *
+ *                                                                            *
+ * Purpose: detect lost connection with proxy and calculate suppression       *
+ *          window if possible                                                *
+ *                                                                            *
+ * Parameters: ts          - [IN] timestamp when the proxy connection was     *
+ *                                established                                 *
+ *             proxy_staus - [IN] - active or passive proxy                   *
+ *             diff        - [IN/OUT] the properties to update                *
+ *                                                                            *
+ ******************************************************************************/
+static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy_status, zbx_proxy_diff_t *diff)
+{
+	if (0 != (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+	{
+		diff->suppress_win.values_num = 0;	/* reset counter of new suppress values received from proxy */
+		return;					/* only for current packet */
+	}
+
+	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
+			5 * CONFIG_PROXYDATA_FREQUENCY < (ts->sec - diff->lastaccess)) ||
+			(HOST_STATUS_PROXY_ACTIVE == proxy_status &&
+			ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX < (ts->sec - diff->lastaccess)))
+	{
+		diff->suppress_win.values_num = 0;
+		diff->suppress_win.period_end = ts->sec;
+		diff->suppress_win.period_start = diff->suppress_win.period_end - diff->proxy_delay;
+
+		if (0 == diff->proxy_delay)
+			diff->suppress_win.flags = ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET;
+		else
+			diff->suppress_win.flags = ZBX_PROXY_SUPPRESS_ACTIVE_BASE_PROXYDELAY;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_proxy_data                                               *
  *                                                                            *
  * Purpose: process 'proxy data' request                                      *
@@ -4590,6 +4628,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
 		zbx_data_session_t	*session = NULL;
+		unsigned char		proxy_status;
 
 		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SESSION, value, sizeof(value), NULL))
 		{
@@ -4605,34 +4644,24 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			session = zbx_dc_get_or_create_data_session(proxy->hostid, value);
 		}
 
-		if (SUCCEED != (ret = DCget_proxy_commdelay(proxy->hostid, &diff.commdelay)))
+		if (SUCCEED != (ret = DCget_proxy_suppress_win(proxy->hostid, &diff.suppress_win, &diff.lastaccess,
+				&proxy_status)))
 		{
 			*error = zbx_dsprintf(*error, "cannot get proxy communication delay");
 			ret = FAIL;
 			goto out;
 		}
 
-		if (0 == diff.commdelay.values_num)
-			diff.commdelay.period_end = diff.commdelay.period_start = 0;
-		else
-			diff.commdelay.values_num = 0;
+		check_proxy_suppression_mode(ts, proxy_status, &diff);
 
 		if (SUCCEED == (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
-				(void *)&proxy->hostid, &jp_data, session, &diff.commdelay, &error_step)))
+				(void *)&proxy->hostid, &jp_data, session, &diff.suppress_win, &error_step)))
 		{
-			diff.hostid = proxy->hostid;
+			diff.flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
 
-			if (0 < diff.commdelay.values_num)
-			{
-				if (0 <= diff.commdelay.period_start - diff.proxy_delay)
-					diff.commdelay.period_start -= diff.proxy_delay;
+			if (0 < diff.suppress_win.values_num)
+				diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
 
-				diff.commdelay.period_end = (int)time(NULL);
-				diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_COMMDELAY;
-				zbx_dc_update_proxy(&diff);
-			}
-
-			diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
 			zbx_dc_update_proxy(&diff);
 		}
 		else

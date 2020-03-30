@@ -1047,6 +1047,19 @@ static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
+{
+	if (ZBX_LOC_QUEUE == proxy->location)
+	{
+		zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
+		proxy->location = ZBX_LOC_NOWHERE;
+	}
+
+	zbx_strpool_release(proxy->proxy_address);
+	zbx_vector_uint64_destroy(&proxy->suppress_win.subscribe);
+	zbx_hashset_remove_direct(&config->proxies, proxy);
+}
+
 static void	DCsync_hosts(zbx_dbsync_t *sync)
 {
 	char		**row;
@@ -1450,9 +1463,12 @@ done:
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
 				proxy->more_data = 0;
-				proxy->commdelay.values_num = 0;
-				proxy->commdelay.period_start = 0;
-				proxy->commdelay.period_end = 0;
+				proxy->suppress_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
+				proxy->suppress_win.values_num = 0;
+				proxy->suppress_win.period_start = 0;
+				proxy->suppress_win.period_end = 0;
+				zbx_vector_uint64_create_ext(&proxy->suppress_win.subscribe, __config_mem_malloc_func,
+						__config_mem_realloc_func, __config_mem_free_func);
 			}
 
 			proxy->auto_compress = atoi(row[32 + ZBX_HOST_TLS_OFFSET]);
@@ -1477,16 +1493,7 @@ done:
 			proxy->last_version_error_time = time(NULL);
 		}
 		else if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		{
-			if (ZBX_LOC_QUEUE == proxy->location)
-			{
-				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
-				proxy->location = ZBX_LOC_NOWHERE;
-			}
-
-			zbx_strpool_release(proxy->proxy_address);
-			zbx_hashset_remove_direct(&config->proxies, proxy);
-		}
+			DCsync_proxy_remove(proxy);
 
 		host->status = status;
 	}
@@ -1512,16 +1519,7 @@ done:
 		/* proxies */
 
 		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		{
-			if (ZBX_LOC_QUEUE == proxy->location)
-			{
-				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
-				proxy->location = ZBX_LOC_NOWHERE;
-			}
-
-			zbx_strpool_release(proxy->proxy_address);
-			zbx_hashset_remove_direct(&config->proxies, proxy);
-		}
+			DCsync_proxy_remove(proxy);
 
 		/* hosts */
 
@@ -12082,6 +12080,93 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_subscribe_proxy                                           *
+ *                                                                            *
+ * Purpose: if there was a loss of communication and it is necessary to       *
+ *          suppress the nodate()  trigger, we try to register the number of  *
+ *          historical data received from the proxy to correct the time       *
+ *          during their processing in the nodata() trigger                   *
+ *                                                                            *
+ * Parameter: subscriptions - [IN] the array of trigger id and value count    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_subscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
+{
+	ZBX_DC_PROXY		*proxy;
+	int			i;
+	zbx_uint64_pair_t	p;
+
+	WRLOCK_CACHE;
+
+	for (i = 0; i < subscriptions->values_num; i++)
+	{
+		p = subscriptions->values[i];
+
+		if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &p.first)))
+			continue;
+
+		if (0 == (proxy->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+			continue;
+
+		if (0 >= proxy->suppress_win.values_num)
+			continue;
+
+		proxy->suppress_win.values_num -= p.second;
+		zbx_vector_uint64_append(&proxy->suppress_win.subscribe, (zbx_uint64_t)zbx_get_thread_id());
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_unsubscribe_proxy                                         *
+ *                                                                            *
+ * Purpose: stop suppress mode of the nodata() trigger                        *
+ *                                                                            *
+ * Parameter: subscriptions - [IN] the array of trigger id and value count    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_unsubscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
+{
+	ZBX_DC_PROXY	*proxy;
+	int		i, j;
+	zbx_uint64_t	p;
+
+	WRLOCK_CACHE;
+
+	for (i = 0; i < subscriptions->values_num; i++)
+	{
+		p = subscriptions->values[i].first;
+
+		if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &p)))
+			continue;
+
+		if (0 == (proxy->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+			continue;
+
+		if (0 >= proxy->suppress_win.values_num)
+		{
+			proxy->suppress_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
+			proxy->suppress_win.period_start = 0;
+			proxy->suppress_win.period_end = 0;
+			proxy->suppress_win.values_num = 0;
+		}
+
+		if (FAIL == (j = zbx_vector_uint64_search(&proxy->suppress_win.subscribe, zbx_get_thread_id(),
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			continue;
+		}
+
+		zbx_vector_uint64_remove(&proxy->suppress_win.subscribe, j);
+	}
+
+	UNLOCK_CACHE;
+
+}
 
 /******************************************************************************
  *                                                                            *
@@ -12099,7 +12184,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 	WRLOCK_CACHE;
 
-	if (0 == (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VALNUM) && diff->lastaccess < config->proxy_lastaccess_ts)
+	if (diff->lastaccess < config->proxy_lastaccess_ts)
 		diff->lastaccess = config->proxy_lastaccess_ts;
 
 	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &diff->hostid)))
@@ -12131,7 +12216,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		}
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR))
 		{
-			if (proxy-> last_version_error_time != diff->last_version_error_time)
+			if (proxy->last_version_error_time != diff->last_version_error_time)
 				proxy->last_version_error_time = diff->last_version_error_time;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR);
 		}
@@ -12143,39 +12228,23 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 			if (proxy->more_data != diff->more_data)
 				proxy->more_data = diff->more_data;
+
+			diff->flags &= ~ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
 		}
 
-		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_COMMDELAY))
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN))
 		{
-			zbx_proxy_commdelay_t	*proxy_commdelay = &proxy->commdelay;
+			zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win, *ds_win = &diff->suppress_win;
 
-			if (0 == proxy_commdelay->values_num)
+			if ((ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) != (ds_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 			{
-				proxy_commdelay->period_start = diff->commdelay.period_start;
-				proxy_commdelay->period_end = diff->commdelay.period_end;
-				proxy_commdelay->values_num = diff->commdelay.values_num;
+				ps_win->period_start = ds_win->period_start;
+				ps_win->period_end = ds_win->period_end;
+				ps_win->flags = ds_win->flags;
 			}
-			else
-			{
-				proxy_commdelay->values_num += diff->commdelay.values_num;
 
-				if (0 != proxy->more_data)
-				{
-					if (diff->commdelay.period_start < proxy_commdelay->period_start)
-						proxy_commdelay->period_start = diff->commdelay.period_start;
-
-					if (diff->commdelay.period_end > proxy_commdelay->period_end)
-						proxy_commdelay->period_end = diff->commdelay.period_end;
-				}
-			}
-		}
-
-		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VALNUM))
-		{
-			if (proxy->commdelay.values_num > 0)
-				proxy->commdelay.values_num--;
-			else
-				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_VALNUM);
+			ps_win->values_num += ds_win->values_num;
+			diff->flags &= ~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
 		}
 	}
 
@@ -12410,41 +12479,60 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 	UNLOCK_CACHE;
 }
 
-int	DCget_proxy_commdelay(zbx_uint64_t hostid, zbx_proxy_commdelay_t *commdelay)
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_proxy_suppress_win                                         *
+ *                                                                            *
+ * Purpose: retrieves proxy suppress window data from the cache               *
+ *                                                                            *
+ * Parameters: hostid       - [IN] proxy host id                              *
+ *             suppress_win - [OUT] suppress window data                      *
+ *             lastaccess   - [OUT] proxy last access time                    *
+ *             proxy_status - [OUT] active or passive proxy                   *
+ *                                                                            *
+ * Return value: SUCCEED - the data is retrieved                              *
+ *               FAIL    - the data cannot be retrieved, proxy not found in   *
+ *                         configuration cache                                *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_proxy_suppress_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *suppress_win, int *lastaccess,
+		unsigned char *proxy_status)
 {
 	const ZBX_DC_PROXY	*dc_proxy;
+	const ZBX_DC_HOST	*dc_host;
 	int			ret;
 
 	RDLOCK_CACHE;
 
 	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
 	{
-		const zbx_proxy_commdelay_t	*proxy_commdelay = &dc_proxy->commdelay;
+		const zbx_proxy_suppress_t	*proxy_suppress_win = &dc_proxy->suppress_win;
 
-		commdelay->period_start = proxy_commdelay->period_start;
-		commdelay->period_end = proxy_commdelay->period_end;
-		commdelay->values_num = proxy_commdelay->values_num;
-		ret = SUCCEED;
-	}
-	else
-		ret = FAIL;
-
-	UNLOCK_CACHE;
-
-	return ret;
-}
-
-int	DCget_proxy_lastaccess(zbx_uint64_t hostid, int *lastaccess)
-{
-	const ZBX_DC_PROXY	*dc_proxy;
-	int			ret;
-
-	RDLOCK_CACHE;
-
-	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-	{
+		suppress_win->period_start = proxy_suppress_win->period_start;
+		suppress_win->period_end = proxy_suppress_win->period_end;
+		suppress_win->values_num = proxy_suppress_win->values_num;
+		suppress_win->flags  = proxy_suppress_win->flags;
 		*lastaccess = dc_proxy->lastaccess;
+
+		if (0 != (proxy_suppress_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+		{
+
+			if (FAIL != zbx_vector_uint64_search(&proxy_suppress_win->subscribe,
+				(zbx_uint64_t)zbx_get_thread_id(), ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				suppress_win->flags |= ZBX_PROXY_SUPPRESS_SUBSCRIBED;
+			}
+		}
+
 		ret = SUCCEED;
+
+		if (NULL != proxy_status)
+		{
+			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+				*proxy_status = dc_host->status;
+			else
+				ret = FAIL;
+		}
 	}
 	else
 		ret = FAIL;
