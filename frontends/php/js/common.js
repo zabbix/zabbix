@@ -308,13 +308,6 @@ function getPosition(obj) {
 	return pos;
 }
 
-function get_bodywidth() {
-	var w = parseInt(document.body.scrollWidth);
-	var w2 = parseInt(document.body.offsetWidth);
-
-	return (w2 < w) ? w2 : w;
-}
-
 /**
  * Opens popup content in overlay dialogue.
  *

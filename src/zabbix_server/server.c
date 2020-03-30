@@ -305,6 +305,8 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 
+int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -1125,6 +1127,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 	DBcheck_character_set();
+
+	if (SUCCEED == DBcheck_double_type())
+		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_ENABLED;
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
+
+	DBcheck_capabilities();
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS

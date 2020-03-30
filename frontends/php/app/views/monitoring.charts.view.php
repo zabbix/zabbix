@@ -63,7 +63,7 @@ $widget = (new CWidget())
 				])
 				: null
 			)
-			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -76,7 +76,7 @@ $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'charts.v
 	->addFormItem((new CVar('view_as', $data['view_as']))->removeId())
 	->addFormItem((new CVar('action', 'charts.view'))->removeId());
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow((new CLabel(_('Host'), 'filter_hostids__ms')),

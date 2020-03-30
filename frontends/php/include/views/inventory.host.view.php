@@ -244,7 +244,7 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CList())->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode])))
+	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
 	->addItem((new CForm())
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem($hostInventoriesTab)

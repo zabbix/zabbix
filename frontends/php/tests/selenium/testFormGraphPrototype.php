@@ -1034,9 +1034,9 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'errors' => [
 						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
-						'Value "name" of "yaxismin" has incorrect decimal format.',
-						'Value "name" of "yaxismax" has incorrect decimal format.'
-					]
+						'Field "yaxismin" is not correct: a number is expected',
+						'Field "yaxismax" is not correct: a number is expected'
+				]
 				]
 			],
 			[

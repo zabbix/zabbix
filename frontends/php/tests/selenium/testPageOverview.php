@@ -610,7 +610,6 @@ class testPageOverview extends CLegacyWebTest {
 					'type' => 'Trigger overview',
 					'links' => [
 						'zabbix.php?action=problem.view&filter_triggerids',
-						'action=acknowledge.edit&eventids',
 						'triggers.php?form=update&triggerid',
 						'action=showgraph&itemid'
 					],
@@ -669,18 +668,7 @@ class testPageOverview extends CLegacyWebTest {
 			$this->zbxTestLogin('overview.php?type=0');
 			$this->zbxTestCheckHeader('Trigger overview');
 			$this->zbxTestAssertElementPresentXpath("//header");
-			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
-
-			$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-max')]");
-			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
-			$this->zbxTestCheckHeader('Trigger overview');
-			$this->zbxTestAssertElementNotPresentXpath("//header");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
-			$this->zbxTestAssertElementNotPresentXpath('//div[@id="mmenu"][@class="top-nav-container"]');
-			$this->zbxTestAssertElementNotPresentXpath('//nav[@class="top-subnav-container"]');
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
-
 			$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]");
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
@@ -690,10 +678,10 @@ class testPageOverview extends CLegacyWebTest {
 
 			$this->webDriver->executeScript('arguments[0].click();', [$this->webDriver->findElement(WebDriverBy::className('btn-min'))]);
 			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-max')]"));
-			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-kiosk')]"));
+			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 			$this->zbxTestAssertElementPresentXpath("//header");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
+			$this->zbxTestAssertElementPresentXpath("//header[@class='header-title']");
 		}
 		catch (Exception $e) {
 			// Reset fullscreen/kiosk mode.

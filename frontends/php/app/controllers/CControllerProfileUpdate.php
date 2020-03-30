@@ -63,9 +63,10 @@ class CControllerProfileUpdate extends CController {
 				case 'web.screenconf.filter.active':
 				case 'web.screens.filter.active':
 				case 'web.scripts.filter.active':
-				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
+				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.sidebar.mode':
 				case 'web.slideconf.filter.active':
 				case 'web.slides.filter.active':
 				case 'web.sysmapconf.filter.active':
@@ -131,6 +132,10 @@ class CControllerProfileUpdate extends CController {
 
 			case 'web.layout.mode':
 				CViewHelper::saveLayoutMode($value_int);
+				break;
+
+			case 'web.sidebar.mode':
+				CViewHelper::saveSidebarMode($value_int);
 				break;
 
 			default:

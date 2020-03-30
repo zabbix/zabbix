@@ -609,6 +609,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			case OCI_SUCCESS_WITH_INFO:
 				zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_oci_error(err, NULL));
 				/* break; is not missing here */
+				ZBX_FALLTHROUGH;
 			case OCI_SUCCESS:
 				err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp,
 						(ub4 *)0, OCI_ATTR_SERVER, oracle.errhp);
@@ -750,6 +751,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
+		ret = ZBX_DB_OK;
+
+	if (ZBX_DB_OK != ret)
+		goto out;
+
+	/* increase float precision */
+	if (0 < (ret = zbx_db_execute("set extra_float_digits to 3")))
 		ret = ZBX_DB_OK;
 
 	if (ZBX_DB_OK != ret)
@@ -1169,7 +1177,7 @@ static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, 
 				*alenp = 0;
 				break;
 			}
-			/* break; is not missing here */
+			ZBX_FALLTHROUGH;
 		case ZBX_TYPE_UINT:
 			*bufpp = &((OCINumber *)context->data)[iter];
 			*alenp = sizeof(OCINumber);
@@ -1256,7 +1264,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 			break;
 		case ZBX_TYPE_FLOAT:
 			context->size_max = sizeof(double);
-			data_type = SQLT_FLT;
+			data_type = SQLT_BDOUBLE;
 			break;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
@@ -1669,33 +1677,38 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 		}
 		else
 		{
-			if (OCI_SUCCESS == err)
+			if (SQLT_IBDOUBLE != data_type && SQLT_BDOUBLE != data_type)
 			{
-				/* retrieve the length semantics for the column */
-				char_semantics = 0;
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics,
-						(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
-			}
-
-			if (OCI_SUCCESS == err)
-			{
-				if (0 != char_semantics)
+				if (OCI_SUCCESS == err)
 				{
-					/* retrieve the column width in characters */
-					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
-							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+					/* retrieve the length semantics for the column */
+					char_semantics = 0;
+					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics,
+							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
+				}
 
-					/* adjust for UTF-8 */
-					col_width *= 4;
-				}
-				else
+				if (OCI_SUCCESS == err)
 				{
-					/* retrieve the column width in bytes */
-					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
-							(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+					if (0 != char_semantics)
+					{
+						/* retrieve the column width in characters */
+						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
+								(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+
+						/* adjust for UTF-8 */
+						col_width *= 4;
+					}
+					else
+					{
+						/* retrieve the column width in bytes */
+						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
+								(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
+					}
 				}
+				col_width++;	/* add 1 byte for terminating '\0' */
 			}
-			col_width++;	/* add 1 byte for terminating '\0' */
+			else
+				col_width = ZBX_MAX_DOUBLE_LEN + 1;
 
 			result->values_alloc[counter - 1] = col_width;
 			result->values[counter - 1] = zbx_malloc(NULL, col_width);
@@ -2388,4 +2401,26 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 int	zbx_db_strlen_n(const char *text, size_t maxlen)
 {
 	return zbx_strlen_utf8_nchars(text, maxlen);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbms_get_version                                             *
+ *                                                                            *
+ * Purpose: returns DBMS version as integer: MMmmuu                           *
+ *          M = major version part                                            *
+ *          m = minor version part                                            *
+ *          u = micro version part                                            *
+ *                                                                            *
+ * Example: 1.2.34 version will be returned as 10234                          *
+ *                                                                            *
+ * Return value: DBMS version or 0 if unknown                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbms_get_version(void)
+{
+#ifdef HAVE_POSTGRESQL
+	return ZBX_PG_SVERSION;
+#endif
+	return 0;
 }

@@ -35,27 +35,20 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
 }
 
-if (CProfile::isModified()) {
-	DBstart();
-	$result = CProfile::flush();
-	DBend($result);
-}
-
 // end transactions if they have not been closed already
 if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 	error(_('Transaction has not been closed. Aborting...'));
 	DBend(false);
 }
 
-show_messages();
+// Display unexpected messages (if any) generated while processing the output.
+echo get_prepared_messages(['with_current_messages' => true]);
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	// end of article div
-	echo '</main>'."\n";
-	if (!defined('ZBX_PAGE_NO_MENU')) {
-		makePageFooter()->show();
-	}
+	makeServerStatusOutput()->show();
+
 	insertPagePostJs();
+
 	require_once 'include/views/js/common.init.js.php';
 
 	if (in_array($page['type'], [PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML])) {
@@ -70,7 +63,11 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		}
 	}
 
-	echo '</body></html>';
+	if (!defined('ZBX_PAGE_NO_MENU')) {
+		makePageFooter()->show();
+	}
+
+	echo '</div></body></html>';
 }
 
 exit;

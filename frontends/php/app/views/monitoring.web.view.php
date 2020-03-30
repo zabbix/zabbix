@@ -36,7 +36,7 @@ $web_layout_mode = $this->getLayoutMode();
 	->setTitle(_('Web monitoring'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
-		(new CTag('nav', true, get_icon('fullscreen', ['mode' => $web_layout_mode])))
+		(new CTag('nav', true, get_icon('kioskmode', ['mode' => $web_layout_mode])))
 			->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'web.view')))

@@ -27,6 +27,7 @@
 #include "zbxserver.h"
 
 #include "zbxhistory.h"
+#include "history_compress.h"
 #include "housekeeper.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 
@@ -290,7 +291,7 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zbx_hashset_create(&rule->item_cache, 1024, zbx_default_uint64_hash_func, zbx_default_uint64_compare_func);
+	zbx_hashset_create(&rule->item_cache, 1024, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&rule->delete_queue);
 	zbx_vector_ptr_reserve(&rule->delete_queue, HK_INITIAL_DELETE_QUEUE_SIZE);
@@ -620,7 +621,7 @@ static int	housekeeping_history_and_trends(int now)
 		/* If partitioning enabled for history and/or trends then drop partitions with expired history.  */
 		/* ZBX_HK_MODE_PARTITION is set during configuration sync based on the following: */
 		/* 1. "Override item history (or trend) period" must be on 2. DB must be PostgreSQL */
-		/* 3. config.db_extension must be set to "timescaledb" */
+		/* 3. config.db.extension must be set to "timescaledb" */
 		if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
 		{
 			hk_drop_partition_for_rule(rule, now);
@@ -1134,6 +1135,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 
+	hk_history_compression_init();
+
 	zbx_set_sigusr_handler(zbx_housekeeper_sigusr_handler);
 
 	while (ZBX_IS_RUNNING())
@@ -1162,6 +1165,13 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION);
+
+		if (0 == strcmp(cfg.db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+		{
+			zbx_setproctitle("%s [synchronizing history and trends compression settings]",
+					get_process_type_string(process_type));
+			hk_history_compression_update(&cfg.db);
+		}
 
 		zbx_setproctitle("%s [removing old history and trends]",
 				get_process_type_string(process_type));

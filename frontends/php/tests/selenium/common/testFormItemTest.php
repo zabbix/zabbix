@@ -151,6 +151,64 @@ class testFormItemTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Zabbix agent',
+						'Key' => 'key.macro.in.preproc.steps'
+					],
+					'macros' => [
+						[
+							'macro' => '{$1}',
+							'value' => 'Numeric macro'
+						],
+						[
+							'macro' => '{$A}',
+							'value' => 'Some text'
+						],
+						[
+							'macro' => '{$_}',
+							'value' => 'Underscore'
+						]
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
+						'Key' => 'macro.in.key.and.preproc.steps[{$DEFAULT_DELAY}]'
+					],
+					'macros' => [
+						[
+							'macro' => '{$1}',
+							'value' => 'Numeric macro'
+						],
+						[
+							'macro' => '{$A}',
+							'value' => 'Some text'
+						],
+						[
+							'macro' => '{$_}',
+							'value' => 'Underscore'
+						],
+						[
+							'macro' => '{$DEFAULT_DELAY}',
+							'value' => '30'
+						]
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => '{$A}', 'parameter_2' => '{$1}'],
+						['type' => 'JSONPath', 'parameter_1' => '{$_}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Zabbix agent',
 						'Key' => 'test.item.key'
 					]
 
@@ -620,6 +678,8 @@ class testFormItemTest extends CWebTest {
 					$this->checkServerMessage(['Incorrect value for field "Host address": cannot be empty.']);
 				}
 
+				$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+				$value_test_button = $overlay->query('button:Get value and test')->waitUntilVisible()->one();
 				// Uncheck "Get value from host" checkbox.
 				if (CTestArrayHelper::get($data, 'host_value', true) === false) {
 					$get_host_value->uncheck();
@@ -628,6 +688,9 @@ class testFormItemTest extends CWebTest {
 						$elements[$field]->waitUntilNotVisible();
 					}
 					$button->waitUntilNotVisible();
+					// Check that Test button changed its name.
+					$this->assertFalse($overlay->query('button:Get value and test')->one(false)->isValid());
+					$overlay->query('button:Test')->waitUntilVisible()->one();
 
 					/*
 					 * Check that value fields still present after "Get value

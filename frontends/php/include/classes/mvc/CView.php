@@ -200,7 +200,7 @@ class CView {
 	/**
 	 * Get current layout mode if layout modes were enabled for this view, or ZBX_LAYOUT_NORMAL otherwise.
 	 *
-	 * @return int  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_FULLSCREEN | ZBX_LAYOUT_KIOSKMODE
+	 * @return int  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
 	 */
 	public function getLayoutMode() {
 		return $this->layout_modes_enabled ? CViewHelper::loadLayoutMode() : ZBX_LAYOUT_NORMAL;

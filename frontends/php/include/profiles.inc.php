@@ -143,8 +143,19 @@ function update_config($config) {
 			'max' => SEC_PER_DAY,
 			'allow_zero' => false,
 			'message' => _('Invalid refresh of unsupported items: %1$s')
-		]
+		],
+		'compress_older' => [
+			'min' => SEC_PER_DAY * 7,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _s('Invalid parameter "%1$s": %2$s.', _('Compress records older than'), '%1$s')
+		],
 	];
+
+	if (array_key_exists('compression_status', $config) && $config['compression_status'] === 0) {
+		unset($fields['compress_older']);
+		unset($config['compress_older']);
+	}
 
 	foreach ($fields as $field => $args) {
 		if (array_key_exists($field, $config)

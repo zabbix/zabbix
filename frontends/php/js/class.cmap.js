@@ -186,16 +186,9 @@ ZABBIX.apps.map = (function($) {
 					class: 'overlay-dialogue',
 					style: 'display: none; top: 0; left: 0;'
 				})
-				.appendTo('body')
+				.appendTo('.wrapper')
 				.draggable({
-					containment: [0, 0, 3200, 3200],
-					start: function(){
-						$(this).data("scroll", {top: window.pageYOffset, left: window.pageXOffset});
-					},
-					drag: function(event, ui){
-						ui.position.top -= parseInt($(this).data("scroll").top);
-						ui.position.left -= parseInt($(this).data("scroll").left);
-					}
+					containment: [0, 0, 3200, 3200]
 				});
 
 			this.updateImage();
@@ -3926,18 +3919,27 @@ jQuery(function ($) {
 	 */
 	$.fn.positionOverlayDialogue = function () {
 		var $map = $('#map-area'),
+			map_offset = $map.offset(),
 			map_margin = 10,
-			obj_pos = this.offset(),
-			obj_size = {width: this.outerWidth(), height: this.outerHeight()},
-			scroll_pos = {left: $(window).scrollLeft(), top: $(window).scrollTop()};
-
-		if (obj_pos.left == 0 && obj_pos.top == 0) {
-			obj_pos = {left: $map.offset().left + $map.width(), top: $map.offset().top - map_margin};
-		}
+			$dialogue = $(this),
+			$dialogue_host = $dialogue.offsetParent(),
+			dialogue_host_offset = $dialogue_host.offset(),
+			// Usable area relative to host.
+			dialogue_host_x_min = $dialogue_host.scrollLeft(),
+			dialogue_host_x_max = Math.min($dialogue_host[0].scrollWidth,
+				$(window).width() + $(window).scrollLeft() - dialogue_host_offset.left + $dialogue_host.scrollLeft()
+			) - 1,
+			dialogue_host_y_min = $dialogue_host.scrollTop(),
+			dialogue_host_y_max = Math.min($dialogue_host[0].scrollHeight,
+				$(window).height() + $(window).scrollTop() - dialogue_host_offset.top + $dialogue_host.scrollTop()
+			) - 1,
+			// Coordinates of map's top right corner relative to dialogue host.
+			pos_x = map_offset.left + $map[0].scrollWidth - dialogue_host_offset.left + $dialogue_host.scrollLeft(),
+			pos_y = map_offset.top - map_margin - dialogue_host_offset.top + $dialogue_host.scrollTop();
 
 		return this.css({
-			left: Math.max(0, Math.min(obj_pos.left, $(window).width() - obj_size.width)) + scroll_pos.left,
-			top: Math.max(scroll_pos.top, Math.min(obj_pos.top, $(window).height() - obj_size.height + scroll_pos.top))
+			left: Math.max(dialogue_host_x_min, Math.min(dialogue_host_x_max - $dialogue.outerWidth(), pos_x)),
+			top: Math.max(dialogue_host_y_min, Math.min(dialogue_host_y_max - $dialogue.outerHeight(), pos_y))
 		});
 	};
 });

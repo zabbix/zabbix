@@ -1496,6 +1496,92 @@ static int	DBpatch_4050059(void)
 
 static int	DBpatch_4050060(void)
 {
+	const ZBX_FIELD	field = {"compression_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050061(void)
+{
+	const ZBX_FIELD	field = {"compression_availability", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050062(void)
+{
+	const ZBX_FIELD	field = {"compress_older", "7d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050063(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	profileid, userid, idx2;
+	int		ret = SUCCEED, value_int, i;
+	const char	*profile = "web.problem.filter.severities";
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = DBselect(
+			"select profileid,userid,value_int"
+			" from profiles"
+			" where idx='web.problem.filter.severity'");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(profileid, row[0]);
+
+		if (0 == (value_int = atoi(row[2])))
+		{
+			if (ZBX_DB_OK > DBexecute("delete from profiles where profileid=" ZBX_FS_UI64, profileid))
+			{
+				ret = FAIL;
+				break;
+			}
+
+			continue;
+		}
+
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s'"
+				" where profileid=" ZBX_FS_UI64, profile, profileid))
+		{
+			ret = FAIL;
+			break;
+		}
+
+		ZBX_DBROW2UINT64(userid, row[1]);
+		idx2 = 0;
+
+		for (i = value_int + 1; i < 6; i++)
+		{
+			if (ZBX_DB_OK > DBexecute("insert into profiles (profileid,userid,idx,idx2,value_id,value_int,"
+					"type) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",0,%d,2)",
+					DBget_maxid("profiles"), userid, profile, ++idx2, i))
+			{
+				ret = FAIL;
+				break;
+			}
+		}
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_4050064(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles set value_int=1 where idx='web.layout.mode' and value_int=2"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050065(void)
+{
 	int		i;
 	const char	*values[] = {
 			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
@@ -1517,12 +1603,12 @@ static int	DBpatch_4050060(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4050061(void)
+static int	DBpatch_4050066(void)
 {
 	return DBdrop_field("config", "dropdown_first_entry");
 }
 
-static int	DBpatch_4050062(void)
+static int	DBpatch_4050067(void)
 {
 	return DBdrop_field("config", "dropdown_first_remember");
 }
@@ -1590,5 +1676,10 @@ DBPATCH_ADD(4050059, 0, 1)
 DBPATCH_ADD(4050060, 0, 1)
 DBPATCH_ADD(4050061, 0, 1)
 DBPATCH_ADD(4050062, 0, 1)
+DBPATCH_ADD(4050063, 0, 1)
+DBPATCH_ADD(4050064, 0, 1)
+DBPATCH_ADD(4050065, 0, 1)
+DBPATCH_ADD(4050066, 0, 1)
+DBPATCH_ADD(4050067, 0, 1)
 
 DBPATCH_END()

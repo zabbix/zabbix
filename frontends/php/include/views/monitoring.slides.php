@@ -27,7 +27,7 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 
 $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$widget
 		->setTitle(_('Slide shows'))
 		->setTitleSubmenu([
@@ -124,7 +124,7 @@ $widget->setControls((new CList([
 		)
 		->addItem($favourite_icon)
 		->addItem($refresh_icon)
-		->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+		->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 	))
 		->setAttribute('aria-label', _('Content controls'))
 ])));
