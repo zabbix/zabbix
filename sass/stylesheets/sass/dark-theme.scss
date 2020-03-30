@@ -1,9 +1,8 @@
-$theme_name: 'dark';
+$theme-name: 'dark';
 
-// NOTIFICATION & ALERT
+// Notification & Alert.
 $red: #e45959;
 $light-red: #503434;
-$lighter-red: #473232;
 
 $dark-yellow: #e99003;
 $yellow: #a78820;
@@ -20,16 +19,49 @@ $disabled-bg-color: #2b2b2b;
 $disabled-item-color: #808080;
 $disabled-item-bg-color: #383838;
 
-// MAIN
-$main-nav-bg-color: #2b2b2b;
-$main-subnav-bg-color: #454545;
-$main-subnav-bg-selected-color: #2e2e2e;
-$main-color: #2d3135;
+// Layout
+$header-bg-color: #2b2b2b;
+$sidebar-bg-color: #454545;
+
+$scrollbar-track-color: rgba(#acbbc2, .55);
+$scrollbar-thumb-color: rgba(#878787, .85);
+$scrollbar-thumb-color-darken: 5%;
+
+$sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
+$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
+
+$sidebar-toggle-bg-position: -630px -592px;
+
+// Main
 $font-color: #f2f2f2;
 $font-selected-color: #f2f2f2;
 $font-alt-color: #737373;
 $body-bg-color: #0e1012;
 $overlay-bg-color: #000000;
+
+// Main menu
+$menu-main-color: #f2f2f2;
+$menu-main-hover-bg-color: #0e0e0e;
+$menu-main-selected-bg-color: #202020;
+$menu-main-selected-border-color: #c5c5c5;
+$menu-main-expanded-bg-color: #0d0d0d;
+
+$menu-main-submenu-color: #f2f2f2;
+$menu-main-submenu-bg-color: #2b2b2b;
+$menu-main-submenu-border-color: #0d0f11;
+$menu-main-submenu-hover-bg-color: #0e0e0e;
+$menu-main-submenu-selected-bg-color: #1c1c1c;
+$menu-main-submenu-selected-border-color: #c5c5c5;
+
+$menu-main-icons: (
+		dashboard: -570px -664px,
+		problems: -570px -688px,
+		monitoring: -570px -712px,
+		inventory: -570px -736px,
+		reports: -570px -760px,
+		configuration: -570px -784px,
+		administration: -570px -808px
+);
 
 // UI
 $ui-bg-color: #2b2b2b;
@@ -49,7 +81,7 @@ $table-border-color: #383838;
 
 $ui-tab-bg-selected-color: #69808d;
 
-// FORMS
+// Forms
 $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
 $form-border-color: #4f4f4f;
@@ -62,13 +94,18 @@ $form-disabled-border-color: #3d3d3d;
 $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
 
-// ERROR MESSAGES
+// Search form
+$form-search-bg-color: #191919;
+$form-search-focused-border-color: $form-border-focus-color;
+$form-search-icon-bg-position: -570px -616px;
+
+// Error messages
 $msg-bad-color: darken(desaturate($red, 10%), 20%);
 $msg-good-color: darken(desaturate($green, 10%), 20%);
 $msg-warning-color: #a97d38;
 $msg-warning-border-color: #614f32;
 
-// BUTTONS
+// Buttons
 $btn-font-color: #f2f2f2;
 $btn-bg-color: #69808d;
 $btn-border-color: #768d99;
@@ -90,7 +127,7 @@ $btn-back-map-background-color: rgba(0, 0, 0, .8);
 $btn-back-text-color: #ffffff;
 $btn-back-background-hover: #768d99;
 
-// LINKS
+// Links
 $link-color: #4796c4;
 $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
@@ -106,19 +143,19 @@ $link-main-subnav-hover-color: #ffffff;
 $link-main-subnav-active-color: #ffffff;
 $link-main-subnav-visited-color: rgba(#ffffff, .8);
 
-// ANALOG CLOCK
+// Analog clock
 $clock-face-color: #383838;
 $clock-hand-color: #f2f2f2;
 $clock-hand-sec-color: #69808d;
 $clock-lines-color: #4f4f4f;
 
-// STATUSES
+// Statuses
 $problem-unack-fg-color: #ff3333;
 $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
-// MULTISELECT
+// Multiselect
 $multiselect-selected-bg-color: #696969;
 
 .status-na-bg,
@@ -128,28 +165,6 @@ $multiselect-selected-bg-color: #696969;
 .status-high-bg,
 .status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;
-}
-
-.top-nav-help {
-	background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important;
-}
-.top-nav-profile {
-	background: url(../img/icon-sprite.svg) no-repeat -84px -104px !important;
-}
-.top-nav-guest {
-	background: url(../img/icon-sprite.svg) no-repeat -241px -140px !important;
-}
-.top-nav-signout {
-	background: url(../img/icon-sprite.svg) no-repeat -84px -140px !important;
-}
-.top-nav-zbbshare {
-	background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important;
-}
-.top-nav-support {
-	background: url(../img/icon-sprite.svg) no-repeat -245px -32px !important;
-}
-.btn-search {
-	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
 }
 
 .timeline-axis {
@@ -164,14 +179,17 @@ $multiselect-selected-bg-color: #696969;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
-.top-subnav a {
-	&:focus {
-		border-bottom: 4px solid lighten($main-nav-bg-color, 30%) !important;
-		outline: none;
+.sidebar {
+	&.is-compact:not(.is-opened) {
+		.form-search {
+			.search-icon {
+				opacity: .75;
+			}
+		}
 	}
 }
 
-// TABLES
+// Tables.
 .list-table {
 	thead th {
 		border-color: lighten($table-border-color, 3%);
@@ -306,7 +324,7 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
-// GRAPH AND MAP
+// Graph and map.
 .btn-back-map-container {
 	.btn-back-map {
 		.btn-back-map-icon {
@@ -315,7 +333,7 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
-// TIME SELECTION
+// Time selection.
 .ui-tabs-nav {
 	.ui-tabs-active {
 		.btn-time {
@@ -371,8 +389,7 @@ $multiselect-selected-bg-color: #696969;
 	color: darken($font-color, 85%);
 }
 
-// WIDGET "HOST AVAILABILITY"
-
+// Widget "Host availability".
 .host-avail-widget {
 
 	&.list-table {

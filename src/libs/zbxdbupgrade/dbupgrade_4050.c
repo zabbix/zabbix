@@ -1572,6 +1572,14 @@ static int	DBpatch_4050063(void)
 	return ret;
 }
 
+static int	DBpatch_4050064(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles set value_int=1 where idx='web.layout.mode' and value_int=2"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1636,5 +1644,6 @@ DBPATCH_ADD(4050060, 0, 1)
 DBPATCH_ADD(4050061, 0, 1)
 DBPATCH_ADD(4050062, 0, 1)
 DBPATCH_ADD(4050063, 0, 1)
+DBPATCH_ADD(4050064, 0, 1)
 
 DBPATCH_END()

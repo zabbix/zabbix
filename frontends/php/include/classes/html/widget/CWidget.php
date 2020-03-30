@@ -33,7 +33,7 @@ class CWidget {
 	protected $body = [];
 
 	/**
-	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_FULLSCREEN|ZBX_LAYOUT_KIOSKMODE).
+	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_KIOSKMODE).
 	 *
 	 * @var integer
 	 */
@@ -72,7 +72,7 @@ class CWidget {
 	}
 
 	public function setBreadcrumbs($breadcrumbs = null) {
-		if ($breadcrumbs !== null && in_array($this->web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+		if ($breadcrumbs !== null && $this->web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			$this->body[] = $breadcrumbs;
 		}
 
@@ -94,25 +94,40 @@ class CWidget {
 	}
 
 	public function toString() {
-		$widget = [];
+		$items = [];
 
-		if ($this->web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+		if ($this->web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
 			$this->addItem(
-				get_icon('fullscreen', ['mode' => ZBX_LAYOUT_KIOSKMODE])
+				get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
 					->setAttribute('aria-label', _('Content controls'))
 			);
 		}
 		elseif ($this->title !== null || $this->controls !== null) {
-			$widget[] = $this->createTopHeader();
+			$items[] = $this->createTopHeader();
 		}
 
-		$tab = [$widget, $this->body];
+		$items[] = get_prepared_messages([
+			'with_auth_warning' => true,
+			'with_session_messages' => true,
+			'with_current_messages' => true
+		]);
 
-		return unpack_object($tab);
+		$items[] = new CTag('main', true, $this->body);
+
+		return unpack_object($items);
 	}
 
 	private function createTopHeader() {
-		$divs = [];
+		$divs = [
+			(new CTag('nav', true, (new CButton(null, _('Show sidebar')))
+				->setId('sidebar-button-toggle')
+				->addClass('button-toggle')
+				->setAttribute('title', _('Show sidebar'))
+			))
+				->addClass('sidebar-nav-toggle')
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _('Sidebar control'))
+		];
 
 		if ($this->title !== null) {
 			$title_tag = (new CTag('h1', true, $this->title))->setId(ZBX_STYLE_PAGE_TITLE);
@@ -135,9 +150,9 @@ class CWidget {
 		}
 
 		if ($this->controls !== null) {
-			$divs[] = (new CDiv($this->controls))->addClass(ZBX_STYLE_NOWRAP);
+			$divs[] = (new CDiv($this->controls))->addClass(ZBX_STYLE_HEADER_CONTROLS);
 		}
 
-		return (new CDiv($divs))->addClass(ZBX_STYLE_HEADER_TITLE);
+		return (new CTag('header', true, $divs))->addClass(ZBX_STYLE_HEADER_TITLE);
 	}
 }

@@ -121,6 +121,7 @@ class ZBase {
 		require_once 'include/func.inc.php';
 		require_once 'include/html.inc.php';
 		require_once 'include/perm.inc.php';
+		require_once 'include/menu.inc.php';
 		require_once 'include/audit.inc.php';
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
@@ -172,7 +173,7 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
-				$this->initMainMenu();
+				$this->initComponents();
 				$this->initModuleManager();
 
 				$file = basename($_SERVER['SCRIPT_NAME']);
@@ -182,7 +183,10 @@ class ZBase {
 				$router->addActions($this->module_manager->getActions());
 				$router->setAction($action_name);
 
-				$this->component_registry->get('menu.main')->setSelected($action_name);
+				$this->component_registry->get('menu.main')
+					->setSelectedByAction($action_name,
+						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+					);
 
 				CProfiler::getInstance()->start();
 
@@ -571,27 +575,24 @@ class ZBase {
 	}
 
 	/**
-	 * Set layout to fullscreen or kiosk mode if URL contains 'fullscreen' and/or 'kiosk' arguments.
+	 * Set layout to kiosk mode if URL contains 'kiosk' arguments.
 	 */
 	private function setLayoutModeByUrl() {
-		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
-			CViewHelper::saveLayoutMode(ZBX_LAYOUT_KIOSKMODE);
-		}
-		elseif (array_key_exists('fullscreen', $_GET)) {
-			CViewHelper::saveLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
-		}
+		if (hasRequest('kiosk')) {
+			CViewHelper::saveLayoutMode(getRequest('kiosk') === '1' ? ZBX_LAYOUT_KIOSKMODE : ZBX_LAYOUT_NORMAL);
 
-		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
-		unset($_GET['fullscreen'], $_GET['kiosk']);
+			// Remove $_GET arguments to prevent CUrl from generating URL with 'kiosk' arguments.
+			unset($_GET['kiosk']);
+		}
 	}
 
 	/**
 	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
-	private function initMainMenu() {
-		$menu = new CMenu('menu.main', []);
-		$this->component_registry->register('menu.main', $menu);
-		include 'include/menu.inc.php';
+	private function initComponents() {
+
+		$this->component_registry->register('menu.main', getMainMenu());
+		$this->component_registry->register('menu.user', getUserMenu());
 	}
 
 	/**

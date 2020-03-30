@@ -356,11 +356,11 @@ if ($data['action'] === 'problem.view') {
 					->addItem(new CRedirectButton(_('Export to CSV'),
 						(new CUrl('zabbix.php'))->setArgument('action', 'problem.view.csv')
 					))
-					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			))->setAttribute('aria-label', _('Content controls'))
 		);
 
-	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+	if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		$widget->addItem($filter);
 	}
 
