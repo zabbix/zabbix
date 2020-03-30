@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-24T16:44:56Z</date>
+    <date>2020-03-30T10:53:05Z</date>
     <media_types>
         <media_type>
             <name>MS Teams</name>
@@ -192,12 +192,16 @@ try {&#13;
             potentialAction: [&#13;
                 {&#13;
                     '@type': 'OpenUri',&#13;
-                    name: 'Event Info',&#13;
+                    name: (params.event_source === '0')&#13;
+                        ? 'Event Info'&#13;
+                        : 'Zabbix Home',&#13;
                     targets: [&#13;
                         {&#13;
                             os: 'default',&#13;
-                            uri: params.zabbix_url + '/tr_events.php?triggerid=' +&#13;
-                                params.trigger_id + '&amp;eventid=' + params.event_id&#13;
+                            uri: (params.event_source === '0')&#13;
+                                ? params.zabbix_url + '/tr_events.php?triggerid=' +&#13;
+                                    params.trigger_id + '&amp;eventid=' + params.event_id&#13;
+                                : params.zabbix_url&#13;
                         }&#13;
                     ]&#13;
                 }&#13;
