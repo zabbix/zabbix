@@ -343,6 +343,10 @@ func main() {
 	if err = resultcache.CheckCacheConfiguration(&agent.Options); err != nil {
 		fatalExit("\"EnablePersistentBuffer\" parameter misconfiguration", err)
 	}
+	if err = resultcache.CacheConfiguration(&agent.Options, addresses); err != nil {
+		fatalExit("%s", err)
+	}
+	defer resultcache.CacheClose(&agent.Options)
 
 	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {
 		fatalExit("cannot use encryption configuration", err)

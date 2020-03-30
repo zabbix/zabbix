@@ -66,10 +66,12 @@ func (w *mockWriter) CanRetry() bool {
 
 func TestResultCache(t *testing.T) {
 	agent.Options.BufferSize = 10
+	agent.Options.EnablePersistentBuffer = 0
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	writer := mockWriter{lastid: 1, t: t}
-	cache := NewActive(0, nil)
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 
 	value := "xyz"
 	result := plugin.Result{
@@ -107,7 +109,7 @@ func TestToken(t *testing.T) {
 	}
 }
 
-func checkBuffer(t *testing.T, c *ResultCache, input []*plugin.Result, expected []*AgentData) {
+func checkBuffer(t *testing.T, c *MemoryCache, input []*plugin.Result, expected []*AgentData) {
 	for _, r := range input {
 		c.write(r)
 	}
@@ -153,7 +155,9 @@ func TestBuffer(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
 
@@ -191,7 +195,9 @@ func TestBufferFull5(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
 
@@ -229,7 +235,9 @@ func TestBufferFull5ReplaceFirst(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
 
@@ -267,7 +275,9 @@ func TestBufferFull5ReplaceLast(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
 
@@ -305,7 +315,9 @@ func TestBufferFull5ReplacInterleaved(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
 
@@ -343,7 +355,9 @@ func TestBufferFull5OneItem(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
 
@@ -380,7 +394,9 @@ func TestBufferFull4OneItemPersistent(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
 
@@ -419,7 +435,9 @@ func TestBufferFull5OneItemPersistent(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
 
@@ -463,6 +481,8 @@ func TestBufferFull10PersistentAndNormal(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
-	cache := NewActive(0, nil)
+	agent.Options.EnablePersistentBuffer = 0
+	c := New(&agent.Options, 0, nil)
+	cache := c.(*MemoryCache)
 	checkBuffer(t, cache, input, expected)
 }
