@@ -1003,14 +1003,16 @@ int	DBcheck_double_type(void)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 #if defined(HAVE_MYSQL)
+	sql = DBdyn_escape_string(CONFIG_DBNAME);
 	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
-			" where table_schema like '%s' and column_type like 'double'", CONFIG_DBNAME);
+			" where table_schema='%s' and column_type='double'", sql);
 #elif defined(HAVE_POSTGRESQL)
-	sql = zbx_strdup(sql, "select count(*) from information_schema.columns"
-			" where data_type like 'double precision'");
+	sql = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ? "public" : CONFIG_DBSCHEMA);
+	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
+			" where table_schema='%s' and data_type='double precision'", sql);
 #elif defined(HAVE_ORACLE)
 	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
-			" where data_type like 'BINARY_DOUBLE'");
+			" where data_type='BINARY_DOUBLE'");
 #elif defined(HAVE_SQLITE3)
 	/* upgrade patch is not required for sqlite3 */
 	ret = SUCCEED;
@@ -1018,9 +1020,9 @@ int	DBcheck_double_type(void)
 #endif
 
 	if (NULL == (result = DBselect("%s"
-			" and ((lower(table_name) like 'trends'"
+			" and ((lower(table_name)='trends'"
 					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
-			" or (lower(table_name) like 'history' and lower(column_name) like 'value'))", sql)))
+			" or (lower(table_name)='history' and lower(column_name)='value'))", sql)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot select records with columns information");
 		goto out;
