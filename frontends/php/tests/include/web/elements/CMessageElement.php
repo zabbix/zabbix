@@ -27,7 +27,7 @@ class CMessageElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://main/output'))->asMessage();
+		return (new CElementQuery('xpath://output'))->asMessage();
 	}
 
 	/**

@@ -103,7 +103,7 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	]));
 }
 
-$action_list->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
+$action_list->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 
 $header['right']->addItem($action_list);
 

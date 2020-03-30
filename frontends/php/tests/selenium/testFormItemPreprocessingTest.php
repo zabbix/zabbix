@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/traits/PreprocessingTrait.php';
 
 /**
+ *
  * @backup items
  */
 class testFormItemPreprocessingTest extends CWebTest {

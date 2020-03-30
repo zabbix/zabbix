@@ -111,7 +111,7 @@
 			},
 			success: function(response) {
 				var errors = [];
-				overlay.$dialogue.find('>.msg-good, >.msg-bad').remove();
+				overlay.$dialogue.find('> .msg-good, > .msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -161,7 +161,7 @@
 				var errors = [],
 					messages = [];
 
-				overlay.$dialogue.find('>.msg-good, >.msg-bad').remove();
+				overlay.$dialogue.find('> .msg-good, > .msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -176,10 +176,10 @@
 					jQuery(errors).insertBefore($form);
 				}
 				else {
-					jQuery('main').find('> .msg-bad, > .msg-good').remove();
+					jQuery('.wrapper').find('> .msg-bad, > .msg-good').remove();
 
 					if (messages.length) {
-						jQuery('main').prepend(messages);
+						jQuery('.wrapper main').before(messages);
 					}
 					overlayDialogueDestroy(overlay.dialogueid);
 				}

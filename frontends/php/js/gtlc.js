@@ -517,7 +517,7 @@ var timeControl = {
 
 				// width
 				if ((!isset('width', obj.objDims) || obj.objDims.width < 0) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)) {
-					var width = get_bodywidth();
+					var width = $('.wrapper')[0].scrollWidth - 20;
 
 					if (!is_number(width)) {
 						width = 1000;
@@ -526,7 +526,7 @@ var timeControl = {
 						obj.objDims.width = 0;
 					}
 
-					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 23);
+					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright)) - 3;
 				}
 
 				// url

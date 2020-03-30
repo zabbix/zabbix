@@ -18,6 +18,11 @@
 **/
 
 
+// Global constants.
+
+// Sync with SASS variable: $ui-transition-duration.
+const UI_TRANSITION_DURATION = 300;
+
 // Array indexOf method for javascript<1.6 compatibility
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {
@@ -103,77 +108,7 @@ var PageRefresh = {
 };
 
 /*
- * Main menu
- */
-var MMenu = {
-	def_label:		null,
-	sub_active: 	false,
-	timeout_reset:	null,
-	timeout_change:	null,
-
-	init: function() {
-		// Detects when none of the selected elements are focused.
-		var elems = jQuery('.top-nav a, .top-subnav a').on('keydown', function(event) {
-			clearTimeout(this.timeout_reset);
-
-			if (event.which == 9) {
-				setTimeout(function() {
-					if (elems.toArray().indexOf(document.querySelector(':focus')) == -1) {
-						clearTimeout(this.timeout_reset);
-						this.timeout_reset = setTimeout(function() {
-							if (elems.toArray().indexOf(document.querySelector(':focus')) == -1){
-								MMenu.showSubMenu(MMenu.def_label)
-							}
-						}, 2500);
-					}
-				});
-			}
-		});
-	},
-
-	mouseOver: function(show_label) {
-		clearTimeout(this.timeout_reset);
-		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
-		PageRefresh.restart();
-	},
-
-	keyUp: function(show_label, event) {
-		if (event.which == 13) {
-			clearTimeout(this.timeout_reset);
-			this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '", true)', 10);
-			PageRefresh.restart();
-		}
-	},
-
-	submenu_mouseOver: function() {
-		clearTimeout(this.timeout_reset);
-		clearTimeout(this.timeout_change);
-		PageRefresh.restart();
-	},
-
-	mouseOut: function() {
-		clearTimeout(this.timeout_change);
-		this.timeout_reset = setTimeout('MMenu.showSubMenu("' + this.def_label + '")', 2500);
-	},
-
-	showSubMenu: function(show_label, focus_subitem) {
-		var sub_menu = jQuery('#sub_' + show_label),
-			top_menu = jQuery('#' + show_label),
-			focus_subitem = focus_subitem || false;
-
-		if (sub_menu) {
-			top_menu.addClass('selected').siblings().removeClass('selected');
-			sub_menu.show().siblings('.top-subnav').hide();
-
-			if (focus_subitem) {
-				jQuery('li:first > a', sub_menu).focus();
-			}
-		}
-	}
-};
-
-/*
- * Audio control system
+ * Audio control system.
  */
 var AudioControl = {
 
@@ -374,7 +309,7 @@ var hintBox = {
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
 			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
-			appendTo = appendTo || 'body';
+			appendTo = appendTo || '.wrapper';
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
@@ -467,73 +402,65 @@ var hintBox = {
 	},
 
 	positionHint: function(e, target) {
-		var wWidth = jQuery(window).width(),
-			wHeight = jQuery(window).height(),
-			scrollTop = jQuery(window).scrollTop(),
-			scrollLeft = jQuery(window).scrollLeft(),
-			hint_width = jQuery(target.hintBoxItem).outerWidth(),
-			hint_height = jQuery(target.hintBoxItem).outerHeight(),
-			top, left;
-
-		// uses stored clientX on afterload positioning when there is no event
 		if (e.clientX) {
 			target.clientX = e.clientX;
 			target.clientY = e.clientY;
 		}
 
-		// doesn't fit in the screen horizontally
-		if (hint_width + 10 > wWidth) {
-			left = scrollLeft + 2;
+		var $host = target.hintBoxItem.offsetParent(),
+			host_offset = $host.offset(),
+			// Usable area relative to host.
+			host_x_min = $host.scrollLeft(),
+			host_x_max = Math.min($host[0].scrollWidth,
+				$(window).width() + $(window).scrollLeft() - host_offset.left + $host.scrollLeft()
+			) - 1,
+			host_y_min = $host.scrollTop(),
+			host_y_max = Math.min($host[0].scrollHeight,
+				$(window).height() + $(window).scrollTop() - host_offset.top + $host.scrollTop()
+			) - 1,
+			// Event coordinates relative to host.
+			event_x = target.clientX - host_offset.left + $host.scrollLeft(),
+			event_y = target.clientY - host_offset.top + $host.scrollTop(),
+			event_offset = 10,
+			// Hint box width and height.
+			hint_width = target.hintBoxItem.outerWidth(),
+			hint_height = target.hintBoxItem.outerHeight(),
+			/*
+				Fix popup width and height since browsers will tend to reduce the size of the popup, if positioned further
+				than the width of window when horizontal scolling is active.
+			*/
+			css = {
+				width: target.hintBoxItem.width(),
+				height: target.hintBoxItem.height()
+			};
+
+		if (event_x + event_offset + hint_width <= host_x_max) {
+			css.left = event_x + event_offset;
 		}
-		// 10px to right if fit
-		else if (wWidth - target.clientX - 10 > hint_width) {
-			left = scrollLeft + target.clientX + 10;
-		}
-		// 10px from screen right side
 		else {
-			left = scrollLeft + wWidth - 10 - hint_width;
+			css.right = -$host.scrollLeft();
 		}
 
-		// 10px below if fit
-		if (wHeight - target.clientY - hint_height - 10 > 0) {
-			top = scrollTop + target.clientY + 10;
+		if (event_y + event_offset + hint_height <= host_y_max) {
+			css.top = event_y + event_offset;
 		}
-		// 10px above if fit
-		else if (target.clientY - hint_height - 10 > 0) {
-			top = scrollTop + target.clientY - hint_height - 10;
+		else if (event_y - event_offset - hint_height >= host_y_min) {
+			css.top = event_y - event_offset - hint_height;
 		}
-		// 10px below as fallback
 		else {
-			top = scrollTop + target.clientY + 10;
-		}
+			css.top = Math.max(host_y_min, Math.min(host_y_max - hint_height, event_y + event_offset));
 
-		// fallback if doesn't fit vertically but could fit if aligned to right or left
-		if ((top - scrollTop + hint_height > wHeight)
-				&& (target.clientX - 10 > hint_width || wWidth - target.clientX - 10 > hint_width)) {
+			if (css.right !== undefined) {
+				delete css.right;
 
-			// align to left if fit
-			if (wWidth - target.clientX - 10 > hint_width) {
-				left = scrollLeft + target.clientX + 10;
-			}
-			// align to right
-			else {
-				left = scrollLeft + target.clientX - hint_width - 10;
-			}
-
-			// 10px from bottom if fit
-			if (wHeight - 10 > hint_height) {
-				top = scrollTop + wHeight - hint_height - 10;
-			}
-			// 10px from top
-			else {
-				top = scrollTop + 10;
+				css.left = ((event_x - event_offset - hint_width >= host_x_min)
+					? event_x - event_offset - hint_width
+					: event_x + event_offset
+				);
 			}
 		}
 
-		target.hintBoxItem.css({
-			top: top + 'px',
-			left: left + 'px'
-		});
+		target.hintBoxItem.css(css);
 	},
 
 	hideHint: function(target, hideStatic) {
@@ -956,5 +883,24 @@ jQuery(function ($) {
 	if (ED && typeof sessionStorage.scrollTop !== 'undefined') {
 		$(window).scrollTop(sessionStorage.scrollTop);
 		sessionStorage.removeItem('scrollTop');
+	}
+});
+
+window.addEventListener('load', e => {
+
+	/**
+	 * SideBar initialization.
+	 */
+	const sidebar = document.querySelector('.sidebar');
+
+	if (sidebar !== null) {
+		ZABBIX.MenuMain = new CMenu(document.querySelector('.menu-main'));
+		ZABBIX.UserMain = new CMenu(document.querySelector('.menu-user'));
+
+		ZABBIX.Sidebar = new CSidebar(sidebar)
+			.on('viewmodechange', (e) => {
+				updateUserProfile('web.sidebar.mode', e.detail.view_mode, []);
+				window.dispatchEvent(new Event('resize'));
+			});
 	}
 });

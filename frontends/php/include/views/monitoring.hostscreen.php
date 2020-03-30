@@ -61,7 +61,7 @@ else {
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
 					->addItem($screen_combobox)
-					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))

@@ -26,6 +26,7 @@ class CProfile {
 	private static $update = [];
 	private static $insert = [];
 	private static $stringProfileMaxLength;
+	private static $is_initialized = false;
 
 	public static function init() {
 		self::$userDetails = CWebUser::$data;
@@ -36,6 +37,16 @@ class CProfile {
 		DBselect('SELECT NULL FROM users u WHERE '.dbConditionId('u.userid', (array) self::$userDetails['userid']).
 			' FOR UPDATE'
 		);
+
+		if (!self::$is_initialized) {
+			register_shutdown_function(function() {
+				DBstart();
+				$result = self::flush();
+				DBend($result);
+			});
+		}
+
+		self::$is_initialized = true;
 	}
 
 	/**
@@ -66,6 +77,8 @@ class CProfile {
 					$result &= self::updateDB($idx, $data['value'], $data['type'], $idx2);
 				}
 			}
+
+			self::clear();
 		}
 
 		return $result;
@@ -89,7 +102,7 @@ class CProfile {
 			return null;
 		}
 
-		if (is_null(self::$profiles)) {
+		if (self::$profiles === null) {
 			self::init();
 		}
 
@@ -199,7 +212,7 @@ class CProfile {
 	 * @param int|array  	$idx2	second identifier, which can be list of identifiers as well
 	 */
 	public static function delete($idx, $idx2 = 0) {
-		if (is_null(self::$profiles)) {
+		if (self::$profiles === null) {
 			self::init();
 		}
 
@@ -247,7 +260,7 @@ class CProfile {
 	 * @param int		$idx2
 	 */
 	public static function update($idx, $value, $type, $idx2 = 0) {
-		if (is_null(self::$profiles)) {
+		if (self::$profiles === null) {
 			self::init();
 		}
 

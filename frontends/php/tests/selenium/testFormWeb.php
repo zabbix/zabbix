@@ -343,7 +343,7 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage(['User', 'Password']);
+			$this->zbxTestTextNotVisible(['User', 'Password'], $this->query('id:authenticationTab')->one());
 			$this->zbxTestAssertNotVisibleId('http_user');
 			$this->zbxTestAssertNotVisibleId('http_password');
 		}

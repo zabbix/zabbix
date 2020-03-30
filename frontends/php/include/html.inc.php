@@ -157,31 +157,21 @@ function get_icon($type, $params = []) {
 
 			return $icon;
 
-		case 'fullscreen':
-			switch ($params['mode']) {
-				case ZBX_LAYOUT_KIOSKMODE:
-					$icon = (new CButton(null, '&nbsp;'))
-						->setTitle(_('Normal view'))
-						->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
-						->addClass(ZBX_LAYOUT_MODE)
-						->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
-						->addClass(ZBX_STYLE_BTN_MIN);
-					break;
-
-				case ZBX_LAYOUT_FULLSCREEN:
-					$icon = (new CButton(null, '&nbsp;'))
-						->setTitle(_('Kiosk mode'))
-						->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
-						->addClass(ZBX_LAYOUT_MODE)
-						->addClass(ZBX_STYLE_BTN_KIOSK);
-					break;
-
-				default:
-					$icon = (new CButton(null, '&nbsp;'))
-						->setTitle(_('Fullscreen'))
-						->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSCREEN)
-						->addClass(ZBX_LAYOUT_MODE)
-						->addClass(ZBX_STYLE_BTN_MAX);
+		case 'kioskmode':
+			if ($params['mode'] == ZBX_LAYOUT_KIOSKMODE) {
+				$icon = (new CButton(null, '&nbsp;'))
+					->setTitle(_('Normal view'))
+					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
+					->addClass(ZBX_LAYOUT_MODE)
+					->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
+					->addClass(ZBX_STYLE_BTN_MIN);
+			}
+			else {
+				$icon = (new CButton(null, '&nbsp;'))
+					->setTitle(_('Kiosk mode'))
+					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
+					->addClass(ZBX_LAYOUT_MODE)
+					->addClass(ZBX_STYLE_BTN_KIOSK);
 			}
 
 			return $icon;
@@ -740,6 +730,37 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 	return makeWarningIcon($warning);
 }
 
+function makeServerStatusOutput() {
+	return (new CTag('output', true))
+		->setId('msg-global-footer')
+		->addClass(ZBX_STYLE_MSG_GLOBAL_FOOTER)
+		->addClass(ZBX_STYLE_MSG_WARNING);
+}
+
+/**
+* Make logo of the specified type.
+*
+* @param int $type  LOGO_TYPE_NORMAL | LOGO_TYPE_SIDEBAR | LOGO_TYPE_SIDEBAR_COMPACT.
+*
+* @return CTag
+*/
+function makeLogo(int $type): ?CTag {
+	static $zabbix_logo_classes = [
+		LOGO_TYPE_NORMAL => ZBX_STYLE_ZABBIX_LOGO,
+		LOGO_TYPE_SIDEBAR => ZBX_STYLE_ZABBIX_SIDEBAR_LOGO,
+		LOGO_TYPE_SIDEBAR_COMPACT => ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT
+	];
+
+	$brand_logo = CBrandHelper::getLogo($type);
+
+	if ($brand_logo !== null) {
+		return (new CImg($brand_logo));
+	}
+	else {
+		return (new CDiv())->addClass($zabbix_logo_classes[$type]);
+	}
+}
+
 /**
  * Renders a page footer.
  *
@@ -748,7 +769,8 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  * @return CDiv
  */
 function makePageFooter($with_version = true) {
-	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))->setAttribute('role', 'contentinfo');
+	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))
+		->setAttribute('role', 'contentinfo');
 }
 
 /**

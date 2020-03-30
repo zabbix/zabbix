@@ -1574,6 +1574,14 @@ static int	DBpatch_4050063(void)
 
 static int	DBpatch_4050064(void)
 {
+	if (ZBX_DB_OK > DBexecute("update profiles set value_int=1 where idx='web.layout.mode' and value_int=2"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050065(void)
+{
 	const ZBX_FIELD	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -1582,7 +1590,7 @@ static int	DBpatch_4050064(void)
 	return DBmodify_field_type("history", &field, &field);
 }
 
-static int	DBpatch_4050065(void)
+static int	DBpatch_4050066(void)
 {
 	const ZBX_FIELD	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
@@ -1592,7 +1600,7 @@ static int	DBpatch_4050065(void)
 	return DBmodify_field_type("trends", &field, &field);
 }
 
-static int	DBpatch_4050066(void)
+static int	DBpatch_4050067(void)
 {
 	const ZBX_FIELD	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
@@ -1602,7 +1610,7 @@ static int	DBpatch_4050066(void)
 	return DBmodify_field_type("trends", &field, &field);
 }
 
-static int	DBpatch_4050067(void)
+static int	DBpatch_4050068(void)
 {
 	const ZBX_FIELD	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
@@ -1612,35 +1620,35 @@ static int	DBpatch_4050067(void)
 	return DBmodify_field_type("trends", &field, &field);
 }
 
-static int	DBpatch_4050068(void)
+static int	DBpatch_4050069(void)
 {
 	const ZBX_FIELD	field = {"yaxismin", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("graphs", &field, &field);
 }
 
-static int	DBpatch_4050069(void)
+static int	DBpatch_4050070(void)
 {
 	const ZBX_FIELD	field = {"yaxismax", "100", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("graphs", &field, &field);
 }
 
-static int	DBpatch_4050070(void)
+static int	DBpatch_4050071(void)
 {
 	const ZBX_FIELD	field = {"percent_left", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("graphs", &field, &field);
 }
 
-static int	DBpatch_4050071(void)
+static int	DBpatch_4050072(void)
 {
 	const ZBX_FIELD	field = {"percent_right", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("graphs", &field, &field);
 }
 
-static int	DBpatch_4050072(void)
+static int	DBpatch_4050073(void)
 {
 	const ZBX_FIELD	field = {"goodsla", "99.9", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
@@ -1720,5 +1728,6 @@ DBPATCH_ADD(4050069, 0, 1)
 DBPATCH_ADD(4050070, 0, 1)
 DBPATCH_ADD(4050071, 0, 1)
 DBPATCH_ADD(4050072, 0, 1)
+DBPATCH_ADD(4050073, 0, 1)
 
 DBPATCH_END()

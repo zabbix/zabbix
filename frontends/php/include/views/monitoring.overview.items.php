@@ -83,13 +83,13 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]));
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	// filter
 	$widget->addItem((new CFilter((new CUrl('overview.php'))->setArgument('type', 1)))
 		->setProfile($data['profileIdx'])
