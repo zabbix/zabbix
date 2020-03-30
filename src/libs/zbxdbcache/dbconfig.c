@@ -12488,18 +12488,15 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
  * Parameters: hostid       - [IN] proxy host id                              *
  *             suppress_win - [OUT] suppress window data                      *
  *             lastaccess   - [OUT] proxy last access time                    *
- *             proxy_status - [OUT] active or passive proxy                   *
  *                                                                            *
  * Return value: SUCCEED - the data is retrieved                              *
  *               FAIL    - the data cannot be retrieved, proxy not found in   *
  *                         configuration cache                                *
  *                                                                            *
  ******************************************************************************/
-int	DCget_proxy_suppress_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *suppress_win, int *lastaccess,
-		unsigned char *proxy_status)
+int	DCget_proxy_suppress_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *suppress_win, int *lastaccess)
 {
 	const ZBX_DC_PROXY	*dc_proxy;
-	const ZBX_DC_HOST	*dc_host;
 	int			ret;
 
 	RDLOCK_CACHE;
@@ -12525,14 +12522,6 @@ int	DCget_proxy_suppress_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *suppress
 		}
 
 		ret = SUCCEED;
-
-		if (NULL != proxy_status)
-		{
-			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
-				*proxy_status = dc_host->status;
-			else
-				ret = FAIL;
-		}
 	}
 	else
 		ret = FAIL;

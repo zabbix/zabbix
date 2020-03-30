@@ -84,9 +84,10 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
  ******************************************************************************/
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
 {
-	int		ret = FAIL, status;
-	char		*error = NULL;
-	DC_PROXY	proxy;
+	int			ret = FAIL, status;
+	char			*error = NULL;
+	DC_PROXY		proxy;
+	zbx_proxy_diff_t	proxy_diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -104,6 +105,12 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
+	if (SUCCEED != (ret = DCget_proxy_suppress_win(proxy.hostid, &proxy_diff.suppress_win, &proxy_diff.lastaccess)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy communication delay");
+		goto out;
+	}
+
 	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
@@ -112,7 +119,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, NULL, &error)))
+	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &proxy_diff, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);

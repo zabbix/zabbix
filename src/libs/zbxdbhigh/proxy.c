@@ -4585,6 +4585,8 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
  *             proxy_hostid - [IN] proxy identifier from database             *
  *             ts           - [IN] timestamp when the proxy connection was    *
  *                                 established                                *
+ *             proxy_diff   - [IN] communication problem info                 *
+ *             proxy_status - [IN] active or passive proxy mode               *
  *             more         - [OUT] available data flag                       *
  *             error        - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *
@@ -4593,31 +4595,30 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, int *more,
-		char **error)
+int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
+		zbx_proxy_diff_t *proxy_diff, unsigned char proxy_status, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED;
 	char			*error_step = NULL, value[MAX_STRING_LEN];
 	size_t			error_alloc = 0, error_offset = 0;
-	zbx_proxy_diff_t	diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
-		diff.more_data = atoi(value);
+		proxy_diff->more_data = atoi(value);
 	else
-		diff.more_data = ZBX_PROXY_DATA_DONE;
+		proxy_diff->more_data = ZBX_PROXY_DATA_DONE;
 
 	if (NULL != more)
-		*more = diff.more_data;
+		*more = proxy_diff->more_data;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PROXY_DELAY, value, sizeof(value), NULL))
-		diff.proxy_delay = atoi(value);
+		proxy_diff->proxy_delay = atoi(value);
 	else
-		diff.proxy_delay = 0;
+		proxy_diff->proxy_delay = 0;
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
@@ -4628,7 +4629,6 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
 		zbx_data_session_t	*session = NULL;
-		unsigned char		proxy_status;
 
 		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SESSION, value, sizeof(value), NULL))
 		{
@@ -4644,25 +4644,18 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			session = zbx_dc_get_or_create_data_session(proxy->hostid, value);
 		}
 
-		if (SUCCEED != (ret = DCget_proxy_suppress_win(proxy->hostid, &diff.suppress_win, &diff.lastaccess,
-				&proxy_status)))
-		{
-			*error = zbx_dsprintf(*error, "cannot get proxy communication delay");
-			ret = FAIL;
-			goto out;
-		}
-
-		check_proxy_suppression_mode(ts, proxy_status, &diff);
+		check_proxy_suppression_mode(ts, proxy_status, proxy_diff);
 
 		if (SUCCEED == (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
-				(void *)&proxy->hostid, &jp_data, session, &diff.suppress_win, &error_step)))
+				(void *)&proxy->hostid, &jp_data, session, &proxy_diff->suppress_win, &error_step)))
 		{
-			diff.flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
+			proxy_diff->flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
 
-			if (0 < diff.suppress_win.values_num)
-				diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
-
-			zbx_dc_update_proxy(&diff);
+			if (0 < proxy_diff->suppress_win.values_num)
+			{
+				proxy_diff->flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
+				zbx_dc_update_proxy(proxy_diff);
+			}
 		}
 		else
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);

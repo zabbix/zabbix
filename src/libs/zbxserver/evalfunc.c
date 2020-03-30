@@ -1685,7 +1685,7 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 		zbx_proxy_suppress_t	suppress_win;
 		int			lastaccess;
 
-		if (SUCCEED != DCget_proxy_suppress_win(item->host.proxy_hostid, &suppress_win, &lastaccess, NULL))
+		if (SUCCEED != DCget_proxy_suppress_win(item->host.proxy_hostid, &suppress_win, &lastaccess))
 		{
 			*error = zbx_strdup(*error, "cannot retrieve proxy last access");
 			goto out;
