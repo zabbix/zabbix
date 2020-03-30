@@ -46,6 +46,14 @@ typedef struct
 }
 lld_filter_t;
 
+/* lld rule override */
+typedef struct
+{
+	lld_filter_t		filter;
+	unsigned char		stop;
+}
+lld_override_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_condition_free                                               *
@@ -515,6 +523,37 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 	}
 }
 
+static void	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_ruleid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	result = DBselect(
+			"select evaltype,formula,stop"
+			" from override"
+			" where itemid=" ZBX_FS_UI64
+			" order by step",
+			lld_ruleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		lld_override_t	*override;
+
+		override = (lld_override_t *)zbx_malloc(NULL, sizeof(lld_condition_t));
+
+		lld_filter_init(&override->filter);
+
+		override->filter.evaltype = atoi(row[0]);
+		override->filter.expression = zbx_strdup(NULL, row[1]);
+		override->stop = (unsigned char)atoi(row[2]);
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **info, char **error)
 {
@@ -599,7 +638,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	zbx_uint64_t		hostid;
 	char			*discovery_key = NULL, *info = NULL;
 	int			lifetime, ret = SUCCEED;
-	zbx_vector_ptr_t	lld_rows, lld_macro_paths;
+	zbx_vector_ptr_t	lld_rows, lld_macro_paths, overrides;
 	lld_filter_t		filter;
 	time_t			now;
 
@@ -607,6 +646,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 
 	zbx_vector_ptr_create(&lld_rows);
 	zbx_vector_ptr_create(&lld_macro_paths);
+	zbx_vector_ptr_create(&overrides);
 
 	lld_filter_init(&filter);
 
@@ -658,6 +698,8 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 		goto out;
 	}
 
+	lld_overrides_load(&overrides, lld_ruleid);
+
 	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macro_paths, &info, error))
 	{
 		ret = FAIL;
@@ -702,6 +744,7 @@ out:
 
 	lld_filter_clean(&filter);
 
+	zbx_vector_ptr_destroy(&overrides);	/* TODO clear */
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
 	zbx_vector_ptr_clear_ext(&lld_macro_paths, (zbx_clean_func_t)zbx_lld_macro_path_free);
