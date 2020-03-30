@@ -105,7 +105,8 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Cannot read output value: %s", zbx_mock_error_string(err));
 
 		expected_dbl = strtod(expected_value, &ptr);
-		if (strlen(expected_value) == (size_t)(ptr - expected_value))
+
+		if (ptr != expected_value && '\0' == *ptr)
 			zbx_mock_assert_double_eq("function result", expected_dbl, atof(returned_value));
 		else
 			zbx_mock_assert_str_eq("function result", expected_value, returned_value);
