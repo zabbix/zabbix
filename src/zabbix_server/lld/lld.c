@@ -49,8 +49,10 @@ lld_filter_t;
 /* lld rule override */
 typedef struct
 {
-	lld_filter_t		filter;
-	unsigned char		stop;
+	zbx_uint64_t	overrideid;
+	lld_filter_t	filter;
+	int		step;
+	unsigned char	stop;
 }
 lld_override_t;
 
@@ -183,24 +185,13 @@ static int	lld_filter_condition_load(zbx_vector_ptr_t *conditions, const char *i
  *             error      - [OUT] the error description                       *
  *                                                                            *
  ******************************************************************************/
-static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char **error)
+static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const DC_ITEM *item, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DC_ITEM		item;
-	int		errcode, ret = SUCCEED;
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
-
-	if (SUCCEED != errcode)
-	{
-		*error = zbx_dsprintf(*error, "Invalid discovery rule ID [" ZBX_FS_UI64 "].",
-				lld_ruleid);
-		ret = FAIL;
-		goto out;
-	}
 
 	result = DBselect(
 			"select item_conditionid,macro,value,operator"
@@ -209,14 +200,12 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)) && SUCCEED == (ret = lld_filter_condition_load(&filter->conditions,
-			row[0], row[1], row[2], row[3], &item, error)))
+			row[0], row[1], row[2], row[3], item, error)))
 		;
 	DBfree_result(result);
 
 	if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
-out:
-	DCconfig_clean_items(&item, &errcode, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -528,35 +517,83 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 	}
 }
 
-static void	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_ruleid)
+static void	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_ruleid, const DC_ITEM *item,
+		char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	overrideids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	int			ret = SUCCEED;
+	lld_override_t		*override;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_vector_uint64_create(&overrideids);
+
+	DBbegin();
+
 	result = DBselect(
-			"select evaltype,formula,stop"
+			"select overrideid,step,evaltype,formula,stop"
 			" from override"
 			" where itemid=" ZBX_FS_UI64
-			" order by step",
+			" order by overrideid",
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		lld_override_t	*override;
-
 		override = (lld_override_t *)zbx_malloc(NULL, sizeof(lld_condition_t));
 
-		lld_filter_init(&override->filter);
+		ZBX_STR2UINT64(override->overrideid, row[0]);
+		override->step = atoi(row[1]);
 
-		override->filter.evaltype = atoi(row[0]);
-		override->filter.expression = zbx_strdup(NULL, row[1]);
-		override->stop = (unsigned char)atoi(row[2]);
+		lld_filter_init(&override->filter);
+		override->filter.evaltype = atoi(row[2]);
+		override->filter.expression = zbx_strdup(NULL, row[3]);
+		override->stop = (unsigned char)atoi(row[4]);
+
+		zbx_vector_uint64_append(&overrideids, override->overrideid);
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select overrideid,override_conditionid,macro,value,operator"
+			" from override_condition"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "overrideid", overrideids.values, overrideids.values_num);
+
+	result = DBselect("%s", sql);
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	overrideid;
+		int		index;
+
+		ZBX_STR2UINT64(overrideid, row[0]);
+		if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &overrideid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		override = (lld_override_t *)overrides->values[index];
+		if (FAIL == (ret = lld_filter_condition_load(&override->filter.conditions, row[1], row[2], row[3],
+				row[4], item, error)))
+		{
+			break;
+		}
+	}
+	DBfree_result(result);
+
+	//if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+	//	zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
+
+	DBcommit();
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&overrideids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
@@ -642,10 +679,11 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	DB_ROW			row;
 	zbx_uint64_t		hostid;
 	char			*discovery_key = NULL, *info = NULL;
-	int			lifetime, ret = SUCCEED;
+	int			lifetime, ret = SUCCEED, errcode;
 	zbx_vector_ptr_t	lld_rows, lld_macro_paths, overrides;
 	lld_filter_t		filter;
 	time_t			now;
+	DC_ITEM			item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, lld_ruleid);
 
@@ -654,6 +692,15 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	zbx_vector_ptr_create(&overrides);
 
 	lld_filter_init(&filter);
+
+	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
+
+	if (SUCCEED != errcode)
+	{
+		*error = zbx_dsprintf(*error, "Invalid discovery rule ID [" ZBX_FS_UI64 "].", lld_ruleid);
+		ret = FAIL;
+		goto out;
+	}
 
 	result = DBselect(
 			"select hostid,key_,evaltype,formula,lifetime"
@@ -691,7 +738,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 		goto out;
 	}
 
-	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, error))
+	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &item, error))
 	{
 		ret = FAIL;
 		goto out;
@@ -703,7 +750,9 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 		goto out;
 	}
 
-	lld_overrides_load(&overrides, lld_ruleid);
+	if (SUCCEED != (ret = lld_overrides_load(&overrides, lld_ruleid, &item, error)))
+		goto out;
+
 
 	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macro_paths, &info, error))
 	{
@@ -744,6 +793,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	if (NULL != info)
 		*error = zbx_strdcat(*error, info);
 out:
+	DCconfig_clean_items(&item, &errcode, 1);
 	zbx_free(info);
 	zbx_free(discovery_key);
 
