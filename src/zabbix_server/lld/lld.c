@@ -558,34 +558,38 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 	}
 	DBfree_result(result);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select overrideid,override_conditionid,macro,value,operator"
-			" from override_condition"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "overrideid", overrideids.values, overrideids.values_num);
-
-	result = DBselect("%s", sql);
-	while (NULL != (row = DBfetch(result)))
+	if (0 != overrideids.values_num)
 	{
-		zbx_uint64_t	overrideid;
-		int		index;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select overrideid,override_conditionid,macro,value,operator"
+				" from override_condition"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "overrideid", overrideids.values,
+				overrideids.values_num);
 
-		ZBX_STR2UINT64(overrideid, row[0]);
-		if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &overrideid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		result = DBselect("%s", sql);
+		while (NULL != (row = DBfetch(result)))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
+			zbx_uint64_t	overrideid;
+			int		index;
 
-		override = (lld_override_t *)overrides->values[index];
-		if (FAIL == (ret = lld_filter_condition_load(&override->filter.conditions, row[1], row[2], row[3],
-				row[4], item, error)))
-		{
-			break;
+			ZBX_STR2UINT64(overrideid, row[0]);
+			if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &overrideid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			override = (lld_override_t *)overrides->values[index];
+			if (FAIL == (ret = lld_filter_condition_load(&override->filter.conditions, row[1], row[2],
+					row[3], row[4], item, error)))
+			{
+				break;
+			}
 		}
+		DBfree_result(result);
 	}
-	DBfree_result(result);
 
 	/* if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype) */
 	/*	zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro); */
