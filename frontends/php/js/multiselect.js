@@ -83,6 +83,16 @@ jQuery(function($) {
 				});
 			}
 
+			// Sort entries by name field.
+			data.sort(function(a, b) {
+				if (a.name === b.name) {
+					return 0;
+				}
+				else {
+					return (a.name < b.name) ? -1 : 1;
+				}
+			});
+
 			return data;
 		},
 
