@@ -517,7 +517,7 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 	}
 }
 
-static void	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_ruleid, const DC_ITEM *item,
+static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_ruleid, const DC_ITEM *item,
 		char **error)
 {
 	DB_RESULT		result;
@@ -553,6 +553,7 @@ static void	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rul
 		override->filter.expression = zbx_strdup(NULL, row[3]);
 		override->stop = (unsigned char)atoi(row[4]);
 
+		zbx_vector_ptr_append(overrides, override);
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
 	}
 	DBfree_result(result);
@@ -594,6 +595,8 @@ static void	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rul
 	zbx_vector_uint64_destroy(&overrideids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
