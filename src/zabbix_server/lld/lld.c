@@ -137,6 +137,41 @@ static void	lld_filter_clean(lld_filter_t *filter)
 	lld_conditions_free(&filter->conditions);
 }
 
+static int	lld_filter_condition_load(zbx_vector_ptr_t *conditions, const char *id, const char *macro,
+		const char *regexp, const char *op, const DC_ITEM *item, char **error)
+{
+	lld_condition_t	*condition;
+
+	condition = (lld_condition_t *)zbx_malloc(NULL, sizeof(lld_condition_t));
+	ZBX_STR2UINT64(condition->id, id);
+	condition->macro = zbx_strdup(NULL, macro);
+	condition->regexp = zbx_strdup(NULL, regexp);
+	condition->op = (unsigned char)atoi(op);
+
+	zbx_vector_ptr_create(&condition->regexps);
+
+	zbx_vector_ptr_append(conditions, condition);
+
+	if ('@' == *condition->regexp)
+	{
+		DCget_expressions_by_name(&condition->regexps, condition->regexp + 1);
+
+		if (0 == condition->regexps.values_num)
+		{
+			*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.",
+					condition->regexp + 1);
+			return FAIL;
+		}
+	}
+	else
+	{
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL,
+				&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_filter_load                                                  *
@@ -152,7 +187,6 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	lld_condition_t	*condition;
 	DC_ITEM		item;
 	int		errcode, ret = SUCCEED;
 
@@ -174,38 +208,9 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-
-		condition = (lld_condition_t *)zbx_malloc(NULL, sizeof(lld_condition_t));
-		ZBX_STR2UINT64(condition->id, row[0]);
-		condition->macro = zbx_strdup(NULL, row[1]);
-		condition->regexp = zbx_strdup(NULL, row[2]);
-		condition->op = (unsigned char)atoi(row[3]);
-
-		zbx_vector_ptr_create(&condition->regexps);
-
-		zbx_vector_ptr_append(&filter->conditions, condition);
-
-		if ('@' == *condition->regexp)
-		{
-			DCget_expressions_by_name(&condition->regexps, condition->regexp + 1);
-
-			if (0 == condition->regexps.values_num)
-			{
-				*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.",
-						condition->regexp + 1);
-				ret = FAIL;
-				break;
-			}
-		}
-		else
-		{
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item, NULL, NULL,
-					&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
-		}
-
-	}
+	while (NULL != (row = DBfetch(result)) && SUCCEED == (ret = lld_filter_condition_load(&filter->conditions,
+			row[0], row[1], row[2], row[3], &item, error)))
+		;
 	DBfree_result(result);
 
 	if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
