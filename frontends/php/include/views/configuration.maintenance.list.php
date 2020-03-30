@@ -28,7 +28,6 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true, new CRedirectButton(_('Create maintenance period'), (new CUrl('maintenance.php'))
 			->removeArgument('maintenanceid')
-			->setArgument('groupids', array_keys($data['filter']['groups']))
 			->setArgument('form', 'create')
 			->getUrl()
 		)))->setAttribute('aria-label', _('Content controls'))
