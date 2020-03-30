@@ -159,5 +159,25 @@ in:
   index: 2
 out:
   return: '10'
+---
+test case: 'constant 1e5'
+in:
+  expression: '{19928}=1e5'
+  index: 1
+out:
+  return: '1e5'
+---
+test case: 'constant 1e-5'
+in:
+  expression: '{19928}=1e-5'
+  index: 1
+out:
+  return: '1e-5'
+---
+test case: 'constant 1e-5.0'
+in:
+  expression: '{19928}=1e-5.0'
+  index: 1
+out:
+  return: ''
 ...
-
