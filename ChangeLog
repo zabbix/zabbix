@@ -1,6 +1,7 @@
 Changes for 5.0.0beta1
 
 New features:
+..F....... [ZBXNEXT-5569] updated main menu to vertical style for the saving space (ashubin, averza)
 A.F....... [ZBXNEXT-5691] implemented IEEE754 compatible value range for Numeric (float) history data type (averza)
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 ........S. [ZBXNEXT-5369] added EVENT.TAGSJSON macro (asestakovs)
@@ -24,6 +25,7 @@ A.F.....S. [ZBXNEXT-5676] added support for TimescaleDB compression (atumilovics
 ........S. [ZBXNEXT-1961] added support for connection string to db.odbc.* items (atumilovics)
 
 Bug fixes:
+..F....... [ZBX-17508] fixed error in oracle database encoding check (gcalenko)
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
 A......... [ZBX-17177] removed "operationid" from lower level properties in Action API (Ivo)
 .......PS. [ZBX-17518] fixed empty parameter handling in GET method of CurlHttpRequest (vso)
