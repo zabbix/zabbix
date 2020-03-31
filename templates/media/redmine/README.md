@@ -38,7 +38,7 @@ This guide describes how to integrate your Zabbix 5.0 installation with Redmine 
 
 [![](images/thumb.05.png?raw=true)](images/05.png)
 
-4\. If you have **custom fields** in **Redmine** and you want them to be filled in with values from Zabbix, add parameters in the form **customfield_\<Redmine custom field ID\>**. Custom fields can only be of the **text**, **integer**, **float** or **date** types.
+4\. If you have **custom fields** in **Redmine** and you want them to be filled in with values from Zabbix, add parameters in the form **customfield_\<Redmine custom field ID\>**. Custom fields can only be of the **text**, **integer**, **float** or **date** types. Custom fields of **date** type must be in the format "YYYY-MM-DD".
 
 5\. Click the **Update** button to save the **Webhook** settings.
 
