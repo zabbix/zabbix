@@ -1582,6 +1582,81 @@ static int	DBpatch_4050064(void)
 
 static int	DBpatch_4050065(void)
 {
+	const ZBX_FIELD	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("history", &field, &field);
+}
+
+static int	DBpatch_4050066(void)
+{
+	const ZBX_FIELD	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_4050067(void)
+{
+	const ZBX_FIELD	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_4050068(void)
+{
+	const ZBX_FIELD	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_4050069(void)
+{
+	const ZBX_FIELD	field = {"yaxismin", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("graphs", &field, &field);
+}
+
+static int	DBpatch_4050070(void)
+{
+	const ZBX_FIELD	field = {"yaxismax", "100", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("graphs", &field, &field);
+}
+
+static int	DBpatch_4050071(void)
+{
+	const ZBX_FIELD	field = {"percent_left", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("graphs", &field, &field);
+}
+
+static int	DBpatch_4050072(void)
+{
+	const ZBX_FIELD	field = {"percent_right", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("graphs", &field, &field);
+}
+
+static int	DBpatch_4050073(void)
+{
+	const ZBX_FIELD	field = {"goodsla", "99.9", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("services", &field, &field);
+}
+
+static int	DBpatch_4050074(void)
+{
 	int		i;
 	const char	*values[] = {
 			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
@@ -1603,12 +1678,12 @@ static int	DBpatch_4050065(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4050066(void)
+static int	DBpatch_4050075(void)
 {
 	return DBdrop_field("config", "dropdown_first_entry");
 }
 
-static int	DBpatch_4050067(void)
+static int	DBpatch_4050076(void)
 {
 	return DBdrop_field("config", "dropdown_first_remember");
 }
@@ -1681,5 +1756,14 @@ DBPATCH_ADD(4050064, 0, 1)
 DBPATCH_ADD(4050065, 0, 1)
 DBPATCH_ADD(4050066, 0, 1)
 DBPATCH_ADD(4050067, 0, 1)
+DBPATCH_ADD(4050068, 0, 1)
+DBPATCH_ADD(4050069, 0, 1)
+DBPATCH_ADD(4050070, 0, 1)
+DBPATCH_ADD(4050071, 0, 1)
+DBPATCH_ADD(4050072, 0, 1)
+DBPATCH_ADD(4050073, 0, 1)
+DBPATCH_ADD(4050074, 0, 1)
+DBPATCH_ADD(4050075, 0, 1)
+DBPATCH_ADD(4050076, 0, 1)
 
 DBPATCH_END()
