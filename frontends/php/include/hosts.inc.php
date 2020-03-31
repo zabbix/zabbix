@@ -999,12 +999,12 @@ function isTemplate($hostId) {
  *       )
  *   )
  *
- * @param array     $hostids        Hots or template ids.
+ * @param array     $hostids        Host or template ids.
  * @param int|null  $parent_hostid  Parent host id of host prototype.
  *
  * @return array
  */
-function getInheritedMacros(array $hostids, ?int $parent_hostid = null) {
+function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 	$user_macro_parser = new CUserMacroParser();
 
 	$all_macros = [];
@@ -1152,7 +1152,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null) {
 				'type' => $parent_host_macros[$macro]['type']
 			];
 		}
-		else if (array_key_exists($macro, $global_macros)) {
+		elseif (array_key_exists($macro, $global_macros)) {
 			$inherited_macro['global'] = [
 				'value' => $global_macros[$macro]['value'],
 				'description' => $global_macros[$macro]['description'],
@@ -1252,7 +1252,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null) {
  *
  * @return array
  */
-function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
+function mergeInheritedMacros(array $host_macros, array $inherited_macros): array {
 	$user_macro_parser = new CUserMacroParser();
 	$inherit_order = ['parent_host', 'template', 'global'];
 

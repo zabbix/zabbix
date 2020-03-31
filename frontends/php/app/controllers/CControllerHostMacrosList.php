@@ -51,7 +51,7 @@ class CControllerHostMacrosList extends CController {
 
 		if ($allow && $this->hasInput('parent_hostid')) {
 			$parent_host = API::Host()->get([
-				'output' => ['hostid'],
+				'output' => [],
 				'hostids' => [$this->getInput('parent_hostid')]
 			]);
 			$allow = (bool) reset($parent_host);

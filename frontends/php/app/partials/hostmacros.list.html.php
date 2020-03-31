@@ -38,7 +38,6 @@ else {
 		]);
 
 	foreach ($data['macros'] as $i => $macro) {
-		$action_col = null;
 		$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 			->setReadonly($data['readonly'])
 			->addClass('macro')
@@ -53,10 +52,12 @@ else {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
 
-			$action_col = (new CCol((new CButton('macros['.$i.'][remove]', _('Remove')))
+			$action_btn = (new CButton('macros['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP);
+				->addClass('element-table-remove');
+		}
+		else {
+			$action_btn = null;
 		}
 
 		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
@@ -80,7 +81,7 @@ else {
 					->setReadonly($data['readonly'])
 					->setAttribute('placeholder', _('description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			$action_col
+			$action_btn ? (new CCol($action_btn))->addClass(ZBX_STYLE_NOWRAP) : null
 		], 'form_row');
 	}
 

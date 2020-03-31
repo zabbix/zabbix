@@ -722,7 +722,7 @@ class C50XmlValidator {
 											'value' =>					['type' => XML_STRING, 'default' => ''],
 											'description' =>			['type' => XML_STRING, 'default' => '']
 										]]
-									]],
+									]]
 								]]
 							]],
 							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
