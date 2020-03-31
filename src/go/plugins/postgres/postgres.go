@@ -93,6 +93,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if len(params) > 0 && len(params[0]) > 0 {
 		var ok bool
 		if session, ok = p.options.Sessions[params[0]]; !ok {
+			if len(params) > 1 && params[1] == "" {
+				return nil, errors.New("Invalid second parameter.")
+			}
+			if len(params) > 2 && params[2] == "" {
+				return nil, errors.New("Invalid third parameter.")
+			}
 			u, err := url.Parse(params[0])
 			if err != nil {
 				return nil, fmt.Errorf("Invalid connection URI: %s", err)
@@ -110,28 +116,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 					return nil, fmt.Errorf("Invalid connection port: %s", err)
 				}
 				session.Port = uint16(port)
-			} else {
-				session.Port = p.options.Port
 			}
 			if len(params) > 1 {
 				session.User = params[1]
-			} else {
-				session.User = p.options.User
 			}
 			if len(params) > 2 {
 				session.Password = params[2]
-			} else {
-				session.Password = p.options.Password
 			}
-
 		}
 	} else {
-		if len(params) > 1 && params[1] == "" {
-			return nil, errors.New("Invalid second parameter.")
-		}
-		if len(params) > 2 && params[2] == "" {
-			return nil, errors.New("Invalid third parameter.")
-		}
 		session = &Session{
 			Host:     p.options.Host,
 			Port:     p.options.Port,
@@ -220,7 +213,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	conn, err := p.connMgr.GetPostgresConnection(connString)
 	if err != nil {
-		fmt.Println("cannot connect to PG ")
 		// Here is another logic of processing connection errors if postgres.ping is requested
 		if key == keyPostgresPing {
 			return postgresPingFailed, nil
