@@ -23,6 +23,7 @@ import (
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/redis"
 	_ "zabbix.com/plugins/systemrun"
+	_ "zabbix.com/plugins/web"
 	_ "zabbix.com/plugins/zabbix/async"
 	_ "zabbix.com/plugins/zabbix/stats"
 	_ "zabbix.com/plugins/zabbix/sync"

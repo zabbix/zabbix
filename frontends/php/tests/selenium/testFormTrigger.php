@@ -596,19 +596,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger_CheckUrl',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<5',
-					'url' => 'www.zabbix.com',
-					'error_msg' => 'Cannot add trigger',
-					'errors' => [
-						'Wrong value for url field.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'description' => 'MyTrigger_CheckUrl',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<5',
-					'url' => 'zabbix.com',
+					'url' => 'javascript:alert(123);',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
 						'Wrong value for url field.'

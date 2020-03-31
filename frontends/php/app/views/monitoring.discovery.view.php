@@ -36,7 +36,7 @@ $widget = (new CWidget())
 	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)

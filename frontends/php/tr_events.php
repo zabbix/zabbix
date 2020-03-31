@@ -193,7 +193,7 @@ $event_tab = (new CDiv([
 	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(get_icon('fullscreen', ['mode' => $page['web_layout_mode']]))
+			->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']]))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	)

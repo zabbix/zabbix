@@ -103,6 +103,30 @@ class MysqlDbBackend extends DbBackend {
 	}
 
 	/**
+	* Check if database is using IEEE754 compatible double precision columns.
+	*
+	* @return bool
+	*/
+	public function isDoubleIEEE754() {
+		global $DB;
+
+		$conditions_or = [
+			'(table_name=\'history\' AND column_name=\'value\')',
+			'(table_name=\'trends\' AND column_name IN (\'value_min\', \'value_avg\', \'value_max\'))'
+		];
+
+		$sql =
+			'SELECT COUNT(*) cnt FROM information_schema.columns'.
+				' WHERE table_schema='.zbx_dbstr($DB['DATABASE']).
+					' AND column_type=\'double\''.
+					' AND ('.implode(' OR ', $conditions_or).')';
+
+		$result = DBfetch(DBselect($sql));
+
+		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == 4);
+	}
+
+	/**
 	 * Check is current connection contain requested cipher list.
 	 *
 	 * @return bool

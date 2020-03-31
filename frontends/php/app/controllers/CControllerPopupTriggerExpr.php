@@ -508,7 +508,14 @@ class CControllerPopupTriggerExpr extends CController {
 									&& in_array($tokens[$key + 1]['value'],
 										$this->functions[$function]['operators'])) {
 								$operator = $tokens[$key + 1]['value'];
-								$value = $tokens[$key + 2]['value'];
+
+								if (array_key_exists($key + 3, $tokens)
+										&& $tokens[$key + 2]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
+									$value = $tokens[$key + 2]['value'].$tokens[$key + 3]['value'];
+								}
+								else {
+									$value = $tokens[$key + 2]['value'];
+								}
 							}
 							else {
 								break;

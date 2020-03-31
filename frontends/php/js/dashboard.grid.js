@@ -437,8 +437,8 @@
 
 		// Apply the calculated dashboard offset (0, 1 or 2 lines) slowly.
 
-		var $main = $obj.closest('main.layout-kioskmode');
-		if (!$main.length) {
+		var $wrapper = $obj.closest('.layout-kioskmode');
+		if (!$wrapper.length) {
 			return;
 		}
 
@@ -449,7 +449,7 @@
 
 		var slide_lines_current = 0;
 		for (var i = 2; i > 0; i--) {
-			if ($main.hasClass('kiosk-slide-lines-' + i)) {
+			if ($wrapper.hasClass('kiosk-slide-lines-' + i)) {
 				slide_lines_current = i;
 				break;
 			}
@@ -457,15 +457,15 @@
 
 		if (slide_lines > slide_lines_current) {
 			if (slide_lines_current > 0) {
-				$main.removeClass('kiosk-slide-lines-' + slide_lines_current);
+				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
 			}
-			$main.addClass('kiosk-slide-lines-' + slide_lines);
+			$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
 		}
 		else if (slide_lines < slide_lines_current) {
 			data['options']['kiosk_slide_timeout'] = setTimeout(function() {
-				$main.removeClass('kiosk-slide-lines-' + slide_lines_current);
+				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
 				if (slide_lines > 0) {
-					$main.addClass('kiosk-slide-lines-' + slide_lines);
+					$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
 				}
 				delete data['options']['kiosk_slide_timeout'];
 			}, 2000);

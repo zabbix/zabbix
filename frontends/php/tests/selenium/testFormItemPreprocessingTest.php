@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/traits/PreprocessingTrait.php';
 
 /**
+ *
  * @backup items
  */
 class testFormItemPreprocessingTest extends CWebTest {
@@ -44,6 +45,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
@@ -139,6 +141,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'test', 'parameter_2' => ''],
 						['type' => 'In range', 'parameter_1' => '1', 'parameter_2' => ''],
 						['type' => 'In range', 'parameter_1' => '', 'parameter_2' => '2'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu', 'parameter_2' => '']
@@ -185,6 +188,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => '', 'parameter_2' => 'test'],
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '1'],
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'label']
 					],

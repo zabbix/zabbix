@@ -843,7 +843,7 @@ static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t
 			zbx_json_adduint64(json, "count", counter_value.ui64);
 			break;
 		case ZBX_COUNTER_TYPE_DBL:
-			tmp = zbx_dsprintf(tmp, ZBX_FS_DBL, counter_value.dbl);
+			tmp = zbx_dsprintf(tmp, ZBX_FS_DBL64, counter_value.dbl);
 			zbx_json_addstring(json, "count", tmp, ZBX_JSON_TYPE_STRING);
 			break;
 		default:

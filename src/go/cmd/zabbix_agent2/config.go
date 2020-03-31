@@ -87,11 +87,11 @@ func updateHostInterface(taskManager scheduler.Scheduler, options *agent.AgentOp
 			return fmt.Errorf("cannot get host interface: value is not an UTF-8 string")
 		}
 
-		var n int
-
-		if options.HostInterface, n = agent.CutAfterN(options.HostInterface, hostInterfaceLen); n > hostInterfaceLen {
+		if len(options.HostInterface) > hostInterfaceLen {
 			log.Warningf("the returned value of \"%s\" item specified by \"HostInterfaceItem\" configuration parameter"+
-				" is too long, using first %d characters", options.HostInterfaceItem, n)
+				" is too long, using first %d characters", options.HostInterfaceItem, hostInterfaceLen)
+
+			options.HostInterface = agent.CutAfterN(options.HostInterface, hostInterfaceLen)
 		}
 	}
 

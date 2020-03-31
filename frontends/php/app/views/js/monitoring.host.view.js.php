@@ -54,8 +54,8 @@
 		});
 
 		function hostPage() {
-			this.refresh_url = '<?= $this->data['refresh_url'] ?>';
-			this.refresh_interval = <?= $this->data['refresh_interval'] ?>;
+			this.refresh_url = '<?= $data['refresh_url'] ?>';
+			this.refresh_interval = <?= $data['refresh_interval'] ?>;
 			this.running = false;
 			this.timeout = null;
 		}
@@ -65,10 +65,10 @@
 				return $('form[name=host_view]');
 			},
 			addMessages: function(messages) {
-				$('main').prepend(messages);
+				$('.wrapper main').before(messages);
 			},
 			removeMessages: function() {
-				$('main .msg-bad').remove();
+				$('.wrapper .msg-bad').remove();
 			},
 			refresh: function() {
 				this.setLoading();
@@ -156,6 +156,6 @@
 			}
 		};
 
-		window.host_page = new hostPage(true);
+		window.host_page = new hostPage();
 	});
 </script>
