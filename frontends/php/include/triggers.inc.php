@@ -994,9 +994,13 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 
 	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 		$eventid = $trigger['problem']['eventid'];
+		$acknowledge = true;
+	}
+	else {
+		$acknowledge = false;
 	}
 
-	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid));
+	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
 
 	return $column;
 }
