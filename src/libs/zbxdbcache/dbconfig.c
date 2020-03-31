@@ -12193,7 +12193,23 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 	{
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS))
 		{
-			if (proxy->lastaccess != diff->lastaccess)
+			int lost = 0;	/* communication lost */
+
+			if (0 != (diff->flags &
+					(ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT | ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG)))
+			{
+				zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win;
+				int			heartbeat = diff->lastaccess - ps_win->heartbeat_time;
+
+				if (0 != ps_win->heartbeat_time &&
+						ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX != ps_win->heartbeat &&
+						SEC_PER_MIN / 2 < abs(ps_win->heartbeat - heartbeat))
+				{
+					lost = 1;
+				}
+			}
+
+			if (0 == lost && proxy->lastaccess != diff->lastaccess)
 				proxy->lastaccess = diff->lastaccess;
 
 			/* proxy last access in database is updated separately in  */
@@ -12238,6 +12254,10 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		{
 			zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win, *ds_win = &diff->suppress_win;
 
+			/* Active proxy sends the delayed data in the second packet. The first packet is empty */
+			if (0 != (ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET))
+				ps_win->period_start = ds_win->period_start;
+
 			if ((ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) != (ds_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 			{
 				ps_win->period_start = ds_win->period_start;
@@ -12252,17 +12272,16 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT))
 		{
 			zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win;
+			int			heartbeat = diff->lastaccess - ps_win->heartbeat_time;
 
-			if (0 != ps_win->heartbeat_time &&
-					ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX > (diff->lastaccess - ps_win->heartbeat_time))
+			if (0 != ps_win->heartbeat_time && ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX > heartbeat)
 			{
-				ps_win->heartbeat = diff->lastaccess - ps_win->heartbeat_time;
+				ps_win->heartbeat = heartbeat;
 			}
 
 			ps_win->heartbeat_time = diff->lastaccess;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT);
 		}
-
 	}
 
 	UNLOCK_CACHE;

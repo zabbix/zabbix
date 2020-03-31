@@ -4558,13 +4558,14 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
 	}
 
 	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
-			5 * CONFIG_PROXYDATA_FREQUENCY < (ts->sec - diff->lastaccess)) ||
+			2 * CONFIG_PROXYDATA_FREQUENCY < (ts->sec - diff->lastaccess)) ||
 			(HOST_STATUS_PROXY_ACTIVE == proxy_status &&
 			diff->suppress_win.heartbeat < (ts->sec - diff->lastaccess)))
 	{
 		diff->suppress_win.values_num = 0;
 		diff->suppress_win.period_end = ts->sec;
 		diff->suppress_win.period_start = diff->suppress_win.period_end - diff->proxy_delay;
+		diff->flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
 
 		if (0 == diff->proxy_delay)
 			diff->suppress_win.flags = ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET;
@@ -4625,6 +4626,9 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
+	proxy_diff->flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
+	check_proxy_suppression_mode(ts, proxy_status, proxy_diff);	/* first packet can be empty for active proxy */
+
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
 		zbx_data_session_t	*session = NULL;
@@ -4643,22 +4647,20 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			session = zbx_dc_get_or_create_data_session(proxy->hostid, value);
 		}
 
-		check_proxy_suppression_mode(ts, proxy_status, proxy_diff);
-
 		if (SUCCEED == (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
 				(void *)&proxy->hostid, &jp_data, session, &proxy_diff->suppress_win, &error_step)))
 		{
-			proxy_diff->flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
-
 			if (0 < proxy_diff->suppress_win.values_num)
-			{
-				proxy_diff->hostid = proxy->hostid;
 				proxy_diff->flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
-				zbx_dc_update_proxy(proxy_diff);
-			}
 		}
 		else
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
+	}
+
+	if (0 != (proxy_diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN))
+	{
+		proxy_diff->hostid = proxy->hostid;
+		zbx_dc_update_proxy(proxy_diff);
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
