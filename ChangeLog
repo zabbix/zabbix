@@ -1,4 +1,4 @@
-Changes for 5.0.0beta1
+Changes for 5.0.0alpha4
 
 New features:
 ..F....... [ZBXNEXT-5569] updated main menu to vertical style for the saving space (ashubin, averza)
@@ -6,7 +6,6 @@ A.F....... [ZBXNEXT-5691] implemented IEEE754 compatible value range for Numeric
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 ........S. [ZBXNEXT-5369] added EVENT.TAGSJSON macro (asestakovs)
 ....I..PS. [ZBXNEXT-1736] increased float precision (asestakovs, vso)
-.........T [ZBX-17457] fixed description in Template DB MySQL by Zabbix agent (mchudinov)
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 .........T [ZBXNEXT-5527] added "Template Server Chassis by IPMI" (mchudinov)
 .........T [ZBXNEXT-5685] added "Template DB MySQL by Zabbix agent 2" (mchudinov)
@@ -25,6 +24,7 @@ A.F.....S. [ZBXNEXT-5676] added support for TimescaleDB compression (atumilovics
 ........S. [ZBXNEXT-1961] added support for connection string to db.odbc.* items (atumilovics)
 
 Bug fixes:
+.........T [ZBX-17457] fixed description in Template DB MySQL by Zabbix agent (mchudinov)
 ..F....... [ZBX-17508] fixed error in oracle database encoding check (gcalenko)
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
 A......... [ZBX-17177] removed "operationid" from lower level properties in Action API (Ivo)
@@ -158,10 +158,10 @@ Changes for 4.4.8rc1
 
 New features:
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
-.........T [ZBX-17457] fixed description in Template DB MySQL by Zabbix agent (mchudinov)
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 
 Bug fixes:
+.........T [ZBX-17457] fixed description in Template DB MySQL by Zabbix agent (mchudinov)
 ..F....... [ZBX-17508] fixed error in oracle database encoding check (gcalenko)
 ...G...... [ZBX-17442] fixed web.page.get to time out when there is no response (vso)
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
