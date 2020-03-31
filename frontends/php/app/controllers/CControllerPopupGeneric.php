@@ -430,7 +430,9 @@ class CControllerPopupGeneric extends CController {
 			'writeonly' =>							'in 1',
 			'noempty' =>							'in 1',
 			'submit_parent' =>						'in 1',
-			'enrich_parent_groups' =>				'in 1'
+			'enrich_parent_groups' =>				'in 1',
+			'filter_groupid_rst' =>					'in 1',
+			'filter_hostid_rst' =>					'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -730,6 +732,27 @@ class CControllerPopupGeneric extends CController {
 	protected function doAction() {
 		$popup = $this->popup_properties[$this->source_table];
 
+		// Update or read profile.
+		if ($this->groupids) {
+			CProfile::updateArray('web.popup.generic.filter_groupid', $this->groupids, PROFILE_TYPE_ID);
+		}
+		elseif ($this->hasInput('filter_groupid_rst')) {
+			CProfile::delete('web.popup.generic.filter_groupid');
+		}
+		else {
+			$this->groupids = CProfile::getArray('web.popup.generic.filter_groupid', []);
+		}
+
+		if ($this->hostids) {
+			CProfile::updateArray('web.popup.generic.filter_hostid', $this->hostids, PROFILE_TYPE_ID);
+		}
+		elseif ($this->hasInput('filter_hostid_rst')) {
+			CProfile::delete('web.popup.generic.filter_hostid');
+		}
+		else {
+			$this->hostids = CProfile::getArray('web.popup.generic.filter_hostid', []);
+		}
+
 		// Set popup options.
 		$this->host_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER);
 		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER);
@@ -1017,11 +1040,11 @@ class CControllerPopupGeneric extends CController {
 					'expandDescription' => true
 				];
 
-				if (!$this->hostids && $this->groupids) {
-					$options['groupids'] = $this->groupids;
-				}
-				elseif ($this->hostids) {
+				if ($this->hostids) {
 					$options['hostids'] = $this->hostids;
+				}
+				elseif ($this->groupids) {
+					$options['groupids'] = $this->groupids;
 				}
 
 				if ($this->hasInput('with_monitored_triggers')) {
@@ -1032,7 +1055,7 @@ class CControllerPopupGeneric extends CController {
 					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 				}
 
-				if (!$this->host_preselect_required || $this->hostids || $this->groupids) {
+				if (!$this->host_preselect_required || $this->hostids) {
 					$records = API::Trigger()->get($options);
 				}
 				else {

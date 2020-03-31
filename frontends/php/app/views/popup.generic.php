@@ -74,7 +74,8 @@ if (array_key_exists('groups', $data['filter'])) {
 		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
 			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
 				'var groups = jQuery(this).multiSelect("getData").map(i => i.id),'.
-					'new_opts = jQuery.extend(e.data.overlay.options, {groupid: groups.length ? groups[0]: []});'.
+					'options = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};'.
+					'new_opts = jQuery.extend(e.data.overlay.options, options);'.
 				'PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);'.
 			'});'.
 		'});';
@@ -97,7 +98,8 @@ if (array_key_exists('hosts', $data['filter'])) {
 		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
 			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
 				'var hosts = jQuery(this).multiSelect("getData").map(i => i.id),'.
-					'new_opts = jQuery.extend(e.data.overlay.options, {hostid: hosts.length ? hosts[0]: []});'.
+					'options = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};'.
+					'new_opts = jQuery.extend(e.data.overlay.options, options);'.
 				'PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);'.
 			'});'.
 		'});';
