@@ -186,59 +186,32 @@ static void	var_to_double(zbx_variant_t *result)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: 1) expand suffixes if  both operands are castable to a number     *
- *          2) if one operand is numeric and another is a string not castable *
- *             to a number, then cast the numeric operand to a string         *
+ * Function: variant_get_double                                               *
+ *                                                                            *
+ * Purpose: get variant value in double (float64) format                      *
+ *                                                                            *
+ * Parameters: var - [IN] the input variant                                   *
+ *                                                                            *
+ * Return value: Depending on variant type:                                   *
+ *    DBL - the variant value                                                 *
+ *    STR - if variant value contains valid float64 string (with supported    *
+ *          Zabbix suffixes) the converted value is returned. Otherwise       *
+ *          ZBX_INFINITY is returned.                                         *
+ *    other types - ZBX_INFINITY
  *                                                                            *
  ******************************************************************************/
-static void	cast_operands(zbx_variant_t *result, zbx_variant_t *operand)
+static double	variant_get_double(const zbx_variant_t *var)
 {
-	zbx_variant_t	tmp_res, tmp_operand;
-	zbx_variant_copy(&tmp_res, result);
-	zbx_variant_copy(&tmp_operand, operand);
-
-	if (ZBX_VARIANT_STR == tmp_res.type)
+	switch (var->type)
 	{
-		double	result_double_value = evaluate_string_to_double(tmp_res.data.str);
-		zbx_variant_clear(&tmp_res);
-		zbx_variant_set_dbl(&tmp_res, result_double_value);
-	}
-
-	if (ZBX_VARIANT_STR == tmp_operand.type)
-	{
-		double	result_double_value = evaluate_string_to_double(tmp_operand.data.str);
-		zbx_variant_clear(&tmp_operand);
-		zbx_variant_set_dbl(&tmp_operand, result_double_value);
-	}
-
-	if (ZBX_INFINITY != tmp_res.data.dbl && ZBX_INFINITY != tmp_operand.data.dbl)
-	{
-		var_to_double(result);
-		var_to_double(operand);
-	}
-	else
-	{
-		if (ZBX_INFINITY == tmp_res.data.dbl)
-		{
-			if (ZBX_VARIANT_DBL == operand->type && ZBX_INFINITY != operand->data.dbl)
-			{
-				zbx_variant_convert(operand, ZBX_VARIANT_STR);
-			}
-		}
-		else if (ZBX_INFINITY == tmp_operand.data.dbl)
-		{
-			if (ZBX_VARIANT_DBL == result->type && ZBX_INFINITY != result->data.dbl)
-			{
-				zbx_variant_convert(result, ZBX_VARIANT_STR);
-			}
-		}
-		else
-		{
+		case ZBX_VARIANT_DBL:
+			return var->data.dbl;
+		case ZBX_VARIANT_STR:
+			return evaluate_string_to_double(var->data.str);
+		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-		}
+			return ZBX_INFINITY;
 	}
-	zbx_variant_clear(&tmp_res);
-	zbx_variant_clear(&tmp_operand);
 }
 
 static zbx_variant_t	evaluate_term1(int *unknown_idx);
@@ -688,6 +661,7 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 	char		op;
 	int		res_idx = -7, oper_idx = -8;	/* set invalid values to catch errors */
 	zbx_variant_t	res, operand;
+	double		left, right, value;
 
 	res = evaluate_term4(&res_idx);
 
@@ -720,61 +694,62 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 
 		operand = evaluate_term4(&oper_idx);
 
-		cast_operands(&res, &operand);
-
-		if (ZBX_VARIANT_STR == res.type && ZBX_VARIANT_STR == operand.type)
+		if (ZBX_VARIANT_DBL == operand.type && ZBX_INFINITY == operand.data.dbl)
 		{
-			int res_temp = strcmp(res.data.str, operand.data.str);
-
-			if ('=' == op)
-				res_temp = res_temp == 0 ? 1 : 0;
-			else
-				res_temp = res_temp != 0 ? 1: 0;
-
 			zbx_variant_clear(&res);
-			zbx_variant_set_dbl(&res, res_temp);
+			return operand;
+		}
+
+		if (ZBX_VARIANT_DBL == res.type && ZBX_UNKNOWN == res.data.dbl)
+		{
+			zbx_variant_clear(&operand);
+			continue;
+		}
+
+		if (ZBX_VARIANT_DBL == operand.type && ZBX_UNKNOWN == operand.data.dbl)
+		{
+			zbx_variant_clear(&res);
+			res = operand;
+			*unknown_idx = oper_idx;
+			continue;
+		}
+
+		left = variant_get_double(&res);
+		right = variant_get_double(&operand);
+
+		if (ZBX_INFINITY != left && ZBX_INFINITY != right)
+		{
+			/* both operands either are of double type or could be cast to it - */
+			/* compare them as double values                                    */
+			value = (SUCCEED == zbx_double_compare(left, right) ? 1 : 0);
+		}
+		else if (ZBX_VARIANT_DBL == res.type || ZBX_VARIANT_DBL == operand.type)
+		{
+			/* if one of operands has double type and the other */
+			/* cannot be cast to double - they cannot be equal  */
+			value = 0;
 		}
 		else
 		{
-			var_to_double(&operand);
-
-			if (ZBX_INFINITY == operand.data.dbl)
+			/* at this point both operands should be strings and should be */
+			/* compared as such but check for their types just in case     */
+			if (ZBX_VARIANT_STR != res.type || ZBX_VARIANT_STR != operand.type)
 			{
-				zbx_variant_clear(&res);
-				zbx_variant_set_dbl(&res, ZBX_INFINITY);
-				zbx_variant_clear(&operand);
-				return res;
-			}
-
-			var_to_double(&res);
-
-			if (ZBX_INFINITY == res.data.dbl)
-			{
-				zbx_variant_clear(&operand);
-				return res;
-			}
-
-			if (ZBX_UNKNOWN == operand.data.dbl)
-			{
-				*unknown_idx = oper_idx;
-				res_idx = oper_idx;
-				res.data.dbl = ZBX_UNKNOWN;
-			}
-			else if (ZBX_UNKNOWN == res.data.dbl)
-			{
-				*unknown_idx = res_idx;
-			}
-			else if  ('=' == op)
-			{
-				res.data.dbl = (SUCCEED == zbx_double_compare(res.data.dbl, operand.data.dbl));
+				zbx_strlcpy(buffer, "Cannot evaluate expression: unsupported value type found.",
+						max_buffer_len);
+				value = ZBX_INFINITY;
+				THIS_SHOULD_NEVER_HAPPEN;
 			}
 			else
-			{
-				res.data.dbl = (SUCCEED != zbx_double_compare(res.data.dbl, operand.data.dbl));
-			}
+				value = !strcmp(res.data.str, operand.data.str);
 		}
 
+		if ('#' == op)
+			value = (SUCCEED == zbx_double_compare(value, 0.0) ? 1.0 : 0.0);
+
+		zbx_variant_clear(&res);
 		zbx_variant_clear(&operand);
+		zbx_variant_set_dbl(&res, value);
 	}
 
 	return res;
