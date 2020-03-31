@@ -51,7 +51,7 @@ typedef struct
 {
 	zbx_uint64_t		overrideid;
 	lld_filter_t		filter;
-	zbx_vector_ptr_t	operations;
+	zbx_vector_ptr_t	override_operations;
 	int			step;
 	unsigned char		stop;
 }
@@ -604,7 +604,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 		override_operation->evaltype = (unsigned char)atoi(row[3]);
 
 		override = (lld_override_t *)overrides->values[index];
-		zbx_vector_ptr_append(&override->operations, override_operation);
+		zbx_vector_ptr_append(&override->override_operations, override_operation);
 	}
 	DBfree_result(result);
 }
@@ -646,7 +646,7 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 		override->filter.expression = zbx_strdup(NULL, row[3]);
 		override->stop = (unsigned char)atoi(row[4]);
 
-		zbx_vector_ptr_create(&override->operations);
+		zbx_vector_ptr_create(&override->override_operations);
 
 		zbx_vector_ptr_append(overrides, override);
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
