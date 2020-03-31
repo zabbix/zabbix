@@ -42,8 +42,6 @@ class CScreenTriggersOverview extends CScreenBase {
 			$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
 		) = getTriggersOverviewData((array) $this->screenitem['resourceid'], $this->screenitem['application']);
 
-		$data['backurl'] = (new CUrl('screens.php'))->setArgument('screenid', $this->screenid);
-
 		if ($this->screenitem['style'] == STYLE_TOP) {
 			$table = new CPartial('trigoverview.table.top', $data);
 		}

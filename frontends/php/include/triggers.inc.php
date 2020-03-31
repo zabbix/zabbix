@@ -968,11 +968,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
  *
  * @param array  $trigger
  * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
- * @param CUrl   $backurl       Used for acknowledge context menu item.
  *
  * @return CCol
  */
-function getTriggerOverviewCell(array $trigger, array $dependencies, CUrl $backurl): CCol {
+function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 	$ack = $trigger['problem']['acknowledged'] == 1 ? (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN) : null;
 	$desc = array_key_exists($trigger['triggerid'], $dependencies)
 		? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
@@ -983,8 +982,6 @@ function getTriggerOverviewCell(array $trigger, array $dependencies, CUrl $backu
 		->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 	$eventid = 0;
-	$acknowledge = [];
-
 	$config = select_config();
 	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
 	$duration = time() - $trigger['lastchange'];
@@ -997,10 +994,9 @@ function getTriggerOverviewCell(array $trigger, array $dependencies, CUrl $backu
 
 	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 		$eventid = $trigger['problem']['eventid'];
-		$acknowledge = ['backurl' => $backurl->getUrl()];
 	}
 
-	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
+	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid));
 
 	return $column;
 }

@@ -220,7 +220,6 @@ if ($type == SHOW_TRIGGERS) {
 	) = getTriggersOverviewData($groupids, $filter['application'], $host_options, $trigger_options, $problem_options);
 
 	$data['filter'] = $filter;
-	$data['backurl'] = new CUrl($page['file']);
 
 	// Render view.
 	echo (new CView('monitoring.overview.triggers', $data))->getOutput();
