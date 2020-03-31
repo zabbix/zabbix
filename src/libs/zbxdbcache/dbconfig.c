@@ -12253,8 +12253,11 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		{
 			zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win;
 
-			if (0 != ps_win->heartbeat_time)
+			if (0 != ps_win->heartbeat_time &&
+					ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX > (diff->lastaccess - ps_win->heartbeat_time))
+			{
 				ps_win->heartbeat = diff->lastaccess - ps_win->heartbeat_time;
+			}
 
 			ps_win->heartbeat_time = diff->lastaccess;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT);
