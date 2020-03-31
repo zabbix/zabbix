@@ -536,6 +536,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error())
 		ret = ZBX_DB_DOWN;
+
+	/* shadow global variable */
+	if (ZBX_DB_OK == ret && ZBX_DB_OK != zbx_db_execute("set @@session.auto_increment_increment=1"))
+		ret = ZBX_DB_FAIL;
+
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
 	ZBX_UNUSED(tls_connect);
