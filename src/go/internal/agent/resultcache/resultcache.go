@@ -227,15 +227,22 @@ func (c *PersistCache) resultFetch(rows *sql.Rows) AgentData {
 func (c *PersistCache) upload(u Uploader) (err error) {
 
 	var results []*AgentData
+	var rows *sql.Rows
 
-	rows, _ := database.Query(fmt.Sprintf("SELECT * FROM data_%d", c.connectId))
+	if rows, err = database.Query(fmt.Sprintf("SELECT * FROM data_%d", c.connectId)); err != nil {
+		log.Errf("[%d] cannot select from data table: %s", c.clientID, err.Error())
+		return
+	}
 	for rows.Next() {
 		result := c.resultFetch(rows)
 		result.persistent = false
 		results = append(results, &result)
 
 	}
-	rows, _ = database.Query(fmt.Sprintf("SELECT * FROM log_%d", c.connectId))
+	if rows, err = database.Query(fmt.Sprintf("SELECT * FROM log_%d", c.connectId)); err != nil {
+		log.Errf("[%d] cannot select from log table: %s", c.clientID, err.Error())
+		return
+	}
 	for rows.Next() {
 		result := c.resultFetch(rows)
 		result.persistent = true
@@ -464,9 +471,11 @@ func (c *PersistCache) write(r *plugin.Result) {
 		if (clock - c.oldestData) > uint64(c.persistPeriod) {
 			query := fmt.Sprintf("DELETE FROM data_%d WHERE clock = %d", c.connectId, c.oldestData)
 			database.Exec(query)
-			rows, _ := database.Query(fmt.Sprintf("SELECT MIN(Clock) FROM data_%d", c.connectId))
-			for rows.Next() {
-				rows.Scan(&c.oldestData)
+			rows, err := database.Query(fmt.Sprintf("SELECT MIN(Clock) FROM data_%d", c.connectId))
+			if err != nil {
+				for rows.Next() {
+					rows.Scan(&c.oldestData)
+				}
 			}
 		}
 		stmt, _ = database.Prepare(c.InsertResultTable(fmt.Sprintf("data_%d", c.connectId)))
@@ -535,7 +544,6 @@ func (c *MemoryCache) updateOptions(options *agent.AgentOptions) {
 
 func (c *PersistCache) updateOptions(options *agent.AgentOptions) {
 	c.persistPeriod = options.PersistentBufferPeriod
-	///c.DbName = options.PersistentBufferFile
 }
 
 func (c *PersistCache) InsertResultTable(table string) string {
@@ -557,14 +565,17 @@ func (c *PersistCache) init() {
 	c.updateOptions(&agent.Options)
 	c.input = make(chan interface{}, 100)
 
-	rows, _ := database.Query(fmt.Sprintf("SELECT Id FROM registry WHERE Address = '%s'", c.output.Addr()))
-	for rows.Next() {
-		rows.Scan(&c.connectId)
+	rows, err := database.Query(fmt.Sprintf("SELECT Id FROM registry WHERE Address = '%s'", c.output.Addr()))
+	if err == nil {
+		for rows.Next() {
+			rows.Scan(&c.connectId)
+		}
 	}
 
-	rows, _ = database.Query(fmt.Sprintf("SELECT MIN(Clock), MAX(Id) FROM data_%d", c.connectId))
-	for rows.Next() {
-		rows.Scan(&c.oldestData, &c.lastDataID)
+	if rows, err = database.Query(fmt.Sprintf("SELECT MIN(Clock), MAX(Id) FROM data_%d", c.connectId)); err == nil {
+		for rows.Next() {
+			rows.Scan(&c.oldestData, &c.lastDataID)
+		}
 	}
 }
 
@@ -695,14 +706,17 @@ func CacheConfiguration(options *agent.AgentOptions, addresses []string) (err er
 	if err != nil {
 		return fmt.Errorf("Cannot open database %s.", options.PersistentBufferFile)
 	}
-	stmt, err := database.Prepare("CREATE TABLE IF NOT EXISTS registry (Id INTEGER PRIMARY KEY, Address TEXT, UNIQUE(Address) )")
+	stmt, _ := database.Prepare("CREATE TABLE IF NOT EXISTS registry (Id INTEGER PRIMARY KEY, Address TEXT, UNIQUE(Address) )")
 	stmt.Exec()
 
 	var Id, Found, i int
 	var Address string
 	Ids := make([]int, 0)
 	Addresses := make([]string, 0)
-	rows, _ := database.Query("SELECT Id, Address FROM registry")
+	rows, err := database.Query("SELECT Id, Address FROM registry")
+	if err != nil {
+		return err
+	}
 	for rows.Next() {
 		rows.Scan(&Id, &Address)
 		Ids = append(Ids, Id)
@@ -742,15 +756,27 @@ func CacheConfiguration(options *agent.AgentOptions, addresses []string) (err er
 		`, table)
 	}
 	for _, addr := range addresses {
-		stmt, _ = database.Prepare("INSERT OR IGNORE INTO registry (Address)	VALUES (?)")
+		stmt, err = database.Prepare("INSERT OR IGNORE INTO registry (Address) VALUES (?)")
+		if err != nil {
+			break
+		}
 		stmt.Exec(addr)
-		rows, _ = database.Query(fmt.Sprintf("SELECT Id FROM registry WHERE Address = '%s'", addr))
+		rows, err = database.Query(fmt.Sprintf("SELECT Id FROM registry WHERE Address = '%s'", addr))
+		if err != nil {
+			break
+		}
 		for rows.Next() {
 			rows.Scan(&Id)
 		}
-		stmt, _ = database.Prepare(CreateTable(fmt.Sprintf("data_%d", Id)))
+		stmt, err = database.Prepare(CreateTable(fmt.Sprintf("data_%d", Id)))
+		if err != nil {
+			break
+		}
 		stmt.Exec()
-		stmt, _ = database.Prepare(CreateTable(fmt.Sprintf("log_%d", Id)))
+		stmt, err = database.Prepare(CreateTable(fmt.Sprintf("log_%d", Id)))
+		if err != nil {
+			break
+		}
 		stmt.Exec()
 		database.Exec(fmt.Sprintf("DELETE FROM log_%d", Id))
 
