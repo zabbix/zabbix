@@ -112,7 +112,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	}
 
 	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), time(NULL),
-			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), 0);
 
 	if (SUCCEED != zbx_check_protocol_version(&proxy))
 	{

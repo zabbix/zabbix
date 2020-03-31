@@ -64,7 +64,7 @@ int	proxy_get_history_count(void);
 int	proxy_get_delay(zbx_uint64_t lastid);
 
 int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp);
-void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress);
+void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t add_flags);
 
 int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);

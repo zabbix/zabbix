@@ -1467,6 +1467,8 @@ done:
 				proxy->suppress_win.values_num = 0;
 				proxy->suppress_win.period_start = 0;
 				proxy->suppress_win.period_end = 0;
+				proxy->suppress_win.heartbeat_time = 0;
+				proxy->suppress_win.heartbeat = ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX;
 				zbx_vector_uint64_create_ext(&proxy->suppress_win.subscribe, __config_mem_malloc_func,
 						__config_mem_realloc_func, __config_mem_free_func);
 			}
@@ -12246,6 +12248,18 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			ps_win->values_num += ds_win->values_num;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);
 		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT))
+		{
+			zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win;
+
+			if (0 != ps_win->heartbeat_time)
+				ps_win->heartbeat = diff->lastaccess - ps_win->heartbeat_time;
+
+			ps_win->heartbeat_time = diff->lastaccess;
+			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT);
+		}
+
 	}
 
 	UNLOCK_CACHE;
@@ -12509,6 +12523,7 @@ int	DCget_proxy_suppress_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *suppress
 		suppress_win->period_end = proxy_suppress_win->period_end;
 		suppress_win->values_num = proxy_suppress_win->values_num;
 		suppress_win->flags  = proxy_suppress_win->flags;
+		suppress_win->heartbeat = proxy_suppress_win->heartbeat;
 		*lastaccess = dc_proxy->lastaccess;
 
 		if (0 != (proxy_suppress_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))

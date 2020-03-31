@@ -31,7 +31,6 @@
 #include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "zbxlld.h"
-#include "cfg.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -4561,7 +4560,7 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
 	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
 			5 * CONFIG_PROXYDATA_FREQUENCY < (ts->sec - diff->lastaccess)) ||
 			(HOST_STATUS_PROXY_ACTIVE == proxy_status &&
-			ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX < (ts->sec - diff->lastaccess)))
+			diff->suppress_win.heartbeat < (ts->sec - diff->lastaccess)))
 	{
 		diff->suppress_win.values_num = 0;
 		diff->suppress_win.period_end = ts->sec;
@@ -4747,16 +4746,17 @@ static void	zbx_db_flush_proxy_lastaccess(void)
  *             lastaccess - [IN] the last proxy access time                   *
  *             compress   - [IN] 1 if proxy is using data compression,        *
  *                               0 otherwise                                  *
+ *             add_flags  - [IN] additional flags for update proxy            *
  *                                                                            *
  * Comments: The proxy parameter properties are also updated.                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress)
+void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t add_flags)
 {
 	zbx_proxy_diff_t	diff;
 
 	diff.hostid = proxy->hostid;
-	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE;
+	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | add_flags;
 	diff.version = version;
 	diff.lastaccess = lastaccess;
 	diff.compress = compress;
