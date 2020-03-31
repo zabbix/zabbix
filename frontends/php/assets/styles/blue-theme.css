@@ -4666,11 +4666,12 @@ svg {
     display: none; }
 
 .checkbox-list li {
-  margin-top: 4px;
-  overflow-x: hidden;
-  text-overflow: ellipsis; }
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 20px; }
   .checkbox-list li label {
-    vertical-align: middle; }
+    line-height: 16px;
+    vertical-align: bottom; }
 
 .columns-wrapper {
   display: flex;
