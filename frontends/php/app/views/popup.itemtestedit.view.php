@@ -77,31 +77,23 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 	]);
 }
 
-$form_list = new CFormList();
+$form_list_left = new CFormList();
+$form_list_right = new CFormList();
 
 if ($data['is_item_testable']) {
-	$form_list
+	$form_list_left
 		->addRow(
 			new CLabel(_('Get value from host'), 'get_value'),
 			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
 		)
 		->addRow(
 			new CLabel(_('Host address'), 'host_address'),
-			(new CDiv([
-				$data['interface_address_enabled']
-					? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					: (new CTextBox('interface[address]'))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setEnabled(false),
-				new CLabel(_('Port'), 'port'),
-				$data['interface_port_enabled']
-					? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					: (new CTextBox('interface[port]'))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-						->setEnabled(false)
-			]))->addClass('item-test-popup-value-row'),
+			$data['interface_address_enabled']
+				? (new CTextBox('interface[address]', $data['inputs']['interface']['address']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				: (new CTextBox('interface[address]'))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setEnabled(false),
 			'host_address_row'
 		)
 		->addRow(
@@ -116,6 +108,21 @@ if ($data['is_item_testable']) {
 					->setId('proxy_hostid'), // Automated tests need this.
 			'proxy_hostid_row'
 		)
+		->addRow(null, null, 'empty_row_1');
+
+	$form_list_right
+		->addRow((new CDiv())->addStyle('height: 24px'))
+		->addRow(
+			new CLabel(_('Port'), 'port'),
+			$data['interface_port_enabled']
+				? (new CTextBox('interface[port]', $data['inputs']['interface']['port'], '', 64))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				: (new CTextBox('interface[port]'))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setEnabled(false),
+			'host_port_row'
+		)
+		->addRow(null, null, 'empty_row_2')
 		->addRow(
 			null,
 			(new CSimpleButton(_('Get value')))
@@ -126,31 +133,21 @@ if ($data['is_item_testable']) {
 		);
 }
 
-$form_list
+$form_list_left
 	->addRow(
 		new CLabel(_('Value'), 'value'),
-		(new CDiv([
-			(new CMultilineInput('value', '', [
-				'disabled' => false,
-				'readonly' => false
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			new CLabel(_('Time'), 'time'),
-			(new CTextBox(null, 'now', true))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setId('time')
-		]))->addClass('preproc-test-popup-value-row')
+		(new CMultilineInput('value', '', [
+			'disabled' => false,
+			'readonly' => false
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		'preproc-test-popup-value-row'
 	)
 	->addRow(
 		new CLabel(_('Previous value'), 'prev_item_value'),
-		(new CDiv([
 			(new CMultilineInput('prev_value', '', [
 				'disabled' => !$data['show_prev']
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			new CLabel(_('Prev. time'), 'prev_time'),
-			(new CTextBox('prev_time', $data['prev_time']))
-				->setEnabled($data['show_prev'])
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		]))->addClass('preproc-test-popup-value-row')
+		'preproc-test-popup-prev-value-row'
 	)
 	->addRow(
 		new CLabel(_('End of line sequence'), 'eol'),
@@ -160,10 +157,28 @@ $form_list
 			->setModern(true)
 	);
 
+$form_list_right
+	->addRow(
+		new CLabel(_('Time'), 'time'),
+		(new CTextBox(null, 'now', true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setId('time')
+	)
+	->addRow(
+		new CLabel(_('Prev. time'), 'prev_time'),
+		(new CTextBox('prev_time', $data['prev_time']))
+			->setEnabled($data['show_prev'])
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	);
+
+$form_list = new CFormList();
+
 if ($macros_table) {
 	$form_list->addRow(
 		_('Macros'),
-		(new CDiv($macros_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($macros_table))
+			->addStyle('width: 675px;')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
 }
 
@@ -206,7 +221,7 @@ if (count($data['steps']) > 0) {
 		_('Preprocessing steps'),
 		(new CDiv($result_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('width: 100%;')
+			->addStyle('width: 675px;')
 	);
 }
 
@@ -214,7 +229,15 @@ if ($data['show_final_result']) {
 	$form_list->addRow(_('Result'), false, 'final-result');
 }
 
+$container = (new CDiv())
+	->addClass(ZBX_STYLE_ROW)
+	->addItem([
+		(new CDiv($form_list_left))->addClass(ZBX_STYLE_CELL),
+		(new CDiv($form_list_right))->addClass(ZBX_STYLE_CELL)
+	]);
+
 $form
+	->addItem($container)
 	->addItem($form_list)
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
