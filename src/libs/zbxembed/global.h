@@ -18,7 +18,7 @@
 **/
 
 #ifndef ZABBIX_GLOBAL_H
-#define ZABBIX_GLOABL_H
+#define ZABBIX_GLOBAL_H
 
 void	es_init_global_functions(zbx_es_t *es);
 
