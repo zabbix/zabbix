@@ -160,6 +160,8 @@ New features:
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 
 Bug fixes:
+..F....... [ZBX-17508] fixed error in oracle database encoding check (gcalenko)
+...G...... [ZBX-17442] fixed web.page.get to time out when there is no response (vso)
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
 .......PS. [ZBX-17518] fixed empty parameter handling in GET method of CurlHttpRequest (vso)
 A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
