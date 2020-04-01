@@ -36,12 +36,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'hostid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
 	'parent_discoveryid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null],
-	'host' =>		        	[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
-	'name' =>	            	[T_ZBX_STR, O_OPT, null,		null,		'isset({add}) || isset({update})'],
-	'status' =>		        	[T_ZBX_INT, O_OPT, null,		IN([HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED]), null],
+	'host' =>					[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
+	'name' =>					[T_ZBX_STR, O_OPT, null,		null,		'isset({add}) || isset({update})'],
+	'status' =>					[T_ZBX_INT, O_OPT, null,		IN([HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED]), null],
 	'inventory_mode' =>			[T_ZBX_INT, O_OPT, null, IN([HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]), null],
-	'templates' =>		    	[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
-	'add_templates' =>		    [T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
+	'templates' =>				[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
+	'add_templates' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
 	'group_links' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
 	'group_prototypes' =>		[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
 	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
@@ -102,6 +102,16 @@ else {
 	access_deny();
 }
 
+// Remove inherited macros data (actions: 'add', 'update' and 'form').
+$macros = cleanInheritedMacros(getRequest('macros', []));
+
+// Remove empty new macro lines.
+$macros = array_filter($macros, function($macro) {
+	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+	return (bool) array_filter(array_intersect_key($macro, $keys));
+});
+
 /*
  * Actions
  */
@@ -131,11 +141,21 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 		unset($groupPrototype);
 	}
 
-	if (hasRequest('macros')) {
-		foreach ($_REQUEST['macros'] as &$macro) {
-			$macro['type'] = ZBX_MACRO_TYPE_TEXT;
-			unset($macro['hostmacroid']);
-		}
+	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
+		// Reset macro type and value.
+		$macros = array_map(function($value) {
+			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
+				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
+				: $value;
+		}, $macros);
+
+		$msg = [
+			'type' => 'error',
+			'message' => _('The cloned host prototype contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
+			'src' => ''
+		];
+
+		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
 	}
 
 	$_REQUEST['form'] = 'clone';
@@ -149,17 +169,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
+		'macros' => $macros,
 		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', []))
 	];
-
-	if (hasRequest('macros')) {
-		// Remove empty new macro lines.
-		$newHostPrototype['macros'] = array_filter(cleanInheritedMacros(getRequest('macros', [])), function($macro) {
-			$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
-
-			return (bool) array_filter(array_intersect_key($macro, $keys));
-		});
-	}
 
 	if (hasRequest('inventory_mode')) {
 		$newHostPrototype['inventory_mode'] = getRequest('inventory_mode');
@@ -297,7 +309,7 @@ if (hasRequest('form')) {
 			'add_templates' => [],
 			'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
 			'groupPrototypes' => getRequest('group_prototypes', []),
-			'macros' => getRequest('macros', [])
+			'macros' => $macros
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => (getRequest('hostid') && $hostPrototype['templateid']),
@@ -414,12 +426,17 @@ if (hasRequest('form')) {
 	}
 
 	// Sort only after inherited macros are added. Otherwise the list will look chaotic.
-	$data['macros'] = array_values(order_macros($macros, 'macro')) + [[
-		'macro' => '',
-		'value' => '',
-		'type' => ZBX_MACRO_TYPE_TEXT,
-		'description' => ''
-	]];
+	$data['macros'] = array_values(order_macros($macros, 'macro'));
+
+	if (!$data['macros'] && !$data['readonly']) {
+		$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
+
+		if ($data['show_inherited_macros']) {
+			$macro['inherited_type'] = ZBX_PROPERTY_OWN;
+		}
+
+		$data['macros'][] = $macro;
+	}
 
 	// This data is used in common.template.edit.js.php.
 	$data['macros_tab'] = [

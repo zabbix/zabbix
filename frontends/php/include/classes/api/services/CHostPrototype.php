@@ -217,7 +217,8 @@ class CHostPrototype extends CHostBase {
 				'macro' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>				['type' => API_STRING_UTF8, 'flag' => API_REQUIRED | API_NOT_EMPTY],
 				'type' =>				['type' => API_INT32, 'flag' => API_REQUIRED, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])],
-				'description' => 		['type' => API_STRING_UTF8]
+				'description' => 		['type' => API_STRING_UTF8],
+				'hostmacroid' => 		['type' => API_INT32]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
