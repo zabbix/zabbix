@@ -93,8 +93,12 @@ class CUserMacro extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		// Forbidden search and filter by value field.
-		unset($options['filter']['value'], $options['search']['value']);
+		// If search or filter have 'value' field then limit query by ZBX_MACRO_TYPE_TEXT.
+		if (($options['search'] && array_key_exists('value', $options['search']))
+				|| ($options['filter'] && array_key_exists('value', $options['filter']))) {
+			$sqlParts['where'][] = 'type!='.ZBX_MACRO_TYPE_SECRET;
+			$sqlPartsGlobal['where'][] = 'type!='.ZBX_MACRO_TYPE_SECRET;
+		}
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
