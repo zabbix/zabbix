@@ -111,6 +111,7 @@ func Open(logType int, level int, filename string, filesize int) error {
 	logStat.filename = filename
 	logStat.filesize = int64(filesize) * MB
 	var err error
+
 	switch logType {
 	case System:
 		priority, err := getSyslogPriority(level)
