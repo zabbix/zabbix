@@ -25,7 +25,7 @@
 ?>
 
 <script type="text/javascript">
-	$(function() {
+	window.addEventListener('load', e => {
 		/**
 		 * On timeselector change only existing list of charts is updated.
 		 * Loading indicator is delayed for 3 seconds if refresh was instantiated by page refresh interval.
@@ -138,10 +138,12 @@
 		 * @return {Promise}
 		 */
 		Chart.prototype.refresh = function(delay_loading) {
+			const {clientWidth} = ZABBIX.Sidebar._target.nextElementSibling;
+			const width = clientWidth - (this.dimensions.shiftXright + this.dimensions.shiftXleft + 23);
+
 			this.curl.setArgument('from', this.timeline.from);
 			this.curl.setArgument('to', this.timeline.to);
 			this.curl.setArgument('height', this.dimensions.graphHeight);
-			const width = document.body.clientWidth - (this.dimensions.shiftXright + this.dimensions.shiftXleft + 23);
 			this.curl.setArgument('width', Math.max(1000, width));
 			this.curl.setArgument('profileIdx', 'web.charts.filter');
 			this.curl.setArgument('_', (+new Date).toString(34));
@@ -339,7 +341,8 @@
 		 * Chart update is debounced for a half second.
 		 */
 		ChartList.prototype.onWindowResize = function() {
-			var width = document.body.clientWidth;
+			var width = ZABBIX.Sidebar._target.nextElementSibling.clientWidth;
+
 			if (this._resize_timeoutid) {
 				clearTimeout(this._resize_timeoutid);
 			}
