@@ -24,7 +24,7 @@ The following parameters are required:<br>
 [![](images/thumb.2.png?raw=true)](images/2.png)
 
 - To export information into your Jira custom field, add a parameter with custom field ID as key (if you need help finding custom field ID, see [this page](https://confluence.atlassian.com/jirakb/how-to-find-id-for-custom-field-s-744522503.html) in Jira documentation). If at least one parameter starting with "customfield_" is configured for the media type, the webhook will use *{TRIGGER.DESCRIPTION}* as an issue description instead of *{ALERT.MESSAGE}*.<br>
-[![](images/thumb.4.png?raw=true)](images/4.png)<br>
+[![](images/thumb.3.png?raw=true)](images/3.png)<br>
 You can configure custom fields manually or import [media_jira_with_CF_example.xml](media_jira_with_CF_example.xml) and change parameters from the template as needed.<br>
 Note, that Jira webhook supports string, url, number, and datetime fields for now. Types of fields used in [media_jira_with_CF_example.xml](media_jira_with_CF_example.xml) are defined at the beginning of parameter placeholders.<br>
 Date and time must be in ISO 8601 format with timezone of the Zabbix server (2020-01-01T23:59:59+0200).
