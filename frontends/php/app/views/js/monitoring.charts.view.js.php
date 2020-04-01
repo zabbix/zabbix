@@ -55,8 +55,9 @@
 		 * @param {object} chart     Chart object prepared in server.
 		 * @param {object} timeline  Timeselector data.
 		 * @param {jQuery} $tmpl     Template object to be used for new chart $el.
+		 * @param {Node}   wrapper   Dom node in respect to which resize must be done.
 		 */
-		function Chart(chart, timeline, $tmpl) {
+		function Chart(chart, timeline, $tmpl, wrapper) {
 			this.$el = $tmpl.clone();
 			this.$img = this.$el.find('img');
 
@@ -73,6 +74,7 @@
 			this.curl.setArgument('graphid', chart.chartid);
 
 			this.use_sbox = !!chart.sbox;
+			this.wrapper = wrapper;
 		}
 
 		/**
@@ -138,8 +140,7 @@
 		 * @return {Promise}
 		 */
 		Chart.prototype.refresh = function(delay_loading) {
-			const {clientWidth} = ZABBIX.Sidebar._target.nextElementSibling;
-			const width = clientWidth - (this.dimensions.shiftXright + this.dimensions.shiftXleft + 23);
+			const width = this.wrapper.clientWidth - (this.dimensions.shiftXright + this.dimensions.shiftXleft + 23);
 
 			this.curl.setArgument('from', this.timeline.from);
 			this.curl.setArgument('to', this.timeline.to);
@@ -188,8 +189,9 @@
 		 * @param {jQuery} $el       A container where charts are maintained.
 		 * @param {object} timeline  Timecontrol object.
 		 * @param {object} config
+		 * @param {Node}   wrapper   Dom node in respect to which resize must be done.
 		 */
-		function ChartList($el, timeline, config) {
+		function ChartList($el, timeline, config, wrapper) {
 			this.curl = new Curl('zabbix.php');
 			this.curl.setArgument('action', 'charts.view.json');
 
@@ -199,6 +201,7 @@
 			this.charts = [];
 			this.charts_map = {};
 			this.config = config;
+			this.wrapper = wrapper;
 		}
 
 		/**
@@ -318,7 +321,7 @@
 			raw_charts.forEach(function(chart) {
 				var chart = this.charts_map[chart.chartid]
 					? this.charts_map[chart.chartid]
-					: new Chart(chart, this.timeline, $tmpl_row);
+					: new Chart(chart, this.timeline, $tmpl_row, this.wrapper);
 
 				// Existing chart nodes are assured to be in correct order.
 				this.$el.append(chart.$el);
@@ -341,7 +344,7 @@
 		 * Chart update is debounced for a half second.
 		 */
 		ChartList.prototype.onWindowResize = function() {
-			var width = ZABBIX.Sidebar._target.nextElementSibling.clientWidth;
+			var width = this.wrapper.clientWidth;
 
 			if (this._resize_timeoutid) {
 				clearTimeout(this._resize_timeoutid);
@@ -354,7 +357,7 @@
 			this._prev_width = width;
 		};
 
-		var app = new ChartList($table, data.timeline, data.config);
+		var app = new ChartList($table, data.timeline, data.config, document.querySelector('.wrapper'));
 
 		window.addEventListener('resize', app.onWindowResize.bind(app));
 
