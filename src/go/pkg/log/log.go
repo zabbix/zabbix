@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/syslog"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -104,22 +105,32 @@ func DecreaseLogLevel() (success bool) {
 	return false
 }
 
+//Open sets a new logger based on the log type and a new log output level
 func Open(logType int, level int, filename string, filesize int) error {
-
 	logStat.logType = logType
 	logStat.filename = filename
 	logStat.filesize = int64(filesize) * MB
 	var err error
-
-	if logType == Console {
+	switch logType {
+	case System:
+		priority, err := getSyslogPriority(level)
+		if err != nil {
+			return err
+		}
+		logwriter, err := syslog.New(priority, "zabbix_agent2")
+		if err != nil {
+			return err
+		}
+		logger = log.New(logwriter, "", log.Lmicroseconds|log.Ldate)
+	case Console:
 		logger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
-	} else if logType == File {
+	case File:
 		logStat.f, err = os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return err
 		}
 		logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
-	} else {
+	default:
 		return errors.New("invalid argument")
 	}
 
@@ -239,4 +250,23 @@ func Caller() (name string) {
 		return filepath.Base(frame.Func.Name())
 	}
 	return ""
+}
+
+func getSyslogPriority(level int) (syslog.Priority, error) {
+	switch level {
+	case Info:
+		return syslog.LOG_INFO, nil
+	case Crit:
+		return syslog.LOG_CRIT, nil
+	case Err:
+		return syslog.LOG_ERR, nil
+	case Warning:
+		return syslog.LOG_WARNING, nil
+	case Debug:
+		return syslog.LOG_DEBUG, nil
+	case Trace:
+		return syslog.LOG_DEBUG, nil
+	default:
+		return 0, errors.New("unknown system log priority level")
+	}
 }
