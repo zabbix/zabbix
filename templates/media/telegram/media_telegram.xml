@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-03-26T22:54:02Z</date>
+    <date>2020-04-01T19:31:50Z</date>
     <media_types>
         <media_type>
             <name>Telegram</name>
@@ -34,18 +34,14 @@
     to: null,&#13;
     message: null,&#13;
 &#13;
-    tg_url_bot_general: 'https://api.telegram.org/bot',&#13;
+    url_bot_general: 'https://api.telegram.org/bot',&#13;
     disable_web_page_preview: true,&#13;
     disable_notification: false,&#13;
     parse_mode: null,&#13;
 &#13;
-    telegram_request: new CurlHttpRequest(),&#13;
+    request: new CurlHttpRequest(),&#13;
 &#13;
-    getToken: function () {&#13;
-        return(this.token);&#13;
-    },&#13;
-&#13;
-    doAction: function(method) {&#13;
+    sendMessage: function(method) {&#13;
 &#13;
         var params = {&#13;
                         sendMessage: {&#13;
@@ -53,29 +49,26 @@
                             text: this.message,&#13;
                             disable_web_page_preview: this.disable_web_page_preview,&#13;
                             disable_notification: this.disable_notification&#13;
-                        },&#13;
-                        getMe: {},&#13;
-                        getUpdates: {}&#13;
-                    };&#13;
+                        }&#13;
+                     };&#13;
 &#13;
-        var url = this.tg_url_bot_general + this.token + '/' + method;&#13;
+        var url = this.url_bot_general + this.token + '/' + method;&#13;
 &#13;
         if (this.parse_mode !== null) {&#13;
-            params['sendMessage']['parse_mode'] = this.parse_mode;&#13;
+            params[method]['parse_mode'] = this.parse_mode;&#13;
         }&#13;
 &#13;
-        this.telegram_request.AddHeader('Content-Type: application/json');&#13;
+        this.request.AddHeader('Content-Type: application/json');&#13;
 &#13;
-        Zabbix.Log(3, '[Telegram Webhook] params: ' + JSON.stringify(params[method]));&#13;
-        Zabbix.Log(3, '[Telegram Webhook] URL: ' + url.replace(this.token, 'XXX'));&#13;
-        //Zabbix.Log(3, '[Telegram Webhook] URL: ' + url);  // uncomment this if you want to see the exposed token in the log file&#13;
-        var telegram_response = this.telegram_request.Post(url, JSON.stringify(params[method]));&#13;
-        Zabbix.Log(3, '[Telegram Webhook] HTTP code: ' + this.telegram_request.Status());&#13;
-        if (this.telegram_request.Status() != 200) {&#13;
-            throw telegram_response;&#13;
+        Zabbix.Log(4, '[Telegram Webhook] params: ' + JSON.stringify(params[method]));&#13;
+        Zabbix.Log(4, '[Telegram Webhook] URL: ' + url.replace(this.token, 'XXX'));  // remove replace() function if you want to see the exposed token in the log file&#13;
+        var response = this.request.Post(url, JSON.stringify(params[method]));&#13;
+        Zabbix.Log(4, '[Telegram Webhook] HTTP code: ' + this.request.Status());&#13;
+        if (this.request.Status() != 200) {&#13;
+            throw response;&#13;
         }&#13;
 &#13;
-        return telegram_response;&#13;
+        return response;&#13;
 &#13;
     }&#13;
 }&#13;
@@ -84,19 +77,22 @@ try {&#13;
 &#13;
     parameters = JSON.parse(value);&#13;
 &#13;
-    Zabbix.Log(3, '[Telegram Webhook] script value= ' + value);&#13;
+    Zabbix.Log(4, '[Telegram Webhook] script value= ' + value);&#13;
+&#13;
+    if (typeof parameters.telegramToken === 'undefined') {&#13;
+        Zabbix.Log(4, '[Telegram Webhook] Incorrect value is given for parameter &quot;telegramToken&quot;: parameter is missing');&#13;
+        throw 'Incorrect value is given for parameter &quot;telegramToken&quot;: parameter is missing';&#13;
+    }&#13;
 &#13;
     Telegram.token = parameters.telegramToken;&#13;
 &#13;
-    if (['Markdown', 'HTML', 'MarkdownV2'].indexOf(parameters.telegramParseMode) !== -1) {&#13;
+    if ((typeof parameters.telegramParseMode !== 'undefined') &amp;&amp; (['Markdown', 'HTML', 'MarkdownV2'].indexOf(parameters.telegramParseMode) !== -1)) {&#13;
         Telegram.parse_mode = parameters.telegramParseMode;&#13;
     }&#13;
 &#13;
-    // Zabbix.Log(3, Telegram.doAction('getMe'));&#13;
-&#13;
     Telegram.to = parameters.To;&#13;
-    Telegram.message = parameters.Subject + ' ' + parameters.Message;&#13;
-    var send_message_result = Telegram.doAction('sendMessage');&#13;
+    Telegram.message = parameters.Subject + '\n' + parameters.Message;&#13;
+    var send_message_result = Telegram.sendMessage('sendMessage');&#13;
 &#13;
     return send_message_result;&#13;
 &#13;
@@ -107,8 +103,10 @@ try {&#13;
             <timeout>10s</timeout>
             <process_tags>YES</process_tags>
             <show_event_menu>NO</show_event_menu>
-            <description>1. Register bot: send &quot;/newbot&quot; to @BotFather and follow instructions&#13;
-2. Copy and paste obtained token into the &quot;telegramToken&quot; field above&#13;
+            <description>https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/telegram&#13;
+&#13;
+1. Register bot: send &quot;/newbot&quot; to @BotFather and follow instructions&#13;
+2. Copy and paste the obtained token into the &quot;telegramToken&quot; field above&#13;
 3. If you want to send personal notifications, you need to get chat id of the user you want to send messages to:&#13;
     3.1. Send &quot;/getid&quot; to &quot;@myidbot&quot; in Telegram messenger&#13;
     3.2. Copy returned chat id and save it in the &quot;Telegram Webhook&quot; media for the user&#13;
