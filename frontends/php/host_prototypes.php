@@ -233,6 +233,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			];
 		}
 
+		/*
+		 * Sanitize macros array. When we clone, we have old hostmacroid.
+		 * We need delete them before we push array to API.
+		*/
+		foreach ($newHostPrototype['macros'] as &$macro) {
+			if (array_key_exists('hostmacroid', $macro)) {
+				unset($macro['hostmacroid']);
+			}
+		}
+		unset($macro);
+
 		$result = API::HostPrototype()->create($newHostPrototype);
 
 		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
