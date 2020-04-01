@@ -584,7 +584,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger_CheckWrongUrl',
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
-					'url' => 'www.zabbix.com',
+					'url' => 'javascript:alert(123);',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
 						'Wrong value for url field.'

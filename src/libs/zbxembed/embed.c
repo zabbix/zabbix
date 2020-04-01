@@ -24,6 +24,7 @@
 #include "embed.h"
 #include "httprequest.h"
 #include "zabbix.h"
+#include "global.h"
 
 #include "duktape.h"
 
@@ -208,6 +209,8 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 	duk_push_global_object(es->env->ctx);
 	duk_del_prop_string(es->env->ctx, -1, "Duktape");
 	duk_pop(es->env->ctx);
+
+	es_init_global_functions(es);
 
 	/* put environment object to be accessible from duktape C calls */
 	duk_push_global_stash(es->env->ctx);
@@ -503,7 +506,7 @@ out:
 /******************************************************************************
  *                                                                            *
  * Function: zbx_es_set_timeout                                               *
- *                                                                            *
+ *                                              es_init_global_functions                              *
  * Purpose: sets script execution timeout                                     *
  *                                                                            *
  * Parameters: es      - [IN] the embedded scripting engine                   *

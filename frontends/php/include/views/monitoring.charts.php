@@ -59,7 +59,7 @@ if ($this->data['graphid']) {
 	);
 }
 
-$content_control->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
+$content_control->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 $content_control = (new CTag('nav', true, $content_control))->setAttribute('aria-label', _('Content controls'));
 
 $chartsWidget = (new CWidget())

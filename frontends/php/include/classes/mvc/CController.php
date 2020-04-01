@@ -339,12 +339,6 @@ abstract class CController {
 			$this->doAction();
 		}
 
-		if (CProfile::isModified()) {
-			DBstart();
-			$result = CProfile::flush();
-			DBend($result);
-		}
-
 		return $this->getResponse();
 	}
 }

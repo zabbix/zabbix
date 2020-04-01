@@ -55,15 +55,6 @@ class CPieGraphDraw extends CGraphDraw {
 		$this->num++;
 	}
 
-	public function set3DAngle($angle = 70) {
-		if (is_numeric($angle) && $angle < 85 && $angle > 10) {
-			$this->angle3d = (int) $angle;
-		}
-		else {
-			$this->angle3d = 70;
-		}
-	}
-
 	public function switchPie3D($type = false) {
 		if ($type) {
 			$this->type = $type;
@@ -81,31 +72,6 @@ class CPieGraphDraw extends CGraphDraw {
 					break;
 				case GRAPH_TYPE_PIE:
 					$this->type = GRAPH_TYPE_3D;
-					break;
-				default:
-					$this->type = GRAPH_TYPE_PIE;
-			}
-		}
-		return $this->type;
-	}
-
-	public function switchPieExploded($type) {
-		if ($type) {
-			$this->type = $type;
-		}
-		else {
-			switch ($this->type) {
-				case GRAPH_TYPE_EXPLODED:
-					$this->type = GRAPH_TYPE_PIE;
-					break;
-				case GRAPH_TYPE_3D_EXPLODED:
-					$this->type = GRAPH_TYPE_3D;
-					break;
-				case GRAPH_TYPE_3D:
-					$this->type = GRAPH_TYPE_3D_EXPLODED;
-					break;
-				case GRAPH_TYPE_PIE:
-					$this->type = GRAPH_TYPE_EXPLODED;
 					break;
 				default:
 					$this->type = GRAPH_TYPE_PIE;
@@ -171,7 +137,6 @@ class CPieGraphDraw extends CGraphDraw {
 
 		for ($i = 0; $i < $this->num; $i++) {
 			$item = get_item_by_itemid($this->items[$i]['itemid']);
-			$type = $this->items[$i]['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
@@ -219,11 +184,11 @@ class CPieGraphDraw extends CGraphDraw {
 				}
 			}
 
-			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
+			$this->data[$this->items[$i]['itemid']]['last'] = isset($history[$item['itemid']])
 				? $history[$item['itemid']][0]['value'] : null;
-			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
-			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
-			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
+			$this->data[$this->items[$i]['itemid']]['shift_min'] = 0;
+			$this->data[$this->items[$i]['itemid']]['shift_max'] = 0;
+			$this->data[$this->items[$i]['itemid']]['shift_avg'] = 0;
 
 			$item['source'] = ($item['trends'] == 0 || ($item['history'] > time() - ($from_time + $this->period / 2)))
 				? 'history'
@@ -238,13 +203,12 @@ class CPieGraphDraw extends CGraphDraw {
 			if (array_key_exists($item['itemid'], $results)) {
 				$result = $results[$item['itemid']];
 				$this->dataFrom = $result['source'];
-				$type = $this->items[$i]['calc_type'];
 
 				foreach ($result['data'] as $row) {
-					$this->data[$item['itemid']][$type]['min'] = $row['min'];
-					$this->data[$item['itemid']][$type]['max'] = $row['max'];
-					$this->data[$item['itemid']][$type]['avg'] = $row['avg'];
-					$this->data[$item['itemid']][$type]['clock'] = $row['clock'];
+					$this->data[$item['itemid']]['min'] = $row['min'];
+					$this->data[$item['itemid']]['max'] = $row['max'];
+					$this->data[$item['itemid']]['avg'] = $row['avg'];
+					$this->data[$item['itemid']]['clock'] = $row['clock'];
 				}
 				unset($result);
 			}
@@ -267,18 +231,18 @@ class CPieGraphDraw extends CGraphDraw {
 					$fncName = 'avg';
 			}
 
-			$item_value = empty($this->data[$item['itemid']][$type][$fncName])
+			$item_value = empty($this->data[$item['itemid']][$fncName])
 				? 0
-				: abs($this->data[$item['itemid']][$type][$fncName]);
+				: abs($this->data[$item['itemid']][$fncName]);
 
-			if ($type == GRAPH_ITEM_SUM) {
+			if ($this->items[$i]['calc_type'] == GRAPH_ITEM_SUM) {
 				$this->background = $i;
 				$graph_sum = $item_value;
 			}
 
 			$this->sum += $item_value;
 
-			$convertedUnit = strlen(convert_units([
+			$convertedUnit = strlen(convertUnits([
 				'value' => $item_value,
 				'units' => $item['units']
 			]));
@@ -338,13 +302,13 @@ class CPieGraphDraw extends CGraphDraw {
 					$fncRealName = _('avg');
 			}
 
-			if (isset($this->data[$item['itemid']][$item['calc_type']])
-					&& isset($this->data[$item['itemid']][$item['calc_type']][$fncName])) {
-				$dataValue = $this->data[$item['itemid']][$item['calc_type']][$fncName];
+			if (isset($this->data[$item['itemid']])
+					&& isset($this->data[$item['itemid']][$fncName])) {
+				$dataValue = $this->data[$item['itemid']][$fncName];
 				$proc = ($this->sum == 0) ? 0 : ($dataValue * 100) / $this->sum;
 
 				$strValue = sprintf(_('Value').': %s ('.(round($proc) != round($proc, 2) ? '%0.2f' : '%0.0f').'%%)',
-					convert_units([
+					convertUnits([
 						'value' => $dataValue,
 						'units' => $this->items[$i]['units']
 					]),
@@ -750,9 +714,7 @@ class CPieGraphDraw extends CGraphDraw {
 		// for each metric
 		$values = [];
 		for ($i = 0; $i < $this->num; $i++) {
-			$type = $this->items[$i]['calc_type'];
-
-			$data = &$this->data[$this->items[$i]['itemid']][$type];
+			$data = &$this->data[$this->items[$i]['itemid']];
 
 			if (!isset($data)) {
 				continue;
@@ -773,9 +735,9 @@ class CPieGraphDraw extends CGraphDraw {
 					$fncName = 'avg';
 			}
 
-			$values[$i] = empty($this->data[$this->items[$i]['itemid']][$type][$fncName])
+			$values[$i] = empty($this->data[$this->items[$i]['itemid']][$fncName])
 				? 0
-				: abs($this->data[$this->items[$i]['itemid']][$type][$fncName]);
+				: abs($this->data[$this->items[$i]['itemid']][$fncName]);
 		}
 
 		switch ($this->type) {

@@ -1305,15 +1305,12 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 	// format value
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convert_units([
-				'value' => $value,
-				'units' => $item['units']
+		$value = convertUnits([
+			'value' => $value,
+			'units' => $item['units']
 		]);
 	}
-	elseif ($item['value_type'] != ITEM_VALUE_TYPE_STR
-		&& $item['value_type'] != ITEM_VALUE_TYPE_TEXT
-		&& $item['value_type'] != ITEM_VALUE_TYPE_LOG) {
-
+	elseif (!in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG])) {
 		$value = _('Unknown value type');
 	}
 
@@ -1321,7 +1318,8 @@ function formatHistoryValue($value, array $item, $trim = true) {
 	switch ($item['value_type']) {
 		case ITEM_VALUE_TYPE_STR:
 			$mapping = getMappedValue($value, $item['valuemapid']);
-		// break; is not missing here
+			// break; is not missing here
+
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
 			if ($trim && mb_strlen($value) > 20) {
@@ -1331,7 +1329,9 @@ function formatHistoryValue($value, array $item, $trim = true) {
 			if ($mapping !== false) {
 				$value = $mapping.' ('.$value.')';
 			}
+
 			break;
+
 		default:
 			$value = applyValueMap($value, $item['valuemapid']);
 	}
@@ -1353,33 +1353,37 @@ function formatHistoryValue($value, array $item, $trim = true) {
  * @return string item functional value from history
  */
 function getItemFunctionalValue($item, $function, $parameter) {
-	// check whether function is allowed
+	// Check whether function is allowed and parameter is specified.
 	if (!in_array($function, ['min', 'max', 'avg']) || $parameter === '') {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
-	$parameter = convertFunctionValue($parameter);
-
-	if (bccomp($parameter, 0) == 0) {
+	// Check whether item type is allowed for min, max and avg functions.
+	if ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
-	// allowed item types for min, max and avg function
-	$history_tables = [ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint'];
+	$number_parser = new CNumberParser(['with_suffix' => true]);
 
-	if (!array_key_exists($item['value_type'], $history_tables)) {
+	if ($number_parser->parse($parameter) != CParser::PARSE_SUCCESS) {
 		return UNRESOLVED_MACRO_STRING;
+	}
+
+	$parameter = $number_parser->calcValue();
+
+	$time_from = time() - $parameter;
+
+	if ($time_from < 0 || $time_from > ZBX_MAX_DATE) {
+		return UNRESOLVED_MACRO_STRING;
+	}
+
+	$result = Manager::History()->getAggregatedValue($item, $function, $time_from);
+
+	if ($result !== null) {
+		return convertUnits(['value' => $result, 'units' => $item['units']]);
 	}
 	else {
-		$result = Manager::History()->getAggregatedValue($item, $function, (time() - $parameter));
-
-		if ($result !== null) {
-			return convert_units(['value' => $result, 'units' => $item['units']]);
-		}
-		// no data in history
-		else {
-			return UNRESOLVED_MACRO_STRING;
-		}
+		return UNRESOLVED_MACRO_STRING;
 	}
 }
 

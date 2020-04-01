@@ -1176,13 +1176,16 @@ jQuery(function($) {
 			});
 			addMenuPopupItems($menu_popup, sections);
 
-			$('body').append($menu_popup);
+			$('.wrapper').append($menu_popup);
+
+			// Position the menu (before hiding).
+			$menu_popup.position(options.position);
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
-			$menu_popup.add('.menu-popup', $menu_popup).css('display', 'none');
+			$menu_popup.add('.menu-popup', $menu_popup).hide();
 
 			// Position and display the menu.
-			$menu_popup.position(options.position).fadeIn(50);
+			$menu_popup.fadeIn(50);
 
 			addToOverlaysStack('menu-popup', event.target, 'menu-popup');
 

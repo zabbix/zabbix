@@ -1163,19 +1163,19 @@ class CScreenProblem extends CScreenBase {
 
 		$csv = [];
 
-		$csv[] = [
+		$csv[] = array_filter([
 			_('Severity'),
 			_('Time'),
 			_('Recovery time'),
 			_('Status'),
 			_('Host'),
 			_('Problem'),
-			($show_opdata != OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
+			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
 			_('Duration'),
 			_('Ack'),
 			_('Actions'),
 			_('Tags')
-		];
+		]);
 
 		$tags = makeTags($data['problems'], false);
 
@@ -1237,25 +1237,29 @@ class CScreenProblem extends CScreenBase {
 				$actions_performed[] = _('Actions').' ('.$data['actions']['actions'][$problem['eventid']]['count'].')';
 			}
 
-			$csv[] = [
-				getSeverityName($problem['severity'], $this->config),
-				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-				($problem['r_eventid'] != 0)
-					? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])
-					: '',
-				$value_str,
-				implode(', ', $hosts),
-				($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $trigger['opdata'] !== '')
-					? $problem['name'].' ('.$opdata.')'
-					: $problem['name'],
-				($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
-				($problem['r_eventid'] != 0)
-					? zbx_date2age($problem['clock'], $problem['r_clock'])
-					: zbx_date2age($problem['clock']),
-				($problem['acknowledged'] == EVENT_ACKNOWLEDGED) ? _('Yes') : _('No'),
-				implode(', ', $actions_performed),
-				implode(', ', $tags[$problem['eventid']])
-			];
+			$row = [];
+
+			$row[] = getSeverityName($problem['severity'], $this->config);
+			$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
+			$row[] = ($problem['r_eventid'] != 0) ? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']) : '';
+			$row[] = $value_str;
+			$row[] = implode(', ', $hosts);
+			$row[] = ($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $trigger['opdata'] !== '')
+				? $problem['name'].' ('.$opdata.')'
+				: $problem['name'];
+
+			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+				$row[] = $opdata;
+			}
+
+			$row[] = ($problem['r_eventid'] != 0)
+				? zbx_date2age($problem['clock'], $problem['r_clock'])
+				: zbx_date2age($problem['clock']);
+			$row[] = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED) ? _('Yes') : _('No');
+			$row[] = implode(', ', $actions_performed);
+			$row[] = implode(', ', $tags[$problem['eventid']]);
+
+			$csv[] = $row;
 		}
 
 		return zbx_toCSV($csv);

@@ -20,10 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-/**
- * @on-before disableDebugMode
- * @on-after enableDebugMode
- */
 class testPageActions extends CLegacyWebTest {
 
 	private $sqlHashAction = '';
@@ -321,20 +317,5 @@ class testPageActions extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM actions WHERE actionid='.$action['actionid']));
 
 		$this->assertEquals($this->oldHashAction, CDBHelper::getHash($this->sqlHashAction));
-	}
-
-	/**
-	 * Debug button sometimes overlaps action link and impossible to click on it.
-	 */
-	public static function setDebugMode($value) {
-		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
-	}
-
-	public function disableDebugMode() {
-		self::setDebugMode(0);
-	}
-
-	public static function enableDebugMode() {
-		self::setDebugMode(1);
 	}
 }

@@ -76,17 +76,6 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret && $this->getInput('ldap_configured', '') == ZBX_AUTH_LDAP_ENABLED) {
-			$ret = $this->validateLdap();
-		}
-		else {
-			$ret &= $this->validateDefaultAuth();
-		}
-
-		if ($ret && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$ret &= $this->validateSamlAuth();
-		}
-
 		if (!$ret) {
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
@@ -223,6 +212,20 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function doAction() {
+		$auth_valid = ($this->getInput('ldap_configured', '') == ZBX_AUTH_LDAP_ENABLED)
+			? $this->validateLdap()
+			: $this->validateDefaultAuth();
+
+		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
+			$auth_valid &= $this->validateSamlAuth();
+		}
+
+		if (!$auth_valid) {
+			$this->response->setFormData($this->getInputAll());
+			$this->setResponse($this->response);
+			return;
+		}
+
 		// Only ZBX_AUTH_LDAP have 'Test' option.
 		if ($this->hasInput('ldap_test')) {
 			$this->response->setMessageOk(_('LDAP login successful'));

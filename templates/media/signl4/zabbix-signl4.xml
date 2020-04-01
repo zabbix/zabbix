@@ -80,7 +80,7 @@ catch (error) {&#13;
 }</script>
             <description>SIGNL4 is a mobile alert notification app for powerful alerting, alert management and mobile assignment of work items. It offers alerting via app push, SMS and voice calls including escalations, tracking, and duty scheduling.&#13;
 &#13;
-Get the app at https://www.signl4.com.&#13;</description>
+Get the app at https://www.signl4.com.</description>
             <message_templates>
                 <message_template>
                     <event_source>TRIGGERS</event_source>

@@ -46,7 +46,9 @@ jQuery(function($) {
 			this.prepareNext(timeout);
 
 			this.$elem = $elem;
+			this.updateWidth();
 			this.$elem.on('mouseenter', this.hideMessage.bind(this));
+			$(window).on('resize', this.updateWidth.bind(this));
 		},
 
 		prepareNext: function(delay) {
@@ -101,6 +103,14 @@ jQuery(function($) {
 
 				this.$elem.fadeOut(200);
 			}
+		},
+
+		updateWidth: function() {
+			let $wrapper = $('.wrapper');
+			this.$elem.css({
+				left: $wrapper.offset().left + 10,
+				width: $wrapper[0].clientWidth - 20
+			});
 		}
 	};
 

@@ -37,14 +37,6 @@ extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern int		CONFIG_TIMER_FORKS;
 
-/* trigger -> functions cache */
-typedef struct
-{
-	zbx_uint64_t		triggerid;
-	zbx_vector_uint64_t	functionids;
-}
-zbx_trigger_functions_t;
-
 /* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
 typedef struct
 {
@@ -343,87 +335,6 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 
 /******************************************************************************
  *                                                                            *
- * Function: db_get_query_functions                                           *
- *                                                                            *
- * Purpose: get event query functionids from database                         *
- *                                                                            *
- ******************************************************************************/
-static void	db_get_query_functions(zbx_vector_ptr_t *event_queries)
-{
-	DB_ROW				row;
-	DB_RESULT			result;
-	int				i;
-	zbx_vector_uint64_t		triggerids;
-	zbx_hashset_t			triggers;
-	zbx_hashset_iter_t		iter;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_trigger_functions_t		*trigger = NULL, trigger_local;
-	zbx_uint64_t			triggerid, functionid;
-	zbx_event_suppress_query_t	*query;
-
-	/* cache functionids by triggerids */
-
-	zbx_hashset_create(&triggers, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_vector_uint64_create(&triggerids);
-
-	for (i = 0; i < event_queries->values_num; i++)
-	{
-		query = (zbx_event_suppress_query_t *)event_queries->values[i];
-		zbx_vector_uint64_append(&triggerids, query->triggerid);
-	}
-
-	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select functionid,triggerid from functions where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids.values,
-			triggerids.values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by triggerid");
-
-	result = DBselect("%s", sql);
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(functionid, row[0]);
-		ZBX_STR2UINT64(triggerid, row[1]);
-
-		if (NULL == trigger || trigger->triggerid != triggerid)
-		{
-			trigger_local.triggerid = triggerid;
-			trigger = (zbx_trigger_functions_t *)zbx_hashset_insert(&triggers, &trigger_local,
-					sizeof(trigger_local));
-			zbx_vector_uint64_create(&trigger->functionids);
-		}
-		zbx_vector_uint64_append(&trigger->functionids, functionid);
-	}
-	DBfree_result(result);
-
-	/*  copy functionids to event queries */
-
-	for (i = 0; i < event_queries->values_num; i++)
-	{
-		query = (zbx_event_suppress_query_t *)event_queries->values[i];
-
-		if (NULL == (trigger = (zbx_trigger_functions_t *)zbx_hashset_search(&triggers, &query->triggerid)))
-			continue;
-
-		zbx_vector_uint64_append_array(&query->functionids, trigger->functionids.values,
-				trigger->functionids.values_num);
-	}
-
-	zbx_hashset_iter_reset(&triggers, &iter);
-	while (NULL != (trigger = (zbx_trigger_functions_t *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_uint64_destroy(&trigger->functionids);
-	zbx_hashset_destroy(&triggers);
-
-	zbx_vector_uint64_destroy(&triggerids);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: db_update_event_suppress_data                                    *
  *                                                                            *
  * Purpose: create/update event suppress data to reflect latest maintenance   *
@@ -457,8 +368,6 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 		zbx_vector_uint64_create(&maintenanceids);
 		zbx_vector_uint64_pair_create(&del_event_maintenances);
-
-		db_get_query_functions(&event_queries);
 
 		zbx_dc_get_running_maintenanceids(&maintenanceids);
 
