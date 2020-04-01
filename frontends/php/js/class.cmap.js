@@ -849,10 +849,8 @@ ZABBIX.apps.map = (function($) {
 							with_applications: '1'
 						};
 
-					if ($('#elementType').val() == '3') {
-						popup_options = jQuery.extend(popup_options,
-							getFirstMultiselectValue('elementNameHost', 'elementNameHostGroup')
-						);
+					if ($('#elementType').val() == '0') {
+						popup_options = jQuery.extend(popup_options, getFirstMultiselectValue('elementNameHost'));
 					}
 
 					PopUp('popup.generic', popup_options, null, event.target);

@@ -594,11 +594,6 @@ class CControllerPopupGeneric extends CController {
 			$group_options['with_hosts_and_templates'] = 1;
 		}
 
-		if ($this->hasInput('groupid')) {
-			$host_options['groupid'] = $this->getInput('groupid');
-			$group_options['groupid'] = $this->getInput('groupid');
-		}
-
 		foreach (['with_applications', 'with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
 				'with_simple_graph_item_prototypes', 'with_triggers', 'with_monitored_triggers'] as $name) {
 			if ($this->hasInput($name)) {

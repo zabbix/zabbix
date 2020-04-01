@@ -905,26 +905,14 @@ Function.prototype.bindAsEventListener = function (context) {
 /**
  * Get first selected host from multiselect field.
  *
- * @param {string} host_field_id       Host field element ID.
- * @param {string} hostgroup_field_id  Host group field element ID.
+ * @param {string} id
  *
  * @return {object}
  */
-function getFirstMultiselectValue(host_field_id, hostgroup_field_id) {
-	var host_values = (typeof host_field_id !== 'undefined')
-			? jQuery('#'+host_field_id).multiSelect('getData')
-			: [],
-		hostgroup_values = (typeof hostgroup_field_id !== 'undefined')
-			? jQuery('#'+hostgroup_field_id).multiSelect('getData')
-			: [],
-		ret = {};
+function getFirstMultiselectValue(id) {
+	var values = jQuery('#'+id).multiSelect('getData');
 
-	if (host_values.length != 0) {
-		ret.hostid = host_values[0].id;
-	}
-	if (hostgroup_values.length != 0) {
-		ret.groupid = hostgroup_values[0].id;
-	}
-
-	return ret;
+	return (values.length != 0)
+		? {hostid: values[0].id}
+		: {};
 }
