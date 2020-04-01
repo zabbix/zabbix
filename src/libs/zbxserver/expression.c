@@ -1657,7 +1657,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*buf = NULL;
-	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
+	size_t		buf_alloc = 3 * ZBX_KIBIBYTE, buf_offset = 0;
 
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';

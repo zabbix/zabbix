@@ -1655,6 +1655,13 @@ static int	DBpatch_4050073(void)
 	return DBmodify_field_type("services", &field, &field);
 }
 
+static int	DBpatch_4050074(void)
+{
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("acknowledges", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1729,5 +1736,6 @@ DBPATCH_ADD(4050070, 0, 1)
 DBPATCH_ADD(4050071, 0, 1)
 DBPATCH_ADD(4050072, 0, 1)
 DBPATCH_ADD(4050073, 0, 1)
+DBPATCH_ADD(4050074, 0, 1)
 
 DBPATCH_END()
