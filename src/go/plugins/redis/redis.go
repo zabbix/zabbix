@@ -34,13 +34,7 @@ const (
 	keySlowlog = "redis.slowlog.count"
 )
 
-// maxParams defines the maximum number of parameters for metrics.
-//var maxParams = map[string]int{
-//	keyInfo:    2,
-//	keyPing:    1,
-//	keyConfig:  2,
-//	keySlowlog: 1,
-//}
+const commonParamsNum = 2
 
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
@@ -103,8 +97,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	// Extract handler related params
-	if len(params) > 2 {
-		handlerParams = params[2:]
+	if len(params) > commonParamsNum {
+		handlerParams = params[commonParamsNum:]
 	}
 
 	switch key {
