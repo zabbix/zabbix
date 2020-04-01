@@ -63,6 +63,8 @@ typedef struct
 	unsigned char		operationtype;
 	unsigned char		evaltype;
 	zbx_vector_ptr_t	opconditions;
+	char			*delay;
+	char			*history;
 }
 lld_override_operation_t;
 
@@ -575,7 +577,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	DB_RESULT			result;
 	DB_ROW				row;
 	lld_override_t			*override;
-	lld_override_operation_t	*override_operation;
+	lld_override_operation_t	*override_operation = NULL;
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select op.overrideid,op.override_operationid,op.operationtype,op.evaltype,"
@@ -611,7 +613,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	result = DBselect("%s", *sql);
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	overrideid;
+		zbx_uint64_t	overrideid, override_operationid;
 		int		index;
 
 		ZBX_STR2UINT64(overrideid, row[0]);
@@ -623,12 +625,24 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 		}
 		override = (lld_override_t *)overrides->values[index];
 
-		override_operation = (lld_override_operation_t *)zbx_malloc(NULL, sizeof(lld_override_operation_t));
-		ZBX_STR2UINT64(override_operation->override_operationid, row[1]);
-		override_operation->operationtype = (unsigned char)atoi(row[2]);
-		override_operation->evaltype = (unsigned char)atoi(row[3]);
+		ZBX_STR2UINT64(override_operationid, row[1]);
+		if (NULL == override_operation || override_operation->override_operationid != override_operationid)
+		{
+			override_operation = (lld_override_operation_t *)zbx_malloc(NULL,
+					sizeof(lld_override_operation_t));
+			memset(override_operation, 0, sizeof(lld_override_operation_t));
 
-		zbx_vector_ptr_append(&override->override_operations, override_operation);
+			override_operation->override_operationid = override_operationid;
+			override_operation->operationtype = (unsigned char)atoi(row[2]);
+			override_operation->evaltype = (unsigned char)atoi(row[3]);
+			zbx_vector_ptr_append(&override->override_operations, override_operation);
+		}
+
+		if (FAIL == DBis_null(row[4]))
+			override_operation->delay = zbx_strdup(NULL, row[4]);
+
+		if (FAIL == DBis_null(row[5]))
+			override_operation->history = zbx_strdup(NULL, row[5]);
 	}
 	DBfree_result(result);
 }
