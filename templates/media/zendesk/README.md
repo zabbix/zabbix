@@ -52,11 +52,14 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 3\. Select Import file [media_zendesk.xml](media_zendesk.xml) and click **Import** button at the bottom to import the Zendesk media type.
 
-4\. Change the value of zendesk_url and zendesk_token variables. Zendesk_type parameter determines the ticket type in Zendesk. One of the following types can be used: question, incident (default), problems, task. 
+4\. Change the value of zendesk_url and zendesk_token variables. Zendesk_type parameter determines the ticket type in Zendesk. One of the following types can be used: question, incident (default), problems, task.  
+In addition, you can override the severity mapping between the Zabbix problem and the Zendesk ticket.  
 
 [![](images/tn_8.png?raw=true)](images/8.png)
 
 5\. If you have custom fields in Zendesk and you want them to be filled in with values from Zabbix, add parameters in the form customfield_\<Zendesk custom field ID\>. Custom fields can only be of the text, number, or date types.
+
+[![](images/tn_13.png?raw=true)](images/13.png)
 
 ## Create the Zendesk user for alerting
 
