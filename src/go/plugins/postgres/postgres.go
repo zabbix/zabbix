@@ -93,12 +93,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if len(params) > 0 && len(params[0]) > 0 {
 		var ok bool
 		if session, ok = p.options.Sessions[params[0]]; !ok {
-			if len(params) > 1 && params[1] == "" {
-				return nil, errors.New("Invalid second parameter.")
-			}
-			if len(params) > 2 && params[2] == "" {
-				return nil, errors.New("Invalid third parameter.")
-			}
 			u, err := url.Parse(params[0])
 			if err != nil {
 				return nil, fmt.Errorf("Invalid connection URI: %s", err)
