@@ -1882,7 +1882,9 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
-	ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY, err, sizeof(err));
+	if (FAIL == (ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
+			err, sizeof(err))))
+		*error = zbx_strdcatf(*error, "Cannot create item, error in key parameters %s.\n", err);
 
 	item->delay = zbx_strdup(NULL, item_prototype->delay);
 	item->delay_orig = NULL;
@@ -1910,7 +1912,12 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
 		if (SUCCEED == ret)
-			ret = substitute_formula_macros(&item->params, jp_row, lld_macro_paths, err, sizeof(err));
+		{
+			if (FAIL == (ret = substitute_formula_macros(&item->params, jp_row, lld_macro_paths, err,
+					sizeof(err))))
+				*error = zbx_strdcatf(*error, "Cannot create item, error in formula: %s.\n", err);
+		}
+
 	}
 	else
 		substitute_lld_macros(&item->params, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
@@ -1926,7 +1933,8 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->snmp_oid_orig = NULL;
 	if (SUCCEED == ret && ITEM_TYPE_SNMP == item_prototype->type)
 	{
-		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_SNMP_OID, err, sizeof(err));
+		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_SNMP_OID,
+				err, sizeof(err));
 	}
 	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 
@@ -1964,7 +1972,9 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->query_fields_orig = NULL;
 
 	if (SUCCEED == ret)
-		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, lld_macro_paths, err, sizeof(err));
+		if (FAIL == (ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, lld_macro_paths, err,
+				sizeof(err))))
+			*error = zbx_strdcatf(*error, "Cannot create item, error in JSON: %s.\n", err);
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
@@ -1979,6 +1989,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 					lld_macro_paths, err, sizeof(err))))
 			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
+				*error = zbx_strdcatf(*error, "Cannot create item, error in XML: %s.\n", err);
 			}
 			break;
 		default:
@@ -2025,7 +2036,6 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (SUCCEED != ret)
 	{
-		*error = zbx_strdcatf(*error, "Cannot create item: %s.\n", err);
 		lld_item_free(item);
 		item = NULL;
 	}
