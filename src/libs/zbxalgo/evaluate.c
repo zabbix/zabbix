@@ -169,18 +169,27 @@ static double	evaluate_number(int *unknown_idx)
 	return result;
 }
 
-static void	var_to_double(zbx_variant_t *result)
+/******************************************************************************
+ *                                                                            *
+ * Function: variant_convert_to_double                                        *
+ *                                                                            *
+ * Purpose: cast string variant to a double variant                           *
+ *                                                                            *
+ * Parameters: var - [IN/OUT] the variant to cast                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	variant_convert_to_double(zbx_variant_t *var)
 {
-	if (ZBX_VARIANT_STR == result->type)
+	if (ZBX_VARIANT_STR == var->type)
 	{
-		double	result_double_value = evaluate_string_to_double(result->data.str);
-		if (ZBX_INFINITY == result_double_value)
+		double	var_double_value = evaluate_string_to_double(var->data.str);
+		if (ZBX_INFINITY == var_double_value)
 		{
 			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
-					" expected numeric token at \"%s\".", result->data.str);
+					" expected numeric token at \"%s\".", var->data.str);
 		}
-		zbx_variant_clear(result);
-		zbx_variant_set_dbl(result, result_double_value);
+		zbx_variant_clear(var);
+		zbx_variant_set_dbl(var, var_double_value);
 	}
 }
 
@@ -328,7 +337,7 @@ static zbx_variant_t	evaluate_term8(int *unknown_idx)
 		zbx_variant_t	res;
 		ptr++;
 		res = evaluate_term9(unknown_idx);
-		var_to_double(&res);
+		variant_convert_to_double(&res);
 
 		if (ZBX_UNKNOWN == res.data.dbl || ZBX_INFINITY == res.data.dbl)
 			return res;
@@ -359,7 +368,7 @@ static zbx_variant_t	evaluate_term7(int *unknown_idx)
 		zbx_variant_t	res;
 		ptr += 3;
 		res = evaluate_term8(unknown_idx);
-		var_to_double(&res);
+		variant_convert_to_double(&res);
 
 		if (ZBX_UNKNOWN == res.data.dbl || ZBX_INFINITY == res.data.dbl)
 			return res;
@@ -410,7 +419,7 @@ static zbx_variant_t	evaluate_term6(int *unknown_idx)
 	{
 		zbx_variant_t	operand;
 
-		var_to_double(&res);
+		variant_convert_to_double(&res);
 
 		if (ZBX_INFINITY == res.data.dbl)
 			return res;
@@ -421,7 +430,7 @@ static zbx_variant_t	evaluate_term6(int *unknown_idx)
 		/* Even if 1st operand is Unknown we evaluate 2nd operand too to catch fatal errors in it. */
 
 		operand = evaluate_term7(&oper_idx);
-		var_to_double(&operand);
+		variant_convert_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -506,7 +515,7 @@ static zbx_variant_t	evaluate_term5(int *unknown_idx)
 
 	while ('+' == *ptr || '-' == *ptr)
 	{
-		var_to_double(&res);
+		variant_convert_to_double(&res);
 
 		if (ZBX_INFINITY == res.data.dbl)
 			return res;
@@ -516,7 +525,7 @@ static zbx_variant_t	evaluate_term5(int *unknown_idx)
 		/* even if 1st operand is Unknown we evaluate 2nd operand to catch fatal error if any occurs */
 
 		operand = evaluate_term6(&oper_idx);
-		var_to_double(&operand);
+		variant_convert_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -597,7 +606,7 @@ static zbx_variant_t	evaluate_term4(int *unknown_idx)
 		else
 			break;
 
-		var_to_double(&res);
+		variant_convert_to_double(&res);
 
 		if (ZBX_INFINITY == res.data.dbl)
 			return res;
@@ -606,7 +615,7 @@ static zbx_variant_t	evaluate_term4(int *unknown_idx)
 
 		operand = evaluate_term5(&oper_idx);
 
-		var_to_double(&operand);
+		variant_convert_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -787,13 +796,13 @@ static zbx_variant_t	evaluate_term2(int *unknown_idx)
 	while ('a' == ptr[0] && 'n' == ptr[1] && 'd' == ptr[2] && SUCCEED == is_operator_delimiter(ptr[3]))
 	{
 		ptr += 3;
-		var_to_double(&res);
+		variant_convert_to_double(&res);
 
 		if (ZBX_INFINITY == res.data.dbl)
 			return res;
 
 		operand = evaluate_term3(&oper_idx);
-		var_to_double(&operand);
+		variant_convert_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -884,14 +893,14 @@ static zbx_variant_t	evaluate_term1(int *unknown_idx)
 	while ('o' == ptr[0] && 'r' == ptr[1] && SUCCEED == is_operator_delimiter(ptr[2]))
 	{
 		ptr += 2;
-		var_to_double(&res);
+		variant_convert_to_double(&res);
 
 		if (ZBX_INFINITY == res.data.dbl)
 			return res;
 
 		operand = evaluate_term2(&oper_idx);
 
-		var_to_double(&operand);
+		variant_convert_to_double(&operand);
 
 		if (ZBX_INFINITY == operand.data.dbl)
 		{
@@ -973,7 +982,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 		}
 		else
 		{
-			var_to_double(&res);
+			variant_convert_to_double(&res);
 		}
 	}
 
@@ -1063,7 +1072,7 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
 	buffer = error;
 	max_buffer_len = max_error_len;
 	res = evaluate_term1(&unknown_idx);
-	var_to_double(&res);
+	variant_convert_to_double(&res);
 	*value = res.data.dbl;
 	zbx_variant_clear(&res);
 
@@ -1084,6 +1093,16 @@ int	evaluate_unknown(const char *expression, double *value, char *error, size_t 
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_string_to_double                                        *
+ *                                                                            *
+ * Purpose: cast string to a double, expand suffixes and parse negative sign  *
+ *                                                                            *
+ * Parameters: in - [IN] the input string                                     *
+ * Return value:  -  the resulting double                                     *
+ *                                                                            *
+ ******************************************************************************/
 double	evaluate_string_to_double(const char *in)
 {
 	int		len;
