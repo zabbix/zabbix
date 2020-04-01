@@ -65,6 +65,9 @@ typedef struct
 	zbx_vector_ptr_t	opconditions;
 	char			*delay;
 	char			*history;
+	char			*trends;
+	unsigned char		severity;
+	zbx_vector_ptr_pair_t	trigger_tags;
 }
 lld_override_operation_t;
 
@@ -569,6 +572,14 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 
 	return ret;
 }
+typedef enum
+{
+	OPERATION_OBJECT_ITEM_PROTOTYPE = 0,
+	OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+	OPERATION_OBJECT_GRAPH_PROTOTYPE,
+	OPERATION_OBJECT_HOST_PROTOTYPE
+}
+zbx_operation_object_type_t;
 
 static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
@@ -591,21 +602,21 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 				"i.inventory_mode"
 			" from override_operation op"
 			" left join override_opperiod p"
-				" on o.override_operationid=p.override_operationid"
+				" on op.override_operationid=p.override_operationid"
 			" left join override_ophistory h"
-				" on o.override_operationid=h.override_operationid"
+				" on op.override_operationid=h.override_operationid"
 			" left join override_optrends tr"
-				" on o.override_operationid=tr.override_operationid"
+				" on op.override_operationid=tr.override_operationid"
 			" left join override_opseverity s"
-				" on o.override_operationid=s.override_operationid"
+				" on op.override_operationid=s.override_operationid"
 			" left join override_optag ta"
-				" on o.override_operationid=ta.override_operationid"
+				" on op.override_operationid=ta.override_operationid"
 			" left join override_opgroup_prototype g"
-				" on o.override_operationid=g.override_operationid"
+				" on op.override_operationid=g.override_operationid"
 			" left join override_optemplate te"
-				" on o.override_operationid=te.override_operationid"
+				" on op.override_operationid=te.override_operationid"
 			" left join override_opinventory i"
-				" on o.override_operationid=i.override_operationid"
+				" on op.override_operationid=i.override_operationid"
 			" where");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "op.overrideid", overrideids->values, overrideids->values_num);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by op.override_operationid");
@@ -630,7 +641,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 		{
 			override_operation = (lld_override_operation_t *)zbx_malloc(NULL,
 					sizeof(lld_override_operation_t));
-			memset(override_operation, 0, sizeof(lld_override_operation_t));
+
+			zbx_vector_ptr_pair_create(&override_operation->trigger_tags);
 
 			override_operation->override_operationid = override_operationid;
 			override_operation->operationtype = (unsigned char)atoi(row[2]);
@@ -638,11 +650,34 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			zbx_vector_ptr_append(&override->override_operations, override_operation);
 		}
 
-		if (FAIL == DBis_null(row[4]))
-			override_operation->delay = zbx_strdup(NULL, row[4]);
+		switch (override_operation->operationtype)
+		{
+			case OPERATION_OBJECT_ITEM_PROTOTYPE:
+				override_operation->delay = FAIL == DBis_null(row[4]) ? zbx_strdup(NULL, row[4]) :
+						NULL;
+				override_operation->history = FAIL == DBis_null(row[5]) ? zbx_strdup(NULL, row[5]) :
+						NULL;
+				override_operation->trends = FAIL == DBis_null(row[6]) ? zbx_strdup(NULL, row[6]) :
+						NULL;
+				break;
+			case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+				override_operation->severity = FAIL == DBis_null(row[7]) ? (unsigned char)atoi(row[7]) :
+						TRIGGER_SEVERITY_COUNT;
 
-		if (FAIL == DBis_null(row[5]))
-			override_operation->history = zbx_strdup(NULL, row[5]);
+				if (FAIL == DBis_null(row[8]))
+				{
+					zbx_ptr_pair_t	pair;
+
+					pair.first = zbx_strdup(NULL, row[8]);
+					pair.second = zbx_strdup(NULL, row[9]);
+
+					zbx_vector_ptr_pair_append(&override_operation->trigger_tags, pair);
+				}
+
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
 	}
 	DBfree_result(result);
 }
@@ -674,7 +709,7 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 	{
 		lld_override_t	*override;
 
-		override = (lld_override_t *)zbx_malloc(NULL, sizeof(lld_condition_t));
+		override = (lld_override_t *)zbx_malloc(NULL, sizeof(lld_override_t));
 
 		ZBX_STR2UINT64(override->overrideid, row[0]);
 		override->step = atoi(row[1]);
