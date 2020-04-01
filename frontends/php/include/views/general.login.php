@@ -43,7 +43,10 @@ $guest = $data['guest_login_url']
 $http_login_link = $data['http_login_url']
 	? (new CListItem(new CLink(_('Sign in with HTTP'), $data['http_login_url'])))->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
-
+$saml_login_link = $data['saml_login_url']
+	? (new CListItem(new CLink(_('Sign in with Single Sign-On (SAML)'), $data['saml_login_url'])))
+		->addClass(ZBX_STYLE_SIGN_IN_TXT)
+	: null;
 
 global $ZBX_SERVER_NAME;
 
@@ -75,6 +78,7 @@ global $ZBX_SERVER_NAME;
 					->addItem(new CSubmit('enter', _('Sign in')))
 					->addItem($guest)
 					->addItem($http_login_link)
+					->addItem($saml_login_link)
 			)
 	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
 	(new CDiv([

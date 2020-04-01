@@ -88,8 +88,11 @@ if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 $messages = clear_messages();
 
 echo (new CView('general.login', [
-	'http_login_url' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+	'http_login_url' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 		? (new CUrl('index_http.php'))->setArgument('request', getRequest('request'))
+		: '',
+	'saml_login_url' => ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED)
+		? (new CUrl('index_sso.php'))->setArgument('request', getRequest('request'))
 		: '',
 	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',
 	'autologin' => $autologin == 1,

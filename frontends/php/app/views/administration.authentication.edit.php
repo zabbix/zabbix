@@ -36,7 +36,7 @@ $auth_tab = (new CFormList('list_auth'))
 			->removeId()
 	);
 
-// HTTP Authentication fields.
+// HTTP authentication fields.
 $http_tab = (new CFormList('list_http'))
 	->addRow(new CLabel(_('Enable HTTP authentication'), 'http_auth_enabled'),
 		(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
@@ -59,7 +59,7 @@ $http_tab = (new CFormList('list_http'))
 			->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 			->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-);
+	);
 
 // LDAP configuration fields.
 if ($data['change_bind_password']) {
@@ -82,10 +82,10 @@ else {
 $ldap_tab = (new CFormList('list_ldap'))
 	->addRow(new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),
 		$data['ldap_error']
-		? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
-		: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
-			->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
-			->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
+			? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
+			: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
+				->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
 	)
 	->addRow((new CLabel(_('LDAP host'), 'ldap_host'))->setAsteriskMark(),
 		(new CTextBox('ldap_host', $data['ldap_host']))
@@ -135,7 +135,114 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
-);
+	);
+
+// SAML authentication fields.
+$is_saml_auth_enabled = ($data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED);
+
+$saml_tab = (new CFormList('list_saml'))
+	->addRow(new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
+		(new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
+			->setChecked($is_saml_auth_enabled)
+			->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
+	)
+	->addRow((new CLabel(_('IdP entity ID'), 'saml_idp_entityid'))->setAsteriskMark(),
+		(new CTextBox('saml_idp_entityid', $data['saml_idp_entityid']))
+			->setEnabled($is_saml_auth_enabled)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('SSO service URL'), 'saml_sso_url'))->setAsteriskMark(),
+		(new CTextBox('saml_sso_url', $data['saml_sso_url']))
+			->setEnabled($is_saml_auth_enabled)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('SLO service URL'), 'saml_slo_url'))->setAsteriskMark(),
+		(new CTextBox('saml_slo_url', $data['saml_slo_url']))
+			->setEnabled($is_saml_auth_enabled)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('Username attribute'), 'saml_username_attribute'))->setAsteriskMark(),
+		(new CTextBox('saml_username_attribute', $data['saml_username_attribute']))
+			->setEnabled($is_saml_auth_enabled)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(new CLabel(_('SP entity ID'), 'saml_sp_entityid'),
+		(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid']))
+			->setEnabled($is_saml_auth_enabled)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(new CLabel(_('SP name ID format'), 'saml_nameid_format'),
+		(new CTextBox('saml_nameid_format', $data['saml_nameid_format']))
+			->setEnabled($is_saml_auth_enabled)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('placeholder', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient')
+	)
+	->addRow(_('Sign'),
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('saml_sign_metadata'))
+				->setLabel(_('Metadata'))
+				->setChecked($data['saml_sign_metadata'] == 1)
+				->setUncheckedValue(0)
+				->setEnabled($is_saml_auth_enabled)
+			)
+			->addItem((new CCheckBox('saml_sign_messages'))
+				->setLabel(_('Messages'))
+				->setChecked($data['saml_sign_messages'] == 1)
+				->setUncheckedValue(0)
+				->setEnabled($is_saml_auth_enabled)
+			)
+			->addItem((new CCheckBox('saml_sign_assertions'))
+				->setLabel(_('Assertions'))
+				->setChecked($data['saml_sign_assertions'] == 1)
+				->setUncheckedValue(0)
+				->setEnabled($is_saml_auth_enabled)
+			)
+			->addItem((new CCheckBox('saml_sign_authn_requests'))
+				->setLabel(_('AuthN requests'))
+				->setChecked($data['saml_sign_authn_requests'] == 1)
+				->setUncheckedValue(0)
+				->setEnabled($is_saml_auth_enabled)
+			)
+			->addItem((new CCheckBox('saml_sign_logout_requests'))
+				->setLabel(_('Logout requests'))
+				->setChecked($data['saml_sign_logout_requests'] == 1)
+				->setUncheckedValue(0)
+				->setEnabled($is_saml_auth_enabled)
+			)
+			->addItem((new CCheckBox('saml_sign_logout_responses'))
+				->setLabel(_('Logout responses'))
+				->setChecked($data['saml_sign_logout_responses'] == 1)
+				->setUncheckedValue(0)
+				->setEnabled($is_saml_auth_enabled)
+			)
+	)
+	->addRow(_('Encrypt'),
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('saml_encrypt_nameid'))
+				->setLabel(_('Name ID'))
+				->setChecked($data['saml_encrypt_nameid'] == 1)
+				->setUncheckedValue(0)
+				->setEnabled($is_saml_auth_enabled)
+			)
+			->addItem((new CCheckBox('saml_encrypt_assertions'))
+				->setLabel(_('Assertions'))
+				->setChecked($data['saml_encrypt_assertions'] == 1)
+				->setUncheckedValue(0)
+				->setEnabled($is_saml_auth_enabled)
+			)
+	)
+	->addRow(new CLabel(_('Case sensitive login'), 'saml_case_sensitive'),
+		(new CCheckBox('saml_case_sensitive'))
+			->setChecked($data['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
+			->setEnabled($is_saml_auth_enabled)
+	);
 
 (new CWidget())
 	->setTitle(_('Authentication'))
@@ -150,6 +257,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->addTab('auth', _('Authentication'), $auth_tab)
 			->addTab('http', _('HTTP settings'), $http_tab)
 			->addTab('ldap', _('LDAP settings'), $ldap_tab)
+			->addTab('saml', _('SAML settings'), $saml_tab)
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update'))),
 				[(new CSubmitButton(_('Test'), 'ldap_test', 1))

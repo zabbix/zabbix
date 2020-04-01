@@ -268,6 +268,7 @@ class CRouter {
 		'imgstore.php'					=> ['CLegacyAction', null, null],
 		'index.php'						=> ['CLegacyAction', null, null],
 		'index_http.php'				=> ['CLegacyAction', null, null],
+		'index_sso.php'					=> ['CLegacyAction', null, null],
 		'items.php'						=> ['CLegacyAction', null, null],
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
 		'latest.php'					=> ['CLegacyAction', null, null],
