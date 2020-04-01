@@ -825,7 +825,7 @@ void	zbx_vcmock_set_time(zbx_mock_handle_t hitem, const char *key)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vcmock_get_time                                              *
+ * Function: zbx_vcmock_get_ts                                                *
  *                                                                            *
  * Purpose: returns the mocked current time                                   *
  *                                                                            *
