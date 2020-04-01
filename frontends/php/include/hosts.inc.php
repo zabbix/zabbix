@@ -1130,12 +1130,12 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 	$parent_host_macros = [];
 
 	if ($parent_hostid !== null) {
-		[$parent_host] = API::Host()->get([
-			'output' => [],
-			'hostids' => [$parent_hostid],
-			'selectMacros' => ['macro', 'type', 'value', 'description']
+		$parent_host_macros = API::UserMacro()->get([
+			'output' => ['macro', 'type', 'value', 'description'],
+			'hostids' => [$parent_hostid]
 		]);
-		$parent_host_macros = array_column($parent_host['macros'], null, 'macro');
+
+		$parent_host_macros = array_column($parent_host_macros, null, 'macro');
 		$all_macros += array_fill_keys(array_keys($parent_host_macros), true);
 	}
 
