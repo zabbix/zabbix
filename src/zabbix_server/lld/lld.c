@@ -604,9 +604,9 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	lld_override_operation_t	*override_operation = NULL;
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
-			"select o.overrideid,o.override_operationid,o.operationobject"
+			"select o.overrideid,o.override_operationid,o.operationobject,"
 				"c.operator,c.value,"
-				"s.status"
+				"s.status,"
 				"p.delay,"
 				"h.history,"
 				"t.trends,"
@@ -615,7 +615,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 				"g.name,"
 				"ote.templateid,"
 				"i.inventory_mode"
-			" from override_operation op"
+			" from override_operation o"
 			" left join override_opcondition c"
 				" on o.override_operationid=c.override_operationid"
 			" left join override_opstatus s"
@@ -637,8 +637,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			" left join override_opinventory i"
 				" on o.override_operationid=i.override_operationid"
 			" where");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "op.overrideid", overrideids->values, overrideids->values_num);
-	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by op.override_operationid");
+	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.overrideid", overrideids->values, overrideids->values_num);
+	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.override_operationid");
 
 	result = DBselect("%s", *sql);
 	while (NULL != (row = DBfetch(result)))
