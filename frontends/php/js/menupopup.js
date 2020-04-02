@@ -1477,6 +1477,9 @@ jQuery(function($) {
 				'aria-expanded': 'false',
 				'area-hidden': 'true'
 			});
+			link.on('click', function(e) {
+				e.stopPropagation();
+			});
 		}
 
 		item.append(link);
