@@ -744,16 +744,12 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	DBfree_result(result);
 }
 
-static int	lld_overrides_compare_by_step(const void *item1, const void *item2)
+static int	lld_overrides_compare_by_step(const void *override1, const void *override2)
 {
-	lld_override_t	*override1 = *(lld_override_t **)item1;
-	lld_override_t	*override2 = *(lld_override_t **)item2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(override1->step, override2->step);
+	ZBX_RETURN_IF_NOT_EQUAL((*(lld_override_t **)override1)->step, (*(lld_override_t **)override2)->step);
 
 	return 0;
 }
-
 
 static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_ruleid, const DC_ITEM *item,
 		char **error)
