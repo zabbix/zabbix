@@ -308,8 +308,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 {
 	struct zbx_json_parse	jp;
 	char			*error = NULL;
-	int			ret = FAIL;
-	zbx_proxy_diff_t 	proxy_diff;
+	int			ret = FAIL, version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -329,20 +328,16 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 		goto out;
 	}
 
-	proxy->version = zbx_get_proxy_protocol_version(&jp);
+	version = zbx_get_proxy_protocol_version(&jp);
 
-	if (SUCCEED != zbx_check_protocol_version(proxy))
+	if (SUCCEED != zbx_check_protocol_version(proxy, version))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != (ret = DCget_proxy_suppress_win(proxy->hostid, &proxy_diff.suppress_win, &proxy_diff.lastaccess)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy communication delay");
-		goto out;
-	}
+	proxy->version = version;
 
-	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, &proxy_diff, HOST_STATUS_PROXY_PASSIVE, more, &error)))
+	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, more, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->host, proxy->addr, error);

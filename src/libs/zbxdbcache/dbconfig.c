@@ -36,6 +36,7 @@
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
 #include "dbsync.h"
+#include "proxy.h"
 
 int	sync_in_progress = 0;
 
@@ -12149,7 +12150,7 @@ void	zbx_dc_unsubscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
 		if (0 == (proxy->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 			continue;
 
-		if (0 >= proxy->suppress_win.values_num)
+		if (0 >= proxy->suppress_win.values_num && ZBX_PROXY_DATA_DONE == proxy->more_data)
 		{
 			proxy->suppress_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 			proxy->suppress_win.period_start = 0;
@@ -12203,7 +12204,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 				if (0 != ps_win->heartbeat_time &&
 						ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX != ps_win->heartbeat &&
-						SEC_PER_MIN / 2 < abs(ps_win->heartbeat - heartbeat))
+						(SEC_PER_MIN / 4) < abs(ps_win->heartbeat - heartbeat))
 				{
 					lost = 1;
 				}
@@ -12255,8 +12256,14 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win, *ds_win = &diff->suppress_win;
 
 			/* Active proxy sends the delayed data in the second packet. The first packet is empty */
-			if (0 != (ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET))
-				ps_win->period_start = ds_win->period_start;
+			if (0 != (ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+			{
+				if (ps_win->period_start != ds_win->period_start)
+					ps_win->period_start = ds_win->period_start;
+
+				if (ps_win->flags != ds_win->flags)
+					ps_win->flags = ds_win->flags;
+			}
 
 			if ((ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) != (ds_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 			{
@@ -12269,7 +12276,8 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);
 		}
 
-		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT))
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT) &&
+				0 == (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 		{
 			zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win;
 			int			heartbeat = diff->lastaccess - ps_win->heartbeat_time;

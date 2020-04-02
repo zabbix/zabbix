@@ -70,7 +70,7 @@ int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp,
 int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		zbx_proxy_diff_t *proxy_diff, unsigned char proxy_status, int *more, char **error);
-int	zbx_check_protocol_version(DC_PROXY *proxy);
+		unsigned char proxy_status, int *more, char **error);
+int	zbx_check_protocol_version(DC_PROXY *proxy, int version);
 
 #endif

@@ -3435,8 +3435,7 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
  * Parameters: proxy        - [IN] the proxy                                  *
  *             jp_data      - [IN] JSON with history data array               *
  *             session      - [IN] the data session                           *
- *             unique_shift - [IN/OUT] auto increment nanoseconds to ensure   *
- *                                     unique value of timestamps             *
+ *             suppress_win - [OUT] counter of delayed values                 *
  *             info         - [OUT] address of a pointer to the info          *
  *                                     string (should be freed by the caller) *
  *                                                                            *
@@ -4551,6 +4550,13 @@ static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_off
  ******************************************************************************/
 static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy_status, zbx_proxy_diff_t *diff)
 {
+	if (0 != (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET) &&
+			0 != diff->proxy_delay)
+	{	/* for active proxy the proxy_delay is sent in the second packet */
+		diff->suppress_win.period_start = diff->suppress_win.period_end - diff->proxy_delay;
+		diff->suppress_win.flags = ZBX_PROXY_SUPPRESS_ACTIVE_BASE_PROXYDELAY;
+	}
+
 	if (0 != (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 	{
 		diff->suppress_win.values_num = 0;	/* reset counter of new suppress values received from proxy */
@@ -4585,7 +4591,6 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
  *             proxy_hostid - [IN] proxy identifier from database             *
  *             ts           - [IN] timestamp when the proxy connection was    *
  *                                 established                                *
- *             proxy_diff   - [IN] communication problem info                 *
  *             proxy_status - [IN] active or passive proxy mode               *
  *             more         - [OUT] available data flag                       *
  *             error        - [OUT] address of a pointer to the info string   *
@@ -4596,38 +4601,54 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
  *                                                                            *
  ******************************************************************************/
 int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		zbx_proxy_diff_t *proxy_diff, unsigned char proxy_status, int *more, char **error)
+		unsigned char proxy_status, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED;
 	char			*error_step = NULL, value[MAX_STRING_LEN];
 	size_t			error_alloc = 0, error_offset = 0;
+	zbx_proxy_diff_t	proxy_diff;
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
+	proxy_diff.flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
+	proxy_diff.hostid = proxy->hostid;
+
+	if (SUCCEED != (ret = DCget_proxy_suppress_win(proxy_diff.hostid, &proxy_diff.suppress_win,
+			&proxy_diff.lastaccess)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy communication delay");
+		goto out;
+	}
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
-		proxy_diff->more_data = atoi(value);
+		proxy_diff.more_data = atoi(value);
 	else
-		proxy_diff->more_data = ZBX_PROXY_DATA_DONE;
+		proxy_diff.more_data = ZBX_PROXY_DATA_DONE;
 
 	if (NULL != more)
-		*more = proxy_diff->more_data;
+		*more = proxy_diff.more_data;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PROXY_DELAY, value, sizeof(value), NULL))
-		proxy_diff->proxy_delay = atoi(value);
+	{
+		proxy_diff.proxy_delay = atoi(value);
+		proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
+	}
 	else
-		proxy_diff->proxy_delay = 0;
+		proxy_diff.proxy_delay = 0;
+
+	check_proxy_suppression_mode(ts, proxy_status, &proxy_diff);	/* first packet can be empty for active proxy */
+
+	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)
+		zbx_dc_update_proxy(&proxy_diff);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
 		if (SUCCEED != (ret = process_host_availability_contents(&jp_data, &error_step)))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
-
-	proxy_diff->flags = ZBX_FLAGS_PROXY_DIFF_UNSET;
-	check_proxy_suppression_mode(ts, proxy_status, proxy_diff);	/* first packet can be empty for active proxy */
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
@@ -4648,20 +4669,20 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		}
 
 		if (SUCCEED == (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
-				(void *)&proxy->hostid, &jp_data, session, &proxy_diff->suppress_win, &error_step)))
+				(void *)&proxy->hostid, &jp_data, session, &proxy_diff.suppress_win, &error_step)))
 		{
-			if (0 < proxy_diff->suppress_win.values_num)
-				proxy_diff->flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
+			if (0 < proxy_diff.suppress_win.values_num)
+			{
+				proxy_diff.flags |= (ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN |
+						ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY);
+			}
 		}
 		else
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 
-	if (0 != (proxy_diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN))
-	{
-		proxy_diff->hostid = proxy->hostid;
-		zbx_dc_update_proxy(proxy_diff);
-	}
+	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)
+		zbx_dc_update_proxy(&proxy_diff);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
@@ -4748,17 +4769,17 @@ static void	zbx_db_flush_proxy_lastaccess(void)
  *             lastaccess - [IN] the last proxy access time                   *
  *             compress   - [IN] 1 if proxy is using data compression,        *
  *                               0 otherwise                                  *
- *             add_flags  - [IN] additional flags for update proxy            *
+ *             flags_add  - [IN] additional flags for update proxy            *
  *                                                                            *
  * Comments: The proxy parameter properties are also updated.                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t add_flags)
+void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t flags_add)
 {
 	zbx_proxy_diff_t	diff;
 
 	diff.hostid = proxy->hostid;
-	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | add_flags;
+	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE | flags_add;
 	diff.version = version;
 	diff.lastaccess = lastaccess;
 	diff.compress = compress;
@@ -4810,13 +4831,14 @@ static void	zbx_update_proxy_lasterror(DC_PROXY *proxy)
  *                                                                            *
  * Parameters:                                                                *
  *     proxy        - [IN] the source proxy                                   *
+ *     version      - [IN] the version of proxy                               *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - no compatibility issue                                       *
  *     FAIL    - compatibility check fault                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_protocol_version(DC_PROXY *proxy)
+int	zbx_check_protocol_version(DC_PROXY *proxy, int version)
 {
 	int	server_version;
 	int	ret = SUCCEED;
@@ -4824,7 +4846,7 @@ int	zbx_check_protocol_version(DC_PROXY *proxy)
 	int	print_log = 0;
 
 	/* warn if another proxy version is used and proceed with compatibility rules*/
-	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != proxy->version)
+	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != version)
 	{
 		now = (int)time(NULL);
 
@@ -4836,14 +4858,14 @@ int	zbx_check_protocol_version(DC_PROXY *proxy)
 		}
 
 		/* don't accept pre 4.2 data */
-		if (ZBX_COMPONENT_VERSION(4, 2) > proxy->version)
+		if (ZBX_COMPONENT_VERSION(4, 2) > version)
 		{
 			if (1 == print_log)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy \"%s\":"
 						" protocol version %d.%d is not supported anymore",
-						proxy->host, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
-						ZBX_COMPONENT_VERSION_MINOR(proxy->version));
+						proxy->host, ZBX_COMPONENT_VERSION_MAJOR(version),
+						ZBX_COMPONENT_VERSION_MINOR(version));
 			}
 			ret = FAIL;
 			goto out;
@@ -4852,12 +4874,12 @@ int	zbx_check_protocol_version(DC_PROXY *proxy)
 		if (1 == print_log)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" protocol version %d.%d differs from server version"
-					" %d.%d", proxy->host, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
-					ZBX_COMPONENT_VERSION_MINOR(proxy->version),
+					" %d.%d", proxy->host, ZBX_COMPONENT_VERSION_MAJOR(version),
+					ZBX_COMPONENT_VERSION_MINOR(version),
 					ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
 		}
 
-		if (proxy->version > server_version)
+		if (version > server_version)
 		{
 			if (1 == print_log)
 				zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
