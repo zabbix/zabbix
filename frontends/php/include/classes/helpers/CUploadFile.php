@@ -39,7 +39,7 @@ class CUploadFile {
 		$maxSize = trim(ini_get('upload_max_filesize'));
 
 		if ($maxSize === '') {
-			$maxSize = '2m'; // PHP default value
+			$maxSize = '2M'; // PHP default value
 		}
 
 		return str2mem($maxSize);
@@ -125,8 +125,8 @@ class CUploadFile {
 	 * @throws Exception if image size is 1MB or greater.
 	 */
 	public function validateImageSize() {
-		if ($this->error === UPLOAD_ERR_INI_SIZE || (bccomp($this->size, ZBX_MAX_IMAGE_SIZE) == 1)) {
-			throw new Exception(_s('Image size must be less than %1$s.', convert_units([
+		if ($this->error === UPLOAD_ERR_INI_SIZE || $this->size > ZBX_MAX_IMAGE_SIZE) {
+			throw new Exception(_s('Image size must be less than %1$s.', convertUnits([
 				'value' => ZBX_MAX_IMAGE_SIZE,
 				'units' => 'B'
 			])));

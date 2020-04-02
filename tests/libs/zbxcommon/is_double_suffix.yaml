@@ -485,17 +485,17 @@ in:
 out:
   return: FAIL
 ---
-test case: fail 1e+2
+test case: succeed 1e+2
 in:
   num: 1e+2
 out:
-  return: FAIL
+  return: SUCCEED
 ---
-test case: fail 1E+2
+test case: succeed 1E+2
 in:
   num: 1E+2
 out:
-  return: FAIL
+  return: SUCCEED
 ---
 test case: fail --1
 in:

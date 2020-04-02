@@ -34,18 +34,16 @@ import (
 
 var Options AgentOptions
 
-func CutAfterN(s string, n int) (string, int) {
-	var l int
-
-	for i := range s {
-		if i > n {
-			s = s[:l]
-			break
+func CutAfterN(s string, n int) string {
+	var i int
+	for pos := range s {
+		if i >= n {
+			return s[:pos]
 		}
-		l = i
+		i++
 	}
 
-	return s, l
+	return s
 }
 
 func CheckHostname(s string) error {

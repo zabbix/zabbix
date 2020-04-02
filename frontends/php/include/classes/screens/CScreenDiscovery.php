@@ -227,7 +227,7 @@ class CScreenDiscovery extends CScreenBase {
 					new CSpan(array_key_exists('host', $h_data) ? $h_data['host'] : ''),
 					(new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 						? ''
-						: convert_units(['value' => time() - $h_data['time'], 'units' => 'uptime'])))
+						: convertUnits(['value' => time() - $h_data['time'], 'units' => 'uptime'])))
 					)
 						->addClass($h_data['class'])
 				];

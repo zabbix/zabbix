@@ -4252,6 +4252,22 @@ int	zbx_number_parse(const char *number, int *len)
 			continue;
 		}
 
+		if ('e' == number[*len] || 'E' == number[*len])
+		{
+			(*len)++;
+
+			if ('-' == number[*len] || '+' == number[*len])
+				(*len)++;
+
+			if (0 == isdigit(number[*len]))
+				return FAIL;
+
+			while (0 != isdigit(number[++(*len)]));
+
+			if ('.' == number[*len] ||'e' == number[*len] || 'E' == number[*len])
+				return FAIL;
+		}
+
 		if (1 > digits || 1 < dots)
 			return FAIL;
 
@@ -5565,4 +5581,28 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
 	return buf;
 
 #	undef ZBX_SUFFIX
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_print_double                                                 *
+ *                                                                            *
+ * Purpose: converts double value to string and truncates insignificant       *
+ *          precision                                                         *
+ *                                                                            *
+ * Parameters: buffer - [OUT] the output buffer                               *
+ *             size   - [IN] the output buffer size                           *
+ *             val    - [IN] double value to be converted                     *
+ *                                                                            *
+ * Return value: the oputput buffer with printed value                        *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_print_double(char *buffer, size_t size, double val)
+{
+	zbx_snprintf(buffer, size, "%.15G", val);
+
+	if (atof(buffer) != val)
+		zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);
+
+	return buffer;
 }

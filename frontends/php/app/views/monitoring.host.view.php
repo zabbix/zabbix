@@ -22,6 +22,7 @@
 /**
  * @var CView $this
  */
+
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
 
@@ -34,7 +35,7 @@ $widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))))
+		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -92,7 +93,7 @@ foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $
 	];
 }
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'host.view')))
 		->setProfile('web.hostsmon.filter')
 		->setActiveTab($data['active_tab'])

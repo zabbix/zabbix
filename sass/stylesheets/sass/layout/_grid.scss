@@ -1,0 +1,80 @@
+html,
+body {
+	height: 100vh;
+}
+
+body {
+	display: flex;
+	overflow: hidden;
+}
+
+aside,
+.wrapper {
+	box-sizing: border-box;
+}
+
+.wrapper {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	overflow: auto;
+	position: relative;
+
+	& > header + [class^="msg-"],
+	& > [class^="msg-"] + [class^="msg-"] {
+		margin-top: 0;
+	}
+
+	&.layout-kioskmode {
+
+		main {
+			padding: 10px;
+
+			// Set the same speed as for the sliding headers of the widgets.
+			@if $ui-transitions {
+				transition: margin-top .3s;
+			}
+		}
+
+		&.kiosk-slide-lines-1 {
+			// Set to the height of the sliding headers of the widgets.
+			main {
+				margin-top: 2rem;
+			}
+		}
+
+		&.kiosk-slide-lines-2 {
+			// Set to double of the height of the sliding headers of the widgets.
+			main {
+				margin-top: 4rem;
+			}
+		}
+	}
+
+	& > .debug-output {
+		flex-shrink: 0;
+	}
+}
+
+header,
+footer {
+	flex-shrink: 0;
+	min-width: 1200px;
+}
+
+header {
+	margin-bottom: 10px;
+}
+
+main {
+	padding: 0 10px;
+	min-width: 1200px;
+}
+
+footer {
+	margin-top: auto;
+}
+
+output {
+	display: block;
+}

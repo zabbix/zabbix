@@ -72,27 +72,11 @@ $timeline = getTimeSelectorPeriod($timeselector_options);
 
 $http_test_name = CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name']);
 
-// Create details widget.
 $details_screen = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_HTTPTEST_DETAILS,
 	'mode' => SCREEN_MODE_JS,
 	'dataId' => 'httptest_details'
 ] + $timeline);
-
-(new CWidget())
-	->setTitle(_('Details of web scenario').': '.$http_test_name)
-	->setWebLayoutMode($page['web_layout_mode'])
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())->addItem(get_icon('fullscreen', ['mode' => $page['web_layout_mode']])))
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	)
-	->addItem($details_screen->get())
-	->show();
-
-echo BR();
 
 $graphs = [];
 
@@ -198,7 +182,17 @@ CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
 // Create graphs widget.
 $widget = (new CWidget())
+	->setTitle(_('Details of web scenario').': '.$http_test_name)
 	->setWebLayoutMode($page['web_layout_mode'])
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']])))
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	)
+	->addItem($details_screen->get())
+	->addItem(new CTag('br'))
 	->addItem(
 		(new CFilter(new CUrl()))
 			->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
