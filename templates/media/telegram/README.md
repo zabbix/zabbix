@@ -18,7 +18,7 @@ This guide describes how to send Zabbix notifications with Telegram messenger Bo
 
 [![](images/1.png?raw=true)](images/1.png)
 
-### Copy and paste obtained token into the "telegramToken" field
+### Copy and paste obtained token into the "Token" field
 
 [![](images/2.png?raw=true)](images/2.png)
 
@@ -41,7 +41,7 @@ This guide describes how to send Zabbix notifications with Telegram messenger Bo
 [![](images/6.png?raw=true)](images/6.png)
 [![](images/7.png?raw=true)](images/7.png)
 
-Everythins is Ok
+Everything is Ok
 
 #### Remember to send '/start', otherwise you will get the error
 
@@ -64,11 +64,6 @@ Everythins is Ok
 
 Read the Telegram Bot API documentation to learn how to format your actions: [Markdown](https://core.telegram.org/bots/api#markdown-style), [HTML](https://core.telegram.org/bots/api#html-style) and [MarkdownV2](https://core.telegram.org/bots/api#html-style).
 
-Set `telegramParseMode` parameter with needed option and configure your actions according to the Telegram's documentation.
+Set `ParseMode` parameter with needed option and configure your actions according to the Telegram's documentation.
 Note: in that case your actions should be separated from other actions (SMS for example) or you're risking to get plain text alert with raw Markdown/HTML tags.
-
-Examples:
-
-...
-
 
