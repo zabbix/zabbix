@@ -88,7 +88,9 @@ $action_list = (new CList())
 	->addItem([
 		new CLabel(_('View as')),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CComboBox('action', $data['action'], 'submit()', $actions))->setEnabled((bool) $data['items'])
+		(new CComboBox('action', $data['action'], 'submit()', $actions))
+			->setEnabled((bool) $data['items'])
+			->removeId()
 	]);
 
 if ($data['action'] !== HISTORY_GRAPH && $data['action'] !== HISTORY_BATCH_GRAPH) {
@@ -152,25 +154,27 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 					]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				)
 				->addRow(_('Value'),
-					(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					(new CTextBox('filter', getRequest('filter', '')))
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+						->removeId()
 				);
 
 			$filterTask = getRequest('filter_task', 0);
 
-			$tasks = [new CComboBox('filter_task', $filterTask, 'submit()', [
+			$tasks = [(new CComboBox('filter_task', $filterTask, 'submit()', [
 				FILTER_TASK_SHOW => _('Show selected'),
 				FILTER_TASK_HIDE => _('Hide selected'),
 				FILTER_TASK_MARK => _('Mark selected'),
 				FILTER_TASK_INVERT_MARK => _('Mark others')
-			])];
+			]))->removeId()];
 
 			if (str_in_array($filterTask, [FILTER_TASK_MARK, FILTER_TASK_INVERT_MARK])) {
 				$tasks[] = ' ';
-				$tasks[] = new CComboBox('mark_color', getRequest('mark_color', 0), null, [
+				$tasks[] = (new CComboBox('mark_color', getRequest('mark_color', 0), null, [
 					MARK_COLOR_RED => _('as Red'),
 					MARK_COLOR_GREEN => _('as Green'),
 					MARK_COLOR_BLUE => _('as Blue')
-				]);
+				]))->removeId();
 			}
 
 			$filterColumn1->addRow(_('Selected'), $tasks);

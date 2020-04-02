@@ -59,11 +59,11 @@ $readonly = ($data['limited'] || $discovered_trigger);
 
 if ($readonly) {
 	$triggersForm
-		->addVar('opdata', $data['opdata'])
-		->addVar('recovery_mode', $data['recovery_mode'])
-		->addVar('type', $data['type'])
-		->addVar('correlation_mode', $data['correlation_mode'])
-		->addVar('manual_close', $data['manual_close']);
+		->addItem((new CVar('opdata', $data['opdata']))->removeId())
+		->addItem((new CVar('recovery_mode', $data['recovery_mode']))->removeId())
+		->addItem((new CVar('type', $data['type']))->removeId())
+		->addItem((new CVar('correlation_mode', $data['correlation_mode']))->removeId())
+		->addItem((new CVar('manual_close', $data['manual_close']))->removeId());
 }
 
 // Create form list.
@@ -106,11 +106,11 @@ $triggersFormList->addRow(_('Severity'), $severity);
 
 // Append expression to form list.
 if ($data['expression_field_readonly']) {
-	$triggersForm->addVar('expression', $data['expression']);
+	$triggersForm->addItem((new CVar('expression', $data['expression']))->removeId());
 }
 
 if ($data['recovery_expression_field_readonly']) {
-	$triggersForm->addVar('recovery_expression', $data['recovery_expression']);
+	$triggersForm->addItem((new CVar('recovery_expression', $data['recovery_expression']))->removeId());
 }
 
 $popup_options = [
