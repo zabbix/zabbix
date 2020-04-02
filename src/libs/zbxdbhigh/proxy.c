@@ -4557,16 +4557,24 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
 		diff->suppress_win.flags = ZBX_PROXY_SUPPRESS_ACTIVE_BASE_PROXYDELAY;
 	}
 
+	/* to identify the case when we receive an empty second packet, store the diagnostics of time */
+	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
+			2 * CONFIG_PROXYDATA_FREQUENCY < (ts->sec - diff->lastaccess)) ||
+			(HOST_STATUS_PROXY_ACTIVE == proxy_status &&
+			diff->suppress_win.heartbeat < (ts->sec - diff->lastaccess)))
+	{
+		diff->suppress_win.flags |= ZBX_PROXY_SUPPRESS_TIME;
+	}
+	else
+		diff->suppress_win.flags &= (~ZBX_PROXY_SUPPRESS_TIME);
+
 	if (0 != (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 	{
 		diff->suppress_win.values_num = 0;	/* reset counter of new suppress values received from proxy */
 		return;					/* only for current packet */
 	}
 
-	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
-			2 * CONFIG_PROXYDATA_FREQUENCY < (ts->sec - diff->lastaccess)) ||
-			(HOST_STATUS_PROXY_ACTIVE == proxy_status &&
-			diff->suppress_win.heartbeat < (ts->sec - diff->lastaccess)))
+	if (0 != (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_TIME))
 	{
 		diff->suppress_win.values_num = 0;
 		diff->suppress_win.period_end = ts->sec;
@@ -4604,7 +4612,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		unsigned char proxy_status, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
-	int			ret = SUCCEED;
+	int			ret = SUCCEED, flags;
 	char			*error_step = NULL, value[MAX_STRING_LEN];
 	size_t			error_alloc = 0, error_offset = 0;
 	zbx_proxy_diff_t	proxy_diff;
@@ -4620,6 +4628,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			&proxy_diff.lastaccess)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy communication delay");
+		ret = FAIL;
 		goto out;
 	}
 
@@ -4639,7 +4648,14 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	else
 		proxy_diff.proxy_delay = 0;
 
+	flags = proxy_diff.suppress_win.flags;
 	check_proxy_suppression_mode(ts, proxy_status, &proxy_diff);	/* first packet can be empty for active proxy */
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() flag_win:%d/%d flag:%d heartbeat:%d proxy_status:%d time_delta:%d "
+			"timestamp:%d lastaccess:%d proxy_delay:%d more:%d", __func__, proxy_diff.suppress_win.flags,
+			flags, (int)proxy_diff.flags, proxy_diff.suppress_win.heartbeat, proxy_status,
+			ts->sec - proxy_diff.lastaccess, ts->sec, proxy_diff.lastaccess, proxy_diff.proxy_delay,
+			proxy_diff.more_data);
 
 	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)
 		zbx_dc_update_proxy(&proxy_diff);
@@ -4672,13 +4688,25 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 				(void *)&proxy->hostid, &jp_data, session, &proxy_diff.suppress_win, &error_step)))
 		{
 			if (0 < proxy_diff.suppress_win.values_num)
-			{
-				proxy_diff.flags |= (ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN |
-						ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY);
-			}
+				proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
 		}
 		else
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
+	}
+
+	/* prevent loss of information before receiving a second packet */
+	if (0 != (proxy_diff.suppress_win.flags & (ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET |
+			ZBX_PROXY_SUPPRESS_TIME)) && 0 == proxy_diff.suppress_win.values_num)
+	{
+		proxy_diff.more_data = ZBX_PROXY_DATA_MORE;
+	}
+
+	if (0 != (proxy_diff.suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+	{
+		proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
+		zabbix_log(LOG_LEVEL_TRACE, "In %s() flag_win:%d flag:%d values_num:%d more_data:%d", __func__,
+				proxy_diff.suppress_win.flags, (int)proxy_diff.flags,
+				proxy_diff.suppress_win.values_num, proxy_diff.more_data);
 	}
 
 	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)

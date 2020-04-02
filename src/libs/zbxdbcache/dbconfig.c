@@ -12194,7 +12194,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 	{
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS))
 		{
-			int lost = 0;	/* communication lost */
+			int			lost = 0;	/* communication lost */
 
 			if (0 != (diff->flags &
 					(ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT | ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG)))
@@ -12242,7 +12242,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY))
 		{
-			if (proxy->proxy_delay != diff->proxy_delay)
+			if (0 == proxy->proxy_delay)
 				proxy->proxy_delay = diff->proxy_delay;
 
 			if (proxy->more_data != diff->more_data)
