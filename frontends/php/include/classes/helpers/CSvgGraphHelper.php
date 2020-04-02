@@ -315,7 +315,7 @@ class CSvgGraphHelper {
 						usort($points, [__CLASS__, 'sortByClock']);
 						$metric['points'] = $points;
 
-						unset($metric['source'], $metric['history'], $metric['trends']);
+						unset($metric['history'], $metric['trends']);
 					}
 				}
 				unset($metric);
@@ -619,11 +619,12 @@ class CSvgGraphHelper {
 	 * Modifies each metric by first determining frequency if needed, then applying missing data markers to data set
 	 * according to missingdatafunc configuration.
 	 *
-	 * @param array $metrics                                List of data sets.
-	 * @param array $metrics['options']['frequency']        Interval at which each data should arrive in seconds.
-	 * @param array $metrics['options']['missingdatafunc']  Data set missing data setting.
-	 * @param array $metrics['points'][]['value']           Point value.
-	 * @param array $metrics['points'][]['clock']           Point timestamp.
+	 * @param array $metrics                                  List of data sets.
+	 * @param array $metrics[]['options']['frequency']        Interval at which each data should arrive in seconds.
+	 * @param array $metrics[]['options']['missingdatafunc']  Data set missing data setting.
+	 * @param array $metrics[]['source']                      Metric source.
+	 * @param array $metrics[]['points'][]['value']           Point value.
+	 * @param array $metrics[]['points'][]['clock']           Point timestamp.
 	 */
 	protected static function applyMissingData(array &$metrics = []) {
 		foreach ($metrics as &$metric) {
@@ -635,7 +636,7 @@ class CSvgGraphHelper {
 				continue;
 			}
 
-			if ($metric['options']['frequency'] == 0) {
+			if ($metric['options']['frequency'] == 0 || $metric['source'] == SVG_GRAPH_DATA_SOURCE_TRENDS) {
 				$metric['options']['frequency'] = self::getAverageDistance($metric['points']);
 			}
 
