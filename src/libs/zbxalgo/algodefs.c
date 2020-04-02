@@ -242,9 +242,9 @@ zbx_hash_t	zbx_hash_splittable64(const void *data)
 	zbx_uint64_t	value = *(const zbx_uint64_t *)data;
 
 	value ^= value >> 30;
-	value *= UINT64_C(0xbf58476d1ce4e5b9);
+	value *= __UINT64_C(0xbf58476d1ce4e5b9);
 	value ^= value >> 27;
-	value *= UINT64_C(0x94d049bb133111eb);
+	value *= __UINT64_C(0x94d049bb133111eb);
 	value ^= value >> 31;
 
 	return (zbx_hash_t)value ^ (value >> 32);
