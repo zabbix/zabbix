@@ -7158,3 +7158,8 @@ table.preprocessing-test-results {
 		@extend %btn-widget;
 	}
 }
+
+.text-overflow {
+	max-width: 150px;
+	white-space: break-spaces;
+}

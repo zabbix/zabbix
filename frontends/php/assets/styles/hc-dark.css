@@ -5447,6 +5447,10 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
+.text-overflow {
+  max-width: 150px;
+  white-space: break-spaces; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
 .sidebar button:focus {
