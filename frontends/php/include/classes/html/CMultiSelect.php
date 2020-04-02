@@ -245,6 +245,10 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
 				}
 
+				if (array_key_exists('groupid', $parameters) && $parameters['groupid'] > 0) {
+					$popup_parameters['groupid'] = (string) $parameters['groupid'];
+				}
+
 				if (array_key_exists('parent_discoveryid', $parameters) && $parameters['parent_discoveryid'] > 0) {
 					$popup_parameters['parent_discoveryid'] = $parameters['parent_discoveryid'];
 					$autocomplete_parameters['parent_discoveryid'] = $parameters['parent_discoveryid'];
