@@ -547,10 +547,10 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 	int		ret = SUCCEED, i;
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
-			"select overrideid,override_conditionid,macro,value,operator"
-			" from override_condition"
+			"select lld_overrideid,lld_override_conditionid,macro,value,operator"
+			" from lld_override_condition"
 			" where");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "overrideid", overrideids->values, overrideids->values_num);
+	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "lld_overrideid", overrideids->values, overrideids->values_num);
 
 	result = DBselect("%s", *sql);
 	while (NULL != (row = DBfetch(result)))
@@ -611,8 +611,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	lld_override_operation_t	*override_operation = NULL;
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
-			"select o.overrideid,o.override_operationid,o.operationobject,"
-				"c.operator,c.value,"
+			"select o.lld_overrideid,o.lld_override_operationid,o.operationobject,o.operator,o.value,"
 				"s.status,"
 				"p.delay,"
 				"h.history,"
@@ -622,30 +621,28 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 				"g.name,"
 				"ote.templateid,"
 				"i.inventory_mode"
-			" from override_operation o"
-			" left join override_opcondition c"
-				" on o.override_operationid=c.override_operationid"
-			" left join override_opstatus s"
-				" on o.override_operationid=s.override_operationid"
-			" left join override_opperiod p"
-				" on o.override_operationid=p.override_operationid"
-			" left join override_ophistory h"
-				" on o.override_operationid=h.override_operationid"
-			" left join override_optrends t"
-				" on o.override_operationid=t.override_operationid"
-			" left join override_opseverity os"
-				" on o.override_operationid=os.override_operationid"
-			" left join override_optag ot"
-				" on o.override_operationid=ot.override_operationid"
-			" left join override_opgroup_prototype g"
-				" on o.override_operationid=g.override_operationid"
-			" left join override_optemplate ote"
-				" on o.override_operationid=ote.override_operationid"
-			" left join override_opinventory i"
-				" on o.override_operationid=i.override_operationid"
+			" from lld_override_operation o"
+			" left join lld_override_opstatus s"
+				" on o.lld_override_operationid=s.lld_override_operationid"
+			" left join lld_override_opperiod p"
+				" on o.lld_override_operationid=p.lld_override_operationid"
+			" left join lld_override_ophistory h"
+				" on o.lld_override_operationid=h.lld_override_operationid"
+			" left join lld_override_optrends t"
+				" on o.lld_override_operationid=t.lld_override_operationid"
+			" left join lld_override_opseverity os"
+				" on o.lld_override_operationid=os.lld_override_operationid"
+			" left join lld_override_optag ot"
+				" on o.lld_override_operationid=ot.lld_override_operationid"
+			" left join lld_override_opgroup_prototype g"
+				" on o.lld_override_operationid=g.lld_override_operationid"
+			" left join lld_override_optemplate ote"
+				" on o.lld_override_operationid=ote.lld_override_operationid"
+			" left join lld_override_opinventory i"
+				" on o.lld_override_operationid=i.lld_override_operationid"
 			" where");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.overrideid", overrideids->values, overrideids->values_num);
-	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.override_operationid");
+	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values, overrideids->values_num);
+	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
 	result = DBselect("%s", *sql);
 	while (NULL != (row = DBfetch(result)))
@@ -680,14 +677,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 
 			override_operation->override_operationid = override_operationid;
 			override_operation->operationtype = (unsigned char)atoi(row[2]);
-
-			if (FAIL == DBis_null(row[3]))
-			{
-				override_operation->operator = (unsigned char)atoi(row[3]);
-				override_operation->value = zbx_strdup(NULL, row[4]);
-			}
-			else
-				override_operation->value = NULL;
+			override_operation->operator = (unsigned char)atoi(row[3]);
+			override_operation->value = zbx_strdup(NULL, row[4]);
 
 			override_operation->status = FAIL == DBis_null(row[5]) ? (unsigned char)atoi(row[5]) :
 					ZBX_PROTOTYPE_STATUS_COUNT;
@@ -781,10 +772,10 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 	DBbegin();
 
 	result = DBselect(
-			"select overrideid,step,evaltype,formula,stop"
-			" from override"
+			"select lld_overrideid,step,evaltype,formula,stop"
+			" from lld_override"
 			" where itemid=" ZBX_FS_UI64
-			" order by overrideid",
+			" order by lld_overrideid",
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
