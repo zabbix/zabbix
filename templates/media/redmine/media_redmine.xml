@@ -64,10 +64,6 @@
                     <value>&lt;PUT YOUR REDMINE URL&gt;</value>
                 </parameter>
                 <parameter>
-                    <name>trigger_description</name>
-                    <value>{TRIGGER.DESCRIPTION}</value>
-                </parameter>
-                <parameter>
                     <name>trigger_id</name>
                     <value>{TRIGGER.ID}</value>
                 </parameter>
