@@ -20,10 +20,6 @@
                     <value>{EVENT.ID}</value>
                 </parameter>
                 <parameter>
-                    <name>event_name</name>
-                    <value>{EVENT.NAME}</value>
-                </parameter>
-                <parameter>
                     <name>event_nseverity</name>
                     <value>{EVENT.NSEVERITY}</value>
                 </parameter>
@@ -293,8 +289,7 @@ try {&#13;
         result = {tags: {}},&#13;
         required_params = [&#13;
             'alert_subject', 'tracker_id', 'project',&#13;
-            'event_source', 'event_value',  'event_name',&#13;
-            'event_update_status'&#13;
+            'event_source', 'event_value',  'event_update_status'&#13;
         ],&#13;
         severities = [&#13;
             {name: 'not_classified', color: '#97AAB3'},&#13;
@@ -370,7 +365,7 @@ try {&#13;
     }&#13;
     // Create issue for trigger-based events.&#13;
     else if (params.event_value === '1' &amp;&amp; params_update.status === '0') {&#13;
-        var issue_id = Redmine.createIssue(params.event_name,&#13;
+        var issue_id = Redmine.createIssue(params.alert_subject,&#13;
             params.alert_subject + '\n' + params.alert_message + '\n' +&#13;
             params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') +&#13;
             'tr_events.php?triggerid=' + params.trigger_id + '&amp;eventid=' + params.event_id + '\n',&#13;
