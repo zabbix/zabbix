@@ -544,7 +544,7 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 	DB_RESULT	result;
 	DB_ROW		row;
 	lld_override_t	*override;
-	int		ret = SUCCEED;
+	int		ret = SUCCEED, i;
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select overrideid,override_conditionid,macro,value,operator"
@@ -556,17 +556,16 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	overrideid;
-		int		index;
 
 		ZBX_STR2UINT64(overrideid, row[0]);
-		if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &overrideid,
+		if (FAIL == (i = zbx_vector_ptr_bsearch(overrides, &overrideid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		override = (lld_override_t *)overrides->values[index];
+		override = (lld_override_t *)overrides->values[i];
 		if (FAIL == (ret = lld_filter_condition_load(&override->filter.conditions, row[1], row[2],
 				row[3], row[4], item, error)))
 		{
@@ -574,6 +573,14 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 		}
 	}
 	DBfree_result(result);
+
+	for (i = 0; i < overrides->values_num; i++)
+	{
+		override = (lld_override_t *)overrides->values[i];
+
+		if (CONDITION_EVAL_TYPE_AND_OR == override->filter.evaltype)
+			zbx_vector_ptr_sort(&override->filter.conditions, lld_condition_compare_by_macro);
+	}
 
 	return ret;
 }
@@ -737,6 +744,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 						(unsigned char)atoi(row[14]) : HOST_INVENTORY_COUNT;
 
 				break;
+			case OPERATION_OBJECT_GRAPH_PROTOTYPE:
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -793,9 +802,6 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 	{
 		lld_override_operations_load(overrides, &overrideids, &sql, &sql_alloc);
 	}
-
-	/* if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype) */
-	/*	zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro); */
 
 	DBcommit();
 	zbx_free(sql);
