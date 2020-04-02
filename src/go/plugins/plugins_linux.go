@@ -23,6 +23,7 @@ import (
 	_ "zabbix.com/plugins/docker"
 	_ "zabbix.com/plugins/kernel"
 	_ "zabbix.com/plugins/log"
+	_ "zabbix.com/plugins/memcached"
 	_ "zabbix.com/plugins/mysql"
 	_ "zabbix.com/plugins/net/netif"
 	_ "zabbix.com/plugins/net/tcp"

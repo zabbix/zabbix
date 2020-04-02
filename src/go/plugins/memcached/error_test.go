@@ -17,15 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package memcached
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"testing"
 )
+
+func Test_zabbixError_Error(t *testing.T) {
+	tests := []struct {
+		name string
+		e    zabbixError
+		want string
+	}{
+		{
+			"ZabbixError stringify",
+			zabbixError{"foobar"},
+			"Foobar.",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.e.Error(); got != tt.want {
+				t.Errorf("zabbixError.Error() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
