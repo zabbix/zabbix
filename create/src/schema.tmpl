@@ -1755,16 +1755,18 @@ INDEX	|1			|overrideid
 TABLE|override_operation|override_operationid|ZBX_TEMPLATE
 FIELD	|override_operationid	|t_id		|	|NOT NULL	|0
 FIELD	|overrideid		|t_id		|	|NOT NULL	|0	|1|override
-FIELD	|operationtype		|t_integer	|'0'	|NOT NULL	|0
-FIELD	|evaltype		|t_integer	|'0'	|NOT NULL	|0
+FIELD	|operationobject		|t_integer	|'0'	|NOT NULL	|0
 INDEX	|1			|overrideid
 
-TABLE|override_opcondition|override_opconditionid|ZBX_TEMPLATE
-FIELD	|override_opconditionid	|t_id		|	|NOT NULL	|0
+TABLE|override_opcondition|override_operationid|ZBX_TEMPLATE
 FIELD	|override_operationid	|t_id		|	|NOT NULL	|0	|1|override_operation
 FIELD	|operator		|t_integer	|'0'	|NOT NULL	|0
 FIELD	|value			|t_varchar(255)	|''	|NOT NULL	|0
 INDEX	|1			|override_operationid
+
+TABLE|override_opstatus|override_operationid|ZBX_TEMPLATE
+FIELD	|override_operationid	|t_id		|	|NOT NULL	|0	|1|override_operation
+FIELD	|status		|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|override_opperiod|override_operationid|ZBX_TEMPLATE
 FIELD	|override_operationid	|t_id		|	|NOT NULL	|0	|1|override_operation
@@ -1793,9 +1795,7 @@ TABLE|override_opgroup_prototype|override_opgroup_prototypeid|ZBX_TEMPLATE
 FIELD	|override_opgroup_prototypeid	|t_id		|	|NOT NULL	|0
 FIELD	|override_operationid		|t_id		|	|NOT NULL	|0	|1|override_operation
 FIELD	|name				|t_varchar(255)	|''	|NOT NULL	|0
-FIELD	|groupid			|t_id		|	|NULL		|0	|2|hstgrp|	|RESTRICT
 INDEX	|1				|override_operationid
-INDEX	|2				|groupid
 
 TABLE|override_optemplate|override_optemplateid|ZBX_TEMPLATE
 FIELD	|override_optemplateid	|t_id		|	|NOT NULL	|0
