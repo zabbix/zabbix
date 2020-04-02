@@ -101,9 +101,6 @@ $filter
 					'object_name' => 'templates',
 					'data' => $data['filter']['templates'],
 					'popup' => [
-						'filter_preselect_fields' => [
-							'hostgroups' => 'filter_groups_'
-						],
 						'parameters' => [
 							'srctbl' => 'templates',
 							'srcfld1' => 'hostid',
