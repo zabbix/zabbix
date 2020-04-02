@@ -1,4 +1,4 @@
-# Microsoft Teams webhook
+# Jira webhook
 
 This guide describes how to integrate Zabbix 5.0 installation with Jira using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 Please note that recovery and update operations and Jira's custom fields are supported only for trigger-based events.
