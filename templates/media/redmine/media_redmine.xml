@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-28T00:00:00Z</date>
+    <date>2020-04-02T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Redmine</name>
@@ -24,8 +24,8 @@
                     <value>{EVENT.NAME}</value>
                 </parameter>
                 <parameter>
-                    <name>event_recovery_value</name>
-                    <value>{EVENT.RECOVERY.VALUE}</value>
+                    <name>event_nseverity</name>
+                    <value>{EVENT.NSEVERITY}</value>
                 </parameter>
                 <parameter>
                     <name>event_source</name>
@@ -53,7 +53,7 @@
                 </parameter>
                 <parameter>
                     <name>redmine_project</name>
-                    <value>&lt;PUT YOUR PROJECT NAME OR ID&gt;</value>
+                    <value>&lt;PUT YOUR PROJECT ID OR NAME&gt;</value>
                 </parameter>
                 <parameter>
                     <name>redmine_tracker_id</name>
@@ -166,7 +166,7 @@
         }&#13;
 &#13;
         Zabbix.Log(4, '[ Redmine Webhook ] Sending request: ' +&#13;
-            url + ((typeof data === 'string') ? ('\n' + data) : ''));&#13;
+            url + ((typeof data === 'string') ? (' ' + data) : ''));&#13;
 &#13;
         switch (method) {&#13;
             case 'get':&#13;
@@ -185,7 +185,7 @@
                 throw 'Unsupported HTTP request method: ' + method;&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[ Redmine Webhook ] Received response with status code ' + request.Status() + '\n' + response);&#13;
+        Zabbix.Log(4, '[ Redmine Webhook ] Received response with status code ' + request.Status() + ': ' + response);&#13;
 &#13;
         if (response !== null) {&#13;
             try {&#13;
@@ -249,7 +249,7 @@
         return result.response;&#13;
     },&#13;
 &#13;
-    createIssue: function(subject, description, fields) {&#13;
+    createIssue: function(subject, description, priority, fields) {&#13;
         var project_id = /^\d+$/.test(Redmine.params.project)&#13;
                 ? Redmine.params.project&#13;
                 : Redmine.getProjectID(Redmine.params.project),&#13;
@@ -261,7 +261,13 @@
                     description: description&#13;
                 }&#13;
             },&#13;
-            result = Redmine.request('post', 'issues.json', Redmine.addCustomFields(data, fields));&#13;
+            result;&#13;
+&#13;
+        if (priority) {&#13;
+            data.issue.priority_id = priority;&#13;
+        }&#13;
+&#13;
+        result = Redmine.request('post', 'issues.json', Redmine.addCustomFields(data, fields));&#13;
 &#13;
         if (typeof result.response !== 'object'&#13;
             || typeof result.response.issue.id === 'undefined'&#13;
@@ -291,8 +297,20 @@ try {&#13;
         result = {tags: {}},&#13;
         required_params = [&#13;
             'alert_subject', 'tracker_id', 'project',&#13;
-            'event_recovery_value', 'event_source', 'event_value',  'event_name',&#13;
-        ];&#13;
+            'event_source', 'event_value',  'event_name',&#13;
+            'event_update_status'&#13;
+        ],&#13;
+        severities = [&#13;
+            {name: 'not_classified', color: '#97AAB3'},&#13;
+            {name: 'information', color: '#7499FF'},&#13;
+            {name: 'warning', color: '#FFC859'},&#13;
+            {name: 'average', color: '#FFA059'},&#13;
+            {name: 'high', color: '#E97659'},&#13;
+            {name: 'disaster', color: '#E45959'},&#13;
+            {name: 'resolved', color: '#009900'},&#13;
+            {name: null, color: '#000000'}&#13;
+        ],&#13;
+        priority;&#13;
 &#13;
     Object.keys(params)&#13;
         .forEach(function (key) {&#13;
@@ -305,8 +323,8 @@ try {&#13;
             else if (key.startsWith('event_update_')) {&#13;
                 params_update[key.substring(13)] = params[key];&#13;
             }&#13;
-            else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
-                throw 'Parameter &quot;' + key + '&quot; can\'t be empty.';&#13;
+            else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key].trim() === '') {&#13;
+                throw 'Parameter &quot;' + key + '&quot; cannot be empty.';&#13;
             }&#13;
         });&#13;
 &#13;
@@ -321,20 +339,38 @@ try {&#13;
     }&#13;
 &#13;
     // Check {EVENT.UPDATE.STATUS} only for trigger-based events.&#13;
-    if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
+    if (params.event_source === '0' &amp;&amp; params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1') {&#13;
         throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
     }&#13;
 &#13;
-    if (params.event_source !== '0' &amp;&amp; params.event_recovery_value === '0') {&#13;
+    if (params.event_source !== '0' &amp;&amp; params.event_value === '0') {&#13;
         throw 'Recovery operations are supported only for trigger-based actions.';&#13;
     }&#13;
+&#13;
+    if (params.event_source === '0' &amp;&amp; ((params.event_value === '1' &amp;&amp; params.event_update_status === '1')&#13;
+        || (params.event_value === '0' &amp;&amp; params.event_update_status === '0'))&#13;
+        &amp;&amp; (isNaN(parseInt(params.redmine_issue_key)) || parseInt(params.redmine_issue_key) &lt; 1 )) {&#13;
+        throw 'Incorrect &quot;redmine_issue_key&quot; parameter given: ' + params.redmine_issue_key +&#13;
+            '\nMust be positive integer.';&#13;
+    }&#13;
+&#13;
+    if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {&#13;
+        params.event_nseverity = '7';&#13;
+    }&#13;
+&#13;
+    if (params.event_value === '0') {&#13;
+        params.event_nseverity = '6';&#13;
+    }&#13;
+&#13;
+    priority = params['severity_' + severities[params.event_nseverity].name];&#13;
+    priority = priority &amp;&amp; priority.trim() || severities[7].name;&#13;
 &#13;
     Redmine.setParams(params_redmine);&#13;
 &#13;
     // Create issue for non trigger-based events.&#13;
     if (params.event_source !== '0'&#13;
-        &amp;&amp; params.event_recovery_value !== '0') {&#13;
-        Redmine.createIssue(params.alert_subject, params.alert_message);&#13;
+        &amp;&amp; params.event_value !== '0') {&#13;
+        Redmine.createIssue(params.alert_subject, params.alert_message, priority);&#13;
     }&#13;
     // Create issue for trigger-based events.&#13;
     else if (params.event_value === '1' &amp;&amp; params_update.status === '0') {&#13;
@@ -342,6 +378,7 @@ try {&#13;
             params.alert_subject + '\n' + params.alert_message + '\n' +&#13;
             params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') +&#13;
             'tr_events.php?triggerid=' + params.trigger_id + '&amp;eventid=' + params.event_id + '\n',&#13;
+            priority,&#13;
             params_fields);&#13;
 &#13;
         result.tags.__zbx_redmine_issue_id = issue_id;&#13;

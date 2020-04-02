@@ -40,9 +40,15 @@ This guide describes how to integrate your Zabbix 5.0 installation with Redmine 
 
 4\. If you have **custom fields** in **Redmine** and you want them to be filled in with values from Zabbix, add parameters in the form **customfield_\<Redmine custom field ID\>**. Custom fields can only be of the **text**, **integer**, **float** or **date** types. Custom fields of **date** type must be in the format "YYYY-MM-DD".
 
-5\. Click the **Update** button to save the **Webhook** settings.
+5\. If you want to prioritize issues according to **severity** values in Zabbix, you can define mapping parameters:
 
-6\. To receive notifications in **Redmine**, you need to create a **Zabbix user** and add **Media** with the **Redmine** type.
+- **severity_\<name\>**: Redmine priority ID
+
+[![](images/thumb.07.png?raw=true)](images/07.png)
+
+6\. Click the **Update** button to save the **Webhook** settings.
+
+7\. To receive notifications in **Redmine**, you need to create a **Zabbix user** and add **Media** with the **Redmine** type.
 
 For **Send to**: enter any text, as this value is not used, but is required.
 
