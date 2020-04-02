@@ -93,12 +93,10 @@ class CSetupWizard extends CForm {
 	}
 
 	protected function bodyToString($destroy = true) {
-		$setup_left = (new CDiv([
-			(new CDiv())
-				->addClass(ZBX_STYLE_SIGNIN_LOGO)
-				->addStyle(CBrandHelper::getLogoStyle()),
-			$this->getList()
-		]))->addClass(ZBX_STYLE_SETUP_LEFT);
+		$setup_left = (new CDiv())
+			->addClass(ZBX_STYLE_SETUP_LEFT)
+			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
+			->addItem($this->getList());
 
 		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
 
@@ -521,21 +519,19 @@ class CSetupWizard extends CForm {
 		$result = true;
 
 		if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-			$db_schema = DBselect('SELECT schema_name FROM information_schema.schemata WHERE schema_name = \''.
-				pg_escape_string($DB['SCHEMA']).'\';'
+			$db_schema = DBselect(
+				"SELECT schema_name".
+				" FROM information_schema.schemata".
+				" WHERE schema_name='".pg_escape_string($DB['SCHEMA'])."'"
 			);
 			$result = DBfetch($db_schema);
-		}
-
-		if ($result) {
-			$result = DBexecute('CREATE TABLE zabbix_installation_test (test_row INTEGER)');
-			$result &= DBexecute('DROP TABLE zabbix_installation_test');
 		}
 
 		$db = DB::getDbBackend();
 
 		if (!$db->checkEncoding()) {
 			error($db->getWarning());
+
 			return false;
 		}
 

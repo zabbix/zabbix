@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,214 +19,171 @@
 **/
 
 
-class CMenu {
-
-	protected $label;
-	protected $action;
-
-	protected $items;
-	protected $alias;
-
-	protected $selected = false;
-
-	private $uniqueid;
+class CMenu extends CTag {
 
 	/**
-	 * Create menu class instance.
-	 *
-	 * @param string $label             Visible label.
-	 * @param string $item['action']    MVC action name or php file name for non-mvc actions.
-	 * @param array  $item['alias']     Array of aliases for permission checks.
-	 * @param string $item['uniqueid']  String qith unique identifier.
-	 * @param array  $item['items']     Array of child menu entries.
+	 * @var CMenuItem[]
 	 */
-	public function __construct(string $label, array $item) {
-		$this->label = $label;
-		$this->action = array_key_exists('action', $item) ? $item['action'] : '';
-		$this->alias = array_key_exists('alias', $item) ? $item['alias'] : [];
-		$this->items = [];
-		$this->uniqueid = array_key_exists('uniqueid', $item)
-			? $item['uniqueid']
-			: 'uid'.base_convert(mt_rand(), 10, 32);
+	private $menu_items = [];
 
-		if (array_key_exists('items', $item)) {
-			foreach ($item['items'] as $child_label => $child_item) {
-				$this->add($child_label, $child_item);
-			}
+	/**
+	 * Create menu.
+	 *
+	 * @param CMenuItem[] $menu_items  Array of menu items.
+	 */
+	public function __construct(array $menu_items = []) {
+		parent::__construct('ul', true);
+
+		foreach ($menu_items as $item) {
+			$this->add($item);
 		}
 	}
 
 	/**
-	 * Getter for alias property.
+	 * Add menu item.
 	 *
-	 * @return array
-	 */
-	public function getAlias(): array {
-		return $this->alias;
-	}
-
-	/**
-	 * Getter for action property.
-	 *
-	 * @return string
-	 */
-	public function getAction(): string {
-		return $this->action;
-	}
-
-	/**
-	 * Getter for items property.
-	 *
-	 * @return array
-	 */
-	public function getItems(): array {
-		return $this->items;
-	}
-
-	/**
-	 * Getter for visual label property.
-	 *
-	 * @return string
-	 */
-	public function getLabel(): string {
-		return $this->label;
-	}
-
-	/**
-	 * Getter for uniqueid property.
-	 *
-	 * @return string
-	 */
-	public function getUniqueId(): string {
-		return $this->uniqueid;
-	}
-
-	/**
-	 * Check is menu element or it nested items marked as selected.
-	 *
-	 * @return bool
-	 */
-	public function isSelected(): bool {
-		return array_reduce($this->items, function(bool $carry, CMenu $child) {
-			return $carry || $child->isSelected();
-		}, $this->selected);
-	}
-
-	/**
-	 * Set selected property on current menu entry or it nested items according passed $action.
-	 *
-	 * @param string $action  Action name to be selected.
+	 * @param CMenuItem $menu_item  Menu item object.
 	 *
 	 * @return CMenu
 	 */
-	public function setSelected(string $action): CMenu {
-		if ($this->action === $action || in_array($action, $this->alias)) {
-			$this->selected = true;
-		}
-		else {
-			foreach ($this->items as $item) {
-				$item->setSelected($action);
-			}
-		}
+	public function add(CMenuItem $menu_item): self {
+		$this->menu_items[] = $menu_item;
 
 		return $this;
 	}
 
 	/**
-	 * Add nested menu items.
+	 * Find menu item by label.
 	 *
 	 * @param string $label  Visual label.
-	 * @param array  $item   Item data.
 	 *
-	 * @return CMenu
+	 * @return CMenuItem|null
 	 */
-	public function add(string $label, array $item): CMenu {
-		$this->items[$label] = new CMenu($label, $item);
+	public function find(string $label): ?CMenuItem {
+		foreach ($this->menu_items as $item) {
+			if ($item->getLabel() === $label) {
+				return $item;
+			}
+		}
 
-		return $this;
+		return null;
 	}
 
 	/**
-	 * Remove nested item by visual label.
+	 * Find menu item by label or add new one, if not exists.
+	 *
+	 * @param string $label  Visual label.
+	 *
+	 * @return CMenuItem
+	 */
+	public function findOrAdd(string $label): CMenuItem {
+		$item = $this->find($label);
+
+		if ($item === null) {
+			$item = new CMenuItem($label);
+			$this->add($item);
+		}
+
+		return $item;
+	}
+
+	/**
+	 * Find selected menu item.
+	 *
+	 * @return CMenuItem|null
+	 */
+	public function findSelected(): ?CMenuItem {
+		foreach ($this->menu_items as $item) {
+			if ($item->isSelected()) {
+				return $item;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Insert new menu item after the one with specified label, or insert as the last item, if not found.
+	 *
+	 * @param string $label         Visual label to insert item after.
+	 * @param CMenuItem $menu_item  Menu item object.
+	 *
+	 * @return CMenu
+	 */
+	public function insertAfter(string $label, CMenuItem $menu_item): self {
+		return $this->insert($label, $menu_item, true);
+	}
+
+	/**
+	 * Insert new menu item before the one with specified label, or insert as the first item, if not found.
+	 *
+	 * @param string $label         Visual label to insert item before.
+	 * @param CMenuItem $menu_item  Menu item object.
+	 *
+	 * @return CMenu
+	 */
+	public function insertBefore(string $label, CMenuItem $menu_item): self {
+		return $this->insert($label, $menu_item);
+	}
+
+	/**
+	 * Remove menu item by label.
 	 *
 	 * @param string $label  Visual label.
 	 *
 	 * @return CMenu
 	 */
-	public function remove(string $label): CMenu {
-		unset($this->items[$label]);
-
-		return $this;
-	}
-
-	/**
-	 * Find nested item by visual label.
-	 *
-	 * @param string $label    Visaul label.
-	 *
-	 * @return CMenu|null
-	 */
-	public function find(string $label): ?CMenu {
-		return $this->has($label) ? $this->items[$label] : null;
-	}
-
-	/**
-	 * Check element contains nested item with visual label.
-	 *
-	 * @param string $label  Visaul label.
-	 *
-	 * @return bool
-	 */
-	public function has(string $label): bool {
-		return array_key_exists($label, $this->items);
-	}
-
-	/**
-	 * Add new nested element before nested element with $before_label visual label.
-	 *
-	 * @param string $before_label  Visual label to insert item before.
-	 * @param string $label         New item visual label.
-	 * @param array  $item          New item data.
-	 *
-	 * @return CMenu
-	 */
-	public function insertBefore(string $before_label, string $label, array $item): CMenu {
-		$this->insert($before_label, $label, $item, false);
-
-		return $this;
-	}
-
-	/**
-	 * Add new nested element after nested element with $after_label visual label.
-	 *
-	 * @param string $after_label  Visual label to insert item before.
-	 * @param string $label        New item visual label.
-	 * @param array  $item         New item data.
-	 *
-	 * @return CMenu
-	 */
-	public function insertAfter(string $after_label, string $label, array $item): CMenu {
-		$this->insert($after_label, $label, $item);
-
-		return $this;
-	}
-
-	/**
-	 * Generic method to insert new item before or after specific item.
-	 *
-	 * @param string $target_label  Visual label to insert item before or after.
-	 * @param string $label         New item visual label.
-	 * @param array  $item          New item data.
-	 * @param bool   $after         Insert new item before or after $target_label
-	 */
-	private function insert(string $target_label, string $label, array $item, bool $after = true): void {
-		if ($this->has($target_label)) {
-			$index = array_search($target_label, array_keys($this->items));
-			$before = ($index > 0 || ($after && $index == 0))
-				? array_slice($this->items, 0, $index + ($after ? 1 : 0))
-				: [];
-			$after = $index < count($this->items) ? array_slice($this->items, $index + ($after ? 1 : 0)) : [];
-			$this->items = $before + [$label => new CMenu($label, $item)] + $after;
+	public function remove(string $label): self {
+		foreach ($this->menu_items as $index => $item) {
+			if ($item->getLabel() === $label) {
+				array_splice($this->menu_items, $index, 1);
+				break;
+			}
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Deep find menu item by action name and mark the whole chain as selected.
+	 *
+	 * @param string $action_name  Action name to search for.
+	 * @param bool $expand         Add 'is-expanded' class for selected submenus.
+	 *
+	 * @return bool  True, if menu item was selected.
+	 */
+	public function setSelectedByAction(string $action_name, bool $expand = true): bool {
+		foreach ($this->menu_items as $item) {
+			if ($item->setSelectedByAction($action_name, $expand)) {
+				if ($expand && $item->hasSubMenu()) {
+					$item->addClass('is-expanded');
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public function toString($destroy = true)
+	{
+		$this->addItem($this->menu_items);
+
+		return parent::toString($destroy);
+	}
+
+	private function insert(string $label, CMenuItem $menu_item, $after = false): self {
+		$count = count($this->menu_items);
+
+		for ($i = 0; $i < $count; $i++) {
+			if ($this->menu_items[$i]->getLabel() === $label) {
+				break;
+			}
+		}
+
+		$position = ($count == $i && !$after) ? 0 : $i + (($i < $count && $after) ? 1 : 0);
+		array_splice($this->menu_items, $position, 0, [$menu_item]);
+
+		return $this;
 	}
 }

@@ -276,11 +276,9 @@ else {
 		$table->addRow($row);
 	}
 
-	$widget->addItem($table)->show();
+	$widget->addItem($table);
 
 	if ($media_type == 0) {
-		echo BR();
-
 		$links = [];
 		foreach ($media_types as $id => $name) {
 			$links[] = (CWebUser::getType() < USER_TYPE_SUPER_ADMIN)
@@ -291,8 +289,13 @@ else {
 		array_pop($links);
 
 		$linksDiv = new CDiv([SPACE._('all').SPACE.'('.SPACE, $links, SPACE.')']);
-		$linksDiv->show();
+
+		$widget
+			->addItem(new CTag('br'))
+			->addItem($linksDiv);
 	}
+
+	$widget->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

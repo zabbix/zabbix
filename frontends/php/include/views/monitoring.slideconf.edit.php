@@ -284,7 +284,7 @@ if (isset($data['slideshow']['slideshowid'])) {
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
+		(new CSubmit('add', _('Add')))->removeId(),
 		[new CButtonCancel()]
 	));
 }

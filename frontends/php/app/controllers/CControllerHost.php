@@ -150,7 +150,7 @@ abstract class CControllerHost extends CController {
 			'selectHosts' => ['hostid'],
 			'hostids' => array_keys($hosts),
 			'skipDependent' => true,
-			'status' => TRIGGER_STATUS_ENABLED,
+			'monitored' => true,
 			'preservekeys' => true
 		]);
 

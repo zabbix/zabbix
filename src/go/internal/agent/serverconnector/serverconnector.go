@@ -150,11 +150,11 @@ func (c *Connector) refreshActiveChecks() {
 			return
 		}
 
-		var n int
-
-		if a.HostMetadata, n = agent.CutAfterN(a.HostMetadata, hostMetadataLen); n != hostMetadataLen {
+		if len(a.HostMetadata) > hostMetadataLen {
 			log.Warningf("the returned value of \"%s\" item specified by \"HostMetadataItem\" configuration parameter"+
-				" is too long, using first %d characters", c.options.HostMetadataItem, n)
+				" is too long, using first %d characters", c.options.HostMetadataItem, hostMetadataLen)
+
+			a.HostMetadata = agent.CutAfterN(a.HostMetadata, hostMetadataLen)
 		}
 	}
 

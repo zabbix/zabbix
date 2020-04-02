@@ -123,7 +123,11 @@ $link = (new CLink('GPL v2', 'https://www.zabbix.com/license'))
 	->addClass(ZBX_STYLE_LINK_ALT);
 $sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_LINKS);
 
-(new CTag('body', true, [(new CTag('main', true, [$ZBX_SETUP_WIZARD, $sub_footer])), makePageFooter()]))
+(new CTag('body', true,
+	(new CDiv([
+		(new CTag('main', true, [$ZBX_SETUP_WIZARD, $sub_footer])), makePageFooter()])
+	)->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
+))
 	->setAttribute('lang', CWebUser::getLang())
 	->show();
 ?>

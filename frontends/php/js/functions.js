@@ -263,11 +263,11 @@ function objectSize(obj) {
 function addMessage(html) {
 	var $message_div = jQuery('<div>').attr('id', 'messages');
 	$message_div.append(html);
-	jQuery('main').prepend($message_div);
+	jQuery('.wrapper main').before($message_div);
 }
 
 function removeMessages() {
-	jQuery('#messages', 'main').remove();
+	jQuery('#messages', '.wrapper').remove();
 }
 
 /**
@@ -480,11 +480,6 @@ function overlayDialogueDestroy(dialogueid) {
 
 		removeFromOverlaysStack(dialogueid);
 		jQuery.publish('overlay.close', {dialogueid: dialogueid});
-
-		if (!jQuery('[data-dialogueid]').length) {
-			jQuery('body').css('overflow', jQuery('body').data('overflow'));
-			jQuery('body').removeData('overflow');
-		}
 	}
 }
 

@@ -134,6 +134,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
+		->removeId()
 		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
 		->onClick('return PopUp("popup.mediatypetest.edit",'.json_encode([
 			'mediatypeid' => $mediaType['mediatypeid']

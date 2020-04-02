@@ -171,7 +171,7 @@ else {
 							$period_combo
 						])
 					),
-				(new CTag('nav', true, get_icon('fullscreen', ['mode' => $page['web_layout_mode']])))
+				(new CTag('nav', true, get_icon('kioskmode', ['mode' => $page['web_layout_mode']])))
 					->setAttribute('aria-label', _('Content controls'))
 			]))
 			->addItem($tree->getHTML())

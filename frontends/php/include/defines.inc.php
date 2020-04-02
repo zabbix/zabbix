@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.0beta1');
+define('ZABBIX_VERSION',		'5.0.0alpha5');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050063);
+define('ZABBIX_DB_VERSION',		4050073);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -355,6 +355,11 @@ define('MODULE_STATUS_ENABLED',	1);
 define('HOST_AVAILABLE_UNKNOWN',	0);
 define('HOST_AVAILABLE_TRUE',		1);
 define('HOST_AVAILABLE_FALSE',		2);
+
+// Logo.
+define('LOGO_TYPE_NORMAL',			0);
+define('LOGO_TYPE_SIDEBAR',			1);
+define('LOGO_TYPE_SIDEBAR_COMPACT',	2);
 
 define('MAINTENANCE_TAG_EVAL_TYPE_AND_OR',	0);
 define('MAINTENANCE_TAG_EVAL_TYPE_OR',		2);
@@ -1338,9 +1343,13 @@ define('ZBX_MACRO_SECRET_MASK', '******'); // Placeholder for masked macro value
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
-define('ZBX_LAYOUT_FULLSCREEN', 1);
-define('ZBX_LAYOUT_KIOSKMODE',  2);
+define('ZBX_LAYOUT_KIOSKMODE',  1);
 define('ZBX_LAYOUT_MODE', 'layout-mode');
+
+// Sidebar
+define('ZBX_SIDEBAR_VIEW_MODE_FULL',	0);
+define('ZBX_SIDEBAR_VIEW_MODE_COMPACT',	1);
+define('ZBX_SIDEBAR_VIEW_MODE_HIDDEN',	2);
 
 // input fields
 define('ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH',		218);
@@ -1539,10 +1548,8 @@ define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
 define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
-define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
-define('ZBX_STYLE_BTN_SEARCH', 'btn-search');
 define('ZBX_STYLE_BTN_TIME', 'btn-time');
 define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
 define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
@@ -1628,8 +1635,8 @@ define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
-define('ZBX_STYLE_HEADER_LOGO', 'header-logo');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
+define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
@@ -1660,6 +1667,7 @@ define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
+define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
 define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
@@ -1719,6 +1727,7 @@ define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
 define('ZBX_STYLE_SCREEN_TABLE', 'screen-table');
 define('ZBX_STYLE_SEARCH', 'search');
+define('ZBX_STYLE_FORM_SEARCH', 'form-search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');
 define('ZBX_STYLE_SELECTED', 'selected');
 define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
@@ -1774,17 +1783,6 @@ define('ZBX_STYLE_TIMELINE_DOT_BIG', 'timeline-dot-big');
 define('ZBX_STYLE_TIMELINE_TD', 'timeline-td');
 define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
 define('ZBX_STYLE_TOP', 'top');
-define('ZBX_STYLE_TOP_NAV', 'top-nav');
-define('ZBX_STYLE_TOP_NAV_CONTAINER', 'top-nav-container');
-define('ZBX_STYLE_TOP_NAV_HELP', 'top-nav-help');
-define('ZBX_STYLE_TOP_NAV_ICONS', 'top-nav-icons');
-define('ZBX_STYLE_TOP_NAV_PROFILE', 'top-nav-profile');
-define('ZBX_STYLE_TOP_NAV_GUEST', 'top-nav-guest');
-define('ZBX_STYLE_TOP_NAV_SIGNOUT', 'top-nav-signout');
-define('ZBX_STYLE_TOP_NAV_SUPPORT', 'top-nav-support');
-define('ZBX_STYLE_TOP_NAV_ZBBSHARE', 'top-nav-zbbshare');
-define('ZBX_STYLE_TOP_SUBNAV', 'top-subnav');
-define('ZBX_STYLE_TOP_SUBNAV_CONTAINER', 'top-subnav-container');
 define('ZBX_STYLE_TOTALS_LIST', 'totals-list');
 define('ZBX_STYLE_TOTALS_LIST_HORIZONTAL', 'totals-list-horizontal');
 define('ZBX_STYLE_TOTALS_LIST_VERTICAL', 'totals-list-vertical');
@@ -1799,6 +1797,9 @@ define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
 define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
+define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
+define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');
+define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT', 'zabbix-sidebar-logo-compact');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
