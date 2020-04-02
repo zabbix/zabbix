@@ -144,7 +144,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 								'dstfld1' => 'application',
 								'real_hosts' => '1',
 								'with_applications' => '1'
-							]).', getFirstMultiselectValue("filter_hostids_")), null, this);'
+							]).', getFirstMultiselectValue("filter_hostids_", "filter_groupids_")), null, this);'
 						)
 				])
 				->addRow(_('Show suppressed problems'),
