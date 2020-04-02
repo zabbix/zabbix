@@ -51,7 +51,7 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 [![](images/tn_7.png?raw=true)](images/7.png)
 
-3\. Select Import file [media_zendesk.xml](media_zendesk.xml) and click **Import** button at the bottom to import the Zendesk media type.
+3\. Select Import file [zendesk_media.xml](zendesk_media.xml) and click **Import** button at the bottom to import the Zendesk media type.
 
 4\. Change the value of zendesk_url and zendesk_token variables. Zendesk_type parameter determines the ticket type in Zendesk. One of the following types can be used: question, incident (default), problems, task.  
 In addition, you can override the severity mapping between the Zabbix problem and the Zendesk ticket.  
