@@ -61,13 +61,18 @@ typedef struct
 {
 	zbx_uint64_t		override_operationid;
 	unsigned char		operationtype;
-	unsigned char		evaltype;
-	zbx_vector_ptr_t	opconditions;
+	unsigned char		operator;
+	char			*value;
+	unsigned char		status;
 	char			*delay;
 	char			*history;
 	char			*trends;
 	unsigned char		severity;
+	unsigned char		inventory_mode;
 	zbx_vector_ptr_pair_t	trigger_tags;
+	zbx_hashset_t		group_prototypes;
+	zbx_hashset_t		templateids;
+
 }
 lld_override_operation_t;
 
@@ -579,7 +584,15 @@ typedef enum
 	OPERATION_OBJECT_GRAPH_PROTOTYPE,
 	OPERATION_OBJECT_HOST_PROTOTYPE
 }
-zbx_operation_object_type_t;
+zbx_operation_object_t;
+
+typedef enum
+{
+	ZBX_PROTOTYPE_STATUS_CREATE_ENABLED,
+	ZBX_PROTOTYPE_STATUS_CREATE_DISABLED,
+	ZBX_PROTOTYPE_STATUS_NO_CREATE,
+	ZBX_PROTOTYPE_STATUS_COUNT
+}zbx_prototype_status_t;
 
 static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
@@ -587,36 +600,42 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	size_t				sql_offset = 0;
 	DB_RESULT			result;
 	DB_ROW				row;
-	lld_override_t			*override;
+	lld_override_t			*override = NULL;
 	lld_override_operation_t	*override_operation = NULL;
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
-			"select op.overrideid,op.override_operationid,op.operationtype,op.evaltype,"
+			"select o.overrideid,o.override_operationid,o.operationobject"
+				"c.operator,c.value,"
+				"s.status"
 				"p.delay,"
 				"h.history,"
-				"tr.trends,"
-				"s.severity,"
-				"ta.tag,ta.value,"
-				"g.name,g.groupid,"
-				"te.templateid,"
+				"t.trends,"
+				"os.severity,"
+				"ot.tag,ot.value,"
+				"g.name,"
+				"ote.templateid,"
 				"i.inventory_mode"
 			" from override_operation op"
+			" left join override_opcondition c"
+				" on o.override_operationid=c.override_operationid"
+			" left join override_opstatus s"
+				" on o.override_operationid=s.override_operationid"
 			" left join override_opperiod p"
-				" on op.override_operationid=p.override_operationid"
+				" on o.override_operationid=p.override_operationid"
 			" left join override_ophistory h"
-				" on op.override_operationid=h.override_operationid"
-			" left join override_optrends tr"
-				" on op.override_operationid=tr.override_operationid"
-			" left join override_opseverity s"
-				" on op.override_operationid=s.override_operationid"
-			" left join override_optag ta"
-				" on op.override_operationid=ta.override_operationid"
+				" on o.override_operationid=h.override_operationid"
+			" left join override_optrends t"
+				" on o.override_operationid=t.override_operationid"
+			" left join override_opseverity os"
+				" on o.override_operationid=os.override_operationid"
+			" left join override_optag ot"
+				" on o.override_operationid=ot.override_operationid"
 			" left join override_opgroup_prototype g"
-				" on op.override_operationid=g.override_operationid"
-			" left join override_optemplate te"
-				" on op.override_operationid=te.override_operationid"
+				" on o.override_operationid=g.override_operationid"
+			" left join override_optemplate ote"
+				" on o.override_operationid=ote.override_operationid"
 			" left join override_opinventory i"
-				" on op.override_operationid=i.override_operationid"
+				" on o.override_operationid=i.override_operationid"
 			" where");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "op.overrideid", overrideids->values, overrideids->values_num);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by op.override_operationid");
@@ -625,16 +644,20 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	overrideid, override_operationid;
-		int		index;
 
 		ZBX_STR2UINT64(overrideid, row[0]);
-		if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &overrideid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (NULL == override || override->overrideid != overrideid)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
+			int	index;
+
+			if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &overrideid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+			override = (lld_override_t *)overrides->values[index];
 		}
-		override = (lld_override_t *)overrides->values[index];
 
 		ZBX_STR2UINT64(override_operationid, row[1]);
 		if (NULL == override_operation || override_operation->override_operationid != override_operationid)
@@ -643,36 +666,75 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 					sizeof(lld_override_operation_t));
 
 			zbx_vector_ptr_pair_create(&override_operation->trigger_tags);
+			zbx_hashset_create(&override_operation->group_prototypes, 5, ZBX_DEFAULT_STRING_HASH_FUNC,
+					ZBX_DEFAULT_STR_COMPARE_FUNC);
+			zbx_hashset_create(&override_operation->templateids, 5, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			override_operation->override_operationid = override_operationid;
 			override_operation->operationtype = (unsigned char)atoi(row[2]);
-			override_operation->evaltype = (unsigned char)atoi(row[3]);
+
+			if (FAIL == DBis_null(row[3]))
+			{
+				override_operation->operator = (unsigned char)atoi(row[3]);
+				override_operation->value = zbx_strdup(NULL, row[4]);
+			}
+			else
+				override_operation->value = NULL;
+
+			override_operation->status = FAIL == DBis_null(row[5]) ? (unsigned char)atoi(row[5]) :
+					ZBX_PROTOTYPE_STATUS_COUNT;
+
 			zbx_vector_ptr_append(&override->override_operations, override_operation);
 		}
 
 		switch (override_operation->operationtype)
 		{
 			case OPERATION_OBJECT_ITEM_PROTOTYPE:
-				override_operation->delay = FAIL == DBis_null(row[4]) ? zbx_strdup(NULL, row[4]) :
+				override_operation->delay = FAIL == DBis_null(row[6]) ? zbx_strdup(NULL, row[6]) :
 						NULL;
-				override_operation->history = FAIL == DBis_null(row[5]) ? zbx_strdup(NULL, row[5]) :
+				override_operation->history = FAIL == DBis_null(row[7]) ? zbx_strdup(NULL, row[7]) :
 						NULL;
-				override_operation->trends = FAIL == DBis_null(row[6]) ? zbx_strdup(NULL, row[6]) :
+				override_operation->trends = FAIL == DBis_null(row[8]) ? zbx_strdup(NULL, row[8]) :
 						NULL;
 				break;
 			case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-				override_operation->severity = FAIL == DBis_null(row[7]) ? (unsigned char)atoi(row[7]) :
+				override_operation->severity = FAIL == DBis_null(row[9]) ? (unsigned char)atoi(row[9]) :
 						TRIGGER_SEVERITY_COUNT;
 
-				if (FAIL == DBis_null(row[8]))
+				if (FAIL == DBis_null(row[10]))
 				{
 					zbx_ptr_pair_t	pair;
 
-					pair.first = zbx_strdup(NULL, row[8]);
-					pair.second = zbx_strdup(NULL, row[9]);
+					pair.first = zbx_strdup(NULL, row[10]);
+					pair.second = zbx_strdup(NULL, row[11]);
 
 					zbx_vector_ptr_pair_append(&override_operation->trigger_tags, pair);
 				}
+				break;
+			case OPERATION_OBJECT_HOST_PROTOTYPE:
+				if (FAIL == DBis_null(row[12]) &&
+						NULL == zbx_hashset_search(&override_operation->group_prototypes,
+								row[12]))
+				{
+					zbx_hashset_insert(&override_operation->group_prototypes, row[12],
+							strlen(row[12]));
+				}
+
+				if (FAIL == DBis_null(row[13]))
+				{
+					zbx_uint64_t	templateid;
+
+					ZBX_STR2UINT64(templateid, row[13]);
+					if (NULL == zbx_hashset_search(&override_operation->templateids, &templateid))
+					{
+						zbx_hashset_insert(&override_operation->templateids, &templateid,
+								sizeof(templateid));
+					}
+				}
+
+				override_operation->inventory_mode = FAIL == DBis_null(row[14]) ?
+						(unsigned char)atoi(row[14]) : HOST_INVENTORY_COUNT;
 
 				break;
 			default:

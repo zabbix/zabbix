@@ -609,6 +609,7 @@ zbx_maintenance_type_t;
 						/* only in server code, never in DB */
 #define HOST_INVENTORY_MANUAL		0
 #define HOST_INVENTORY_AUTOMATIC	1
+#define HOST_INVENTORY_COUNT		2
 
 #define HOST_INVENTORY_FIELD_COUNT	70
 
