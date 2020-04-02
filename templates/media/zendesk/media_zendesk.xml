@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-30T11:20:56Z</date>
+    <date>2020-04-02T11:20:56Z</date>
     <media_types>
         <media_type>
             <name>Zendesk</name>
@@ -18,10 +18,6 @@
                 <parameter>
                     <name>event_id</name>
                     <value>{EVENT.ID}</value>
-                </parameter>
-                <parameter>
-                    <name>event_name</name>
-                    <value>{EVENT.NAME}</value>
                 </parameter>
                 <parameter>
                     <name>event_nseverity</name>
@@ -263,7 +259,6 @@ try {&#13;
             'alert_subject',&#13;
             'alert_message',&#13;
             'event_id',&#13;
-            'event_name',&#13;
             'event_source',&#13;
             'event_value',&#13;
             'event_update_status'&#13;
@@ -372,11 +367,10 @@ try {&#13;
                 external_id: params.event_id,&#13;
                 type: Zendesk.params.type,&#13;
                 status: 'new',&#13;
-                subject: params.event_name,&#13;
+                subject: params.alert_subject,&#13;
                 comment: {&#13;
                     body: params.zbxurl + (params.zbxurl.endsWith('/') ? '' : '/') + 'tr_events.php?triggerid=' +&#13;
-                        params.trigger_id + '&amp;eventid=' + params.event_id + '\n' +&#13;
-                        params.alert_subject + '\n' + params.alert_message,&#13;
+                        params.trigger_id + '&amp;eventid=' + params.event_id + '\n' + params.alert_message,&#13;
                     public: 'false'&#13;
                 },&#13;
                 priority: priority,&#13;
@@ -394,9 +388,9 @@ try {&#13;
         data = {&#13;
             ticket: {&#13;
                 type: Zendesk.params.type,&#13;
-                subject: params.event_name,&#13;
+                subject: params.alert_subject,&#13;
                 comment: {&#13;
-                    body: params.alert_subject + '\n' + params.alert_message,&#13;
+                    body: params.alert_message,&#13;
                     public: 'false'&#13;
                 }&#13;
             }&#13;
@@ -419,7 +413,7 @@ catch (error) {&#13;
                 <message_template>
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>PROBLEM</operation_mode>
-                    <subject>Problem: {EVENT.NAME}</subject>
+                    <subject>{EVENT.NAME}</subject>
                     <message>Problem started at {EVENT.TIME} on {EVENT.DATE}&#13;
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
@@ -431,7 +425,7 @@ Original problem ID: {EVENT.ID}&#13;
                 <message_template>
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>RECOVERY</operation_mode>
-                    <subject>Resolved: {EVENT.NAME}</subject>
+                    <subject>{EVENT.NAME}</subject>
                     <message>Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
@@ -443,7 +437,7 @@ Original problem ID: {EVENT.ID}&#13;
                 <message_template>
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>UPDATE</operation_mode>
-                    <subject>Updated problem: {EVENT.NAME}</subject>
+                    <subject>{EVENT.NAME}</subject>
                     <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
 {EVENT.UPDATE.MESSAGE}&#13;
 &#13;

@@ -1,5 +1,6 @@
 
 ![](images/zendesk_logo.png?raw=true) 
+
 # Zendesk Webhook
 # How it Works
 If a trigger fires, Zabbix will send an event to a service in Zendesk. Event from Zabbix will trigger a new incident on the Zendesk service.  
