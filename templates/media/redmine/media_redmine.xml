@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-02T00:00:00Z</date>
+    <date>2020-04-03T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Redmine</name>
@@ -120,7 +120,7 @@
                                     break;&#13;
                             }&#13;
 &#13;
-                            if (field_value) {&#13;
+                            if (field_value !== undefined) {&#13;
                                 data.issue.custom_fields.push({id: field, value: field_value});&#13;
                             }&#13;
                         }&#13;
