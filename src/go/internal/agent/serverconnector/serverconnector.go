@@ -206,11 +206,7 @@ func (c *Connector) refreshActiveChecks() {
 		} else {
 			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address)
 		}
-		if agent.Options.EnablePersistentBuffer == 1 {
-			c.taskManager.UpdateTasks(c.clientID, c.resultCache.(*resultcache.PersistCache), 0, []*glexpr.Expression{}, []*plugin.Request{})
-		} else {
-			c.taskManager.UpdateTasks(c.clientID, c.resultCache.(*resultcache.MemoryCache), 0, []*glexpr.Expression{}, []*plugin.Request{})
-		}
+		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), 0, []*glexpr.Expression{}, []*plugin.Request{})
 		return
 	}
 
@@ -302,11 +298,7 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	if agent.Options.EnablePersistentBuffer == 1 {
-		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(*resultcache.PersistCache), *response.RefreshUnsupported, response.Expressions, response.Data)
-	} else {
-		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(*resultcache.MemoryCache), *response.RefreshUnsupported, response.Expressions, response.Data)
-	}
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), *response.RefreshUnsupported, response.Expressions, response.Data)
 }
 
 func (c *Connector) run() {
