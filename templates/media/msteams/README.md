@@ -31,9 +31,9 @@ http://zabbix/<br>
 4\. You can also choose between two notification formats. Set *"use_default_message"* parameter:
 - **false** (default)
     - Use preformatted message with predefined set of fields for trigger-based notifications.<br>
-In internal, autoregistration and discovery notifications *{ALERT.SUBJECT}* as a title and *{ALERT.MESSAGE}* as text a body of the message will be used.
+In internal, autoregistration and discovery notifications *{ALERT.MESSAGE}* as text a body of the message will be used.
 - **true**
-    - Use {ALERT.SUBJECT} as a title and {ALERT.MESSAGE} as text a body of the message in all types of notifications.
+    - Use {ALERT.MESSAGE} as text a body of the message in all types of notifications.
 
 [![](images/thumb.2.png?raw=true)](images/2.png)
 
