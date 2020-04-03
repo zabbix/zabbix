@@ -89,7 +89,6 @@ class testPageOverview extends CLegacyWebTest {
 					'filter' => [
 						'Host groups' => 'Group to check Overview',
 						'Minimum severity' => 'Information',
-//						'Severity' => ['Information', 'Warning', 'Average', 'High', 'Disaster']
 					],
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview'

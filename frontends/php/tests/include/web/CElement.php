@@ -111,7 +111,7 @@ class CElement extends CBaseElement implements IWaitable {
 			throw new Exception('Cannot reload stalled element selected as a part of multi-element selection.');
 		}
 
-		if ($this->parent !== null) {
+		if ($this->parent !== null && $this->parent->isStalled()) {
 			$this->parent->reload();
 		}
 

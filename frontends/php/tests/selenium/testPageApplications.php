@@ -81,16 +81,20 @@ class testPageApplications extends CLegacyWebTest {
 
 		// Check selected host and group.
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals(['ЗАББИКС Сервер'], array_values($filter->getField('Hosts')->getSelected()));
-		$this->assertEquals([], $filter->getField('Host groups')->getSelected());
+		$filter->checkValue([
+			'Hosts' => 'ЗАББИКС Сервер',
+			'Host groups' => []
+		]);
 
+		$filter->getField('Hosts')->clear();
 		$filter->fill($data['filter']);
 		$filter->submit();
 		$this->page->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'Host name', false)) {
+		if (CTestArrayHelper::get($data, 'filter.Hosts', false) && !is_array($data['filter']['Hosts'])) {
 			// Get host id
-			$sql_host_id = DBfetch(DBselect("SELECT hostid FROM hosts WHERE host='".$data['Host name']."'"));
+			$host = CTestArrayHelper::get($data, 'Host name', $data['filter']['Hosts']);
+			$sql_host_id = DBfetch(DBselect("SELECT hostid FROM hosts WHERE host='".$host."'"));
 			$host_id= $sql_host_id['hostid'];
 
 			// Check the application names in frontend
@@ -117,7 +121,7 @@ class testPageApplications extends CLegacyWebTest {
 				}
 			}
 		}
-		elseif (is_array(CTestArrayHelper::get($data, 'filter.Hosts', false))) {
+		else {
 			// Check disabled creation button of application
 			$this->zbxTestAssertElementText("//button[@id='form']", 'Create application (select host first)');
 			$this->zbxTestAssertAttribute("//button[@id='form']",'disabled','true');
@@ -125,11 +129,10 @@ class testPageApplications extends CLegacyWebTest {
 		}
 
 		if (CTestArrayHelper::get($data['filter'], 'Host groups', false)) {
-			if (CTestArrayHelper::get($data['filter'], 'Host groups', false)) {
-				$filter = $this->query('name:zbx_filter')->asForm()->one();
-				$filter->getField('Hosts')->clear();
-				$filter->submit();
-			}
+			$filter = $this->query('name:zbx_filter')->asForm()->one();
+			$filter->getField('Hosts')->clear();
+			$filter->submit();
+
 			$group_app= [];
 			$sql_all_applications = "SELECT a.name FROM hosts_groups hg LEFT JOIN applications a ON hg.hostid=a.hostid"
 					. " WHERE hg.groupid=(SELECT groupid FROM hstgrp WHERE name='".$data['filter']['Host groups']."')";

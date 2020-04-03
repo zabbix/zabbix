@@ -51,15 +51,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Graphs');
 
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		foreach (['Copy graph to several groups 1', 'Group to copy graph', 'Zabbix servers'] as $group) {
-			$filter->getField('Host groups')->select($group);
-		}
-
-		foreach (['Available host', 'SLA reports host', 'ЗАББИКС Сервер'] as $host) {
-			$filter->getField('Hosts')->fill($host);
-		}
-		$filter->getField('Host groups')->clear();
-		$filter->getField('Hosts')->clear();
+		$filter->checkValue(['Hosts' => $host_name]);
 
 		$this->zbxTestAssertElementPresentXpath('//button[@type="button"][text()="Create graph"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="green"][text()="Enabled"]');

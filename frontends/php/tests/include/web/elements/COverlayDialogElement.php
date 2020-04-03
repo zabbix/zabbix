@@ -58,16 +58,18 @@ class COverlayDialogElement extends CElement {
 			return $this;
 		}
 
-		$form = $this->query('xpath:./div[@class="overlay-dialogue-controls"]')->asForm(['normalized' => true])
-				->waitUntilPresent()->one();
-		$fields = $form->getFields();
-
 		if (!is_array($context)) {
-			$fields->first()->fill($context);
+			// Assuming that we are looking for a single multiselect...
+			$this->query('xpath:./div[@class="overlay-dialogue-controls"]//./div[@class="multiselect-control"]')
+					->asMultiselect()->one()->fill($context);
 			$this->waitUntilReady();
 
 			return $this;
 		}
+
+		$form = $this->query('xpath:./div[@class="overlay-dialogue-controls"]')->asForm(['normalized' => true])
+				->waitUntilPresent()->one();
+		$fields = $form->getFields();
 
 		foreach ($context as $name => $value) {
 			if (is_array($value) && array_key_exists('name', $value) && array_key_exists('value', $value)) {

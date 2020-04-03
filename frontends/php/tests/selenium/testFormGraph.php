@@ -865,10 +865,10 @@ class testFormGraph extends CLegacyWebTest {
 				$this->zbxTestLaunchOverlayDialog('Items');
 				$link = $item['itemName'];
 				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
-					$host->fill([
-						'values' => $this->host,
-						'context' => $this->hostGroup
-					]);
+				$host->fill([
+					'values' => $this->host,
+					'context' => $this->hostGroup
+				]);
 				$this->zbxTestClickLinkTextWait($link);
 
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));

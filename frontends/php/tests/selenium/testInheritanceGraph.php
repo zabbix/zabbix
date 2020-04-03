@@ -122,7 +122,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 				$filter = $this->query('name:zbx_filter')->asForm()->one();
 				$filter->getField('Hosts')->clear()->fill($this->template);
 				$filter->submit();
-				$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
+				$this->query('link', $data['name'])->one()->waitUntilVisible();
 				break;
 
 			case TEST_BAD:

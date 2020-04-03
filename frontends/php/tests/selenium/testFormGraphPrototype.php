@@ -1093,10 +1093,10 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
-				$host->fill([
-					'values' => $this->host,
-					'context' => $this->hostGroup
-				]);
+			$host->fill([
+				'values' => $this->host,
+				'context' => $this->hostGroup
+			]);
 			$this->query('link', $this->itemSimple)->waitUntilClickable()->one()->click();
 
 			if (isset($data['removeItem'])) {
