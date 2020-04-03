@@ -21,7 +21,7 @@
                 </parameter>
                 <parameter>
                     <name>To</name>
-                    <value>{ALERT.TO}</value>
+                    <value>{ALERT.SENDTO}</value>
                 </parameter>
                 <parameter>
                     <name>Token</name>
