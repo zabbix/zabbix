@@ -46,6 +46,7 @@ const (
 	errorParametersNotAllowed    = "Item does not allow parameters."
 	errorInvalidEndpoint         = "Invalid endpoint format."
 	errorQueryErrorMessage       = "Docker returned an error."
+	errorCannotConnectToDaemon   = "Cannot connect to Docker daemon."
 )
 
 type containerDiscovery struct {

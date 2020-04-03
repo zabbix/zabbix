@@ -46,6 +46,10 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	}
 
 	socketPath := strings.Split(p.options.Endpoint, "://")[1]
+	if _, err := os.Stat(socketPath); os.IsNotExist(err) || os.IsPermission(err) {
+		p.Errf(errorCannotConnectToDaemon)
+	}
+
 	p.client = newClient(socketPath, p.options.Timeout)
 
 }
@@ -62,10 +66,6 @@ func (p *Plugin) Validate(options interface{}) error {
 
 	endpointParts := strings.SplitN(opts.Endpoint, "://", 2)
 	if len(endpointParts) == 1 || endpointParts[0] != "unix" {
-		return errors.New(errorInvalidEndpoint)
-	}
-
-	if _, err := os.Stat(endpointParts[1]); os.IsNotExist(err) || os.IsPermission(err) {
 		return errors.New(errorInvalidEndpoint)
 	}
 
