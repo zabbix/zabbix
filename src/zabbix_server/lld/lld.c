@@ -900,7 +900,6 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 		lld_row->jp_row = jp_row;
 		zbx_vector_ptr_create(&lld_row->item_links);
-
 		zbx_vector_ptr_create(&lld_row->overrides);
 
 		for (i = 0; i < overrides->values_num; i++)
@@ -923,6 +922,26 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 	ret = SUCCEED;
 out:
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+	{
+		for (i = 0; i < lld_rows->values_num; i++)
+		{
+			int	j;
+
+			lld_row = (zbx_lld_row_t *)lld_rows->values[i];
+
+			zabbix_log(LOG_LEVEL_TRACE, "lld_row '%.*s' overrides:",
+					(int)(lld_row->jp_row.end - lld_row->jp_row.start + 1),
+					lld_row->jp_row.start);
+
+			for (j = 0; j < lld_row->overrides.values_num; j++)
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "  lld_overrideid: " ZBX_FS_UI64,
+						*(const zbx_uint64_t *)lld_row->overrides.values[j]);
+			}
+		}
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
