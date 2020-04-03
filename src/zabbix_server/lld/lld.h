@@ -35,6 +35,7 @@ typedef struct
 {
 	struct zbx_json_parse	jp_row;
 	zbx_vector_ptr_t	item_links;	/* the list of item prototypes */
+	zbx_vector_ptr_t	overrides;
 }
 zbx_lld_row_t;
 

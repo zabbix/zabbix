@@ -546,6 +546,8 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 	lld_override_t	*override;
 	int		ret = SUCCEED, i;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select lld_overrideid,lld_override_conditionid,macro,value,operator"
 			" from lld_override_condition"
@@ -583,6 +585,8 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 			zbx_vector_ptr_sort(&override->filter.conditions, lld_condition_compare_by_macro);
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
 	return ret;
 }
 typedef enum
@@ -610,6 +614,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	DB_ROW				row;
 	lld_override_t			*override = NULL;
 	lld_override_operation_t	*override_operation = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select o.lld_overrideid,o.lld_override_operationid,o.operationobject,o.operator,o.value,"
@@ -642,7 +648,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			" left join lld_override_opinventory i"
 				" on o.lld_override_operationid=i.lld_override_operationid"
 			" where");
-	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values, overrideids->values_num);
+	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
+			overrideids->values_num);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
 	result = DBselect("%s", *sql);
@@ -736,7 +743,6 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 
 				override_operation->inventory_mode = FAIL == DBis_null(row[14]) ?
 						(unsigned char)atoi(row[14]) : HOST_INVENTORY_COUNT;
-
 				break;
 			case OPERATION_OBJECT_GRAPH_PROTOTYPE:
 				break;
@@ -745,6 +751,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 		}
 	}
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	lld_overrides_compare_by_step(const void *override1, const void *override2)
@@ -847,13 +855,15 @@ static void	lld_override_free(lld_override_t *override)
 	zbx_free(override);
 }
 
+#define OVERRIDE_STOP_TRUE	1
+
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **info, char **error)
+		const zbx_vector_ptr_t *lld_macro_paths, const zbx_vector_ptr_t	*overrides, char **info, char **error)
 {
 	struct zbx_json_parse	jp, jp_array, jp_row;
 	const char		*p;
 	zbx_lld_row_t		*lld_row;
-	int			ret = FAIL;
+	int			ret = FAIL, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -886,10 +896,29 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 			continue;
 
 		lld_row = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
+		zbx_vector_ptr_append(lld_rows, lld_row);
+
 		lld_row->jp_row = jp_row;
 		zbx_vector_ptr_create(&lld_row->item_links);
 
-		zbx_vector_ptr_append(lld_rows, lld_row);
+		zbx_vector_ptr_create(&lld_row->overrides);
+
+		for (i = 0; i < overrides->values_num; i++)
+		{
+			lld_override_t	*override;
+
+			override = (lld_override_t *)overrides->values[i];
+
+			lld_check_received_data_for_filter(&override->filter, &jp_row, lld_macro_paths, info);
+
+			if (SUCCEED != filter_evaluate(&override->filter, &jp_row, lld_macro_paths))
+				continue;
+
+			zbx_vector_ptr_append(&lld_row->overrides, override);
+
+			if (OVERRIDE_STOP_TRUE == override->stop)
+				break;
+		}
 	}
 
 	ret = SUCCEED;
@@ -908,6 +937,7 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
 {
 	zbx_vector_ptr_clear_ext(&lld_row->item_links, (zbx_clean_func_t)lld_item_link_free);
 	zbx_vector_ptr_destroy(&lld_row->item_links);
+	zbx_vector_ptr_destroy(&lld_row->overrides);
 	zbx_free(lld_row);
 }
 
@@ -1004,8 +1034,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	if (SUCCEED != (ret = lld_overrides_load(&overrides, lld_ruleid, &item, error)))
 		goto out;
 
-
-	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macro_paths, &info, error))
+	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macro_paths, &overrides, &info, error))
 	{
 		ret = FAIL;
 		goto out;
@@ -1051,7 +1080,7 @@ out:
 	lld_filter_clean(&filter);
 
 	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
-	zbx_vector_ptr_destroy(&overrides);	/* TODO clear */
+	zbx_vector_ptr_destroy(&overrides);
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
 	zbx_vector_ptr_clear_ext(&lld_macro_paths, (zbx_clean_func_t)zbx_lld_macro_path_free);
