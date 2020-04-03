@@ -101,7 +101,6 @@ catch (error) {&#13;
     throw 'Sending failed: ' + error + '.';&#13;
 }</script>
             <timeout>10s</timeout>
-            <process_tags>YES</process_tags>
             <description>https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/telegram&#13;
 &#13;
 1. Register bot: send &quot;/newbot&quot; to @BotFather and follow instructions&#13;
