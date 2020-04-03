@@ -604,7 +604,13 @@ typedef enum
 	ZBX_PROTOTYPE_STATUS_CREATE_DISABLED,
 	ZBX_PROTOTYPE_STATUS_NO_CREATE,
 	ZBX_PROTOTYPE_STATUS_COUNT
-}zbx_prototype_status_t;
+}
+zbx_prototype_status_t;
+
+static int	zbx_str_compare_func(const void *d1, const void *d2)
+{
+	return strcmp((const char *)d1, (const char *)d2);
+}
 
 static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
@@ -681,7 +687,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 
 			zbx_vector_ptr_pair_create(&override_operation->trigger_tags);
 			zbx_hashset_create(&override_operation->group_prototypes, 5, ZBX_DEFAULT_STRING_HASH_FUNC,
-					ZBX_DEFAULT_STR_COMPARE_FUNC);
+					zbx_str_compare_func);
 			zbx_hashset_create(&override_operation->templateids, 5, ZBX_DEFAULT_UINT64_HASH_FUNC,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -726,7 +732,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 								row[12]))
 				{
 					zbx_hashset_insert(&override_operation->group_prototypes, row[12],
-							strlen(row[12]));
+							strlen(row[12]) + 1);
 				}
 
 				if (FAIL == DBis_null(row[13]))
@@ -782,6 +788,59 @@ static void	lld_override_operation_free(lld_override_operation_t *override_opera
 	zbx_free(override_operation->history);
 	zbx_free(override_operation->trends);
 	zbx_free(override_operation);
+}
+
+static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
+{
+	int			i;
+	lld_override_t		*override;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		*templateid;
+	char			*group_prototype;
+
+	for (i = 0; i < overrides->values_num; i++)
+	{
+		int	j;
+
+		override = (lld_override_t *)overrides->values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "overrideid: " ZBX_FS_UI64, override->overrideid);
+		zabbix_log(LOG_LEVEL_TRACE, "  step: %d", override->step);
+		zabbix_log(LOG_LEVEL_TRACE, "  stop: %d", override->stop);
+
+		for (j = 0; j < override->override_operations.values_num; j++)
+		{
+			lld_override_operation_t	*override_operation;
+			int				k;
+
+			override_operation = (lld_override_operation_t *)override->override_operations.values[j];
+
+			zabbix_log(LOG_LEVEL_TRACE, "    override_operationid:" ZBX_FS_UI64,
+					override_operation->override_operationid);
+			zabbix_log(LOG_LEVEL_TRACE, "    operationtype: %d", override_operation->operationtype);
+			zabbix_log(LOG_LEVEL_TRACE, "    operator: %d", override_operation->operator);
+			zabbix_log(LOG_LEVEL_TRACE, "    value '%s'", override_operation->value);
+			zabbix_log(LOG_LEVEL_TRACE, "    status: %d", override_operation->status);
+			zabbix_log(LOG_LEVEL_TRACE, "    delay '%s'", ZBX_NULL2STR(override_operation->delay));
+			zabbix_log(LOG_LEVEL_TRACE, "    history '%s'", ZBX_NULL2STR(override_operation->history));
+			zabbix_log(LOG_LEVEL_TRACE, "    trends '%s'", ZBX_NULL2STR(override_operation->trends));
+
+			for (k = 0; k < override_operation->trigger_tags.values_num; k++)
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "    tag:'%s' value:'%s'",
+						(char *)override_operation->trigger_tags.values[k].first,
+						(char *)override_operation->trigger_tags.values[k].second);
+			}
+
+			zbx_hashset_iter_reset(&override_operation->templateids, &iter);
+			while (NULL != (templateid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+				zabbix_log(LOG_LEVEL_TRACE, "    templateid: " ZBX_FS_UI64, *templateid);
+
+			zbx_hashset_iter_reset(&override_operation->group_prototypes, &iter);
+			while (NULL != (group_prototype = (char *)zbx_hashset_iter_next(&iter)))
+				zabbix_log(LOG_LEVEL_TRACE, "    group_prototype '%s'", group_prototype);
+		}
+	}
 }
 
 static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_ruleid, const DC_ITEM *item,
@@ -840,6 +899,9 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&overrideids);
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		lld_dump_overrides(overrides);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
