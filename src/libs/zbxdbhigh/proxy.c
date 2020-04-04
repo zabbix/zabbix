@@ -2951,8 +2951,8 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
  *                                      (FAIL - item/host was not found)      *
  *                                   out - value processing result            *
  *                                      (SUCCEED - processed, FAIL - error)   *
- *             values_num - [IN] the number of items/values to process        *
- *             suppress_win - [IN/OUT] proxy communication delay info        *
+ *             values_num   - [IN] the number of items/values to process      *
+ *             suppress_win - [IN/OUT] proxy communication delay info         *
  *                                                                            *
  * Return value: the number of processed values                               *
  *                                                                            *
