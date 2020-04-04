@@ -2223,7 +2223,7 @@ int	proxy_get_delay(const zbx_uint64_t lastid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [lastid=" ZBX_FS_UI64 "]", __func__, lastid);
 
-	sql = zbx_dsprintf(sql, "select write_clock,id from proxy_history where id>" ZBX_FS_UI64 " order by id asc",
+	sql = zbx_dsprintf(sql, "select write_clock from proxy_history where id>" ZBX_FS_UI64 " order by id asc",
 			lastid);
 
 	result = DBselectN(sql, 1);
@@ -2983,17 +2983,18 @@ int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcode
 		if (0 != items[i].host.proxy_hostid && NULL != suppress_win &&
 				0 != (suppress_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) && 0 < history_num)
 		{
-			if (0 != (suppress_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET) &&
-					values[i].ts.sec < suppress_win->period_start)
-			{
-				suppress_win->period_start = values[i].ts.sec;
-			}
-
-			if (suppress_win->period_start <= values[i].ts.sec &&
-					values[i].ts.sec <= suppress_win->period_end)
+			if (values[i].ts.sec <= suppress_win->period_end)
 			{
 				suppress_win->values_num++;
 			}
+			else
+			{
+				suppress_win->flags &= (~ZBX_PROXY_SUPPRESS_MORE);
+			}
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s() flags:%d values_num:%d value_time:%d period_end:%d",
+					__func__, suppress_win->flags, suppress_win->values_num, values[i].ts.sec,
+					suppress_win->period_end);
 		}
 
 		processed_num++;
@@ -4550,23 +4551,7 @@ static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_off
  ******************************************************************************/
 static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy_status, zbx_proxy_diff_t *diff)
 {
-	if (0 != (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET) &&
-			0 != diff->proxy_delay)
-	{	/* for active proxy the proxy_delay is sent in the second packet */
-		diff->suppress_win.period_start = diff->suppress_win.period_end - diff->proxy_delay;
-		diff->suppress_win.flags = ZBX_PROXY_SUPPRESS_ACTIVE_BASE_PROXYDELAY;
-	}
-
-	/* to identify the case when we receive an empty second packet, store the diagnostics of time */
-	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
-			2 * CONFIG_PROXYDATA_FREQUENCY < (ts->sec - diff->lastaccess)) ||
-			(HOST_STATUS_PROXY_ACTIVE == proxy_status &&
-			diff->suppress_win.heartbeat < (ts->sec - diff->lastaccess)))
-	{
-		diff->suppress_win.flags |= ZBX_PROXY_SUPPRESS_TIME;
-	}
-	else
-		diff->suppress_win.flags &= (~ZBX_PROXY_SUPPRESS_TIME);
+	int	delay;
 
 	if (0 != (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 	{
@@ -4574,17 +4559,16 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
 		return;					/* only for current packet */
 	}
 
-	if (0 != (diff->suppress_win.flags & ZBX_PROXY_SUPPRESS_TIME))
+	delay = ts->sec - diff->lastaccess;
+
+	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
+			(2 * CONFIG_PROXYDATA_FREQUENCY) < delay && NET_DELAY_MAX < delay) ||
+			(HOST_STATUS_PROXY_ACTIVE == proxy_status && diff->suppress_win.heartbeat < delay))
 	{
 		diff->suppress_win.values_num = 0;
 		diff->suppress_win.period_end = ts->sec;
-		diff->suppress_win.period_start = diff->suppress_win.period_end - diff->proxy_delay;
 		diff->flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
-
-		if (0 == diff->proxy_delay)
-			diff->suppress_win.flags = ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET;
-		else
-			diff->suppress_win.flags = ZBX_PROXY_SUPPRESS_ACTIVE_BASE_PROXYDELAY;
+		diff->suppress_win.flags |= (ZBX_PROXY_SUPPRESS_ACTIVE | ZBX_PROXY_SUPPRESS_MORE);
 	}
 }
 
@@ -4612,7 +4596,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		unsigned char proxy_status, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
-	int			ret = SUCCEED, flags;
+	int			ret = SUCCEED, flags_old;
 	char			*error_step = NULL, value[MAX_STRING_LEN];
 	size_t			error_alloc = 0, error_offset = 0;
 	zbx_proxy_diff_t	proxy_diff;
@@ -4641,21 +4625,19 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		*more = proxy_diff.more_data;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PROXY_DELAY, value, sizeof(value), NULL))
-	{
 		proxy_diff.proxy_delay = atoi(value);
-		proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
-	}
 	else
 		proxy_diff.proxy_delay = 0;
 
-	flags = proxy_diff.suppress_win.flags;
+	proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
+	flags_old = proxy_diff.suppress_win.flags;
 	check_proxy_suppression_mode(ts, proxy_status, &proxy_diff);	/* first packet can be empty for active proxy */
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() flag_win:%d/%d flag:%d heartbeat:%d proxy_status:%d time_delta:%d "
-			"timestamp:%d lastaccess:%d proxy_delay:%d more:%d", __func__, proxy_diff.suppress_win.flags,
-			flags, (int)proxy_diff.flags, proxy_diff.suppress_win.heartbeat, proxy_status,
-			ts->sec - proxy_diff.lastaccess, ts->sec, proxy_diff.lastaccess, proxy_diff.proxy_delay,
-			proxy_diff.more_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d heartbeat:%d period_end:%d delay:%d"
+			" timestamp:%d lastaccess:%d proxy_delay:%d more:%d", __func__, proxy_diff.suppress_win.flags,
+			flags_old, (int)proxy_diff.flags, proxy_status, proxy_diff.suppress_win.heartbeat,
+			proxy_diff.suppress_win.period_end, ts->sec - proxy_diff.lastaccess,
+			ts->sec, proxy_diff.lastaccess, proxy_diff.proxy_delay, proxy_diff.more_data);
 
 	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)
 		zbx_dc_update_proxy(&proxy_diff);
@@ -4665,6 +4647,8 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		if (SUCCEED != (ret = process_host_availability_contents(&jp_data, &error_step)))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
+
+	flags_old = proxy_diff.suppress_win.flags;
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
@@ -4684,29 +4668,21 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 			session = zbx_dc_get_or_create_data_session(proxy->hostid, value);
 		}
 
-		if (SUCCEED == (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
+		if (SUCCEED != (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
 				(void *)&proxy->hostid, &jp_data, session, &proxy_diff.suppress_win, &error_step)))
 		{
-			if (0 < proxy_diff.suppress_win.values_num)
-				proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
-		}
-		else
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
-	}
-
-	/* prevent loss of information before receiving a second packet */
-	if (0 != (proxy_diff.suppress_win.flags & (ZBX_PROXY_SUPPRESS_ACTIVE_BASE_VALUE_TS_SINGL_PACKET |
-			ZBX_PROXY_SUPPRESS_TIME)) && 0 == proxy_diff.suppress_win.values_num)
-	{
-		proxy_diff.more_data = ZBX_PROXY_DATA_MORE;
+		}
 	}
 
 	if (0 != (proxy_diff.suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 	{
-		proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
-		zabbix_log(LOG_LEVEL_TRACE, "In %s() flag_win:%d flag:%d values_num:%d more_data:%d", __func__,
-				proxy_diff.suppress_win.flags, (int)proxy_diff.flags,
-				proxy_diff.suppress_win.values_num, proxy_diff.more_data);
+		if (0 < proxy_diff.suppress_win.values_num || flags_old != proxy_diff.suppress_win.flags)
+			proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Result of %s() flag_win:%d/%d flag:%d values_num:%d",
+				__func__, proxy_diff.suppress_win.flags, flags_old, (int)proxy_diff.flags,
+				proxy_diff.suppress_win.values_num);
 	}
 
 	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)

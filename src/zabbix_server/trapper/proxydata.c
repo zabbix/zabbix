@@ -230,7 +230,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
 
-	if (ZBX_PROXY_DATA_MORE == more_history && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+	if (0 != history_lastid && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 	if (SUCCEED == send_data_to_server(sock, j.buffer, &error))

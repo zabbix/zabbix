@@ -1653,6 +1653,7 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts;
 	char				*arg2 = NULL;
+	zbx_proxy_suppress_t		suppress_win;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1679,10 +1680,10 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 	}
 
 	zbx_timespec(&ts);
+	suppress_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 
 	if (0 != item->host.proxy_hostid && 0 != lazy)
 	{
-		zbx_proxy_suppress_t	suppress_win;
 		int			lastaccess;
 
 		if (SUCCEED != DCget_proxy_suppress_win(item->host.proxy_hostid, &suppress_win, &lastaccess))
@@ -1691,18 +1692,17 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 			goto out;
 		}
 
-		if (0 != (suppress_win.flags & ZBX_PROXY_SUPPRESS_SUBSCRIBED))
-		{
-			lastaccess = suppress_win.period_start;
-		}
-
-		period = arg1 + (ts.sec - lastaccess);
+		if (0 != (suppress_win.flags & ZBX_PROXY_SUPPRESS_MORE))
+			suppress_win.flags |= ZBX_PROXY_SUPPRESS_SUBSCRIBED;
+		else
+			period = arg1 + (ts.sec - lastaccess);
 	}
 	else
 		period = arg1;
 
-	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
-			1 == values.values_num)
+	if (0 != (suppress_win.flags & ZBX_PROXY_SUPPRESS_SUBSCRIBED) ||
+			(SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
+			1 == values.values_num))
 	{
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	}
@@ -1724,6 +1724,12 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 		}
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+
+		if (0 != item->host.proxy_hostid && 0 != lazy)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "Nodata in %s() flag:%d values_num:%d start_time:%d period:%d",
+					__func__, suppress_win.flags, suppress_win.values_num, ts.sec - period, period);
+		}
 	}
 
 	ret = SUCCEED;

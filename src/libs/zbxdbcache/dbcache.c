@@ -2436,34 +2436,6 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_subscribtions_increment                                    *
- *                                                                            *
- * Purpose: auxiliary function for calculate values received from proxy       *
- *                                                                            *
- * Parameters: proxy_subscribtions - [IN/OUT] array of counters               *
- *             proxy_hostid        - [IN] the proxy hostid                    *
- *                                                                            *
- ******************************************************************************/
-static void	proxy_subscribtions_increment(zbx_vector_uint64_pair_t *proxy_subscribtions, zbx_uint64_t proxy_hostid)
-{
-	int			i;
-	zbx_uint64_pair_t	phid = {proxy_hostid, 0};
-
-	if (FAIL == (i = zbx_vector_uint64_pair_search(proxy_subscribtions, phid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-	{
-		zbx_uint64_pair_t	p;
-
-		p.first = proxy_hostid;
-		p.second = 0;
-		zbx_vector_uint64_pair_append(proxy_subscribtions, p);
-		i = proxy_subscribtions->values_num - 1;
-	}
-
-	proxy_subscribtions->values[i].second++;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCmass_prepare_history                                           *
  *                                                                            *
  * Purpose: prepare history data using items from configuration cache and     *
@@ -2552,7 +2524,11 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		DCinventory_value_add(inventory_values, item, h);
 
 		if (0 != item->host.proxy_hostid && FAIL == is_item_processed_by_server(item->type, item->key_orig))
-			proxy_subscribtions_increment(proxy_subscribtions, item->host.proxy_hostid);
+		{
+			zbx_uint64_pair_t	p = {item->host.proxy_hostid, h->ts.sec};
+
+			zbx_vector_uint64_pair_append(proxy_subscribtions, p);
+		}
 	}
 
 	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);

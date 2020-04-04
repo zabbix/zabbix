@@ -1463,10 +1463,8 @@ done:
 				proxy->lastaccess = atoi(row[24]);
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
-				proxy->more_data = 0;
 				proxy->suppress_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 				proxy->suppress_win.values_num = 0;
-				proxy->suppress_win.period_start = 0;
 				proxy->suppress_win.period_end = 0;
 				proxy->suppress_win.heartbeat_time = 0;
 				proxy->suppress_win.heartbeat = ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX;
@@ -12097,7 +12095,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
  ******************************************************************************/
 void	zbx_dc_subscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
 {
-	ZBX_DC_PROXY		*proxy;
+	ZBX_DC_PROXY		*proxy = NULL;
 	int			i;
 	zbx_uint64_pair_t	p;
 
@@ -12107,16 +12105,22 @@ void	zbx_dc_subscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
 	{
 		p = subscriptions->values[i];
 
-		if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &p.first)))
+		if ((NULL == proxy || p.first != proxy->hostid) &&
+				NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &p.first)))
+		{
 			continue;
+		}
 
 		if (0 == (proxy->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 			continue;
 
-		if (0 >= proxy->suppress_win.values_num)
+		if (0 != (proxy->suppress_win.flags & ZBX_PROXY_SUPPRESS_MORE) &&
+				(int)p.second > proxy->suppress_win.period_end)
+		{
 			continue;
+		}
 
-		proxy->suppress_win.values_num -= p.second;
+		proxy->suppress_win.values_num --;
 		zbx_vector_uint64_append(&proxy->suppress_win.subscribe, (zbx_uint64_t)zbx_get_thread_id());
 	}
 
@@ -12136,12 +12140,15 @@ void	zbx_dc_unsubscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
 {
 	ZBX_DC_PROXY	*proxy;
 	int		i, j;
-	zbx_uint64_t	p;
+	zbx_uint64_t	p = 0;
 
 	WRLOCK_CACHE;
 
 	for (i = 0; i < subscriptions->values_num; i++)
 	{
+		if (p == subscriptions->values[i].first)
+			continue;
+
 		p = subscriptions->values[i].first;
 
 		if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &p)))
@@ -12150,16 +12157,15 @@ void	zbx_dc_unsubscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
 		if (0 == (proxy->suppress_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 			continue;
 
-		if (0 >= proxy->suppress_win.values_num && ZBX_PROXY_DATA_DONE == proxy->more_data)
+		if (0 >= proxy->suppress_win.values_num && 0 == (proxy->suppress_win.flags & ZBX_PROXY_SUPPRESS_MORE))
 		{
 			proxy->suppress_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
-			proxy->suppress_win.period_start = 0;
 			proxy->suppress_win.period_end = 0;
 			proxy->suppress_win.values_num = 0;
 		}
 
-		if (FAIL == (j = zbx_vector_uint64_search(&proxy->suppress_win.subscribe, zbx_get_thread_id(),
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (FAIL == (j = zbx_vector_uint64_search(&proxy->suppress_win.subscribe,
+				(zbx_uint64_t)zbx_get_thread_id(), ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
 			continue;
 		}
@@ -12168,7 +12174,6 @@ void	zbx_dc_unsubscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
 	}
 
 	UNLOCK_CACHE;
-
 }
 
 /******************************************************************************
@@ -12194,7 +12199,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 	{
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS))
 		{
-			int			lost = 0;	/* communication lost */
+			int	lost = 0;	/* communication lost */
 
 			if (0 != (diff->flags &
 					(ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT | ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG)))
@@ -12204,7 +12209,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 				if (0 != ps_win->heartbeat_time &&
 						ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX != ps_win->heartbeat &&
-						(SEC_PER_MIN / 4) < abs(ps_win->heartbeat - heartbeat))
+						NET_DELAY_MAX < abs(ps_win->heartbeat - heartbeat))
 				{
 					lost = 1;
 				}
@@ -12242,11 +12247,8 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY))
 		{
-			if (0 == proxy->proxy_delay)
+			if (proxy->proxy_delay != diff->proxy_delay)
 				proxy->proxy_delay = diff->proxy_delay;
-
-			if (proxy->more_data != diff->more_data)
-				proxy->more_data = diff->more_data;
 
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY);
 		}
@@ -12255,22 +12257,16 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		{
 			zbx_proxy_suppress_t	*ps_win = &proxy->suppress_win, *ds_win = &diff->suppress_win;
 
-			/* Active proxy sends the delayed data in the second packet. The first packet is empty */
-			if (0 != (ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))
-			{
-				if (ps_win->period_start != ds_win->period_start)
-					ps_win->period_start = ds_win->period_start;
-
-				if (ps_win->flags != ds_win->flags)
-					ps_win->flags = ds_win->flags;
-			}
-
 			if ((ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) != (ds_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 			{
-				ps_win->period_start = ds_win->period_start;
 				ps_win->period_end = ds_win->period_end;
-				ps_win->flags = ds_win->flags;
 			}
+
+			if (ps_win->flags != ds_win->flags)
+				ps_win->flags = ds_win->flags;
+
+			if (0 > ps_win->values_num)	/* some new values was processed faster than old */
+				ps_win->values_num = 0;	/* we will suppress more                         */
 
 			ps_win->values_num += ds_win->values_num;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);
@@ -12549,7 +12545,6 @@ int	DCget_proxy_suppress_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *suppress
 	{
 		const zbx_proxy_suppress_t	*proxy_suppress_win = &dc_proxy->suppress_win;
 
-		suppress_win->period_start = proxy_suppress_win->period_start;
 		suppress_win->period_end = proxy_suppress_win->period_end;
 		suppress_win->values_num = proxy_suppress_win->values_num;
 		suppress_win->flags  = proxy_suppress_win->flags;
@@ -12560,7 +12555,7 @@ int	DCget_proxy_suppress_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *suppress
 		{
 
 			if (FAIL != zbx_vector_uint64_search(&proxy_suppress_win->subscribe,
-				(zbx_uint64_t)zbx_get_thread_id(), ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+					(zbx_uint64_t)zbx_get_thread_id(), ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 				suppress_win->flags |= ZBX_PROXY_SUPPRESS_SUBSCRIBED;
 			}

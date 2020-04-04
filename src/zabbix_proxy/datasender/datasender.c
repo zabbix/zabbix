@@ -142,7 +142,7 @@ static int	proxy_data_sender(int *more, int now)
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts.ns);
 
-		if (ZBX_PROXY_DATA_MORE == more_history && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 		if (SUCCEED != (upload_state = put_data_to_server(&sock, &j, &error)))

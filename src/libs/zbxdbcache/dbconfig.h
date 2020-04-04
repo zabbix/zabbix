@@ -377,7 +377,6 @@ typedef struct
 	int			nextcheck;
 	int			lastaccess;
 	int			proxy_delay;
-	int			more_data;
 	zbx_proxy_suppress_t	suppress_win;
 	int			last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
 							/* or 0 if no error */
