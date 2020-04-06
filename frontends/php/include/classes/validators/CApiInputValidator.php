@@ -121,6 +121,9 @@ class CApiInputValidator {
 			case API_PSK:
 				return self::validatePSK($rule, $data, $path, $error);
 
+			case API_SORTORDER:
+				return self::validateSortOrder($rule, $data, $path, $error);
+
 			case API_IDS:
 				return self::validateIds($rule, $data, $path, $error);
 
@@ -198,6 +201,7 @@ class CApiInputValidator {
 			case API_FLAG:
 			case API_OUTPUT:
 			case API_PSK:
+			case API_SORTORDER:
 			case API_HG_NAME:
 			case API_H_NAME:
 			case API_NUMERIC:
@@ -902,7 +906,7 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * APPI output validator.
+	 * API output validator.
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_COUNT, API_ALLOW_NULL
@@ -978,6 +982,51 @@ class CApiInputValidator {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * API sort order validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateSortOrder($rule, &$data, $path, &$error) {
+		$in = ZBX_SORT_UP.','.ZBX_SORT_DOWN;
+
+		if (self::validateStringUtf8(['in' => $in], $data, $path, $e)) {
+			return true;
+		}
+
+		if (is_string($data)) {
+			$error = $e;
+			return false;
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or a character string is expected'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = [
+			'type' => API_STRING_UTF8,
+			'in' => $in
+		];
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
 
 		return true;
 	}

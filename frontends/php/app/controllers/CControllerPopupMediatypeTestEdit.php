@@ -48,7 +48,7 @@ class CControllerPopupMediatypeTestEdit extends CController {
 
 	protected function doAction() {
 		$mediatype = API::MediaType()->get([
-			'output' => ['type', 'status', 'parameters'],
+			'output' => ['type', 'name', 'status', 'parameters'],
 			'mediatypeids' => $this->getInput('mediatypeid'),
 		]);
 
@@ -71,8 +71,10 @@ class CControllerPopupMediatypeTestEdit extends CController {
 			error(_('Cannot test disabled media type.'));
 		}
 
+		CArrayHelper::sort($mediatype[0]['parameters'], ['name']);
+
 		$this->setResponse(new CControllerResponseData([
-			'title' => _('Test media type'),
+			'title' => _s('Test media type "%1$s"', $mediatype[0]['name']),
 			'errors' => hasErrorMesssages() ? getMessages() : null,
 			'mediatypeid' => $this->getInput('mediatypeid'),
 			'sendto' => '',

@@ -76,7 +76,7 @@ require_once dirname(__FILE__).'/testFormAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
+//require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralMacro.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
@@ -210,7 +210,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
-		$suite->addTestSuite('testFormAdministrationGeneralImages');
+//		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralMacro');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
