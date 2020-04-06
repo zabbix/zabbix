@@ -5962,12 +5962,13 @@ svg {
 
 .checkbox-list {
 	li {
-		margin-top: 4px;
-		overflow-x: hidden;
+		overflow: hidden;
 		text-overflow: ellipsis;
+		line-height: 20px;
 
 		label {
-			vertical-align: middle;
+			line-height: 16px;
+			vertical-align: bottom;
 		}
 	}
 }
