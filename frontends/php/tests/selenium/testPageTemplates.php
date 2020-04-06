@@ -119,9 +119,9 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->fill([
-			'Host groups'	=> 'Templates',
-			'Linked templates' => 'Template Module ICMP Ping'
+		$filter->getField('Linked templates')->fill([
+				'values' => 'Template Module ICMP Ping',
+				'context' => 'Templates'
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
