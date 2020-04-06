@@ -1005,7 +1005,7 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, int *severity, int *status)
+void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity, unsigned char *status)
 {
 	int	i, j;
 
@@ -1196,8 +1196,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	lld_filter_t		filter;
 	time_t			now;
 	DC_ITEM			item;
-	zabbix_increase_log_level();
-	zabbix_increase_log_level();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, lld_ruleid);
 
 	zbx_vector_ptr_create(&lld_rows);
@@ -1319,7 +1318,6 @@ out:
 	zbx_vector_ptr_destroy(&lld_macro_paths);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-	zabbix_decrease_log_level();
-	zabbix_decrease_log_level();
+
 	return ret;
 }

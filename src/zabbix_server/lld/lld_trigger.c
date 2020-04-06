@@ -1190,7 +1190,6 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	char				*err_msg = NULL;
 	const char			*operation_msg;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
-	int				severity;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1215,6 +1214,10 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		buffer = zbx_strdup(buffer, trigger_prototype->description);
 		substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
+		priority = trigger_prototype->priority;
+
+		lld_override_trigger(&lld_row->overrides, buffer, &priority, NULL);
+
 		if (0 != strcmp(trigger->description, buffer))
 		{
 			trigger->description_orig = trigger->description;
@@ -1222,10 +1225,6 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 			buffer = NULL;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION;
 		}
-
-		priority = trigger_prototype->priority;
-
-		lld_override_trigger(&lld_row->overrides, trigger->description, &priority, NULL);
 
 		if (trigger->priority != priority)
 		{
