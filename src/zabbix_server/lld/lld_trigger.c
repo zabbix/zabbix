@@ -89,6 +89,8 @@ typedef struct
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_MODE | ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG |	\
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE | ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA)
 	zbx_uint64_t		flags;
+	unsigned char		status;
+	unsigned char		priority;
 }
 zbx_lld_trigger_t;
 
@@ -418,8 +420,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		if ((unsigned char)atoi(row[4]) != trigger_prototype->type)
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE;
 
-		if ((unsigned char)atoi(row[5]) != trigger_prototype->priority)
-			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY;
+		trigger->priority = (unsigned char)atoi(row[5]);
 
 		if ((unsigned char)atoi(row[9]) != trigger_prototype->recovery_mode)
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE;
@@ -1189,6 +1190,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	char				*err_msg = NULL;
 	const char			*operation_msg;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
+	int				severity;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1208,6 +1210,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 
 	if (NULL != trigger)
 	{
+		unsigned char	priority;
+
 		buffer = zbx_strdup(buffer, trigger_prototype->description);
 		substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
@@ -1217,6 +1221,16 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 			trigger->description = buffer;
 			buffer = NULL;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION;
+		}
+
+		priority = trigger_prototype->priority;
+
+		lld_override_trigger(&lld_row->overrides, trigger->description, &priority, NULL);
+
+		if (trigger->priority != priority)
+		{
+			trigger->priority = priority;
+			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY;
 		}
 
 		if (0 != strcmp(trigger->expression, expression))
@@ -1291,6 +1305,18 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		substitute_lld_macros(&trigger->description, jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(trigger->description, ZBX_WHITESPACE);
 
+		trigger->status = trigger_prototype->status;
+		trigger->priority = trigger_prototype->priority;
+
+		lld_override_trigger(&lld_row->overrides, trigger->description, &trigger->priority, &trigger->status);
+
+		if (TRIGGER_STATUS_NO_CREATE == trigger->status)
+		{
+			zbx_free(trigger->description);
+			zbx_free(trigger);
+			goto out;
+		}
+
 		trigger->expression = expression;
 		trigger->expression_orig = NULL;
 		expression = NULL;
@@ -1329,8 +1355,6 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_vector_ptr_append(triggers, trigger);
 	}
 
-	zbx_free(buffer);
-
 	if (SUCCEED != lld_functions_make(&trigger_prototype->functions, &trigger->functions, items,
 			&lld_row->item_links, jp_row, lld_macros, &err_msg))
 	{
@@ -1346,6 +1370,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 out:
 	zbx_free(recovery_expression);
 	zbx_free(expression);
+	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2506,7 +2531,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		if (0 == trigger->triggerid)
 		{
 			zbx_db_insert_add_values(&db_insert, triggerid, trigger->description, trigger->expression,
-					(int)trigger_prototype->priority, (int)trigger_prototype->status,
+					(int)trigger->priority, (int)trigger->status,
 					trigger->comments, trigger->url, (int)trigger_prototype->type,
 					(int)TRIGGER_VALUE_OK, (int)TRIGGER_STATE_NORMAL,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger_prototype->recovery_mode,
@@ -2568,7 +2593,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spriority=%d", d,
-						(int)trigger_prototype->priority);
+						(int)trigger->priority);
 				d = ",";
 			}
 

@@ -958,18 +958,18 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 			if (OPERATION_OBJECT_ITEM_PROTOTYPE != override_operation->operationtype)
 				continue;
 
-			zabbix_log(LOG_LEVEL_TRACE, "In %s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
+			zabbix_log(LOG_LEVEL_TRACE, "%s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
 					__func__, override_operation->override_operationid, override_operation->value,
 					name);
 
 			if (FAIL == regexp_strmatch_condition(name, override_operation->value,
 					override_operation->operator))
 			{
-				zabbix_log(LOG_LEVEL_TRACE, "End of %s():FAIL", __func__);
+				zabbix_log(LOG_LEVEL_TRACE, "%s():FAIL", __func__);
 				continue;
 			}
 
-			zabbix_log(LOG_LEVEL_TRACE, "End of %s():SUCCEED", __func__);
+			zabbix_log(LOG_LEVEL_TRACE, "%s():SUCCEED", __func__);
 
 			if (NULL != override_operation->delay)
 				*delay = override_operation->delay;
@@ -992,6 +992,68 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 						break;
 					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
 						*status = ITEM_STATUS_NO_CREATE;
+						break;
+					case ZBX_PROTOTYPE_STATUS_COUNT:
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+				}
+			}
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, int *severity, int *status)
+{
+	int	i, j;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (i = 0; i < overrides->values_num; i++)
+	{
+		lld_override_t	*override;
+
+		override = overrides->values[i];
+
+		for (j = 0; j < override->override_operations.values_num; j++)
+		{
+			lld_override_operation_t	*override_operation;
+
+			override_operation = override->override_operations.values[j];
+
+			if (OPERATION_OBJECT_TRIGGER_PROTOTYPE != override_operation->operationtype)
+				continue;
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
+					__func__, override_operation->override_operationid, override_operation->value,
+					name);
+
+			if (FAIL == regexp_strmatch_condition(name, override_operation->value,
+					override_operation->operator))
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "%s():FAIL", __func__);
+				continue;
+			}
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s():SUCCEED", __func__);
+
+			if (TRIGGER_SEVERITY_COUNT != override_operation->severity)
+				*severity = override_operation->severity;
+
+			if (NULL != status)
+			{
+				switch (override_operation->status)
+				{
+					case ZBX_PROTOTYPE_STATUS_CREATE_ENABLED:
+						*status = TRIGGER_STATUS_ENABLED;
+						break;
+					case ZBX_PROTOTYPE_STATUS_CREATE_DISABLED:
+						*status = TRIGGER_STATUS_DISABLED;
+						break;
+					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
+						*status = TRIGGER_STATUS_NO_CREATE;
 						break;
 					case ZBX_PROTOTYPE_STATUS_COUNT:
 						break;

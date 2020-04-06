@@ -622,6 +622,7 @@ zbx_maintenance_type_t;
 /* trigger statuses */
 #define TRIGGER_STATUS_ENABLED		0
 #define TRIGGER_STATUS_DISABLED		1
+#define TRIGGER_STATUS_NO_CREATE	2
 
 /* trigger types */
 #define TRIGGER_TYPE_NORMAL		0
