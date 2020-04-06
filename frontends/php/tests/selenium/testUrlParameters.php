@@ -675,7 +675,7 @@ class testUrlParameters extends CLegacyWebTest {
 			[
 				'title' => 'Custom graphs',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
 						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=524&filter_set=1',
