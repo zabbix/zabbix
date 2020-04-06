@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-30T10:53:05Z</date>
+    <date>2020-04-03T06:11:10Z</date>
     <media_types>
         <media_type>
             <name>MS Teams</name>
@@ -22,10 +22,6 @@
                 <parameter>
                     <name>event_id</name>
                     <value>{EVENT.ID}</value>
-                </parameter>
-                <parameter>
-                    <name>event_name</name>
-                    <value>{EVENT.NAME}</value>
                 </parameter>
                 <parameter>
                     <name>event_nseverity</name>
@@ -180,9 +176,7 @@ try {&#13;
             sections: [&#13;
                 {&#13;
                     markdown: 'false',&#13;
-                    activityTitle: (params.use_default_message.toLowerCase() == 'true')&#13;
-                        ? params.alert_subject&#13;
-                        : '[' + params.event_status + '] ' + params.event_name,&#13;
+                    activityTitle: params.alert_subject,&#13;
                     activitySubtitle: 'On ' + params.host_name + ' [' + params.host_ip + ']',&#13;
                     text: (params.use_default_message.toLowerCase() == 'true')&#13;
                         ? params.alert_message&#13;
@@ -218,7 +212,6 @@ try {&#13;
         }&#13;
         // Update message.&#13;
         else if (params.event_update_status === '1') {&#13;
-            body.sections[0].activityTitle = '[UPDATED] ' + params.event_name,&#13;
             body.sections[0].text = params.event_update_user + ' ' + params.event_update_action + '.';&#13;
 &#13;
             if (params.event_update_message) {&#13;

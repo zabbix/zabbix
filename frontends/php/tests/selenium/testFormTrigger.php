@@ -248,7 +248,7 @@ class testFormTrigger extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'rows', 7);
 			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'readonly');
 			$this->zbxTestTextPresent('Close expression constructor');
-			$this->zbxTestAssertNotVisibleId('expression');
+			$this->zbxTestAssertNotVisibleXpath('//input[@name="expression"]');
 
 			if (!isset($data['form'])) {
 				$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'add_expression') and text()='Add']");

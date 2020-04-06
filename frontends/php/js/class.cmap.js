@@ -950,25 +950,25 @@ ZABBIX.apps.map = (function($) {
 					});
 
 					if ((last_value === SVGMapShape.TYPE_LINE) !== (value === SVGMapShape.TYPE_LINE)) {
-						var x = parseInt($('#shapeForm #x').val(), 10),
-							y = parseInt($('#shapeForm #y').val(), 10),
-							width = parseInt($('#shapeForm #areaSizeWidth').val(), 10),
-							height = parseInt($('#shapeForm #areaSizeHeight').val(), 10);
+						var x = parseInt($('#shapeX').val(), 10),
+							y = parseInt($('#shapeY').val(), 10),
+							width = parseInt($('#shapeAreaSizeWidth').val(), 10),
+							height = parseInt($('#shapeAreaSizeHeight').val(), 10);
 
 						if (value === SVGMapShape.TYPE_LINE) {
 							// Switching from figures to line.
-							$('#shapeForm #areaSizeWidth').val(x + width);
-							$('#shapeForm #areaSizeHeight').val(y + height);
+							$('#shapeAreaSizeWidth').val(x + width);
+							$('#shapeAreaSizeHeight').val(y + height);
 						}
 						else {
 							// Switching from line to figures.
 							var mx = Math.min(x, width),
 								my = Math.min(y, height);
 
-							$('#shapeForm #x').val(mx);
-							$('#shapeForm #y').val(my);
-							$('#shapeForm #areaSizeWidth').val(Math.max(x, width) - mx);
-							$('#shapeForm #areaSizeHeight').val(Math.max(y, height) - my);
+							$('#shapeX').val(mx);
+							$('#shapeY').val(my);
+							$('#shapeAreaSizeWidth').val(Math.max(x, width) - mx);
+							$('#shapeAreaSizeHeight').val(Math.max(y, height) - my);
 						}
 					}
 
@@ -3860,8 +3860,8 @@ ZABBIX.apps.map = (function($) {
 		Shape.prototype.bind('afterMove', function(event, element) {
 			if (sysmap.selection.count.shapes === 1 && sysmap.selection.count.selements === 0
 					&& sysmap.selection.shapes[element.id] !== void(0)) {
-				$('#shapeForm input[name=x]').val(element.data.x);
-				$('#shapeForm input[name=y]').val(element.data.y);
+				$('#shapeX').val(element.data.x);
+				$('#shapeY').val(element.data.y);
 
 				if (typeof element.data.width !== 'undefined') {
 					$('#shapeForm input[name=width]').val(element.data.width);
