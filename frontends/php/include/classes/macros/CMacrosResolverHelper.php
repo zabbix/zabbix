@@ -346,26 +346,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve user macros in trigger expression.
-	 *
-	 * @static
-	 *
-	 * @param array $trigger
-	 * @param array $trigger['triggerid']
-	 * @param array $trigger['expression']
-	 *
-	 * @return string
-	 */
-	public static function resolveTriggerExpressionUserMacro(array $trigger) {
-		self::init();
-
-		$triggers = self::$macrosResolver->resolveTriggerExpressionUserMacro(zbx_toHash([$trigger], 'triggerid'));
-		$trigger = reset($triggers);
-
-		return $trigger['expression'];
-	}
-
-	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
 	 * @static
