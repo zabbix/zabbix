@@ -5,21 +5,21 @@
 This guide describes how to send notifications from Zabbix 4.4 to the Telegram messenger using Telegram Bot API and Zabbix webhook feature.
 
 ## Supported features:
-* personal and group notifications
+* Personal and group notifications
 * Markdown/HTML support
 
 ## Not implemented:
-* graphs sending - waiting for [ZBXNEXT-5611](https://support.zabbix.com/browse/ZBXNEXT-5611)
-* emoji support
+* Graphs sending - waiting for [ZBXNEXT-5611](https://support.zabbix.com/browse/ZBXNEXT-5611)
+* Emoji support
 
 ## Telegram setup
 
 1\. Register a new Telegram Bot: send "/newbot" to @BotFather and follow the instructions. The token provided by @BotFather in the final step will be needed for configuring Zabbix webhook.
 [![](images/1.png?raw=true)](images/1.png)
 
-2\. If you want to send personal notifications, you need to obtain chat ID of the user the bot should send messages to
+2\. If you want to send personal notifications, you need to obtain chat ID of the user the bot should send messages to.
 
-Send "/getid" to "@myidbot" in Telegram messenger
+Send "/getid" to "@myidbot" in Telegram messenger.
 
 [![](images/3.png?raw=true)](images/3.png)
 
@@ -29,25 +29,25 @@ Ask the user to send "/start" to the bot, created in step 1. If you skip this st
 
 3\.If you want to send group notifications, you need to obtain group ID of the group the bot should send messages to. To do so:
 
-Add "@myidbot" to your group
-Send "/getgroupid@myidbot" message in the group
+Add "@myidbot" to your group.
+Send "/getgroupid@myidbot" message in the group.
 In the group chat send "/start@your_bot_name_here". If you skip this step, Telegram bot won't be able to send messages to the group.
 
 [![](images/9.png?raw=true)](images/9.png)
 
 ## Zabbix setup
 
-1\. In the "Administration > Media types" section, import the media_telegram.xml
+1\. In the "Administration > Media types" section, import the media_telegram.xml.
 2\. Configure the added media type: 
-Copy and paste your Telegram bot token into the "telegramToken" field
+Copy and paste your Telegram bot token into the "telegramToken" field.
 
 [![](images/2.png?raw=true)](images/2.png)
 
-Read the Telegram Bot API documentation to learn how to format your actions: [Markdown](https://core.telegram.org/bots/api#markdown-style) / [HTML](https://core.telegram.org/bots/api#html-style) / [MarkdownV2](https://core.telegram.org/bots/api#html-style).
 In the `ParseMode` parameter set required option according to the Telegram's documentation. 
-Note: in that case your actions should be separated from other actions (for example, SMS) or you may get plain text alert with raw Markdown/HTML tags.
+Read the Telegram Bot API documentation to learn how to format action notification messages: [Markdown](https://core.telegram.org/bots/api#markdown-style) / [HTML](https://core.telegram.org/bots/api#html-style) / [MarkdownV2](https://core.telegram.org/bots/api#html-style).
+Note: in this case, your Telegram-related actions should be separated from other notification actions (for example, SMS), otherwise you may get plain text alert with raw Markdown/HTML tags.
 
-Test the media type using chat ID or group ID you've got:
+Test the media type using chat ID or group ID you've got.
 
 [![](images/6.png?raw=true)](images/6.png)
 [![](images/7.png?raw=true)](images/7.png)
