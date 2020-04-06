@@ -2061,6 +2061,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 {
 	char			*buffer = NULL, err[MAX_STRING_LEN];
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
+	const char		*delay, *history, *trends;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2074,6 +2075,12 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		buffer = NULL;
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_NAME;
 	}
+
+	delay = item_prototype->delay;
+	history = item_prototype->history;
+	trends = item_prototype->trends;
+
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends);
 
 	if (0 != strcmp(item->key_proto, item_prototype->key))
 	{
@@ -2091,7 +2098,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
 	}
 
-	buffer = zbx_strdup(buffer, item_prototype->delay);
+	buffer = zbx_strdup(buffer, delay);
 	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->delay, buffer))
@@ -2102,7 +2109,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DELAY;
 	}
 
-	buffer = zbx_strdup(buffer, item_prototype->history);
+	buffer = zbx_strdup(buffer, history);
 	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->history, buffer))
@@ -2113,7 +2120,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY;
 	}
 
-	buffer = zbx_strdup(buffer, item_prototype->trends);
+	buffer = zbx_strdup(buffer, trends);
 	substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->trends, buffer))
