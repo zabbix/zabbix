@@ -155,8 +155,26 @@ func New(options *agent.AgentOptions, clientid uint64, output Uploader) ResultCa
 	}
 }
 
-func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
+func createTableQuery(table string, id int) string {
+	return fmt.Sprintf(
+		"CREATE TABLE IF NOT EXISTS %s_%d ("+
+			"id INTEGER,"+
+			"itemid INTEGER,"+
+			"lastlogsize INTEGER,"+
+			"mtime INTEGER,"+
+			"state INTEGER,"+
+			"value TEXT,"+
+			"eventsource TEXT,"+
+			"eventid INTEGER,"+
+			"eventseverity INTEGER,"+
+			"eventtimestamp INTEGER,"+
+			"clock INTEGER,"+
+			"ns INTEGER"+
+			")",
+		table, id)
+}
 
+func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
 	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
 		return errors.New("\"EnablePersistentBuffer\" parameter misconfiguration: \"PersistentBufferFile\" parameter is not set")
 	}
@@ -173,80 +191,58 @@ func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
 		return fmt.Errorf("Cannot open database %s.", options.PersistentBufferFile)
 	}
 	defer database.Close()
-	stmt, _ := database.Prepare("CREATE TABLE IF NOT EXISTS registry (Id INTEGER PRIMARY KEY, Address TEXT, UNIQUE(Address) )")
+	stmt, _ := database.Prepare("CREATE TABLE IF NOT EXISTS registry (id INTEGER PRIMARY KEY,address TEXT,UNIQUE(address))")
 	stmt.Exec()
 
-	var Id, Found, i int
-	var Address string
-	Ids := make([]int, 0)
-	Addresses := make([]string, 0)
-	rows, err := database.Query("SELECT Id, Address FROM registry")
+	var id int
+	var address string
+	ids := make([]int, 0)
+	registeredAddresses := make([]string, 0)
+	rows, err := database.Query("SELECT Id,Address FROM registry")
 	if err != nil {
 		return err
 	}
 	for rows.Next() {
-		rows.Scan(&Id, &Address)
-		Ids = append(Ids, Id)
-		Addresses = append(Addresses, Address)
+		rows.Scan(&id, &address)
+		ids = append(ids, id)
+		registeredAddresses = append(registeredAddresses, address)
 	}
-	for i, Address = range Addresses {
+addressCheck:
+	for i, address := range registeredAddresses {
 		for _, addr := range addresses {
-			if addr == Address {
-				Found = 1
-				break
+			if addr == address {
+				continue addressCheck
 			}
 		}
-		if Found == 0 {
-			database.Exec(fmt.Sprintf("DELETE FROM registry WHERE ID = %d", Ids[i]))
-			database.Exec(fmt.Sprintf("DROP TABLE data_%d", Ids[i]))
-			database.Exec(fmt.Sprintf("DROP TABLE log_%d", Ids[i]))
-		}
-		Found = 0
+		database.Exec(fmt.Sprintf("DELETE FROM registry WHERE ID = %d", ids[i]))
+		database.Exec(fmt.Sprintf("DROP TABLE data_%d", ids[i]))
+		database.Exec(fmt.Sprintf("DROP TABLE log_%d", ids[i]))
 	}
 
-	CreateTable := func(table string) string {
-		return fmt.Sprintf(`
-			CREATE TABLE IF NOT EXISTS %s
-			(Id INTEGER,
-			Itemid INTEGER,
-			LastLogsize INTEGER,
-			Mtime INTEGER,
-			State INTEGER,
-			Value TEXT,
-			EventSource TEXT,
-			EventID INTEGER,
-			EventSeverity INTEGER,
-			EventTimestamp INTEGER,
-			Clock INTEGER,
-			Ns INTEGER
-			)
-		`, table)
-	}
 	for _, addr := range addresses {
 		stmt, err = database.Prepare("INSERT OR IGNORE INTO registry (Address) VALUES (?)")
 		if err != nil {
 			break
 		}
 		stmt.Exec(addr)
-		rows, err = database.Query(fmt.Sprintf("SELECT Id FROM registry WHERE Address = '%s'", addr))
+		rows, err = database.Query("SELECT Id FROM registry WHERE Address=?", addr)
 		if err != nil {
 			break
 		}
 		for rows.Next() {
-			rows.Scan(&Id)
+			rows.Scan(&id)
 		}
-		stmt, err = database.Prepare(CreateTable(fmt.Sprintf("data_%d", Id)))
+		stmt, err = database.Prepare(createTableQuery("data", id))
 		if err != nil {
 			break
 		}
 		stmt.Exec()
-		stmt, err = database.Prepare(CreateTable(fmt.Sprintf("log_%d", Id)))
+		stmt, err = database.Prepare(createTableQuery("log", id))
 		if err != nil {
 			break
 		}
 		stmt.Exec()
-		database.Exec(fmt.Sprintf("DELETE FROM log_%d", Id))
-
+		database.Exec(fmt.Sprintf("DELETE FROM log_%d", id))
 	}
 	return err
 
