@@ -937,7 +937,7 @@ static int	regexp_strmatch_condition(const char *value, const char *pattern, uns
 }
 
 void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, const char **delay,
-		const char **history, const char **trends/*, int *status*/)
+		const char **history, const char **trends, int *status)
 {
 	int	i, j;
 
@@ -969,6 +969,8 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 				continue;
 			}
 
+			zabbix_log(LOG_LEVEL_TRACE, "End of %s():SUCCEED", __func__);
+
 			if (NULL != override_operation->delay)
 				*delay = override_operation->delay;
 
@@ -978,9 +980,25 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 			if (NULL != override_operation->trends)
 				*trends = override_operation->trends;
 
-			zabbix_log(LOG_LEVEL_TRACE, "End of %s():SUCCEED", __func__);
-			/*if (ZBX_PROTOTYPE_STATUS_COUNT != override_operation->status)
-				*status = override_operation->status;*/
+			if (NULL != status)
+			{
+				switch (override_operation->status)
+				{
+					case ZBX_PROTOTYPE_STATUS_CREATE_ENABLED:
+						*status = ITEM_STATUS_ACTIVE;
+						break;
+					case ZBX_PROTOTYPE_STATUS_CREATE_DISABLED:
+						*status = ITEM_STATUS_DISABLED;
+						break;
+					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
+						*status = ITEM_STATUS_NO_CREATE;
+						break;
+					case ZBX_PROTOTYPE_STATUS_COUNT:
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+				}
+			}
 		}
 	}
 
@@ -1116,7 +1134,8 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	lld_filter_t		filter;
 	time_t			now;
 	DC_ITEM			item;
-
+	zabbix_increase_log_level();
+	zabbix_increase_log_level();
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, lld_ruleid);
 
 	zbx_vector_ptr_create(&lld_rows);
@@ -1238,6 +1257,7 @@ out:
 	zbx_vector_ptr_destroy(&lld_macro_paths);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
+	zabbix_decrease_log_level();
+	zabbix_decrease_log_level();
 	return ret;
 }

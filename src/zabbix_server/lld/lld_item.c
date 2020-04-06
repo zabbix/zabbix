@@ -186,6 +186,7 @@ typedef struct
 	char			*ssl_key_file_orig;
 	char			*ssl_key_password;
 	char			*ssl_key_password_orig;
+	int			status;
 	int			lastcheck;
 	int			ts_delete;
 	const zbx_lld_row_t	*lld_row;
@@ -1886,8 +1887,9 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	delay = item_prototype->delay;
 	history = item_prototype->history;
 	trends = item_prototype->trends;
+	item->status = item_prototype->status;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends);
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->status);
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
@@ -2032,9 +2034,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	zbx_vector_ptr_create(&item->preproc_ops);
 	zbx_vector_ptr_create(&item->dependent_items);
 
-	if (SUCCEED != ret)
+	if (SUCCEED != ret || ITEM_STATUS_NO_CREATE == item->status)
 	{
-		*error = zbx_strdcatf(*error, "Cannot create item: %s.\n", err);
+		if (ITEM_STATUS_NO_CREATE != item->status)
+			*error = zbx_strdcatf(*error, "Cannot create item: %s.\n", err);
+
 		lld_item_free(item);
 		item = NULL;
 	}
@@ -2080,7 +2084,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	history = item_prototype->history;
 	trends = item_prototype->trends;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends);
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, NULL);
 
 	if (0 != strcmp(item->key_proto, item_prototype->key))
 	{
@@ -2744,7 +2748,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		zbx_db_insert_add_values(db_insert_items, item->itemid, item->name, item->key, hostid,
 				(int)item_prototype->type, (int)item_prototype->value_type,
 				item->delay, item->history, item->trends,
-				(int)item_prototype->status, item_prototype->trapper_hosts, item->units,
+				(int)item->status, item_prototype->trapper_hosts, item->units,
 				item_prototype->formula, item_prototype->logtimefmt, item_prototype->valuemapid,
 				item->params, item->ipmi_sensor, item->snmp_oid, (int)item_prototype->authtype,
 				item->username, item->password, item_prototype->publickey, item_prototype->privatekey,

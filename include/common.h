@@ -491,6 +491,7 @@ const char	*zbx_alert_type_string(unsigned char type);
 /* item statuses */
 #define ITEM_STATUS_ACTIVE		0
 #define ITEM_STATUS_DISABLED		1
+#define ITEM_STATUS_NO_CREATE		2
 
 /* item states */
 #define ITEM_STATE_NORMAL		0
