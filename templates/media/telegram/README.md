@@ -1,4 +1,4 @@
-# Zabbix Telegram webhook intergration
+# Telegram webhook 
 
 ![](images/telegram_logo.png?raw=true)
 
