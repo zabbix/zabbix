@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-05 01:46+0300\n"
+"POT-Creation-Date: 2020-04-06 22:12+0300\n"
 "PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2350,7 +2350,7 @@ msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" ana makinesi bulunamıyor."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" ana makinesi bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1153
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının ana makine prototipi \"%2$s\" için ana makine grubu \"%1$s\" bulunamadı."
@@ -2373,32 +2373,32 @@ msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" simgesi bulunamadı."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "\"%2$s\" haritasında kullanılan simge haritası \"%1$s\" bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1537
+#: include/classes/import/CConfigurationImport.php:1539
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "\"%3$s\" grafiği için Y ekseni MAKS değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1306
+#: include/classes/import/CConfigurationImport.php:1308
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının grafik prototipi \"%3$s\" için Y ekseni MAKS değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1521
+#: include/classes/import/CConfigurationImport.php:1523
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "\"%3$s\" grafiği için Y ekseni MİN değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1286
+#: include/classes/import/CConfigurationImport.php:1288
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının grafik prototipi \"%3$s\" için Y ekseni MİN değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1555
+#: include/classes/import/CConfigurationImport.php:1557
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "\"%3$s\" grafiğinde kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1326
+#: include/classes/import/CConfigurationImport.php:1328
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının \"%3$s\" grafik prototipinde kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
@@ -2418,7 +2418,7 @@ msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" haritası bulunamıyor."
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
 msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" haritası bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1176
+#: include/classes/import/CConfigurationImport.php:1178
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının \"%2$s\" ana makine prototipi için \"%1$s\" şablonu bulunamıyor."
@@ -2429,12 +2429,12 @@ msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının \"%2$s\" ana makine pro
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" tetikleyicisi bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:747
+#: include/classes/import/CConfigurationImport.php:749
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\" üzerindeki \"%2$s\" öğesi için değer haritası \"%1$s\" bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1075
+#: include/classes/import/CConfigurationImport.php:1077
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının öğe prototipi \"%2$s\" için kullanılan \"%1$s\" değer haritası bulunamıyor."
@@ -8967,18 +8967,18 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:178
 #: include/classes/helpers/CSvgGraphHelper.php:373
 #: include/classes/helpers/CSvgGraphHelper.php:385
-#: include/classes/import/CConfigurationImport.php:759
-#: include/classes/import/CConfigurationImport.php:844
-#: include/classes/import/CConfigurationImport.php:882
-#: include/classes/import/CConfigurationImport.php:970
-#: include/classes/import/CConfigurationImport.php:1088
-#: include/classes/import/CConfigurationImport.php:2592
-#: include/classes/import/CConfigurationImport.php:2696
-#: include/classes/import/CConfigurationImport.php:2706
-#: include/classes/import/CConfigurationImport.php:2734
-#: include/classes/import/CConfigurationImport.php:2748
-#: include/classes/import/CConfigurationImport.php:2757
-#: include/classes/import/CConfigurationImport.php:2763
+#: include/classes/import/CConfigurationImport.php:761
+#: include/classes/import/CConfigurationImport.php:846
+#: include/classes/import/CConfigurationImport.php:884
+#: include/classes/import/CConfigurationImport.php:972
+#: include/classes/import/CConfigurationImport.php:1090
+#: include/classes/import/CConfigurationImport.php:2594
+#: include/classes/import/CConfigurationImport.php:2698
+#: include/classes/import/CConfigurationImport.php:2708
+#: include/classes/import/CConfigurationImport.php:2736
+#: include/classes/import/CConfigurationImport.php:2750
+#: include/classes/import/CConfigurationImport.php:2759
+#: include/classes/import/CConfigurationImport.php:2765
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -9652,7 +9652,7 @@ msgstr "\"%2$s\" şablonunda \"%1$s\" öğesi mevcut değil."
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "\"%1$s\" öğesi mevcut değil veya bu öğeye erişiminiz yok"
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" üzerindeki \"%1$s\" öğesi: uygulama \"%3$s\" mevcut değil."
@@ -16813,7 +16813,7 @@ msgstr "\"%2$s\" üzerinde \"%1$s\" tetiği zaten var."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "\"%1$s\" tetikleyicisi farklı bağlantılara sahip şablonlara ait."
 
-#: include/classes/import/CConfigurationImport.php:1675
+#: include/classes/import/CConfigurationImport.php:1677
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "\"%1$s\" tetikleyicisi, varolmayan \"%2$s\" tetikleyicisine bağımlı."
@@ -16933,7 +16933,7 @@ msgstr "Tetikleyici prototipi \"%1$s\", farklı bağlantılara sahip şablonlara
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Tetikleyici prototipi \"%1$s\", çoklu keşif kurallarından öğe prototipleri içeriyor."
 
-#: include/classes/import/CConfigurationImport.php:1399
+#: include/classes/import/CConfigurationImport.php:1401
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Tetikleyici prototipi \"%1$s\", var olmayan \"%2$s\" tetikleyicisine bağlı."
@@ -18382,7 +18382,7 @@ msgstr "\"%1$s\" web senaryosu, \"%2$s\" sunucusunda halihazırda mevcut."
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "\"%1$s\" web senaryosu zaten var."
 
-#: include/classes/import/CConfigurationImport.php:1449
+#: include/classes/import/CConfigurationImport.php:1451
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" üzerindeki \"%1$s\" web senaryosu: \"%3$s\" uygulaması mevcut değil."
@@ -19262,10 +19262,10 @@ msgstr "değiştirilemez"
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
-#: include/classes/import/CConfigurationImport.php:760
-#: include/classes/import/CConfigurationImport.php:971
-#: include/classes/import/CConfigurationImport.php:1089
-#: include/classes/import/CConfigurationImport.php:2735
+#: include/classes/import/CConfigurationImport.php:762
+#: include/classes/import/CConfigurationImport.php:973
+#: include/classes/import/CConfigurationImport.php:1091
+#: include/classes/import/CConfigurationImport.php:2737
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -19325,7 +19325,7 @@ msgid "circular dependency is not allowed"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1952
-#: include/classes/import/CConfigurationImport.php:2749
+#: include/classes/import/CConfigurationImport.php:2751
 msgid "circular item dependency is not allowed"
 msgstr "çevrimsel öğe bağımlılığına izin verilmiyor"
 
@@ -19756,8 +19756,8 @@ msgid "maximum dependent items count reached"
 msgstr "maksimum bağımlı öğe sayısına ulaşıldı"
 
 #: include/classes/api/services/CItemGeneral.php:2032
-#: include/classes/import/CConfigurationImport.php:2697
-#: include/classes/import/CConfigurationImport.php:2764
+#: include/classes/import/CConfigurationImport.php:2699
+#: include/classes/import/CConfigurationImport.php:2766
 msgid "maximum number of dependency levels reached"
 msgstr "maksimum bağımlılık düzeyi sayısına ulaşıldı"
 
@@ -20308,11 +20308,11 @@ msgstr "değer"
 msgid "value \"%1$s\" already exists"
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:845
-#: include/classes/import/CConfigurationImport.php:883
-#: include/classes/import/CConfigurationImport.php:2593
-#: include/classes/import/CConfigurationImport.php:2707
-#: include/classes/import/CConfigurationImport.php:2758
+#: include/classes/import/CConfigurationImport.php:847
+#: include/classes/import/CConfigurationImport.php:885
+#: include/classes/import/CConfigurationImport.php:2595
+#: include/classes/import/CConfigurationImport.php:2709
+#: include/classes/import/CConfigurationImport.php:2760
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "\"%1$s\" değeri bulunamadı"

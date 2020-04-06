@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-05 01:46+0300\n"
-"PO-Revision-Date: 2020-04-01 01:44+0300\n"
+"POT-Creation-Date: 2020-04-06 22:12+0300\n"
+"PO-Revision-Date: 2020-04-06 04:44+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1585698250.000000\n"
+"X-POOTLE-MTIME: 1586141048.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:67
 #: include/classes/db/OracleDbBackend.php:136
@@ -2293,7 +2293,7 @@ msgstr "マップ\"%2$s\"で使用されているホスト\"%1$s\"が見つか�
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で使用されているホスト\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1153
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロトタイプ\"%2$s\"のためのホストグループ\"%1$s\"が見つかりません。"
@@ -2316,32 +2316,32 @@ msgstr "マップ\"%2$s\"で使用されているアイコン\"%1$s\"が見つ�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で使用されているアイコンのマッピング\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1537
+#: include/classes/import/CConfigurationImport.php:1539
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "グラフ\"%3$s\"のY軸の最大値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1306
+#: include/classes/import/CConfigurationImport.php:1308
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"でY軸の最大値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1521
+#: include/classes/import/CConfigurationImport.php:1523
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "グラフ\"%3$s\"のY軸の最小値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1286
+#: include/classes/import/CConfigurationImport.php:1288
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"でY軸の最小値として利用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1555
+#: include/classes/import/CConfigurationImport.php:1557
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "グラフ\"%3$s\"内で使用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1326
+#: include/classes/import/CConfigurationImport.php:1328
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"上のディスカバリルール\"%4$s\"のグラフのプロトタイプ\"%3$s\"で使用されている\"%2$s\"上のアイテム\"%1$s\"が見つかりません。"
@@ -2361,7 +2361,7 @@ msgstr "マップ\"%2$s\"で使用されているマップ\"%1$s\"が見つか�
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"で使用されているマップ\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1176
+#: include/classes/import/CConfigurationImport.php:1178
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロトタイプ\"%2$s\"のためのテンプレート\"%1$s\"が見つかりません。"
@@ -2372,12 +2372,12 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で使用されているトリガー\"%1$s\"が見つかりません。"
 
-#: include/classes/import/CConfigurationImport.php:747
+#: include/classes/import/CConfigurationImport.php:749
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\"上のアイテム\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
 
-#: include/classes/import/CConfigurationImport.php:1075
+#: include/classes/import/CConfigurationImport.php:1077
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のアイテムのプロトタイプ\"%2$s\"で使用されている値のマッピング\"%1$s\"がみつかりません。"
@@ -8900,18 +8900,18 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/graphdraw/CPieGraphDraw.php:178
 #: include/classes/helpers/CSvgGraphHelper.php:373
 #: include/classes/helpers/CSvgGraphHelper.php:385
-#: include/classes/import/CConfigurationImport.php:759
-#: include/classes/import/CConfigurationImport.php:844
-#: include/classes/import/CConfigurationImport.php:882
-#: include/classes/import/CConfigurationImport.php:970
-#: include/classes/import/CConfigurationImport.php:1088
-#: include/classes/import/CConfigurationImport.php:2592
-#: include/classes/import/CConfigurationImport.php:2696
-#: include/classes/import/CConfigurationImport.php:2706
-#: include/classes/import/CConfigurationImport.php:2734
-#: include/classes/import/CConfigurationImport.php:2748
-#: include/classes/import/CConfigurationImport.php:2757
-#: include/classes/import/CConfigurationImport.php:2763
+#: include/classes/import/CConfigurationImport.php:761
+#: include/classes/import/CConfigurationImport.php:846
+#: include/classes/import/CConfigurationImport.php:884
+#: include/classes/import/CConfigurationImport.php:972
+#: include/classes/import/CConfigurationImport.php:1090
+#: include/classes/import/CConfigurationImport.php:2594
+#: include/classes/import/CConfigurationImport.php:2698
+#: include/classes/import/CConfigurationImport.php:2708
+#: include/classes/import/CConfigurationImport.php:2736
+#: include/classes/import/CConfigurationImport.php:2750
+#: include/classes/import/CConfigurationImport.php:2759
+#: include/classes/import/CConfigurationImport.php:2765
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -9585,7 +9585,7 @@ msgstr "アイテム\"%1$s\"はテンプレート\"%2$s\"に存在しません�
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "アイテム\"%1$s\"が存在しないかアクセス権限がありません"
 
-#: include/classes/import/CConfigurationImport.php:730
+#: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上のアイテム\"%1$s\": アプリケーション\"%3$s\"は存在しません。"
@@ -16285,7 +16285,7 @@ msgstr "アイテムのテスト"
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:77
 #, c-format
 msgid "Test media type \"%1$s\""
-msgstr ""
+msgstr "メディアタイプ\"%1$s\"のテスト"
 
 #: app/controllers/CControllerPopupItemTestEdit.php:107
 #: app/controllers/CControllerPopupItemTestGetValue.php:82
@@ -16720,7 +16720,7 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "トリガー\"%1$s\"はリンクされている他のテンプレートに含まれています。"
 
-#: include/classes/import/CConfigurationImport.php:1675
+#: include/classes/import/CConfigurationImport.php:1677
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "トリガー\"%1$s\"は存在しないトリガー\"%2$s\"に依存しています。"
@@ -16837,7 +16837,7 @@ msgstr "トリガーのプロトタイプ\"%1$s\"はリンクされている他�
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "トリガーのプロトタイプ\"%1$s\"に複数のディスカバリルールからのアイテムのプロトタイプが含まれています。"
 
-#: include/classes/import/CConfigurationImport.php:1399
+#: include/classes/import/CConfigurationImport.php:1401
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "トリガーのプロトタイプ\"%1$s\"はトリガー\"%2$s\"に依存しますが存在しません。"
@@ -18278,7 +18278,7 @@ msgstr "Webシナリオ\"%1$s\"はホスト\"%2$s\"にすでに存在します�
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Webシナリオ\"%1$s\"はすでに存在します。"
 
-#: include/classes/import/CConfigurationImport.php:1449
+#: include/classes/import/CConfigurationImport.php:1451
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上のWebシナリオ\"%1$s\": アプリケーション\"%3$s\"が存在しません。"
@@ -19159,10 +19159,10 @@ msgstr "変更できません"
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
-#: include/classes/import/CConfigurationImport.php:760
-#: include/classes/import/CConfigurationImport.php:971
-#: include/classes/import/CConfigurationImport.php:1089
-#: include/classes/import/CConfigurationImport.php:2735
+#: include/classes/import/CConfigurationImport.php:762
+#: include/classes/import/CConfigurationImport.php:973
+#: include/classes/import/CConfigurationImport.php:1091
+#: include/classes/import/CConfigurationImport.php:2737
 #: include/classes/validators/CActionCondValidator.php:65
 #: include/classes/validators/CActionCondValidator.php:71
 #: include/classes/validators/CActionCondValidator.php:82
@@ -19222,7 +19222,7 @@ msgid "circular dependency is not allowed"
 msgstr "循環する依存関係は許可されていません"
 
 #: include/classes/api/services/CItemGeneral.php:1952
-#: include/classes/import/CConfigurationImport.php:2749
+#: include/classes/import/CConfigurationImport.php:2751
 msgid "circular item dependency is not allowed"
 msgstr "循環するアイテムの依存関係は許可されていません"
 
@@ -19653,8 +19653,8 @@ msgid "maximum dependent items count reached"
 msgstr "依存アイテムの数が最大数に達しました"
 
 #: include/classes/api/services/CItemGeneral.php:2032
-#: include/classes/import/CConfigurationImport.php:2697
-#: include/classes/import/CConfigurationImport.php:2764
+#: include/classes/import/CConfigurationImport.php:2699
+#: include/classes/import/CConfigurationImport.php:2766
 msgid "maximum number of dependency levels reached"
 msgstr "依存レベルの数が最大数に達しました\""
 
@@ -20205,11 +20205,11 @@ msgstr "値"
 msgid "value \"%1$s\" already exists"
 msgstr "値\"%1$s\"はすでにあります"
 
-#: include/classes/import/CConfigurationImport.php:845
-#: include/classes/import/CConfigurationImport.php:883
-#: include/classes/import/CConfigurationImport.php:2593
-#: include/classes/import/CConfigurationImport.php:2707
-#: include/classes/import/CConfigurationImport.php:2758
+#: include/classes/import/CConfigurationImport.php:847
+#: include/classes/import/CConfigurationImport.php:885
+#: include/classes/import/CConfigurationImport.php:2595
+#: include/classes/import/CConfigurationImport.php:2709
+#: include/classes/import/CConfigurationImport.php:2760
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "値\"%1$s\"が存在しません"
