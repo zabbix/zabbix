@@ -32,8 +32,6 @@ import (
 )
 
 type MemoryCache struct {
-	input  chan interface{}
-	output Uploader
 	baseCache
 	results         []*AgentData
 	token           string

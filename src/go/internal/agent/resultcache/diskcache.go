@@ -39,10 +39,7 @@ const (
 )
 
 type DiskCache struct {
-	input  chan interface{}
-	output Uploader
 	baseCache
-	results       []*AgentData
 	token         string
 	lastDataID    uint64
 	clientID      uint64
@@ -53,7 +50,6 @@ type DiskCache struct {
 	oldestLog     uint64
 	oldestData    uint64
 	connectId     int
-	logTable      string
 	database      *sql.DB
 }
 
@@ -223,7 +219,7 @@ func (c *DiskCache) write(r *plugin.Result) {
 
 	var stmt *sql.Stmt
 
-	if r.Persistent == true {
+	if r.Persistent {
 		if c.oldestLog == 0 {
 			c.oldestLog = clock
 		}
@@ -250,7 +246,6 @@ func (c *DiskCache) write(r *plugin.Result) {
 		stmt.Exec(c.lastDataID, r.Itemid, LastLogsize, Mtime, State, Value,
 			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns)
 	}
-
 }
 
 func (c *DiskCache) run() {
@@ -287,7 +282,7 @@ func (c *DiskCache) InsertResultTable(table string) string {
 		INSERT INTO %s
 		(Id, Itemid, LastLogsize, Mtime, State, Value, EventSource, EventID, EventSeverity, EventTimestamp, Clock, Ns)
 		VALUES
-		(?,?,?,?,?,?,?,?,?,?,?,?)	
+		(?,?,?,?,?,?,?,?,?,?,?,?)
 	`, table)
 }
 
