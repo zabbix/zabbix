@@ -65,12 +65,21 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check layout at Macros tab.
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
+		// Compare host prototype's macros from DB and frontend.
+		$expected_macros = CDBHelper::getAll('SELECT macro, value, description '
+			. 'FROM hostmacro WHERE hostid ='.self::HOST_PROTOTYPE_ID);
+		$this->assertEquals($expected_macros, $this->getMacros());
+
+		// Check global macros.
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
 		$this->zbxTestWaitForPageToLoad();
 
 		// Create two macros arrays: from DB and from Frontend form.
 		$macros = [
-			'database' => CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+			'database' => array_merge(
+					CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+					$expected_macros
+				),
 			'frontend' => []
 		];
 
@@ -413,9 +422,18 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'visible_name' => 'Host with all fields visible name',
 					'hostgroup' => 'Virtual machines',
 					'group_prototype' => '{#FSNAME}',
-					'template' => 'Form test template',
+					'template' => 'Template-layout-test-001',
 					'inventory' => 'Automatic',
-					'checkbox' => false
+					'checkbox' => false,
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$NEW_MACRO}',
+							'value' => 'Macro_Value',
+							'description' => 'Macro Description'
+						]
+					]
 				]
 			]
 		];
@@ -455,6 +473,12 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
+
+		if (array_key_exists('macros', $data)) {
+			$this->zbxTestTabSwitch('Macros');
+			$this->fillMacros($data['macros']);
+		}
+
 		if (array_key_exists('inventory', $data)) {
 			$this->zbxTestTabSwitch('Inventory');
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
@@ -471,8 +495,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['name'].'"]');
 		}
 
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 		// Check the results in form.
-		$this->checkFormFields($data);
+		$this->checkFormFields($data, $hostid);
 
 		// Check the results in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name'])));
@@ -865,7 +890,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($hostname)));
 	}
 
-	private function checkFormFields($data) {
+	private function checkFormFields($data, $hostid = null) {
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestClickLinkTextWait($data['visible_name']);
 			$this->zbxTestAssertElementValue('name', $data['visible_name']);
@@ -890,6 +915,45 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestAssertElementText('//div[@id="templateTab"]//a', $data['template']);
+		}
+
+		if (array_key_exists('macros', $data)) {
+			$this->zbxTestTabSwitch('Macros');
+			$this->assertMacros($data['macros']);
+
+			$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
+			// Create two macros arrays: from DB and from Frontend form.
+			$macros = [
+				'database' => array_merge(
+					CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+					CDBHelper::getAll('SELECT macro, value, description FROM hostmacro where hostid ='.$hostid)
+				),
+				'frontend' => []
+			];
+
+			// Write macros rows from Frontend to array.
+			$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
+			$count = $table->getRows()->count() - 1;
+			for ($i = 0; $i < $count; $i += 2) {
+				$macro = [];
+				$row = $table->getRow($i);
+				$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
+				$macro['value'] = $row->query('xpath:./td[2]/div/textarea')->one()->getValue();
+				$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
+
+				$macros['frontend'][] = $macro;
+			}
+
+			// Sort arrays by Macros.
+			foreach ($macros as &$array) {
+				usort($array, function ($a, $b) {
+					return strcmp($a['macro'], $b['macro']);
+				});
+			}
+			unset($array);
+
+		// Compare macros from DB with macros from Frontend.
+		$this->assertEquals($macros['database'], $macros['frontend']);
 		}
 
 		if (array_key_exists('inventory', $data)) {
