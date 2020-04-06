@@ -1842,6 +1842,8 @@ out:
 	return ret;
 }
 
+
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_item_make                                                    *
@@ -1862,6 +1864,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	const struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
 	char				err[MAX_STRING_LEN];
 	int				ret;
+	const char			*delay, *history, *trends;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1880,21 +1883,27 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	substitute_lld_macros(&item->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->name, ZBX_WHITESPACE);
 
+	delay = item_prototype->delay;
+	history = item_prototype->history;
+	trends = item_prototype->trends;
+
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends);
+
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
 	ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY, err, sizeof(err));
 
-	item->delay = zbx_strdup(NULL, item_prototype->delay);
+	item->delay = zbx_strdup(NULL, delay);
 	item->delay_orig = NULL;
 	substitute_lld_macros(&item->delay, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->delay, ZBX_WHITESPACE);
 
-	item->history = zbx_strdup(NULL, item_prototype->history);
+	item->history = zbx_strdup(NULL, history);
 	item->history_orig = NULL;
 	substitute_lld_macros(&item->history, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->history, ZBX_WHITESPACE);
 
-	item->trends = zbx_strdup(NULL, item_prototype->trends);
+	item->trends = zbx_strdup(NULL, trends);
 	item->trends_orig = NULL;
 	substitute_lld_macros(&item->trends, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	zbx_lrtrim(item->trends, ZBX_WHITESPACE);

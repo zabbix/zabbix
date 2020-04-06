@@ -817,7 +817,7 @@ static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
 
 			zabbix_log(LOG_LEVEL_TRACE, "    override_operationid:" ZBX_FS_UI64,
 					override_operation->override_operationid);
-			zabbix_log(LOG_LEVEL_TRACE, "    operationtype: %d", override_operation->operationtype);
+			zabbix_log(LOG_LEVEL_TRACE, "    operationobject: %d", override_operation->operationtype);
 			zabbix_log(LOG_LEVEL_TRACE, "    operator: %d", override_operation->operator);
 			zabbix_log(LOG_LEVEL_TRACE, "    value '%s'", override_operation->value);
 			zabbix_log(LOG_LEVEL_TRACE, "    status: %d", override_operation->status);
@@ -915,6 +915,76 @@ static void	lld_override_free(lld_override_t *override)
 	zbx_vector_ptr_clear_ext(&override->override_operations, (zbx_clean_func_t)lld_override_operation_free);
 	zbx_vector_ptr_destroy(&override->override_operations);
 	zbx_free(override);
+}
+
+static int	regexp_strmatch_condition(const char *value, const char *pattern, unsigned char op)
+{
+	switch (op)
+	{
+		case CONDITION_OPERATOR_REGEXP:
+			if (NULL != zbx_regexp_match(value, pattern, NULL))
+				return SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_REGEXP:
+			if (NULL == zbx_regexp_match(value, pattern, NULL))
+				return SUCCEED;
+			break;
+		default:
+			return zbx_strmatch_condition(value, pattern, op);
+	}
+
+	return FAIL;
+}
+
+void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, const char **delay,
+		const char **history, const char **trends/*, int *status*/)
+{
+	int	i, j;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (i = 0; i < overrides->values_num; i++)
+	{
+		lld_override_t	*override;
+
+		override = overrides->values[i];
+
+		for (j = 0; j < override->override_operations.values_num; j++)
+		{
+			lld_override_operation_t	*override_operation;
+
+			override_operation = override->override_operations.values[j];
+
+			if (OPERATION_OBJECT_ITEM_PROTOTYPE != override_operation->operationtype)
+				continue;
+
+			zabbix_log(LOG_LEVEL_TRACE, "In %s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
+					__func__, override_operation->override_operationid, override_operation->value,
+					name);
+
+			if (FAIL == regexp_strmatch_condition(name, override_operation->value,
+					override_operation->operator))
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "End of %s():FAIL", __func__);
+				continue;
+			}
+
+			if (NULL != override_operation->delay)
+				*delay = override_operation->delay;
+
+			if (NULL != override_operation->history)
+				*history = override_operation->history;
+
+			if (NULL != override_operation->trends)
+				*trends = override_operation->trends;
+
+			zabbix_log(LOG_LEVEL_TRACE, "End of %s():SUCCEED", __func__);
+			/*if (ZBX_PROTOTYPE_STATUS_COUNT != override_operation->status)
+				*status = override_operation->status;*/
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 #define OVERRIDE_STOP_TRUE	1
