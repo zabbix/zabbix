@@ -4563,7 +4563,7 @@ static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy
 
 	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
 			(2 * CONFIG_PROXYDATA_FREQUENCY) < delay && NET_DELAY_MAX < delay) ||
-			(HOST_STATUS_PROXY_ACTIVE == proxy_status && diff->suppress_win.heartbeat < delay))
+			(HOST_STATUS_PROXY_ACTIVE == proxy_status && NET_DELAY_MAX < delay))
 	{
 		diff->suppress_win.values_num = 0;
 		diff->suppress_win.period_end = ts->sec;
