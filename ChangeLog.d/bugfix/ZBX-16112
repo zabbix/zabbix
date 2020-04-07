@@ -1,0 +1,1 @@
+..F....... [ZBX-16112] fixed connection timeout issue with media type testing by increasing timeout to 65 seconds (Ivo)
