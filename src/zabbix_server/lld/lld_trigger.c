@@ -1310,11 +1310,14 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger->status = trigger_prototype->status;
 		trigger->priority = trigger_prototype->priority;
 
+		zbx_vector_ptr_pair_create(&trigger->override_tags);
+
 		lld_override_trigger(&lld_row->overrides, trigger->description, &trigger->priority,
 				&trigger->override_tags, &trigger->status);
 
 		if (TRIGGER_STATUS_NO_CREATE == trigger->status)
 		{
+			zbx_vector_ptr_pair_destroy(&trigger->override_tags);
 			zbx_free(trigger->description);
 			zbx_free(trigger);
 			goto out;
@@ -1352,7 +1355,6 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_vector_ptr_create(&trigger->dependencies);
 		zbx_vector_ptr_create(&trigger->dependents);
 		zbx_vector_ptr_create(&trigger->tags);
-		zbx_vector_ptr_pair_create(&trigger->override_tags);
 
 		trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
@@ -1761,18 +1763,6 @@ static void	lld_trigger_tags_make(zbx_vector_ptr_t *trigger_prototypes, zbx_vect
 	zbx_lld_function_t		*function;
 	zbx_lld_item_trigger_t		item_trigger;
 	zbx_lld_tag_t			*tag;
-
-	for (i = 0; i < trigger_prototypes->values_num; i++)
-	{
-		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes->values[i];
-
-		if (0 != trigger_prototype->tags.values_num)
-			break;
-	}
-
-	/* trigger prototypes have no tags */
-	if (i == trigger_prototypes->values_num)
-		return;
 
 	/* used for fast search of trigger by item prototype */
 	zbx_hashset_create(&items_triggers, 512, items_triggers_hash_func, items_triggers_compare_func);
