@@ -2155,6 +2155,9 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
+		if (0 != (h->flags & ZBX_DC_FLAG_NOHISTORY))
+			continue;
+
 		if (0 != (h->flags & ZBX_DC_FLAG_UNDEF))
 			continue;
 
@@ -2223,6 +2226,9 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 	{
 		unsigned int		flags = PROXY_HISTORY_FLAG_META;
 		const ZBX_DC_HISTORY	*h = &history[i];
+
+		if (0 != (h->flags & ZBX_DC_FLAG_NOHISTORY))
+			continue;
 
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 			continue;
@@ -2297,6 +2303,9 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 		int			mtime;
 		const ZBX_DC_HISTORY	*h = &history[i];
 
+		if (0 != (h->flags & ZBX_DC_FLAG_NOHISTORY))
+			continue;
+
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 			continue;
 
@@ -2360,6 +2369,9 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
+		if (0 != (h->flags & ZBX_DC_FLAG_NOHISTORY))
+			continue;
+
 		if (ITEM_STATE_NOTSUPPORTED != h->state)
 			continue;
 
@@ -2392,6 +2404,9 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
+
+		if (0 != (h->flags & ZBX_DC_FLAG_NOHISTORY))
+			continue;
 
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
@@ -2726,6 +2741,75 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_prepare_history                                            *
+ *                                                                            *
+ * Purpose: prepares history update by checking which values must be stored   *
+ *                                                                            *
+ * Parameters: history     - [IN/OUT] the history values                      *
+ *             history_num - [IN] the number of history values                *
+ *                                                                            *
+ ******************************************************************************/
+static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
+{
+	int			i, *errcodes;
+	DC_ITEM			*items;
+	zbx_vector_uint64_t	itemids;
+
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_reserve(&itemids, history_num);
+
+	for (i = 0; i < history_num; i++)
+		zbx_vector_uint64_append(&itemids, history[i].itemid);
+
+	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
+	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
+
+	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
+
+	for (i = 0; i < history_num; i++)
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
+		/* store items with enabled history  */
+		if (0 != items[i].history)
+			continue;
+
+		/* store numeric items to handle data conversion errors on server */
+		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
+			continue;
+
+		/* store discovery rules */
+		if (0 != (items[i].flags & ZBX_FLAG_DISCOVERY_RULE))
+			continue;
+
+		/* store errors or first value after an error */
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state || ITEM_STATE_NOTSUPPORTED == items[i].state)
+			continue;
+
+		/* store items linked to host inventory */
+		if (0 != items[i].inventory_link)
+			continue;
+
+		if (0 != (history[i].flags & ZBX_DC_FLAG_META))
+		{
+			/* meta data updates must be kept in history, so just don't store the value */
+			history[i].flags |= ZBX_DC_FLAG_NOVALUE;
+			continue;
+		}
+
+		/* all checks passed, item must not be stored in proxy history/sent to server */
+		history[i].flags |= ZBX_DC_FLAG_NOHISTORY;
+	}
+
+	DCconfig_clean_items(items, errcodes, history_num);
+	zbx_free(items);
+	zbx_free(errcodes);
+	zbx_vector_uint64_destroy(&itemids);
+}
+
 static void	sync_proxy_history(int *total_num, int *more)
 {
 	int			history_num;
@@ -2753,6 +2837,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 			break;
 
 		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
+		proxy_prepare_history(history, history_items.values_num);
 
 		do
 		{
