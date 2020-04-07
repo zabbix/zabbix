@@ -1005,9 +1005,22 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity, unsigned char *status)
+static int	ptr_pair_compare_func(const void *d1, const void *d2)
 {
-	int	i, j;
+	const zbx_ptr_pair_t	*pair1 = (const zbx_ptr_pair_t *)d1;
+	const zbx_ptr_pair_t	*pair2 = (const zbx_ptr_pair_t *)d2;
+	int			ret;
+
+	if (0 != (ret = strcmp((char *)pair1->first, (char *)pair2->first)))
+		return ret;
+
+	return strcmp((char *)pair1->second, (char *)pair2->second);
+}
+
+void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity,
+		zbx_vector_ptr_pair_t *override_tags, unsigned char *status)
+{
+	int	i, j, k;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1042,6 +1055,9 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 			if (TRIGGER_SEVERITY_COUNT != override_operation->severity)
 				*severity = override_operation->severity;
 
+			for (k = 0; k < override_operation->trigger_tags.values_num; k++)
+				zbx_vector_ptr_pair_append(override_tags, override_operation->trigger_tags.values[k]);
+
 			if (NULL != status)
 			{
 				switch (override_operation->status)
@@ -1063,6 +1079,8 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 			}
 		}
 	}
+
+	zbx_vector_ptr_pair_sort(override_tags, ptr_pair_compare_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

@@ -67,6 +67,7 @@ typedef struct
 	zbx_vector_ptr_t	dependencies;
 	zbx_vector_ptr_t	dependents;
 	zbx_vector_ptr_t	tags;
+	zbx_vector_ptr_pair_t	override_tags;
 #define ZBX_FLAG_LLD_TRIGGER_UNSET			__UINT64_C(0x0000)
 #define ZBX_FLAG_LLD_TRIGGER_DISCOVERED			__UINT64_C(0x0001)
 #define ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION		__UINT64_C(0x0002)
@@ -252,6 +253,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 {
 	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)lld_tag_free);
+	zbx_vector_ptr_pair_destroy(&trigger->override_tags);
 	zbx_vector_ptr_destroy(&trigger->tags);
 	zbx_vector_ptr_destroy(&trigger->dependents);
 	zbx_vector_ptr_clear_ext(&trigger->dependencies, zbx_ptr_free);
@@ -444,6 +446,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		zbx_vector_ptr_create(&trigger->dependencies);
 		zbx_vector_ptr_create(&trigger->dependents);
 		zbx_vector_ptr_create(&trigger->tags);
+		zbx_vector_ptr_pair_create(&trigger->override_tags);
 
 		zbx_vector_ptr_append(triggers, trigger);
 	}
@@ -1216,7 +1219,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		priority = trigger_prototype->priority;
 
-		lld_override_trigger(&lld_row->overrides, buffer, &priority, NULL);
+		lld_override_trigger(&lld_row->overrides, buffer, &priority, &trigger->override_tags, NULL);
 
 		if (0 != strcmp(trigger->description, buffer))
 		{
@@ -1307,7 +1310,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger->status = trigger_prototype->status;
 		trigger->priority = trigger_prototype->priority;
 
-		lld_override_trigger(&lld_row->overrides, trigger->description, &trigger->priority, &trigger->status);
+		lld_override_trigger(&lld_row->overrides, trigger->description, &trigger->priority,
+				&trigger->override_tags, &trigger->status);
 
 		if (TRIGGER_STATUS_NO_CREATE == trigger->status)
 		{
@@ -1348,6 +1352,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_vector_ptr_create(&trigger->dependencies);
 		zbx_vector_ptr_create(&trigger->dependents);
 		zbx_vector_ptr_create(&trigger->tags);
+		zbx_vector_ptr_pair_create(&trigger->override_tags);
 
 		trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
@@ -1657,23 +1662,39 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 {
 	zbx_lld_trigger_t	*trigger;
 	int			i;
-	zbx_lld_tag_t		*tag_proto, *tag;
+	zbx_lld_tag_t		*tag;
 	char			*buffer = NULL;
+	const char		*key, *value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == (trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links)))
 		goto out;
 
-	for (i = 0; i < trigger_prototype->tags.values_num; i++)
+	for (i = 0; i < trigger_prototype->tags.values_num + trigger->override_tags.values_num; i++)
 	{
-		tag_proto = (zbx_lld_tag_t *)trigger_prototype->tags.values[i];
+		if (i < trigger_prototype->tags.values_num)
+		{
+			zbx_lld_tag_t	*tag_proto;
+
+			tag_proto = (zbx_lld_tag_t *)trigger_prototype->tags.values[i];
+			key = tag_proto->tag;
+			value = tag_proto->value;
+		}
+		else
+		{
+			zbx_ptr_pair_t	pair;
+
+			pair = trigger->override_tags.values[i - trigger_prototype->tags.values_num];
+			key = pair.first;
+			value = pair.second;
+		}
 
 		if (i < trigger->tags.values_num)
 		{
 			tag = (zbx_lld_tag_t *)trigger->tags.values[i];
 
-			buffer = zbx_strdup(buffer, tag_proto->tag);
+			buffer = zbx_strdup(buffer, key);
 			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 			if (0 != strcmp(buffer, tag->tag))
@@ -1684,7 +1705,7 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 				tag->flags |= ZBX_FLAG_LLD_TAG_UPDATE_TAG;
 			}
 
-			buffer = zbx_strdup(buffer, tag_proto->value);
+			buffer = zbx_strdup(buffer, value);
 			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 			if (0 != strcmp(buffer, tag->value))
@@ -1701,11 +1722,11 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 
 			tag->triggertagid = 0;
 
-			tag->tag = zbx_strdup(NULL, tag_proto->tag);
+			tag->tag = zbx_strdup(NULL, key);
 			substitute_lld_macros(&tag->tag, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(tag->tag, ZBX_WHITESPACE);
 
-			tag->value = zbx_strdup(NULL, tag_proto->value);
+			tag->value = zbx_strdup(NULL, value);
 			substitute_lld_macros(&tag->value, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(tag->value, ZBX_WHITESPACE);
 

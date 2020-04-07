@@ -45,8 +45,9 @@ void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zb
 
 void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, const char **delay,
 		const char **history, const char **trends, int *status);
-void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity, unsigned char *status);
-;int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows,
+void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity,
+		zbx_vector_ptr_pair_t *override_tags, unsigned char *status);
+int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macros, char **error, int lifetime, int lastcheck);
 
 void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows);
