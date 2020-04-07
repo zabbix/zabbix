@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/common/testFormItemTest.php';
  *
  * @backup items
  */
-class testFormHostItemTest extends testFormItemTest {
+class testFormItemTestHost extends testFormItemTest {
 
 	const HOST_ID	= 99136;	// 'Test item host' monitored by 'Active proxy 1'
 	const IS_HOST	= true;
@@ -55,7 +55,7 @@ class testFormHostItemTest extends testFormItemTest {
 	 * @backup-once items
 	 *
 	 */
-	public function testFormHostItemTest_CheckItemTestButtonState() {
+	public function testFormItemTestHost_CheckItemTestButtonState() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(),
 			'Item for Test Button check', $this->getCreateLink('items'),
 			$this->getSavedLink('items'), 'Item', ' added', true, self::HOST_ID
@@ -65,7 +65,7 @@ class testFormHostItemTest extends testFormItemTest {
 	/**
 	 * Check Test item prototype Button enabled/disabled state depending on item type.
 	 */
-	public function testFormHostItemTest_CheckItemPrototypeTestButtonState() {
+	public function testFormItemTestHost_CheckItemPrototypeTestButtonState() {
 		$prototype_create_link = 'disc_prototypes.php?form=create&parent_discoveryid='.self::LLD_ID;
 		$prototype_saved_link = 'disc_prototypes.php?form=update&parent_discoveryid='.self::LLD_ID.'&itemid=';
 
@@ -78,7 +78,7 @@ class testFormHostItemTest extends testFormItemTest {
 	/**
 	 *  Check Test LLD Button enabled/disabled state depending on item type.
 	 */
-	public function testFormHostItemTest_CheckLLDTestButtonState() {
+	public function testFormItemTestHost_CheckLLDTestButtonState() {
 		$this->checkTestButtonState($this->getCommonTestButtonStateData(),
 			'LLD for Test Button check', $this->getCreateLink('host_discovery'),
 			$this->getSavedLink('host_discovery'), 'Discovery rule', ' created',
@@ -91,9 +91,9 @@ class testFormHostItemTest extends testFormItemTest {
 	 *
 	 * @dataProvider getItemTestItemData
 	 *
-	 * @depends testFormHostItemTest_CheckItemTestButtonState
+	 * @depends testFormItemTestHost_CheckItemTestButtonState
 	 */
-	public function testFormHostItemTest_TestItem($data) {
+	public function testFormItemTestHost_TestItem($data) {
 		$this->checkTestItem($this->getCreateLink('items'), $data, self::IS_HOST);
 	}
 
@@ -102,9 +102,9 @@ class testFormHostItemTest extends testFormItemTest {
 	 *
 	 * @dataProvider getPrototypeTestItemData
 	 *
-	 * @depends testFormHostItemTest_CheckItemPrototypeTestButtonState
+	 * @depends testFormItemTestHost_CheckItemPrototypeTestButtonState
 	 */
-	public function testFormHostItemTest_TestItemPrototype($data) {
+	public function testFormItemTestHost_TestItemPrototype($data) {
 		$prototype_create_link = 'disc_prototypes.php?form=create&parent_discoveryid='.self::LLD_ID;
 
 		$this->checkTestItem($prototype_create_link, $data, self::IS_HOST);
@@ -115,9 +115,9 @@ class testFormHostItemTest extends testFormItemTest {
 	 *
 	 * @dataProvider getCommonTestItemData
 	 *
-	 * @depends testFormHostItemTest_CheckLLDTestButtonState
+	 * @depends testFormItemTestHost_CheckLLDTestButtonState
 	 */
-	public function testFormHostItemTest_TestLLD($data) {
+	public function testFormItemTestHost_TestLLD($data) {
 		$this->checkTestItem($this->getCreateLink('host_discovery'), $data, self::IS_HOST);
 	}
 }
