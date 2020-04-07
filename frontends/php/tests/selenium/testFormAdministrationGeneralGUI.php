@@ -27,8 +27,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 	public static function allValues() {
 		return CDBHelper::getDataProvider(
-			'SELECT default_theme,dropdown_first_entry,dropdown_first_remember,search_limit,max_in_table,'.
-				'server_check_interval'.
+			'SELECT default_theme,search_limit,max_in_table,server_check_interval'.
 			' FROM config'.
 			' ORDER BY configid'
 		);
