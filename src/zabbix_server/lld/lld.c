@@ -1085,6 +1085,73 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *status)
+{
+	int	i, j, k;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (i = 0; i < overrides->values_num; i++)
+	{
+		lld_override_t	*override;
+
+		override = overrides->values[i];
+
+		for (j = 0; j < override->override_operations.values_num; j++)
+		{
+			lld_override_operation_t	*override_operation;
+
+			override_operation = override->override_operations.values[j];
+
+			if (OPERATION_OBJECT_HOST_PROTOTYPE != override_operation->operationtype)
+				continue;
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
+					__func__, override_operation->override_operationid, override_operation->value,
+					name);
+
+			if (FAIL == regexp_strmatch_condition(name, override_operation->value,
+					override_operation->operator))
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "%s():FAIL", __func__);
+				continue;
+			}
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s():SUCCEED", __func__);
+
+//			if (TRIGGER_SEVERITY_COUNT != override_operation->severity)
+//				*severity = override_operation->severity;
+//
+//			for (k = 0; k < override_operation->trigger_tags.values_num; k++)
+//				zbx_vector_ptr_pair_append(override_tags, override_operation->trigger_tags.values[k]);
+
+			if (NULL != status)
+			{
+				switch (override_operation->status)
+				{
+					case ZBX_PROTOTYPE_STATUS_CREATE_ENABLED:
+						*status = HOST_STATUS_MONITORED;
+						break;
+					case ZBX_PROTOTYPE_STATUS_CREATE_DISABLED:
+						*status = HOST_STATUS_NOT_MONITORED;
+						break;
+					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
+						*status = HOST_STATUS_NO_CREATE;
+						break;
+					case ZBX_PROTOTYPE_STATUS_COUNT:
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+				}
+			}
+		}
+	}
+
+//	zbx_vector_ptr_pair_sort(override_tags, ptr_pair_compare_func);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 #define OVERRIDE_STOP_TRUE	1
 
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
