@@ -840,8 +840,7 @@ ZABBIX.apps.map = (function($) {
 
 				// application selection pop up
 				$('#application-select').click(function(event) {
-					var data = $('#elementNameHost').multiSelect('getData'),
-						popup_options = {
+					var popup_options = {
 							srctbl: 'applications',
 							srcfld1: 'name',
 							dstfrm: 'selementForm',
@@ -850,8 +849,10 @@ ZABBIX.apps.map = (function($) {
 							with_applications: '1'
 						};
 
-					if (data.length > 0 && $('#elementType').val() == '4') {
-						popup_options['hostid'] = data[0].id;
+					if ($('#elementType').val() == '3') {
+						popup_options = jQuery.extend(popup_options,
+							getFirstMultiselectValue('elementNameHost', 'elementNameHostGroup')
+						);
 					}
 
 					PopUp('popup.generic', popup_options, null, event.target);
@@ -2689,7 +2690,7 @@ ZABBIX.apps.map = (function($) {
 			// hosts
 			$('#elementNameHost').multiSelectHelper({
 				id: 'elementNameHost',
-				objectName: 'hosts',
+				object_name: 'hosts',
 				name: 'elementValue',
 				selectedLimit: 1,
 				popup: {
@@ -2705,7 +2706,7 @@ ZABBIX.apps.map = (function($) {
 			// triggers
 			$('#elementNameTriggers').multiSelectHelper({
 				id: 'elementNameTriggers',
-				objectName: 'triggers',
+				object_name: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
 					real_hosts: true
@@ -2727,7 +2728,7 @@ ZABBIX.apps.map = (function($) {
 			// host group
 			$('#elementNameHostGroup').multiSelectHelper({
 				id: 'elementNameHostGroup',
-				objectName: 'hostGroup',
+				object_name: 'hostGroup',
 				name: 'elementValue',
 				selectedLimit: 1,
 				popup: {

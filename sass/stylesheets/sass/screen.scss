@@ -1214,6 +1214,7 @@ $ui-transition-duration: .3s !default;
 
 		li {
 			display: block; // Override ".table-forms li".
+			padding-left: 0 !important;
 			margin: 2px 2px 0 0;
 			overflow: hidden;
 			white-space: nowrap;
@@ -1352,6 +1353,10 @@ $ui-transition-duration: .3s !default;
 
 	li {
 		display: table-row;
+
+		&.display-none {
+			@extend .display-none
+		}
 	}
 
 	.multiselect-suggest {
@@ -4568,6 +4573,11 @@ $form-icon-btn: (
 			padding: 6px 5px;
 			border: 0;
 			border-bottom: 1px solid $table-border-color;
+
+			&.list-table-footer {
+				color: $font-alt-color;
+				text-align: right;
+			}
 		}
 	}
 
@@ -5958,6 +5968,10 @@ svg {
 			display: none;
 		}
 	}
+}
+
+.display-none {
+	display: none;
 }
 
 .checkbox-list {

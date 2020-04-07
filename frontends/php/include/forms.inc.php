@@ -207,16 +207,18 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow((new CLabel(_('Hosts'), 'filter_hostid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => 'hosts',
+			'object_name' => 'host_templates',
 			'data' => $host_filter,
 			'popup' => [
+				'filter_preselect_fields' => [
+					'hostgroups' => 'filter_groupids_'
+				],
 				'parameters' => [
 					'srctbl' => 'host_templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_hostids_',
-					'editable' => true,
-					'templated_hosts' => true
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -249,10 +251,7 @@ function getItemFilterForm(&$items) {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1'
 					]).
-					',(jQuery("input[name=\'filter_hostids\']").length > 0)'.
-						' ? {hostid: jQuery("input[name=\'filter_hostids\']").val()}'.
-						' : {}'.
-					'), null, this);'
+					', getFirstMultiselectValue("filter_hostids_")), null, this);'
 				)
 		]
 	);
@@ -1715,18 +1714,6 @@ function getTriggerFormData(array $data) {
 	}
 	else {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
-	}
-
-	if ($data['hostid'] && (!array_key_exists('groupid', $data) || !$data['groupid'])) {
-		$db_hostgroups = API::HostGroup()->get([
-			'output' => ['groupid'],
-			'hostids' => $data['hostid'],
-			'templateids' => $data['hostid']
-		]);
-
-		if ($db_hostgroups) {
-			$data['groupid'] = $db_hostgroups[0]['groupid'];
-		}
 	}
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {

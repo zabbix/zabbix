@@ -136,7 +136,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 * Check authentication with LDAP settings.
 	 */
 	public function testFormAdministrationAuthenticationLdap_CheckSettings($data) {
-		$this->page->login()->open('zabbix.php?action=authentication.edit&ddreset=1');
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
 		$this->assertPageTitle('Configuration of authentication');
 

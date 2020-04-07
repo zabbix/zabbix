@@ -756,15 +756,15 @@ if ($data['hostid'] != 0) {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid')),
-			new CButtonCancel(url_param('groupid'))
+			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid')),
+			new CButtonCancel()
 		]
 	));
 }
 else {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('groupid'))]
+		[new CButtonCancel()]
 	));
 }
 

@@ -42,7 +42,6 @@ $fields = [
 	'hostids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
-	'groupid' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
 	'clone_hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,
 									'isset({form}) && {form} == "full_clone"'
@@ -136,6 +135,7 @@ $fields = [
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'filter_host' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'filter_groups' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'filter_ip' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
@@ -158,9 +158,6 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
 if (getRequest('hostid')) {
 	$hosts = API::Host()->get([
 		'output' => [],
@@ -185,6 +182,7 @@ if (hasRequest('filter_set')) {
 		PROFILE_TYPE_INT
 	);
 	CProfile::updateArray('web.hosts.filter_templates', getRequest('filter_templates', []), PROFILE_TYPE_ID);
+	CProfile::updateArray('web.hosts.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 	CProfile::updateArray('web.hosts.filter_proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
 	CProfile::update('web.hosts.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 		PROFILE_TYPE_INT
@@ -212,6 +210,7 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.hosts.filter_port');
 	CProfile::delete('web.hosts.filter_monitored_by');
 	CProfile::deleteIdx('web.hosts.filter_templates');
+	CProfile::deleteIdx('web.hosts.filter_groups');
 	CProfile::deleteIdx('web.hosts.filter_proxyids');
 	CProfile::delete('web.hosts.filter.evaltype');
 	CProfile::deleteIdx('web.hosts.filter.tags.tag');
@@ -225,6 +224,7 @@ $filter = [
 	'dns' => CProfile::get('web.hosts.filter_dns', ''),
 	'host' => CProfile::get('web.hosts.filter_host', ''),
 	'templates' => CProfile::getArray('web.hosts.filter_templates', []),
+	'groups' => CProfile::getArray('web.hosts.filter_groups', []),
 	'port' => CProfile::get('web.hosts.filter_port', ''),
 	'monitored_by' => CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY),
 	'proxyids' => CProfile::getArray('web.hosts.filter_proxyids', []),
@@ -1029,17 +1029,6 @@ elseif (hasRequest('hosts') && hasRequest('action') && str_in_array(getRequest('
 /*
  * Display
  */
-$pageFilter = new CPageFilter([
-	'groups' => [
-		'real_hosts' => true,
-		'editable' => true
-	],
-	'groupid' => getRequest('groupid')
-]);
-
-$_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['hostid'] = getRequest('hostid', 0);
-
 $config = select_config();
 
 if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || hasRequest('masssave'))) {
@@ -1158,8 +1147,6 @@ elseif (hasRequest('form')) {
 		'tls_psk' => getRequest('tls_psk', '')
 	];
 
-	$groups = [];
-
 	if (!hasRequest('form_refresh')) {
 		if ($data['hostid'] != 0) {
 			$dbHosts = API::Host()->get([
@@ -1254,9 +1241,7 @@ elseif (hasRequest('form')) {
 			$groups = zbx_objectValues($dbHost['groups'], 'groupid');
 		}
 		else {
-			if (getRequest('groupid', 0) != 0) {
-				$groups[] = getRequest('groupid');
-			}
+			$groups = getRequest('groupids', []);
 
 			$data['status'] = HOST_STATUS_MONITORED;
 		}
@@ -1454,6 +1439,23 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	// Get host groups.
+	$filter['groups'] = $filter['groups']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter['groups'],
+			'real_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]), ['groupid' => 'id'])
+		: [];
+
+	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+	if ($filter_groupids) {
+		$filter_groupids = getSubGroups($filter_groupids);
+	}
+
+	// Get templates.
 	$filter['templates'] = $filter['templates']
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
@@ -1462,48 +1464,46 @@ else {
 		]), ['templateid' => 'id'])
 		: [];
 
-	// get Hosts
-	$hosts = [];
-	if ($pageFilter->groupsSelected) {
-		switch ($filter['monitored_by']) {
-			case ZBX_MONITORED_BY_ANY:
-				$proxyids = null;
-				break;
+	switch ($filter['monitored_by']) {
+		case ZBX_MONITORED_BY_ANY:
+			$proxyids = null;
+			break;
 
-			case ZBX_MONITORED_BY_PROXY:
-				$proxyids = $filter['proxyids']
-					? $filter['proxyids']
-					: array_keys(API::Proxy()->get([
-						'output' => [],
-						'preservekeys' => true
-					]));
-				break;
+		case ZBX_MONITORED_BY_PROXY:
+			$proxyids = $filter['proxyids']
+				? $filter['proxyids']
+				: array_keys(API::Proxy()->get([
+					'output' => [],
+					'preservekeys' => true
+				]));
+			break;
 
-			case ZBX_MONITORED_BY_SERVER:
-				$proxyids = 0;
-				break;
-		}
-
-		$hosts = API::Host()->get([
-			'output' => ['hostid', $sortField],
-			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
-			'groupids' => $pageFilter->groupids,
-			'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
-			'editable' => true,
-			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1,
-			'search' => [
-				'name' => ($filter['host'] === '') ? null : $filter['host'],
-				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
-				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
-			],
-			'filter' => [
-				'port' => ($filter['port'] === '') ? null : $filter['port']
-			],
-			'proxyids' => $proxyids
-		]);
+		case ZBX_MONITORED_BY_SERVER:
+			$proxyids = 0;
+			break;
 	}
+
+	// Select hosts.
+	$hosts = API::Host()->get([
+		'output' => ['hostid', $sortField],
+		'evaltype' => $filter['evaltype'],
+		'tags' => $filter['tags'],
+		'groupids' => $filter_groupids,
+		'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
+		'editable' => true,
+		'sortfield' => $sortField,
+		'limit' => $config['search_limit'] + 1,
+		'search' => [
+			'name' => ($filter['host'] === '') ? null : $filter['host'],
+			'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
+			'dns' => ($filter['dns'] === '') ? null : $filter['dns']
+		],
+		'filter' => [
+			'port' => ($filter['port'] === '') ? null : $filter['port']
+		],
+		'proxyids' => $proxyids
+	]);
+
 	order_result($hosts, $sortField, $sortOrder);
 
 	// pager
@@ -1519,9 +1519,7 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$pagingLine = CPagerHelper::paginate($page_num, $hosts, $sortOrder,
-		(new CUrl('hosts.php'))->setArgument('groupid', $pageFilter->groupid)
-	);
+	$pagingLine = CPagerHelper::paginate($page_num, $hosts, $sortOrder, new CUrl('hosts.php'));
 
 	$hosts = API::Host()->get([
 		'output' => API_OUTPUT_EXTEND,
@@ -1623,14 +1621,12 @@ else {
 	}
 
 	$data = [
-		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
 		'paging' => $pagingLine,
 		'page' => $page_num,
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
-		'groupId' => $pageFilter->groupid,
 		'config' => $config,
 		'templates' => $templates,
 		'maintenances' => $db_maintenances,

@@ -204,7 +204,7 @@
 		<?php if ($data['is_template']): ?>
 			return {'only_hostid':'<?= $data['hostid'] ?>'};
 		<?php else: ?>
-			return {'real_hosts':'1'};
+			return {'real_hosts':'1', 'hostid':'<?= $data['hostid'] ?>'};
 		<?php endif ?>
 	}
 
@@ -235,8 +235,7 @@
 			<?php if ($data['normal_only'] !== ''): ?>
 				popup_options['normal_only'] = '1';
 			<?php endif ?>
-			<?php if (!$data['parent_discoveryid'] && $data['groupid'] && $data['hostid']): ?>
-				popup_options['groupid'] = '<?= $data['groupid'] ?>',
+			<?php if (!$data['parent_discoveryid'] && $data['hostid']): ?>
 				popup_options['hostid'] = '<?= $data['hostid'] ?>';
 			<?php endif ?>
 

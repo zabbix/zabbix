@@ -442,21 +442,21 @@ if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').url_param('groupid')),
+			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid')),
 			new CButtonQMessage(
 				'delete_and_clear',
 				_('Delete and clear'),
 				_('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
-				url_param('form').url_param('templateid').url_param('groupid')
+				url_param('form').url_param('templateid')
 			),
-			new CButtonCancel(url_param('groupid'))
+			new CButtonCancel()
 		]
 	));
 }
 else {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('groupid'))]
+		[new CButtonCancel()]
 	));
 }
 

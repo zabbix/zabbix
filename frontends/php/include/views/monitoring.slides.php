@@ -71,18 +71,44 @@ $refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SLIDESHOW, 'x'.$
 
 $controls = null;
 
-if (isset($this->data['isDynamicItems'])) {
+if ($data['has_dynamic_widgets']) {
 	$controls = (new CList())
-		->addItem([
-			new CLabel(_('Group'), 'groupid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$this->data['pageFilter']->getGroupsCB()
-		])
-		->addItem([
-			new CLabel(_('Host'), 'hostid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$this->data['pageFilter']->getHostsCB()
-		]);
+		->addItem(new CLabel(_('Host'), 'hostid'))
+		->addItem(
+			(new CMultiSelect([
+				'name' => 'dynamic_hostid',
+				'object_name' => 'hosts',
+				'data' => $data['host'],
+				'multiple' => false,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'hosts',
+						'srcfld1' => 'hostid',
+						'dstfld1' => 'dynamic_hostid',
+						'monitored_hosts' => 1
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		);
+
+	zbx_add_post_js(
+		'jQuery("#dynamic_hostid").on("change", function() {'.
+			'var hosts = jQuery(this).multiSelect("getData"),'.
+				'url = new Curl("slides.php", false);'.
+
+			// Make URL.
+			'url.setArgument("elementid", '.$data['screen']['slideshowid'].');'.
+			'if (hosts.length) {'.
+				'url.setArgument("hostid", hosts[0].id);'.
+			'}'.
+			'else {'.
+				'url.setArgument("reset", "reset");'.
+			'}'.
+
+			// Push URL change.
+			'return redirect(url.getUrl(), "get", "", false, false);'.
+		'});'
+	);
 }
 
 $widget->setControls((new CList([

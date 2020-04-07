@@ -1655,6 +1655,39 @@ static int	DBpatch_4050073(void)
 	return DBmodify_field_type("services", &field, &field);
 }
 
+static int	DBpatch_4050074(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
+			"web..hostid", "web.view.groupid", "web.view.hostid", "web.view.graphid",
+			"web.config.groupid", "web.config.hostid", "web.templates.php.groupid", "web.cm.groupid",
+			"web.httpmon.php.sort", "web.httpmon.php.sortorder", "web.avail_report.0.hostid",
+			"web.avail_report.0.groupid", "web.graphs.filter.to", "web.graphs.filter.from", "web.graphs.filter.active"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='%s'", values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050075(void)
+{
+	return DBdrop_field("config", "dropdown_first_entry");
+}
+
+static int	DBpatch_4050076(void)
+{
+	return DBdrop_field("config", "dropdown_first_remember");
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1729,5 +1762,8 @@ DBPATCH_ADD(4050070, 0, 1)
 DBPATCH_ADD(4050071, 0, 1)
 DBPATCH_ADD(4050072, 0, 1)
 DBPATCH_ADD(4050073, 0, 1)
+DBPATCH_ADD(4050074, 0, 1)
+DBPATCH_ADD(4050075, 0, 1)
+DBPATCH_ADD(4050076, 0, 1)
 
 DBPATCH_END()

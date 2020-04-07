@@ -1546,6 +1546,7 @@ pre, pre a, pre td, pre span {
     padding-bottom: 2px; }
     .multiselect .multiselect-list li {
       display: block;
+      padding-left: 0 !important;
       margin: 2px 2px 0 0;
       overflow: hidden;
       white-space: nowrap;
@@ -3642,6 +3643,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 6px 5px;
       border: 0;
       border-bottom: 1px solid #888888; }
+      .screen-table .list-table td.list-table-footer {
+        color: #333333;
+        text-align: right; }
   .screen-table .dashbrd-widget {
     margin: 0;
     border: 0; }
@@ -4619,6 +4623,9 @@ svg {
     margin-bottom: 5px; }
   .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
     display: none; }
+
+.display-none, .table-forms li.display-none {
+  display: none; }
 
 .checkbox-list li {
   overflow: hidden;

@@ -62,32 +62,28 @@ $widget = (new CWidget())
 		]
 	])
 	->setWebLayoutMode($web_layout_mode)
-	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem(new CInput('hidden', 'type', $this->data['type']))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$this->data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Hosts location'), 'view_style'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
-						STYLE_TOP => _('Top'),
-						STYLE_LEFT => _('Left')
-					])
-				])
-			),
+	->setControls(
 		(new CTag('nav', true, (new CList())
+			->addItem((new CForm('get'))
+				->cleanItems()
+				->setAttribute('aria-label', _('Main filter'))
+				->addItem(new CInput('hidden', 'type', $data['type']))
+				->addItem((new CList())
+					->addItem([
+						new CLabel(_('Hosts location'), 'view_style'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CComboBox('view_style', $data['view_style'], 'submit()', [
+							STYLE_TOP => _('Top'),
+							STYLE_LEFT => _('Left')
+						])
+					])
+				)
+			)
 			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
-	]));
+	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	// filter
@@ -96,14 +92,51 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
 			(new CFormList())
+				->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
+					(new CMultiSelect([
+						'multiple' => true,
+						'name' => 'filter_groupids[]',
+						'object_name' => 'hostGroup',
+						'data' => $data['filter']['groups'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_groupids_',
+								'with_monitored_items' => true
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
+					(new CMultiSelect([
+						'multiple' => true,
+						'name' => 'filter_hostids[]',
+						'object_name' => 'hosts',
+						'data' => $data['filter']['hosts'],
+						'popup' => [
+							'filter_preselect_fields' => [
+								'hostgroups' => 'filter_groupids_'
+							],
+							'parameters' => [
+								'srctbl' => 'hosts',
+								'srcfld1' => 'hostid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_hostids_',
+								'monitored_hosts' => true,
+								'with_monitored_items' => true
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
 				->addRow(_('Application'), [
 					(new CTextBox('application', $data['filter']['application']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-						->setAttribute('autofocus', 'autofocus'),
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('application_name', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
-						->onClick('return PopUp("popup.generic",'.
+						->onClick('return PopUp("popup.generic", jQuery.extend('.
 							json_encode([
 								'srctbl' => 'applications',
 								'srcfld1' => 'name',
@@ -111,7 +144,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 								'dstfld1' => 'application',
 								'real_hosts' => '1',
 								'with_applications' => '1'
-							]).', null, this);'
+							]).', getFirstMultiselectValue("filter_hostids_", "filter_groupids_")), null, this);'
 						)
 				])
 				->addRow(_('Show suppressed problems'),
@@ -123,15 +156,21 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	);
 }
 
-// data table
-if ($data['pageFilter']->groupsSelected) {
-	$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
-	$table = getItemsDataOverview($groupids, $data['filter']['application'], $data['view_style'],
-		$data['filter']['show_suppressed']
-	);
+if ($data['view_style'] == STYLE_TOP) {
+	$table = new CPartial('dataoverview.table.top', [
+		'visible_items' => $data['visible_items'],
+		'db_hosts' => $data['db_hosts'],
+		'items_by_name' => $data['items_by_name'],
+		'has_hidden_data' => $data['has_hidden_data']
+	]);
 }
 else {
-	$table = new CTableInfo();
+	$table = new CPartial('dataoverview.table.left', [
+		'visible_items' => $data['visible_items'],
+		'db_hosts' => $data['db_hosts'],
+		'items_by_name' => $data['items_by_name'],
+		'has_hidden_data' => $data['has_hidden_data']
+	]);
 }
 
 $widget->addItem($table);

@@ -34,7 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'hostids' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'groupids' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	// maintenance
 	'maintenanceid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'maintenanceids' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null],
@@ -65,6 +64,7 @@ $fields = [
 	'filter_rst' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_status' =>						[T_ZBX_INT, O_OPT, null,	IN([-1, MAINTENANCE_STATUS_ACTIVE, MAINTENANCE_STATUS_APPROACH, MAINTENANCE_STATUS_EXPIRED]), null],
+	'filter_groups' =>						[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	// sort and sortorder
 	'sort' =>								[T_ZBX_STR, O_OPT, P_SYS,
 												IN('"active_since","active_till","maintenance_type","name"'),
@@ -80,9 +80,6 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
 if (isset($_REQUEST['maintenanceid'])) {
 	$dbMaintenance = API::Maintenance()->get([
 		'output' => API_OUTPUT_EXTEND,
@@ -215,13 +212,6 @@ elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdel
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));
 }
 
-$options = [
-	'groups' => ['editable' => 1],
-	'groupid' => getRequest('groupid')
-];
-$pageFilter = new CPageFilter($options);
-$_REQUEST['groupid'] = $pageFilter->groupid;
-
 /*
  * Display
  */
@@ -322,16 +312,34 @@ else {
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.maintenance.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.maintenance.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::updateArray('web.maintenance.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.maintenance.filter_name');
 		CProfile::delete('web.maintenance.filter_status');
+		CProfile::deleteIdx('web.maintenance.filter_groups');
 	}
 
 	$filter = [
 		'name' => CProfile::get('web.maintenance.filter_name', ''),
-		'status' => CProfile::get('web.maintenance.filter_status', -1)
+		'status' => CProfile::get('web.maintenance.filter_status', -1),
+		'groups' => CProfile::getArray('web.maintenance.filter_groups', [])
 	];
+
+	// Get host groups.
+	$filter['groups'] = $filter['groups']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter['groups'],
+			'editable' => true,
+			'preservekeys' => true
+		]), ['groupid' => 'id'])
+		: [];
+
+	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+	if ($filter_groupids) {
+		$filter_groupids = getSubGroups($filter_groupids);
+	}
 
 	$config = select_config();
 
@@ -349,18 +357,12 @@ else {
 		'search' => [
 			'name' => ($filter['name'] === '') ? null : $filter['name']
 		],
+		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
 		'sortorder' => $sortOrder,
 		'limit' => $config['search_limit'] + 1
 	];
-
-	if ($pageFilter->groupsSelected && $pageFilter->groupid > 0) {
-		$options['groupids'] = $pageFilter->groupids;
-	}
-	else {
-		$options['groupids'] = $config['dropdown_first_entry'] ? null : [];
-	}
 
 	$data['maintenances'] = API::Maintenance()->get($options);
 
@@ -400,11 +402,7 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['maintenances'], $sortOrder,
-		(new CUrl('maintenance.php'))->setArgument('groupid', $pageFilter->groupid)
-	);
-
-	$data['pageFilter'] = $pageFilter;
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['maintenances'], $sortOrder, new CUrl('maintenance.php'));
 
 	// render view
 	echo (new CView('configuration.maintenance.list', $data))->getOutput();
