@@ -25,20 +25,21 @@ require_once dirname(__FILE__).'/common/testFormMacros.php';
  */
 class testFormHostPrototypeMacros extends testFormMacros {
 
+	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
+	const LLD_ID			= 90001;
 	const IS_PROTOTYPE	= true;
-	const LLD_ID	 = 90001;
 
 	use MacrosTrait;
 
 	/**
-	 * The name of the host for updating macros, id=20006.
+	 * The name of the host for updating macros, id=99200.
 	 *
 	 * @var string
 	 */
 	protected $host_name_update = 'Host prototype for macros {#UPDATE}';
 
 	/**
-	 * The name of the host for removing macros, id=30010.
+	 * The name of the host for removing macros, id=99201.
 	 *
 	 * @var string
 	 */
