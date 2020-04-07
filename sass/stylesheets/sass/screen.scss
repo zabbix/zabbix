@@ -5,6 +5,10 @@ $ui-transitions: true !default;
 // Sync with JavaScript variable: UI_TRANSITION_DURATION.
 $ui-transition-duration: .3s !default;
 
+// Sprite path
+$sprite-path: '../img/icon-sprite.svg?20200407';
+$browser-sprite-path: '../img/browser-sprite.png?20200407';
+
 @import "utils/mixins";
 
 @import "base/reset";
