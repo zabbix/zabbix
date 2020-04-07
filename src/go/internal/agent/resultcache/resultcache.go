@@ -178,32 +178,36 @@ func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
 	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
 		return errors.New("\"EnablePersistentBuffer\" parameter misconfiguration: \"PersistentBufferFile\" parameter is not set")
 	}
-	if options.EnablePersistentBuffer == 0 && options.PersistentBufferFile != "" {
-		return errors.New("\"PersistentBufferFile\" parameter is not empty but \"EnablePersistentBuffer\" is not set")
-	}
-
 	if options.EnablePersistentBuffer == 0 {
-		return err
+		if options.PersistentBufferFile != "" {
+			return errors.New("\"PersistentBufferFile\" parameter is not empty but \"EnablePersistentBuffer\" is not set")
+		}
+		return
 	}
 	var database *sql.DB
 	database, err = sql.Open("sqlite3", options.PersistentBufferFile)
 	if err != nil {
-		return fmt.Errorf("Cannot open database %s.", options.PersistentBufferFile)
+		return fmt.Errorf("Cannot open database %s : %s.", options.PersistentBufferFile, err)
 	}
 	defer database.Close()
+
 	stmt, _ := database.Prepare("CREATE TABLE IF NOT EXISTS registry (id INTEGER PRIMARY KEY,address TEXT,UNIQUE(address))")
-	stmt.Exec()
+	if _, err = stmt.Exec(); err != nil {
+		return err
+	}
 
 	var id int
 	var address string
 	ids := make([]int, 0)
 	registeredAddresses := make([]string, 0)
-	rows, err := database.Query("SELECT Id,Address FROM registry")
+	rows, err := database.Query("SELECT id,address FROM registry")
 	if err != nil {
 		return err
 	}
 	for rows.Next() {
-		rows.Scan(&id, &address)
+		if err = rows.Scan(&id, &address); err != nil {
+			return err
+		}
 		ids = append(ids, id)
 		registeredAddresses = append(registeredAddresses, address)
 	}
@@ -214,34 +218,53 @@ addressCheck:
 				continue addressCheck
 			}
 		}
-		database.Exec(fmt.Sprintf("DELETE FROM registry WHERE ID = %d", ids[i]))
-		database.Exec(fmt.Sprintf("DROP TABLE data_%d", ids[i]))
-		database.Exec(fmt.Sprintf("DROP TABLE log_%d", ids[i]))
+		if _, err = database.Exec(fmt.Sprintf("DELETE FROM registry WHERE ID = %d", ids[i])); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("DROP TABLE data_%d", ids[i])); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("DROP TABLE log_%d", ids[i])); err != nil {
+			return err
+		}
 	}
 
 	for _, addr := range addresses {
-		stmt, err = database.Prepare("INSERT OR IGNORE INTO registry (Address) VALUES (?)")
+		stmt, err = database.Prepare("INSERT OR IGNORE INTO registry (address) VALUES (?)")
 		if err != nil {
 			break
 		}
-		stmt.Exec(addr)
-		rows, err = database.Query("SELECT Id FROM registry WHERE Address=?", addr)
+		if _, err = stmt.Exec(addr); err != nil {
+			break
+		}
+		rows, err = database.Query("SELECT id FROM registry WHERE address=?", addr)
 		if err != nil {
 			break
 		}
-		for rows.Next() {
-			rows.Scan(&id)
+		if !rows.Next() {
+			break
 		}
+		if err = rows.Scan(&id); err != nil {
+			break
+		}
+		if err = rows.Close(); err != nil {
+			break
+		}
+
 		stmt, err = database.Prepare(createTableQuery("data", id))
 		if err != nil {
 			break
 		}
-		stmt.Exec()
+		if _, err = stmt.Exec(); err != nil {
+			break
+		}
 		stmt, err = database.Prepare(createTableQuery("log", id))
 		if err != nil {
 			break
 		}
-		stmt.Exec()
+		if _, err = stmt.Exec(); err != nil {
+			break
+		}
 		database.Exec(fmt.Sprintf("DELETE FROM log_%d", id))
 	}
 	return err

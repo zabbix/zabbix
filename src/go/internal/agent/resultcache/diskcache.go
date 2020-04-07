@@ -22,6 +22,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"zabbix.com/internal/agent"
@@ -36,6 +37,8 @@ import (
 
 const (
 	DbVariableNotSet = -1
+	StorageTolerance = 600
+	DataLimit        = 10000
 )
 
 type DiskCache struct {
@@ -46,73 +49,84 @@ type DiskCache struct {
 	lastError     error
 	retry         *time.Timer
 	timeout       int
-	persistPeriod int
+	storagePeriod int
 	oldestLog     uint64
 	oldestData    uint64
 	connectId     int
 	database      *sql.DB
+	persistFlag   uint32
 }
 
-func (c *DiskCache) resultFetch(rows *sql.Rows) AgentData {
+func (c *DiskCache) resultFetch(rows *sql.Rows) (AgentData, error) {
 	var tmp uint64
 	var data AgentData
 	var LastLogSize int64
 	var Mtime, State, EventID, EventSeverity, EventTimestamp int
 	var Value, EventSource string
 
-	rows.Scan(&data.Id, &data.Itemid, &LastLogSize, &Mtime, &State, &Value, &EventSource, &EventID,
+	err := rows.Scan(&data.Id, &data.Itemid, &LastLogSize, &Mtime, &State, &Value, &EventSource, &EventID,
 		&EventSeverity, &EventTimestamp, &data.Clock, &data.Ns)
-	if LastLogSize != DbVariableNotSet {
-		tmp = uint64(LastLogSize)
-		data.LastLogsize = &tmp
+	if err == nil {
+		if LastLogSize != DbVariableNotSet {
+			tmp = uint64(LastLogSize)
+			data.LastLogsize = &tmp
+		}
+		if Mtime != DbVariableNotSet {
+			data.Mtime = &Mtime
+		}
+		if State != DbVariableNotSet {
+			data.State = &State
+		}
+		if Value != "" {
+			data.Value = &Value
+		}
+		if EventSource != "" {
+			data.EventSource = &EventSource
+		}
+		if EventID != DbVariableNotSet {
+			data.EventID = &EventID
+		}
+		if EventSeverity != DbVariableNotSet {
+			data.EventSeverity = &EventSeverity
+		}
+		if EventTimestamp != DbVariableNotSet {
+			data.EventTimestamp = &EventTimestamp
+		}
 	}
-	if Mtime != DbVariableNotSet {
-		data.Mtime = &Mtime
-	}
-	if State != DbVariableNotSet {
-		data.State = &State
-	}
-	if Value != "" {
-		data.Value = &Value
-	}
-	if EventSource != "" {
-		data.EventSource = &EventSource
-	}
-	if EventID != DbVariableNotSet {
-		data.EventID = &EventID
-	}
-	if EventSeverity != DbVariableNotSet {
-		data.EventSeverity = &EventSeverity
-	}
-	if EventTimestamp != DbVariableNotSet {
-		data.EventTimestamp = &EventTimestamp
-	}
-	return data
+	return data, err
 }
 
 func (c *DiskCache) upload(u Uploader) (err error) {
 
 	var results []*AgentData
 	var rows *sql.Rows
+	var maxDataId, maxLogId uint64
+	var oldestData, oldestLog uint64
 
-	if rows, err = c.database.Query(fmt.Sprintf("SELECT * FROM data_%d", c.connectId)); err != nil {
+	if rows, err = c.database.Query(fmt.Sprintf("SELECT * FROM data_%d ORDER BY id LIMIT ?", c.connectId), DataLimit); err != nil {
 		log.Errf("[%d] cannot select from data table: %s", c.clientID, err.Error())
 		return
 	}
 	for rows.Next() {
-		result := c.resultFetch(rows)
+		result, _ := c.resultFetch(rows)
 		result.persistent = false
 		results = append(results, &result)
+		if result.Id > maxDataId {
+			maxDataId = result.Id
+		}
 
 	}
-	if rows, err = c.database.Query(fmt.Sprintf("SELECT * FROM log_%d", c.connectId)); err != nil {
+	if rows, err = c.database.Query(fmt.Sprintf("SELECT * FROM log_%d ORDER BY id LIMIT ?", c.connectId), DataLimit); err != nil {
 		log.Errf("[%d] cannot select from log table: %s", c.clientID, err.Error())
 		return
 	}
 	for rows.Next() {
-		result := c.resultFetch(rows)
+		result, _ := c.resultFetch(rows)
 		result.persistent = true
 		results = append(results, &result)
+		if result.Id > maxDataId {
+			maxLogId = result.Id
+		}
 	}
 	if len(results) == 0 {
 		return
@@ -149,10 +163,30 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		log.Warningf("[%d] history upload to [%s] is working again", c.clientID, u.Addr())
 		c.lastError = nil
 	}
-	c.database.Exec(fmt.Sprintf("DELETE FROM data_%d", c.connectId))
-	c.database.Exec(fmt.Sprintf("DELETE FROM log_%d", c.connectId))
-	c.oldestData = 0
-	c.oldestLog = 0
+	if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM data_%d WHERE id<=?", c.connectId), maxDataId); err != nil {
+		log.Warningf("Cannot delete from data_%d: %s", c.connectId, err)
+	}
+	if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM log_%d WHERE id<=?", c.connectId), maxLogId); err != nil {
+		log.Warningf("Cannot delete from log_%d: %s", c.connectId, err)
+	}
+	if rows, err = c.database.Query(fmt.Sprintf("SELECT MIN(clock) FROM data_%d", c.connectId)); err == nil {
+		for rows.Next() {
+			if err = rows.Scan(&oldestData); err != nil {
+				oldestData = 0
+			}
+		}
+	}
+	if rows, err = c.database.Query(fmt.Sprintf("SELECT MIN(clock) FROM log_%d", c.connectId)); err == nil {
+		for rows.Next() {
+			if err = rows.Scan(&oldestLog); err != nil {
+				oldestLog = 0
+			}
+		}
+	}
+	c.oldestData = oldestData
+	c.oldestLog = oldestLog
+	// enable persitent data writting
+	c.persistFlag = 0
 
 	return
 }
@@ -169,6 +203,7 @@ func (c *DiskCache) flushOutput(u Uploader) {
 }
 
 func (c *DiskCache) write(r *plugin.Result) {
+	var err error
 	c.lastDataID++
 
 	var LastLogsize int64 = DbVariableNotSet
@@ -223,28 +258,38 @@ func (c *DiskCache) write(r *plugin.Result) {
 		if c.oldestLog == 0 {
 			c.oldestLog = clock
 		}
-		if (clock - c.oldestLog) <= uint64(c.persistPeriod) {
-			stmt, _ = c.database.Prepare(c.InsertResultTable(fmt.Sprintf("log_%d", c.connectId)))
+		if (clock - c.oldestLog) > uint64(c.storagePeriod) {
+			c.persistFlag = 1
 		}
+		stmt, _ = c.database.Prepare(c.insertResultTable(fmt.Sprintf("log_%d", c.connectId)))
+
 	} else {
 		if c.oldestData == 0 {
 			c.oldestData = clock
 		}
-		if (clock - c.oldestData) > uint64(c.persistPeriod) {
-			query := fmt.Sprintf("DELETE FROM data_%d WHERE clock = %d", c.connectId, c.oldestData)
-			c.database.Exec(query)
-			rows, err := c.database.Query(fmt.Sprintf("SELECT MIN(Clock) FROM data_%d", c.connectId))
-			if err != nil {
+
+		if (clock - c.oldestData) > uint64(c.storagePeriod+StorageTolerance) {
+			query := fmt.Sprintf("DELETE FROM data_%d WHERE clock<=?", c.connectId)
+			if _, err = c.database.Exec(query, c.oldestData+StorageTolerance); err != nil {
+				log.Warningf("Cannot delete old data from data_%d : %s", c.connectId, err)
+			}
+			rows, err := c.database.Query(fmt.Sprintf("SELECT MIN(clock) FROM data_%d", c.connectId))
+			if err == nil {
 				for rows.Next() {
-					rows.Scan(&c.oldestData)
+					if err = rows.Scan(&c.oldestData); err != nil {
+						c.oldestData = 0
+					}
 				}
 			}
 		}
-		stmt, _ = c.database.Prepare(c.InsertResultTable(fmt.Sprintf("data_%d", c.connectId)))
+		stmt, _ = c.database.Prepare(c.insertResultTable(fmt.Sprintf("data_%d", c.connectId)))
 	}
 	if stmt != nil {
-		stmt.Exec(c.lastDataID, r.Itemid, LastLogsize, Mtime, State, Value,
+		_, err = stmt.Exec(c.lastDataID, r.Itemid, LastLogsize, Mtime, State, Value,
 			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns)
+		if err != nil {
+			log.Warningf("Cannot execute SQL statement : %s", err)
+		}
 	}
 }
 
@@ -274,16 +319,16 @@ func (c *DiskCache) run() {
 }
 
 func (c *DiskCache) updateOptions(options *agent.AgentOptions) {
-	c.persistPeriod = options.PersistentBufferPeriod
+	c.storagePeriod = options.PersistentBufferPeriod
 }
 
-func (c *DiskCache) InsertResultTable(table string) string {
-	return fmt.Sprintf(`
-		INSERT INTO %s
-		(Id, Itemid, LastLogsize, Mtime, State, Value, EventSource, EventID, EventSeverity, EventTimestamp, Clock, Ns)
-		VALUES
-		(?,?,?,?,?,?,?,?,?,?,?,?)
-	`, table)
+func (c *DiskCache) insertResultTable(table string) string {
+	return fmt.Sprintf(
+		"INSERT INTO %s"+
+			"(id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns)"+
+			"VALUES"+
+			"(?,?,?,?,?,?,?,?,?,?,?,?)",
+		table)
 }
 
 func (c *DiskCache) init(u Uploader) {
@@ -297,16 +342,21 @@ func (c *DiskCache) init(u Uploader) {
 	}
 
 	var rows *sql.Rows
-	rows, err = c.database.Query(fmt.Sprintf("SELECT Id FROM registry WHERE Address = '%s'", c.Uploader().Addr()))
+	rows, err = c.database.Query(fmt.Sprintf("SELECT id FROM registry WHERE address = '%s'", c.Uploader().Addr()))
 	if err == nil {
 		for rows.Next() {
-			rows.Scan(&c.connectId)
+			if err = rows.Scan(&c.connectId); err != nil {
+				c.connectId = 0
+			}
 		}
 	}
 
-	if rows, err = c.database.Query(fmt.Sprintf("SELECT MIN(Clock), MAX(Id) FROM data_%d", c.connectId)); err == nil {
+	if rows, err = c.database.Query(fmt.Sprintf("SELECT MIN(clock), MAX(id) FROM data_%d", c.connectId)); err == nil {
 		for rows.Next() {
-			rows.Scan(&c.oldestData, &c.lastDataID)
+			if err = rows.Scan(&c.oldestData, &c.lastDataID); err != nil {
+				c.oldestData = 0
+				c.lastDataID = 0
+			}
 		}
 	}
 }
@@ -322,5 +372,9 @@ func (c *DiskCache) SlotsAvailable() int {
 }
 
 func (c *DiskCache) PersistSlotsAvailable() int {
+
+	if atomic.LoadUint32(&c.persistFlag) == 1 {
+		return 0
+	}
 	return int(^uint(0) >> 1) //Max int
 }
