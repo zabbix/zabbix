@@ -763,7 +763,7 @@ class CHistoryManager {
 			];
 
 			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = 'Math.floor((params.width*((doc[\'clock\'].date.getMillis()/1000+params.delta)%params.size))'.
+			$formula = 'Math.floor((params.width*((doc[\'clock\'].value.getMillis()/1000+params.delta)%params.size))'.
 					'/params.size)';
 
 			$script = [
