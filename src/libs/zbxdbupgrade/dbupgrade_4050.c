@@ -1657,11 +1657,6 @@ static int	DBpatch_4050073(void)
 
 static int	DBpatch_4050074(void)
 {
-<<<<<<< HEAD
-	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBmodify_field_type("acknowledges", &field, NULL);
-=======
 	int		i;
 	const char	*values[] = {
 			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
@@ -1691,7 +1686,13 @@ static int	DBpatch_4050075(void)
 static int	DBpatch_4050076(void)
 {
 	return DBdrop_field("config", "dropdown_first_remember");
->>>>>>> 44591fc27b5f31025a91856682db3dd194c21667
+}
+
+static int	DBpatch_4050077(void)
+{
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("acknowledges", &field, NULL);
 }
 
 #endif
@@ -1769,10 +1770,8 @@ DBPATCH_ADD(4050071, 0, 1)
 DBPATCH_ADD(4050072, 0, 1)
 DBPATCH_ADD(4050073, 0, 1)
 DBPATCH_ADD(4050074, 0, 1)
-<<<<<<< HEAD
-=======
 DBPATCH_ADD(4050075, 0, 1)
 DBPATCH_ADD(4050076, 0, 1)
->>>>>>> 44591fc27b5f31025a91856682db3dd194c21667
+DBPATCH_ADD(4050077, 0, 1)
 
 DBPATCH_END()
