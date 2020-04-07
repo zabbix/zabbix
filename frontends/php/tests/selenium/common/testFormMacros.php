@@ -36,303 +36,106 @@ abstract class testFormMacros extends CWebTest {
 		return CDBHelper::getHash(self::SQL_HOSTS);
 	}
 
-	public static function getCreateCommonMacrosData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'Name' => 'With Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$1234}',
-							'value' => '!@#$%^&*()_+/*',
-							'description' => '!@#$%^&*()_+/*',
-						],
-						[
-							'macro' => '{$MACRO1}',
-							'value' => 'Value_1',
-							'description' => 'Test macro Description 1'
-						],
-						[
-							'macro' => '{$MACRO3}',
-							'value' => '',
-							'description' => '',
-						],
-						[
-							'macro' => '{$MACRO4}',
-							'value' => 'value',
-							'description' => '',
-						],
-						[
-							'macro' => '{$MACRO5}',
-							'value' => '',
-							'description' => 'DESCRIPTION',
-						],
-						[
-							'macro' => '{$MACRO6}',
-							'value' => 'Значение',
-							'description' => 'Описание',
-						],
-						[
-							'macro' => '{$MACRO:A}',
-							'value' => '{$MACRO:A}',
-							'description' => '{$MACRO:A}',
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Without dollar in Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{MACRO}',
-						]
-					],
-					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With empty Macro',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '',
-							'value' => 'Macro_Value',
-							'description' => 'Macro Description'
-						]
-					],
-					'error_details' => 'Invalid macro "": macro is empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_details' => 'Macro "{$MACRO}" is not unique.'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Test creating of host or template with Macros.
 	 */
-	protected function checkCreate($data, $host_type = 'host') {
-		$this->page->login()->open($host_type.'s.php?form=create');
-		$form = $this->query('name:'.$host_type.'sForm')->waitUntilPresent()->asForm()->one();
+	protected function checkCreate($data, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
+		if ($is_prototype) {
+			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
+		}
+		else {
+			$this->page->login()->open($host_type.'s.php?form=create');
+		}
 
-		$form->fill([
-			ucfirst($host_type).' name' => $data['Name'],
-			'Groups' => 'Zabbix servers'
-		]);
+		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form->fill([ucfirst($host_type).' name' => $data['Name']]);
 
-		$this->checkMacros(' added', $data['Name'], $host_type, $data, 'Cannot add ');
-	}
+		if ($is_prototype) {
+			$form->selectTab('Groups');
+		}
+		$form->fill(['Groups' => 'Zabbix servers']);
 
-	public static function getUpdateCommonMacrosData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$UPDATED_MACRO1}',
-							'value' => 'updated value1',
-							'description' => 'updated description 1',
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO2}',
-							'value' => 'Updated value 2',
-							'description' => 'Updated description 2',
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$UPDATED_MACRO1}',
-							'value' => '',
-							'description' => '',
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO2}',
-							'value' => 'Updated Value 2',
-							'description' => '',
-						],
-						[
-							'macro' => '{$UPDATED_MACRO3}',
-							'value' => '',
-							'description' => 'Updated Description 3',
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO:A}',
-							'value' => '{$MACRO:B}',
-							'description' => '{$MACRO:C}',
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$UPDATED_MACRO_1}',
-							'value' => '',
-							'description' => 'DESCRIPTION',
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'macro' => '{$UPDATED_MACRO_2}',
-							'value' => 'Значение',
-							'description' => 'Описание',
-						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'Without dollar in Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{MACRO}',
-						]
-					],
-					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With empty Macro',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '',
-							'value' => 'Macro_Value',
-							'description' => 'Macro Description'
-						]
-					],
-					'error_details' => 'Invalid macro "": macro is empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'Name' => 'With repeated Macros',
-					'macros' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_1',
-							'description' => 'Macro Description_1'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'macro' => '{$MACRO}',
-							'value' => 'Macro_Value_2',
-							'description' => 'Macro Description_2'
-						]
-					],
-					'error_details' => 'Macro "{$MACRO}" is not unique.'
-				]
-			]
-		];
+		$name =  $data['Name'];
+		$this->checkMacros($data, $form_type, $name, $host_type, $is_prototype, $lld_id);
 	}
 
 	/**
 	 * Test updating of host or template with Macros.
 	 */
-	protected function checkUpdate($data, $hostname, $host_type = 'host') {
+	protected function checkUpdate($data, $hostname, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($hostname));
 
-		$this->page->login()->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		$this->checkMacros(' updated', $hostname, $host_type, $data, 'Cannot update ');
+		if ($is_prototype) {
+			$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
+		}
+		else {
+			$this->page->login()->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
+		}
+		$name = $hostname;
+		$this->checkMacros($data, $form_type, $name, $host_type, $is_prototype, $lld_id);
 	}
 
 	/**
 	 * Test removing Macros from host or template.
 	 */
-	protected function checkRemove($hostname, $host_type = 'host') {
+	protected function checkRemove($hostname, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($hostname));
 
-		$this->page->login()->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		$form = $this->query('name:'.$host_type.'sForm')->waitUntilPresent()->asForm()->one();
+		if ($is_prototype) {
+			$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
+		}
+		else {
+			$this->page->login()->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
+		}
+
+
+		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->removeMacros();
 		$form->submit();
 
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
-		$this->assertEquals(ucfirst($host_type).' updated', $message->getTitle());
+
+		if ($is_prototype) {
+			$this->assertEquals('Host prototype updated', $message->getTitle());
+		}
+		else {
+			$this->assertEquals(ucfirst($host_type).' updated', $message->getTitle());
+		}
+
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($hostname)));
 		// Check the results in form.
-		$this->checkMacrosFields($host_type, null, $hostname);
+		$this->checkMacrosFields($hostname, $is_prototype, $lld_id, $host_type, $form_type,  null);
 	}
 
 	/**
-	 * Test changing and resetting global macro on host or template.
+	 * Test changing and resetting global macro on host, prototype or template.
 	 */
-	protected function checkChangeRemoveInheritedMacro($host_type = 'host') {
-		$host = [
-			ucfirst($host_type).' name' => 'With edited global macro',
-			'Groups' => 'Zabbix servers'
-		];
+	protected function checkChangeRemoveInheritedMacro($form_type, $host_type, $is_prototype = false, $lld_id = null) {
+		if ($is_prototype) {
+			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
+			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 
-		$this->page->login()->open($host_type.'s.php?form=create');
-		$form = $this->query('name:'.$host_type.'sForm')->waitUntilPresent()->asForm()->one();
-		$form->fill($host);
+			$name = 'Host prototype with edited global {#MACRO}';
+			$form->fill([ucfirst($host_type).' name' => $name]);
+			$form->selectTab('Groups');
+			$form->fill(['Groups' => 'Zabbix servers']);
+		}
+		else {
+			$this->page->login()->open($host_type.'s.php?form=create');
+			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 
+			$name = $host_type.' with edited global macro';
+			$form->fill([
+				ucfirst($host_type).' name' => $name,
+				'Groups' => 'Zabbix servers'
+			]);
+		}
 		$form->selectTab('Macros');
-
-		// Check inherited macros before editing.
-		$this->query('id:show_inherited_macros')->waitUntilPresent()
-			->asSegmentedRadio()->one()->fill('Inherited and '.$host_type.' macros');
+		// Go to inherited macros.
+		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
+		// Check inherited macros before changes.
 		$this->checkInheritedGlobalMacros();
 
 		$edited_macros = [
@@ -344,7 +147,7 @@ abstract class testFormMacros extends CWebTest {
 		];
 
 		$count = count($edited_macros);
-		// Change macro.
+		// Change macro to edited values.
 		for ($i = 0; $i < $count; $i += 1) {
 			$this->query('id:macros_'.$i.'_change')->one()->click();
 			$this->query('id:macros_'.$i.'_value')->one()->fill($edited_macros[$i]['value']);
@@ -354,41 +157,48 @@ abstract class testFormMacros extends CWebTest {
 		$form->submit();
 
 		// Check saved edited macros in host/template form.
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host[ucfirst($host_type).' name']));
-		$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
+		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
+		if ($is_prototype) {
+			$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
+		}
+		else {
+			$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
+		}
 		$form->selectTab('Macros');
 		$this->assertMacros($edited_macros);
 
 		// Remove edited macro and reset to global.
-		$this->query('id:show_inherited_macros')->waitUntilPresent()
-			->asSegmentedRadio()->one()->fill('Inherited and '.$host_type.' macros');
-
+		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
 		for ($i = 0; $i < $count; $i += 1) {
 			$this->query('id:macros_'.$i.'_change')->waitUntilVisible()->one()->click();
 		}
-
 		$form->submit();
 
-		$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		$form->selectTab('Macros');
+		if ($is_prototype) {
+			$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
+		}
+		else {
+			$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
+		}
 
+		$form->selectTab('Macros');
 		$this->assertMacros();
 
 		// Check inherited macros again after remove.
-		$this->query('id:show_inherited_macros')->waitUntilPresent()
-			->asSegmentedRadio()->one()->fill('Inherited and '.$host_type.' macros');
+		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
 		$this->checkInheritedGlobalMacros();
 	}
 
 	/**
 	 * Check adding and saving macros in host or template form.
 	 */
-	private function checkMacros($action, $name, $host_type, $data, $error_message) {
+	private function checkMacros($data = null, $form_type, $name, $host_type, $is_prototype, $lld_id) {
+
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
 
-		$form = $this->query('name:'.$host_type.'sForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
 		$this->fillMacros($data['macros']);
 		$form->submit();
@@ -397,14 +207,14 @@ abstract class testFormMacros extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->assertTrue($message->isGood());
-				$this->assertEquals(ucfirst($host_type).$action, $message->getTitle());
+				$this->assertEquals($data['success_message'], $message->getTitle());
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
 				// Check the results in form.
-				$this->checkMacrosFields($host_type, $data, $name);
+				$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type, $data);
 				break;
 			case TEST_BAD:
 				$this->assertTrue($message->isBad());
-				$this->assertEquals($error_message.$host_type, $message->getTitle());
+				$this->assertEquals($data['error_message'], $message->getTitle());
 				$this->assertTrue($message->hasLine($data['error_details']));
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
@@ -415,24 +225,38 @@ abstract class testFormMacros extends CWebTest {
 	/**
 	 * Checking saved macros in host or template form.
 	 */
-	private function checkMacrosFields($host_type, $data = null, $name) {
+	private function checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type,  $data = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-		$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		$form = $this->query('id:'.$host_type.'sForm')->waitUntilPresent()->asForm()->one();
-		$form->selectTab('Macros');
+		if ($is_prototype) {
+			$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
+		}
+		else {
+			$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
+		}
 
+		$form = $this->query('id:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Macros');
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
+		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
+		// Get all macros defined for this host.
+		$hostmacros = CDBHelper::getAll('SELECT macro, value, description FROM hostmacro where hostid ='.$id);
+
+		$this->checkInheritedGlobalMacros($hostmacros);
 	}
 
 	/**
 	 * Check host/template inherited macros in form matching with global macros in DB,
 	 * if there is no any host/template defined macros.
 	 */
-	public function checkInheritedGlobalMacros() {
+	public function checkInheritedGlobalMacros($hostmacros = []) {
 		// Create two macros arrays: from DB and from Frontend form.
 		$macros = [
-			'database' => CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+			// Merge global macros with host defined macros.
+			'database' => array_merge(
+					CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+					$hostmacros
+				),
 			'frontend' => []
 		];
 

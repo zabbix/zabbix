@@ -570,15 +570,15 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		// Check that inherited macros field are not editabble.
 		$fields = $this->getMacros();
-		foreach ($fields as $i=> $field) {
+		foreach ($fields as $i => $field) {
 			$this->assertFalse($this->query('id:macros_'.$i.'_macro')->one()->isEnabled());
 			$this->assertFalse($this->query('id:macros_'.$i.'_value')->one()->isEnabled());
 			$this->assertFalse($this->query('id:macros_'.$i.'_description')->one()->isEnabled());
 		}
 
 		// Check that added macros are written in DB 2 times: for template and for linked host.
-		foreach ($macros as $i=> $macro) {
-			$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM hostmacro WHERE macro='.zbx_dbstr($macros[$i]['macro'])));
+		foreach ($macros as $macro) {
+			$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM hostmacro WHERE macro='.zbx_dbstr($macro['macro'])));
 		}
 	}
 

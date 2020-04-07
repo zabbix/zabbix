@@ -497,7 +497,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 		// Check the results in form.
-		$this->checkFormFields($data, $hostid);
+		$this->checkFormFields($data);
 
 		// Check the results in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($data['name'])));
@@ -890,7 +890,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($hostname)));
 	}
 
-	private function checkFormFields($data, $hostid = null) {
+	private function checkFormFields($data) {
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestClickLinkTextWait($data['visible_name']);
 			$this->zbxTestAssertElementValue('name', $data['visible_name']);
@@ -920,40 +920,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('macros', $data)) {
 			$this->zbxTestTabSwitch('Macros');
 			$this->assertMacros($data['macros']);
-
-			$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
-			// Create two macros arrays: from DB and from Frontend form.
-			$macros = [
-				'database' => array_merge(
-					CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
-					CDBHelper::getAll('SELECT macro, value, description FROM hostmacro where hostid ='.$hostid)
-				),
-				'frontend' => []
-			];
-
-			// Write macros rows from Frontend to array.
-			$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
-			$count = $table->getRows()->count() - 1;
-			for ($i = 0; $i < $count; $i += 2) {
-				$macro = [];
-				$row = $table->getRow($i);
-				$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
-				$macro['value'] = $row->query('xpath:./td[2]/div/textarea')->one()->getValue();
-				$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
-
-				$macros['frontend'][] = $macro;
-			}
-
-			// Sort arrays by Macros.
-			foreach ($macros as &$array) {
-				usort($array, function ($a, $b) {
-					return strcmp($a['macro'], $b['macro']);
-				});
-			}
-			unset($array);
-
-		// Compare macros from DB with macros from Frontend.
-		$this->assertEquals($macros['database'], $macros['frontend']);
 		}
 
 		if (array_key_exists('inventory', $data)) {
