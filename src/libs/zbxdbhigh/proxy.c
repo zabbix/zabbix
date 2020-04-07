@@ -4633,11 +4633,11 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	flags_old = proxy_diff.suppress_win.flags;
 	check_proxy_suppression_mode(ts, proxy_status, &proxy_diff);	/* first packet can be empty for active proxy */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d heartbeat:%d period_end:%d delay:%d"
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d period_end:%d delay:%d"
 			" timestamp:%d lastaccess:%d proxy_delay:%d more:%d", __func__, proxy_diff.suppress_win.flags,
-			flags_old, (int)proxy_diff.flags, proxy_status, proxy_diff.suppress_win.heartbeat,
-			proxy_diff.suppress_win.period_end, ts->sec - proxy_diff.lastaccess,
-			ts->sec, proxy_diff.lastaccess, proxy_diff.proxy_delay, proxy_diff.more_data);
+			flags_old, (int)proxy_diff.flags, proxy_status, proxy_diff.suppress_win.period_end,
+			ts->sec - proxy_diff.lastaccess, ts->sec, proxy_diff.lastaccess, proxy_diff.proxy_delay,
+			proxy_diff.more_data);
 
 	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)
 		zbx_dc_update_proxy(&proxy_diff);

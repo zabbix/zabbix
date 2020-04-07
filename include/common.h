@@ -936,8 +936,6 @@ typedef struct
 	int			values_num;
 	int			period_end;
 	zbx_vector_uint64_t	subscribe;
-	int			heartbeat;
-	int			heartbeat_time;
 #define ZBX_PROXY_SUPPRESS_DISABLE				0x00
 #define ZBX_PROXY_SUPPRESS_ACTIVE				0x01
 #define ZBX_PROXY_SUPPRESS_PROXYDELAY				0x02
