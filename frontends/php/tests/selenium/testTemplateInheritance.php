@@ -55,7 +55,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		COverlayDialogElement::find()->one()->setDataContext('Templates');
 		$this->zbxTestClickLinkTextWait('Template Module Zabbix agent');
 
 		$this->zbxTestTextPresent('Template Module Zabbix agent');

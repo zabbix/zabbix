@@ -33,7 +33,10 @@ $expression_form = (new CForm())
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
 	->addVar('itemid', $data['itemid'])
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->addItem((new CInput('submit', 'submit'))
+		->addStyle('display: none;')
+		->removeId()
+	);
 
 if ($data['parent_discoveryid'] !== '') {
 	$expression_form->addVar('parent_discoveryid', $data['parent_discoveryid']);
@@ -49,20 +52,21 @@ $popup_options = [
 	'srcfld2' => 'name',
 	'dstfrm' => $expression_form->getName(),
 	'dstfld1' => 'itemid',
-	'dstfld2' => 'description',
+	'dstfld2' => 'item_description',
 	'with_webitems' => '1',
 	'writeonly' => '1'
 ];
-if ($data['groupid'] && $data['hostid']) {
-	$popup_options['groupid'] = $data['groupid'];
+
+if ($data['hostid']) {
 	$popup_options['hostid'] = $data['hostid'];
 }
+
 if ($data['parent_discoveryid'] !== '') {
 	$popup_options['normal_only'] = '1';
 }
 
 $item = [
-	(new CTextBox('description', $data['description'], true))
+	(new CTextBox('item_description', $data['item_description'], true))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -82,14 +86,14 @@ if ($data['parent_discoveryid'] !== '') {
 				'srcfld2' => 'name',
 				'dstfrm' => $expression_form->getName(),
 				'dstfld1' => 'itemid',
-				'dstfld2' => 'description',
+				'dstfld2' => 'item_description',
 				'parent_discoveryid' => $data['parent_discoveryid']
 			]).', null, this);'
 		)
 		->removeId();
 }
 
-$expression_form_list->addRow((new CLabel(_('Item'), 'description'))->setAsteriskMark(), $item);
+$expression_form_list->addRow((new CLabel(_('Item'), 'item_description'))->setAsteriskMark(), $item);
 
 $function_combo_box = new CComboBox('function', $data['function'], 'reloadPopup(this.form, "popup.triggerexpr")');
 foreach ($data['functions'] as $id => $f) {
@@ -198,7 +202,7 @@ $output = [
 					'var tmp = elem.value;'.
 						'elem.value = value;'.
 
-					'"description" === elem.id && tmp !== value && reloadPopup(elem.form, "popup.triggerexpr");'.
+					'"item_description" === elem.id && tmp !== value && reloadPopup(elem.form, "popup.triggerexpr");'.
 				'}'.
 			'};'.
 		'});'

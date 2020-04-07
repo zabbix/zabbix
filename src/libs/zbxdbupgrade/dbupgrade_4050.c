@@ -1657,9 +1657,41 @@ static int	DBpatch_4050073(void)
 
 static int	DBpatch_4050074(void)
 {
+<<<<<<< HEAD
 	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("acknowledges", &field, NULL);
+=======
+	int		i;
+	const char	*values[] = {
+			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
+			"web..hostid", "web.view.groupid", "web.view.hostid", "web.view.graphid",
+			"web.config.groupid", "web.config.hostid", "web.templates.php.groupid", "web.cm.groupid",
+			"web.httpmon.php.sort", "web.httpmon.php.sortorder", "web.avail_report.0.hostid",
+			"web.avail_report.0.groupid", "web.graphs.filter.to", "web.graphs.filter.from", "web.graphs.filter.active"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='%s'", values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050075(void)
+{
+	return DBdrop_field("config", "dropdown_first_entry");
+}
+
+static int	DBpatch_4050076(void)
+{
+	return DBdrop_field("config", "dropdown_first_remember");
+>>>>>>> 44591fc27b5f31025a91856682db3dd194c21667
 }
 
 #endif
@@ -1737,5 +1769,10 @@ DBPATCH_ADD(4050071, 0, 1)
 DBPATCH_ADD(4050072, 0, 1)
 DBPATCH_ADD(4050073, 0, 1)
 DBPATCH_ADD(4050074, 0, 1)
+<<<<<<< HEAD
+=======
+DBPATCH_ADD(4050075, 0, 1)
+DBPATCH_ADD(4050076, 0, 1)
+>>>>>>> 44591fc27b5f31025a91856682db3dd194c21667
 
 DBPATCH_END()

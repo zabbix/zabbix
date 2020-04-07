@@ -21,7 +21,11 @@
 define('ZABBIX_VERSION',		'5.0.0alpha5');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
+<<<<<<< HEAD
 define('ZABBIX_DB_VERSION',		4050074);
+=======
+define('ZABBIX_DB_VERSION',		4050076);
+>>>>>>> 44591fc27b5f31025a91856682db3dd194c21667
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -56,6 +60,10 @@ define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
+
+// Applied to tables with variable count of columns. Columns above this limit will be truncated.
+define('ZBX_MAX_TABLE_COLUMNS', 50);
+define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
@@ -92,6 +100,9 @@ define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
 define('ZBX_SCRIPT_TYPE_TELNET',		3);
 define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
+
+define('ZBX_SEARCH_TYPE_STRICT',	0);
+define('ZBX_SEARCH_TYPE_PATTERN',	1);
 
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
@@ -155,9 +166,6 @@ define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);
-
-define('ZBX_DROPDOWN_FIRST_NONE',	0);
-define('ZBX_DROPDOWN_FIRST_ALL',	1);
 
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
@@ -725,7 +733,6 @@ define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
 // used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
-define('SCREEN_RESOURCE_CHART',				18);
 define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
 define('SCREEN_RESOURCE_LLD_GRAPH',			20);
 // used in Monitoring > Web > Details (httpdetails.php)
@@ -1297,6 +1304,7 @@ define('API_COLOR',				27);
 define('API_NUMERIC',			28);
 define('API_LLD_MACRO',			29);
 define('API_PSK',				30);
+define('API_SORTORDER',			31);
 
 // flags
 define('API_REQUIRED',					0x0001);
@@ -1598,6 +1606,7 @@ define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
+define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');

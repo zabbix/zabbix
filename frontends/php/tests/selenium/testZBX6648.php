@@ -28,29 +28,35 @@ class testZBX6648 extends CLegacyWebTest {
 		return [
 			[
 				[
-					'hostgroup' => 'ZBX6648 All Triggers',
 					'host' => 'ZBX6648 All Triggers Host',
+					'hostgroup' => 'ZBX6648 All Triggers',
 					'triggers' => 'both'
 				]
 			],
 			[
 				[
-					'hostgroup' => 'ZBX6648 Enabled Triggers',
 					'host' => 'ZBX6648 Enabled Triggers Host',
+					'hostgroup' => 'ZBX6648 Enabled Triggers',
 					'triggers' => 'enabled'
 				]
 			],
 			[
 				[
 					'hostgroup' => 'ZBX6648 Disabled Triggers',
-					'host' => 'ZBX6648 Disabled Triggers Host',
 					'triggers' => 'disabled'
 				]
 			],
 			[
 				[
-					'hostgroup' => 'ZBX6648 Group No Hosts',
+					'host' => 'Test item host',
+					'hostgroup' => 'Zabbix servers',
 					'triggers' => 'no triggers'
+				]
+			],
+			[
+				[
+					'hostgroup' => 'ZBX6648 Group No Hosts',
+					'triggers' => 'no hosts'
 				]
 			]
 		];
@@ -60,30 +66,35 @@ class testZBX6648 extends CLegacyWebTest {
 	 * @dataProvider zbx_data
 	 */
 	public function testZBX6648_eventFilter($zbx_data) {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
+		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
 
 		switch ($zbx_data['triggers']) {
 			case 'both' :
 			case 'enabled' :
-				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
-				COverlayDialogElement::find()->one()->waitUntilReady();
-				$this->zbxTestLaunchOverlayDialog('Triggers');
-				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
-				COverlayDialogElement::find()->one()->waitUntilReady();
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill([
+					'values' => $zbx_data['host'],
+					'context' => $zbx_data['hostgroup']
+				]);
 				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'disabled' :
-				$hostgroup = $zbx_data['hostgroup'];
-				$host = $zbx_data['host'];
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='groupid']/option[text()='$hostgroup']");
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='hostid']/option[text()='$host']");
+			case 'no hosts' :
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				COverlayDialogElement::find()->all()->last()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Host groups');
+				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['hostgroup'].'"]');
 				break;
 			case 'no triggers' :
-				$hostgroup = $zbx_data['hostgroup'];
-				$this->zbxTestAssertElementNotPresentXpath("//select[@id='groupid']/option[text()='$hostgroup']");
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($zbx_data['hostgroup']);
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['host'].'"]');
 				break;
 		}
 	}

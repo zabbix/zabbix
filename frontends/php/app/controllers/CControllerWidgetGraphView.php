@@ -346,7 +346,12 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$time_control_data['src'] = $graph_src->getUrl();
 
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-				$item_graph_url = (new CUrl('charts.php'))->setArgument('graphid', $resourceid);
+				$item_graph_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'charts.view')
+					->setArgument('view_as', HISTORY_GRAPH)
+					->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+					->setArgument('filter_graphids', [$resourceid])
+					->setArgument('filter_set', '1');
 			}
 			else {
 				$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);

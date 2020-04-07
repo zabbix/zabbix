@@ -710,7 +710,9 @@ function makeApplicationTemplatePrefix($applicationid, array $parent_templates) 
 	foreach ($templates as $template) {
 		if ($template['permission'] == PERM_READ_WRITE) {
 			$name = (new CLink(CHtml::encode($template['name']),
-				(new CUrl('applications.php'))->setArgument('hostid', $template['hostid'])
+				(new CUrl('applications.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['hostid']])
 			))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
@@ -1373,32 +1375,7 @@ function isReadableTemplates(array $templateids) {
 }
 
 /**
- * Check if user has read permissions for hosts or templates.
- *
- * @param array $hostids
- *
- * @return bool
- */
-function isReadableHostTemplates(array $hostids) {
-	$count = API::Host()->get([
-		'countOutput' => true,
-		'hostids' => $hostids
-	]);
-
-	if ($count == count($hostids)) {
-		return true;
-	}
-
-	$count += API::Template()->get([
-		'countOutput' => true,
-		'templateids' => $hostids
-	]);
-
-	return ($count == count($hostids));
-}
-
-/**
- * Check if user has read permissions for hosts or templates.
+ * Check if user has write permissions for hosts or templates.
  *
  * @param array $hostids
  *

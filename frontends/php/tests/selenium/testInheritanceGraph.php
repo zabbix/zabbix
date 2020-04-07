@@ -119,7 +119,10 @@ class testInheritanceGraph extends CLegacyWebTest {
 				$this->zbxTestCheckHeader('Graphs');
 				$this->zbxTestTextNotPresent('Cannot add graph');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph added');
-				$this->zbxTestTextPresent($data['name']);
+				$filter = $this->query('name:zbx_filter')->asForm()->one();
+				$filter->getField('Hosts')->clear()->fill($this->template);
+				$filter->submit();
+				$this->query('link', $data['name'])->one()->waitUntilVisible();
 				break;
 
 			case TEST_BAD:

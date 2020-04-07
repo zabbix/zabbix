@@ -72,7 +72,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'result' => ['Discord', 'Email', 'Email (HTML)', 'Mattermost', 'Opsgenie', 'PagerDuty', 'Pushover', 'Slack', 'SMS']
+					'result' => ['Discord', 'Email', 'Email (HTML)', 'Mattermost', 'Opsgenie', 'PagerDuty', 'Pushover',
+						'SIGNL4', 'Slack', 'SMS']
 				]
 			],
 			[
@@ -460,7 +461,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$row = $table->findRow('Name', $data['name']);
 		$row->query('button:Test')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$this->assertEquals('Test media type', $dialog->getTitle());
+		$this->assertEquals('Test media type "'.$data['name'].'"', $dialog->getTitle());
 		$form = $dialog->asForm();
 
 		// Fill and submit testing form.
@@ -499,7 +500,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$row = $table->findRow('Name', $media);
 		$row->query('button:Test')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$this->assertEquals('Test media type', $dialog->getTitle());
+		$this->assertEquals('Test media type "'.$media.'"', $dialog->getTitle());
 		$form = $dialog->asForm();
 		$form->fill($fields);
 

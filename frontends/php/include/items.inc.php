@@ -994,72 +994,112 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
 }
 
 /**
- * Retrieve overview table object for items.
+ * @param array $db_hosts
+ * @param array $db_items
+ * @param array $items_by_name
+ * @param int   $show_suppressed
  *
- * @param array  $groupids
- * @param string $application      IDs of applications to filter items by.
- * @param int    $viewMode
- * @param int    $show_suppressed  Whether to show suppressed problems.
- *
- * @return CTableInfo
+ * @return array
  */
-
-function getItemsDataOverview(array $groupids, $application, $viewMode,
-		$show_suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE) {
-	// application filter
-	if ($application !== '') {
-		$applicationids = array_keys(API::Application()->get([
-			'output' => [],
-			'groupids' => $groupids ? $groupids : null,
-			'search' => ['name' => $application],
-			'preservekeys' => true
-		]));
-		$groupids = [];
-	}
-	else {
-		$applicationids = null;
+function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$items_by_name, int $show_suppressed): array {
+	$visible_items = [];
+	foreach ($items_by_name as $hostid_to_itemids) {
+		foreach ($hostid_to_itemids as $itemid) {
+			$visible_items[$itemid] = $db_items[$itemid];
+		}
 	}
 
-	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'key_', 'name', 'value_type', 'units', 'valuemapid'],
-		'selectHosts' => ['name'],
-		'groupids' => $groupids ? $groupids : null,
-		'applicationids' => $applicationids,
-		'monitored' => true,
-		'webitems' => true,
-		'preservekeys' => true
-	]);
+	$history = Manager::History()->getLastValues($visible_items, 1, ZBX_HISTORY_PERIOD);
 
 	$db_triggers = getTriggersWithActualSeverity([
 		'output' => ['triggerid', 'priority', 'value'],
 		'selectItems' => ['itemid'],
-		'groupids' => $groupids ? $groupids : null,
-		'applicationids' => $applicationids,
+		'itemids' => array_keys($visible_items),
 		'monitored' => true,
 		'preservekeys' => true
 	], ['show_suppressed' => $show_suppressed]);
-
-	foreach ($db_triggers as $db_trigger) {
+	$itemid_to_triggerids = [];
+	foreach ($db_triggers as $triggerid => $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {
-			if (array_key_exists($item['itemid'], $db_items)) {
-				$db_item = &$db_items[$item['itemid']];
-
-				// a little tricky check for attempt to overwrite active trigger (value=1) with
-				// inactive or active trigger with lower priority.
-				if (!array_key_exists('triggerid', $db_item)
-						|| ($db_item['value'] == TRIGGER_VALUE_FALSE && $db_trigger['value'] == TRIGGER_VALUE_TRUE)
-						|| (($db_item['value'] == TRIGGER_VALUE_FALSE || $db_trigger['value'] == TRIGGER_VALUE_TRUE)
-							&& $db_item['priority'] < $db_trigger['priority'])) {
-					$db_item['triggerid'] = $db_trigger['triggerid'];
-					$db_item['priority'] = $db_trigger['priority'];
-					$db_item['value'] = $db_trigger['value'];
-				}
-
-				$db_item['acknowledged'] = $db_trigger['problem']['acknowledged'];
-
-				unset($db_item);
+			if (!array_key_exists($item['itemid'], $itemid_to_triggerids)) {
+				$itemid_to_triggerids[$item['itemid']] = [];
 			}
+			$itemid_to_triggerids[$item['itemid']][] = $triggerid;
 		}
+	}
+
+	foreach ($items_by_name as $name => $hostid_to_itemids) {
+		foreach ($db_hosts as $host) {
+			if (!array_key_exists($host['hostid'], $hostid_to_itemids)) {
+				continue;
+			}
+
+			$itemid = $hostid_to_itemids[$host['hostid']];
+			$visible_items[$itemid]['value'] = array_key_exists($itemid, $history)
+				? $history[$itemid][0]['value']
+				: null;
+			$trigger = null;
+
+			if (array_key_exists($itemid, $itemid_to_triggerids)) {
+				$max_priority = -1;
+				$max_priority_triggerid = -1;
+				foreach ($itemid_to_triggerids[$itemid] as $triggerid) {
+					$trigger = $db_triggers[$triggerid];
+
+					// Bump lower priority triggers of value "true" ahead of triggers with value "false".
+					$multiplier = ($trigger['value'] == TRIGGER_VALUE_TRUE) ? TRIGGER_SEVERITY_COUNT : 0;
+					if ($trigger['priority'] + $multiplier > $max_priority) {
+						$max_priority_triggerid = $triggerid;
+						$max_priority = $trigger['priority'] + $multiplier;
+					}
+				}
+				$trigger = $db_triggers[$max_priority_triggerid];
+			}
+			$visible_items[$itemid]['trigger'] = $trigger;
+		}
+	}
+
+	return $visible_items;
+}
+
+/**
+ * @param array  $groupids
+ * @param array  $hostids
+ * @param string $application
+ *
+ * @return array
+ */
+function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
+	$config = select_config();
+
+	if ($application !== '') {
+		$applicationids = array_keys(API::Application()->get([
+			'output' => [],
+			'hostids' => $hostids,
+			'groupids' => $groupids,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]));
+
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'applicationids' => $applicationids,
+			'monitored' => true,
+			'webitems' => true,
+			'limit' => $config['search_limit'],
+			'preservekeys' => true
+		]);
+	}
+	else {
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+			'hostids' => $hostids,
+			'groupids' => $groupids,
+			'monitored' => true,
+			'webitems' => true,
+			'limit' => $config['search_limit'],
+			'preservekeys' => true
+		]);
 	}
 
 	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
@@ -1069,171 +1109,152 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
-	// fetch latest values
-	$history = Manager::History()->getLastValues(zbx_toHash($db_items, 'itemid'), 1, ZBX_HISTORY_PERIOD);
-
-	// fetch data for the host JS menu
-	$hosts = API::Host()->get([
-		'output' => ['name', 'hostid'],
-		'monitored_hosts' => true,
-		'groupids' => $groupids ? $groupids : null,
-		'applicationids' => $applicationids,
-		'with_monitored_items' => true,
-		'preservekeys' => true
-	]);
-
-	$items = [];
-	$item_counter = [];
-	$host_items = [];
-	$host_names = [];
-
-	foreach ($db_items as $db_item) {
-		$item_name = $db_item['name_expanded'];
-		$host_name = $db_item['hosts'][0]['name'];
-		$host_names[$db_item['hostid']] = $host_name;
-
-		if (!array_key_exists($host_name, $item_counter)) {
-			$item_counter[$host_name] = [];
-		}
-
-		if (!array_key_exists($item_name, $item_counter[$host_name])) {
-			$item_counter[$host_name][$item_name] = 0;
-		}
-
-		if (!array_key_exists($item_name, $host_items) || !array_key_exists($host_name, $host_items[$item_name])) {
-			$host_items[$item_name][$host_name] = [];
-		}
-
-		if (!array_key_exists($db_item['itemid'], $host_items[$item_name][$host_name])) {
-			if (array_key_exists($db_item['itemid'], $host_items[$item_name][$host_name])) {
-				$item_place = $host_items[$item_name][$host_name][$db_item['itemid']]['item_place'];
-			}
-			else {
-				$item_place = $item_counter[$host_name][$item_name];
-				$item_counter[$host_name][$item_name]++;
-			}
-
-			$item = [
-				'itemid' => $db_item['itemid'],
-				'value_type' => $db_item['value_type'],
-				'value' => isset($history[$db_item['itemid']]) ? $history[$db_item['itemid']][0]['value'] : null,
-				'units' => $db_item['units'],
-				'valuemapid' => $db_item['valuemapid'],
-				'item_place' => $item_place,
-				'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
-			];
-
-			if (array_key_exists('triggerid', $db_item)) {
-				$item += [
-					'triggerid' => $db_item['triggerid'],
-					'severity' => $db_item['priority'],
-					'tr_value' => $db_item['value']
-				];
-			}
-			else {
-				$item += [
-					'triggerid' => null,
-					'severity' => null,
-					'tr_value' => null
-				];
-			}
-
-			$items[$item_name][$item_place][$host_name] = $item;
-
-			$host_items[$item_name][$host_name][$db_item['itemid']] = $items[$item_name][$item_place][$host_name];
-		}
-	}
-
-	$table = (new CTableInfo())->setHeadingColumn(0);
-	if (!$host_names) {
-		return $table;
-	}
-	$table->makeVerticalRotation();
-
-	order_result($host_names);
-
-	if ($viewMode == STYLE_TOP) {
-		$header = [_('Items')];
-		foreach ($host_names as $host_name) {
-			$header[] = (new CColHeader($host_name))
-				->addClass('vertical_rotation')
-				->setTitle($host_name);
-		}
-		$table->setHeader($header);
-
-		foreach ($items as $item_name => $item_data) {
-			foreach ($item_data as $ithosts) {
-				$tableRow = [(new CColHeader($item_name))->addClass(ZBX_STYLE_NOWRAP)];
-				foreach ($host_names as $host_name) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
-				}
-				$table->addRow($tableRow);
-			}
-		}
-	}
-	else {
-		$header = [_('Hosts')];
-		foreach ($items as $item_name => $item_data) {
-			foreach ($item_data as $ithosts) {
-				$header[] = (new CColHeader($item_name))
-					->addClass('vertical_rotation')
-					->setTitle($item_name);
-			}
-		}
-		$table->setHeader($header);
-
-		foreach ($host_names as $hostId => $host_name) {
-			$host = $hosts[$hostId];
-
-			$name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostId));
-
-			$tableRow = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
-			foreach ($items as $item_data) {
-				foreach ($item_data as $ithosts) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
-				}
-			}
-			$table->addRow($tableRow);
-		}
-	}
-
-	return $table;
+	return $db_items;
 }
 
-function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
+/**
+ * @param array  $groupids
+ * @param array  $hostids
+ * @param array  $itemids
+ * @param string $application
+ *
+ * @return array
+ */
+function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
+	$config = select_config();
+	if ($application !== '') {
+		$applicationids = array_keys(API::Application()->get([
+			'output' => [],
+			'hostids' => $hostids ? $hostids : null,
+			'groupids' => $groupids ? $groupids : null,
+			'search' => ['name' => $application],
+			'preservekeys' => true
+		]));
+
+		$db_hosts = API::Host()->get([
+			'output' => ['name', 'hostid'],
+			'groupids' => $groupids,
+			'applicationids' => $applicationids,
+			'monitored_hosts' => true,
+			'with_monitored_items' => true,
+			'preservekeys' => true,
+			'limit' => $config['search_limit']
+		]);
+	}
+	else {
+		$db_hosts = API::Host()->get([
+			'output' => ['name', 'hostid'],
+			'monitored_hosts' => true,
+			'hostids' => $hostids,
+			'itemids' => $itemids,
+			'groupids' => $groupids,
+			'with_monitored_items' => true,
+			'preservekeys' => true,
+			'limit' => $config['search_limit']
+		]);
+	}
+
+	CArrayHelper::sort($db_hosts, [
+		['field' => 'name', 'order' => ZBX_SORT_UP],
+	]);
+
+	return $db_hosts;
+}
+
+/**
+ * @param array  $groupids
+ * @param array  $hostids
+ * @param string $application
+ *
+ * @return array
+ */
+function getDataOverviewLeft(?array $groupids, ?array $hostids, string $application = ''): array {
+	$db_items = getDataOverviewItems($groupids, $hostids, $application);
+	$items_by_name = [];
+	foreach ($db_items as $itemid => $db_item) {
+		if (!array_key_exists($db_item['name'], $items_by_name)) {
+			$items_by_name[$db_item['name']] = [];
+		}
+		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+	}
+
+	$hidden_items_cnt = count(array_splice($items_by_name, ZBX_MAX_TABLE_COLUMNS));
+
+	$itemids = [];
+	foreach ($items_by_name as $hostid_to_itemid) {
+		foreach ($hostid_to_itemid as $itemid) {
+			$itemids[] = $itemid;
+		}
+	}
+	$db_items = array_intersect_key($db_items, array_flip($itemids));
+
+	$db_hosts = getDataOverviewHosts(null, null, $itemids);
+	$db_hosts_ctn = count($db_hosts);
+	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
+
+	$has_hidden_data = ($hidden_items_cnt || ($db_hosts_ctn > count($db_hosts)));
+
+	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
+}
+
+/**
+ * @param array  $groupids
+ * @param array  $hostids
+ * @param string $application
+ *
+ * @return array
+ */
+function getDataOverviewTop(?array $groupids, ?array $hostids, string $application = ''): array {
+	$db_hosts = getDataOverviewHosts($groupids, $hostids, null, $application);
+	$hostids = array_keys($db_hosts);
+	$hidden_db_hosts_cnt = count(array_splice($hostids, ZBX_MAX_TABLE_COLUMNS));
+	$db_hosts = array_intersect_key($db_hosts, array_flip($hostids));
+
+	$db_items = getDataOverviewItems(null, $hostids, $application);
+	$items_by_name = [];
+	foreach ($db_items as $itemid => $db_item) {
+		if (!array_key_exists($db_item['name'], $items_by_name)) {
+			$items_by_name[$db_item['name']] = [];
+		}
+		$items_by_name[$db_item['name']][$db_item['hostid']] = $itemid;
+	}
+
+	$items_by_name_ctn = count($items_by_name);
+	$items_by_name = array_slice($items_by_name, 0, ZBX_MAX_TABLE_COLUMNS, true);
+
+	$has_hidden_data = ($hidden_db_hosts_cnt || ($items_by_name_ctn > count($items_by_name)));
+
+	return [$db_items, $db_hosts, $items_by_name, $has_hidden_data];
+}
+
+/**
+ * @param array $item
+ * @param array $trigger
+ *
+ * @return CCol
+ */
+function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	$ack = null;
 	$css = '';
 	$value = UNKNOWN_VALUE;
 
-	if (isset($ithosts[$hostName])) {
-		$item = $ithosts[$hostName];
+	if ($trigger && $trigger['value'] == TRIGGER_VALUE_TRUE) {
+		$css = getSeverityStyle($trigger['priority']);
 
-		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
-			$css = getSeverityStyle($item['severity']);
-			$ack = ($item['acknowledged'] == 1) ? [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)] : null;
-		}
-
-		if ($item['value'] !== null) {
-			$value = formatHistoryValue($item['value'], $item);
+		if ($trigger['problem']['acknowledged'] == 1) {
+			$ack = [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)];
 		}
 	}
 
-	if ($value != UNKNOWN_VALUE) {
-		$value = $value;
+	if ($item['value'] !== null) {
+		$value = formatHistoryValue($item['value'], $item);
 	}
 
-	$column = (new CCol([$value, $ack]))->addClass($css);
-
-	if (isset($ithosts[$hostName])) {
-		$column
-			->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
-			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->addClass(ZBX_STYLE_NOWRAP);
-	}
-
-	$tableRow[] = $column;
-
-	return $tableRow;
+	return (new CCol([$value, $ack]))
+		->addClass($css)
+		->setMenuPopup(CMenuPopupHelper::getHistory($item['itemid']))
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->addClass(ZBX_STYLE_NOWRAP);
 }
 
 /**

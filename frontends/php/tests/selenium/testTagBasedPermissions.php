@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  */
 class testTagBasedPermissions extends CLegacyWebTest {
 	public $user = 'Tag-user';
+	public $trigger_host = 'Host for tag permissions';
 
 	/**
 	 * Set tags permissions in user groups and login as simple user
@@ -194,6 +195,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
+			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickLinkTextWait($name);
 			// Apply filter
 			$this->zbxTestClickButtonText('Apply');
@@ -298,6 +300,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestLaunchOverlayDialog('Triggers');
+			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->zbxTestClickButtonText('Apply');
@@ -397,6 +400,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
+			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->zbxTestClickButtonText('Apply');

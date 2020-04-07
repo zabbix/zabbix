@@ -451,7 +451,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
@@ -565,8 +565,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-			$this->zbxTestClickLinkText($data['template']);
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
+			$this->query('link', $data['template'])->waitUntilClickable()->one()->click();
 		}
 
 		// Change inventory mode.
@@ -835,7 +835,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 

@@ -75,7 +75,7 @@ $tab_view = (new CTabView())->addTab('elements_tab', '', $form_list);
 // append buttons to form
 $tab_view->setFooter(makeFormFooter(
 	new CSubmit('copy', _('Copy')),
-	[new CButtonCancel(url_param('groupid').url_param('hostid'))]
+	[new CButtonCancel(url_param('hostid'))]
 ));
 
 $form->addItem($tab_view);

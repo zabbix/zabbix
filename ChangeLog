@@ -1,8 +1,22 @@
 Changes for 5.0.0alpha5
 
 New features:
+.........T [ZBXNEXT-5599] Added MS Teams media type (tuskov)
+.........T [ZBXNEXT-5715] Added Jira media type (tuskov)
+...G...... [ZBXNEXT-5767] added Memcached plugin (vadimipatov)
 
 Bug fixes:
+A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
+...G...... [ZBX-17541] fixed Zabbix agent compilation on MS Windows (vso)
+...G...... [ZBX-16772] enabled zabbix_agent2 to use OpenSSL 1.0.1, 1.0.2 on Unix platforms (Andris)
+.D........ [ZBX-17500] fixed errors in zabbix_agent2 man-page (akozlovs)
+.......PS. [ZBX-17336] fixed wrong error message when fping fails (mabele)
+..F....... [ZBX-17427] fixed top busiest triggers filter (miks)
+..F....... [ZBX-17365] fixed parameters order in Media types test form (rlataria)
+..F....... [ZBX-17428] fixed skipping null cells in CSV file (talbergs)
+...G...... [ZBX-17461] fixed length parameter for web.page.regexp item key (viktors)
+.......PS. [ZBX-17475] fixed the interface_snmp amount that was used to proxy configuration (MVekslers)
+...G...... [ZBX-17442] fixed web.page.get to time out when there is no response (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.0alpha4
@@ -168,6 +182,13 @@ New features:
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 
 Bug fixes:
+A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
+...G...... [ZBX-16772] enabled zabbix_agent2 to use OpenSSL 1.0.1, 1.0.2 on Unix platforms (Andris)
+.D........ [ZBX-17500] fixed errors in zabbix_agent2 man-page (akozlovs)
+.......PS. [ZBX-17336] fixed wrong error message when fping fails (mabele)
+..F....... [ZBX-17427] fixed top busiest triggers filter (miks)
+..F....... [ZBX-17428] fixed skipping null cells in CSV file (talbergs)
+...G...... [ZBX-17461] fixed length parameter for web.page.regexp item key (viktors)
 .........T [ZBX-17457] fixed description in Template DB MySQL by Zabbix agent (mchudinov)
 ..F....... [ZBX-17508] fixed error in oracle database encoding check (gcalenko)
 ...G...... [ZBX-17442] fixed web.page.get to time out when there is no response (vso)
@@ -1282,6 +1303,10 @@ New features:
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 
 Bug fixes:
+A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
+.......PS. [ZBX-17336] fixed wrong error message when fping fails (mabele)
+..F....... [ZBX-17427] fixed top busiest triggers filter (miks)
+...G...... [ZBX-17523] fixed agent compilation on Windows is broken (akozlovs)
 ..F....... [ZBX-17508] fixed error in oracle database encoding check (gcalenko)
 ...G...... [ZBX-17442] fixed web.page.get to time out when there is no response (vso)
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)

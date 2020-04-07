@@ -168,7 +168,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Templates');
 
 		foreach ($data['templates'] as $template) {
-			$this->zbxTestDropdownSelectWait('groupid', $template['group']);
+			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+			$this->zbxTestLaunchOverlayDialog('Host groups');
+			COverlayDialogElement::find()->all()->last()->query('link', $template['group'])->one()->waitUntilClickable()->click();
 			$this->zbxTestClickLinkTextWait($template['name']);
 			$this->zbxTestWaitForPageToLoad();
 		}
@@ -335,7 +337,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			foreach ($data['templates'] as $template) {
 				$this->zbxTestClickButtonMultiselect('add_templates_');
 				$this->zbxTestLaunchOverlayDialog('Templates');
-				$this->zbxTestDropdownSelectWait('groupid', $template['group']);
+				COverlayDialogElement::find()->one()->setDataContext('Templates');
 				$this->zbxTestClickLinkTextWait($template['name']);
 				$this->zbxTestWaitForPageToLoad();
 			}
@@ -455,7 +457,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 

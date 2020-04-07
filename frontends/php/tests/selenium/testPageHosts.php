@@ -48,7 +48,10 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
-		$this->zbxTestDropdownSelectWait('groupid', $this->HostGroup);
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Host groups')->select($this->HostGroup);
+		$filter->submit();
 
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextPresent('Simple form test host');
@@ -117,7 +120,7 @@ class testPageHosts extends CLegacyWebTest {
 		$oldHashHostInventory = CDBHelper::getHash($sqlHostInventory);
 
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 
@@ -145,7 +148,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButton('host.massdisable');
@@ -169,7 +172,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
 		$this->zbxTestClickButton('host.massdisable');
@@ -192,7 +195,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
 		$this->zbxTestClickButton('host.massenable');
@@ -210,7 +213,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButton('host.massenable');
@@ -226,22 +229,26 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByName() {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestInputTypeOverwrite('filter_host', $this->HostName);
-		$this->zbxTestClickButtonText('Apply');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Name')->fill($this->HostName);
+		$filter->submit();
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
 	public function testPageHosts_FilterByTemplates() {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestClickButtonMultiselect('filter_templates_');
-		$this->zbxTestLaunchOverlayDialog('Templates');
-		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//select/option[text()="Templates"]');
-		$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//a[text()="Form test template"]');
-		$this->zbxTestClickButtonText('Apply');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+		$filter->fill([
+			'Templates' => [
+				'values' =>'Form test template',
+				'context' => 'Templates']
+		]);
+		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Simple form test host']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
@@ -249,8 +256,9 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByProxy() {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickButtonText('Reset');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
@@ -269,32 +277,33 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterNone() {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestInputTypeOverwrite('filter_host', '1928379128ksdhksdjfh');
-		$this->zbxTestClickButtonText('Apply');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
+		$filter->submit();
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
-		$this->zbxTestInputTypeOverwrite('filter_host', '%');
-		$this->zbxTestClickButtonText('Apply');
+		$filter->invalidate();
+		$filter->getField('Name')->fill('%');
+		$filter->submit();
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
 	}
 
 	public function testPageHosts_FilterByAllFields() {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestDropdownSelectWait('groupid', $this->HostGroup);
-		$this->zbxTestInputTypeOverwrite('filter_host', $this->HostName);
-		$this->zbxTestInputTypeOverwrite('filter_ip', $this->HostIp);
-		$this->zbxTestInputTypeOverwrite('filter_port', $this->HostPort);
-		$this->zbxTestClickButtonText('Apply');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Host groups')->select($this->HostGroup);
+		$filter->getField('Name')->fill($this->HostName);
+		$filter->getField('IP')->fill($this->HostIp);
+		$filter->getField('Port')->fill($this->HostPort);
+		$filter->submit();
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 
 	public function testPageHosts_FilterReset() {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestClickButtonText('Apply');
+		$this->query('button:Reset')->one()->click();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 

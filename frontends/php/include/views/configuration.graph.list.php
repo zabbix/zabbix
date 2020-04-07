@@ -41,22 +41,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 else {
 	$widget = (new CWidget())
 		->setTitle(_('Graphs'))
-		->setControls(new CList([
-			(new CForm('get'))
-				->cleanItems()
-				->setAttribute('aria-label', _('Main filter'))
-				->addItem((new CList())
-					->addItem([
-						new CLabel(_('Group'), 'groupid'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$this->data['pageFilter']->getGroupsCB()
-					])
-					->addItem([
-						new CLabel(_('Host'), 'hostid'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$this->data['pageFilter']->getHostsCB()
-					])
-				),
+		->setControls(
 			(new CTag('nav', true, ($data['hostid'] == 0)
 				? (new CButton('form', _('Create graph (select host first)')))->setEnabled(false)
 				: new CRedirectButton(_('Create graph'), (new CUrl('graphs.php'))
@@ -66,11 +51,59 @@ else {
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
-		]));
+		);
 
 	if (!empty($this->data['hostid'])) {
 		$widget->addItem(get_header_host_table('graphs', $this->data['hostid']));
 	}
+
+	// Add filter tab.
+	$widget->addItem(
+		(new CFilter(new CUrl('graphs.php')))
+			->setProfile($data['profileIdx'])
+			->setActiveTab($data['active_tab'])
+			->addFilterTab(_('Filter'), [
+				(new CFormList())
+					->addRow(
+						(new CLabel(_('Host groups'), 'filter_groups__ms')),
+						(new CMultiSelect([
+							'name' => 'filter_groups[]',
+							'object_name' => 'hostGroup',
+							'data' => $data['filter']['groups'],
+							'popup' => [
+								'parameters' => [
+									'srctbl' => 'host_groups',
+									'srcfld1' => 'groupid',
+									'dstfrm' => 'zbx_filter',
+									'dstfld1' => 'filter_groups_',
+									'with_hosts_and_templates' => 1,
+									'editable' => 1
+								]
+							]
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					)
+					->addRow(
+						(new CLabel(_('Hosts'), 'filter_hosts__ms')),
+						(new CMultiSelect([
+							'name' => 'filter_hostids[]',
+							'object_name' => 'host_templates',
+							'data' => $data['filter']['hosts'],
+							'popup' => [
+								'filter_preselect_fields' => [
+									'hostgroups' => 'filter_groups_'
+								],
+								'parameters' => [
+									'srctbl' => 'host_templates',
+									'srcfld1' => 'hostid',
+									'dstfrm' => 'zbx_filter',
+									'dstfld1' => 'filter_hostids_',
+									'editable' => 1
+								]
+							]
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					)
+			])
+	);
 }
 
 // create form
@@ -135,7 +168,7 @@ foreach ($data['graphs'] as $graph) {
 		->setArgument('graphid', $graphid);
 
 	if ($data['parent_discoveryid'] === null) {
-		$url->setArgument('hostid', $this->data['hostid']);
+		$url->setArgument('filter_hostids', [$data['hostid']]);
 	}
 
 	$name[] = new CLink(CHtml::encode($graph['name']), $url);

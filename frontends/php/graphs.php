@@ -33,7 +33,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
-	'groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,
 								IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
@@ -71,6 +70,11 @@ $fields = [
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		null,			null],
+	// filter
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name"'),					null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -97,12 +101,7 @@ $_REQUEST['show_legend'] = getRequest('show_legend', 0);
 /*
  * Permissions
  */
-$groupId = getRequest('groupid');
-if ($groupId && !isWritableHostGroups([$groupId])) {
-	access_deny();
-}
-
-$hostId = getRequest('hostid', 0);
+$hostid = getRequest('hostid', 0);
 
 if (hasRequest('parent_discoveryid')) {
 	// check whether discovery rule is editable by user
@@ -116,7 +115,7 @@ if (hasRequest('parent_discoveryid')) {
 		access_deny();
 	}
 
-	$hostId = $discoveryRule['hostid'];
+	$hostid = $discoveryRule['hostid'];
 
 	// check whether graph prototype is editable by user
 	if (hasRequest('graphid')) {
@@ -141,7 +140,7 @@ elseif (hasRequest('graphid')) {
 		access_deny();
 	}
 }
-elseif ($hostId && !isWritableHostTemplates([$hostId])) {
+elseif ($hostid && !isWritableHostTemplates([$hostid])) {
 	access_deny();
 }
 
@@ -243,7 +242,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$messageFailed = _('Cannot add graph');
 		}
 
-		$cookieId = $hostId;
+		$cookieId = $hostid;
 	}
 
 	if ($result) {
@@ -281,7 +280,7 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 		$result = API::Graph()->delete([$graphId]);
 
 		if ($result) {
-			uncheckTableRows($hostId);
+			uncheckTableRows($hostid);
 		}
 		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 	}
@@ -314,7 +313,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 		$result = API::Graph()->delete($graphIds);
 
 		if ($result) {
-			uncheckTableRows($hostId);
+			uncheckTableRows($hostid);
 		}
 		else {
 			$graphs = API::Graph()->get([
@@ -323,7 +322,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 				'editable' => true
 			]);
 
-			uncheckTableRows($hostId, zbx_objectValues($graphs, 'graphid'));
+			uncheckTableRows($hostid, zbx_objectValues($graphs, 'graphid'));
 		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
@@ -378,7 +377,7 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 
 		if ($result) {
 			uncheckTableRows(
-				(getRequest('parent_discoveryid') == 0) ? $hostId : getRequest('parent_discoveryid')
+				(getRequest('parent_discoveryid') == 0) ? $hostid : getRequest('parent_discoveryid')
 			);
 			unset($_REQUEST['group_graphid']);
 		}
@@ -393,25 +392,75 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 	show_messages();
 }
 
+/**
+ * Update profile keys.
+ */
+$sort_field = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+$sort_order = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+CProfile::update('web.'.$page['file'].'.sort', $sort_field, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sort_order, PROFILE_TYPE_STR);
+
+if (hasRequest('filter_set')) {
+	CProfile::updateArray('web.graphs.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
+	CProfile::updateArray('web.graphs.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+}
+elseif (hasRequest('filter_rst')) {
+	CProfile::deleteIdx('web.graphs.filter_groups');
+
+	$filter_hostids = getRequest('filter_hostids', CProfile::getArray('web.graphs.filter_hostids', []));
+	if (count($filter_hostids) != 1) {
+		CProfile::deleteIdx('web.graphs.filter_hostids');
+	}
+}
+
 /*
  * Display
  */
-$pageFilter = new CPageFilter([
-	'groups' => [
-		'with_hosts_and_templates' => true,
-		'editable' => true
-	],
-	'hosts' => [
-		'editable' => true,
-		'templated_hosts' => true
-	],
-	'groupid' => $groupId,
-	'hostid' => $hostId
-]);
+if (hasRequest('parent_discoveryid')) {
+	// Argument parent_discoveryid is considered as alternative filter.
+	$filter = [
+		'groups' => null,
+		'hosts' => null
+	];
+}
+else {
+	$filter = [
+		'groups' => CProfile::getArray('web.graphs.filter_groups', null),
+		'hosts' => CProfile::getArray('web.graphs.filter_hostids', null)
+	];
+}
 
-if (empty($_REQUEST['parent_discoveryid'])) {
-	$groupId = $pageFilter->groupid;
-	$hostId = $pageFilter->hostid;
+// Get host groups.
+$filter['groups'] = $filter['groups']
+	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'groupids' => $filter['groups'],
+		'with_hosts_and_templates' => true,
+		'editable' => true,
+		'preservekeys' => true
+	]), ['groupid' => 'id'])
+	: [];
+
+$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+if ($filter_groupids) {
+	$filter_groupids = getSubGroups($filter_groupids);
+}
+
+// Get hosts.
+$filter['hosts'] = $filter['hosts']
+	? CArrayHelper::renameObjectsKeys(API::Host()->get([
+		'output' => ['hostid', 'name'],
+		'hostids' => $filter['hosts'],
+		'templated_hosts' => true,
+		'editable' => true,
+		'preservekeys' => true
+	]), ['hostid' => 'id'])
+	: [];
+
+// Get hostid.
+if ($hostid == 0 && count($filter['hosts']) == 1) {
+	$hostid = reset($filter['hosts'])['id'];
 }
 
 if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('group_graphid')) {
@@ -428,8 +477,7 @@ elseif (isset($_REQUEST['form'])) {
 		'graphid' => getRequest('graphid', 0),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'group_gid' => getRequest('group_gid', []),
-		'hostid' => $hostId,
-		'groupid' => $groupId,
+		'hostid' => $hostid,
 		'normal_only' => getRequest('normal_only')
 	];
 
@@ -595,63 +643,44 @@ elseif (isset($_REQUEST['form'])) {
 	// is template
 	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
 
-	// Read groupid for selected host or template if groupid filter is set to 'All' (is equal 0).
-
-	if ($data['hostid'] && !$data['groupid']) {
-		$db_hostgroup = API::HostGroup()->get([
-			'output' => ['groupid'],
-			'hostids' => $data['hostid'],
-			'templateids' => $data['hostid']
-		]);
-
-		if ($db_hostgroup) {
-			$data['groupid'] = $db_hostgroup[0]['groupid'];
-		}
-	}
-
 	// render view
 	echo (new CView('configuration.graph.edit', $data))->getOutput();
 }
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
-
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
 	$config = select_config();
 
 	$data = [
-		'pageFilter' => $pageFilter,
-		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : $hostId,
+		'filter' => $filter,
+		'hostid' => $hostid,
 		'parent_discoveryid' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
 		'graphs' => [],
-		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sort' => $sort_field,
+		'sortorder' => $sort_order,
+		'profileIdx' => 'web.graphs.filter',
+		'active_tab' => CProfile::get('web.graphs.filter.active', 1)
 	];
 
-	if ($data['pageFilter']->hostsSelected) {
-		$options = [
-			'output' => ['graphid', 'name', 'graphtype'],
-			'hostids' => ($data['hostid'] == 0) ? null : $data['hostid'],
-			'groupids' => ($data['hostid'] == 0 && $pageFilter->groupid > 0) ? $pageFilter->groupids : null,
-			'discoveryids' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
-			'editable' => true,
-			'limit' => $config['search_limit'] + 1
-		];
+	// Select graphs.
+	$options = [
+		'output' => ['graphid', 'name', 'graphtype'],
+		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
+		'groupids' => $filter_groupids,
+		'discoveryids' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
+		'editable' => true,
+		'limit' => $config['search_limit'] + 1
+	];
 
-		$data['graphs'] = hasRequest('parent_discoveryid')
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
+	$data['graphs'] = hasRequest('parent_discoveryid')
+		? API::GraphPrototype()->get($options)
+		: API::Graph()->get($options);
 
-		if ($sortField === 'graphtype') {
-			foreach ($data['graphs'] as $gnum => $graph) {
-				$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
-			}
+	if ($sort_field === 'graphtype') {
+		foreach ($data['graphs'] as $gnum => $graph) {
+			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
-
-		order_result($data['graphs'], $sortField, $sortOrder);
 	}
+
+	order_result($data['graphs'], $sort_field, $sort_order);
 
 	// pager
 	if (hasRequest('page')) {
@@ -666,32 +695,26 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['graphs'], $sortOrder,
-		(new CUrl('graphs.php'))
-			->setArgument('groupid', $pageFilter->groupid)
-			->setArgument('hostid', $data['hostid'])
-	);
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['graphs'], $sort_order, new CUrl('graphs.php'));
 
-	if ($data['pageFilter']->hostsSelected) {
-		// Get graphs after paging.
-		$options = [
-			'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
-			'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
-			'graphids' => zbx_objectValues($data['graphs'], 'graphid')
-		];
+	// Get graphs after paging.
+	$options = [
+		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
+		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
+		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
+		'graphids' => zbx_objectValues($data['graphs'], 'graphid')
+	];
 
-		$data['graphs'] = hasRequest('parent_discoveryid')
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
+	$data['graphs'] = hasRequest('parent_discoveryid')
+		? API::GraphPrototype()->get($options)
+		: API::Graph()->get($options);
 
-		foreach ($data['graphs'] as $gnum => $graph) {
-			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
-		}
-
-		order_result($data['graphs'], $sortField, $sortOrder);
+	foreach ($data['graphs'] as $gnum => $graph) {
+		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
+
+	order_result($data['graphs'], $sort_field, $sort_order);
 
 	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
 		? ZBX_FLAG_DISCOVERY_NORMAL

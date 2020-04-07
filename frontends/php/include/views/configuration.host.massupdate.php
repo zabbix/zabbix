@@ -323,7 +323,7 @@ if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(
 	new CSubmit('masssave', _('Update')),
-	[new CButtonCancel(url_param('groupid'))]
+	[new CButtonCancel()]
 ));
 
 $hostView->addItem($hostTab);
