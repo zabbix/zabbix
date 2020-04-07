@@ -1688,6 +1688,13 @@ static int	DBpatch_4050076(void)
 	return DBdrop_field("config", "dropdown_first_remember");
 }
 
+static int	DBpatch_4050077(void)
+{
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("acknowledges", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1765,5 +1772,6 @@ DBPATCH_ADD(4050073, 0, 1)
 DBPATCH_ADD(4050074, 0, 1)
 DBPATCH_ADD(4050075, 0, 1)
 DBPATCH_ADD(4050076, 0, 1)
+DBPATCH_ADD(4050077, 0, 1)
 
 DBPATCH_END()
