@@ -35,14 +35,14 @@ class testFormHostPrototypeMacros extends testFormMacros {
 	 *
 	 * @var string
 	 */
-	protected $host_name_update = 'Host prototype for {#UPDATE}';
+	protected $host_name_update = 'Host prototype for macros {#UPDATE}';
 
 	/**
 	 * The name of the host for removing macros, id=30010.
 	 *
 	 * @var string
 	 */
-	protected $host_name_remove = 'Host prototype for macros {#REMOVE}';
+	protected $host_name_remove = 'Host prototype for macros {#DELETE}';
 
 	public static function getCreateHostPrototypeMacrosData() {
 		return [

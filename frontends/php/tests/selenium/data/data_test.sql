@@ -2343,13 +2343,13 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, f
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, params, posts, headers) VALUES (99349, 0, 99137, 'Test discovery rule', '', 'test', NULL, 1, '', '', '');
 
 -- testFormHostPrototypeMacros
-INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99200, 'Host prototype for {#UPDATE}', 'Host prototype for {#UPDATE}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99200, 'Host prototype for macros {#UPDATE}', 'Host prototype for macros {#UPDATE}', 0, '', 2);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99200, 90001);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (222090, 99200, '', 5, NULL);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99500, 99200, '{$UPDATE_MACRO_1}', 'Update macro value 1', 'Update macro description 1');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99501, 99200, '{$UPDATE_MACRO_2}', 'Update macro value 2', 'Update macro description 2');
 
-INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99201, 'Host prototype for {#DELETE}', 'Host prototype for {#DELETE}', 0, '', 2);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99201, 'Host prototype for macros {#DELETE}', 'Host prototype for macros {#DELETE}', 0, '', 2);
 INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99201, 90001);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (222091, 99201, '', 5, NULL);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99502, 99201, '{$DELETE_MACRO_1}', 'Delete macro value 1', 'Delete macro description 1');
