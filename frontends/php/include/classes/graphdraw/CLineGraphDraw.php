@@ -309,7 +309,12 @@ class CLineGraphDraw extends CGraphDraw {
 					$data['shift_avg'][$idx] = 0;
 				}
 
-				$data['missing_data_interval'] = self::getDataFrequency($result['data'], $item) * 3;
+				if ($item['source'] !== 'trends') {
+					$data['missing_data_interval'] = self::getDataFrequency($result['data'], $item) * 3;
+				}
+				else {
+					$data['missing_data_interval'] = self::getAverageDistance($result['data'], $item) * 3;
+				}
 			}
 
 			$data['avg_orig'] = $data['avg'] ? CMathHelper::safeAvg($data['avg']) : null;
