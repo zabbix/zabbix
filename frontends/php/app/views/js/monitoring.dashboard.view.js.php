@@ -211,18 +211,40 @@
 		jQuery('.dashbrd-grid-container').dashboardGrid('addNewWidget', this);
 	};
 
+	// Paste widget.
+	function dashbrd_paste_widget() {
+		jQuery('.dashbrd-grid-container').dashboardGrid('pasteWidget', null, null);
+	};
+
 	var showEditMode = function showEditMode() {
 		jQuery('#dashbrd-control > li').hide().last().show();
 
 		var ul = jQuery('#dashbrd-config').closest('ul');
 		jQuery('#dashbrd-config', ul).click(dashbrd_config),
 		jQuery('#dashbrd-add-widget', ul).click(dashbrd_add_widget),
+		jQuery('#dashbrd-paste-widget').click(dashbrd_paste_widget),
 		jQuery('#dashbrd-save', ul).click(dashbrd_save_changes),
 		jQuery('#dashbrd-cancel', ul).click(dashbrd_cancel),
 
 		// Hide filter with timeline.
 		jQuery('.filter-btn-container, .filter-space').hide();
 		timeControl.disableAllSBox();
+
+		// Enable 'Paste widget' button.
+		if (jQuery('.dashbrd-grid-container').dashboardGrid('isWidgetCopied')) {
+			jQuery('#dashbrd-paste-widget').attr('disabled', false);
+		}
+		else {
+			// Listen for local storage 'dashboard.copied_widget' update and enable 'Paste widget' button.
+			var dashboard = jQuery('.dashbrd-grid-container').data('dashboardGrid');
+			if (dashboard['storage']) {
+				dashboard['storage'].onKeyUpdate('dashboard.copied_widget', function() {
+					if (jQuery('.dashbrd-grid-container').dashboardGrid('isWidgetCopied')) {
+						jQuery('#dashbrd-paste-widget').attr('disabled', false);
+					}
+				});
+			}
+		}
 
 		// Update buttons on existing widgets to edit mode.
 		jQuery('.dashbrd-grid-container').dashboardGrid('setModeEditDashboard');

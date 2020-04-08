@@ -107,6 +107,9 @@ else {
 					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
 					(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
 						->addClass(ZBX_STYLE_BTN_ALT),
+					(new CButton('dashbrd-paste-widget', _('Paste widget')))
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->setEnabled(false),
 					(new CButton('dashbrd-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
 					''
@@ -226,7 +229,8 @@ else {
 	// Initialize dashboard grid.
 	(new CScriptTag(
 		'$(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
-			'.dashboardGrid('.json_encode($dashboard_options).')'.
+			'.dashboardGrid($.extend('.json_encode($dashboard_options).', '.
+				'{"storage": ZABBIX.namespace("instances.localStorage")}))'.
 			'.dashboardGrid("setDashboardData", '.json_encode($dashboard_data).')'.
 			'.dashboardGrid("setWidgetDefaults", '.json_encode($data['widget_defaults']).')'.
 			'.dashboardGrid("addWidgets", '.json_encode($data['grid_widgets']).

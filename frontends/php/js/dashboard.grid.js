@@ -47,8 +47,8 @@
 			},
 			widget_actions = {
 				'widgetType': widget['type'],
-				'widgetName': widget['widgetid'],
 				'currentRate': widget['rf_rate'],
+				'widget_uniqueid': widget['uniqueid'],
 				'multiplier': '0'
 			},
 			classes = widget['iterator'] ? iterator_classes : widget_classes;
@@ -129,18 +129,6 @@
 								}
 							})
 						)
-					)
-					.append((data['options']['editable'] && !data['options']['kioskmode'])
-						? $('<li>').hide().append(
-							$('<button>', {
-								'type': 'button',
-								'class': 'btn-widget-delete',
-								'title': t('Delete')
-							}).on('click', function() {
-								methods.deleteWidget.call($obj, widget);
-							})
-						)
-						: ''
 					)
 				);
 		}
@@ -1395,6 +1383,8 @@
 
 		setDivPosition(widget['div'], data, widget['pos']);
 		resizeDashboardGrid($obj, data);
+
+		$.publish('widget.update.dimensions');
 	}
 
 	function makeDraggable($obj, data, widget) {
@@ -2240,7 +2230,12 @@
 		delete fields['show_header'];
 
 		if (widget === null || !('type' in widget) && !('pos' in widget)) {
-			pos = findEmptyPosition($obj, data, type);
+			var area_size = {
+				'width': data.widget_defaults[type].size.width,
+				'height': data.widget_defaults[type].size.height
+			};
+
+			pos = findEmptyPosition($obj, data, area_size);
 			if (!pos) {
 				showMessageExhausted(data);
 				return;
@@ -2447,13 +2442,19 @@
 			});
 	}
 
-	function findEmptyPosition($obj, data, type) {
-		var pos = {
-				'x': 0,
-				'y': 0,
-				'width': data.widget_defaults[type].size.width,
-				'height': data.widget_defaults[type].size.height
-			};
+	/**
+	 * Find first empty position in gived size.
+	 *
+	 * @param {object} $obj               Dashboard object.
+	 * @param {object} data               Dashboard 'dashboardGrid' object.
+	 * @param {type}   area_size          Seeked space.
+	 * @param {int}    area_size[width]   Seeked space width.
+	 * @param {int}    area_size[height]  Seeked space height.
+	 *
+	 * @returns {object|boolean}  area_size object extended with position or false in case if no empty space is found.
+	 */
+	function findEmptyPosition($obj, data, area_size) {
+		var pos = $.extend(area_size, {'x': 0, 'y': 0});
 
 		// Go y by row and try to position widget in each space.
 		var	max_col = data.options['max-columns'] - pos.width,
@@ -2547,7 +2548,7 @@
 				}
 
 				var message = $inner_box.is('.dashbrd-grid-widget-set-size')
-						? t('Release to create a new widget.')
+						? t('Release to create a widget.')
 						: t('Click and drag to desired size.'),
 					frame_callback,
 					size_detection,
@@ -2635,7 +2636,7 @@
 			}
 		});
 
-		$(document).on('click mouseup dragend', function() {
+		$(document).on('click mouseup dragend', function(event) {
 			if (data['pos-action'] !== 'add') {
 				return;
 			}
@@ -2653,7 +2654,47 @@
 
 			data['pos-action'] = 'addmodal';
 			setResizableState('enable', data.widgets, '');
-			$obj.dashboardGrid('addNewWidget', null, dimension);
+
+			if (isWidgetCopied($obj)) {
+				var menu = getDashboardWidgetActionMenu(dimension),
+					placeholder = $obj.data('dashboardGrid').new_widget_placeholder,
+					options = {
+						position: {
+							of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
+							my: ['left', 'top'],
+							at: ['right', 'bottom']
+						},
+						closeCallback: function() {
+							data['pos-action'] = '';
+							data.add_widget_dimension = {};
+
+							if (data.widgets.length) {
+								placeholder.container.hide();
+								placeholder.setPositioning();
+							}
+							else {
+								placeholder.container.removeAttr('style');
+							}
+						}
+					};
+
+				// Adopt menu position to direction in which placeholder was drawn.
+				if (dimension.left > dimension.x) {
+					options.position.my[0] = 'right';
+					options.position.at[0] = 'left';
+				}
+				if (dimension.top > dimension.y) {
+					options.position.my[1] = 'bottom';
+					options.position.at[1] = 'top';
+				}
+				options.position.my = options.position.my.join(' ');
+				options.position.at = options.position.at.join(' ');
+
+				placeholder.container.menuPopup(menu, event, options);
+			}
+			else {
+				$obj.dashboardGrid('addNewWidget', null, dimension);
+			}
 		});
 
 		$obj
@@ -2856,9 +2897,6 @@
 	function setWidgetModeEdit($obj, data, widget) {
 		clearUpdateWidgetContentTimer(widget);
 
-		$('.btn-widget-action', widget['content_header']).parent('li').hide();
-		$('.btn-widget-delete', widget['content_header']).parent('li').show();
-
 		if (!widget['iterator']) {
 			removeWidgetInfoButtons(widget['content_header']);
 		}
@@ -3053,11 +3091,11 @@
 				size_new = getWidgetContentSize(widget);
 
 			if (!isEqualContentSize(size_old, size_new)) {
-				success = doAction('onResizeEnd', $obj, data, widget);
-				if (success) {
-					widget['content_size'] = size_new;
-				}
+			success = doAction('onResizeEnd', $obj, data, widget);
+			if (success) {
+				widget['content_size'] = size_new;
 			}
+		}
 		}
 
 		return success;
@@ -3169,12 +3207,18 @@
 		return triggers.length;
 	}
 
+	function isWidgetCopied($obj) {
+		var buffer = $obj.data('dashboardGrid').storage.readKey('dashboard.copied_widget');
+		return (typeof buffer === 'object' && buffer !== null);
+	}
+
 	var	methods = {
 		init: function(options) {
 			options = $.extend({
 				'widget-height': 70,
 				'rows': 0,
-				'updated': false
+				'updated': false,
+				'storage': null
 			}, options);
 
 			options['widget-width'] = 100 / options['max-columns'];
@@ -3221,7 +3265,8 @@
 						tasks: {}
 					},
 					data_buffer: [],
-					minimalHeight: calculateGridMinHeight($this)
+					minimalHeight: calculateGridMinHeight($this),
+					storage: options['storage']
 				});
 
 				var	data = $this.data('dashboardGrid'),
@@ -3250,6 +3295,16 @@
 						data.new_widget_placeholder.updateLabelVisibility();
 					});
 			});
+		},
+
+		isWidgetCopied: function() {
+			var ret = false;
+
+			this.each(function() {
+				ret = isWidgetCopied($(this));
+			});
+
+			return ret;
 		},
 
 		refreshDynamicWidgets: function(host) {
@@ -3529,6 +3584,110 @@
 			});
 		},
 
+		// After pressing "Copy" button on widget.
+		copyWidget: function(widget) {
+			return this.each(function() {
+				var w = {
+					type: widget.type,
+					pos: {
+						width: widget.pos.width,
+						height: widget.pos.height
+					},
+					header: widget.header,
+					view_mode: widget.view_mode,
+					rf_rate: widget.rf_rate,
+					fields: widget.fields,
+					configuration: widget.configuration
+				};
+
+				$(this).data('dashboardGrid').storage.writeKey('dashboard.copied_widget', w);
+			});
+		},
+
+		/**
+		 * @param {object} widget  Widget to replace.
+		 * @param {object} pos     Position to paste new widget in.
+		 *
+		 * @returns {jQuery}
+		 */
+		pasteWidget: function(widget, pos) {
+			return this.each(function() {
+				var	$this = $(this),
+					$wrapper = $this.closest('main'),
+					data = $this.data('dashboardGrid'),
+					new_widget = data.storage.readKey('dashboard.copied_widget'),
+					warning_msg_remove = function() {
+						$wrapper.siblings('.msg-warning').not('.msg-global-footer').remove();
+						$.unsubscribe('widget.update.dimensions', warning_msg_remove);
+					};
+
+				// Regenerate reference field values.
+				if ('reference' in new_widget.fields) {
+					new_widget.fields['reference'] = methods.makeReference.call($this);
+				}
+
+				warning_msg_remove();
+
+				// When no position is given, find first empty space. Use copied widget width and height.
+				if (pos === null) {
+					var area_size = {
+						'width': new_widget.pos.width,
+						'height': new_widget.pos.height
+					};
+
+					pos = findEmptyPosition($this, data, area_size);
+					if (!pos) {
+						$.subscribe('widget.update.dimensions', warning_msg_remove);
+						$wrapper.siblings('.msg-good, .msg-bad').remove();
+						$wrapper.before(makeMessageBox(
+							'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, true
+						));
+						return;
+					}
+
+					new_widget.pos.x = pos.x;
+					new_widget.pos.y = pos.y;
+				}
+				else {
+					new_widget = $.extend(new_widget, {pos: pos});
+				}
+
+				// Remove old widget.
+				if (widget !== null) {
+					removeWidget($this, data, widget);
+				}
+
+				if (pos['y'] + pos['height'] > data['options']['rows']) {
+					resizeDashboardGrid($this, data, pos['y'] + pos['height']);
+
+					// Body height should be adjusted to animate scrollTop work.
+					$('body').css('height', Math.max(
+						$('body').height(), (pos['y'] + pos['height']) * data['options']['widget-height']
+					));
+				}
+
+				// 5px shift is widget padding.
+				$('html, body')
+					.animate({scrollTop: pos['y'] * data['options']['widget-height']
+						+ $('.dashbrd-grid-container').position().top - 5})
+					.promise()
+					.then(function() {
+						methods.addWidget.call($this, new_widget);
+
+						// New widget is last element in data['widgets'] array.
+						new_widget = data['widgets'].slice(-1)[0];
+						setWidgetModeEdit($this, data, new_widget);
+						updateWidgetContent($this, data, new_widget);
+
+						// Remove height attribute set for scroll animation.
+						$('body').css('height', '');
+					});
+
+				// Mark dashboard as updated.
+				data['options']['updated'] = true;
+			});
+		},
+
 		// After pressing "delete" button on widget.
 		deleteWidget: function(widget) {
 			return this.each(function() {
@@ -3633,7 +3792,12 @@
 						updateWidgetConfig($this, data, widget);
 					});
 
-					if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
+					var area_size = {
+						'width': data.widget_defaults[data.dialogue.widget_type].size.width,
+						'height': data.widget_defaults[data.dialogue.widget_type].size.height
+					};
+
+					if (widget === null && !findEmptyPosition($this, data, area_size)) {
 						showMessageExhausted(data);
 					}
 					else {
