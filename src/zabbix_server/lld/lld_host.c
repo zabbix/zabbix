@@ -661,10 +661,13 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 		host->status = status_proto;
 
-		lld_override_host(&lld_row->overrides, host->host, &host->status);
+		zbx_vector_uint64_create(&host->lnk_templateids);
+
+		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->status);
 
 		if (HOST_STATUS_NO_CREATE == host->status)
 		{
+			zbx_vector_uint64_destroy(&host->lnk_templateids);
 			zbx_free(host->host);
 			zbx_free(host);
 		}
@@ -675,7 +678,6 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			zbx_lrtrim(host->name, ZBX_WHITESPACE);
 			host->name_orig = NULL;
 			zbx_vector_uint64_create(&host->new_groupids);
-			zbx_vector_uint64_create(&host->lnk_templateids);
 			zbx_vector_uint64_create(&host->del_templateids);
 			zbx_vector_ptr_create(&host->new_hostmacros);
 			zbx_vector_ptr_create(&host->interfaces);
@@ -695,6 +697,8 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			zbx_lrtrim(host->host, ZBX_WHITESPACE);
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HOST;
 		}
+
+		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, NULL);
 
 		/* host visible name */
 		buffer = zbx_strdup(buffer, name_proto);
@@ -1870,6 +1874,10 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 		zbx_vector_uint64_reserve(&host->lnk_templateids, templateids.values_num);
 		for (j = 0; j < templateids.values_num; j++)
 			zbx_vector_uint64_append(&host->lnk_templateids, templateids.values[j]);
+
+		/* sort templates which should be linked by override */
+		zbx_vector_uint64_sort(&host->lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&host->lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		if (0 != host->hostid)
 			zbx_vector_uint64_append(&hostids, host->hostid);

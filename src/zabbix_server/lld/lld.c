@@ -1085,9 +1085,10 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *status)
+void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_vector_uint64_t *lnk_templateids,
+		unsigned char *status)
 {
-	int	i, j, k;
+	int	i, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1100,6 +1101,8 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, unsi
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
 			lld_override_operation_t	*override_operation;
+			zbx_hashset_iter_t		iter;
+			zbx_uint64_t			*templateid;
 
 			override_operation = override->override_operations.values[j];
 
@@ -1119,11 +1122,9 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, unsi
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s():SUCCEED", __func__);
 
-//			if (TRIGGER_SEVERITY_COUNT != override_operation->severity)
-//				*severity = override_operation->severity;
-//
-//			for (k = 0; k < override_operation->trigger_tags.values_num; k++)
-//				zbx_vector_ptr_pair_append(override_tags, override_operation->trigger_tags.values[k]);
+			zbx_hashset_iter_reset(&override_operation->templateids, &iter);
+			while (NULL != (templateid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+				zbx_vector_uint64_append(lnk_templateids, *templateid);
 
 			if (NULL != status)
 			{
