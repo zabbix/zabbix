@@ -55,15 +55,14 @@ abstract class testFormMacros extends CWebTest {
 		}
 		$form->fill(['Groups' => 'Zabbix servers']);
 
-		$name =  $data['Name'];
-		$this->checkMacros($data, $form_type, $name, $host_type, $is_prototype, $lld_id);
+		$this->checkMacros($data, $form_type, $data['Name'], $host_type, $is_prototype, $lld_id);
 	}
 
 	/**
 	 * Test updating of host or template with Macros.
 	 */
-	protected function checkUpdate($data, $hostname, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($hostname));
+	protected function checkUpdate($data, $name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
+		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
 		if ($is_prototype) {
 			$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
@@ -71,7 +70,6 @@ abstract class testFormMacros extends CWebTest {
 		else {
 			$this->page->login()->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
 		}
-		$name = $hostname;
 		$this->checkMacros($data, $form_type, $name, $host_type, $is_prototype, $lld_id);
 	}
 
@@ -87,7 +85,6 @@ abstract class testFormMacros extends CWebTest {
 		else {
 			$this->page->login()->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
 		}
-
 
 		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
@@ -106,7 +103,7 @@ abstract class testFormMacros extends CWebTest {
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($hostname)));
 		// Check the results in form.
-		$this->checkMacrosFields($hostname, $is_prototype, $lld_id, $host_type, $form_type,  null);
+		$this->checkMacrosFields($hostname, $is_prototype, $lld_id, $host_type, $form_type, null);
 	}
 
 	/**
