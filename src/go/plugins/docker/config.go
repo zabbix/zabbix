@@ -21,7 +21,6 @@ package docker
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"zabbix.com/pkg/conf"
@@ -46,10 +45,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	}
 
 	socketPath := strings.Split(p.options.Endpoint, "://")[1]
-	if _, err := os.Stat(socketPath); os.IsNotExist(err) || os.IsPermission(err) {
-		p.Errf(errorCannotConnectToDaemon)
-	}
-
 	p.client = newClient(socketPath, p.options.Timeout)
 
 }

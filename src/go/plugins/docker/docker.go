@@ -35,20 +35,6 @@ const (
 	dockerVersion = "1.28"
 )
 
-const (
-	errorCannotFetchData         = "Cannot fetch data."
-	errorCannotReadResponse      = "Cannot read response."
-	errorCannotUnmarshalJSON     = "Cannot unmarshal JSON."
-	errorCannotUnmarshalAPIError = "Cannot unmarshal API error."
-	errorCannotMarshalJSON       = "Cannot marshal JSON."
-	errorTooManyParams           = "Too many parameters."
-	errorUnsupportedMetric       = "Unsupported metric."
-	errorParametersNotAllowed    = "Item does not allow parameters."
-	errorInvalidEndpoint         = "Invalid endpoint format."
-	errorQueryErrorMessage       = "Docker returned an error."
-	errorCannotConnectToDaemon   = "Cannot connect to Docker daemon."
-)
-
 type containerDiscovery struct {
 	ID   string `json:"{#ID}"`
 	Name string `json:"{#NAME}"`
@@ -108,6 +94,7 @@ func (cli *client) Query(params []string, key *itemKey) ([]byte, error) {
 
 	resp, err := cli.client.Get("http://" + path.Join(dockerVersion, keyPath))
 	if err != nil {
+		impl.Errf("cannot fetch data: %s", err)
 		return nil, errors.New(errorCannotFetchData)
 	}
 	defer resp.Body.Close()
