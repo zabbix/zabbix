@@ -159,6 +159,7 @@ func createTableQuery(table string, id int) string {
 	return fmt.Sprintf(
 		"CREATE TABLE IF NOT EXISTS %s_%d ("+
 			"id INTEGER,"+
+			"write_clock INTEGER,"+
 			"itemid INTEGER,"+
 			"lastlogsize INTEGER,"+
 			"mtime INTEGER,"+
@@ -190,7 +191,6 @@ func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
 		return fmt.Errorf("Cannot open database %s : %s.", options.PersistentBufferFile, err)
 	}
 	defer database.Close()
-
 	stmt, _ := database.Prepare("CREATE TABLE IF NOT EXISTS registry (id INTEGER PRIMARY KEY,address TEXT,UNIQUE(address))")
 	if _, err = stmt.Exec(); err != nil {
 		return err
@@ -206,10 +206,14 @@ func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
 	}
 	for rows.Next() {
 		if err = rows.Scan(&id, &address); err != nil {
+			rows.Close()
 			return err
 		}
 		ids = append(ids, id)
 		registeredAddresses = append(registeredAddresses, address)
+	}
+	if err = rows.Err(); err != nil {
+		return err
 	}
 addressCheck:
 	for i, address := range registeredAddresses {
@@ -232,41 +236,52 @@ addressCheck:
 	for _, addr := range addresses {
 		stmt, err = database.Prepare("INSERT OR IGNORE INTO registry (address) VALUES (?)")
 		if err != nil {
-			break
+			return err
 		}
 		if _, err = stmt.Exec(addr); err != nil {
-			break
+			return err
 		}
 		rows, err = database.Query("SELECT id FROM registry WHERE address=?", addr)
 		if err != nil {
-			break
+			return err
 		}
 		if !rows.Next() {
-			break
+			if err = rows.Err(); err == nil {
+				err = fmt.Errorf("Cannot select id for address %s", addr)
+			}
+			return err
 		}
 		if err = rows.Scan(&id); err != nil {
-			break
+			return err
 		}
 		if err = rows.Close(); err != nil {
-			break
+			return err
 		}
 
 		stmt, err = database.Prepare(createTableQuery("data", id))
 		if err != nil {
-			break
+			return err
 		}
 		if _, err = stmt.Exec(); err != nil {
-			break
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS clk_idx_data ON data_%d (write_clock)", id)); err != nil {
+			return err
 		}
 		stmt, err = database.Prepare(createTableQuery("log", id))
 		if err != nil {
-			break
+			return err
 		}
 		if _, err = stmt.Exec(); err != nil {
-			break
+			return err
 		}
-		database.Exec(fmt.Sprintf("DELETE FROM log_%d", id))
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS clk_idx_log ON log_%d (write_clock)", id)); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("DELETE FROM log_%d", id)); err != nil {
+			return err
+		}
 	}
-	return err
+	return nil
 
 }
