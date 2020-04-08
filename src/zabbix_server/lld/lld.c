@@ -912,7 +912,7 @@ static int	regexp_strmatch_condition(const char *value, const char *pattern, uns
 }
 
 void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, const char **delay,
-		const char **history, const char **trends, int *status)
+		const char **history, const char **trends, unsigned char *status)
 {
 	int	i, j;
 

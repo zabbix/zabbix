@@ -186,12 +186,12 @@ typedef struct
 	char			*ssl_key_file_orig;
 	char			*ssl_key_password;
 	char			*ssl_key_password_orig;
-	int			status;
 	int			lastcheck;
 	int			ts_delete;
 	const zbx_lld_row_t	*lld_row;
 	zbx_vector_ptr_t	preproc_ops;
 	zbx_vector_ptr_t	dependent_items;
+	unsigned char		status;
 	unsigned char		type;
 }
 zbx_lld_item_t;
@@ -1842,8 +1842,6 @@ out:
 
 	return ret;
 }
-
-
 
 /******************************************************************************
  *                                                                            *
