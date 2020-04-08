@@ -943,6 +943,10 @@ class CHelpItems {
 			],
 			ITEM_TYPE_INTERNAL => [
 				[
+					'key' => 'zabbix[version]',
+					'description' => _('Version of Zabbix server or proxy')
+				],
+				[
 					'key' => 'zabbix[boottime]',
 					'description' => _('Startup time of Zabbix server, Unix timestamp.')
 				],

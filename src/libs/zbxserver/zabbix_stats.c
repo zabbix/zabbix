@@ -48,6 +48,8 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 
 	DCget_count_stats_all(&count_stats);
 
+	zbx_json_addstring(json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+
 	/* zabbix[boottime] */
 	zbx_json_adduint64(json, "boottime", CONFIG_SERVER_STARTUP_TIME);
 
