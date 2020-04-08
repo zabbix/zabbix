@@ -22,31 +22,44 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testTriggerExpressions extends CLegacyWebTest {
 
-	public static function provider() {
-		return [
-			['20M', 'FALSE', 'red'],
-			['19.9M', 'TRUE', 'green'],
-			['20479K', 'TRUE', 'green']
-		];
-	}
-
-	/**
-	* @dataProvider provider
-	*/
-	public function testTriggerExpression_SimpleTest($value, $expected, $css_class) {
-		// Open advanced editor for testing trigger expression results
+	public function testTriggerExpressions_SimpleTest() {
+		// Open advanced editor for testing trigger expression results.
 		$this->zbxTestLogin('triggers.php?form=update&triggerid=13357');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestClickButtonText('Expression constructor');
 		$this->zbxTestClickButtonText('Test');
 		$this->zbxTestLaunchOverlayDialog('Test');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
-		// Type values in expression testing form
-		$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@type="text"]', $value);
+		// Check table headers presence in tesing dialog.
+		$table_headers = ['Expression Variable Elements', 'Result type', 'Value',
+						'Expression', 'Result', 'Error'];
 
-		// Verify result of expression status
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Test"]');
-		$this->zbxTestAssertElementText('(//div[@class="overlay-dialogue-body"]//td[@class="'.$css_class.'"])[1]', $expected);
-		$this->zbxTestAssertElementText('(//div[@class="overlay-dialogue-body"]//td[@class="'.$css_class.'"])[2]', $expected);
+		foreach ($table_headers as $header) {
+			$this->assertTrue($dialog->query('xpath://table//th[text() ="'.$header.'"]')->one()->isPresent());
+		}
+
+		// Type value in expression testing form.
+		$dialog->query('xpath:.//input[@type="text"]')->waitUntilPresent()->one()->fill('20M');
+
+		// Verify zabbix server connection error message.
+		$dialog->query('button:Test')->one()->click();
+
+		$message = $dialog->query('tag:output')->waitUntilPresent()->asMessage()->one();
+		$this->assertTrue($message->isBad());
+		$this->assertEquals('Cannot evaluate expression', $message->getTitle());
+
+		$message_details = [
+			'Connection to Zabbix server "localhost" refused. Possible reasons:',
+			'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
+			'2. Security environment (for example, SELinux) is blocking the connection;',
+			'3. Zabbix server daemon not running;',
+			'4. Firewall is blocking TCP connection.',
+			'Connection refused'
+		];
+
+		foreach ($message_details as $line) {
+			$this->assertTrue($message->hasLine($line));
+		}
 	}
 }
