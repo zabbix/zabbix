@@ -1291,6 +1291,34 @@ class CUser extends CApiService {
 	}
 
 	/**
+	 * Method is ONLY for internal use!
+	 * Login user by alias. Return array with user data.
+	 *
+	 * @param string $alias     Authenticated user alias value.
+	 * @param bool   $api_call  Check is method called via API call or from local php file.
+	 *
+	 * @return array
+	 */
+	public function loginSso($alias, $api_call = true) {
+		if ($api_call) {
+			return self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect method "%1$s.%2$s".', 'user', 'loginSso'));
+		}
+
+		$config = select_config();
+		$db_user = $this->findByAlias($alias, ($config['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
+			$config['authentication_type'], false
+		);
+
+		unset($db_user['passwd']);
+		$db_user = self::createSession($alias, $db_user);
+		self::$userData = $db_user;
+
+		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+
+		return $db_user;
+	}
+
+	/**
 	 * Check if session id is authenticated.
 	 *
 	 * @param array  $session

@@ -38,3 +38,9 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //];
 // Value types stored in Elasticsearch.
 //$HISTORY['types'] = ['uint', 'text'];
+
+// Used for SAML authentication.
+$SSO['SP_KEY']			= './frontends/php/conf/certs/sp.key';
+$SSO['SP_CERT']			= './frontends/php/conf/certs/sp.cert';
+$SSO['IDP_CERT']		= './frontends/php/conf/certs/idp.cert';
+$SSO['SETTINGS']		= [];

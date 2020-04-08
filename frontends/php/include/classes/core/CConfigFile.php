@@ -158,13 +158,17 @@ class CConfigFile {
 			$this->config['HISTORY'] = $HISTORY;
 		}
 
+		if (isset($SSO)) {
+			$this->config['SSO'] = $SSO;
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -172,6 +176,7 @@ class CConfigFile {
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
+		$SSO = $this->config['SSO'];
 	}
 
 	public function save() {
@@ -243,6 +248,12 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //];
 // Value types stored in Elasticsearch.
 //$HISTORY[\'types\'] = [\'uint\', \'text\'];
+
+// Used for SAML authentication.
+$SSO[\'SP_KEY\']		= \''.addcslashes($this->config['SP_KEY'], "'\\").'\';
+$SSO[\'SP_CERT\']		= \''.addcslashes($this->config['SP_CERT'], "'\\").'\';
+$SSO[\'IDP_CERT\']		= \''.addcslashes($this->config['IDP_CERT'], "'\\").'\';
+$SSO[\'SETTINGS\']		= [];
 ';
 	}
 
@@ -268,6 +279,12 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 		$this->config['ZBX_SERVER_NAME'] = '';
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
+		$this->config['SSO'] = [
+			'SP_KEY' => 'conf/certs/sp.key',
+			'SP_CERT' => 'conf/certs/sp.crt',
+			'IDP_CERT' => 'conf/certs/idp.crt',
+			'SETTINGS' => []
+		];
 	}
 
 	protected function check() {
