@@ -1144,8 +1144,6 @@ void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, uns
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
 			lld_override_operation_t	*override_operation;
-			zbx_hashset_iter_t		iter;
-			zbx_uint64_t			*templateid;
 
 			override_operation = override->override_operations.values[j];
 
