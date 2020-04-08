@@ -176,7 +176,7 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK)
 
 	zbx_uint64_t		flags;
-	char			inventory_mode;
+	char			inventory_mode_orig;
 	unsigned char		status;
 }
 zbx_lld_host_t;
@@ -331,9 +331,9 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK;
 
 		if (SUCCEED == DBis_null(row[11]))
-			host->inventory_mode = HOST_INVENTORY_DISABLED;
+			host->inventory_mode_orig = HOST_INVENTORY_DISABLED;
 		else
-			host->inventory_mode = (char)atoi(row[11]);
+			host->inventory_mode_orig = (char)atoi(row[11]);
 
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->lnk_templateids);
@@ -2107,11 +2107,11 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
 				upd_hosts++;
 
-			if (host->inventory_mode != inventory_mode)
+			if (host->inventory_mode_orig != inventory_mode)
 			{
 				if (HOST_INVENTORY_DISABLED == inventory_mode)
 					zbx_vector_uint64_append(&del_host_inventory_hostids, host->hostid);
-				else if (HOST_INVENTORY_DISABLED == host->inventory_mode)
+				else if (HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
 					new_host_inventories++;
 				else
 					zbx_vector_uint64_append(&upd_host_inventory_hostids, host->hostid);
@@ -2371,8 +2371,11 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 						host->hostid);
 			}
 
-			if (host->inventory_mode != inventory_mode && HOST_INVENTORY_DISABLED == host->inventory_mode)
+			if (host->inventory_mode_orig != inventory_mode &&
+					HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
+			{
 				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)inventory_mode);
+			}
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			{
