@@ -326,7 +326,7 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 	return $query;
 }
 
-function DBexecute($query, $skip_error_messages = 0) {
+function DBexecute($query) {
 	global $DB;
 
 	if (!isset($DB['DB']) || empty($DB['DB'])) {

@@ -38,6 +38,7 @@ class DB {
 	const FIELD_TYPE_UINT = 'uint';
 	const FIELD_TYPE_BLOB = 'blob';
 	const FIELD_TYPE_TEXT = 'text';
+	const FIELD_TYPE_NCLOB = 'nclob';
 
 	private static $schema = null;
 
@@ -269,6 +270,10 @@ class DB {
 			return ($DB['TYPE'] == ZBX_DB_ORACLE) ? 2048 : 65535;
 		}
 
+		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_NCLOB) {
+			return 65535;
+		}
+
 		return $schema['fields'][$field_name]['length'];
 	}
 
@@ -388,9 +393,39 @@ class DB {
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+					case self::FIELD_TYPE_NCLOB:
+						// Using strlen because 4000 bytes is largest possible string literal in oracle query.
+						if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > 4000) {
+							$chunks = zbx_dbstr(self::chunkMultibyteStr($values[$field], 4000));
+							$values[$field] = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
+						}
+						else {
+							$values[$field] = zbx_dbstr($values[$field]);
+						}
+						break;
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param string $str
+	 * @param int $chunk_size
+	 *
+	 * @return array
+	 */
+	public static function chunkMultibyteStr(string $str, int $chunk_size): array {
+		$chunks = [];
+		$offset = 0;
+		$size = strlen($str);
+
+		while ($offset < $size) {
+			$chunk = mb_strcut($str, $offset, $chunk_size);
+			$chunks[] = $chunk;
+			$offset = strlen($chunk) + $offset;
+		}
+
+		return $chunks;
 	}
 
 	/**
