@@ -1061,7 +1061,7 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 }
 
 void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_vector_uint64_t *lnk_templateids,
-		unsigned char *status)
+		char *inventory_mode, unsigned char *status)
 {
 	int	i, j;
 
@@ -1101,6 +1101,9 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 			while (NULL != (templateid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
 				zbx_vector_uint64_append(lnk_templateids, *templateid);
 
+			if (HOST_INVENTORY_COUNT != override_operation->inventory_mode)
+				*inventory_mode = override_operation->inventory_mode;
+
 			if (NULL != status)
 			{
 				switch (override_operation->status)
@@ -1122,8 +1125,6 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 			}
 		}
 	}
-
-//	zbx_vector_ptr_pair_sort(override_tags, ptr_pair_compare_func);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

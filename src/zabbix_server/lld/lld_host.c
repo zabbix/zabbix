@@ -176,6 +176,7 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK)
 
 	zbx_uint64_t		flags;
+	char			inventory_mode;
 	char			inventory_mode_orig;
 	unsigned char		status;
 }
@@ -623,7 +624,8 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 }
 
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
-		unsigned char status_proto, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros)
+		char inventory_mode_proto, unsigned char status_proto, const zbx_lld_row_t *lld_row,
+		const zbx_vector_ptr_t *lld_macros)
 {
 	char		*buffer = NULL;
 	int		i;
@@ -660,10 +662,12 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		zbx_lrtrim(host->host, ZBX_WHITESPACE);
 
 		host->status = status_proto;
+		host->inventory_mode = inventory_mode_proto;
 
 		zbx_vector_uint64_create(&host->lnk_templateids);
 
-		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->status);
+		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode,
+				&host->status);
 
 		if (HOST_STATUS_NO_CREATE == host->status)
 		{
@@ -698,7 +702,9 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HOST;
 		}
 
-		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, NULL);
+		host->inventory_mode = inventory_mode_proto;
+
+		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, NULL);
 
 		/* host visible name */
 		buffer = zbx_strdup(buffer, name_proto);
@@ -2062,7 +2068,7 @@ static void	lld_interface_snmp_prepare_sql(const zbx_uint64_t interfaceid, const
  ******************************************************************************/
 static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, const char *host_proto,
 		zbx_uint64_t proxy_hostid, char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
-		const char *ipmi_password, char inventory_mode, unsigned char tls_connect,
+		const char *ipmi_password, unsigned char tls_connect,
 		unsigned char tls_accept, const char *tls_issuer, const char *tls_subject, const char *tls_psk_identity,
 		const char *tls_psk, const zbx_vector_uint64_t *del_hostgroupids)
 {
@@ -2072,8 +2078,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;
 	zbx_lld_interface_t	*interface;
-	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids, del_interfaceids, del_snmp_ids,
-				del_hostmacroids;
+	zbx_vector_uint64_t	upd_manual_host_inventory_hostids, upd_auto_host_inventory_hostids,
+				del_host_inventory_hostids, del_interfaceids,
+				del_snmp_ids, del_hostmacroids;
 	zbx_uint64_t		hostid = 0, hostgroupid = 0, hostmacroid = 0, interfaceid = 0;
 	char			*sql1 = NULL, *sql2 = NULL, *value_esc;
 	size_t			sql1_alloc = 0, sql1_offset = 0,
@@ -2083,7 +2090,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_uint64_create(&upd_host_inventory_hostids);
+	zbx_vector_uint64_create(&upd_manual_host_inventory_hostids);
+	zbx_vector_uint64_create(&upd_auto_host_inventory_hostids);
 	zbx_vector_uint64_create(&del_host_inventory_hostids);
 	zbx_vector_uint64_create(&del_interfaceids);
 	zbx_vector_uint64_create(&del_hostmacroids);
@@ -2099,7 +2107,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		if (0 == host->hostid)
 		{
 			new_hosts++;
-			if (HOST_INVENTORY_DISABLED != inventory_mode)
+			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 				new_host_inventories++;
 		}
 		else
@@ -2107,14 +2115,26 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
 				upd_hosts++;
 
-			if (host->inventory_mode_orig != inventory_mode)
+			if (host->inventory_mode_orig != host->inventory_mode)
 			{
-				if (HOST_INVENTORY_DISABLED == inventory_mode)
+				if (HOST_INVENTORY_DISABLED == host->inventory_mode)
 					zbx_vector_uint64_append(&del_host_inventory_hostids, host->hostid);
 				else if (HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
 					new_host_inventories++;
 				else
-					zbx_vector_uint64_append(&upd_host_inventory_hostids, host->hostid);
+				{
+					switch (host->inventory_mode)
+					{
+						case HOST_INVENTORY_MANUAL:
+							zbx_vector_uint64_append(&upd_manual_host_inventory_hostids,
+									host->hostid);
+							break;
+						case HOST_INVENTORY_AUTOMATIC:
+							zbx_vector_uint64_append(&upd_auto_host_inventory_hostids,
+									host->hostid);
+							break;
+					}
+				}
 			}
 		}
 
@@ -2161,9 +2181,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	if (0 == new_hosts && 0 == new_host_inventories && 0 == upd_hosts && 0 == upd_interfaces &&
 			0 == upd_hostmacros && 0 == new_hostgroups && 0 == new_hostmacros && 0 == new_interfaces &&
 			0 == del_hostgroupids->values_num && 0 == del_hostmacroids.values_num &&
-			0 == upd_host_inventory_hostids.values_num && 0 == del_host_inventory_hostids.values_num &&
-			0 == del_interfaceids.values_num && 0 == new_snmp && 0 == upd_snmp &&
-			0 == del_snmp_ids.values_num)
+			0 == upd_auto_host_inventory_hostids.values_num &&
+			0 == upd_manual_host_inventory_hostids.values_num &&
+			0 == del_host_inventory_hostids.values_num && 0 == del_interfaceids.values_num &&
+			0 == new_snmp && 0 == upd_snmp && 0 == del_snmp_ids.values_num)
 	{
 		goto out;
 	}
@@ -2249,8 +2270,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
 
-			if (HOST_INVENTORY_DISABLED != inventory_mode)
-				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)inventory_mode);
+			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
 		}
 		else
 		{
@@ -2371,10 +2392,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 						host->hostid);
 			}
 
-			if (host->inventory_mode_orig != inventory_mode &&
+			if (host->inventory_mode_orig != host->inventory_mode &&
 					HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
 			{
-				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)inventory_mode);
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
 			}
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
@@ -2575,7 +2596,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	}
 
 	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids.values_num ||
-			0 != upd_host_inventory_hostids.values_num || 0 != del_host_inventory_hostids.values_num ||
+			0 != upd_auto_host_inventory_hostids.values_num ||
+			0 != upd_manual_host_inventory_hostids.values_num ||
+			0 != del_host_inventory_hostids.values_num ||
 			0 != del_interfaceids.values_num || 0 != del_snmp_ids.values_num)
 	{
 		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
@@ -2597,12 +2620,23 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
-		if (0 != upd_host_inventory_hostids.values_num)
+		if (0 != upd_manual_host_inventory_hostids.values_num)
 		{
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"update host_inventory set inventory_mode=%d where", (int)inventory_mode);
+				"update host_inventory set inventory_mode=%d where", HOST_INVENTORY_MANUAL);
 			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hostid",
-					upd_host_inventory_hostids.values, upd_host_inventory_hostids.values_num);
+					upd_manual_host_inventory_hostids.values,
+					upd_manual_host_inventory_hostids.values_num);
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
+		}
+
+		if (0 != upd_auto_host_inventory_hostids.values_num)
+		{
+			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
+				"update host_inventory set inventory_mode=%d where", HOST_INVENTORY_AUTOMATIC);
+			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hostid",
+					upd_auto_host_inventory_hostids.values,
+					upd_auto_host_inventory_hostids.values_num);
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
@@ -2641,7 +2675,8 @@ out:
 	zbx_vector_uint64_destroy(&del_interfaceids);
 	zbx_vector_uint64_destroy(&del_hostmacroids);
 	zbx_vector_uint64_destroy(&del_host_inventory_hostids);
-	zbx_vector_uint64_destroy(&upd_host_inventory_hostids);
+	zbx_vector_uint64_create(&upd_auto_host_inventory_hostids);
+	zbx_vector_uint64_create(&upd_manual_host_inventory_hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -3429,7 +3464,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_uint64_t		proxy_hostid;
 	char			*ipmi_username = NULL, *ipmi_password, *tls_issuer, *tls_subject, *tls_psk_identity,
 				*tls_psk;
-	char			ipmi_authtype, inventory_mode;
+	char			ipmi_authtype, inventory_mode_proto;
 	unsigned char		ipmi_privilege, tls_connect, tls_accept;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3498,9 +3533,9 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		name_proto = row[2];
 		status = (unsigned char)atoi(row[3]);
 		if (SUCCEED == DBis_null(row[4]))
-			inventory_mode = HOST_INVENTORY_DISABLED;
+			inventory_mode_proto = HOST_INVENTORY_DISABLED;
 		else
-			inventory_mode = (char)atoi(row[4]);
+			inventory_mode_proto = (char)atoi(row[4]);
 
 		lld_hosts_get(parent_hostid, &hosts, proxy_hostid, ipmi_authtype, ipmi_privilege, ipmi_username,
 				ipmi_password, tls_connect, tls_accept, tls_issuer, tls_subject,
@@ -3515,7 +3550,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		{
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-			host = lld_host_make(&hosts, host_proto, name_proto, status, lld_row, lld_macro_paths);
+			host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto, status, lld_row,
+					lld_macro_paths);
 			lld_groups_make(host, &groups, &group_prototypes, &lld_row->jp_row, lld_macro_paths);
 		}
 
@@ -3534,7 +3570,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 		lld_groups_save(&groups, &group_prototypes);
 		lld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
-				ipmi_username, ipmi_password, inventory_mode, tls_connect, tls_accept,
+				ipmi_username, ipmi_password, tls_connect, tls_accept,
 				tls_issuer, tls_subject, tls_psk_identity, tls_psk, &del_hostgroupids);
 
 		/* linking of the templates */
