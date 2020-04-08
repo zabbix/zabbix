@@ -70,7 +70,6 @@ typedef struct
 	unsigned char		severity;
 	unsigned char		inventory_mode;
 	zbx_vector_ptr_pair_t	trigger_tags;
-	zbx_hashset_t		group_prototypes;
 	zbx_hashset_t		templateids;
 
 }
@@ -607,11 +606,6 @@ typedef enum
 }
 zbx_prototype_status_t;
 
-static int	zbx_str_compare_func(const void *d1, const void *d2)
-{
-	return strcmp((const char *)d1, (const char *)d2);
-}
-
 static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
 {
@@ -631,7 +625,6 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 				"t.trends,"
 				"os.severity,"
 				"ot.tag,ot.value,"
-				"g.name,"
 				"ote.templateid,"
 				"i.inventory_mode"
 			" from lld_override_operation o"
@@ -647,8 +640,6 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 				" on o.lld_override_operationid=os.lld_override_operationid"
 			" left join lld_override_optag ot"
 				" on o.lld_override_operationid=ot.lld_override_operationid"
-			" left join lld_override_opgroup_prototype g"
-				" on o.lld_override_operationid=g.lld_override_operationid"
 			" left join lld_override_optemplate ote"
 				" on o.lld_override_operationid=ote.lld_override_operationid"
 			" left join lld_override_opinventory i"
@@ -686,8 +677,6 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			memset(override_operation, 0, sizeof(lld_override_operation_t));
 
 			zbx_vector_ptr_pair_create(&override_operation->trigger_tags);
-			zbx_hashset_create(&override_operation->group_prototypes, 5, ZBX_DEFAULT_STRING_HASH_FUNC,
-					zbx_str_compare_func);
 			zbx_hashset_create(&override_operation->templateids, 5, ZBX_DEFAULT_UINT64_HASH_FUNC,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -727,19 +716,11 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 				}
 				break;
 			case OPERATION_OBJECT_HOST_PROTOTYPE:
-				if (FAIL == DBis_null(row[12]) &&
-						NULL == zbx_hashset_search(&override_operation->group_prototypes,
-								row[12]))
-				{
-					zbx_hashset_insert(&override_operation->group_prototypes, row[12],
-							strlen(row[12]) + 1);
-				}
-
-				if (FAIL == DBis_null(row[13]))
+				if (FAIL == DBis_null(row[12]))
 				{
 					zbx_uint64_t	templateid;
 
-					ZBX_STR2UINT64(templateid, row[13]);
+					ZBX_STR2UINT64(templateid, row[12]);
 					if (NULL == zbx_hashset_search(&override_operation->templateids, &templateid))
 					{
 						zbx_hashset_insert(&override_operation->templateids, &templateid,
@@ -747,8 +728,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 					}
 				}
 
-				override_operation->inventory_mode = FAIL == DBis_null(row[14]) ?
-						(unsigned char)atoi(row[14]) : HOST_INVENTORY_COUNT;
+				override_operation->inventory_mode = FAIL == DBis_null(row[13]) ?
+						(unsigned char)atoi(row[13]) : HOST_INVENTORY_COUNT;
 				break;
 			case OPERATION_OBJECT_GRAPH_PROTOTYPE:
 				break;
@@ -779,7 +760,6 @@ static void	lld_override_operation_free(lld_override_operation_t *override_opera
 	}
 	zbx_vector_ptr_pair_destroy(&override_operation->trigger_tags);
 
-	zbx_hashset_destroy(&override_operation->group_prototypes);
 	zbx_hashset_destroy(&override_operation->templateids);
 
 	zbx_free(override_operation->value);
@@ -796,7 +776,6 @@ static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
 	lld_override_t		*override;
 	zbx_hashset_iter_t	iter;
 	zbx_uint64_t		*templateid;
-	char			*group_prototype;
 
 	for (i = 0; i < overrides->values_num; i++)
 	{
@@ -835,10 +814,6 @@ static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
 			zbx_hashset_iter_reset(&override_operation->templateids, &iter);
 			while (NULL != (templateid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
 				zabbix_log(LOG_LEVEL_TRACE, "    templateid: " ZBX_FS_UI64, *templateid);
-
-			zbx_hashset_iter_reset(&override_operation->group_prototypes, &iter);
-			while (NULL != (group_prototype = (char *)zbx_hashset_iter_next(&iter)))
-				zabbix_log(LOG_LEVEL_TRACE, "    group_prototype '%s'", group_prototype);
 		}
 	}
 }
