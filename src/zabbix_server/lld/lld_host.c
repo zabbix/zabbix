@@ -2675,8 +2675,8 @@ out:
 	zbx_vector_uint64_destroy(&del_interfaceids);
 	zbx_vector_uint64_destroy(&del_hostmacroids);
 	zbx_vector_uint64_destroy(&del_host_inventory_hostids);
-	zbx_vector_uint64_create(&upd_auto_host_inventory_hostids);
-	zbx_vector_uint64_create(&upd_manual_host_inventory_hostids);
+	zbx_vector_uint64_destroy(&upd_auto_host_inventory_hostids);
+	zbx_vector_uint64_destroy(&upd_manual_host_inventory_hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

@@ -803,7 +803,7 @@ static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
 			zabbix_log(LOG_LEVEL_TRACE, "    delay '%s'", ZBX_NULL2STR(override_operation->delay));
 			zabbix_log(LOG_LEVEL_TRACE, "    history '%s'", ZBX_NULL2STR(override_operation->history));
 			zabbix_log(LOG_LEVEL_TRACE, "    trends '%s'", ZBX_NULL2STR(override_operation->trends));
-
+			zabbix_log(LOG_LEVEL_TRACE, "    inventory_mode: %d", override_operation->inventory_mode);
 			for (k = 0; k < override_operation->trigger_tags.values_num; k++)
 			{
 				zabbix_log(LOG_LEVEL_TRACE, "    tag:'%s' value:'%s'",
