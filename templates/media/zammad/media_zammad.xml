@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-06T00:00:00Z</date>
+    <date>2020-04-09T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Zammad</name>
@@ -58,6 +58,10 @@
                 <parameter>
                     <name>zammad_customer</name>
                     <value>&lt;PUT YOUR CUSTOMER EMAIL&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>zammad_enable_tags</name>
+                    <value>true</value>
                 </parameter>
                 <parameter>
                     <name>zammad_ticket_id</name>
@@ -256,7 +260,7 @@ try {&#13;
     Object.keys(params)&#13;
         .forEach(function (key) {&#13;
             if (key.startsWith('zammad_')) {&#13;
-                params_zammad[key.substring(7)] = params[key];&#13;
+                params_zammad[key.substring(7)] = params[key].trim();&#13;
             }&#13;
             else if (key.startsWith('event_update_')) {&#13;
                 params_update[key.substring(13)] = params[key];&#13;
@@ -324,7 +328,9 @@ try {&#13;
         result.tags.__zbx_zammad_ticketlink = params.zammad_url +&#13;
             (params.zammad_url.endsWith('/') ? '' : '/') + '#ticket/zoom/' + ticket_id;&#13;
 &#13;
-        Zammad.setTicketTags(params.event_tags, ticket_id);&#13;
+        if (Zammad.params.enable_tags.toLowerCase() === 'true') {&#13;
+            Zammad.setTicketTags(params.event_tags, ticket_id);&#13;
+        }&#13;
     }&#13;
     // Update created ticket for trigger-based event.&#13;
     else {&#13;
