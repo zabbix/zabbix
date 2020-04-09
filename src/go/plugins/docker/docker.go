@@ -94,7 +94,7 @@ func (cli *client) Query(params []string, key *itemKey) ([]byte, error) {
 
 	resp, err := cli.client.Get("http://" + path.Join(dockerVersion, keyPath))
 	if err != nil {
-		impl.Errf("cannot fetch data: %s", err)
+		impl.Debugf("cannot fetch data: %s", err)
 		return nil, errors.New(errorCannotFetchData)
 	}
 	defer resp.Body.Close()
