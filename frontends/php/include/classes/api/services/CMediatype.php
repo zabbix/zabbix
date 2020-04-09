@@ -1297,9 +1297,4 @@ class CMediatype extends CApiService {
 
 		return $api_input_rules;
 	}
-
-	protected function addAuditBulk($action, $resourcetype, array $objects, array $objects_old = null) {
-		// TODO: trim "oldvalue"
-		/* parent::addAuditBulk($action, $resourcetype, $objects, $objects_old); */
-	}
 }
