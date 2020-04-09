@@ -507,7 +507,7 @@ class CZabbixServer {
 				return false;
 			}
 
-			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->timeout)) {
+			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, ZBX_CONNECT_TIMEOUT)) {
 				switch ($errorMsg) {
 					case 'Connection refused':
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);

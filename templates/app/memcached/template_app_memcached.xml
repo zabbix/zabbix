@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-03-23T12:22:16Z</date>
+   <date>2020-04-02T13:36:12Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -12,6 +12,8 @@
          <template>Template App Memcached</template>
          <name>Template App Memcached</name>
          <description>Get Memcached metrics from plugin for the New Zabbix Agent (zabbix-agent2).&#13;
+&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398623-discussion-thread-for-official-zabbix-template-memcached&#13;
 &#13;
 Template tooling version used: 0.35</description>
          <groups>

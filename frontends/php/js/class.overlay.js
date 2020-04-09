@@ -211,6 +211,10 @@ Overlay.prototype.load = function(action, options) {
 	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
 
+	// Properties 'action' and 'options' are stored to enable popup reload. This may be done outside the class.
+	this.action = action;
+	this.options = options;
+
 	if (this.xhr) {
 		this.xhr.abort();
 	}
@@ -430,6 +434,10 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'element':
 				this.element = obj[key];
+				break;
+
+			case 'data':
+				this.data = obj[key];
 				break;
 		}
 	}

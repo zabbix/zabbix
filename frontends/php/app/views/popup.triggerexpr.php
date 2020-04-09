@@ -56,10 +56,11 @@ $popup_options = [
 	'with_webitems' => '1',
 	'writeonly' => '1'
 ];
-if ($data['groupid'] && $data['hostid']) {
-	$popup_options['groupid'] = $data['groupid'];
+
+if ($data['hostid']) {
 	$popup_options['hostid'] = $data['hostid'];
 }
+
 if ($data['parent_discoveryid'] !== '') {
 	$popup_options['normal_only'] = '1';
 }

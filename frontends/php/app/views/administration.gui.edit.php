@@ -32,17 +32,6 @@ $gui_tab = (new CFormList())
 		(new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes()))
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Dropdown first entry'), [
-		new CComboBox('dropdown_first_entry', $data['dropdown_first_entry'], null, [
-			ZBX_DROPDOWN_FIRST_NONE => _('None'),
-			ZBX_DROPDOWN_FIRST_ALL => _('All')
-		]),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CCheckBox('dropdown_first_remember'))
-			->setLabel(_('remember selected'))
-			->setChecked($data['dropdown_first_remember'] == 1)
-			->setUncheckedValue('0')
-	])
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
 		(new CNumericBox('search_limit', $data['search_limit'], 6))
 			->setAriaRequired()

@@ -132,8 +132,10 @@ if ($data['host']['description'] !== '') {
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
-		new CLink(_('Web'),
-			'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')
+		new CLink(_('Web'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'web.view')
+			->setArgument('filter_hostids[]', $data['host']['hostid'])
+			->setArgument('filter_set', '1')
 		),
 		new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
@@ -148,18 +150,26 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('filter_hostids[]', $data['host']['hostid'])
 				->setArgument('filter_set', '1')
 		),
-		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')),
-		new CLink(_('Screens'),
-			'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid')
-		)
+		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'charts.view')
+				->setArgument('view_as', HISTORY_GRAPH)
+				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+				->setArgument('filter_hostids', [$data['host']['hostid']])
+		),
+		new CLink(_('Screens'), (new CUrl('host_screen.php'))->setArgument('hostid', $data['host']['hostid']))
 	])
 );
 
 // configuration
 if ($data['rwHost']) {
-	$hostLink = new CLink(_('Host'), 'hosts.php?form=update&hostid='.$data['host']['hostid'].url_param('groupid'));
+	$hostLink = new CLink(_('Host'), (new CUrl('hosts.php'))
+		->setArgument('form', 'update')
+		->setArgument('hostid', $data['host']['hostid'])
+	);
 	$applicationsLink = new CLink(_('Applications'),
-		'applications.php?hostid='.$data['host']['hostid'].url_param('groupid')
+		(new CUrl('applications.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);
 
 	$itemsLink = new CLink(_('Items'),
@@ -172,11 +182,18 @@ if ($data['rwHost']) {
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);
-	$graphsLink = new CLink(_('Graphs'), 'graphs.php?hostid='.$data['host']['hostid'].url_param('groupid'));
-	$discoveryLink = new CLink(_('Discovery'),
-		'host_discovery.php?hostid='.$data['host']['hostid'].url_param('groupid')
+	$graphsLink = new CLink(_('Graphs'),
+		(new CUrl('graphs.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);
-	$webLink = new CLink(_('Web'), 'httpconf.php?hostid='.$data['host']['hostid'].url_param('groupid'));
+	$discoveryLink = new CLink(_('Discovery'),
+		(new CUrl('host_discovery.php'))->setArgument('hostid',$data['host']['hostid'])
+	);
+	$webLink = new CLink(_('Web'), (new CUrl('httpconf.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$data['host']['hostid']])
+	);
 }
 else {
 	$hostLink = _('Host');
@@ -227,7 +244,7 @@ if (!$inventoryValues) {
 $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 
 // append tabs and form
-$hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param('groupid'))]));
+$hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel()]));
 
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
