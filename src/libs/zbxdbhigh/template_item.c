@@ -107,6 +107,27 @@ typedef struct
 }
 zbx_lld_rule_map_t;
 
+typedef struct
+{
+	zbx_uint64_t		lld_overrideid;
+	zbx_uint64_t		itemid;
+	char			*name;
+	char			*formula;
+	zbx_vector_ptr_t	override_conditions;
+	unsigned char		step;
+	unsigned char		evaltype;
+	unsigned char		stop;
+}
+lld_override_t;
+
+typedef struct
+{
+	char			*macro;
+	char			*value;
+	unsigned char		operator;
+}
+lld_override_codition_t;
+
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
 {
@@ -1365,6 +1386,163 @@ static void	copy_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 	zbx_vector_uint64_destroy(&itemids);
 }
 
+static void	lld_override_condition_free(lld_override_codition_t *override_condition)
+{
+	zbx_free(override_condition->macro);
+	zbx_free(override_condition->value);
+	zbx_free(override_condition);
+}
+
+static void	lld_override_free(lld_override_t *override)
+{
+	zbx_vector_ptr_clear_ext(&override->override_conditions, (zbx_clean_func_t)lld_override_condition_free);
+	zbx_vector_ptr_destroy(&override->override_conditions);
+	zbx_free(override->name);
+	zbx_free(override->formula);
+	zbx_free(override);
+}
+
+static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids, const zbx_vector_ptr_t *items)
+{
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	DB_RESULT			result;
+	DB_ROW				row;
+	lld_override_t			*override;
+	zbx_vector_ptr_t		overrides;
+	zbx_vector_uint64_t		overrideids, itemids;
+	int				i;
+	zbx_hashset_t			items_t;
+	const zbx_template_item_t	*item, **pitem;
+	zbx_db_insert_t			db_insert;
+
+	if (0 == items->values_num)
+		return;
+
+	zbx_vector_uint64_create(&overrideids);
+	zbx_vector_ptr_create(&overrides);
+	zbx_vector_uint64_create(&itemids);
+	zbx_hashset_create(&items_t, items->values_num, template_item_hash_func, template_item_compare_func);
+
+	/* remove old lld rules macros */
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (const zbx_template_item_t *)items->values[i];
+
+		if (0 == (ZBX_FLAG_DISCOVERY_RULE & item->flags))
+			continue;
+
+		if (NULL == item->key)	/* item already existed */
+			zbx_vector_uint64_append(&itemids, item->itemid);
+
+		zbx_hashset_insert(&items_t, &item, sizeof(zbx_template_item_t *));
+	}
+
+	if (0 != itemids.values_num)
+	{
+		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_override where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+		DBexecute("%s", sql);
+		sql_offset = 0;
+	}
+
+	zbx_vector_uint64_destroy(&itemids);
+
+	/* read overrides from templates that should be linked */
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		"select l.lld_overrideid,l.itemid,l.name,l.step,l.evaltype,l.formula,l.stop"
+			" from lld_override l,items i"
+			" where l.itemid=i.itemid"
+			" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by l.lld_overrideid");
+
+	result = DBselect("%s", sql);
+	while (NULL != (row = DBfetch(result)))
+	{
+		override = (lld_override_t *)zbx_malloc(NULL, sizeof(lld_override_t));
+		ZBX_STR2UINT64(override->lld_overrideid, row[0]);
+		ZBX_STR2UINT64(override->itemid, row[1]);
+		override->name = zbx_strdup(NULL, row[2]);
+		override->step = (unsigned char)atoi(row[3]);
+		override->evaltype = (unsigned char)atoi(row[4]);
+		override->formula = zbx_strdup(NULL, row[5]);
+		override->stop = (unsigned char)atoi(row[6]);
+		zbx_vector_ptr_create(&override->override_conditions);
+
+		zbx_vector_uint64_append(&overrideids, override->lld_overrideid);
+		zbx_vector_ptr_append(&overrides, override);
+	}
+	DBfree_result(result);
+
+	if (0 != overrideids.values_num)
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select lld_overrideid,operator,macro,value"
+				" from lld_override_condition"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "lld_overrideid", overrideids.values, overrideids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by lld_overrideid");
+
+		result = DBselect("%s", sql);
+		while (NULL != (row = DBfetch(result)))
+		{
+			lld_override_codition_t	*override_condition;
+			zbx_uint64_t		overrideid;
+
+			ZBX_STR2UINT64(overrideid, row[0]);
+
+			if (FAIL == (i = zbx_vector_ptr_bsearch(&overrides, &overrideid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			override = overrides.values[i];
+
+			override_condition = (lld_override_codition_t *)zbx_malloc(NULL, sizeof(lld_override_codition_t));
+			override_condition->operator = (unsigned char)atoi(row[1]);
+			override_condition->macro = zbx_strdup(NULL, row[2]);
+			override_condition->value = zbx_strdup(NULL, row[3]);
+
+			zbx_vector_ptr_append(&override->override_conditions, override_condition);
+		}
+		DBfree_result(result);
+	}
+	zbx_free(sql);
+
+	zbx_db_insert_prepare(&db_insert, "lld_override", "lld_overrideid", "itemid", "name", "step", "evaltype",
+			"formula", NULL);
+	for (i = 0; i < overrides.values_num; i++)
+	{
+		zbx_template_item_t	item_local, *pitem_local = &item_local;
+
+		override = overrides.values[i];
+
+		item_local.templateid = override->itemid;
+		if (NULL == (pitem = (const zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), (*pitem)->itemid, override->name, override->step,
+				override->evaltype, override->formula);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "lld_overrideid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_hashset_destroy(&items_t);
+	zbx_vector_uint64_destroy(&overrideids);
+	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
+	zbx_vector_ptr_destroy(&overrides);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: compare_template_items                                           *
@@ -1470,6 +1648,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	save_template_discovery_prototypes(hostid, &items);
 	copy_template_items_preproc(templateids, &items);
 	copy_template_lld_macro_paths(templateids, &items);
+	copy_template_lld_overrides(templateids, &items);
 out:
 	zbx_vector_ptr_clear_ext(&lld_rules, (zbx_clean_func_t)free_lld_rule_map);
 	zbx_vector_ptr_destroy(&lld_rules);
