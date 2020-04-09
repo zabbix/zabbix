@@ -44,7 +44,7 @@ Copy and paste your Telegram bot token into the "telegramToken" field.
 [![](images/2.png?raw=true)](images/2.png)
 
 In the `ParseMode` parameter set required option according to the Telegram's documentation. 
-Read the Telegram Bot API documentation to learn how to format action notification messages: [Markdown](https://core.telegram.org/bots/api#markdown-style) / [HTML](https://core.telegram.org/bots/api#html-style) / [MarkdownV2](https://core.telegram.org/bots/api#markdown2-style).
+Read the Telegram Bot API documentation to learn how to format action notification messages: [Markdown](https://core.telegram.org/bots/api#markdown-style) / [HTML](https://core.telegram.org/bots/api#html-style) / [MarkdownV2](https://core.telegram.org/bots/api#markdownv2-style).
 Note: in this case, your Telegram-related actions should be separated from other notification actions (for example, SMS), otherwise you may get plain text alert with raw Markdown/HTML tags.
 
 Test the media type using chat ID or group ID you've got.
