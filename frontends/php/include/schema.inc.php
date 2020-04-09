@@ -3190,6 +3190,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'graphs_items' => [
@@ -7929,10 +7935,10 @@ return [
 			],
 		],
 	],
-	'override' => [
-		'key' => 'overrideid',
+	'lld_override' => [
+		'key' => 'lld_overrideid',
 		'fields' => [
-			'overrideid' => [
+			'lld_overrideid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -7976,20 +7982,20 @@ return [
 			],
 		],
 	],
-	'override_condition' => [
-		'key' => 'override_conditionid',
+	'lld_override_condition' => [
+		'key' => 'lld_override_conditionid',
 		'fields' => [
-			'override_conditionid' => [
+			'lld_override_conditionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 			],
-			'overrideid' => [
+			'lld_overrideid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override',
-				'ref_field' => 'overrideid',
+				'ref_table' => 'lld_override',
+				'ref_field' => 'lld_overrideid',
 			],
 			'operator' => [
 				'null' => false,
@@ -8011,49 +8017,26 @@ return [
 			],
 		],
 	],
-	'override_operation' => [
-		'key' => 'override_operationid',
+	'lld_override_operation' => [
+		'key' => 'lld_override_operationid',
 		'fields' => [
-			'override_operationid' => [
+			'lld_override_operationid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 			],
-			'overrideid' => [
+			'lld_overrideid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override',
-				'ref_field' => 'overrideid',
+				'ref_table' => 'lld_override',
+				'ref_field' => 'lld_overrideid',
 			],
-			'operationtype' => [
+			'operationobject' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			],
-			'evaltype' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-		],
-	],
-	'override_opcondition' => [
-		'key' => 'override_opconditionid',
-		'fields' => [
-			'override_opconditionid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'override_operationid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
 			],
 			'operator' => [
 				'null' => false,
@@ -8069,15 +8052,33 @@ return [
 			],
 		],
 	],
-	'override_opperiod' => [
-		'key' => 'override_operationid',
+	'lld_override_opstatus' => [
+		'key' => 'lld_override_operationid',
 		'fields' => [
-			'override_operationid' => [
+			'lld_override_operationid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'lld_override_opperiod' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
 			],
 			'delay' => [
 				'null' => false,
@@ -8087,15 +8088,15 @@ return [
 			],
 		],
 	],
-	'override_ophistory' => [
-		'key' => 'override_operationid',
+	'lld_override_ophistory' => [
+		'key' => 'lld_override_operationid',
 		'fields' => [
-			'override_operationid' => [
+			'lld_override_operationid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
 			],
 			'history' => [
 				'null' => false,
@@ -8105,15 +8106,15 @@ return [
 			],
 		],
 	],
-	'override_optrends' => [
-		'key' => 'override_operationid',
+	'lld_override_optrends' => [
+		'key' => 'lld_override_operationid',
 		'fields' => [
-			'override_operationid' => [
+			'lld_override_operationid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
 			],
 			'trends' => [
 				'null' => false,
@@ -8123,15 +8124,15 @@ return [
 			],
 		],
 	],
-	'override_opseverity' => [
-		'key' => 'override_operationid',
+	'lld_override_opseverity' => [
+		'key' => 'lld_override_operationid',
 		'fields' => [
-			'override_operationid' => [
+			'lld_override_operationid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
 			],
 			'severity' => [
 				'null' => false,
@@ -8141,20 +8142,20 @@ return [
 			],
 		],
 	],
-	'override_optag' => [
-		'key' => 'override_optagid',
+	'lld_override_optag' => [
+		'key' => 'lld_override_optagid',
 		'fields' => [
-			'override_optagid' => [
+			'lld_override_optagid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 			],
-			'override_operationid' => [
+			'lld_override_operationid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
 			],
 			'tag' => [
 				'null' => false,
@@ -8170,50 +8171,20 @@ return [
 			],
 		],
 	],
-	'override_opgroup_prototype' => [
-		'key' => 'override_opgroup_prototypeid',
+	'lld_override_optemplate' => [
+		'key' => 'lld_override_optemplateid',
 		'fields' => [
-			'override_opgroup_prototypeid' => [
+			'lld_override_optemplateid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 			],
-			'override_operationid' => [
+			'lld_override_operationid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
-			],
-			'name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			],
-			'groupid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'hstgrp',
-				'ref_field' => 'groupid',
-			],
-		],
-	],
-	'override_optemplate' => [
-		'key' => 'override_optemplateid',
-		'fields' => [
-			'override_optemplateid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'override_operationid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
 			],
 			'templateid' => [
 				'null' => false,
@@ -8224,15 +8195,15 @@ return [
 			],
 		],
 	],
-	'override_opinventory' => [
-		'key' => 'override_operationid',
+	'lld_override_opinventory' => [
+		'key' => 'lld_override_operationid',
 		'fields' => [
-			'override_operationid' => [
+			'lld_override_operationid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'override_operation',
-				'ref_field' => 'override_operationid',
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
 			],
 			'inventory_mode' => [
 				'null' => false,
