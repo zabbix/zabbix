@@ -90,8 +90,10 @@ PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpa
 
 PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, zbx_perf_counter_lang_t lang, double *value);
 wchar_t		*get_counter_name(DWORD pdhIndex);
+wchar_t		*get_object_name_local(char *eng_name);
 int		check_counter_path(char *counterPath, int convert_from_numeric);
 int		init_builtin_counter_indexes(void);
 DWORD 		get_builtin_counter_index(zbx_builtin_counter_ref_t ref);
+void		free_object_name_ref(void);
 
 #endif /* ZABBIX_PERFMON_H */

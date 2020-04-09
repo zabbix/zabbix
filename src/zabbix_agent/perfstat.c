@@ -335,6 +335,7 @@ void	free_perf_collector(void)
 	ppsd.pdh_query = NULL;
 
 	free_perf_counter_list();
+	free_object_name_ref();
 
 	zbx_mutex_destroy(&perfstat_access);
 }

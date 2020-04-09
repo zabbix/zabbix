@@ -43,6 +43,15 @@ builtin_counter_map[] =
 	{ 0, L"Total Sessions" }
 };
 
+struct builtin_object_ref
+{
+	char	*eng_name;
+	wchar_t	*loc_name;
+};
+
+static struct builtin_object_ref	*builtin_object_names = NULL;
+static unsigned int			object_num = 0;
+
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath)
 {
 	DWORD		dwSize = PDH_MAX_COUNTER_PATH;
@@ -359,7 +368,7 @@ finish:
  ******************************************************************************/
 int	init_builtin_counter_indexes(void)
 {
-	int 		ret = FAIL, i;
+	int 		ret = SUCCEED;
 	wchar_t 	*counter_text, *saved_ptr;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -367,7 +376,10 @@ int	init_builtin_counter_indexes(void)
 	/* Get buffer holding a list of performance counter indexes and English counter names. */
 	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used).          */
 	if (NULL == (counter_text = saved_ptr = get_all_counter_eng_names(L"Counter")))
+	{
+		ret = FAIL;
 		goto out;
+	}
 
 	/* bypass first pair of counter data elements - these contain number of records */
 	counter_text += wcslen(counter_text) + 1;
@@ -375,7 +387,12 @@ int	init_builtin_counter_indexes(void)
 
 	for (; 0 != *counter_text; counter_text += wcslen(counter_text) + 1)
 	{
-		DWORD counter_index = (DWORD)_wtoi(counter_text);
+		wchar_t		loc_name[PDH_MAX_COUNTER_NAME], tmp[PDH_MAX_COUNTER_NAME];
+		DWORD		counter_index, loc_name_sz, sz;
+		int		i;
+		PDH_STATUS	pdh_status;
+
+		counter_index = (DWORD)_wtoi(counter_text);
 		counter_text += wcslen(counter_text) + 1;
 
 		for (i = 0; i < ARRSIZE(builtin_counter_map); i++)
@@ -386,9 +403,41 @@ int	init_builtin_counter_indexes(void)
 				break;
 			}
 		}
+
+		sz = loc_name_sz = PDH_MAX_COUNTER_NAME;
+
+		if (ERROR_SUCCESS != (pdh_status = PdhLookupPerfNameByIndex(NULL, counter_index, loc_name,
+				&loc_name_sz)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain localized name of object or counter (index=%u): %s",
+					counter_index, strerror_from_module(pdh_status, L"PDH.DLL"));
+			continue;
+		}
+
+		if (0 == wcslen(loc_name))
+			memcpy(loc_name, counter_text, (wcslen(counter_text) + 1) * sizeof(wchar_t));
+
+		if (ERROR_SUCCESS == (pdh_status = PdhGetDefaultPerfCounter(NULL, NULL, loc_name, tmp, &sz)) ||
+				PDH_CSTATUS_NO_COUNTERNAME == pdh_status || PDH_CSTATUS_NO_COUNTER == pdh_status)
+		{
+			builtin_object_names = zbx_realloc(builtin_object_names,
+					sizeof(struct builtin_object_ref) * (object_num + 1));
+
+			builtin_object_names[object_num].eng_name = zbx_unicode_to_utf8(counter_text);
+			builtin_object_names[object_num].loc_name = zbx_malloc(NULL, sizeof(wchar_t) * loc_name_sz);
+			memcpy(builtin_object_names[object_num].loc_name, loc_name, sizeof(wchar_t) * loc_name_sz);
+
+			object_num++;
+		}
+		else if (PDH_CSTATUS_NO_OBJECT != pdh_status)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot obtain default counter (index=%u): %s", counter_index,
+					strerror_from_module(pdh_status, L"PDH.DLL"));
+			ret = FAIL;
+			break;
+		}
 	}
 
-	ret = SUCCEED;
 	zbx_free(saved_ptr);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -492,4 +541,30 @@ clean:
 	zbx_free(wcounterPath);
 
 	return ret;
+}
+
+wchar_t	*get_object_name_local(char *eng_name)
+{
+	unsigned int	i;
+
+	for (i = 0; i < object_num; i++)
+	{
+		if (0 == strcmp(builtin_object_names[i].eng_name, eng_name))
+			return builtin_object_names[i].loc_name;
+	}
+
+	return NULL;
+}
+
+void	free_object_name_ref(void)
+{
+	unsigned int	i;
+
+	for (i = 0; i < object_num; i++)
+	{
+		zbx_free(builtin_object_names[i].eng_name);
+		zbx_free(builtin_object_names[i].loc_name);
+	}
+
+	zbx_free(builtin_object_names);
 }
