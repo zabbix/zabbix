@@ -140,6 +140,7 @@ define('ZBX_DB_MAX_INSERTS', 10000);
 // Default db and field character set
 define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
 define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+define('ORACLE_MAX_STRING_SIZE', 4000);
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 

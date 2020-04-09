@@ -395,8 +395,8 @@ class DB {
 						break;
 					case self::FIELD_TYPE_NCLOB:
 						// Using strlen because 4000 bytes is largest possible string literal in oracle query.
-						if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > 4000) {
-							$chunks = zbx_dbstr(self::chunkMultibyteStr($values[$field], 4000));
+						if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > ORACLE_MAX_STRING_SIZE) {
+							$chunks = zbx_dbstr(self::chunkMultibyteStr($values[$field], ORACLE_MAX_STRING_SIZE));
 							$values[$field] = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
 						}
 						else {
