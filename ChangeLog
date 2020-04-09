@@ -1,11 +1,28 @@
 Changes for 5.0.0alpha5
 
 New features:
+A.F....PS. [ZBXNEXT-2297] added user defined macros creation/edition for host prototypes (gcalenko, MVekslers)
+........S. [ZBXNEXT-5825,ZBXNEXT-5826] fixed support of Elasticsearch version 7.x (viktors, vjaceslavs, vmurzins)
+...G...... [ZBXNEXT-5325] added Docker plugin (afayantsev)
+.........T [ZBXNEXT-5622] added Zendesk media (mchudinov)
+.........T [ZBXCTR-1] added Telegram media type (ableev)
+.........T [ZBXNEXT-5824] added media "Redmine" (afayantsev)
+..F.I..... [ZBXNEXT-5861] added {EVENT.DURATION} macro to subject of message templates (MVekslers)
+..F.....S. [ZBXNEXT-5848] Expand acknowledge message maximum size to more than 256 characters (arimdjonoks)
+..F.I..... [ZBXNEXT-5702] improved UI performance for large installations (miks, talbergs)
 .........T [ZBXNEXT-5599] Added MS Teams media type (tuskov)
 .........T [ZBXNEXT-5715] Added Jira media type (tuskov)
 ...G...... [ZBXNEXT-5767] added Memcached plugin (vadimipatov)
 
 Bug fixes:
+...G...... [ZBX-17558] fixed Zabbix agent 2 compilation on MS Windows (vso)
+........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
+..F....... [ZBX-17423] fixed "reset" button in history page (talbergs)
+...G...... [ZBX-17551] fixed duktape crash on ppc64le architecture (wiper)
+..F....... [ZBX-16112] fixed connection timeout issue with media type testing by increasing timeout to 65 seconds (Ivo)
+...G...... [ZBX-17377] fixed HostInterfaceItem not being refreshed during active checks  (esneiders)
+..F....... [ZBX-17526] fixed severity checkboxes in the firefox browser (ashubin)
+..F....... [ZBX-17395] fixed deletion of templated applications that were linked to items when importing templates (Ivo)
 A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
 ...G...... [ZBX-17541] fixed Zabbix agent compilation on MS Windows (vso)
 ...G...... [ZBX-16772] enabled zabbix_agent2 to use OpenSSL 1.0.1, 1.0.2 on Unix platforms (Andris)
