@@ -2920,7 +2920,10 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					&inventory_values, compression_age, &proxy_subscribtions);
 
 			if (0 != proxy_subscribtions.values_num)
+			{
+				zbx_vector_uint64_pair_sort(&proxy_subscribtions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 				zbx_dc_subscribe_proxy(&proxy_subscribtions);
+			}
 
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{

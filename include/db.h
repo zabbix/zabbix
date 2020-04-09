@@ -784,7 +784,7 @@ typedef struct
 	int			last_version_error_time;
 	int			proxy_delay;
 	int			more_data;
-	zbx_proxy_suppress_t	suppress_win;
+	zbx_proxy_suppress_t	nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)

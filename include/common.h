@@ -24,7 +24,6 @@
 #include "zbxtypes.h"
 #include "version.h"
 #include "md5.h"
-#include "zbxalgo.h"
 
 #if defined(__MINGW32__)
 #	define __try
@@ -935,13 +934,9 @@ typedef struct
 {
 	int			values_num;
 	int			period_end;
-	zbx_vector_uint64_t	subscribe;
 #define ZBX_PROXY_SUPPRESS_DISABLE				0x00
 #define ZBX_PROXY_SUPPRESS_ACTIVE				0x01
-#define ZBX_PROXY_SUPPRESS_PROXYDELAY				0x02
-#define ZBX_PROXY_SUPPRESS_SINGL_PACKET				0x04
-#define ZBX_PROXY_SUPPRESS_SUBSCRIBED				0x08
-#define ZBX_PROXY_SUPPRESS_MORE					0x10
+#define ZBX_PROXY_SUPPRESS_MORE					0x02
 	int	flags;
 }
 zbx_proxy_suppress_t;
