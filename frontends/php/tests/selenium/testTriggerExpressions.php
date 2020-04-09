@@ -18,17 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 
-class testTriggerExpressions extends CLegacyWebTest {
+class testTriggerExpressions extends CWebTest {
+
+	const TRIGGER_ID = 13357;		//'Lack of available memory on server {HOST.NAME}'
 
 	public function testTriggerExpressions_SimpleTest() {
 		// Open advanced editor for testing trigger expression results.
-		$this->zbxTestLogin('triggers.php?form=update&triggerid=13357');
-		$this->zbxTestCheckHeader('Triggers');
-		$this->zbxTestClickButtonText('Expression constructor');
-		$this->zbxTestClickButtonText('Test');
-		$this->zbxTestLaunchOverlayDialog('Test');
+		$this->page->login()->open('triggers.php?form=update&triggerid='.self::TRIGGER_ID);
+		$this->query('button:Expression constructor')->waitUntilPresent()->one()->click();
+		$this->query('button:Test')->waitUntilPresent()->one()->click();
+
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Check table headers presence in tesing dialog.
