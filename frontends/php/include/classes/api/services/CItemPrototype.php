@@ -373,6 +373,22 @@ class CItemPrototype extends CItemGeneral {
 		}
 		unset($item);
 
+		// Validate item prototype status field.
+		$rules = [
+			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NO_CREATE])]
+		];
+
+		foreach ($items as $key => $item) {
+			if (array_key_exists('status', $item)) {
+				$item = array_intersect_key($item, $rules);
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+		}
+
 		$this->validateDependentItems($items);
 
 		foreach ($items as &$item) {
@@ -736,6 +752,22 @@ class CItemPrototype extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$this->checkInput($items, true);
+
+		// Validate item prototype status field.
+		$rules = [
+			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NO_CREATE])]
+		];
+
+		foreach ($items as $key => $item) {
+			if (array_key_exists('status', $item)) {
+				$item = array_intersect_key($item, $rules);
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+		}
 
 		$db_items = $this->get([
 			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],

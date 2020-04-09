@@ -496,10 +496,26 @@ abstract class CGraphGeneral extends CApiService {
 
 		$read_only_fields = ['templateid', 'flags'];
 
+		if (get_class($this) === 'CGraphPrototype') {
+			$rules = [
+				'status' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_STATUS_CREATE, GRAPH_STATUS_NO_CREATE])]
+			];
+		}
+
 		foreach ($graphs as $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_set, $graph['name']);
 
+			if (array_key_exists('status', $graph)) {
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules],
+						array_intersect_key($graph, $rules), $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+
 			$templatedGraph = false;
+
 			if (isset($graph['gitems'])) {
 				// check if new items are from same templated host
 				$graphHosts = API::Host()->get([
@@ -627,8 +643,23 @@ abstract class CGraphGeneral extends CApiService {
 
 		$read_only_fields = ['templateid', 'flags'];
 
+		if (get_class($this) === 'CGraphPrototype') {
+			$rules = [
+				'status' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_STATUS_CREATE, GRAPH_STATUS_NO_CREATE])]
+			];
+		}
+
 		foreach ($graphs as $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_update, $graph['name']);
+
+			if (array_key_exists('status', $graph)) {
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules],
+						array_intersect_key($graph, $rules), $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
 
 			$templatedGraph = false;
 

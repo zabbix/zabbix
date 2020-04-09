@@ -521,6 +521,10 @@ abstract class CTriggerGeneral extends CApiService {
 		];
 		$read_only_fields = ['triggerid', 'value', 'lastchange', 'error', 'templateid', 'state', 'flags'];
 
+		$rules = [
+			'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED, TRIGGER_STATUS_NO_CREATE])]
+		];
+
 		foreach ($triggers as &$trigger) {
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_wrong_fields);
@@ -531,6 +535,16 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_set, $trigger['description']);
+
+			// Validate trigger prototype status field.
+			if (get_class($this) === 'CTriggerPrototype' && array_key_exists('status', $trigger)) {
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules],
+						array_intersect_key($trigger, $rules), $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
 
 			if (!array_key_exists('recovery_mode', $trigger)) {
 				$trigger['recovery_mode'] = ZBX_RECOVERY_MODE_EXPRESSION;
@@ -724,6 +738,12 @@ abstract class CTriggerGeneral extends CApiService {
 		$_db_triggers = $this->createRelationMap($_db_trigger_tags, 'triggerid', 'triggertagid')
 			->mapMany($_db_triggers, $_db_trigger_tags, 'tags');
 
+		if (get_class($this) === 'CTriggerPrototype') {
+			$rules = [
+				'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED, TRIGGER_STATUS_NO_CREATE])]
+			];
+		}
+
 		foreach ($triggers as $tnum => &$trigger) {
 			// check permissions
 			if (!array_key_exists($trigger['triggerid'], $_db_triggers)) {
@@ -743,6 +763,16 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($class === 'CTrigger') {
 				$updateDiscoveredValidator->setObjectName($description);
 				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $_db_trigger);
+			}
+
+			// Validate trigger prototype status field.
+			if (get_class($this) === 'CTriggerPrototype' && array_key_exists('status', $trigger)) {
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules],
+						array_intersect_key($trigger, $rules), $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
 			}
 
 			if (array_key_exists('recovery_mode', $trigger)) {
