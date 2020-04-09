@@ -29,7 +29,7 @@ Ask the user to send "/start" to the bot, created in step 1. If you skip this st
 
 3\.If you want to send group notifications, you need to obtain group ID of the group the bot should send messages to. To do so:
 
-Add "@myidbot" to your group.
+Add "@myidbot" and "@your_bot_name_here" to your group.
 Send "/getgroupid@myidbot" message in the group.
 In the group chat send "/start@your_bot_name_here". If you skip this step, Telegram bot won't be able to send messages to the group.
 
