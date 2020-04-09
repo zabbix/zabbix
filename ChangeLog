@@ -182,6 +182,14 @@ New features:
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 
 Bug fixes:
+...G...... [ZBX-17558] fixed Zabbix agent 2 compilation on MS Windows (vso)
+...G...... [ZBX-17140] fixed builtin counter index rewrite on localized Windows systems (atumilovics)
+........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
+..F....... [ZBX-17423] fixed "reset" button in history page (talbergs)
+...G...... [ZBX-17551] fixed duktape crash on ppc64le architecture (wiper)
+..F....... [ZBX-16112] fixed connection timeout issue with media type testing by increasing timeout to 65 seconds (Ivo)
+...G...... [ZBX-17377] fixed HostInterfaceItem not being refreshed during active checks  (esneiders)
+..F....... [ZBX-17395] fixed deletion of templated applications that were linked to items when importing templates (Ivo)
 A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
 ...G...... [ZBX-16772] enabled zabbix_agent2 to use OpenSSL 1.0.1, 1.0.2 on Unix platforms (Andris)
 .D........ [ZBX-17500] fixed errors in zabbix_agent2 man-page (akozlovs)
