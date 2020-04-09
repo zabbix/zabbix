@@ -265,9 +265,11 @@ addressCheck:
 		if _, err = stmt.Exec(); err != nil {
 			return err
 		}
-		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS clk_idx_data ON data_%d (write_clock)", id)); err != nil {
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS data_%d_1 ON data_%d (write_clock)", id, id)); err != nil {
 			return err
 		}
+
+		fmt.Printf("ID: %d\n", id)
 		stmt, err = database.Prepare(createTableQuery("log", id))
 		if err != nil {
 			return err
@@ -275,7 +277,7 @@ addressCheck:
 		if _, err = stmt.Exec(); err != nil {
 			return err
 		}
-		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS clk_idx_log ON log_%d (write_clock)", id)); err != nil {
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS log_%d_1 ON log_%d (write_clock)", id, id)); err != nil {
 			return err
 		}
 		if _, err = database.Exec(fmt.Sprintf("DELETE FROM log_%d", id)); err != nil {
