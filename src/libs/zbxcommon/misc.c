@@ -362,7 +362,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 	if (NULL != tz)
 	{
 		long	offset;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 		offset = zbx_get_timezone_offset(current_time.time, tm);
 #else
 		offset = zbx_get_timezone_offset(current_time.tv_sec, tm);
@@ -398,7 +398,7 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 #ifdef HAVE_TM_TM_GMTOFF
 	offset = tm->tm_gmtoff;
 #else
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	tm_utc = *gmtime(&t);
 #else
 	gmtime_r(&t, &tm_utc);
