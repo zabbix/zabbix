@@ -57,7 +57,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'index' => 0,
 							'macro' => '{$1234}',
 							'value' => '!@#$%^&*()_+/*',
-							'description' => '!@#$%^&*()_+/*',
+							'description' => '!@#$%^&*()_+/*'
 						],
 						[
 							'macro' => '{$MACRO1}',
@@ -67,27 +67,27 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						[
 							'macro' => '{$MACRO3}',
 							'value' => '',
-							'description' => '',
+							'description' => ''
 						],
 						[
 							'macro' => '{$MACRO4}',
 							'value' => 'value',
-							'description' => '',
+							'description' => ''
 						],
 						[
 							'macro' => '{$MACRO5}',
 							'value' => '',
-							'description' => 'DESCRIPTION',
+							'description' => 'DESCRIPTION'
 						],
 						[
 							'macro' => '{$MACRO6}',
 							'value' => 'Значение',
-							'description' => 'Описание',
+							'description' => 'Описание'
 						],
 						[
 							'macro' => '{$MACRO:A}',
 							'value' => '{$MACRO:A}',
-							'description' => '{$MACRO:A}',
+							'description' => '{$MACRO:A}'
 						]
 					],
 					'success_message' => 'Host prototype added'
@@ -101,7 +101,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'macro' => '{MACRO}',
+							'macro' => '{MACRO}'
 						]
 					],
 					'error_message' => 'Cannot add host prototype',
@@ -190,19 +190,19 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'index' => 0,
 							'macro' => '{$UPDATED_MACRO1}',
 							'value' => '',
-							'description' => '',
+							'description' => ''
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
 							'macro' => '{$UPDATED_MACRO2}',
 							'value' => 'Updated Value 2',
-							'description' => '',
+							'description' => ''
 						],
 						[
 							'macro' => '{$UPDATED_MACRO3}',
 							'value' => '',
-							'description' => 'Updated Description 3',
+							'description' => 'Updated Description 3'
 						]
 					],
 					'success_message' => 'Host prototype updated'
@@ -217,21 +217,21 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'index' => 0,
 							'macro' => '{$MACRO:A}',
 							'value' => '{$MACRO:B}',
-							'description' => '{$MACRO:C}',
+							'description' => '{$MACRO:C}'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
 							'macro' => '{$UPDATED_MACRO_1}',
 							'value' => '',
-							'description' => 'DESCRIPTION',
+							'description' => 'DESCRIPTION'
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 2,
 							'macro' => '{$UPDATED_MACRO_2}',
 							'value' => 'Значение',
-							'description' => 'Описание',
+							'description' => 'Описание'
 						]
 					],
 					'success_message' => 'Host prototype updated'
@@ -245,7 +245,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'macro' => '{MACRO}',
+							'macro' => '{MACRO}'
 						]
 					],
 					'error_message' => 'Cannot update host prototype',

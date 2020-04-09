@@ -38,14 +38,19 @@ abstract class testFormMacros extends CWebTest {
 
 	/**
 	 * Test creating of host or template with Macros.
+	 *
+	 * @param array	$data			given data provider
+	 * @param string $form_type		string used in form selector
+	 * @param string $host_type		string defining is it host, template or host prototype
+	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkCreate($data, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
-		if ($is_prototype) {
-			$this->page->login()->open('host_prototypes.php?form=create&parent_discoveryid='.$lld_id);
-		}
-		else {
-			$this->page->login()->open($host_type.'s.php?form=create');
-		}
+		$this->page->login()->open(
+			$is_prototype
+			? 'host_prototypes.php?form=create&parent_discoveryid='.$lld_id
+			: $host_type.'s.php?form=create'
+		);
 
 		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->fill([ucfirst($host_type).' name' => $data['Name']]);
@@ -59,32 +64,44 @@ abstract class testFormMacros extends CWebTest {
 	}
 
 	/**
-	 * Test updating of host or template with Macros.
+	 * Test updating Macros in host, host prototype or template.
+	 *
+	 * @param array	$data			given data provider
+	 * @param string $name			name of host where changes are made
+	 * @param string $form_type		string used in form selector
+	 * @param string $host_type		string defining is it host, template or host prototype
+	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkUpdate($data, $name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-		if ($is_prototype) {
-			$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
-		}
-		else {
-			$this->page->login()->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		}
+		$this->page->login()->open(
+			$is_prototype
+			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+		);
+
 		$this->checkMacros($data, $form_type, $name, $host_type, $is_prototype, $lld_id);
 	}
 
 	/**
-	 * Test removing Macros from host or template.
+	 * Test removing Macros from host, host prototype or template.
+	 *
+	 * @param string $name			name of host where changes are made
+	 * @param string $form_type		string used in form selector
+	 * @param string $host_type		string defining is it host, template or host prototype
+	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
-	protected function checkRemove($hostname, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($hostname));
+	protected function checkRemove($name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
+		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-		if ($is_prototype) {
-			$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
-		}
-		else {
-			$this->page->login()->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		}
+		$this->page->login()->open(
+			$is_prototype
+			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+		);
 
 		$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
@@ -94,20 +111,20 @@ abstract class testFormMacros extends CWebTest {
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
 
-		if ($is_prototype) {
-			$this->assertEquals('Host prototype updated', $message->getTitle());
-		}
-		else {
-			$this->assertEquals(ucfirst($host_type).' updated', $message->getTitle());
-		}
+		$this->assertEquals(($is_prototype ? 'Host prototype' : ucfirst($host_type)).' updated', $message->getTitle());
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($hostname)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
 		// Check the results in form.
-		$this->checkMacrosFields($hostname, $is_prototype, $lld_id, $host_type, $form_type, null);
+		$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type, null);
 	}
 
 	/**
 	 * Test changing and resetting global macro on host, prototype or template.
+	 *
+	 * @param string $form_type		string used in form selector
+	 * @param string $host_type		string defining is it host, template or host prototype
+	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkChangeRemoveInheritedMacro($form_type, $host_type, $is_prototype = false, $lld_id = null) {
 		if ($is_prototype) {
@@ -155,12 +172,13 @@ abstract class testFormMacros extends CWebTest {
 
 		// Check saved edited macros in host/template form.
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
-		if ($is_prototype) {
-			$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
-		}
-		else {
-			$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		}
+
+		$this->page->open(
+			$is_prototype
+			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+		);
+
 		$form->selectTab('Macros');
 		$this->assertMacros($edited_macros);
 
@@ -171,12 +189,11 @@ abstract class testFormMacros extends CWebTest {
 		}
 		$form->submit();
 
-		if ($is_prototype) {
-			$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
-		}
-		else {
-			$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		}
+		$this->page->open(
+			$is_prototype
+			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+		);
 
 		$form->selectTab('Macros');
 		$this->assertMacros();
@@ -187,10 +204,16 @@ abstract class testFormMacros extends CWebTest {
 	}
 
 	/**
-	 * Check adding and saving macros in host or template form.
+	 *  Check adding and saving macros in host, host prototype or template form.
+	 *
+	 * @param array	$data			given data provider
+	 * @param string $form_type		string used in form selector
+	 * @param string $name			name of host where changes are made
+	 * @param string $host_type		string defining is it host, template or host prototype
+	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	private function checkMacros($data = null, $form_type, $name, $host_type, $is_prototype, $lld_id) {
-
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
@@ -220,17 +243,23 @@ abstract class testFormMacros extends CWebTest {
 	}
 
 	/**
-	 * Checking saved macros in host or template form.
+	 * Checking saved macros in host, host prototype or template form.
+	 *
+	 * @param string $name			name of host where changes are made
+	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param int $lld_id			points to LLD rule id where host prototype belongs
+	 * @param string $host_type		string defining is it host, template or host prototype
+	 * @param string $form_type		string used in form selector
+	 * @param array	$data			given data provider
 	 */
 	private function checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $form_type,  $data = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-		if ($is_prototype) {
-			$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id);
-		}
-		else {
-			$this->page->open($host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0');
-		}
+		$this->page->open(
+			$is_prototype
+			? 'host_prototypes.php?form=update&parent_discoveryid='.$lld_id.'&hostid='.$id
+			: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+		);
 
 		$form = $this->query('id:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Macros');
@@ -243,8 +272,9 @@ abstract class testFormMacros extends CWebTest {
 	}
 
 	/**
-	 * Check host/template inherited macros in form matching with global macros in DB,
-	 * if there is no any host/template defined macros.
+	 * Check host/host prototype/template inherited macros in form matching with global macros in DB.
+	 *
+	 * @param array $hostmacros			all macros defined particularly for this host
 	 */
 	public function checkInheritedGlobalMacros($hostmacros = []) {
 		// Create two macros arrays: from DB and from Frontend form.
