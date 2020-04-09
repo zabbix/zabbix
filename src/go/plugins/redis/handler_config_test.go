@@ -25,12 +25,9 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-	"zabbix.com/pkg/plugin"
 )
 
 func TestPlugin_configHandler(t *testing.T) {
-	impl.Configure(&plugin.GlobalOptions{}, nil)
-
 	stubConn := radix.Stub("", "", func(args []string) interface{} {
 		switch strings.ToLower(args[2]) {
 		case "param1":
@@ -49,7 +46,7 @@ func TestPlugin_configHandler(t *testing.T) {
 
 	defer stubConn.Close()
 
-	conn := &redisConn{
+	conn := &RedisConn{
 		client: stubConn,
 	}
 
@@ -59,43 +56,38 @@ func TestPlugin_configHandler(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		p       *Plugin
 		args    args
 		want    interface{}
 		wantErr bool
 	}{
 		{
 			"Pattern * should be used if it is not explicitly specified",
-			&impl,
 			args{conn: conn, params: []string{""}},
 			`{"param1":"foo","param2":"bar"}`,
 			false,
 		},
 		{
 			"Should fetch specified parameter and return its value",
-			&impl,
-			args{conn: conn, params: []string{"", "param1"}},
+			args{conn: conn, params: []string{"param1"}},
 			`foo`,
 			false,
 		},
 		{
 			"Should fail if parameter not found",
-			&impl,
-			args{conn: conn, params: []string{"", "UnknownParam"}},
+			args{conn: conn, params: []string{"UnknownParam"}},
 			nil,
 			true,
 		},
 		{
 			"Should fail if error occurred",
-			&impl,
-			args{conn: conn, params: []string{"", "WantErr"}},
+			args{conn: conn, params: []string{"WantErr"}},
 			nil,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.configHandler(tt.args.conn, tt.args.params)
+			got, err := configHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.configHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

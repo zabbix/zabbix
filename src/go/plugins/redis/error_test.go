@@ -31,7 +31,7 @@ func Test_zabbixError_Error(t *testing.T) {
 	}{
 		{
 			"ZabbixError stringify",
-			zabbixError("foobar"),
+			zabbixError{"foobar"},
 			"foobar",
 		},
 	}

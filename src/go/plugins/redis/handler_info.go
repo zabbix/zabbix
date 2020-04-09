@@ -22,11 +22,14 @@ package redis
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"strings"
 
 	"github.com/mediocregopher/radix/v3"
 )
+
+const infoMaxParams = 1
 
 type infoSection string
 type infoKey string
@@ -60,6 +63,7 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 			if _, ok := res[section]; !ok {
 				res[section] = make(infoKeySpace)
 			}
+
 			continue
 		}
 
@@ -70,13 +74,12 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 		}
 
 		key := infoKey(kv[0])
-		value := strings.TrimSpace(string(kv[1]))
+		value := strings.TrimSpace(kv[1])
 
 		// Followed sections has a bit more complicated format.
 		// E.g: dbXXX: keys=XXX,expires=XXX
 		if section == "Keyspace" || section == "Commandstats" ||
-			(section == "Replication" &&
-				redisSlaveMetricRE.MatchString(string(key))) {
+			(section == "Replication" && redisSlaveMetricRE.MatchString(string(key))) {
 
 			extKeySpace := make(infoExtKeySpace)
 
@@ -86,12 +89,14 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 			}
 
 			res[section][key] = extKeySpace
+
 			continue
 		}
 
 		if len(section) == 0 {
 			return nil, errorInvalidFormat
 		}
+
 		res[section][key] = value
 	}
 
@@ -103,37 +108,34 @@ func parseRedisInfo(info string) (res redisInfo, err error) {
 		return nil, errorEmptyResult
 	}
 
-	return
+	return res, nil
 }
 
 // infoHandler gets an output of 'INFO' command, parses it and returns it in JSON format.
-func (p *Plugin) infoHandler(conn redisClient, params []string) (interface{}, error) {
-	var (
-		res     string
-		section infoSection
-	)
+func infoHandler(conn redisClient, params []string) (interface{}, error) {
+	var res string
 
-	if len(params) > 1 && len(params[1]) > 0 {
-		section = infoSection(strings.ToLower(params[1]))
-	} else {
-		section = "default"
+	if len(params) > infoMaxParams {
+		return nil, errorInvalidParams
+	}
+
+	section := infoSection("default")
+	if len(params) > 0 && len(params[0]) > 0 {
+		section = infoSection(strings.ToLower(params[0]))
 	}
 
 	if err := conn.Query(radix.Cmd(&res, "INFO", string(section))); err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotFetchData)
 	}
 
 	redisInfo, err := parseRedisInfo(res)
 	if err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotParseData
+		return nil, err
 	}
 
 	jsonRes, err := json.Marshal(redisInfo)
 	if err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotMarshalJson
+		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil

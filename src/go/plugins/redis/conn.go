@@ -20,74 +20,117 @@
 package redis
 
 import (
-	"crypto/sha512"
+	"context"
 	"github.com/mediocregopher/radix/v3"
 	"sync"
 	"time"
 	"zabbix.com/pkg/log"
 )
 
-const clientName = "zbx_monitor"
-
-type connId [sha512.Size]byte
+const hkInterval = 10
 
 type redisClient interface {
 	Query(cmd radix.CmdAction) error
 }
 
-type redisConn struct {
+type RedisConn struct {
 	client         radix.Client
-	uri            URI
 	lastTimeAccess time.Time
 }
 
 // Query wraps the radix.Client.Do function.
-func (r *redisConn) Query(cmd radix.CmdAction) error {
+func (r *RedisConn) Query(cmd radix.CmdAction) error {
 	return r.client.Do(cmd)
 }
 
 // updateAccessTime updates the last time a connection was accessed.
-func (r *redisConn) updateAccessTime() {
+func (r *RedisConn) updateAccessTime() {
 	r.lastTimeAccess = time.Now()
 }
 
 // Thread-safe structure for manage connections.
-type connManager struct {
+type ConnManager struct {
 	sync.Mutex
 	connMutex   sync.Mutex
-	connections map[connId]*redisConn
+	connections map[URI]*RedisConn
 	keepAlive   time.Duration
 	timeout     time.Duration
+	Destroy     context.CancelFunc
 }
 
-// NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, timeout time.Duration) *connManager {
-	connMgr := &connManager{
-		connections: make(map[connId]*redisConn),
+// NewConnManager initializes ConnManager structure and runs Go Routine that watches for unused connections.
+func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	connMgr := &ConnManager{
+		connections: make(map[URI]*RedisConn),
 		keepAlive:   keepAlive,
 		timeout:     timeout,
+		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
 	}
 
-	// Repeatedly check for unused connections and close them.
-	go func() {
-		for range time.Tick(10 * time.Second) {
-			if err := connMgr.closeUnused(); err != nil {
-				log.Errf("[%s] Error occurred while closing connection: %s", pluginName, err.Error())
-			}
-		}
-	}()
+	go connMgr.housekeeper(ctx, hkInterval)
 
 	return connMgr
 }
 
-const poolSize = 1
-
-// create creates a new connection with a given URI and password.
-func (c *connManager) create(uri URI, cid connId) (*redisConn, error) {
+// closeUnused closes each connection that has not been accessed at least within the keepalive interval.
+func (c *ConnManager) closeUnused() {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if _, ok := c.connections[cid]; ok {
+	for uri, conn := range c.connections {
+		if time.Since(conn.lastTimeAccess) > c.keepAlive {
+			if err := conn.client.Close(); err == nil {
+				delete(c.connections, uri)
+				log.Debugf("[%s] Closed unused connection: %s", pluginName, uri.Addr())
+			} else {
+				log.Errf("[%s] Error occurred while closing connection: %s", pluginName, uri.Addr())
+			}
+		}
+	}
+}
+
+// closeAll closes all existed connections.
+func (c *ConnManager) closeAll() {
+	c.connMutex.Lock()
+	for uri, conn := range c.connections {
+		if err := conn.client.Close(); err == nil {
+			delete(c.connections, uri)
+		} else {
+			log.Errf("[%s] Error occurred while closing connection: %s", pluginName, uri.Addr())
+		}
+	}
+	c.connMutex.Unlock()
+}
+
+// housekeeper repeatedly checks for unused connections and close them.
+func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+
+	for {
+		select {
+		case <-ctx.Done():
+			ticker.Stop()
+			c.closeAll()
+
+			return
+		case <-ticker.C:
+			c.closeUnused()
+		}
+	}
+}
+
+// create creates a new connection with a given URI and password.
+func (c *ConnManager) create(uri URI) (*RedisConn, error) {
+	const clientName = "zbx_monitor"
+
+	const poolSize = 1
+
+	c.connMutex.Lock()
+	defer c.connMutex.Unlock()
+
+	if _, ok := c.connections[uri]; ok {
 		// Should never happen.
 		panic("connection already exists")
 	}
@@ -103,7 +146,7 @@ func (c *connManager) create(uri URI, cid connId) (*redisConn, error) {
 			err = conn.Do(radix.Cmd(nil, "CLIENT", "SETNAME", clientName))
 		}
 
-		return
+		return conn, err
 	}
 
 	client, err := radix.NewPool(uri.Scheme(), uri.Addr(), poolSize, radix.PoolConnFunc(AuthConnFunc))
@@ -111,23 +154,22 @@ func (c *connManager) create(uri URI, cid connId) (*redisConn, error) {
 		return nil, err
 	}
 
-	c.connections[cid] = &redisConn{
+	c.connections[uri] = &RedisConn{
 		client:         client,
-		uri:            uri,
 		lastTimeAccess: time.Now(),
 	}
 
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
 
-	return c.connections[cid], nil
+	return c.connections[uri], nil
 }
 
 // get returns a connection with given cid if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *connManager) get(cid connId) *redisConn {
+func (c *ConnManager) get(uri URI) *RedisConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if conn, ok := c.connections[cid]; ok {
+	if conn, ok := c.connections[uri]; ok {
 		conn.updateAccessTime()
 		return conn
 	}
@@ -135,45 +177,16 @@ func (c *connManager) get(cid connId) *redisConn {
 	return nil
 }
 
-// CloseUnused closes each connection that has not been accessed at least within the keepalive interval.
-func (c *connManager) closeUnused() (err error) {
-	var uri URI
-
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
-
-	for cid, conn := range c.connections {
-		if time.Since(conn.lastTimeAccess) > c.keepAlive {
-			if err = conn.client.Close(); err == nil {
-				uri = conn.uri
-				delete(c.connections, cid)
-				log.Debugf("[%s] Closed unused connection: %s", pluginName, uri.Addr())
-			}
-		}
-	}
-
-	// Return the last error only.
-	return
-}
-
 // GetConnection returns an existing connection or creates a new one.
-func (c *connManager) GetConnection(uri URI) (conn *redisConn, err error) {
-	cid := createConnectionId(uri)
-
+func (c *ConnManager) GetConnection(uri URI) (conn *RedisConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
-	conn = c.get(cid)
+	conn = c.get(uri)
 
 	if conn == nil {
-		conn, err = c.create(uri, cid)
+		conn, err = c.create(uri)
 	}
 
-	return
-}
-
-// createConnectionId returns sha512 hash from URI.
-func createConnectionId(uri URI) connId {
-	// TODO: add memoization
-	return connId(sha512.Sum512([]byte((uri.Uri()))))
+	return conn, err
 }
