@@ -18,35 +18,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/common/testFormMacros.php';
+require_once dirname(__FILE__).'/common/testFormMacros.php';
 
 /**
  * @backup hosts
  */
-class testFormTemplateMacros extends testFormMacros {
+class testFormHostPrototypeMacros extends testFormMacros {
+
+	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
+	const LLD_ID			= 90001;
+	const IS_PROTOTYPE	= true;
 
 	use MacrosTrait;
 
 	/**
-	 * The name of the template for updating macros, id=40000.
+	 * The name of the host for updating macros, id=99200.
 	 *
 	 * @var string
 	 */
-	protected $template_name_update = 'Form test template';
+	protected $host_name_update = 'Host prototype for macros {#UPDATE}';
 
 	/**
-	 * The name of the template for removing macros, id=99016.
+	 * The name of the host for removing macros, id=99201.
 	 *
 	 * @var string
 	 */
-	protected $template_name_remove = 'Template to test graphs';
+	protected $host_name_remove = 'Host prototype for macros {#DELETE}';
 
-	public static function getCreateTemplateMacrosData() {
+	public static function getCreateHostPrototypeMacrosData() {
 		return [
 			[
 				[
 					'expected' => TEST_GOOD,
-					'Name' => 'Template With Macros',
+					'Name' => 'Host prototype With {#MACROS}',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -86,13 +90,13 @@ class testFormTemplateMacros extends testFormMacros {
 							'description' => '{$MACRO:A}'
 						]
 					],
-						'success_message' => 'Template added'
+					'success_message' => 'Host prototype added'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'Template Without dollar in Macros',
+					'Name' => 'Without dollar in {#MACROS}',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -100,14 +104,14 @@ class testFormTemplateMacros extends testFormMacros {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error_message' => 'Cannot add template',
+					'error_message' => 'Cannot add host prototype',
 					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'Template With empty Macro',
+					'Name' => 'Host prototype With empty {#MACRO}',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -117,14 +121,14 @@ class testFormTemplateMacros extends testFormMacros {
 							'description' => 'Macro Description'
 						]
 					],
-					'error_message' => 'Cannot add template',
-					'error_details' => 'Invalid macro "": macro is empty.'
+					'error_message' => 'Cannot add host prototype',
+					'error_details' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'Name' => 'Template With repeated Macros',
+					'Name' => 'Host prototype With repeated {#MACROS}',
 					'macros' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -139,21 +143,21 @@ class testFormTemplateMacros extends testFormMacros {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_message' => 'Cannot add template',
-					'error_details' => 'Macro "{$MACRO}" is not unique.'
+					'error_message' => 'Cannot add host prototype',
+					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists. '
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider getCreateTemplateMacrosData
+	 * @dataProvider getCreateHostPrototypeMacrosData
 	 */
-	public function testFormTemplateMacros_Create($data) {
-		$this->checkCreate($data, 'templates', 'template');
+	public function testFormHostPrototypeMacros_Create($data) {
+		$this->checkCreate($data, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public static function getUpdateTemplateMacrosData() {
+	public static function getUpdateHostPrototypeMacrosData() {
 		return [
 			[
 				[
@@ -164,17 +168,17 @@ class testFormTemplateMacros extends testFormMacros {
 							'index' => 0,
 							'macro' => '{$UPDATED_MACRO1}',
 							'value' => 'updated value1',
-							'description' => 'updated description 1'
+							'description' => 'updated description 1',
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
 							'macro' => '{$UPDATED_MACRO2}',
 							'value' => 'Updated value 2',
-							'description' => 'Updated description 2'
+							'description' => 'Updated description 2',
 						]
 					],
-					'success_message' => 'Template updated'
+					'success_message' => 'Host prototype updated'
 				]
 			],
 			[
@@ -198,10 +202,10 @@ class testFormTemplateMacros extends testFormMacros {
 						[
 							'macro' => '{$UPDATED_MACRO3}',
 							'value' => '',
-							'description' => 'Updated Description 3',
+							'description' => 'Updated Description 3'
 						]
 					],
-					'success_message' => 'Template updated'
+					'success_message' => 'Host prototype updated'
 				]
 			],
 			[
@@ -230,7 +234,7 @@ class testFormTemplateMacros extends testFormMacros {
 							'description' => 'Описание'
 						]
 					],
-					'success_message' => 'Template updated'
+					'success_message' => 'Host prototype updated'
 				]
 			],
 			[
@@ -244,7 +248,7 @@ class testFormTemplateMacros extends testFormMacros {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error_message' => 'Cannot update template',
+					'error_message' => 'Cannot update host prototype',
 					'error_details' => 'Invalid macro "{MACRO}": incorrect syntax near "MACRO}".'
 				]
 			],
@@ -261,8 +265,8 @@ class testFormTemplateMacros extends testFormMacros {
 							'description' => 'Macro Description'
 						]
 					],
-					'error_message' => 'Cannot update template',
-					'error_details' => 'Invalid macro "": macro is empty.'
+					'error_message' => 'Cannot update host prototype',
+					'error_details' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
 				]
 			],
 			[
@@ -285,25 +289,25 @@ class testFormTemplateMacros extends testFormMacros {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error_message' => 'Cannot update template',
-					'error_details' => 'Macro "{$MACRO}" is not unique.'
+					'error_message' => 'Cannot update host prototype',
+					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider getUpdateTemplateMacrosData
+	 * @dataProvider getUpdateHostPrototypeMacrosData
 	 */
-	public function testFormTemplateMacros_Update($data) {
-		$this->checkUpdate($data, $this->template_name_update, 'templates', 'template');
+	public function testFormHostPrototypeMacros_Update($data) {
+		$this->checkUpdate($data, $this->host_name_update, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public function testFormTemplateMacros_Remove() {
-		$this->checkRemove($this->template_name_remove, 'templates', 'template');
+	public function testFormHostPrototypeMacros_Remove() {
+		$this->checkRemove($this->host_name_remove, 'hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public function testFormTemplateMacros_ChangeRemoveInheritedMacro() {
-		$this->checkChangeRemoveInheritedMacro('templates', 'template');
+	public function testFormHostPrototypeMacros_ChangeRemoveInheritedMacro() {
+		$this->checkChangeRemoveInheritedMacro('hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 }

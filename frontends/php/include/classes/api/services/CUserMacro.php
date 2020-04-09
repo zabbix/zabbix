@@ -795,6 +795,16 @@ class CUserMacro extends CApiService {
 				'editable' => true
 			]);
 
+			if ($count == count($hostids)) {
+				return;
+			}
+
+			$count += API::HostPrototype()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
 			if ($count != count($hostids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
