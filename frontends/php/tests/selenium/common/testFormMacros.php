@@ -42,7 +42,7 @@ abstract class testFormMacros extends CWebTest {
 	 * @param array	$data			given data provider
 	 * @param string $form_type		string used in form selector
 	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkCreate($data, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
@@ -70,7 +70,7 @@ abstract class testFormMacros extends CWebTest {
 	 * @param string $name			name of host where changes are made
 	 * @param string $form_type		string used in form selector
 	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkUpdate($data, $name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
@@ -91,7 +91,7 @@ abstract class testFormMacros extends CWebTest {
 	 * @param string $name			name of host where changes are made
 	 * @param string $form_type		string used in form selector
 	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkRemove($name, $form_type, $host_type, $is_prototype = false, $lld_id = null) {
@@ -123,7 +123,7 @@ abstract class testFormMacros extends CWebTest {
 	 *
 	 * @param string $form_type		string used in form selector
 	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkChangeRemoveInheritedMacro($form_type, $host_type, $is_prototype = false, $lld_id = null) {
@@ -210,7 +210,7 @@ abstract class testFormMacros extends CWebTest {
 	 * @param string $form_type		string used in form selector
 	 * @param string $name			name of host where changes are made
 	 * @param string $host_type		string defining is it host, template or host prototype
-	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	private function checkMacros($data = null, $form_type, $name, $host_type, $is_prototype, $lld_id) {
@@ -246,7 +246,7 @@ abstract class testFormMacros extends CWebTest {
 	 * Checking saved macros in host, host prototype or template form.
 	 *
 	 * @param string $name			name of host where changes are made
-	 * @param booleam $is_prototype	defines is it prototype or not
+	 * @param boolean $is_prototype	defines is it prototype or not
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 * @param string $host_type		string defining is it host, template or host prototype
 	 * @param string $form_type		string used in form selector
