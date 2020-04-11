@@ -96,6 +96,7 @@ type Uploader interface {
 
 // common cache data
 type cacheData struct {
+	log.Logger
 	input      chan interface{}
 	uploader   Uploader
 	clientID   uint64
@@ -131,30 +132,6 @@ func (c *cacheData) Flush() {
 	c.Upload(nil)
 }
 
-func (c *cacheData) Tracef(format string, args ...interface{}) {
-	log.Tracef("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
-}
-
-func (c *cacheData) Debugf(format string, args ...interface{}) {
-	log.Debugf("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
-}
-
-func (c *cacheData) Warningf(format string, args ...interface{}) {
-	log.Warningf("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
-}
-
-func (c *cacheData) Infof(format string, args ...interface{}) {
-	log.Infof("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
-}
-
-func (c *cacheData) Errf(format string, args ...interface{}) {
-	log.Errf("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
-}
-
-func (c *cacheData) Critf(format string, args ...interface{}) {
-	log.Critf("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
-}
-
 func newToken() string {
 	h := md5.New()
 	_ = binary.Write(h, binary.LittleEndian, time.Now().UnixNano())
@@ -178,6 +155,7 @@ func fetchRowAndClose(rows *sql.Rows, args ...interface{}) (ok bool, err error) 
 
 func New(options *agent.AgentOptions, clientid uint64, output Uploader) ResultCache {
 	data := &cacheData{
+		Logger:   log.New(fmt.Sprintf("%d", clientid)),
 		clientID: clientid,
 		input:    make(chan interface{}, 100),
 		uploader: output,
