@@ -49,6 +49,7 @@ import (
 	"time"
 
 	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
 )
 
@@ -61,11 +62,6 @@ type ResultCache interface {
 	Stop()
 	UpdateOptions(options *agent.AgentOptions)
 	Upload(u Uploader)
-}
-
-type baseCache struct {
-	input    chan interface{}
-	uploader Uploader
 }
 
 type AgentData struct {
@@ -98,42 +94,65 @@ type Uploader interface {
 	CanRetry() (enabled bool)
 }
 
-func (c *baseCache) InitBase(u Uploader) {
-	c.input = make(chan interface{}, 100)
-	c.uploader = u
+// common cache data
+type cacheData struct {
+	input      chan interface{}
+	uploader   Uploader
+	clientID   uint64
+	token      string
+	lastDataID uint64
+	lastError  error
+	retry      *time.Timer
+	timeout    int
 }
 
-func (c *baseCache) Input() interface{} {
-	return <-c.input
-}
-
-func (c *baseCache) Uploader() Uploader {
-	return c.uploader
-}
-
-func (c *baseCache) Stop() {
+func (c *cacheData) Stop() {
 	c.input <- nil
 }
 
-func (c *baseCache) Write(result *plugin.Result) {
+func (c *cacheData) Write(result *plugin.Result) {
 	c.input <- result
 }
 
-func (c *baseCache) UpdateOptions(options *agent.AgentOptions) {
+func (c *cacheData) UpdateOptions(options *agent.AgentOptions) {
 	c.input <- options
 }
 
-func (c *baseCache) Upload(u Uploader) {
+func (c *cacheData) Upload(u Uploader) {
 	if u == nil {
-		u = c.Uploader()
+		u = c.uploader
 	}
 	if u != nil {
 		c.input <- u
 	}
 }
 
-func (c *baseCache) Flush() {
+func (c *cacheData) Flush() {
 	c.Upload(nil)
+}
+
+func (c *cacheData) Tracef(format string, args ...interface{}) {
+	log.Tracef("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
+}
+
+func (c *cacheData) Debugf(format string, args ...interface{}) {
+	log.Debugf("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
+}
+
+func (c *cacheData) Warningf(format string, args ...interface{}) {
+	log.Warningf("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
+}
+
+func (c *cacheData) Infof(format string, args ...interface{}) {
+	log.Infof("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
+}
+
+func (c *cacheData) Errf(format string, args ...interface{}) {
+	log.Errf("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
+}
+
+func (c *cacheData) Critf(format string, args ...interface{}) {
+	log.Critf("[%d] %s", c.clientID, fmt.Sprintf(format, args...))
 }
 
 func newToken() string {
@@ -142,16 +161,41 @@ func newToken() string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func New(options *agent.AgentOptions, clientid uint64, output Uploader) ResultCache {
-	if options.EnablePersistentBuffer == 0 {
-		cache := &MemoryCache{clientID: clientid, token: newToken()}
-		cache.init(output)
-		return cache
+func tableName(prefix string, index int) string {
+	return fmt.Sprintf("%s_%d", prefix, index)
+}
 
+// fetchRowAndClose fetches and scans the next row. False is returned if there are no
+// rows to fetch or an error occured.
+func fetchRowAndClose(rows *sql.Rows, args ...interface{}) (ok bool, err error) {
+	if rows.Next() {
+		err = rows.Scan(args...)
+		rows.Close()
+		return err == nil, err
+	}
+	return false, rows.Err()
+}
+
+func New(options *agent.AgentOptions, clientid uint64, output Uploader) ResultCache {
+	data := &cacheData{
+		clientID: clientid,
+		input:    make(chan interface{}, 100),
+		uploader: output,
+		token:    newToken(),
+	}
+
+	if options.EnablePersistentBuffer == 0 {
+		c := &MemoryCache{
+			cacheData: data,
+		}
+		c.init(options)
+		return c
 	} else {
-		cache := &DiskCache{clientID: clientid, token: newToken()}
-		cache.init(output)
-		return cache
+		c := &DiskCache{
+			cacheData: data,
+		}
+		c.init(options)
+		return c
 	}
 }
 
@@ -245,16 +289,11 @@ addressCheck:
 		if err != nil {
 			return err
 		}
-		if !rows.Next() {
-			if err = rows.Err(); err == nil {
-				err = fmt.Errorf("Cannot select id for address %s", addr)
+
+		if ok, err := fetchRowAndClose(rows, &id); !ok {
+			if err == nil {
+				err = fmt.Errorf("cannot select id for address %s", addr)
 			}
-			return err
-		}
-		if err = rows.Scan(&id); err != nil {
-			return err
-		}
-		if err = rows.Close(); err != nil {
 			return err
 		}
 
@@ -269,7 +308,6 @@ addressCheck:
 			return err
 		}
 
-		fmt.Printf("ID: %d\n", id)
 		stmt, err = database.Prepare(createTableQuery("log", id))
 		if err != nil {
 			return err

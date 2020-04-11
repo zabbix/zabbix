@@ -32,17 +32,11 @@ import (
 )
 
 type MemoryCache struct {
-	baseCache
+	*cacheData
 	results         []*AgentData
-	token           string
-	lastDataID      uint64
-	clientID        uint64
-	lastError       error
 	maxBufferSize   int32
 	totalValueNum   int32
 	persistValueNum int32
-	retry           *time.Timer
-	timeout         int
 }
 
 func (c *MemoryCache) upload(u Uploader) (err error) {
@@ -50,7 +44,7 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 		return
 	}
 
-	log.Debugf("[%d] upload history data, %d/%d value(s)", c.clientID, len(c.results), cap(c.results))
+	c.Debugf("upload history data, %d/%d value(s)", len(c.results), cap(c.results))
 
 	request := AgentDataRequest{
 		Request: "agent data",
@@ -63,7 +57,7 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	var data []byte
 
 	if data, err = json.Marshal(&request); err != nil {
-		log.Errf("[%d] cannot convert cached history to json: %s", c.clientID, err.Error())
+		c.Errf("cannot convert cached history to json: %s", err.Error())
 		return
 	}
 
@@ -73,14 +67,14 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	}
 	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("[%d] history upload to [%s] started to fail: %s", c.clientID, u.Addr(), err)
+			c.Warningf("history upload to [%s] started to fail: %s", u.Addr(), err)
 			c.lastError = err
 		}
 		return
 	}
 
 	if c.lastError != nil {
-		log.Warningf("[%d] history upload to [%s] is working again", c.clientID, u.Addr())
+		c.Warningf("history upload to [%s] is working again", u.Addr())
 		c.lastError = nil
 	}
 
@@ -117,8 +111,8 @@ func (c *MemoryCache) addResult(result *AgentData) {
 	}
 
 	if c.persistValueNum >= c.maxBufferSize/2 || c.totalValueNum >= c.maxBufferSize {
-		if !full && c.Uploader() != nil {
-			c.flushOutput(c.Uploader())
+		if !full && c.uploader != nil {
+			c.flushOutput(c.uploader)
 		}
 	}
 }
@@ -130,7 +124,7 @@ func (c *MemoryCache) insertResult(result *AgentData) {
 	if !result.persistent {
 		for i, r := range c.results {
 			if r.Itemid == result.Itemid {
-				log.Debugf("[%d] cache is full, replacing oldest value for itemid:%d", c.clientID, r.Itemid)
+				c.Debugf("cache is full, replacing oldest value for itemid:%d", r.Itemid)
 				index = i
 				break
 			}
@@ -142,14 +136,14 @@ func (c *MemoryCache) insertResult(result *AgentData) {
 				if result.persistent {
 					c.persistValueNum++
 				}
-				log.Debugf("[%d] cache is full, removing oldest value for itemid:%d", c.clientID, r.Itemid)
+				c.Debugf("cache is full, removing oldest value for itemid:%d", r.Itemid)
 				index = i
 				break
 			}
 		}
 	}
 	if index == -1 {
-		log.Warningf("[%d] cache is full and cannot cannot find a value to replace, adding new instead", c.clientID)
+		c.Warningf("cache is full and cannot cannot find a value to replace, adding new instead")
 		c.addResult(result)
 		return
 	}
@@ -202,10 +196,10 @@ func (c *MemoryCache) write(r *plugin.Result) {
 
 func (c *MemoryCache) run() {
 	defer log.PanicHook()
-	log.Debugf("[%d] starting memory cache", c.clientID)
+	c.Debugf("starting memory cache")
 
 	for {
-		u := c.Input()
+		u := <-c.input
 		if u == nil {
 			break
 		}
@@ -218,7 +212,7 @@ func (c *MemoryCache) run() {
 			c.updateOptions(v)
 		}
 	}
-	log.Debugf("[%d] memory cache has been stopped", c.clientID)
+	c.Debugf("memory cache has been stopped")
 	monitor.Unregister(monitor.Output)
 }
 
@@ -227,9 +221,8 @@ func (c *MemoryCache) updateOptions(options *agent.AgentOptions) {
 	c.timeout = options.Timeout
 }
 
-func (c *MemoryCache) init(u Uploader) {
-	c.updateOptions(&agent.Options)
-	c.InitBase(u)
+func (c *MemoryCache) init(options *agent.AgentOptions) {
+	c.updateOptions(options)
 	c.results = make([]*AgentData, 0, c.maxBufferSize)
 }
 
