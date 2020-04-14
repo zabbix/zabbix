@@ -12078,17 +12078,14 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_subscribe_proxy                                           *
+ * Function: zbx_dc_proxy_update_nodata                                       *
  *                                                                            *
- * Purpose: if there was a loss of communication and it is necessary to       *
- *          suppress the nodate()  trigger, we try to register the number of  *
- *          historical data received from the proxy to correct the time       *
- *          during their processing in the nodata() trigger                   *
+ * Purpose: stop suppress mode of the nodata() trigger                        *
  *                                                                            *
- * Parameter: subscriptions - [IN] the array of trigger id and value count    *
+ * Parameter: subscriptions - [IN] the array of trigger id and time of values *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_subscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
+void	zbx_dc_proxy_update_nodata(zbx_vector_uint64_pair_t *subscriptions)
 {
 	ZBX_DC_PROXY		*proxy = NULL;
 	int			i;
@@ -12116,40 +12113,6 @@ void	zbx_dc_subscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
 		}
 
 		proxy->nodata_win.values_num --;
-	}
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_dc_unsubscribe_proxy                                         *
- *                                                                            *
- * Purpose: stop suppress mode of the nodata() trigger                        *
- *                                                                            *
- * Parameter: subscriptions - [IN] the array of trigger id and value count    *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_unsubscribe_proxy(zbx_vector_uint64_pair_t *subscriptions)
-{
-	ZBX_DC_PROXY	*proxy;
-	int		i;
-	zbx_uint64_t	p = 0;
-
-	WRLOCK_CACHE;
-
-	for (i = 0; i < subscriptions->values_num; i++)
-	{
-		if (p == subscriptions->values[i].first)
-			continue;
-
-		p = subscriptions->values[i].first;
-
-		if (NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &p)))
-			continue;
-
-		if (0 == (proxy->nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
-			continue;
 
 		if (0 < proxy->nodata_win.values_num || 0 != (proxy->nodata_win.flags & ZBX_PROXY_SUPPRESS_MORE))
 			continue;

@@ -883,8 +883,7 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 
 void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff);
 void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess);
-void	zbx_dc_subscribe_proxy(zbx_vector_uint64_pair_t *subscriptions);
-void	zbx_dc_unsubscribe_proxy(zbx_vector_uint64_pair_t *subscriptions);
+void	zbx_dc_proxy_update_nodata(zbx_vector_uint64_pair_t *subscriptions);
 
 typedef struct
 {

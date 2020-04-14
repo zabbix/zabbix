@@ -2919,12 +2919,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
 					&inventory_values, compression_age, &proxy_subscribtions);
 
-			if (0 != proxy_subscribtions.values_num)
-			{
-				zbx_vector_uint64_pair_sort(&proxy_subscribtions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-				zbx_dc_subscribe_proxy(&proxy_subscribtions);
-			}
-
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
 				DCconfig_items_apply_changes(&item_diff);
@@ -3006,7 +3000,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 		if (0 != proxy_subscribtions.values_num)
 		{
-			zbx_dc_unsubscribe_proxy(&proxy_subscribtions);
+			zbx_vector_uint64_pair_sort(&proxy_subscribtions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_dc_proxy_update_nodata(&proxy_subscribtions);
 			zbx_vector_uint64_pair_clear(&proxy_subscribtions);
 		}
 

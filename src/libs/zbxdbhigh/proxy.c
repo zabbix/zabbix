@@ -4538,7 +4538,7 @@ static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_off
 
 /******************************************************************************
  *                                                                            *
- * Function: check_proxy_suppression_mode                                     *
+ * Function: check_proxy_nodata                                               *
  *                                                                            *
  * Purpose: detect lost connection with proxy and calculate suppression       *
  *          window if possible                                                *
@@ -4549,7 +4549,7 @@ static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_off
  *             diff        - [IN/OUT] the properties to update                *
  *                                                                            *
  ******************************************************************************/
-static void	check_proxy_suppression_mode(zbx_timespec_t *ts, unsigned char proxy_status, zbx_proxy_diff_t *diff)
+static void	check_proxy_nodata(zbx_timespec_t *ts, unsigned char proxy_status, zbx_proxy_diff_t *diff)
 {
 	int	delay;
 
@@ -4631,7 +4631,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
 	flags_old = proxy_diff.nodata_win.flags;
-	check_proxy_suppression_mode(ts, proxy_status, &proxy_diff);	/* first packet can be empty for active proxy */
+	check_proxy_nodata(ts, proxy_status, &proxy_diff);	/* first packet can be empty for active proxy */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d period_end:%d delay:%d"
 			" timestamp:%d lastaccess:%d proxy_delay:%d more:%d", __func__, proxy_diff.nodata_win.flags,
