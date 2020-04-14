@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 01:45+0300\n"
+"POT-Creation-Date: 2020-04-14 11:24+0300\n"
 "PO-Revision-Date: 2019-12-09 09:51+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -4281,7 +4281,7 @@ msgstr "oversikter"
 msgid "Dashed line"
 msgstr "Stiplede linje"
 
-#: include/classes/items/CHelpItems.php:1067
+#: include/classes/items/CHelpItems.php:1071
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Data cachestatistikk. Cache - en av verdiene (moduser: alle, float, uint, str, logg, tekst), historie (modus: pfree, totalt, brukt, gratis), trend (moduser: pfree, totalt, brukt, gratis), tekst (moduser: pfree, totalt, brukt, gratis)."
 
@@ -7635,7 +7635,7 @@ msgstr "IPMI-skript kan bare utføres av serveren."
 msgid "IPMI sensor"
 msgstr "IPMI-sensor"
 
-#: include/classes/items/CHelpItems.php:1101
+#: include/classes/items/CHelpItems.php:1105
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -14365,19 +14365,19 @@ msgstr "Henter innhold av en fil. Returnerer tekst"
 msgid "Retry"
 msgstr "Prøv igjen"
 
-#: include/classes/items/CHelpItems.php:1091
+#: include/classes/items/CHelpItems.php:1095
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1095
+#: include/classes/items/CHelpItems.php:1099
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1077
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Returner første kolonne av den første raden i SQL-spørresultatet."
 
-#: include/classes/items/CHelpItems.php:1087
+#: include/classes/items/CHelpItems.php:1091
 msgid "Return value of an attribute of MBean object."
 msgstr "Returner verdien av et attributt for MBean-objekt."
 
@@ -16757,11 +16757,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Transaksjonen er ikke stengt. Avbryter ..."
 
-#: include/classes/items/CHelpItems.php:1077
+#: include/classes/items/CHelpItems.php:1081
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1081
+#: include/classes/items/CHelpItems.php:1085
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -17915,7 +17915,7 @@ msgstr "Brukernavn og passord"
 msgid "Users"
 msgstr "Brukere"
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1067
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware-cachestatistikk. Gyldige moduser er: totalt, gratis, pfree, brukt og pusset."
 
@@ -18302,6 +18302,10 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:371
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Versjon av Zabbix agent. Returnerer streng"
+
+#: include/classes/items/CHelpItems.php:1063
+msgid "Version of Zabbix server or proxy"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:50
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:123

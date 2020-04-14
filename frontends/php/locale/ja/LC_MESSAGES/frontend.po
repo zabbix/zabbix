@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 01:45+0300\n"
-"PO-Revision-Date: 2020-04-06 04:44+0300\n"
+"POT-Creation-Date: 2020-04-14 11:24+0300\n"
+"PO-Revision-Date: 2020-04-13 01:21+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1586141048.000000\n"
+"X-POOTLE-MTIME: 1586733661.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:67
 #: include/classes/db/OracleDbBackend.php:136
@@ -4222,7 +4222,7 @@ msgstr "ダッシュボード"
 msgid "Dashed line"
 msgstr "破線"
 
-#: include/classes/items/CHelpItems.php:1067
+#: include/classes/items/CHelpItems.php:1071
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "データキャッシュの統計。cache - values (mode: all, float, uint, str, log, text)、history (mode: pfree, total, used, free)、trend (mode: pfree, total, used, free)、text (mode: pfree, total, used, free)。"
 
@@ -7341,7 +7341,7 @@ msgstr "ホストのプロトタイプを削除しました"
 
 #: include/views/configuration.host.prototype.edit.php:301
 msgid "Host prototype macros"
-msgstr ""
+msgstr "ホストのプロトタイプのマクロ"
 
 #: host_prototypes.php:224 host_prototypes.php:277
 msgid "Host prototype updated"
@@ -7565,7 +7565,7 @@ msgstr "IPMIスクリプトはサーバーでのみ実行できます。"
 msgid "IPMI sensor"
 msgstr "IPMIセンサー"
 
-#: include/classes/items/CHelpItems.php:1101
+#: include/classes/items/CHelpItems.php:1105
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr "IPMIセンサーのIDとその他のセンサーに関連したパラメーターを取得。JSONで返す。"
 
@@ -9004,7 +9004,7 @@ msgstr "継承したマクロとホストマクロ"
 
 #: include/views/configuration.host.prototype.edit.php:302
 msgid "Inherited and host prototype macros"
-msgstr ""
+msgstr "継承したマクロとホストのプロトタイプのマクロ"
 
 #: include/views/configuration.template.edit.php:429
 msgid "Inherited and template macros"
@@ -12042,7 +12042,7 @@ msgstr "未確認"
 #: app/partials/trigoverview.table.left.php:62
 #: app/partials/trigoverview.table.top.php:61
 msgid "Not all results are displayed. Please provide more specific search criteria."
-msgstr ""
+msgstr "すべての結果が表示されるわけではありません。 より具体的な検索条件を入力してください。"
 
 #: include/classes/api/services/CTrigger.php:1042
 #: include/classes/api/services/CTriggerPrototype.php:870
@@ -13008,7 +13008,7 @@ msgstr "親グラフ"
 
 #: app/partials/hostmacros.inherited.list.html.php:51
 msgid "Parent host value"
-msgstr ""
+msgstr "親ホストの値"
 
 #: include/views/configuration.item.edit.php:49
 #: include/views/configuration.item.prototype.edit.php:44
@@ -13102,7 +13102,7 @@ msgstr "リンクなしで貼り付け"
 
 #: app/views/monitoring.charts.view.php:103
 msgid "Pattern"
-msgstr ""
+msgstr "パターン"
 
 #: actionconf.php:83 include/views/configuration.action.edit.php:161
 msgid "Pause operations for suppressed problems"
@@ -14271,19 +14271,19 @@ msgstr "ファイルのコンテンツ取得。テキスト値を返す。"
 msgid "Retry"
 msgstr "再試行"
 
-#: include/classes/items/CHelpItems.php:1091
+#: include/classes/items/CHelpItems.php:1095
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr "MBeanオブジェクトまたはその属性を記述するLLDマクロを含むJSON配列を返す。LLDに使用できる。"
 
-#: include/classes/items/CHelpItems.php:1095
+#: include/classes/items/CHelpItems.php:1099
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr "MBeanオブジェクトまたはその属性を含むJSON配列を返す。 jmx.discoveryと比較するとLLDマクロは定義されていない。LLDに使用できる。"
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1077
 msgid "Return first column of the first row of the SQL query result."
 msgstr "SQLクエリ実行結果の最初の行の最初の列を返す。"
 
-#: include/classes/items/CHelpItems.php:1087
+#: include/classes/items/CHelpItems.php:1091
 msgid "Return value of an attribute of MBean object."
 msgstr "MBeanオブジェクトの属性の値を返す。"
 
@@ -14837,7 +14837,7 @@ msgstr "検索パターンが空白です"
 
 #: app/views/monitoring.charts.view.php:100
 msgid "Search type"
-msgstr ""
+msgstr "検索タイプ"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -15635,7 +15635,7 @@ msgstr "実行するアクションのコマンドで指定されたスクリプ
 
 #: app/views/monitoring.charts.view.php:159
 msgid "Specify host to see the graphs."
-msgstr ""
+msgstr "グラフを表示するホストを指定してください。"
 
 #: app/views/popup.generic.php:158 include/views/monitoring.history.php:280
 msgid "Specify some filter condition to see the values."
@@ -15828,7 +15828,7 @@ msgstr "Straight"
 
 #: app/views/monitoring.charts.view.php:102
 msgid "Strict"
-msgstr ""
+msgstr "限定"
 
 #: include/items.inc.php:1737 include/items.inc.php:1741
 #: include/items.inc.php:1745
@@ -16364,7 +16364,7 @@ msgstr "クローンしたホストは\"隠しテキスト\"タイプのユー�
 
 #: host_prototypes.php:154
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr ""
+msgstr "クローンしたホストのプロトタイプには、\"隠しテキスト\"タイプのユーザー定義マクロが含まれています。 これらのマクロの値とタイプはリセットされました。"
 
 #: templates.php:203
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -16660,11 +16660,11 @@ msgstr "トータル"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "トランザクションがクローズされていません。終了します..."
 
-#: include/classes/items/CHelpItems.php:1077
+#: include/classes/items/CHelpItems.php:1081
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr "LLDのためにSQLクエリ結果をJSON配列に変換。"
 
-#: include/classes/items/CHelpItems.php:1081
+#: include/classes/items/CHelpItems.php:1085
 msgid "Transform SQL query result into a JSON array."
 msgstr "SQLクエリ結果をJSON配列に変換。"
 
@@ -17809,7 +17809,7 @@ msgstr "ユーザー名とパスワード"
 msgid "Users"
 msgstr "ユーザー"
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1067
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free, pfree, used, pused。"
 
@@ -18195,6 +18195,10 @@ msgstr "バージョン"
 #: include/classes/items/CHelpItems.php:371
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Zabbixエージェントのバージョン。文字列値を返す。"
+
+#: include/classes/items/CHelpItems.php:1063
+msgid "Version of Zabbix server or proxy"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:50
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:123
@@ -19422,7 +19426,7 @@ msgstr "データの保存期間設定(全体設定)"
 
 #: app/views/monitoring.charts.view.php:132
 msgid "graph pattern"
-msgstr ""
+msgstr "グラフのパターン"
 
 #: include/func.inc.php:598 jsLoader.php:152
 msgctxt "hour short"

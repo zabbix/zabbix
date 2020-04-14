@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 01:45+0300\n"
+"POT-Creation-Date: 2020-04-14 11:24+0300\n"
 "PO-Revision-Date: 2020-02-22 16:52+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -4345,7 +4345,7 @@ msgstr "Панели"
 msgid "Dashed line"
 msgstr "Пунктирная линия"
 
-#: include/classes/items/CHelpItems.php:1067
+#: include/classes/items/CHelpItems.php:1071
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Статистика кэша данных. Кэш - одно из значений (режимы: all, float, uint, str, log, text), history (режимы: pfree, total, used, free), trends (режимы: pfree, total, used, free), text (режимы: pfree, total, used, free)."
 
@@ -7708,7 +7708,7 @@ msgstr "IPMI скрипты можно выполнять только на се
 msgid "IPMI sensor"
 msgstr "IPMI датчик"
 
-#: include/classes/items/CHelpItems.php:1101
+#: include/classes/items/CHelpItems.php:1105
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr "ID датчиков IPMI и другие связанные с датчиками параметры. Возвращает JSON."
 
@@ -14458,19 +14458,19 @@ msgstr "Получение содержимого файла. Возвращае
 msgid "Retry"
 msgstr "Повтор"
 
-#: include/classes/items/CHelpItems.php:1091
+#: include/classes/items/CHelpItems.php:1095
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr "Возвращает JSON массив с LLD макросами, которые описывают MBean объекты и их атрибуты. Можно использовать для LLD."
 
-#: include/classes/items/CHelpItems.php:1095
+#: include/classes/items/CHelpItems.php:1099
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr "Возвращает JSON массив с MBean объектами и их атрибутами. В сравнении с jmx.discovery этот ключ не задает LLD макросы. Можно использовать для LLD."
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1077
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Возвращает первую колонку первой строки результата SQL запрос."
 
-#: include/classes/items/CHelpItems.php:1087
+#: include/classes/items/CHelpItems.php:1091
 msgid "Return value of an attribute of MBean object."
 msgstr "Возвращает значение атрибута MBean объекта."
 
@@ -16853,11 +16853,11 @@ msgstr "Общее количество"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Транзакция не была закрыта. Откат..."
 
-#: include/classes/items/CHelpItems.php:1077
+#: include/classes/items/CHelpItems.php:1081
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr "Преобразование результата SQL запроса в JSON массив для низкоуровневого обнаружения."
 
-#: include/classes/items/CHelpItems.php:1081
+#: include/classes/items/CHelpItems.php:1085
 msgid "Transform SQL query result into a JSON array."
 msgstr "Преобразование результата SQL запроса в JSON массив."
 
@@ -18020,7 +18020,7 @@ msgstr "Имя пользователя и пароль"
 msgid "Users"
 msgstr "Пользователи"
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1067
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика VMware кэша. Возможные режимы: total, free, pfree, used и pused."
 
@@ -18408,6 +18408,10 @@ msgstr "Версия"
 #: include/classes/items/CHelpItems.php:371
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Версия Zabbix агента. Возвращает строку"
+
+#: include/classes/items/CHelpItems.php:1063
+msgid "Version of Zabbix server or proxy"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:50
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:123

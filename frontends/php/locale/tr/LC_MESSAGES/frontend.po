@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 01:45+0300\n"
+"POT-Creation-Date: 2020-04-14 11:24+0300\n"
 "PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -4279,7 +4279,7 @@ msgstr "Panolar"
 msgid "Dashed line"
 msgstr "Kesikli çizgi"
 
-#: include/classes/items/CHelpItems.php:1067
+#: include/classes/items/CHelpItems.php:1071
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Veri önbellek istatistikleri. Önbellek - değerlerden biri (kipler: all, float, uint, str, log, text), geçmiş (kipler: pfree, total, used, free), eğilim (kipler: pfree, total, used, free), metin (kipler: pfree, total, used, free)."
 
@@ -7632,7 +7632,7 @@ msgstr "IPMI betikleri yalnızca sunucu tarafından çalıştırılabilir."
 msgid "IPMI sensor"
 msgstr "IPMI algılayıcısı"
 
-#: include/classes/items/CHelpItems.php:1101
+#: include/classes/items/CHelpItems.php:1105
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
 msgstr ""
 
@@ -14360,19 +14360,19 @@ msgstr "Bir dosyanın içeriği alınıyor. Metin döndürür"
 msgid "Retry"
 msgstr "Tekrar dene"
 
-#: include/classes/items/CHelpItems.php:1091
+#: include/classes/items/CHelpItems.php:1095
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1095
+#: include/classes/items/CHelpItems.php:1099
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1073
+#: include/classes/items/CHelpItems.php:1077
 msgid "Return first column of the first row of the SQL query result."
 msgstr "SQL sorgu sonucunun ilk satırının ilk sütununu döndürür."
 
-#: include/classes/items/CHelpItems.php:1087
+#: include/classes/items/CHelpItems.php:1091
 msgid "Return value of an attribute of MBean object."
 msgstr "Bir MBean nesne özniteliğinin dönüş değeri."
 
@@ -16753,11 +16753,11 @@ msgstr ""
 msgid "Transaction has not been closed. Aborting..."
 msgstr "İşlem kapatılmadı. Durduruluyor..."
 
-#: include/classes/items/CHelpItems.php:1077
+#: include/classes/items/CHelpItems.php:1081
 msgid "Transform SQL query result into a JSON array for low-level discovery."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:1081
+#: include/classes/items/CHelpItems.php:1085
 msgid "Transform SQL query result into a JSON array."
 msgstr ""
 
@@ -17912,7 +17912,7 @@ msgstr "Kullanıcı adı ve parola"
 msgid "Users"
 msgstr "Kullanıcılar"
 
-#: include/classes/items/CHelpItems.php:1063
+#: include/classes/items/CHelpItems.php:1067
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware önbellek istatistikleri. Geçerli kipler: total, free, pfree, used ve pused."
 
@@ -18299,6 +18299,10 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:371
 msgid "Version of Zabbix agent. Returns string"
 msgstr "Zabbix aracısının sürümü. String döndürür"
+
+#: include/classes/items/CHelpItems.php:1063
+msgid "Version of Zabbix server or proxy"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:50
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:123
