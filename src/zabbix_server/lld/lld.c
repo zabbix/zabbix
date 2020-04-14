@@ -588,23 +588,6 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 
 	return ret;
 }
-typedef enum
-{
-	OPERATION_OBJECT_ITEM_PROTOTYPE = 0,
-	OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-	OPERATION_OBJECT_GRAPH_PROTOTYPE,
-	OPERATION_OBJECT_HOST_PROTOTYPE
-}
-zbx_operation_object_t;
-
-typedef enum
-{
-	ZBX_PROTOTYPE_STATUS_CREATE_ENABLED,
-	ZBX_PROTOTYPE_STATUS_CREATE_DISABLED,
-	ZBX_PROTOTYPE_STATUS_NO_CREATE,
-	ZBX_PROTOTYPE_STATUS_COUNT
-}
-zbx_prototype_status_t;
 
 static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
