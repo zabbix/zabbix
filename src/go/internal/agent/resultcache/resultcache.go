@@ -46,6 +46,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"zabbix.com/internal/agent"
@@ -197,7 +198,7 @@ func createTableQuery(table string, id int) string {
 		table, id)
 }
 
-func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
+func Prepare(options *agent.AgentOptions, addresses []string, recreate bool) (err error) {
 	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
 		return errors.New("\"EnablePersistentBuffer\" parameter misconfiguration: \"PersistentBufferFile\" parameter is not set")
 	}
@@ -212,8 +213,17 @@ func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
 	if err != nil {
 		return fmt.Errorf("Cannot open database %s : %s.", options.PersistentBufferFile, err)
 	}
-	defer database.Close()
-	stmt, _ := database.Prepare("CREATE TABLE IF NOT EXISTS registry (id INTEGER PRIMARY KEY,address TEXT,UNIQUE(address))")
+	defer func() {
+		database.Close()
+		if err != nil && recreate == true {
+			os.Remove(options.PersistentBufferFile)
+		}
+
+	}()
+	stmt, err := database.Prepare("CREATE TABLE IF NOT EXISTS registry (id INTEGER PRIMARY KEY,address TEXT,UNIQUE(address))")
+	if err != nil {
+		return err
+	}
 	if _, err = stmt.Exec(); err != nil {
 		return err
 	}

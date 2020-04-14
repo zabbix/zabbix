@@ -51,19 +51,14 @@ type DiskCache struct {
 	persistFlag   uint32
 }
 
-type TableData struct {
-	AgentData
-	write_clock uint64
-}
-
-func (c *DiskCache) resultFetch(rows *sql.Rows) (d *TableData, err error) {
+func (c *DiskCache) resultFetch(rows *sql.Rows) (d *AgentData, err error) {
 	var tmp uint64
 	var LastLogSize int64
-	var data TableData
+	var data AgentData
 	var Mtime, State, EventID, EventSeverity, EventTimestamp int
 	var Value, EventSource string
 
-	err = rows.Scan(&data.Id, &data.write_clock, &data.Itemid, &LastLogSize, &Mtime, &State, &Value, &EventSource, &EventID,
+	err = rows.Scan(&data.Id, &data.Itemid, &LastLogSize, &Mtime, &State, &Value, &EventSource, &EventID,
 		&EventSeverity, &EventTimestamp, &data.Clock, &data.Ns)
 	if err == nil {
 		if LastLogSize != DbVariableNotSet {
@@ -160,21 +155,30 @@ func (c *DiskCache) updateLogRange() (err error) {
 
 func (c *DiskCache) upload(u Uploader) (err error) {
 	var results []*AgentData
-	var result *TableData
+	var result *AgentData
 	var rows *sql.Rows
 	var maxDataId, maxLogId uint64
 
-	if rows, err = c.database.Query(fmt.Sprintf("SELECT * FROM data_%d ORDER BY id LIMIT ?", c.serverID), DataLimit); err != nil {
+	if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
+		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
+		" FROM data_%d ORDER BY id LIMIT ?", c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from data table: %s", err.Error())
 		return
 	}
+	defer func() {
+		if err != nil && (c.lastError == nil || err.Error() != c.lastError.Error()) {
+			c.Warningf("cannot upload history data: %s", err)
+			c.lastError = err
+		}
+	}()
+
 	for rows.Next() {
 		if result, err = c.resultFetch(rows); err != nil {
 			rows.Close()
 			return
 		}
 		result.persistent = false
-		results = append(results, &result.AgentData)
+		results = append(results, result)
 	}
 	if err = rows.Err(); err != nil {
 		return
@@ -185,7 +189,9 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 
 	if dataLen != DataLimit {
-		if rows, err = c.database.Query(fmt.Sprintf("SELECT * FROM log_%d ORDER BY id LIMIT ?", c.serverID),
+		if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
+			"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
+			" FROM log_%d ORDER BY id LIMIT ?", c.serverID),
 			DataLimit-len(results)); err != nil {
 
 			c.Errf("cannot select from log table: %s", err.Error())
@@ -197,7 +203,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 				return
 			}
 			result.persistent = true
-			results = append(results, &result.AgentData)
+			results = append(results, result)
 		}
 		if err = rows.Err(); err != nil {
 			return
@@ -269,7 +275,6 @@ func (c *DiskCache) flushOutput(u Uploader) {
 	}
 
 	if err := c.upload(u); err != nil && u.CanRetry() {
-		c.Warningf("cannot upload history data: %s", err)
 		c.retry = time.AfterFunc(UploadRetryInterval, func() { c.Upload(u) })
 	}
 }
@@ -362,7 +367,8 @@ func (c *DiskCache) write(r *plugin.Result) {
 		_, err = stmt.Exec(c.lastDataID, now, r.Itemid, LastLogsize, Mtime, State, Value,
 			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns)
 		if err != nil {
-			c.Errf("cannot execute SQL statement : %s", err)
+			errmsg := fmt.Sprintf("cannot execute SQL statement : %s", err)
+			panic(errmsg)
 		}
 	}
 }

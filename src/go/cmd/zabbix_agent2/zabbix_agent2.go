@@ -340,8 +340,11 @@ func main() {
 		fatalExit("cannot parse the \"ServerActive\" parameter", err)
 	}
 
-	if err = resultcache.Prepare(&agent.Options, addresses); err != nil {
-		fatalExit("cannot prepare cache", err)
+	if err = resultcache.Prepare(&agent.Options, addresses, true); err != nil {
+		if err = resultcache.Prepare(&agent.Options, addresses, false); err != nil {
+			fatalExit("cannot prepare cache", err)
+
+		}
 	}
 
 	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {
