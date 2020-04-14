@@ -9703,14 +9703,7 @@ char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hos
 			if ('\"' == text[i] && (0 == i || (0 < i && '\\' != text[i - 1]) || 1 == i ||
 					(1 < i && '\\' == text[i - 2])))
 			{
-				if (0 == cur_token_inside_quote)
-				{
-					cur_token_inside_quote = 1;
-				}
-				else
-				{
-					cur_token_inside_quote = 0;
-				}
+				cur_token_inside_quote = 0 == cur_token_inside_quote ? 1 : 0;
 			}
 		}
 
@@ -9741,7 +9734,7 @@ char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hos
 				/* autoquote */
 				tmp = zbx_malloc(NULL, sz + 3);
 				tmp[0] = '\"';
-				zbx_escape_string(tmp+1, sz + 1, value, "\"\\");
+				zbx_escape_string(tmp + 1, sz + 1, value, "\"\\");
 				tmp[sz + 1] = '\"';
 				tmp[sz + 2] = '\0';
 				zbx_free(value);

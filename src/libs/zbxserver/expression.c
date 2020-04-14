@@ -5455,6 +5455,7 @@ out:
  *             error     - [OUT] should be not NULL if                        *
  *                               ZBX_MACRO_NUMERIC flag is set                *
  *             error_len - [IN] the size of error buffer                      *
+ * cur_token_inside_quote - [IN] used in autoquoting for trigger prototypes   *
  *                                                                            *
  * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
  *               if all discovery macros resolved to numeric values,          *
@@ -5462,7 +5463,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t error_len)
+		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t error_len, int cur_token_inside_quote)
 {
 	char	c, *replace_to = NULL;
 	int	ret = SUCCEED, l ,r;
@@ -5591,6 +5592,36 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 		zbx_free(replace_to);
 		replace_to = replace_to_esc;
 	}
+	else if (0 != (flags & ZBX_TOKEN_TRIGGER))
+	{
+		char	*tmp;
+		size_t	sz;
+
+		sz = zbx_get_escape_string_len(replace_to, "\"\\");
+
+		if (0 == cur_token_inside_quote && ZBX_INFINITY == evaluate_string_to_double(replace_to))
+		{
+			/* autoquote */
+			tmp = zbx_malloc(NULL, sz + 3);
+			tmp[0] = '\"';
+			zbx_escape_string(tmp + 1, sz + 1, replace_to, "\"\\");
+			tmp[sz + 1] = '\"';
+			tmp[sz + 2] = '\0';
+			zbx_free(replace_to);
+			replace_to = tmp;
+		}
+		else
+		{
+			if (sz != strlen(replace_to))
+			{
+				tmp = zbx_malloc(NULL, sz + 1);
+				zbx_escape_string(tmp, sz + 1, replace_to, "\"\\");
+				tmp[sz] = '\0';
+				zbx_free(replace_to);
+				replace_to = tmp;
+			}
+		}
+	}
 
 	if (NULL != replace_to)
 	{
@@ -5718,13 +5749,23 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
 int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
 		int flags, char *error, size_t max_error_len)
 {
-	int		ret = SUCCEED, pos = 0;
+	int		ret = SUCCEED, pos = 0, prev_token_loc_r = -1, cur_token_inside_quote = 0;
+	size_t		i;
 	zbx_token_t	token;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
 
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
 	{
+		for (i = prev_token_loc_r + 1; i < token.loc.l; ++i)
+		{
+			if ('\"' == (*data)[i] && (0 == i || (0 < i && '\\' != (*data)[i - 1]) || 1 == i ||
+					(1 < i && '\\' == (*data)[i - 2])))
+			{
+				cur_token_inside_quote = 0 == cur_token_inside_quote ? 1 : 0;
+			}
+		}
+
 		if (0 != (token.type & flags))
 		{
 			switch (token.type)
@@ -5732,7 +5773,7 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 				case ZBX_TOKEN_LLD_MACRO:
 				case ZBX_TOKEN_LLD_FUNC_MACRO:
 					ret = process_lld_macro_token(data, &token, flags, jp_row, lld_macro_paths,
-							error, max_error_len);
+							error, max_error_len, cur_token_inside_quote);
 					pos = token.loc.r;
 					break;
 				case ZBX_TOKEN_USER_MACRO:
@@ -5754,7 +5795,7 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 					break;
 			}
 		}
-
+		prev_token_loc_r = token.loc.r;
 		pos++;
 	}
 
