@@ -1,6 +1,7 @@
 Changes for 5.0.0alpha5
 
 New features:
+..F....PS. [ZBXNEXT-5851] added ability to monitor versions of all other Zabbix servers and proxies with zabbix.stats and zabbix[version] internal items (vso)
 A.F....PS. [ZBXNEXT-2297] added user defined macros creation/edition for host prototypes (gcalenko, MVekslers)
 ........S. [ZBXNEXT-5825,ZBXNEXT-5826] fixed support of Elasticsearch version 7.x (viktors, vjaceslavs, vmurzins)
 ...G...... [ZBXNEXT-5325] added Docker plugin (afayantsev)
