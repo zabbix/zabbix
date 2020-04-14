@@ -1594,7 +1594,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	const zbx_template_item_t	**pitem;
 	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
 					db_insert_opperiod, db_insert_ophistory, db_insert_optrends,
-					db_insert_opseverity, db_insert_optag, db_insert_optemplate;
+					db_insert_opseverity, db_insert_optag, db_insert_optemplate,
+					db_insert_opinventory;
 	zbx_uint64_t			overrideid, override_operationid;
 
 	zbx_vector_uint64_create(&overrideids);
@@ -1682,6 +1683,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 	zbx_db_insert_prepare(&db_insert_optemplate, "lld_override_optemplate", "lld_override_optemplateid",
 				"lld_override_operationid", "templateid", NULL);
+	zbx_db_insert_prepare(&db_insert_opinventory, "lld_override_opinventory", "lld_override_operationid",
+			"inventory_mode", NULL);
 
 	for (i = 0; i < overrides.values_num; i++)
 	{
@@ -1762,6 +1765,12 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 						templateid);
 			}
 
+			if (HOST_INVENTORY_COUNT != override_operation->inventory_mode)
+			{
+				zbx_db_insert_add_values(&db_insert_opinventory, override_operationid,
+						(int)override_operation->inventory_mode);
+			}
+
 			override_operationid++;
 		}
 
@@ -1800,6 +1809,9 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	zbx_db_insert_autoincrement(&db_insert_optemplate, "lld_override_optemplateid");
 	zbx_db_insert_execute(&db_insert_optemplate);
 	zbx_db_insert_clean(&db_insert_optemplate);
+
+	zbx_db_insert_execute(&db_insert_opinventory);
+	zbx_db_insert_clean(&db_insert_opinventory);
 
 	zbx_vector_uint64_destroy(&overrideids);
 	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
