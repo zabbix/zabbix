@@ -1721,7 +1721,7 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 			if (ZBX_PROTOTYPE_STATUS_COUNT != override_operation->status)
 			{
-				zbx_db_insert_add_values(&db_insert_opstatus, override_operationid, overrideid,
+				zbx_db_insert_add_values(&db_insert_opstatus, override_operationid,
 						(int)override_operation->status);
 			}
 
