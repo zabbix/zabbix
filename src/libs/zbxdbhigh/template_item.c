@@ -1596,11 +1596,11 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	lld_override_operation_t	*override_operation;
 	zbx_vector_ptr_t		overrides;
 	zbx_vector_uint64_t		overrideids;
-	int				i, j, count;
+	int				i, j, k, count;
 	const zbx_template_item_t	**pitem;
 	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
 					db_insert_opperiod, db_insert_ophistory, db_insert_optrends,
-					db_insert_opseverity;
+					db_insert_opseverity, db_insert_optag;
 	zbx_uint64_t			overrideid, override_operationid;
 
 	zbx_vector_uint64_create(&overrideids);
@@ -1683,6 +1683,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 	zbx_db_insert_prepare(&db_insert_opseverity, "lld_override_opseverity", "lld_override_operationid", "severity",
 			NULL);
+	zbx_db_insert_prepare(&db_insert_optag, "lld_override_optag", "lld_override_optagid",
+			"lld_override_operationid", "tag", "value", NULL);
 
 	for (i = 0; i < overrides.values_num; i++)
 	{
@@ -1747,6 +1749,14 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 						(int)override_operation->severity);
 			}
 
+			for (k = 0; k < override_operation->trigger_tags.values_num; k++)
+			{
+				zbx_ptr_pair_t	pair = override_operation->trigger_tags.values[k];
+
+				zbx_db_insert_add_values(&db_insert_optag, __UINT64_C(0), override_operationid,
+						pair.first, pair.second);
+			}
+
 			override_operationid++;
 		}
 
@@ -1777,6 +1787,10 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 	zbx_db_insert_execute(&db_insert_opseverity);
 	zbx_db_insert_clean(&db_insert_opseverity);
+
+	zbx_db_insert_autoincrement(&db_insert_optag, "lld_override_optagid");
+	zbx_db_insert_execute(&db_insert_optag);
+	zbx_db_insert_clean(&db_insert_optag);
 
 	zbx_vector_uint64_destroy(&overrideids);
 	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
