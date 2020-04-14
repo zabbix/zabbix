@@ -1612,7 +1612,7 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	zbx_vector_uint64_t		overrideids;
 	int				i, j, count;
 	const zbx_template_item_t	**pitem;
-	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations;
+	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus;
 	zbx_uint64_t			overrideid, override_operationid;
 
 	zbx_vector_uint64_create(&overrideids);
@@ -1684,6 +1684,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	zbx_db_insert_prepare(&db_insert_ooperations, "lld_override_operation", "lld_override_operationid",
 				"lld_overrideid", "operationobject", "operator", "value", NULL);
 
+	zbx_db_insert_prepare(&db_insert_opstatus, "lld_override_opstatus", "lld_override_operationid", "status", NULL);
+
 	for (i = 0; i < overrides.values_num; i++)
 	{
 		zbx_template_item_t	item_local, *pitem_local = &item_local;
@@ -1716,6 +1718,13 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 			zbx_db_insert_add_values(&db_insert_ooperations, override_operationid, overrideid,
 					(int)override_operation->operationtype, (int)override_operation->operator,
 					override_operation->value);
+
+			if (ZBX_PROTOTYPE_STATUS_COUNT != override_operation->status)
+			{
+				zbx_db_insert_add_values(&db_insert_opstatus, override_operationid, overrideid,
+						(int)override_operation->status);
+			}
+
 			override_operationid++;
 		}
 
@@ -1731,6 +1740,9 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 	zbx_db_insert_execute(&db_insert_ooperations);
 	zbx_db_insert_clean(&db_insert_ooperations);
+
+	zbx_db_insert_execute(&db_insert_opstatus);
+	zbx_db_insert_clean(&db_insert_opstatus);
 
 	zbx_vector_uint64_destroy(&overrideids);
 	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
