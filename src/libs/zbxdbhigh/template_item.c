@@ -467,6 +467,23 @@ out:
 	return conditions_num;
 }
 
+static void	update_template_lld_formula(char **formula, zbx_uint64_t id_proto, zbx_uint64_t id)
+{
+	char	srcid[64], dstid[64], *ptr;
+	size_t	pos = 0, len;
+
+	zbx_snprintf(srcid, sizeof(srcid), "{" ZBX_FS_UI64 "}", id_proto);
+	zbx_snprintf(dstid, sizeof(dstid), "{" ZBX_FS_UI64 "}", id);
+
+	len = strlen(srcid);
+
+	while (NULL != (ptr = strstr(*formula + pos, srcid)))
+	{
+		pos = ptr - *formula + len - 1;
+		zbx_replace_string(formula, ptr - *formula, &pos, dstid);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: update_template_lld_rule_formulas                                *
@@ -510,9 +527,6 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 		for (j = 0; j < rule->conditions.values_num; j++)
 		{
 			zbx_uint64_t			id;
-			char				srcid[64], dstid[64], *ptr;
-			size_t				pos = 0, len;
-
 			zbx_lld_rule_condition_t	*condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
 
 			if (j < rule->conditionids.values_num)
@@ -520,16 +534,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 			else
 				id = conditionid++;
 
-			zbx_snprintf(srcid, sizeof(srcid), "{" ZBX_FS_UI64 "}", condition->item_conditionid);
-			zbx_snprintf(dstid, sizeof(dstid), "{" ZBX_FS_UI64 "}", id);
-
-			len = strlen(srcid);
-
-			while (NULL != (ptr = strstr(formula + pos, srcid)))
-			{
-				pos = ptr - formula + len - 1;
-				zbx_replace_string(&formula, ptr - formula, &pos, dstid);
-			}
+			update_template_lld_formula(&formula, condition->item_conditionid, id);
 		}
 
 		zbx_free(item->formula);
@@ -1714,6 +1719,13 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 			zbx_db_insert_add_values(&db_insert_oconditions, override_conditionid, overrideid,
 					(int)override_condition->operator, override_condition->macro,
 					override_condition->value);
+
+			if (CONDITION_EVAL_TYPE_EXPRESSION == override->evaltype)
+			{
+				update_template_lld_formula(&override->formula,
+						override_condition->override_conditionid, override_conditionid);
+			}
+
 			override_conditionid++;
 		}
 
