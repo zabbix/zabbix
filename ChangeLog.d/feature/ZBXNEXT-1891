@@ -1,0 +1,1 @@
+.......PS. [ZBXNEXT-1891] added option 'delay' for zabbix[proxy] internal check and calculate nodata() to respect proxy availability (asestakovs, MVekslers)

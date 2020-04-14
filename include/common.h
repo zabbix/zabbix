@@ -932,11 +932,11 @@ ZBX_TASK_EX;
 
 typedef struct
 {
-	int			values_num;
-	int			period_end;
-#define ZBX_PROXY_SUPPRESS_DISABLE				0x00
-#define ZBX_PROXY_SUPPRESS_ACTIVE				0x01
-#define ZBX_PROXY_SUPPRESS_MORE					0x02
+	int	values_num;
+	int	period_end;
+#define ZBX_PROXY_SUPPRESS_DISABLE	0x00
+#define ZBX_PROXY_SUPPRESS_ACTIVE	0x01
+#define ZBX_PROXY_SUPPRESS_MORE		0x02
 	int	flags;
 }
 zbx_proxy_suppress_t;
