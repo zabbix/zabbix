@@ -1,4 +1,4 @@
-Changes for 5.0.0alpha5
+Changes for 5.0.0beta1
 
 New features:
 ..F....PS. [ZBXNEXT-5851] added ability to monitor versions of all other Zabbix servers and proxies with zabbix.stats and zabbix[version] internal items (vso)
