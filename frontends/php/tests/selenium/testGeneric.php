@@ -42,12 +42,12 @@ class testGeneric extends CLegacyWebTest {
 
 			['zabbix.php?action=problem.view',	'Problems'],
 
-			['charts.php',						'Custom graphs [refreshed every 30 sec.]'],
-			['screens.php',					'Configuration of screens'],
-			['slides.php',						'Configuration of slide shows'],
-			['zabbix.php?action=map.view',							'Configuration of network maps'],
-			['zabbix.php?action=discovery.view',					'Status of discovery'],
-			['srv_status.php',					'Services [refreshed every 30 sec.]'],
+			['zabbix.php?action=charts.view',		'Custom graphs'],
+			['screens.php',							'Configuration of screens'],
+			['slides.php',							'Configuration of slide shows'],
+			['zabbix.php?action=map.view',			'Configuration of network maps'],
+			['zabbix.php?action=discovery.view',	'Status of discovery'],
+			['srv_status.php',						'Services [refreshed every 30 sec.]'],
 
 			// inventory
 			['hostinventoriesoverview.php',	'Host inventory overview'],
@@ -84,7 +84,7 @@ class testGeneric extends CLegacyWebTest {
 			['services.php',					'Configuration of services'],
 
 			// Administration
-			['zabbix.php?action=gui.edit&ddreset=1',	'Configuration of GUI'],
+			['zabbix.php?action=gui.edit',	'Configuration of GUI'],
 			['zabbix.php?action=housekeeping.edit',		'Configuration of housekeeping'],
 			['zabbix.php?action=image.list',	'Configuration of images'],
 			['zabbix.php?action=iconmap.list',	'Configuration of icon mapping'],

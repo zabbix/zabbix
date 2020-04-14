@@ -508,7 +508,14 @@ class CControllerPopupTriggerExpr extends CController {
 									&& in_array($tokens[$key + 1]['value'],
 										$this->functions[$function]['operators'])) {
 								$operator = $tokens[$key + 1]['value'];
-								$value = $tokens[$key + 2]['value'];
+
+								if (array_key_exists($key + 3, $tokens)
+										&& $tokens[$key + 2]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
+									$value = $tokens[$key + 2]['value'].$tokens[$key + 3]['value'];
+								}
+								else {
+									$value = $tokens[$key + 2]['value'];
+								}
 							}
 							else {
 								break;
@@ -584,7 +591,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'value' => $value,
 			'params' => $params,
 			'paramtype' => $param_type,
-			'description' => $description,
+			'item_description' => $description,
 			'functions' => $this->functions,
 			'function' => $function,
 			'operator' => $operator,
@@ -625,7 +632,7 @@ class CControllerPopupTriggerExpr extends CController {
 		// Create and validate trigger expression before inserting it into textarea field.
 		if ($this->getInput('add', false)) {
 			try {
-				if ($data['description']) {
+				if ($data['item_description']) {
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {

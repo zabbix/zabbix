@@ -106,11 +106,6 @@ $widget = (new CWidget())
 			->addItem(new CInput('hidden', 'type', $this->data['type']))
 			->addItem((new CList())
 				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$this->data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
 					new CLabel(_('Hosts location'), 'view_style'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
@@ -120,13 +115,13 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			->addItem(get_icon('overviewhelp')->setHint($help_hint))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]));
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	// filter
 	$widget->addItem(new CPartial('common.filter.trigger', [
 		'filter' => [
@@ -139,8 +134,8 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			'application' => $data['filter']['application'],
 			'inventory' => $data['filter']['inventory'],
 			'show_suppressed' => $data['filter']['show_suppressed'],
-			'hostId' => $data['hostid'],
-			'groupId' => $data['groupid']
+			'groups' => $data['filter']['groups'],
+			'hosts' => $data['filter']['hosts']
 		],
 		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],
@@ -148,14 +143,13 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	]));
 }
 
-// data table
-if ($data['pageFilter']->groupsSelected) {
-	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $data['view_style']);
+if ($data['view_style'] == STYLE_TOP) {
+	$table = new CPartial('trigoverview.table.top', $data);
 }
 else {
-	$dataTable = new CTableInfo();
+	$table = new CPartial('trigoverview.table.left', $data);
 }
 
-$widget->addItem($dataTable);
+$widget->addItem($table);
 
 $widget->show();

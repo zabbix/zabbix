@@ -33,9 +33,11 @@ class CControllerProfileUpdate extends CController {
 		if ($ret) {
 			switch ($this->getInput('idx')) {
 				case 'web.actionconf.filter.active':
+				case 'web.applications.filter.active':
 				case 'web.auditacts.filter.active':
 				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
+				case 'web.charts.filter.active':
 				case 'web.correlation.filter.active':
 				case 'web.dashbrd.filter.active':
 				case 'web.discovery.filter.active':
@@ -43,6 +45,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.graphs.filter.active':
 				case 'web.groups.filter.active':
 				case 'web.hostinventories.filter.active':
+				case 'web.hostinventoriesoverview.filter.active':
 				case 'web.hosts.filter.active':
 				case 'web.hostsmon.filter.active':
 				case 'web.httpconf.filter.active':
@@ -63,6 +66,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
 				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.sidebar.mode':
 				case 'web.slideconf.filter.active':
 				case 'web.slides.filter.active':
 				case 'web.sysmapconf.filter.active':
@@ -73,6 +77,8 @@ class CControllerProfileUpdate extends CController {
 				case 'web.triggers.filter.active':
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
+				case 'web.web.filter.active':
+				case CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY:
 					$ret = true;
 					break;
 
@@ -126,6 +132,10 @@ class CControllerProfileUpdate extends CController {
 
 			case 'web.layout.mode':
 				CViewHelper::saveLayoutMode($value_int);
+				break;
+
+			case 'web.sidebar.mode':
+				CViewHelper::saveSidebarMode($value_int);
 				break;
 
 			default:

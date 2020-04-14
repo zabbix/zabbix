@@ -37,7 +37,7 @@ class testFormMaintenance extends CLegacyWebTest {
 	 * Create maintenance with periods and host group.
 	 */
 	public function testFormMaintenance_Create() {
-		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
 		$this->zbxTestContentControlButtonClickTextWait('Create maintenance period');
@@ -126,7 +126,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$old_hash = CDBHelper::getHash($sql_hash);
 
 		// Open form and change maintenance name.
-		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestClickLinkTextWait($this->name);
 		$this->zbxTestInputTypeOverwrite('mname', 'Some random text');
 
@@ -159,7 +159,7 @@ class testFormMaintenance extends CLegacyWebTest {
 	 * @depends testFormMaintenance_Create
 	 */
 	public function testFormMaintenance_Update() {
-		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
 		$this->zbxTestClickLinkTextWait($this->name);
@@ -212,7 +212,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 	public function testFormMaintenance_UpdateTags() {
 		$maintenance = 'Maintenance for update (data collection)';
-		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
 		$this->zbxTestClickLinkTextWait($maintenance);
@@ -245,7 +245,7 @@ class testFormMaintenance extends CLegacyWebTest {
 	public function testFormMaintenance_Clone() {
 		$suffix = ' (clone)';
 
-		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
 
@@ -271,7 +271,7 @@ class testFormMaintenance extends CLegacyWebTest {
 	 * @depends testFormMaintenance_Create
 	 */
 	public function testFormMaintenance_Delete() {
-		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
 

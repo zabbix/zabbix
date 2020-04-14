@@ -27,7 +27,7 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 
 $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$widget
 		->setTitle(_('Screens'))
 		->setTitleSubmenu([
@@ -57,34 +57,46 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 
 $controls = new CList();
 
-if (check_dynamic_items($data['screen']['screenid'], 0)) {
-	$pageFilter = new CPageFilter([
-		'groups' => [
-			'monitored_hosts' => true,
-			'with_items' => true
-		],
-		'hosts' => [
-			'monitored_hosts' => true,
-			'with_items' => true,
-			'DDFirstLabel' => _('not selected')
-		],
-		'hostid' => getRequest('hostid'),
-		'groupid' => getRequest('groupid')
-	]);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-
+if ($data['has_dynamic_widgets']) {
 	$controls
-		->addItem([
-			new CLabel(_('Group'), 'groupid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$pageFilter->getGroupsCB()
-		])
-		->addItem([
-			new CLabel(_('Host'), 'hostid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$pageFilter->getHostsCB()
-		]);
+		->addItem(new CLabel(_('Host'), 'hostid'))
+		->addItem(
+			(new CMultiSelect([
+				'name' => 'dynamic_hostid',
+				'object_name' => 'hosts',
+				'data' => $data['host'],
+				'multiple' => false,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'hosts',
+						'srcfld1' => 'hostid',
+						'dstfld1' => 'dynamic_hostid',
+						'dstfrm' => 'headerForm',
+						'monitored_hosts' => 1,
+						'with_items' => 1
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		);
+
+	zbx_add_post_js(
+		'jQuery("#dynamic_hostid").on("change", function() {'.
+			'var hosts = jQuery(this).multiSelect("getData"),'.
+				'url = new Curl("screens.php", false);'.
+
+			// Make URL.
+			'url.setArgument("elementid", '.$data['screen']['screenid'].');'.
+			'if (hosts.length) {'.
+				'url.setArgument("hostid", hosts[0].id);'.
+			'}'.
+			'else {'.
+				'url.setArgument("reset", "reset");'.
+			'}'.
+
+			// Push URL change.
+			'return redirect(url.getUrl(), "get", "", false, false);'.
+		'});'
+	);
 }
 
 $controls
@@ -99,7 +111,7 @@ $controls
 			'elid' => $data['screen']['screenid']
 		]
 	))
-	->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]));
+	->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]));
 
 $widget->setControls((new CTag('nav', true, (new CList())
 	->addItem((new CForm('get'))
@@ -113,8 +125,7 @@ $widget->setControls((new CTag('nav', true, (new CList())
 $screenBuilder = new CScreenBuilder([
 	'screenid' => $data['screen']['screenid'],
 	'mode' => SCREEN_MODE_PREVIEW,
-	'groupid' => getRequest('groupid'),
-	'hostid' => getRequest('hostid'),
+	'hostid' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 	'profileIdx' => $data['profileIdx'],
 	'profileIdx2' => $data['profileIdx2'],
 	'from' => $data['from'],

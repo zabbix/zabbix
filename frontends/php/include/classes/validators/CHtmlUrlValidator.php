@@ -90,11 +90,25 @@ class CHtmlUrlValidator {
 			}
 		}
 
-		$url = parse_url($url);
-		$allowed_schemes = explode(',', strtolower(ZBX_URI_VALID_SCHEMES));
+		$url_parts = parse_url($url);
+		if (!$url_parts) {
+			return false;
+		}
 
-		return ($url && ((array_key_exists('scheme', $url) && in_array(strtolower($url['scheme']), $allowed_schemes))
-			|| (array_key_exists('path', $url) && preg_match('/^[a-z_\.]+\.php/i', $url['path']) == 1)
-		));
+		if (array_key_exists('scheme', $url_parts)) {
+			if (!in_array(strtolower($url_parts['scheme']), explode(',', strtolower(ZBX_URI_VALID_SCHEMES)))) {
+				return false;
+			}
+
+			if (array_key_exists('host', $url_parts)) {
+				return true;
+			}
+			else {
+				return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '/');
+			}
+		}
+		else {
+			return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '');
+		}
 	}
 }

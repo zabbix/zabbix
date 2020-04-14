@@ -27,11 +27,13 @@ class CControllerWebView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'groupid' =>	'db hstgrp.groupid',
-			'hostid' =>		'db hosts.hostid',
-			'sort' =>		'in hostname,name',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'page' =>		'ge 1'
+			'filter_groupids' => 'array_id',
+			'filter_hostids'  => 'array_id',
+			'sort'            => 'in hostname,name',
+			'sortorder'       => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'filter_rst'      => 'in 1',
+			'filter_set'      => 'in 1',
+			'page'            => 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,60 +46,76 @@ class CControllerWebView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
-			return false;
-		}
-
-		if ($this->hasInput('groupid') && $this->getInput('groupid') != 0) {
-			$groups = API::HostGroup()->get([
-				'output' => [],
-				'groupids' => [$this->getInput('groupid')]
-			]);
-
-			if (!$groups) {
-				return false;
-			}
-		}
-
-		if ($this->hasInput('hostid') && $this->getInput('hostid') != 0) {
-			$hosts = API::Host()->get([
-				'output' => [],
-				'hostids' => [$this->getInput('hostid')]
-			]);
-
-			if (!$hosts) {
-				return false;
-			}
-		}
-
-		return true;
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
-		$sortField = $this->getInput('sort', CProfile::get('web.httpmon.php.sort', 'name'));
-		$sortOrder = $this->getInput('sortorder', CProfile::get('web.httpmon.php.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.httpmon.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.httpmon.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.httpmon.php.sort', $sortField, PROFILE_TYPE_STR);
-		CProfile::update('web.httpmon.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
+		CProfile::update('web.httpmon.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.httpmon.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		$data = [
-			'sort' => $sortField,
-			'sortorder' => $sortOrder,
-			'page' => $this->getInput('page', 1)
+		if ($this->hasInput('filter_set')) {
+			CProfile::updateArray('web.httpmon.filter.groupids', $this->getInput('filter_groupids', []),
+				PROFILE_TYPE_ID
+			);
+			CProfile::updateArray('web.httpmon.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
+		}
+		else if ($this->hasInput('filter_rst')) {
+			CProfile::deleteIdx('web.httpmon.filter.groupids');
+			CProfile::deleteIdx('web.httpmon.filter.hostids');
+		}
+
+		$data['filter'] = [
+			'groupids' => CProfile::getArray('web.httpmon.filter.groupids', []),
+			'hostids' => CProfile::getArray('web.httpmon.filter.hostids', [])
 		];
 
-		$data['pageFilter'] = new CPageFilter([
-			'groups' => [
+		// Select host groups.
+		$data['filter']['groupids'] = $data['filter']['groupids']
+			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+				'output' => ['name', 'groupid'],
+				'groupids' => $data['filter']['groupids'],
+				'with_httptests' => true,
 				'real_hosts' => true,
-				'with_httptests' => true
-			],
-			'hosts' => [
+				'preservekeys' => true
+			]), ['groupid' => 'id'])
+			: [];
+
+		$filter_groupids = $data['filter']['groupids'] ? array_keys($data['filter']['groupids']) : null;
+		if ($filter_groupids) {
+			$filter_groupids = getSubGroups($filter_groupids);
+		}
+
+		// Select hosts.
+		$data['filter']['hostids'] = $data['filter']['hostids']
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['name', 'hostid'],
+				'hostids' => $data['filter']['hostids'],
 				'with_monitored_items' => true,
-				'with_httptests' => true
-			],
-			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
-			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
-		]);
+				'with_httptests' => true,
+				'preservekeys' => true
+			]), ['hostid' => 'id'])
+			: [];
+
+		$data['screen_view'] = CScreenBuilder::getScreen([
+			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,
+			'mode' => SCREEN_MODE_JS,
+			'dataId' => 'httptest',
+			'page' => $this->getInput('page', 1),
+			'data' => [
+				'sort' => $sort_field,
+				'sortorder' => $sort_order,
+				'groupids' => $filter_groupids,
+				'hostids' => $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null
+			]
+		])->get();
+
+		$data += [
+			'profileIdx' => 'web.web.filter',
+			'active_tab' => CProfile::get('web.web.filter.active', 1)
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Web monitoring'));

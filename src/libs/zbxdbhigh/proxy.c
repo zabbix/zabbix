@@ -782,6 +782,14 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hosts->values, hosts->values_num);
 	}
+	else if (0 == strcmp(table->table, "interface_snmp"))
+	{
+		if (0 == hosts->values_num)
+			goto skip_data;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",interface h where t.interfaceid=h.interfaceid and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.hostid", hosts->values, hosts->values_num);
+	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

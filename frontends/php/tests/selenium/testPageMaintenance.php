@@ -31,7 +31,7 @@ class testPageMaintenance extends CLegacyWebTest {
 	*/
 	public function testPageMaintenance_CheckLayout($maintenance) {
 		$this->zbxTestLogin('maintenance.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 
 		$this->zbxTestCheckHeader('Maintenance periods');
@@ -61,8 +61,8 @@ class testPageMaintenance extends CLegacyWebTest {
 		$sqlTimeperiods = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
 		$oldHashTimeperiods = CDBHelper::getHash($sqlTimeperiods);
 
-		$this->zbxTestLogin('maintenance.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestLogin('maintenance.php');;
+		$this->query('button:Reset')->one()->click();
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
@@ -86,7 +86,7 @@ class testPageMaintenance extends CLegacyWebTest {
 		$maintenanceid = $maintenance['maintenanceid'];
 
 		$this->zbxTestLogin('maintenance.php');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckboxSelect('maintenanceids_'.$maintenanceid);
 		$this->zbxTestClickButton('maintenance.massdelete');

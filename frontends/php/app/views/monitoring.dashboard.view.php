@@ -55,20 +55,28 @@ else {
 	if ($data['dynamic']['has_dynamic_widgets']) {
 		$main_filter_form = (new CForm('get'))
 			->cleanItems()
+			->setAttribute('name', 'dashboard_filter')
 			->setAttribute('aria-label', _('Main filter'))
 			->addVar('action', 'dashboard.view')
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Host'), 'hostid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getHostsCB()
-				])
-		);
+			->addItem([
+				(new CLabel(_('Host'), 'hostid'))->addStyle('margin-right: 5px;'),
+				(new CMultiSelect([
+					'name' => 'dynamic_hostid',
+					'object_name' => 'hosts',
+					'data' => $data['dynamic']['host'],
+					'multiple' => false,
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'hosts',
+							'srcfld1' => 'hostid',
+							'dstfrm' => 'dashboard_filter',
+							'dstfld1' => 'dynamic_hostid',
+							'monitored_hosts' => true,
+							'with_items' => true
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			]);
 	}
 
 	$widget = (new CWidget())
@@ -90,7 +98,7 @@ else {
 						->setAttribute('aria-haspopup', true)
 						->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid']))
 					)
-					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			]))->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem((new CListItem([
@@ -163,6 +171,46 @@ else {
 	}
 	else {
 		$dashboard_options['updated'] = true;
+	}
+
+	if ($data['dynamic']['has_dynamic_widgets']) {
+		(new CScriptTag(
+			// Add event listener to perform dynamic host switch when browser back/previous buttons are pressed.
+			'window.addEventListener("popstate", e => {'.
+				'var data = (e.state && e.state.host) ? [e.state.host] : [];'.
+				'jQuery("#dynamic_hostid").multiSelect("addData", data, false);'.
+				'jQuery(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", data ? data[0] : null);'.
+			'});'.
+
+			// Dynamic host selector on-change handler.
+			'jQuery("#dynamic_hostid").on("change", function() {'.
+				'var hosts = jQuery(this).multiSelect("getData"),'.
+					'host = hosts.length ? hosts[0] : null,'.
+					'url = new Curl("zabbix.php", false);'.
+
+				// Make URL.
+				'url.setArgument("action", "dashboard.view");'.
+				'url.setArgument("dashboardid", '.$data['dashboard']['dashboardid'].');'.
+				($data['show_timeselector']
+					? 'url.setArgument("from", "'.$data['timeline']['from'].'");'.
+						'url.setArgument("to", "'.$data['timeline']['to'].'");'
+					: '').
+
+				'if (host) {'.
+					'url.setArgument("hostid", host.id);'.
+				'}'.
+
+				// Refresh dynamic widgets.
+				'jQuery(".dashbrd-grid-container").dashboardGrid("refreshDynamicWidgets", host);'.
+
+				// Push URL change.
+				'history.pushState({host: host}, "", url.getUrl());'.
+
+				// Update user profile.
+				'var hostid = host ? host.id : 1;'.
+				'updateUserProfile("'.CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY.'", hostid);'.
+			'});'
+		))->show();
 	}
 
 	// Process objects before adding widgets, not to cause dashboard to resize.

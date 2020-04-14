@@ -466,7 +466,7 @@ class testFormAction extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage('Type of calculation');
+			$this->zbxTestTextNotVisible('Type of calculation');
 			$this->zbxTestAssertNotVisibleId('evaltype');
 		}
 
@@ -1347,7 +1347,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->assertEquals('Send message', $operation_details->getField('Operation type')->getValue());
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
 		$this->assertFalse($operation_details->getField('Custom message')->getValue());
-		$this->zbxTestTextNotVisibleOnPage('Subject','Message');
+		$this->zbxTestTextNotVisible(['Subject','Message']);
 		// Set the Custom message option and check Subject and Message fields.
 		$operation_details->getField('Custom message')->set(true);
 		$this->assertEquals(255, $operation_details->getField('Subject')->waitUntilVisible()->getAttribute('maxlength'));
@@ -1772,10 +1772,11 @@ class testFormAction extends CLegacyWebTest {
 // add target host Zabbix server
 		$this->zbxTestClickButtonMultiselect('operation_opcommand_hst_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
+		$this->zbxTestClickButtonMultiselect('popup_host_group');
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+		$this->query('link:Zabbix servers')->one()->waitUntilClickable()->click();
 
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickLinkTextWait('Simple form test host');
-
 // add target group Zabbix servers
 		$this->zbxTestClickButtonMultiselect('operation_opcommand_grp_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');

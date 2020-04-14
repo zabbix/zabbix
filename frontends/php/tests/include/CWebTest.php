@@ -105,12 +105,6 @@ class CWebTest extends CTest {
 		$errors = [];
 		if (self::$shared_page !== null) {
 				foreach (self::$shared_page->getBrowserLog() as $log) {
-					// Workaround for ID duplicates.
-					// TODO: remove workaround after fix ZBX-17220
-					if (strpos($log['message'], 'elements with non-unique id') !== false) {
-						continue;
-					}
-
 					$errors[] = $log['message'];
 				}
 		}
@@ -237,6 +231,8 @@ class CWebTest extends CTest {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		// Reset default fill mode for multiselect elements.
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 		if (!self::$shared_page->cleanup()) {
 			self::closePage();
 		}
