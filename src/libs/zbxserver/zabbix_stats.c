@@ -48,8 +48,6 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 
 	DCget_count_stats_all(&count_stats);
 
-	zbx_json_addstring(json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-
 	/* zabbix[boottime] */
 	zbx_json_adduint64(json, "boottime", CONFIG_SERVER_STARTUP_TIME);
 
@@ -127,6 +125,9 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	}
 
 	zbx_json_close(json);
+
+	/* zabbix[version] */
+	zbx_json_addstring(json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
 	/* zabbix[vmware,buffer,<mode>] */
 	if (SUCCEED == zbx_vmware_get_statistics(&vmware_stats))

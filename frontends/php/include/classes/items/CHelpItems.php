@@ -943,10 +943,6 @@ class CHelpItems {
 			],
 			ITEM_TYPE_INTERNAL => [
 				[
-					'key' => 'zabbix[version]',
-					'description' => _('Version of Zabbix server or proxy')
-				],
-				[
 					'key' => 'zabbix[boottime]',
 					'description' => _('Startup time of Zabbix server, Unix timestamp.')
 				],
@@ -1061,6 +1057,10 @@ class CHelpItems {
 				[
 					'key' => 'zabbix[vcache,cache,<parameter>]',
 					'description' => _('Value cache effectiveness. Valid parameters are: requests, hits and misses.')
+				],
+				[
+					'key' => 'zabbix[version]',
+					'description' => _('Version of Zabbix server or proxy')
 				],
 				[
 					'key' => 'zabbix[vmware,buffer,<mode>]',
