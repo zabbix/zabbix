@@ -1530,8 +1530,6 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			override_operation = (lld_override_operation_t *)zbx_malloc(NULL,
 					sizeof(lld_override_operation_t));
 
-			memset(override_operation, 0, sizeof(lld_override_operation_t));
-
 			zbx_vector_ptr_pair_create(&override_operation->trigger_tags);
 			zbx_hashset_create(&override_operation->templateids, 5, ZBX_DEFAULT_UINT64_HASH_FUNC,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1547,51 +1545,39 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			zbx_vector_ptr_append(&override->override_operations, override_operation);
 		}
 
-		switch (override_operation->operationtype)
+		override_operation->delay = FAIL == DBis_null(row[6]) ? zbx_strdup(NULL, row[6]) :
+				NULL;
+		override_operation->history = FAIL == DBis_null(row[7]) ? zbx_strdup(NULL, row[7]) :
+				NULL;
+		override_operation->trends = FAIL == DBis_null(row[8]) ? zbx_strdup(NULL, row[8]) :
+				NULL;
+		override_operation->severity = FAIL == DBis_null(row[9]) ? (unsigned char)atoi(row[9]) :
+				TRIGGER_SEVERITY_COUNT;
+
+		if (FAIL == DBis_null(row[10]))
 		{
-			case OPERATION_OBJECT_ITEM_PROTOTYPE:
-				override_operation->delay = FAIL == DBis_null(row[6]) ? zbx_strdup(NULL, row[6]) :
-						NULL;
-				override_operation->history = FAIL == DBis_null(row[7]) ? zbx_strdup(NULL, row[7]) :
-						NULL;
-				override_operation->trends = FAIL == DBis_null(row[8]) ? zbx_strdup(NULL, row[8]) :
-						NULL;
-				break;
-			case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-				override_operation->severity = FAIL == DBis_null(row[9]) ? (unsigned char)atoi(row[9]) :
-						TRIGGER_SEVERITY_COUNT;
+			zbx_ptr_pair_t	pair;
 
-				if (FAIL == DBis_null(row[10]))
-				{
-					zbx_ptr_pair_t	pair;
+			pair.first = zbx_strdup(NULL, row[10]);
+			pair.second = zbx_strdup(NULL, row[11]);
 
-					pair.first = zbx_strdup(NULL, row[10]);
-					pair.second = zbx_strdup(NULL, row[11]);
-
-					zbx_vector_ptr_pair_append(&override_operation->trigger_tags, pair);
-				}
-				break;
-			case OPERATION_OBJECT_HOST_PROTOTYPE:
-				if (FAIL == DBis_null(row[12]))
-				{
-					zbx_uint64_t	templateid;
-
-					ZBX_STR2UINT64(templateid, row[12]);
-					if (NULL == zbx_hashset_search(&override_operation->templateids, &templateid))
-					{
-						zbx_hashset_insert(&override_operation->templateids, &templateid,
-								sizeof(templateid));
-					}
-				}
-
-				override_operation->inventory_mode = FAIL == DBis_null(row[13]) ?
-						(unsigned char)atoi(row[13]) : HOST_INVENTORY_COUNT;
-				break;
-			case OPERATION_OBJECT_GRAPH_PROTOTYPE:
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+			zbx_vector_ptr_pair_append(&override_operation->trigger_tags, pair);
 		}
+
+		if (FAIL == DBis_null(row[12]))
+		{
+			zbx_uint64_t	templateid;
+
+			ZBX_STR2UINT64(templateid, row[12]);
+			if (NULL == zbx_hashset_search(&override_operation->templateids, &templateid))
+			{
+				zbx_hashset_insert(&override_operation->templateids, &templateid,
+						sizeof(templateid));
+			}
+		}
+
+		override_operation->inventory_mode = FAIL == DBis_null(row[13]) ?
+				(unsigned char)atoi(row[13]) : HOST_INVENTORY_COUNT;
 	}
 	DBfree_result(result);
 
@@ -1613,7 +1599,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	int				i, j, count;
 	const zbx_template_item_t	**pitem;
 	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
-					db_insert_opperiod, db_insert_ophistory, db_insert_optrends;
+					db_insert_opperiod, db_insert_ophistory, db_insert_optrends,
+					db_insert_opseverity;
 	zbx_uint64_t			overrideid, override_operationid;
 
 	zbx_vector_uint64_create(&overrideids);
@@ -1694,6 +1681,9 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	zbx_db_insert_prepare(&db_insert_optrends, "lld_override_optrends", "lld_override_operationid", "trends",
 			NULL);
 
+	zbx_db_insert_prepare(&db_insert_opseverity, "lld_override_opseverity", "lld_override_operationid", "severity",
+			NULL);
+
 	for (i = 0; i < overrides.values_num; i++)
 	{
 		zbx_template_item_t	item_local, *pitem_local = &item_local;
@@ -1751,6 +1741,12 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 						override_operation->trends);
 			}
 
+			if (TRIGGER_SEVERITY_COUNT != override_operation->severity)
+			{
+				zbx_db_insert_add_values(&db_insert_opseverity, override_operationid,
+						(int)override_operation->severity);
+			}
+
 			override_operationid++;
 		}
 
@@ -1778,6 +1774,9 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 	zbx_db_insert_execute(&db_insert_optrends);
 	zbx_db_insert_clean(&db_insert_optrends);
+
+	zbx_db_insert_execute(&db_insert_opseverity);
+	zbx_db_insert_clean(&db_insert_opseverity);
 
 	zbx_vector_uint64_destroy(&overrideids);
 	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
