@@ -3091,11 +3091,11 @@
 				size_new = getWidgetContentSize(widget);
 
 			if (!isEqualContentSize(size_old, size_new)) {
-			success = doAction('onResizeEnd', $obj, data, widget);
-			if (success) {
-				widget['content_size'] = size_new;
+				success = doAction('onResizeEnd', $obj, data, widget);
+				if (success) {
+					widget['content_size'] = size_new;
+				}
 			}
-		}
 		}
 
 		return success;
@@ -3207,6 +3207,13 @@
 		return triggers.length;
 	}
 
+	/**
+	 * Check if widget is copied.
+	 *
+	 * @param {type} $obj  Dashboard object.
+	 *
+	 * @returns {boolean}
+	 */
 	function isWidgetCopied($obj) {
 		var buffer = $obj.data('dashboardGrid').storage.readKey('dashboard.copied_widget');
 		return (typeof buffer === 'object' && buffer !== null);
@@ -3297,6 +3304,11 @@
 			});
 		},
 
+		/**
+		 * Check if widget is copied.
+		 *
+		 * @returns {boolean}
+		 */
 		isWidgetCopied: function() {
 			var ret = false;
 
@@ -3584,7 +3596,13 @@
 			});
 		},
 
-		// After pressing "Copy" button on widget.
+		/**
+		 * Function to store copied widget into storage handler.
+		 *
+		 * @param {object} widget  Widget object copied.
+		 *
+		 * @returns {jQuery}
+		 */
 		copyWidget: function(widget) {
 			return this.each(function() {
 				var w = {
@@ -3605,8 +3623,10 @@
 		},
 
 		/**
-		 * @param {object} widget  Widget to replace.
-		 * @param {object} pos     Position to paste new widget in.
+		 * Create new widget or replace existing widget in given position.
+		 *
+		 * @param {object} widget  (nullable) Widget to replace.
+		 * @param {object} pos     (nullable) Position to paste new widget in.
 		 *
 		 * @returns {jQuery}
 		 */
