@@ -1612,7 +1612,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	zbx_vector_uint64_t		overrideids;
 	int				i, j, count;
 	const zbx_template_item_t	**pitem;
-	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus;
+	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
+					db_insert_opperiod, db_insert_ophistory, db_insert_optrends;
 	zbx_uint64_t			overrideid, override_operationid;
 
 	zbx_vector_uint64_create(&overrideids);
@@ -1686,6 +1687,13 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 	zbx_db_insert_prepare(&db_insert_opstatus, "lld_override_opstatus", "lld_override_operationid", "status", NULL);
 
+	zbx_db_insert_prepare(&db_insert_opperiod, "lld_override_opperiod", "lld_override_operationid", "delay",
+			NULL);
+	zbx_db_insert_prepare(&db_insert_ophistory, "lld_override_ophistory", "lld_override_operationid", "history",
+			NULL);
+	zbx_db_insert_prepare(&db_insert_optrends, "lld_override_optrends", "lld_override_operationid", "trends",
+			NULL);
+
 	for (i = 0; i < overrides.values_num; i++)
 	{
 		zbx_template_item_t	item_local, *pitem_local = &item_local;
@@ -1725,6 +1733,24 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 						(int)override_operation->status);
 			}
 
+			if (NULL != override_operation->delay)
+			{
+				zbx_db_insert_add_values(&db_insert_opperiod, override_operationid,
+						override_operation->delay);
+			}
+
+			if (NULL != override_operation->history)
+			{
+				zbx_db_insert_add_values(&db_insert_ophistory, override_operationid,
+						override_operation->history);
+			}
+
+			if (NULL != override_operation->trends)
+			{
+				zbx_db_insert_add_values(&db_insert_optrends, override_operationid,
+						override_operation->trends);
+			}
+
 			override_operationid++;
 		}
 
@@ -1743,6 +1769,15 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 	zbx_db_insert_execute(&db_insert_opstatus);
 	zbx_db_insert_clean(&db_insert_opstatus);
+
+	zbx_db_insert_execute(&db_insert_opperiod);
+	zbx_db_insert_clean(&db_insert_opperiod);
+
+	zbx_db_insert_execute(&db_insert_ophistory);
+	zbx_db_insert_clean(&db_insert_ophistory);
+
+	zbx_db_insert_execute(&db_insert_optrends);
+	zbx_db_insert_clean(&db_insert_optrends);
 
 	zbx_vector_uint64_destroy(&overrideids);
 	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
