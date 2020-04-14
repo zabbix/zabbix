@@ -70,7 +70,7 @@ typedef struct
 	unsigned char		severity;
 	unsigned char		inventory_mode;
 	zbx_vector_ptr_pair_t	trigger_tags;
-	zbx_hashset_t		templateids;
+	zbx_vector_uint64_t	templateids;
 
 }
 lld_override_operation_t;
@@ -657,11 +657,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			override_operation = (lld_override_operation_t *)zbx_malloc(NULL,
 					sizeof(lld_override_operation_t));
 
-			memset(override_operation, 0, sizeof(lld_override_operation_t));
-
 			zbx_vector_ptr_pair_create(&override_operation->trigger_tags);
-			zbx_hashset_create(&override_operation->templateids, 5, ZBX_DEFAULT_UINT64_HASH_FUNC,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_create(&override_operation->templateids);
 
 			override_operation->override_operationid = override_operationid;
 			override_operation->operationtype = (unsigned char)atoi(row[2]);
@@ -674,51 +671,35 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			zbx_vector_ptr_append(&override->override_operations, override_operation);
 		}
 
-		switch (override_operation->operationtype)
+		override_operation->delay = FAIL == DBis_null(row[6]) ? zbx_strdup(NULL, row[6]) :
+				NULL;
+		override_operation->history = FAIL == DBis_null(row[7]) ? zbx_strdup(NULL, row[7]) :
+				NULL;
+		override_operation->trends = FAIL == DBis_null(row[8]) ? zbx_strdup(NULL, row[8]) :
+				NULL;
+		override_operation->severity = FAIL == DBis_null(row[9]) ? (unsigned char)atoi(row[9]) :
+				TRIGGER_SEVERITY_COUNT;
+
+		if (FAIL == DBis_null(row[10]))
 		{
-			case OPERATION_OBJECT_ITEM_PROTOTYPE:
-				override_operation->delay = FAIL == DBis_null(row[6]) ? zbx_strdup(NULL, row[6]) :
-						NULL;
-				override_operation->history = FAIL == DBis_null(row[7]) ? zbx_strdup(NULL, row[7]) :
-						NULL;
-				override_operation->trends = FAIL == DBis_null(row[8]) ? zbx_strdup(NULL, row[8]) :
-						NULL;
-				break;
-			case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-				override_operation->severity = FAIL == DBis_null(row[9]) ? (unsigned char)atoi(row[9]) :
-						TRIGGER_SEVERITY_COUNT;
+			zbx_ptr_pair_t	pair;
 
-				if (FAIL == DBis_null(row[10]))
-				{
-					zbx_ptr_pair_t	pair;
+			pair.first = zbx_strdup(NULL, row[10]);
+			pair.second = zbx_strdup(NULL, row[11]);
 
-					pair.first = zbx_strdup(NULL, row[10]);
-					pair.second = zbx_strdup(NULL, row[11]);
-
-					zbx_vector_ptr_pair_append(&override_operation->trigger_tags, pair);
-				}
-				break;
-			case OPERATION_OBJECT_HOST_PROTOTYPE:
-				if (FAIL == DBis_null(row[12]))
-				{
-					zbx_uint64_t	templateid;
-
-					ZBX_STR2UINT64(templateid, row[12]);
-					if (NULL == zbx_hashset_search(&override_operation->templateids, &templateid))
-					{
-						zbx_hashset_insert(&override_operation->templateids, &templateid,
-								sizeof(templateid));
-					}
-				}
-
-				override_operation->inventory_mode = FAIL == DBis_null(row[13]) ?
-						(unsigned char)atoi(row[13]) : HOST_INVENTORY_COUNT;
-				break;
-			case OPERATION_OBJECT_GRAPH_PROTOTYPE:
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+			zbx_vector_ptr_pair_append(&override_operation->trigger_tags, pair);
 		}
+
+		if (FAIL == DBis_null(row[12]))
+		{
+			zbx_uint64_t	templateid;
+
+			ZBX_STR2UINT64(templateid, row[12]);
+			zbx_vector_uint64_append(&override_operation->templateids, templateid);
+		}
+
+		override_operation->inventory_mode = FAIL == DBis_null(row[13]) ?
+				(unsigned char)atoi(row[13]) : HOST_INVENTORY_COUNT;
 	}
 	DBfree_result(result);
 
@@ -743,7 +724,7 @@ static void	lld_override_operation_free(lld_override_operation_t *override_opera
 	}
 	zbx_vector_ptr_pair_destroy(&override_operation->trigger_tags);
 
-	zbx_hashset_destroy(&override_operation->templateids);
+	zbx_vector_uint64_destroy(&override_operation->templateids);
 
 	zbx_free(override_operation->value);
 
@@ -757,8 +738,6 @@ static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
 {
 	int			i;
 	lld_override_t		*override;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		*templateid;
 
 	for (i = 0; i < overrides->values_num; i++)
 	{
@@ -794,9 +773,11 @@ static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
 						(char *)override_operation->trigger_tags.values[k].second);
 			}
 
-			zbx_hashset_iter_reset(&override_operation->templateids, &iter);
-			while (NULL != (templateid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
-				zabbix_log(LOG_LEVEL_TRACE, "    templateid: " ZBX_FS_UI64, *templateid);
+			for (k = 0; k < override_operation->templateids.values_num; k++)
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "    templateid: " ZBX_FS_UI64,
+						override_operation->templateids.values[k]);
+			}
 		}
 	}
 }
@@ -1046,7 +1027,7 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_vector_uint64_t *lnk_templateids,
 		char *inventory_mode, unsigned char *status)
 {
-	int	i, j;
+	int	i, j, k;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1059,8 +1040,6 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
 			lld_override_operation_t	*override_operation;
-			zbx_hashset_iter_t		iter;
-			zbx_uint64_t			*templateid;
 
 			override_operation = override->override_operations.values[j];
 
@@ -1080,9 +1059,8 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s():SUCCEED", __func__);
 
-			zbx_hashset_iter_reset(&override_operation->templateids, &iter);
-			while (NULL != (templateid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
-				zbx_vector_uint64_append(lnk_templateids, *templateid);
+			for (k = 0; k < override_operation->templateids.values_num; k++)
+				zbx_vector_uint64_append(lnk_templateids, override_operation->templateids.values[k]);
 
 			if (HOST_INVENTORY_COUNT != override_operation->inventory_mode)
 				*inventory_mode = override_operation->inventory_mode;

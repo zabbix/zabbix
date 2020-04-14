@@ -1759,10 +1759,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 
 			for (k = 0; k < override_operation->templateids.values_num; k++)
 			{
-				zbx_uint64_t	templateid = override_operation->templateids.values[k];
-
 				zbx_db_insert_add_values(&db_insert_optemplate, __UINT64_C(0), override_operationid,
-						templateid);
+						override_operation->templateids.values[k]);
 			}
 
 			if (HOST_INVENTORY_COUNT != override_operation->inventory_mode)
