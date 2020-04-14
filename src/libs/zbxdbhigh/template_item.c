@@ -1385,26 +1385,28 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	DB_RESULT			result;
 	DB_ROW				row;
 	lld_override_t			*override;
+	lld_override_codition_t		*override_condition;
 	zbx_vector_ptr_t		overrides;
 	zbx_vector_uint64_t		overrideids;
-	int				i;
+	int				i, j;
 	const zbx_template_item_t	**pitem;
-	zbx_db_insert_t			db_insert;
+	zbx_db_insert_t			db_insert, db_insert_oconditions;
+	zbx_uint64_t			overrideid;
 
 	zbx_vector_uint64_create(&overrideids);
 	zbx_vector_ptr_create(&overrides);
 
-	/* remove old lld rules overrides */
+	/* remove overrides from existing items with same key */
 	if (0 != lld_itemids->values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_override where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
 				lld_itemids->values_num);
 		DBexecute("%s", sql);
-		sql_offset = 0;
 	}
 
 	/* read overrides from templates that should be linked */
+	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select l.lld_overrideid,l.itemid,l.name,l.step,l.evaltype,l.formula,l.stop"
 			" from lld_override l,items i"
@@ -1438,24 +1440,23 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 			"select lld_overrideid,operator,macro,value"
 				" from lld_override_condition"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "lld_overrideid", overrideids.values, overrideids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "lld_overrideid", overrideids.values,
+				overrideids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by lld_overrideid");
 
 		result = DBselect("%s", sql);
 		while (NULL != (row = DBfetch(result)))
 		{
-			lld_override_codition_t	*override_condition;
-			zbx_uint64_t		overrideid;
-
 			ZBX_STR2UINT64(overrideid, row[0]);
 
-			if (FAIL == (i = zbx_vector_ptr_bsearch(&overrides, &overrideid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (i = zbx_vector_ptr_bsearch(&overrides, &overrideid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
-			override = overrides.values[i];
+			override = (lld_override_t *)overrides.values[i];
 
 			override_condition = (lld_override_codition_t *)zbx_malloc(NULL, sizeof(lld_override_codition_t));
 			override_condition->operator = (unsigned char)atoi(row[1]);
@@ -1468,8 +1469,13 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	}
 	zbx_free(sql);
 
+	overrideid = DBget_maxid_num("lld_override", overrides.values_num);
 	zbx_db_insert_prepare(&db_insert, "lld_override", "lld_overrideid", "itemid", "name", "step", "evaltype",
 			"formula", NULL);
+
+	zbx_db_insert_prepare(&db_insert_oconditions, "lld_override_condition", "lld_override_conditionid",
+			"lld_overrideid", "operator", "macro", "value", NULL);
+
 	for (i = 0; i < overrides.values_num; i++)
 	{
 		zbx_template_item_t	item_local, *pitem_local = &item_local;
@@ -1483,13 +1489,27 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 			continue;
 		}
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), (*pitem)->itemid, override->name, override->step,
+		zbx_db_insert_add_values(&db_insert, overrideid, (*pitem)->itemid, override->name, override->step,
 				override->evaltype, override->formula);
+
+		for (j = 0; j < override->override_conditions.values_num; j++)
+		{
+			override_condition = (lld_override_codition_t *)override->override_conditions.values[j];
+
+			zbx_db_insert_add_values(&db_insert_oconditions, __UINT64_C(0), overrideid,
+					override_condition->operator, override_condition->macro,
+					override_condition->value);
+		}
+
+		overrideid++;
 	}
 
-	zbx_db_insert_autoincrement(&db_insert, "lld_overrideid");
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
+
+	zbx_db_insert_autoincrement(&db_insert_oconditions, "lld_override_conditionid");
+	zbx_db_insert_execute(&db_insert_oconditions);
+	zbx_db_insert_clean(&db_insert_oconditions);
 
 	zbx_vector_uint64_destroy(&overrideids);
 	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
