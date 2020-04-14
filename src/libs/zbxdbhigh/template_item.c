@@ -123,6 +123,7 @@ lld_override_t;
 
 typedef struct
 {
+	zbx_uint64_t		override_conditionid;
 	char			*macro;
 	char			*value;
 	unsigned char		operator;
@@ -1430,12 +1431,11 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 	lld_override_codition_t	*override_condition;
 
 	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset,
-		"select lld_overrideid,operator,macro,value"
+		"select lld_overrideid,lld_override_conditionid,operator,macro,value"
 			" from lld_override_condition"
 			" where");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "lld_overrideid", overrideids->values,
 			overrideids->values_num);
-	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by lld_overrideid");
 
 	result = DBselect("%s", *sql);
 	while (NULL != (row = DBfetch(result)))
@@ -1452,9 +1452,10 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 		override = (lld_override_t *)overrides->values[i];
 
 		override_condition = (lld_override_codition_t *)zbx_malloc(NULL, sizeof(lld_override_codition_t));
-		override_condition->operator = (unsigned char)atoi(row[1]);
-		override_condition->macro = zbx_strdup(NULL, row[2]);
-		override_condition->value = zbx_strdup(NULL, row[3]);
+		ZBX_STR2UINT64(override_condition->override_conditionid, row[1]);
+		override_condition->operator = (unsigned char)atoi(row[2]);
+		override_condition->macro = zbx_strdup(NULL, row[3]);
+		override_condition->value = zbx_strdup(NULL, row[4]);
 
 		zbx_vector_ptr_append(&override->override_conditions, override_condition);
 	}
@@ -1590,13 +1591,13 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	lld_override_operation_t	*override_operation;
 	zbx_vector_ptr_t		overrides;
 	zbx_vector_uint64_t		overrideids;
-	int				i, j, k, count;
+	int				i, j, k, conditions_num, operations_num;
 	const zbx_template_item_t	**pitem;
 	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
 					db_insert_opperiod, db_insert_ophistory, db_insert_optrends,
 					db_insert_opseverity, db_insert_optag, db_insert_optemplate,
 					db_insert_opinventory;
-	zbx_uint64_t			overrideid, override_operationid;
+	zbx_uint64_t			overrideid, override_operationid, override_conditionid;
 
 	zbx_vector_uint64_create(&overrideids);
 	zbx_vector_ptr_create(&overrides);
@@ -1655,14 +1656,18 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	zbx_db_insert_prepare(&db_insert_oconditions, "lld_override_condition", "lld_override_conditionid",
 			"lld_overrideid", "operator", "macro", "value", NULL);
 
-	for (i = 0, count = 0; i < overrides.values_num; i++)
+	for (i = 0, operations_num = 0, conditions_num = 0; i < overrides.values_num; i++)
 	{
 		override = (lld_override_t *)overrides.values[i];
-		count += override->override_operations.values_num;
+		operations_num += override->override_operations.values_num;
+		conditions_num += override->override_conditions.values_num;
 	}
 
-	if (0 != count)
-		override_operationid = DBget_maxid_num("lld_override_operation", count);
+	if (0 != operations_num)
+		override_operationid = DBget_maxid_num("lld_override_operation", operations_num);
+
+	if (0 != conditions_num)
+		override_conditionid = DBget_maxid_num("lld_override_condition", conditions_num);
 
 	zbx_db_insert_prepare(&db_insert_ooperations, "lld_override_operation", "lld_override_operationid",
 				"lld_overrideid", "operationobject", "operator", "value", NULL);
@@ -1706,9 +1711,10 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		{
 			override_condition = (lld_override_codition_t *)override->override_conditions.values[j];
 
-			zbx_db_insert_add_values(&db_insert_oconditions, __UINT64_C(0), overrideid,
+			zbx_db_insert_add_values(&db_insert_oconditions, override_conditionid, overrideid,
 					(int)override_condition->operator, override_condition->macro,
 					override_condition->value);
+			override_conditionid++;
 		}
 
 		for (j = 0; j < override->override_operations.values_num; j++)
@@ -1778,7 +1784,6 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	zbx_db_insert_autoincrement(&db_insert_oconditions, "lld_override_conditionid");
 	zbx_db_insert_execute(&db_insert_oconditions);
 	zbx_db_insert_clean(&db_insert_oconditions);
 
