@@ -367,9 +367,11 @@ func (c *DiskCache) write(r *plugin.Result) {
 		_, err = stmt.Exec(c.lastDataID, now, r.Itemid, LastLogsize, Mtime, State, Value,
 			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns)
 		if err != nil {
-			errmsg := fmt.Sprintf("cannot execute SQL statement : %s", err)
-			panic(errmsg)
+			c.Errf("cannot execute SQL statement : %s", err)
 		}
+	}
+	if err != nil {
+		panic(err)
 	}
 }
 

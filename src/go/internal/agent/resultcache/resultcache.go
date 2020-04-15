@@ -198,28 +198,14 @@ func createTableQuery(table string, id int) string {
 		table, id)
 }
 
-func Prepare(options *agent.AgentOptions, addresses []string, recreate bool) (err error) {
-	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
-		return errors.New("\"EnablePersistentBuffer\" parameter misconfiguration: \"PersistentBufferFile\" parameter is not set")
-	}
-	if options.EnablePersistentBuffer == 0 {
-		if options.PersistentBufferFile != "" {
-			return errors.New("\"PersistentBufferFile\" parameter is not empty but \"EnablePersistentBuffer\" is not set")
-		}
-		return
-	}
+func prepareDiskCache(options *agent.AgentOptions, addresses []string) (err error) {
 	var database *sql.DB
 	database, err = sql.Open("sqlite3", options.PersistentBufferFile)
 	if err != nil {
 		return fmt.Errorf("Cannot open database %s : %s.", options.PersistentBufferFile, err)
 	}
-	defer func() {
-		database.Close()
-		if err != nil && recreate == true {
-			os.Remove(options.PersistentBufferFile)
-		}
+	defer database.Close()
 
-	}()
 	stmt, err := database.Prepare("CREATE TABLE IF NOT EXISTS registry (id INTEGER PRIMARY KEY,address TEXT,UNIQUE(address))")
 	if err != nil {
 		return err
@@ -311,5 +297,24 @@ addressCheck:
 		}
 	}
 	return nil
+}
 
+func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
+	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
+		return errors.New("\"EnablePersistentBuffer\" parameter misconfiguration: \"PersistentBufferFile\" parameter is not set")
+	}
+	if options.EnablePersistentBuffer == 0 {
+		if options.PersistentBufferFile != "" {
+			return errors.New("\"PersistentBufferFile\" parameter is not empty but \"EnablePersistentBuffer\" is not set")
+		}
+		return
+	}
+
+	if err = prepareDiskCache(options, addresses); err != nil {
+		if err = os.Remove(options.PersistentBufferFile); err != nil {
+			return
+		}
+		err = prepareDiskCache(options, addresses)
+	}
+	return
 }
