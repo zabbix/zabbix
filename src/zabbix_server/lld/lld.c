@@ -82,7 +82,6 @@ typedef struct
 	unsigned char		status;
 	unsigned char		severity;
 	unsigned char		inventory_mode;
-
 }
 lld_override_operation_t;
 
