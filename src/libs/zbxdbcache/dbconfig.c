@@ -9698,12 +9698,17 @@ char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hos
 
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
-		for (i = prev_token_loc_r + 1; i < token.loc.l; ++i)
+		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
 		{
-			if ('\"' == text[i] && (0 == i || (0 < i && '\\' != text[i - 1]) || 1 == i ||
-					(1 < i && '\\' == text[i - 2])))
+			switch (text[i])
 			{
-				cur_token_inside_quote = 0 == cur_token_inside_quote ? 1 : 0;
+				case '\\':
+					if (0 != cur_token_inside_quote)
+						i++;
+					break;
+				case '"':
+					cur_token_inside_quote = !cur_token_inside_quote;
+					break;
 			}
 		}
 

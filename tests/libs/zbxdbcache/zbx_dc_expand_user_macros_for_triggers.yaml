@@ -187,4 +187,13 @@ in:
   expression: '{2000} < {$A}'
 out:
   expression: '{2000} < 2000'
+---
+test case: Expand '{1} < "\\\"a\"" and {1} = {$A}' with {$A}="b"
+in:
+  macros:
+    - name: '{$A}'
+      value: 'b'
+  expression: '{1} < "\\\"a\"" and {1} = {$A}'
+out:
+  expression: '{1} < "\\\"a\"" and {1} = "b"'
 ...
