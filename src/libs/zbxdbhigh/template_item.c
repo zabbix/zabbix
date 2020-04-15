@@ -1966,8 +1966,11 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	zbx_hashset_create(&lld_items, items.values_num, template_item_hash_func, template_item_compare_func);
 
 	prepare_lld_items(&items, &lld_itemids, &lld_items);
-	copy_template_lld_macro_paths(templateids, &lld_itemids, &lld_items);
-	copy_template_lld_overrides(templateids, &lld_itemids, &lld_items);
+	if (0 != lld_items.num_data)
+	{
+		copy_template_lld_macro_paths(templateids, &lld_itemids, &lld_items);
+		copy_template_lld_overrides(templateids, &lld_itemids, &lld_items);
+	}
 
 	zbx_hashset_destroy(&lld_items);
 	zbx_vector_uint64_destroy(&lld_itemids);

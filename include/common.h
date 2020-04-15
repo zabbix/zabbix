@@ -574,6 +574,15 @@ typedef enum
 }
 zbx_maintenance_type_t;
 
+typedef enum
+{
+	ZBX_PROTOTYPE_STATUS_CREATE_ENABLED,
+	ZBX_PROTOTYPE_STATUS_CREATE_DISABLED,
+	ZBX_PROTOTYPE_STATUS_NO_CREATE,
+	ZBX_PROTOTYPE_STATUS_COUNT
+}
+zbx_prototype_status_t;
+
 /* regular expressions */
 #define EXPRESSION_TYPE_INCLUDED	0
 #define EXPRESSION_TYPE_ANY_INCLUDED	1
@@ -710,15 +719,6 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define OPERATION_TYPE_HOST_INVENTORY	10
 #define OPERATION_TYPE_RECOVERY_MESSAGE	11
 #define OPERATION_TYPE_ACK_MESSAGE	12
-
-typedef enum
-{
-	ZBX_PROTOTYPE_STATUS_CREATE_ENABLED,
-	ZBX_PROTOTYPE_STATUS_CREATE_DISABLED,
-	ZBX_PROTOTYPE_STATUS_NO_CREATE,
-	ZBX_PROTOTYPE_STATUS_COUNT
-}
-zbx_prototype_status_t;
 
 /* normal and recovery operations */
 #define ZBX_OPERATION_MODE_NORMAL	0
