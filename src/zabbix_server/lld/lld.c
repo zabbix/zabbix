@@ -35,6 +35,8 @@ typedef enum
 }
 zbx_operation_object_t;
 
+#define OVERRIDE_STOP_TRUE	1
+
 /* lld rule filter condition (item_condition table record) */
 typedef struct
 {
@@ -891,15 +893,15 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 
 	for (i = 0; i < overrides->values_num; i++)
 	{
-		lld_override_t	*override;
+		const lld_override_t	*override;
 
-		override = overrides->values[i];
+		override = (const lld_override_t *)overrides->values[i];
 
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
-			lld_override_operation_t	*override_operation;
+			const lld_override_operation_t	*override_operation;
 
-			override_operation = override->override_operations.values[j];
+			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
 			if (OPERATION_OBJECT_ITEM_PROTOTYPE != override_operation->operationtype)
 				continue;
@@ -972,15 +974,15 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 
 	for (i = 0; i < overrides->values_num; i++)
 	{
-		lld_override_t	*override;
+		const lld_override_t	*override;
 
-		override = overrides->values[i];
+		override = (const lld_override_t *)overrides->values[i];
 
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
-			lld_override_operation_t	*override_operation;
+			const lld_override_operation_t	*override_operation;
 
-			override_operation = override->override_operations.values[j];
+			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
 			if (OPERATION_OBJECT_TRIGGER_PROTOTYPE != override_operation->operationtype)
 				continue;
@@ -1040,15 +1042,15 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 
 	for (i = 0; i < overrides->values_num; i++)
 	{
-		lld_override_t	*override;
+		const lld_override_t	*override;
 
-		override = overrides->values[i];
+		override = (const lld_override_t *)overrides->values[i];
 
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
-			lld_override_operation_t	*override_operation;
+			const lld_override_operation_t	*override_operation;
 
-			override_operation = override->override_operations.values[j];
+			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
 			if (OPERATION_OBJECT_HOST_PROTOTYPE != override_operation->operationtype)
 				continue;
@@ -1105,15 +1107,15 @@ void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, uns
 
 	for (i = 0; i < overrides->values_num; i++)
 	{
-		lld_override_t	*override;
+		const lld_override_t	*override;
 
-		override = overrides->values[i];
+		override = (const lld_override_t *)overrides->values[i];
 
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
-			lld_override_operation_t	*override_operation;
+			const lld_override_operation_t	*override_operation;
 
-			override_operation = override->override_operations.values[j];
+			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
 			if (OPERATION_OBJECT_GRAPH_PROTOTYPE != override_operation->operationtype)
 				continue;
@@ -1152,8 +1154,6 @@ void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, uns
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
-#define OVERRIDE_STOP_TRUE	1
 
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, const zbx_vector_ptr_t	*overrides, char **info, char **error)
