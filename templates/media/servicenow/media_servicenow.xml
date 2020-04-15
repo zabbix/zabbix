@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-10T04:56:38Z</date>
+    <date>2020-04-15T03:37:22Z</date>
     <media_types>
         <media_type>
             <name>ServiceNow</name>
@@ -49,7 +49,7 @@
                 </parameter>
                 <parameter>
                     <name>servicenow_password</name>
-                    <value>&lt;PASSWORD&gt;</value>
+                    <value>&lt;PLACE PASSWORD HERE&gt;</value>
                 </parameter>
                 <parameter>
                     <name>servicenow_sys_id</name>
@@ -61,7 +61,7 @@
                 </parameter>
                 <parameter>
                     <name>servicenow_user</name>
-                    <value>&lt;USERNAME&gt;</value>
+                    <value>&lt;PLACE USERNAME HERE&gt;</value>
                 </parameter>
                 <parameter>
                     <name>trigger_description</name>
@@ -208,11 +208,12 @@
 &#13;
             throw message + ' Check debug log for more information.';&#13;
         }&#13;
-&#13;
-        return {&#13;
-            status: request.Status(),&#13;
-            response: response&#13;
-        };&#13;
+        else if (typeof response.result !== 'object' || typeof response.result.sys_id === 'undefined') {&#13;
+            throw 'Cannot create ServiceNow incident. Check debug log for more information.';&#13;
+        }&#13;
+        else {&#13;
+            return response.result;&#13;
+        }&#13;
     }&#13;
 };&#13;
 &#13;
@@ -224,13 +225,8 @@ try {&#13;
         data = {},&#13;
         result = {tags: {}},&#13;
         required_params = [&#13;
-            'alert_subject',&#13;
-            'alert_message',&#13;
-            'event_source',&#13;
-            'event_value',&#13;
-            'event_update_status',&#13;
-            'event_recovery_value',&#13;
-            'event_nseverity'&#13;
+            'alert_subject', 'alert_message', 'event_source', 'event_value',&#13;
+            'event_update_status', 'event_recovery_value', 'event_nseverity'&#13;
         ],&#13;
         severities = [&#13;
             {name: 'not_classified', color: '#97AAB3'},&#13;
@@ -242,7 +238,8 @@ try {&#13;
             {name: 'resolved', color: '#009900'},&#13;
             {name: 'default', color: '#000000'}&#13;
         ],&#13;
-        method = 'post';&#13;
+        method = 'post',&#13;
+        process_tags = true;&#13;
 &#13;
     Object.keys(params)&#13;
         .forEach(function (key) {&#13;
@@ -298,24 +295,29 @@ try {&#13;
 &#13;
     if (params.event_source === '0') {&#13;
         if (params.event_value === '1' &amp;&amp; update.status === '0') {&#13;
-            data.description = (Object.keys(fields).length ? params.trigger_description : data.description);&#13;
+            data.description = Object.keys(fields).length ? params.trigger_description : data.description;&#13;
         }&#13;
         else {&#13;
+            process_tags = false;&#13;
             method = 'put';&#13;
             delete data.description;&#13;
             delete data.urgency;&#13;
             ServiceNow.params.url += '/' + params.servicenow_sys_id;&#13;
-            ServiceNow.setComment(data,&#13;
-                ((params.event_value === '0' &amp;&amp; !Object.keys(fields).length) ? params.alert_message : update));&#13;
+            ServiceNow.setComment(data, (params.event_value === '0' &amp;&amp; !Object.keys(fields).length)&#13;
+                ? params.alert_message&#13;
+                : update&#13;
+            );&#13;
         }&#13;
     }&#13;
 &#13;
-    var response = (ServiceNow.request(method, data)).response.result;&#13;
+    var response = ServiceNow.request(method, data);&#13;
 &#13;
-    result.tags.__zbx_servicenow_sys_id = response.sys_id;&#13;
-    result.tags.__zbx_servicenow_link = params.servicenow_url +&#13;
-        (params.servicenow_url.endsWith('/') ? '' : '/') + '/incident.do?sys_id=' + response.sys_id;&#13;
-    result.tags.__zbx_servicenow_number = response.number;&#13;
+    if (process_tags) {&#13;
+        result.tags.__zbx_servicenow_sys_id = response.sys_id;&#13;
+        result.tags.__zbx_servicenow_link = params.servicenow_url +&#13;
+            (params.servicenow_url.endsWith('/') ? '' : '/') + '/incident.do?sys_id=' + response.sys_id;&#13;
+        result.tags.__zbx_servicenow_number = response.number;&#13;
+    }&#13;
 &#13;
     return JSON.stringify(result);&#13;
 }&#13;
