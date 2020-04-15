@@ -36,6 +36,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	public function get(array $options) {
 		$hosts_fields = array_keys($this->getTableSchema('hosts')['fields']);
+		$output_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode'];
 		$link_fields = ['group_prototypeid', 'groupid', 'hostid', 'templateid'];
 		$group_fields = ['group_prototypeid', 'name', 'hostid', 'templateid'];
 		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
@@ -62,7 +63,7 @@ class CHostPrototype extends CHostBase {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => 'inventory_mode,'.implode(',', $hosts_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => 'inventory_mode,'.implode(',', $output_fields), 'default' => $output_fields],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
 			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $link_fields), 'default' => null],
@@ -86,6 +87,10 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $output_fields;
+		}
 
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
