@@ -132,6 +132,7 @@ in:
   expression: '{1} < "\"{$A}\"{$B}\""'
 out:
   expression: '{1} < "\"\\\"\"\\\""'
+---
 test case: Expand '{1} < " \" {$A}  \"  {$B}  \"  " and {$A}<>"\"{$B}" and " {$A} " = " {$A} "' with {$A}=",'{$B}'=\\
 in:
   macros:

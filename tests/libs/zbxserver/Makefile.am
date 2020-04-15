@@ -1,7 +1,8 @@
 if SERVER
 SERVER_tests = \
 	get_trigger_expression_constant \
-	evaluate_function
+	evaluate_function \
+	substitute_lld_macros
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -88,6 +89,19 @@ get_trigger_expression_constant_LDFLAGS = @SERVER_LDFLAGS@
 get_trigger_expression_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
+substitute_lld_macros_SOURCES = \
+	substitute_lld_macros.c
+
+substitute_lld_macros_LDADD = \ 
+	$(COMMON_LIB_FILES)
+
+substitute_lld_macros_LDADD += @SERVER_LIBS@
+
+substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@
+
+substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS)
+	
+
 evaluate_function_SOURCES = \
 	evaluate_function.c \
 	$(COMMON_SRC_FILES)
@@ -124,3 +138,4 @@ evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	$(VALUECACHE_WRAP_FUNCS)
 endif
+

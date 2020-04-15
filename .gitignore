@@ -175,6 +175,7 @@ tests/libs/zbxcommon/zbx_truncate_itemkey
 tests/libs/zbxcommon/zbx_truncate_value
 tests/libs/zbxserver/evaluate_function
 tests/libs/zbxserver/get_trigger_expression_constant
+tests/libs/zbxserver/substitute_lld_macros
 /zabbix-*.tar.gz
 .vscode
 sbin/zabbix_agentd
