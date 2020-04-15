@@ -1817,7 +1817,8 @@ static int	DBpatch_4050089(void)
 	const ZBX_TABLE	table =
 		{"lld_override_opperiod", "lld_override_operationid", 0,
 			{
-				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+						0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"delay", "0", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
@@ -1840,7 +1841,8 @@ static int	DBpatch_4050091(void)
 	const ZBX_TABLE	table =
 		{"lld_override_ophistory", "lld_override_operationid", 0,
 			{
-				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+						0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"history", "90d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
@@ -1863,7 +1865,8 @@ static int	DBpatch_4050093(void)
 	const ZBX_TABLE	table =
 		{"lld_override_optrends", "lld_override_operationid", 0,
 			{
-				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+						0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"trends", "365d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
 			},
@@ -1886,7 +1889,8 @@ static int	DBpatch_4050095(void)
 	const ZBX_TABLE	table =
 		{"lld_override_opseverity", "lld_override_operationid", 0,
 			{
-				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+						0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{0}
 			},
@@ -1910,7 +1914,8 @@ static int	DBpatch_4050097(void)
 		{"lld_override_optag", "lld_override_optagid", 0,
 			{
 				{"lld_override_optagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+						0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
@@ -1960,7 +1965,8 @@ static int	DBpatch_4050101(void)
 
 static int	DBpatch_4050102(void)
 {
-	return DBcreate_index("lld_override_optemplate", "lld_override_optemplate_1", "lld_override_operationid,templateid", 1);
+	return DBcreate_index("lld_override_optemplate", "lld_override_optemplate_1",
+			"lld_override_operationid,templateid", 1);
 }
 
 static int	DBpatch_4050103(void)
