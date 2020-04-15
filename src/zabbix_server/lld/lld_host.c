@@ -178,7 +178,6 @@ typedef struct
 	char			inventory_mode;
 	char			inventory_mode_orig;
 	unsigned char		status;
-	
 }
 zbx_lld_host_t;
 
