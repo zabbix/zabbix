@@ -101,12 +101,13 @@ function getMainMenu(): CMenu {
 					(new CMenuItem(_('Host groups')))
 						->setUrl(new CUrl('hostgroups.php'), 'hostgroups.php'),
 					(new CMenuItem(_('Templates')))
-						->setUrl(new CUrl('templates.php'), 'templates.php'),
+						->setUrl(new CUrl('templates.php'), 'templates.php')
+						->setAliases(['conf.import.php?rules_preset=template']),
 					(new CMenuItem(_('Hosts')))
 						->setUrl(new CUrl('hosts.php'), 'hosts.php')
 						->setAliases(['items.php', 'triggers.php', 'graphs.php', 'applications.php',
 							'host_discovery.php', 'disc_prototypes.php', 'trigger_prototypes.php',
-							'host_prototypes.php', 'httpconf.php'
+							'host_prototypes.php', 'httpconf.php', 'conf.import.php?rules_preset=host'
 						]),
 					(new CMenuItem(_('Maintenance')))
 						->setUrl(new CUrl('maintenance.php'), 'maintenance.php'),
@@ -171,7 +172,7 @@ function getMainMenu(): CMenu {
 						->setAliases(['user.edit']),
 					(new CMenuItem(_('Media types')))
 						->setAction('mediatype.list')
-						->setAliases(['mediatype.edit']),
+						->setAliases(['mediatype.edit', 'conf.import.php?rules_preset=mediatype']),
 					(new CMenuItem(_('Scripts')))
 						->setAction('script.list')
 						->setAliases(['script.edit']),

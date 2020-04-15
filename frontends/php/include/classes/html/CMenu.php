@@ -147,14 +147,15 @@ class CMenu extends CTag {
 	/**
 	 * Deep find menu item by action name and mark the whole chain as selected.
 	 *
-	 * @param string $action_name  Action name to search for.
-	 * @param bool $expand         Add 'is-expanded' class for selected submenus.
+	 * @param string $action_name    Action name to search for.
+	 * @param array $request_params  Parameters of current HTTP request to compare in search process
+	 * @param bool $expand           Add 'is-expanded' class for selected submenus.
 	 *
 	 * @return bool  True, if menu item was selected.
 	 */
-	public function setSelectedByAction(string $action_name, bool $expand = true): bool {
+	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = true): bool {
 		foreach ($this->menu_items as $item) {
-			if ($item->setSelectedByAction($action_name, $expand)) {
+			if ($item->setSelectedByAction($action_name, $request_params, $expand)) {
 				if ($expand && $item->hasSubMenu()) {
 					$item->addClass('is-expanded');
 				}
