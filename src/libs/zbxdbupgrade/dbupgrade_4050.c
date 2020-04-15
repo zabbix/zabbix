@@ -1717,7 +1717,7 @@ static int	DBpatch_4050078(void)
 
 static int	DBpatch_4050079(void)
 {
-	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override", 1, &field);
 }
@@ -1747,7 +1747,8 @@ static int	DBpatch_4050081(void)
 
 static int	DBpatch_4050082(void)
 {
-	const ZBX_FIELD	field = {"lld_overrideid", NULL, "lld_override", "lld_overrideid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_overrideid", NULL, "lld_override", "lld_overrideid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_condition", 1, &field);
 }
@@ -1777,7 +1778,8 @@ static int	DBpatch_4050084(void)
 
 static int	DBpatch_4050085(void)
 {
-	const ZBX_FIELD	field = {"lld_overrideid", NULL, "lld_override", "lld_overrideid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"lld_overrideid", NULL, "lld_override", "lld_overrideid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_operation", 1, &field);
 }
@@ -1804,7 +1806,8 @@ static int	DBpatch_4050087(void)
 
 static int	DBpatch_4050088(void)
 {
-	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_opstatus", 1, &field);
 }
@@ -1826,7 +1829,8 @@ static int	DBpatch_4050089(void)
 
 static int	DBpatch_4050090(void)
 {
-	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_opperiod", 1, &field);
 }
@@ -1848,7 +1852,8 @@ static int	DBpatch_4050091(void)
 
 static int	DBpatch_4050092(void)
 {
-	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_ophistory", 1, &field);
 }
@@ -1870,7 +1875,8 @@ static int	DBpatch_4050093(void)
 
 static int	DBpatch_4050094(void)
 {
-	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_optrends", 1, &field);
 }
@@ -1892,7 +1898,8 @@ static int	DBpatch_4050095(void)
 
 static int	DBpatch_4050096(void)
 {
-	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_opseverity", 1, &field);
 }
@@ -1916,7 +1923,8 @@ static int	DBpatch_4050097(void)
 
 static int	DBpatch_4050098(void)
 {
-	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_optag", 1, &field);
 }
@@ -1944,7 +1952,8 @@ static int	DBpatch_4050100(void)
 
 static int	DBpatch_4050101(void)
 {
-	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_optemplate", 1, &field);
 }
@@ -1956,7 +1965,7 @@ static int	DBpatch_4050102(void)
 
 static int	DBpatch_4050103(void)
 {
-	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("lld_override_optemplate", 2, &field);
 }
@@ -1983,7 +1992,8 @@ static int	DBpatch_4050105(void)
 
 static int	DBpatch_4050106(void)
 {
-	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"lld_override_operationid", NULL, "lld_override_operation", "lld_override_operationid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("lld_override_opinventory", 1, &field);
 }
