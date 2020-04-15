@@ -92,6 +92,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Check layout at Macros tab.
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
+		$this->zbxTestAssertElementPresentXpath('//li[@id="macros_container"]/div[text()="No macros found."]');
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -168,7 +169,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Templates');
 
 		foreach ($data['templates'] as $template) {
-			$this->zbxTestDropdownSelectWait('groupid', $template['group']);
+			COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+			$this->zbxTestLaunchOverlayDialog('Host groups');
+			COverlayDialogElement::find()->all()->last()->query('link', $template['group'])->one()->waitUntilClickable()->click();
 			$this->zbxTestClickLinkTextWait($template['name']);
 			$this->zbxTestWaitForPageToLoad();
 		}
@@ -285,7 +288,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'groups' => [
 						'Templates'
 					],
-					'macro' => '{#MACRO_NEW}',
+					'group_macro' => '{#GROUP_MACRO}',
 					'templates' => [
 						['name' => 'Inheritance test template', 'group' => 'Templates']
 					],
@@ -325,8 +328,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			}
 		}
 
-		if (array_key_exists('macro', $data)) {
-			$this->zbxTestInputTypeByXpath('//*[@name="group_prototypes[0][name]"]', $data['macro']);
+		if (array_key_exists('group_macro', $data)) {
+			$this->zbxTestInputTypeByXpath('//*[@name="group_prototypes[0][name]"]', $data['group_macro']);
 		}
 
 		// Templates tab.
@@ -335,7 +338,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			foreach ($data['templates'] as $template) {
 				$this->zbxTestClickButtonMultiselect('add_templates_');
 				$this->zbxTestLaunchOverlayDialog('Templates');
-				$this->zbxTestDropdownSelectWait('groupid', $template['group']);
+				COverlayDialogElement::find()->one()->setDataContext('Templates');
 				$this->zbxTestClickLinkTextWait($template['name']);
 				$this->zbxTestWaitForPageToLoad();
 			}
@@ -455,7 +458,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
@@ -501,7 +504,87 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 	}
 
-	public static function getDeleteData() {
+	/**
+	 * Open specified host prototype form for update.
+	 *
+	 * @param array $data	test case data from data provider
+	 */
+	private function selectHostPrototypeForUpdate($action, $data) {
+		if ($action === 'host') {
+			$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.
+					zbx_dbstr($data['host_prototype'])
+			);
+			$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.
+					zbx_dbstr($data['discovery'])
+			);
+		}
+		elseif ($action === 'template') {
+			$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
+					zbx_dbstr($data['host_prototype'])
+			);
+			$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
+					zbx_dbstr($data['discovery'])
+			);
+		}
+
+		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.$discovery_id.'&hostid='.
+				$host_prototype
+		);
+	}
+
+	public function testInheritanceHostPrototype_AddMacroToTemplatedPrototype() {
+		// Template: Inheritance test template with host prototype.
+		$template_lld_id = 99083;		// Discovery rule for host prototype test.
+		$template_prototype_id = 99007;	// Host prototype for update {#TEST}.
+
+		// Host: Host for inheritance host prototype tests
+		$host_lld_id = 99084;			// Discovery rule for host prototype test.
+		$host_prototype_id = 99008;		// Host prototype for update {#TEST}.
+
+		$macros = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'macro' => '{$INHERITED_MACRO1}',
+				'value' => 'Inherited value1',
+				'description' => 'Inherited description1'
+			],
+			[
+				'macro' => '{$INHERITED_MACRO2}',
+				'value' => 'Inherited value2',
+				'description' => 'Inherited description2'
+			]
+		];
+		// Edit host prototype on template and add macros.
+		$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='
+			.$template_lld_id.'&hostid='.$template_prototype_id);
+
+		$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Macros');
+		$this->fillMacros($macros);
+		$form->submit();
+
+		// Open host prototype inherited from template on host and check inherited macros.
+		$this->page->open('host_prototypes.php?form=update&parent_discoveryid='
+			.$host_lld_id.'&hostid='.$host_prototype_id);
+		$form->selectTab('Macros');
+		$this->assertMacros($macros);
+
+		// Check that inherited macros field are not editabble.
+		$fields = $this->getMacros();
+		foreach ($fields as $i => $field) {
+			$this->assertFalse($this->query('id:macros_'.$i.'_macro')->one()->isEnabled());
+			$this->assertFalse($this->query('id:macros_'.$i.'_value')->one()->isEnabled());
+			$this->assertFalse($this->query('id:macros_'.$i.'_description')->one()->isEnabled());
+		}
+
+		// Check that added macros are written in DB 2 times: for template and for linked host.
+		foreach ($macros as $macro) {
+			$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM hostmacro WHERE macro='.zbx_dbstr($macro['macro'])));
+		}
+	}
+
+		public static function getDeleteData() {
 		return [
 			[
 				[
@@ -542,33 +625,5 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype']);
 			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
-	}
-
-	/**
-	 * Open specified host prototype form for update.
-	 *
-	 * @param array $data	test case data from data provider
-	 */
-	private function selectHostPrototypeForUpdate($action, $data) {
-		if ($action === 'host') {
-			$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.
-					zbx_dbstr($data['host_prototype'])
-			);
-			$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.
-					zbx_dbstr($data['discovery'])
-			);
-		}
-		elseif ($action === 'template') {
-			$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
-					zbx_dbstr($data['host_prototype'])
-			);
-			$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
-					zbx_dbstr($data['discovery'])
-			);
-		}
-
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.$discovery_id.'&hostid='.
-				$host_prototype
-		);
 	}
 }

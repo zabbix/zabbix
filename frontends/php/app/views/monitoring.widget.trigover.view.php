@@ -23,11 +23,16 @@
  * @var CView $this
  */
 
-$table = getTriggersOverview($data['hosts'], $data['triggers'], $data['style']);
+if ($data['style'] == STYLE_TOP) {
+	$table = (new CPartial('trigoverview.table.top', $data))->getOutput();
+}
+else {
+	$table = (new CPartial('trigoverview.table.left', $data))->getOutput();
+}
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString()
+	'body' => $table
 ];
 
 if (($messages = getMessages()) !== null) {

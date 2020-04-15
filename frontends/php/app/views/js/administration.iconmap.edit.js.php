@@ -54,6 +54,7 @@
 			(new CButton('remove', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('remove_mapping')
+				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
 	]))
 		->setId('iconmapidRow_#{iconmappingid}')

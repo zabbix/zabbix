@@ -393,8 +393,7 @@ function check_fields_raw(&$fields) {
 		'sid' =>			[T_ZBX_STR, O_OPT, P_SYS, HEX(),		null],
 		'triggers_hash' =>	[T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null],
 		'print' =>			[T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null],
-		'page' =>			[T_ZBX_INT, O_OPT, P_SYS, null,		null], // paging
-		'ddreset' =>		[T_ZBX_INT, O_OPT, P_SYS, null,		null]
+		'page' =>			[T_ZBX_INT, O_OPT, P_SYS, null,		null]	// paging
 	];
 	$fields = zbx_array_merge($system_fields, $fields);
 

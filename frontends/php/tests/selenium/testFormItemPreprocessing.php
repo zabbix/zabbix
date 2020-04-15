@@ -115,10 +115,9 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 		$table->findRow('Key', $preprocessing_item_key)->select();
 		$this->query('button:Copy')->one()->click();
 		$form = $this->query('name:elements_form')->waitUntilPresent()->asForm()->one();
-
 		$form->fill([
 			'Target type'	=> 'Hosts',
-			'Target' => ['values' => [$target_hostname], 'context' => 'Zabbix servers']
+			'Target' => $target_hostname
 		]);
 		$form->submit();
 

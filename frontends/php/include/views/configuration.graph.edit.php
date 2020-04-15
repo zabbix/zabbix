@@ -368,8 +368,7 @@ $popup_options_add = [
 if ($data['normal_only']) {
 	$popup_options_add['normal_only'] = '1';
 }
-if ($data['groupid'] && $data['hostid']) {
-	$popup_options_add['groupid'] = $data['groupid'];
+if ($data['hostid']) {
 	$popup_options_add['hostid'] = $data['hostid'];
 }
 

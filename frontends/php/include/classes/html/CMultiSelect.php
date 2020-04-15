@@ -31,6 +31,13 @@ class CMultiSelect extends CTag {
 	const SEARCH_METHOD = 'multiselect.get';
 
 	/**
+	 * Supported preselect types.
+	 *
+	 * @param array
+	 */
+	protected $preselect_fields = ['hosts', 'hostgroups'];
+
+	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
 	 * @param bool  $options['multiple']       Allows multiple selections.
 	 * @param bool  $options['add_post_js']
@@ -60,7 +67,7 @@ class CMultiSelect extends CTag {
 		$url = (new CUrl('jsrpc.php'))
 			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
 			->setArgument('method', static::SEARCH_METHOD)
-			->setArgument('objectName', $options['objectName']);
+			->setArgument('object_name', $options['object_name']);
 
 		if (array_key_exists('objectOptions', $options)) {
 			foreach ($options['objectOptions'] as $option_name => $option_value) {
@@ -91,6 +98,10 @@ class CMultiSelect extends CTag {
 		}
 
 		if (array_key_exists('popup', $options)) {
+			if (array_key_exists('filter_preselect_fields', $options['popup'])) {
+				$params['popup']['filter_preselect_fields'] = $options['popup']['filter_preselect_fields'];
+			}
+
 			if (array_key_exists('parameters', $options['popup'])) {
 				$params['popup']['parameters'] = $options['popup']['parameters'];
 
@@ -145,7 +156,7 @@ class CMultiSelect extends CTag {
 		$mapped_options = [];
 		$mappings = [
 			'name' => 'name',
-			'object_name' => 'objectName',
+			'object_name' => 'object_name',
 			'disabled' => 'disabled',
 			'default_value' => 'defaultValue',
 			'data' => 'data',
@@ -170,11 +181,27 @@ class CMultiSelect extends CTag {
 		$popup_parameters = [];
 
 		if (array_key_exists('popup', $options)) {
-			$valid_fields = ['parameters'];
+			$valid_fields = ['parameters', 'filter_preselect_fields'];
 
 			foreach ($options['popup'] as $field => $value) {
 				if (!in_array($field, $valid_fields)) {
 					error('unsupported option: $options[\'popup\'][\''.$field.'\']');
+				}
+			}
+
+			if (array_key_exists('filter_preselect_fields', $options['popup'])) {
+				if (is_array($options['popup']['filter_preselect_fields'])) {
+					foreach ($options['popup']['filter_preselect_fields'] as $field => $value) {
+						if (in_array($field, $this->preselect_fields) && is_string($value) && $value !== '') {
+							$mapped_options['popup']['filter_preselect_fields'][$field] = $value;
+						}
+						else {
+							error('invalid property: $options[\'popup\'][\'filter_preselect_fields\'][\''.$field.'\']');
+						}
+					}
+				}
+				else {
+					error('invalid property: $options[\'popup\'][\'filter_preselect_fields\']');
 				}
 			}
 
@@ -183,9 +210,10 @@ class CMultiSelect extends CTag {
 
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
-					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
+					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes', 'with_items',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names'
+					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items',
+					'with_httptests', 'with_hosts_and_templates'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -215,6 +243,10 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
 					$popup_parameters['only_hostid'] = (string) $parameters['hostid'];
 					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
+				}
+
+				if (array_key_exists('groupid', $parameters) && $parameters['groupid'] > 0) {
+					$popup_parameters['groupid'] = (string) $parameters['groupid'];
 				}
 
 				if (array_key_exists('parent_discoveryid', $parameters) && $parameters['parent_discoveryid'] > 0) {
@@ -247,19 +279,26 @@ class CMultiSelect extends CTag {
 				}
 
 				if (array_key_exists('templated_hosts', $parameters) && $parameters['templated_hosts']) {
+					$popup_parameters['templated_hosts'] = '1';
 					$autocomplete_parameters['templated_hosts'] = true;
+				}
+
+				if (array_key_exists('with_hosts_and_templates', $parameters) && $parameters['with_hosts_and_templates']) {
+					$popup_parameters['with_hosts_and_templates'] = '1';
+					$autocomplete_parameters['with_hosts_and_templates'] = true;
 				}
 
 				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
 						'with_simple_graph_item_prototypes', 'with_triggers'] as $name) {
 					if (array_key_exists($name, $parameters) && $parameters[$name]) {
 						$popup_parameters[$name] = '1';
+						$autocomplete_parameters[$name] = true;
 					}
 				}
 
 				if (array_key_exists('webitems', $parameters) && $parameters['webitems']) {
 					$popup_parameters['with_webitems'] = '1';
-					$autocomplete_parameters['webitems'] = '1';
+					$autocomplete_parameters['webitems'] = true;
 				}
 
 				if (array_key_exists('editable', $parameters) && $parameters['editable']) {
@@ -274,7 +313,28 @@ class CMultiSelect extends CTag {
 
 				if (array_key_exists('with_monitored_triggers', $parameters) && $parameters['with_monitored_triggers']) {
 					$popup_parameters['with_monitored_triggers'] = '1';
-					$autocomplete_parameters['monitored'] = true;
+
+					if ($popup_parameters['srctbl'] === 'triggers') {
+						$autocomplete_parameters['monitored'] = true;
+					}
+					else {
+						$autocomplete_parameters['with_monitored_triggers'] = true;
+					}
+				}
+
+				if (array_key_exists('with_monitored_items', $parameters) && $parameters['with_monitored_items']) {
+					$popup_parameters['with_monitored_items'] = '1';
+					$autocomplete_parameters['with_monitored_items'] = true;
+				}
+
+				if (array_key_exists('with_httptests', $parameters) && $parameters['with_httptests']) {
+					$popup_parameters['with_httptests'] = '1';
+					$autocomplete_parameters['with_httptests'] = true;
+				}
+
+				if (array_key_exists('with_items', $parameters) && $parameters['with_items']) {
+					$popup_parameters['with_items'] = '1';
+					$autocomplete_parameters['with_items'] = true;
 				}
 
 				if (array_key_exists('excludeids', $parameters) && $parameters['excludeids']) {
@@ -287,7 +347,7 @@ class CMultiSelect extends CTag {
 
 				if (array_key_exists('enrich_parent_groups', $parameters) && $parameters['enrich_parent_groups']) {
 					$popup_parameters['enrich_parent_groups'] = '1';
-					$autocomplete_parameters['enrich_parent_groups'] = '1';
+					$autocomplete_parameters['enrich_parent_groups'] = true;
 				}
 
 				if (array_key_exists('orig_names', $parameters) && $parameters['orig_names']) {

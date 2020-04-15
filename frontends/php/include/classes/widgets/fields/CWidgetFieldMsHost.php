@@ -22,6 +22,14 @@
 class CWidgetFieldMsHost extends CWidgetFieldMs {
 
 	/**
+	 * ID for Host group Multiselect element used to prefill Application PoPup Host group filter.
+	 * Analog for multiselect filter_preselect_fields['hostgroups'] property.
+	 *
+	 * @var string  (nullable) ID for Multiselect element.
+	 */
+	public $filter_preselect_host_group_field;
+
+	/**
 	 * Create widget field for Host selection
 	 *
 	 * @param string      $name     field name in form

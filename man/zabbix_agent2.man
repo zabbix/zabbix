@@ -76,27 +76,27 @@ Perform administrative functions according to \fIruntime\-option\fR.
 Runtime control options
 .RS 4
 .TP 4
-\fBloglevel increase\f
+\fBloglevel increase\fR
 Increase log level
 .RE
 .RS 4
 .TP 4
-\fBloglevel decrease\f
+\fBloglevel decrease\fR
 Decrease log level
 .RE
 .RS 4
 .TP 4
-\fBhelp\f
+\fBhelp\fR
 List available runtime control options
 .RE
 .RS 4
 .TP 4
-\fBmetrics\f
+\fBmetrics\fR
 List available metrics
 .RE
 .RS 4
 .TP 4
-\fBversion\f
+\fBversion\fR
 Display version
 .RE
 .RE

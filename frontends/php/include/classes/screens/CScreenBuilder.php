@@ -247,9 +247,6 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_HISTORY:
 				return new CScreenHistory($options);
 
-			case SCREEN_RESOURCE_CHART:
-				return new CScreenChart($options);
-
 			case SCREEN_RESOURCE_LLD_GRAPH:
 				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldGraph($options);

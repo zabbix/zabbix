@@ -1,15 +1,15 @@
 #!/bin/bash
 
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] || [ -z "$5" ] || [ -z "$6" ]; then
 	echo "Usage: 
-	./export_data.sh -uroot -p<password> <DB name> ZBX_DATA > ../src/data.tmpl
-	./export_data.sh -uroot -p<password> <DB name> ZBX_TEMPLATE > ../src/templates.tmpl
-	./export_data.sh -uroot -p<password> <DB name> ZBX_DASHBOARD > ../src/dashboards.tmpl
+	./export_data.sh -hhost -Pport -uroot -p<password> <DB name> ZBX_DATA > ../src/data.tmpl
+	./export_data.sh -hhost -Pport -uroot -p<password> <DB name> ZBX_TEMPLATE > ../src/templates.tmpl
+	./export_data.sh -hhost -Pport -uroot -p<password> <DB name> ZBX_DASHBOARD > ../src/dashboards.tmpl
 	The script generates data file out of existing MySQL database." && exit 1
 fi
-dblogin="$1 $2"
-dbname=$3
-dbflag=$4
+dblogin="$1 $2 $3 $4"
+dbname=$5
+dbflag=$6
 basedir=`dirname "$0"`
 schema=$basedir/../src/schema.tmpl
 

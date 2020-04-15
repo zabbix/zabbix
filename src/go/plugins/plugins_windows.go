@@ -25,6 +25,7 @@ import (
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/net/udp"
 	_ "zabbix.com/plugins/proc"
+	_ "zabbix.com/plugins/redis"
 	_ "zabbix.com/plugins/system/cpu"
 	_ "zabbix.com/plugins/system/swap"
 	_ "zabbix.com/plugins/system/uptime"

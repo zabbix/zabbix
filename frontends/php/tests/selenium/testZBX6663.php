@@ -180,13 +180,13 @@ class testZBX6663 extends CLegacyWebTest {
 
 		if (isset($zbx_data['host'])) {
 			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestDropdownSelectWait('groupid', 'all');
+			$this->query('button:Reset')->one()->click();
 			$this->zbxTestClickLinkText($zbx_data['host']);
 		}
 
 		if (isset($zbx_data['template'])) {
 			$this->zbxTestLogin('templates.php');
-			$this->zbxTestDropdownSelectWait('groupid', 'all');
+			$this->query('button:Reset')->one()->click();
 			$this->zbxTestOpen('templates.php?page=2');
 			$this->zbxTestClickLinkText($zbx_data['template']);
 		}

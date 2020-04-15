@@ -1059,6 +1059,10 @@ class CHelpItems {
 					'description' => _('Value cache effectiveness. Valid parameters are: requests, hits and misses.')
 				],
 				[
+					'key' => 'zabbix[version]',
+					'description' => _('Version of Zabbix server or proxy')
+				],
+				[
 					'key' => 'zabbix[vmware,buffer,<mode>]',
 					'description' => _('VMware cache statistics. Valid modes are: total, free, pfree, used and pused.')
 				],
