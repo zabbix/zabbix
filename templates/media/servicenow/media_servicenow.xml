@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-15T03:37:22Z</date>
+    <date>2020-04-15T17:59:48Z</date>
     <media_types>
         <media_type>
             <name>ServiceNow</name>
@@ -94,7 +94,6 @@
             </parameters>
             <script>var ServiceNow = {&#13;
     params: {},&#13;
-    data: {},&#13;
 &#13;
     setParams: function (params) {&#13;
         if (typeof params !== 'object') {&#13;
@@ -115,21 +114,6 @@
         ServiceNow.HTTPProxy = HTTPProxy;&#13;
     },&#13;
 &#13;
-    setComment: function(data, update) {&#13;
-        if (typeof update === 'string') {&#13;
-            data.comments = update;&#13;
-        }&#13;
-        else if (update.status === '1') {&#13;
-            data.comments = update.user + ' ' + update.action + '.';&#13;
-&#13;
-            if (update.message) {&#13;
-                data.comments += '\nMessage:\n' + update.message;&#13;
-            }&#13;
-        }&#13;
-&#13;
-        ServiceNow.data = data;&#13;
-    },&#13;
-&#13;
     setFields: function (data, fields) {&#13;
         if (typeof fields === 'object' &amp;&amp; Object.keys(fields).length) {&#13;
             Object.keys(fields)&#13;
@@ -137,8 +121,6 @@
                     data[field] = fields[field];&#13;
                 });&#13;
         }&#13;
-&#13;
-        ServiceNow.data = data;&#13;
     },&#13;
 &#13;
     request: function (method, data) {&#13;
@@ -211,9 +193,8 @@
         else if (typeof response.result !== 'object' || typeof response.result.sys_id === 'undefined') {&#13;
             throw 'Cannot create ServiceNow incident. Check debug log for more information.';&#13;
         }&#13;
-        else {&#13;
-            return response.result;&#13;
-        }&#13;
+&#13;
+        return response.result;&#13;
     }&#13;
 };&#13;
 &#13;
@@ -291,8 +272,6 @@ try {&#13;
     ServiceNow.setProxy(params.HTTPProxy);&#13;
     ServiceNow.setFields(data, fields);&#13;
 &#13;
-    data = ServiceNow.data;&#13;
-&#13;
     if (params.event_source === '0') {&#13;
         if (params.event_value === '1' &amp;&amp; update.status === '0') {&#13;
             data.description = Object.keys(fields).length ? params.trigger_description : data.description;&#13;
@@ -303,10 +282,18 @@ try {&#13;
             delete data.description;&#13;
             delete data.urgency;&#13;
             ServiceNow.params.url += '/' + params.servicenow_sys_id;&#13;
-            ServiceNow.setComment(data, (params.event_value === '0' &amp;&amp; !Object.keys(fields).length)&#13;
-                ? params.alert_message&#13;
-                : update&#13;
-            );&#13;
+&#13;
+&#13;
+            if (update.status === '1') {&#13;
+                data.comments = update.user + ' ' + update.action + '.';&#13;
+&#13;
+                if (update.message) {&#13;
+                    data.comments += '\nMessage:\n' + update.message;&#13;
+                }&#13;
+            }&#13;
+            else if (!Object.keys(fields).length) {&#13;
+                data.comments = params.alert_message;&#13;
+            }&#13;
         }&#13;
     }&#13;
 &#13;
