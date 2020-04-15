@@ -5757,12 +5757,17 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, cons
 
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
 	{
-		for (i = prev_token_loc_r + 1; i < token.loc.l; ++i)
+		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
 		{
-			if ('\"' == (*data)[i] && (0 == i || (0 < i && '\\' != (*data)[i - 1]) || 1 == i ||
-					(1 < i && '\\' == (*data)[i - 2])))
+			switch ((*data)[i])
 			{
-				cur_token_inside_quote = 0 == cur_token_inside_quote ? 1 : 0;
+				case '\\':
+					if (0 != cur_token_inside_quote)
+						i++;
+					break;
+				case '"':
+					cur_token_inside_quote = !cur_token_inside_quote;
+					break;
 			}
 		}
 
