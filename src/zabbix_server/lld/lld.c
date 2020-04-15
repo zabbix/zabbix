@@ -822,7 +822,6 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 
 		ZBX_STR2UINT64(override->overrideid, row[0]);
 		override->step = atoi(row[1]);
-
 		lld_filter_init(&override->filter);
 		override->filter.evaltype = atoi(row[2]);
 		override->filter.expression = zbx_strdup(NULL, row[3]);
@@ -842,11 +841,10 @@ static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_rule
 	}
 
 	DBcommit();
-
-	zbx_vector_ptr_sort(overrides, lld_overrides_compare_by_step);
-
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&overrideids);
+
+	zbx_vector_ptr_sort(overrides, lld_overrides_compare_by_step);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		lld_dump_overrides(overrides);
