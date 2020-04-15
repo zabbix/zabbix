@@ -291,22 +291,23 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	);
 
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
-
-	// macros
-	$divTabs->addTab('macroTab', _('Macros'),
-		(new CFormList('macrosFormList'))
-			->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
-				->addValue(_('Host macros'), 0)
-				->addValue(_('Inherited and host macros'), 1)
-				->setModern(true)
-			)
-			->addRow(null, new CPartial('hostmacros.list.html', [
-				'macros' => $data['macros'],
-				'show_inherited_macros' => $data['show_inherited_macros'],
-				'readonly' => $data['readonly']
-			]), 'macros_container')
-	);
 }
+
+// macros
+$tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
+$divTabs->addTab('macroTab', _('Macros'),
+	(new CFormList('macrosFormList'))
+		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+			->addValue(_('Host prototype macros'), 0)
+			->addValue(_('Inherited and host prototype macros'), 1)
+			->setModern(true)
+		)
+		->addRow(null, new CPartial($tmpl, [
+			'macros' => $data['macros'],
+			'parent_hostid' => $data['parent_host']['hostid'],
+			'readonly' => $data['readonly']
+		]), 'macros_container')
+);
 
 $inventoryFormList = (new CFormList('inventorylist'))
 	->addRow(null,

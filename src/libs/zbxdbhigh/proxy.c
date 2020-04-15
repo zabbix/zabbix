@@ -4319,7 +4319,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 		}
 		else if (FAIL == is_uint32(tmp, &connection_type) || (ZBX_TCP_SEC_UNENCRYPTED != connection_type &&
-				ZBX_TCP_SEC_TLS_PSK != connection_type))
+				ZBX_TCP_SEC_TLS_PSK != connection_type && ZBX_TCP_SEC_TLS_CERT != connection_type))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid value for \""
 					ZBX_PROTO_TAG_TLS_ACCEPTED "\"", __func__, tmp);
@@ -4344,46 +4344,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, zbx_json_strerror());
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: process_autoregistration                                         *
- *                                                                            *
- * Purpose: update autoregistration data, received from proxy                 *
- *                                                                            *
- * Parameters: jp           - [IN] JSON with historical data                  *
- *             proxy_hostid - [IN] proxy identifier from database             *
- *             ts           - [IN] timestamp when the proxy connection was    *
- *                                 established                                *
- *             error        - [OUT] address of a pointer to the info string   *
- *                                  (should be freed by the caller)           *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
-int	process_autoregistration(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, zbx_timespec_t *ts,
-		char **error)
-{
-	struct zbx_json_parse	jp_data;
-	int			ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
-
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
-	}
-
-	ret = process_autoregistration_contents(&jp_data, proxy_hostid, error);
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

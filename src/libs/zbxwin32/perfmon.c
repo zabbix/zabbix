@@ -24,23 +24,47 @@
 
 static ZBX_THREAD_LOCAL zbx_perf_counter_id_t	*PerfCounterList = NULL;
 
-/* This struct contains mapping between built-in English counter names and PDH indexes. */
-/* If you change it then you also need to add enum values to zbx_builtin_counter_ref_t.  */
-static struct builtin_counter_ref
+/* This struct contains mapping between built-in English object names and PDH indexes. */
+/* If you change it then you also need to add enum values to zbx_builtin_object_ref_t. */
+static struct builtin_object_ref
 {
 	unsigned long	pdhIndex;
-	wchar_t 	eng_name[PDH_MAX_COUNTER_NAME];
+	wchar_t		eng_name[PDH_MAX_COUNTER_NAME];
 }
-builtin_counter_map[] =
+builtin_object_map[] =
 {
 	{ 0, L"System" },
 	{ 0, L"Processor" },
 	{ 0, L"Processor Information" },
-	{ 0, L"% Processor Time" },
-	{ 0, L"Processor Queue Length" },
-	{ 0, L"System Up Time" },
-	{ 0, L"Terminal Services" },
-	{ 0, L"Total Sessions" }
+	{ 0, L"Terminal Services" }
+};
+
+/* this enum must be only modified along with builtin_object_map[] */
+typedef enum
+{
+	POI_SYSTEM = 0,
+	POI_PROCESSOR,
+	POI_PROCESSOR_INFORMATION,
+	POI_TERMINAL_SERVICES,
+	POI_MAX_INDEX = POI_TERMINAL_SERVICES
+}
+zbx_builtin_object_ref_t;
+
+/* This struct contains mapping between built-in English counter names and PDH indexes. */
+/* If you change it then you also need to add enum values to zbx_builtin_counter_ref_t. */
+static struct builtin_counter_ref
+{
+	unsigned long			pdhIndex;
+	zbx_builtin_object_ref_t	object;
+	wchar_t				eng_name[PDH_MAX_COUNTER_NAME];
+}
+builtin_counter_map[] =
+{
+	{ 0,	POI_SYSTEM,			L"Processor Queue Length" },
+	{ 0,	POI_SYSTEM,			L"System Up Time" },
+	{ 0,	POI_PROCESSOR,			L"% Processor Time" },
+	{ 0,	POI_PROCESSOR_INFORMATION,	L"% Processor Time" },
+	{ 0,	POI_TERMINAL_SERVICES,		L"Total Sessions" }
 };
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath)
@@ -262,14 +286,30 @@ close_query:
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_builtin_object_index                                         *
+ *                                                                            *
+ * Purpose: get performance object index by reference value described by      *
+ *          zbx_builtin_counter_ref_t enum                                    *
+ *                                                                            *
+ * Parameters: object_ref - [IN] built-in performance object                  *
+ *                                                                            *
+ * Comments: Performance object index values can differ across Windows        *
+ *           installations for the same names                                 *
+ *                                                                            *
+ ******************************************************************************/
+DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref)
+{
+	return builtin_object_map[builtin_counter_map[counter_ref].object].pdhIndex;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_builtin_counter_index                                        *
  *                                                                            *
  * Purpose: get performance counter index by reference value described by     *
  *          zbx_builtin_counter_ref_t enum                                    *
  *                                                                            *
- * Parameters: counter_ref    - [IN] built-in performance counter             *
- *                                                                            *
- * Return value: PDH performance counter index or 0 on failure                *
+ * Parameters: counter_ref - [IN] built-in performance counter                *
  *                                                                            *
  * Comments: Performance counter index values can differ across Windows       *
  *           installations for the same names                                 *
@@ -277,19 +317,6 @@ close_query:
  ******************************************************************************/
 DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 {
-	if (PCI_MAX_INDEX < counter_ref)
-	{
-		static int first_error = 1;
-
-		if (0 != first_error)
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			first_error = 0;
-		}
-
-		return 0;
-	}
-
 	return builtin_counter_map[counter_ref].pdhIndex;
 }
 
@@ -316,7 +343,7 @@ static wchar_t	*get_all_counter_eng_names(wchar_t *reg_value_name)
 	DWORD		buffer_size = 0;
 	LSTATUS		status = ERROR_SUCCESS;
 	/* this registry key guaranteed to hold english counter texts even in localized Win versions */
-	static HKEY reg_key = HKEY_PERFORMANCE_TEXT;
+	static HKEY	reg_key = HKEY_PERFORMANCE_TEXT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -345,6 +372,136 @@ finish:
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_perf_name_by_index                                           *
+ *                                                                            *
+ * Purpose: fills performance counter name based on its index                 *
+ *                                                                            *
+ * Parameters: index - [IN]  PDH counter index                                *
+ *             name  - [OUT] counter name buffer                              *
+ *             size  - [IN]  counter name buffer size                         *
+ *                                                                            *
+ * Return value: SUCCEED if counter data is valid,                            *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_perf_name_by_index(DWORD index, wchar_t *name, DWORD size)
+{
+	int		ret = SUCCEED;
+	PDH_STATUS	pdh_status;
+
+	if (ERROR_SUCCESS != (pdh_status = PdhLookupPerfNameByIndex(NULL, index, name, &size)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex() failed: %s",
+				strerror_from_module(pdh_status, L"PDH.DLL"));
+		ret = FAIL;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: validate_counter_path                                            *
+ *                                                                            *
+ * Purpose: checks if specified counter path data is ponting to valid counter *
+ *                                                                            *
+ * Parameters: cpe - [IN] PDH counter path data                               *
+ *                                                                            *
+ * Return value: SUCCEED if counter data is valid,                            *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	validate_counter_path(PDH_COUNTER_PATH_ELEMENTS	*cpe)
+{
+	int		ret = FAIL;
+	DWORD		s = 0;
+	PDH_STATUS	pdh_status;
+	wchar_t		*path = NULL;
+
+	if (PDH_MORE_DATA == (pdh_status = PdhMakeCounterPath(cpe, NULL, &s, 0)))
+	{
+		path = zbx_malloc(path, sizeof(wchar_t) * s);
+
+		if (ERROR_SUCCESS != (pdh_status = PdhMakeCounterPath(cpe, path, &s, 0)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "PdhMakeCounterPath() failed: %s",
+					strerror_from_module(pdh_status, L"PDH.DLL"));
+		}
+		else if (ERROR_SUCCESS != (pdh_status = PdhValidatePath(path)))
+		{
+			if (PDH_CSTATUS_NO_COUNTER != pdh_status && PDH_CSTATUS_NO_INSTANCE != pdh_status)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "PdhValidatePath() szObjectName:%s szCounterName:%s"
+						" failed: %s", cpe->szObjectName, cpe->szCounterName,
+						strerror_from_module(pdh_status, L"PDH.DLL"));
+			}
+		}
+		else
+		{
+			ret = SUCCEED;
+		}
+
+		zbx_free(path);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "PdhMakeCounterPath() failed: %s",
+				strerror_from_module(pdh_status, L"PDH.DLL"));
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: validate_object_counter                                          *
+ *                                                                            *
+ * Purpose: checks if specified counter is valid successor of the object      *
+ *                                                                            *
+ * Parameters: object  - [IN] PDH object index                                *
+ *             counter - [IN] PDH counter index                               *
+ *                                                                            *
+ * Return value: SUCCEED if object - counter combination is valid,            *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	validate_object_counter(DWORD object, DWORD counter)
+{
+	PDH_COUNTER_PATH_ELEMENTS	*cpe;
+	int				ret = SUCCEED;
+
+	cpe = (PDH_COUNTER_PATH_ELEMENTS *)zbx_malloc(NULL, sizeof(PDH_COUNTER_PATH_ELEMENTS));
+	memset(cpe, 0, sizeof(PDH_COUNTER_PATH_ELEMENTS));
+
+	cpe->szObjectName = zbx_malloc(NULL, sizeof(wchar_t) * PDH_MAX_COUNTER_NAME);
+	cpe->szCounterName = zbx_malloc(NULL, sizeof(wchar_t) * PDH_MAX_COUNTER_NAME);
+
+	if (SUCCEED != get_perf_name_by_index(object, cpe->szObjectName, PDH_MAX_COUNTER_NAME) ||
+			SUCCEED != get_perf_name_by_index(counter, cpe->szCounterName, PDH_MAX_COUNTER_NAME))
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+	if (SUCCEED != validate_counter_path(cpe))
+	{
+		/* try with "any" instance name */
+		cpe->szInstanceName = L"*";
+
+		if (SUCCEED != validate_counter_path(cpe))
+			ret = FAIL;
+	}
+
+out:
+	zbx_free(cpe->szCounterName);
+	zbx_free(cpe->szObjectName);
+	zbx_free(cpe);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: init_builtin_counter_indexes                                     *
  *                                                                            *
  * Purpose: scans registry key with all performance counter English names     *
@@ -359,28 +516,53 @@ finish:
  ******************************************************************************/
 int	init_builtin_counter_indexes(void)
 {
-	int 		ret = FAIL, i;
-	wchar_t 	*counter_text, *saved_ptr;
+	int 		ret = SUCCEED, i;
+	wchar_t 	*counter_text, *eng_names, *counter_base;
+	DWORD		counter_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* Get buffer holding a list of performance counter indexes and English counter names. */
 	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used).          */
-	if (NULL == (counter_text = saved_ptr = get_all_counter_eng_names(L"Counter")))
+	if (NULL == (counter_base = eng_names = get_all_counter_eng_names(L"Counter")))
+	{
+		ret = FAIL;
 		goto out;
+	}
 
 	/* bypass first pair of counter data elements - these contain number of records */
-	counter_text += wcslen(counter_text) + 1;
-	counter_text += wcslen(counter_text) + 1;
+	counter_base += wcslen(counter_base) + 1;
+	counter_base += wcslen(counter_base) + 1;
 
-	for (; 0 != *counter_text; counter_text += wcslen(counter_text) + 1)
+	/* get builtin object names */
+	for (counter_text = counter_base; 0 != *counter_text; counter_text += wcslen(counter_text) + 1)
 	{
-		DWORD counter_index = (DWORD)_wtoi(counter_text);
+		counter_index = (DWORD)_wtoi(counter_text);
+		counter_text += wcslen(counter_text) + 1;
+
+		for (i = 0; i < ARRSIZE(builtin_object_map); i++)
+		{
+			if (0 == builtin_object_map[i].pdhIndex &&
+					0 == wcscmp(builtin_object_map[i].eng_name, counter_text))
+			{
+				builtin_object_map[i].pdhIndex = counter_index;
+				break;
+			}
+		}
+	}
+
+	/* Get builtin counter names. There may be counter name duplicates. */
+	/* Validate them in combination with parent object.                 */
+	for (counter_text = counter_base; 0 != *counter_text; counter_text += wcslen(counter_text) + 1)
+	{
+		counter_index = (DWORD)_wtoi(counter_text);
 		counter_text += wcslen(counter_text) + 1;
 
 		for (i = 0; i < ARRSIZE(builtin_counter_map); i++)
 		{
-			if (0 == wcscmp(builtin_counter_map[i].eng_name, counter_text))
+			if (0 == builtin_counter_map[i].pdhIndex &&
+					0 == wcscmp(builtin_counter_map[i].eng_name, counter_text) &&
+					SUCCEED == validate_object_counter(get_builtin_object_index(i), counter_index))
 			{
 				builtin_counter_map[i].pdhIndex = counter_index;
 				break;
@@ -388,19 +570,50 @@ int	init_builtin_counter_indexes(void)
 		}
 	}
 
-	ret = SUCCEED;
-	zbx_free(saved_ptr);
+	zbx_free(eng_names);
+
+#define CHECK_COUNTER_INDICES(index_map)								\
+	for (i = 0; i < ARRSIZE(index_map); i++)							\
+	{												\
+		if (0 == index_map[i].pdhIndex)								\
+		{											\
+			char	*counter;								\
+													\
+			counter = zbx_unicode_to_utf8(index_map[i].eng_name);				\
+			zabbix_log(LOG_LEVEL_ERR, "Failed to initialize builtin counter: %s", counter);	\
+			zbx_free(counter);								\
+		}											\
+	}
+
+	/* check if all builtin counter indices are filled */
+	CHECK_COUNTER_INDICES(builtin_object_map);
+	CHECK_COUNTER_INDICES(builtin_counter_map);
+
+#undef CHECK_COUNTER_INDICES
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_counter_name                                                 *
+ *                                                                            *
+ * Purpose: get performance object or counter name by PDH index               *
+ *                                                                            *
+ * Parameters: pdhIndex - [IN] built-in performance counter index             *
+ *                                                                            *
+ * Return value: PDH performance counter name                                 *
+ *               or "UnknownPerformanceCounter" on failure                    *
+ *                                                                            *
+ * Comments: Performance counter index values can differ across Windows       *
+ *           installations for the same names                                 *
+ *                                                                            *
+ ******************************************************************************/
 wchar_t	*get_counter_name(DWORD pdhIndex)
 {
 	zbx_perf_counter_id_t	*counterName;
-	DWORD			dwSize;
-	PDH_STATUS		pdh_status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pdhIndex:%u", __func__, pdhIndex);
 
@@ -420,13 +633,12 @@ wchar_t	*get_counter_name(DWORD pdhIndex)
 		counterName->pdhIndex = pdhIndex;
 		counterName->next = PerfCounterList;
 
-		dwSize = PDH_MAX_COUNTER_NAME;
-		if (ERROR_SUCCESS == (pdh_status = PdhLookupPerfNameByIndex(NULL, pdhIndex, counterName->name, &dwSize)))
+		if (SUCCEED == get_perf_name_by_index(pdhIndex, counterName->name, PDH_MAX_COUNTER_NAME))
+		{
 			PerfCounterList = counterName;
+		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex() failed: %s",
-					strerror_from_module(pdh_status, L"PDH.DLL"));
 			zbx_free(counterName);
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL", __func__);
 			return L"UnknownPerformanceCounter";
