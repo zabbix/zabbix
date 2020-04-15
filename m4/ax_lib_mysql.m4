@@ -48,7 +48,7 @@
 
 AC_DEFUN([LIBMYSQL_OPTIONS_TRY],
 [
-	AC_MSG_CHECKING([for MySQL init options])
+	AC_MSG_CHECKING([for MySQL init options function])
 	AC_TRY_LINK(
 [
 #include <mysql.h>
@@ -58,7 +58,8 @@ AC_DEFUN([LIBMYSQL_OPTIONS_TRY],
 
 	mysql_options(mysql, MYSQL_INIT_COMMAND, "set @@session.auto_increment_offset=1");
 ],
-	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS],[mysql_options], [Define to mysql_options if it is MySQL library])
+	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS], [mysql_options], [Define mysql_options for MySQL])
+	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS_ARGS_VOID_CAST], [], [Do not define void cast for arg options for MySQL])
 	found_mysql_options="yes"
 	AC_MSG_RESULT(yes),
 	AC_MSG_RESULT(no))
@@ -66,7 +67,7 @@ AC_DEFUN([LIBMYSQL_OPTIONS_TRY],
 
 AC_DEFUN([LIBMARIADB_OPTIONS_TRY],
 [
-	AC_MSG_CHECKING([for MariaDB init options])
+	AC_MSG_CHECKING([for MariaDB init options function])
 	AC_TRY_LINK(
 [
 #include <mysql.h>
@@ -74,9 +75,10 @@ AC_DEFUN([LIBMARIADB_OPTIONS_TRY],
 [
 	MYSQL	*mysql;
 
-	mysql_optionsv(mysql, MYSQL_INIT_COMMAND, "set @@session.auto_increment_offset=1");
+	mysql_optionsv(mysql, MYSQL_INIT_COMMAND, (void *)"set @@session.auto_increment_offset=1");
 ],
-	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS],[mysql_optionsv], [Define to mysql_optionsv if it is MariaDB library])
+	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS], [mysql_optionsv], [Define mysql_optionsv for MariaDB])
+	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS_ARGS_VOID_CAST], [(void *)], [Define void cast for arg options for MariaDB])
 	found_mariadb_options="yes"
 	AC_MSG_RESULT(yes),
 	AC_MSG_RESULT(no))
@@ -243,7 +245,7 @@ AC_DEFUN([AX_LIB_MYSQL],
             LIBMARIADB_OPTIONS_TRY([no])
             if test "$found_mariadb_options" != "yes"; then
                 LIBMYSQL_OPTIONS_TRY([no])
-		if test "$found_mysql_options" != "yes"; then
+                if test "$found_mysql_options" != "yes"; then
                     AC_MSG_RESULT([no])
                     AC_MSG_ERROR([Could not find the options function for mysql init])
                 fi
