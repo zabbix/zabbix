@@ -133,17 +133,17 @@ lld_override_codition_t;
 typedef struct
 {
 	zbx_uint64_t		override_operationid;
-	unsigned char		operationtype;
-	unsigned char		operator;
 	char			*value;
-	unsigned char		status;
 	char			*delay;
 	char			*history;
 	char			*trends;
-	unsigned char		severity;
-	unsigned char		inventory_mode;
 	zbx_vector_ptr_pair_t	trigger_tags;
 	zbx_vector_uint64_t	templateids;
+	unsigned char		operationtype;
+	unsigned char		operator;
+	unsigned char		status;
+	unsigned char		severity;
+	unsigned char		inventory_mode;
 
 }
 lld_override_operation_t;
