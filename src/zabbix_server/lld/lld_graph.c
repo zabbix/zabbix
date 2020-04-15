@@ -661,6 +661,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 		graph = (zbx_lld_graph_t *)zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
 
 		graph->graphid = 0;
+
 		graph->name = zbx_strdup(NULL, name_proto);
 		graph->name_orig = NULL;
 		substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_SIMPLE, NULL, 0);
