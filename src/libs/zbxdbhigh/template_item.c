@@ -1597,7 +1597,6 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 	lld_override_operation_t	*override_operation;
 	const zbx_template_item_t	**pitem;
 
-
 	if (0 != overrides->values_num)
 		overrideid = DBget_maxid_num("lld_override", overrides->values_num);
 
@@ -1778,13 +1777,13 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		const zbx_vector_uint64_t *lld_itemids, zbx_hashset_t *lld_items)
 {
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	DB_RESULT			result;
-	DB_ROW				row;
-	lld_override_t			*override;
-	zbx_vector_ptr_t		overrides;
-	zbx_vector_uint64_t		overrideids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	lld_override_t		*override;
+	zbx_vector_ptr_t	overrides;
+	zbx_vector_uint64_t	overrideids;
 
 	zbx_vector_uint64_create(&overrideids);
 	zbx_vector_ptr_create(&overrides);
