@@ -101,7 +101,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				u.Host = p.options.Host
 			}
 			session = &Session{
-				Host:     u.Host,
+				Host:     u.Hostname(),
 				Database: u.Path,
 			}
 			var port uint64
