@@ -24,7 +24,6 @@ import (
 	"github.com/mediocregopher/radix/v3"
 	"reflect"
 	"testing"
-	"zabbix.com/pkg/plugin"
 )
 
 const (
@@ -176,8 +175,6 @@ func Benchmark_parseRedisInfo_Extended(b *testing.B) {
 }
 
 func TestPlugin_infoHandler(t *testing.T) {
-	impl.Configure(&plugin.GlobalOptions{}, nil)
-
 	stubConn := radix.Stub("", "", func(args []string) interface{} {
 		switch args[1] {
 		case "commonsection":
@@ -196,7 +193,7 @@ func TestPlugin_infoHandler(t *testing.T) {
 
 	defer stubConn.Close()
 
-	conn := &redisConn{
+	conn := &RedisConn{
 		client: stubConn,
 	}
 
@@ -206,43 +203,38 @@ func TestPlugin_infoHandler(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		p       *Plugin
 		args    args
 		want    interface{}
 		wantErr bool
 	}{
 		{
 			"Default section should be used if it is not explicitly specified",
-			&impl,
-			args{conn: conn, params: []string{"", ""}},
+			args{conn: conn, params: []string{""}},
 			`{"DefaultSection":{"test":"111"}}`,
 			false,
 		},
 		{
 			"Should fetch specified section and return marshalled result",
-			&impl,
-			args{conn: conn, params: []string{"", "COMMONSECTION"}},
+			args{conn: conn, params: []string{"COMMONSECTION"}},
 			`{"CommonSection":{"bar":"0.00","foo":"123"}}`,
 			false,
 		},
 		{
 			"Should fail if error occurred",
-			&impl,
-			args{conn: conn, params: []string{"", "WantErr"}},
+			args{conn: conn, params: []string{"WantErr"}},
 			nil,
 			true,
 		},
 		{
 			"Should fail on malformed data",
-			&impl,
-			args{conn: conn, params: []string{"", "UnknownSection"}},
+			args{conn: conn, params: []string{"UnknownSection"}},
 			nil,
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.p.infoHandler(tt.args.conn, tt.args.params)
+			got, err := infoHandler(tt.args.conn, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Plugin.infoHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

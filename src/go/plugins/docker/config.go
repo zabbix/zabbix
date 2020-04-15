@@ -21,7 +21,6 @@ package docker
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"zabbix.com/pkg/conf"
@@ -62,10 +61,6 @@ func (p *Plugin) Validate(options interface{}) error {
 
 	endpointParts := strings.SplitN(opts.Endpoint, "://", 2)
 	if len(endpointParts) == 1 || endpointParts[0] != "unix" {
-		return errors.New(errorInvalidEndpoint)
-	}
-
-	if _, err := os.Stat(endpointParts[1]); os.IsNotExist(err) || os.IsPermission(err) {
 		return errors.New(errorInvalidEndpoint)
 	}
 

@@ -52,7 +52,7 @@ foreach ($data['inputs'] as $name => $value) {
 		continue;
 	}
 
-	$form->addVar($name, $value);
+	$form->addItem((new CInput('hidden', $name, $value))->removeId());
 }
 
 // Create macros table.

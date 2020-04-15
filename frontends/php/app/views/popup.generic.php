@@ -662,7 +662,9 @@ $output['script_inline'] =
 if ($form) {
 	$form->addItem([
 		$table,
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
+		(new CInput('submit', 'submit'))
+			->addStyle('display: none;')
+			->removeId()
 	]);
 	$output['body'] = (new CDiv([$data['messages'], $form]))->toString();
 }

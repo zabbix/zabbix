@@ -102,5 +102,10 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 {
 	return 0;
 }
+
+DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
+{
+	return 0;
+}
 */
 import "C"

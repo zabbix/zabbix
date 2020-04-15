@@ -938,17 +938,13 @@
 #elif defined(DUK_F_PPC32)
 /* --- PowerPC 32-bit --- */
 #define DUK_USE_ARCH_STRING "ppc32"
-#if !defined(DUK_USE_BYTEORDER)
-#define DUK_USE_BYTEORDER 3
-#endif
+/* Byte order varies, so rely on autodetect. */
 #define DUK_USE_PACKED_TVAL
 #define DUK_F_PACKED_TVAL_PROVIDED
 #elif defined(DUK_F_PPC64)
 /* --- PowerPC 64-bit --- */
 #define DUK_USE_ARCH_STRING "ppc64"
-#if !defined(DUK_USE_BYTEORDER)
-#define DUK_USE_BYTEORDER 3
-#endif
+/* Byte order varies, so rely on autodetect. */
 #undef DUK_USE_PACKED_TVAL
 #define DUK_F_PACKED_TVAL_PROVIDED
 #elif defined(DUK_F_SPARC32)
