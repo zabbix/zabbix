@@ -92,7 +92,7 @@ get_trigger_expression_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
 substitute_lld_macros_SOURCES = \
 	substitute_lld_macros.c
 
-substitute_lld_macros_LDADD = \ 
+substitute_lld_macros_LDADD = \
 	$(COMMON_LIB_FILES)
 
 substitute_lld_macros_LDADD += @SERVER_LIBS@
@@ -100,7 +100,7 @@ substitute_lld_macros_LDADD += @SERVER_LIBS@
 substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@
 
 substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS)
-	
+
 
 evaluate_function_SOURCES = \
 	evaluate_function.c \

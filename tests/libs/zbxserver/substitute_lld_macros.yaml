@@ -140,7 +140,7 @@ in:
   macros:
     - {macro: '{#A}', path: $.a}
     - {macro: '{#B}', path: $.b}
-  expression: '{1} < 10'
+  expression: '{1} < {#A}{#B}'
 out:
   expression: '{1} < 10'
   return: SUCCEED
@@ -195,23 +195,23 @@ out:
 test case: Expand '{2000} < {#A}' with {#A}=2e+3
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":2000}'
+  lld: '{"a":2e+3}'
   macros:
     - {macro: '{#A}', path: $.a}
   expression: '{2000} < {#A}'
 out:
-  expression: '{2000} < 2000'
+  expression: '{2000} < 2e+3'
   return: SUCCEED
 ---
 test case: Expand '{1} < "\\\"a\"" and {1} = {#A}' with {#A}="b"
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
-  lld: '{"a":"b"}'
+  lld: '{"a":"\"b\""}'
   macros:
     - {macro: '{#A}', path: $.a}
   expression: '{1} < "\\\"a\"" and {1} = {#A}'
 out:
-  expression: '{1} < "\\\"a\"" and {1} = "b"'
+  expression: '{1} < "\\\"a\"" and {1} = "\"b\""'
   return: SUCCEED
 ---
 test case: Expand '{2} <> {$M:"context:\"\\/\""} and {1} < {#A}' with {#A}=x
