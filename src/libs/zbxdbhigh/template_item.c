@@ -1656,7 +1656,7 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		overrideid = DBget_maxid_num("lld_override", overrides.values_num);
 
 	zbx_db_insert_prepare(&db_insert, "lld_override", "lld_overrideid", "itemid", "name", "step", "evaltype",
-			"formula", NULL);
+			"formula", "stop", NULL);
 
 	zbx_db_insert_prepare(&db_insert_oconditions, "lld_override_condition", "lld_override_conditionid",
 			"lld_overrideid", "operator", "macro", "value", NULL);
@@ -1710,7 +1710,7 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		}
 
 		zbx_db_insert_add_values(&db_insert, overrideid, (*pitem)->itemid, override->name, (int)override->step,
-				(int)override->evaltype, override->formula);
+				(int)override->evaltype, override->formula, (int)override->stop);
 
 		for (j = 0; j < override->override_conditions.values_num; j++)
 		{
