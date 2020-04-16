@@ -283,7 +283,6 @@ try {&#13;
             delete data.urgency;&#13;
             ServiceNow.params.url += '/' + params.servicenow_sys_id;&#13;
 &#13;
-&#13;
             if (update.status === '1') {&#13;
                 data.comments = update.user + ' ' + update.action + '.';&#13;
 &#13;
