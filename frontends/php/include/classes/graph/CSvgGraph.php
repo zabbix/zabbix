@@ -886,7 +886,7 @@ class CSvgGraph extends CSvg {
 	}
 
 	/**
-	 * Edit the first and last path segments to streach up till edge of graph.
+	 * Edit the first and last path segments to stretch up till edge of graph.
 	 *
 	 * @param array $paths
 	 * @param array $metric
