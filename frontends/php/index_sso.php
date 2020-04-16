@@ -34,7 +34,7 @@ require_once __DIR__.'/vendor/xmlseclibs/xmlseclibs.php';
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Utils;
 
-$baseurl = Utils::getSelfURLhost();
+$baseurl = Utils::getSelfURLNoQuery();
 
 $sp_key = '';
 $sp_cert = '';
@@ -68,9 +68,9 @@ if (!$idp_cert && file_exists('conf/certs/idp.crt')) {
 
 $settings = [
 	'sp' => [
-		'entityId' => $baseurl.'/app/index_sso.php?metadata',
+		'entityId' => $baseurl.'?metadata',
 		'assertionConsumerService' => [
-			'url' => $baseurl.'/app/index_sso.php?acs'
+			'url' => $baseurl.'?acs'
 		],
 		'NameIDFormat' => $config['saml_nameid_format'],
 		'x509cert' => $sp_cert,
