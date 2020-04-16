@@ -3467,10 +3467,11 @@ int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
  *          instance id if its empty                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_check_instanceid()
+int	zbx_db_check_instanceid()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		ret = SUCCEED;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -3483,10 +3484,13 @@ void	zbx_db_check_instanceid()
 					zbx_create_token(0), row[0]))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot update instanceid in database");
+				ret = FAIL;
 			}
 		}
 	}
 	DBfree_result(result);
 
 	DBclose();
+
+	return ret;
 }

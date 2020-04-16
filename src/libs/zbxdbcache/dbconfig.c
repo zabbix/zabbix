@@ -929,7 +929,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	/* instance id cannot be changed - update it only at first sync to avoid read locks later */
 	if (0 == found)
-		DCstrpool_replace(found, &config->config->instanceid, row[33]);
+		DCstrpool_replace(found, &config->config->instanceid, row[32]);
 
 #if TRIGGER_SEVERITY_COUNT != 6
 #	error "row indexes below are based on assumption of six trigger severity levels"

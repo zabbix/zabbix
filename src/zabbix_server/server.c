@@ -1135,7 +1135,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	DBcheck_capabilities();
 
-	zbx_db_check_instanceid();
+	if (SUCCEED != zbx_db_check_instanceid())
+		exit(EXIT_FAILURE);
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS

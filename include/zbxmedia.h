@@ -34,8 +34,8 @@ typedef struct
 }
 zbx_mailaddr_t;
 
-int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
-		const char *smtp_email, const char *mailto, const char *mailsubject, const char *mailbody,
+int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
+		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
 		unsigned char content_type, int timeout, char *error, size_t max_error_len);
