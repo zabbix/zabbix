@@ -197,6 +197,7 @@ bin/agent
 bin/mock_server
 bin/zabbix_get
 bin/zabbix_sender
+bin/zabbix_js
 .cproject
 etc/agent.conf
 sbin/zabbix_agent2
