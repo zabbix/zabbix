@@ -4568,7 +4568,39 @@ static void	check_proxy_nodata(zbx_timespec_t *ts, unsigned char proxy_status, z
 		diff->nodata_win.values_num = 0;
 		diff->nodata_win.period_end = ts->sec;
 		diff->flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
-		diff->nodata_win.flags |= (ZBX_PROXY_SUPPRESS_ACTIVE | ZBX_PROXY_SUPPRESS_MORE);
+		diff->nodata_win.flags |= ZBX_PROXY_SUPPRESS_ENABLE;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_proxy_nodata_empty                                         *
+ *                                                                            *
+ * Purpose: detect lack of data during lost connectivity                      *
+ *                                                                            *
+ * Parameters: ts          - [IN] timestamp when the proxy connection was     *
+ *                                established                                 *
+ *             proxy_staus - [IN] - active or passive proxy                   *
+ *             diff        - [IN/OUT] the properties to update                *
+ *                                                                            *
+ ******************************************************************************/
+static void	check_proxy_nodata_empty(zbx_timespec_t *ts, unsigned char proxy_status, zbx_proxy_diff_t *diff)
+{
+	int	delay_empty;
+
+	if (0 != (diff->nodata_win.flags & ZBX_PROXY_SUPPRESS_EMPTY) && 0 != diff->nodata_win.values_num)
+		diff->nodata_win.flags &= (~ZBX_PROXY_SUPPRESS_EMPTY);
+
+	if (0 == (diff->nodata_win.flags & ZBX_PROXY_SUPPRESS_EMPTY) || 0 != diff->nodata_win.values_num)
+		return;
+
+	delay_empty = ts->sec - diff->nodata_win.period_end;
+
+	if (HOST_STATUS_PROXY_PASSIVE == proxy_status ||
+			(HOST_STATUS_PROXY_ACTIVE == proxy_status && NET_DELAY_MAX < delay_empty))
+	{
+		diff->nodata_win.period_end = 0;
+		diff->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 	}
 }
 
@@ -4677,6 +4709,8 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (0 != (proxy_diff.nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
 	{
+		check_proxy_nodata_empty(ts, proxy_status, &proxy_diff);
+
 		if (0 < proxy_diff.nodata_win.values_num || flags_old != proxy_diff.nodata_win.flags)
 			proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN;
 
