@@ -2332,7 +2332,8 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 
-			$pt_last = end($lines)[1];
+			$last_line = end($lines);
+			$pt_last = $last_line[1];
 			$px_last = $max_x - 1;
 			if ($pt_last != $px_last) {
 				// If graph image contains a region in "future", extending happens up till "now" instead of image edge.
@@ -2343,7 +2344,14 @@ class CLineGraphDraw extends CGraphDraw {
 
 				if ($px_last - $pt_last < ZBX_GRAPH_MAX_SKIP_CELL
 						|| (!$frequency || $data['clock'][$px_last] - $data['clock'][$pt_last] < $frequency)) {
-					$lines[] = [$pt_last, $px_last];
+
+					// If last segment is "dot", extend that into a line.
+					if ($last_line[0] == $last_line[1]) {
+						$lines[count($lines) - 1][1] = $px_last;
+					}
+					else {
+						$lines[] = [$pt_last, $px_last];
+					}
 				}
 			}
 		}
