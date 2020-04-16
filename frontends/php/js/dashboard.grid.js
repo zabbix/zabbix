@@ -3224,8 +3224,7 @@
 			options = $.extend({
 				'widget-height': 70,
 				'rows': 0,
-				'updated': false,
-				'storage': null
+				'updated': false
 			}, options);
 
 			options['widget-width'] = 100 / options['max-columns'];
@@ -3273,7 +3272,7 @@
 					},
 					data_buffer: [],
 					minimalHeight: calculateGridMinHeight($this),
-					storage: options['storage']
+					storage: ZABBIX.namespace('instances.localStorage')
 				});
 
 				var	data = $this.data('dashboardGrid'),

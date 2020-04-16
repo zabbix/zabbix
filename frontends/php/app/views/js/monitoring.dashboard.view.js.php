@@ -237,13 +237,11 @@
 		else {
 			// Listen for local storage 'dashboard.copied_widget' update and enable 'Paste widget' button.
 			var dashboard = jQuery('.dashbrd-grid-container').data('dashboardGrid');
-			if (dashboard['storage']) {
-				dashboard['storage'].onKeyUpdate('dashboard.copied_widget', function() {
-					if (jQuery('.dashbrd-grid-container').dashboardGrid('isWidgetCopied')) {
-						jQuery('#dashbrd-paste-widget').attr('disabled', false);
-					}
-				});
-			}
+			dashboard['storage'].onKeyUpdate('dashboard.copied_widget', function() {
+				if (jQuery('.dashbrd-grid-container').dashboardGrid('isWidgetCopied')) {
+					jQuery('#dashbrd-paste-widget').attr('disabled', false);
+				}
+			});
 		}
 
 		// Update buttons on existing widgets to edit mode.

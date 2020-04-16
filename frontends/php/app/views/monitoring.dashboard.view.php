@@ -229,8 +229,7 @@ else {
 	// Initialize dashboard grid.
 	(new CScriptTag(
 		'$(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
-			'.dashboardGrid($.extend('.json_encode($dashboard_options).', '.
-				'{"storage": ZABBIX.namespace("instances.localStorage")}))'.
+			'.dashboardGrid('.json_encode($dashboard_options).')'.
 			'.dashboardGrid("setDashboardData", '.json_encode($dashboard_data).')'.
 			'.dashboardGrid("setWidgetDefaults", '.json_encode($data['widget_defaults']).')'.
 			'.dashboardGrid("addWidgets", '.json_encode($data['grid_widgets']).
