@@ -2674,6 +2674,7 @@
 							}
 							else {
 								placeholder.container.removeAttr('style');
+								placeholder.setPositioning();
 							}
 						}
 					};
