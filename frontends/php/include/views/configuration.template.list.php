@@ -76,10 +76,23 @@ $filter
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())
-			->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
+			->addRow(
+				(new CLabel(_('Host groups'), 'filter_groups__ms')),
+				(new CMultiSelect([
+					'name' => 'filter_groups[]',
+					'object_name' => 'hostGroup',
+					'data' => $data['filter']['groups'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'host_groups',
+							'srcfld1' => 'groupid',
+							'dstfrm' => $filter->getName(),
+							'dstfld1' => 'filter_groups_',
+							'templated_hosts' => 1,
+							'editable' => 1
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(
 				(new CLabel(_('Linked templates'), 'filter_templates__ms')),
@@ -97,36 +110,29 @@ $filter
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
+			->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			),
 		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 	]);
 
 $widget = (new CWidget())
 	->setTitle(_('Templates'))
-	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getGroupsCB()
-				])
-			),
-		(new CTag('nav', true,
-			(new CList())
-				->addItem(new CRedirectButton(_('Create template'),
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create template'),
 				(new CUrl('templates.php'))
-					->setArgument('groupid', $data['pageFilter']->groupid)
+					->setArgument('groupids', array_keys($data['filter']['groups']))
 					->setArgument('form', 'create')
 					->getUrl()
-				))
-				->addItem(
-					(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=template")')
 				)
+			)
+			->addItem(
+				(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=template")')
+			)
 		))->setAttribute('aria-label', _('Content controls'))
-	]))
+	)
 	->addItem($filter);
 
 $form = (new CForm())->setName('templates');
@@ -153,9 +159,7 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['templates'] as $template) {
-	$name = new CLink($template['name'],
-		'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid')
-	);
+	$name = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 
 	$linkedTemplatesOutput = [];
 	$linkedToOutput = [];
@@ -177,7 +181,9 @@ foreach ($data['templates'] as $template) {
 			$linkedTemplatesOutput[] = ', ';
 		}
 
-		$url = 'templates.php?form=update&templateid='.$parentTemplate['templateid'].url_param('groupid');
+		$url = (new CUrl('templates.php'))
+			->setArgument('form', 'update')
+			->setArgument('templateid', $parentTemplate['templateid']);
 
 		if (array_key_exists($parentTemplate['templateid'], $data['writable_templates'])) {
 			$linkedTemplatesOutput[] = (new CLink($parentTemplate['name'], $url))
@@ -210,7 +216,9 @@ foreach ($data['templates'] as $template) {
 
 		if ($linkedToObject['status'] == HOST_STATUS_TEMPLATE) {
 			if (array_key_exists($linkedToObject['templateid'], $data['writable_templates'])) {
-				$url = 'templates.php?form=update&templateid='.$linkedToObject['templateid'].url_param('groupid');
+				$url = (new CUrl('templates.php'))
+					->setArgument('form', 'update')
+					->setArgument('templateid', $linkedToObject['templateid']);
 				$link = (new CLink($linkedToObject['name'], $url))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY);
@@ -222,7 +230,9 @@ foreach ($data['templates'] as $template) {
 		}
 		else {
 			if (array_key_exists($linkedToObject['hostid'], $data['writable_hosts'])) {
-				$url = 'hosts.php?form=update&hostid='.$linkedToObject['hostid'].url_param('groupid');
+				$url = (new CUrl('hosts.php'))
+					->setArgument('form', 'update')
+					->setArgument('hostid', $linkedToObject['hostid']);
 				$link = (new CLink($linkedToObject['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 			}
 			else {
@@ -239,7 +249,11 @@ foreach ($data['templates'] as $template) {
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
-			new CLink(_('Applications'), 'applications.php?hostid='.$template['templateid'].url_param('groupid')),
+			new CLink(_('Applications'),
+				(new CUrl('applications.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['applications'])
 		],
 		[
@@ -259,7 +273,11 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['triggers'])
 		],
 		[
-			new CLink(_('Graphs'), 'graphs.php?hostid='.$template['templateid'].url_param('groupid')),
+			new CLink(_('Graphs'),
+				(new CUrl('graphs.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['graphs'])
 		],
 		[
@@ -271,7 +289,11 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['discoveries'])
 		],
 		[
-			new CLink(_('Web'), 'httpconf.php?hostid='.$template['templateid'].url_param('groupid')),
+			new CLink(_('Web'),
+				(new CUrl('httpconf.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['httpTests'])
 		],
 		$linkedTemplatesOutput,
@@ -289,7 +311,6 @@ $form->addItem([
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'export.templates.xml')
 					->setArgument('backurl', (new CUrl('templates.php'))
-						->setArgument('groupid', $data['pageFilter']->groupid)
 						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
 						->getUrl())
 					->getUrl()

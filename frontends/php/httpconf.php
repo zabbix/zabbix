@@ -26,13 +26,12 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
-$page['scripts'] = ['class.cviewswitcher.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null],
 	'new_httpstep'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	null,				null],
 	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
 	// form
@@ -79,6 +78,8 @@ $fields = [
 	'filter_status' =>		[T_ZBX_INT, O_OPT, null,
 		IN([-1, HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED]), null
 	],
+	'filter_groups'		=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'filter_hostids'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.
@@ -108,7 +109,6 @@ if (!empty($_REQUEST['steps'])) {
 /*
  * Permissions
  */
-//*
 if (hasRequest('httptestid')) {
 	$httptests = API::HttpTest()->get([
 		'output' => [],
@@ -120,13 +120,7 @@ if (hasRequest('httptestid')) {
 		access_deny();
 	}
 }
-
-if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
-	access_deny();
-}
-
-$groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->get(['groupids' => $groupId])) {
+elseif (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
 
@@ -742,27 +736,56 @@ else {
 
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.httpconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::updateArray('web.httpconf.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
+		CProfile::updateArray('web.httpconf.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.httpconf.filter_status');
+		CProfile::deleteIdx('web.httpconf.filter_groups');
+
+		$filter_hostids = getRequest('filter_hostids', CProfile::getArray('web.httpconf.filter_hostids', []));
+		if (count($filter_hostids) != 1) {
+			CProfile::deleteIdx('web.httpconf.filter_hostids');
+		}
 	}
 
-	$pageFilter = new CPageFilter([
-		'groups' => [
-			'editable' => true
-		],
-		'hosts' => [
+	$filter = [
+		'status' => CProfile::get('web.httpconf.filter_status', -1),
+		'groups' => CProfile::getArray('web.httpconf.filter_groups', null),
+		'hosts' => CProfile::getArray('web.httpconf.filter_hostids', null)
+	];
+
+	// Get host groups.
+	$filter['groups'] = $filter['groups']
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter['groups'],
 			'editable' => true,
-			'templated_hosts' => true
-		],
-		'hostid' => getRequest('hostid'),
-		'groupid' => getRequest('groupid')
-	]);
+			'preservekeys' => true
+		]), ['groupid' => 'id'])
+		: [];
+
+	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+	if ($filter_groupids) {
+		$filter_groupids = getSubGroups($filter_groupids);
+	}
+
+	// Get hosts.
+	$filter['hosts'] = $filter['hosts']
+		? CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => $filter['hosts'],
+			'templated_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]), ['hostid' => 'id'])
+		: [];
 
 	$data = [
-		'hostid' => $pageFilter->hostid,
-		'pageFilter' => $pageFilter,
-		'filter_status' => CProfile::get('web.httpconf.filter_status', -1),
+		'hostid' => (count($filter['hosts']) == 1)
+			? reset($filter['hosts'])['id']
+			: getRequest('hostid', 0),
+		'filter' => $filter,
 		'httpTests' => [],
 		'httpTestsLastData' => [],
 		'paging' => null,
@@ -783,89 +806,80 @@ else {
 		$data['showInfoColumn'] = true;
 	}
 
-	if ($data['pageFilter']->hostsSelected) {
-		$config = select_config();
+	$config = select_config();
 
-		$options = [
-			'editable' => true,
-			'output' => ['httptestid', $sortField],
-			'limit' => $config['search_limit'] + 1
-		];
-		if ($data['filter_status'] != -1) {
-			$options['filter']['status'] = $data['filter_status'];
-		}
-		if ($data['pageFilter']->hostid > 0) {
-			$options['hostids'] = $data['pageFilter']->hostid;
-		}
-		elseif ($data['pageFilter']->groupid > 0) {
-			$options['groupids'] = $data['pageFilter']->groupids;
-		}
-		$httpTests = API::HttpTest()->get($options);
-
-		$dbHttpTests = DBselect(
-			'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.
-				'ht.authentication,ht.http_proxy,a.applicationid,a.name AS application_name'.
-				' FROM httptest ht'.
-				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
-				' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
-				' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
-		);
-		$httpTests = [];
-		while ($dbHttpTest = DBfetch($dbHttpTests)) {
-			$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
-		}
-
-		order_result($httpTests, $sortField, $sortOrder);
-
-		// pager
-		if (hasRequest('page')) {
-			$page_num = getRequest('page');
-		}
-		elseif (isRequestMethod('get') && !hasRequest('cancel')) {
-			$page_num = 1;
-		}
-		else {
-			$page_num = CPagerHelper::loadPage($page['file']);
-		}
-
-		CPagerHelper::savePage($page['file'], $page_num);
-
-		$data['paging'] = CPagerHelper::paginate($page_num, $httpTests, $sortOrder,
-			(new CUrl('httpconf.php'))
-				->setArgument('hostid', $data['hostid'])
-				->setArgument('groupid', $data['pageFilter']->groupid)
-		);
-
-		if($data['showInfoColumn']) {
-			$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
-
-			foreach ($httpTestsLastData as $httpTestId => &$lastData) {
-				if ($lastData['lastfailedstep'] !== null) {
-					$lastData['failedstep'] = get_httpstep_by_no($httpTestId, $lastData['lastfailedstep']);
-				}
-			}
-			unset($lastData);
-		}
-		else {
-			$httpTestsLastData = [];
-		}
-
-		$dbHttpSteps = DBselect(
-			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
-				' FROM httpstep hs'.
-				' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
-				' GROUP BY hs.httptestid'
-		);
-		while ($dbHttpStep = DBfetch($dbHttpSteps)) {
-			$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
-		}
-
-		order_result($httpTests, $sortField, $sortOrder);
-
-		$data['parent_templates'] = getHttpTestParentTemplates($httpTests);
-		$data['httpTests'] = $httpTests;
-		$data['httpTestsLastData'] = $httpTestsLastData;
+	$options = [
+		'output' => ['httptestid', $sortField],
+		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
+		'groupids' => $filter_groupids,
+		'editable' => true,
+		'limit' => $config['search_limit'] + 1
+	];
+	if ($data['filter']['status'] != -1) {
+		$options['filter']['status'] = $data['filter']['status'];
 	}
+
+	$httpTests = API::HttpTest()->get($options);
+
+	$dbHttpTests = DBselect(
+		'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.
+			'ht.authentication,ht.http_proxy,a.applicationid,a.name AS application_name'.
+			' FROM httptest ht'.
+			' INNER JOIN hosts h ON h.hostid=ht.hostid'.
+			' LEFT JOIN applications a ON a.applicationid=ht.applicationid'.
+			' WHERE '.dbConditionInt('ht.httptestid', zbx_objectValues($httpTests, 'httptestid'))
+	);
+	$httpTests = [];
+	while ($dbHttpTest = DBfetch($dbHttpTests)) {
+		$httpTests[$dbHttpTest['httptestid']] = $dbHttpTest;
+	}
+
+	order_result($httpTests, $sortField, $sortOrder);
+
+	// pager
+	if (hasRequest('page')) {
+		$page_num = getRequest('page');
+	}
+	elseif (isRequestMethod('get') && !hasRequest('cancel')) {
+		$page_num = 1;
+	}
+	else {
+		$page_num = CPagerHelper::loadPage($page['file']);
+	}
+
+	CPagerHelper::savePage($page['file'], $page_num);
+
+	$data['paging'] = CPagerHelper::paginate($page_num, $httpTests, $sortOrder, new CUrl('httpconf.php'));
+
+	if($data['showInfoColumn']) {
+		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));
+
+		foreach ($httpTestsLastData as $httpTestId => &$lastData) {
+			if ($lastData['lastfailedstep'] !== null) {
+				$lastData['failedstep'] = get_httpstep_by_no($httpTestId, $lastData['lastfailedstep']);
+			}
+		}
+		unset($lastData);
+	}
+	else {
+		$httpTestsLastData = [];
+	}
+
+	$dbHttpSteps = DBselect(
+		'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
+			' FROM httpstep hs'.
+			' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
+			' GROUP BY hs.httptestid'
+	);
+	while ($dbHttpStep = DBfetch($dbHttpSteps)) {
+		$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];
+	}
+
+	order_result($httpTests, $sortField, $sortOrder);
+
+	$data['parent_templates'] = getHttpTestParentTemplates($httpTests);
+	$data['httpTests'] = $httpTests;
+	$data['httpTestsLastData'] = $httpTestsLastData;
 
 	// render view
 	echo (new CView('configuration.httpconf.list', $data))->getOutput();

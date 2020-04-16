@@ -2145,7 +2145,6 @@
 		}
 		if (typeof widget['dynamic'] !== 'undefined') {
 			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
-			ajax_data['dynamic_groupid'] = widget['dynamic']['groupid'];
 		}
 
 		startPreloader(widget);
@@ -3004,8 +3003,7 @@
 		if (typeof widget['fields']['dynamic'] !== 'undefined') {
 			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
-					'hostid': data['dashboard']['dynamic']['hostid'],
-					'groupid': data['dashboard']['dynamic']['groupid']
+					'hostid': data['dashboard']['dynamic']['hostid']
 				};
 			}
 			else {
@@ -3251,6 +3249,25 @@
 						data['cell-width'] = getCurrentCellWidth(data);
 						data.new_widget_placeholder.updateLabelVisibility();
 					});
+			});
+		},
+
+		refreshDynamicWidgets: function(host) {
+			var	$this = $(this),
+				data = $this.data('dashboardGrid');
+
+			$.each(data['widgets'], function(index, widget) {
+				if (widget.fields.dynamic && +widget.fields.dynamic == 1) {
+					if (host) {
+						widget.dynamic = {};
+						widget.dynamic.hostid = host.id;
+					}
+					else {
+						delete widget.dynamic;
+					}
+
+					updateWidgetContent($this, data, widget);
+				}
 			});
 		},
 

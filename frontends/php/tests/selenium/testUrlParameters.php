@@ -81,45 +81,38 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'templates.php?form=update&templateid=10001&groupid=0',
+						'url' => 'templates.php?form=update&templateid=10001',
 						'text_present' => 'Templates'
 					],
 					[
-						'url' => 'templates.php?form=update&templateid=10001&groupid=1',
-						'text_present' => 'Templates'
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=9999999&groupid=1',
+						'url' => 'templates.php?form=update&templateid=9999999',
 						'text_not_present' => 'Templates',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'templates.php?form=update&templateid=abc&groupid=abc',
+						'url' => 'templates.php?form=update&templateid=abc',
 						'text_not_present' => 'Templates',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "templateid" is not integer.',
-							'Field "groupid" is not integer.'
+							'Field "templateid" is not integer.'
 						]
 					],
 					[
-						'url' => 'templates.php?form=update&templateid=&groupid=',
+						'url' => 'templates.php?form=update&templateid=',
 						'text_not_present' => 'Templates',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "templateid" is not integer.',
-							'Field "groupid" is not integer.'
+							'Field "templateid" is not integer.'
 						]
 					],
 					[
-						'url' => 'templates.php?form=update&templateid=-1&groupid=-1',
+						'url' => 'templates.php?form=update&templateid=-1',
 						'text_not_present' => 'Templates',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "templateid" field.',
-							'Incorrect value "-1" for "groupid" field.'
+							'Incorrect value "-1" for "templateid" field.'
 						]
 					],
 					[
@@ -138,45 +131,38 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'hosts.php?form=update&hostid=10084&groupid=0',
+						'url' => 'hosts.php?form=update&hostid=10084',
 						'text_present' => 'Hosts'
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=10084&groupid=4',
-						'text_present' => 'Hosts'
-					],
-					[
-						'url' => 'hosts.php?form=update&hostid=9999999&groupid=4',
+						'url' => 'hosts.php?form=update&hostid=9999999',
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=abc&groupid=abc',
+						'url' => 'hosts.php?form=update&hostid=abc',
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.',
 							'Field "hostid" is not integer.'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=&groupid=',
+						'url' => 'hosts.php?form=update&hostid=',
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.',
 							'Field "hostid" is not integer.'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=-1&groupid=-1',
+						'url' => 'hosts.php?form=update&hostid=-1',
 						'text_not_present' => 'Hosts',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "hostid" field.',
-							'Incorrect value "-1" for "groupid" field.'
+							'Incorrect value "-1" for "hostid" field.'
 						]
 					],
 					[
@@ -195,45 +181,38 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'maintenance.php?form=update&maintenanceid=1&groupid=0',
+						'url' => 'maintenance.php?form=update&maintenanceid=1',
 						'text_present' => 'Maintenance periods'
 					],
 					[
-						'url' => 'maintenance.php?form=update&maintenanceid=1&groupid=4',
-						'text_present' => 'Maintenance periods'
-					],
-					[
-						'url' => 'maintenance.php?form=update&maintenanceid=9999999&groupid=4',
+						'url' => 'maintenance.php?form=update&maintenanceid=9999999',
 						'text_not_present' => 'Maintenance periods',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'maintenance.php?form=update&maintenanceid=abc&groupid=abc',
+						'url' => 'maintenance.php?form=update&maintenanceid=abc',
 						'text_not_present' => 'Maintenance periods',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is not integer.',
-							'Field "groupid" is not integer.'
+							'Field "maintenanceid" is not integer.'
 						]
 					],
 					[
-						'url' => 'maintenance.php?form=update&maintenanceid=&groupid=',
+						'url' => 'maintenance.php?form=update&maintenanceid=',
 						'text_not_present' => 'Maintenance periods',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "maintenanceid" is not integer.',
-							'Field "groupid" is not integer.'
+							'Field "maintenanceid" is not integer.'
 						]
 					],
 					[
-						'url' => 'maintenance.php?form=update&maintenanceid=-1&groupid=-1',
+						'url' => 'maintenance.php?form=update&maintenanceid=-1',
 						'text_not_present' => 'Maintenance periods',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "maintenanceid" field.',
-							'Incorrect value "-1" for "groupid" field.'
+							'Incorrect value "-1" for "maintenanceid" field.'
 						]
 					],
 					[
@@ -498,18 +477,10 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => 'Overview'
 					],
 					[
-						'url' => 'overview.php?groupid=9999999&type=0',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
 						'url' => 'overview.php?groupid=abc&type=abc',
 						'text_not_present' => 'Overview',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.',
 							'Field "type" is not integer.'
 						]
 					],
@@ -518,7 +489,6 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_not_present' => 'Overview',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.',
 							'Field "type" is not integer.'
 						]
 					],
@@ -527,7 +497,6 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_not_present' => 'Overview',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "groupid" field.',
 							'Incorrect value "-1" for "type" field.'
 						]
 					]
@@ -704,71 +673,71 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Custom graphs [refreshed every 30 sec.]',
+				'title' => 'Custom graphs',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'charts.php?groupid=4&hostid=10084&graphid=524',
-						'text_not_present' => 'Graphs',
+						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=524&filter_set=1',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'charts.php?groupid=9999999&hostid=0&graphid=0',
-						'text_not_present' => 'Graphs',
+						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=524&'.
+								'filter_graphids%5B%5D=700018&filter_set=1',
+						'text_present' => [
+							'No permissions to referred object or it does not exist!',
+							'Host to check graph 1: Check graph 1'
+						]
+					],
+					[
+						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_hostids%5B%5D=666666&filter_set=1',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'charts.php?groupid=0&hostid=9999999&graphid=0',
-						'text_not_present' => 'Graphs',
+						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_hostids%5B%5D=50011&'.
+						'filter_graphids%5B%5D=524&filter_set=1',
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'No permissions to referred object or it does not exist!',
+							'1_Host_to_check_Monitoring_Overview'
 						]
 					],
 					[
-						'url' => 'charts.php?groupid=0&hostid=0&graphid=9999999',
+						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=abc&filter_set=1',
 						'text_not_present' => 'Graphs',
+						'fatal_error' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_graphids" field.'
 						]
 					],
 					[
-						'url' => 'charts.php?groupid=abc&hostid=abc&graphid=abc',
+						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=&filter_set=1',
 						'text_not_present' => 'Graphs',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.',
-							'Field "hostid" is not integer.',
-							'Field "graphid" is not integer.'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_graphids" field.'
 						]
 					],
 					[
-						'url' => 'charts.php?groupid=&hostid=&graphid=',
+						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=-1&filter_set=1',
 						'text_not_present' => 'Graphs',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.',
-							'Field "hostid" is not integer.',
-							'Field "graphid" is not integer.'
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for "filter_graphids" field.'
 						]
 					],
 					[
-						'url' => 'charts.php?groupid=-1&hostid=-1&graphid=-1',
-						'text_not_present' => 'Graphs',
+						'url' => 'zabbix.php?action=charts.view&filter_set=1',
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "groupid" field.',
-							'Incorrect value "-1" for "hostid" field.',
-							'Incorrect value "-1" for "graphid" field.'
+							'Graphs',
+							'Specify host to see the graphs.'
 						]
-					],
-					[
-						'url' => 'charts.php',
-						'text_present' => 'Graphs'
 					]
 				]
 			],
@@ -1029,42 +998,38 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'hostinventoriesoverview.php?groupid=4&groupby=',
+						'url' => 'hostinventoriesoverview.php?groupby=&filter_set=1',
 						'text_present' => 'Host inventory overview'
 					],
 					[
-						'url' => 'hostinventoriesoverview.php?groupid=4&groupby=alias',
+						'url' => 'hostinventoriesoverview.php?filter_groupby=alias&filter_set=1',
 						'text_present' => 'Host inventory overview'
 					],
 					[
-						'url' => 'hostinventoriesoverview.php?groupid=9999999&groupby=',
-						'text_not_present' => 'Host inventory overview',
+						'url' => 'hostinventoriesoverview.php?filter_groups%5B%5D=abc&filter_groupby=&filter_set=1',
+						'text_present' => [
+							'Page received incorrect data',
+							'Field "filter_groups" is not integer.'
+						]
+					],
+					[
+						'url' => 'hostinventoriesoverview.php?filter_groups%5B%5D=&filter_groupby=&filter_set=1',
+						'text_present' => [
+							'Page received incorrect data',
+							'Field "filter_groups" is not integer.'
+						]
+					],
+					[
+						'url' => 'hostinventoriesoverview.php?filter_groups%5B%5D=-1&filter_groupby=&filter_set=1',
+						'text_present' => [
+							'Page received incorrect data',
+							'Incorrect value for "filter_groups" field.'
+						]
+					],
+					[
+						'url' => 'hostinventoriesoverview.php?filter_groups%5B%5D=9999999&filter_groupby=&filter_set=1',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'hostinventoriesoverview.php?groupid=abc&groupby=',
-						'text_not_present' => 'Host inventory overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.'
-						]
-					],
-					[
-						'url' => 'hostinventoriesoverview.php?groupid=&groupby=',
-						'text_not_present' => 'Host inventory overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.'
-						]
-					],
-					[
-						'url' => 'hostinventoriesoverview.php?groupid=-1&groupby=',
-						'text_not_present' => 'Host inventory overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "groupid" field.'
 						]
 					],
 					[
@@ -1079,38 +1044,34 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => true,
 				'test_cases' => [
 					[
-						'url' => 'hostinventories.php?groupid=4',
+						'url' => 'hostinventories.php?filter_groups%5B%5D=4&filter_set=1',
 						'text_present' => 'Host inventory'
 					],
 					[
-						'url' => 'hostinventories.php?groupid=9999999',
-						'text_not_present' => 'Host inventory',
+						'url' => 'hostinventories.php?filter_groups%5B%5D=9999999&filter_set=1',
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'text_present' => 'type here to search'
 						]
 					],
 					[
-						'url' => 'hostinventories.php?groupid=abc',
-						'text_not_present' => 'Host inventory',
+						'url' => 'hostinventories.php?filter_groups%5B%5D=abc&filter_set=1',
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.'
+							'Page received incorrect data',
+							'Field "filter_groups" is not integer.'
 						]
 					],
 					[
-						'url' => 'hostinventories.php?groupid=',
-						'text_not_present' => 'Host inventory',
+						'url' => 'hostinventories.php?filter_groups%5B%5D=&filter_set=1',
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.'
+							'Page received incorrect data',
+							'Field "filter_groups" is not integer.'
 						]
 					],
 					[
-						'url' => 'hostinventories.php?groupid=-1',
-						'text_not_present' => 'Host inventory',
+						'url' => 'hostinventories.php?filter_groups%5B%5D=-1&filter_set=1',
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "groupid" field.'
+							'Page received incorrect data',
+							'Incorrect value for "filter_groups" field.'
 						]
 					],
 					[

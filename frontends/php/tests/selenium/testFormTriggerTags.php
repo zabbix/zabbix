@@ -183,7 +183,7 @@ class testFormTriggerTags extends CWebTest {
 		$old_hash = CDBHelper::getHash($sql_triggers);
 
 		$this->page->login()->open('hosts.php?groupid=4');
-		$this->query('link:'.$this->host)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->host)->waitUntilPresent()->one()->click();
 		$this->query('link:Triggers')->waitUntilPresent()->one()->click();
 
 		$this->query('button:Create trigger')->waitUntilPresent()->one()->click();
@@ -297,9 +297,9 @@ class testFormTriggerTags extends CWebTest {
 		$data['fields']['Name'] = 'Trigger with tags for updating';
 
 		$this->page->login()->open('hosts.php?groupid=4');
-		$this->query('link:'.$this->host)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->host)->waitUntilPresent()->one()->click();
 		$this->query('link:Triggers')->waitUntilPresent()->one()->click();
-		$this->query('link:'.$this->update_trigger)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->update_trigger)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
@@ -335,9 +335,9 @@ class testFormTriggerTags extends CWebTest {
 		$new_name = 'Trigger with tags for cloning - Clone';
 
 		$this->page->login()->open('hosts.php?groupid=4');
-		$this->query('link:'.$this->host)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->host)->waitUntilPresent()->one()->click();
 		$this->query('link:Triggers')->waitUntilPresent()->one()->click();
-		$this->query('link:'.$this->clone_trigger)->waitUntilPresent()->one()->click();
+		$this->query('link', $this->clone_trigger)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 
 		$form->getField('Name')->clear()->type($new_name);
@@ -356,7 +356,7 @@ class testFormTriggerTags extends CWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM triggers WHERE description='.zbx_dbstr($new_name)));
 
 		// Check created clone.
-		$this->query('link:'.$new_name)->one()->click();
+		$this->query('link', $new_name)->one()->click();
 		$form->invalidate();
 		$name = $form->getField('Name')->getValue();
 		$this->assertEquals($new_name, $name);

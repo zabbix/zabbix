@@ -23,8 +23,9 @@
  * @var CView $this
  */
 
+$tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 $output = [
-	'body' => (new CPartial('hostmacros.list.html', $data))->getOutput()
+	'body' => (new CPartial($tmpl, $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

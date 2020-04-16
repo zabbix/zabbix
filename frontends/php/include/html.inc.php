@@ -284,9 +284,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$breadcrumbs->addItem([
-			new CSpan(
-				new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid'))
-			),
+			new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))),
 			'/',
 			$template
 		]);
@@ -332,7 +330,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$breadcrumbs->addItem([
-			new CSpan(new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid'))),
+			new CSpan(new CLink(_('All hosts'), new CUrl('hosts.php'))),
 			'/',
 			$host
 		]);
@@ -349,13 +347,18 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$content_menu = (new CList())
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Content menu'));
+
 	/*
 	 * the count of rows
 	 */
 	if ($lld_ruleid == 0) {
 		// applications
 		$applications = new CSpan([
-			new CLink(_('Applications'), 'applications.php?hostid='.$db_host['hostid']),
+			new CLink(_('Applications'),
+				(new CUrl('applications.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['applications'])
 		]);
 		if ($current_element == 'applications') {
@@ -393,7 +396,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// graphs
 		$graphs = new CSpan([
-			new CLink(_('Graphs'), 'graphs.php?hostid='.$db_host['hostid']),
+			new CLink(_('Graphs'), (new CUrl('graphs.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['graphs'])
 		]);
 		if ($current_element == 'graphs') {
@@ -425,7 +431,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// web scenarios
 		$http_tests = new CSpan([
-			new CLink(_('Web scenarios'), 'httpconf.php?hostid='.$db_host['hostid']),
+			new CLink(_('Web scenarios'),
+				(new CUrl('httpconf.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['httpTests'])
 		]);
 		if ($current_element == 'web') {
@@ -447,7 +457,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		$list->addItem([
 			(new CSpan())->addItem(
-				new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'].url_param('groupid'))
+				new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'])
 			),
 			'/',
 			$discovery_rule

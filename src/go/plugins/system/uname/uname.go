@@ -20,8 +20,6 @@
 package uname
 
 import (
-	"errors"
-
 	"zabbix.com/pkg/plugin"
 )
 
@@ -34,17 +32,13 @@ var impl Plugin
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters.")
-	}
-
 	switch key {
 	case "system.uname":
-		return getUname()
+		return getUname(params)
 	case "system.hostname":
-		return getHostname()
+		return getHostname(params)
 	case "system.sw.arch":
-		return getSwArch()
+		return getSwArch(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}

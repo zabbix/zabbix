@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.0alpha5');
+define('ZABBIX_VERSION',		'5.0.0beta2');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050073);
+define('ZABBIX_DB_VERSION',		4050077);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -57,6 +57,10 @@ define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
+// Applied to tables with variable count of columns. Columns above this limit will be truncated.
+define('ZBX_MAX_TABLE_COLUMNS', 50);
+define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
+
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
@@ -76,8 +80,6 @@ define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font
 define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 
-define('ZBX_SCRIPT_TIMEOUT',		60); // in seconds
-
 define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
 define('ZBX_MAX_IMAGE_SIZE', ZBX_MEBIBYTE);
@@ -92,6 +94,9 @@ define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
 define('ZBX_SCRIPT_TYPE_TELNET',		3);
 define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
+
+define('ZBX_SEARCH_TYPE_STRICT',	0);
+define('ZBX_SEARCH_TYPE_PATTERN',	1);
 
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
@@ -155,9 +160,6 @@ define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);
-
-define('ZBX_DROPDOWN_FIRST_NONE',	0);
-define('ZBX_DROPDOWN_FIRST_ALL',	1);
 
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
@@ -725,7 +727,6 @@ define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
 // used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
-define('SCREEN_RESOURCE_CHART',				18);
 define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
 define('SCREEN_RESOURCE_LLD_GRAPH',			20);
 // used in Monitoring > Web > Details (httpdetails.php)
@@ -1227,7 +1228,10 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
-define('ZBX_SOCKET_TIMEOUT',        3);                 // socket timeout limit
+define('ZBX_SOCKET_TIMEOUT',			3);		// Socket timeout limit.
+define('ZBX_CONNECT_TIMEOUT',			3);		// Zabbix server connect timeout limit.
+define('ZBX_MEDIA_TYPE_TEST_TIMEOUT',	65);	// Timeout limit set for media type test.
+define('ZBX_SCRIPT_TIMEOUT',			60);	// Timeout limit set for scripts.
 define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
 // value is also used in servercheck.js file
@@ -1357,6 +1361,7 @@ define('ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH',		218);
 define('ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH',	218);
 define('ZBX_TEXTAREA_MACRO_WIDTH',				250);
 define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		300);
+define('ZBX_TEXTAREA_MACRO_INHERITED_WIDTH',	180);
 define('ZBX_TEXTAREA_TAG_WIDTH',				250);
 define('ZBX_TEXTAREA_TAG_VALUE_WIDTH',			300);
 define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
@@ -1599,6 +1604,7 @@ define('ZBX_STYLE_DASHED_BORDER', 'dashed-border');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
+define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
