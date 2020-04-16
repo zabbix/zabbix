@@ -618,6 +618,7 @@ FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|compression_status	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compression_availability	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compress_older	|t_varchar(32)	|'7d'	|NOT NULL	|ZBX_NODATA
+FIELD		|instanceid	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1735,4 +1736,4 @@ FIELD		|contextname	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050077	|4050077
+ROW		|4050078	|4050078
