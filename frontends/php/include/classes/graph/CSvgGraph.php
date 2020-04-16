@@ -875,12 +875,114 @@ class CSvgGraph extends CSvg {
 			if (array_key_exists($index, $this->paths) && ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE)) {
 				if ($metric['options']['fill'] > 0) {
-					$this->drawMetricArea($metric, $this->paths[$index]);
+					$paths = $this->decoratePathVirualArea($this->paths[$index], $metric);
+					$this->drawMetricArea($metric, $paths);
 				}
 
-				$this->addItem(new CSvgGraphLineGroup($this->paths[$index], $metric));
+				$paths = $this->decoratePathVirualLine($this->paths[$index], $metric);
+				$this->addItem(new CSvgGraphLineGroup($paths, $metric));
 			}
 		}
+	}
+
+	/**
+	 * Edit the first and last path segments to streach up till edge of graph.
+	 *
+	 * @param array $paths
+	 * @param array $metric
+	 *
+	 * @return array  Modified paths.
+	 */
+	protected function decoratePathVirualArea(array $paths, array $metric): array {
+		$connect_left = false;
+		$connect_right = false;
+
+		$timestamps = array_keys($this->points[$metric['options']['order']]);
+
+		$first_path =& $paths[0];
+		$first_point =& $first_path[0];
+		$first_point_time = reset($timestamps);
+
+		$last_path =& $paths[count($paths) - 1];
+		$last_point =& $last_path[count($last_path) - 1];
+		$last_point_time = end($timestamps);
+
+		if ($metric['options']['frequency'] <= 0) {
+			$connect_left = true;
+			$connect_right = true;
+		}
+		else {
+			$diff_left = $first_point_time - $this->time_from;
+			$connect_left = $diff_left < 3 * $metric['options']['frequency'];
+
+			$diff_right = $this->time_till - $last_point_time;
+			$connect_right = $diff_right < 3 * $metric['options']['frequency'];
+		}
+
+		if ($connect_left) {
+			if (count($paths) > 1) {
+				$first_point[0] = 0;
+			}
+			else {
+				array_unshift($first_path, [0 => 0] + $first_point);
+			}
+		}
+
+		if ($connect_right) {
+			if (count($paths) > 1) {
+				$last_point[0] = $this->width;
+			}
+			else {
+				$last_path[] = [0 => $this->width] + $last_point;
+			}
+		}
+
+		return $paths;
+	}
+
+	/**
+	 * Extend first and last path segments till edge of graph.
+	 *
+	 * @param array $paths
+	 * @param array $metric
+	 *
+	 * @return array  Modified paths.
+	 */
+	protected function decoratePathVirualLine(array $paths, array $metric): array {
+		$connect_left = false;
+		$connect_right = false;
+
+		$timestamps = array_keys($this->points[$metric['options']['order']]);
+
+		$first_path =& $paths[0];
+		$first_point = $first_path[0];
+		$first_point_time = reset($timestamps);
+
+		$last_path =& $paths[count($paths) - 1];
+		$last_point = $last_path[count($last_path) - 1];
+		$last_point_time = end($timestamps);
+
+		if ($metric['options']['frequency'] <= 0) {
+			$connect_left = true;
+			$connect_right = true;
+		}
+		else {
+			$diff_left = $first_point_time - $this->time_from;
+			$connect_left = $diff_left < 3 * $metric['options']['frequency'];
+
+			$diff_right = $this->time_till - $last_point_time;
+			$connect_right = $diff_right < 3 * $metric['options']['frequency'];
+		}
+
+		if ($connect_left) {
+			array_unshift($first_path, [0 => 0] + $first_point);
+		}
+
+		if ($connect_right) {
+			$last_path[] = [0 => $this->width] + $last_point;
+		}
+
+		return $paths;
 	}
 
 	/**
