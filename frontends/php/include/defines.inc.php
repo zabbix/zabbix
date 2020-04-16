@@ -1562,7 +1562,6 @@ define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
 define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
-define('ZBX_STYLE_BTN_WIDGET_DELETE', 'btn-widget-delete');
 define('ZBX_STYLE_BTN_WIDGET_EDIT', 'btn-widget-edit');
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_BOTTOM', 'bottom');
