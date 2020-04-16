@@ -540,6 +540,7 @@ class CEvent extends CApiService {
 	 *                                       - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
 	 *                                       - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
 	 *                                       - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
+	 *                                       - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
 	 *
 	 * @return array
 	 */
@@ -562,6 +563,7 @@ class CEvent extends CApiService {
 		]);
 
 		$ack_eventids = [];
+		$unack_eventids = [];
 		$sev_change_eventids = [];
 		$acknowledges = [];
 		$time = time();
@@ -582,6 +584,13 @@ class CEvent extends CApiService {
 					&& $event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 				$action |= ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
 				$ack_eventids[] = $eventid;
+			}
+
+			// Perform ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE action flag.
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+					&& $event['acknowledged'] == EVENT_ACKNOWLEDGED) {
+				$action |= ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE;
+				$unack_eventids[] = $eventid;
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
@@ -615,6 +624,19 @@ class CEvent extends CApiService {
 
 		// Make changes in problem and events tables.
 		if ($acknowledges) {
+			// Unacknowledge problems and events.
+			if ($unack_eventids) {
+				DB::update('problem', [
+					'values' => ['acknowledged' => EVENT_NOT_ACKNOWLEDGED],
+					'where' => ['eventid' => $unack_eventids]
+				]);
+
+				DB::update('events', [
+					'values' => ['acknowledged' => EVENT_NOT_ACKNOWLEDGED],
+					'where' => ['eventid' => $unack_eventids]
+				]);
+			}
+
 			// Acknowledge problems and events.
 			if ($ack_eventids) {
 				DB::update('problem', [
@@ -711,6 +733,7 @@ class CEvent extends CApiService {
 	 *                                           - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
 	 *                                           - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
 	 *                                           - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
+	 *                                           - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
 	 *
 	 * @throws APIException                    If the input is invalid.
 	 */
@@ -731,7 +754,7 @@ class CEvent extends CApiService {
 
 		// Check that at least one valid flag is set.
 		$action_mask = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
-				| ZBX_PROBLEM_UPDATE_SEVERITY;
+				| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE;
 
 		if (($data['action'] & $action_mask) != $data['action']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
@@ -742,6 +765,21 @@ class CEvent extends CApiService {
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
 		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
 		$has_severity_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY);
+
+		$ack_variants = [ZBX_PROBLEM_UPDATE_ACKNOWLEDGE, ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE];
+		$ack_action_fulfilled = false;
+		foreach ($ack_variants as $ack_variant) {
+			if (($data['action'] & $ack_variant) == $ack_variant) {
+				if ($ack_action_fulfilled) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+						_s('value must be one of %1$s', implode(', ', $ack_variants))
+					));
+				}
+				else {
+					$ack_action_fulfilled = true;
+				}
+			}
+		}
 
 		$events = $this->get([
 			'output' => [],
