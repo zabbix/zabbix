@@ -197,7 +197,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME),
 			'can_zoomout' => ($ts['to'] - $ts['from'] + 1 < ZBX_MAX_PERIOD),
 			'can_decrement' => ($ts['from'] > 0),
-			'can_increment' => ($ts['to'] < $ts['now'])
+			'can_increment' => ($ts['to'] < $ts['now'] - ZBX_MIN_PERIOD)
 		])]));
 	}
 

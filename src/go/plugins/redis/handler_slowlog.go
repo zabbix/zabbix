@@ -20,14 +20,17 @@
 package redis
 
 import (
+	"fmt"
 	"github.com/mediocregopher/radix/v3"
 )
+
+const slowlogMaxParams = 0
 
 type slowlog []interface{}
 type logItem = []interface{}
 
-// getLastSlowlogId gets the last log item ID from slowlog.
-func getLastSlowlogId(sl slowlog) (int64, error) {
+// getLastSlowlogID gets the last log item ID from slowlog.
+func getLastSlowlogID(sl slowlog) (int64, error) {
 	if len(sl) == 0 {
 		return 0, nil
 	}
@@ -50,15 +53,18 @@ func getLastSlowlogId(sl slowlog) (int64, error) {
 }
 
 // slowlogHandler gets an output of 'SLOWLOG GET 1' command and returns the last slowlog Id.
-func (p *Plugin) slowlogHandler(conn redisClient, params []string) (interface{}, error) {
+func slowlogHandler(conn redisClient, params []string) (interface{}, error) {
 	var res []interface{}
 
-	if err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1")); err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+	if len(params) > slowlogMaxParams {
+		return nil, errorInvalidParams
 	}
 
-	lastId, err := getLastSlowlogId(slowlog(res))
+	if err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1")); err != nil {
+		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotFetchData)
+	}
 
-	return lastId, err
+	lastID, err := getLastSlowlogID(slowlog(res))
+
+	return lastID, err
 }

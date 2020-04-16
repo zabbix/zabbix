@@ -741,6 +741,7 @@ class CConfigurationExport {
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectTemplates' => API_OUTPUT_EXTEND,
+			'selectMacros' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
 		]);

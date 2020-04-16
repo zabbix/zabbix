@@ -80,6 +80,9 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_addfloat(json, "pused", *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PUSED));
 	zbx_json_close(json);
 
+	/* zabbix[version] */
+	zbx_json_addstring(json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+
 	/* zabbix[wcache,<cache>,<mode>] */
 	DCget_stats_all(&wcache_info);
 	zbx_json_addobject(json, "wcache");
