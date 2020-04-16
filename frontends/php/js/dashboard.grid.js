@@ -2643,15 +2643,6 @@
 
 			var dimension = $.extend({}, data.add_widget_dimension);
 
-			/*
-			 * Unset if dimension width/height is equal to size of placeholder.
-			 * Widget default size will be used.
-			 */
-			if (dimension.width == 2 && dimension.height == 2) {
-				delete dimension.width;
-				delete dimension.height;
-			}
-
 			data['pos-action'] = 'addmodal';
 			setResizableState('enable', data.widgets, '');
 
@@ -4043,6 +4034,15 @@
 
 		addNewWidget: function(trigger_elmnt, pos) {
 			var widget = (pos && 'x' in pos && 'y' in pos) ? {pos: pos} : null;
+
+			/*
+			 * Unset if dimension width/height is equal to size of placeholder.
+			 * Widget default size will be used.
+			 */
+			if (pos && pos.width == 2 && pos.height == 2) {
+				delete pos.width;
+				delete pos.height;
+			}
 
 			return this.each(function() {
 				var	$this = $(this),
