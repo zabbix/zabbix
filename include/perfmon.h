@@ -89,6 +89,7 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 wchar_t		*get_counter_name(DWORD pdhIndex);
 wchar_t		*get_object_name_local(char *eng_name);
 int		check_counter_path(char *counterPath, int convert_from_numeric);
+int		init_object_names(void);
 int		init_builtin_counter_indexes(void);
 DWORD 		get_builtin_object_index(zbx_builtin_counter_ref_t ref);
 DWORD 		get_builtin_counter_index(zbx_builtin_counter_ref_t ref);

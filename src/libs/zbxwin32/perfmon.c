@@ -69,12 +69,13 @@ builtin_counter_map[] =
 
 struct object_name_ref
 {
-	char	*eng_name;
-	wchar_t	*loc_name;
+	char		*eng_name;
+	wchar_t		*loc_name;
+	unsigned long	idx;
 };
 
-static struct object_name_ref	*builtin_object_names = NULL;
-static unsigned int		object_num = 0;
+static struct object_name_ref	*object_names = NULL;
+static int			object_num = 0;
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath)
 {
@@ -511,11 +512,78 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: init_object_names                                                *
+ *                                                                            *
+ * Purpose: obtains PDH object names and indices to be able to assign/read    *
+ *          English object names later                                        *
+ *                                                                            *
+ * Return value: SUCCEED/FAIL                                                 *
+ *                                                                            *
+ * Comments: This function should be normally called during agent             *
+ *           initialization from init_perf_collector().                       *
+ *                                                                            *
+ ******************************************************************************/
+int	init_object_names(void)
+{
+	DWORD		sz = 0;
+	wchar_t		*objects_list = NULL, *object;
+	PDH_STATUS	pdh_status;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (PDH_MORE_DATA != (pdh_status = PdhEnumObjects(NULL, NULL, NULL, &sz, PERF_DETAIL_WIZARD, TRUE)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot obtain required buffer size: %s",
+				strerror_from_module(pdh_status, L"PDH.DLL"));
+		goto out;
+	}
+
+	objects_list = zbx_malloc(NULL, (++sz) * sizeof(wchar_t));
+
+	if (ERROR_SUCCESS != (pdh_status = PdhEnumObjects(NULL, NULL, objects_list, &sz, PERF_DETAIL_WIZARD, FALSE)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot obtain objects list: %s",
+				strerror_from_module(pdh_status, L"PDH.DLL"));
+		goto out;
+	}
+
+	for (object = objects_list; L'\0' != *object; object += wcslen(object) + 1)
+	{
+		object_names = zbx_realloc(object_names, sizeof(struct object_name_ref) * (object_num + 1));
+
+		object_names[object_num].eng_name = NULL;
+		object_names[object_num].loc_name = zbx_malloc(NULL, sizeof(wchar_t) * sz);
+		memcpy(object_names[object_num].loc_name, object, sizeof(wchar_t) * sz);
+
+		if (ERROR_SUCCESS !=
+				(pdh_status = PdhLookupPerfIndexByName(NULL, object, &object_names[object_num].idx)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain object index: %s",
+					strerror_from_module(pdh_status, L"PDH.DLL"));
+			object_names[object_num].idx = 0;
+		}
+
+		object_num++;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(objects_list);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: init_builtin_counter_indexes                                     *
  *                                                                            *
- * Purpose: scans registry key with all performance counter English names     *
+ * Purpose: Scans registry key with all performance counter English names     *
  *          and obtains system-dependent PDH counter indexes for further      *
- *          use by corresponding items                                        *
+ *          use by corresponding items. Also adds English translation to      *
+ *          object names table.                                               *
  *                                                                            *
  * Return value: SUCCEED/FAIL                                                 *
  *                                                                            *
@@ -543,13 +611,9 @@ int	init_builtin_counter_indexes(void)
 	counter_base += wcslen(counter_base) + 1;
 	counter_base += wcslen(counter_base) + 1;
 
-	/* get builtin object names */
+	/* get object names */
 	for (counter_text = counter_base; 0 != *counter_text; counter_text += wcslen(counter_text) + 1)
 	{
-		wchar_t		loc_name[PDH_MAX_COUNTER_NAME], tmp[PDH_MAX_COUNTER_NAME];
-		DWORD		loc_name_sz, sz;
-		PDH_STATUS	pdh_status;
-
 		counter_index = (DWORD)_wtoi(counter_text);
 		counter_text += wcslen(counter_text) + 1;
 
@@ -563,38 +627,14 @@ int	init_builtin_counter_indexes(void)
 			}
 		}
 
-		sz = loc_name_sz = PDH_MAX_COUNTER_NAME;
-
-		if (ERROR_SUCCESS != (pdh_status = PdhLookupPerfNameByIndex(NULL, counter_index, loc_name,
-				&loc_name_sz)))
+		for (i = 0; i < object_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain localized name of object or counter (index=%u): %s",
-					counter_index, strerror_from_module(pdh_status, L"PDH.DLL"));
-			continue;
-		}
-
-		if (0 == wcslen(loc_name))
-			memcpy(loc_name, counter_text, (wcslen(counter_text) + 1) * sizeof(wchar_t));
-
-		if (ERROR_SUCCESS == (pdh_status = PdhGetDefaultPerfCounter(NULL, NULL, loc_name, tmp, &sz)) ||
-				PDH_CSTATUS_NO_COUNTERNAME == pdh_status || PDH_CSTATUS_NO_COUNTER == pdh_status)
-		{
-			builtin_object_names = zbx_realloc(builtin_object_names,
-					sizeof(struct object_name_ref) * (object_num + 1));
-
-			builtin_object_names[object_num].eng_name = zbx_unicode_to_utf8(counter_text);
-			builtin_object_names[object_num].loc_name = zbx_malloc(NULL, sizeof(wchar_t) * loc_name_sz);
-			memcpy(builtin_object_names[object_num].loc_name, loc_name, sizeof(wchar_t) * loc_name_sz);
-
-			object_num++;
-		}
-		else if (PDH_CSTATUS_NO_OBJECT != pdh_status)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot obtain default counter (index=%u): %s", counter_index,
-					strerror_from_module(pdh_status, L"PDH.DLL"));
-			zbx_free(eng_names);
-			ret = FAIL;
-			goto out;
+			if (object_names[i].idx == counter_index || (0 == object_names[i].idx &&
+					0 == wcscmp(object_names[i].loc_name, counter_text)))
+			{
+				object_names[i].eng_name = zbx_unicode_to_utf8(counter_text);
+				break;
+			}
 		}
 	}
 
@@ -755,12 +795,12 @@ clean:
 
 wchar_t	*get_object_name_local(char *eng_name)
 {
-	unsigned int	i;
+	int	i;
 
 	for (i = 0; i < object_num; i++)
 	{
-		if (0 == strcmp(builtin_object_names[i].eng_name, eng_name))
-			return builtin_object_names[i].loc_name;
+		if (NULL != object_names[i].eng_name && 0 == strcmp(object_names[i].eng_name, eng_name))
+			return object_names[i].loc_name;
 	}
 
 	return NULL;
@@ -768,13 +808,13 @@ wchar_t	*get_object_name_local(char *eng_name)
 
 void	free_object_name_ref(void)
 {
-	unsigned int	i;
+	int	i;
 
 	for (i = 0; i < object_num; i++)
 	{
-		zbx_free(builtin_object_names[i].eng_name);
-		zbx_free(builtin_object_names[i].loc_name);
+		zbx_free(object_names[i].eng_name);
+		zbx_free(object_names[i].loc_name);
 	}
 
-	zbx_free(builtin_object_names);
+	zbx_free(object_names);
 }
