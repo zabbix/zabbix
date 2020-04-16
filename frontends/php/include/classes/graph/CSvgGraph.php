@@ -915,7 +915,7 @@ class CSvgGraph extends CSvg {
 			$diff_left = $first_point_time - $this->time_from;
 			$connect_left = $diff_left < 3 * $metric['options']['frequency'];
 
-			$diff_right = $this->time_till - $last_point_time;
+			$diff_right = min($this->time_till, time()) - $last_point_time;
 			$connect_right = $diff_right < 3 * $metric['options']['frequency'];
 		}
 
@@ -929,11 +929,19 @@ class CSvgGraph extends CSvg {
 		}
 
 		if ($connect_right) {
-			if (count($paths) > 1) {
-				$last_point[0] = $this->width;
+			if ($this->time_till > time()) {
+				$seconds_in_pixel = ($this->time_till - $this->time_from) / $this->width;
+				$right_edge = (time() - $this->time_from) / $seconds_in_pixel;
 			}
 			else {
-				$last_path[] = [0 => $this->width] + $last_point;
+				$right_edge = $this->width;
+			}
+
+			if (count($paths) > 1) {
+				$last_point[0] = $right_edge;
+			}
+			else {
+				$last_path[] = [0 => $right_edge] + $last_point;
 			}
 		}
 
@@ -970,7 +978,7 @@ class CSvgGraph extends CSvg {
 			$diff_left = $first_point_time - $this->time_from;
 			$connect_left = $diff_left < 3 * $metric['options']['frequency'];
 
-			$diff_right = $this->time_till - $last_point_time;
+			$diff_right = min($this->time_till, time()) - $last_point_time;
 			$connect_right = $diff_right < 3 * $metric['options']['frequency'];
 		}
 
@@ -979,7 +987,15 @@ class CSvgGraph extends CSvg {
 		}
 
 		if ($connect_right) {
-			$last_path[] = [0 => $this->width] + $last_point;
+			if ($this->time_till > time()) {
+				$seconds_in_pixel = ($this->time_till - $this->time_from) / $this->width;
+				$right_edge = (time() - $this->time_from) / $seconds_in_pixel;
+			}
+			else {
+				$right_edge = $this->width;
+			}
+
+			$last_path[] = [0 => $right_edge] + $last_point;
 		}
 
 		return $paths;
