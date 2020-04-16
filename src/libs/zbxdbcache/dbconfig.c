@@ -848,7 +848,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
 					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
-					"compression_status", "compression_availability", "compress_older"};	/* sync with zbx_dbsync_compare_config() */
+					"compression_status", "compression_availability", "compress_older",
+					"instanceid"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -925,6 +926,10 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
+
+	/* instance id cannot be changed - update it only at first sync to avoid read locks later */
+	if (0 == found)
+		DCstrpool_replace(found, &config->config->instanceid, row[33]);
 
 #if TRIGGER_SEVERITY_COUNT != 6
 #	error "row indexes below are based on assumption of six trigger severity levels"
@@ -12365,7 +12370,7 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
  *                                                                            *
  * Function: zbx_dc_set_macro_env                                             *
  *                                                                            *
- * Purpose: sts user macro environment security level                         *
+ * Purpose: sets user macro environment security level                        *
  *                                                                            *
  * Parameter: env - [IN] the security level (see ZBX_MACRO_ENV_* defines)     *
  *                                                                            *
@@ -12378,6 +12383,22 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env)
 	unsigned char	old_env = macro_env;
 	macro_env = env;
 	return old_env;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_instanceid                                            *
+ *                                                                            *
+ * Purpose: returns server/proxy instance id                                  *
+ *                                                                            *
+ * Return value: The instance id.                                             *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_dc_get_instanceid()
+{
+	/* instanceid is initialized during first configuration cache synchronization */
+	/* and is never updated - so it can be accessed without locking cache         */
+	return config->config->instanceid;
 }
 
 #ifdef HAVE_TESTS
