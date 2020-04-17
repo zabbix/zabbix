@@ -1981,7 +1981,7 @@ function makeEventHistoryTable(array $actions, array $users, array $config) {
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
 			makeActionTableIcon($action, $config),
-			(new CCol(zbx_nl2br($action['message'])))->addClass(ZBX_STYLE_TEXT_OVERFLOW)
+			(new CCol(zbx_nl2br($action['message'])))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK)
 		]);
 	}
 

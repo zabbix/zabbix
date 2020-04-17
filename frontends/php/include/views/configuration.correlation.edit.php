@@ -77,7 +77,7 @@ if ($data['correlation']['filter']['conditions']) {
 		$condition_table->addRow([
 				$labelSpan,
 				(new CCol(getcorrConditionDescription($condition, $correlation_condition_string_values[0][$j])))
-					->addClass(ZBX_STYLE_TEXT_OVERFLOW),
+					->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('javascript: removeCondition('.$i.');')

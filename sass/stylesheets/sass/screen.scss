@@ -1434,6 +1434,13 @@ $ui-transition-duration: .3s !default;
 				}
 			}
 
+			&.overflow-break {
+				max-width: 150px;
+				overflow-wrap: break-word;
+				white-space: initial;
+				word-wrap: break-word;
+			}
+
 			&:last-child {
 				padding-right: 0;
 			}
@@ -7157,9 +7164,4 @@ table.preprocessing-test-results {
 		display: inline-block;
 		@extend %btn-widget;
 	}
-}
-
-.text-overflow {
-	max-width: 150px;
-	white-space: break-spaces;
 }

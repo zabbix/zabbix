@@ -1736,6 +1736,11 @@ pre, pre a, pre td, pre span {
         vertical-align: middle; }
         .table-forms .table-forms-td-right td.center .btn-grey {
           margin: 3px 0; }
+      .table-forms .table-forms-td-right td.overflow-break {
+        max-width: 150px;
+        overflow-wrap: break-word;
+        white-space: initial;
+        word-wrap: break-word; }
       .table-forms .table-forms-td-right td:last-child {
         padding-right: 0; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
@@ -5502,10 +5507,6 @@ table.preprocessing-test-results .rel-container {
   display: block; }
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
-
-.text-overflow {
-  max-width: 150px;
-  white-space: break-spaces; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
