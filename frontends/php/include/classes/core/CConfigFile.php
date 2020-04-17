@@ -250,10 +250,11 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$HISTORY[\'types\'] = [\'uint\', \'text\'];
 
 // Used for SAML authentication.
-$SSO[\'SP_KEY\']		= \''.addcslashes($this->config['SP_KEY'], "'\\").'\';
-$SSO[\'SP_CERT\']		= \''.addcslashes($this->config['SP_CERT'], "'\\").'\';
-$SSO[\'IDP_CERT\']		= \''.addcslashes($this->config['IDP_CERT'], "'\\").'\';
-$SSO[\'SETTINGS\']		= [];
+// Uncomment to override the default paths to SP private key, SP and IdP X.509 certificates, and to set extra settings.
+//$SSO[\'SP_KEY\']			= \'conf/certs/sp.key\';
+//$SSO[\'SP_CERT\']			= \'conf/certs/sp.crt\';
+//$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
+//$SSO[\'SETTINGS\']		= [];
 ';
 	}
 
@@ -279,12 +280,7 @@ $SSO[\'SETTINGS\']		= [];
 		$this->config['ZBX_SERVER_NAME'] = '';
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
-		$this->config['SSO'] = [
-			'SP_KEY' => 'conf/certs/sp.key',
-			'SP_CERT' => 'conf/certs/sp.crt',
-			'IDP_CERT' => 'conf/certs/idp.crt',
-			'SETTINGS' => []
-		];
+		$this->config['SSO'] = null;
 	}
 
 	protected function check() {
