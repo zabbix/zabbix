@@ -420,7 +420,7 @@ Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
 Operational data: {EVENT.OPDATA}&#13;
 Original problem ID: {EVENT.ID}&#13;
-{TRIGGER.URL}&#13;</message>
+{TRIGGER.URL}</message>
                 </message_template>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
@@ -432,7 +432,7 @@ Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
 Operational data: {EVENT.OPDATA}&#13;
 Original problem ID: {EVENT.ID}&#13;
-{TRIGGER.URL}&#13;</message>
+{TRIGGER.URL}</message>
                 </message_template>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
@@ -441,7 +441,7 @@ Original problem ID: {EVENT.ID}&#13;
                     <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
 {EVENT.UPDATE.MESSAGE}&#13;
 &#13;
-Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.&#13;</message>
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.</message>
                 </message_template>
                 <message_template>
                     <event_source>DISCOVERY</event_source>
@@ -457,7 +457,7 @@ Device uptime: {DISCOVERY.DEVICE.UPTIME}&#13;
 Device service name: {DISCOVERY.SERVICE.NAME}&#13;
 Device service port: {DISCOVERY.SERVICE.PORT}&#13;
 Device service status: {DISCOVERY.SERVICE.STATUS}&#13;
-Device service uptime: {DISCOVERY.SERVICE.UPTIME}&#13;</message>
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
                 </message_template>
                 <message_template>
                     <event_source>AUTOREGISTRATION</event_source>
@@ -465,7 +465,7 @@ Device service uptime: {DISCOVERY.SERVICE.UPTIME}&#13;</message>
                     <subject>Autoregistration: {HOST.HOST}</subject>
                     <message>Host name: {HOST.HOST}&#13;
 Host IP: {HOST.IP}&#13;
-Agent port: {HOST.PORT}&#13;</message>
+Agent port: {HOST.PORT}</message>
                 </message_template>
                 <message_template>
                     <event_source>INTERNAL</event_source>
@@ -475,7 +475,7 @@ Agent port: {HOST.PORT}&#13;</message>
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
 Operational data: {EVENT.OPDATA}&#13;
-Original problem ID: {EVENT.ID}&#13;</message>
+Original problem ID: {EVENT.ID}</message>
                 </message_template>
             </message_templates>
         </media_type>

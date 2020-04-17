@@ -153,4 +153,4 @@ $(TARGETBIN): $(OBJS) .FORCE
 
 clean:
 	go clean -cache
-	del $(TOPDIR)\include\config.h "$(TARGETBIN)" $(OBJS) 2>NUL
+	del $(TOPDIR)\include\config.h "$(TARGETBIN)" $(OUTPUTDIR)\*.o 2>NUL
