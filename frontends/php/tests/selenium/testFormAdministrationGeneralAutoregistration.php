@@ -30,9 +30,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralAutoregistration_checkDefaultState() {
 		// Navigate to autoregistration page from dashboard page.
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
-		$this->query('link:Administration')->one()->click();
-		$this->query('xpath://nav[@class="top-subnav-container"]//a[text()="General"]')->one()->click();
+		$this->page->login()->open('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Autoregistration');
 
 		// Check elements dafault state.
@@ -142,6 +140,9 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 	public function testFormAdministrationGeneralAutoregistration_Audit($data) {
 		// Add encryption.
 		$this->page->login()->open('zabbix.php?action=autoreg.edit');
+		// Added sleep, because sorting on Audit page is by time,
+		// but sometimes there is no time difference between test cases and they are sorted unpredictably
+		sleep(1);
 		$form = $this->query('id:autoreg-form')->asForm()->one();
 		$form->fill($data['fields']);
 		$form->submit();

@@ -225,7 +225,7 @@ class CScreenHistory extends CScreenBase {
 						$value = '"'.$value.'"';
 					}
 					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-						sscanf($value, '%f', $value);
+						$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					}
 
 					$row = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
@@ -422,7 +422,7 @@ class CScreenHistory extends CScreenBase {
 					$value = $history_row['value'];
 
 					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-						sscanf($value, '%f', $value);
+						$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 					}
 
 					if ($item['valuemapid']) {
@@ -508,7 +508,7 @@ class CScreenHistory extends CScreenBase {
 						$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
 
 						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-							sscanf($value, '%f', $value);
+							$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 						}
 
 						if ($item['valuemapid']) {

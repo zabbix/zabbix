@@ -764,7 +764,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClickAndAcceptAlert('delete');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation deleted');
-		$this->zbxTestTextNotVisibleOnPage('Event correlation for delete');
+		$this->zbxTestTextNotVisible('Event correlation for delete');
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for delete'";
 		$this->assertEquals(0, CDBHelper::getCount($sql));

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,11 +52,11 @@ class CLegacyAction extends CAction {
 		$denied = [];
 
 		if ($user_type < USER_TYPE_ZABBIX_USER) {
-			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart5.php', 'chart6.php', 'chart7.php', 'charts.php',
-				'history.php', 'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php',
-				'imgstore.php', 'jsrpc.php', 'map.import.php', 'map.php', 'overview.php', 'toptriggers.php',
-				'tr_events.php', 'screenconf.php', 'screenedit.php', 'screen.import.php', 'screens.php',
-				'slideconf.php', 'slides.php', 'srv_status.php', 'sysmap.php', 'sysmaps.php', 'report2.php'
+			$denied = ['chart.php', 'chart2.php', 'chart3.php', 'chart5.php', 'chart6.php', 'chart7.php', 'history.php',
+				'hostinventories.php', 'hostinventoriesoverview.php', 'httpdetails.php', 'image.php', 'imgstore.php',
+				'jsrpc.php', 'map.import.php', 'map.php', 'overview.php', 'toptriggers.php', 'tr_events.php',
+				'screenconf.php', 'screenedit.php', 'screen.import.php', 'screens.php', 'slideconf.php', 'slides.php',
+				'srv_status.php', 'sysmap.php', 'sysmaps.php', 'report2.php'
 			];
 		}
 

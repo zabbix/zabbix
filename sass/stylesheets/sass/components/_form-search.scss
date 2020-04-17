@@ -1,0 +1,119 @@
+$form-search-color: #ffffff !default;
+$form-search-bg-color: #092637 !default;
+$form-search-border-color: #010a0f !default;
+$form-search-focused-color: $form-search-color !default;
+$form-search-focused-bg-color: $form-search-bg-color !default;
+$form-search-focused-border-color: lighten($sidebar-bg-color, 20%) !default;
+
+// Standard search-icon style.
+$form-search-icon-bg-position: -540px -616px !default;
+$form-search-icon-opacity: .75 !default;
+
+// Search-icon style on focused search-input.
+$form-search-focused-icon-bg-position: $form-search-icon-bg-position !default;
+$form-search-focused-icon-opacity: $form-search-icon-opacity !default;
+
+// Focused search-icon style.
+$form-search-icon-focused-bg-position: -570px -616px !default;
+$form-search-icon-focused-opacity: 1 !default;
+
+// Hovered search-icon style on focused search-input.
+$form-search-focused-icon-hover-bg-position: $form-search-icon-focused-bg-position !default;
+$form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !default;
+
+.form-search {
+	position: relative;
+	height: 24px;
+
+	.search {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 24px;
+
+		padding-right: 22px;
+		color: $form-search-color;
+		background: $form-search-bg-color;
+		border: 1px solid $form-search-border-color;
+		border-radius: 3px;
+
+		&:focus {
+			color: $form-search-focused-color;
+			background: $form-search-focused-bg-color;
+			border-color: $form-search-focused-border-color;
+
+			& ~ .search-icon {
+				background-position: $form-search-focused-icon-bg-position;
+				opacity: $form-search-focused-icon-opacity;
+
+				&:hover:not(:disabled) {
+					background-position: $form-search-focused-icon-hover-bg-position;
+					opacity: $form-search-focused-icon-hover-opacity;
+				}
+			}
+		}
+	}
+
+	.search-icon {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 24px;
+		height: 24px;
+		padding: 0;
+
+		// Reset global button style.
+		background-color: transparent !important;
+
+		background: url($sprite-path) no-repeat $form-search-icon-bg-position;
+		image-rendering: pixelated;
+		border: 0;
+		opacity: $form-search-icon-opacity;
+		transform: scale(.8);
+
+		&:focus {
+			box-shadow: 0 0 0 2px $form-search-focused-border-color;
+		}
+
+		&:focus,
+		&:hover:not(:disabled) {
+			background-position: $form-search-icon-focused-bg-position;
+			opacity: $form-search-icon-focused-opacity;
+		}
+
+		@if $ui-transitions {
+			transition: opacity $ui-transition-duration ease-out;
+		}
+	}
+}
+
+.search-suggest {
+	position: absolute;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	min-width: 16px;
+	color: $font-alt-color;
+	background-color: $form-bg-color;
+	border: 1px solid $action-border-color;
+	border-top: 0;
+	box-shadow: 0 6px 10px 0 $action-shadow-color;
+
+	li {
+		display: block;
+		height: inherit;
+		padding: .4em 5px;
+		margin: 0;
+		overflow: hidden;
+		color: $font-color;
+		line-height: normal;
+		word-break: break-word;
+		cursor: pointer;
+		transition: background-color .2s ease-out;
+
+		&.suggest-hover {
+			background-color: $action-hover-color;
+		}
+	}
+}

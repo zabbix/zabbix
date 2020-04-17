@@ -44,8 +44,9 @@ class testInheritanceApplication extends CLegacyWebTest {
 	 */
 	private function openApplicationsPage($host) {
 		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//select[@name="hostid"]'));
-		$this->zbxTestDropdownSelectWait('hostid', $host);
+		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$filter->getField('Hosts')->clear()->fill($host);
+		$filter->submit();
 		$this->zbxTestCheckHeader('Applications');
 	}
 
@@ -111,7 +112,9 @@ class testInheritanceApplication extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Application added');
 
 			// Check created application on host.
-			$this->zbxTestDropdownSelectWait('hostid', $data['host']);
+			$filter = $this->query('name:zbx_filter')->asForm()->one();
+			$filter->getField('Hosts')->fill($data['host']);
+			$filter->submit();
 			$get_text = $this->zbxTestGetText('//table//td[text()=": '.$data['application'].'"]');
 			$this->assertEquals($get_text, $data['template'].': '.$data['application']);
 
@@ -153,7 +156,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 					'SELECT templateid FROM application_template'.
 				')';
 
-		$this->openApplicationsPage($this->template);
+		$this->openApplicationsPage($this->template, 'Templates');
 
 		foreach (CDBHelper::getAll($applications) as $application) {
 			// Update application on template.
@@ -174,7 +177,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 				')');
 
 		// Open template page and update application name.
-		$this->openApplicationsPage($this->template);
+		$this->openApplicationsPage($this->template, 'Templates');
 		$this->zbxTestClickLinkTextWait($application);
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('appname'));
 		$this->zbxTestInputType('appname', $new_name);
@@ -186,7 +189,9 @@ class testInheritanceApplication extends CLegacyWebTest {
 		$this->assertEquals($new_name, $get_template_application);
 
 		// Check updated application name on host.
-		$this->zbxTestDropdownSelectWait('hostid', $this->host);
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Hosts')->clear()->fill($this->host);
+		$filter->submit();
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//table//td[text()=": '.$new_name.'"]'));
 		$get_host_application = $this->zbxTestGetText('//table//td[text()=": '.$new_name.'"]');
 		$this->assertEquals($get_host_application, $this->template.': '.$new_name);
@@ -250,8 +255,9 @@ class testInheritanceApplication extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('//tbody//td[text()=": '.$data['application'].'"]');
 
 			// Check application on host.
-			$this->zbxTestDropdownSelectWait('hostid', $data['host']);
-			$this->zbxTestWaitForPageToLoad();
+			$filter = $this->query('name:zbx_filter')->asForm()->one();
+			$filter->getField('Hosts')->clear()->fill($data['host']);
+			$filter->submit();
 
 			// Check the results in DB.
 			$sql = 'SELECT NULL FROM applications WHERE name='.zbx_dbstr($data['application']);

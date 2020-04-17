@@ -144,7 +144,7 @@ class CPageHeader {
 HTML;
 
 		foreach ($this->cssFiles as $path) {
-			echo '<link rel="stylesheet" type="text/css" href="'.$path.'" />'."\n";
+			echo '<link rel="stylesheet" type="text/css" href="'.$path.'?'.(int) filemtime($path).'" />'."\n";
 		}
 
 		if ($this->styles) {

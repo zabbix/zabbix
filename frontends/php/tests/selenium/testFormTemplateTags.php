@@ -285,7 +285,10 @@ class testFormTemplateTags extends CWebTest {
 		$data['fields']['Template name'] = $this->update_template;
 
 		$this->page->login()->open('templates.php');
-		$this->query('link:'.$this->update_template)->waitUntilPresent()->one()->click();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->submit();
+		$this->query('link', $this->update_template)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
@@ -331,7 +334,10 @@ class testFormTemplateTags extends CWebTest {
 		$new_name = 'Template with tags for cloning - '.$action;
 
 		$this->page->login()->open('templates.php?groupid=4');
-		$this->query('link:'.$this->clone_template)->waitUntilPresent()->one()->click();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Host groups')->select('Zabbix servers');
+		$filter->submit();
+		$this->query('link', $this->clone_template)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 		$form->getField('Template name')->fill($new_name);
 
@@ -351,7 +357,7 @@ class testFormTemplateTags extends CWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name)));
 
 		// Check created clone.
-		$this->query('link:'.$new_name)->one()->click();
+		$this->query('link', $new_name)->one()->click();
 		$form->invalidate();
 		$name = $form->getField('Template name')->getValue();
 		$this->assertEquals($new_name, $name);

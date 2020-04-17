@@ -123,7 +123,11 @@ foreach ($data['hosts'] as $hostid => $host) {
 		],
 		$host['graphs']
 			? [
-				new CLink(_('Graphs'), (new CUrl('charts.php'))->setArgument('hostid', $host['hostid'])),
+				new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'charts.view')
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', (array) $host['hostid'])
+				),
 				CViewHelper::showNum($host['graphs'])
 			]
 			: (new CSpan(_('Graphs')))->addClass(ZBX_STYLE_DISABLED),
@@ -138,7 +142,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 				new CLink(_('Web'),
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'web.view')
-						->setArgument('hostid', $host['hostid'])
+						->setArgument('filter_set', '1')
+						->setArgument('filter_hostids', (array) $host['hostid'])
 				),
 				CViewHelper::showNum($host['httpTests'])
 			]

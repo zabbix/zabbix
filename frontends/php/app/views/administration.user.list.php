@@ -33,7 +33,7 @@ $widget = (new CWidget())
 		(new CForm('get'))
 			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
-			->addVar('action', 'user.list')
+			->addItem((new CVar('action', 'user.list'))->removeId())
 			->addItem((new CList())
 				->addItem([
 					new CLabel(_('User group'), 'filter_usrgrpid'),

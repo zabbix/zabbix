@@ -225,6 +225,16 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, DCget_item_count(0));
 	}
+	else if (0 == strcmp(tmp, "version"))			/* zabbix["version"] */
+	{
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		SET_STR_RESULT(result, zbx_strdup(NULL, ZABBIX_VERSION));
+	}
 	else if (0 == strcmp(tmp, "items_unsupported"))		/* zabbix["items_unsupported"] */
 	{
 		if (1 != nparams)

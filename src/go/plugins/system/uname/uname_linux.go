@@ -20,11 +20,16 @@
 package uname
 
 import (
+	"errors"
 	"fmt"
 	"syscall"
 )
 
-func getUname() (uname string, err error) {
+func getUname(params []string) (uname string, err error) {
+	if len(params) > 0 {
+		return "", errors.New("Too many parameters.")
+	}
+
 	var utsname syscall.Utsname
 	if err = syscall.Uname(&utsname); err != nil {
 		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
@@ -36,7 +41,11 @@ func getUname() (uname string, err error) {
 	return uname, nil
 }
 
-func getHostname() (hostname string, err error) {
+func getHostname(params []string) (hostname string, err error) {
+	if len(params) > 0 {
+		return "", errors.New("Too many parameters.")
+	}
+
 	var utsname syscall.Utsname
 	if err = syscall.Uname(&utsname); err != nil {
 		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
@@ -46,7 +55,11 @@ func getHostname() (hostname string, err error) {
 	return arrayToString(&utsname.Nodename), nil
 }
 
-func getSwArch() (uname string, err error) {
+func getSwArch(params []string) (uname string, err error) {
+	if len(params) > 0 {
+		return "", errors.New("Too many parameters.")
+	}
+
 	var utsname syscall.Utsname
 	if err = syscall.Uname(&utsname); err != nil {
 		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())

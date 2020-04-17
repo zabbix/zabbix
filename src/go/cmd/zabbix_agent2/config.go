@@ -22,7 +22,6 @@ package main
 import (
 	"fmt"
 	"time"
-	"unicode/utf8"
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
@@ -69,42 +68,10 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 	return nil
 }
 
-func updateHostInterface(taskManager scheduler.Scheduler, options *agent.AgentOptions) error {
-	const hostInterfaceLen = 255
-	var err error
-
-	if len(options.HostInterface) > 0 {
-		if len(options.HostInterfaceItem) > 0 {
-			log.Warningf("both \"HostInterface\" and \"HostInterfaceItem\" configuration parameter defined, using \"HostInterface\"")
-		}
-	} else if len(options.HostInterfaceItem) > 0 {
-		options.HostInterface, err = taskManager.PerformTask(options.HostInterfaceItem, time.Duration(options.Timeout)*time.Second, agent.LocalChecksClientID)
-		if err != nil {
-			return fmt.Errorf("cannot get host interface: %s", err)
-		}
-
-		if !utf8.ValidString(options.HostInterface) {
-			return fmt.Errorf("cannot get host interface: value is not an UTF-8 string")
-		}
-
-		var n int
-
-		if options.HostInterface, n = agent.CutAfterN(options.HostInterface, hostInterfaceLen); n > hostInterfaceLen {
-			log.Warningf("the returned value of \"%s\" item specified by \"HostInterfaceItem\" configuration parameter"+
-				" is too long, using first %d characters", options.HostInterfaceItem, n)
-		}
-	}
-
-	return nil
-}
-
 func configUpdateItemParameters(taskManager scheduler.Scheduler, options *agent.AgentOptions) error {
 	var err error
 
 	if err = updateHostname(taskManager, options); err != nil {
-		return err
-	}
-	if err = updateHostInterface(taskManager, options); err != nil {
 		return err
 	}
 

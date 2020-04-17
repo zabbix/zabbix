@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 $page['title'] = _('Custom slides');
 $page['file'] = 'slides.php';
 $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.pmaster.js', 'class.calendar.js', 'gtlc.js',
-	'flickerfreescreen.js', 'layout.mode.js'
+	'multiselect.js', 'flickerfreescreen.js', 'layout.mode.js'
 ];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['web_layout_mode'] = CViewHelper::loadLayoutMode();
@@ -39,7 +39,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>			[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,	null],
 	'hostid' =>				[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,	null],
 	'elementid' =>			[T_ZBX_INT,			O_OPT, P_SYS|P_NZERO, DB_ID, null],
 	'step' =>				[T_ZBX_INT,			O_OPT, P_SYS,	BETWEEN(0, 65535), null],
@@ -59,9 +58,6 @@ validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
  */
 $data = [];
 
-if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
 if (getRequest('hostid') && !isReadableHosts([getRequest('hostid')])) {
 	access_deny();
 }
@@ -81,6 +77,14 @@ if (!$data['screen']) {
 			->getUrl()
 		);
 	}
+}
+
+// Save dynamic item hostid.
+if (hasRequest('hostid')) {
+	CProfile::update('web.slides.hostid', getRequest('hostid'), PROFILE_TYPE_ID);
+}
+elseif (hasRequest('reset')) {
+	CProfile::delete('web.slides.hostid');
 }
 
 CProfile::update('web.slides.elementid', $data['elementId'], PROFILE_TYPE_ID);
@@ -177,26 +181,22 @@ updateTimeSelectorPeriod($timeselector_options);
 $data['timeline'] = getTimeSelectorPeriod($timeselector_options);
 $data['active_tab'] = CProfile::get('web.slides.filter.active', 1);
 
-// get groups and hosts
+// Dynamic item host selector.
 if (check_dynamic_items($data['elementId'], 1)) {
-	$data['isDynamicItems'] = true;
+	$data['has_dynamic_widgets'] = true;
+	$hostid = getRequest('hostid', CProfile::get('web.slides.hostid', 0));
+	$data['host'] = ($hostid > 0)
+		? CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => [$hostid],
+			'monitored_hosts' => 1
+		]), ['hostid' => 'id'])
+		: [];
 
-	$data['pageFilter'] = new CPageFilter([
-		'groups' => [
-			'monitored_hosts' => true,
-			'with_items' => true
-		],
-		'hosts' => [
-			'monitored_hosts' => true,
-			'with_items' => true,
-			'DDFirstLabel' => _('not selected')
-		],
-		'hostid' => getRequest('hostid'),
-		'groupid' => getRequest('groupid')
-	]);
-
-	$data['groupid'] = $data['pageFilter']->groupid;
-	$data['hostid'] = $data['pageFilter']->hostid;
+	$data['hostid'] = $data['host'] ? $data['host'][0]['id'] : 0;
+}
+else {
+	$data['has_dynamic_widgets'] = false;
 }
 
 // get element

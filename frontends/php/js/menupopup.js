@@ -156,9 +156,13 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs.disabled = true;
 		}
 		else {
-			var graphs_url = new Curl('charts.php', false);
+			var graphs_url = new Curl('zabbix.php', false);
 
-			graphs_url.setArgument('hostid', options.hostid);
+			graphs_url.setArgument('action', 'charts.view')
+			graphs_url.setArgument('view_as', 'showgraph'); // HISTORY_GRAPH
+			graphs_url.setArgument('filter_search_type', '0'); // ZBX_SEARCH_TYPE_STRICT
+			graphs_url.setArgument('filter_hostids[]', options.hostid);
+			graphs_url.setArgument('filter_set', '1');
 			graphs.url = graphs_url.getUrl();
 		}
 
@@ -1176,13 +1180,16 @@ jQuery(function($) {
 			});
 			addMenuPopupItems($menu_popup, sections);
 
-			$('body').append($menu_popup);
+			$('.wrapper').append($menu_popup);
+
+			// Position the menu (before hiding).
+			$menu_popup.position(options.position);
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
-			$menu_popup.add('.menu-popup', $menu_popup).css('display', 'none');
+			$menu_popup.add('.menu-popup', $menu_popup).hide();
 
 			// Position and display the menu.
-			$menu_popup.position(options.position).fadeIn(50);
+			$menu_popup.fadeIn(50);
 
 			addToOverlaysStack('menu-popup', event.target, 'menu-popup');
 
@@ -1473,6 +1480,9 @@ jQuery(function($) {
 				'aria-haspopup': 'true',
 				'aria-expanded': 'false',
 				'area-hidden': 'true'
+			});
+			link.on('click', function(e) {
+				e.stopPropagation();
 			});
 		}
 

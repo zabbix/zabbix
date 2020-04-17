@@ -19,35 +19,35 @@
 
 
 // Time range selector.
-jQuery(function ($){
-	var container = $('.filter-space').first(),
+jQuery(function($) {
+	var $container = $('.filter-space').first(),
 		xhr = null,
 		endpoint = new Curl('zabbix.php', false),
 		element = {
-			from: container.find('[name=from]'),
-			to: container.find('[name=to]'),
-			from_clndr: container.find('[name=from_calendar]'),
-			to_clndr: container.find('[name=to_calendar]'),
-			apply: container.find('[name=apply]'),
-			increment: container.find('.btn-time-right'),
-			decrement: container.find('.btn-time-left'),
-			zoomout: container.find('.btn-time-out'),
-			quickranges: container.find('.time-quick a'),
-			label: container.find('.btn-time')
+			from: $container.find('[name=from]'),
+			to: $container.find('[name=to]'),
+			from_clndr: $container.find('[name=from_calendar]'),
+			to_clndr: $container.find('[name=to_calendar]'),
+			apply: $container.find('[name=apply]'),
+			increment: $container.find('.btn-time-right'),
+			decrement: $container.find('.btn-time-left'),
+			zoomout: $container.find('.btn-time-out'),
+			quickranges: $container.find('.time-quick a'),
+			label: $container.find('.btn-time')
 		},
 		request_data = {
-			idx: container.data('profileIdx'),
-			idx2: container.data('profileIdx2'),
+			idx: $container.data('profileIdx'),
+			idx2: $container.data('profileIdx2'),
 			from: element.from.val(),
 			to: element.to.val()
 		},
-		ui_accessible = (container.data('accessible') == 1),
+		ui_accessible = ($container.data('accessible') == 1),
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 
-	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout'+
+	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout' +
 		' timeselector.rangeoffset',
 		timeSelectorEventHandler
 	);
@@ -56,61 +56,61 @@ jQuery(function ($){
 	element.to.keydown(submitChangeHandler);
 
 	// Time selector DOM elements event triggerers initialization.
-	container.on('click', function (e) {
-		var event = '',
+	$container.on('click', function(event) {
+		var action = '',
 			data = {},
-			target = $(e.target);
+			$target = $(event.target);
 
 		if (ui_disabled) {
-			return cancelEvent(e);
+			return cancelEvent(event);
 		}
-		else if (target.is(element.increment)) {
-			event = 'timeselector.increment';
+		else if ($target.is(element.increment)) {
+			action = 'timeselector.increment';
 		}
-		else if (target.is(element.decrement)) {
-			event = 'timeselector.decrement';
+		else if ($target.is(element.decrement)) {
+			action = 'timeselector.decrement';
 		}
-		else if (target.is(element.zoomout)) {
-			event = 'timeselector.zoomout';
+		else if ($target.is(element.zoomout)) {
+			action = 'timeselector.zoomout';
 		}
-		else if (target.is(element.apply)) {
-			event = 'timeselector.rangechange';
+		else if ($target.is(element.apply)) {
+			action = 'timeselector.rangechange';
 			data = {
 				from: element.from.val(),
 				to: element.to.val()
 			}
 		}
-		else if (element.quickranges.index(target) != -1) {
-			event = 'timeselector.rangechange';
-			data = target.data();
+		else if (element.quickranges.index($target) != -1) {
+			action = 'timeselector.rangechange';
+			data = $target.data();
 			element.quickranges.removeClass('selected');
-			target.addClass('selected');
+			$target.addClass('selected');
 		}
 
-		if (event !== '') {
-			$.publish(event, data);
+		if (action !== '') {
+			$.publish(action, data);
 		}
 	});
 
 	/**
 	 * Trigger timeselector.rangechange event on 'enter' key press in 'from' or 'to' input field.
 	 *
-	 * @param {object} e jQuery event object.
+	 * @param {object} event  jQuery event object.
 	 */
-	function submitChangeHandler(e) {
-		if (e.which == 13) {
+	function submitChangeHandler(event) {
+		if (event.which == 13) { // Enter
 			$.publish('timeselector.rangechange', {
 				from: element.from.val(),
 				to: element.to.val()
 			});
-			return cancelEvent(e);
+			return cancelEvent(event);
 		}
 	}
 
 	/**
 	 * Time selector UI update.
 	 *
-	 * @param {object} data Server response on 'timeselector.rangechange' request.
+	 * @param {object} data  Server response on 'timeselector.rangechange' request.
 	 */
 	function updateTimeSelectorUI(data) {
 		if (!ui_accessible) {
@@ -129,17 +129,23 @@ jQuery(function ($){
 			decrement: data.can_decrement,
 			increment: data.can_increment,
 			zoomout: data.can_zoomout
-		}, function (elm, state) {
+		}, function(elm, state) {
 			if (typeof state !== 'undefined') {
 				element[elm].prop('disabled', !state);
 			}
+
 			element[elm].removeClass('disabled');
 		});
 
 		element.quickranges.removeClass('selected');
-		element.quickranges.filter('[data-label="'+data.label+'"]').addClass('selected');
+		element.quickranges
+			.filter('[data-label="' + data.label + '"]')
+			.addClass('selected');
 
-		element.apply.closest('.ui-tabs-panel').removeClass('is-loading is-loading-fadein');
+		element.apply
+			.closest('.ui-tabs-panel')
+			.removeClass('is-loading is-loading-fadein');
+
 		ui_disabled = false;
 	}
 
@@ -151,7 +157,10 @@ jQuery(function ($){
 			return;
 		}
 
-		element.apply.closest('.ui-tabs-panel').addClass('is-loading is-loading-fadein');
+		element.apply
+			.closest('.ui-tabs-panel')
+			.addClass('is-loading is-loading-fadein');
+
 		$([element.from[0], element.to[0], element.apply[0]]).prop('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
 
@@ -163,24 +172,24 @@ jQuery(function ($){
 	 * 'timeselector.rangeupdate'.
 	 *
 	 * Handled events:
-	 *   timeselector.rangechange    Event to apply new time selector from and to values.
-	 *   timeselector.decrement      Event to decrement current time selector interval.
-	 *   timeselector.increment      Event to increment current time selector interval.
-	 *   timeselector.zoomout        Event to zoomout current time selector interval.
-	 *   timeselector.rangeoffset    Event to apply offset to from and to values.
+	 *   timeselector.rangechange  Event to apply new time selector from and to values.
+	 *   timeselector.decrement    Event to decrement current time selector interval.
+	 *   timeselector.increment    Event to increment current time selector interval.
+	 *   timeselector.zoomout      Event to zoomout current time selector interval.
+	 *   timeselector.rangeoffset  Event to apply offset to from and to values.
 	 *
-	 * @param {object} e        jQuery event object.
-	 * @param {object} data     Object with published data for event.
+	 * @param {object} event  jQuery event object.
+	 * @param {object} data   Object with published data for event.
 	 */
-	function timeSelectorEventHandler(e, data) {
+	function timeSelectorEventHandler(event, data) {
 		var args = {
 			'idx': request_data.idx,
 			'idx2': request_data.idx2,
-			'from': (e.namespace === 'rangechange') ? data.from : request_data.from,
-			'to': (e.namespace === 'rangechange') ? data.to : request_data.to
+			'from': (event.namespace === 'rangechange') ? data.from : request_data.from,
+			'to': (event.namespace === 'rangechange') ? data.to : request_data.to
 		};
 
-		switch (e.namespace) {
+		switch (event.namespace) {
 			case 'rangeoffset':
 				args.from_offset = data.from_offset;
 				args.to_offset = data.to_offset;
@@ -193,7 +202,7 @@ jQuery(function ($){
 				break;
 		}
 
-		endpoint.setArgument('method', e.namespace);
+		endpoint.setArgument('method', event.namespace);
 
 		if (xhr && xhr.abort) {
 			return;
@@ -206,8 +215,8 @@ jQuery(function ($){
 			type: 'post',
 			cache: false,
 			data: args,
-			success: function (json) {
-				request_data = $.extend(data, request_data, json, {event: e.namespace});
+			success: function(json) {
+				request_data = $.extend(data, request_data, json, {event: event.namespace});
 				updateTimeSelectorUI(request_data);
 
 				if (json.error) {
@@ -216,16 +225,18 @@ jQuery(function ($){
 						alert(json.error);
 					}
 
-					container.find('.time-input-error').each(function (i, elm) {
-						var node = $(elm),
-							field = node.attr('data-error-for');
+					$container.find('.time-input-error').each(function(i, elm) {
+						var $node = $(elm),
+							field = $node.attr('data-error-for');
 
 						if (json.error[field]) {
-							node.show()
-								.find('.red').text(json.error[field]);
+							$node
+								.show()
+								.find('.red')
+								.text(json.error[field]);
 						}
 						else {
-							node.hide();
+							$node.hide();
 						}
 					});
 
@@ -233,13 +244,15 @@ jQuery(function ($){
 				}
 				else {
 					updateUrlArguments(json.from, json.to);
-					container.find('.time-input-error').hide();
+					$container
+						.find('.time-input-error')
+						.hide();
 					$.publish('timeselector.rangeupdate', request_data);
 				}
 
 				xhr = null;
 			},
-			error: function (request, status, error) {
+			error: function(request, status, error) {
 				/*
 				 * In case there is something very wrong with the code like "echo '<br>'" in the middle where there is
 				 * supposed to be JSON, show error. Otherwise it could've been just a temporary connection issue
@@ -247,9 +260,9 @@ jQuery(function ($){
 				 */
 				if (request.status != 200) {
 					var request = this,
-					retry = function() {
-						$.ajax(request);
-					};
+						retry = function() {
+							$.ajax(request);
+						};
 
 					// Retry with 2s interval.
 					setTimeout(retry, 2000);
@@ -298,35 +311,35 @@ jQuery(function ($){
 
 	$(document)
 		.on('mousedown', 'img', selectionHandlerDragStart)
-		.on('dblclick', 'img', function(e) {
-			if (typeof $(e.target).data('zbx_sbox') !== 'undefined') {
+		.on('dblclick', 'img', function(event) {
+			if (typeof $(event.target).data('zbx_sbox') !== 'undefined') {
 				$.publish('timeselector.zoomout', {
 					from: element.from.val(),
 					to: element.to.val()
 				});
 
-				return cancelEvent(e);
+				return cancelEvent(event);
 			}
 		})
-		.on('click', 'a', function(e) {
+		.on('click', 'a', function(event) {
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
-			if ($(e.target).is('img') && typeof $(e.target).data('zbx_sbox') !== 'undefined' && prevent_click
+			if ($(event.target).is('img') && typeof $(event.target).data('zbx_sbox') !== 'undefined' && prevent_click
 					&& $(this).hasClass('dashbrd-widget-graph-link')) {
-				return cancelEvent(e);
+				return cancelEvent(event);
 			}
 		});
 
 	/**
 	 * Handle selection box drag start event.
 	 *
-	 * @param {object} e    jQuery event object.
+	 * @param {object} event  jQuery event object.
 	 */
-	function selectionHandlerDragStart(e) {
-		if (e.which !== 1) {
+	function selectionHandlerDragStart(event) {
+		if (event.which !== 1) {
 			return;
 		}
 
-		var target = $(e.target),
+		var target = $(event.target),
 			data = target.data();
 
 		if (typeof data.zbx_sbox === 'undefined') {
@@ -337,13 +350,13 @@ jQuery(function ($){
 
 		/**
 		 * @prop {object}  data
-		 * @prop {integer} data.height            Height of selection box.
-		 * @prop {integer} data.left              Left margin of selection box.
-		 * @prop {integer} data.right             Right margin of selection box.
-		 * @prop {integer} data.top               Top margin of selection box.
-		 * @prop {integer} data.from_ts           Timestamp for start time of selection box.
-		 * @prop {integer} data.to_ts             Timestamp for end time of selection box.
-		 * @prop {integer} data.prevent_refresh   Mark image as non updateable during selection.
+		 * @prop {integer} data.height           Height of selection box.
+		 * @prop {integer} data.left             Left margin of selection box.
+		 * @prop {integer} data.right            Right margin of selection box.
+		 * @prop {integer} data.top              Top margin of selection box.
+		 * @prop {integer} data.from_ts          Timestamp for start time of selection box.
+		 * @prop {integer} data.to_ts            Timestamp for end time of selection box.
+		 * @prop {integer} data.prevent_refresh  Mark image as non updateable during selection.
 		 */
 		data = data.zbx_sbox;
 		data.prevent_refresh = true;
@@ -352,61 +365,65 @@ jQuery(function ($){
 		var offset = target.offset(),
 			left = data.left,
 			right = target.outerWidth() - data.right,
-			xpos = Math.min(Math.max(left, e.pageX - offset.left), right),
+			xpos = Math.min(Math.max(left, event.pageX - offset.left), right),
 			parent = target.parent();
 
 		offset.top += data.top;
-		if ((e.pageY < offset.top) || e.pageY > offset.top + data.height) {
+		if ((event.pageY < offset.top) || event.pageY > offset.top + data.height) {
 			prevent_click = false;
 			return;
 		}
 
 		prevent_click = true;
-		noclick_area = $('<div/>').css({
-			position: 'absolute',
-			top: 0,
-			left: (parent.is('.center') ? target : parent).position().left,
-			height: target.height() + 'px',
-			width: target.width() + 'px',
-			overflow: 'hidden',
-			display: 'none'
-		}).insertAfter(parent);
+		noclick_area = $('<div/>')
+			.css({
+				position: 'absolute',
+				top: 0,
+				left: (parent.is('.center') ? target : parent).position().left,
+				height: target.height() + 'px',
+				width: target.width() + 'px',
+				overflow: 'hidden',
+				display: 'none'
+			})
+			.insertAfter(parent);
 
 		selection = {
-			dom: $('<div class="graph-selection"/>').css({
-				position: 'absolute',
-				top: data.top,
-				left: xpos,
-				height: data.height + 'px',
-				width: '1px'
-			}).appendTo(noclick_area),
+			dom: $('<div class="graph-selection"/>')
+				.css({
+					position: 'absolute',
+					top: data.top,
+					left: xpos,
+					height: data.height + 'px',
+					width: '1px'
+				})
+				.appendTo(noclick_area),
 			offset: offset,
 			min: left,
 			max: right,
 			base_x: xpos,
-			seconds_per_px: (data.to_ts - data.from_ts)/(right - left)
+			seconds_per_px: (data.to_ts - data.from_ts) / (right - left)
 		}
 
 		$(document)
 			.on('mouseup', {zbx_sbox: data, target: target}, selectionHandlerDragEnd)
 			.on('mousemove', selectionHandlerDrag);
 
-		return cancelEvent(e);
+		return cancelEvent(event);
 	}
 
 	/**
 	 * Handle selection box drag end event.
 	 *
-	 * @param {object} e    jQuery event object.
+	 * @param {object} event  jQuery event object.
 	 */
-	function selectionHandlerDragEnd(e) {
+	function selectionHandlerDragEnd(event) {
 		var left = Math.floor(Math.max(selection.dom.position().left, selection.min)),
 			from_offset = (left - selection.min) * selection.seconds_per_px,
 			to_offset = (selection.max - Math.floor(selection.dom.width()) - left) * selection.seconds_per_px,
-			zbx_sbox = e.data.zbx_sbox;
+			zbx_sbox = event.data.zbx_sbox;
 
 		zbx_sbox.prevent_refresh = false;
-		e.data.target.data('zbx_sbox', zbx_sbox);
+		event.data.target.data('zbx_sbox', zbx_sbox);
 
 		selection.dom.remove();
 		selection = null;
@@ -424,31 +441,56 @@ jQuery(function ($){
 			});
 		}
 
-		return cancelEvent(e);
+		return cancelEvent(event);
 	}
 
 	/**
 	 * Handle selection box drag event
 	 *
-	 * @param {object} e    jQuery event object.
+	 * @param {object} event  jQuery event object.
 	 */
-	function selectionHandlerDrag(e) {
-		var x = Math.min(Math.max(selection.min, e.pageX - selection.offset.left), selection.max),
+	function selectionHandlerDrag(event) {
+		var x = Math.min(Math.max(selection.min, event.pageX - selection.offset.left), selection.max),
 			width = Math.abs(x - selection.base_x),
 			seconds = Math.round(width * selection.seconds_per_px),
-			label = formatTimestamp(seconds, false, true)
-				+ (seconds < 60 ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '');
+			label = formatTimestamp(seconds, false, true) + (seconds < 60 ? ' [min 1' + t('S_MINUTE_SHORT') + ']' : '');
 
 		if (!was_dragged) {
 			was_dragged = true;
 			noclick_area.show();
 		}
 
-		selection.dom.css({
-			left: Math.min(selection.base_x, x),
-			width: width + 'px'
-		}).text(label);
+		selection.dom
+			.css({
+				left: Math.min(selection.base_x, x),
+				width: width + 'px'
+			})
+			.text(label);
 	}
+
+	function checkDisableTimeSelectorUI() {
+		if (!element.zoomout.length) {
+			return false;
+		}
+
+		$.ajax({
+			url: endpoint.getUrl(),
+			type: 'post',
+			cache: false,
+			data: {
+				method: 'rangechange',
+				idx: request_data.idx,
+				idx2: request_data.idx2,
+				from: request_data.from,
+				to: request_data.to
+			},
+			success: function(json) {
+				updateTimeSelectorUI(json);
+			}
+		});
+	}
+
+	checkDisableTimeSelectorUI();
 });
 
 /**
@@ -517,7 +559,7 @@ var timeControl = {
 
 				// width
 				if ((!isset('width', obj.objDims) || obj.objDims.width < 0) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)) {
-					var width = get_bodywidth();
+					var width = $('.wrapper')[0].scrollWidth - 20;
 
 					if (!is_number(width)) {
 						width = 1000;
@@ -526,7 +568,7 @@ var timeControl = {
 						obj.objDims.width = 0;
 					}
 
-					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 23);
+					obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright)) - 3;
 				}
 
 				// url

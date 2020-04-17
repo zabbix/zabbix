@@ -126,20 +126,39 @@ class OracleDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDatabaseEncoding() {
-		$db_params = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
+		$row = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
 			' WHERE '.dbConditionString('parameter', ['NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET']).
 				' AND value!='.zbx_dbstr(ZBX_DB_DEFAULT_CHARSET)
 		));
 
-		foreach ($db_params as $db_param) {
-			if ($db_param['value'] != ZBX_DB_DEFAULT_CHARSET) {
-				$this->setWarning((_s('Incorrect parameter "%1$s" value: %2$s.',
-					$db_param['parameter'], _s('"%1$s" instead "%2$s"', $db_param['value'], ZBX_DB_DEFAULT_CHARSET)
-				)));
-				return false;
-			}
+		if ($row) {
+			$this->setWarning((_s('Incorrect parameter "%1$s" value: %2$s.',
+				$row['parameter'], _s('"%1$s" instead "%2$s"', $row['value'], ZBX_DB_DEFAULT_CHARSET)
+			)));
 		}
 
-		return true;
+		return !$row;
+	}
+
+	/**
+	* Check if database is using IEEE754 compatible double precision columns.
+	*
+	* @return bool
+	*/
+	public function isDoubleIEEE754() {
+		global $DB;
+
+		$conditions_or = [
+			'(table_name=\'HISTORY\' AND column_name=\'VALUE\')',
+			'(table_name=\'TRENDS\' AND column_name IN (\'VALUE_MIN\', \'VALUE_AVG\', \'VALUE_MAX\'))'
+		];
+
+		$sql =
+			'SELECT COUNT(*) cnt FROM user_tab_columns'.
+				' WHERE data_type=\'BINARY_DOUBLE\' AND ('.implode(' OR ', $conditions_or).')';
+
+		$result = DBfetch(DBselect($sql));
+
+		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == 4);
 	}
 }

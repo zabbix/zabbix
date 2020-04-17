@@ -123,6 +123,9 @@ if ($data['action'] === 'problem.view') {
 				'object_name' => 'hosts',
 				'data' => $data['filter']['hosts'],
 				'popup' => [
+					'filter_preselect_fields' => [
+						'hostgroups' => 'filter_groupids_'
+					],
 					'parameters' => [
 						'srctbl' => 'hosts',
 						'srcfld1' => 'hostid',
@@ -137,7 +140,7 @@ if ($data['action'] === 'problem.view') {
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('filter_application_select', _('Select')))
-				->onClick('return PopUp("popup.generic",'.
+				->onClick('return PopUp("popup.generic", jQuery.extend('.
 					json_encode([
 						'srctbl' => 'applications',
 						'srcfld1' => 'name',
@@ -145,7 +148,7 @@ if ($data['action'] === 'problem.view') {
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1',
 						'real_hosts' => '1'
-					]).', null, this);'
+					]).', getFirstMultiselectValue("filter_hostids_")), null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_GREY)
 		])
@@ -155,6 +158,9 @@ if ($data['action'] === 'problem.view') {
 				'object_name' => 'triggers',
 				'data' => $data['filter']['triggers'],
 				'popup' => [
+					'filter_preselect_fields' => [
+						'hosts' => 'filter_hostids_'
+					],
 					'parameters' => [
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
@@ -356,11 +362,11 @@ if ($data['action'] === 'problem.view') {
 					->addItem(new CRedirectButton(_('Export to CSV'),
 						(new CUrl('zabbix.php'))->setArgument('action', 'problem.view.csv')
 					))
-					->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			))->setAttribute('aria-label', _('Content controls'))
 		);
 
-	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+	if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		$widget->addItem($filter);
 	}
 

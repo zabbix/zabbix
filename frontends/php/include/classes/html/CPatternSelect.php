@@ -38,9 +38,13 @@ class CPatternSelect extends CMultiSelect {
 			}
 			unset($item);
 		}
+	}
 
-		// Add popup patternselect flag.
-		$this->params['popup']['parameters']['patternselect'] = 1;
+	protected function mapOptions(array $options): array {
+		$options = parent::mapOptions($options);
+		$options['popup']['parameters']['patternselect'] = '1';
+
+		return $options;
 	}
 
 	public function setEnabled($enabled) {

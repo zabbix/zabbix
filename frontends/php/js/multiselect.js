@@ -35,7 +35,7 @@ jQuery(function($) {
 	/**
 	 * Multi select helper.
 	 *
-	 * @param string options['objectName']		backend data source
+	 * @param string options['object_name']		backend data source
 	 * @param object options['objectOptions']	parameters to be added the request URL (optional)
 	 *
 	 * @see jQuery.multiSelect()
@@ -46,7 +46,7 @@ jQuery(function($) {
 		var curl = new Curl('jsrpc.php', false);
 		curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 		curl.setArgument('method', 'multiselect.get');
-		curl.setArgument('objectName', options.objectName);
+		curl.setArgument('object_name', options.object_name);
 
 		for (var key in options.objectOptions) {
 			curl.setArgument(key, options.objectOptions[key]);
@@ -83,20 +83,35 @@ jQuery(function($) {
 				});
 			}
 
+			// Sort entries by name field.
+			data.sort(function(a, b) {
+				if (a.name === b.name) {
+					return 0;
+				}
+				else {
+					return (a.name < b.name) ? -1 : 1;
+				}
+			});
+
 			return data;
 		},
 
 		/**
 		 * Insert outside data
 		 *
-		 * @param object    multiselect value object
+		 * @param {array} items           Multiselect value object.
+		 * @param {bool}  trigger_change  (optional) Either to trigger element on-change event once data added. True by default.
 		 *
 		 * @return jQuery
 		 */
-		addData: function(items) {
+		addData: function(items, trigger_change) {
 			return this.each(function() {
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
+
+				if (typeof trigger_change !== 'boolean') {
+					trigger_change = true;
+				}
 
 				if (ms.options.selectedLimit == 1) {
 					for (var id in ms.values.selected) {
@@ -108,7 +123,7 @@ jQuery(function($) {
 					addSelected($obj, items[i]);
 				}
 
-				$obj.trigger('change', ms);
+				trigger_change && $obj.trigger('change', ms);
 			});
 		},
 
@@ -263,6 +278,7 @@ jQuery(function($) {
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
+	 * @param string options['popup']['filter_preselect_fields']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
 	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
@@ -370,6 +386,9 @@ jQuery(function($) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
 					}
+				})
+				.on('remove', function() {
+					cleanSearch($obj);
 				});
 
 			if (empty(ms.options.data)) {
@@ -397,15 +416,49 @@ jQuery(function($) {
 				}
 
 				popup_button.on('click', function(event) {
+					var popup_options = ms.options.popup.parameters;
+
+					if (ms.options.popup.filter_preselect_fields) {
+						popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj));
+					}
+
 					// Click used instead focus because in patternselect listen only click.
 					$('input[type="text"]', $obj).click();
-					return PopUp('popup.generic', ms.options.popup.parameters, null, event.target);
+					return PopUp('popup.generic', popup_options, null, event.target);
 				});
 
 				$obj.after($('<div>', {'class': 'multiselect-button'}).append(popup_button));
 			}
 		});
 	};
+
+	/**
+	 * Get current value from preselect filter field.
+	 *
+	 * @param {jQuery} $obj
+	 *
+	 * @return {object}
+	 */
+	function getFilterPreselectField($obj) {
+		var ms = $obj.data('multiSelect'),
+			ret = {};
+
+		if (typeof ms.options.popup.filter_preselect_fields.hosts !== 'undefined') {
+			var hosts = $('#' + ms.options.popup.filter_preselect_fields.hosts).multiSelect('getData');
+			if (hosts.length != 0) {
+				ret.hostid = hosts[0].id;
+			}
+		}
+
+		if (typeof ms.options.popup.filter_preselect_fields.hostgroups !== 'undefined') {
+			var host_groups = $('#' + ms.options.popup.filter_preselect_fields.hostgroups).multiSelect('getData');
+			if (host_groups.length != 0) {
+				ret.groupid = host_groups[0].id;
+			}
+		}
+
+		return ret;
+	}
 
 	function makeMultiSelectInput($obj) {
 		var ms = $obj.data('multiSelect'),
@@ -415,6 +468,7 @@ jQuery(function($) {
 				'id': $label.length ? $label.attr('for') : null,
 				'class': 'input',
 				'type': 'text',
+				'autocomplete': 'off',
 				'placeholder': ms.options.placeholder,
 				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
 				'aria-required': ms.options.required_str
