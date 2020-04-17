@@ -42,7 +42,6 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hosti
 			MACRO_TYPE_COMMON, NULL, 0);
 	substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &pwd,
 			MACRO_TYPE_COMMON, NULL, 0);
-	printf("AKDBG user %s\n",user);
 	username_len = strlen(user) + 1;
 	password_len = strlen(pwd) + 1;
 	sensor_len = strlen(sensor) + 1;
