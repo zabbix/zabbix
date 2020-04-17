@@ -5010,6 +5010,7 @@ svg {
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
+.icon-action-unack,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -5034,6 +5035,7 @@ svg {
   .icon-action-severity-changed::before,
   .icon-action-message::before,
   .icon-action-ack::before,
+  .icon-action-unack::before,
   .icon-invisible::before,
   .icon-problem-generated::before,
   .icon-problem-recovery::before,
@@ -5084,6 +5086,9 @@ svg {
 
 .icon-action-ack::before {
   background-position: -323px -245px; }
+
+.icon-action-unack::before {
+  background-position: -124px -512px; }
 
 .icon-invisible::before {
   background-position: -89px -803px; }
@@ -6046,6 +6051,9 @@ td.inactive-bg {
 
 .icon-action-ack::before {
   background-position: -323px -285px; }
+
+.icon-action-unack::before {
+  background-position: -284px -512px; }
 
 .icon-invisible::before {
   background-position: -249px -803px; }
