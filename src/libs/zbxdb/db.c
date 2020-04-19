@@ -395,9 +395,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	/* shadow global auto_increment variables */
 
-	if (ZBX_DB_OK == ret &&
-			0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
-					"set @@session.auto_increment_increment=1"))
+	if (0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
+			"set @@session.auto_increment_increment=1"))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_increment option.");
 		ret = ZBX_DB_FAIL;
@@ -412,7 +411,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 
 #if defined(HAVE_MYSQL_TLS)
-	if (NULL != tls_connect)
+	if (ZBX_DB_OK == ret && NULL != tls_connect)
 	{
 		unsigned int	mysql_tls_mode;
 
@@ -465,7 +464,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_MARIADB_TLS)
 	ZBX_UNUSED(cipher_13);
 
-	if (NULL != tls_connect)
+	if (ZBX_DB_OK == ret && NULL != tls_connect)
 	{
 		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 		{
