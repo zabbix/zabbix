@@ -184,7 +184,6 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateSamlAuth() {
-		$is_valid = true;
 		$saml_fields = ['saml_idp_entityid', 'saml_sso_url', 'saml_slo_url', 'saml_username_attribute'];
 		$config = select_config();
 		$this->getInputs($config, $saml_fields);
@@ -194,12 +193,12 @@ class CControllerAuthenticationUpdate extends CController {
 				$this->response->setMessageError(
 					_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
 				);
-				$is_valid = false;
-				break;
+
+				return false;
 			}
 		}
 
-		return $is_valid;
+		return true;
 	}
 
 	/**
