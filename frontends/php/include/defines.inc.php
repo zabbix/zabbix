@@ -40,7 +40,8 @@ define('ZBX_GIBIBYTE',	'1073741824');
 define('ZBX_TEBIBYTE',	'1099511627776');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-// the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1
+// The maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1.
+// Both dates are included to the period, so one second is needed to cover the case from "now" till "now-2y".
 define('ZBX_MAX_PERIOD',		63162001);
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
