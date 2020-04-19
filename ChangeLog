@@ -1336,6 +1336,12 @@ New features:
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 
 Bug fixes:
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
 ........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
 ..F....... [ZBX-17423] fixed "reset" button in history page (talbergs)
 ..F....... [ZBX-17395] fixed deletion of templated applications that were linked to items when importing templates (Ivo)
