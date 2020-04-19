@@ -1,8 +1,23 @@
 Changes for 5.0.0beta2
 
 New features:
+A.F.....S. [ZBXNEXT-702] Implemented ability to compare string values in triggers (arimdjonoks, Ivo, Sasha)
+.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
+.........T [ZBXNEXT-5658] added media "Zammad" (afayantsev)
+.........T [ZBXNEXT-5821] added "Template App Memcached" (ychukina)
+.........T [ZBXNEXT-5833] added "Template DB ClickHouse by HTTP" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17521] fixed closing multi-level pop-up menus when selected with a mouse click (vasilijs)
+..F....... [ZBX-15914] fixed map elements label inconsistency (agriscenko)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17140] fixed builtin counter index rewrite on localized Windows systems (atumilovics)
+.......PS. [ZBX-17412] fixed updating metadata, ip, port for hosts with TLS certificate encryption monitored via proxy (mabele)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.0beta1

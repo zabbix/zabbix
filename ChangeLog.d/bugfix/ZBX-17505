@@ -1,1 +1,0 @@
-...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
