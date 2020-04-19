@@ -4173,6 +4173,7 @@ Changes for 3.0.31rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-17600] fixed security vulnerability CVE-2020-11800 (remote code execution) (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.30
