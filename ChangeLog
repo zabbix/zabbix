@@ -203,10 +203,19 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 Changes for 4.4.8rc1
 
 New features:
+.........T [ZBXCTR-1] added Telegram media type (ableev)
+.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 
 Bug fixes:
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
+.......PS. [ZBX-17412] fixed updating metadata, ip, port for hosts with TLS certificate encryption monitored via proxy (mabele)
 ...G...... [ZBX-17558] fixed Zabbix agent 2 compilation on MS Windows (vso)
 ...G...... [ZBX-17140] fixed builtin counter index rewrite on localized Windows systems (atumilovics)
 ........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
