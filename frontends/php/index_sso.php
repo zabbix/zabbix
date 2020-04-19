@@ -134,6 +134,11 @@ try {
 
 		if ($user) {
 			CSession::unsetValue(['saml_username_attribute']);
+
+			if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
+				throw new Exception(_('GUI access disabled.'));
+			}
+
 			CWebUser::setSessionCookie($user['sessionid']);
 
 			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
