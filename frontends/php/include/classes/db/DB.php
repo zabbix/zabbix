@@ -282,7 +282,8 @@ class DB {
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 			foreach ($tableSchema['fields'] as $name => $field) {
-				if ($field['type'] == self::FIELD_TYPE_TEXT && !$field['null']) {
+				if (($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB)
+						&& !$field['null']) {
 					foreach ($values as &$value) {
 						if (!isset($value[$name])) {
 							$value[$name] = '';
@@ -1107,7 +1108,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if ($field_schema['type'] == self::FIELD_TYPE_TEXT) {
+			if ($field_schema['type'] == self::FIELD_TYPE_TEXT || $field_schema['type'] == self::FIELD_TYPE_NCLOB) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);
