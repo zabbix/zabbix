@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-19 14:15+0300\n"
-"PO-Revision-Date: 2020-04-15 00:39+0300\n"
+"PO-Revision-Date: 2020-04-20 02:10+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1586903973.000000\n"
+"X-POOTLE-MTIME: 1587341424.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:67
 #: include/classes/db/OracleDbBackend.php:136
@@ -130,7 +130,7 @@ msgstr[0] "%1$sイベント"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
+msgstr[0] "%1$s ホストがメンテナンス中"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:119
 #: include/views/monitoring.history.php:31
@@ -208,7 +208,7 @@ msgstr "%1$s文字入力可"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
+msgstr[0] "%1$s 件の未確認の障害"
 
 #: app/views/monitoring.widget.problems.view.php:280
 #, c-format
@@ -2272,7 +2272,7 @@ msgstr[0] "Webシナリオを有効にできません"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:213
 msgid "Cannot evaluate expression"
-msgstr ""
+msgstr "条件式を評価できません"
 
 #: app/controllers/CControllerPopupScriptExec.php:89
 msgid "Cannot execute script"
@@ -15839,7 +15839,7 @@ msgstr "限定"
 
 #: include/triggers.inc.php:1855
 msgid "String"
-msgstr ""
+msgstr "文字列"
 
 #: include/items.inc.php:1737 include/items.inc.php:1741
 #: include/items.inc.php:1745
