@@ -479,7 +479,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	DB_ROW			row;
 	int			ret = FAIL, errcode;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], sessionid[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
-				*message = NULL, *error = NULL, *params = NULL, *value = NULL;
+				*message = NULL, *error = NULL, *params = NULL, *value = NULL, *debug = NULL;
 	zbx_uint64_t		mediatypeid;
 	size_t			string_alloc;
 	struct zbx_json		json;
@@ -568,7 +568,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 		goto fail;
 	}
 
-	zbx_alerter_deserialize_result(response, &value, &errcode, &error);
+	zbx_alerter_deserialize_result(response, &value, &errcode, &error, &debug);
 	zbx_free(response);
 
 	if (SUCCEED != errcode)
@@ -578,6 +578,8 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 	if (NULL != value)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_DATA, value, ZBX_JSON_TYPE_STRING);
+	if (NULL != debug)
+		zbx_json_addraw(&json, "debug", debug);
 
 	(void)zbx_tcp_send(sock, json.buffer);
 
@@ -595,6 +597,7 @@ fail:
 	zbx_free(data);
 	zbx_free(value);
 	zbx_free(error);
+	zbx_free(debug);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }

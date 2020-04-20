@@ -121,8 +121,10 @@ void	zbx_am_db_alert_free(zbx_am_db_alert_t *alert);
 void	zbx_am_media_clear(zbx_am_media_t *media);
 void	zbx_am_media_free(zbx_am_media_t *media);
 
-zbx_uint32_t	zbx_alerter_serialize_result(unsigned char **data, const char *value, int errcode, const char *error);
-void	zbx_alerter_deserialize_result(const unsigned char *data, char **value, int *errcode, char **error);
+zbx_uint32_t	zbx_alerter_serialize_result(unsigned char **data, const char *value, int errcode, const char *error,
+		const char *debug);
+void	zbx_alerter_deserialize_result(const unsigned char *data, char **value, int *errcode, char **error,
+		char **debug);
 
 zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t alertid, const char *sendto,
 		const char *subject, const char *message, const char *smtp_server, unsigned short smtp_port,

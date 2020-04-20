@@ -92,12 +92,13 @@ static void	alerter_register(zbx_ipc_socket_t *socket)
  *             value   - [IN] the value or error message                      *
  *                                                                            *
  ******************************************************************************/
-static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int errcode, const char *error)
+static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int errcode, const char *error,
+		const char *debug)
 {
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
 
-	data_len = zbx_alerter_serialize_result(&data, value, errcode, error);
+	data_len = zbx_alerter_serialize_result(&data, value, errcode, error, debug);
 	zbx_ipc_socket_write(socket, ZBX_IPC_ALERTER_RESULT, data, data_len);
 
 	zbx_free(data);
@@ -132,7 +133,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 			smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password, content_type,
 			ALARM_ACTION_TIMEOUT, error, sizeof(error));
 
-	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error));
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(sendto);
 	zbx_free(subject);
@@ -166,7 +167,7 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 
 	/* SMS uses its own timeouts */
 	ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
-	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error));
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(sendto);
 	zbx_free(message);
@@ -194,7 +195,7 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 	zbx_alerter_deserialize_exec(ipc_message->data, &alertid, &command);
 
 	ret = execute_script_alert(command, error, sizeof(error));
-	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error));
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(command);
 }
@@ -251,12 +252,12 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	{
 		zbx_json_close(&json);
 		zbx_json_adduint64(&json, "ms", duration);
-		zabbix_log(LOG_LEVEL_INFORMATION, "json '%s'", json.buffer);
-		zbx_json_free(&json);
 		zbx_es_set_debug(&es_engine, NULL);
+		alerter_send_result(socket, output, ret, error, json.buffer);
+		zbx_json_free(&json);
 	}
-
-	alerter_send_result(socket, output, ret, error);
+	else
+		alerter_send_result(socket, output, ret, error, NULL);
 
 	zbx_free(output);
 	zbx_free(error);
