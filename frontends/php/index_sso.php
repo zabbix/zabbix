@@ -24,7 +24,7 @@ require_once __DIR__.'/include/config.inc.php';
 $config = select_config();
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
-if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED || get_cookie(ZBX_SESSION_NAME) !== null) {
+if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
 	redirect($redirect_to->toString());
 }
 
@@ -72,6 +72,9 @@ $settings = [
 		'assertionConsumerService' => [
 			'url' => $baseurl.'?acs'
 		],
+		'singleLogoutService' => [
+			'url' => $baseurl.'?sls',
+		],
 		'NameIDFormat' => $config['saml_nameid_format'],
 		'x509cert' => $sp_cert,
 		'privateKey' => $sp_key
@@ -107,7 +110,7 @@ $settings = [
 try {
 	$auth = new Auth($settings);
 
-	if (hasRequest('acs') && !CSession::keyExists('saml_username_attribute')) {
+	if (hasRequest('acs') && !CSession::keyExists('saml_data')) {
 		$auth->processResponse();
 
 		if (!$auth->isAuthenticated()) {
@@ -122,32 +125,55 @@ try {
 			);
 		}
 
-		CSession::setValue('saml_username_attribute', reset($user_attributes[$config['saml_username_attribute']]));
+		CSession::setValue('saml_data', [
+			'username_attribute' => reset($user_attributes[$config['saml_username_attribute']]),
+			'nameid' => $auth->getNameId(),
+			'nameid_format' => $auth->getNameIdFormat(),
+			'nameid_name_qualifier' => $auth->getNameIdNameQualifier(),
+			'nameid_sp_name_qualifier' => $auth->getNameIdSPNameQualifier(),
+			'session_index' => $auth->getSessionIndex()
+		]);
 
 		if (hasRequest('RelayState') && Utils::getSelfURL() != getRequest('RelayState')) {
 			$auth->redirectTo(getRequest('RelayState'));
 		}
 	}
 
-	if (CSession::keyExists('saml_username_attribute')) {
-		$user = API::getApiService('user')->loginSso(CSession::getValue('saml_username_attribute'), false);
+	if (hasRequest('slo')) {
+		$saml_data = CSession::getValue('saml_data');
 
-		if ($user) {
-			CSession::unsetValue(['saml_username_attribute']);
+		$auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], false, $saml_data['nameid_format'],
+			$saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
+		);
+	}
 
-			if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-				throw new Exception(_('GUI access disabled.'));
-			}
+	if (hasRequest('sls')) {
+		$auth->processSLO();
 
-			CWebUser::setSessionCookie($user['sessionid']);
+		redirect('index.php?reconnect=1');
+	}
 
-			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
-			redirect(reset($redirect));
+	if (CWebUser::isLoggedIn()) {
+		redirect($redirect_to->toString());
+	}
+
+	if (CSession::keyExists('saml_data')) {
+		$saml_data = CSession::getValue('saml_data');
+		$user = API::getApiService('user')->loginSso($saml_data['username_attribute'], false);
+
+		if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
+			CSession::unsetValue(['saml_data']);
+
+			throw new Exception(_('GUI access disabled.'));
 		}
+
+		CWebUser::setSessionCookie($user['sessionid']);
+
+		$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
+		redirect(reset($redirect));
 	}
-	else {
-		$auth->login();
-	}
+
+	$auth->login();
 }
 catch (Exception $e) {
 	error($e->getMessage());

@@ -45,11 +45,16 @@ window.ZABBIX = Object.create({
 	/**
 	 * Logs user out, also, handles side effects before that.
 	 */
-	logout: function() {
+	logout: function(uri = '') {
 		var ls = this.namespace('instances.localStorage');
 		ls && ls.destruct();
 
-		redirect('index.php?reconnect=1', 'post', 'sid', true);
+		if (uri !== '') {
+			redirect(uri);
+		}
+		else {
+			redirect('index.php?reconnect=1', 'post', 'sid', true);
+		}
 	}
 });
 

@@ -239,7 +239,7 @@ function getUserMenu(): CMenu {
 			->setIcon('icon-signout')
 			->setUrl(new CUrl('#signout'))
 			->setTitle(_('Sign out'))
-			->onClick('ZABBIX.logout()')
+			->onClick(CSession::keyExists('saml_data') ? "ZABBIX.logout('index_sso.php?slo')" : 'ZABBIX.logout()')
 	);
 
 	return $menu;
