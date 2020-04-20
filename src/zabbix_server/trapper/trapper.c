@@ -591,7 +591,7 @@ fail:
 
 	if (NULL != debug)
 		zbx_json_addraw(&json, "debug", debug);
-zabbix_log(LOG_LEVEL_INFORMATION, "buffer '%s'", json.buffer);
+
 	(void)zbx_tcp_send(sock, json.buffer);
 
 	zbx_free(params);
