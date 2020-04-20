@@ -337,6 +337,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 				alerter_process_exec(&alerter_socket, &message);
 				break;
 			case ZBX_IPC_ALERTER_WEBHOOK:
+			case ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL:
 				alerter_process_webhook(&alerter_socket, &message);
 				break;
 		}

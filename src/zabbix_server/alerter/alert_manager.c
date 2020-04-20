@@ -1512,7 +1512,11 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			zbx_free(cmd);
 			break;
 		case MEDIA_TYPE_WEBHOOK:
-			command = ZBX_IPC_ALERTER_WEBHOOK;
+			if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
+				command = ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL;
+			else
+				command = ZBX_IPC_ALERTER_WEBHOOK;
+
 			data_len = zbx_alerter_serialize_webhook(&data, mediatype->script_bin, mediatype->script_bin_sz,
 					mediatype->timeout, alert->params);
 			break;
