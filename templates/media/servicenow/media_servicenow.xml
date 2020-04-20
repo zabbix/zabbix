@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-20T12:56:11Z</date>
+    <date>2020-04-20T13:31:34Z</date>
     <media_types>
         <media_type>
             <name>ServiceNow</name>
@@ -28,20 +28,8 @@
                     <value>{EVENT.SOURCE}</value>
                 </parameter>
                 <parameter>
-                    <name>event_update_action</name>
-                    <value>{EVENT.UPDATE.ACTION}</value>
-                </parameter>
-                <parameter>
-                    <name>event_update_message</name>
-                    <value>{EVENT.UPDATE.MESSAGE}</value>
-                </parameter>
-                <parameter>
                     <name>event_update_status</name>
                     <value>{EVENT.UPDATE.STATUS}</value>
-                </parameter>
-                <parameter>
-                    <name>event_update_user</name>
-                    <value>{USER.FULLNAME}</value>
                 </parameter>
                 <parameter>
                     <name>event_value</name>
@@ -118,7 +106,7 @@
         if (typeof fields === 'object' &amp;&amp; Object.keys(fields).length) {&#13;
             Object.keys(fields)&#13;
                 .forEach(function(field) {&#13;
-                    data[field] = (data[field].match(/^\d{4}\.\d{2}\.\d{2}$/) !== null)&#13;
+                    data[field] = (fields[field].match(/^\d{4}\.\d{2}\.\d{2}$/) !== null)&#13;
                         ? fields[field].replace(/\./g, '-')&#13;
                         : fields[field];&#13;
                 });&#13;
@@ -204,7 +192,6 @@ try {&#13;
     var params = JSON.parse(value),&#13;
         fields = {},&#13;
         servicenow = {},&#13;
-        update = {},&#13;
         data = {},&#13;
         result = {tags: {}},&#13;
         required_params = [&#13;
@@ -231,9 +218,6 @@ try {&#13;
             }&#13;
             else if (key.startsWith('u_')) {&#13;
                 fields[key] = params[key];&#13;
-            }&#13;
-            else if (key.startsWith('event_update_')) {&#13;
-                update[key.substring(13)] = params[key];&#13;
             }&#13;
             else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
                 throw 'Parameter &quot;' + key + '&quot; can\'t be empty.';&#13;
@@ -274,28 +258,13 @@ try {&#13;
     ServiceNow.setProxy(params.HTTPProxy);&#13;
     ServiceNow.setFields(data, fields);&#13;
 &#13;
-    if (params.event_source === '0') {&#13;
-        if (params.event_value === '1' &amp;&amp; update.status === '0') {&#13;
-            data.description = Object.keys(fields).length ? params.trigger_description : data.description;&#13;
-        }&#13;
-        else {&#13;
-            process_tags = false;&#13;
-            method = 'put';&#13;
-            delete data.description;&#13;
-            delete data.urgency;&#13;
-            ServiceNow.params.url += '/' + params.servicenow_sys_id;&#13;
-&#13;
-            if (update.status === '1') {&#13;
-                data.comments = update.user + ' ' + update.action + '.';&#13;
-&#13;
-                if (update.message) {&#13;
-                    data.comments += '\nMessage:\n' + update.message;&#13;
-                }&#13;
-            }&#13;
-            else if (!Object.keys(fields).length) {&#13;
-                data.comments = params.alert_message;&#13;
-            }&#13;
-        }&#13;
+    if (params.event_source === '0' &amp;&amp; (params.event_value === '0' || params.event_update_status === '1')) {&#13;
+        process_tags = false;&#13;
+        method = 'put';&#13;
+        delete data.description;&#13;
+        delete data.urgency;&#13;
+        ServiceNow.params.url += '/' + params.servicenow_sys_id;&#13;
+        data.comments = params.alert_message;&#13;
     }&#13;
 &#13;
     var response = ServiceNow.request(method, data);&#13;
@@ -303,7 +272,7 @@ try {&#13;
     if (process_tags) {&#13;
         result.tags.__zbx_servicenow_sys_id = response.sys_id;&#13;
         result.tags.__zbx_servicenow_link = params.servicenow_url +&#13;
-            (params.servicenow_url.endsWith('/') ? '' : '/') + '/incident.do?sys_id=' + response.sys_id;&#13;
+            (params.servicenow_url.endsWith('/') ? '' : '/') + 'incident.do?sys_id=' + response.sys_id;&#13;
         result.tags.__zbx_servicenow_number = response.number;&#13;
     }&#13;
 &#13;
