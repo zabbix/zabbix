@@ -381,7 +381,6 @@ class CNewValidator {
 				return (mb_strlen($value) <= $field_schema['length']);
 
 			case DB::FIELD_TYPE_NCLOB:
-				// break; is not missing here.
 			case DB::FIELD_TYPE_TEXT:
 				if ($flags & P_CRLF) {
 					$value = CRLFtoLF($value);
