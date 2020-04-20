@@ -92,7 +92,7 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 
 	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
 	{
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "log exceeds the maximum size " ZBX_FS_UI64 " bytes.",
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "log exceeds the maximum size of " ZBX_FS_UI64 " bytes.",
 				ZBX_ES_LOG_MEMORY_LIMIT);
 	}
 
