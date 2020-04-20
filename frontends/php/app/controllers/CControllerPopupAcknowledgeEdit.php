@@ -32,7 +32,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'scope' =>					'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
 			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
-			'acknowledgement' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE.','.ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE,
+			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+			'unacknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE,
 			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
@@ -72,9 +73,12 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'scope' => (int) $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),
 			'change_severity' => $this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE),
 			'severity' => $this->hasInput('severity') ? (int) $this->getInput('severity') : null,
-			'acknowledgement' => $this->getInput('acknowledgement', ZBX_PROBLEM_UPDATE_NONE),
+			'acknowledge_problem' => $this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
+			'unacknowledge_problem' => $this->getInput('unacknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 0,
+			'has_ack_events'=> false,
+			'has_unack_events'=> false,
 			'problem_can_be_closed' => false,
 			'problem_severity_can_be_changed' => false
 		];
@@ -146,6 +150,9 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			if ($can_be_closed) {
 				$data['problem_can_be_closed'] = true;
 			}
+
+			$data['has_ack_events'] |= ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
+			$data['has_unack_events'] |= ($event['acknowledged'] != EVENT_ACKNOWLEDGED);
 		}
 
 		// Severity can be changed only for editable triggers.
