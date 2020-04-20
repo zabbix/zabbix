@@ -202,7 +202,9 @@ try {
 
 	if (CSession::keyExists('saml_data')) {
 		$saml_data = CSession::getValue('saml_data');
-		$user = API::getApiService('user')->loginSso($saml_data['username_attribute'], false);
+		$user = API::getApiService('user')->loginByAlias($saml_data['username_attribute'],
+			($config['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE), $config['authentication_type']
+		);
 
 		if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 			CSession::unsetValue(['saml_data']);
