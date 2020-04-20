@@ -93,13 +93,6 @@ class CUserMacro extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		// If search or filter have 'value' field then limit query by ZBX_MACRO_TYPE_TEXT.
-		if (($options['search'] && array_key_exists('value', $options['search']))
-				|| ($options['filter'] && array_key_exists('value', $options['filter']))) {
-			$sqlParts['where'][] = 'type!='.ZBX_MACRO_TYPE_SECRET;
-			$sqlPartsGlobal['where'][] = 'type!='.ZBX_MACRO_TYPE_SECRET;
-		}
-
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($options['editable'] && !is_null($options['globalmacro'])) {
@@ -173,18 +166,6 @@ class CUserMacro extends CApiService {
 			$sqlParts['where']['hht'] = 'hm.hostid=ht.hostid';
 		}
 
-		// search
-		if (is_array($options['search'])) {
-			zbx_db_search('hostmacro hm', $options, $sqlParts);
-			zbx_db_search('globalmacro gm', $options, $sqlPartsGlobal);
-		}
-
-		// filter
-		if (is_array($options['filter'])) {
-			$this->dbFilter('hostmacro hm', $options, $sqlParts);
-			$this->dbFilter('globalmacro gm', $options, $sqlPartsGlobal);
-		}
-
 		// sorting
 		$sqlParts = $this->applyQuerySortOptions('hostmacro', 'hm', $options, $sqlParts);
 		$sqlPartsGlobal = $this->applyQuerySortOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
@@ -197,28 +178,25 @@ class CUserMacro extends CApiService {
 
 		// init GLOBALS
 		if (!is_null($options['globalmacro'])) {
-			$sqlPartsGlobal = $this->applyQueryOutputOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
-			$res = DBselect($this->createSelectQueryFromParts($sqlPartsGlobal), $sqlPartsGlobal['limit']);
-			while ($macro = DBfetch($res)) {
-				if ($options['countOutput']) {
-					$result = $macro['rowscount'];
-				}
-				else {
-					$result[$macro['globalmacroid']] = $macro;
-				}
-			}
+			$sql_parts = $this->applyQueryFilterOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
+			$sql_parts = $this->applyQueryOutputOptions('globalmacro', 'gm', $options, $sql_parts);
+			$key_property = 'globalmacroid';
 		}
 		// init HOSTS
 		else {
-			$sqlParts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sqlParts);
-			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-			while ($macro = DBfetch($res)) {
-				if ($options['countOutput']) {
-					$result = $macro['rowscount'];
-				}
-				else {
-					$result[$macro['hostmacroid']] = $macro;
-				}
+			$sql_parts = $this->applyQueryFilterOptions('hostmacro', 'hm', $options, $sqlParts);
+			$sql_parts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sql_parts);
+			$key_property = 'hostmacroid';
+		}
+
+		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+
+		while ($macro = DBfetch($res)) {
+			if ($options['countOutput']) {
+				$result = $macro['rowscount'];
+			}
+			else {
+				$result[$macro[$key_property]] = $macro;
 			}
 		}
 
@@ -965,6 +943,47 @@ class CUserMacro extends CApiService {
 		}
 
 		return $sqlParts;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function applyQueryFilterOptions($table, $alias, array $options, $sql_parts) {
+		if (is_array($options['search'])) {
+			// Do not allow to search by value for macro of type ZBX_MACRO_TYPE_SECRET.
+			if (array_key_exists('value', $options['search'])) {
+				$sql_parts['where']['search'] = $alias.'.type!='.ZBX_MACRO_TYPE_SECRET;
+				zbx_db_search($table.' '.$alias, [
+						'searchByAny' => false,
+						'search' => ['value' => $options['search']['value']]
+					] + $options, $sql_parts
+				);
+				unset($options['search']['value']);
+			}
+
+			if ($options['search']) {
+				zbx_db_search($table.' '.$alias, $options, $sql_parts);
+			}
+		}
+
+		if (is_array($options['filter'])) {
+			// Do not allow to filter by value for macro of type ZBX_MACRO_TYPE_SECRET.
+			if (array_key_exists('value', $options['filter'])) {
+				$sql_parts['where']['filter'] = $alias.'.type!='.ZBX_MACRO_TYPE_SECRET;
+				$this->dbFilter($table.' '.$alias, [
+						'searchByAny' => false,
+						'filter' => ['value' => $options['filter']['value']]
+					] + $options, $sql_parts
+				);
+				unset($options['filter']['value']);
+			}
+
+			if ($options['filter']) {
+				$this->dbFilter($table.' '.$alias, $options, $sql_parts);
+			}
+		}
+
+		return $sql_parts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
