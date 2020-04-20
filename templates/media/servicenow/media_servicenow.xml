@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-15T17:59:48Z</date>
+    <date>2020-04-20T12:56:11Z</date>
     <media_types>
         <media_type>
             <name>ServiceNow</name>
@@ -118,7 +118,9 @@
         if (typeof fields === 'object' &amp;&amp; Object.keys(fields).length) {&#13;
             Object.keys(fields)&#13;
                 .forEach(function(field) {&#13;
-                    data[field] = fields[field];&#13;
+                    data[field] = (data[field].match(/^\d{4}\.\d{2}\.\d{2}$/) !== null)&#13;
+                        ? fields[field].replace(/\./g, '-')&#13;
+                        : fields[field];&#13;
                 });&#13;
         }&#13;
     },&#13;
