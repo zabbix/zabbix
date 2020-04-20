@@ -1277,7 +1277,9 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_am_alert_t *alert, int sta
  *                                                                            *
  * Parameters: alerter_service - [IN] the IPC service                         *
  *             alert           - [IN] the alert                               *
- *             value           - [IN] the value or error message              *
+ *             value           - [IN] the value                               *
+ *             error           - [IN] error message                           *
+ *             debug           - [IN] debug message                           *
  *                                                                            *
  ******************************************************************************/
 static void	am_external_alert_send_response(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,

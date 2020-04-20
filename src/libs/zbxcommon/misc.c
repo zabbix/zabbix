@@ -485,6 +485,18 @@ int	zbx_day_in_month(int year, int mon)
 	return 30;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_duration                                                 *
+ *                                                                            *
+ * Purpose: get duration in milliseconds since start_time till current time   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     start_time - [IN] time from when duration should be counted            *
+ *                                                                            *
+ * Return value: duration in milliseconds since start_time till current time  *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	zbx_get_duration(struct timeval start_time)
 {
 	struct timeval	current_time;
