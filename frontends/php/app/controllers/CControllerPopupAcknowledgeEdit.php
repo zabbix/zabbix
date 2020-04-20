@@ -32,7 +32,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'scope' =>					'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM,
 			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
-			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+			'acknowledgement' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE.','.ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE,
 			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
@@ -72,11 +72,10 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'scope' => (int) $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),
 			'change_severity' => $this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE),
 			'severity' => $this->hasInput('severity') ? (int) $this->getInput('severity') : null,
-			'acknowledge_problem' => $this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
+			'acknowledgement' => $this->getInput('acknowledgement', ZBX_PROBLEM_UPDATE_NONE),
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
-			'problem_can_be_acknowledged' => false,
 			'problem_severity_can_be_changed' => false
 		];
 
@@ -146,11 +145,6 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			// If at least one event can be closed, enable 'Close problem' checkbox.
 			if ($can_be_closed) {
 				$data['problem_can_be_closed'] = true;
-			}
-
-			// If at least one event is not acknowledged, enable 'Acknowledge' checkbox.
-			if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-				$data['problem_can_be_acknowledged'] = true;
 			}
 		}
 

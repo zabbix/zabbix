@@ -76,10 +76,19 @@ $form_list
 		]))
 			->addClass(ZBX_STYLE_HOR_LIST)
 	)
-	->addRow(_('Acknowledge'),
-		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
-			->setChecked($data['acknowledge_problem'])
-			->setEnabled($data['problem_can_be_acknowledged'])
+	->addRow(_('Change acknowledgement'),
+		(new CList([
+			(new CCheckBox('change_acknowledgement'))
+				->onClick('javascript: jQuery("#acknowledgement input").attr("disabled", this.checked ? false : true)')
+				->setChecked($data['change_severity'])
+				->setEnabled($data['problem_severity_can_be_changed']),
+			(new CRadioButtonList('acknowledgement', -1))
+				->addValue(_('Acknowledge'), ZBX_PROBLEM_UPDATE_ACKNOWLEDGE)
+				->addValue(_('Unacknowledge'), ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)
+				->setEnabled(false)
+				->setModern(true)
+		]))
+			->addClass(ZBX_STYLE_HOR_LIST)
 	)
 	->addRow(_('Close problem'),
 		(new CCheckBox('close_problem', ZBX_PROBLEM_UPDATE_CLOSE))
