@@ -40,29 +40,32 @@ $sp_key = '';
 $sp_cert = '';
 $idp_cert = '';
 
-if (isset($SSO)) {
-	if (array_key_exists('SP_KEY', $SSO) && file_exists($SSO['SP_KEY'])) {
+global $SSO;
+
+if (is_array($SSO) && array_key_exists('SP_KEY', $SSO)) {
+	if (file_exists($SSO['SP_KEY'])) {
 		$sp_key = file_get_contents($SSO['SP_KEY']);
 	}
-
-	if (array_key_exists('SP_CERT', $SSO) && file_exists($SSO['SP_CERT'])) {
-		$sp_cert = file_get_contents($SSO['SP_CERT']);
-	}
-
-	if (array_key_exists('IDP_CERT', $SSO) && file_exists($SSO['IDP_CERT'])) {
-		$idp_cert = file_get_contents($SSO['IDP_CERT']);
-	}
 }
-
-if (!$sp_key && file_exists('conf/certs/sp.key')) {
+elseif (file_exists('conf/certs/sp.key')) {
 	$sp_key = file_get_contents('conf/certs/sp.key');
 }
 
-if (!$sp_cert && file_exists('conf/certs/sp.crt')) {
+if (is_array($SSO) && array_key_exists('SP_CERT', $SSO)) {
+	if (file_exists($SSO['SP_CERT'])) {
+		$sp_cert = file_get_contents($SSO['SP_CERT']);
+	}
+}
+elseif (file_exists('conf/certs/sp.crt')) {
 	$sp_cert = file_get_contents('conf/certs/sp.crt');
 }
 
-if (!$idp_cert && file_exists('conf/certs/idp.crt')) {
+if (is_array($SSO) && array_key_exists('IDP_CERT', $SSO)) {
+	if (file_exists($SSO['IDP_CERT'])) {
+		$idp_cert = file_get_contents($SSO['IDP_CERT']);
+	}
+}
+elseif (file_exists('conf/certs/idp.crt')) {
 	$idp_cert = file_get_contents('conf/certs/idp.crt');
 }
 
