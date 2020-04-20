@@ -490,7 +490,6 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	zbx_user_t		user;
 	unsigned short		smtp_port;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -592,7 +591,7 @@ fail:
 
 	if (NULL != debug)
 		zbx_json_addraw(&json, "debug", debug);
-
+zabbix_log(LOG_LEVEL_INFORMATION, "buffer '%s'", json.buffer);
 	(void)zbx_tcp_send(sock, json.buffer);
 
 	zbx_free(params);

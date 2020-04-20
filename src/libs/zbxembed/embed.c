@@ -525,4 +525,3 @@ void	zbx_es_set_debug(zbx_es_t *es, struct zbx_json *json)
 {
 	es->env->json = json;
 }
-

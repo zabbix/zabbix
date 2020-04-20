@@ -234,7 +234,8 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	{
 		zbx_es_set_timeout(&es_engine, timeout);
 
-		ret = zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, params, &output, &error, &duration);
+		ret = zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, params, &output, &error,
+				ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL == ipc_message->code ? &duration : NULL);
 	}
 
 	if (SUCCEED == zbx_es_fatal_error(&es_engine))
