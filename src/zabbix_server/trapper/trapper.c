@@ -576,7 +576,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	if (SUCCEED == errcode)
 		ret = SUCCEED;
 fail:
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, SUCCEED == result ? ZBX_PROTO_VALUE_SUCCESS :
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, SUCCEED == ret ? ZBX_PROTO_VALUE_SUCCESS :
 				ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == ret)
@@ -592,7 +592,7 @@ fail:
 
 	if (NULL != debug)
 		zbx_json_addraw(&json, "debug", debug);
-	zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
+
 	(void)zbx_tcp_send(sock, json.buffer);
 
 	zbx_free(params);
