@@ -133,7 +133,7 @@ int	zbx_es_check_timeout(void *udata)
 {
 	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
 
-	if (time(NULL) - env->start_time > env->timeout)
+	if (time(NULL) - env->start_time.tv_sec > env->timeout)
 		return 1;
 
 	return 0;
@@ -455,7 +455,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_load_function(es->env->ctx);
 	duk_push_string(es->env->ctx, param);
 
-	es->env->start_time = time(NULL);
+	gettimeofday(&es->env->start_time, NULL);
 
 	if (DUK_EXEC_SUCCESS != duk_pcall(es->env->ctx, 1))
 	{
@@ -520,8 +520,5 @@ void	zbx_es_set_timeout(zbx_es_t *es, int timeout)
 
 void	zbx_es_set_debug(zbx_es_t *es, struct zbx_json *json)
 {
-	zbx_json_init(json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addarray(json, "logs");
-
 	es->env->json = json;
 }
