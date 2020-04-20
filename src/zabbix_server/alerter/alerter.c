@@ -214,17 +214,23 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 {
 	char	*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
 	int	script_bin_sz, ret, timeout;
+	struct	zbx_json	json;
 
 	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params);
 
-		if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
+	if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
 		ret = zbx_es_init_env(&es_engine, &error);
+
+	zbx_es_set_debug(&es_engine, &json);
 
 	if (SUCCEED == ret)
 	{
 		zbx_es_set_timeout(&es_engine, timeout);
+
 		ret = zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, params, &output, &error);
 	}
+
+	zbx_json_free(&json);
 
 	if (SUCCEED == zbx_es_fatal_error(&es_engine))
 	{

@@ -33,6 +33,7 @@ struct zbx_es_env
 	int		rt_error_num;
 	int		fatal_error;
 	int		timeout;
+	struct zbx_json	*json;
 
 	jmp_buf		loc;
 };

@@ -66,7 +66,27 @@ static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_zabbix_log(duk_context *ctx)
 {
-	zabbix_log(duk_to_int(ctx, 0), "%s", duk_to_string(ctx, 1));
+	zbx_es_env_t		*env;
+	const char		*message;
+	int			level;
+	duk_memory_functions	out_funcs;
+
+	level = duk_to_int(ctx, 0);
+	message = duk_to_string(ctx, 1);
+
+	zabbix_log(level, "%s", message);
+
+	duk_get_memory_functions(ctx, &out_funcs);
+	env = (zbx_es_env_t *)out_funcs.udata;
+
+	if (NULL == env->json)
+		return 0;
+
+	zbx_json_addobject(env->json, NULL);
+	zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
+	zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(env->json);
+
 	return 0;
 }
 

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXEMBED_H
 #define ZABBIX_ZBXEMBED_H
 
+#include "zbxjson.h"
+
 typedef struct zbx_es_env zbx_es_env_t;
 
 typedef struct
@@ -38,5 +40,6 @@ int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, cha
 int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
 	char **error);
 void	zbx_es_set_timeout(zbx_es_t *es, int timeout);
+void	zbx_es_set_debug(zbx_es_t *es, struct zbx_json *json);
 
 #endif /* ZABBIX_ZBXEMBED_H */

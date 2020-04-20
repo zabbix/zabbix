@@ -517,3 +517,11 @@ void	zbx_es_set_timeout(zbx_es_t *es, int timeout)
 {
 	es->env->timeout = timeout;
 }
+
+void	zbx_es_set_debug(zbx_es_t *es, struct zbx_json *json)
+{
+	zbx_json_init(json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(json, "logs");
+
+	es->env->json = json;
+}
