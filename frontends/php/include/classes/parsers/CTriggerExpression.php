@@ -18,8 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CTriggerExpression {
-	// for parsing of trigger expression
+	// For parsing of trigger expression.
 	const STATE_AFTER_OPEN_BRACE = 1;
 	const STATE_AFTER_BINARY_OPERATOR = 2;
 	const STATE_AFTER_LOGICAL_OPERATOR = 3;
@@ -56,16 +57,17 @@ class CTriggerExpression {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'lldmacros' => true              Enable low-level discovery macros usage in trigger expression.
-	 *   'allow_func_only' => false       Allow trigger expression without host:key pair, i.e. {func(param)}.
-	 *   'calc_constant_values' => false  Include calculated constant values in the result (i.e., "10K" => 10240).
+	 *   'lldmacros' => true             Enable low-level discovery macros usage in trigger expression.
+	 *   'allow_func_only' => true       Allow trigger expression without host:key pair, i.e. {func(param)}.
+	 *   'collapsed_expression' => true  Short trigger expression.
+	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
 	 *
 	 * @var array
 	 */
 	public $options = [
 		'lldmacros' => true,
 		'allow_func_only' => false,
-		'calc_constant_values' => false
+		'collapsed_expression' => false
 	];
 
 	/**
@@ -125,6 +127,13 @@ class CTriggerExpression {
 	protected $function_macro_parser;
 
 	/**
+	 * Parser for function id macros.
+	 *
+	 * @var CFunctionIdParser
+	 */
+	protected $functionid_parser;
+
+	/**
 	 * Parser for trigger functions.
 	 *
 	 * @var CFunctionParser
@@ -170,6 +179,7 @@ class CTriggerExpression {
 	 * @param array $options
 	 * @param bool  $options['lldmacros']
 	 * @param bool  $options['allow_func_only']
+	 * @param bool  $options['collapsed_expression']
 	 */
 	public function __construct(array $options = []) {
 		$this->options = array_merge($this->options, $options);
@@ -178,7 +188,12 @@ class CTriggerExpression {
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
 		$this->notOperatorParser = new CSetParser(['not']);
 		$this->macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
-		$this->function_macro_parser = new CFunctionMacroParser();
+		if ($this->options['collapsed_expression']) {
+			$this->functionid_parser = new CFunctionIdParser();
+		}
+		else {
+			$this->function_macro_parser = new CFunctionMacroParser();
+		}
 		$this->function_parser = new CFunctionParser();
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser;
@@ -222,6 +237,11 @@ class CTriggerExpression {
 
 		$this->pos = 0;
 		$this->expression = $expression;
+
+		if ($this->options['collapsed_expression'] && $this->options['allow_func_only']) {
+			$this->isValid = false;
+			$this->error = 'Incompatible options.';
+		}
 
 		$state = self::STATE_AFTER_OPEN_BRACE;
 		$afterSpace = false;
@@ -536,7 +556,7 @@ class CTriggerExpression {
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
 	private function parseConstant() {
-		if ($this->parseFunctionMacro() || $this->parseNumber()
+		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseString()
 				|| $this->parseUsing($this->user_macro_parser, CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)
 				|| $this->parseUsing($this->macro_parser, CTriggerExprParserResult::TOKEN_TYPE_MACRO)) {
 			return true;
@@ -621,6 +641,21 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseFunctionMacro() {
+		if ($this->options['collapsed_expression']) {
+			return $this->parseUsing($this->functionid_parser, CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO);
+		}
+		else {
+			return $this->parseSimpleMacro();
+		}
+	}
+
+	/**
+	 * Parses a simple macro constant {host:key.func()} in the trigger expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseSimpleMacro() {
 		$startPos = $this->pos;
 
 		if ($this->function_macro_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
@@ -684,10 +719,6 @@ class CTriggerExpression {
 			'suffix' => $this->number_parser->getSuffix()
 		];
 
-		if ($this->options['calc_constant_values']) {
-			$token_data['calc_value'] = $value;
-		}
-
 		$this->result->addToken(
 			CTriggerExprParserResult::TOKEN_TYPE_NUMBER,
 			$this->number_parser->getMatch(),
@@ -699,5 +730,73 @@ class CTriggerExpression {
 		$this->pos += $this->number_parser->getLength() - 1;
 
 		return true;
+	}
+
+	/**
+	 * Parses a quoted string constant in the trigger expression and moves a current position ($this->pos) on a last
+	 * symbol of the string.
+	 *
+	 * @return bool returns true if parsed successfully, false otherwise
+	 */
+	private function parseString() {
+		if (!preg_match('/^"([^"\\\\]|\\\\["\\\\])*"/', substr($this->expression, $this->pos), $matches)) {
+			return false;
+		}
+
+		$len = strlen($matches[0]);
+
+		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_STRING, $matches[0], $this->pos, $len,
+			['string' => self::unquoteString($matches[0])]
+		);
+
+		$this->pos += $len - 1;
+
+		return true;
+	}
+
+	/**
+	 * Unquoting quoted string $value.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function unquoteString(string $value): string {
+		return strtr(substr($value, 1, -1), ['\\"' => '"', '\\\\' => '\\']);
+	}
+
+	/**
+	 * Quoting $value if it contains a non numeric value.
+	 *
+	 * @param string $value
+	 * @param bool   $allow_macros
+	 * @param bool   $force
+	 *
+	 * @return string
+	 */
+	public static function quoteString(string $value, bool $allow_macros = true, bool $force = false): string {
+		if (!$force) {
+			$number_parser = new CNumberParser(['with_suffix' => true]);
+
+			if ($number_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return $value;
+			}
+
+			if ($allow_macros) {
+				$user_macro_parser = new CUserMacroParser();
+				$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+				$lld_macro_parser = new CLLDMacroParser();
+				$lld_macro_function_parser = new CLLDMacroFunctionParser;
+
+				if ($user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+						|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
+						|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
+						|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+					return $value;
+				}
+			}
+		}
+
+		return '"'.strtr($value, ['\\' => '\\\\', '"' => '\\"']).'"';
 	}
 }

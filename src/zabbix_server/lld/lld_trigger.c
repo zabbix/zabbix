@@ -1198,9 +1198,10 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	expression = zbx_strdup(expression, trigger_prototype->expression);
 	recovery_expression = zbx_strdup(recovery_expression, trigger_prototype->recovery_expression);
 
-	if (SUCCEED != substitute_lld_macros(&expression, jp_row, lld_macros, ZBX_MACRO_NUMERIC, err, sizeof(err)) ||
-			SUCCEED != substitute_lld_macros(&recovery_expression, jp_row, lld_macros, ZBX_MACRO_NUMERIC, err,
-					sizeof(err)))
+	if (SUCCEED != substitute_lld_macros(&expression, jp_row, lld_macros, ZBX_MACRO_ANY | ZBX_TOKEN_TRIGGER,
+			err, sizeof(err)) ||
+			SUCCEED != substitute_lld_macros(&recovery_expression, jp_row, lld_macros,
+					ZBX_MACRO_ANY | ZBX_TOKEN_TRIGGER, err, sizeof(err)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s trigger: %s.\n", operation_msg, err);
 		goto out;

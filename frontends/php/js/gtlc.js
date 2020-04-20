@@ -469,6 +469,10 @@ jQuery(function($) {
 	}
 
 	function checkDisableTimeSelectorUI() {
+		if (!element.zoomout.length) {
+			return false;
+		}
+
 		$.ajax({
 			url: endpoint.getUrl(),
 			type: 'post',

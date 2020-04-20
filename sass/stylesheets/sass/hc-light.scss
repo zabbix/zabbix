@@ -283,7 +283,7 @@ $multiselect-selected-bg-color: #777777;
 
 	.dashbrd-grid-new-widget-label {
 		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -213px -888px;
+			background: url($sprite-path) no-repeat -213px -888px;
 		}
 	}
 }
@@ -291,7 +291,7 @@ $multiselect-selected-bg-color: #777777;
 .dashbrd-grid-widget-set-size {
 	.dashbrd-grid-new-widget-label {
 		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -401px -888px;
+			background: url($sprite-path) no-repeat -401px -888px;
 		}
 	}
 }
@@ -308,10 +308,10 @@ $multiselect-selected-bg-color: #777777;
 }
 
 $var-icons: (
-	maint: url(../img/icon-sprite.svg) no-repeat -203px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -208px -729px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -208px -765px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -203px -693px
+	maint: url($sprite-path) no-repeat -203px -802px,
+	depend-up: url($sprite-path) no-repeat -208px -729px,
+	depend-down: url($sprite-path) no-repeat -208px -765px,
+	ackn: url($sprite-path) no-repeat -203px -693px
 );
 
 // Dynamically generated classes:
@@ -330,8 +330,8 @@ $var-icons: (
 }
 
 $form-icon-btn: (
-	cal: url(../img/icon-sprite.svg) no-repeat -201px -834px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -168px -617px
+	cal: url($sprite-path) no-repeat -201px -834px,
+	wzrd-action: url($sprite-path) no-repeat -168px -617px
 );
 
 // Dynamically generated classes:
@@ -349,18 +349,18 @@ $form-icon-btn: (
 }
 
 $icon-widget-btn: (
-	iterator-page-previous: url(../img/icon-sprite.svg) no-repeat -244px -657px,
-	iterator-page-next: url(../img/icon-sprite.svg) no-repeat -242px -623px,
-	widget-action: url(../img/icon-sprite.svg) no-repeat -165px -618px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -165px -654px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -165px -690px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -201px -619px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -201px -582px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -165px -546px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -165px -582px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -165px -474px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -165px -510px,
-	info-clock: url(../img/icon-sprite.svg) no-repeat -246px -762px
+	iterator-page-previous: url($sprite-path) no-repeat -244px -657px,
+	iterator-page-next: url($sprite-path) no-repeat -242px -623px,
+	widget-action: url($sprite-path) no-repeat -165px -618px,
+	widget-collapse: url($sprite-path) no-repeat -165px -654px,
+	widget-expand: url($sprite-path) no-repeat -165px -690px,
+	widget-edit: url($sprite-path) no-repeat -201px -619px,
+	widget-delete: url($sprite-path) no-repeat -201px -582px,
+	alarm-on: url($sprite-path) no-repeat -165px -546px,
+	alarm-off: url($sprite-path) no-repeat -165px -582px,
+	sound-on: url($sprite-path) no-repeat -165px -474px,
+	sound-off: url($sprite-path) no-repeat -165px -510px,
+	info-clock: url($sprite-path) no-repeat -246px -762px
 );
 
 // Dynamically generated classes:
@@ -384,7 +384,7 @@ $icon-widget-btn: (
 }
 
 .btn-dashbrd-conf {
-	background: url(../img/icon-sprite.svg) no-repeat -201px -619px !important;
+	background: url($sprite-path) no-repeat -201px -619px !important;
 }
 
 .subfilter-enabled {
@@ -430,33 +430,33 @@ $icon-widget-btn: (
 
 			&.selected {
 				&::before {
-					background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
+					background: url($sprite-path) no-repeat -317px -835px;
 				}
 			}
 		}
 
 		&.selected {
 			&::before {
-				background: url(../img/icon-sprite.svg) no-repeat -164px -835px;
+				background: url($sprite-path) no-repeat -164px -835px;
 			}
 		}
 	}
 }
 
 .add-child-btn {
-	background: url(../img/icon-sprite.svg) no-repeat -206px -551px !important;
+	background: url($sprite-path) no-repeat -206px -551px !important;
 }
 
 .edit-item-btn {
-	background: url(../img/icon-sprite.svg) no-repeat -206px -478px !important;
+	background: url($sprite-path) no-repeat -206px -478px !important;
 }
 
 .import-items-btn {
-	background: url(../img/icon-sprite.svg) no-repeat -206px -515px !important;
+	background: url($sprite-path) no-repeat -206px -515px !important;
 }
 
 .drag-icon {
-	background: url(../img/icon-sprite.svg) no-repeat -165px -762px !important;
+	background: url($sprite-path) no-repeat -165px -762px !important;
 }
 
 // Colors and general.
@@ -748,7 +748,7 @@ a.link-action {
 			}
 
 			.icon-wzrd-action {
-				background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+				background: transparent url($sprite-path) no-repeat -165px -624px;
 			}
 		}
 	}
@@ -799,7 +799,7 @@ a.link-action {
 	}
 
 	&::after {
-		background: url(../img/icon-sprite.svg) no-repeat;
+		background: url($sprite-path) no-repeat;
 		content: '';
 		position: absolute;
 		left: 6px;
@@ -949,7 +949,7 @@ td.inactive-bg {
 
 .inactive-bg::after {
 	content: '';
-	background: url(../img/icon-sprite.svg) no-repeat -256px -411px;
+	background: url($sprite-path) no-repeat -256px -411px;
 	width: 22px;
 	height: 18px;
 	top: 5px;
@@ -1166,7 +1166,7 @@ td.inactive-bg {
 
 		&::before {
 			content: '';
-			background-image: url(../img/icon-sprite.svg);
+			background-image: url($sprite-path);
 			background-repeat: no-repeat;
 			border-radius: 3px;
 			position: absolute;

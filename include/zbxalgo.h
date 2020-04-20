@@ -355,6 +355,7 @@ unsigned int	zbx_isqrt32(unsigned int value);
 int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
 		zbx_vector_ptr_t *unknown_msgs);
 int	evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
+double	evaluate_string_to_double(const char *in);
 
 /* forecasting */
 

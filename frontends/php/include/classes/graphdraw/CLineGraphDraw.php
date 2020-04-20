@@ -455,7 +455,9 @@ class CLineGraphDraw extends CGraphDraw {
 					continue;
 				}
 
-				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($trigger);
+				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpressions([$trigger],
+					['resolve_usermacros' => true, 'resolve_functionids' => false]
+				)[0]['expression'];
 
 				if (!preg_match('/^\{\d+\}\s*(?<operator>[><]=?|=)\s*(?<constant>.*)$/', $trigger['expression'],
 						$matches)) {

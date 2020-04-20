@@ -509,13 +509,18 @@ class CControllerPopupTriggerExpr extends CController {
 										$this->functions[$function]['operators'])) {
 								$operator = $tokens[$key + 1]['value'];
 
+								$value = '';
+								$i = 2;
+
 								if (array_key_exists($key + 3, $tokens)
 										&& $tokens[$key + 2]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
-									$value = $tokens[$key + 2]['value'].$tokens[$key + 3]['value'];
+									$value .= $tokens[$key + 2]['value'];
+									$i++;
 								}
-								else {
-									$value = $tokens[$key + 2]['value'];
-								}
+
+								$value .= ($tokens[$key + $i]['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING)
+									? $tokens[$key + $i]['data']['string']
+									: $tokens[$key + $i]['value'];
 							}
 							else {
 								break;
@@ -656,7 +661,7 @@ class CControllerPopupTriggerExpr extends CController {
 						$function,
 						rtrim(implode(',', $quoted_params), ','),
 						$operator,
-						$data['value']
+						CTriggerExpression::quoteString($data['value'])
 					);
 
 					// Validate trigger expression.

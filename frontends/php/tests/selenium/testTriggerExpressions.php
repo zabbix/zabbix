@@ -18,35 +18,49 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
 
-class testTriggerExpressions extends CLegacyWebTest {
+class testTriggerExpressions extends CWebTest {
 
-	public static function provider() {
-		return [
-			['20M', 'FALSE', 'red'],
-			['19.9M', 'TRUE', 'green'],
-			['20479K', 'TRUE', 'green']
+	const TRIGGER_ID = 13357;		//'Lack of available memory on server {HOST.NAME}'
+
+	public function testTriggerExpressions_SimpleTest() {
+		// Open advanced editor for testing trigger expression results.
+		$this->page->login()->open('triggers.php?form=update&triggerid='.self::TRIGGER_ID);
+		$this->query('button:Expression constructor')->waitUntilPresent()->one()->click();
+		$this->query('button:Test')->waitUntilPresent()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+
+		// Check table headers presence in tesing dialog.
+		$table_headers = ['Expression Variable Elements', 'Result type', 'Value',
+						'Expression', 'Result', 'Error'];
+
+		foreach ($table_headers as $header) {
+			$this->assertTrue($dialog->query('xpath://table//th[text() ="'.$header.'"]')->one()->isPresent());
+		}
+
+		// Type value in expression testing form.
+		$dialog->query('xpath:.//input[@type="text"]')->waitUntilPresent()->one()->fill('20M');
+
+		// Verify zabbix server connection error message.
+		$dialog->query('button:Test')->one()->click();
+
+		$message = $dialog->query('tag:output')->waitUntilPresent()->asMessage()->one();
+		$this->assertTrue($message->isBad());
+		$this->assertEquals('Cannot evaluate expression', $message->getTitle());
+
+		$message_details = [
+			'Connection to Zabbix server "localhost" refused. Possible reasons:',
+			'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
+			'2. Security environment (for example, SELinux) is blocking the connection;',
+			'3. Zabbix server daemon not running;',
+			'4. Firewall is blocking TCP connection.',
+			'Connection refused'
 		];
-	}
 
-	/**
-	* @dataProvider provider
-	*/
-	public function testTriggerExpression_SimpleTest($value, $expected, $css_class) {
-		// Open advanced editor for testing trigger expression results
-		$this->zbxTestLogin('triggers.php?form=update&triggerid=13357');
-		$this->zbxTestCheckHeader('Triggers');
-		$this->zbxTestClickButtonText('Expression constructor');
-		$this->zbxTestClickButtonText('Test');
-		$this->zbxTestLaunchOverlayDialog('Test');
-
-		// Type values in expression testing form
-		$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@type="text"]', $value);
-
-		// Verify result of expression status
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Test"]');
-		$this->zbxTestAssertElementText('(//div[@class="overlay-dialogue-body"]//td[@class="'.$css_class.'"])[1]', $expected);
-		$this->zbxTestAssertElementText('(//div[@class="overlay-dialogue-body"]//td[@class="'.$css_class.'"])[2]', $expected);
+		foreach ($message_details as $line) {
+			$this->assertTrue($message->hasLine($line));
+		}
 	}
 }
