@@ -126,7 +126,6 @@ class CControllerPopupAcknowledgeCreate extends CController {
 				$eventid_chunks = array_chunk($data['eventids'], ZBX_DB_MAX_INSERTS);
 				foreach ($eventid_chunks as $eventid_chunk) {
 					$data['eventids'] = $eventid_chunk;
-					t($data);
 					$result = API::Event()->acknowledge($data);
 
 					// Do not continue if event.acknowledge validation fails.

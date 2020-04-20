@@ -78,14 +78,10 @@ $form_list
 	)
 	->addRow(_('Change acknowledgement'),
 		(new CList([
-			(new CCheckBox('change_acknowledgement'))
-				->onClick('javascript: jQuery("#acknowledgement input").attr("disabled", this.checked ? false : true)')
-				->setChecked($data['change_severity'])
-				->setEnabled($data['problem_severity_can_be_changed']),
-			(new CRadioButtonList('acknowledgement', -1))
+			(new CRadioButtonList('acknowledgement', ZBX_PROBLEM_UPDATE_NONE))
+				->addValue(_('None'), ZBX_PROBLEM_UPDATE_NONE)
 				->addValue(_('Acknowledge'), ZBX_PROBLEM_UPDATE_ACKNOWLEDGE)
 				->addValue(_('Unacknowledge'), ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)
-				->setEnabled(false)
 				->setModern(true)
 		]))
 			->addClass(ZBX_STYLE_HOR_LIST)
