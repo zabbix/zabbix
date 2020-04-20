@@ -219,11 +219,11 @@ Changes for 4.4.8rc1
 
 New features:
 .........T [ZBXCTR-1] added Telegram media type (ableev)
-.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 
 Bug fixes:
+.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
 ..F....... [ZBX-17524] fixed time selector button state (rlataria)
 A......... [ZBX-17496] fixed UserMacro API validation (miks)
 ..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
@@ -4199,8 +4199,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.31rc1
-
-New features:
 
 Bug fixes:
 ...G...PS. [ZBX-17600] fixed security vulnerability CVE-2020-11800 (remote code execution) (Andris)
