@@ -1590,7 +1590,7 @@ static int	item_preproc_script(zbx_variant_t *value, const char *params, zbx_var
 
 	size = zbx_variant_data_bin_get(bytecode->data.bin, (void **)&code);
 
-	if (SUCCEED == zbx_es_execute(&es_engine, params, code, size, value->data.str, &output, errmsg))
+	if (SUCCEED == zbx_es_execute(&es_engine, params, code, size, value->data.str, &output, errmsg, NULL))
 	{
 		zbx_variant_clear(value);
 

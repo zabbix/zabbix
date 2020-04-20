@@ -429,12 +429,14 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
-	char **error)
+	char **error, zbx_uint64_t *duration)
 {
 	void		*buffer;
 	volatile int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	gettimeofday(&es->env->start_time, NULL);
 
 	if (SUCCEED == zbx_es_fatal_error(es))
 	{
@@ -454,8 +456,6 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	memcpy(buffer, code, size);
 	duk_load_function(es->env->ctx);
 	duk_push_string(es->env->ctx, param);
-
-	gettimeofday(&es->env->start_time, NULL);
 
 	if (DUK_EXEC_SUCCESS != duk_pcall(es->env->ctx, 1))
 	{
@@ -498,6 +498,9 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;
 out:
+	if (NULL != duration)
+		*duration = zbx_get_duration(es->env->start_time);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
@@ -522,3 +525,4 @@ void	zbx_es_set_debug(zbx_es_t *es, struct zbx_json *json)
 {
 	es->env->json = json;
 }
+

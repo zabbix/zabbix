@@ -485,6 +485,15 @@ int	zbx_day_in_month(int year, int mon)
 	return 30;
 }
 
+zbx_uint64_t	zbx_get_duration(struct timeval start_time)
+{
+	struct timeval	current_time;
+
+	gettimeofday(&current_time, NULL);
+
+	return (current_time.tv_sec - start_time.tv_sec) * 1000 + (current_time.tv_usec - start_time.tv_usec) / 1000;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_calloc2                                                      *

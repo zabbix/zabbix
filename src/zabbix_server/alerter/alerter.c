@@ -212,9 +212,10 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
  ******************************************************************************/
 static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
 {
-	char	*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
-	int	script_bin_sz, ret, timeout;
+	char			*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
+	int			script_bin_sz, ret, timeout;
 	struct	zbx_json	json;
+	zbx_uint64_t		duration = 0;
 
 	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params);
 
@@ -232,10 +233,8 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	{
 		zbx_es_set_timeout(&es_engine, timeout);
 
-		ret = zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, params, &output, &error);
+		ret = zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, params, &output, &error, &duration);
 	}
-
-
 
 	if (SUCCEED == zbx_es_fatal_error(&es_engine))
 	{
@@ -248,18 +247,21 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		}
 	}
 
+	if (ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL == ipc_message->code)
+	{
+		zbx_json_close(&json);
+		zbx_json_adduint64(&json, "ms", duration);
+		zabbix_log(LOG_LEVEL_INFORMATION, "json '%s'", json.buffer);
+		zbx_json_free(&json);
+		zbx_es_set_debug(&es_engine, NULL);
+	}
+
 	alerter_send_result(socket, output, ret, error);
 
 	zbx_free(output);
 	zbx_free(error);
 	zbx_free(params);
 	zbx_free(script_bin);
-
-	if (ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL == ipc_message->code)
-	{
-		zbx_json_free(&json);
-		zbx_es_set_debug(&es_engine, NULL);
-	}
 }
 
 /******************************************************************************

@@ -70,7 +70,6 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 	const char		*message;
 	int			level;
 	duk_memory_functions	out_funcs;
-	struct timeval		tv;
 
 	level = duk_to_int(ctx, 0);
 	message = duk_to_string(ctx, 1);
@@ -86,9 +85,7 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 	zbx_json_addobject(env->json, NULL);
 	zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
 
-	gettimeofday(&tv, NULL);
-	zbx_json_adduint64(env->json, "ms", (tv.tv_sec - env->start_time.tv_sec) * 1000 +
-			(tv.tv_usec - env->start_time.tv_usec) / 1000);
+	zbx_json_adduint64(env->json, "ms", zbx_get_duration(env->start_time));
 	zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(env->json);
 

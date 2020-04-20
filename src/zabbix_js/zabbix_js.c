@@ -163,7 +163,7 @@ static char	*execute_script(const char *script, const char *param, int timeout, 
 		goto out;
 	}
 
-	if (FAIL == zbx_es_execute(&es, script, code, size, param, &result, &errmsg))
+	if (FAIL == zbx_es_execute(&es, script, code, size, param, &result, &errmsg, NULL))
 	{
 		*error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
 		goto out;
