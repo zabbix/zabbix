@@ -1,8 +1,23 @@
 Changes for 5.0.0beta2
 
 New features:
+A.F.....S. [ZBXNEXT-702] Implemented ability to compare string values in triggers (arimdjonoks, Ivo, Sasha)
+.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
+.........T [ZBXNEXT-5658] added media "Zammad" (afayantsev)
+.........T [ZBXNEXT-5821] added "Template App Memcached" (ychukina)
+.........T [ZBXNEXT-5833] added "Template DB ClickHouse by HTTP" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17521] fixed closing multi-level pop-up menus when selected with a mouse click (vasilijs)
+..F....... [ZBX-15914] fixed map elements label inconsistency (agriscenko)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17140] fixed builtin counter index rewrite on localized Windows systems (atumilovics)
+.......PS. [ZBX-17412] fixed updating metadata, ip, port for hosts with TLS certificate encryption monitored via proxy (mabele)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.0beta1
@@ -203,10 +218,19 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 Changes for 4.4.8rc1
 
 New features:
+.........T [ZBXCTR-1] added Telegram media type (ableev)
+.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 
 Bug fixes:
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
+.......PS. [ZBX-17412] fixed updating metadata, ip, port for hosts with TLS certificate encryption monitored via proxy (mabele)
 ...G...... [ZBX-17558] fixed Zabbix agent 2 compilation on MS Windows (vso)
 ...G...... [ZBX-17140] fixed builtin counter index rewrite on localized Windows systems (atumilovics)
 ........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
@@ -1336,6 +1360,12 @@ New features:
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 
 Bug fixes:
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
 ........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
 ..F....... [ZBX-17423] fixed "reset" button in history page (talbergs)
 ..F....... [ZBX-17395] fixed deletion of templated applications that were linked to items when importing templates (Ivo)
@@ -4173,6 +4203,7 @@ Changes for 3.0.31rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-17600] fixed security vulnerability CVE-2020-11800 (remote code execution) (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.30

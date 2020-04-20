@@ -33,14 +33,13 @@
 #include "zbxmockassert.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
-#include "valuecache_test.h"
 #include "valuecache_mock.h"
 
 /*
  * data source
  */
 static zbx_vcmock_ds_t	vc_ds;
-static time_t	vcmock_time;
+static zbx_timespec_t	vcmock_ts;
 
 int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
 void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex);
@@ -56,6 +55,8 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
 int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 time_t	__wrap_time(time_t *ptr);
+
+void	zbx_vc_set_mode(int mode);
 
 /* comparison function to sort history record vector by timestamps in ascending order */
 static int	history_compare(const void *d1, const void *d2)
@@ -84,8 +85,11 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 {
 	const char		*data;
 	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
 
-	data = zbx_mock_get_object_member_string(hvalue, "value");
+	handle = zbx_mock_get_object_member_handle(hvalue, "value");
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string_ex(handle, &data)))
+		fail_msg("Cannot read history value: %s", zbx_mock_error_string(err));
 
 	if (ITEM_VALUE_TYPE_LOG != value_type)
 	{
@@ -318,6 +322,21 @@ void	zbx_vcmock_ds_dump(void)
 		printf("itemid:" ZBX_FS_UI64 ", value_type:%d\n", item->itemid, item->value_type);
 		zbx_vcmock_history_dump(item->value_type, &item->data);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_ds_first_item                                         *
+ *                                                                            *
+ * Purpose: returns first item in value cache mock data source                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_vcmock_ds_item_t	*zbx_vcmock_ds_first_item(void)
+{
+	zbx_hashset_iter_t	iter;
+
+	zbx_hashset_iter_reset((zbx_hashset_t *)&vc_ds.items, &iter);
+	return (zbx_vcmock_ds_item_t *)zbx_hashset_iter_next(&iter);
 }
 
 /******************************************************************************
@@ -769,13 +788,20 @@ void	zbx_vcmock_set_mode(zbx_mock_handle_t hitem, const char *key)
 /*
  * time() emulation
  */
-
 time_t	__wrap_time(time_t *ptr)
 {
 	if (NULL != ptr)
-		*ptr = vcmock_time;
+		*ptr = vcmock_ts.sec;
 
-	return vcmock_time;
+	return vcmock_ts.sec;
+}
+
+/*
+ * zbx_timespec() emulation
+ */
+void	__wrap_zbx_timespec(zbx_timespec_t *ts)
+{
+	*ts = vcmock_ts;
 }
 
 /******************************************************************************
@@ -790,12 +816,21 @@ void	zbx_vcmock_set_time(zbx_mock_handle_t hitem, const char *key)
 {
 	zbx_mock_error_t	err;
 	const char		*data;
-	zbx_timespec_t		ts;
 
 	data = zbx_mock_get_object_member_string(hitem, key);
 
-	if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(data, &ts)))
+	if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(data, &vcmock_ts)))
 		fail_msg("Cannot read \"%s\" parameter", key);
+}
 
-	vcmock_time = ts.sec;
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vcmock_get_ts                                                *
+ *                                                                            *
+ * Purpose: returns the mocked current time                                   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_timespec_t	zbx_vcmock_get_ts()
+{
+	return vcmock_ts;
 }
