@@ -493,6 +493,8 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
 	{
@@ -571,24 +573,27 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	zbx_alerter_deserialize_result(response, &value, &errcode, &error, &debug);
 	zbx_free(response);
 
-	if (SUCCEED != errcode)
-		goto fail;
+	if (SUCCEED == errcode)
+		ret = SUCCEED;
+fail:
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, SUCCEED == result ? ZBX_PROTO_VALUE_SUCCESS :
+				ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-	if (NULL != value)
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_DATA, value, ZBX_JSON_TYPE_STRING);
+	if (SUCCEED == ret)
+	{
+		if (NULL != value)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_DATA, value, ZBX_JSON_TYPE_STRING);
+	}
+	else
+	{
+		if (NULL != error && '\0' != *error)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
+	}
+
 	if (NULL != debug)
 		zbx_json_addraw(&json, "debug", debug);
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "json.buffer '%s'", json.buffer);
 	(void)zbx_tcp_send(sock, json.buffer);
-
-	zbx_json_free(&json);
-
-	ret = SUCCEED;
-fail:
-	if (SUCCEED != ret)
-		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 
 	zbx_free(params);
 	zbx_free(message);
@@ -598,6 +603,7 @@ fail:
 	zbx_free(value);
 	zbx_free(error);
 	zbx_free(debug);
+	zbx_json_free(&json);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
