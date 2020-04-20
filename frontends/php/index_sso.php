@@ -110,6 +110,46 @@ $settings = [
 	]
 ];
 
+if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
+	foreach (['strict', 'compress', 'contactPerson', 'organization'] as $option) {
+		if (array_key_exists($option, $SSO['SETTINGS'])) {
+			$settings[$option] = $SSO['SETTINGS'][$option];
+		}
+	}
+
+	if (array_key_exists('sp', $SSO['SETTINGS'])) {
+		foreach (['attributeConsumingService', 'x509certNew'] as $option) {
+			if (array_key_exists($option, $SSO['SETTINGS']['sp'])) {
+				$settings['sp'][$option] = $SSO['SETTINGS']['sp'][$option];
+			}
+		}
+	}
+
+	if (array_key_exists('idp', $SSO['SETTINGS'])) {
+		if (array_key_exists('singleLogoutService', $SSO['SETTINGS']['idp'])
+				&& array_key_exists('responseUrl', $SSO['SETTINGS']['idp']['singleLogoutService'])) {
+			$settings['idp']['singleLogoutService']['responseUrl'] =
+				$SSO['SETTINGS']['idp']['singleLogoutService']['responseUrl'];
+		}
+
+		foreach (['certFingerprint', 'certFingerprintAlgorithm', 'x509certMulti'] as $option) {
+			if (array_key_exists($option, $SSO['SETTINGS']['idp'])) {
+				$settings['idp'][$option] = $SSO['SETTINGS']['idp'][$option];
+			}
+		}
+	}
+
+	if (array_key_exists('security', $SSO['SETTINGS'])) {
+		foreach (['wantNameId', 'requestedAuthnContext', 'requestedAuthnContextComparison', 'wantXMLValidation',
+				'relaxDestinationValidation', 'destinationStrictlyMatches', 'signatureAlgorithm', 'digestAlgorithm',
+				'rejectUnsolicitedResponsesWithInResponseTo', 'lowercaseUrlencoding'] as $option) {
+			if (array_key_exists($option, $SSO['SETTINGS']['security'])) {
+				$settings['security'][$option] = $SSO['SETTINGS']['security'][$option];
+			}
+		}
+	}
+}
+
 try {
 	$auth = new Auth($settings);
 
