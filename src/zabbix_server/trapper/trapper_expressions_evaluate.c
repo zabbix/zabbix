@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "zbxserver.h"
+#include "trapper_expressions_evaluate.h"
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions,
 				char **error)
