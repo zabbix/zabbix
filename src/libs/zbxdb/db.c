@@ -402,9 +402,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret &&
-			0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
-					"set @@session.auto_increment_offset=1"))
+	if (ZBX_DB_OK == ret && 0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
+			"set @@session.auto_increment_offset=1"))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_offset option.");
 		ret = ZBX_DB_FAIL;
