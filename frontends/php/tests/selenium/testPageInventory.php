@@ -35,8 +35,7 @@ class testPageInventory extends CLegacyWebTest {
 	*/
 	public function testPageInventory_CheckLayout($data) {
 		$this->zbxTestLogin('hostinventories.php');
-
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckTitle('Host inventory');
 		$this->zbxTestCheckHeader('Host inventory');

@@ -99,6 +99,7 @@ class testGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
+		$this->page->removeFocus();
 		$element = $overlay->query('id:svg-graph-preview')->one();
 
 		$errors = [];

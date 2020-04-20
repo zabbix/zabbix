@@ -123,7 +123,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		// Go to Template form.
 		$this->page->login()->open('templates.php?groupid=1');
 		$templates_table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
-		$this->query('link:'.$this->template)->one()->click();
+		$this->query('link', $this->template)->one()->click();
 
 		$form = $this->query('name:templatesForm')->waitUntilPresent()->asForm()->one();
 		// Fill tags on template.
@@ -168,7 +168,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$this->page->login()->open('triggers.php?filter_set=1&filter_hostids[0]='.$this->hostid);
 		// Go to inherited trigger.
 		$host_triggers_table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
-		$host_triggers_table->query('link:'.$inherited_trigger)->one()->click();
+		$host_triggers_table->query('link', $inherited_trigger)->one()->click();
 		// Check trigger name.
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		$name = $form->getField('Name')->getValue();

@@ -151,7 +151,7 @@ foreach ($data['discoveries'] as $discovery) {
 		[
 			new CLink(
 				_('Graph prototypes'),
-				'graphs.php?parent_discoveryid='.$discovery['itemid']
+				(new CUrl('graphs.php'))->setArgument('parent_discoveryid', $discovery['itemid'])
 			),
 			CViewHelper::showNum($discovery['graphs'])
 		],

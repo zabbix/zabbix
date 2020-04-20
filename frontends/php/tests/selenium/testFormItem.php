@@ -20,6 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/api/services/CItemGeneral.php';
+require_once dirname(__FILE__).'/../../include/classes/api/services/CItem.php';
 
 /**
  * @backup items
@@ -426,7 +428,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($type == 'Database monitor' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'db.odbc.select[<unique short description>,dsn]');
+			$this->zbxTestAssertElementValue('key', 'db.odbc.select[<unique short description>,<dsn>,<connection string>]');
 		}
 
 		if ($type == 'SSH agent' && !isset($itemid)) {
@@ -2002,7 +2004,7 @@ class testFormItem extends CLegacyWebTest {
 			}
 
 		if (isset($data['dbCheck'])) {
-			$result = DBselect("SELECT name,key_,value_type FROM items where key_ = '".$key."'");
+			$result = DBselect("SELECT name,key_,value_type FROM items where hostid=40001 and key_ = '".$key."'");
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['name'], $name);
 				$this->assertEquals($row['key_'], $key);
@@ -2075,7 +2077,7 @@ class testFormItem extends CLegacyWebTest {
 	}
 
 	public function testFormItem_HousekeeperUpdate() {
-		$this->zbxTestLogin('zabbix.php?action=gui.edit&ddreset=1');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
@@ -2091,7 +2093,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
 		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
 
-		$this->zbxTestOpen('zabbix.php?action=gui.edit&ddreset=1');
+		$this->zbxTestOpen('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
@@ -2112,7 +2114,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickWait('trends_mode_hint');
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
-		$this->zbxTestOpen('zabbix.php?action=gui.edit&ddreset=1');
+		$this->zbxTestOpen('zabbix.php?action=gui.edit');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
 
 		$this->zbxTestInputType('hk_history', 90);

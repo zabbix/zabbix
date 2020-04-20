@@ -29,6 +29,7 @@ $page['file'] = 'screens.php';
 $page['scripts'] = [
 	'class.calendar.js',
 	'gtlc.js',
+	'multiselect.js',
 	'flickerfreescreen.js',
 	'class.svg.canvas.js',
 	'class.svg.map.js',
@@ -44,7 +45,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
 	'hostid' =>		[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
 	'tr_groupid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
 	'tr_hostid' =>	[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,		null],
@@ -62,9 +62,6 @@ validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
  * Permissions
  */
 // Validate group IDs.
-if (getRequest('groupid') && !isReadableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
 if (getRequest('tr_groupid') && !isReadableHostGroups([getRequest('tr_groupid')])) {
 	access_deny();
 }
@@ -90,6 +87,14 @@ $data = [];
 $options = [
 	'output' => ['screenid', 'name']
 ];
+
+// Save dynamic item hostid.
+if (hasRequest('hostid')) {
+	CProfile::update('web.screens.hostid', getRequest('hostid'), PROFILE_TYPE_ID);
+}
+elseif (hasRequest('reset')) {
+	CProfile::delete('web.screens.hostid');
+}
 
 if (getRequest('elementid')) {
 	$options['screenids'] = getRequest('elementid');
@@ -135,7 +140,24 @@ else {
 	updateTimeSelectorPeriod($timeselector_options);
 
 	$data += $timeselector_options;
+
+	// Dynamic item host selector.
+	$data['has_dynamic_widgets'] = check_dynamic_items($data['screen']['screenid'], 0);
+
+	if ($data['has_dynamic_widgets']) {
+		$hostid = getRequest('hostid', CProfile::get('web.screens.hostid', 0));
+		$data['host'] = ($hostid > 0)
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => [$hostid],
+				'monitored_hosts' => 1
+			]), ['hostid' => 'id'])
+			: [];
+
+		$data['hostid'] = $data['host'] ? $data['host'][0]['id'] : null;
+	}
 }
+
 ob_end_flush();
 
 // render view

@@ -34,6 +34,13 @@ class testFormGraph extends CLegacyWebTest {
 	protected $host = 'Simple form test host';
 
 	/**
+	 * The name of the host group that the above host belongs to.
+	 *
+	 * @var string
+	 */
+	protected $hostGroup = 'Zabbix servers';
+
+	/**
 	 * The name of the host item for the testing of the layout of the graphs created in the test data set.
 	 *
 	 * @var string
@@ -187,12 +194,14 @@ class testFormGraph extends CLegacyWebTest {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
+			$this->query('button:Reset')->one()->click();
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin('hosts.php');
+			$this->query('button:Reset')->one()->click();
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
@@ -446,9 +455,9 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			if (isset($data['host'])) {
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill($this->host);
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->zbxTestClickLinkText($this->itemSimple);
 			}
 
@@ -593,6 +602,9 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Hosts')->clear()->fill('Simple form test host');
+		$filter->submit();
 		$this->zbxTestTextPresent([
 			$data['name'],
 			'Graphs'
@@ -832,6 +844,7 @@ class testFormGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
@@ -851,10 +864,11 @@ class testFormGraph extends CLegacyWebTest {
 				$this->zbxTestClick('add_item');
 				$this->zbxTestLaunchOverlayDialog('Items');
 				$link = $item['itemName'];
-
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill([
+					'values' => $this->host,
+					'context' => $this->hostGroup
+				]);
 				$this->zbxTestClickLinkTextWait($link);
 
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));
@@ -919,12 +933,11 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['ymin_name'])) {
 			$this->zbxTestClick('yaxis_min');
 			$this->zbxTestLaunchOverlayDialog('Items');
-
-			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-			COverlayDialogElement::find()->one()->waitUntilReady();
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]//select[@name='hostid']"));
-			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
+			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+			$host->fill([
+				'values' => $this->host,
+				'context' => $this->hostGroup
+			]);
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymin_name = $data['ymin_name'];
@@ -935,12 +948,11 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['ymax_name'])) {
 			$this->zbxTestClick('yaxis_max');
 			$this->zbxTestLaunchOverlayDialog('Items');
-
-			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-			COverlayDialogElement::find()->one()->waitUntilReady();
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[contains(@class, 'overlay-dialogue modal')]//select[@name='hostid']"));
-			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
+			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+			$host->fill([
+				'values' => $this->host,
+				'context' => $this->hostGroup
+			]);
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymax_name = $data['ymax_name'];
@@ -978,6 +990,13 @@ class testFormGraph extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
+			$filter = $this->query('name:zbx_filter')->asForm()->one();
+			$filter->getField('Hosts')->fill([
+				'values' => $this->host,
+				'context' => $this->hostGroup
+			]);
+			$filter->submit();
+
 			$this->zbxTestClickLinkTextWait($name);
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestDropdownAssertSelected('graphtype', $graphtype);

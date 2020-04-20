@@ -1167,8 +1167,10 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	ZBX_DC_HMACRO		*macro;
 
 	if (NULL == (result = DBselect(
-			"select hostmacroid,hostid,macro,value,type"
-			" from hostmacro")))
+			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type"
+			" from hostmacro m"
+			" inner join hosts h on m.hostid=h.hostid"
+			" where h.flags<>%d", ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;
 	}

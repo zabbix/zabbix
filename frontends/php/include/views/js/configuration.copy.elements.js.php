@@ -54,17 +54,17 @@
 
 			switch ($('#copy_type').find('input[name=copy_type]:checked').val()) {
 				case '<?= COPY_TYPE_TO_HOST_GROUP ?>':
-					helper_options.objectName = 'hostGroup';
+					helper_options.object_name = 'hostGroup';
 					helper_options.popup.parameters.srctbl = 'host_groups';
 					helper_options.popup.parameters.srcfld1 = 'groupid';
 					break;
 				case '<?= COPY_TYPE_TO_HOST ?>':
-					helper_options.objectName = 'hosts';
+					helper_options.object_name = 'hosts';
 					helper_options.popup.parameters.srctbl = 'hosts';
 					helper_options.popup.parameters.srcfld1 = 'hostid';
 					break;
 				case '<?= COPY_TYPE_TO_TEMPLATE ?>':
-					helper_options.objectName = 'templates';
+					helper_options.object_name = 'templates';
 					helper_options.popup.parameters.srctbl = 'templates';
 					helper_options.popup.parameters.srcfld1 = 'hostid';
 					helper_options.popup.parameters.srcfld2 = 'host';
