@@ -25,6 +25,8 @@
 #include "duktape.h"
 #include "zabbix.h"
 
+#define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
+
 /******************************************************************************
  *                                                                            *
  * Function: es_zabbix_dtor                                              *
@@ -87,6 +89,12 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 	zbx_json_adduint64(env->json, "ms", zbx_get_duration(env->start_time));
 	zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(env->json);
+
+	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
+	{
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "log exceeds the maximum size " ZBX_FS_UI64 " bytes.",
+				ZBX_MAX_RECV_DATA_SIZE);
+	}
 
 	return 0;
 }
