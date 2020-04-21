@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-01-29T12:59:01Z</date>
+    <date>2020-04-20T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>SIGNL4</name>
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
-                    <name>teamsecret</name>
-                    <value>{ALERT.SENDTO}</value>
+                    <name>Host IP</name>
+                    <value>{HOST.IP}</value>
                 </parameter>
                 <parameter>
-                    <name>Subject</name>
-                    <value>{ALERT.SUBJECT}</value>
+                    <name>Hostname</name>
+                    <value>{HOST.NAME}</value>
                 </parameter>
                 <parameter>
                     <name>Message</name>
@@ -24,16 +24,16 @@
                     <value>{EVENT.SEVERITY}</value>
                 </parameter>
                 <parameter>
+                    <name>Subject</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>teamsecret</name>
+                    <value>{ALERT.SENDTO}</value>
+                </parameter>
+                <parameter>
                     <name>X-S4-ExternalID</name>
                     <value>Zabbix event id: {EVENT.ID}</value>
-                </parameter>
-                <parameter>
-                    <name>Hostname</name>
-                    <value>{HOST.NAME}</value>
-                </parameter>
-                <parameter>
-                    <name>Host IP</name>
-                    <value>{HOST.IP}</value>
                 </parameter>
             </parameters>
             <script>// SIGNL4 Webhook&#13;
@@ -43,6 +43,10 @@ try {&#13;
         params = JSON.parse(value),&#13;
         endpoint = 'https://connect.signl4.com/webhook/',&#13;
         request = new CurlHttpRequest();&#13;
+&#13;
+    if (typeof params.HTTPProxy !== 'undefined' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
+        request.SetProxy(params.HTTPProxy);&#13;
+    }&#13;
 &#13;
     if (typeof params.teamsecret === 'string' &amp;&amp; params.teamsecret.trim() !== '') {&#13;
         endpoint += params.teamsecret;&#13;
