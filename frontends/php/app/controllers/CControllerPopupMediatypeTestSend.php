@@ -160,6 +160,23 @@ class CControllerPopupMediatypeTestSend extends CController {
 			];
 		}
 
+		if (array_key_exists('debug', $result)) {
+			$output['debug'] = [
+				'log' => [],
+				'ms' => $result['debug']['ms']
+			];
+			$debuglevel = [_('Info'), _('Critical'), _('Error'), _('Warning'), _('Debug'), _('Trace')];
+
+			foreach ($result['debug']['log'] as $logitem) {
+				$ms = (DateTime::createFromFormat('U.u', $logitem['ms']/1000));
+				$output['debug']['log'][] = [
+					'ms' => $ms->format('H:i:s.v'),
+					'level' => '['.$debuglevel[$logitem['level']].']',
+					'message' => $logitem['message']
+				];
+			}
+		}
+
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }

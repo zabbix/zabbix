@@ -5511,6 +5511,14 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
+#mediatype_testlog .logitems {
+  overflow: auto;
+  margin-bottom: 10px; }
+  #mediatype_testlog .logitems pre {
+    white-space: nowrap; }
+#mediatype_testlog .logtotalms {
+  margin-bottom: 10px; }
+
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {
   opacity: .75; }
 

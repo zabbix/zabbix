@@ -37,6 +37,7 @@ function mediatypeTestSend(overlay) {
 
 	$form.trimValues(['#sendto', '#subject', '#message']);
 	$form_fields.prop('disabled', true);
+	$('#mediatypetest_log').addClass('<?= ZBX_STYLE_DISABLED ?>');
 
 	overlay.setLoading();
 	overlay.xhr = jQuery.ajax({
@@ -47,12 +48,17 @@ function mediatypeTestSend(overlay) {
 
 			if (typeof ret.messages !== 'undefined') {
 				jQuery(ret.messages).insertBefore($form);
-				$form.parent().find('.link-action').click();
+				$form.parent().find('.msg-bad .link-action').click();
 			}
 
 			if ('response' in ret) {
 				jQuery('#webhook_response_value', $form).val(ret.response.value);
 				jQuery('#webhook_response_type', $form).text(ret.response.type);
+			}
+
+			if ('debug' in ret) {
+				$('#mediatypetest_log').removeClass('disabled');
+				sessionStorage.setItem('mediatypetest', JSON.stringify(ret.debug));
 			}
 
 			overlay.unsetLoading();
@@ -80,3 +86,35 @@ function mediatypeTestSend(overlay) {
 		type: 'post'
 	});
 }
+
+function openLogPopup(opener) {
+	if ($(opener).hasClass('<?= ZBX_STYLE_DISABLED ?>')) {
+		return;
+	}
+
+	var debug = JSON.parse(sessionStorage.getItem('mediatypetest')||'null'),
+		$content = $('<div id="mediatype_testlog"/>'),
+		$logitems = $('<div class="logitems"/>'),
+		$footer = $('<pre/>');
+
+	if (debug) {
+		debug.log.forEach(function (entry) {
+			$('<pre/>').text(entry.ms + ' ' + entry.level + ' ' + entry.message).appendTo($logitems);
+		});
+		$footer.text(<?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms');
+		$content.append($logitems);
+	}
+
+	overlayDialogue({
+		'dialogueid': '',
+		'title': <?= json_encode(_('Media type test log')) ?>,
+		'content': $content.wrap('<p/>').parent().html(),
+		'class': 'modal-popup modal-popup-generic',
+		'buttons': [],
+		'element': opener,
+		'type': 'popup',
+		'footer': $footer
+	});
+}
+
+sessionStorage.removeItem('mediatypetest');

@@ -7173,3 +7173,19 @@ table.preprocessing-test-results {
 		@extend %btn-widget;
 	}
 }
+
+// Media type test log popup
+#mediatype_testlog {
+	.logitems {
+		overflow: auto;
+		margin-bottom: 10px;
+
+		pre {
+			white-space: nowrap;
+		}
+	}
+
+	.logtotalms {
+		margin-bottom: 10px;
+	}
+}
