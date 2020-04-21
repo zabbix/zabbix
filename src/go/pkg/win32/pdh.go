@@ -43,10 +43,7 @@ var (
 	pdhLookupPerfNameByIndex    uintptr
 	pdhRemoveCounter            uintptr
 	pdhEnumObjItem              uintptr
-
-	//Did not work with init, for not added as lazy load
-	modPdhDll              = windows.NewLazyDLL("pdh.dll")
-	procPdhEnumObjectItems = modPdhDll.NewProc("PdhEnumObjectItemsW")
+	pdhEnumObjectItems          uintptr
 )
 
 const (
@@ -208,16 +205,9 @@ func PdhEnumObjectItems(className string) (counters []string, instances []string
 	var counterListSize uint32
 	var instanceListSize uint32
 
-	ret, _, _ := procPdhEnumObjectItems.Call(
-		uintptr(0),
-		uintptr(0),
-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(className))),
-		uintptr(0),
-		uintptr(unsafe.Pointer(&counterListSize)),
-		uintptr(0),
-		uintptr(unsafe.Pointer(&instanceListSize)),
-		uintptr(PERF_DETAIL_WIZARD),
-		uintptr(0))
+	ret, _, _ := syscall.Syscall9(pdhEnumObjectItems, 8, uintptr(0), uintptr(0),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(className))), uintptr(0), uintptr(unsafe.Pointer(&counterListSize)),
+		uintptr(0), uintptr(unsafe.Pointer(&instanceListSize)), uintptr(PERF_DETAIL_WIZARD), uintptr(0))
 	if ret != PDH_MORE_DATA {
 		return nil, nil, newPdhError(ret)
 	}
@@ -229,16 +219,10 @@ func PdhEnumObjectItems(className string) (counters []string, instances []string
 		instbuf = make([]uint16, instanceListSize)
 		instptr = uintptr(unsafe.Pointer(&instbuf[0]))
 	}
-	ret, _, _ = procPdhEnumObjectItems.Call(
-		uintptr(0),
-		uintptr(0),
-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(className))),
-		uintptr(unsafe.Pointer(&counterbuf[0])),
-		uintptr(unsafe.Pointer(&counterListSize)),
-		instptr,
-		uintptr(unsafe.Pointer(&instanceListSize)),
-		uintptr(PERF_DETAIL_WIZARD),
-		uintptr(0))
+	ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, uintptr(0), uintptr(0),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(className))), uintptr(unsafe.Pointer(&counterbuf[0])),
+		uintptr(unsafe.Pointer(&counterListSize)), instptr, uintptr(unsafe.Pointer(&instanceListSize)),
+		uintptr(PERF_DETAIL_WIZARD), uintptr(0))
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return nil, nil, newPdhError(ret)
 	}
@@ -259,4 +243,5 @@ func init() {
 	pdhMakeCounterPath = hPdh.mustGetProcAddress("PdhMakeCounterPathW")
 	pdhLookupPerfNameByIndex = hPdh.mustGetProcAddress("PdhLookupPerfNameByIndexW")
 	pdhRemoveCounter = hPdh.mustGetProcAddress("PdhRemoveCounter")
+	pdhEnumObjectItems = hPdh.mustGetProcAddress("PdhEnumObjectItemsW")
 }

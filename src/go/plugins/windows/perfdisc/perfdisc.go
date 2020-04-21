@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"zabbix/src/go/pkg/win32"
+
+	"zabbix.com/pkg/win32"
 
 	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/plugin"
