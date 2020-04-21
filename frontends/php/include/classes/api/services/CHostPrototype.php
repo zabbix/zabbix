@@ -1434,7 +1434,8 @@ class CHostPrototype extends CHostBase {
 
 		foreach ($update_macros as $hostid => $macros) {
 			foreach ($macros as $macro) {
-				if (array_key_exists($macro['macro'], $host_macros[$hostid])) {
+				if (array_key_exists($hostid, $host_macros)
+						&& array_key_exists($macro['macro'], $host_macros[$hostid])) {
 					$hostmacroid = $host_macros[$hostid][$macro['macro']];
 					$diff = array_diff($macro, $db_macros[$hostmacroid]);
 					unset($diff['hostid'], $diff['hostmacroid']);
