@@ -323,8 +323,9 @@ switch ($data['operationtype']) {
 
 		// For new target list.
 		$checked_current_host = array_key_exists('0', $opr_data['opcommand_hst'])
-			? ($opr_data['opcommand_hst']['0']['hostid'] == '0')
+			? ($opr_data['opcommand_hst']['0'] === '0')
 			: false;
+
 		if ($checked_current_host) {
 			unset($opr_data['opcommand_hst']['0']);
 		}
