@@ -4559,8 +4559,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (NULL != error)
 				{
-					zbx_snprintf(error, maxerrlen, "Macro '%.*s' value is not numeric",
-							(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
+					res = SUCCEED;
 				}
 			}
 			else if (1 == require_address && NULL != strstr(replace_to, "{$"))
