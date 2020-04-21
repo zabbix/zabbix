@@ -102,7 +102,7 @@ function openLogPopup(opener) {
 			$('<pre/>').text(entry.ms + ' ' + entry.level + ' ' + entry.message).appendTo($logitems);
 		});
 		$footer.text(<?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms');
-		$content.append($logitems);
+		$content.append($logitems).append($footer);
 	}
 
 	overlayDialogue({
@@ -110,10 +110,16 @@ function openLogPopup(opener) {
 		'title': <?= json_encode(_('Media type test log')) ?>,
 		'content': $content.wrap('<p/>').parent().html(),
 		'class': 'modal-popup modal-popup-generic',
-		'buttons': [],
+		'buttons': [
+			{
+				'title': <?= json_encode(_('Ok')) ?>,
+				'cancel': true,
+				'focused': true,
+				'action': () => {}
+			}
+		],
 		'element': opener,
-		'type': 'popup',
-		'footer': $footer
+		'type': 'popup'
 	});
 }
 
