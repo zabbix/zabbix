@@ -44,7 +44,7 @@ try {&#13;
         endpoint = 'https://connect.signl4.com/webhook/',&#13;
         request = new CurlHttpRequest();&#13;
 &#13;
-    if (typeof params.HTTPProxy !== 'undefined' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
+    if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
         request.SetProxy(params.HTTPProxy);&#13;
     }&#13;
 &#13;

@@ -146,7 +146,7 @@
             url = Redmine.params.url + query,&#13;
             request = new CurlHttpRequest();&#13;
 &#13;
-        if (typeof Redmine.HTTPProxy !== 'undefined' &amp;&amp; Redmine.HTTPProxy.trim() !== '') {&#13;
+        if (typeof Redmine.HTTPProxy === 'string' &amp;&amp; Redmine.HTTPProxy.trim() !== '') {&#13;
             request.SetProxy(Redmine.HTTPProxy);&#13;
         }&#13;
 &#13;

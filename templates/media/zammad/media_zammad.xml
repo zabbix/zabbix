@@ -100,7 +100,7 @@
             url = Zammad.params.url + query,&#13;
             request = new CurlHttpRequest();&#13;
 &#13;
-        if (typeof Zammad.HTTPProxy !== 'undefined' &amp;&amp; Zammad.HTTPProxy.trim() !== '') {&#13;
+        if (typeof Zammad.HTTPProxy === 'string' &amp;&amp; Zammad.HTTPProxy.trim() !== '') {&#13;
             request.SetProxy(Zammad.HTTPProxy);&#13;
         }&#13;
 &#13;

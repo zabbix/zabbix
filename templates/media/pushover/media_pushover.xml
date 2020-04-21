@@ -63,7 +63,7 @@
         data,&#13;
         response;&#13;
 &#13;
-    if (typeof params.HTTPProxy !== 'undefined' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
+    if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
         request.SetProxy(params.HTTPProxy);&#13;
     }&#13;
 &#13;

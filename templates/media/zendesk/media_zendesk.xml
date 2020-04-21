@@ -166,7 +166,7 @@
             url = Zendesk.params.url + query,&#13;
             request = new CurlHttpRequest();&#13;
 &#13;
-        if (typeof Zendesk.HTTPProxy !== 'undefined' &amp;&amp; Zendesk.HTTPProxy.trim() !== '') {&#13;
+        if (typeof Zendesk.HTTPProxy === 'string' &amp;&amp; Zendesk.HTTPProxy.trim() !== '') {&#13;
             request.SetProxy(Zendesk.HTTPProxy);&#13;
         }&#13;
 &#13;

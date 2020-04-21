@@ -260,7 +260,7 @@ try {&#13;
 &#13;
     request.AddHeader('Content-Type: application/json');&#13;
 &#13;
-    if (typeof params.HTTPProxy !== 'undefined' &amp;&amp; params.HTTPProxy !== '') {&#13;
+    if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy !== '') {&#13;
         request.SetProxy(params.HTTPProxy);&#13;
     }&#13;
 &#13;
