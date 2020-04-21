@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-17T00:00:00Z</date>
+    <date>2020-04-20T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Zammad</name>
@@ -100,8 +100,8 @@
             url = Zammad.params.url + query,&#13;
             request = new CurlHttpRequest();&#13;
 &#13;
-        if (typeof Zammad.params.HTTPProxy !== 'undefined' &amp;&amp; Zammad.params.HTTPProxy.trim() !== '') {&#13;
-            request.SetProxy(Zammad.params.HTTPProxy);&#13;
+        if (typeof Zammad.HTTPProxy === 'string' &amp;&amp; Zammad.HTTPProxy.trim() !== '') {&#13;
+            request.SetProxy(Zammad.HTTPProxy);&#13;
         }&#13;
 &#13;
         request.AddHeader('Content-Type: application/json');&#13;
@@ -310,6 +310,7 @@ try {&#13;
     priority = priority &amp;&amp; priority.trim() || severities[7].name;&#13;
 &#13;
     Zammad.setParams(params_zammad);&#13;
+    Zammad.HTTPProxy = params.HTTPProxy;&#13;
 &#13;
     // Create ticket for non trigger-based events.&#13;
     if (params.event_source !== '0'&#13;
