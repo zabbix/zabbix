@@ -11,5 +11,5 @@ SUBDIRS = \
 	zbxalgo \
 	zbxprometheus \
 	zbxcomms \
-	zbxregexp
-
+	zbxregexp \
+	zbxserver

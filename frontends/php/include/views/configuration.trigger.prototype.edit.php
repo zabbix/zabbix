@@ -48,11 +48,11 @@ if ($data['triggerid'] !== null) {
 
 if ($data['limited']) {
 	$triggersForm
-		->addVar('opdata', $data['opdata'])
-		->addVar('recovery_mode', $data['recovery_mode'])
-		->addVar('type', $data['type'])
-		->addVar('correlation_mode', $data['correlation_mode'])
-		->addVar('manual_close', $data['manual_close']);
+		->addItem((new CVar('opdata', $data['opdata']))->removeId())
+		->addItem((new CVar('recovery_mode', $data['recovery_mode']))->removeId())
+		->addItem((new CVar('type', $data['type']))->removeId())
+		->addItem((new CVar('correlation_mode', $data['correlation_mode']))->removeId())
+		->addItem((new CVar('manual_close', $data['manual_close']))->removeId());
 }
 
 // create form list
@@ -79,11 +79,11 @@ $triggersFormList
 
 // append expression to form list
 if ($data['expression_field_readonly']) {
-	$triggersForm->addVar('expression', $data['expression']);
+	$triggersForm->addItem((new CVar('expression', $data['expression']))->removeId());
 }
 
 if ($data['recovery_expression_field_readonly']) {
-	$triggersForm->addVar('recovery_expression', $data['recovery_expression']);
+	$triggersForm->addItem((new CVar('recovery_expression', $data['recovery_expression']))->removeId());
 }
 
 $popup_options = [
@@ -93,8 +93,7 @@ $popup_options = [
 	'dstfld1' => $data['expression_field_name'],
 	'parent_discoveryid' => $data['parent_discoveryid']
 ];
-if ($data['groupid'] && $data['hostid']) {
-	$popup_options['groupid'] = $data['groupid'];
+if ($data['hostid']) {
 	$popup_options['hostid'] = $data['hostid'];
 }
 $add_expression_button = (new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
@@ -592,8 +591,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'with_triggers' => '1',
 						'normal_only' => '1',
 						'noempty' => '1',
-						'hostid' => $data['hostid'],
-						'groupid' => $data['groupid']
+						'hostid' => $data['hostid']
 					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),

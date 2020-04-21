@@ -330,6 +330,38 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Evaluate trigger expressions.
+	 *
+	 * @param array  $data
+	 * @param string $sid
+	 *
+	 * @return bool|array
+	 */
+	public function expressionsEvaluate(array $data, string $sid) {
+		$response = $this->request([
+			'request' => 'expressions.evaluate',
+			'sid' => $sid,
+			'data' => $data
+		]);
+
+		if ($response === false) {
+			return false;
+		}
+
+		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
+			'expression' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'value' =>		['type' => API_INT32, 'in' => '0,1'],
+			'error' =>		['type' => API_STRING_UTF8]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $response, '/', $this->error)) {
+			return false;
+		}
+
+		return $response;
+	}
+
+	/**
 	 * Returns the error message.
 	 *
 	 * @return string
@@ -475,7 +507,7 @@ class CZabbixServer {
 				return false;
 			}
 
-			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->timeout)) {
+			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, ZBX_CONNECT_TIMEOUT)) {
 				switch ($errorMsg) {
 					case 'Connection refused':
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);

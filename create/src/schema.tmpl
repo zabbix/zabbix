@@ -561,8 +561,6 @@ FIELD		|ldap_base_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_bind_dn	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_bind_password|t_varchar(128)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_search_attribute|t_varchar(128)|''|NOT NULL	|ZBX_NODATA
-FIELD		|dropdown_first_entry|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|dropdown_first_remember|t_integer|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_PROXY		|2|hstgrp	|groupid	|RESTRICT
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_NODATA
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_NODATA
@@ -1122,7 +1120,7 @@ FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|2|events
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
-FIELD		|message	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|message	|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|old_severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|new_severity	|t_integer	|'0'	|NOT NULL	|0
@@ -1737,4 +1735,4 @@ FIELD		|contextname	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050073	|4050073
+ROW		|4050077	|4050077

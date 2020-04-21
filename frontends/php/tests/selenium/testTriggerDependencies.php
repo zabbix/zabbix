@@ -29,6 +29,8 @@ class testTriggerDependencies extends CLegacyWebTest {
 	* @dataProvider testTriggerDependenciesFromHost_SimpleTestProvider
 	*/
 	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $expected) {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$hostId);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
@@ -37,8 +39,11 @@ class testTriggerDependencies extends CLegacyWebTest {
 
 		$this->zbxTestClick('bnt1');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
-
-		$this->zbxTestDropdownSelectWait('hostid', 'Template OS FreeBSD');
+		$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+		$host->fill([
+			'values' => 'Template OS FreeBSD',
+			'context' => 'Templates'
+		]);
 		$this->zbxTestClickLinkTextWait('/etc/passwd has been changed on Template OS FreeBSD');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
 		$this->zbxTestTextPresent('Template OS FreeBSD: /etc/passwd has been changed on {HOST.NAME}');

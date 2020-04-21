@@ -72,8 +72,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'result' => ['Discord', 'Email', 'Email (HTML)', 'Mattermost', 'Opsgenie', 'PagerDuty', 'Pushover',
-						'SIGNL4', 'Slack', 'SMS']
+					'result' => ['Discord', 'Email', 'Email (HTML)', 'Jira', 'Jira with CustomFields', 'Mattermost',
+						'MS Teams', 'Opsgenie', 'PagerDuty', 'Pushover', 'Redmine', 'SIGNL4', 'Slack', 'SMS', 'Telegram',
+						'Zendesk'
+					]
 				]
 			],
 			[

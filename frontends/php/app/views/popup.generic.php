@@ -31,99 +31,106 @@ $output = [
 	'buttons' => null
 ];
 
+$options = $data['options'];
 $controls = [];
 $form = null;
 
-$options = $data['options'];
-$page_filter = $data['page_filter'];
-
 // Construct table header.
-$header_form = (new CForm())->cleanItems();
-foreach ($options as $option_key => $option_value) {
-	if ($option_value === true) {
-		$header_form->addItem((new CVar($option_key, 1))->removeId());
-	}
-	elseif ($option_value) {
-		$header_form->addItem((new CVar($option_key, $option_value))->removeId());
-	}
-}
+$header_form = ($data['popup_type'] === 'help_items') ? (new CForm())->cleanItems() : new CDiv();
+$header_form->setId('generic-popup-form');
 
-// Only host id.
-if (array_key_exists('only_hostid', $options)) {
-	$host = $options['only_hostid'];
+// Make 'empty' button.
+if (in_array($data['popup_type'], ['applications', 'application_prototypes', 'triggers'])
+		&& !array_key_exists('noempty', $options)) {
+	$value1 = (strpos($options['dstfld1'], 'id') !== false) ? 0 : '';
+	$value2 = (strpos($options['dstfld2'], 'id') !== false) ? 0 : '';
+	$value3 = (strpos($options['dstfld3'], 'id') !== false) ? 0 : '';
 
-	if ($host) {
-		$controls[] = [
-			new CLabel(_('Host'), 'hostid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CComboBox('hostid', $host['hostid']))
-				->addItem($host['hostid'], $host['name'])
-				->setEnabled(false)
-				->setTitle(_('You can not switch hosts for current selection.'))
-				->removeId()
-		];
-	}
+	$empty_script = get_window_opener($options['dstfld1'], $value1);
+	$empty_script .= get_window_opener($options['dstfld2'], $value2);
+	$empty_script .= get_window_opener($options['dstfld3'], $value3);
+	$empty_script .= 'overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));';
+	$empty_script .= 'return false;';
+
+	$empty_btn = (new CButton('empty', _('Empty')))
+		->addStyle('float: right; margin-left: 5px;')
+		->onClick($empty_script);
 }
 else {
-	// Show Group dropdown in header for these specified sources.
-	$show_group_cmb_box = ['triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'item_prototypes',
-		'templates', 'hosts', 'host_templates'
-	];
-
-	if (in_array($data['popup_type'], $show_group_cmb_box)
-			&& ($data['popup_type'] !== 'item_prototypes' || !$options['parent_discoveryid'])) {
-		$controls[] = [
-			new CLabel(_('Group'), 'groupid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$page_filter->getGroupsCB(['action' => 'javascript: reloadPopup(this.form);'])
-		];
-	}
-
-	// Show Type dropdown in header for help items.
-	if ($data['popup_type'] === 'help_items') {
-		$cmb_types = new CComboBox('itemtype', $options['itemtype'], 'javascript: reloadPopup(this.form);');
-
-		foreach ($data['allowed_item_types'] as $type) {
-			$cmb_types->addItem($type, item_type2str($type));
-		}
-
-		$controls[] = [
-			new CLabel(_('Type'), 'itemtype'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$cmb_types
-		];
-	}
-
-	// Show Host dropdown in header for these specified sources.
-	$show_host_cmb_box = ['triggers', 'items', 'applications', 'graphs', 'graph_prototypes', 'item_prototypes'];
-	if (in_array($data['popup_type'], $show_host_cmb_box)
-			&& ($data['popup_type'] !== 'item_prototypes' || !$options['parent_discoveryid'])) {
-		$controls[] = [
-			new CLabel(_('Host'), 'hostid'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$page_filter->getHostsCB(['action' => 'javascript: reloadPopup(this.form);'])
-		];
-	}
+	$empty_btn = null;
 }
 
-if (in_array($data['popup_type'], ['applications', 'application_prototypes', 'triggers'])) {
-	if (!array_key_exists('noempty', $options)) {
-		$value1 = strpos($options['dstfld1'], 'id') !== false ? 0 : '';
-		$value2 = strpos($options['dstfld2'], 'id') !== false ? 0 : '';
-		$value3 = strpos($options['dstfld3'], 'id') !== false ? 0 : '';
+// Add host group multiselect control.
+if (array_key_exists('groups', $data['filter'])) {
+	$multiselect_options = $data['filter']['groups'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
-		$empty_script = get_window_opener($options['dstfrm'], $options['dstfld1'], $value1);
-		$empty_script .= get_window_opener($options['dstfrm'], $options['dstfld2'], $value2);
-		$empty_script .= get_window_opener($options['dstfrm'], $options['dstfld3'], $value3);
-		$empty_script .= ' overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));';
-		$empty_script .= ' return false;';
+	$hostgroup_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Host group'), 'popup_host_group_ms'), $hostgroup_ms);
 
-		$controls[] = [(new CButton('empty', _('Empty')))->onClick($empty_script)];
+	$output['script_inline'] .=
+		$hostgroup_ms->getPostJS().
+		'var overlay = overlays_stack.end();'.
+		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
+			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
+				'var groups = jQuery(this).multiSelect("getData").map(i => i.id),'.
+					'options = groups.length ? {groupid: groups[0]} : {filter_groupid_rst: 1, groupid: []};'.
+					'new_opts = jQuery.extend(e.data.overlay.options, options);'.
+				'PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);'.
+			'});'.
+		'});';
+}
+
+// Add host multiselect.
+if (array_key_exists('hosts', $data['filter'])) {
+	$multiselect_options = $data['filter']['hosts'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$host_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	if ($multiselect_options['disabled']) {
+		$host_ms->setTitle(_('You can not switch hosts for current selection.'));
 	}
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), [$empty_btn, $host_ms]);
+
+	$output['script_inline'] .=
+		$host_ms->getPostJS().
+		'var overlay = overlays_stack.end();'.
+		'jQuery(".multiselect", overlay.$dialogue).each(function(i, ms) {'.
+			'jQuery(ms).on("change", {overlay: overlay}, function(e) {'.
+				'var hosts = jQuery(this).multiSelect("getData").map(i => i.id),'.
+					'options = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};'.
+					'new_opts = jQuery.extend(e.data.overlay.options, options);'.
+				'PopUp(e.data.overlay.action, new_opts, e.data.overlay.dialogueid);'.
+			'});'.
+		'});';
+}
+elseif ($empty_btn) {
+	$controls[] = (new CFormList())->addRow($empty_btn);
+}
+
+// Show Type dropdown in header for help items.
+if ($data['popup_type'] === 'help_items') {
+	$cmb_types = new CComboBox('itemtype', $options['itemtype'], 'javascript: reloadPopup(this.form);');
+
+	$header_form
+		->addVar('srctbl', $data['popup_type'])
+		->addVar('srcfld1', $options['srcfld1'])
+		->addVar('dstfrm', $options['dstfrm'])
+		->addVar('dstfld1', $options['dstfld1']);
+
+	foreach (CControllerPopupGeneric::ALLOWED_ITEM_TYPES as $type) {
+		$cmb_types->addItem($type, item_type2str($type));
+	}
+
+	$controls[] = [
+		new CLabel(_('Type'), 'itemtype'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$cmb_types
+	];
 }
 
 if ($controls) {
-	$header_form->addItem(new CList($controls));
+	$header_form->addItem($controls);
 	$output['controls'] = $header_form->toString();
 }
 
@@ -137,10 +144,6 @@ if ($data['form']) {
 
 $table_columns = [];
 
-if ($page_filter->hostsAll) {
-	$table_columns[] = _('Host');
-}
-
 if ($data['multiselect'] && $form !== null) {
 	$ch_box = (new CColHeader(
 		(new CCheckBox('all_records'))->onClick("javascript: checkAll('".$form->getName()."', 'all_records', 'item');")
@@ -150,6 +153,10 @@ if ($data['multiselect'] && $form !== null) {
 }
 
 $table = (new CTableInfo())->setHeader(array_merge($table_columns, $data['table_columns']));
+
+if ($data['preselect_required']) {
+	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
+}
 
 $js_action_onclick = ' jQuery(this).removeAttr("onclick");'.
 	' overlayDialogueDestroy(jQuery(this).closest("[data-dialogueid]").attr("data-dialogueid"));'.
@@ -361,10 +368,10 @@ switch ($data['popup_type']) {
 
 	case 'help_items':
 		foreach ($data['table_records'] as $item) {
-			$action = get_window_opener($options['dstfrm'], $options['dstfld1'], $item[$options['srcfld1']]);
+			$action = get_window_opener($options['dstfld1'], $item[$options['srcfld1']]);
 			$action .= 'updateItemTestBtn();';
 			$action .= $options['srcfld2']
-				? get_window_opener($options['dstfrm'], $options['dstfld2'], $item[$options['srcfld2']])
+				? get_window_opener($options['dstfld2'], $item[$options['srcfld2']])
 				: '';
 
 			$name = (new CLink($item['key'], 'javascript:void(0);'))->onClick($action.$js_action_onclick);
@@ -379,9 +386,9 @@ switch ($data['popup_type']) {
 				$name = $d_rule['name'].
 					NAME_DELIMITER.discovery_check2str($d_check['type'], $d_check['key_'], $d_check['ports']);
 
-				$action = get_window_opener($options['dstfrm'], $options['dstfld1'], $d_check[$options['srcfld1']]);
+				$action = get_window_opener($options['dstfld1'], $d_check[$options['srcfld1']]);
 				$action .= $options['srcfld2']
-					? get_window_opener($options['dstfrm'], $options['dstfld2'], $name)
+					? get_window_opener($options['dstfld2'], $name)
 					: '';
 
 				$table->addRow(
@@ -431,7 +438,6 @@ switch ($data['popup_type']) {
 				$description->onClick($js_action.$js_action_onclick);
 
 				$table->addRow([
-					($options['hostid'] > 0) ? null : $item['hostname'],
 					$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
 					$description,
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
@@ -463,7 +469,6 @@ switch ($data['popup_type']) {
 				$host = reset($item['hosts']);
 
 				$table->addRow([
-					($options['hostid'] > 0) ? null : $host['name'],
 					$data['multiselect']
 						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
 						: null,
@@ -537,10 +542,12 @@ switch ($data['popup_type']) {
 				$graphtype
 			]);
 
-			// For a "popup_reference".
+			// For returned data array.
 			$graph = [
 				'id' => $graph['graphid'],
-				'name' => reset($graph['hosts'])['name'].NAME_DELIMITER.$graph['name']
+				'name' => $options['patternselect']
+					? $graph['name']
+					: reset($graph['hosts'])['name'].NAME_DELIMITER.$graph['name']
 			];
 		}
 		unset($graph);
@@ -631,29 +638,33 @@ if ($data['multiselect'] && $form !== null) {
 			'title' => _('Select'),
 			'class' => '',
 			'isSubmit' => true,
-			'action' => 'return addSelectedValues('.zbx_jsvalue($form->getId()).', '.
-				zbx_jsvalue($options['reference']).', '.$options['parentid'].');'
+			'action' => 'return addSelectedValues('.zbx_jsvalue($options['reference']).', '.$options['parentid'].');'
 		]
 	];
 }
 
+// Types require results returned as array.
 $types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
 	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
 ];
+
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {
-	$output['script_inline'] .= 'var popup_reference = '.zbx_jsvalue($data['table_records'], true).';';
+	$output['data'] = $data['table_records'];
 }
 
-$output['script_inline'] .= '
-jQuery(document).ready(function() {
-	cookie.init();
-	chkbxRange.init();
-});';
+$output['script_inline'] =
+	'jQuery(document).ready(function() {'.
+		$output['script_inline'].
+		'cookie.init();'.
+		'chkbxRange.init();'.
+	'});';
 
 if ($form) {
 	$form->addItem([
 		$table,
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
+		(new CInput('submit', 'submit'))
+			->addStyle('display: none;')
+			->removeId()
 	]);
 	$output['body'] = (new CDiv([$data['messages'], $form]))->toString();
 }

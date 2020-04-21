@@ -42,6 +42,13 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	protected $host = 'Simple form test host';
 
 	/**
+	 * The name of the host group that the above host belongs to.
+	 *
+	 * @var string
+	 */
+	protected $hostGroup = 'Zabbix servers';
+
+	/**
 	 * The name of the test discovery rule created in the test data set.
 	 *
 	 * @var string
@@ -306,6 +313,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
+			$this->query('button:Reset')->one()->click();
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$discoveryRule = $this->discoveryRuleTemplate;
 			$hostid = 30000;
@@ -592,10 +600,9 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Items');
 
 			if (isset($data['host'])) {
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-
-				$this->zbxTestClickLinkText($this->itemSimple);
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill($this->host);
+				$this->query('link', $this->itemSimple)->waitUntilClickable()->one()->click();
 			}
 
 			if (isset($data['template'])) {
@@ -1055,6 +1062,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$itemName = $this->item;
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
 
@@ -1084,9 +1092,12 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestClick('add_item');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-			$this->zbxTestClickLinkText($this->itemSimple);
+			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+			$host->fill([
+				'values' => $this->host,
+				'context' => $this->hostGroup
+			]);
+			$this->query('link', $this->itemSimple)->waitUntilClickable()->one()->click();
 
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');
@@ -1097,9 +1108,12 @@ class testFormGraphPrototype extends CLegacyWebTest {
 
 				$this->zbxTestClick('add_item');
 				$this->zbxTestLaunchOverlayDialog('Items');
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-				$this->zbxTestDropdownSelectWait('hostid', $this->host);
-				$this->zbxTestClickLinkText($this->itemSimple);
+				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host->fill([
+					'values' => $this->host,
+					'context' => $this->hostGroup
+				]);
+				$this->query('link', $this->itemSimple)->waitUntilClickable()->one()->click();
 
 				$this->zbxTestClick('add_protoitem');
 				$this->zbxTestLaunchOverlayDialog('Item prototypes');

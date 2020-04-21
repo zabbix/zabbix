@@ -19,12 +19,6 @@
 **/
 
 
-function get_maintenance_by_maintenanceid($maintenanceid) {
-	return DBfetch(DBselect(
-		'SELECT m.* FROM maintenances m WHERE m.maintenanceid='.zbx_dbstr($maintenanceid)
-	));
-}
-
 function timeperiod_type2str($timeperiod_type) {
 	switch ($timeperiod_type) {
 		case TIMEPERIOD_TYPE_ONETIME:

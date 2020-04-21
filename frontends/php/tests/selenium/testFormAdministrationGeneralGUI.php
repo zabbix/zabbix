@@ -27,8 +27,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 	public static function allValues() {
 		return CDBHelper::getDataProvider(
-			'SELECT default_theme,dropdown_first_entry,dropdown_first_remember,search_limit,max_in_table,'.
-				'server_check_interval'.
+			'SELECT default_theme,search_limit,max_in_table,server_check_interval'.
 			' FROM config'.
 			' ORDER BY configid'
 		);
@@ -45,35 +44,23 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestTextPresent([
 			'Default theme',
-			'Dropdown first entry',
-			'remember selected',
 			'Limit for search and filter results',
 			'Max count of elements to show inside table cell',
 			'Show warning if Zabbix server is down'
 		]);
 
 		$this->zbxTestDropdownHasOptions('default_theme', ['Blue', 'Dark']);
-		$this->zbxTestDropdownHasOptions('dropdown_first_entry', ['All', 'None']);
 
 		$this->zbxTestAssertElementPresentId('search_limit');
 		$this->zbxTestAssertAttribute('//input[@id="search_limit"]', 'maxlength', '6');
 		$this->zbxTestAssertElementPresentId('max_in_table');
 		$this->zbxTestAssertAttribute('//input[@id="max_in_table"]','maxlength', '5');
 
-		$this->zbxTestAssertElementPresentId('dropdown_first_remember');
 		$this->zbxTestAssertElementPresentId('server_check_interval');
 
 		$this->zbxTestAssertElementPresentId('update');
 
 		$this->zbxTestAssertAttribute("//select[@id='default_theme']/option[@selected='selected']", "value", $allValues['default_theme']);
-		$this->zbxTestAssertAttribute("//select[@id='dropdown_first_entry']/option[@selected='selected']", "value", $allValues['dropdown_first_entry']);
-
-		if ($allValues['dropdown_first_remember']) {
-			$this->assertTrue($this->zbxTestCheckboxSelected('dropdown_first_remember'));
-		}
-		if ($allValues['dropdown_first_remember']==0) {
-			$this->assertFalse($this->zbxTestCheckboxSelected('dropdown_first_remember'));
-		}
 
 		if ($allValues['server_check_interval']) {
 			$this->assertTrue($this->zbxTestCheckboxSelected('server_check_interval'));
@@ -105,53 +92,6 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('blue-theme');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: "Blue" theme can not be selected as default theme: it does not exist in the DB');
-
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
-	}
-
-	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstEntry() {
-
-		$this->zbxTestLogin('zabbix.php?action=gui.edit');
-		$sql_hash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$old_hash = CDBHelper::getHash($sql_hash);
-
-		$this->zbxTestDropdownSelect('dropdown_first_entry', 'None');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Dropdown first entry']);
-		$sql = 'SELECT dropdown_first_entry FROM config WHERE dropdown_first_entry=0';
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Value "None" can not be selected as "dropdown first entry" value');
-
-		$this->zbxTestDropdownSelect('dropdown_first_entry', 'All');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Dropdown first entry']);
-
-		$sql = 'SELECT dropdown_first_entry FROM config WHERE dropdown_first_entry=1';
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Value "All" can not be selected as "dropdown first entry" value');
-
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
-	}
-
-	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstRemember() {
-
-		$this->zbxTestLogin('zabbix.php?action=gui.edit');
-		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['dropdown_first_remember']).' FROM config ORDER BY configid';
-		$old_hash = CDBHelper::getHash($sql_hash);
-
-		$this->zbxTestCheckboxSelect('dropdown_first_remember');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'remember selected']);
-		$this->assertTrue($this->zbxTestCheckboxSelected('dropdown_first_remember'));
-
-		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=0';
-		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
-
-		$this->zbxTestCheckboxSelect('dropdown_first_remember', false);
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'remember selected']);
-		$this->assertFalse($this->zbxTestCheckboxSelected('dropdown_first_remember'));
-
-		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=1';
-		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}

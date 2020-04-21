@@ -1,5 +1,6 @@
 SUBDIRS = \
 	. \
+	mocks \
 	libs \
 	zabbix_server
 

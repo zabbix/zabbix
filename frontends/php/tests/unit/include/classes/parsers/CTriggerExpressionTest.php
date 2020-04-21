@@ -3200,7 +3200,42 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 
 			["{last(#5)}={#LLDMACRO}", null, false],
 			["{last(#5)}={#LLDMACRO}", null, false, ['lldmacros' => false]],
-			["{last(#5)}={#LLDMACRO}", null, true, ['allow_func_only' => true]]
+			["{last(#5)}={#LLDMACRO}", null, true, ['allow_func_only' => true]],
+
+			// collapsed trigger expressions
+			['{host:key.func()}', null, false, ['collapsed_expression' => true]],
+			['{func()}', null, false, ['collapsed_expression' => true]],
+			['{123}', null, true, ['collapsed_expression' => true]],
+			['{123} = {$MACRO}', null, true, ['collapsed_expression' => true]],
+			['{123} = {#MACRO}', null, true, ['collapsed_expression' => true]],
+			['{123} = {#MACRO}', null, false, ['collapsed_expression' => true, 'lldmacros' => false]],
+
+			// Compare strings.
+			['{host:key.last()}=""', null, true],
+			['{host:key.last()}=" "', null, true],
+			['{host:key.last()}="\"abc\""', null, true],
+			['{host:key.last()}="\"a\\bc\""', null, false],
+			['{host:key.last()}= "\"abc" ', null, true],
+			['{host:key.last()}="\\\"', null, true], // Actually looks like {host:key.last()}="\\"
+			['{host:key.last()}="\\ \""', null, false],
+			['{host:key.last()}=" "      ', null, true],
+			['"abc"="abc"', null, true],
+			['    "abc"  =   "abc"   ', null, true],
+			['"abc"="abc"="abc"', null, true],
+			['"abc"="abc" and "abc"', null, true],
+			['{host:key.last()}="\ "', null, false],
+			['{host:key.last()}="\\', null, false],
+			['{host:key.last()}="\"', null, false],
+			['{host:key.last()}=""abc', null, false],
+			['{host:key.last()}=" "abc', null, false],
+			['{host:key.last()}="abc\"', null, false],
+			['{host:key.last()}="\""\"', null, false],
+			['{host:key.last()}="\\ \"', null, false],
+			['{host:key.last()}="\\\\\ "', null, false], // Actually looks like {host:key.last()}="\\\ "
+			['{host:key.last()}=" " "', null, false],
+			['{host:key.last()}="\n"', null, false],
+			['"abc"="abc"and"abc"', null, false],
+			['"abc"="abc" and abc"', null, false]
 		];
 	}
 

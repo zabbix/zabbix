@@ -25,33 +25,38 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Maintenance periods'))
-	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$this->data['pageFilter']->getGroupsCB()
-				])
-			),
+	->setControls(
 		(new CTag('nav', true, new CRedirectButton(_('Create maintenance period'), (new CUrl('maintenance.php'))
 			->removeArgument('maintenanceid')
-			->setArgument('groupid', $data['pageFilter']->groupid)
 			->setArgument('form', 'create')
 			->getUrl()
 		)))->setAttribute('aria-label', _('Content controls'))
-	]))
+	)
 	->addItem((new CFilter(new CUrl('maintenance.php')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			),
+			(new CFormList())
+				->addRow(
+					(new CLabel(_('Host groups'), 'filter_groups__ms')),
+					(new CMultiSelect([
+						'name' => 'filter_groups[]',
+						'object_name' => 'hostGroup',
+						'data' => $data['filter']['groups'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_groups_',
+								'editable' => 1
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+				->addRow(_('Name'),
+					(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				),
 			(new CFormList())->addRow(_('State'),
 				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
 					->addValue(_('Any'), -1)
