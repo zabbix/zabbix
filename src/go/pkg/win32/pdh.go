@@ -42,6 +42,11 @@ var (
 	pdhMakeCounterPath          uintptr
 	pdhLookupPerfNameByIndex    uintptr
 	pdhRemoveCounter            uintptr
+	pdhEnumObjItem              uintptr
+
+	//Did not work with init, for not added as lazy load
+	modPdhDll              = windows.NewLazyDLL("pdh.dll")
+	procPdhEnumObjectItems = modPdhDll.NewProc("PdhEnumObjectItemsW")
 )
 
 const (
@@ -58,6 +63,8 @@ const (
 	PDH_FMT_NOCAP100 = 0x00008000
 
 	PDH_MAX_COUNTER_NAME = 1024
+
+	PERF_DETAIL_WIZARD = 400
 )
 
 func newPdhError(ret uintptr) (err error) {
@@ -195,6 +202,48 @@ func PdhLookupPerfNameByIndex(index int) (path string, err error) {
 		return "", newPdhError(ret)
 	}
 	return windows.UTF16ToString(buf), nil
+}
+
+func PdhEnumObjectItems(className string) (counters []string, instances []string, err error) {
+	var counterListSize uint32
+	var instanceListSize uint32
+
+	ret, _, _ := procPdhEnumObjectItems.Call(
+		uintptr(0),
+		uintptr(0),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(className))),
+		uintptr(0),
+		uintptr(unsafe.Pointer(&counterListSize)),
+		uintptr(0),
+		uintptr(unsafe.Pointer(&instanceListSize)),
+		uintptr(PERF_DETAIL_WIZARD),
+		uintptr(0))
+	if ret != PDH_MORE_DATA {
+		return nil, nil, newPdhError(ret)
+	}
+	counterbuf := make([]uint16, counterListSize)
+	var instptr uintptr
+	var instbuf []uint16
+
+	if instanceListSize != 0 {
+		instbuf = make([]uint16, instanceListSize)
+		instptr = uintptr(unsafe.Pointer(&instbuf[0]))
+	}
+	ret, _, _ = procPdhEnumObjectItems.Call(
+		uintptr(0),
+		uintptr(0),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(className))),
+		uintptr(unsafe.Pointer(&counterbuf[0])),
+		uintptr(unsafe.Pointer(&counterListSize)),
+		instptr,
+		uintptr(unsafe.Pointer(&instanceListSize)),
+		uintptr(PERF_DETAIL_WIZARD),
+		uintptr(0))
+	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
+		return nil, nil, newPdhError(ret)
+	}
+
+	return UTF16ToStringSlice(counterbuf), UTF16ToStringSlice(instbuf), nil
 }
 
 func init() {
