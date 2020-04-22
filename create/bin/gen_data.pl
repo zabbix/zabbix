@@ -50,9 +50,27 @@ my %sqlite3 = (
 	"exec_cmd"	=>	";\n"
 );
 
+# Maximum line length that SQL*Plus can read from .sql file is 2499 characters.
+# Splitting long entries in 'media_type' table have to happen before SQL*Plus limit has been reached and end-of-lien
+# character has to stay intact in one line.
+my $oracle_field_limit = 2000;
+my $media_type = 0;
+
 sub process_table
 {
 	my $line = $_[0];
+
+	if ($output{'database'} eq 'oracle')
+	{
+		if ($line =~ m/media_type$/)
+		{
+			$media_type = 1;
+		}
+		elsif ($media_type == 1)
+		{
+			$media_type = 0;
+		}
+	}
 
 	$line = "`$line`" if ($output{'database'} eq 'mysql');
 
@@ -104,9 +122,16 @@ sub process_row
 
 	my $first = 1;
 	my $values = "(";
+	my $count = 0;
+	my $split_script_field = 0;
 
 	foreach (@array)
 	{
+		if ($output{'database'} eq 'oracle' && $media_type == 1)
+		{
+			$count++;
+		}
+
 		$values = "$values," if ($first == 0);
 		$first = 0;
 
@@ -160,6 +185,39 @@ sub process_row
 			{
 				$_ =~ s/&eol;/' || chr(13) || chr(10) || '/g;
 				$_ =~ s/&bsn;/' || chr(10) || '/g;
+
+				# field No.22 is 'scripr' field in 'media_type' table
+				if ($count == 22 && length($_) > $oracle_field_limit)
+				{
+					my @sections = unpack("(A$oracle_field_limit)*", $_);
+					my $move_to_next;
+					my $first_part = 1;
+					my $script;
+
+					$split_script_field = 1;
+
+					foreach (@sections)
+					{
+						# split after 'end of line' character and move what is left to the next line
+						if (/(.*' \|\| chr\(13\) \|\| chr\(10\) \|\| ')(.*)/)
+						{
+							if ($first_part == 1)
+							{
+								$script = "TO_NCLOB('$1')";
+								$first_part = 0;
+							}
+							else
+							{
+								$script = "${script}||\nTO_NCLOB('$move_to_next";
+								$script = "${script}$1')";
+							}
+
+							$move_to_next = $2;
+						}
+					}
+
+					$_ = $script;
+				}
 			}
 			else
 			{
@@ -167,7 +225,16 @@ sub process_row
 				$_ =~ s/&bsn;/\x0A/g;
 			}
 
-			$values = "$values$modifier'$_'";
+			# can be set to 1 only if Oracle DB is used
+			if ($split_script_field == 1)
+			{
+				$values = "$values$modifier$_";
+				$split_script_field = 0;
+			}
+			else
+			{
+				$values = "$values$modifier'$_'";
+			}
 		}
 	}
 
