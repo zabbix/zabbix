@@ -4145,6 +4145,8 @@ static size_t	zbx_no_function(const char *expr)
 
 		if (inside_quote)
 		{
+			if ('\0' == *ptr)
+				break;
 			ptr++;
 			continue;
 		}

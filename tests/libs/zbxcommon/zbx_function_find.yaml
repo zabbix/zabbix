@@ -484,4 +484,11 @@ out:
   func_pos: 3
   par_l: 6
   par_r: 41
+---
+test case: "Broken expressoin ending with \ inside quotes"
+in:
+  param: '"\'
+out:
+  return: 'FAIL'
+  error: 'Incorrect function expression: "\'
 ...
