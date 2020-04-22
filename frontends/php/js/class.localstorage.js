@@ -57,6 +57,7 @@ function ZBX_LocalStorage(version, prefix) {
 	this.addKey('notifications.active_tabid');
 	this.addKey('notifications.user_settings');
 	this.addKey('notifications.alarm_state');
+	this.addKey('web.notifications.pos');
 
 	if (this.readKey('version') != version) {
 		this.truncate();
