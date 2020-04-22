@@ -52,7 +52,7 @@ var maxParams = map[string]int{
 	keyPostgresCache:                                     3,
 	keyPostgresSizeArchive:                               3,
 	keyPostgresDiscoveryDatabases:                        3,
-	keyPostgresDatabasesBloating:                         3,
+	keyPostgresDatabasesBloating:                         4,
 	keyPostgresDatabasesSize:                             4,
 	keyPostgresDatabasesAge:                              4,
 	keyPostgresBgwriter:                                  3,
@@ -86,25 +86,30 @@ func (p *Plugin) Stop() {
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var (
-		connString string
-		handler    requestHandler
-		session    *Session
+		connString    string
+		handler       requestHandler
+		session       *Session
+		handlerParams []string
 	)
+	// The first param can be either a port & host or a session identifier.
 	if len(params) > 0 && len(params[0]) > 0 {
 		var ok bool
 		if session, ok = p.options.Sessions[params[0]]; !ok {
+			// get host & port from first parameter, username from second parameter,
+			// password from the third parameter, database name from the fourth  parameter
+			var port uint64
+
 			u, err := url.Parse(params[0])
 			if err != nil {
-				return nil, fmt.Errorf("Invalid connection URI: %s", err)
+				return nil, fmt.Errorf("Invalid connection parameters: %s", err)
 			}
 			if u.Host == "" {
 				u.Host = p.options.Host
 			}
+
 			session = &Session{
-				Host:     u.Hostname(),
-				Database: u.Path,
+				Host: u.Hostname(),
 			}
-			var port uint64
 			if u.Port() != "" {
 				if port, err = strconv.ParseUint(u.Port(), 10, 16); err != nil {
 					return nil, fmt.Errorf("Invalid connection port: %s", err)
@@ -116,6 +121,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			}
 			if len(params) > 2 {
 				session.Password = params[2]
+			}
+			if len(params) > 3 {
+				session.Database = params[3]
 			}
 		}
 	} else {
@@ -216,7 +224,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New(formatZabbixError(err.Error()))
 	}
 
-	var handlerParams []string
 	if len(params) > 0 {
 		path := strings.TrimLeft(u.Path, "/")
 		handlerParams = []string{path}
