@@ -132,7 +132,7 @@ int	PERF_COUNTER_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }
 
-int	perf_counter_discovery_ex(const char *function, AGENT_REQUEST *request, AGENT_RESULT *result,
+int	perf_instance_get_ex(const char *function, AGENT_REQUEST *request, AGENT_RESULT *result,
 		zbx_perf_counter_lang_t lang)
 {
 	char		*tmp;
