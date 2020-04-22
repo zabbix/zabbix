@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-03-13T14:05:18Z</date>
+    <date>2020-04-22T14:06:45Z</date>
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -26,10 +26,11 @@
             </applications>
             <items>
                 <item>
-                    <name>PostgreSQL archive</name>
+                    <name>PostgreSQL: Archive</name>
                     <key>pgsql.archive</key>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
+                    <description>Collect archive status metrics</description>
                     <applications>
                         <application>
                             <name>Zabbix raw items</name>
@@ -129,7 +130,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                 <item>
                     <name>PostgreSQL: Autovacuum: count of autovacuum workers</name>
                     <key>pgsql.autovacuum.count</key>
-                    <description>Count number of autovacuum workers.</description>
+                    <description>Number of autovacuum workers.</description>
                     <applications>
                         <application>
                             <name>PostgreSQL</name>
@@ -146,9 +147,6 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     <value_type>TEXT</value_type>
                     <description>https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</description>
                     <applications>
-                        <application>
-                            <name>PostgreSQL</name>
-                        </application>
                         <application>
                             <name>Zabbix raw items</name>
                         </application>
@@ -363,7 +361,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                     </master_item>
                 </item>
                 <item>
-                    <name>PostgreSQL cache hit</name>
+                    <name>PostgreSQL: Cache hit</name>
                     <key>pgsql.cache.hit</key>
                     <value_type>FLOAT</value_type>
                     <units>percent</units>
@@ -598,7 +596,21 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</
                     </master_item>
                 </item>
                 <item>
-                    <name>PostgreSQL: database statistic sum</name>
+                    <name>PostgreSQL: Get dbstat</name>
+                    <key>pgsql.dbstat</key>
+                    <history>1h</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <description>Collect all metrics from pg_stat_database per database&#13;
+https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</description>
+                    <applications>
+                        <application>
+                            <name>Zabbix raw items</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>PostgreSQL: Database statistic sum</name>
                     <key>pgsql.dbstat.sum</key>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
@@ -1036,22 +1048,8 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</
                     </master_item>
                 </item>
                 <item>
-                    <name>PostgreSQL: Get dbstat</name>
-                    <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
-                    <history>1h</history>
-                    <trends>0</trends>
-                    <value_type>TEXT</value_type>
-                    <description>Collect all metrics from pg_stat_database per database&#13;
-https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</description>
-                    <applications>
-                        <application>
-                            <name>Zabbix raw items</name>
-                        </application>
-                    </applications>
-                </item>
-                <item>
-                    <name>PostgreSQL: locks</name>
-                    <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                    <name>PostgreSQL: Locks</name>
+                    <key>pgsql.locks</key>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <description>Collect all metrics from pg_locks per database&#13;
@@ -1063,10 +1061,10 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                     </applications>
                 </item>
                 <item>
-                    <name>PostgreSQL: age of oldest xid</name>
+                    <name>PostgreSQL: Age of oldest xid</name>
                     <key>pgsql.oldest.xid</key>
                     <value_type>FLOAT</value_type>
-                    <description>Returns age of oldest xid.</description>
+                    <description>Age of oldest xid.</description>
                     <applications>
                         <application>
                             <name>PostgreSQL</name>
@@ -1107,7 +1105,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                     </applications>
                 </item>
                 <item>
-                    <name>Replication: lag in byte</name>
+                    <name>Replication: Lag in byte</name>
                     <key>pgsql.replication.lag.b</key>
                     <units>b</units>
                     <description>Replication lag with Master in byte.</description>
@@ -1168,7 +1166,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                     </applications>
                 </item>
                 <item>
-                    <name>PostgreSQL uptime</name>
+                    <name>PostgreSQL: Uptime</name>
                     <key>pgsql.uptime</key>
                     <value_type>FLOAT</value_type>
                     <units>ms</units>
@@ -1185,7 +1183,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                     <history>1h</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
-                    <description>Master item to collect WAL metrics</description>
+                    <description>Collect WAL metrics</description>
                     <applications>
                         <application>
                             <name>Zabbix raw items</name>
@@ -1210,7 +1208,8 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                     <item_prototypes>
                         <item_prototype>
                             <name>DB {#DBNAME}: Database age</name>
-                            <key>pgsql.db.age[&quot;{#DBNAME}&quot;]</key>
+                            <key>pgsql.db.age[{$PG.URI},{$PG.USER},{$PG.PASSWORD},&quot;{#DBNAME}&quot;]</key>
+                            <delay>15m</delay>
                             <description>Database size</description>
                             <application_prototypes>
                                 <application_prototype>
@@ -1220,7 +1219,8 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                         </item_prototype>
                         <item_prototype>
                             <name>DB {#DBNAME}: Get bloating tables</name>
-                            <key>pgsql.db.bloating_tables[&quot;{#DBNAME}&quot;]</key>
+                            <key>pgsql.db.bloating_tables[{$PG.URI},{$PG.USER},{$PG.PASSWORD},&quot;{#DBNAME}&quot;]</key>
+                            <delay>30s</delay>
                             <description>Number of scans done for table/index in the database</description>
                             <application_prototypes>
                                 <application_prototype>
@@ -1230,8 +1230,8 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                         </item_prototype>
                         <item_prototype>
                             <name>DB {#DBNAME}: Database size</name>
-                            <key>pgsql.db.size[&quot;{#DBNAME}&quot;]</key>
-                            <delay>15m</delay>
+                            <key>pgsql.db.size[{$PG.URI},{$PG.USER},{$PG.PASSWORD},&quot;{#DBNAME}&quot;]</key>
+                            <delay>5m</delay>
                             <history>7d</history>
                             <units>B</units>
                             <description>Database size</description>
@@ -1265,7 +1265,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1292,7 +1292,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1319,7 +1319,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                             <trigger_prototypes>
                                 <trigger_prototype>
@@ -1355,7 +1355,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                             <trigger_prototypes>
                                 <trigger_prototype>
@@ -1389,7 +1389,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1415,7 +1415,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1442,7 +1442,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1469,7 +1469,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1496,7 +1496,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1523,7 +1523,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1550,7 +1550,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1577,7 +1577,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1604,7 +1604,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.dbstat[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.dbstat</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1613,6 +1613,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.accessexclusive[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of accessexclusive locks for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1624,7 +1629,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1633,6 +1638,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.accessshare[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of accessshare locks for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1644,7 +1654,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1653,6 +1663,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.exclusive[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of exclusive locks for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1664,7 +1679,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1673,6 +1688,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.rowexclusive[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of rowexclusive locks for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1684,7 +1704,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1693,6 +1713,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.rowshare[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of rowshare locks for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1704,7 +1729,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1713,6 +1738,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.sharerowexclusive[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of total sharerowexclusive for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1724,7 +1754,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1733,6 +1763,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.shareupdateexclusive[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of shareupdateexclusive locks for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1744,7 +1779,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1753,6 +1788,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.share[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of share locks for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1764,7 +1804,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                         <item_prototype>
@@ -1773,6 +1813,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <key>pgsql.locks.total[&quot;{#DBNAME}&quot;]</key>
                             <delay>0</delay>
                             <description>Number of total locks for each database</description>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>PostgreSQL: DB {#DBNAME}</name>
+                                </application_prototype>
+                            </application_prototypes>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1784,7 +1829,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>pgsql.locks[&quot;{$PG.DB}&quot;]</key>
+                                <key>pgsql.locks</key>
                             </master_item>
                         </item_prototype>
                     </item_prototypes>
@@ -1818,7 +1863,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <color>66BB6A</color>
                                     <item>
                                         <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.db.size[&quot;{#DBNAME}&quot;]</key>
+                                        <key>pgsql.db.size[{$PG.URI},{$PG.USER},{$PG.PASSWORD},&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -1981,6 +2026,10 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                     <value>100</value>
                 </macro>
                 <macro>
+                    <macro>{$PG.PASSWORD}</macro>
+                    <value>postgres</value>
+                </macro>
+                <macro>
                     <macro>{$PG.PING_TIME.MAX.WARN}</macro>
                     <value>1s</value>
                 </macro>
@@ -2013,8 +2062,12 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                     <value>30s</value>
                 </macro>
                 <macro>
+                    <macro>{$PG.URI}</macro>
+                    <value>postgresql://localhost:5432</value>
+                </macro>
+                <macro>
                     <macro>{$PG.USER}</macro>
-                    <value>zbx_monitor</value>
+                    <value>postgres</value>
                 </macro>
             </macros>
             <screens>
