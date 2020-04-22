@@ -174,7 +174,7 @@ if (!hasRequest('masssave')) {
 // Append buttons to the form.
 $tabs->setFooter(makeFormFooter(
 	new CSubmit('masssave', _('Update')),
-	[new CButtonCancel(url_param('groupid'))]
+	[new CButtonCancel()]
 ));
 
 $form->addItem($tabs);

@@ -1657,110 +1657,150 @@ static int	DBpatch_4050073(void)
 
 static int	DBpatch_4050074(void)
 {
-	const ZBX_FIELD	field = {"saml_auth_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	int		i;
+	const char	*values[] = {
+			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
+			"web..hostid", "web.view.groupid", "web.view.hostid", "web.view.graphid",
+			"web.config.groupid", "web.config.hostid", "web.templates.php.groupid", "web.cm.groupid",
+			"web.httpmon.php.sort", "web.httpmon.php.sortorder", "web.avail_report.0.hostid",
+			"web.avail_report.0.groupid", "web.graphs.filter.to", "web.graphs.filter.from", "web.graphs.filter.active"
+		};
 
-	return DBadd_field("config", &field);
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='%s'", values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 static int	DBpatch_4050075(void)
 {
-	const ZBX_FIELD	field = {"saml_idp_entityid", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBadd_field("config", &field);
+	return DBdrop_field("config", "dropdown_first_entry");
 }
 
 static int	DBpatch_4050076(void)
 {
-	const ZBX_FIELD	field = {"saml_sso_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBadd_field("config", &field);
+	return DBdrop_field("config", "dropdown_first_remember");
 }
 
 static int	DBpatch_4050077(void)
 {
-	const ZBX_FIELD	field = {"saml_slo_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("config", &field);
+	return DBmodify_field_type("acknowledges", &field, NULL);
 }
 
 static int	DBpatch_4050078(void)
 {
-	const ZBX_FIELD	field = {"saml_username_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_auth_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050079(void)
 {
-	const ZBX_FIELD	field = {"saml_sp_entityid", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_idp_entityid", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050080(void)
 {
-	const ZBX_FIELD	field = {"saml_nameid_format", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_sso_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050081(void)
 {
-	const ZBX_FIELD	field = {"saml_sign_metadata", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_slo_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050082(void)
 {
-	const ZBX_FIELD	field = {"saml_sign_messages", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_username_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050083(void)
 {
-	const ZBX_FIELD	field = {"saml_sign_assertions", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_sp_entityid", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050084(void)
 {
-	const ZBX_FIELD	field = {"saml_sign_authn_requests", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_nameid_format", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050085(void)
 {
-	const ZBX_FIELD	field = {"saml_sign_logout_requests", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_sign_metadata", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050086(void)
 {
-	const ZBX_FIELD	field = {"saml_sign_logout_responses", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_sign_messages", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050087(void)
 {
-	const ZBX_FIELD	field = {"saml_encrypt_nameid", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_sign_assertions", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050088(void)
 {
-	const ZBX_FIELD	field = {"saml_encrypt_assertions", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"saml_sign_authn_requests", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_4050089(void)
+{
+	const ZBX_FIELD	field = {"saml_sign_logout_requests", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050090(void)
+{
+	const ZBX_FIELD	field = {"saml_sign_logout_responses", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050091(void)
+{
+	const ZBX_FIELD	field = {"saml_encrypt_nameid", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050092(void)
+{
+	const ZBX_FIELD	field = {"saml_encrypt_assertions", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050093(void)
 {
 	const ZBX_FIELD	field = {"saml_case_sensitive", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -1857,5 +1897,9 @@ DBPATCH_ADD(4050086, 0, 1)
 DBPATCH_ADD(4050087, 0, 1)
 DBPATCH_ADD(4050088, 0, 1)
 DBPATCH_ADD(4050089, 0, 1)
+DBPATCH_ADD(4050090, 0, 1)
+DBPATCH_ADD(4050091, 0, 1)
+DBPATCH_ADD(4050092, 0, 1)
+DBPATCH_ADD(4050093, 0, 1)
 
 DBPATCH_END()

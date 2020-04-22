@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-03-27T15:18:08Z</date>
+    <date>2020-04-03T02:21:21Z</date>
     <media_types>
         <media_type>
             <name>Jira with CustomFields</name>
@@ -102,10 +102,6 @@
                 <parameter>
                     <name>jira_user</name>
                     <value>&lt;PLACE LOGIN&gt;</value>
-                </parameter>
-                <parameter>
-                    <name>summary</name>
-                    <value>[{EVENT.STATUS}] {EVENT.NAME}</value>
                 </parameter>
                 <parameter>
                     <name>trigger_description</name>
@@ -409,7 +405,7 @@ try {&#13;
     }&#13;
     // Create issue for trigger-based events.&#13;
     else if (params.event_value === '1' &amp;&amp; update.status === '0' &amp;&amp; !jira.issue_key.startsWith(jira.project_key)) {&#13;
-        var key = Jira.createIssue(params.summary,&#13;
+        var key = Jira.createIssue(params.alert_subject,&#13;
             (Object.keys(fields).length ? params.trigger_description : params.alert_message), fields);&#13;
 &#13;
 &#13;
@@ -422,7 +418,7 @@ try {&#13;
         if (!jira.issue_key.startsWith(jira.project_key)) {&#13;
             throw 'Incorrect Issue key given: ' + jira.issue_key;&#13;
         }&#13;
-        Jira.updateIssue(params.summary, fields,&#13;
+        Jira.updateIssue(params.alert_subject, fields,&#13;
             ((params.event_value === '0' &amp;&amp; !Object.keys(fields).length)&#13;
                 ? params.alert_message : update));&#13;
     }&#13;
@@ -441,7 +437,7 @@ catch (error) {&#13;
                 <message_template>
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>PROBLEM</operation_mode>
-                    <subject>Problem: {EVENT.NAME}</subject>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
                     <message>Problem started at {EVENT.TIME} on {EVENT.DATE}&#13;
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
@@ -453,8 +449,8 @@ Original problem ID: {EVENT.ID}&#13;
                 <message_template>
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>RECOVERY</operation_mode>
-                    <subject>Resolved: {EVENT.NAME}</subject>
-                    <message>Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
+                    <message>Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
@@ -464,7 +460,7 @@ Original problem ID: {EVENT.ID}&#13;
                 <message_template>
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>UPDATE</operation_mode>
-                    <subject>Updated problem: {EVENT.NAME}</subject>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
                     <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
 {EVENT.UPDATE.MESSAGE}&#13;
 &#13;

@@ -567,16 +567,18 @@ class testFormUser extends CWebTest {
 			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
 			$color = $this->query('tag:body')->one()->getCSSValue('background-color');
 			$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
-			$file = explode('/', $stylesheet->getAttribute('href'));
+			$parts = explode('/', $stylesheet->getAttribute('href'));
+			$file_time = explode('?', end($parts));
+			$file = $file_time[0];
 
 			if ($data['fields']['Theme'] === 'Dark') {
 				$this->assertEquals('dark-theme', $db_theme);
-				$this->assertEquals('dark-theme.css', end($file));
+				$this->assertEquals('dark-theme.css', $file);
 				$this->assertEquals('rgba(14, 16, 18, 1)', $color);
 			}
 			else if ($data['fields']['Theme'] === 'High-contrast light') {
 				$this->assertEquals('hc-light', $db_theme);
-				$this->assertEquals('hc-light.css', end($file));
+				$this->assertEquals('hc-light.css', $file);
 				$this->assertEquals('rgba(255, 255, 255, 1)', $color);
 			}
 

@@ -840,8 +840,7 @@ ZABBIX.apps.map = (function($) {
 
 				// application selection pop up
 				$('#application-select').click(function(event) {
-					var data = $('#elementNameHost').multiSelect('getData'),
-						popup_options = {
+					var popup_options = {
 							srctbl: 'applications',
 							srcfld1: 'name',
 							dstfrm: 'selementForm',
@@ -850,8 +849,10 @@ ZABBIX.apps.map = (function($) {
 							with_applications: '1'
 						};
 
-					if (data.length > 0 && $('#elementType').val() == '4') {
-						popup_options['hostid'] = data[0].id;
+					if ($('#elementType').val() == '3') {
+						popup_options = jQuery.extend(popup_options,
+							getFirstMultiselectValue('elementNameHost', 'elementNameHostGroup')
+						);
 					}
 
 					PopUp('popup.generic', popup_options, null, event.target);
@@ -950,25 +951,25 @@ ZABBIX.apps.map = (function($) {
 					});
 
 					if ((last_value === SVGMapShape.TYPE_LINE) !== (value === SVGMapShape.TYPE_LINE)) {
-						var x = parseInt($('#shapeForm #x').val(), 10),
-							y = parseInt($('#shapeForm #y').val(), 10),
-							width = parseInt($('#shapeForm #areaSizeWidth').val(), 10),
-							height = parseInt($('#shapeForm #areaSizeHeight').val(), 10);
+						var x = parseInt($('#shapeX').val(), 10),
+							y = parseInt($('#shapeY').val(), 10),
+							width = parseInt($('#shapeAreaSizeWidth').val(), 10),
+							height = parseInt($('#shapeAreaSizeHeight').val(), 10);
 
 						if (value === SVGMapShape.TYPE_LINE) {
 							// Switching from figures to line.
-							$('#shapeForm #areaSizeWidth').val(x + width);
-							$('#shapeForm #areaSizeHeight').val(y + height);
+							$('#shapeAreaSizeWidth').val(x + width);
+							$('#shapeAreaSizeHeight').val(y + height);
 						}
 						else {
 							// Switching from line to figures.
 							var mx = Math.min(x, width),
 								my = Math.min(y, height);
 
-							$('#shapeForm #x').val(mx);
-							$('#shapeForm #y').val(my);
-							$('#shapeForm #areaSizeWidth').val(Math.max(x, width) - mx);
-							$('#shapeForm #areaSizeHeight').val(Math.max(y, height) - my);
+							$('#shapeX').val(mx);
+							$('#shapeY').val(my);
+							$('#shapeAreaSizeWidth').val(Math.max(x, width) - mx);
+							$('#shapeAreaSizeHeight').val(Math.max(y, height) - my);
 						}
 					}
 
@@ -2689,7 +2690,7 @@ ZABBIX.apps.map = (function($) {
 			// hosts
 			$('#elementNameHost').multiSelectHelper({
 				id: 'elementNameHost',
-				objectName: 'hosts',
+				object_name: 'hosts',
 				name: 'elementValue',
 				selectedLimit: 1,
 				popup: {
@@ -2705,7 +2706,7 @@ ZABBIX.apps.map = (function($) {
 			// triggers
 			$('#elementNameTriggers').multiSelectHelper({
 				id: 'elementNameTriggers',
-				objectName: 'triggers',
+				object_name: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
 					real_hosts: true
@@ -2727,7 +2728,7 @@ ZABBIX.apps.map = (function($) {
 			// host group
 			$('#elementNameHostGroup').multiSelectHelper({
 				id: 'elementNameHostGroup',
-				objectName: 'hostGroup',
+				object_name: 'hostGroup',
 				name: 'elementValue',
 				selectedLimit: 1,
 				popup: {
@@ -3860,8 +3861,8 @@ ZABBIX.apps.map = (function($) {
 		Shape.prototype.bind('afterMove', function(event, element) {
 			if (sysmap.selection.count.shapes === 1 && sysmap.selection.count.selements === 0
 					&& sysmap.selection.shapes[element.id] !== void(0)) {
-				$('#shapeForm input[name=x]').val(element.data.x);
-				$('#shapeForm input[name=y]').val(element.data.y);
+				$('#shapeX').val(element.data.x);
+				$('#shapeY').val(element.data.y);
 
 				if (typeof element.data.width !== 'undefined') {
 					$('#shapeForm input[name=width]').val(element.data.width);

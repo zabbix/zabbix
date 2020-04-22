@@ -26,34 +26,71 @@ class CHostPrototype extends CHostBase {
 
 	protected $sortColumns = ['hostid', 'host', 'name', 'status'];
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->getOptions = array_merge($this->getOptions, [
-			'discoveryids'  		=> null,
-			'inherited'				=> null,
-			'selectDiscoveryRule' 	=> null,
-			'selectGroupLinks'		=> null,
-			'selectGroupPrototypes' => null,
-			'selectParentHost'		=> null,
-			'selectTemplates' 		=> null,
-			'editable'				=> false,
-			'nopermissions'			=> null,
-			'sortfield'    			=> '',
-			'sortorder'     		=> ''
-		]);
-	}
-
 	/**
 	 * Get host prototypes.
 	 *
 	 * @param array $options
+	 * @param bool  $options['selectMacros']  Array of macros fields to be selected or string "extend".
 	 *
 	 * @return array
 	 */
 	public function get(array $options) {
-		$options = zbx_array_merge($this->getOptions, $options);
+		$hosts_fields = array_keys($this->getTableSchema('hosts')['fields']);
+		$output_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode'];
+		$link_fields = ['group_prototypeid', 'groupid', 'hostid', 'templateid'];
+		$group_fields = ['group_prototypeid', 'name', 'hostid', 'templateid'];
+		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
+		$hostmacro_fields = array_keys($this->getTableSchema('hostmacro')['fields']);
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'discoveryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'hostid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
+				'templateid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'inventory_mode' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
+			]],
+			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => 'inventory_mode,'.implode(',', $output_fields), 'default' => $output_fields],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			'groupCount' =>				['type' => API_FLAG, 'default' => false],
+			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $link_fields), 'default' => null],
+			'selectGroupPrototypes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_fields), 'default' => null],
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_fields), 'default' => null],
+			'selectParentHost' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
+			'selectTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
+			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hostmacro_fields), 'default' => null],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'inherited'	=>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]	// TODO: This property and frontend usage SHOULD BE removed.
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $output_fields;
+		}
 
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
@@ -171,6 +208,12 @@ class CHostPrototype extends CHostBase {
 			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
+				'macro' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'value' =>				['type' => API_STRING_UTF8, 'flag' => API_REQUIRED | API_NOT_EMPTY],
+				'type' =>				['type' => API_INT32, 'flag' => API_REQUIRED, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])],
+				'description' => 		['type' => API_STRING_UTF8]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
@@ -239,6 +282,7 @@ class CHostPrototype extends CHostBase {
 		unset($host_prototype);
 
 		$host_prototypes = $this->createReal($host_prototypes);
+		$this->createMacros(array_column($host_prototypes, 'macros', 'hostid'));
 		$this->inherit($host_prototypes);
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_PROTOTYPE, $host_prototypes);
@@ -343,6 +387,13 @@ class CHostPrototype extends CHostBase {
 			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
+				'hostmacroid' =>		['type' => API_ID],
+				'macro' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'value' =>				['type' => API_STRING_UTF8],
+				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET])],
+				'description' => 		['type' => API_STRING_UTF8]
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
@@ -476,6 +527,12 @@ class CHostPrototype extends CHostBase {
 			unset($host_prototype['groupLinks']);
 		}
 		unset($host_prototype);
+
+		$macros = array_column($host_prototypes, 'macros', 'hostid');
+
+		if ($macros) {
+			$this->updateMacros($macros);
+		}
 
 		$host_prototypes = $this->updateReal($host_prototypes);
 		$this->inherit($host_prototypes);
@@ -618,10 +675,16 @@ class CHostPrototype extends CHostBase {
 		// save the new host prototypes
 		if (!zbx_empty($insertHostPrototypes)) {
 			$insertHostPrototypes = $this->createReal($insertHostPrototypes);
+			$this->createMacros(array_column($insertHostPrototypes, 'macros', 'hostid'));
 		}
 
 		if (!zbx_empty($updateHostPrototypes)) {
 			$updateHostPrototypes = $this->updateReal($updateHostPrototypes);
+			$macros = array_column($updateHostPrototypes, 'macros', 'hostid');
+
+			if ($macros) {
+				$this->updateMacros($macros);
+			}
 		}
 
 		$host_prototypes = array_merge($updateHostPrototypes, $insertHostPrototypes);
@@ -853,6 +916,7 @@ class CHostPrototype extends CHostBase {
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
+			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
 		]);
@@ -1279,6 +1343,19 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
+		// adding macros
+		if ($options['selectMacros'] !== null && $options['selectMacros'] != API_OUTPUT_COUNT) {
+			$macros = API::UserMacro()->get([
+				'output' => $this->outputExtend($options['selectMacros'], ['hostid', 'hostmacroid']),
+				'hostids' => $hostPrototypeIds,
+				'preservekeys' => true
+			]);
+
+			$relationMap = $this->createRelationMap($macros, 'hostid', 'hostmacroid');
+			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
+			$result = $relationMap->mapMany($result, $macros, 'macros');
+		}
+
 		return $result;
 	}
 
@@ -1315,5 +1392,76 @@ class CHostPrototype extends CHostBase {
 
 		// delete group prototypes
 		DB::delete('group_prototype', ['group_prototypeid' => $groupPrototypeIds]);
+	}
+
+	/**
+	 * Create host prototype macro with prototype id as key and macros array.
+	 *
+	 * @param array $host_prototype_macro  Array of host prototype macros.
+	 */
+	protected function createMacros(array $host_prototype_macros) {
+		$create = [];
+
+		foreach ($host_prototype_macros as $host_prototypeid => $macros) {
+			foreach ($macros as $macro) {
+				$create[] = ['hostid' => $host_prototypeid] + $macro;
+			}
+		}
+
+		if ($create) {
+			API::UserMacro()->create($create);
+		}
+	}
+
+	/**
+	 * Update host prototype macros, key is host prototype id and value is array of arrays with macro objects.
+	 *
+	 * @param array $macros     Array with macros objects.
+	 */
+	protected function updateMacros(array $update_macros) {
+		$create = [];
+		$update = [];
+		$db_macros = API::UserMacro()->get([
+			'output' => ['hostid', 'macro', 'type', 'value', 'description'],
+			'hostids' => array_keys($update_macros),
+			'preservekeys' => true
+		]);
+		$host_macros = array_fill_keys(array_column($db_macros, 'hostid'), []);
+
+		foreach ($db_macros as $hostmacroid => $db_macro) {
+			$host_macros[$db_macro['hostid']][$db_macro['macro']] = $hostmacroid;
+		}
+
+		foreach ($update_macros as $hostid => $macros) {
+			foreach ($macros as $macro) {
+				if (array_key_exists($hostid, $host_macros)
+						&& array_key_exists($macro['macro'], $host_macros[$hostid])) {
+					$hostmacroid = $host_macros[$hostid][$macro['macro']];
+					$diff = array_diff($macro, $db_macros[$hostmacroid]);
+					unset($diff['hostid'], $diff['hostmacroid']);
+
+					if ($diff) {
+						$update[] = ['hostmacroid' => $hostmacroid] + $diff;
+					}
+
+					unset($db_macros[$hostmacroid], $host_macros[$hostid][$macro['macro']]);
+				}
+				else {
+					$create[] = ['hostid' => $hostid] + $macro;
+				}
+			}
+		}
+
+		if ($create) {
+			API::UserMacro()->create($create);
+		}
+
+		if ($update) {
+			API::UserMacro()->update($update);
+		}
+
+		if ($db_macros) {
+			API::UserMacro()->delete(array_keys($db_macros));
+		}
 	}
 }

@@ -23,11 +23,16 @@
  * @var CView $this
  */
 
-$table = getItemsDataOverview($data['groupids'], $data['application'], $data['style'], $data['show_suppressed']);
+if ($data['style'] == STYLE_TOP) {
+	$table = (new CPartial('dataoverview.table.top', $data))->getOutput();
+}
+else {
+	$table = (new CPartial('dataoverview.table.left', $data))->getOutput();
+}
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString()
+	'body' => $table
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -66,6 +66,23 @@ else {
 	$dbGraph = reset($dbGraph);
 }
 
+$hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
+$items = zbx_toHash($dbGraph['items'], 'itemid');
+
+$db_items = API::Item()->get([
+	'output' => [],
+	'selectPreprocessing' => ['type', 'params'],
+	'itemids' => array_keys($items),
+	'webitems' => true,
+	'nopermissions' => true,
+	'preservekeys' => true
+]);
+
+foreach ($items as &$item) {
+	$item['preprocessing'] = $db_items[$item['itemid']]['preprocessing'];
+}
+unset($item);
+
 /*
  * Display
  */
@@ -88,9 +105,6 @@ CArrayHelper::sort($dbGraph['gitems'], [
 	['field' => 'sortorder', 'order' => ZBX_SORT_UP],
 	['field' => 'itemid', 'order' => ZBX_SORT_DOWN]
 ]);
-
-$hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
-$items = zbx_toHash($dbGraph['items'], 'itemid');
 
 foreach ($dbGraph['gitems'] as $graph_item) {
 	$item = $items[$graph_item['itemid']];

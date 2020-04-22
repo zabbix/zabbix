@@ -32,11 +32,10 @@ $table = (new CTableInfo())
 
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'web.view')
-	->setArgument('groupid', '')
-	->setArgument('hostid', '0');
+	->setArgument('filter_set', '1');
 
 foreach ($data['groups'] as $group) {
-	$url->setArgument('groupid', $group['groupid']);
+	$url->setArgument('filter_groupids', [$group['groupid']]);
 
 	$table->addRow([
 		new CLink($group['name'], $url->getUrl()),

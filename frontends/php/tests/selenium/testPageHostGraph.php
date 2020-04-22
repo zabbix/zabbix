@@ -50,20 +50,8 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 
-		$groups = ['all'];
-		$rows = DBfetchArray(DBselect(
-				'SELECT name FROM hstgrp WHERE groupid IN ( SELECT DISTINCT groupid FROM hosts_groups ORDER BY groupid)'
-		));
-		foreach ($rows as $group) {
-			$groups[] = $group['name'];
-		}
-		$this->zbxTestDropdownHasOptions('groupid', $groups);
-
-		$hosts = ['all'];
-		foreach (DBfetchArray(DBselect('SELECT name FROM hosts WHERE flags IN (0,4) AND status IN (0,1,3)')) as $host) {
-			$hosts[] = $host['name'];
-		}
-		$this->zbxTestDropdownHasOptions('hostid', $hosts);
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->checkValue(['Hosts' => $host_name]);
 
 		$this->zbxTestAssertElementPresentXpath('//button[@type="button"][text()="Create graph"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="green"][text()="Enabled"]');
@@ -72,15 +60,17 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 
 		// Check host breadcrumbs text and url.
+		$filter->getField('Hosts')->fill($host_name);
+		$filter->submit();
 		$breadcrumbs = [
-			'hosts.php?hostid='.$hostid.'&groupid=0' => 'All hosts',
+			'hosts.php' => 'All hosts',
 			'hosts.php?form=update&hostid='.$hostid => $host_name,
-			'applications.php?hostid='.$hostid => 'Applications',
+			'applications.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Applications',
 			'items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Items',
 			'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Triggers',
-			'graphs.php?hostid='.$hostid => 'Graphs',
+			'graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Graphs',
 			'host_discovery.php?hostid='.$hostid => 'Discovery rules',
-			'httpconf.php?hostid='.$hostid => 'Web scenarios',
+			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Web scenarios',
 		];
 		$count_items = CDBHelper::getCount('SELECT NULL FROM items WHERE hostid='.$hostid);
 		$count_graphs = CDBHelper::getCount($sql);
@@ -114,7 +104,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			// Check name value.
 			$this->assertEquals($graph['name'],
 					$element->findElement(WebDriverBy::xpath('./td/a[@href="graphs.php?form=update&graphid='
-					.$graph['graphid'].'&hostid='.$hostid.'"]'))->getText()
+					.$graph['graphid'].'&filter_hostids%5B0%5D='.$hostid.'"]'))->getText()
 			);
 
 			// Check width value.
@@ -444,8 +434,10 @@ class testPageHostGraph extends CLegacyWebTest {
 			// Select hosts or templates.
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
 				// Select host group.
-				$this->zbxTestDropdownSelectWait('groupid', $data['group']);
-
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Host groups');
+				COverlayDialogElement::find()->all()->last()->query('link', $data['group'])->waitUntilVisible()->one()->click();
+				$this->query('id:overlay-bg')->waitUntilNotVisible();
 				foreach ($data['targets'] as $target) {
 					$result = DBselect('SELECT hostid FROM hosts WHERE host='. zbx_dbstr($target));
 					while ($row = DBfetch($result)) {
@@ -697,15 +689,29 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function testPageHostGraph_CheckFilter($data) {
 		$this->openPageHostGraphs($data['host']);
+
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		if (array_key_exists('group', $data)) {
-			$this->zbxTestDropdownSelect('groupid', $data['group']);
-		}
-		if (array_key_exists('host', $data)) {
-			$this->zbxTestDropdownSelect('hostid', $data['host']);
-			if (array_key_exists('change_group', $data)) {
-				$this->zbxTestDropdownSelect('groupid', $data['change_group']);
+			if ($data['group'] === 'all') {
+				$filter->getField('Host groups')->clear();
+			}
+			else {
+				$filter->getField('Host groups')->select($data['group']);
 			}
 		}
+		if (array_key_exists('host', $data)) {
+			if ($data['host'] === 'all') {
+				$filter->getField('Hosts')->clear();
+			}
+			else {
+				$filter->getField('Hosts')->fill($data['host']);
+			}
+			if (array_key_exists('change_group', $data)) {
+				$filter->getField('Host groups')->clear();
+				$filter->getField('Host groups')->select($data['change_group']);
+			}
+		}
+		$filter->submit();
 
 		if ($data['host'] === 'all') {
 			$this->zbxTestAssertElementPresentXpath(
@@ -734,7 +740,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			$hostid = 0;
 		}
 
-		$this->zbxTestLogin('graphs.php?groupid=0&hostid='.$hostid);
+		$this->zbxTestLogin('graphs.php?filter_hostids%5B%5D='.$hostid.'&filter_set=1');
 		return $hostid;
 	}
 

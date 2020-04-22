@@ -10,7 +10,7 @@ This integration is supported only for **Teams** as part of Office 365. Note, th
 
 
 ## Setting up webhook in Zabbix 
-1\. n the Zabbix web interface go to Administration → General section and select Macros from the dropdown menu in top left corner. Setup the global macro "{$ZABBIX.URL}" which will contain the URL to the Zabbix frontend. 
+1\. In the Zabbix web interface go to Administration → General section and select Macros from the dropdown menu in top left corner. Setup the global macro "{$ZABBIX.URL}" which will contain the URL to the Zabbix frontend. 
 <br>The URL should be either an IP address, a fully qualified domain name or localhost. Specifying a protocol is mandatory, whereas port is optional.
 Good examples:<br>
 http://zabbix.com<br>
@@ -24,16 +24,16 @@ http://zabbix/<br>
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
-2\. In the *Administration > Media types* section, import the [media_msteams.xml](media_msteams.xml)
+2\. In the *Administration > Media types* section, import the [media_ms_teams.xml](media_ms_teams.xml)
 
 3\. Open the newly added **MS Teams** media type and replace placeholder *&lt;PLACE WEBHOOK URL HERE&gt;* with the **incoming webhook URL**, created during the webhook setup in MS Teams.
 
-4\. ou can also choose between two notification formats. Set *"use_default_message"* parameter:
+4\. You can also choose between two notification formats. Set *"use_default_message"* parameter:
 - **false** (default)
     - Use preformatted message with predefined set of fields for trigger-based notifications.<br>
-In internal, autoregistration and discovery notifications *{ALERT.SUBJECT}* as a title and *{ALERT.MESSAGE}* as text a body of the message will be used.
+In internal, autoregistration and discovery notifications *{ALERT.MESSAGE}* as text a body of the message will be used.
 - **true**
-    - Use {ALERT.SUBJECT} as a title and {ALERT.MESSAGE} as text a body of the message in all types of notifications.
+    - Use {ALERT.MESSAGE} as text a body of the message in all types of notifications.
 
 [![](images/thumb.2.png?raw=true)](images/2.png)
 

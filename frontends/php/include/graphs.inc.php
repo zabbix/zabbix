@@ -308,7 +308,9 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag) {
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url->setArgument('hostid', $template['hostid']);
+			$url
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$template['hostid']]);
 		}
 
 		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);

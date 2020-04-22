@@ -134,11 +134,11 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 #ifdef _WINDOWS
 	cpe.szMachineName = NULL;
-	cpe.szObjectName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR));
+	cpe.szObjectName = get_builtin_object_name(PCI_PROCESSOR_TIME);
 	cpe.szInstanceName = cpu;
 	cpe.szParentInstance = NULL;
 	cpe.dwInstanceIndex = (DWORD)-1;
-	cpe.szCounterName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_TIME));
+	cpe.szCounterName = get_builtin_counter_name(PCI_PROCESSOR_TIME);
 
 	/* 64 logical CPUs (threads) is a hard limit for 32-bit Windows systems and some old 64-bit versions,  */
 	/* such as Windows Vista. Systems with <= 64 threads will always have one processor group, which means */
@@ -174,7 +174,8 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "more than 64 CPUs, using \"Processor Information\" counter");
 
-		cpe.szObjectName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_INFORMATION));
+		cpe.szObjectName = get_builtin_object_name(PCI_INFORMATION_PROCESSOR_TIME);
+		cpe.szCounterName = get_builtin_counter_name(PCI_INFORMATION_PROCESSOR_TIME);
 
 		/* This doesn't seem to be well documented but it looks like Windows treats Processor Information */
 		/* object differently on NUMA-enabled systems. First index for the object may either mean logical */
@@ -215,9 +216,9 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		}
 	}
 
-	cpe.szObjectName = get_counter_name(get_builtin_counter_index(PCI_SYSTEM));
+	cpe.szObjectName = get_builtin_object_name(PCI_PROCESSOR_QUEUE_LENGTH);
 	cpe.szInstanceName = NULL;
-	cpe.szCounterName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_QUEUE_LENGTH));
+	cpe.szCounterName = get_builtin_counter_name(PCI_PROCESSOR_QUEUE_LENGTH);
 
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 		goto clean;

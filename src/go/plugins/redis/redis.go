@@ -21,6 +21,7 @@ package redis
 
 import (
 	"errors"
+	"time"
 	"zabbix.com/pkg/plugin"
 )
 
@@ -33,76 +34,91 @@ const (
 	keySlowlog = "redis.slowlog.count"
 )
 
-// maxParams defines the maximum number of parameters for metrics.
-var maxParams = map[string]int{
-	keyInfo:    2,
-	keyPing:    1,
-	keyConfig:  2,
-	keySlowlog: 1,
-}
+const commonParamsNum = 2
 
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
-	connMgr *connManager
+	connMgr *ConnManager
 	options PluginOptions
 }
 
-type handler func(conn redisClient, params []string) (res interface{}, err error)
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(conn redisClient, params []string) (res interface{}, err error)
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
 
+// whereToConnect builds a URI based on key's parameters and a configuration file.
+func whereToConnect(params []string, sessions map[string]*Session, defaultURI string) (u *URI, err error) {
+	const user = "zabbix"
+
+	password := ""
+	if len(params) > 1 {
+		password = params[1]
+	}
+
+	uri := defaultURI
+
+	// The first param can be either a URI or a session identifier
+	if len(params) > 0 && len(params[0]) > 0 {
+		if isLooksLikeURI(params[0]) {
+			// Use the URI defined as key's parameter
+			uri = params[0]
+		} else {
+			if _, ok := sessions[params[0]]; !ok {
+				return nil, errorUnknownSession
+			}
+
+			// Use a pre-defined session
+			uri = sessions[params[0]].URI
+			password = sessions[params[0]].Password
+		}
+	}
+
+	if len(password) > 0 {
+		return newURIWithCreds(uri, user, password)
+	}
+
+	return parseURI(uri)
+}
+
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var (
-		uri     URI
-		handler handler
+		handleMetric  handlerFunc
+		handlerParams []string
+		zbxErr        zabbixError
 	)
 
-	// The first param can be either a URI or a session identifier.
-	if len(params) > 0 && len(params[0]) > 0 {
-		if isLooksLikeUri(params[0]) {
-			// Use the URI from key
-			uri, err = newUriWithCreds(params[0], p.options.Password)
-		} else {
-			if _, ok := p.options.Sessions[params[0]]; !ok {
-				return nil, errorUnknownSession
-			}
-			// Use a pre-defined session
-			uri, err = newUriWithCreds(p.options.Sessions[params[0]].Uri, p.options.Sessions[params[0]].Password)
-		}
-	} else {
-		// Use the default URI if the first param is omitted.
-		uri, err = newUriWithCreds(p.options.Uri, p.options.Password)
-	}
-
+	uri, err := whereToConnect(params, p.options.Sessions, p.options.URI)
 	if err != nil {
 		return nil, err
 	}
 
+	// Extract handler related params
+	if len(params) > commonParamsNum {
+		handlerParams = params[commonParamsNum:]
+	}
+
 	switch key {
 	case keyInfo:
-		handler = p.infoHandler // redis.info[[uri][,section]]
+		handleMetric = infoHandler // redis.info[[connString][,password][,section]]
 
 	case keyPing:
-		handler = p.pingHandler // redis.ping[[uri]]
+		handleMetric = pingHandler // redis.ping[[connString][,password]]
 
 	case keyConfig:
-		handler = p.configHandler // redis.config[[uri][,pattern]]
+		handleMetric = configHandler // redis.config[[connString][,password][,pattern]]
 
 	case keySlowlog:
-		handler = p.slowlogHandler // redis.slowlog[[uri]]
+		handleMetric = slowlogHandler // redis.slowlog[[connString][,password]]
 
 	default:
 		return nil, errorUnsupportedMetric
 	}
 
-	if len(params) > maxParams[key] {
-		return nil, errorTooManyParameters
-	}
-
-	conn, err := p.connMgr.GetConnection(uri)
+	conn, err := p.connMgr.GetConnection(*uri)
 	if err != nil {
 		// Special logic of processing connection errors is used if redis.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -111,13 +127,37 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		p.Errf(err.Error())
+
 		return nil, errors.New(formatZabbixError(err.Error()))
 	}
 
-	return handler(conn, params)
+	result, err = handleMetric(conn, handlerParams)
+	if err != nil {
+		p.Errf(err.Error())
+
+		if errors.As(err, &zbxErr) {
+			return nil, zbxErr
+		}
+	}
+
+	return result, nil
 }
 
-// init registers metrics.
+// Start implements the Runner interface and performs initialization when plugin is activated.
+func (p *Plugin) Start() {
+	p.connMgr = NewConnManager(
+		time.Duration(p.options.KeepAlive)*time.Second,
+		time.Duration(p.options.Timeout)*time.Second,
+		hkInterval*time.Second,
+	)
+}
+
+// Stop implements the Runner interface and frees resources when plugin is deactivated.
+func (p *Plugin) Stop() {
+	p.connMgr.Destroy()
+	p.connMgr = nil
+}
+
 func init() {
 	plugin.RegisterMetrics(&impl, pluginName,
 		keyInfo, "Returns output of INFO command.",

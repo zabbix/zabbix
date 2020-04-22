@@ -25,17 +25,25 @@
 #include "zbxserialize.h"
 
 #include "ipmi_protocol.h"
+#include "zbxserver.h"
 
-zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objectid, const char *addr,
-		unsigned short port, signed char authtype, unsigned char privilege, const char *username,
-		const char *password, const char *sensor, int command, const char *key)
+zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hostid, zbx_uint64_t objectid,
+		const char *addr, unsigned short port, signed char authtype, unsigned char privilege,
+		const char *username, const char *password, const char *sensor, int command, const char *key)
 {
 	unsigned char	*ptr;
+	char		*user, *pwd;
 	zbx_uint32_t	data_len, addr_len, username_len, password_len, sensor_len, key_len;
 
 	addr_len = strlen(addr) + 1;
-	username_len = strlen(username) + 1;
-	password_len = strlen(password) + 1;
+	user = zbx_strdup(NULL, username);
+	pwd = zbx_strdup(NULL, password);
+	substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &user,
+			MACRO_TYPE_COMMON, NULL, 0);
+	substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &pwd,
+			MACRO_TYPE_COMMON, NULL, 0);
+	username_len = strlen(user) + 1;
+	password_len = strlen(pwd) + 1;
 	sensor_len = strlen(sensor) + 1;
 	key_len = NULL != key ? strlen(key) + 1 : 0;
 
@@ -49,11 +57,14 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objec
 	ptr += zbx_serialize_short(ptr, port);
 	ptr += zbx_serialize_char(ptr, authtype);
 	ptr += zbx_serialize_char(ptr, privilege);
-	ptr += zbx_serialize_str(ptr, username, username_len);
-	ptr += zbx_serialize_str(ptr, password, password_len);
+	ptr += zbx_serialize_str(ptr, user, username_len);
+	ptr += zbx_serialize_str(ptr, pwd, password_len);
 	ptr += zbx_serialize_str(ptr, sensor, sensor_len);
 	ptr += zbx_serialize_int(ptr, command);
 	(void)zbx_serialize_str(ptr, key, key_len);
+
+	zbx_free(user);
+	zbx_free(pwd);
 
 	return data_len;
 }

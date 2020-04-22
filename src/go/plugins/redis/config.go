@@ -21,25 +21,21 @@ package redis
 
 import (
 	"fmt"
-	"time"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 )
 
 type Session struct {
 	// URI is a connection string consisting of a network scheme, a host address and a port or a path to a Unix-socket.
-	Uri string `conf:"optional"`
+	URI string `conf:"name=Uri,optional"`
 
-	// Password to send to protected Redis server.
+	// Password to send to a protected Redis server.
 	Password string `conf:"optional"`
 }
 
 type PluginOptions struct {
 	// URI is the default connection string.
-	Uri string `conf:"default=tcp://localhost:6379"`
-
-	// Password is the default password.
-	Password string `conf:"optional"`
+	URI string `conf:"name=Uri,default=tcp://localhost:6379"`
 
 	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
@@ -57,19 +53,16 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
+
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
 	}
 
 	for _, session := range p.options.Sessions {
-		if session.Uri == "" {
-			session.Uri = p.options.Uri
+		if session.URI == "" {
+			session.URI = p.options.URI
 		}
 	}
-
-	p.connMgr = NewConnManager(
-		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.Timeout)*time.Second)
 }
 
 const MaxAuthPassLen = 512
@@ -77,30 +70,29 @@ const MaxAuthPassLen = 512
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
 func (p *Plugin) Validate(options interface{}) error {
-	var opts PluginOptions
-	var err error
+	var (
+		opts PluginOptions
+		err  error
+	)
 
 	err = conf.Unmarshal(options, &opts)
 	if err != nil {
 		return err
 	}
 
-	err = validateUri(opts.Uri)
+	err = validateURI(opts.URI)
 	if err != nil {
 		return err
 	}
 
-	if len(opts.Password) > MaxAuthPassLen {
-		return fmt.Errorf("password cannot be longer than %d characters", MaxAuthPassLen)
-	}
+	uri := opts.URI
 
-	uri := opts.Uri
 	for name, session := range opts.Sessions {
-		if session.Uri != "" {
-			uri = session.Uri
+		if session.URI != "" {
+			uri = session.URI
 		}
 
-		err = validateUri(uri)
+		err = validateURI(uri)
 		if err != nil {
 			return fmt.Errorf("invalid parameters for session '%s': %s", name, err.Error())
 		}

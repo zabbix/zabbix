@@ -23,9 +23,6 @@
  * @var CView $this
  */
 
-$allowed_testing = $data['allowed_testing'];
-$test = $data['test'];
-
 $data_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([
@@ -49,21 +46,23 @@ $result_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([
 		_('Expression'),
-		_('Result')
+		_('Result'),
+		_('Error')
 	]);
 
 foreach ($data['eHTMLTree'] as $e) {
+	$expression = $e['expression']['value'];
 	$result = '';
 	$style = null;
+	$error = null;
 
-	if ($allowed_testing && $test && array_key_exists('expression', $e)) {
-		if (evalExpressionData($e['expression']['value'], $data['macros_data'])) {
-			$result = 'TRUE';
-			$style = ZBX_STYLE_GREEN;
+	if (array_key_exists($expression, $data['results'])) {
+		if (array_key_exists('value', $data['results'][$expression])) {
+			$result = $data['results'][$expression]['value'] ? 'TRUE' : 'FALSE';
+			$style = $data['results'][$expression]['value'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED;
 		}
-		else {
-			$result = 'FALSE';
-			$style = ZBX_STYLE_RED;
+		if (array_key_exists('error', $data['results'][$expression])) {
+			$error = makeErrorIcon($data['results'][$expression]['error']);
 		}
 	}
 
@@ -71,19 +70,23 @@ foreach ($data['eHTMLTree'] as $e) {
 		(new CCol($e['list']))
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-		(new CCol($result))->addClass($style)
+		(new CCol($result))->addClass($style),
+		new CCol($error)
 	]);
 }
 
+$expression = $data['expression'];
 $result = '';
-if ($allowed_testing && $test) {
-	if (evalExpressionData($data['expression'], $data['macros_data'])) {
-		$result = 'TRUE';
-		$style = ZBX_STYLE_GREEN;
+$style = null;
+$error = null;
+
+if (array_key_exists($expression, $data['results'])) {
+	if (array_key_exists('value', $data['results'][$expression])) {
+		$result = $data['results'][$expression]['value'] ? 'TRUE' : 'FALSE';
+		$style = $data['results'][$expression]['value'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED;
 	}
-	else {
-		$result = 'FALSE';
-		$style = ZBX_STYLE_RED;
+	if (array_key_exists('error', $data['results'][$expression])) {
+		$error = makeErrorIcon($data['results'][$expression]['error']);
 	}
 }
 
@@ -92,7 +95,8 @@ $result_table->setFooter([
 		->setAttribute('title', $data['outline'])
 		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 		->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-	(new CCol($result))->addClass($style)
+	(new CCol($result))->addClass($style),
+	new CCol($error)
 ]);
 
 $form_list->addRow(_('Result'),
@@ -118,7 +122,7 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Test'),
-			'enabled' => $allowed_testing,
+			'enabled' => $data['allowed_testing'],
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,

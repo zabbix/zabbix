@@ -211,8 +211,7 @@ class CWidgetHelper {
 	 */
 	private static function getMultiselectField($field, $captions, $form_name, $object_name, $popup_options) {
 		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
-
-		return (new CMultiSelect([
+		$options = [
 			'name' => $field_name,
 			'object_name' => $object_name,
 			'multiple' => $field->isMultiple(),
@@ -224,7 +223,13 @@ class CWidgetHelper {
 				] + $popup_options
 			],
 			'add_post_js' => false
-		]))
+		];
+
+		if ($field instanceof CWidgetFieldMsHost && $field->filter_preselect_host_group_field) {
+			$options['popup']['filter_preselect_fields']['hostgroups'] = $field->filter_preselect_host_group_field;
+		}
+
+		return (new CMultiSelect($options))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
 	}
@@ -531,6 +536,13 @@ class CWidgetHelper {
 	 * @return array
 	 */
 	public static function getApplicationSelector($field) {
+		$popup_options = json_encode($field->getFilterParameters());
+
+		if ($field->filter_preselect_host_field) {
+			$popup_options = 'jQuery.extend('.
+				$popup_options.', getFirstMultiselectValue("'.$field->filter_preselect_host_field.'"))';
+		}
+
 		return [
 			(new CTextBox($field->getName(), $field->getValue()))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -539,9 +551,7 @@ class CWidgetHelper {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton($field->getName().'_select', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick(
-					'return PopUp("popup.generic", '.json_encode($field->getFilterParameters()).', null, this);'
-				)
+				->onClick('return PopUp("popup.generic", '.$popup_options.', null, this);')
 		];
 	}
 
@@ -631,6 +641,7 @@ class CWidgetHelper {
 					(new CButton())
 						->setAttribute('title', _('Delete'))
 						->addClass(ZBX_STYLE_REMOVE_BTN)
+						->removeId()
 				))
 					->addClass(ZBX_STYLE_COLUMN_5)
 			]))
@@ -670,9 +681,7 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getGraphOverride($field, $form_name) {
-		$list = (new CList())
-			->addClass(ZBX_STYLE_OVERRIDES_LIST)
-			->setId('overrides');
+		$list = (new CList())->addClass(ZBX_STYLE_OVERRIDES_LIST);
 
 		$values = $field->getValue();
 
@@ -937,7 +946,8 @@ class CWidgetHelper {
 						(new CButton())
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';')
-							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand')),
+							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand'))
+							->removeId(),
 						(new CPatternSelect([
 							'name' => $field_name.'['.$row_num.'][hosts][]',
 							'object_name' => 'hosts',
@@ -983,6 +993,7 @@ class CWidgetHelper {
 					(new CButton())
 						->setAttribute('title', _('Delete'))
 						->addClass(ZBX_STYLE_REMOVE_BTN)
+						->removeId()
 				]))->addClass(ZBX_STYLE_COLUMN_5)
 			]))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)

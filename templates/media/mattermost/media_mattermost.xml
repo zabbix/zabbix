@@ -1,19 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2019-12-10T05:43:47Z</date>
+    <version>5.0</version>
+    <date>2020-04-20T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Mattermost</name>
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
-                    <name>zabbix_url</name>
-                    <value>{$ZABBIX.URL}</value>
-                </parameter>
-                <parameter>
                     <name>bot_token</name>
                     <value>&lt;YOUR BOT TOKEN&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>event_date</name>
+                    <value>{EVENT.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_id</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>event_name</name>
+                    <value>{EVENT.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_nseverity</name>
+                    <value>{EVENT.NSEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>event_opdata</name>
+                    <value>{EVENT.OPDATA}</value>
+                </parameter>
+                <parameter>
+                    <name>event_recovery_date</name>
+                    <value>{EVENT.RECOVERY.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_recovery_time</name>
+                    <value>{EVENT.RECOVERY.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_severity</name>
+                    <value>{EVENT.SEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>event_tags</name>
+                    <value>{EVENT.TAGS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_time</name>
+                    <value>{EVENT.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_date</name>
+                    <value>{EVENT.UPDATE.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_message</name>
+                    <value>{EVENT.UPDATE.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_status</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_time</name>
+                    <value>{EVENT.UPDATE.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_value</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>host_ip</name>
+                    <value>{HOST.IP}</value>
+                </parameter>
+                <parameter>
+                    <name>host_name</name>
+                    <value>{HOST.NAME}</value>
                 </parameter>
                 <parameter>
                     <name>mattermost_url</name>
@@ -28,91 +92,23 @@
                     <value>{ALERT.SENDTO}</value>
                 </parameter>
                 <parameter>
-                    <name>event_tags</name>
-                    <value>{EVENT.TAGS}</value>
-                </parameter>
-                <parameter>
-                    <name>event_name</name>
-                    <value>{EVENT.NAME}</value>
-                </parameter>
-                <parameter>
-                    <name>event_nseverity</name>
-                    <value>{EVENT.NSEVERITY}</value>
-                </parameter>
-                <parameter>
-                    <name>event_ack_status</name>
-                    <value>{EVENT.ACK.STATUS}</value>
-                </parameter>
-                <parameter>
-                    <name>event_value</name>
-                    <value>{EVENT.VALUE}</value>
-                </parameter>
-                <parameter>
-                    <name>event_update_status</name>
-                    <value>{EVENT.UPDATE.STATUS}</value>
-                </parameter>
-                <parameter>
-                    <name>event_date</name>
-                    <value>{EVENT.DATE}</value>
-                </parameter>
-                <parameter>
-                    <name>event_time</name>
-                    <value>{EVENT.TIME}</value>
-                </parameter>
-                <parameter>
-                    <name>event_severity</name>
-                    <value>{EVENT.SEVERITY}</value>
-                </parameter>
-                <parameter>
-                    <name>event_opdata</name>
-                    <value>{EVENT.OPDATA}</value>
-                </parameter>
-                <parameter>
-                    <name>event_id</name>
-                    <value>{EVENT.ID}</value>
-                </parameter>
-                <parameter>
-                    <name>event_update_message</name>
-                    <value>{EVENT.UPDATE.MESSAGE}</value>
+                    <name>trigger_description</name>
+                    <value>{TRIGGER.DESCRIPTION}</value>
                 </parameter>
                 <parameter>
                     <name>trigger_id</name>
                     <value>{TRIGGER.ID}</value>
                 </parameter>
                 <parameter>
-                    <name>trigger_description</name>
-                    <value>{TRIGGER.DESCRIPTION}</value>
-                </parameter>
-                <parameter>
-                    <name>host_name</name>
-                    <value>{HOST.NAME}</value>
-                </parameter>
-                <parameter>
-                    <name>host_ip</name>
-                    <value>{HOST.IP}</value>
-                </parameter>
-                <parameter>
-                    <name>event_update_date</name>
-                    <value>{EVENT.UPDATE.DATE}</value>
-                </parameter>
-                <parameter>
-                    <name>event_update_time</name>
-                    <value>{EVENT.UPDATE.TIME}</value>
-                </parameter>
-                <parameter>
-                    <name>event_recovery_date</name>
-                    <value>{EVENT.RECOVERY.DATE}</value>
-                </parameter>
-                <parameter>
-                    <name>event_recovery_time</name>
-                    <value>{EVENT.RECOVERY.TIME}</value>
+                    <name>zabbix_url</name>
+                    <value>{$ZABBIX.URL}</value>
                 </parameter>
             </parameters>
             <attempts>1</attempts>
             <script>var SEVERITY_COLORS = [&#13;
     '#97AAB3', '#7499FF', '#FFC859',&#13;
     '#FFA059', '#E97659', '#E45959'&#13;
-    ];&#13;
+];&#13;
 &#13;
 var RESOLVE_COLOR = '#009900';&#13;
 &#13;
@@ -125,12 +121,13 @@ var EVENT_STATUS = {&#13;
     PROBLEM: 'PROBLEM',&#13;
     UPDATE: 'UPDATE',&#13;
     RESOLVE: 'OK'&#13;
-}&#13;
+};&#13;
 &#13;
 if (!String.prototype.format) {&#13;
     String.prototype.format = function() {&#13;
         var args = arguments;&#13;
-        return this.replace(/{(\d+)}/g, function(match, number) { &#13;
+&#13;
+        return this.replace(/{(\d+)}/g, function(match, number) {&#13;
             return number in args&#13;
                 ? args[number]&#13;
                 : match&#13;
@@ -142,47 +139,49 @@ if (!String.prototype.format) {&#13;
 function isEventProblem(params) {&#13;
     return params.event_value == 1&#13;
         &amp;&amp; params.event_update_status == 0&#13;
-        ;&#13;
+    ;&#13;
 }&#13;
 &#13;
 function isEventUpdate(params) {&#13;
     return params.event_value == 1&#13;
         &amp;&amp; params.event_update_status == 1&#13;
-        ;&#13;
+    ;&#13;
 }&#13;
 &#13;
 function isEventResolve(params) {&#13;
     return params.event_value == 0;&#13;
 }&#13;
 &#13;
-function getPermalink(mattermostURL, teamName, postID) {&#13;
+function getPermalink(mattermost_url, team_name, postid) {&#13;
     return '{0}/{1}/pl/{2}'.format(&#13;
-        mattermostURL.replace(/\/+$/, ''),&#13;
-        teamName,&#13;
-        postID&#13;
-        );&#13;
+        mattermost_url.replace(/\/+$/, ''),&#13;
+        team_name,&#13;
+        postid&#13;
+    );&#13;
 }&#13;
 &#13;
-function getChannel(sendTo) {&#13;
+function getChannel(send_to) {&#13;
     switch (true) {&#13;
-        case /.+\/#.+/.test(sendTo):&#13;
-            return getChannelByName(sendTo);&#13;
+        case /.+\/#.+/.test(send_to):&#13;
+            return getChannelByName(send_to);&#13;
 &#13;
-        case /@.+/.test(sendTo):&#13;
-            return getDirectChannel(sendTo);&#13;
+        case /@.+/.test(send_to):&#13;
+            return getDirectChannel(send_to);&#13;
 &#13;
         default:&#13;
-            return getChannelByID(sendTo);&#13;
+            return getChannelByID(send_to);&#13;
     }&#13;
 }&#13;
 &#13;
-function getChannelByName(sendTo) {&#13;
-    var teamChan = sendTo.trim().split('/#');&#13;
+function getChannelByName(send_to) {&#13;
+    var team_chan = send_to&#13;
+        .trim()&#13;
+        .split('/#');&#13;
 &#13;
     var resp = JSON.parse(req.Get(&#13;
-        Mattermost.channelByName.format(teamChan[0], teamChan[1]),&#13;
+        Mattermost.channel_byname.format(team_chan[0], team_chan[1]),&#13;
         JSON.stringify(fields)&#13;
-        )&#13;
+    )&#13;
     );&#13;
 &#13;
     if (req.Status() != 200) {&#13;
@@ -192,51 +191,54 @@ function getChannelByName(sendTo) {&#13;
     return resp;&#13;
 }&#13;
 &#13;
-function getDirectChannel(sendTo) {&#13;
-    Zabbix.Log(5, '[ Webhook ] Call {0}({1})'.format(&#13;
+function getDirectChannel(send_to) {&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(arguments)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
-    var teamUser = sendTo.trim().split('/@');&#13;
-    var bot = getBotUser();&#13;
-    var user = getUserByName(teamUser[1])&#13;
+    var teamUser = send_to&#13;
+            .trim()&#13;
+            .split('/@'),&#13;
+        bot = getBotUser(),&#13;
+        user = getUserByName(teamUser[1]);&#13;
 &#13;
     var resp = JSON.parse(req.Post(&#13;
-        Mattermost.directChannel,&#13;
+        Mattermost.direct_channel,&#13;
         JSON.stringify([bot.id, user.id])&#13;
-        )&#13;
+    )&#13;
     );&#13;
 &#13;
-    Zabbix.Log(5, '[ Webhook ] Result {0}: {1}'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(resp)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     if (req.Status() != 201) {&#13;
         throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
     }&#13;
 &#13;
-    resp.teamName = teamUser[0];&#13;
+    resp.team_name = teamUser[0];&#13;
+&#13;
     return resp;&#13;
 }&#13;
 &#13;
 function getChannelByID(channelID) {&#13;
-    Zabbix.Log(5, '[ Webhook ] Call {0}({1})'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(arguments)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     var resp = JSON.parse(req.Get(&#13;
-        Mattermost.getChannel.format(channelID),&#13;
+        Mattermost.get_channel.format(channelID),&#13;
         JSON.stringify(fields)&#13;
-        )&#13;
+    )&#13;
     );&#13;
 &#13;
-    Zabbix.Log(5, '[ Webhook ] Result {0}: {1}'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(resp)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     if (req.Status() != 200) {&#13;
         throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
@@ -246,21 +248,21 @@ function getChannelByID(channelID) {&#13;
 }&#13;
 &#13;
 function getBotUser() {&#13;
-    Zabbix.Log(5, '[ Webhook ] Call {0}({1})'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(arguments)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     var resp = JSON.parse(req.Get(&#13;
-        Mattermost.botUser,&#13;
+        Mattermost.bot_user,&#13;
         JSON.stringify(fields)&#13;
-        )&#13;
+    )&#13;
     );&#13;
 &#13;
-    Zabbix.Log(5, '[ Webhook ] Result {0}: {1}'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(resp)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     if (req.Status() != 200) {&#13;
         throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
@@ -270,21 +272,21 @@ function getBotUser() {&#13;
 }&#13;
 &#13;
 function getUserByName(userName) {&#13;
-    Zabbix.Log(5, '[ Webhook ] Call {0}({1})'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(arguments)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     var resp = JSON.parse(req.Get(&#13;
-        Mattermost.userByName.format(userName),&#13;
+        Mattermost.format(userName),&#13;
         JSON.stringify(fields)&#13;
-        )&#13;
+    )&#13;
     );&#13;
 &#13;
-    Zabbix.Log(5, '[ Webhook ] Result {0}: {1}'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(resp)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     if (req.Status() != 200) {&#13;
         throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
@@ -294,21 +296,21 @@ function getUserByName(userName) {&#13;
 }&#13;
 &#13;
 function getTeamByID(teamID) {&#13;
-    Zabbix.Log(5, '[ Webhook ] Call {0}({1})'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Call {0}({1})'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(arguments)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     var resp = JSON.parse(req.Get(&#13;
-        Mattermost.getTeam.format(teamID),&#13;
+        Mattermost.get_team.format(teamID),&#13;
         JSON.stringify(fields)&#13;
-        )&#13;
+    )&#13;
     );&#13;
 &#13;
-    Zabbix.Log(5, '[ Webhook ] Result {0}: {1}'.format(&#13;
+    Zabbix.Log(5, '[ Mattermost Webhook ] Result {0}: {1}'.format(&#13;
         arguments.callee.name,&#13;
         JSON.stringify(resp)&#13;
-        ));&#13;
+    ));&#13;
 &#13;
     if (req.Status() != 200) {&#13;
         throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
@@ -317,23 +319,27 @@ function getTeamByID(teamID) {&#13;
     return resp;&#13;
 }&#13;
 &#13;
-function createProblemURL(zabbixURL, triggerId, eventId) {&#13;
-    var problemURL = '{0}/tr_events.php?triggerid={1}&amp;eventid={2}'&#13;
+function createProblemURL(zabbix_url, triggerid, eventid) {&#13;
+    var problem_url = '{0}/tr_events.php?triggeriid{1}&amp;eventid={2}'&#13;
         .format(&#13;
-            zabbixURL,&#13;
-            triggerId,&#13;
-            eventId&#13;
+            zabbix_url,&#13;
+            triggerid,&#13;
+            eventid&#13;
         );&#13;
 &#13;
-    return problemURL&#13;
+    return problem_url;&#13;
 }&#13;
 &#13;
-function getTagValue(eventTags, key) {&#13;
+function getTagValue(event_tags, key) {&#13;
     var pattern = new RegExp('(' + key + ':.+)');&#13;
-    var tagValue = eventTags&#13;
+    var tagValue = event_tags&#13;
         .split(',')&#13;
-        .filter(function (v) {return v.match(pattern)})&#13;
-        .map(function (v) {return v.split(':')[1]})[0]&#13;
+        .filter(function (v) {&#13;
+            return v.match(pattern);&#13;
+        })&#13;
+        .map(function (v) {&#13;
+            return v.split(':')[1];&#13;
+        })[0]&#13;
         || 0;&#13;
 &#13;
     return tagValue;&#13;
@@ -344,12 +350,12 @@ function handlerAlarm(req, params) {&#13;
     var fields = {&#13;
         channel_id: channel.id,&#13;
         props: {}&#13;
-    }&#13;
+    };&#13;
 &#13;
     if (isEventProblem(params)) {&#13;
-        var teamName = channel.teamName&#13;
-            ? channel.teamName&#13;
-            : getTeamByID(channel.team_id).name&#13;
+        var team_name = channel.team_name&#13;
+            ? channel.team_name&#13;
+            : getTeamByID(channel.team_id).name;&#13;
 &#13;
         fields.props.attachments = [&#13;
             createMessage(&#13;
@@ -358,13 +364,13 @@ function handlerAlarm(req, params) {&#13;
                 params.event_date,&#13;
                 params.event_time,&#13;
                 createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
-                )&#13;
-            ];&#13;
+            )&#13;
+        ];&#13;
 &#13;
         var resp = JSON.parse(req.Post(&#13;
-            Mattermost.postMessage,&#13;
+            Mattermost.post_message,&#13;
             JSON.stringify(fields)&#13;
-            )&#13;
+        )&#13;
         );&#13;
 &#13;
         if (req.Status() != 201) {&#13;
@@ -376,11 +382,12 @@ function handlerAlarm(req, params) {&#13;
         result.tags.__mattermost_channel_name = channel.name;&#13;
         result.tags.__mattermost_message_link = getPermalink(&#13;
             params.mattermost_url,&#13;
-            teamName,&#13;
+            team_name,&#13;
             resp.id&#13;
-            );&#13;
+        );&#13;
 &#13;
-    } else if (isEventUpdate(params)) {&#13;
+    }&#13;
+    else if (isEventUpdate(params)) {&#13;
         fields.root_id = getTagValue(params.event_tags, 'mattermost_post_id');&#13;
         fields.message = params.event_update_message || '';&#13;
         fields.props.attachments = [&#13;
@@ -391,19 +398,20 @@ function handlerAlarm(req, params) {&#13;
                 params.event_update_time,&#13;
                 createProblemURL(params.zabbix_url, params.trigger_id, params.event_id),&#13;
                 true&#13;
-                )&#13;
-            ];&#13;
-&#13;
-        var resp = JSON.parse(req.Post(&#13;
-            Mattermost.postMessage, JSON.stringify(fields)&#13;
             )&#13;
+        ];&#13;
+&#13;
+        resp = JSON.parse(req.Post(&#13;
+            Mattermost.post_message, JSON.stringify(fields)&#13;
+        )&#13;
         );&#13;
 &#13;
         if (req.Status() != 201) {&#13;
             throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
         }&#13;
 &#13;
-    } else if (isEventResolve(params)) {&#13;
+    }&#13;
+    else if (isEventResolve(params)) {&#13;
         fields.channel_id = getTagValue(params.event_tags, 'mattermost_channel_id');&#13;
         fields.id = getTagValue(params.event_tags, 'mattermost_post_id');&#13;
         fields.props.attachments = [&#13;
@@ -413,15 +421,15 @@ function handlerAlarm(req, params) {&#13;
                 params.event_date,&#13;
                 params.event_time,&#13;
                 createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
-                )&#13;
-            ];&#13;
+            )&#13;
+        ];&#13;
 &#13;
         var post_id = getTagValue(params.event_tags, 'mattermost_post_id');&#13;
 &#13;
-        var resp = JSON.parse(req.Put(&#13;
-            Mattermost.chatUpdate.format(post_id),&#13;
+        resp = JSON.parse(req.Put(&#13;
+            Mattermost.chat_update.format(post_id),&#13;
             JSON.stringify(fields)&#13;
-            )&#13;
+        )&#13;
         );&#13;
 &#13;
         if (req.Status() != 200) {&#13;
@@ -435,12 +443,12 @@ function handlerEvent(req, params) {&#13;
     var fields = {&#13;
         channel_id: channel.id,&#13;
         props: {}&#13;
-    }&#13;
+    };&#13;
 &#13;
     if (isEventProblem(params)) {&#13;
-        var teamName = channel.teamName&#13;
-            ? channel.teamName&#13;
-            : getTeamByID(channel.team_id).name&#13;
+        var team_name = channel.team_name&#13;
+            ? channel.team_name&#13;
+            : getTeamByID(channel.team_id).name;&#13;
 &#13;
         fields.props.attachments = [&#13;
             createMessage(&#13;
@@ -449,10 +457,11 @@ function handlerEvent(req, params) {&#13;
                 params.event_date,&#13;
                 params.event_time,&#13;
                 createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
-                )&#13;
-            ];&#13;
+            )&#13;
+        ];&#13;
 &#13;
-        var resp = JSON.parse(req.Post(Mattermost.postMessage, JSON.stringify(fields)));&#13;
+        var resp = JSON.parse(req.Post(Mattermost.post_message, JSON.stringify(fields)));&#13;
+&#13;
         if (req.Status() != 201) {&#13;
             throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
         }&#13;
@@ -460,11 +469,12 @@ function handlerEvent(req, params) {&#13;
         result.tags.__mattermost_channel_name = channel.name;&#13;
         result.tags.__mattermost_message_link = getPermalink(&#13;
             params.mattermost_url,&#13;
-            teamName,&#13;
+            team_name,&#13;
             resp.id&#13;
-            );&#13;
-    &#13;
-    } else if (isEventUpdate(params)) {&#13;
+        );&#13;
+&#13;
+    }&#13;
+    else if (isEventUpdate(params)) {&#13;
         fields.message = params.event_update_message || '';&#13;
         fields.props.attachments = [&#13;
             createMessage(&#13;
@@ -474,15 +484,17 @@ function handlerEvent(req, params) {&#13;
                 params.event_update_time,&#13;
                 createProblemURL(params.zabbix_url, params.trigger_id, params.event_id),&#13;
                 false&#13;
-                )&#13;
-            ];&#13;
+            )&#13;
+        ];&#13;
 &#13;
-        var resp = JSON.parse(req.Post(Mattermost.postMessage, JSON.stringify(fields)));&#13;
+        resp = JSON.parse(req.Post(Mattermost.post_message, JSON.stringify(fields)));&#13;
+&#13;
         if (req.Status() != 201) {&#13;
             throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
         }&#13;
 &#13;
-    } else if (isEventResolve(params)) {&#13;
+    }&#13;
+    else if (isEventResolve(params)) {&#13;
         fields.props.attachments = [&#13;
             createMessage(&#13;
                 EVENT_STATUS.RESOLVE,&#13;
@@ -490,31 +502,32 @@ function handlerEvent(req, params) {&#13;
                 params.event_recovery_date,&#13;
                 params.event_recovery_time,&#13;
                 createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
-                )&#13;
-            ];&#13;
+            )&#13;
+        ];&#13;
 &#13;
-        var resp = JSON.parse(req.Post(Mattermost.postMessage, JSON.stringify(fields)));&#13;
+        resp = JSON.parse(req.Post(Mattermost.post_message, JSON.stringify(fields)));&#13;
+&#13;
         if (req.Status() != 201) {&#13;
             throw '[{0}] {1}'.format(resp.status_code, resp.message);&#13;
         }&#13;
     }&#13;
-}   &#13;
+}&#13;
 &#13;
 function createMessage(&#13;
     status,&#13;
-    eventSeverityColor,&#13;
-    eventDate,&#13;
-    eventTime,&#13;
-    problemURL,&#13;
+    event_severity_color,&#13;
+    event_date,&#13;
+    event_time,&#13;
+    problem_url,&#13;
     isShort&#13;
-    ) {&#13;
+) {&#13;
     var message = {&#13;
         fallbac: '{0} #{1}: {2}'.format(status, params.event_id, params.event_name),&#13;
         title: '{0} #{1}: {2}'.format(status, params.event_id, params.event_name),&#13;
-        color: eventSeverityColor,&#13;
-        title_link: problemURL,&#13;
-        footer: problemURL,&#13;
-        &#13;
+        color: event_severity_color,&#13;
+        title_link: problem_url,&#13;
+        footer: problem_url,&#13;
+&#13;
         fields: [&#13;
             {&#13;
                 title: 'Host',&#13;
@@ -523,7 +536,7 @@ function createMessage(&#13;
             },&#13;
             {&#13;
                 title: 'Event time',&#13;
-                value: '{0} {1}'.format(eventDate, eventTime),&#13;
+                value: '{0} {1}'.format(event_date, event_time),&#13;
                 short: true&#13;
             },&#13;
             {&#13;
@@ -551,38 +564,107 @@ function createMessage(&#13;
                 value: params.trigger_description,&#13;
                 short: true&#13;
             }&#13;
-            )&#13;
+        );&#13;
     }&#13;
 &#13;
     return message;&#13;
 }&#13;
 &#13;
+function validateParams(params) {&#13;
+    if (typeof params.bot_token !== 'string' || params.bot_token.trim() === '') {&#13;
+        throw 'Field &quot;bot_token&quot; cannot be empty';&#13;
+    }&#13;
+&#13;
+    if (isNaN(params.event_id)) {&#13;
+        throw 'Field &quot;event_id&quot; is not a number';&#13;
+    }&#13;
+&#13;
+    if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {&#13;
+        throw 'Incorrect &quot;event_nseverity&quot; parameter given: ' + params.event_nseverity + '\nMust be 0-5.';&#13;
+    }&#13;
+&#13;
+    if (typeof params.event_severity !== 'string' || params.event_severity.trim() === '') {&#13;
+        throw 'Field &quot;event_severity&quot; cannot be empty';&#13;
+    }&#13;
+&#13;
+    if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1') {&#13;
+        throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    if (params.event_value !== '0' &amp;&amp; params.event_value !== '1') {&#13;
+        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    if (typeof params.host_ip !== 'string' || params.host_ip.trim() === '') {&#13;
+        throw 'Field &quot;host_ip&quot; cannot be empty';&#13;
+    }&#13;
+&#13;
+    if (typeof params.host_name !== 'string' || params.host_name.trim() === '') {&#13;
+        throw 'Field &quot;host_name&quot; cannot be empty';&#13;
+    }&#13;
+&#13;
+    if (typeof params.mattermost_url !== 'string' || params.mattermost_url.trim() === '') {&#13;
+        throw 'Field &quot;mattermost_url&quot; cannot be empty';&#13;
+    }&#13;
+&#13;
+    if (!/^(http|https):\/\/.+/.test(params.mattermost_url)) {&#13;
+        throw 'Field &quot;mattermost_url&quot; must contain a schema';&#13;
+    }&#13;
+&#13;
+    if (['alarm', 'event'].indexOf(params.send_mode) === -1) {&#13;
+        throw 'Incorrect &quot;send_mode&quot; parameter given: ' + params.send_mode + '\nMust be &quot;alarm&quot; or &quot;event&quot;.';&#13;
+    }&#13;
+&#13;
+    if (typeof params.send_to !== 'string' || params.send_to.trim() === '') {&#13;
+        throw 'Field &quot;send_to&quot; cannot be empty';&#13;
+    }&#13;
+&#13;
+    if (isNaN(params.trigger_id)) {&#13;
+        throw 'field &quot;trigger_id&quot; is not a number';&#13;
+    }&#13;
+&#13;
+    if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '') {&#13;
+        throw 'Field &quot;zabbix_url&quot; cannot be empty';&#13;
+    }&#13;
+&#13;
+    if (!/^(http|https):\/\/.+/.test(params.zabbix_url)) {&#13;
+        throw 'Field &quot;zabbix_url&quot; must contain a schema';&#13;
+    }&#13;
+&#13;
+}&#13;
+&#13;
 try {&#13;
-    var params = JSON.parse(value),&#13;
-        req = new CurlHttpRequest(),&#13;
+    var params = JSON.parse(value);&#13;
+&#13;
+    validateParams(params);&#13;
+&#13;
+    var req = new CurlHttpRequest(),&#13;
         fields = {},&#13;
         result = {tags: {}};&#13;
 &#13;
+    if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
+        req.SetProxy(params.HTTPProxy);&#13;
+    }&#13;
 &#13;
     req.AddHeader('Content-Type: application/json; charset=utf-8');&#13;
-    req.AddHeader('Authorization: Bearer ' + params.bot_token)&#13;
+    req.AddHeader('Authorization: Bearer ' + params.bot_token);&#13;
 &#13;
     params.mattermost_url = params.mattermost_url.replace(/\/+$/, '');&#13;
     params.zabbix_url = params.zabbix_url.replace(/\/+$/, '');&#13;
-    &#13;
+&#13;
     var APIEndpoint = params.mattermost_url + '/api/v4/';&#13;
 &#13;
     var Mattermost = {&#13;
-        postMessage: APIEndpoint + 'posts',&#13;
-        getChannel: APIEndpoint + 'channels/{0}',&#13;
-        getTeam: APIEndpoint + 'teams/{0}',&#13;
-        chatUpdate: APIEndpoint + 'posts/{0}',&#13;
-        directChannel: APIEndpoint + 'channels/direct',&#13;
-        channelByName: APIEndpoint + 'teams/name/{0}/channels/name/{1}',&#13;
-        userByName: APIEndpoint + 'users/username/{0}',&#13;
-        botUser: APIEndpoint + 'users/me'&#13;
+        post_message: APIEndpoint + 'posts',&#13;
+        get_channel: APIEndpoint + 'channels/{0}',&#13;
+        get_team: APIEndpoint + 'teams/{0}',&#13;
+        chat_update: APIEndpoint + 'posts/{0}',&#13;
+        direct_channel: APIEndpoint + 'channels/direct',&#13;
+        channel_byname: APIEndpoint + 'teams/name/{0}/channels/name/{1}',&#13;
+        user_byname: APIEndpoint + 'users/username/{0}',&#13;
+        bot_user: APIEndpoint + 'users/me'&#13;
 &#13;
-    }&#13;
+    };&#13;
 &#13;
     params.send_mode = params.send_mode.toLowerCase();&#13;
     params.send_mode = params.send_mode in SEND_MODE_HANDLERS&#13;
@@ -590,10 +672,12 @@ try {&#13;
         : 'alarm';&#13;
 &#13;
     SEND_MODE_HANDLERS[params.send_mode](req, params);&#13;
+&#13;
     return JSON.stringify(result);&#13;
 &#13;
-} catch (error) {&#13;
-    Zabbix.Log(5, 'Mattermost notification failed: ' + error);&#13;
+}&#13;
+catch (error) {&#13;
+    Zabbix.Log(4, '[ Mattermost Webhook ] Mattermost notification failed: ' + error);&#13;
     throw 'Mattermost notification failed: ' + error;&#13;
 }</script>
             <process_tags>YES</process_tags>

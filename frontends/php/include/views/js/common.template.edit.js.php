@@ -321,6 +321,7 @@
 					macros: macros,
 					show_inherited_macros: show_inherited_macros ? 1 : 0,
 					templateids: linked_templates.concat(add_templates),
+					<?= array_key_exists('parent_hostid', $data) ? 'parent_hostid: '.json_encode($data['parent_hostid']).',' : '' ?>
 					readonly: <?= (int) $data['readonly'] ?>
 				},
 				dataType: 'json',
