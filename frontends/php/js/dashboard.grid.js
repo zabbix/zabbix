@@ -3641,26 +3641,26 @@
 
 				// In case if selected space is 2x2 cells (represents simple click), use pasted widget size.
 				if (widget === null && pos !== null && pos.width == 2 && pos.height == 2) {
-					var test_pos = {
-						'width': new_widget.pos.width,
-						'height': new_widget.pos.height,
-						'x': pos.x,
-						'y': pos.y
-					};
+					pos.width = new_widget.pos.width;
+					pos.height = new_widget.pos.height;
 
-					if (test_pos.x > data.options['max-columns'] - test_pos.width
-							|| test_pos.y > data.options['max-rows'] - test_pos.height
-							|| !isPosFree($this, data, test_pos)) {
-						$.subscribe('widget.update.dimensions', warning_msg_remove);
-						$wrapper.siblings('.msg-good, .msg-bad').remove();
-						$wrapper.before(makeMessageBox(
-							'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, true
-						));
-						return;
+					if (pos.x > data.options['max-columns'] - pos.width
+							|| pos.y > data.options['max-rows'] - pos.height
+							|| !isPosFree($this, data, pos)) {
+						$.map(data.widgets, function(box) {
+							return rectOverlap(box.pos, pos) ? box : null;
+						}).forEach(function(box) {
+							if (pos.x + pos.width > box.pos.x && pos.x < box.pos.x) {
+								pos.width = box.pos.x - pos.x;
+							}
+							if (pos.y + pos.height > box.pos.y && pos.y < box.pos.y) {
+								pos.height = box.pos.y - pos.y;
+							}
+						});
 					}
-					else {
-						pos = test_pos;
-					}
+
+					pos.width = Math.min(data.options['max-columns'] - pos.x, pos.width);
+					pos.height = Math.min(data.options['max-rows'] - pos.y, pos.height);
 				}
 
 				// When no position is given, find first empty space. Use copied widget width and height.
@@ -4057,8 +4057,6 @@
 		},
 
 		addNewWidget: function(trigger_elmnt, pos) {
-			var widget = (pos && 'x' in pos && 'y' in pos) ? {pos: pos} : null;
-
 			/*
 			 * Unset if dimension width/height is equal to size of placeholder.
 			 * Widget default size will be used.
@@ -4067,6 +4065,8 @@
 				delete pos.width;
 				delete pos.height;
 			}
+
+			var widget = (pos && 'x' in pos && 'y' in pos) ? {pos: pos} : null;
 
 			return this.each(function() {
 				var	$this = $(this),
