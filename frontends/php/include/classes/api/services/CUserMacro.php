@@ -178,25 +178,30 @@ class CUserMacro extends CApiService {
 
 		// init GLOBALS
 		if (!is_null($options['globalmacro'])) {
-			$sql_parts = $this->applyQueryFilterOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
-			$sql_parts = $this->applyQueryOutputOptions('globalmacro', 'gm', $options, $sql_parts);
-			$key_property = 'globalmacroid';
+			$sqlPartsGlobal = $this->applyQueryFilterOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
+			$sqlPartsGlobal = $this->applyQueryOutputOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
+			$res = DBselect($this->createSelectQueryFromParts($sqlPartsGlobal), $sqlPartsGlobal['limit']);
+			while ($macro = DBfetch($res)) {
+				if ($options['countOutput']) {
+					$result = $macro['rowscount'];
+				}
+				else {
+					$result[$macro['globalmacroid']] = $macro;
+				}
+			}
 		}
 		// init HOSTS
 		else {
-			$sql_parts = $this->applyQueryFilterOptions('hostmacro', 'hm', $options, $sqlParts);
-			$sql_parts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sql_parts);
-			$key_property = 'hostmacroid';
-		}
-
-		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
-
-		while ($macro = DBfetch($res)) {
-			if ($options['countOutput']) {
-				$result = $macro['rowscount'];
-			}
-			else {
-				$result[$macro[$key_property]] = $macro;
+			$sqlParts = $this->applyQueryFilterOptions('hostmacro', 'hm', $options, $sqlParts);
+			$sqlParts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sqlParts);
+			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+			while ($macro = DBfetch($res)) {
+				if ($options['countOutput']) {
+					$result = $macro['rowscount'];
+				}
+				else {
+					$result[$macro['hostmacroid']] = $macro;
+				}
 			}
 		}
 
