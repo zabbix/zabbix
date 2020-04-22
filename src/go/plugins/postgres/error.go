@@ -37,7 +37,7 @@ const (
 	errorCannotConnectPostgres           = zabbixError("Cannot connect to Postgres server.")
 	errorCannotGetPostgresVersion        = zabbixError("Cannot get Postgres version.")
 	errorCannotConvertPostgresVersionInt = zabbixError("Cannot convert Postgres version to integer.")
-	errorFourthParam                     = zabbixError("Invalid fourth parameter.")
+	errorFourthParam                     = zabbixError("Invalid fourth parameter. Fourth parameter in the key should be database name")
 )
 
 // formatZabbixError formats a given error text. It capitalizes the first letter and adds a dot to the end.
