@@ -182,18 +182,22 @@ try {
 		}
 	}
 
-	if (hasRequest('slo')) {
-		$saml_data = CSession::getValue('saml_data');
+	if ($config['saml_slo_url'] !== '') {
+		if (hasRequest('slo') && CSession::keyExists('saml_data')) {
+			$saml_data = CSession::getValue('saml_data');
 
-		$auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], false, $saml_data['nameid_format'],
-			$saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
-		);
-	}
+			$auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], false,
+				$saml_data['nameid_format'], $saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
+			);
+		}
 
-	if (hasRequest('sls')) {
-		$auth->processSLO();
+		if (hasRequest('sls')) {
+			$auth->processSLO();
 
-		redirect('index.php?reconnect=1');
+			CWebUser::logout();
+
+			redirect('index.php');
+		}
 	}
 
 	if (CWebUser::isLoggedIn()) {

@@ -158,11 +158,10 @@ $saml_tab = (new CFormList('list_saml'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('SLO service URL'), 'saml_slo_url'))->setAsteriskMark(),
+	->addRow(new CLabel(_('SLO service URL'), 'saml_slo_url'),
 		(new CTextBox('saml_slo_url', $data['saml_slo_url']))
 			->setEnabled($is_saml_auth_enabled)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Username attribute'), 'saml_username_attribute'))->setAsteriskMark(),
 		(new CTextBox('saml_username_attribute', $data['saml_username_attribute']))

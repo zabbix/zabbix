@@ -41,12 +41,18 @@ $fields = [
 ];
 check_fields($fields);
 
+$config = select_config();
+
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
+	if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED && $config['saml_slo_url'] !== ''
+			&& CSession::keyExists('saml_data')) {
+		redirect('index_sso.php?slo');
+	}
+
 	CWebUser::logout();
 	redirect('index.php');
 }
 
-$config = select_config();
 $autologin = hasRequest('enter') ? getRequest('autologin', 0) : getRequest('autologin', 1);
 $request = getRequest('request', '');
 

@@ -184,7 +184,7 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateSamlAuth() {
-		$saml_fields = ['saml_idp_entityid', 'saml_sso_url', 'saml_slo_url', 'saml_username_attribute'];
+		$saml_fields = ['saml_idp_entityid', 'saml_sso_url', 'saml_username_attribute'];
 		$config = select_config();
 		$this->getInputs($config, $saml_fields);
 
