@@ -1447,8 +1447,7 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 	{
 		ZBX_STR2UINT64(overrideid, row[0]);
 
-		if (FAIL == (i = zbx_vector_ptr_bsearch(overrides, &overrideid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL == (i = zbx_vector_ptr_bsearch(overrides, &overrideid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -1458,7 +1457,7 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 
 		override_condition = (lld_override_codition_t *)zbx_malloc(NULL, sizeof(lld_override_codition_t));
 		ZBX_STR2UINT64(override_condition->override_conditionid, row[1]);
-		override_condition->operator = (unsigned char)atoi(row[2]);
+		ZBX_STR2UCHAR(override_condition->operator, row[2]);
 		override_condition->macro = zbx_strdup(NULL, row[3]);
 		override_condition->value = zbx_strdup(NULL, row[4]);
 
@@ -1795,10 +1794,10 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", lld_itemids->values,
 				lld_itemids->values_num);
 		DBexecute("%s", sql);
+		sql_offset = 0;
 	}
 
 	/* read overrides from templates that should be linked */
-	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select l.lld_overrideid,l.itemid,l.name,l.step,l.evaltype,l.formula,l.stop"
 			" from lld_override l,items i"
@@ -1814,10 +1813,10 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		ZBX_STR2UINT64(override->overrideid, row[0]);
 		ZBX_STR2UINT64(override->itemid, row[1]);
 		override->name = zbx_strdup(NULL, row[2]);
-		override->step = (unsigned char)atoi(row[3]);
-		override->evaltype = (unsigned char)atoi(row[4]);
+		ZBX_STR2UCHAR(override->step, row[3]);
+		ZBX_STR2UCHAR(override->evaltype, row[4]);
 		override->formula = zbx_strdup(NULL, row[5]);
-		override->stop = (unsigned char)atoi(row[6]);
+		ZBX_STR2UCHAR(override->stop, row[6]);
 		zbx_vector_ptr_create(&override->override_conditions);
 		zbx_vector_ptr_create(&override->override_operations);
 
@@ -1830,11 +1829,9 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 	{
 		lld_override_conditions_load(&overrides, &overrideids, &sql, &sql_alloc);
 		lld_override_operations_load(&overrides, &overrideids, &sql, &sql_alloc);
+		save_template_lld_overrides(&overrides, lld_items);
 	}
 	zbx_free(sql);
-
-	if (0 != overrides.values_num)
-		save_template_lld_overrides(&overrides, lld_items);
 
 	zbx_vector_uint64_destroy(&overrideids);
 	zbx_vector_ptr_clear_ext(&overrides, (zbx_clean_func_t)lld_override_free);
@@ -1909,6 +1906,18 @@ static void	link_template_dependent_items(zbx_vector_ptr_t *items)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: prepare_lld_items                                                *
+ *                                                                            *
+ * Purpose: prepare lld items by indexing them and scanning for already       *
+ *          existing items                                                    *
+ *                                                                            *
+ * Parameters: items       - [IN] lld items                                   *
+ *             lld_itemids - [OUT] identifiers of existing lld items          *
+ *             lld_items   - [OUT] lld items indexed by itemid                *
+ *                                                                            *
+ ******************************************************************************/
 static void	prepare_lld_items(const zbx_vector_ptr_t *items, zbx_vector_uint64_t *lld_itemids,
 		zbx_hashset_t *lld_items)
 {
