@@ -1653,9 +1653,6 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 			continue;
 		}
 
-		zbx_db_insert_add_values(&db_insert, overrideid, (*pitem)->itemid, override->name, (int)override->step,
-				(int)override->evaltype, override->formula, (int)override->stop);
-
 		for (j = 0; j < override->override_conditions.values_num; j++)
 		{
 			override_condition = (lld_override_codition_t *)override->override_conditions.values[j];
@@ -1672,6 +1669,10 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 
 			override_conditionid++;
 		}
+
+		/* prepare lld_override insert after formula is updated */
+		zbx_db_insert_add_values(&db_insert, overrideid, (*pitem)->itemid, override->name, (int)override->step,
+				(int)override->evaltype, override->formula, (int)override->stop);
 
 		for (j = 0; j < override->override_operations.values_num; j++)
 		{
