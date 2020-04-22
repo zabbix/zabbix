@@ -3003,7 +3003,7 @@
 		if (typeof widget['fields']['dynamic'] !== 'undefined') {
 			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
-					'hostid': data['dashboard']['dynamic']['hostid']
+					'hostid': data['dashboard']['dynamic']['host'][0]['id']
 				};
 			}
 			else {
