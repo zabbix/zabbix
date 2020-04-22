@@ -30,11 +30,6 @@ import (
 )
 
 var (
-	//Did not work with init, for not added as lazy load
-	// modPdhDll              = windows.NewLazyDLL("pdh.dll")
-	// procPdhEnumObjectItems = modPdhDll.NewProc("PdhEnumObjectItemsW")
-	// procPdhEnumObjects     = modPdhDll.NewProc("PdhEnumObjectsW")
-
 	hPdh Hlib
 
 	pdhOpenQuery                uintptr
@@ -50,7 +45,7 @@ var (
 	pdhRemoveCounter            uintptr
 	pdhEnumObjItem              uintptr
 	pdhEnumObjectItems          uintptr
-	pdhPdhEnumObjects           uintptr
+	pdhEnumObjects              uintptr
 )
 
 const (
@@ -255,14 +250,14 @@ func PdhEnumObjectItems(className string) (counters []string, instances []string
 
 func PdhEnumObject() (objects []string, err error) {
 	var objectListSize uint32
-	ret, _, _ := syscall.Syscall6(pdhPdhEnumObjects, 6, uintptr(0), uintptr(0), uintptr(0),
+	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, uintptr(0), uintptr(0), uintptr(0),
 		uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
 	if ret != PDH_MORE_DATA {
 		return nil, newPdhError(ret)
 	}
 
 	objectBuf := make([]uint16, objectListSize)
-	ret, _, _ = syscall.Syscall6(pdhPdhEnumObjects, 6, uintptr(0), uintptr(0),
+	ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, uintptr(0), uintptr(0),
 		uintptr(unsafe.Pointer(&objectBuf[0])), uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD),
 		bool2uintptr(false))
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
@@ -286,4 +281,5 @@ func init() {
 	pdhLookupPerfNameByIndex = hPdh.mustGetProcAddress("PdhLookupPerfNameByIndexW")
 	pdhRemoveCounter = hPdh.mustGetProcAddress("PdhRemoveCounter")
 	pdhEnumObjectItems = hPdh.mustGetProcAddress("PdhEnumObjectItemsW")
+	pdhEnumObjects = hPdh.mustGetProcAddress("PdhEnumObjectsW")
 }
