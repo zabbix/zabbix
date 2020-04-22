@@ -413,13 +413,13 @@ out:
  *                                                                            *
  * Purpose: executes script                                                   *
  *                                                                            *
- * Parameters: es       - [IN] the embedded scripting engine                  *
- *             script   - [IN] the script to execute                          *
- *             code     - [IN] the precompiled bytecode                       *
- *             size     - [IN] the size of precompiled bytecode               *
- *             param    - [IN] the parameter to pass to the script            *
- *             output   - [OUT] the result value                              *
- *             error    - [OUT] the error message                             *
+ * Parameters: es     - [IN] the embedded scripting engine                    *
+ *             script - [IN] the script to execute                            *
+ *             code   - [IN] the precompiled bytecode                         *
+ *             size   - [IN] the size of precompiled bytecode                 *
+ *             param  - [IN] the parameter to pass to the script              *
+ *             output - [OUT] the result value                                *
+ *             error  - [OUT] the error message                               *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
