@@ -250,12 +250,12 @@ err:
 	return ret;
 }
 
-int	PERF_COUNTER_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	PERF_INSTANCE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return perf_counter_discovery_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
+	return perf_instance_get_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
 }
 
-int	PERF_COUNTER_DISCOVERY_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	PERF_INSTANCE_GET_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return perf_counter_discovery_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
+	return perf_instance_get_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }
