@@ -132,6 +132,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 		$params['mediatypeid'] = $this->getInput('mediatypeid');
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_MEDIA_TYPE_TEST_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 		$result = $server->testMediaType($params, CWebUser::getSessionCookie());
+		$debug = $server->getDebug();
 
 		if ($result) {
 			$msg_title = null;
@@ -160,18 +161,20 @@ class CControllerPopupMediatypeTestSend extends CController {
 			];
 		}
 
-		if (array_key_exists('debug', $result)) {
+		if ($debug) {
 			$output['debug'] = [
 				'log' => [],
-				'ms' => $result['debug']['ms']
+				'ms' => $debug['ms']
 			];
 			$debuglevel = [_('Info'), _('Critical'), _('Error'), _('Warning'), _('Debug'), _('Trace')];
 
-			foreach ($result['debug']['log'] as $logitem) {
-				$ms = (DateTime::createFromFormat('U.u', $logitem['ms']/1000));
+			foreach ($debug['logs'] as $logitem) {
+				$ms = (DateTime::createFromFormat('U.u', $logitem['ms'] ? $logitem['ms']/1000 : 0.0001));
+				$level = array_key_exists($logitem['level'], $debuglevel)
+					? $debuglevel[$logitem['level']] : _('Unknown');
 				$output['debug']['log'][] = [
 					'ms' => $ms->format('H:i:s.v'),
-					'level' => '['.$debuglevel[$logitem['level']].']',
+					'level' => '['.$level.']',
 					'message' => $logitem['message']
 				];
 			}
