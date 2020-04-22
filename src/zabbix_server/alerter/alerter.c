@@ -216,7 +216,6 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 {
 	char			*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
 	int			script_bin_sz, ret, timeout;
-	struct	zbx_json	json;
 	unsigned char		debug;
 
 	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params, &debug);
@@ -224,17 +223,12 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
 		ret = zbx_es_init_env(&es_engine, &error);
 
-	if (ZBX_ALERT_DEBUG == debug)
-	{
-		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
-		if (SUCCEED == zbx_es_is_env_initialized(&es_engine))
-			zbx_es_set_debug(&es_engine, &json);
-	}
-
 	if (SUCCEED == ret)
 	{
 		zbx_es_set_timeout(&es_engine, timeout);
+
+		if (ZBX_ALERT_DEBUG == debug)
+			zbx_es_debug_enable(&es_engine);
 
 		ret = zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, params, &output, &error);
 	}
@@ -250,13 +244,10 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		}
 	}
 
-	if (ZBX_ALERT_DEBUG == debug)
+	if (ZBX_ALERT_DEBUG == debug && SUCCEED == zbx_es_is_env_initialized(&es_engine))
 	{
-		alerter_send_result(socket, output, ret, error, json.buffer);
-		zbx_json_free(&json);
-
-		if (SUCCEED == zbx_es_is_env_initialized(&es_engine))
-			zbx_es_set_debug(&es_engine, NULL);
+		alerter_send_result(socket, output, ret, error, zbx_es_debug_info(&es_engine));
+		zbx_es_debug_disable(&es_engine);
 	}
 	else
 		alerter_send_result(socket, output, ret, error, NULL);

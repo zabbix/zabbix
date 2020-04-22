@@ -231,6 +231,7 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 out:
 	if (SUCCEED != ret)
 	{
+		zbx_es_debug_disable(es);
 		zbx_free(es->env->error);
 		zbx_free(es->env);
 	}
@@ -268,6 +269,7 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 	}
 
 	duk_destroy_heap(es->env->ctx);
+	zbx_es_debug_disable(es);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
@@ -529,7 +531,22 @@ void	zbx_es_set_timeout(zbx_es_t *es, int timeout)
 	es->env->timeout = timeout;
 }
 
-void	zbx_es_set_debug(zbx_es_t *es, struct zbx_json *json)
+void	zbx_es_debug_enable(zbx_es_t *es)
 {
-	es->env->json = json;
+	es->env->json = zbx_malloc(NULL, sizeof(struct zbx_json));
+
+	zbx_json_init(es->env->json, ZBX_JSON_STAT_BUF_LEN);
+}
+const char	*zbx_es_debug_info(const zbx_es_t *es)
+{
+	return es->env->json->buffer;
+}
+
+void	zbx_es_debug_disable(zbx_es_t *es)
+{
+	if (NULL == es->env->json)
+		return;
+
+	zbx_json_free(es->env->json);
+	zbx_free(es->env->json);
 }
