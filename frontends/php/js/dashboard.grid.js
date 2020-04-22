@@ -3653,7 +3653,7 @@
 							if (pos.x + pos.width > box.pos.x && pos.x < box.pos.x) {
 								pos.width = box.pos.x - pos.x;
 							}
-							if (pos.y + pos.height > box.pos.y && pos.y < box.pos.y) {
+							else if (pos.y + pos.height > box.pos.y && pos.y < box.pos.y) {
 								pos.height = box.pos.y - pos.y;
 							}
 						});
