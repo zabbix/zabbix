@@ -30,6 +30,11 @@ import (
 )
 
 var (
+	//Did not work with init, for not added as lazy load
+	// modPdhDll              = windows.NewLazyDLL("pdh.dll")
+	// procPdhEnumObjectItems = modPdhDll.NewProc("PdhEnumObjectItemsW")
+	// procPdhEnumObjects     = modPdhDll.NewProc("PdhEnumObjectsW")
+
 	hPdh Hlib
 
 	pdhOpenQuery                uintptr
@@ -41,9 +46,11 @@ var (
 	pdhParseCounterPath         uintptr
 	pdhMakeCounterPath          uintptr
 	pdhLookupPerfNameByIndex    uintptr
+	pdhLookupPerfIndexByName    uintptr
 	pdhRemoveCounter            uintptr
 	pdhEnumObjItem              uintptr
 	pdhEnumObjectItems          uintptr
+	pdhPdhEnumObjects           uintptr
 )
 
 const (
@@ -201,6 +208,22 @@ func PdhLookupPerfNameByIndex(index int) (path string, err error) {
 	return windows.UTF16ToString(buf), nil
 }
 
+func PdhLookupPerfIndexByName(name string) (idx int, err error) {
+	size := uint32(PDH_MAX_COUNTER_NAME)
+	buf := make([]int, size)
+	nameUTF16, err := syscall.UTF16PtrFromString(name)
+	if err != nil {
+		return 0, err
+	}
+
+	ret, _, _ := syscall.Syscall(pdhLookupPerfIndexByName, 3, 0, uintptr(unsafe.Pointer(nameUTF16)), uintptr(unsafe.Pointer(&buf[0])))
+	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
+		return 0, newPdhError(ret)
+	}
+
+	return buf[0], nil
+}
+
 func PdhEnumObjectItems(className string) (counters []string, instances []string, err error) {
 	var counterListSize uint32
 	var instanceListSize uint32
@@ -230,9 +253,28 @@ func PdhEnumObjectItems(className string) (counters []string, instances []string
 	return UTF16ToStringSlice(counterbuf), UTF16ToStringSlice(instbuf), nil
 }
 
+func PdhEnumObject() (objects []string, err error) {
+	var objectListSize uint32
+	ret, _, _ := syscall.Syscall6(pdhPdhEnumObjects, 6, uintptr(0), uintptr(0), uintptr(0),
+		uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
+	if ret != PDH_MORE_DATA {
+		return nil, newPdhError(ret)
+	}
+
+	objectBuf := make([]uint16, objectListSize)
+	ret, _, _ = syscall.Syscall6(pdhPdhEnumObjects, 6, uintptr(0), uintptr(0),
+		uintptr(unsafe.Pointer(&objectBuf[0])), uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD),
+		bool2uintptr(false))
+	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
+		return nil, newPdhError(ret)
+	}
+
+	return UTF16ToStringSlice(objectBuf), nil
+}
+
 func init() {
 	hPdh = mustLoadLibrary("pdh.dll")
-
+	pdhLookupPerfIndexByName = hPdh.mustGetProcAddress("PdhLookupPerfIndexByNameW")
 	pdhOpenQuery = hPdh.mustGetProcAddress("PdhOpenQuery")
 	pdhCloseQuery = hPdh.mustGetProcAddress("PdhCloseQuery")
 	pdhAddCounter = hPdh.mustGetProcAddress("PdhAddCounterW")

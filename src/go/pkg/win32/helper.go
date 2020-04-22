@@ -21,24 +21,44 @@
 
 package win32
 
+import (
+	"golang.org/x/sys/windows"
+)
+
+// UTF16ToStringSlice converts uint16 array to a string array
 func UTF16ToStringSlice(in []uint16) []string {
+	var singleName []uint16
 	var out []string
-	var single string
-
-	for i := 0; i < (len(in) - 1); i++ {
-		if in[i] == 0 {
-			out = append(out, single)
-			single = ""
-
-			if in[i+1] == 0 {
-				return out
-			}
-
-			continue
+	for len(in) != 0 {
+		singleName, in = nextField(in)
+		if len(singleName) == 0 {
+			break
 		}
 
-		single += string(rune(in[i]))
+		out = append(out, windows.UTF16ToString(singleName))
 	}
 
 	return out
+}
+
+func nextField(buf []uint16) (field []uint16, left []uint16) {
+	start := -1
+	for i, c := range buf {
+		if c != 0 {
+			start = i
+			break
+		}
+	}
+
+	if start == -1 {
+		return []uint16{}, []uint16{}
+	}
+
+	for i, c := range buf[start:] {
+		if c == 0 {
+			return buf[start : start+i], buf[start+i+1:]
+		}
+	}
+
+	return buf[start:], []uint16{}
 }
