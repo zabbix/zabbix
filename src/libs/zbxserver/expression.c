@@ -4553,14 +4553,8 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		{
 			if (1 == require_numeric)
 			{
-				if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
-				{
+				if (SUCCEED == is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX))
 					wrap_negative_double_suffix(&replace_to, NULL);
-				}
-				else if (NULL != error)
-				{
-					res = SUCCEED;
-				}
 			}
 			else if (1 == require_address && NULL != strstr(replace_to, "{$"))
 			{
