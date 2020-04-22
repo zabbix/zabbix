@@ -420,6 +420,7 @@ out:
  *             param    - [IN] the parameter to pass to the script            *
  *             output   - [OUT] the result value                              *
  *             error    - [OUT] the error message                             *
+ *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
