@@ -208,8 +208,7 @@ sub process_row
 							}
 							else
 							{
-								$script = "${script}||\nTO_NCLOB('$move_to_next";
-								$script = "${script}$1')";
+								$script = "${script}||\nTO_NCLOB('$move_to_next$1')";
 							}
 
 							$move_to_next = $2;
