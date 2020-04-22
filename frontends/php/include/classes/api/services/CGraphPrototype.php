@@ -66,7 +66,6 @@ class CGraphPrototype extends CGraphGeneral {
 			'graphids'					=> null,
 			'itemids'					=> null,
 			'discoveryids'				=> null,
-			//'status'					=> [],
 			'templated'					=> null,
 			'inherited'					=> null,
 			'editable'					=> false,

@@ -95,6 +95,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectFilter'					=> null,
 			'selectLLDMacroPaths'			=> null,
 			'selectPreprocessing'			=> null,
+			'selectOverrides'				=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -686,6 +687,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectOverrides' => ['name', 'step', 'evaltype', 'formula', 'stop', 'conditions', 'operations'],
 			'preservekeys' => true
 		]);
 
@@ -979,6 +981,224 @@ class CDiscoveryRule extends CItemGeneral {
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
 		$this->createItemPreprocessing($items);
+
+		$this->createOverrides($items);
+	}
+
+	/**
+	 * Creates overrides for low-level discovery rules.
+	 *
+	 * @param array $items  Low-level discovery rules.
+	 */
+	protected function createOverrides(array $items) {
+		$overrides = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('overrides', $item)) {
+				foreach ($item['overrides'] as $num => $override) {
+					if (!array_key_exists('step', $override)) {
+						$override['step'] = $num + 1;
+					}
+
+					// Formula will be added after conditions.
+					$overrides[$override['step']] = [
+						'itemid' => $item['itemid'],
+						'name' => $override['name'],
+						'step' => $override['step'],
+						'stop' => array_key_exists('stop', $override) ? $override['stop'] : ZBX_LLD_OVERRIDE_STOP_NO
+					];
+
+					if (array_key_exists('filter', $override)) {
+						$overrides[$override['step']]['evaltype'] = $override['filter']['evaltype'];
+					}
+
+					$overrides = array_values($overrides);
+				}
+			}
+		}
+
+		$overrideids = DB::insertBatch('lld_override', $overrides);
+
+		if ($overrideids) {
+			$ovrd_conditions = [];
+			$ovrd_idx = 0;
+			$cnd_idx = 0;
+
+			foreach ($items as &$item) {
+				if (array_key_exists('overrides', $item)) {
+					foreach ($item['overrides'] as &$override) {
+						$override['lld_overrideid'] = $overrideids[$ovrd_idx++];
+
+						if (array_key_exists('filter', $override)) {
+							foreach ($override['filter']['conditions'] as $condition) {
+								$condition['lld_overrideid'] = $override['lld_overrideid'];
+								$ovrd_conditions[] = $condition;
+							}
+						}
+					}
+					unset($override);
+				}
+			}
+			unset($item);
+
+			$conditionids = DB::insertBatch('lld_override_condition', $ovrd_conditions);
+
+			$ids = [];
+
+			if ($conditionids) {
+				foreach ($items as &$item) {
+					if (array_key_exists('overrides', $item)) {
+						foreach ($item['overrides'] as &$override) {
+							if (array_key_exists('filter', $override)) {
+								foreach ($override['filter']['conditions'] as &$condition) {
+									$condition['lld_override_conditionid'] = $conditionids[$cnd_idx++];
+								}
+								unset($condition);
+							}
+						}
+						unset($override);
+					}
+				}
+				unset($item);
+
+				foreach ($items as $item) {
+					if (array_key_exists('overrides', $item)) {
+						foreach ($item['overrides'] as $override) {
+							if (array_key_exists('filter', $override)
+									&& $override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+								$ids = [];
+								foreach ($override['filter']['conditions'] as $condition) {
+									$ids[$condition['formulaid']] = $condition['lld_override_conditionid'];
+								}
+
+								$formula = CConditionHelper::replaceLetterIds($override['filter']['formula'], $ids);
+								DB::updateByPk('lld_override', $override['lld_overrideid'], ['formula' => $formula]);
+							}
+						}
+					}
+				}
+			}
+
+			$operations = [];
+			foreach ($items as $item) {
+				if (array_key_exists('overrides', $item)) {
+					foreach ($item['overrides'] as $override) {
+						foreach ($override['operations'] as $operation) {
+							$operations[] = [
+								'lld_overrideid' => $override['lld_overrideid'],
+								'operationobject' => $operation['operationobject'],
+								'operator' => array_key_exists('operator', $operation)
+									? $operation['operator']
+									: CONDITION_OPERATOR_EQUAL,
+								'value' => array_key_exists('value', $operation) ? $operation['value'] : ''
+							];
+
+						}
+					}
+				}
+			}
+
+			$operationids = DB::insertBatch('lld_override_operation', $operations);
+
+			$opr_idx = 0;
+			$opstatus = [];
+			$opperiod = [];
+			$ophistory = [];
+			$optrends = [];
+			$opseverity = [];
+			$optag = [];
+			$optemplate = [];
+			$opinventory = [];
+
+			foreach ($items as $item) {
+				if (array_key_exists('overrides', $item)) {
+					foreach ($item['overrides'] as $override) {
+						foreach ($override['operations'] as $operation) {
+							$operation['lld_override_operationid'] = $operationids[$opr_idx++];
+
+							// Status applies to all operation object types.
+							if (array_key_exists('opstatus', $operation)) {
+								$opstatus[] = [
+									'lld_override_operationid' => $operation['lld_override_operationid'],
+									'status' => $operation['opstatus']['status']
+								];
+							}
+
+							switch ($operation['operationobject']) {
+								case OPERATION_OBJECT_ITEM_PROTOTYPE:
+									if (array_key_exists('opperiod', $operation)) {
+										$opperiod[] = [
+											'lld_override_operationid' => $operation['lld_override_operationid'],
+											'delay' => $operation['opperiod']['delay']
+										];
+									}
+
+									if (array_key_exists('ophistory', $operation)) {
+										$ophistory[] = [
+											'lld_override_operationid' => $operation['lld_override_operationid'],
+											'history' => $operation['ophistory']['history']
+										];
+									}
+
+									if (array_key_exists('optrends', $operation)) {
+										$optrends[] = [
+											'lld_override_operationid' => $operation['lld_override_operationid'],
+											'trends' => $operation['optrends']['trends']
+										];
+									}
+									break;
+
+								case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+									if (array_key_exists('opseverity', $operation)) {
+										$opseverity[] = [
+											'lld_override_operationid' => $operation['lld_override_operationid'],
+											'severity' => $operation['opseverity']['severity']
+										];
+									}
+
+									if (array_key_exists('optag', $operation)) {
+										foreach ($operation['optag'] as $tag) {
+											$optag[] = [
+												'lld_override_operationid' => $operation['lld_override_operationid'],
+												'tag' => $tag['tag'],
+												'value'	=> $tag['value']
+											];
+										}
+									}
+									break;
+
+								case OPERATION_OBJECT_HOST_PROTOTYPE:
+									if (array_key_exists('optemplate', $operation)) {
+										foreach ($operation['optemplate'] as $template) {
+											$optemplate[] = [
+												'lld_override_operationid' => $operation['lld_override_operationid'],
+												'templateid' => $template['templateid']
+											];
+										}
+									}
+
+									if (array_key_exists('opinventory', $operation)) {
+										$opinventory[] = [
+											'lld_override_operationid' => $operation['lld_override_operationid'],
+											'inventory_mode' => $operation['opinventory']['inventory_mode']
+										];
+									}
+									break;
+							}
+						}
+					}
+				}
+			}
+
+			DB::insertBatch('lld_override_opstatus', $opstatus);
+			DB::insertBatch('lld_override_opperiod', $opperiod);
+			DB::insertBatch('lld_override_ophistory', $ophistory);
+			DB::insertBatch('lld_override_optrends', $optrends);
+			DB::insertBatch('lld_override_opseverity', $opseverity);
+			DB::insertBatch('lld_override_optag', $optag);
+			DB::insertBatch('lld_override_optemplate', $optemplate);
+			DB::insertBatch('lld_override_opinventory', $opinventory);
+		}
 	}
 
 	protected function updateReal(array $items) {
@@ -1181,6 +1401,20 @@ class CDiscoveryRule extends CItemGeneral {
 		DB::insertBatch('lld_macro_path', $lld_macro_paths);
 
 		$this->updateItemPreprocessing($items);
+
+		// Delete old overrides and replace with new ones if any.
+		$ovrd_itemids = [];
+		foreach ($items as $item) {
+			if (array_key_exists('overrides', $item)) {
+				$ovrd_itemids[$item['itemid']] = true;
+			}
+		}
+
+		if ($ovrd_itemids) {
+			DBexecute('DELETE FROM lld_override WHERE '.dbConditionId('itemid', array_keys($ovrd_itemids)));
+		}
+
+		$this->createOverrides($items);
 	}
 
 	/**
@@ -1242,6 +1476,241 @@ class CDiscoveryRule extends CItemGeneral {
 				foreach ($item['filter']['conditions'] as $condition) {
 					$conditionValidator->setObjectName($item['name']);
 					$this->checkValidator($condition, $conditionValidator);
+				}
+			}
+		}
+
+		$this->validateOverrides($validateItems, $update);
+	}
+
+	/**
+	 * Validate low-level discovery rule overrides.
+	 *
+	 * @param array $items   Low-level discovery rules.
+	 * @param bool  $update  True if caller method is an update method.
+	 */
+	protected function validateOverrides(array $items, $update) {
+		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
+			'step' =>			['type' => API_INT32],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => $update ? 0x00 : (API_REQUIRED | API_NOT_EMPTY), 'length' => DB::getFieldLength('lld_override', 'name')],
+			'stop' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_OVERRIDE_STOP_NO, ZBX_LLD_OVERRIDE_STOP_YES]), 'default' => ZBX_LLD_OVERRIDE_STOP_NO],
+			'filter' =>			['type' => API_OBJECT, 'fields' => [
+				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
+				'formula' =>		['type' => API_STRING_UTF8],
+				'conditions' =>		['type' => API_OBJECTS, 'fields' => [
+					'macro' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_condition', 'macro')],
+					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_REGEXP],
+					'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_condition', 'value')],
+					'formulaid' =>		['type' => API_STRING_UTF8]
+				]]
+			]],
+			'operations' =>	['type' => API_OBJECTS, 'flags' => $update ? 0x00 : (API_REQUIRED | API_NOT_EMPTY), 'fields' => [
+				'operationobject' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE])],
+				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_EQUAL],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_operation', 'value')],
+				'opstatus' =>			['type' => API_OBJECT, 'fields' => [
+					'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_CREATE_ENABLED, ZBX_PROTOTYPE_STATUS_CREATE_DISABLED, ZBX_PROTOTYPE_STATUS_NO_CREATE])],
+				]],
+				'opperiod' =>			['type' => API_OBJECT, 'fields' => [
+					'delay' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
+				]],
+				'ophistory' =>			['type' => API_OBJECT, 'fields' => [
+					'history' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
+				]],
+				'optrends' =>			['type' => API_OBJECT, 'fields' => [
+					'trends' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
+				]],
+				'opseverity' =>			['type' => API_OBJECT, 'fields' => [
+					'severity' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))]
+				]],
+				'optag' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['tag', 'value']], 'fields' => [
+					'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_optag', 'tag')],
+					'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_optag', 'value'), 'default' => DB::getDefault('lld_override_optag', 'value')]
+				]],
+				'optemplate' =>			['type' => API_OBJECTS, 'fields' => [
+					'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+				]],
+				'opinventory' =>		['type' => API_OBJECT, 'fields' => [
+					'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
+				]]
+			]]
+		]];
+
+		// Schema for filter is already validated in API validator. Create the formula validator for filter.
+		$condition_validator = new CConditionValidator([
+			'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for override "%1$s": %3$s.'),
+			'messageMissingCondition' =>
+				_('Condition "%2$s" used in formula "%3$s" for override "%1$s" is not defined.'),
+			'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for override "%1$s".')
+		]);
+
+		$update_interval_parser = new CUpdateIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => true
+		]);
+
+		foreach ($items as $lld_idx => $item) {
+			if (array_key_exists('overrides', $item)) {
+				$path = '/'.($lld_idx + 1).'/overrides';
+
+				if (!CApiInputValidator::validate($api_input_rules, $item['overrides'], $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				foreach ($item['overrides'] as $ovrd_idx => $override) {
+					if (array_key_exists('filter', $override)) {
+						$condition_validator->setObjectName($override['name']);
+
+						// Validate the formula and check if they are in the conditions.
+						if (!$condition_validator->validate($override['filter'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, $condition_validator->getError());
+						}
+
+						// Validate that conditions have correct macros and 'formulaid' for custom expressions.
+						if (array_key_exists('conditions', $override['filter'])) {
+							foreach ($override['filter']['conditions'] as $cnd_idx => $condition) {
+								// API validator only checks if 'macro' field exists and is not empty. It must be macro.
+								if (!preg_match('/^'.ZBX_PREG_EXPRESSION_LLD_MACROS.'$/', $condition['macro'])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Incorrect filter condition macro for override "%1$s".', $override['name'])
+									);
+								}
+
+								if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+									/*
+									 * Check only if 'formulaid' exists. It cannot be empty or incorrect, but that is
+									 * already validated by previously set conditionValidator.
+									 */
+									if (!array_key_exists('formulaid', $condition)) {
+										$cond_path = $path.'/'.($ovrd_idx + 1).'/filter/conditions/'.($cnd_idx + 1);
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Invalid parameter "%1$s": %2$s.', $path,
+												_s('the parameter "%1$s" is missing', 'formulaid')
+											)
+										);
+									}
+								}
+							}
+						}
+					}
+
+					// Check integrity of 'overrideobject' and its fields.
+					foreach ($override['operations'] as $opr_idx => $operation) {
+						$opr_path = $path.'/'.($ovrd_idx + 1).'/operations/'.($opr_idx + 1);
+
+						switch ($operation['operationobject']) {
+							case OPERATION_OBJECT_ITEM_PROTOTYPE:
+								foreach (['opseverity', 'optag', 'optemplate', 'opinventory'] as $field) {
+									if (array_key_exists($field, $operation)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+											$opr_path, _s('unexpected parameter "%1$s"', $field)
+										));
+									}
+								}
+
+								if (!array_key_exists('opstatus', $operation)
+										&& !array_key_exists('opperiod', $operation)
+										&& !array_key_exists('ophistory', $operation)
+										&& !array_key_exists('optrends', $operation)) {
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+										$opr_path,
+										_s('value must be one of %1$s', 'opstatus, opperiod, ophistory, optrends')
+									));
+								}
+
+								if (array_key_exists('opperiod', $operation)) {
+									$this->validateDelay($update_interval_parser, $operation['opperiod']['delay']);
+								}
+
+								if (array_key_exists('ophistory', $operation)
+										&& !validateTimeUnit($operation['ophistory']['history'], SEC_PER_HOUR,
+												25 * SEC_PER_YEAR, true, $error,
+												['usermacros' => true, 'lldmacros' => true])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
+									);
+								}
+
+								if (array_key_exists('optrends', $operation)
+										&& !validateTimeUnit($operation['optrends']['trends'], SEC_PER_HOUR,
+												25 * SEC_PER_YEAR, true, $error,
+												['usermacros' => true, 'lldmacros' => true])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
+									);
+								}
+								break;
+
+							case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+								foreach (['opperiod', 'ophistory', 'optrends', 'optemplate', 'opinventory'] as $field) {
+									if (array_key_exists($field, $operation)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+											$opr_path, _s('unexpected parameter "%1$s"', $field)
+										));
+									}
+								}
+
+								if (!array_key_exists('opstatus', $operation)
+										&& !array_key_exists('opseverity', $operation)
+										&& !array_key_exists('optag', $operation)) {
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+										$opr_path,
+										_s('value must be one of %1$s', 'opstatus, opseverity, optag')
+									));
+								}
+								break;
+
+							case OPERATION_OBJECT_GRAPH_PROTOTYPE:
+								foreach (['opperiod', 'ophistory', 'optrends', 'opseverity', 'optag', 'optemplate',
+										'opinventory'] as $field) {
+									if (array_key_exists($field, $operation)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+											$opr_path, _s('unexpected parameter "%1$s"', $field)
+										));
+									}
+								}
+
+								if (!array_key_exists('opstatus', $operation)) {
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+										$opr_path,
+										_s('value must be one of %1$s', 'opstatus')
+									));
+								}
+								break;
+
+							case OPERATION_OBJECT_HOST_PROTOTYPE:
+								foreach (['opperiod', 'ophistory', 'optrends', 'opseverity', 'optag'] as $field) {
+									if (array_key_exists($field, $operation)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+											$opr_path, _s('unexpected parameter "%1$s"', $field)
+										));
+									}
+								}
+
+								if (!array_key_exists('opstatus', $operation)
+										&& !array_key_exists('optemplate', $operation)
+										&& !array_key_exists('opinventory', $operation)) {
+									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+										$opr_path,
+										_s('value must be one of %1$s', 'opstatus, optemplate, opinventory')
+									));
+								}
+
+								if (array_key_exists('optemplate', $operation)) {
+									$templates_cnt = API::Template()->get([
+										'templateids' => zbx_objectValues($operation['optemplate'], 'templateid'),
+										'countOutput' => true
+									]);
+
+									if (count($operation['optemplate']) != $templates_cnt) {
+										self::exception(ZBX_API_ERROR_PERMISSIONS,
+											_('No permissions to referred object or it does not exist!')
+										);
+									}
+								}
+								break;
+						}
+					}
 				}
 			}
 		}
@@ -1552,6 +2021,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectOverrides' => ['name', 'step', 'evaltype', 'formula', 'stop', 'conditions', 'operations'],
 			'preservekeys' => true
 		]);
 		$srcDiscovery = reset($srcDiscovery);
@@ -2290,6 +2760,230 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$result[$itemid]['lld_macro_paths'][] = $lld_macro_path;
 			}
+		}
+
+		// add overrides
+		if ($options['selectOverrides'] !== null && $options['selectOverrides'] != API_OUTPUT_COUNT) {
+			$ovrd_fields = ['itemid', 'lld_overrideid'];
+			$filter_requested = $this->outputIsRequested('filter', $options['selectOverrides']);
+			$operations_requested = $this->outputIsRequested('operations', $options['selectOverrides']);
+
+			if ($filter_requested) {
+				$ovrd_fields = array_merge($ovrd_fields, ['formula', 'evaltype']);
+			}
+
+			$overrides = API::getApiService()->select('lld_override', [
+				'output' => $this->outputExtend($options['selectOverrides'], $ovrd_fields),
+				'filter' => ['itemid' => $itemIds],
+				'preservekeys' => true
+			]);
+
+			if ($filter_requested) {
+				$conditions = API::getApiService()->select('lld_override_condition', [
+					'output' => ['lld_override_conditionid', 'macro', 'value', 'lld_overrideid', 'operator'],
+					'filter' => ['lld_overrideid' => array_keys($overrides)],
+					'sortfield' => 'lld_override_conditionid',
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($conditions, 'lld_overrideid', 'lld_override_conditionid');
+
+				foreach ($overrides as &$override) {
+					$override['filter'] = [
+						'evaltype' => $override['evaltype'],
+						'formula' => $override['formula']
+					];
+					unset($override['evaltype'], $override['formula']);
+				}
+				unset($override);
+
+				$overrides = $relation_map->mapMany($overrides, $conditions, 'conditions');
+
+				foreach ($overrides as &$override) {
+					$override['filter'] += ['conditions' => $override['conditions']];
+					unset($override['conditions']);
+
+					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$formula = $override['filter']['formula'];
+					}
+					else {
+						$conditions = zbx_toHash($override['filter']['conditions'], 'lld_override_conditionid');
+						$conditions = order_macros($conditions, 'macro');
+						$formula_conditions = [];
+
+						foreach ($conditions as $condition) {
+							$formula_conditions[$condition['lld_override_conditionid']] = $condition['macro'];
+						}
+
+						$formula = CConditionHelper::getFormula($formula_conditions, $override['filter']['evaltype']);
+					}
+
+					$formulaids = CConditionHelper::getFormulaIds($formula);
+
+					foreach ($override['filter']['conditions'] as &$condition) {
+						$condition['formulaid'] = $formulaids[$condition['lld_override_conditionid']];
+						unset($condition['lld_override_conditionid'], $condition['lld_overrideid']);
+					}
+					unset($condition);
+
+					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$override['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
+						$override['filter']['eval_formula'] = $override['filter']['formula'];
+					}
+					else {
+						$override['filter']['eval_formula'] = CConditionHelper::replaceNumericIds($formula,
+							$formulaids
+						);
+					}
+				}
+				unset($override);
+			}
+
+			if ($operations_requested) {
+				$operations = API::getApiService()->select('lld_override_operation', [
+					'output' => ['lld_override_operationid', 'lld_overrideid', 'operationobject', 'operator', 'value'],
+					'filter' => ['lld_overrideid' => array_keys($overrides)],
+					'sortfield' => 'lld_override_operationid',
+					'preservekeys' => true
+				]);
+
+				$opstatus = DB::select('lld_override_opstatus', [
+					'output' => ['lld_override_operationid', 'status'],
+					'filter' => ['lld_override_operationid' => array_keys($operations)]
+				]);
+
+				$item_prototype_objectids = [];
+				$trigger_prototype_objectids = [];
+				$host_prototype_objectids = [];
+
+				foreach ($operations as $operation) {
+					switch ($operation['operationobject']) {
+						case OPERATION_OBJECT_ITEM_PROTOTYPE:
+							$item_prototype_objectids[$operation['lld_override_operationid']] = true;
+							break;
+
+						case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+							$trigger_prototype_objectids[$operation['lld_override_operationid']] = true;
+							break;
+
+						case OPERATION_OBJECT_HOST_PROTOTYPE:
+							$host_prototype_objectids[$operation['lld_override_operationid']] = true;
+							break;
+					}
+				}
+
+				if ($item_prototype_objectids) {
+					$ophistory = DB::select('lld_override_ophistory', [
+						'output' => ['lld_override_operationid', 'history'],
+						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+					]);
+					$optrends = DB::select('lld_override_optrends', [
+						'output' => ['lld_override_operationid', 'trends'],
+						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+					]);
+					$opperiod = DB::select('lld_override_opperiod', [
+						'output' => ['lld_override_operationid', 'delay'],
+						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+					]);
+				}
+
+				if ($trigger_prototype_objectids) {
+					$opseverity = DB::select('lld_override_opseverity', [
+						'output' => ['lld_override_operationid', 'severity'],
+						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
+					]);
+					$optag = DB::select('lld_override_optag', [
+						'output' => ['lld_override_operationid', 'tag', 'value'],
+						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
+					]);
+				}
+
+				if ($host_prototype_objectids) {
+					$optemplate = DB::select('lld_override_optemplate', [
+						'output' => ['lld_override_operationid', 'templateid'],
+						'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
+					]);
+					$opinventory = DB::select('lld_override_opinventory', [
+						'output' => ['lld_override_operationid', 'inventory_mode'],
+						'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
+					]);
+				}
+
+				foreach ($operations as &$operation) {
+					foreach ($opstatus as $row) {
+						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
+							$operation['opstatus']['status'] = $row['status'];
+						}
+					}
+
+					foreach ($ophistory as $row) {
+						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
+							$operation['ophistory']['history'] = $row['history'];
+						}
+					}
+
+					foreach ($optrends as $row) {
+						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
+							$operation['optrends']['trends'] = $row['trends'];
+						}
+					}
+
+					foreach ($opperiod as $row) {
+						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
+							$operation['opperiod']['delay'] = $row['delay'];
+						}
+					}
+
+					foreach ($opseverity as $row) {
+						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
+							$operation['opseverity']['severity'] = $row['severity'];
+						}
+					}
+
+					foreach ($optag as $row) {
+						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
+							$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];
+						}
+					}
+
+					foreach ($optemplate as $row) {
+						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
+							$operation['optemplate'][] = ['templateid' => $row['templateid']];
+						}
+					}
+
+					foreach ($opinventory as $row) {
+						if (bccomp($operation['lld_override_operationid'], $row['lld_override_operationid']) == 0) {
+							$operation['opinventory']['inventory_mode'] = $row['inventory_mode'];
+						}
+					}
+				}
+				unset($operation);
+
+				$relation_map = $this->createRelationMap($operations, 'lld_overrideid', 'lld_override_operationid');
+
+				$overrides = $relation_map->mapMany($overrides, $operations, 'operations');
+			}
+
+			foreach ($result as &$row) {
+				$row['overrides'] = [];
+
+				foreach ($overrides as $override) {
+					if (bccomp($override['itemid'], $row['itemid']) == 0) {
+						unset($override['itemid'], $override['lld_overrideid']);
+
+						if ($operations_requested) {
+							foreach ($override['operations'] as &$operation) {
+								unset($operation['lld_override_operationid'], $operation['lld_overrideid']);
+							}
+							unset($operation);
+						}
+
+						$row['overrides'][] = $override;
+					}
+				}
+			}
+			unset($row);
 		}
 
 		return $result;
