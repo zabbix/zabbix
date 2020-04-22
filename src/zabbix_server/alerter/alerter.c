@@ -217,13 +217,14 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	char			*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
 	int			script_bin_sz, ret, timeout;
 	struct	zbx_json	json;
+	unsigned char		debug;
 
-	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params);
+	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params, &debug);
 
 	if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
 		ret = zbx_es_init_env(&es_engine, &error);
 
-	if (ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL == ipc_message->code)
+	if (ZBX_ALERT_DEBUG == debug)
 	{
 		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -249,7 +250,7 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		}
 	}
 
-	if (ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL == ipc_message->code)
+	if (ZBX_ALERT_DEBUG == debug)
 	{
 		alerter_send_result(socket, output, ret, error, json.buffer);
 		zbx_json_free(&json);
@@ -358,7 +359,6 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 				alerter_process_exec(&alerter_socket, &message);
 				break;
 			case ZBX_IPC_ALERTER_WEBHOOK:
-			case ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL:
 				alerter_process_webhook(&alerter_socket, &message);
 				break;
 		}

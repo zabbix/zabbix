@@ -39,9 +39,10 @@
 #define ZBX_IPC_ALERTER_SMS			1102
 #define ZBX_IPC_ALERTER_EXEC			1104
 #define ZBX_IPC_ALERTER_WEBHOOK			1105
-#define ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL	1106
 
 #define ZBX_WATCHDOG_ALERT_FREQUENCY	(15 * SEC_PER_MIN)
+#define ZBX_ALERT_NO_DEBUG		0
+#define ZBX_ALERT_DEBUG			1
 
 typedef struct
 {
@@ -164,10 +165,10 @@ void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t 
 		char **sendto, char **subject, char **message, char **params);
 
 zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *script_bin, int script_sz,
-		int timeout, const char *params);
+		int timeout, const char *params, unsigned char debug);
 
 void	zbx_alerter_deserialize_webhook(const unsigned char *data, char **script_bin, int *script_sz, int *timeout,
-		char **params);
+		char **params, unsigned char *debug);
 
 zbx_uint32_t	zbx_alerter_serialize_mediatypes(unsigned char **data, zbx_am_db_mediatype_t **mediatypes,
 		int mediatypes_num);

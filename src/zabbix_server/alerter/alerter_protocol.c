@@ -392,7 +392,7 @@ void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t 
 }
 
 zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *script_bin, int script_sz,
-		int timeout, const char *params)
+		int timeout, const char *params, unsigned char debug)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, params_len;
@@ -401,6 +401,7 @@ zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *scr
 	zbx_serialize_prepare_value(data_len, script_sz);
 	zbx_serialize_prepare_value(data_len, timeout);
 	zbx_serialize_prepare_str(data_len, params);
+	zbx_serialize_prepare_value(data_len, debug);
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
@@ -408,20 +409,22 @@ zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *scr
 	ptr += zbx_serialize_str(ptr, script_bin, script_sz);
 	ptr += zbx_serialize_value(ptr, script_sz);
 	ptr += zbx_serialize_value(ptr, timeout);
-	(void)zbx_serialize_str(ptr, params, params_len);
+	ptr += zbx_serialize_str(ptr, params, params_len);
+	(void)zbx_serialize_value(ptr, debug);
 
 	return data_len;
 }
 
 void	zbx_alerter_deserialize_webhook(const unsigned char *data, char **script_bin, int *script_sz, int *timeout,
-		char **params)
+		char **params, unsigned char *debug)
 {
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_str(data, script_bin, len);
 	data += zbx_deserialize_value(data, script_sz);
 	data += zbx_deserialize_value(data, timeout);
-	(void)zbx_deserialize_str(data, params, len);
+	data += zbx_deserialize_str(data, params, len);
+	(void)zbx_deserialize_value(data, debug);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_mediatypes(unsigned char **data, zbx_am_db_mediatype_t **mediatypes,

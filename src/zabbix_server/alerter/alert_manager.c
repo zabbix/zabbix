@@ -1455,7 +1455,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am_alert_t *alert)
 {
 	zbx_am_mediatype_t	*mediatype;
-	unsigned char		*data = NULL;
+	unsigned char		*data = NULL, debug;
 	size_t			data_len;
 	zbx_uint64_t		command;
 	char			*cmd = NULL, *error = NULL;
@@ -1514,13 +1514,14 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			zbx_free(cmd);
 			break;
 		case MEDIA_TYPE_WEBHOOK:
+			command = ZBX_IPC_ALERTER_WEBHOOK;
 			if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
-				command = ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL;
+				debug = ZBX_ALERT_DEBUG;
 			else
-				command = ZBX_IPC_ALERTER_WEBHOOK;
+				debug = ZBX_ALERT_NO_DEBUG;
 
 			data_len = zbx_alerter_serialize_webhook(&data, mediatype->script_bin, mediatype->script_bin_sz,
-					mediatype->timeout, alert->params);
+					mediatype->timeout, alert->params, debug);
 			break;
 		default:
 			error = "unsupported media type";
