@@ -133,7 +133,7 @@ int	zbx_es_check_timeout(void *udata)
 {
 	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
 
-	if (time(NULL) - env->start_time.tv_sec > env->timeout)
+	if (time(NULL) - env->start_time.sec > env->timeout)
 		return 1;
 
 	return 0;
@@ -435,7 +435,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	gettimeofday(&es->env->start_time, NULL);
+	zbx_timespec(&es->env->start_time);
 
 	if (NULL != es->env->json)
 	{
@@ -506,7 +506,7 @@ out:
 	if (NULL != es->env->json)
 	{
 		zbx_json_close(es->env->json);
-		zbx_json_adduint64(es->env->json, "ms", zbx_get_duration(es->env->start_time));
+		zbx_json_adduint64(es->env->json, "ms", zbx_get_duration_ms(&es->env->start_time));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));

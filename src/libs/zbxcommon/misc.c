@@ -487,23 +487,23 @@ int	zbx_day_in_month(int year, int mon)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_duration                                                 *
+ * Function: zbx_get_duration_ms                                              *
  *                                                                            *
- * Purpose: get duration in milliseconds since start_time till current time   *
+ * Purpose: get duration in milliseconds since time stamp till current time   *
  *                                                                            *
  * Parameters:                                                                *
  *     start_time - [IN] time from when duration should be counted            *
  *                                                                            *
- * Return value: duration in milliseconds since start_time till current time  *
+ * Return value: duration in milliseconds since time stamp till current time  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_get_duration(struct timeval start_time)
+zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
 {
-	struct timeval	current_time;
+	zbx_timespec_t	now;
 
-	gettimeofday(&current_time, NULL);
+	zbx_timespec(&now);
 
-	return (current_time.tv_sec - start_time.tv_sec) * 1000 + (current_time.tv_usec - start_time.tv_usec) / 1000;
+	return (now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6;
 }
 
 /******************************************************************************

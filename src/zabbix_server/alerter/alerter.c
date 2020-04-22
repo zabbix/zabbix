@@ -226,7 +226,9 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	if (ZBX_IPC_ALERTER_WEBHOOK_EXTERNAL == ipc_message->code)
 	{
 		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-		zbx_es_set_debug(&es_engine, &json);
+
+		if (SUCCEED == zbx_es_is_env_initialized(&es_engine))
+			zbx_es_set_debug(&es_engine, &json);
 	}
 
 	if (SUCCEED == ret)
@@ -251,7 +253,9 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	{
 		alerter_send_result(socket, output, ret, error, json.buffer);
 		zbx_json_free(&json);
-		zbx_es_set_debug(&es_engine, NULL);
+
+		if (SUCCEED == zbx_es_is_env_initialized(&es_engine))
+			zbx_es_set_debug(&es_engine, NULL);
 	}
 	else
 		alerter_send_result(socket, output, ret, error, NULL);
