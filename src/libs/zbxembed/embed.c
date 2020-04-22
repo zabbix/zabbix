@@ -534,12 +534,18 @@ void	zbx_es_set_timeout(zbx_es_t *es, int timeout)
 
 void	zbx_es_debug_enable(zbx_es_t *es)
 {
-	es->env->json = zbx_malloc(NULL, sizeof(struct zbx_json));
-
-	zbx_json_init(es->env->json, ZBX_JSON_STAT_BUF_LEN);
+	if (NULL == es->env->json)
+	{
+		es->env->json = zbx_malloc(NULL, sizeof(struct zbx_json));
+		zbx_json_init(es->env->json, ZBX_JSON_STAT_BUF_LEN);
+	}
 }
+
 const char	*zbx_es_debug_info(const zbx_es_t *es)
 {
+	if (NULL == es->env->json)
+		return NULL;
+
 	return es->env->json->buffer;
 }
 
