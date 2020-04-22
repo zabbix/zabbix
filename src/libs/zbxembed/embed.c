@@ -418,8 +418,6 @@ out:
  *             param    - [IN] the parameter to pass to the script            *
  *             output   - [OUT] the result value                              *
  *             error    - [OUT] the error message                             *
- *             duration - [OUT] script execution duration in milliseconds,    *
- *                              can be NULL                                   *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
@@ -430,7 +428,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
-	char **error, zbx_uint64_t *duration)
+	char **error)
 {
 	void		*buffer;
 	volatile int	ret = FAIL;
@@ -438,6 +436,12 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	gettimeofday(&es->env->start_time, NULL);
+
+	if (NULL != es->env->json)
+	{
+		zbx_json_clean(es->env->json);
+		zbx_json_addarray(es->env->json, "logs");
+	}
 
 	if (SUCCEED == zbx_es_fatal_error(es))
 	{
@@ -499,8 +503,11 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	duk_pop(es->env->ctx);
 	es->env->rt_error_num = 0;
 out:
-	if (NULL != duration)
-		*duration = zbx_get_duration(es->env->start_time);
+	if (NULL != es->env->json)
+	{
+		zbx_json_close(es->env->json);
+		zbx_json_adduint64(es->env->json, "ms", zbx_get_duration(es->env->start_time));
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 

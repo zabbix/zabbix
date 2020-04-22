@@ -38,7 +38,7 @@ int	zbx_es_is_env_initialized(zbx_es_t *es);
 int	zbx_es_fatal_error(zbx_es_t *es);
 int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
 int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
-	char **error, zbx_uint64_t *duration);
+	char **error);
 void	zbx_es_set_timeout(zbx_es_t *es, int timeout);
 void	zbx_es_set_debug(zbx_es_t *es, struct zbx_json *json);
 
