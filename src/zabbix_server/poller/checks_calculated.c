@@ -86,9 +86,10 @@ static int	calcitem_add_function(expression_t *exp, char *host, char *key, char 
 
 static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
-	char		*e, *buf = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
-	int		ret = NOTSUPPORTED;
+	char			*e, *buf = NULL;
+	size_t			exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
+	int			ret = NOTSUPPORTED;
+	zbx_vector_uint64_t	hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, dc_item->params);
 
@@ -152,6 +153,10 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __func__, exp->exp);
 
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_append(&hostids, dc_item->host.hostid);
+	exp->exp = zbx_dc_expand_user_macros_for_triggers_and_calc_items(exp->exp, hostids.values, 1);
+
 	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL, NULL,
 			&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len))
 	{
@@ -159,6 +164,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	}
 out:
 	zbx_free(buf);
+	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
