@@ -52,7 +52,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("Unsupported metric.")
 	}
 
-	_, instances, err := win32.PdhEnumObjectItems(name)
+	instances, err := win32.PdhEnumObjectItems(name)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get performance discovery object: %s", err.Error())
 	}

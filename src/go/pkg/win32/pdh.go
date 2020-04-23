@@ -219,15 +219,14 @@ func PdhLookupPerfIndexByName(name string) (idx int, err error) {
 	return buf[0], nil
 }
 
-func PdhEnumObjectItems(className string) (counters []string, instances []string, err error) {
-	var counterListSize uint32
-	var instanceListSize uint32
+func PdhEnumObjectItems(objectName string) (instances []string, err error) {
+	var counterListSize, instanceListSize uint32
 
-	ret, _, _ := syscall.Syscall9(pdhEnumObjectItems, 8, uintptr(0), uintptr(0),
-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(className))), uintptr(0), uintptr(unsafe.Pointer(&counterListSize)),
-		uintptr(0), uintptr(unsafe.Pointer(&instanceListSize)), uintptr(PERF_DETAIL_WIZARD), uintptr(0))
+	ret, _, _ := syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0,
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(objectName))), 0, uintptr(unsafe.Pointer(&counterListSize)), 0,
+		uintptr(unsafe.Pointer(&instanceListSize)), uintptr(PERF_DETAIL_WIZARD), 0)
 	if ret != PDH_MORE_DATA {
-		return nil, nil, newPdhError(ret)
+		return nil, newPdhError(ret)
 	}
 	counterbuf := make([]uint16, counterListSize)
 	var instptr uintptr
@@ -237,15 +236,15 @@ func PdhEnumObjectItems(className string) (counters []string, instances []string
 		instbuf = make([]uint16, instanceListSize)
 		instptr = uintptr(unsafe.Pointer(&instbuf[0]))
 	}
-	ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, uintptr(0), uintptr(0),
-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(className))), uintptr(unsafe.Pointer(&counterbuf[0])),
+	ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0,
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(objectName))), uintptr(unsafe.Pointer(&counterbuf[0])),
 		uintptr(unsafe.Pointer(&counterListSize)), instptr, uintptr(unsafe.Pointer(&instanceListSize)),
-		uintptr(PERF_DETAIL_WIZARD), uintptr(0))
+		uintptr(PERF_DETAIL_WIZARD), 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
-		return nil, nil, newPdhError(ret)
+		return nil, newPdhError(ret)
 	}
 
-	return utf16ToStringSlice(counterbuf), utf16ToStringSlice(instbuf), nil
+	return utf16ToStringSlice(instbuf), nil
 }
 
 func PdhEnumObject() (objects []string, err error) {
