@@ -12391,13 +12391,13 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env)
  *                                                                            *
  * Purpose: returns server/proxy instance id                                  *
  *                                                                            *
- * Return value: The instance id.                                             *
+ * Return value: the instance id                                              *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_dc_get_instanceid()
+const char	*zbx_dc_get_instanceid(void)
 {
-	/* instanceid is initialized during first configuration cache synchronization */
-	/* and is never updated - so it can be accessed without locking cache         */
+	/* instanceid is initialized during the first configuration cache synchronization */
+	/* and is never updated - so it can be accessed without locking cache             */
 	return config->config->instanceid;
 }
 

@@ -102,6 +102,7 @@ typedef struct
 	zbx_uint64_t	mediatypeid;
 	zbx_uint64_t	alertpoolid;
 	zbx_uint64_t	eventid;
+	/* the problem event id for recovery events */
 	zbx_uint64_t	p_eventid;
 	int		nextsend;
 
@@ -760,9 +761,8 @@ static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediat
  *                                                                            *
  * Return value: The alert object.                                            *
  *                                                                            *
- * Comments: The string pointers are copied over instead of allocating new    *
- *           strings. This means that the db_alert must not be freed after    *
- *           copying.                                                         *
+ * Comments: The db_alert is destroyed during copying process and should not  *
+ *           be accessed/freed afterwards.                                    *
  *                                                                            *
  ******************************************************************************/
 static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)

@@ -3466,8 +3466,12 @@ int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
  * Purpose: checks instanceid value in config table and generates new         *
  *          instance id if its empty                                          *
  *                                                                            *
+ * Return value: SUCCEED - valid instance id either exists or was created     *
+ *               FAIL    - no valid instance id exists and could not create   *
+ *                         one                                                *
+ *                                                                            *
  ******************************************************************************/
-int	zbx_db_check_instanceid()
+int	zbx_db_check_instanceid(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -3480,13 +3484,21 @@ int	zbx_db_check_instanceid()
 	{
 		if (SUCCEED == DBis_null(row[1]) || '\0' == *row[1])
 		{
-			if (ZBX_DB_OK > DBexecute("update config set instanceid='%s' where configid=%s",
-					zbx_create_token(0), row[0]))
+			char	*token;
+
+			token = zbx_create_token(0);
+			if (ZBX_DB_OK > DBexecute("update config set instanceid='%s' where configid=%s", token, row[0]))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot update instanceid in database");
+				zabbix_log(LOG_LEVEL_ERR, "cannot update instance id in database");
 				ret = FAIL;
 			}
+			zbx_free(token);
 		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot read instance id from database");
+		ret = FAIL;
 	}
 	DBfree_result(result);
 
