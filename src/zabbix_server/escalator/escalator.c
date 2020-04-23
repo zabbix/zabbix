@@ -489,7 +489,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 
 	if (0 != mediatypeid)
 	{
-		result = DBselect("select subject,message,mediatypeid from media_type_message"
+		result = DBselect("select mediatype_messageid,subject,message,mediatypeid from media_type_message"
 				" where eventsource=%d and recovery=%d and mediatypeid=" ZBX_FS_UI64,
 				evt_src, op_mode, mediatypeid);
 
