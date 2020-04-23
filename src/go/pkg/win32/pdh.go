@@ -245,7 +245,7 @@ func PdhEnumObjectItems(className string) (counters []string, instances []string
 		return nil, nil, newPdhError(ret)
 	}
 
-	return UTF16ToStringSlice(counterbuf), UTF16ToStringSlice(instbuf), nil
+	return utf16ToStringSlice(counterbuf), utf16ToStringSlice(instbuf), nil
 }
 
 func PdhEnumObject() (objects []string, err error) {
@@ -264,7 +264,7 @@ func PdhEnumObject() (objects []string, err error) {
 		return nil, newPdhError(ret)
 	}
 
-	return UTF16ToStringSlice(objectBuf), nil
+	return utf16ToStringSlice(objectBuf), nil
 }
 
 func init() {

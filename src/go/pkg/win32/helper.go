@@ -25,12 +25,11 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-// UTF16ToStringSlice converts uint16 array to a string array
-func UTF16ToStringSlice(in []uint16) []string {
+func utf16ToStringSlice(in []uint16) (out []string) {
 	var singleName []uint16
-	var out []string
-	for len(in) != 0 {
-		singleName, in = nextField(in)
+	count := len(in)
+	for i := 0; i < count; i++ {
+		singleName, in = RemoveSingleField(in)
 		if len(singleName) == 0 {
 			break
 		}
@@ -38,10 +37,10 @@ func UTF16ToStringSlice(in []uint16) []string {
 		out = append(out, windows.UTF16ToString(singleName))
 	}
 
-	return out
+	return
 }
 
-func nextField(buf []uint16) (field []uint16, left []uint16) {
+func RemoveSingleField(buf []uint16) (field []uint16, left []uint16) {
 	start := -1
 	for i, c := range buf {
 		if c != 0 {
@@ -49,16 +48,13 @@ func nextField(buf []uint16) (field []uint16, left []uint16) {
 			break
 		}
 	}
-
 	if start == -1 {
 		return []uint16{}, []uint16{}
 	}
-
 	for i, c := range buf[start:] {
 		if c == 0 {
 			return buf[start : start+i], buf[start+i+1:]
 		}
 	}
-
 	return buf[start:], []uint16{}
 }

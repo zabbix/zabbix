@@ -69,25 +69,6 @@ type CounterPathElements struct {
 	CounterName    string
 }
 
-func nextField(buf []uint16) (field []uint16, left []uint16) {
-	start := -1
-	for i, c := range buf {
-		if c != 0 {
-			start = i
-			break
-		}
-	}
-	if start == -1 {
-		return []uint16{}, []uint16{}
-	}
-	for i, c := range buf[start:] {
-		if c == 0 {
-			return buf[start : start+i], buf[start+i+1:]
-		}
-	}
-	return buf[start:], []uint16{}
-}
-
 func locateDefaultCounters() (err error) {
 	var size uint32
 	counter := windows.StringToUTF16Ptr("Counter")
@@ -104,11 +85,11 @@ func locateDefaultCounters() (err error) {
 
 	var wcharIndex, wcharName []uint16
 	for len(buf) != 0 {
-		wcharIndex, buf = nextField(buf)
+		wcharIndex, buf = win32.RemoveSingleField(buf)
 		if len(wcharIndex) == 0 {
 			break
 		}
-		wcharName, buf = nextField(buf)
+		wcharName, buf = win32.RemoveSingleField(buf)
 		if len(wcharName) == 0 {
 			break
 		}
