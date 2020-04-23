@@ -1443,6 +1443,13 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 				}
 			}
 
+			&.overflow-break {
+				max-width: 150px;
+				overflow-wrap: break-word;
+				white-space: initial;
+				word-wrap: break-word;
+			}
+
 			&:last-child {
 				padding-right: 0;
 			}
