@@ -123,7 +123,7 @@ static void	am_db_clear(zbx_am_db_t *amdb)
  *                                                                            *
  * Parameters: alerts - [OUT] the new alerts                                  *
  *                                                                            *
- * Comments: One the first call this function will return new and not sent    *
+ * Comments: On the first call this function will return new and not sent     *
  *           alerts. After that only new alerts are returned.                 *
  *                                                                            *
  * Return value: SUCCEED - the alerts were read successfully                  *
