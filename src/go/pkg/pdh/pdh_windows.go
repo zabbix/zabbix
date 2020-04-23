@@ -47,6 +47,8 @@ const (
 	CounterTotalSessions
 )
 
+var Counters map[string]string
+
 var sysCounters []sysCounter = []sysCounter{
 	{name: "System"},
 	{name: "Processor"},
@@ -70,7 +72,23 @@ type CounterPathElements struct {
 }
 
 func locateDefaultCounters() (err error) {
+	if err = locateCounters(); err != nil {
+		return
+	}
+	for idx, name := range Counters {
+		for i := range sysCounters {
+			if sysCounters[i].name == name {
+				sysCounters[i].index = idx
+				break
+			}
+		}
+	}
+	return
+}
+
+func locateCounters() (err error) {
 	var size uint32
+	Counters = make(map[string]string)
 	counter := windows.StringToUTF16Ptr("Counter")
 	err = windows.RegQueryValueEx(HKEY_PERFORMANCE_TEXT, counter, nil, nil, nil, &size)
 	if err != nil {
@@ -93,12 +111,8 @@ func locateDefaultCounters() (err error) {
 		if len(wcharName) == 0 {
 			break
 		}
-		name := windows.UTF16ToString(wcharName)
-		for i := range sysCounters {
-			if sysCounters[i].name == name {
-				sysCounters[i].index = windows.UTF16ToString(wcharIndex)
-			}
-		}
+
+		Counters[windows.UTF16ToString(wcharIndex)] = windows.UTF16ToString(wcharName)
 	}
 
 	return
