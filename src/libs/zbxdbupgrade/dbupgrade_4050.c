@@ -1655,6 +1655,14 @@ static int	DBpatch_4050073(void)
 	return DBmodify_field_type("services", &field, &field);
 }
 
+static int	DBpatch_4050074(void)
+{
+	const ZBX_FIELD	old_field = {"script", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"script", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media_type", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1729,5 +1737,6 @@ DBPATCH_ADD(4050070, 0, 1)
 DBPATCH_ADD(4050071, 0, 1)
 DBPATCH_ADD(4050072, 0, 1)
 DBPATCH_ADD(4050073, 0, 1)
+DBPATCH_ADD(4050074, 0, 1)
 
 DBPATCH_END()
