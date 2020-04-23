@@ -120,7 +120,6 @@ class CMenuItem extends CTag {
 			parse_str($query_string, $query_params);
 			$this->aliases[$action_name][] = $query_params;
 		}
-		unset($alias);
 
 		return $this;
 	}
