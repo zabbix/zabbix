@@ -285,7 +285,11 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['screens'])
 		],
 		[
-			new CLink(_('Discovery'), 'host_discovery.php?hostid='.$template['templateid']),
+			new CLink(_('Discovery'),
+				(new CUrl('host_discovery.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['templateid']])
+			),
 			CViewHelper::showNum($template['discoveries'])
 		],
 		[

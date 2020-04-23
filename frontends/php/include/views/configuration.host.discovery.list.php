@@ -23,28 +23,144 @@
  * @var CView $this
  */
 
+require_once dirname(__FILE__).'/js/configuration.host.discovery.list.js.php';
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(new CRedirectButton(_('Create discovery rule'),
-				(new CUrl('host_discovery.php'))
-					->setArgument('form', 'create')
-					->setArgument('hostid', $data['hostid'])
-					->getUrl()
-			))
+			(new CList())->addItem(
+				($data['hostid'] != 0)
+					? new CRedirectButton(_('Create discovery rule'),
+						(new CUrl('host_discovery.php'))
+							->setArgument('form', 'create')
+							->setArgument('hostid', $data['hostid'])
+							->getUrl()
+					)
+					: (new CButton('form', _('Create discovery rule (select host first)')))->setEnabled(false)
+			)
 		))->setAttribute('aria-label', _('Content controls'))
+	);
+
+if ($data['hostid'] != 0) {
+	$widget->addItem(get_header_host_table('discoveries', $data['hostid']));
+}
+
+// Add filter tab.
+$filter = (new CFilter(new CUrl('host_discovery.php')))
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab']);
+
+$filter_column1 = (new CFormList())
+	->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
+		(new CMultiSelect([
+			'name' => 'filter_groupids[]',
+			'object_name' => 'hostGroup',
+			'data' => $data['filter']['groups'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $filter->getName(),
+					'dstfld1' => 'filter_groupids_',
+					'editable' => true
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
+	->addRow((new CLabel(_('Hosts'), 'filter_hostids__ms')),
+		(new CMultiSelect([
+			'name' => 'filter_hostids[]',
+			'object_name' => 'host_templates',
+			'data' => $data['filter']['hosts'],
+			'popup' => [
+				'filter_preselect_fields' => [
+					'hostgroups' => 'filter_groupids_'
+				],
+				'parameters' => [
+					'srctbl' => 'host_templates',
+					'srcfld1' => 'hostid',
+					'dstfrm' => $filter->getName(),
+					'dstfld1' => 'filter_hostids_',
+					'editable' => true
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Name'),
+		(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Key'),
+		(new CTextBox('filter_key', $data['filter']['key']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	);
+
+// type select
+$filter_type_visibility = [];
+$cmb_type = new CComboBox('filter_type', $data['filter']['type'], null, [-1 => _('all')]);
+zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');
+
+$lld_types = item_type2str();
+unset($lld_types[ITEM_TYPE_AGGREGATE], $lld_types[ITEM_TYPE_HTTPTEST], $lld_types[ITEM_TYPE_CALCULATED],
+	$lld_types[ITEM_TYPE_SNMPTRAP]
+);
+
+$cmb_type->addItems($lld_types);
+
+foreach ($lld_types as $type => $name) {
+	if ($type != ITEM_TYPE_TRAPPER) {
+		zbx_subarray_push($filter_type_visibility, $type, 'filter_delay_row');
+	}
+	if ($type == ITEM_TYPE_SNMP) {
+		zbx_subarray_push($filter_type_visibility, $type, 'filter_snmp_oid_row');
+	}
+}
+
+zbx_add_post_js(
+	'var filterTypeSwitcher = new CViewSwitcher("filter_type", "change", '.json_encode($filter_type_visibility).');'
+);
+
+$filter_column2 = (new CFormList())
+	->addRow(_('Type'), $cmb_type)
+	->addRow(_('Update interval'),
+		(new CTextBox('filter_delay', $data['filter']['delay']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		'filter_delay_row'
+	)
+	->addRow(_('Keep lost resources period'),
+		(new CTextBox('filter_lifetime', $data['filter']['lifetime']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	)
+	->addRow(_('SNMP OID'),
+		(new CTextBox('filter_snmp_oid', $data['filter']['snmp_oid']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		'filter_snmp_oid_row'
+	);
+
+$filter_column3 = (new CFormList())
+	->addRow(_('State'),
+		new CComboBox('filter_state', $data['filter']['state'], null, [
+			-1 => _('all'),
+			ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
+			ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
+		])
+	)
+	->addRow(_('Status'),
+		new CComboBox('filter_status', $data['filter']['status'], null, [
+			-1 => _('all'),
+			ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
+			ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
+		])
+	);
+
+$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2, $filter_column3]);
+
+$widget->addItem($filter);
 
 // create form
-$discoveryForm = (new CForm())
-	->setName('discovery')
-	->addVar('hostid', $this->data['hostid']);
+$discoveryForm = (new CForm())->setName('discovery');
 
-$url = (new CUrl('host_discovery.php'))
-	->setArgument('hostid', $data['hostid'])
-	->getUrl();
+if ($data['hostid'] != 0) {
+	$discoveryForm->addVar('hostid', $data['hostid']);
+}
+
+$url = (new CUrl('host_discovery.php'))->getUrl();
 
 // create table
 $discoveryTable = (new CTableInfo())
@@ -56,12 +172,12 @@ $discoveryTable = (new CTableInfo())
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
-		($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
+		_('Hosts'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-		$data['showInfoColumn'] ? _('Info') : null
+		_('Info')
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
@@ -94,7 +210,7 @@ foreach ($data['discoveries'] as $discovery) {
 	// status
 	$status = (new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
-		'?hostid='.$_REQUEST['hostid'].
+		'?hostid='.$discovery['hostid'].
 			'&g_hostdruleid[]='.$discovery['itemid'].
 			'&action='.($discovery['status'] == ITEM_STATUS_DISABLED
 				? 'discoveryrule.massenable'
@@ -106,20 +222,10 @@ foreach ($data['discoveries'] as $discovery) {
 			->addSID();
 
 	// info
-	if ($data['showInfoColumn']) {
-		$info_icons = [];
-		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
-			$info_icons[] = makeErrorIcon($discovery['error']);
-		}
-	}
+	$info_icons = [];
 
-	// host prototype link
-	$hostPrototypeLink = null;
-	if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$hostPrototypeLink = [
-			new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']),
-			CViewHelper::showNum($discovery['hostPrototypes'])
-		];
+	if ($discovery['status'] == ITEM_STATUS_ACTIVE && $discovery['error'] !== '') {
+		$info_icons[] = makeErrorIcon($discovery['error']);
 	}
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
@@ -155,19 +261,24 @@ foreach ($data['discoveries'] as $discovery) {
 			),
 			CViewHelper::showNum($discovery['graphs'])
 		],
-		$hostPrototypeLink,
+		[
+			new CLink(_('Host prototypes'),
+				(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $discovery['itemid'])
+			),
+			CViewHelper::showNum($discovery['hostPrototypes'])
+		],
 		(new CDiv(CHtml::encode($discovery['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
-		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
+		makeInformationList($info_icons)
 	]);
 }
 
 // append table to form
 $discoveryForm->addItem([
 	$discoveryTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'g_hostdruleid',
 		[
 			'discoveryrule.massenable' => ['name' => _('Enable'),
@@ -180,8 +291,7 @@ $discoveryForm->addItem([
 			'discoveryrule.massdelete' => ['name' => _('Delete'),
 				'confirm' =>_('Delete selected discovery rules?')
 			]
-		],
-		$this->data['hostid']
+		]
 	)
 ]);
 

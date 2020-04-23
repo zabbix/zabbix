@@ -428,7 +428,11 @@ foreach ($data['hosts'] as $host) {
 			CViewHelper::showNum($host['graphs'])
 		],
 		[
-			new CLink(_('Discovery'), 'host_discovery.php?hostid='.$host['hostid']),
+			new CLink(_('Discovery'),
+				(new CUrl('host_discovery.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$host['hostid']])
+			),
 			CViewHelper::showNum($host['discoveries'])
 		],
 		[

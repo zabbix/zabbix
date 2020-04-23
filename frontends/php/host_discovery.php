@@ -42,7 +42,7 @@ $evalTypes = [
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({form})'],
+	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && !isset({itemid})'],
 	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
 	'interfaceid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
@@ -196,6 +196,30 @@ $fields = [
 	'check_now' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	// filter
+	'filter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_groupids' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_hostids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_type' =>			[T_ZBX_INT, O_OPT, null,
+									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
+									]),
+									null
+								],
+	'filter_delay' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
+	'filter_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_snmp_oid' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_state' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
+									null
+								],
+	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
+									null
+								],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -209,6 +233,8 @@ $item = [];
 /*
  * Permissions
  */
+$hostid = getRequest('hostid', 0);
+
 if (getRequest('itemid', false)) {
 	$item = API::DiscoveryRule()->get([
 		'itemids' => getRequest('itemid'),
@@ -226,10 +252,10 @@ if (getRequest('itemid', false)) {
 	$_REQUEST['hostid'] = $item['hostid'];
 	$host = reset($item['hosts']);
 }
-else {
+elseif ($hostid) {
 	$hosts = API::Host()->get([
-		'output' => ['hostid', 'name', 'status', 'flags'],
-		'hostids' => getRequest('hostid'),
+		'output' => ['hostid', 'name', 'status'],
+		'hostids' => $hostid,
 		'templated_hosts' => true,
 		'editable' => true
 	]);
@@ -297,7 +323,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					info(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
-				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
+
+				if ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
@@ -547,7 +574,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryrule.massenable', 'discoveryrule.massdisable']) && hasRequest('g_hostdruleid')) {
 	$itemids = getRequest('g_hostdruleid');
-	$status = (getRequest('action') == 'discoveryrule.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+	$status = (getRequest('action') === 'discoveryrule.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 	$lld_rules = [];
 	foreach ($itemids as $itemid) {
@@ -686,29 +713,158 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	if (hasRequest('filter_set')) {
+		CProfile::updateArray('web.host_discovery.filter.groupids', getRequest('filter_groupids', []), PROFILE_TYPE_ID);
+		CProfile::updateArray('web.host_discovery.filter.hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+		CProfile::update('web.host_discovery.filter.name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.host_discovery.filter.key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.host_discovery.filter.type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.host_discovery.filter.delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.host_discovery.filter.lifetime', getRequest('filter_lifetime', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.host_discovery.filter.snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.host_discovery.filter.state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.host_discovery.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::deleteIdx('web.host_discovery.filter.groupids');
+
+		if (count(CProfile::getArray('web.host_discovery.filter.hostids', [])) != 1) {
+			CProfile::deleteIdx('web.host_discovery.filter.hostids');
+		}
+
+		CProfile::delete('web.host_discovery.filter.name');
+		CProfile::delete('web.host_discovery.filter.key');
+		CProfile::delete('web.host_discovery.filter.type');
+		CProfile::delete('web.host_discovery.filter.delay');
+		CProfile::delete('web.host_discovery.filter.lifetime');
+		CProfile::delete('web.host_discovery.filter.snmp_oid');
+		CProfile::delete('web.host_discovery.filter.state');
+		CProfile::delete('web.host_discovery.filter.status');
+	}
+
+	$filter_groupids = CProfile::getArray('web.host_discovery.filter.groupids', []);
+	$filter_hostids = CProfile::getArray('web.host_discovery.filter.hostids', []);
+
+	$filter = [
+		'groups' => [],
+		'hosts' => [],
+		'name' => CProfile::get('web.host_discovery.filter.name', ''),
+		'key' => CProfile::get('web.host_discovery.filter.key', ''),
+		'type' => CProfile::get('web.host_discovery.filter.type', -1),
+		'delay' => CProfile::get('web.host_discovery.filter.delay', ''),
+		'lifetime' => CProfile::get('web.host_discovery.filter.lifetime', ''),
+		'snmp_oid' => CProfile::get('web.host_discovery.filter.snmp_oid', ''),
+		'state' => CProfile::get('web.host_discovery.filter.state', -1),
+		'status' => CProfile::get('web.host_discovery.filter.status', -1),
+	];
+
 	$config = select_config();
 
 	$data = [
-		'hostid' => getRequest('hostid', 0),
-		'host' => $host,
-		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE),
+		'filter' => $filter,
+		'hostid' => $hostid,
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'profileIdx' => 'web.host_discovery.filter',
+		'active_tab' => CProfile::get('web.host_discovery.filter.active', 1)
 	];
 
-	// discoveries
-	$data['discoveries'] = API::DiscoveryRule()->get([
-		'hostids' => $data['hostid'],
+	// Select LLD rules.
+	$options = [
 		'output' => API_OUTPUT_EXTEND,
-		'editable' => true,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
+		'editable' => true,
+		'filter' => [],
+		'search' => [],
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
-	]);
+	];
 
+	if ($filter_groupids) {
+		$filter['groups'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter_groupids,
+			'with_hosts_and_templates' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]), ['groupid' => 'id']);
+
+		$options['groupids'] = getSubGroups(array_keys($filter['groups']));
+	}
+
+	if ($filter_hostids) {
+		$filter['hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => $filter_hostids,
+			'templated_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
+		]), ['hostid' => 'id']);
+
+		$options['hostids'] = array_keys($filter['hosts']);
+
+		if (count($filter['hosts']) == 1) {
+			$data['hostid'] = reset($filter['hosts'])['id'];
+		}
+	}
+
+	if ($filter['name'] !== '') {
+		$options['search']['name'] = $filter['name'];
+	}
+
+	if ($filter['key'] !== '') {
+		$options['search']['key_'] = $filter['key'];
+	}
+
+	if ($filter['type'] != -1) {
+		$options['filter']['type'] = $filter['type'];
+	}
+
+	/*
+	 * Trapper and SNMP trap items contain zeros in "delay" field and, if no specific type is set, look in item types
+	 * other than trapper and SNMP trap that allow zeros. For example, when a flexible interval is used. Since trapper
+	 * and SNMP trap items contain zeros, but those zeros should not be displayed, they cannot be filtered by entering
+	 * either zero or any other number in filter field.
+	 */
+	if ($filter['delay'] !== '') {
+		if ($filter['type'] == -1 && $filter['delay'] == 0) {
+			$options['filter']['type'] = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,  ITEM_TYPE_INTERNAL,
+				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
+				ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX
+			];
+			$options['filter']['delay'] = $filter['delay'];
+		}
+		elseif ($filter['type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT) {
+			$options['filter']['delay'] = -1;
+		}
+		else {
+			$options['filter']['delay'] = $filter['delay'];
+		}
+	}
+
+	if ($filter['lifetime'] !== '') {
+		$options['filter']['lifetime'] = $filter['lifetime'];
+	}
+
+	if ($filter['snmp_oid'] !== '') {
+		$options['filter']['snmp_oid'] = $filter['snmp_oid'];
+	}
+
+	if ($filter['status'] != -1) {
+		$options['filter']['status'] = $filter['status'];
+	}
+
+	if ($filter['state'] != -1) {
+		$options['filter']['status'] = ITEM_STATUS_ACTIVE;
+		$options['filter']['state'] = $filter['state'];
+	}
+
+	$data['filter'] = $filter;
+
+	$data['discoveries'] = API::DiscoveryRule()->get($options);
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
 	switch ($sortField) {
@@ -740,7 +896,7 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sortOrder,
-		(new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid'])
+		new CUrl('host_discovery.php')
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
