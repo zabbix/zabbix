@@ -147,9 +147,9 @@ class CMenu extends CTag {
 	/**
 	 * Deep find menu item by action name and mark the whole chain as selected.
 	 *
-	 * @param string $action_name    Action name to search for.
-	 * @param array $request_params  Parameters of current HTTP request to compare in search process
-	 * @param bool $expand           Add 'is-expanded' class for selected submenus.
+	 * @param string $action_name     Action name to search for.
+	 * @param array  $request_params  Parameters of current HTTP request to compare in search process.
+	 * @param bool   $expand          Add 'is-expanded' class for selected submenus.
 	 *
 	 * @return bool  True, if menu item was selected.
 	 */
