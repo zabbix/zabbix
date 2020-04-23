@@ -186,7 +186,7 @@ sub process_row
 				$_ =~ s/&eol;/' || chr(13) || chr(10) || '/g;
 				$_ =~ s/&bsn;/' || chr(10) || '/g;
 
-				# field No.22 is 'scripr' field in 'media_type' table
+				# field No.22 is 'script' field in 'media_type' table
 				if ($count == 22 && length($_) > $oracle_field_limit)
 				{
 					my @sections = unpack("(A$oracle_field_limit)*", $_);
@@ -213,6 +213,11 @@ sub process_row
 
 							$move_to_next = $2;
 						}
+					}
+
+					if (length($move_to_next) > 0)
+					{
+						substr($script, length($script) - 2, 2, "$move_to_next')");
 					}
 
 					$_ = $script;
