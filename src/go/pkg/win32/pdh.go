@@ -221,9 +221,14 @@ func PdhLookupPerfIndexByName(name string) (idx int, err error) {
 
 func PdhEnumObjectItems(objectName string) (instances []string, err error) {
 	var counterListSize, instanceListSize uint32
+	nameUTF16, err := syscall.UTF16FromString(objectName)
+	if err != nil {
+		return nil, err
+	}
+	ptrNameUTF16 := uintptr(unsafe.Pointer(&nameUTF16[0]))
 
 	ret, _, _ := syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0,
-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(objectName))), 0, uintptr(unsafe.Pointer(&counterListSize)), 0,
+		ptrNameUTF16, 0, uintptr(unsafe.Pointer(&counterListSize)), 0,
 		uintptr(unsafe.Pointer(&instanceListSize)), uintptr(PERF_DETAIL_WIZARD), 0)
 	if ret != PDH_MORE_DATA {
 		return nil, newPdhError(ret)
@@ -236,8 +241,7 @@ func PdhEnumObjectItems(objectName string) (instances []string, err error) {
 		instbuf = make([]uint16, instanceListSize)
 		instptr = uintptr(unsafe.Pointer(&instbuf[0]))
 	}
-	ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0,
-		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(objectName))), uintptr(unsafe.Pointer(&counterbuf[0])),
+	ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0, ptrNameUTF16, uintptr(unsafe.Pointer(&counterbuf[0])),
 		uintptr(unsafe.Pointer(&counterListSize)), instptr, uintptr(unsafe.Pointer(&instanceListSize)),
 		uintptr(PERF_DETAIL_WIZARD), 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
