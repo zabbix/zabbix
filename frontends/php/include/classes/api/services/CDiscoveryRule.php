@@ -687,7 +687,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-			'selectOverrides' => ['name', 'step', 'evaltype', 'formula', 'stop', 'conditions', 'operations'],
+			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 			'preservekeys' => true
 		]);
 
@@ -1190,14 +1190,14 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 			}
 
-			DB::insertBatch('lld_override_opstatus', $opstatus);
-			DB::insertBatch('lld_override_opperiod', $opperiod);
-			DB::insertBatch('lld_override_ophistory', $ophistory);
-			DB::insertBatch('lld_override_optrends', $optrends);
-			DB::insertBatch('lld_override_opseverity', $opseverity);
+			DB::insertBatch('lld_override_opstatus', $opstatus, false);
+			DB::insertBatch('lld_override_opperiod', $opperiod, false);
+			DB::insertBatch('lld_override_ophistory', $ophistory, false);
+			DB::insertBatch('lld_override_optrends', $optrends, false);
+			DB::insertBatch('lld_override_opseverity', $opseverity, false);
 			DB::insertBatch('lld_override_optag', $optag);
 			DB::insertBatch('lld_override_optemplate', $optemplate);
-			DB::insertBatch('lld_override_opinventory', $opinventory);
+			DB::insertBatch('lld_override_opinventory', $opinventory, false);
 		}
 	}
 
@@ -2021,7 +2021,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-			'selectOverrides' => ['name', 'step', 'evaltype', 'formula', 'stop', 'conditions', 'operations'],
+			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 			'preservekeys' => true
 		]);
 		$srcDiscovery = reset($srcDiscovery);
@@ -2049,6 +2049,18 @@ class CDiscoveryRule extends CItemGeneral {
 
 		if (!$dstDiscovery['lld_macro_paths']) {
 			unset($dstDiscovery['lld_macro_paths']);
+		}
+
+		if ($dstDiscovery['overrides']) {
+			foreach ($dstDiscovery['overrides'] as &$override) {
+				if (array_key_exists('filter', $override)) {
+					unset($override['filter']['eval_formula']);
+				}
+			}
+			unset($override);
+		}
+		else {
+			unset($dstDiscovery['overrides']);
 		}
 
 		// if this is a plain host, map discovery interfaces
