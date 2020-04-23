@@ -32,7 +32,6 @@
 #define MACRO_TYPE_TRIGGER_DESCRIPTION	0x00000010	/* name */
 #define MACRO_TYPE_TRIGGER_COMMENTS	0x00000020	/* description */
 #define MACRO_TYPE_ITEM_KEY		0x00000040
-#define MACRO_TYPE_ITEM_EXPRESSION	0x00000080
 #define MACRO_TYPE_INTERFACE_ADDR	0x00000100
 #define MACRO_TYPE_COMMON		0x00000400
 #define MACRO_TYPE_PARAMS_FIELD		0x00000800
@@ -55,8 +54,7 @@
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
-char	*zbx_dc_expand_user_macros_for_triggers_and_calc_items(const char *text, zbx_uint64_t *hostids,
-		int hostids_num);
+char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 
 int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end);
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);

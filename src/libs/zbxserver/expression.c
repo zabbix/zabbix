@@ -2822,7 +2822,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 {
 	char			c, *replace_to = NULL, sql[64];
 	const char		*m;
-	int			N_functionid, indexed_macro, require_numeric, require_address, ret, res = SUCCEED,
+	int			N_functionid, indexed_macro, require_address, ret, res = SUCCEED,
 				pos = 0, found,
 				raw_value;
 	size_t			data_alloc, data_len;
@@ -2856,7 +2856,6 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 			found = zbx_token_find(*data, pos, &token, token_search))
 	{
 		indexed_macro = 0;
-		require_numeric = 0;
 		require_address = 0;
 		N_functionid = 1;
 		raw_value = 0;
@@ -4232,15 +4231,6 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				pos = token.loc.r;
 			}
 		}
-		else if (0 != (macro_type & MACRO_TYPE_ITEM_EXPRESSION))
-		{
-			if (ZBX_TOKEN_USER_MACRO == token.type)
-			{
-				require_numeric = 1;
-				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
-				pos = token.loc.r;
-			}
-		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_SCRIPT))
 		{
 			if (ZBX_TOKEN_USER_MACRO == token.type)
@@ -4551,12 +4541,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 
 		if (NULL != replace_to)
 		{
-			if (1 == require_numeric)
-			{
-				if (SUCCEED == is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX))
-					wrap_negative_double_suffix(&replace_to, NULL);
-			}
-			else if (1 == require_address && NULL != strstr(replace_to, "{$"))
+			if (1 == require_address && NULL != strstr(replace_to, "{$"))
 			{
 				/* Macros should be already expanded. An unexpanded user macro means either unknown */
 				/* macro or macro value validation failure.                                         */

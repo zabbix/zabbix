@@ -9669,7 +9669,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros_for_triggers_and_calc_items            *
+ * Function: zbx_dc_expand_user_macros_in_expression                          *
  *                                                                            *
  * Purpose: expand user macros for triggers and calculated items in the       *
  *          specified text value and autoquote macros that are not already    *
@@ -9683,10 +9683,9 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  *               macros will be left unresolved.                              *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *
- *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros_for_triggers_and_calc_items(const char *text, zbx_uint64_t *hostids, int hostids_num)
+char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
@@ -9808,7 +9807,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	get_functionids(&functionids, expression);
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	out = zbx_dc_expand_user_macros_for_triggers_and_calc_items(expression, hostids.values, hostids.values_num);
+	out = zbx_dc_expand_user_macros_in_expression(expression, hostids.values, hostids.values_num);
 
 	if (NULL != strstr(out, "{$"))
 	{

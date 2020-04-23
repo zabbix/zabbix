@@ -2116,16 +2116,10 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
-	{
-		row[2] = zbx_dc_expand_user_macros_for_triggers_and_calc_items(row[2], hostids.values,
-				hostids.values_num);
-	}
+		row[2] = zbx_dc_expand_user_macros_in_expression(row[2], hostids.values, hostids.values_num);
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
-	{
-		row[11] = zbx_dc_expand_user_macros_for_triggers_and_calc_items(row[11], hostids.values,
-				hostids.values_num);
-	}
+		row[11] = zbx_dc_expand_user_macros_in_expression(row[11], hostids.values, hostids.values_num);
 
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);
