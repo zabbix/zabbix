@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <date>2020-04-17T09:24:27Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -91,13 +91,11 @@ catch (error) {
                </applications>
                <preprocessing>
                   <step>
-                     <type>JAVASCRIPT</type>
-                     <params>try {
-    return value.match(/HAProxy version (\d+\.\d+\.\d+),/)[1];
-}
-catch (error) {
-    throw "HAProxy version is not found : " + error;
-}</params>
+                     <type>REGEX</type>
+                     <params>HAProxy version ([^,]*),
+\1</params>
+                     <error_handler>CUSTOM_ERROR</error_handler>
+                     <error_handler_params>HAProxy version is not found</error_handler_params>
                   </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -212,6 +210,349 @@ catch (error) {
          </items>
          <discovery_rules>
             <discovery_rule>
+               <name>TCP BACKEND discovery</name>
+               <type>DEPENDENT</type>
+               <key>haproxy.backend_tcp.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#SVNAME}</macro>
+                        <value>BACKEND</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#MODE}</macro>
+                        <value>tcp</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery TCP backends</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Responses denied per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.dresp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Responses denied due to security concerns (ACL-restricted).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].dresp.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Errors connection per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.econ.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of requests that encountered an error attempting to connect to a backend server.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].econ.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Response errors per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.eresp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of requests whose responses yielded an error</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].eresp.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.BACK_ERESP.MAX.WARN}</expression>
+                           <name>HAProxy TCP Backend {#PXNAME}: Number of responses with error is more than {$HAPROXY.BACK_ERESP.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Unassigned requests</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.qcur[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Current number of requests unassigned in queue.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].qcur.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.BACK_QCUR.MAX.WARN}</expression>
+                           <name>HAProxy TCP Backend {#PXNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Time in queue</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.qtime[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>Average time spent in queue (in ms) for the last 1,024 requests</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].qtime.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.BACK_QTIME.MAX.WARN}</expression>
+                           <name>HAProxy TCP Backend {#PXNAME}: Average time spent in queue is more than {$HAPROXY.BACK_QTIME.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Responses time</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.rtime[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>Average backend response time (in ms) for the last 1,024 requests</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].rtime.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.BACK_RTIME.MAX.WARN}</expression>
+                           <name>HAProxy TCP Backend {#PXNAME}: Average response time is more than {$HAPROXY.BACK_RTIME.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Status</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.status[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Service state</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].status.first()</params>
+                        </step>
+                        <step>
+                           <type>BOOL_TO_DECIMAL</type>
+                           <params/>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>10m</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(#5)}=0</expression>
+                           <name>HAProxy TCP Backend {#PXNAME}: Server is DOWN</name>
+                           <priority>AVERAGE</priority>
+                           <description>Backend is not available.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Redispatched requests per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.wredis.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of times a request was redispatched to a different backend.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].wredis.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Backend {#PXNAME}: Retried connections per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.backend_tcp.wretr.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of times a connection was retried.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Backend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].wretr.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>HAProxy: TCP Backend {#PXNAME} Redispatched requests and retried connections per second</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.backend_tcp.wredis.rate[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.backend_tcp.wretr.rate[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+               </master_item>
+               <lld_macro_paths>
+                  <lld_macro_path>
+                     <lld_macro>{#PXNAME}</lld_macro>
+                     <path>$.pxname</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#SVNAME}</lld_macro>
+                     <path>$.svname</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#MODE}</lld_macro>
+                     <path>$.mode</path>
+                  </lld_macro_path>
+               </lld_macro_paths>
+            </discovery_rule>
+            <discovery_rule>
                <name>BACKEND discovery</name>
                <type>DEPENDENT</type>
                <key>haproxy.backend.discovery</key>
@@ -223,6 +564,11 @@ catch (error) {
                         <macro>{#SVNAME}</macro>
                         <value>BACKEND</value>
                         <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#MODE}</macro>
+                        <value>http</value>
+                        <formulaid>B</formulaid>
                      </condition>
                   </conditions>
                </filter>
@@ -543,6 +889,361 @@ catch (error) {
                      <lld_macro>{#SVNAME}</lld_macro>
                      <path>$.svname</path>
                   </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#MODE}</lld_macro>
+                     <path>$.mode</path>
+                  </lld_macro_path>
+               </lld_macro_paths>
+            </discovery_rule>
+            <discovery_rule>
+               <name>TCP FRONTEND discovery</name>
+               <type>DEPENDENT</type>
+               <key>haproxy.frontend_tcp.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#SVNAME}</macro>
+                        <value>FRONTEND</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#MODE}</macro>
+                        <value>tcp</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery TCP frontends</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Incoming traffic</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.frontend_tcp.bin[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>bps</units>
+                     <description>Number of bits received by the frontend</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].bin.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Outgoing traffic</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.frontend_tcp.bout[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>bps</units>
+                     <description>Number of bits sent by the frontend</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].bout.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Denied requests per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.frontend_tcp.dreq.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Requests denied due to security concerns (ACL-restricted) per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].dreq.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.FRONT_DREQ.MAX.WARN}</expression>
+                           <name>HAProxy TCP Frontend {#PXNAME}: Number of requests denied is more than {$HAPROXY.FRONT_DREQ.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Request errors per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.frontend_tcp.ereq.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of request errors per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].ereq.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.FRONT_EREQ.MAX.WARN}</expression>
+                           <name>HAProxy TCP Frontend {#PXNAME}: Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Sessions rate</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.frontend_tcp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of sessions created per second</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].rate.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Requests rate</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.frontend_tcp.req_rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>HTTP requests per second</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].req_rate.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Established sessions</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.frontend_tcp.scur[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The current number of established sessions.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].scur.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Session limits</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.frontend_tcp.slim[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The most simultaneous sessions that are allowed, as defined by the maxconn setting in the frontend.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].slim.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP Frontend {#PXNAME}: Session utilization</name>
+                     <type>CALCULATED</type>
+                     <key>haproxy.frontend_tcp.sutil[{#PXNAME}:{#SVNAME}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <params>last(haproxy.frontend_tcp.scur[{#PXNAME}:{#SVNAME}]) / last(haproxy.frontend_tcp.slim[{#PXNAME}:{#SVNAME}]) * 100</params>
+                     <description>Percentage of sessions used (scur / slim * 100).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP Frontend {#PXNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.FRONT_SUTIL.MAX.WARN}</expression>
+                           <name>HAProxy TCP Frontend {#PXNAME}: Session utilization is more than {$HAPROXY.FRONT_SUTIL.MAX.WARN}% for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy’s configuration to allow more sessions, or migrate your HAProxy server to a bigger box.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>HAProxy: TCP Frontend {#PXNAME} Errors and denials per second</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.frontend_tcp.ereq.rate[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.frontend_tcp.dreq.rate[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>HAProxy: TCP Frontend {#PXNAME} In/Out traffic</name>
+                     <graph_items>
+                        <graph_item>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.frontend_tcp.bin[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>GRADIENT_LINE</drawtype>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.frontend_tcp.bout[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>HAProxy: TCP Frontend {#PXNAME} Requests and sessions per second</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.frontend_tcp.req_rate[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.frontend_tcp.rate[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+               </master_item>
+               <lld_macro_paths>
+                  <lld_macro_path>
+                     <lld_macro>{#PXNAME}</lld_macro>
+                     <path>$.pxname</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#SVNAME}</lld_macro>
+                     <path>$.svname</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#MODE}</lld_macro>
+                     <path>$.mode</path>
+                  </lld_macro_path>
                </lld_macro_paths>
             </discovery_rule>
             <discovery_rule>
@@ -557,6 +1258,11 @@ catch (error) {
                         <macro>{#SVNAME}</macro>
                         <value>FRONTEND</value>
                         <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#MODE}</macro>
+                        <value>http</value>
+                        <formulaid>B</formulaid>
                      </condition>
                   </conditions>
                </filter>
@@ -1060,6 +1766,354 @@ catch (error) {
                      <lld_macro>{#SVNAME}</lld_macro>
                      <path>$.svname</path>
                   </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#MODE}</lld_macro>
+                     <path>$.mode</path>
+                  </lld_macro_path>
+               </lld_macro_paths>
+            </discovery_rule>
+            <discovery_rule>
+               <name>TCP Servers discovery</name>
+               <type>DEPENDENT</type>
+               <key>haproxy.server_tcp.discovery</key>
+               <delay>0</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#SVNAME}</macro>
+                        <value>FRONTEND|BACKEND</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#MODE}</macro>
+                        <value>tcp</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Discovery tcp servers</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Responses denied per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.dresp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Responses denied due to security concerns (ACL-restricted).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].dresp.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Errors connection per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.econ.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of requests that encountered an error attempting to connect to a backend server.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].econ.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Response errors per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.eresp.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of requests whose responses yielded an error.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].eresp.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.SERVER_ERESP.MAX.WARN}</expression>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}: Number of responses with error is more than {$HAPROXY.SERVER_ERESP.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Unassigned requests</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.qcur[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Current number of requests unassigned in queue.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].qcur.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.SERVER_QCUR.MAX.WARN}</expression>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Time in queue</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.qtime[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>Average time spent in queue (in ms) for the last 1,024 requests.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].qtime.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.SERVER_QTIME.MAX.WARN}</expression>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}: Average time spent in queue is more than {$HAPROXY.SERVER_QTIME.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Responses time</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.rtime[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>Average server response time (in ms) for the last 1,024 requests.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].rtime.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$HAPROXY.SERVER_RTIME.MAX.WARN}</expression>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}: Average response time is more than {$HAPROXY.SERVER_RTIME.MAX.WARN} for 5m</name>
+                           <priority>WARNING</priority>
+                           <description>Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Status</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.status[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Service state</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].status.first()</params>
+                        </step>
+                        <step>
+                           <type>BOOL_TO_DECIMAL</type>
+                           <params/>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>10m</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{max(#5)}=0</expression>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}: Server is DOWN</name>
+                           <priority>WARNING</priority>
+                           <description>Server is not available.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Redispatched requests per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.wredis.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of times a request was redispatched to a different backend.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].wredis.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>HAProxy TCP {#PXNAME} {#SVNAME}: Retried connections per second</name>
+                     <type>DEPENDENT</type>
+                     <key>haproxy.server_tcp.wretr.rate[{#PXNAME}:{#SVNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of times a connection was retried.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>HAProxy TCP {#PXNAME} {#SVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.[?(@.pxname == '{#PXNAME}' &amp;&amp; @.svname == '{#SVNAME}')].wretr.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>HAProxy: TCP {#PXNAME} {#SVNAME} Response time and time in queue</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.server_tcp.rtime[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template App HAProxy by Zabbix agent</host>
+                              <key>haproxy.server_tcp.qtime[{#PXNAME}:{#SVNAME}]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <master_item>
+                  <key>web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]</key>
+               </master_item>
+               <lld_macro_paths>
+                  <lld_macro_path>
+                     <lld_macro>{#PXNAME}</lld_macro>
+                     <path>$.pxname</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#SVNAME}</lld_macro>
+                     <path>$.svname</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#MODE}</lld_macro>
+                     <path>$.mode</path>
+                  </lld_macro_path>
                </lld_macro_paths>
             </discovery_rule>
             <discovery_rule>
@@ -1076,9 +2130,14 @@ catch (error) {
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>A</formulaid>
                      </condition>
+                     <condition>
+                        <macro>{#MODE}</macro>
+                        <value>http</value>
+                        <formulaid>B</formulaid>
+                     </condition>
                   </conditions>
                </filter>
-               <description>Discovery Servers</description>
+               <description>Discovery servers</description>
                <item_prototypes>
                   <item_prototype>
                      <name>HAProxy {#PXNAME} {#SVNAME}: Responses denied per second</name>
@@ -1446,6 +2505,10 @@ catch (error) {
                   <lld_macro_path>
                      <lld_macro>{#SVNAME}</lld_macro>
                      <path>$.svname</path>
+                  </lld_macro_path>
+                  <lld_macro_path>
+                     <lld_macro>{#MODE}</lld_macro>
+                     <path>$.mode</path>
                   </lld_macro_path>
                </lld_macro_paths>
             </discovery_rule>

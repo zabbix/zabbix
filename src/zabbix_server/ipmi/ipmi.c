@@ -119,8 +119,9 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 		goto cleanup;
 	}
 
-	data_len = zbx_ipmi_serialize_request(&data, host->hostid, interface.addr, interface.port, host->ipmi_authtype,
-			host->ipmi_privilege, host->ipmi_username, host->ipmi_password, sensor, op, NULL);
+	data_len = zbx_ipmi_serialize_request(&data, host->hostid, host->hostid, interface.addr, interface.port,
+			host->ipmi_authtype, host->ipmi_privilege, host->ipmi_username, host->ipmi_password, sensor, op,
+			NULL);
 
 	if (FAIL == zbx_ipc_socket_write(&ipmi_socket, ZBX_IPC_IPMI_SCRIPT_REQUEST, data, data_len))
 	{
@@ -189,9 +190,9 @@ int	zbx_ipmi_test_item(const DC_ITEM *item, char **info)
 		exit(EXIT_FAILURE);
 	}
 
-	data_len = zbx_ipmi_serialize_request(&data, item->host.hostid, item->interface.addr, item->interface.port,
-			item->host.ipmi_authtype, item->host.ipmi_privilege, item->host.ipmi_username,
-			item->host.ipmi_password, item->ipmi_sensor, 0, item->key);
+	data_len = zbx_ipmi_serialize_request(&data, item->host.hostid, item->host.hostid, item->interface.addr,
+			item->interface.port, item->host.ipmi_authtype, item->host.ipmi_privilege,
+			item->host.ipmi_username, item->host.ipmi_password, item->ipmi_sensor, 0, item->key);
 
 	zbx_ipc_message_init(&message);
 

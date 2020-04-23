@@ -125,7 +125,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$interface_hostids = [];
 
 		foreach ($data as $hostid => $texts) {
-			$matched_macros = $this->extractMacros($texts, $types);
+			$matched_macros = self::extractMacros($texts, $types);
 
 			if (array_key_exists('macros', $matched_macros)) {
 				if (array_key_exists('host', $matched_macros['macros']) && $matched_macros['macros']['host']) {
@@ -342,11 +342,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$original_triggers = $triggers;
-		$triggers = $this->resolveTriggerExpressionUserMacro($triggers);
+		$triggers = $this->resolveTriggerExpressions($triggers,
+			['resolve_usermacros' => true, 'resolve_functionids' => false]
+		);
 
 		// Find macros.
 		foreach ($triggers as $triggerid => $trigger) {
-			$matched_macros = $this->extractMacros([$trigger['description']], $types);
+			$matched_macros = self::extractMacros([$trigger['description']], $types);
 
 			if (!$options['references_only']) {
 				$functionids = $this->findFunctions($trigger['expression']);
@@ -500,7 +502,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$texts[] = $trigger[$source];
 			}
 
-			$matched_macros = $this->extractMacros($texts, $types);
+			$matched_macros = self::extractMacros($texts, $types);
 
 			foreach ($matched_macros['macros_n']['host'] as $token => $data) {
 				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
@@ -655,7 +657,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Find macros.
 		$functionids = $this->findFunctions($trigger['expression']);
-		$matched_macros = $this->extractMacros([$trigger['url']], $types);
+		$matched_macros = self::extractMacros([$trigger['url']], $types);
 
 		foreach ($matched_macros['macros']['trigger'] as $macro) {
 			$macro_values[$triggerid][$macro] = $triggerid;
@@ -753,41 +755,70 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Purpose: Translate {10}>10 to something like {localhost:system.cpu.load.last()}>10
 	 *
 	 * @param array  $triggers
-	 * @param string $triggers[][<sources>]			see options['source']
+	 * @param string $triggers[][<sources>]			  See options['source']
 	 * @param array  $options
-	 * @param bool   $options['html']				returns formatted trigger expression
-	 * @param bool   $options['resolve_usermacros']	resolve user macros
-	 * @param bool   $options['resolve_macros']		resolve macros in item keys and functions
-	 * @param array  $options['sources']			an array of the field names
+	 * @param bool   $options['html']				  Returns formatted trigger expression. Default: false.
+	 * @param bool   $options['resolve_usermacros']	  Resolve user macros. Default: false.
+	 * @param bool   $options['resolve_macros']		  Resolve macros in item keys and functions. Default: false.
+	 * @param bool   $options['resolve_functionids']  Resolve finctionid macros. Default: true.
+	 * @param array  $options['sources']			  An array of the field names. Default: ['expression'].
 	 *
 	 * @return string|array
 	 */
 	public function resolveTriggerExpressions(array $triggers, array $options) {
+		$options += [
+			'html' => false,
+			'resolve_usermacros' => false,
+			'resolve_macros' => false,
+			'resolve_functionids' => true,
+			'sources' => ['expression']
+		];
+
 		$functionids = [];
 		$usermacros = [];
 		$macro_values = [];
+		$usermacro_values = [];
 
 		$types = [
 			'macros' => [
 				'trigger' => ['{TRIGGER.VALUE}']
 			],
-			'functionids' => true,
 			'lldmacros' => true,
 			'usermacros' => true
 		];
 
+		$expression_data = new CTriggerExpression(['collapsed_expression' => true]);
+
 		// Find macros.
 		foreach ($triggers as $key => $trigger) {
+			$functionid_macros = [];
 			$texts = [];
 			foreach ($options['sources'] as $source) {
-				$texts[] = $trigger[$source];
+				if ($trigger[$source] !== '' && ($result = $expression_data->parse($trigger[$source])) !== false) {
+					foreach ($result->getTokens() as $token) {
+						switch ($token['type']) {
+							case CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
+								$functionid_macros[$token['value']] = null;
+								break;
+
+							case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
+								$texts[] = $token['value'];
+								break;
+
+							case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+								$texts[] = $token['data']['string'];
+								break;
+						}
+					}
+				}
 			}
 
-			$matched_macros = $this->extractMacros($texts, $types);
+			$matched_macros = self::extractMacros($texts, $types);
 
-			$macro_values[$key] = $matched_macros['functionids'];
+			$macro_values[$key] = $functionid_macros;
+			$usermacro_values[$key] = [];
 
-			foreach (array_keys($matched_macros['functionids']) as $macro) {
+			foreach (array_keys($functionid_macros) as $macro) {
 				$functionids[] = substr($macro, 1, -1); // strip curly braces
 			}
 
@@ -800,153 +831,168 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		if ($functionids) {
 			$functions = [];
 
-			// Selecting functions.
-			$result = DBselect(
-				'SELECT f.functionid,f.itemid,f.name,f.parameter'.
-				' FROM functions f'.
-				' WHERE '.dbConditionInt('f.functionid', $functionids)
-			);
+			if ($options['resolve_functionids']) {
+				// Selecting functions.
+				$result = DBselect(
+					'SELECT f.functionid,f.itemid,f.name,f.parameter'.
+					' FROM functions f'.
+					' WHERE '.dbConditionInt('f.functionid', $functionids)
+				);
 
-			$hostids = [];
-			$itemids = [];
-			$hosts = [];
-			$items = [];
-
-			while ($row = DBfetch($result)) {
-				$itemids[$row['itemid']] = true;
-				$row['function'] = $row['name'];
-				unset($row['name']);
-
-				$functions['{'.$row['functionid'].'}'] = $row;
-				unset($functions['{'.$row['functionid'].'}']['functionid']);
-			}
-
-			// Selecting items.
-			if ($itemids) {
-				if ($options['html']) {
-					$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,ir.state,id.parent_itemid'.
-						' FROM items i'.
-							' LEFT JOIN item_rtdata ir ON i.itemid=ir.itemid'.
-							' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-						' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
-				}
-				else {
-					$sql = 'SELECT i.itemid,i.hostid,i.key_'.
-						' FROM items i'.
-						' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
-				}
-				$result = DBselect($sql);
+				$hostids = [];
+				$itemids = [];
+				$hosts = [];
+				$items = [];
 
 				while ($row = DBfetch($result)) {
-					$hostids[$row['hostid']] = true;
-					$items[$row['itemid']] = $row;
-				}
-			}
+					$itemids[$row['itemid']] = true;
+					$row['function'] = $row['name'];
+					unset($row['name']);
 
-			// Selecting hosts.
-			if ($hostids) {
+					$functions['{'.$row['functionid'].'}'] = $row;
+					unset($functions['{'.$row['functionid'].'}']['functionid']);
+				}
+
+				// Selecting items.
+				if ($itemids) {
+					if ($options['html']) {
+						$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,ir.state,id.parent_itemid'.
+							' FROM items i'.
+								' LEFT JOIN item_rtdata ir ON i.itemid=ir.itemid'.
+								' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+							' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
+					}
+					else {
+						$sql = 'SELECT i.itemid,i.hostid,i.key_'.
+							' FROM items i'.
+							' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
+					}
+					$result = DBselect($sql);
+
+					while ($row = DBfetch($result)) {
+						$hostids[$row['hostid']] = true;
+						$items[$row['itemid']] = $row;
+					}
+				}
+
+				// Selecting hosts.
+				if ($hostids) {
+					$result = DBselect(
+						'SELECT h.hostid,h.host FROM hosts h WHERE '.dbConditionInt('h.hostid', array_keys($hostids))
+					);
+
+					while ($row = DBfetch($result)) {
+						$hosts[$row['hostid']] = $row;
+					}
+				}
+
+				if ($options['resolve_macros']) {
+					$items = $this->resolveItemKeys($items);
+					foreach ($items as &$item) {
+						$item['key_'] = $item['key_expanded'];
+						unset($item['key_expanded']);
+					}
+					unset($item);
+				}
+
+				foreach ($functions as $macro => &$function) {
+					if (!array_key_exists($function['itemid'], $items)) {
+						unset($functions[$macro]);
+						continue;
+					}
+					$item = $items[$function['itemid']];
+
+					if (!array_key_exists($item['hostid'], $hosts)) {
+						unset($functions[$macro]);
+						continue;
+					}
+					$host = $hosts[$item['hostid']];
+
+					$function['hostid'] = $item['hostid'];
+					$function['host'] = $host['host'];
+					$function['key_'] = $item['key_'];
+					if ($options['html']) {
+						$function['type'] = $item['type'];
+						$function['flags'] = $item['flags'];
+						$function['status'] = $item['status'];
+						$function['state'] = $item['state'];
+						$function['parent_itemid'] = $item['parent_itemid'];
+					}
+				}
+				unset($function);
+
+				if ($options['resolve_macros']) {
+					$functions = $this->resolveFunctionParameters($functions);
+					foreach ($functions as &$function) {
+						$function['parameter'] = $function['parameter_expanded'];
+						unset($function['parameter_expanded']);
+					}
+					unset($function);
+				}
+
+				foreach ($macro_values as &$macros) {
+					foreach ($macros as $macro => &$value) {
+						if (array_key_exists($macro, $functions)) {
+							$function = $functions[$macro];
+
+							if ($options['html']) {
+								$style = ($function['status'] == ITEM_STATUS_ACTIVE)
+									? ($function['state'] == ITEM_STATE_NORMAL) ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY
+									: $style = ZBX_STYLE_RED;
+
+								if ($function['type'] == ITEM_TYPE_HTTPTEST) {
+									$link = (new CSpan($function['host'].':'.$function['key_']))->addClass($style);
+								}
+								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+									$link = (new CLink($function['host'].':'.$function['key_'],
+										'disc_prototypes.php?form=update&itemid='.$function['itemid'].
+										'&parent_discoveryid='.$function['parent_itemid']
+									))
+										->addClass(ZBX_STYLE_LINK_ALT)
+										->addClass($style);
+								}
+								else {
+									$link = (new CLink($function['host'].':'.$function['key_'],
+										'items.php?form=update&itemid='.$function['itemid']
+									))
+										->addClass(ZBX_STYLE_LINK_ALT)
+										->setAttribute('data-itemid', $function['itemid'])
+										->addClass($style);
+								}
+
+								$value = [
+									'{', $link, '.', bold($function['function'].'('), $function['parameter'], bold(')'), '}'
+								];
+							}
+							else {
+								$value = '{'.
+									$function['host'].':'.
+									$function['key_'].'.'.
+									$function['function'].'('.$function['parameter'].')'.
+								'}';
+							}
+						}
+						else {
+							$value = $options['html'] ? (new CSpan('*ERROR*'))->addClass(ZBX_STYLE_RED) : '*ERROR*';
+						}
+					}
+					unset($value);
+				}
+				unset($macros);
+			}
+			else {
+				// Selecting functions.
 				$result = DBselect(
-					'SELECT h.hostid,h.host FROM hosts h WHERE '.dbConditionInt('h.hostid', array_keys($hostids))
+					'SELECT f.functionid,i.hostid'.
+					' FROM functions f,items i'.
+					' WHERE f.itemid=i.itemid'.
+						' AND '.dbConditionInt('f.functionid', $functionids)
 				);
 
 				while ($row = DBfetch($result)) {
-					$hosts[$row['hostid']] = $row;
+					$functions['{'.$row['functionid'].'}'] = ['hostid' => $row['hostid']];
 				}
 			}
-
-			if ($options['resolve_macros']) {
-				$items = $this->resolveItemKeys($items);
-				foreach ($items as &$item) {
-					$item['key_'] = $item['key_expanded'];
-					unset($item['key_expanded']);
-				}
-				unset($item);
-			}
-
-			foreach ($functions as $macro => &$function) {
-				if (!array_key_exists($function['itemid'], $items)) {
-					unset($functions[$macro]);
-					continue;
-				}
-				$item = $items[$function['itemid']];
-
-				if (!array_key_exists($item['hostid'], $hosts)) {
-					unset($functions[$macro]);
-					continue;
-				}
-				$host = $hosts[$item['hostid']];
-
-				$function['hostid'] = $item['hostid'];
-				$function['host'] = $host['host'];
-				$function['key_'] = $item['key_'];
-				if ($options['html']) {
-					$function['type'] = $item['type'];
-					$function['flags'] = $item['flags'];
-					$function['status'] = $item['status'];
-					$function['state'] = $item['state'];
-					$function['parent_itemid'] = $item['parent_itemid'];
-				}
-			}
-			unset($function);
-
-			if ($options['resolve_macros']) {
-				$functions = $this->resolveFunctionParameters($functions);
-				foreach ($functions as &$function) {
-					$function['parameter'] = $function['parameter_expanded'];
-					unset($function['parameter_expanded']);
-				}
-				unset($function);
-			}
-
-			foreach ($macro_values as &$macros) {
-				foreach ($macros as $macro => &$value) {
-					if (array_key_exists($macro, $functions)) {
-						$function = $functions[$macro];
-
-						if ($options['html']) {
-							$style = ($function['status'] == ITEM_STATUS_ACTIVE)
-								? ($function['state'] == ITEM_STATE_NORMAL) ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY
-								: $style = ZBX_STYLE_RED;
-
-							if ($function['type'] == ITEM_TYPE_HTTPTEST) {
-								$link = (new CSpan($function['host'].':'.$function['key_']))->addClass($style);
-							}
-							elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-								$link = (new CLink($function['host'].':'.$function['key_'],
-									'disc_prototypes.php?form=update&itemid='.$function['itemid'].
-									'&parent_discoveryid='.$function['parent_itemid']
-								))
-									->addClass(ZBX_STYLE_LINK_ALT)
-									->addClass($style);
-							}
-							else {
-								$link = (new CLink($function['host'].':'.$function['key_'],
-									'items.php?form=update&itemid='.$function['itemid']
-								))
-									->addClass(ZBX_STYLE_LINK_ALT)
-									->setAttribute('data-itemid', $function['itemid'])
-									->addClass($style);
-							}
-
-							$value = [
-								'{', $link, '.', bold($function['function'].'('), $function['parameter'], bold(')'), '}'
-							];
-						}
-						else {
-							$value = '{'.
-								$function['host'].':'.
-								$function['key_'].'.'.
-								$function['function'].'('.$function['parameter'].')'.
-							'}';
-						}
-					}
-					else {
-						$value = $options['html'] ? (new CSpan('*ERROR*'))->addClass(ZBX_STYLE_RED) : '*ERROR*';
-					}
-				}
-				unset($value);
-			}
-			unset($macros);
 
 			foreach ($usermacros as $key => &$usermacros_data) {
 				foreach (array_keys($macro_values[$key]) as $macro) {
@@ -959,112 +1005,70 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			unset($usermacros_data);
 
 			// Get user macros values.
-			foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
-				$macro_values[$key] = array_key_exists($key, $macro_values)
-					? array_merge($macro_values[$key], $usermacros_data['macros'])
-					: $usermacros_data['macros'];
+			foreach ($this->getUserMacros($usermacros, true) as $key => $usermacros_data) {
+				$usermacro_values[$key] = $usermacros_data['macros'];
 			}
 		}
 
-		$types = $this->transformToPositionTypes($types);
-
 		// Replace macros to value.
-		foreach ($triggers as $key => &$trigger) {
+		foreach ($triggers as $key => $trigger) {
 			foreach ($options['sources'] as $source) {
-				$matched_macros = $this->getMacroPositions($trigger[$source], $types);
+				if ($trigger[$source] === '' || ($result = $expression_data->parse($trigger[$source])) === false) {
+					continue;
+				}
 
-				if ($options['html']) {
-					$expression = [];
-					$pos_left = 0;
+				$expression = [];
+				$pos_left = 0;
 
-					foreach ($matched_macros as $pos => $macro) {
-						if (array_key_exists($macro, $macro_values[$key])) {
-							if ($pos_left != $pos) {
-								$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+				foreach ($result->getTokens() as $token) {
+					switch ($token['type']) {
+						case CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
+							if (!$options['resolve_functionids']) {
+								continue 2;
 							}
+							// break; is not missing here
 
-							$expression[] = $macro_values[$key][$macro];
-
-							$pos_left = $pos + strlen($macro);
-						}
+						case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
+						case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+							if ($pos_left != $token['pos']) {
+								$expression[] = substr($trigger[$source], $pos_left, $token['pos'] - $pos_left);
+							}
+							$pos_left = $token['pos'] + $token['length'];
+							break;
 					}
+
+					switch ($token['type']) {
+						case CTriggerExprParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
+							$expression[] = $macro_values[$key][$token['value']];
+							break;
+
+						case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
+							if (array_key_exists($token['value'], $usermacro_values[$key])) {
+								$expression[] =
+									CTriggerExpression::quoteString($usermacro_values[$key][$token['value']], false);
+							}
+							else {
+								$expression[] = ($options['resolve_usermacros'] && $options['html'])
+									? (new CSpan('*ERROR*'))->addClass(ZBX_STYLE_RED)
+									: $token['value'];
+							}
+							break;
+
+						case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+							$string = strtr($token['data']['string'], $usermacro_values[$key]);
+							$expression[] = CTriggerExpression::quoteString($string, false, true);
+							break;
+
+					}
+				}
+
+				if ($pos_left != strlen($trigger[$source])) {
 					$expression[] = substr($trigger[$source], $pos_left);
-
-					$trigger[$source] = $expression;
 				}
-				else {
-					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-						if (array_key_exists($macro, $macro_values[$key])) {
-							$trigger[$source] =
-								substr_replace($trigger[$source], $macro_values[$key][$macro], $pos, strlen($macro));
-						}
-					}
-				}
+
+				$triggers[$key][$source] = $options['html'] ? $expression : implode('', $expression);
 			}
 		}
-		unset($trigger);
-
-		return $triggers;
-	}
-
-	/**
-	 * Resolve user macros in trigger expression.
-	 *
-	 * @param string $triggers[$triggerid]['expression']
-	 *
-	 * @return array
-	 */
-	public function resolveTriggerExpressionUserMacro(array $triggers) {
-		$usermacros = [];
-		$macro_values = [];
-
-		$types = ['usermacros' => true];
-
-		// Find macros.
-		foreach ($triggers as $triggerid => $trigger) {
-			$matched_macros = $this->extractMacros([$trigger['expression']], $types);
-
-			if ($matched_macros['usermacros']) {
-				$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
-			}
-		}
-
-		if ($usermacros) {
-			// Get hosts for triggers.
-			$db_triggers = API::Trigger()->get([
-				'output' => [],
-				'selectHosts' => ['hostid'],
-				'triggerids' => array_keys($usermacros),
-				'preservekeys' => true
-			]);
-
-			foreach ($usermacros as $triggerid => &$usermacros_data) {
-				if (array_key_exists($triggerid, $db_triggers)) {
-					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
-				}
-			}
-			unset($usermacros_data);
-
-			// Get user macros values.
-			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
-				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
-					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
-					: $usermacros_data['macros'];
-			}
-		}
-
-		$types = $this->transformToPositionTypes($types);
-
-		// Replace macros to value.
-		foreach ($triggers as $triggerid => &$trigger) {
-			$matched_macros = $this->getMacroPositions($trigger['expression'], $types);
-
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				$trigger['expression'] =
-					substr_replace($trigger['expression'], $macro_values[$triggerid][$macro], $pos, strlen($macro));
-			}
-		}
-		unset($trigger);
 
 		return $triggers;
 	}
@@ -1339,7 +1343,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($items as $key => $item) {
-			$matched_macros = $this->extractMacros([$item['name_expanded']], $types);
+			$matched_macros = self::extractMacros([$item['name_expanded']], $types);
 
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = ['hostids' => [$item['hostid']], 'macros' => $matched_macros['usermacros']];
@@ -1616,7 +1620,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$texts[] = $value[$source];
 			}
 
-			$matched_macros = $this->extractMacros($texts, $types);
+			$matched_macros = self::extractMacros($texts, $types);
 
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = [
@@ -2005,7 +2009,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// Extract macros from collected strings.
-			$matched_macros = $this->extractMacros($texts, $types_by_selement_type[$selement_type]);
+			$matched_macros = self::extractMacros($texts, $types_by_selement_type[$selement_type]);
 
 			// Map extracted macros to map elements.
 			if (array_key_exists('macros', $matched_macros)) {
@@ -2205,7 +2209,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						 * For example, having a trigger like: '{host:item.change()}=1 or {$MACRO: "{1234} ..."}' gives
 						 * incorrect result of 'functionids' without requesting to parse macros and user macros as well.
 						 */
-						$matched_functionids = $this->extractMacros([$trigger['expression']], [
+						$matched_functionids = self::extractMacros([$trigger['expression']], [
 							'macros' => [
 								'trigger' => ['{TRIGGER.VALUE}']
 							],
@@ -2562,7 +2566,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			$num = 0;
-			$matched_macros = $this->extractMacros([$trigger['expression'].$trigger['recovery_expression']], $types);
+			$matched_macros = self::extractMacros([$trigger['expression'].$trigger['recovery_expression']], $types);
 
 			foreach (array_keys($matched_macros['functionids']) as $macro) {
 				$functionid = substr($macro, 1, -1); // strip curly braces
@@ -2651,7 +2655,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Extract macros.
 		if ($data['supported_macros']) {
-			$matched_macros = $this->extractMacros($data['texts_support_macros'],
+			$matched_macros = self::extractMacros($data['texts_support_macros'],
 				['macros' => $data['supported_macros']]
 			);
 
@@ -2665,7 +2669,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Extract user macros.
 		$data['texts_support_user_macros'] = array_merge($texts, $data['texts_support_user_macros']);
 		if ($data['texts_support_user_macros']) {
-			$matched_macros = $this->extractMacros($data['texts_support_user_macros'], ['usermacros' => true]);
+			$matched_macros = self::extractMacros($data['texts_support_user_macros'], ['usermacros' => true]);
 
 			$usermacros = [[
 				'macros' => $matched_macros['usermacros'],
@@ -2683,7 +2687,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			? array_merge($texts, $data['texts_support_lld_macros'])
 			: [];
 		if ($data['texts_support_lld_macros']) {
-			$matched_macros = $this->extractMacros($data['texts_support_lld_macros'], ['lldmacros' => true]);
+			$matched_macros = self::extractMacros($data['texts_support_lld_macros'], ['lldmacros' => true]);
 
 			foreach (array_keys($matched_macros['lldmacros']) as $lldmacro) {
 				$macros[$lldmacro] = $lldmacro;
@@ -2731,7 +2735,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$url_macros = [];
 
 		foreach ($urls as $index => $url) {
-			$matched_macros = $this->extractMacros([$url['url'], $url['name']], $types);
+			$matched_macros = self::extractMacros([$url['url'], $url['name']], $types);
 			$url_macros[$index] = [];
 
 			foreach ($matched_macros['macros_an']['event'] as $token => $data) {

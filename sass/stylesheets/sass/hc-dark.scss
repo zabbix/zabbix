@@ -317,7 +317,7 @@ $multiselect-selected-bg-color: #222222;
 
 	.dashbrd-grid-new-widget-label {
 		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -269px -888px;
+			background: url($sprite-path) no-repeat -269px -888px;
 		}
 	}
 }
@@ -325,7 +325,7 @@ $multiselect-selected-bg-color: #222222;
 .dashbrd-grid-widget-set-size {
 	.dashbrd-grid-new-widget-label {
 		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -457px -888px;
+			background: url($sprite-path) no-repeat -457px -888px;
 		}
 	}
 }
@@ -391,10 +391,10 @@ $multiselect-selected-bg-color: #222222;
 }
 
 $var-icons: (
-	maint: url(../img/icon-sprite.svg) no-repeat -357px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -361px -729px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -361px -765px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -357px -693px
+	maint: url($sprite-path) no-repeat -357px -802px,
+	depend-up: url($sprite-path) no-repeat -361px -729px,
+	depend-down: url($sprite-path) no-repeat -361px -765px,
+	ackn: url($sprite-path) no-repeat -357px -693px
 );
 
 // Dynamically generated classes:
@@ -413,8 +413,8 @@ $var-icons: (
 }
 
 $form-icon-btn: (
-	cal: url(../img/icon-sprite.svg) no-repeat -354px -834px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -317px -617px
+	cal: url($sprite-path) no-repeat -354px -834px,
+	wzrd-action: url($sprite-path) no-repeat -317px -617px
 );
 
 // Dynamically generated classes:
@@ -432,14 +432,14 @@ $form-icon-btn: (
 }
 
 $icon-btn: (
-	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -187px,
-	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -223px,
-	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -223px,
-	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -259px,
-	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -295px,
-	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -329px,
-	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -367px,
-	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -403px
+	conf: $btn-bg-color url($sprite-path) no-repeat -43px -187px,
+	kiosk: $btn-bg-color url($sprite-path) no-repeat -79px -223px,
+	max: $btn-bg-color url($sprite-path) no-repeat -43px -223px,
+	min: $btn-bg-color url($sprite-path) no-repeat -43px -259px,
+	add-fav: $btn-bg-color url($sprite-path) no-repeat -43px -295px,
+	remove-fav: $btn-bg-color url($sprite-path) no-repeat -43px -329px,
+	action: $btn-bg-color url($sprite-path) no-repeat -43px -367px,
+	info: $btn-bg-color url($sprite-path) no-repeat -43px -403px
 );
 
 // Dynamically generated classes:
@@ -459,17 +459,17 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	iterator-page-previous: url(../img/icon-sprite.svg) no-repeat -397px -657px,
-	iterator-page-next: url(../img/icon-sprite.svg) no-repeat -395px -623px,
-	widget-action: url(../img/icon-sprite.svg) no-repeat -318px -618px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -318px -654px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -318px -690px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -354px -619px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -318px -546px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -318px -582px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -318px -474px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -318px -510px,
-	info-clock: url(../img/icon-sprite.svg) no-repeat -399px -762px
+	iterator-page-previous: url($sprite-path) no-repeat -397px -657px,
+	iterator-page-next: url($sprite-path) no-repeat -395px -623px,
+	widget-action: url($sprite-path) no-repeat -318px -618px,
+	widget-collapse: url($sprite-path) no-repeat -318px -654px,
+	widget-expand: url($sprite-path) no-repeat -318px -690px,
+	widget-edit: url($sprite-path) no-repeat -354px -619px,
+	alarm-on: url($sprite-path) no-repeat -318px -546px,
+	alarm-off: url($sprite-path) no-repeat -318px -582px,
+	sound-on: url($sprite-path) no-repeat -318px -474px,
+	sound-off: url($sprite-path) no-repeat -318px -510px,
+	info-clock: url($sprite-path) no-repeat -399px -762px
 );
 
 // Dynamically generated classes:
@@ -492,7 +492,7 @@ $icon-widget-btn: (
 }
 
 .btn-dashbrd-conf {
-	background: url(../img/icon-sprite.svg) no-repeat -354px -619px !important;
+	background: url($sprite-path) no-repeat -354px -619px !important;
 }
 
 .subfilter-enabled {
@@ -542,7 +542,7 @@ $icon-widget-btn: (
 
 		&.selected {
 			&::before {
-				background: url(../img/icon-sprite.svg) no-repeat -317px -835px;
+				background: url($sprite-path) no-repeat -317px -835px;
 			}
 		}
 	}
@@ -570,19 +570,19 @@ $icon-widget-btn: (
 }
 
 .add-child-btn {
-	background: url(../img/icon-sprite.svg) no-repeat -359px -551px !important;
+	background: url($sprite-path) no-repeat -359px -551px !important;
 }
 
 .edit-item-btn {
-	background: url(../img/icon-sprite.svg) no-repeat -359px -478px !important;
+	background: url($sprite-path) no-repeat -359px -478px !important;
 }
 
 .import-items-btn {
-	background: url(../img/icon-sprite.svg) no-repeat -359px -515px !important;
+	background: url($sprite-path) no-repeat -359px -515px !important;
 }
 
 .drag-icon {
-	background: url(../img/icon-sprite.svg) no-repeat -318px -762px !important;
+	background: url($sprite-path) no-repeat -318px -762px !important;
 }
 
 // Colors and general.
@@ -878,7 +878,7 @@ a.link-action {
 			}
 
 			.icon-wzrd-action {
-				background: transparent url(../img/icon-sprite.svg) no-repeat -318px -624px;
+				background: transparent url($sprite-path) no-repeat -318px -624px;
 			}
 		}
 	}
@@ -929,7 +929,7 @@ a.link-action {
 	}
 
 	&::after {
-		background: url(../img/icon-sprite.svg) no-repeat;
+		background: url($sprite-path) no-repeat;
 		content: '';
 		position: absolute;
 		left: 6px;
@@ -1079,7 +1079,7 @@ td.inactive-bg {
 
 	&::after {
 		content: '';
-		background: url(../img/icon-sprite.svg) no-repeat -256px -443px;
+		background: url($sprite-path) no-repeat -256px -443px;
 		width: 22px;
 		height: 18px;
 		top: 5px;
@@ -1330,7 +1330,7 @@ td.inactive-bg {
 
 		&::before {
 			content: '';
-			background-image: url(../img/icon-sprite.svg);
+			background-image: url($sprite-path);
 			background-repeat: no-repeat;
 			border-radius: 3px;
 			position: absolute;

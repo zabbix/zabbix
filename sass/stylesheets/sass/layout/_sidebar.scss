@@ -99,7 +99,7 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	.button-expand {
 		width: 24px;
 		height: 24px;
-		background: url(../img/icon-sprite.svg) no-repeat;
+		background: url($sprite-path) no-repeat;
 		border: none;
 		border-radius: 0;
 		text-indent: -9999px;
@@ -265,7 +265,7 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	.button-toggle {
 		width: 24px;
 		height: 24px;
-		background: url(../img/icon-sprite.svg) no-repeat $sidebar-toggle-bg-position;
+		background: url($sprite-path) no-repeat $sidebar-toggle-bg-position;
 		border: none;
 		border-radius: 0;
 		text-indent: -9999px;
