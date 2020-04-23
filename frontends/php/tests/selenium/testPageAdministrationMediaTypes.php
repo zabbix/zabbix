@@ -452,7 +452,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'name' => 'Reference webhook',
 					'webhook' => true,
-					'parameters' => ['Message', 'Subject', 'To', 'URL', 'Response'],
+					'parameters' => ['HTTPProxy', 'Message', 'Subject', 'To', 'URL', 'Response'],
 					'error' => [
 						'Connection to Zabbix server "localhost" refused. Possible reasons:',
 						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
