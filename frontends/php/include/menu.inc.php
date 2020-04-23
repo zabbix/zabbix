@@ -156,7 +156,8 @@ function getMainMenu(): CMenu {
 						->setAliases(['autoreg.edit', 'housekeeping.edit', 'image.list', 'image.edit',
 							'iconmap.list', 'iconmap.edit', 'regex.list', 'regex.edit', 'macros.edit', 'valuemap.list',
 							'valuemap.edit', 'workingtime.edit', 'trigseverity.edit', 'trigdisplay.edit',
-							'miscconfig.edit', 'module.list', 'module.edit', 'module.scan'
+							'miscconfig.edit', 'module.list', 'module.edit', 'module.scan',
+							'conf.import.php?rules_preset=valuemap'
 						]),
 					(new CMenuItem(_('Proxies')))
 						->setAction('proxy.list')
