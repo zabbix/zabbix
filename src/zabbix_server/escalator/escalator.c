@@ -498,10 +498,10 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	else
 	{
 		result = DBselect(
-				"select mtm.subject,mtm.message,mt.mediatypeid from media_type mt"
-				" left join (select mediatypeid,subject,message from media_type_message"
-				" where eventsource=%d and recovery=%d) mtm"
-				" on mt.mediatypeid=mtm.mediatypeid"
+				"select mm.mediatype_messageid,mm.subject,mm.message,mt.mediatypeid from media_type mt"
+				" left join (select mediatypeid,subject,message,mediatype_messageid"
+				" from media_type_message where eventsource=%d and recovery=%d) mm"
+				" on mt.mediatypeid=mm.mediatypeid"
 				" join (select distinct mediatypeid from media where userid=" ZBX_FS_UI64 ") m"
 				" on mt.mediatypeid=m.mediatypeid",
 				evt_src, op_mode, userid);
@@ -509,11 +509,14 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(mediatypeid, row[2]);
+		zbx_uint64_t	mtmid;
 
-		if (FAIL == DBis_null(row[0]) || FAIL == DBis_null(row[1]))
+		ZBX_DBROW2UINT64(mtmid, row[0]);
+		ZBX_STR2UINT64(mediatypeid, row[3]);
+
+		if (0 != mtmid)
 		{
-			add_user_msg(userid, mediatypeid, user_msg, row[0], row[1], actionid, event, r_event, ack,
+			add_user_msg(userid, mediatypeid, user_msg, row[1], row[2], actionid, event, r_event, ack,
 					macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE);
 		}
 		else
