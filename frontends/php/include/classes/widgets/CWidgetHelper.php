@@ -57,7 +57,7 @@ class CWidgetHelper {
 							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)))
 						->addClass('table-forms-second-column')
 						->addStyle('position: absolute; right: 8px; top: 5px;')
-				]))->addStyle('position: relative;')
+				]))->addStyle('position: relative; transform: scale(1);')
 			)
 			->addRow(_('Name'),
 				(new CTextBox('name', $dialogue_name))
