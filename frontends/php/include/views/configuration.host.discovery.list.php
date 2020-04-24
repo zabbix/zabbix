@@ -168,6 +168,7 @@ $discoveryTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Host'),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Items'),
 		_('Triggers'),
@@ -239,6 +240,7 @@ foreach ($data['discoveries'] as $discovery) {
 
 	$discoveryTable->addRow([
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
+		$discovery['hosts'][0]['name'],
 		$description,
 		[
 			new CLink(
