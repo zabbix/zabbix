@@ -168,7 +168,7 @@ class testFormHostTags extends CWebTest {
 		]);
 
 		$form->selectTab('Tags');
-		$this->fillTags($data['tags']);
+		$this->fillParameters($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -275,7 +275,7 @@ class testFormHostTags extends CWebTest {
 		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
-		$this->fillTags($data['tags']);
+		$this->fillParameters($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -320,7 +320,7 @@ class testFormHostTags extends CWebTest {
 		$form->getField('Host name')->fill($new_name);
 
 		$form->selectTab('Tags');
-		$tags = $this->getTags();
+		$tags = $this->getValues();
 
 		$this->query('button:'.$action)->one()->click();
 		$form->submit();
@@ -340,7 +340,7 @@ class testFormHostTags extends CWebTest {
 		$this->assertEquals($new_name, $name);
 
 		$form->selectTab('Tags');
-		$this->assertTags($tags);
+		$this->assertValues($tags);
 	}
 
 	private function checkTagFields($data) {
@@ -348,6 +348,6 @@ class testFormHostTags extends CWebTest {
 		$this->page->open('hosts.php?form=update&hostid='.$id.'&groupid=0');
 		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
-		$this->assertTags($data['tags']);
+		$this->assertValues($data['tags']);
 	}
 }

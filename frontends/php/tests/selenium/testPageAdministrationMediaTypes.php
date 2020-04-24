@@ -73,7 +73,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					'result' => ['Discord', 'Email', 'Email (HTML)', 'Jira', 'Jira with CustomFields', 'Mattermost',
-						'MS Teams', 'Opsgenie', 'PagerDuty', 'Pushover', 'Redmine', 'SIGNL4', 'Slack', 'SMS', 'Telegram',
+						'MS Teams', 'Opsgenie', 'PagerDuty', 'Pushover', 'Redmine', 'Reference webhook', 'SIGNL4',
+						'Slack', 'SMS', 'Telegram', 'URL test webhook', 'Validation webhook', 'Webhook to delete',
 						'Zendesk'
 					]
 				]
@@ -445,6 +446,22 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Connection refused'
 					]
 				]
+			],
+			// 	Webhook media type.
+			[
+				[
+					'name' => 'Reference webhook',
+					'webhook' => true,
+					'parameters' => ['HTTPProxy', 'Message', 'Subject', 'To', 'URL', 'Response'],
+					'error' => [
+						'Connection to Zabbix server "localhost" refused. Possible reasons:',
+						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
+						'2. Security environment (for example, SELinux) is blocking the connection;',
+						'3. Zabbix server daemon not running;',
+						'4. Firewall is blocking TCP connection.',
+						'Connection refused'
+					]
+				]
 			]
 		];
 	}
@@ -465,6 +482,11 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Test media type "'.$data['name'].'"', $dialog->getTitle());
 		$form = $dialog->asForm();
+		$fields = CTestArrayHelper::get($data, 'parameters', ['Send to', 'Subject', 'Message']);
+		$this->assertEquals($fields, $form->getLabels()->asText());
+		if (CTestArrayHelper::get($data, 'webhook', false)) {
+			$this->assertTrue($form->getField('Response')->isEnabled(false));
+		}
 
 		// Fill and submit testing form.
 		if (array_key_exists('form', $data)) {
@@ -481,6 +503,11 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 		else {
 			$this->assertTrue($message->hasLine($data['error']));
+		}
+
+		if (CTestArrayHelper::get($data, 'webhook', false)) {
+			$form->checkValue(['Response' => 'false']);
+			$this->assertEquals($form->query('id:webhook_response_type')->one()->getText(), 'Response type: String');
 		}
 	}
 
