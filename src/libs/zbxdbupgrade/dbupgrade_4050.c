@@ -1663,6 +1663,22 @@ static int	DBpatch_4050074(void)
 	return DBmodify_field_type("media_type", &field, &old_field);
 }
 
+static int	DBpatch_4050075(void)
+{
+	const ZBX_FIELD	old_field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("auditlog_details", &field, &old_field);
+}
+
+static int	DBpatch_4050076(void)
+{
+	const ZBX_FIELD	old_field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("auditlog_details", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1738,5 +1754,7 @@ DBPATCH_ADD(4050071, 0, 1)
 DBPATCH_ADD(4050072, 0, 1)
 DBPATCH_ADD(4050073, 0, 1)
 DBPATCH_ADD(4050074, 0, 1)
+DBPATCH_ADD(4050075, 0, 1)
+DBPATCH_ADD(4050076, 0, 1)
 
 DBPATCH_END()
