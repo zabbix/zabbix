@@ -77,8 +77,6 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'unacknowledge_problem' => $this->getInput('unacknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 0,
-			'has_ack_events'=> false,
-			'has_unack_events'=> false,
 			'problem_can_be_closed' => false,
 			'problem_severity_can_be_changed' => false
 		];
@@ -122,6 +120,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'preservekeys' => true
 		]);
 
+		$ack_count = 0;
+
 		// Loop through events to figure out what operations should be allowed.
 		foreach ($events as $event) {
 			$can_be_closed = true;
@@ -151,9 +151,11 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				$data['problem_can_be_closed'] = true;
 			}
 
-			$data['has_ack_events'] |= ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
-			$data['has_unack_events'] |= ($event['acknowledged'] != EVENT_ACKNOWLEDGED);
+			$ack_count += ($event['acknowledged'] === EVENT_ACKNOWLEDGED) ? 1 : 0;
 		}
+
+		$data['has_ack_events'] = ($ack_count > 0);
+		$data['has_unack_events'] = ($ack_count != count($event));
 
 		// Severity can be changed only for editable triggers.
 		$data['problem_severity_can_be_changed'] = !!$editable_triggers;
