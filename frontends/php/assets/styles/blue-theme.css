@@ -3327,6 +3327,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0 10px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
+      .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
+        position: relative;
+        transform: scale(1); }
+        .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field .table-forms-second-column {
+          position: absolute;
+          top: 5px;
+          right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
         margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
