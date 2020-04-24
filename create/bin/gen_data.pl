@@ -180,7 +180,6 @@ sub process_row
 				$_ =~ s/&eol;/' || chr(13) || chr(10) || '/g;
 				$_ =~ s/&bsn;/' || chr(10) || '/g;
 
-				# field No.22 is 'script' field in 'media_type' table
 				if (length($_) > $oracle_field_limit)
 				{
 					my @sections = unpack("(A$oracle_field_limit)*", $_);
@@ -189,6 +188,9 @@ sub process_row
 					my $script;
 
 					$split_script_field = 1;
+
+					# escape "\n" that have to remain as is in the code
+					$_ =~ s/\\n/\\\\\\\\n/g;
 
 					foreach (@sections)
 					{
