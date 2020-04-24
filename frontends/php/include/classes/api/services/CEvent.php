@@ -766,19 +766,13 @@ class CEvent extends CApiService {
 		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
 		$has_severity_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY);
 
-		$ack_variants = [ZBX_PROBLEM_UPDATE_ACKNOWLEDGE, ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE];
-		$ack_action_fulfilled = false;
-		foreach ($ack_variants as $ack_variant) {
-			if (($data['action'] & $ack_variant) == $ack_variant) {
-				if ($ack_action_fulfilled) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
-						_s('value must be one of %1$s', implode(', ', $ack_variants))
-					));
-				}
-				else {
-					$ack_action_fulfilled = true;
-				}
-			}
+		if (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) &&
+				($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+				]))
+			));
 		}
 
 		$events = $this->get([
