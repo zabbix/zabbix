@@ -181,6 +181,7 @@ class CMenuItem extends CTag {
 			foreach ($this->aliases[$action_name] as $alias_params) {
 				if (!array_diff_assoc($alias_params, $request_params)) {
 					$this->setSelected();
+
 					return true;
 				}
 			}
@@ -188,6 +189,7 @@ class CMenuItem extends CTag {
 
 		if ($this->sub_menu !== null && $this->sub_menu->setSelectedByAction($action_name, $request_params, $expand)) {
 			$this->setSelected();
+
 			return true;
 		}
 
