@@ -596,7 +596,8 @@ class CConfigurationExportBuilder {
 				'verify_peer' => $discoveryRule['verify_peer'],
 				'verify_host' => $discoveryRule['verify_host'],
 				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
-				'preprocessing' => $discoveryRule['preprocessing']
+				'preprocessing' => $discoveryRule['preprocessing'],
+				'overrides' => $discoveryRule['overrides']
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {

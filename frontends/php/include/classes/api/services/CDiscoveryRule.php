@@ -1161,7 +1161,7 @@ class CDiscoveryRule extends CItemGeneral {
 											$optag[] = [
 												'lld_override_operationid' => $operation['lld_override_operationid'],
 												'tag' => $tag['tag'],
-												'value'	=> $tag['value']
+												'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
 											];
 										}
 									}
