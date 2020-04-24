@@ -53,7 +53,7 @@ my %sqlite3 = (
 # Maximum line length that SQL*Plus can read from .sql file is 2499 characters.
 # Splitting long entries in 'media_type' table have to happen before SQL*Plus limit has been reached and end-of-lien
 # character has to stay intact in one line.
-my $oracle_field_limit = 2000;
+my $oracle_field_limit = 2048;
 my $media_type = 0;
 
 sub process_table
@@ -122,16 +122,10 @@ sub process_row
 
 	my $first = 1;
 	my $values = "(";
-	my $count = 0;
 	my $split_script_field = 0;
 
 	foreach (@array)
 	{
-		if ($output{'database'} eq 'oracle' && $media_type == 1)
-		{
-			$count++;
-		}
-
 		$values = "$values," if ($first == 0);
 		$first = 0;
 
@@ -187,7 +181,7 @@ sub process_row
 				$_ =~ s/&bsn;/' || chr(10) || '/g;
 
 				# field No.22 is 'script' field in 'media_type' table
-				if ($count == 22 && length($_) > $oracle_field_limit)
+				if (length($_) > $oracle_field_limit)
 				{
 					my @sections = unpack("(A$oracle_field_limit)*", $_);
 					my $move_to_next;
