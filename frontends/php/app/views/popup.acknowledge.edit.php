@@ -77,14 +77,14 @@ $form_list
 			->addClass(ZBX_STYLE_HOR_LIST)
 	);
 
-if ($data['has_unack_events'] && $data['has_ack_events'] || $data['has_unack_events']) {
+if ($data['has_unack_events']) {
 	$form_list->addRow(_('Acknowledge'),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 			->onChange("$('#unacknowledge_problem').prop('disabled', this.checked)")
 	);
 }
 
-if ($data['has_unack_events'] && $data['has_ack_events'] || $data['has_ack_events']) {
+if ($data['has_ack_events']) {
 	$form_list->addRow(_('Unacknowledge'),
 		(new CCheckBox('unacknowledge_problem', ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
 			->onChange("$('#acknowledge_problem').prop('disabled', this.checked)")
