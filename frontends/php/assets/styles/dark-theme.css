@@ -257,6 +257,8 @@ header {
     margin: 0 -2px 0 auto;
     padding: 2px;
     white-space: nowrap; }
+    header .header-controls label {
+      line-height: 24px; }
   header a.link-action {
     box-sizing: border-box;
     display: block;
