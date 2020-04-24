@@ -628,7 +628,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 {
 	char		*buffer = NULL;
 	int		i;
-	zbx_lld_host_t	*host = NULL;
+	zbx_lld_host_t	*host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -673,6 +673,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			zbx_vector_uint64_destroy(&host->lnk_templateids);
 			zbx_free(host->host);
 			zbx_free(host);
+			goto out;
 		}
 		else
 		{
@@ -721,6 +722,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	}
 
 	host->jp_row = &lld_row->jp_row;
+out:
 	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)host);
@@ -3637,8 +3639,12 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		{
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-			host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto, status, lld_row,
-					lld_macro_paths);
+			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
+					status, lld_row, lld_macro_paths)))
+			{
+				continue;
+			}
+
 			lld_groups_make(host, &groups, &group_prototypes, &lld_row->jp_row, lld_macro_paths);
 		}
 
