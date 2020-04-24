@@ -116,7 +116,6 @@ class CMenuItem extends CTag {
 	public function setAliases(array $aliases): self {
 		foreach ($aliases as $alias) {
 			['path' => $action_name, 'query' => $query_string] = parse_url($alias) + ['query' => ''];
-			$query_params = [];
 			parse_str($query_string, $query_params);
 			$this->aliases[$action_name][] = $query_params;
 		}
