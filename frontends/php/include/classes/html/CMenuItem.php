@@ -179,7 +179,7 @@ class CMenuItem extends CTag {
 	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = true): bool {
 		if (array_key_exists($action_name, $this->aliases)) {
 			foreach ($this->aliases[$action_name] as $alias_params) {
-				if ($alias_params == array_intersect_assoc($alias_params, $request_params)) {
+				if (!array_diff_assoc($alias_params, $request_params)) {
 					$this->setSelected();
 					return true;
 				}
