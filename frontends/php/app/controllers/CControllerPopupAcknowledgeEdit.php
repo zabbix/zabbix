@@ -151,7 +151,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				$data['problem_can_be_closed'] = true;
 			}
 
-			$ack_count += ($event['acknowledged'] === EVENT_ACKNOWLEDGED) ? 1 : 0;
+			$ack_count += ($event['acknowledged'] == EVENT_ACKNOWLEDGED) ? 1 : 0;
 		}
 
 		$data['has_ack_events'] = ($ack_count > 0);
