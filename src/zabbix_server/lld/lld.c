@@ -169,7 +169,7 @@ static void	lld_filter_clean(lld_filter_t *filter)
 	lld_conditions_free(&filter->conditions);
 }
 
-static int	lld_filter_condition_load(zbx_vector_ptr_t *conditions, const char *id, const char *macro,
+static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id, const char *macro,
 		const char *regexp, const char *op, const DC_ITEM *item, char **error)
 {
 	lld_condition_t	*condition;
@@ -229,7 +229,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const 
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
-	while (NULL != (row = DBfetch(result)) && SUCCEED == (ret = lld_filter_condition_load(&filter->conditions,
+	while (NULL != (row = DBfetch(result)) && SUCCEED == (ret = lld_filter_condition_add(&filter->conditions,
 			row[0], row[1], row[2], row[3], item, error)))
 		;
 	DBfree_result(result);
@@ -579,7 +579,7 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 		}
 
 		override = (lld_override_t *)overrides->values[i];
-		if (FAIL == (ret = lld_filter_condition_load(&override->filter.conditions, row[1], row[2], row[3],
+		if (FAIL == (ret = lld_filter_condition_add(&override->filter.conditions, row[1], row[2], row[3],
 				row[4], item, error)))
 		{
 			break;
