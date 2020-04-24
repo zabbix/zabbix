@@ -515,6 +515,37 @@ function reloadPopup(form, action) {
 }
 
 /**
+ * Open "Update problem" dialog and manage URL change.
+ *
+ * @param {array}  options
+ * @param {string} options['widget']    (optional) Widget's uniqueid.
+ * @param {bool}   options['reload']    (optional) Either to make complete page refresh after acknowledge.create.
+ * @param {array}  options['eventids']  Eventids to update.
+ * @param {type} trigger_elmnt          Trigger element.
+ *
+ * @returns {Overlay}
+ */
+function acknowledgePopUp(options, trigger_elmnt) {
+	options.backurl = location.href;
+	if (options.reload) {
+		options.reload = 1;
+	}
+
+	var overlay = PopUp('popup.acknowledge.edit', options, null, trigger_elmnt);
+
+	overlay.xhr.then(function(resp) {
+		var url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'popup');
+		url.setArgument('popup_action', 'acknowledge.edit');
+		url.setArgument('eventids', options.eventids);
+
+		history.replaceState({}, '', url.getUrl());
+	});
+
+	return overlay;
+}
+
+/**
  * Pass value to add.popup trigger.
  *
  * @param {string} object			refers to destination object

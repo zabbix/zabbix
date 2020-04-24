@@ -27,9 +27,11 @@ $form = (new CForm())
 	->cleanItems()
 	->setId('acknowledge_form')
 	->addVar('action', 'popup.acknowledge.create')
+	->addVar('reload', $data['reload'] ? : null)
 	->addVar('eventids', $data['eventids']);
 
 $form_list = (new CFormList())
+	->addRow(new CLabel(_('Problem')), $data['problem_name'])
 	->addRow(
 		new CLabel(_('Message'), 'message'),
 		(new CTextArea('message', $data['message']))
@@ -104,6 +106,7 @@ $output = [
 			'action' => 'return submitAcknowledge(overlay);'
 		]
 	],
+	'cancel_action' => 'return onAcknowledgePopUpClose();',
 	'script_inline' => $this->readJsFile('popup.acknowledge.edit.js.php')
 ];
 

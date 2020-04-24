@@ -138,6 +138,9 @@ $data = [
 	'hosts_by_name' => [],
 	'exceeded_hosts' => false,
 	'exceeded_trigs' => false,
+	'menu_options' => [
+		'reload' => 1
+	]
 ];
 
 // fetch trigger data

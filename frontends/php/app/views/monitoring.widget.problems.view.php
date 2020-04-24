@@ -187,7 +187,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			->setHint(
 				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
 					'triggerid' => $trigger['triggerid']], $eventid, $show_timeline, $data['fields']['show_tags'],
-					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority']
+					$data['fields']['tags'], $data['fields']['tag_name_format'], $data['fields']['tag_priority'],
+					['widget' => $data['uniqueid']]
 				)
 			)
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
@@ -245,10 +246,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 		->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 		->addClass(ZBX_STYLE_LINK_ALT)
-		->onClick('return PopUp("popup.acknowledge.edit",'.
-			json_encode([
-				'eventids' => [$problem['eventid']]
-			]).', null, this);'
+		->onClick('return acknowledgePopUp('.json_encode([
+				'eventids' => [$problem['eventid']],
+				'widget' => $data['uniqueid']
+			]).', this);'
 		);
 
 	$table->addRow(array_merge($row, [
@@ -281,6 +282,28 @@ $output = [
 	'header' => $data['name'],
 	'body' => $table->toString()
 ];
+
+if ($data['initial_load']) {
+	$output['script_inline'] =
+		'jQuery(function($) {' .
+			'$.subscribe("acknowledge.create", function(event, response, overlay) {' .
+				'if ("'.$data['uniqueid'].'" !== overlay.options.widget) {' .
+					'return;' .
+				'}' .
+
+				// Update message box.
+				'$(".dashbrd-grid-container").closest("main")' .
+					'.siblings(".msg-good, .msg-bad .msg-warning").not(".msg-global-footer")' .
+					'.remove();' .
+
+				'var msg_box = makeMessageBox("good", response.message, null, true);' .
+				'$(".dashbrd-grid-container").closest("main").before(msg_box);' .
+
+				// Upadate widget.
+				'$(".dashbrd-grid-container").dashboardGrid("refreshWidget", overlay.options.widget);' .
+			'});' .
+		'});';
+}
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

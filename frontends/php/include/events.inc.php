@@ -173,10 +173,11 @@ function make_event_details(array $event) {
 			(new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('return PopUp("popup.acknowledge.edit",'.
+				->onClick('return acknowledgePopUp('.
 					json_encode([
-						'eventids' => [$event['eventid']]
-					]).', null, this);'
+						'eventids' => [$event['eventid']],
+						'reload' => 1
+					]).', this);'
 				)
 		]);
 
@@ -363,10 +364,11 @@ function make_small_eventlist(array $startEvent) {
 		$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->onClick('return PopUp("popup.acknowledge.edit",'.
+			->onClick('return acknowledgePopUp('.
 				json_encode([
-					'eventids' => [$event['eventid']]
-				]).', null, this);'
+					'eventids' => [$event['eventid']],
+					'reload' => 1
+				]).', this);'
 			);
 
 		$table->addRow([
@@ -412,11 +414,15 @@ function make_small_eventlist(array $startEvent) {
  *                                             - PROBLEMS_TAG_NAME_SHORTENED;
  *                                             - PROBLEMS_TAG_NAME_NONE.
  * @param string $tag_priority               A list of comma-separated tag names.
+ * @param array  $options
+ * @param string $options['widget']          (optional) Holds widget reference if loaded through widget.
+ * @param bool   $options['reload']          (optional) Either to make full page reload after successful update problem
+ *                                           operation.
  *
  * @return CDiv
  */
 function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $show_tags = PROBLEMS_SHOW_TAGS_3,
-		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '') {
+		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '', array $options = []) {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -599,10 +605,9 @@ function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $s
 			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('return PopUp("popup.acknowledge.edit",'.
-					json_encode([
+				->onClick('return acknowledgePopUp('.json_encode([
 						'eventids' => [$problem['eventid']]
-					]).', null, this);'
+					] + $options).', this);'
 				);
 
 			$table->addRow(array_merge($row, [

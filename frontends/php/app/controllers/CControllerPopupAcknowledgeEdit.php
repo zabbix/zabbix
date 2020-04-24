@@ -33,7 +33,9 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
 			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
+			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
+			'backurl' =>				'string',
+			'reload' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -77,12 +79,14 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
 			'problem_can_be_acknowledged' => false,
-			'problem_severity_can_be_changed' => false
+			'problem_severity_can_be_changed' => false,
+			'backurl' => $this->getInput('backurl', ''),
+			'reload' => $this->getInput('reload', false)
 		];
 
 		// Select events.
 		$events = API::Event()->get([
-			'output' => ['eventid', 'objectid', 'acknowledged', 'value', 'r_eventid'],
+			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid'],
 			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -108,6 +112,10 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				'userids' => array_keys($history['userids']),
 				'preservekeys' => true
 			]);
+			$data['problem_name'] = reset($events)['name'];
+		}
+		else {
+			$data['problem_name'] = _s('%1$d problems selected.', count($events));
 		}
 
 		$triggerids = array_column($events, 'objectid', 'objectid');

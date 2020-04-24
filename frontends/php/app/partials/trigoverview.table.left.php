@@ -47,7 +47,7 @@ foreach ($data['hosts_by_name'] as $hostname => $hostid) {
 		}
 
 		if ($trigger) {
-			$row[] = getTriggerOverviewCell($trigger, $data['dependencies']);
+			$row[] = getTriggerOverviewCell($trigger, $data['dependencies'], $data['menu_options']);
 		}
 		else {
 			$row[] = new CCol();

@@ -27,7 +27,9 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		$this->setType(WIDGET_TRIG_OVER);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'uniqueid' => 'required|string',
+			'initial_load' => 'in 0,1'
 		]);
 	}
 
@@ -39,6 +41,10 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 			'style' => $fields['style'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
+			],
+			'initial_load' => (bool) $this->getInput('initial_load', false),
+			'menu_options' => [
+				'widget' => $this->getInput('uniqueid')
 			]
 		];
 

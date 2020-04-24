@@ -29,7 +29,9 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 		$this->setType(WIDGET_PROBLEMS_BY_SV);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'uniqueid' => 'required|string',
+			'initial_load' => 'in 0,1'
 		]);
 	}
 
@@ -75,7 +77,9 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'initial_load' => (bool) $this->getInput('initial_load', false),
+			'uniqueid' => $this->getInput('uniqueid')
 		]));
 	}
 }

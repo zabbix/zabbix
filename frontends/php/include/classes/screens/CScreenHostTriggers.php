@@ -259,18 +259,18 @@ class CScreenHostTriggers extends CScreenBase {
 			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('return PopUp("popup.acknowledge.edit",'.
-					json_encode([
-						'eventids' => [$problem['eventid']]
-					]).', null, this);'
-				);
+				->onClick('return acknowledgePopUp('.json_encode([
+					'eventids' => [$problem['eventid']],
+					'reload' => 1
+				]).', this);');
 
 			$table->addRow([
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
 						->setHint(make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-							'triggerid' => $trigger['triggerid']], $problem['eventid']
+							'triggerid' => $trigger['triggerid']], $problem['eventid'], true, PROBLEMS_SHOW_TAGS_3, [],
+							PROBLEMS_TAG_NAME_FULL, '', ['reload' => 1]
 						))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,

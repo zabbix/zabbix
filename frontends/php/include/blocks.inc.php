@@ -386,7 +386,7 @@ function makeSystemStatus(array $filter, array $data, array $config) {
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CLinkAction($allTriggersNum))
 					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $data['actions'], $config,
-						$filter
+						$filter, ['reload' => 1]
 					));
 			}
 
@@ -394,7 +394,7 @@ function makeSystemStatus(array $filter, array $data, array $config) {
 			if ($unackTriggersNum) {
 				$unackTriggersNum = (new CLinkAction($unackTriggersNum))
 					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $data['actions'], $config,
-						$filter
+						$filter, ['reload' => 1]
 					));
 			}
 
@@ -517,6 +517,7 @@ function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupu
  * @param array      $data['data']['groups'][]['stats']
  * @param array      $data['filter']
  * @param array      $data['filter']['severities']
+ * @param array      $data['uniqueid']  Refers to widget in which popup was opened.
  *
  * @return CDiv
  */
@@ -545,6 +546,7 @@ function makeSeverityTotals(array $data) {
  * @param array   $data['filter']
  * @param array   $data['filter']['ext_ack']
  * @param array   $data['severity_names']
+ * @param string  $data['uniqueid']  Refers to widget in which popup was opened.
  * @param array   $stat
  * @param int     $stats['count']
  * @param array   $stats['problems']
@@ -566,7 +568,7 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 	if ($allTriggersNum) {
 		$allTriggersNum = (new CLinkAction($allTriggersNum))
 			->setHint(makeProblemsPopup($stat['problems'], $data['data']['triggers'], $data['data']['actions'],
-				$data['severity_names'], $data['filter']
+				$data['severity_names'], $data['filter'], ['widget' => $data['uniqueid']]
 			));
 	}
 
@@ -574,7 +576,7 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 	if ($unackTriggersNum) {
 		$unackTriggersNum = (new CLinkAction($unackTriggersNum))
 			->setHint(makeProblemsPopup($stat['problems_unack'], $data['data']['triggers'], $data['data']['actions'],
-				$data['severity_names'], $data['filter']
+				$data['severity_names'], $data['filter'], ['widget' => $data['uniqueid']]
 			));
 	}
 
@@ -731,10 +733,15 @@ function make_status_of_zbx() {
  * @param array  $filter['show_suppressed']  (optional)
  * @param array  $filter['show_timeline']    (optional)
  * @param array  $filter['show_opdata']      (optional)
+ * @param array  $menu_options
+ * @param array  $menu_options['widget']     (optional) Refers to widget in which popup was loaded.
+ * @param array  $menu_options['reload']     (optional) Specify if page need to be reloaded after acknowledge.create.
  *
  * @return CTableInfo
  */
-function makeProblemsPopup(array $problems, array $triggers, array $actions, array $config, array $filter) {
+function makeProblemsPopup(array $problems, array $triggers, array $actions, array $config, array $filter,
+		array $menu_options = []
+) {
 	$url_details = (new CUrl('tr_events.php'))
 		->setArgument('triggerid', '')
 		->setArgument('eventid', '');
@@ -866,10 +873,10 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->onClick('return PopUp("popup.acknowledge.edit",'.
+			->onClick('return acknowledgePopUp('.
 				json_encode([
 					'eventids' => [$problem['eventid']]
-				]).', null, this);'
+				] + $menu_options).', this);'
 			);
 
 		$table->addRow(array_merge($row, [

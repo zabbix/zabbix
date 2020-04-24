@@ -37,7 +37,12 @@ class CScreenTriggersOverview extends CScreenBase {
 			(new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		$data = [];
+		$data = [
+			'menu_options' => [
+				'reload' => 1
+			]
+		];
+
 		list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 			$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
 		) = getTriggersOverviewData((array) $this->screenitem['resourceid'], $this->screenitem['application']);

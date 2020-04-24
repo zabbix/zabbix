@@ -110,6 +110,22 @@
 			}
 		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
 
+		// Subscribe to 'acknowledge.create' event.
+		$.subscribe('acknowledge.create', function(event, response) {
+			// Clear all selected checkboxes in Monitoring->Problems.
+			if (chkbxRange.prefix === 'problem') {
+				chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+				chkbxRange.clearSelectedOnFilterChange();
+			}
+
+			// Reload content.
+			window.flickerfreeScreen.refresh('problem');
+
+			// Display message.
+			$('.msg-bad, .msg-good, .msg-warning', $('.wrapper')).not('.msg-global-footer').remove();
+			$(makeMessageBox('good', response.message, null, true)).insertBefore('main');
+		});
+
 		$(document).on('submit', '#problem_form', function(e) {
 			e.preventDefault();
 
@@ -117,9 +133,9 @@
 					return $(this).val();
 				}).get();
 
-			return PopUp('popup.acknowledge.edit', {
+			return acknowledgePopUp({
 				eventids: eventids
-			}, null, this);
+			}, this);
 		});
 	});
 </script>

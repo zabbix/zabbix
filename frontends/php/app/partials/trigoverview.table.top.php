@@ -46,7 +46,7 @@ foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
 		}
 
 		if ($trigger) {
-			$row[] = getTriggerOverviewCell($trigger, $data['dependencies']);
+			$row[] = getTriggerOverviewCell($trigger, $data['dependencies'], $data['menu_options']);
 		}
 		else {
 			$row[] = new CCol();

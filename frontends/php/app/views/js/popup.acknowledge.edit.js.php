@@ -53,13 +53,22 @@ function submitAcknowledge(overlay) {
 			jQuery(response.errors).insertBefore($form);
 		}
 		else {
-			// Clear all selected checkboxes in Monitoring->Problems.
-			if (chkbxRange.prefix === 'problem') {
-				chkbxRange.clearSelectedOnFilterChange();
-			}
+			overlayDialogueDestroy(overlay.dialogueid);
+			onAcknowledgePopUpClose();
 
-			// Reload the page.
-			location.href = location.href;
+			$.publish('acknowledge.create', [response, overlay]);
 		}
 	});
+}
+
+/**
+ * Function executed when 'Update problem' dialog gets closed.
+ */
+function onAcknowledgePopUpClose() {
+	<?php if ($data['backurl']): ?>
+	history.replaceState({}, '', <?= json_encode($data['backurl']) ?>);
+	<?php endif ?>
+	<?php if ($data['reload']): ?>
+	location.reload();
+	<?php endif ?>
 }
