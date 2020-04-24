@@ -324,6 +324,19 @@ class CConfigurationImport {
 						$templatesRefs[$template['name']] = $template['name'];
 					}
 				}
+
+				if ($discoveryRule['overrides']) {
+					foreach ($discoveryRule['overrides'] as $override) {
+						foreach ($override['operations'] as $operation) {
+							if ($operation['operationobject'] == OPERATION_OBJECT_HOST_PROTOTYPE
+									&& array_key_exists('optemplate', $operation)) {
+								foreach ($operation['optemplate'] as $template) {
+									$templatesRefs[$template['name']] = $template['name'];
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -978,6 +991,35 @@ class CConfigurationImport {
 				}
 
 				unset($item['master_item']);
+
+				if ($item['overrides']) {
+					foreach ($item['overrides'] as &$override) {
+						foreach ($override['operations'] as &$operation) {
+							if ($operation['operationobject'] == OPERATION_OBJECT_HOST_PROTOTYPE
+									&& array_key_exists('optemplate', $operation)) {
+								foreach ($operation['optemplate'] as &$template) {
+									$templateid = $this->referencer->resolveTemplate($template['name']);
+
+									if (!$templateid) {
+										throw new Exception(_s(
+											'Cannot find template "%1$s" for override "%2$s" of discovery rule "%3$s" on "%4$s".',
+											$template['name'],
+											$override['name'],
+											$item['name'],
+											$host
+										));
+									}
+
+									$template['templateid'] = $templateid;
+
+									unset($template['name']);
+								}
+							}
+						}
+						unset($operation);
+					}
+					unset($override);
+				}
 
 				if ($itemId) {
 					$item['itemid'] = $itemId;
