@@ -34,9 +34,6 @@ int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -83,17 +80,11 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.PROC_NUM)
 	case "system.boottime":
 		cfunc = unsafe.Pointer(C.SYSTEM_BOOTTIME)
-	case "web.page.get":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_GET)
-	case "web.page.perf":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_PERF)
-	case "web.page.regexp":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_REGEXP)
 	case "net.tcp.listen":
 		cfunc = unsafe.Pointer(C.NET_TCP_LISTEN)
-	case "net.tcp.service", "net.udp.service":
+	case "net.tcp.service":
 		cfunc = unsafe.Pointer(C.CHECK_SERVICE)
-	case "net.tcp.service.perf", "net.udp.service.perf":
+	case "net.tcp.service.perf":
 		cfunc = unsafe.Pointer(C.CHECK_SERVICE_PERF)
 	case "net.udp.listen":
 		cfunc = unsafe.Pointer(C.NET_UDP_LISTEN)

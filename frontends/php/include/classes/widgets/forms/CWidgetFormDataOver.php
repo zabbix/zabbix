@@ -35,8 +35,19 @@ class CWidgetFormDataOver extends CWidgetForm {
 		}
 		$this->fields[$field_groups->getName()] = $field_groups;
 
+		// Hosts.
+		$field_hosts = new CWidgetFieldMsHost('hostids', _('Hosts'));
+		$field_hosts->filter_preselect_host_group_field = 'groupids_';
+
+		if (array_key_exists('hostids', $this->data)) {
+			$field_hosts->setValue($this->data['hostids']);
+		}
+
+		$this->fields[$field_hosts->getName()] = $field_hosts;
+
 		// Application field.
 		$field_application = new CWidgetFieldApplication('application', _('Application'));
+		$field_application->filter_preselect_host_field = 'hostids_';
 
 		if (array_key_exists('application', $this->data)) {
 			$field_application->setValue($this->data['application']);

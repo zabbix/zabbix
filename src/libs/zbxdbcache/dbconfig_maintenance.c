@@ -26,6 +26,7 @@
 #include "dbconfig.h"
 
 #include "dbsync.h"
+#include "zbxserver.h"
 
 extern int		CONFIG_TIMER_FORKS;
 
@@ -499,6 +500,31 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_substract_time                                                *
+ *                                                                            *
+ * Purpose: substract two local times with DST correction                     *
+ *                                                                            *
+ * Parameter: minuend       - [IN] the minuend time                           *
+ *            subtrahend    - [IN] the subtrahend time (may be negative)      *
+ *            tm            - [OUT] the struct tm                             *
+ *                                                                            *
+ * Return value: the resulting time difference in seconds                     *
+ *                                                                            *
+ ******************************************************************************/
+static time_t dc_substract_time(time_t minuend, int subtrahend, struct tm *tm)
+{
+	time_t	diff, offset_min, offset_diff;
+
+	offset_min = zbx_get_timezone_offset(minuend, tm);
+	diff = minuend - subtrahend;
+	offset_diff = zbx_get_timezone_offset(diff, tm);
+	diff -= offset_diff - offset_min;
+
+	return diff;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_calculate_maintenance_period                                  *
  *                                                                            *
  * Purpose: calculate start time for the specified maintenance period         *
@@ -507,8 +533,8 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
  *            period        - [IN] the maintenance period                     *
  *            start_date    - [IN] the period starting timestamp based on     *
  *                                 current time                               *
- *            running_since - [IN] the actual period starting timestamp       *
- *            running_since - [IN] the actual period ending timestamp         *
+ *            running_since - [OUT] the actual period starting timestamp      *
+ *            running_until - [OUT] the actual period ending timestamp        *
  *                                                                            *
  * Return value: SUCCEED - a valid period was found                           *
  *               FAIL    - period started before maintenance activation time  *
@@ -519,7 +545,7 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 		time_t *running_until)
 {
 	int		day, wday, week;
-	struct tm	*tm;
+	struct tm	tm;
 	time_t		active_since = maintenance->active_since;
 
 	if (TIMEPERIOD_TYPE_ONETIME == period->type)
@@ -538,23 +564,23 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 			if (start_date < active_since)
 				return FAIL;
 
-			tm = localtime(&active_since);
-			active_since = active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN +
-					tm->tm_sec);
+			tm = *localtime(&active_since);
+			active_since = dc_substract_time(active_since,
+					tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec, &tm);
 
 			day = (start_date - active_since) / SEC_PER_DAY;
-			start_date -= SEC_PER_DAY * (day % period->every);
+			start_date = dc_substract_time(start_date, SEC_PER_DAY * (day % period->every), &tm);
 			break;
 		case TIMEPERIOD_TYPE_WEEKLY:
 			if (start_date < active_since)
 				return FAIL;
 
-			tm = localtime(&active_since);
-			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-			active_since = active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR +
-					tm->tm_min * SEC_PER_MIN + tm->tm_sec);
+			tm = *localtime(&active_since);
+			wday = (0 == tm.tm_wday ? 7 : tm.tm_wday) - 1;
+			active_since = dc_substract_time(active_since, wday * SEC_PER_DAY +
+					tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec, &tm);
 
-			for (; start_date >= active_since; start_date -= SEC_PER_DAY)
+			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, &tm))
 			{
 				/* check for every x week(s) */
 				week = (start_date - active_since) / SEC_PER_WEEK;
@@ -562,8 +588,8 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 					continue;
 
 				/* check for day of the week */
-				tm = localtime(&start_date);
-				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+				tm = *localtime(&start_date);
+				wday = (0 == tm.tm_wday ? 7 : tm.tm_wday) - 1;
 				if (0 == (period->dayofweek & (1 << wday)))
 					continue;
 
@@ -571,32 +597,32 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 			}
 			break;
 		case TIMEPERIOD_TYPE_MONTHLY:
-			for (; start_date >= active_since; start_date -= SEC_PER_DAY)
+			for (; start_date >= active_since; start_date = dc_substract_time(start_date, SEC_PER_DAY, &tm))
 			{
 				/* check for month */
-				tm = localtime(&start_date);
-				if (0 == (period->month & (1 << tm->tm_mon)))
+				tm = *localtime(&start_date);
+				if (0 == (period->month & (1 << tm.tm_mon)))
 					continue;
 
 				if (0 != period->day)
 				{
 					/* check for day of the month */
-					if (period->day != tm->tm_mday)
+					if (period->day != tm.tm_mday)
 						continue;
 				}
 				else
 				{
 					/* check for day of the week */
-					wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+					wday = (0 == tm.tm_wday ? 7 : tm.tm_wday) - 1;
 					if (0 == (period->dayofweek & (1 << wday)))
 						continue;
 
 					/* check for number of day (first, second, third, fourth or last) */
-					day = (tm->tm_mday - 1) / 7 + 1;
+					day = (tm.tm_mday - 1) / 7 + 1;
 					if (5 == period->every && 4 == day)
 					{
-						if (tm->tm_mday + 7 <= zbx_day_in_month(1900 + tm->tm_year,
-								tm->tm_mon + 1))
+						if (tm.tm_mday + 7 <= zbx_day_in_month(1900 + tm.tm_year,
+								tm.tm_mon + 1))
 						{
 							continue;
 						}
@@ -621,6 +647,58 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 		*running_until = maintenance->active_until;
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_check_maintenance_period                                      *
+ *                                                                            *
+ * Purpose: calculates start time for the specified maintenance period and    *
+ *          checks if we are inside the maintenance period                    *
+ *                                                                            *
+ * Parameter: maintenance   - [IN] the maintenance                            *
+ *            period        - [IN] the maintenance period                     *
+ *            now           - [IN] current time                               *
+ *            running_since - [OUT] the actual period starting timestamp      *
+ *            running_until - [OUT] the actual period ending timestamp        *
+ *                                                                            *
+ * Return value: SUCCEED - current time is inside valid maintenance period    *
+ *               FAIL    - current time is outside valid maintenance period   *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_check_maintenance_period(const zbx_dc_maintenance_t *maintenance,
+		const zbx_dc_maintenance_period_t *period, time_t now, time_t *running_since, time_t *running_until)
+{
+	struct tm	tm;
+	int		seconds, rc, ret = FAIL;
+	time_t		period_start, period_end;
+
+	tm = *localtime(&now);
+	seconds = tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec;
+	period_start = dc_substract_time(now, seconds, &tm);
+	period_start = dc_substract_time(period_start, -period->start_time, &tm);
+
+	tm = *localtime(&period_start);
+
+	/* skip maintenance if the time does not exist due to DST */
+	if (period->start_time != (tm.tm_hour * SEC_PER_HOUR + tm.tm_min * SEC_PER_MIN + tm.tm_sec))
+	{
+		goto out;
+	}
+
+	if (now < period_start)
+		period_start = dc_substract_time(period_start, SEC_PER_DAY, &tm);
+
+	rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start, &period_end);
+
+	if (SUCCEED == rc && period_start <= now && now < period_end)
+	{
+		*running_since = period_start;
+		*running_until = period_end;
+		ret = SUCCEED;
+	}
+out:
+	return ret;
 }
 
 /******************************************************************************
@@ -755,16 +833,13 @@ int	zbx_dc_update_maintenances(void)
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
-	int				i, running_num = 0, seconds, rc, started_num = 0, stopped_num = 0, ret = FAIL;
+	int				i, running_num = 0, started_num = 0, stopped_num = 0, ret = FAIL;
 	unsigned char			state;
-	struct tm			*tm;
 	time_t				now, period_start, period_end, running_since, running_until;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
-	tm = localtime(&now);
-	seconds = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
 
 	WRLOCK_CACHE;
 
@@ -788,14 +863,8 @@ int	zbx_dc_update_maintenances(void)
 			{
 				period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
 
-				period_start = now - seconds + period->start_time;
-				if (seconds < period->start_time)
-					period_start -= SEC_PER_DAY;
-
-				rc = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start,
-						&period_end);
-
-				if (SUCCEED == rc && period_start <= now && now < period_end)
+				if (SUCCEED == dc_check_maintenance_period(maintenance, period, now, &period_start,
+						&period_end))
 				{
 					state = ZBX_MAINTENANCE_RUNNING;
 					if (period_end > running_until)
@@ -1451,6 +1520,21 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 		query = (zbx_event_suppress_query_t *)event_queries->values[i];
 
 		/* find hostids of items used in event trigger expressions */
+
+		/* Some processes do not have trigger data at hand and create event queries */
+		/* without filling query functionids. Do it here if necessary.              */
+		if (0 == query->functionids.values_num)
+		{
+			ZBX_DC_TRIGGER	*trigger;
+
+			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+					&query->triggerid)))
+			{
+				continue;
+			}
+			get_functionids(&query->functionids, trigger->expression);
+			get_functionids(&query->functionids, trigger->recovery_expression);
+		}
 
 		for (j = 0; j < query->functionids.values_num; j++)
 		{

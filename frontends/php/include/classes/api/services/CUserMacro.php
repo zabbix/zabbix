@@ -93,9 +93,6 @@ class CUserMacro extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		// Forbidden search and filter by value field.
-		unset($options['filter']['value'], $options['search']['value']);
-
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($options['editable'] && !is_null($options['globalmacro'])) {
@@ -169,18 +166,6 @@ class CUserMacro extends CApiService {
 			$sqlParts['where']['hht'] = 'hm.hostid=ht.hostid';
 		}
 
-		// search
-		if (is_array($options['search'])) {
-			zbx_db_search('hostmacro hm', $options, $sqlParts);
-			zbx_db_search('globalmacro gm', $options, $sqlPartsGlobal);
-		}
-
-		// filter
-		if (is_array($options['filter'])) {
-			$this->dbFilter('hostmacro hm', $options, $sqlParts);
-			$this->dbFilter('globalmacro gm', $options, $sqlPartsGlobal);
-		}
-
 		// sorting
 		$sqlParts = $this->applyQuerySortOptions('hostmacro', 'hm', $options, $sqlParts);
 		$sqlPartsGlobal = $this->applyQuerySortOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
@@ -193,6 +178,7 @@ class CUserMacro extends CApiService {
 
 		// init GLOBALS
 		if (!is_null($options['globalmacro'])) {
+			$sqlPartsGlobal = $this->applyQueryFilterOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
 			$sqlPartsGlobal = $this->applyQueryOutputOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
 			$res = DBselect($this->createSelectQueryFromParts($sqlPartsGlobal), $sqlPartsGlobal['limit']);
 			while ($macro = DBfetch($res)) {
@@ -206,6 +192,7 @@ class CUserMacro extends CApiService {
 		}
 		// init HOSTS
 		else {
+			$sqlParts = $this->applyQueryFilterOptions('hostmacro', 'hm', $options, $sqlParts);
 			$sqlParts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sqlParts);
 			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 			while ($macro = DBfetch($res)) {
@@ -782,6 +769,9 @@ class CUserMacro extends CApiService {
 			$count = API::Host()->get([
 				'countOutput' => true,
 				'hostids' => $hostids,
+				'filter' => [
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				],
 				'editable' => true
 			]);
 
@@ -792,6 +782,19 @@ class CUserMacro extends CApiService {
 			$count += API::Template()->get([
 				'countOutput' => true,
 				'templateids' => $hostids,
+				'filter' => [
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				],
+				'editable' => true
+			]);
+
+			if ($count == count($hostids)) {
+				return;
+			}
+
+			$count += API::HostPrototype()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
 				'editable' => true
 			]);
 
@@ -961,6 +964,47 @@ class CUserMacro extends CApiService {
 		}
 
 		return $sqlParts;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function applyQueryFilterOptions($table, $alias, array $options, $sql_parts) {
+		if (is_array($options['search'])) {
+			// Do not allow to search by value for macro of type ZBX_MACRO_TYPE_SECRET.
+			if (array_key_exists('value', $options['search'])) {
+				$sql_parts['where']['search'] = $alias.'.type!='.ZBX_MACRO_TYPE_SECRET;
+				zbx_db_search($table.' '.$alias, [
+						'searchByAny' => false,
+						'search' => ['value' => $options['search']['value']]
+					] + $options, $sql_parts
+				);
+				unset($options['search']['value']);
+			}
+
+			if ($options['search']) {
+				zbx_db_search($table.' '.$alias, $options, $sql_parts);
+			}
+		}
+
+		if (is_array($options['filter'])) {
+			// Do not allow to filter by value for macro of type ZBX_MACRO_TYPE_SECRET.
+			if (array_key_exists('value', $options['filter'])) {
+				$sql_parts['where']['filter'] = $alias.'.type!='.ZBX_MACRO_TYPE_SECRET;
+				$this->dbFilter($table.' '.$alias, [
+						'searchByAny' => false,
+						'filter' => ['value' => $options['filter']['value']]
+					] + $options, $sql_parts
+				);
+				unset($options['filter']['value']);
+			}
+
+			if ($options['filter']) {
+				$this->dbFilter($table.' '.$alias, $options, $sql_parts);
+			}
+		}
+
+		return $sql_parts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

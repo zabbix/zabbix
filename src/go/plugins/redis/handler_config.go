@@ -26,24 +26,27 @@ import (
 	"strings"
 )
 
+const configMaxParams = 1
+
 const globChars = "*?[]!"
 
-// configHandler gets an output of 'CONFIG GET [pattern]' command and returns it in JSON format or as a single-value.
-func (p *Plugin) configHandler(conn redisClient, params []string) (interface{}, error) {
-	var (
-		pattern string
-		res     map[string]string
-	)
+const anyCommand = "*"
 
-	if len(params) > 1 && len(params[1]) > 0 {
-		pattern = params[1]
-	} else {
-		pattern = "*"
+// configHandler gets an output of 'CONFIG GET [pattern]' command and returns it in JSON format or as a single-value.
+func configHandler(conn redisClient, params []string) (interface{}, error) {
+	var res map[string]string
+
+	if len(params) > configMaxParams {
+		return nil, errorInvalidParams
+	}
+
+	pattern := anyCommand
+	if len(params) > 0 && len(params[0]) > 0 {
+		pattern = params[0]
 	}
 
 	if err := conn.Query(radix.Cmd(&res, "CONFIG", "GET", pattern)); err != nil {
-		p.Errf(err.Error())
-		return nil, errorCannotFetchData
+		return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotFetchData)
 	}
 
 	if len(res) == 0 {
@@ -53,8 +56,7 @@ func (p *Plugin) configHandler(conn redisClient, params []string) (interface{}, 
 	if strings.ContainsAny(pattern, globChars) {
 		jsonRes, err := json.Marshal(res)
 		if err != nil {
-			p.Errf(err.Error())
-			return nil, errorCannotMarshalJson
+			return nil, fmt.Errorf("%s (%w)", err.Error(), errorCannotMarshalJSON)
 		}
 
 		return string(jsonRes), nil

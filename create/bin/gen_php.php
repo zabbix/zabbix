@@ -48,7 +48,7 @@ function parse_schema($path) {
 						break;
 					case 't_double':
 						$type = 'DB::FIELD_TYPE_FLOAT';
-						$length = 16;
+						$length = false;
 						break;
 					case 't_varchar':
 						$type = 'DB::FIELD_TYPE_CHAR';

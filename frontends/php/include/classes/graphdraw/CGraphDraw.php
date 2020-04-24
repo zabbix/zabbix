@@ -50,7 +50,7 @@ abstract class CGraphDraw {
 		$this->m_minY = null;
 		$this->m_maxY = null;
 		$this->data = [];
-		$this->items = null;
+		$this->items = [];
 		$this->min = null;
 		$this->max = null;
 		$this->avg = null;
@@ -167,7 +167,7 @@ abstract class CGraphDraw {
 			$value = null;
 		}
 		if (is_null($value)) {
-			$value = 900;
+			$value = 200;
 		}
 		$this->sizeY = $value;
 	}
@@ -181,7 +181,7 @@ abstract class CGraphDraw {
 	}
 
 	public function getLastValue($num) {
-		$data = &$this->data[$this->items[$num]['itemid']][$this->items[$num]['calc_type']];
+		$data = &$this->data[$this->items[$num]['itemid']];
 
 		if (isset($data)) {
 			for ($i = $this->sizeX - 1; $i >= 0; $i--) {

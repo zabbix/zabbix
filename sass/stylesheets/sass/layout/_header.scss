@@ -1,0 +1,87 @@
+header {
+	display: flex;
+	align-items: center;
+	height: 45px;
+	padding: 0 10px;
+	background: $header-bg-color;
+	border-bottom: 1px solid $ui-border-color;
+
+	> div {
+		overflow: hidden;
+	}
+
+	h1 {
+		position: relative;
+		padding-top: 1px;
+		overflow: hidden;
+		line-height: 24px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.header-controls {
+		flex-shrink: 0;
+		margin: 0 -2px 0 auto;
+		padding: 2px;
+		white-space: nowrap;
+
+		label {
+			line-height: 24px;
+		}
+	}
+
+	a.link-action {
+		box-sizing: border-box;
+		display: block;
+		height: 25px;
+
+		h1 {
+			padding-right: 1em;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 50%;
+				right: .15em;
+				width: .3em;
+				height: .3em;
+				margin-top: -.15em;
+				border-right: 2px solid $font-color;
+				border-bottom: 2px solid $font-color;
+				transform: rotate(45deg);
+				transition: border-color .2s ease-out;
+			}
+		}
+
+		&:hover,
+		&:focus {
+			h1::after {
+				border-color: $link-hover-color;
+			}
+		}
+	}
+
+	form {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	ul {
+		text-align: right;
+
+		li {
+			display: inline-block;
+			vertical-align: top;
+			position: relative;
+			padding: 0 0 0 10px;
+		}
+
+		ul li:first-child {
+			padding-left: 0;
+		}
+
+		button {
+			line-height: 22px;
+		}
+	}
+}

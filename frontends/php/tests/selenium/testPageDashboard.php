@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageDashboard extends CLegacyWebTest {
 
 	public $graphCpu = 'CPU usage';
+	public $hostGroup = 'Zabbix servers';
+	public $hostName = 'ЗАББИКС Сервер';
 	public $graphCpuId = 910;
 	public $graphMemory = 'Memory usage';
 	public $graphMemoryId = 919;
@@ -83,16 +85,30 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_AddFavouriteGraphs() {
-		$this->zbxTestLogin('charts.php');
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
+		$this->zbxTestLogin('zabbix.php?action=charts.view');
 		$this->zbxTestCheckHeader('Graphs');
-		$this->zbxTestDropdownSelectWait('graphid', $this->graphCpu);
+		$this->query('xpath://a[text()="Filter"]')->one()->click();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->fill([
+			'Host' => [
+				'values' => $this->hostName,
+				'context' => $this->hostGroup
+			]
+		]);
+		$filter->getField('Graphs')->select($this->graphCpu);
+		$filter->submit();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//button[@id="addrm_fav" and @title="Remove from favourites"]'));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
-		$this->zbxTestDropdownSelectWait('graphid', $this->graphMemory);
+		$filter->query('button:Reset')->one()->click();
+		$filter->invalidate();
+		$filter->getField('Graphs')->select($this->graphMemory);
+		$filter->submit();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
 		$this->zbxTestClickWait('addrm_fav');
@@ -100,15 +116,13 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//a[@href='charts.php?graphid=$this->graphCpuId']", 'ЗАББИКС Сервер: '.$this->graphCpu);
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//a[@href='charts.php?graphid=$this->graphMemoryId']", 'ЗАББИКС Сервер: '.$this->graphMemory);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//a[@href='zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D=$this->graphCpuId&filter_set=1']", 'ЗАББИКС Сервер: '.$this->graphCpu);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-container']/div[9]//a[@href='zabbix.php?action=charts.view&view_as=showgraph&filter_search_type=0&filter_graphids%5B0%5D=$this->graphMemoryId&filter_set=1']", 'ЗАББИКС Сервер: '.$this->graphMemory);
 		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphCpuId"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphMemoryId"));
 	}
 
 	public function testPageDashboard_RemoveFavouriteGraphs() {
-		// Disable debug mode. Debug button overlaps delete graph icon.
-		DBexecute("UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7");
 		$exception = null;
 
 		try {
@@ -126,8 +140,6 @@ class testPageDashboard extends CLegacyWebTest {
 			$exception = $e;
 		}
 
-		// Enable debug mode.
-		DBexecute("UPDATE usrgrp SET debug_mode=1 WHERE usrgrpid=7");
 		if ($exception !== null) {
 			throw $exception;
 		}
@@ -160,44 +172,25 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids'"));
 	}
 
-	public function testPageDashboard_FullScreen() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$this->zbxTestCheckHeader('Global view');
-		$this->zbxTestAssertElementPresentXpath("//header");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
-
-		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-max')]");
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
-		$this->zbxTestCheckHeader('Global view');
-		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
-		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
-	}
-
-	/**
-	 * @depends testPageDashboard_FullScreen
-	 */
 	public function testPageDashboard_KioskMode() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view', false);
 		$this->zbxTestCheckHeader('Global view');
-		$this->zbxTestAssertElementNotPresentXpath("//header");
+		$this->zbxTestAssertElementPresentXpath("//header");
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]");
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
 		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 
 		$this->webDriver->executeScript('arguments[0].click();', [$this->webDriver->findElement(WebDriverBy::className('btn-min'))]);
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-max')]"));
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-kiosk')]"));
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 		$this->zbxTestAssertElementPresentXpath("//header");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
+		$this->zbxTestAssertElementPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 	}
 
@@ -207,25 +200,15 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
 		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 
-		//  Set layout mode to full screen.
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=1', false);
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
-		$this->zbxTestCheckHeader('Global view');
-		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
-		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
-
 		// Set layout mode to default layout.
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=0');
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&kiosk=0');
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 	}
 
 	/**

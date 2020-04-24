@@ -1,84 +1,32 @@
-$theme_name: 'blue' !default;
+$theme-name: 'blue' !default;
 
-@import '_reset.scss';
-@import '_colors.scss';
-@import '_fonts.scss';
-@import '_mixins.scss';
+$ui-transitions: true !default;
 
-html {
-	position: relative;
-	min-height: 100%;
-}
+// Sync with JavaScript variable: UI_TRANSITION_DURATION.
+$ui-transition-duration: .3s !default;
 
-body {
-	line-height: $body-line-height;
-	color: $font-color;
-	background-color: $body-bg-color;
-	margin-bottom: 71px;
-	min-width: 1200px;
+// Sprite path
+$sprite-path: '../img/icon-sprite.svg?20200407';
+$browser-sprite-path: '../img/browser-sprite.png?20200407';
 
-	font: {
-		family: $font-stack;
-		size: $font-body-size;
-	}
-}
+@import "utils/mixins";
 
-a {
+@import "base/reset";
+@import "base/colors";
+@import "base/typography";
+@import "base/common";
 
-	&:link {
-		color: $link-color;
-		text-decoration: none;
-		transition: color .2s ease-out;
-	}
+@import "utils/scrollable";
 
-	&:visited {
-		color: $link-visited-color;
-		text-decoration: none;
-	}
+@import "layout/grid";
+@import "layout/header";
+@import "layout/footer";
+@import "layout/sidebar";
 
-	&:hover {
-		outline: 0;
-		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, .5);
-	}
-
-	&:focus {
-		color: $link-hover-color;
-		outline: none;
-		border-bottom: 2px solid rgba($link-hover-color, .5);
-	}
-
-	&:active {
-		outline: 0;
-		color: $link-active-color;
-		border-bottom: 1px solid rgba($link-active-color, .5);
-	}
-
-	img {
-		border: 0;
-		vertical-align: top;
-	}
-}
-
-svg a {
-	fill: $link-color;
-	cursor: pointer;
-
-	&:visited {
-		fill: $link-visited-color;
-	}
-
-	&:hover,
-	&:focus {
-		fill: $link-hover-color;
-		text-decoration: underline;
-	}
-
-	&:active {
-		fill: $link-active-color;
-		text-decoration: underline;
-	}
-}
+@import "components/form-search";
+@import "components/menu-main";
+@import "components/menu-user";
+@import "components/message-box";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -139,80 +87,6 @@ svg a {
 	}
 }
 
-h1 {
-	font-size: $font-h1-size;
-	line-height: $h1-line-height;
-}
-
-h2 {
-	font-size: $font-h2-size;
-	line-height: $h2-line-height;
-}
-
-h3 {
-	font-size: $font-h3-size;
-	text-transform: $font-transform;
-	color: $font-alt-color;
-	letter-spacing: .0688em;
-	text-rendering: optimizeLegibility;
-}
-
-h4 {
-	font-size: $font-h4-size;
-	color: $font-color;
-	line-height: $h4-line-height;
-}
-
-sup {
-	font-size: $font-h3-size;
-	color: $font-alt-color;
-}
-
-b {
-	font-weight: bold;
-}
-
-strong {
-	@extend b;
-}
-
-em {
-	font-style: italic;
-}
-
-ol {
-	list-style: decimal;
-	list-style-position: inside;
-
-	li {
-		padding: 0 0 .7em;
-	}
-}
-
-p {
-	margin: 0 0 .7em;
-}
-
-pre {
-	font: {
-		family: $font-stack-mono;
-		size: $font-mono-size;
-	}
-	@extend %space-pre-wrap;
-
-	a {
-		@extend %space-pre-wrap;
-	}
-
-	td {
-		@extend %space-pre-wrap;
-	}
-
-	span {
-		@extend %space-pre-wrap;
-	}
-}
-
 .disabled {
 	cursor: default !important;
 	opacity: .35;
@@ -246,255 +120,8 @@ pre {
 
 %space-pre-wrap {
 	white-space: pre-wrap;
-	word-break: break-all;  // For the Internet Explorer.
-	word-break: break-word; // Override for the other browsers.
+	word-break: break-word;
 	overflow-wrap: break-word;
-}
-
-.top-nav-container {
-	background-color: $main-nav-bg-color;
-	height: 45px;
-	line-height: 45px;
-	padding: 0 10px;
-	position: relative;
-}
-
-.top-nav a,
-.top-subnav a,
-.header-logo {
-	&:active,
-	&:hover,
-	&:link,
-	&:visited {
-		border: 0;
-	}
-}
-
-.top-nav {
-	font-size: $font-top-nav-size;
-	background-color: $main-nav-bg-color;
-	display: inline-block;
-
-	li {
-		display: block;
-		float: left;
-
-		&.selected {
-			position: relative;
-
-			&::after {
-				content: '';
-				position: absolute;
-				bottom: -1px;
-				left: 0;
-				right: 0;
-				margin: 0 auto;
-				width: 0;
-				height: 0;
-				font-size: 0;
-				line-height: 0;
-				border-left: 9px solid $transparent;
-				border-right: 9px solid $transparent;
-				border-bottom: 9px solid $main-subnav-bg-color;
-			}
-
-			a,
-			a:hover {
-				color: $link-main-nav-active-color;
-			}
-		}
-	}
-
-	a {
-		padding: 15px 10px;
-		color: $link-main-nav-color;
-		text-decoration: none;
-		cursor: pointer;
-		outline: 0;
-
-		&:link {
-			color: $link-main-nav-color;
-		}
-
-		&:visited {
-			color: $link-main-nav-visited-color;
-		}
-
-		&:hover {
-			color: $link-main-nav-hover-color;
-		}
-
-		&:focus {
-			color: $link-main-nav-active-color;
-			background-color: $ui-hover-color !important;
-		}
-
-		&:active {
-			color: $link-main-nav-active-color;
-		}
-	}
-}
-
-ul.top-nav-icons {
-	position: absolute;
-	top: 0;
-	right: 10px;
-
-	li {
-		display: block;
-		float: left;
-		padding: 0 0 0 10px;
-
-		.search-suggest {
-			min-width: 186px;
-
-			li {
-				float: none;
-				padding: .4em 5px;
-
-				a {
-					opacity: inherit;
-					width: inherit;
-				}
-			}
-		}
-	}
-
-	a,
-	span.top-nav-guest {
-		display: block;
-		width: 24px;
-		height: 45px;
-		line-height: 45px;
-		color: $link-main-nav-active-color;
-		font-size: $font-h3-size;
-		text-decoration: none;
-		outline: 0;
-		opacity: .75;
-		transition: opacity .2s ease-out;
-
-		&:hover {
-			opacity: 1;
-		}
-
-		&:focus {
-			background-color: $ui-hover-color !important;
-			opacity: 1;
-		}
-	}
-
-	.top-nav-help {
-		background: url(../img/icon-sprite.svg) no-repeat -6px -32px;
-	}
-
-	.top-nav-profile {
-		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
-	}
-
-	.top-nav-guest {
-		background: url(../img/icon-sprite.svg) no-repeat -241px -104px;
-	}
-
-	.top-nav-signout {
-		background: url(../img/icon-sprite.svg) no-repeat -6px -140px;
-	}
-
-	.top-nav-zbbshare {
-		background: url(../img/icon-sprite.svg) no-repeat -9px -68px;
-		width: auto;
-		padding: 0 6px 0 17px;
-	}
-
-	.top-nav-support {
-		background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
-		width: auto;
-		padding: 0 6px 0 17px;
-	}
-
-	form {
-		position: relative;
-	}
-
-	input {
-		background-color: darken($main-nav-bg-color, 7%);
-		border: 1px solid darken($main-nav-bg-color, 10%);
-		width: 198px;
-		margin: 6px 3px 0 0;
-		color: $font-color;
-		padding: 4px 24px 4px 5px;
-
-		@media (max-width: 1050px) {
-			width: 130px;
-		}
-
-		transition: width .5s ease-out;
-
-		&:focus {
-			background-color: $form-bg-color;
-			border: 1px solid $form-border-color;
-
-			+ .btn-search {
-				opacity: 1;
-			}
-		}
-	}
-}
-
-.top-subnav-container {
-	background-color: $main-subnav-bg-color;
-	height: 30px;
-	line-height: 30px;
-	padding: 0 10px;
-	position: relative;
-}
-
-.top-subnav {
-	background-color: $main-subnav-bg-color;
-	position: absolute;
-	left: 0;
-
-	li {
-		display: block;
-		float: left;
-		padding: 0 10px;
-
-		&:last-child {
-			box-shadow: 25px 0 10px -10px $main-subnav-bg-color;
-		}
-	}
-
-	a {
-		padding: 8px 0;
-
-		&:link {
-			color: $link-main-subnav-color;
-		}
-
-		&:visited {
-			color: $link-main-subnav-visited-color;
-		}
-
-		&:hover {
-			color: $link-main-subnav-hover-color;
-		}
-
-		&:active {
-			color: $link-main-subnav-active-color;
-		}
-
-		&:focus {
-			border-bottom: 4px solid rgba($ui-hover-color, .5) !important;
-			color: $link-main-subnav-active-color;
-			outline: none;
-			padding-bottom: 4px;
-		}
-
-		&.selected {
-			border-bottom: 4px solid lighten($main-subnav-bg-color, 50%);
-			color: $link-main-subnav-active-color;
-			padding-bottom: 4px;
-		}
-	}
 }
 
 .arrow-up {
@@ -535,7 +162,24 @@ ul.top-nav-icons {
 	line-height: 0;
 }
 
-.header-title,
+.zabbix-logo {
+	width: 114px;
+	height: 30px;
+	background: url($sprite-path) no-repeat 0 -864px;
+}
+
+.zabbix-sidebar-logo {
+	width: 91px;
+	height: 24px;
+	background: url($sprite-path) no-repeat -570px -400px;
+}
+
+.zabbix-sidebar-logo-compact {
+	width: 24px;
+	height: 24px;
+	background: url($sprite-path) no-repeat -540px -400px;
+}
+
 .object-group {
 	min-height: 24px;
 	line-height: 24px;
@@ -544,129 +188,41 @@ ul.top-nav-icons {
 	vertical-align: top;
 }
 
-.header-title {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	margin: -10px 0 10px;
-	padding: 10px 0 6px;
-	border-bottom: 1px solid $ui-border-color;
+.dashbrd-edit {
+	background-color: $ui-bg-color;
+	box-shadow: 0 0 0 4px $ui-bg-color;
+	display: inline-block;
+	margin-right: 5px;
+	position: relative;
 
-	> div {
-		&:first-child {
-			overflow: hidden;
-		}
-
-		&:last-child {
-			flex-shrink: 0;
-		}
-	}
-
-	h1 {
-		position: relative;
-		line-height: 24px;
-		overflow: hidden;
-		padding-top: 1px;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	a.link-action {
-		display: block;
-		box-sizing: border-box;
-		height: 25px;
-
-		h1 {
-			padding-right: 1em;
-
-			&::after {
-				content: '';
-				position: absolute;
-				top: 50%;
-				right: .15em;
-				margin-top: -.15em;
-				width: .3em;
-				height: .3em;
-				border-right: 2px solid $font-color;
-				border-bottom: 2px solid $font-color;
-				transform: rotate(45deg);
-				transition: border-color .2s ease-out;
-			}
-		}
-
-		&:hover,
-		&:focus {
-			h1::after {
-				border-color: $link-hover-color;
-			}
-		}
-	}
-
-	form {
-		display: flex;
-		justify-content: flex-end;
+	&::after {
+		content: '';
+		position: absolute;
+		min-height: 24px;
+		z-index: -1;
+		top: -5px;
+		right: -5px;
+		bottom: -5px;
+		left: -5px;
+		border: 1px solid $ui-border-color;
 	}
 
 	ul {
-		text-align: right;
-
 		li {
-			display: inline-block;
-			vertical-align: top;
-			position: relative;
-			padding: 0 0 0 10px;
-		}
+			vertical-align: middle;
 
-		ul li:first-child {
-			padding-left: 0;
-		}
+			&:first-child {
+				padding: 0;
+			}
 
-		button {
-			line-height: 22px;
-		}
-	}
-
-	.dashbrd-edit {
-		background-color: $ui-bg-color;
-		box-shadow: 0 0 0 4px $ui-bg-color;
-		display: inline-block;
-		margin-right: 5px;
-		position: relative;
-
-		&::after {
-			content: '';
-			position: absolute;
-			min-height: 24px;
-			z-index: -1;
-			top: -5px;
-			right: -5px;
-			bottom: -5px;
-			left: -5px;
-			border: 1px solid $ui-border-color;
-		}
-
-		ul {
-			li {
+			.btn-dashbrd-conf {
 				vertical-align: middle;
-
-				&:first-child {
-					padding: 0;
-				}
-
-				.btn-dashbrd-conf {
-					vertical-align: middle;
-				}
 			}
 		}
 	}
 }
 
-// Article
-article {
-	padding: 10px 10px 0;
-}
-
-// Object Group Navigation
+// Object group navigation.
 .object-group {
 	margin-bottom: -1px;
 
@@ -713,7 +269,6 @@ article {
 }
 
 .hor-list {
-
 	li {
 		display: inline-block;
 		margin: 0 6px 0 0;
@@ -728,7 +283,7 @@ article {
 	}
 }
 
-// Breadcrumbs inline with filter block
+// Breadcrumbs inline with filter block.
 .filter-breadcrumb {
 	display: inline-block;
 	padding-top: 0;
@@ -776,7 +331,6 @@ article {
 		}
 
 		> span {
-
 			a {
 				margin-top: 1px;
 				line-height: 13px;
@@ -789,43 +343,7 @@ article {
 	}
 }
 
-// Footer
-footer {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	height: 30px;
-	text-align: center;
-	color: $font-alt-color;
-}
-
-main {
-	@extend article;
-}
-
-output {
-	display: block;
-}
-
-.logo {
-	float: left;
-	display: block;
-	width: 95px;
-	height: 25px;
-	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
-}
-
-.header-logo {
-	float: left;
-	display: block;
-	margin: 10px 10px 0 0;
-
-	&:focus {
-		box-shadow: 0 0 0 2px rgba($blue, .35);
-	}
-}
-
-// Tables
+// Tables.
 .list-table {
 	width: 100%;
 	background-color: $ui-bg-color;
@@ -852,9 +370,7 @@ output {
 	&.compact-view {
 		tr {
 			&[class*='flh-'] {
-
-				@if $theme_name == 'blue' {
-
+				@if $theme-name == 'blue' {
 					&:not(.row-selected):not(:hover) {
 						td {
 							color: $font-color;
@@ -884,8 +400,7 @@ output {
 					}
 				}
 
-				@if $theme_name == 'dark' {
-
+				@if $theme-name == 'dark' {
 					&:not(.row-selected):not(:hover) {
 						td {
 							color: #000000;
@@ -911,8 +426,7 @@ output {
 					}
 				}
 
-				@if $theme_name == 'blue' or $theme_name == 'dark' {
-
+				@if $theme-name == 'blue' or $theme-name == 'dark' {
 					&:not(.row-selected):not(:hover) {
 						td {
 							[class*='icon-'] {
@@ -986,7 +500,6 @@ output {
 			}
 
 			.rel-container {
-
 				span {
 					margin: 0;
 				}
@@ -1027,7 +540,7 @@ output {
 			}
 
 			.icon-wzrd-action {
-				background: url(../img/icon-sprite.svg) no-repeat -6px -624px;
+				background: url($sprite-path) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
 				margin: 0;
@@ -1138,7 +651,6 @@ output {
 		}
 
 		.treeview {
-
 			span {
 				margin: 0;
 			}
@@ -1162,7 +674,6 @@ output {
 	}
 
 	tbody tr {
-
 		&:hover {
 			background-color: $ui-hover-color;
 
@@ -1355,28 +866,25 @@ output {
 	line-height: 12px;
 	text-align: center;
 
-	&:link {
-		color: $font-color;
-	}
-
-	&:visited {
+	&:link,
+	&:visited,
+	&:hover,
+	&:focus,
+	&:active {
 		color: $font-color;
 	}
 
 	&:hover {
-		color: $font-color;
 		background-color: $ui-hover-color;
 		border-bottom-color: $form-border-color;
 	}
 
 	&:focus {
-		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-focus-color;
 	}
 
 	&:active {
-		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-color;
 	}
@@ -1431,7 +939,6 @@ output {
 	vertical-align: top;
 
 	&:last-child {
-
 		.dashbrd-widget {
 			margin: 0 0 10px;
 		}
@@ -1474,7 +981,7 @@ output {
 	@extend %webkit-hor-scrollbar;
 }
 
-// Timeline in table view
+// Timeline in table view.
 .timeline-date {
 	text-align: right;
 	white-space: nowrap;
@@ -1498,7 +1005,6 @@ output {
 }
 
 .timeline-dot {
-
 	&::after {
 		@extend %timeline-dot;
 		background-color: $btn-bg-color;
@@ -1509,7 +1015,6 @@ output {
 }
 
 .timeline-dot-big {
-
 	&::after {
 		@extend %timeline-dot;
 		background-color: $ui-bg-color;
@@ -1544,7 +1049,7 @@ output {
 	border-bottom-color: $ui-bg-color !important;
 }
 
-// Filters
+// Filters.
 .filter-btn-container {
 	position: relative;
 	text-align: right;
@@ -1574,7 +1079,6 @@ output {
 		border: 0;
 
 		thead {
-
 			th {
 				color: initial;
 				padding: 8px 5px 5px;
@@ -1654,7 +1158,6 @@ output {
 	}
 
 	.table-forms .table-forms-td-right {
-
 		td {
 			padding: 0 5px 5px 0;
 			vertical-align: middle;
@@ -1715,6 +1218,7 @@ output {
 
 		li {
 			display: block; // Override ".table-forms li".
+			padding-left: 0 !important;
 			margin: 2px 2px 0 0;
 			overflow: hidden;
 			white-space: nowrap;
@@ -1739,7 +1243,6 @@ output {
 			}
 
 			&.selected {
-
 				.subfilter-enabled,
 				.subfilter-disable-btn,
 				.subfilter-disable-btn:active {
@@ -1828,7 +1331,7 @@ output {
 	}
 }
 
-// Forms
+// Forms.
 .table-forms-container {
 	margin: 0 0 10px;
 	background-color: $ui-bg-color;
@@ -1842,7 +1345,6 @@ output {
 }
 
 .form-btns {
-
 	button {
 		margin: 10px 6px 5px;
 	}
@@ -1855,10 +1357,13 @@ output {
 
 	li {
 		display: table-row;
+
+		&.display-none {
+			@extend .display-none
+		}
 	}
 
 	.multiselect-suggest {
-
 		li {
 			display: block;
 		}
@@ -1875,7 +1380,6 @@ output {
 	}
 
 	tfoot {
-
 		.table-forms-td-right {
 			padding-top: 5px;
 		}
@@ -1939,6 +1443,13 @@ output {
 				}
 			}
 
+			&.overflow-break {
+				max-width: 150px;
+				overflow-wrap: break-word;
+				white-space: initial;
+				word-wrap: break-word;
+			}
+
 			&:last-child {
 				padding-right: 0;
 			}
@@ -1966,7 +1477,6 @@ output {
 	}
 
 	.hor-list {
-
 		li {
 			display: inline-block;
 		}
@@ -1998,7 +1508,6 @@ output {
 }
 
 .list-check-radio {
-
 	li {
 		display: block;
 		padding: .3em 0;
@@ -2035,7 +1544,6 @@ output {
 	counter-reset: line;
 
 	.list-numbered-item {
-
 		&::before {
 			content: counter(line);
 			counter-increment: line;
@@ -2291,7 +1799,6 @@ select {
 }
 
 .checkbox-radio {
-
 	&:checked[readonly] + label span {
 		transition: none;
 
@@ -2313,13 +1820,11 @@ select {
 	}
 
 	&[type="checkbox"] {
-
 		+ label span {
 			border-radius: 2px;
 		}
 
 		&:checked + label span {
-
 			&::after {
 				content: '';
 				position: absolute;
@@ -2335,7 +1840,6 @@ select {
 		}
 
 		&:checked[disabled] + label span {
-
 			&::after {
 				border-color: $form-border-color !important;
 			}
@@ -2343,13 +1847,11 @@ select {
 	}
 
 	&[type="radio"] {
-
 		+ label span {
 			border-radius: 50%;
 		}
 
 		&:checked + label span {
-
 			&::after {
 				content: '';
 				position: absolute;
@@ -2364,7 +1866,6 @@ select {
 		}
 
 		&:checked[disabled] + label span {
-
 			&::after {
 				background-color: $form-border-color !important;
 			}
@@ -2599,46 +2100,24 @@ button {
 	}
 }
 
-.btn-search {
-	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
-	position: absolute;
-	border: 0;
-	top: 11px;
-	right: 4px;
-	width: 24px;
-	min-height: 22px;
-	height: 22px;
-	padding: 0;
-	opacity: .75;
-	transition: opacity .2s ease-out;
-
-	&:hover,
-	&:active,
-	&:focus {
-		@extend %btn-search-hover-focus;
-	}
-
-	&[disabled] {
-		background-color: $transparent;
-
-		&:hover {
-			background-color: $transparent;
-			opacity: .75;
-		}
-	}
-}
-
 $icon-btn: (
-	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
-	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -259px,
-	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
-	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
-	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
-	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -329px,
-	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
-	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px
+	conf: $btn-bg-color url($sprite-path) no-repeat -7px -187px,
+	kiosk: $btn-bg-color url($sprite-path) no-repeat -79px -259px,
+	min: $btn-bg-color url($sprite-path) no-repeat -7px -259px,
+	add-fav: $btn-bg-color url($sprite-path) no-repeat -7px -295px,
+	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
+	action: $btn-bg-color url($sprite-path) no-repeat -7px -367px,
+	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px
 );
 
+// Dynamically generated classes:
+//  .btn-conf
+//  .btn-kiosk
+//  .btn-min
+//  .btn-add-fav
+//  .btn-remove-fav
+//  .btn-action
+//  .btn-info
 @each $icon-btn, $bgimage in $icon-btn {
 	.btn-#{$icon-btn} {
 		background: $bgimage;
@@ -2647,20 +2126,33 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	iterator-page-previous: url(../img/icon-sprite.svg) no-repeat -85px -657px,
-	iterator-page-next: url(../img/icon-sprite.svg) no-repeat -83px -623px,
-	widget-action: url(../img/icon-sprite.svg) no-repeat -6px -618px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -6px -654px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -6px -689px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -42px -619px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -42px -582px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -6px -546px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -6px -582px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -6px -474px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -6px -510px,
-	info-clock: url(../img/icon-sprite.svg) no-repeat -87px -762px
+	iterator-page-previous: url($sprite-path) no-repeat -85px -657px,
+	iterator-page-next: url($sprite-path) no-repeat -83px -623px,
+	widget-action: url($sprite-path) no-repeat -6px -618px,
+	widget-collapse: url($sprite-path) no-repeat -6px -654px,
+	widget-expand: url($sprite-path) no-repeat -6px -689px,
+	widget-edit: url($sprite-path) no-repeat -42px -619px,
+	widget-delete: url($sprite-path) no-repeat -42px -582px,
+	alarm-on: url($sprite-path) no-repeat -6px -546px,
+	alarm-off: url($sprite-path) no-repeat -6px -582px,
+	sound-on: url($sprite-path) no-repeat -6px -474px,
+	sound-off: url($sprite-path) no-repeat -6px -510px,
+	info-clock: url($sprite-path) no-repeat -87px -762px
 );
 
+// Dynamically generated classes:
+//  .btn-iterator-page-previous
+//  .btn-iterator-page-next
+//  .btn-widget-action
+//  .btn-widget-collapse
+//  .btn-widget-expand
+//  .btn-widget-edit
+//  .btn-widget-delete
+//  .btn-alarm-on
+//  .btn-alarm-off
+//  .btn-sound-on
+//  .btn-sound-off
+//  .btn-info-clock
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
 	.btn-#{$icon-widget-btn} {
 		background: $bgimage;
@@ -2668,8 +2160,7 @@ $icon-widget-btn: (
 	}
 }
 
-// TIME SELECTION
-
+// Time selection.
 .ui-tabs-nav {
 	height: 30px;
 	line-height: 30px;
@@ -2695,7 +2186,6 @@ $icon-widget-btn: (
 		}
 
 		&.ui-tabs-active {
-
 			a {
 				padding: 8px 10px 6px;
 				background-color: $transparent;
@@ -2707,7 +2197,6 @@ $icon-widget-btn: (
 		}
 
 		&.ui-state-disabled {
-
 			a {
 				cursor: default;
 				color: $btn-disabled-font-color;
@@ -2749,7 +2238,7 @@ $icon-widget-btn: (
 			top: 0;
 			height: 24px;
 			width: 24px;
-			background: url(../img/icon-sprite.svg) no-repeat -87px -583px;
+			background: url($sprite-path) no-repeat -87px -583px;
 		}
 	}
 
@@ -2762,12 +2251,11 @@ $icon-widget-btn: (
 			top: 0;
 			height: 24px;
 			width: 24px;
-			background: url(../img/icon-sprite.svg) no-repeat -87px -547px;
+			background: url($sprite-path) no-repeat -87px -547px;
 		}
 	}
 
 	.ui-state-focus {
-
 		.btn-time,
 		.filter-trigger {
 			box-shadow: 0 0 0 2px rgba($blue, .35);
@@ -2775,7 +2263,6 @@ $icon-widget-btn: (
 		}
 
 		&.ui-tabs-active {
-
 			.btn-time,
 			.filter-trigger {
 				box-shadow: 0 0 0 2px rgba($blue, .35);
@@ -2784,7 +2271,6 @@ $icon-widget-btn: (
 	}
 
 	.ui-tabs-active {
-
 		.btn-time,
 		.filter-trigger {
 			color: $font-color;
@@ -2822,7 +2308,6 @@ $icon-widget-btn: (
 
 .filter-space {
 	box-sizing: border-box;
-	margin-top: 10px;
 
 	li a.ui-tabs-anchor {
 		vertical-align: top;
@@ -2853,7 +2338,7 @@ $icon-widget-btn: (
 
 .btn-time-left,
 .btn-time-right {
-	background: url(../img/icon-sprite.svg) no-repeat;
+	background: url($sprite-path) no-repeat;
 	content: '';
 	border: 0;
 	height: 24px;
@@ -2920,7 +2405,6 @@ $icon-widget-btn: (
 	line-height: 20px;
 
 	li {
-
 		&:last-of-type {
 			a {
 				margin-bottom: 0;
@@ -3014,7 +2498,7 @@ $icon-widget-btn: (
 }
 
 .btn-dashbrd-conf {
-	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
+	background: url($sprite-path) no-repeat -42px -619px;
 	@extend %btn-dashbrd;
 }
 
@@ -3095,11 +2579,6 @@ $icon-widget-btn: (
 	}
 }
 
-%btn-search-hover-focus {
-	background-color: $transparent;
-	opacity: 1;
-}
-
 %btn-widget-hover-active {
 	background-color: $transparent;
 	opacity: 1;
@@ -3132,12 +2611,17 @@ button[disabled] {
 }
 
 $var-icons: (
-	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -729px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -765px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
+	maint: url($sprite-path) no-repeat -46px -802px,
+	depend-up: url($sprite-path) no-repeat -49px -729px,
+	depend-down: url($sprite-path) no-repeat -49px -765px,
+	ackn: url($sprite-path) no-repeat -45px -693px
 );
 
+// Dynamically generated classes:
+//  .icon-maint
+//  .icon-depend-up
+//  .icon-depend-down
+//  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
 		margin: 0 18px 0 0;
@@ -3149,33 +2633,48 @@ $var-icons: (
 }
 
 $trigger-expression-tree-icons: (
-	top-bottom: url(../img/icon-sprite.svg) no-repeat -84px -300px,
-	top-bottom-right: url(../img/icon-sprite.svg) no-repeat -84px -334px,
-	top-right: url(../img/icon-sprite.svg) no-repeat -84px -372px,
-	empty: url(../img/icon-sprite.svg) no-repeat -84px -350px
+	top-bottom: url($sprite-path) no-repeat -84px -300px,
+	top-bottom-right: url($sprite-path) no-repeat -84px -334px,
+	top-right: url($sprite-path) no-repeat -84px -372px,
+	empty: url($sprite-path) no-repeat -84px -350px
 );
 
-@each $var-icon, $bgimage in $trigger-expression-tree-icons {
-	.icon-tree-#{$var-icon} {
-		margin: 0 12px 0 0;
+%trigger-expression-tree-icons-common {
+	margin: 0 12px 0 0;
+
+	&::before {
+		background: url($sprite-path) no-repeat;
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		position: absolute;
+		content: '';
+	}
+}
+
+// Dynamically generated classes:
+//  .icon-tree-top-bottom
+//  .icon-tree-top-bottom-right
+//  .icon-tree-top-right
+//  .icon-tree-empty
+@each $class, $bg-position in $trigger-expression-tree-icons {
+	.icon-tree-#{$class} {
+		@extend %trigger-expression-tree-icons-common;
 
 		&::before {
-			background: $bgimage;
-			display: inline-block;
-			width: 12px;
-			height: 12px;
-			position: absolute;
-			content: '';
+			background-position: $bg-position;
 		}
 	}
 }
 
 $form-icon-btn: (
-	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
-	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -6px -617px
+	cal: url($sprite-path) no-repeat -42px -834px,
+	wzrd-action: url($sprite-path) no-repeat -6px -617px
 );
 
+// Dynamically generated classes:
+//  .icon-cal
+//  .icon-wzrd-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
@@ -3214,7 +2713,7 @@ $form-icon-btn: (
 .drag-icon {
 	margin-left: -9px;
 	height: 24px;
-	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
+	background: url($sprite-path) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
 
@@ -3226,7 +2725,6 @@ $form-icon-btn: (
 }
 
 .ui-draggable-dragging {
-
 	.drag-icon,
 	.dashbrd-widget-head,
 	.dashbrd-grid-widget-head,
@@ -3250,12 +2748,11 @@ $form-icon-btn: (
 		left: 0;
 		width: 14px;
 		height: 14px;
-		background: url(../img/icon-sprite.svg) no-repeat -47px -659px;
+		background: url($sprite-path) no-repeat -47px -659px;
 	}
 }
 
-// Sign in, Installation
-
+// Installation.
 .setup-container {
 	background-color: $ui-bg-color;
 	width: 766px;
@@ -3273,14 +2770,16 @@ $form-icon-btn: (
 		padding: 0;
 	}
 
-	.signin-logo {
-		margin: 0 0 37px;
+	.setup-logo {
+		display: flex;
+		margin-bottom: 40px;
+		justify-content: flex-start;
 	}
 }
 
 .setup-left {
 	float: left;
-	width: 198px;
+	width: 200px;
 	padding-right: 10px;
 
 	ul {
@@ -3300,7 +2799,7 @@ $form-icon-btn: (
 
 .setup-right {
 	width: auto;
-	margin-left: 198px;
+	margin-left: 200px;
 }
 
 .setup-right-body {
@@ -3391,7 +2890,6 @@ $form-icon-btn: (
 	}
 
 	input {
-
 		&[type="text"] {
 			@extend %signin-input;
 		}
@@ -3411,11 +2909,9 @@ $form-icon-btn: (
 }
 
 .signin-logo {
-	margin: 0 auto;
+	display: flex;
 	margin-bottom: 21px;
-	width: 114px;
-	height: 30px;
-	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
+	justify-content: center;
 }
 
 .signin-links {
@@ -3430,35 +2926,16 @@ $form-icon-btn: (
 	width: 100%;
 }
 
-/*
- * Dashboard, widgets and iterators.
- *
- * To maintain code clarity:
- *   - Do not mix rules for dashboard view mode and dashboard edit mode.
- *   - Do not mix rules for widgets and iterators.
- */
-
+// Dashboard, widgets and iterators.
+// To maintain code clarity:
+//   - Do not mix rules for dashboard view mode and dashboard edit mode.
+//   - Do not mix rules for widgets and iterators.
 .dashbrd-grid-container {
 	position: relative;
 	margin: -4px;
 
 	// For widget sliding headers to appear over the breadcrumbs.
 	z-index: 3;
-}
-
-.layout-kioskmode {
-	// Set the same speed as for the sliding headers of the widgets.
-	transition: margin-top .3s;
-
-	&.kiosk-slide-lines-1 {
-		// Set to the height of the sliding headers of the widgets.
-		margin-top: 2rem;
-	}
-
-	&.kiosk-slide-lines-2 {
-		// Set to double of the height of the sliding headers of the widgets.
-		margin-top: 4rem;
-	}
 }
 
 .dashbrd-grid-new-widget-placeholder {
@@ -3499,7 +2976,7 @@ $form-icon-btn: (
 		text-align: center;
 
 		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			background: url($sprite-path) no-repeat -157px -888px;
 			content: ' ';
 			height: $icon-height;
 			width: 36px;
@@ -3517,7 +2994,7 @@ $form-icon-btn: (
 			background-color: rgba($ui-bg-color, .7);
 
 			.dashbrd-grid-new-widget-label::before {
-				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
+				background: url($sprite-path) no-repeat -122px -284px;
 			}
 		}
 	}
@@ -3526,7 +3003,7 @@ $form-icon-btn: (
 .dashbrd-grid-widget-set-size {
 	.dashbrd-grid-new-widget-label {
 		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
+			background: url($sprite-path) no-repeat -345px -888px;
 		}
 	}
 }
@@ -3673,14 +3150,12 @@ $form-icon-btn: (
 	}
 
 	&.dashbrd-grid-widget-focus {
-
 		.dashbrd-grid-widget-actions {
 			opacity: 1;
 		}
 	}
 
 	&.ui-resizable-resizing.resizing-top {
-
 		.dashbrd-grid-widget-container {
 			top: auto;
 			bottom: 0;
@@ -3688,7 +3163,6 @@ $form-icon-btn: (
 	}
 
 	&.ui-resizable-resizing.resizing-left {
-
 		.dashbrd-grid-widget-container {
 			left: auto;
 			right: 0;
@@ -4324,16 +3798,10 @@ $form-icon-btn: (
 		}
 
 		tbody tr {
-
 			&:last-child td {
 				border-bottom: 1px solid $table-border-color;
 			}
 		}
-	}
-
-	.debug-output {
-		max-height: 300px;
-		border-color: $table-border-color;
 	}
 
 	.msg-bad,
@@ -4358,7 +3826,6 @@ $form-icon-btn: (
 }
 
 %dashbrd-widget-td {
-
 	&:first-child {
 		padding-left: 10px;
 	}
@@ -4413,10 +3880,10 @@ $form-icon-btn: (
 	}
 }
 
-// Action Menus, Pop-up Menus
+// Action Menus, Pop-up Menus.
 .menu-popup {
 	position: absolute;
-	z-index: 1000;
+	z-index: 1001;
 	padding: 5px 15px 5px 25px;
 	min-width: 166px;
 	max-width: 250px;
@@ -4461,7 +3928,6 @@ $form-icon-btn: (
 		}
 
 		&.selected {
-
 			&::before {
 				display: block;
 				width: 24px;
@@ -4469,7 +3935,7 @@ $form-icon-btn: (
 				position: absolute;
 				left: 0;
 				content: '';
-				background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
+				background: url($sprite-path) no-repeat -5px -835px;
 			}
 		}
 
@@ -4526,33 +3992,6 @@ $form-icon-btn: (
 	}
 }
 
-.search-suggest {
-	position: absolute;
-	z-index: 1000;
-	padding: 0 5px;
-	min-width: 16px;
-	color: $font-alt-color;
-	background-color: $form-bg-color;
-	border: 1px solid $action-border-color;
-	border-top: 0;
-	box-shadow: 0 6px 10px 0 $action-shadow-color;
-
-	li {
-		display: block;
-		height: inherit;
-		line-height: normal;
-		color: $font-color;
-		padding: .4em 5px;
-		margin: 0 -5px;
-		cursor: pointer;
-		transition: background-color .2s ease-out;
-
-		&.suggest-hover {
-			background-color: $action-hover-color;
-		}
-	}
-}
-
 .overlay-dialogue {
 	display: table;
 	position: absolute;
@@ -4583,7 +4022,6 @@ $form-icon-btn: (
 			}
 
 			.columns-wrapper {
-
 				.column-50:last-of-type {
 					margin-left: 10px;
 				}
@@ -4647,6 +4085,7 @@ $form-icon-btn: (
 		position: sticky;
 		top: 0;
 		z-index: 4;
+		margin: 0 0 10px;
 	}
 
 	.list-table {
@@ -4668,7 +4107,6 @@ $form-icon-btn: (
 	}
 
 	.table-forms-td-right {
-
 		td {
 			vertical-align: middle;
 
@@ -4730,7 +4168,7 @@ $form-icon-btn: (
 		border-bottom-left-radius: 0;
 
 		&::after {
-			background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+			background: url($sprite-path) no-repeat -47px -478px;
 			content: '';
 			position: absolute;
 			left: 3px;
@@ -4750,14 +4188,12 @@ $form-icon-btn: (
 	}
 
 	&.multilineinput-readonly {
-
 		input[type=text][readonly] {
 			background-color: $form-disabled-bg-color !important;
 		}
 	}
 
 	&.multilineinput-disabled {
-
 		input[type=text] {
 			cursor: default;
 		}
@@ -4830,7 +4266,6 @@ $form-icon-btn: (
 
 // Flexible textarea.
 .textarea-flexible-container {
-
 	td {
 		line-height: 22px;
 
@@ -4863,7 +4298,6 @@ $form-icon-btn: (
 	max-width: 100%;
 
 	a {
-
 		&:focus,
 		&:hover {
 			outline: none;
@@ -4907,7 +4341,7 @@ $form-icon-btn: (
 			width: 28px;
 			height: 24px;
 			vertical-align: middle;
-			background: url(../img/icon-sprite.svg) no-repeat -85px -691px;
+			background: url($sprite-path) no-repeat -85px -691px;
 		}
 	}
 }
@@ -5053,7 +4487,7 @@ $form-icon-btn: (
 	}
 }
 
-// Problem notification overlay
+// Problem notification overlay.
 .notif {
 	width: 250px;
 
@@ -5112,7 +4546,7 @@ $form-icon-btn: (
 		height: 14px;
 		float: left;
 		margin-top: 20px;
-		background: url(../img/icon-sprite.svg) no-repeat -11px -587px;
+		background: url($sprite-path) no-repeat -11px -587px;
 	}
 
 }
@@ -5129,7 +4563,7 @@ $form-icon-btn: (
 	}
 }
 
-// Maps, Screens, Graphs
+// Maps, Screens, Graphs.
 .screen-table {
 	background-color: $ui-bg-color;
 	width: 100%;
@@ -5150,6 +4584,11 @@ $form-icon-btn: (
 			padding: 6px 5px;
 			border: 0;
 			border-bottom: 1px solid $table-border-color;
+
+			&.list-table-footer {
+				color: $font-alt-color;
+				text-align: right;
+			}
 		}
 	}
 
@@ -5176,7 +4615,6 @@ $form-icon-btn: (
 	}
 
 	.nothing-to-show {
-
 		td {
 			text-align: center !important;
 		}
@@ -5184,7 +4622,6 @@ $form-icon-btn: (
 }
 
 .dashed-border {
-
 	td {
 		border: 1px dashed $table-border-color;
 	}
@@ -5358,7 +4795,6 @@ $form-icon-btn: (
 }
 
 #map-area {
-
 	.map-element-area-bg {
 		background-color: rgba($action-hover-color, .35);
 	}
@@ -5369,7 +4805,7 @@ $form-icon-btn: (
 	margin: -3px;
 }
 
-// Debug, Overlay Description
+// Debug, Overlay Description.
 .debug-output {
 	display: none;
 	max-height: 600px;
@@ -5385,7 +4821,7 @@ $form-icon-btn: (
 .btn-debug {
 	position: fixed;
 	bottom: 10px;
-	right: 15px;
+	right: 35px;
 	z-index: 15000;
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;
@@ -5433,17 +4869,17 @@ $form-icon-btn: (
 
 %scroll-vert-shadow {
 	background:
-		// Shadow covers
+		// Shadow covers.
 		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
 		linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
-		// Shadows
+		// Shadows.
 		radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
 		radial-gradient(50% 100%, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background:
-		// Shadow covers
+		// Shadow covers.
 		linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
 		linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
-		// Shadows
+		// Shadows.
 		radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
 		radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background-repeat: no-repeat;
@@ -5452,7 +4888,7 @@ $form-icon-btn: (
 	background-attachment: local, local, scroll, scroll;
 }
 
-// Alerts
+// Alerts.
 .green {
 	color: $green;
 }
@@ -5484,7 +4920,6 @@ select.red {
 }
 
 select {
-
 	option.red {
 		@extend .red;
 	}
@@ -5756,8 +5191,8 @@ a.link-action {
 	background-color: $alt-red;
 }
 
-// SEVERITY STATUSES
-@if $theme_name == 'blue' or $theme_name == 'dark' {
+// Severity statuses.
+@if $theme-name == 'blue' or $theme-name == 'dark' {
 	td[class] {
 		+ {
 			td.na-bg,
@@ -5801,6 +5236,14 @@ a.link-action {
 		}
 	}
 
+	// Dynamically generated classes:
+	//  .log-na-bg
+	//  .log-normal-bg
+	//  .log-info-bg
+	//  .log-average-bg
+	//  .log-warning-bg
+	//  .log-high-bg
+	//  .log-disaster-bg
 	.log-#{$severity-type} {
 		color: darken($color, 45%);
 		background-color: $color;
@@ -5814,7 +5257,6 @@ a.link-action {
 .warning-bg,
 .high-bg,
 .disaster-bg {
-
 	a {
 		transition: none;
 	}
@@ -5837,8 +5279,7 @@ td.inactive-bg {
 	@extend .inactive-bg;
 }
 
-// FILTER CHECKBOXES
-
+// Filter checkboxes.
 .table-forms-second-column {
 	display: inline-block;
 	width: 50%;
@@ -5850,8 +5291,7 @@ td.inactive-bg {
 	}
 }
 
-// Event status colors
-
+// Event status colors.
 .problem-unack-fg {
 	color: $problem-unack-fg-color;
 }
@@ -5872,234 +5312,7 @@ td.inactive-bg {
 	background-color: $lighter-yellow;
 }
 
-.msg-bad,
-.msg-good,
-.msg-warning {
-	background-color: $ui-bg-color;
-	color: $font-color;
-	border: 2px solid;
-	font-size: $font-top-nav-size;
-	margin-bottom: 10px;
-	padding: 6px 10px 6px 75px;
-	text-align: left;
-	vertical-align: middle;
-	position: relative;
-	border-radius: 2px;
-
-	.overlay-close-btn {
-		color: $font-alt-color;
-		font-size: $font-top-nav-size;
-	}
-
-	.link-action {
-		margin-right: 10px;
-		font-size: $font-msg-reset-size;
-
-		.arrow-up {
-			border-bottom-color: darken(desaturate($green, 10%), 20%);
-		}
-
-		.arrow-down {
-			border-top-color: darken(desaturate($green, 10%), 20%);
-		}
-	}
-
-	button {
-		background-color: $white;
-	}
-
-	&::before {
-		content: '';
-		width: 61px;
-		position: absolute;
-		left: 0;
-		top: 0;
-		bottom: 0;
-	}
-
-	&::after {
-		content: '';
-		background: url(../img/icon-sprite.svg) no-repeat;
-		margin-top: 2px;
-		margin-left: 16px;
-		width: 27px;
-		height: 25px;
-		position: absolute;
-		left: 0;
-		top: 0;
-	}
-}
-
-.msg-bad {
-	border-color: $msg-bad-border-color;
-
-	.link-action {
-		color: $msg-bad-color;
-
-		.arrow-up {
-			border-bottom-color: $msg-bad-color;
-		}
-
-		.arrow-down {
-			border-top-color: $msg-bad-color;
-		}
-	}
-
-	ul {
-		border-top-color: $msg-bad-border-color;
-	}
-
-	button {
-		color: $msg-bad-color;
-		border-color: $msg-bad-border-color;
-	}
-
-	&::before {
-		background-color: $msg-bad-border-color;
-	}
-
-	&::after {
-		background-position: -122px -325px;
-	}
-}
-
-.msg-good {
-	border-color: $msg-good-border-color;
-
-	.link-action {
-		color: $msg-good-color;
-
-		.arrow-up {
-			border-bottom-color: $msg-good-color;
-		}
-
-		.arrow-down {
-			border-top-color: $msg-good-color;
-		}
-	}
-
-	ul {
-		border-top-color: $msg-good-border-color;
-	}
-
-	button {
-		color: $msg-good-color;
-		border-color: $msg-good-border-color;
-	}
-
-	&::before {
-		background-color: $msg-good-border-color;
-	}
-
-	&::after {
-		background-position: -122px -244px;
-	}
-}
-
-.msg-warning {
-	border-color: $msg-warning-border-color;
-
-	.link-action {
-		color: $msg-warning-color;
-
-		.arrow-up {
-			border-bottom-color: $msg-warning-color;
-		}
-
-		.arrow-down {
-			border-top-color: $msg-warning-color;
-		}
-	}
-
-	ul {
-		border-top-color: $msg-warning-border-color;
-	}
-
-	button {
-		color: $msg-warning-color;
-		border-color: $msg-warning-border-color;
-	}
-
-	&::before {
-		background-color: $msg-warning-border-color;
-	}
-
-	&::after {
-		background-position: -122px -325px;
-	}
-}
-
-.msg-details {
-	font-size: $font-form-size;
-	text-align: left;
-	font-weight: normal;
-
-	.link-action {
-		position: absolute;
-		top: 7px;
-		left: 10px;
-		margin-bottom: 20px;
-	}
-
-	ul {
-		font-size: $font-msg-reset-size;
-		max-height: 300px;
-		padding: 0 5px 0 0;
-		overflow-y: auto;
-		@extend %webkit-scrollbar;
-
-		li {
-			margin: 0 0 0 1em;
-
-			&::before {
-				content: '\2013';
-				float: left;
-				margin-left: -1em;
-			}
-
-			&:only-child {
-				margin-left: 0;
-			}
-		}
-
-		&.msg-details-border {
-			margin: 8px 0 0;
-			border-top-width: 1px;
-			border-top-style: dashed;
-			padding-top: .5em;
-		}
-	}
-}
-
-.msg-buttons {
-	text-align: right;
-	margin: 10px 0 0;
-
-	button {
-		margin: 0 0 0 10px;
-	}
-}
-
-.msg-global-footer {
-	display: none;
-	position: fixed;
-	z-index: 10000;
-	right: 0;
-	left: 0;
-	bottom: 0;
-	margin: 0 10px;
-}
-
-.msg-global {
-	text-align: left;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 5%;
-	max-width: 25%;
-}
-
-// Plus/Add icon
-
+// Plus/Add icon.
 .plus-icon {
 	display: inline-block;
 	@extend %plus-icon;
@@ -6120,8 +5333,7 @@ td.inactive-bg {
 	}
 }
 
-// Close/Remove icon
-
+// Close/Remove icon.
 %close-icon {
 	display: block;
 	padding: 0;
@@ -6201,8 +5413,7 @@ a.overlay-close-btn {
 	}
 }
 
-// Color picker
-
+// Color picker.
 .color-picker {
 	height: 20px;
 	white-space: nowrap;
@@ -6237,7 +5448,7 @@ a.overlay-close-btn {
 		width: 18px;
 		height: 18px;
 		border: 1px solid $form-border-color;
-		background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
+		background: url($sprite-path) no-repeat -323px -411px;
 		cursor: pointer;
 	}
 
@@ -6260,8 +5471,7 @@ a.overlay-close-btn {
 	}
 }
 
-// Preloader
-
+// Preloader.
 @keyframes is-loading-kf {
 	to {
 		transform: rotate(360deg);
@@ -6304,7 +5514,6 @@ a.overlay-close-btn {
 	}
 
 	&.is-loading-fadein {
-
 		&::before {
 			opacity: 0;
 			animation: fadein 2s ease-in .5s normal forwards;
@@ -6316,7 +5525,6 @@ a.overlay-close-btn {
 		}
 
 		.delayed-15s {
-
 			&::before,
 			&::after {
 				animation-delay: 15s;
@@ -6326,7 +5534,6 @@ a.overlay-close-btn {
 }
 
 button {
-
 	&.is-loading {
 		position: relative;
 
@@ -6346,7 +5553,6 @@ button {
 }
 
 span {
-
 	&.is-loading {
 		position: relative;
 		display: inline-block;
@@ -6357,14 +5563,12 @@ span {
 
 .dashbrd-grid-widget-content,
 .dashbrd-grid-iterator-content {
-
 	&.is-loading::before {
 		margin: calc(.25rem + 1px);
 	}
 }
 
 .overlay-dialogue.modal .overlay-dialogue-body {
-
 	&.is-loading {
 		overflow: hidden;
 
@@ -6392,12 +5596,20 @@ span {
 }
 
 $browser-logos: (
-	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
-	ff: url(../img/browser-sprite.png) no-repeat -66px 0,
-	ed: url(../img/browser-sprite.png) no-repeat 0 -66px,
-	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
-	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
+	chrome: 0 0,
+	ff: -66px 0,
+	ed: 0 -66px,
+	opera: -66px -66px,
+	safari: 0 -132px
 );
+
+%browser-logo-style {
+	background: url($browser-sprite-path) no-repeat;
+	width: 66px;
+	height: 66px;
+	margin: 0 auto;
+	margin-bottom: 5px;
+}
 
 // Dynamically generated classes for the browser logo:
 //  .browser-logo-chrome
@@ -6405,18 +5617,11 @@ $browser-logos: (
 //  .browser-logo-ed
 //  .browser-logo-opera
 //  .browser-logo-safari
-@each $browser, $bgimage in $browser-logos {
-	.browser-logo-#{$browser} {
-		background: $bgimage;
+@each $class, $bg-position in $browser-logos {
+	.browser-logo-#{$class} {
 		@extend %browser-logo-style;
+		background-position: $bg-position;
 	}
-}
-
-%browser-logo-style {
-	width: 66px;
-	height: 66px;
-	margin: 0 auto;
-	margin-bottom: 5px;
 }
 
 .browser-warning-container {
@@ -6450,6 +5655,7 @@ $browser-logos: (
 	text-align: center;
 }
 
+// TODO: Legacy
 %webkit-scrollbar {
 	&::-webkit-scrollbar {
 		width: 9px;
@@ -6465,6 +5671,7 @@ $browser-logos: (
 	}
 }
 
+// TODO: Legacy
 %webkit-hor-scrollbar {
 	&::-webkit-scrollbar {
 		height: 9px;
@@ -6492,7 +5699,6 @@ $browser-logos: (
 }
 
 tr.cursor-move {
-
 	td * {
 		cursor: move;
 	}
@@ -6500,12 +5706,6 @@ tr.cursor-move {
 
 .cursor-pointer {
 	cursor: pointer;
-}
-
-%overflow-ellipsis {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 .overflow-ellipsis {
@@ -6547,12 +5747,12 @@ tr.cursor-move {
 	}
 }
 
-.server-name {
-	color: $font-alt-color;
-	float: right;
-	white-space: nowrap;
-	overflow: hidden;
-	@extend %overflow-ellipsis;
+main {
+	.server-name {
+		float: right;
+		margin: 10px;
+		color: $font-alt-color;
+	}
 }
 
 .uppercase {
@@ -6576,12 +5776,12 @@ tr.cursor-move {
 	display: inline;
 }
 
-// Dashboard widget: URL
+// Dashboard widget - URL.
 .widget-url {
 	display: block;
 }
 
-// Analog Clock
+// Analog Clock.
 .clock {
 	display: flex;
 	justify-content: center;
@@ -6766,7 +5966,6 @@ svg {
 	}
 
 	.list-accordion-item-closed {
-
 		.multiselect {
 			height: 24px;
 			overflow: hidden;
@@ -6782,14 +5981,19 @@ svg {
 	}
 }
 
+.display-none {
+	display: none;
+}
+
 .checkbox-list {
 	li {
-		margin-top: 4px;
-		overflow-x: hidden;
+		overflow: hidden;
 		text-overflow: ellipsis;
+		line-height: 20px;
 
 		label {
-			vertical-align: middle;
+			line-height: 16px;
+			vertical-align: bottom;
 		}
 	}
 }
@@ -6898,7 +6102,6 @@ svg {
 
 	input[type=text],
 	.btn-link {
-
 		&:not(:last-of-type) {
 			margin-right: 10px;
 		}
@@ -6971,7 +6174,6 @@ svg {
 	}
 
 	.preprocessing-list-item {
-
 		.step-name {
 			padding-left: 10px;
 		}
@@ -7105,19 +6307,19 @@ svg {
 						outline: none;
 					}
 					.add-child-btn {
-						background: url(../img/icon-sprite.svg) no-repeat -47px -551px;
+						background: url($sprite-path) no-repeat -47px -551px;
 						background-color: $transparent !important;
 						height: 15px;
 						width: 14px;
 					}
 					.edit-item-btn {
-						background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+						background: url($sprite-path) no-repeat -47px -478px;
 						background-color: $transparent !important;
 						height: 15px;
 						width: 14px;
 					}
 					.import-items-btn {
-						background: url(../img/icon-sprite.svg) no-repeat -47px -515px;
+						background: url($sprite-path) no-repeat -47px -515px;
 						background-color: $transparent !important;
 						height: 15px;
 						width: 14px;
@@ -7296,7 +6498,7 @@ svg {
 		left: 0;
 		width: 18px;
 		height: 18px;
-		background-image: url(../img/icon-sprite.svg);
+		background-image: url($sprite-path);
 		background-repeat: no-repeat;
 	}
 }
@@ -7357,7 +6559,6 @@ svg {
 }
 
 .icon-action-msgs {
-
 	&[data-count]::after {
 		color: $ui-bg-color;
 	}
@@ -7368,7 +6569,6 @@ svg {
 }
 
 .icon-actions-number-gray {
-
 	&[data-count]::after {
 		color: $font-color;
 	}
@@ -7379,7 +6579,6 @@ svg {
 }
 
 .icon-actions-number-yellow {
-
 	&[data-count]::after {
 		color: $font-color;
 	}
@@ -7390,7 +6589,6 @@ svg {
 }
 
 .icon-actions-number-red {
-
 	&[data-count]::after {
 		color: $font-color;
 	}
@@ -7417,7 +6615,7 @@ svg {
 	display: table;
 }
 
-// RANGE CONTROL
+// Range control.
 $range-track-color: #c0c0c0;
 $range-progress-color: $link-color;
 $range-thumb-color: $link-color;
@@ -7562,7 +6760,7 @@ $range-input-width: 31px;
 	}
 }
 
-// Screen reader
+// Screen reader.
 .inline-sr-only {
 	font-size: 0;
 }
@@ -7579,7 +6777,6 @@ $range-input-width: 31px;
 }
 
 table.preprocessing-test-results {
-
 	td {
 		vertical-align: top !important;
 	}
@@ -7597,7 +6794,6 @@ table.preprocessing-test-results {
 }
 
 .totals-list {
-
 	&:not(.list-table) {
 		display: flex;
 		height: 100%;
@@ -7618,7 +6814,6 @@ table.preprocessing-test-results {
 	}
 
 	&.totals-list-horizontal {
-
 		> div {
 			flex-direction: column;
 			justify-content: center;
@@ -7641,10 +6836,8 @@ table.preprocessing-test-results {
 	}
 }
 
-// WIDGET "HOST AVAILABILITY"
-
+// Widget "Host availability".
 .host-avail-widget {
-
 	td:not(:first-child) {
 		border-left: 1px dotted $table-border-color;
 
@@ -7687,7 +6880,6 @@ table.preprocessing-test-results {
 
 		&:focus,
 		&:active {
-
 			+ .btn-undo {
 				border-top-color: $form-border-focus-color;
 				border-bottom-color: $form-border-focus-color;
@@ -7725,7 +6917,7 @@ table.preprocessing-test-results {
 				width: 22px;
 				height: 22px;
 				content: '';
-				background: url(../img/icon-sprite.svg) no-repeat -119px -474px;
+				background: url($sprite-path) no-repeat -119px -474px;
 			}
 
 			&.is-focused {
@@ -7792,9 +6984,8 @@ table.preprocessing-test-results {
 }
 
 .icon-text {
-
 	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -87px -474px;
+		background: url($sprite-path) no-repeat -87px -474px;
 	}
 
 	&:not(.highlighted):enabled {
@@ -7802,7 +6993,6 @@ table.preprocessing-test-results {
 		&:focus,
 		&:active,
 		&[aria-expanded="true"] {
-
 			&::before {
 				background-position: -399px -474px;
 			}
@@ -7811,9 +7001,8 @@ table.preprocessing-test-results {
 }
 
 .icon-secret {
-
 	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -87px -510px;
+		background: url($sprite-path) no-repeat -87px -510px;
 	}
 
 	&:not(.highlighted):enabled {
@@ -7821,7 +7010,6 @@ table.preprocessing-test-results {
 		&:focus,
 		&:active,
 		&[aria-expanded="true"] {
-
 			&::before {
 				background-position: -399px -510px;
 			}
@@ -7855,14 +7043,13 @@ table.preprocessing-test-results {
 		width: 10px;
 		height: 10px;
 		content: '';
-		background: url(../img/icon-sprite.svg) no-repeat -547px -431px;
+		background: url($sprite-path) no-repeat -547px -431px;
 	}
 
 	&:enabled {
 		&:hover,
 		&:focus,
 		&:active {
-
 			&::after {
 				background-position: -604px -431px;
 			}
@@ -7873,15 +7060,14 @@ table.preprocessing-test-results {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 
 		&::after {
-			background: url(../img/icon-sprite.svg) no-repeat -604px -503px;
+			background: url($sprite-path) no-repeat -604px -503px;
 		}
 
 		&:hover,
 		&:focus,
 		&:active {
-
 			&::after {
-				background: url(../img/icon-sprite.svg) no-repeat -604px -503px;
+				background: url($sprite-path) no-repeat -604px -503px;
 			}
 		}
 	}
@@ -7908,10 +7094,8 @@ table.preprocessing-test-results {
 }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-
 	/* for IE11 only. Fixed cell height if table has 100% height */
 	.host-avail-widget {
-
 		td {
 			height: 100%;
 		}

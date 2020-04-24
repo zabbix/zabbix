@@ -52,21 +52,21 @@ class testFormWeb extends CLegacyWebTest {
 		return [
 			[
 				[
-					'agent' => 'Internet Explorer 10.0',
+					'agent' => 'Internet Explorer 10',
 					'authentication' => 'None',
 					'host' => 'Simple form test host'
 				]
 			],
 			[
 				[
-					'agent' => 'Internet Explorer 10.0',
+					'agent' => 'Internet Explorer 10',
 					'authentication' => 'Basic',
 					'host' => 'Simple form test host'
 				]
 			],
 			[
 				[
-					'agent' => 'Internet Explorer 10.0',
+					'agent' => 'Internet Explorer 10',
 					'authentication' => 'NTLM',
 					'host' => 'Simple form test host'
 				]
@@ -102,7 +102,7 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
-					'agent' => 'Internet Explorer 10.0',
+					'agent' => 'Internet Explorer 10',
 					'authentication' => 'None',
 					'template' => 'Inheritance test template'
 				]
@@ -110,7 +110,7 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
-					'agent' => 'Internet Explorer 10.0',
+					'agent' => 'Internet Explorer 10',
 					'authentication' => 'Basic',
 					'template' => 'Inheritance test template'
 				]
@@ -118,7 +118,7 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
-					'agent' => 'Internet Explorer 10.0',
+					'agent' => 'Internet Explorer 10',
 					'authentication' => 'NTLM',
 					'template' => 'Inheritance test template'
 				]
@@ -248,47 +248,20 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('retries', 1);
 
 		$this->zbxTestTextPresent('Agent');
-		$this->zbxTestAssertVisibleId('agent');
 
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Internet Explorer']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 11.0']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 10.0']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 9.0']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 8.0']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 7.0']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 6.0']");
+		$agents = ['Microsoft Edge 80', 'Microsoft Edge 44', 'Internet Explorer 11', 'Internet Explorer 10',
+			'Internet Explorer 9', 'Internet Explorer 8', 'Firefox 73 (Windows)', 'Firefox 73 (Linux)',
+			'Firefox 73 (macOS)', 'Chrome 80 (Windows)', 'Chrome 80 (Linux)', 'Chrome 80 (macOS)', 'Chrome 80 (iOS)',
+			'Chromium 80 (Linux)', 'Opera 67 (Windows)', 'Opera 67 (Linux)', 'Opera 67 (macOS)', 'Safari 13 (macOS)',
+			'Safari 13 (iPhone)', 'Safari 13 (iPad)', 'Safari 13 (iPod Touch)', 'Zabbix', 'Lynx 2.8.8rel.2', 'Links 2.8',
+			'Googlebot 2.1', 'other ...'];
+		$agent_element = $this->query('id:agent')->one()->asDropdown();
+		$this->assertEquals($agent_element->getOptions()->asText(), $agents);
 
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Mozilla Firefox']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Mozilla Firefox']/option[text()='Firefox 33.0 (Windows)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Mozilla Firefox']/option[text()='Firefox 33.0 (Linux)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Mozilla Firefox']/option[text()='Firefox 33.0 (Mac)']");
-
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Opera']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Opera']/option[text()='Opera 25.0 (Windows)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Opera']/option[text()='Opera 25.0 (Mac)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Opera']/option[text()='Opera 12.16 (Linux)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Opera']/option[text()='Opera Mobile 12.02']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Opera']/option[text()='Opera Mini 9.80']");
-
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Safari']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Safari']/option[text()='Safari 7.0.6 (Mac)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Safari']/option[text()='Safari 5.1.7 (Windows)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Safari']/option[text()='Safari 6.0 (iPad)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Safari']/option[text()='Safari 5.0.2 (iPhone)']");
-
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Google Chrome']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Google Chrome']/option[text()='Chrome 38.0 (Windows)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Google Chrome']/option[text()='Chrome 38.0 (Linux)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Google Chrome']/option[text()='Chrome 38.0 (Mac)']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Google Chrome']/option[text()='Chromium 37.0 (Linux)']");
-
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Others']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Others']/option[text()='Konqueror 4.14.2']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Others']/option[text()='Lynx 2.8.8rel.2']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Others']/option[text()='Links 2.8']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Others']/option[text()='Android Webkit Browser 4.4.4']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Others']/option[text()='Googlebot 2.1']");
-		$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='Others']/option[text()='other ...']");
+		$agent_groups = ['Internet Explorer', 'Mozilla Firefox', 'Opera', 'Safari', 'Google Chrome', 'Others'];
+		foreach ($agent_groups as $group) {
+			$this->zbxTestAssertElementPresentXpath("//select[@id='agent']/optgroup[@label='$group']");
+		}
 
 		if ($agent == 'other ...') {
 			$this->zbxTestAssertVisibleId('agent_other');
@@ -370,7 +343,7 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'size', 20);
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage(['User', 'Password']);
+			$this->zbxTestTextNotVisible(['User', 'Password'], $this->query('id:authenticationTab')->one());
 			$this->zbxTestAssertNotVisibleId('http_user');
 			$this->zbxTestAssertNotVisibleId('http_password');
 		}
@@ -1126,11 +1099,11 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Internet Explorer 11.0 None',
-					'agent' => 'Internet Explorer 11.0',
+					'name' => 'Internet Explorer 11 None',
+					'agent' => 'Internet Explorer 11',
 					'authentication' => 'None',
 					'add_step' => [
-						['step' => 'Internet Explorer 11.0 None']
+						['step' => 'Internet Explorer 11 None']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1140,13 +1113,13 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Internet Explorer 11.0 Basic',
-					'agent' => 'Internet Explorer 11.0',
+					'name' => 'Internet Explorer 11 Basic',
+					'agent' => 'Internet Explorer 11',
 					'authentication' => 'Basic',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Internet Explorer 11.0 Basic']
+						['step' => 'Internet Explorer 11 Basic']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1156,13 +1129,13 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Internet Explorer 11.0 NTLM',
-					'agent' => 'Internet Explorer 11.0',
+					'name' => 'Internet Explorer 11 NTLM',
+					'agent' => 'Internet Explorer 11',
 					'authentication' => 'NTLM',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Internet Explorer 11.0 NTLM']
+						['step' => 'Internet Explorer 11 NTLM']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1172,11 +1145,11 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Firefox 33.0 (Windows) None',
-					'agent' => 'Firefox 33.0 (Windows)',
+					'name' => 'Firefox 73 (Windows) None',
+					'agent' => 'Firefox 73 (Windows)',
 					'authentication' => 'None',
 					'add_step' => [
-						['step' => 'Firefox 33.0 (Windows) None']
+						['step' => 'Firefox 73 (Windows) None']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1186,13 +1159,13 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Firefox 33.0 (Windows) Basic',
-					'agent' => 'Firefox 33.0 (Windows)',
+					'name' => 'Firefox 73 (Windows) Basic',
+					'agent' => 'Firefox 73 (Windows)',
 					'authentication' => 'Basic',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Firefox 33.0 (Windows) Basic']
+						['step' => 'Firefox 73 (Windows) Basic']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1202,13 +1175,13 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Firefox 33.0 (Windows) 8.0 NTLM',
-					'agent' => 'Firefox 33.0 (Windows)',
+					'name' => 'Firefox 73 (Windows) 8.0 NTLM',
+					'agent' => 'Firefox 73 (Windows)',
 					'authentication' => 'NTLM',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Firefox 33.0 (Windows) NTLM']
+						['step' => 'Firefox 73 (Windows) NTLM']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1218,11 +1191,11 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Opera 25.0 (Windows) None',
-					'agent' => 'Opera 25.0 (Windows)',
+					'name' => 'Opera 67 (Windows) None',
+					'agent' => 'Opera 67 (Windows)',
 					'authentication' => 'None',
 					'add_step' => [
-						['step' => 'Opera 25.0 (Windows) None']
+						['step' => 'Opera 67 (Windows) None']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1232,13 +1205,13 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Opera 25.0 (Windows) Basic',
-					'agent' => 'Opera 25.0 (Windows)',
+					'name' => 'Opera 67 (Windows) Basic',
+					'agent' => 'Opera 67 (Windows)',
 					'authentication' => 'Basic',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Opera 25.0 (Windows) Basic']
+						['step' => 'Opera 67 (Windows) Basic']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1248,13 +1221,13 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Opera 25.0 (Windows) NTLM',
-					'agent' => 'Opera 25.0 (Windows)',
+					'name' => 'Opera 67 (Windows) NTLM',
+					'agent' => 'Opera 67 (Windows)',
 					'authentication' => 'NTLM',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Opera 25.0 (Windows) NTLM']
+						['step' => 'Opera 67 (Windows) NTLM']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1264,24 +1237,24 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Safari 7.0.6 (Mac)',
-					'agent' => 'Safari 7.0.6 (Mac)',
+					'name' => 'Safari 13 (macOS)',
+					'agent' => 'Safari 13 (macOS)',
 					'authentication' => 'None',
 					'add_step' => [
-						['step' => 'Safari 7.0.6 (Mac) None']
+						['step' => 'Safari 13 (macOS) None']
 					]
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Safari 7.0.6 (Mac) Basic',
-					'agent' => 'Safari 7.0.6 (Mac)',
+					'name' => 'Safari 13 (macOS) Basic',
+					'agent' => 'Safari 13 (macOS)',
 					'authentication' => 'Basic',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Safari 7.0.6 (Mac) Basic']
+						['step' => 'Safari 13 (macOS) Basic']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1291,14 +1264,14 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Safari 7.0.6 (Mac) NTLM',
-					'agent' => 'Safari 7.0.6 (Mac)',
+					'name' => 'Safari 13 (macOS) NTLM',
+					'agent' => 'Safari 13 (macOS)',
 					'authentication' => 'NTLM',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Safari 7.0.6 (Mac) NTLM', 'remove' => true],
-						['step' => 'Safari 7.0.6 (Mac) NTLM']
+						['step' => 'Safari 13 (macOS) NTLM', 'remove' => true],
+						['step' => 'Safari 13 (macOS) NTLM']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1308,11 +1281,11 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Chrome 38.0 (Windows) None',
-					'agent' => 'Chrome 38.0 (Windows)',
+					'name' => 'Chrome 80 (Windows) None',
+					'agent' => 'Chrome 80 (Windows)',
 					'authentication' => 'None',
 					'add_step' => [
-						['step' => 'Chrome 38.0 (Windows) None']
+						['step' => 'Chrome 80 (Windows) None']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1322,13 +1295,13 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Chrome 38.0 (Windows) Basic',
-					'agent' => 'Chrome 38.0 (Windows)',
+					'name' => 'Chrome 80 (Windows) Basic',
+					'agent' => 'Chrome 80 (Windows)',
 					'authentication' => 'Basic',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Chrome 38.0 (Windows) Basic']
+						['step' => 'Chrome 80 (Windows) Basic']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,
@@ -1338,13 +1311,13 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Chrome 38.0 (Windows) NTLM',
-					'agent' => 'Chrome 38.0 (Windows)',
+					'name' => 'Chrome 80 (Windows) NTLM',
+					'agent' => 'Chrome 80 (Windows)',
 					'authentication' => 'NTLM',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
 					'add_step' => [
-						['step' => 'Chrome 38.0 (Windows) NTLM']
+						['step' => 'Chrome 80 (Windows) NTLM']
 					],
 					'dbCheck' => true,
 					'formCheck' => true,

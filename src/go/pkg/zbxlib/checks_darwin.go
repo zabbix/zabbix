@@ -33,9 +33,6 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -68,12 +65,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		return unsafe.Pointer(C.NET_DNS_RECORD)
 	case "system.boottime":
 		return unsafe.Pointer(C.SYSTEM_BOOTTIME)
-	case "web.page.get":
-		return unsafe.Pointer(C.WEB_PAGE_GET)
-	case "web.page.perf":
-		return unsafe.Pointer(C.WEB_PAGE_PERF)
-	case "web.page.regexp":
-		return unsafe.Pointer(C.WEB_PAGE_REGEXP)
 	case "net.tcp.listen":
 		return unsafe.Pointer(C.NET_TCP_LISTEN)
 	case "net.tcp.port":

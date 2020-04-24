@@ -186,7 +186,7 @@ class CMultiselectElement extends CElement {
 		$buttons = [];
 		$xpath = 'xpath:.//button';
 
-		foreach ($this->query($xpath)->all() as $button) {
+		foreach ($this->query($xpath)->waitUntilVisible()->all() as $button) {
 			$buttons[$button->getText()] = $button;
 		}
 

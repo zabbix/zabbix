@@ -143,6 +143,8 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search by all options in filter
 	 */
 	public function testPageProblems_FilterByAllOptions() {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
@@ -156,7 +158,6 @@ class testPageProblems extends CLegacyWebTest {
 		// Select host
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('spanid10084');
 
 		// Type application
@@ -165,9 +166,6 @@ class testPageProblems extends CLegacyWebTest {
 		// Select trigger
 		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
-
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestDropdownSelect('hostid', 'ЗАББИКС Сервер');
 		$this->zbxTestCheckboxSelect("item_'99250'");
 		$this->zbxTestCheckboxSelect("item_'99251'");
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
@@ -213,10 +211,10 @@ class testPageProblems extends CLegacyWebTest {
 		// Check Tags column in result
 		$this->zbxTestAssertVisibleXpath('//thead/tr/th[text()="Tags"]');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
-		$this->zbxTestTextNotVisibleOnPage('Database');
-		$this->zbxTestTextNotVisibleOnPage('Service: abc');
-		$this->zbxTestTextNotVisibleOnPage('Tag4');
-		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+		$this->zbxTestTextNotVisible('Database');
+		$this->zbxTestTextNotVisible('Service: abc');
+		$this->zbxTestTextNotVisible('Tag4');
+		$this->zbxTestTextNotVisible('Tag5: 5');
 
 		// Check Show tags 2
 		$this->zbxTestClickXpath('//label[@for="filter_show_tags_2"]');
@@ -224,9 +222,9 @@ class testPageProblems extends CLegacyWebTest {
 		// Check tags in result
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
-		$this->zbxTestTextNotVisibleOnPage('Service: abc');
-		$this->zbxTestTextNotVisibleOnPage('Tag4');
-		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+		$this->zbxTestTextNotVisible('Service: abc');
+		$this->zbxTestTextNotVisible('Tag4');
+		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
 		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
 
@@ -237,8 +235,8 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[3]', 'Service: abc');
-		$this->zbxTestTextNotVisibleOnPage('Tag4');
-		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
+		$this->zbxTestTextNotVisible('Tag4');
+		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
 		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
 	}
@@ -384,13 +382,16 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_SuppressedProblems() {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'Host group for suppression');
+		COverlayDialogElement::find()->one()->setDataContext('Host group for suppression');
+
 		$this->zbxTestClickLinkTextWait('Host for suppression');
 		$this->zbxTestClickButtonText('Apply');
 

@@ -840,24 +840,15 @@ extern zbx_rwlock_t	config_lock;
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
 
-/* validator function optionally used to validate macro values when expanding user macros */
-
 /******************************************************************************
  *                                                                            *
- * Function: zbx_macro_value_validator_func_t                                 *
- *                                                                            *
- * Purpose: validate macro value when expanding user macros                   *
- *                                                                            *
- * Parameters: value   - [IN] the macro value                                 *
- *                                                                            *
- * Return value: SUCCEED - the value is valid                                 *
- *               FAIL    - otherwise                                          *
+ * zbx_dc_expand_user_macros - has no autoquoting                             *
+ * zbx_dc_expand_user_macros_for_triggers - autoquotes macros that are not    *
+ * already quoted and cannot be casted to a double                            *
  *                                                                            *
  ******************************************************************************/
-typedef int (*zbx_macro_value_validator_func_t)(const char *value);
-
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_value_validator_func_t validator_func);
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
+char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num);
 
 void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids);

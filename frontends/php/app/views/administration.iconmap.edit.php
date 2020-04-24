@@ -125,7 +125,7 @@ $form_list->addRow(
 );
 
 $tab = new CTabView();
-$tab->addTab('iconmap', _('Icon map'), $form_list);
+$tab->addTab('iconmap_edit', _('Icon map'), $form_list);
 
 if ($data['iconmapid'] != 0) {
 	$tab->setFooter(makeFormFooter(

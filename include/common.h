@@ -112,6 +112,7 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
+#define ZBX_MAX_DOUBLE_LEN	24
 
 /******************************************************************************
  *                                                                            *
@@ -751,6 +752,9 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 
 #define ZBX_PROBLEM_UPDATE_ACTION_COUNT	4
 
+/* database double precision upgrade states */
+#define ZBX_DB_DBL_PRECISION_DISABLED	0
+#define ZBX_DB_DBL_PRECISION_ENABLED	1
 
 #define ZBX_USER_ONLINE_TIME	600
 
@@ -989,8 +993,9 @@ int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint
 #define is_uint31(str, value) \
 	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFF)
 
+#define ZBX_MAX_UINT31_1	0x7FFFFFFE
 #define is_uint31_1(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFE)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, ZBX_MAX_UINT31_1)
 
 #define is_uint_range(str, value, min, max) \
 	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
@@ -1049,6 +1054,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
+int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charlist);
 
 typedef struct zbx_custom_interval	zbx_custom_interval_t;
 int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
@@ -1099,6 +1105,7 @@ double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time(void);
 void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
+long	zbx_get_timezone_offset(time_t t, struct tm *tm);
 int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 int	zbx_day_in_month(int year, int mon);
 
@@ -1158,6 +1165,8 @@ int	ip_in_list(const char *list, const char *ip);
 #define VALUE_ERRMSG_MAX	128
 const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len);
 const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len);
+
+const char	*zbx_print_double(char *buffer, size_t size, double val);
 
 /* IP range support */
 #define ZBX_IPRANGE_V4	0
@@ -1376,6 +1385,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 
 /* additional token flags */
+#define ZBX_TOKEN_TRIGGER	0x004000
 #define ZBX_TOKEN_NUMERIC	0x008000
 #define ZBX_TOKEN_JSON		0x010000
 #define ZBX_TOKEN_XML		0x020000
@@ -1481,8 +1491,10 @@ typedef enum
 zbx_token_search_t;
 
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
-int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+
+int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc);
+char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
@@ -1585,7 +1597,7 @@ void	*zbx_variant_data_bin_copy(const void *bin);
 void	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
 zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 
-int	zbx_validate_value_dbl(double value);
+int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
@@ -1600,7 +1612,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
-int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
+int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, int dbl_precision, char **errmsg);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */

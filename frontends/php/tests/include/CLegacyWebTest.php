@@ -69,7 +69,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestLogout() {
-		$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
+		$this->query('xpath://a[@href="#signout"]')->one()->click();
 	}
 
 	public function zbxTestCheckMandatoryStrings() {
@@ -131,25 +131,33 @@ class CLegacyWebTest extends CWebTest {
 		}
 	}
 
-	public function zbxTestTextVisibleOnPage($strings) {
+	public function zbxTestTextVisible($strings, $context = null) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
+		}
+
+		if ($context === null) {
+			$context = $this;
 		}
 
 		foreach ($strings as $string) {
 			if (!empty($string)) {
-				$this->assertTrue($this->query('xpath://*[contains(text(),"'.$string.'")]')->count() !== 0, '"'.$string.'" must exist.');
+				$this->assertTrue($context->query('xpath://*[contains(text(),"'.$string.'")]')->count() !== 0, '"'.$string.'" must exist.');
 			}
 		}
 	}
 
-	public function zbxTestTextNotVisibleOnPage($strings) {
+	public function zbxTestTextNotVisible($strings, $context = null) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
 		}
 
+		if ($context === null) {
+			$context = $this;
+		}
+
 		foreach ($strings as $string) {
-			$elements = $this->query('xpath://*[contains(text(),"'.$string.'")]')->all();
+			$elements = $context->query('xpath:.//*[contains(text(),"'.$string.'")]')->all();
 			foreach ($elements as $element) {
 				$this->assertFalse($element->isDisplayed());
 			}
@@ -606,7 +614,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @throws NoSuchElementException
 	 */
 	public function zbxTestContentControlButtonClickText($text) {
-		$xpath = "//div[contains(@class, 'header-title')]".
+		$xpath = "//header[@class='header-title']".
 				"//nav[@aria-label='Content controls']".
 					"//button[text()='{$text}']";
 
@@ -653,7 +661,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @throws NoSuchElementException
 	 */
 	public function zbxTestContentControlButtonClickTextWait($text) {
-		$xpath = "//div[contains(@class, 'header-title')]".
+		$xpath = "//header[contains(@class, 'header-title')]".
 					"//nav[@aria-label='Content controls']".
 						"//button[text()='{$text}']";
 
@@ -673,24 +681,6 @@ class CLegacyWebTest extends CWebTest {
 						"//button[contains(@class, '{$class}')]";
 
 		$this->zbxTestClickXpathWait($xpath);
-	}
-
-	/**
-	 * Select option for select element inside 'Main filter' area.
-	 *
-	 * @param string $name   Select tag name attribute.
-	 * @param string $value  Option value to select.
-	 *
-	 * @throws NoSuchElementException
-	 */
-	public function zbxTestMainFilterDropdownSelectWait($name, $value) {
-		$xpath = "//div[contains(@class, 'header-title')]".
-					"//form[@aria-label='Main filter']".
-						"//select[@name='{$name}']".
-							"/option[@value='{$value}']";
-
-		$this->zbxTestClickXpathWait($xpath);
-		$this->zbxTestWaitForPageToLoad();
 	}
 
 	/**

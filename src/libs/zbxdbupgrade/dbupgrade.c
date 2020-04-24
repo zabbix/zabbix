@@ -71,13 +71,13 @@ zbx_db_version_t;
 #endif
 
 #if defined(HAVE_MYSQL)
-#	define ZBX_TYPE_FLOAT_STR	"double(16,4)"
+#	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"bigint unsigned"
 #elif defined(HAVE_ORACLE)
-#	define ZBX_TYPE_FLOAT_STR	"number(20,4)"
+#	define ZBX_TYPE_FLOAT_STR	"binary_double"
 #	define ZBX_TYPE_UINT_STR	"number(20)"
 #elif defined(HAVE_POSTGRESQL)
-#	define ZBX_TYPE_FLOAT_STR	"numeric(16,4)"
+#	define ZBX_TYPE_FLOAT_STR	"double precision"
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
 #endif
 
@@ -134,6 +134,7 @@ typedef enum
 {
 	ZBX_ORACLE_COLUMN_TYPE_NUMERIC,
 	ZBX_ORACLE_COLUMN_TYPE_CHARACTER,
+	ZBX_ORACLE_COLUMN_TYPE_DOUBLE,
 	ZBX_ORACLE_COLUMN_TYPE_UNKNOWN
 }
 zbx_oracle_column_type_t;
@@ -160,13 +161,14 @@ static zbx_oracle_column_type_t	zbx_oracle_column_type(unsigned char field_type)
 	{
 		case ZBX_TYPE_ID:
 		case ZBX_TYPE_INT:
-		case ZBX_TYPE_FLOAT:
 		case ZBX_TYPE_UINT:
 			return ZBX_ORACLE_COLUMN_TYPE_NUMERIC;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_TEXT:
 			return ZBX_ORACLE_COLUMN_TYPE_CHARACTER;
+		case ZBX_TYPE_FLOAT:
+			return ZBX_ORACLE_COLUMN_TYPE_DOUBLE;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_ORACLE_COLUMN_TYPE_UNKNOWN;
@@ -273,6 +275,8 @@ static void	DBdrop_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#elif defined(HAVE_ORACLE)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default null", field->name);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s drop default", field->name);
 #endif
@@ -537,7 +541,8 @@ int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZB
 	/* old column is copied there. Then old column is dropped. This method does not preserve column order.    */
 	/* NOTE: Existing column indexes and constraints are not respected by the current implementation!         */
 
-	if (NULL != old_field && zbx_oracle_column_type(old_field->type) != zbx_oracle_column_type(field->type))
+	if (NULL != old_field && (zbx_oracle_column_type(old_field->type) != zbx_oracle_column_type(field->type) ||
+			ZBX_ORACLE_COLUMN_TYPE_DOUBLE == zbx_oracle_column_type(field->type)))
 		return DBmodify_field_type_with_copy(table_name, field);
 #endif
 	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
@@ -981,6 +986,57 @@ out:
 	DBclose();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+int	DBcheck_double_type(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	const int	total_dbl_cols = 4;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+#if defined(HAVE_MYSQL)
+	sql = DBdyn_escape_string(CONFIG_DBNAME);
+	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
+			" where table_schema='%s' and column_type='double'", sql);
+#elif defined(HAVE_POSTGRESQL)
+	sql = DBdyn_escape_string(NULL == CONFIG_DBSCHEMA || '\0' == *CONFIG_DBSCHEMA ? "public" : CONFIG_DBSCHEMA);
+	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
+			" where table_schema='%s' and data_type='double precision'", sql);
+#elif defined(HAVE_ORACLE)
+	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
+			" where data_type='BINARY_DOUBLE'");
+#elif defined(HAVE_SQLITE3)
+	/* upgrade patch is not required for sqlite3 */
+	ret = SUCCEED;
+	goto out;
+#endif
+
+	if (NULL == (result = DBselect("%s"
+			" and ((lower(table_name)='trends'"
+					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
+			" or (lower(table_name)='history' and lower(column_name)='value'))", sql)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot select records with columns information");
+		goto out;
+	}
+
+	if (NULL != (row = DBfetch(result)) && total_dbl_cols == atoi(row[0]))
+		ret = SUCCEED;
+
+	DBfree_result(result);
+out:
+	DBclose();
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
