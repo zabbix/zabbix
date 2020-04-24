@@ -133,7 +133,7 @@
 						const macro_type = jQuery('#macros_' + macro_num + '_inherited_macro_type').val();
 
 						jQuery('#macros_' + macro_num + '_macro').prop('readonly', true);
-						
+
 						jQuery('#macros_' + macro_num + '_inherited_type')
 							.val(jQuery('#macros_' + macro_num + '_inherited_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
 
