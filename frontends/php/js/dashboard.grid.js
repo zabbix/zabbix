@@ -437,8 +437,8 @@
 
 		// Apply the calculated dashboard offset (0, 1 or 2 lines) slowly.
 
-		var $main = $obj.closest('main.layout-kioskmode');
-		if (!$main.length) {
+		var $wrapper = $obj.closest('.layout-kioskmode');
+		if (!$wrapper.length) {
 			return;
 		}
 
@@ -449,7 +449,7 @@
 
 		var slide_lines_current = 0;
 		for (var i = 2; i > 0; i--) {
-			if ($main.hasClass('kiosk-slide-lines-' + i)) {
+			if ($wrapper.hasClass('kiosk-slide-lines-' + i)) {
 				slide_lines_current = i;
 				break;
 			}
@@ -457,15 +457,15 @@
 
 		if (slide_lines > slide_lines_current) {
 			if (slide_lines_current > 0) {
-				$main.removeClass('kiosk-slide-lines-' + slide_lines_current);
+				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
 			}
-			$main.addClass('kiosk-slide-lines-' + slide_lines);
+			$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
 		}
 		else if (slide_lines < slide_lines_current) {
 			data['options']['kiosk_slide_timeout'] = setTimeout(function() {
-				$main.removeClass('kiosk-slide-lines-' + slide_lines_current);
+				$wrapper.removeClass('kiosk-slide-lines-' + slide_lines_current);
 				if (slide_lines > 0) {
-					$main.addClass('kiosk-slide-lines-' + slide_lines);
+					$wrapper.addClass('kiosk-slide-lines-' + slide_lines);
 				}
 				delete data['options']['kiosk_slide_timeout'];
 			}, 2000);
@@ -2145,7 +2145,6 @@
 		}
 		if (typeof widget['dynamic'] !== 'undefined') {
 			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
-			ajax_data['dynamic_groupid'] = widget['dynamic']['groupid'];
 		}
 
 		startPreloader(widget);
@@ -3004,8 +3003,7 @@
 		if (typeof widget['fields']['dynamic'] !== 'undefined') {
 			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
-					'hostid': data['dashboard']['dynamic']['hostid'],
-					'groupid': data['dashboard']['dynamic']['groupid']
+					'hostid': data['dashboard']['dynamic']['hostid']
 				};
 			}
 			else {
@@ -3251,6 +3249,25 @@
 						data['cell-width'] = getCurrentCellWidth(data);
 						data.new_widget_placeholder.updateLabelVisibility();
 					});
+			});
+		},
+
+		refreshDynamicWidgets: function(host) {
+			var	$this = $(this),
+				data = $this.data('dashboardGrid');
+
+			$.each(data['widgets'], function(index, widget) {
+				if (widget.fields.dynamic && +widget.fields.dynamic == 1) {
+					if (host) {
+						widget.dynamic = {};
+						widget.dynamic.hostid = host.id;
+					}
+					else {
+						delete widget.dynamic;
+					}
+
+					updateWidgetContent($this, data, widget);
+				}
 			});
 		},
 

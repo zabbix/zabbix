@@ -507,6 +507,8 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
+void	DBcheck_capabilities(void);
+
 /******************************************************************************
  *                                                                            *
  * Type: ZBX_GRAPH_ITEMS                                                      *

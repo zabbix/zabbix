@@ -56,6 +56,13 @@ class CPage {
 	protected $height = null;
 
 	/**
+	 * Page width.
+	 *
+	 * @var integer
+	 */
+	protected $width = null;
+
+	/**
 	 * Viewport freeze flag.
 	 *
 	 * @var boolean
@@ -82,10 +89,7 @@ class CPage {
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
-		$this->driver = RemoteWebDriver::create('http://'.
-				(defined('PHPUNIT_DRIVER_ADDRESS') ? PHPUNIT_DRIVER_ADDRESS : 'localhost').
-				':4444/wd/hub', $capabilities
-		);
+		$this->driver = RemoteWebDriver::create('http://'.PHPUNIT_DRIVER_ADDRESS.':4444/wd/hub', $capabilities);
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
@@ -269,13 +273,33 @@ class CPage {
 		}
 
 		try {
-			// Screenshot is 1px smaller to ensure that scroll is still present.
-			$this->height = (int)$this->driver->executeScript(
-					'return window.getComputedStyle(document.documentElement)["height"];'
-			) - 1;
+			// Calculate page width and height depending on sidemenu and scrollbars presence.
+			$size = $this->driver->executeScript(
+				'var side = document.getElementsByClassName("sidebar")[0];'.
+				'var wrapper = document.getElementsByClassName("wrapper")[0];'.
 
-			if ($this->height > self::DEFAULT_PAGE_HEIGHT) {
-				$this->setViewport(self::DEFAULT_PAGE_WIDTH, $this->height);
+				'var width = ((typeof side !== "undefined") ? side.scrollWidth : 0)'.
+					'+ ((typeof wrapper !== "undefined") ? wrapper.scrollWidth : 0);'.
+				'var height = Math.max((typeof wrapper !== "undefined") ? wrapper.scrollHeight : 0,'.
+				'(typeof side !== "undefined") ? side.scrollHeight : 0);'.
+				'return'.
+					'[(width !== 0) ? width : window.getComputedStyle(document.documentElement)["width"],'.
+					'(height !== 0) ? height : window.getComputedStyle(document.documentElement)["height"],'.
+					'(typeof wrapper !== "undefined" && wrapper.scrollWidth >'.
+						'parseInt(window.getComputedStyle(wrapper)["width"], 10)) ? 20 : 0];'
+				);
+
+			$this->width = (int)$size[0];
+
+			// Screenshot is 1px smaller to ensure that scroll is still present.
+			$this->height = (int)$size[1] - 1;
+
+			if ($this->height > self::DEFAULT_PAGE_HEIGHT || $this->width > self::DEFAULT_PAGE_WIDTH) {
+				$this->setViewport(max([
+					// Add 20px to page width when vertical scroll presents.
+					$this->width + (int)$size[2], self::DEFAULT_PAGE_WIDTH]),
+					max([$this->height, self::DEFAULT_PAGE_HEIGHT
+				]));
 
 				$this->viewportUpdated = true;
 			}

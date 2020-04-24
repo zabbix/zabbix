@@ -198,6 +198,13 @@ abstract class DbBackend {
 	abstract public function checkEncoding();
 
 	/**
+	* Check if database is using IEEE754 compatible double precision columns.
+	*
+	* @return bool
+	*/
+	abstract public function isDoubleIEEE754();
+
+	/**
 	 * Set warning message.
 	 *
 	 * @param string $message

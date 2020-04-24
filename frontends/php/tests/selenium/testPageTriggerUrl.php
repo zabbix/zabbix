@@ -28,63 +28,97 @@ require_once dirname(__FILE__) . '/../include/CWebTest.php';
  */
 class testPageTriggerUrl extends CWebTest {
 
-	public $trigger = '1_trigger_Not_classified';
-	public $url = 'tr_events.php?triggerid=100032&eventid=9000';
+	public function getTriggerLinkData() {
+		return [
+			// Check tag priority.
+			[
+				[
+					'trigger' => '1_trigger_High',
+					'links' => [
+						'Problems' => 'zabbix.php?action=problem.view&filter_triggerids%5B%5D=100035&filter_set=1',
+						'Configuration' => 'triggers.php?form=update&triggerid=100035',
+						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
+						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
+						'Unique webhook url' => 'zabbix.php?action=mediatype.list&ddreset=1',
+						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'
+					],
+					'background' => "high-bg"
+				]
+			],
+			[
+				[
+					'trigger' => '1_trigger_Not_classified',
+					'links' => [
+						'Problems' => 'zabbix.php?action=problem.view&filter_triggerids%5B%5D=100032&filter_set=1',
+						'Configuration' => 'triggers.php?form=update&triggerid=100032',
+						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
+						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
+						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'
+					],
+					'background' => 'na-bg'
+				]
+			]
+		];
+	}
 
 	/**
+	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in Problems widget.
 	 */
-	public function testPageTriggerUrl_ProblemsWidget() {
+	public function testPageTriggerUrl_ProblemsWidget($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Problems');
 		$table = $widget->getContent()->asTable();
 
 		// Find trigger and open trigger overlay dialogue.
-		$table->query('link', $this->trigger)->one()->click();
-		$this->checkTriggerUrl(false);
+		$table->query('link', $data['trigger'])->one()->click();
+		$this->checkTriggerUrl(false, $data, false);
 	}
 
-	/*
+	/**
+	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in Trigger overview widget.
 	 */
-	public function testPageTriggerUrl_TriggerOverviewWidget() {
+	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Group to check Overview');
 
 		$table = $widget->getContent()->asTable();
 		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', $this->trigger);
+		$row = $table->findRow('Triggers', $data['trigger']);
 		// Open trigger context menu.
-		$row->query('xpath://td[contains(@class, "na-bg")]')->one()->click();
-		$this->checkTriggerUrl();
+		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
+		$this->checkTriggerUrl(true, $data);
 	}
 
-	/*
+	/**
+	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Problems page.
 	 */
-	public function testPageTriggerUrl_ProblemsPage() {
+	public function testPageTriggerUrl_ProblemsPage($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view');
 		$table = $this->query('class:list-table')->asTable()->one();
 		// Open trigger context menu.
-		$table->query('link', $this->trigger)->one()->click();
-		$this->checkTriggerUrl();
+		$table->query('link', $data['trigger'])->one()->click();
+		$this->checkTriggerUrl(false, $data);
 	}
 
-	/*
+	/**
+	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Overview page.
 	 */
-	public function testPageTriggerUrl_OverviewPage() {
+	public function testPageTriggerUrl_OverviewPage($data) {
 		$this->page->login()->open('overview.php');
 
 		$table = $this->query('class:list-table')->asTable()->one();
 		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', $this->trigger);
+		$row = $table->findRow('Triggers', $data['trigger']);
 
 		// Open trigger context menu.
-		$row->query('xpath://td[contains(@class, "na-bg")]')->one()->click();
-		$this->checkTriggerUrl();
+		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
+		$this->checkTriggerUrl(true, $data);
 	}
 
 	/**
@@ -156,27 +190,29 @@ class testPageTriggerUrl extends CWebTest {
 		$this->assertContains($url, $this->page->getCurrentUrl());
 	}
 
-	/*
+	/**
+	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in screen item Trigger overview.
 	 */
-	public function testPageTriggerUrl_ScreensTriggerOverview() {
+	public function testPageTriggerUrl_ScreensTriggerOverview($data) {
 		$name = 'Trigger overview';
 		$this->page->login()->open('screens.php?elementid=200021');
 		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
 				CXPathHelper::escapeQuotes($name).']/../../..')->one()->waitUntilPresent();
 		$table = $screen_item->query('class:list-table')->asTable()->one();
 		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', $this->trigger);
+		$row = $table->findRow('Triggers', $data['trigger']);
 
 		// Open trigger context menu.
-		$row->query('xpath://td[contains(@class, "na-bg")]')->one()->click();
-		$this->checkTriggerUrl();
+		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
+		$this->checkTriggerUrl(true, $data);
 	}
 
-	/*
+	/**
+	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in screen item Host issues.
 	 */
-	public function testPageTriggerUrl_ScreensHostIssues() {
+	public function testPageTriggerUrl_ScreensHostIssues($data) {
 		$name = 'Host issues';
 		$this->page->login()->open('screens.php?elementid=200021');
 		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
@@ -184,14 +220,15 @@ class testPageTriggerUrl extends CWebTest {
 		$table = $screen_item->query('class:list-table')->asTable()->one();
 
 		// Find trigger and open trigger overlay.
-		$table->query('link', $this->trigger)->one()->click();
-		$this->checkTriggerUrl(false);
+		$table->query('link', $data['trigger'])->one()->click();
+		$this->checkTriggerUrl(false, $data, false);
 	}
 
-	/*
+	/**
+	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in screen item Host group issues.
 	 */
-	public function testPageTriggerUrl_ScreensHostGroupIssues() {
+	public function testPageTriggerUrl_ScreensHostGroupIssues($data) {
 		$name = 'Host issues';
 		$this->page->login()->open('screens.php?elementid=200021');
 		$screen_item = $this->query('xpath://div[contains(@class, "dashbrd-widget-head")]/h4[text()='.
@@ -199,39 +236,57 @@ class testPageTriggerUrl extends CWebTest {
 		$table = $screen_item->query('class:list-table')->asTable()->one();
 
 		// Find trigger and open trigger overlay.
-		$table->query('link', $this->trigger)->one()->click();
-		$this->checkTriggerUrl(false);
+		$table->query('link', $data['trigger'])->one()->click();
+		$this->checkTriggerUrl(false, $data, false);
 	}
 
-	/*
+	/**
+	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Event details page.
 	 */
-	public function testPageTriggerUrl_EventDetails() {
-		$this->page->login()->open($this->url);
-		$this->query('link', $this->trigger)->waitUntilPresent()->one()->click();
-		$this->checkTriggerUrl();
+	public function testPageTriggerUrl_EventDetails($data) {
+		$this->page->login()->open($data['links']['Trigger URL']);
+		$this->query('link', $data['trigger'])->waitUntilPresent()->one()->click();
+		$this->checkTriggerUrl(false, $data);
 	}
 
 	/**
 	 * Follow trigger url and check opened page.
 	 *
-	 * @param boolean $popup_menu		trigger context menu popup exist
+	 * @param boolean $trigger_overview		the check is made for a trigger overview instance
+	 * @param array $data
+	 * @param boolean $popup_menu			trigger context menu popup exist
 	 */
-	private function checkTriggerUrl($popup_menu = true) {
+	private function checkTriggerUrl($trigger_overview, $data, $popup_menu = true) {
 		if ($popup_menu) {
 			// Check trigger popup menu.
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			$this->assertTrue($popup->hasTitles(['TRIGGER', 'LINKS', 'HISTORY']));
+			// Check Url of each link.
+			foreach ($data['links'] as $link => $url) {
+				$this->assertTrue($popup->hasItems($link));
+				$this->assertContains($url, $popup->getItem($link)->getAttribute('href'));
+			}
+			if ($trigger_overview) {
+				$this->assertTrue($popup->hasItems('Acknowledge'));
+				// Check that only the links from data provider plus Acknowledge link persist in the popup.
+				$this->assertEquals(count($data['links'])+1, $popup->getItems()->count());
+			}
+			else {
+				// Check that only the expected links ar present in the popup.
+				$this->assertEquals(count($data['links']), $popup->getItems()->count());
+			}
+			// Open trigger link.
 			$popup->fill('Trigger URL');
 		}
 		else {
 			// Follow trigger link in overlay dialogue.
 			$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
-			$hintbox->query('link', $this->url)->one()->click();
+			$hintbox->query('link', $data['links']['Trigger URL'])->one()->click();
 		}
 
 		// Check opened page.
 		$this->assertEquals('Event details', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-		$this->assertContains($this->url, $this->page->getCurrentUrl());
+		$this->assertContains($data['links']['Trigger URL'], $this->page->getCurrentUrl());
 	}
 }

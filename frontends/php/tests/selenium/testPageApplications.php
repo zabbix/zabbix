@@ -29,27 +29,36 @@ class testPageApplications extends CLegacyWebTest {
 		return [
 			[
 				[
-					'host' => 'Test host',
-					'group' => 'all',
-					'visible_name' => 'ЗАББИКС Сервер'
+					'filter' => [
+						'Hosts' => 'ЗАББИКС Сервер'
+					],
+					'Host name' => 'Test host'
 				]
 			],
 			[
 				[
-					'host' => 'Template App Apache Tomcat JMX',
-					'group' => 'all'
+					'filter' => [
+						'Hosts' => 'Template App Apache Tomcat JMX'
+					]
 				]
 			],
 			[
 				[
-					'host' => 'all',
-					'group' => 'Templates/Applications'
+					'filter' => [
+						'Hosts' => ['ЗАББИКС Сервер', 'Empty host']
+					]
 				]
 			],
 			[
 				[
-					'host' => 'all',
-					'group' => 'all'
+					'filter' => [
+						'Host groups' => 'Templates/Applications'
+					]
+				]
+			],
+			[
+				[
+					'filter' => []
 				]
 			]
 		];
@@ -71,21 +80,21 @@ class testPageApplications extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Applications');
 
 		// Check selected host and group.
-		$this->zbxTestDropdownAssertSelected('hostid', 'ЗАББИКС Сервер');
-		$this->zbxTestDropdownAssertSelected('groupid', 'all');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->checkValue([
+			'Hosts' => 'ЗАББИКС Сервер',
+			'Host groups' => []
+		]);
 
-		// Select host and/or host group
-		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestDropdownSelectWait('hostid', $data['visible_name']);
-		}
-		else {
-			$this->zbxTestDropdownSelectWait('hostid', $data['host']);
-		}
-		$this->zbxTestDropdownSelectWait('groupid', $data['group']);
+		$filter->getField('Hosts')->clear();
+		$filter->fill($data['filter']);
+		$filter->submit();
+		$this->page->waitUntilReady();
 
-		if ($data['host'] != 'all') {
+		if (CTestArrayHelper::get($data, 'filter.Hosts', false) && !is_array($data['filter']['Hosts'])) {
 			// Get host id
-			$sql_host_id = DBfetch(DBselect("SELECT hostid FROM hosts WHERE host='".$data['host']."'"));
+			$host = CTestArrayHelper::get($data, 'Host name', $data['filter']['Hosts']);
+			$sql_host_id = DBfetch(DBselect("SELECT hostid FROM hosts WHERE host='".$host."'"));
 			$host_id= $sql_host_id['hostid'];
 
 			// Check the application names in frontend
@@ -119,10 +128,14 @@ class testPageApplications extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'object-group')]");
 		}
 
-		if ($data['group'] != 'all') {
+		if (CTestArrayHelper::get($data['filter'], 'Host groups', false)) {
+			$filter = $this->query('name:zbx_filter')->asForm()->one();
+			$filter->getField('Hosts')->clear();
+			$filter->submit();
+
 			$group_app= [];
 			$sql_all_applications = "SELECT a.name FROM hosts_groups hg LEFT JOIN applications a ON hg.hostid=a.hostid"
-					. " WHERE hg.groupid=(SELECT groupid FROM hstgrp WHERE name='".$data['group']."')";
+					. " WHERE hg.groupid=(SELECT groupid FROM hstgrp WHERE name='".$data['filter']['Host groups']."')";
 			$result = DBselect($sql_all_applications);
 			while ($row = DBfetch($result)) {
 				$group_app[] = $row['name'];
@@ -131,10 +144,19 @@ class testPageApplications extends CLegacyWebTest {
 		}
 	}
 
-	public function selectApplications($app_names, $host) {
+	public function selectApplications($app_names, $host, $hostgroup) {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestDropdownSelectWait('hostid', $host);
+		// Filter applications by host
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Hosts')->fill([
+			'values' => $host,
+			'context' => $hostgroup
+		]);
+		$filter->submit();
+
 		$result = [];
 		$hosts = DBfetch(DBselect('SELECT hostid FROM hosts WHERE name=' . zbx_dbstr($host)));
 		$this->assertFalse(empty($hosts));
@@ -168,7 +190,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test deactivation of selected applications.
 	 */
 	public function testPageApplications_DisableSelected() {
-		$result = $this->selectApplications(['General','OS'], 'ЗАББИКС Сервер');
+		$result = $this->selectApplications(['General','OS'], 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
@@ -187,7 +209,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test deactivation of all applications in host.
 	 */
 	public function testPageApplications_DisableAll() {
-		$result = $this->selectApplications('all', 'ЗАББИКС Сервер');
+		$result = $this->selectApplications('all', 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
@@ -205,7 +227,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test activation of selected applications.
 	 */
 	public function testPageApplications_EnableSelected() {
-		$result = $this->selectApplications(['General','OS'], 'ЗАББИКС Сервер');
+		$result = $this->selectApplications(['General','OS'], 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
@@ -224,7 +246,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test activation of all applications in host.
 	 */
 	public function testPageApplications_EnableAll() {
-		$result = $this->selectApplications('all', 'ЗАББИКС Сервер');
+		$result = $this->selectApplications('all', 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
@@ -242,7 +264,7 @@ class testPageApplications extends CLegacyWebTest {
 	 * Test deleting of application.
 	 */
 	public function testPageApplications_DeleteSelected() {
-		$result = $this->selectApplications(['Selenium test application'], 'ЗАББИКС Сервер');
+		$result = $this->selectApplications(['Selenium test application'], 'ЗАББИКС Сервер', 'Zabbix servers');
 		$items = CDBHelper::getCount('SELECT NULL FROM items');
 
 		$this->zbxTestClickButtonText('Delete');
@@ -264,7 +286,7 @@ class testPageApplications extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM applications ORDER BY applicationid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$result = $this->selectApplications('all', 'ЗАББИКС Сервер');
+		$result = $this->selectApplications('all', 'ЗАББИКС Сервер', 'Zabbix servers');
 
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();

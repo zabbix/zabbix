@@ -40,6 +40,7 @@
 		(new CButton('remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->onClick('removeUserGroupShares("#{usrgrpid}");')
+			->removeId()
 	))->addClass(ZBX_STYLE_NOWRAP)
 ]))
 	->setId('user_group_shares_#{usrgrpid}')
@@ -63,6 +64,7 @@
 		(new CButton('remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->onClick('removeUserShares("#{id}");')
+			->removeId()
 	))->addClass(ZBX_STYLE_NOWRAP)
 ]))
 	->setId('user_shares_#{id}')
@@ -111,7 +113,7 @@
 			},
 			success: function(response) {
 				var errors = [];
-				overlay.$dialogue.find('>.msg-good, >.msg-bad').remove();
+				overlay.$dialogue.find('> .msg-good, > .msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -161,7 +163,7 @@
 				var errors = [],
 					messages = [];
 
-				overlay.$dialogue.find('>.msg-good, >.msg-bad').remove();
+				overlay.$dialogue.find('> .msg-good, > .msg-bad').remove();
 
 				if (typeof response === 'object') {
 					if ('errors' in response) {
@@ -176,10 +178,10 @@
 					jQuery(errors).insertBefore($form);
 				}
 				else {
-					jQuery('main').find('> .msg-bad, > .msg-good').remove();
+					jQuery('.wrapper').find('> .msg-bad, > .msg-good').remove();
 
 					if (messages.length) {
-						jQuery('main').prepend(messages);
+						jQuery('.wrapper main').before(messages);
 					}
 					overlayDialogueDestroy(overlay.dialogueid);
 				}

@@ -34,9 +34,11 @@ $buttons = [
 
 echo '<body lang="'.CWebUser::getLang().'">';
 
-(new CTag('main', true,
+(new CDiv((new CTag('main', true,
 	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons)
-))->show();
+))))
+	->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
+	->show();
 
 echo '</body>';
 echo '</html>';

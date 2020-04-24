@@ -1,0 +1,84 @@
+$menu-user-icons: (
+		support: -247px -48px,
+		share: -90px -84px,
+		help: -90px -48px,
+		guest: -247px -156px,
+		profile: -90px -120px,
+		signout: -90px -156px
+) !default;
+
+%menu-user-icon-common {
+	&::before {
+		content: '';
+		width: 12px;
+		height: 12px;
+		background: url($sprite-path) no-repeat;
+	}
+}
+
+// Dynamically generated classes for icons:
+//  .icon-support
+//  .icon-share
+//  .icon-help
+//  .icon-guest
+//  .icon-profile
+//  .icon-signout
+@each $class, $bg-position in $menu-user-icons {
+	.icon-#{$class} {
+		@extend %menu-user-icon-common;
+
+		&::before {
+			background-position: $bg-position;
+		}
+	}
+}
+
+.menu-user {
+	padding: 12px 0;
+
+	li {
+		line-height: 16px;
+	}
+
+	a,
+	span {
+		position: relative;
+		display: block;
+		padding: 12px 12px 12px 48px;
+		font-size: 12px;
+		white-space: nowrap;
+
+		@if $ui-transitions {
+			transition: color $ui-transition-duration ease-out;
+		}
+
+		&::before {
+			position: absolute;
+			top: 13px;
+			left: 18px;
+			opacity: .75;
+
+			@if $ui-transitions {
+				transition: opacity $ui-transition-duration ease-out;
+			}
+		}
+	}
+
+	a {
+		color: $menu-user-color;
+
+		&:hover,
+		&:focus {
+			border-bottom: 0;
+			color: $menu-user-hover-color;
+
+			&::before {
+				opacity: 1;
+			}
+		}
+	}
+
+	span {
+		color: $menu-user-disabled-color;
+	}
+}

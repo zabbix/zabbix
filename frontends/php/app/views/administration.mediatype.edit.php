@@ -105,9 +105,7 @@ foreach ($data['exec_params'] as $i => $exec_param) {
 		(new CButton('exec_params['.$i.'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
-		],
-		'form_row'
-	);
+		], 'form_row');
 }
 
 $exec_params_table->addRow([(new CButton('exec_param_add', _('Add')))
@@ -168,25 +166,27 @@ foreach ($data['parameters'] as $parameter) {
 			->onClick('jQuery(this).closest("tr").remove()')
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
-	]);
+	], 'form_row');
 }
 
 $row_template = (new CTag('script', true))
 	->setId('parameters_row')
 	->setAttribute('type', 'text/x-jquery-tmpl')
-	->addItem(new CRow([
-		(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
-			->setAttribute('style', 'width: 100%;')
-			->removeId(),
-		(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
-			->setAttribute('style', 'width: 100%;')
-			->removeId(),
-		(new CButton('', _('Remove')))
-			->removeId()
-			->onClick('jQuery(this).closest("tr").remove()')
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-	]));
+	->addItem(
+		(new CRow([
+			(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
+				->setAttribute('style', 'width: 100%;')
+				->removeId(),
+			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
+				->setAttribute('style', 'width: 100%;')
+				->removeId(),
+			(new CButton('', _('Remove')))
+				->removeId()
+				->onClick('jQuery(this).closest("tr").remove()')
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))->addClass('form_row')
+	);
 
 $widget->addItem($row_template);
 

@@ -55,13 +55,13 @@ class CRouter {
 	 */
 	private $routes = [
 		// action						controller											layout					view
-		'acknowledge.create'			=> ['CControllerAcknowledgeCreate',					null,					null],
-		'acknowledge.edit'				=> ['CControllerAcknowledgeEdit',					'layout.htmlpage',		'monitoring.acknowledge.edit'],
 		'auditlog.list'					=> ['CControllerAuditLogList',						'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'			=> ['CControllerAuthenticationEdit',				'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'			=> ['CControllerAuthenticationUpdate',				null,					null],
 		'autoreg.edit'					=> ['CControllerAutoregEdit',						'layout.htmlpage',		'administration.autoreg.edit'],
 		'autoreg.update'				=> ['CControllerAutoregUpdate',						null,					null],
+		'charts.view'					=> ['CControllerChartsView',						'layout.htmlpage',		'monitoring.charts.view'],
+		'charts.view.json'				=> ['CControllerChartsViewJson',					'layout.json',			'monitoring.charts.view.json'],
 		'dashboard.delete'				=> ['CControllerDashboardDelete',					null,					null],
 		'dashboard.list'				=> ['CControllerDashboardList',						'layout.htmlpage',		'monitoring.dashboard.list'],
 		'dashboard.properties.check'	=> ['CControllerDashboardPropertiesCheck',			'layout.json',			null],
@@ -124,6 +124,8 @@ class CRouter {
 		'notifications.get'				=> ['CControllerNotificationsGet',					'layout.json',			null],
 		'notifications.mute'			=> ['CControllerNotificationsMute',					'layout.json',			null],
 		'notifications.read'			=> ['CControllerNotificationsRead',					'layout.json',			null],
+		'popup.acknowledge.edit'		=> ['CControllerPopupAcknowledgeEdit',				'layout.json',			'popup.acknowledge.edit'],
+		'popup.acknowledge.create'		=> ['CControllerPopupAcknowledgeCreate',			'layout.json',			null],
 		'popup.action.acknowledge'		=> ['CControllerPopupActionAcknowledge',			'layout.json',			'popup.operation.common'],
 		'popup.action.operation'		=> ['CControllerPopupActionOperation',				'layout.json',			'popup.operation.common'],
 		'popup.action.recovery'			=> ['CControllerPopupActionRecovery',				'layout.json',			'popup.operation.common'],
@@ -248,7 +250,6 @@ class CRouter {
 		'chart5.php'					=> ['CLegacyAction', null, null],
 		'chart6.php'					=> ['CLegacyAction', null, null],
 		'chart7.php'					=> ['CLegacyAction', null, null],
-		'charts.php'					=> ['CLegacyAction', null, null],
 		'conf.import.php'				=> ['CLegacyAction', null, null],
 		'correlation.php'				=> ['CLegacyAction', null, null],
 		'disc_prototypes.php'			=> ['CLegacyAction', null, null],

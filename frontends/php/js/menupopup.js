@@ -83,7 +83,7 @@ function getMenuPopupHistory(options) {
  * @param {bool}   options['showWeb']		     Link to Monitoring->Hosts->Web page.
  * @param {bool}   options['showTriggers']       Link to Monitoring->Problems page.
  * @param {bool}   options['hasGoTo']            "Go to" block in popup.
- * @param {int}    options['severity_min']       (optional)
+ * @param {array}  options['severities']         (optional)
  * @param {bool}   options['show_suppressed']    (optional)
  * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
@@ -139,8 +139,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_hostids[]', options.hostid);
-			if (typeof options.severity_min !== 'undefined') {
-				url.setArgument('filter_severity', options.severity_min);
+			if (typeof options.severities !== 'undefined') {
+				url.setArgument('filter_severities[]', options.severities);
 			}
 			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 				url.setArgument('filter_show_suppressed', '1');
@@ -156,9 +156,13 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			graphs.disabled = true;
 		}
 		else {
-			var graphs_url = new Curl('charts.php', false);
+			var graphs_url = new Curl('zabbix.php', false);
 
-			graphs_url.setArgument('hostid', options.hostid);
+			graphs_url.setArgument('action', 'charts.view')
+			graphs_url.setArgument('view_as', 'showgraph'); // HISTORY_GRAPH
+			graphs_url.setArgument('filter_search_type', '0'); // ZBX_SEARCH_TYPE_STRICT
+			graphs_url.setArgument('filter_hostids[]', options.hostid);
+			graphs_url.setArgument('filter_set', '1');
 			graphs.url = graphs_url.getUrl();
 		}
 
@@ -287,7 +291,7 @@ function getMenuPopupMapElementSubmap(options) {
  * Get menu popup host group map element section data.
  *
  * @param {string} options['groupid']
- * @param {int}    options['severity_min']       (optional)
+ * @param {array}  options['severities']         (optional)
  * @param {bool}   options['show_suppressed']    (optional)
  * @param {array}  options['urls']               (optional)
  * @param {string} options['url'][]['label']
@@ -302,8 +306,8 @@ function getMenuPopupMapElementGroup(options) {
 
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_groupids[]', options.groupid);
-	if (typeof options.severity_min !== 'undefined') {
-		problems_url.setArgument('severity_min', options.severity_min);
+	if (typeof options.severities !== 'undefined') {
+		problems_url.setArgument('filter_severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('filter_show_suppressed', '1');
@@ -336,7 +340,7 @@ function getMenuPopupMapElementGroup(options) {
  * Get menu popup trigger map element section data.
  *
  * @param {array}  options['triggerids']
- * @param {int}    options['severity_min']     (optional)
+ * @param {array}  options['severities']       (optional)
  * @param {bool}   options['show_suppressed']  (optional)
  * @param {array}  options['urls']             (optional)
  * @param {string} options['url'][]['label']
@@ -350,8 +354,8 @@ function getMenuPopupMapElementTrigger(options) {
 
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_triggerids[]', options.triggerids);
-	if (typeof options.severity_min !== 'undefined') {
-		problems_url.setArgument('filter_severity', options.severity_min);
+	if (typeof options.severities !== 'undefined') {
+		problems_url.setArgument('filter_severities[]', options.severities);
 	}
 	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
 		problems_url.setArgument('filter_show_suppressed', '1');
@@ -658,8 +662,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
- * @param {object} options['acknowledge']             Link to acknowledge page (optional).
- * @param {string} options['acknowledge']['backurl']  Return URL.
+ * @param {bool}   options['acknowledge']             (optional) Whether to show Acknowledge section.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
@@ -691,16 +694,16 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	items[items.length] = events;
 
 	// acknowledge
-	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
-		var url = new Curl('zabbix.php', false);
-
-		url.setArgument('action', 'acknowledge.edit');
-		url.setArgument('eventids[]', options.eventid);
-		url.setArgument('backurl', options.acknowledge.backurl);
-
+	if (typeof options.acknowledge !== 'undefined' && options.acknowledge) {
 		items[items.length] = {
 			label: t('Acknowledge'),
-			url: url.getUrl()
+			clickCallback: function() {
+				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
+
+				return PopUp('popup.acknowledge.edit', {
+					eventids: [options.eventid]
+				}, null, trigger_elmnt);
+			}
 		};
 	}
 
@@ -1177,13 +1180,16 @@ jQuery(function($) {
 			});
 			addMenuPopupItems($menu_popup, sections);
 
-			$('body').append($menu_popup);
+			$('.wrapper').append($menu_popup);
+
+			// Position the menu (before hiding).
+			$menu_popup.position(options.position);
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
-			$menu_popup.add('.menu-popup', $menu_popup).css('display', 'none');
+			$menu_popup.add('.menu-popup', $menu_popup).hide();
 
 			// Position and display the menu.
-			$menu_popup.position(options.position).fadeIn(50);
+			$menu_popup.fadeIn(50);
 
 			addToOverlaysStack('menu-popup', event.target, 'menu-popup');
 
@@ -1474,6 +1480,9 @@ jQuery(function($) {
 				'aria-haspopup': 'true',
 				'aria-expanded': 'false',
 				'area-hidden': 'true'
+			});
+			link.on('click', function(e) {
+				e.stopPropagation();
 			});
 		}
 

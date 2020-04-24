@@ -1494,6 +1494,207 @@ static int	DBpatch_4050059(void)
 	return DBadd_field("hostmacro", &field);
 }
 
+static int	DBpatch_4050060(void)
+{
+	const ZBX_FIELD	field = {"compression_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050061(void)
+{
+	const ZBX_FIELD	field = {"compression_availability", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050062(void)
+{
+	const ZBX_FIELD	field = {"compress_older", "7d", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4050063(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	profileid, userid, idx2;
+	int		ret = SUCCEED, value_int, i;
+	const char	*profile = "web.problem.filter.severities";
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = DBselect(
+			"select profileid,userid,value_int"
+			" from profiles"
+			" where idx='web.problem.filter.severity'");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(profileid, row[0]);
+
+		if (0 == (value_int = atoi(row[2])))
+		{
+			if (ZBX_DB_OK > DBexecute("delete from profiles where profileid=" ZBX_FS_UI64, profileid))
+			{
+				ret = FAIL;
+				break;
+			}
+
+			continue;
+		}
+
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s'"
+				" where profileid=" ZBX_FS_UI64, profile, profileid))
+		{
+			ret = FAIL;
+			break;
+		}
+
+		ZBX_DBROW2UINT64(userid, row[1]);
+		idx2 = 0;
+
+		for (i = value_int + 1; i < 6; i++)
+		{
+			if (ZBX_DB_OK > DBexecute("insert into profiles (profileid,userid,idx,idx2,value_id,value_int,"
+					"type) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ",0,%d,2)",
+					DBget_maxid("profiles"), userid, profile, ++idx2, i))
+			{
+				ret = FAIL;
+				break;
+			}
+		}
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_4050064(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles set value_int=1 where idx='web.layout.mode' and value_int=2"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050065(void)
+{
+	const ZBX_FIELD	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("history", &field, &field);
+}
+
+static int	DBpatch_4050066(void)
+{
+	const ZBX_FIELD	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_4050067(void)
+{
+	const ZBX_FIELD	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_4050068(void)
+{
+	const ZBX_FIELD	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_4050069(void)
+{
+	const ZBX_FIELD	field = {"yaxismin", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("graphs", &field, &field);
+}
+
+static int	DBpatch_4050070(void)
+{
+	const ZBX_FIELD	field = {"yaxismax", "100", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("graphs", &field, &field);
+}
+
+static int	DBpatch_4050071(void)
+{
+	const ZBX_FIELD	field = {"percent_left", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("graphs", &field, &field);
+}
+
+static int	DBpatch_4050072(void)
+{
+	const ZBX_FIELD	field = {"percent_right", "0", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("graphs", &field, &field);
+}
+
+static int	DBpatch_4050073(void)
+{
+	const ZBX_FIELD	field = {"goodsla", "99.9", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("services", &field, &field);
+}
+
+static int	DBpatch_4050074(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
+			"web..hostid", "web.view.groupid", "web.view.hostid", "web.view.graphid",
+			"web.config.groupid", "web.config.hostid", "web.templates.php.groupid", "web.cm.groupid",
+			"web.httpmon.php.sort", "web.httpmon.php.sortorder", "web.avail_report.0.hostid",
+			"web.avail_report.0.groupid", "web.graphs.filter.to", "web.graphs.filter.from", "web.graphs.filter.active"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='%s'", values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050075(void)
+{
+	return DBdrop_field("config", "dropdown_first_entry");
+}
+
+static int	DBpatch_4050076(void)
+{
+	return DBdrop_field("config", "dropdown_first_remember");
+}
+
+static int	DBpatch_4050077(void)
+{
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("acknowledges", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1554,5 +1755,23 @@ DBPATCH_ADD(4050056, 0, 1)
 DBPATCH_ADD(4050057, 0, 1)
 DBPATCH_ADD(4050058, 0, 1)
 DBPATCH_ADD(4050059, 0, 1)
+DBPATCH_ADD(4050060, 0, 1)
+DBPATCH_ADD(4050061, 0, 1)
+DBPATCH_ADD(4050062, 0, 1)
+DBPATCH_ADD(4050063, 0, 1)
+DBPATCH_ADD(4050064, 0, 1)
+DBPATCH_ADD(4050065, 0, 1)
+DBPATCH_ADD(4050066, 0, 1)
+DBPATCH_ADD(4050067, 0, 1)
+DBPATCH_ADD(4050068, 0, 1)
+DBPATCH_ADD(4050069, 0, 1)
+DBPATCH_ADD(4050070, 0, 1)
+DBPATCH_ADD(4050071, 0, 1)
+DBPATCH_ADD(4050072, 0, 1)
+DBPATCH_ADD(4050073, 0, 1)
+DBPATCH_ADD(4050074, 0, 1)
+DBPATCH_ADD(4050075, 0, 1)
+DBPATCH_ADD(4050076, 0, 1)
+DBPATCH_ADD(4050077, 0, 1)
 
 DBPATCH_END()

@@ -211,6 +211,10 @@ Overlay.prototype.load = function(action, options) {
 	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
 
+	// Properties 'action' and 'options' are stored to enable popup reload. This may be done outside the class.
+	this.action = action;
+	this.options = options;
+
 	if (this.xhr) {
 		this.xhr.abort();
 	}
@@ -243,9 +247,11 @@ Overlay.prototype.unmount = function() {
 
 	this.body_mutation_observer.disconnect();
 
+	var $wrapper = jQuery('.wrapper');
+
 	if (!jQuery('[data-dialogueid]').length) {
-		jQuery('body').css('overflow', jQuery('body').data('overflow'));
-		jQuery('body').removeData('overflow');
+		$wrapper.css('overflow', $wrapper.data('overflow'));
+		$wrapper.removeData('overflow');
 	}
 };
 
@@ -253,13 +259,15 @@ Overlay.prototype.unmount = function() {
  * Appends associated nodes to document body.
  */
 Overlay.prototype.mount = function() {
+	var $wrapper = jQuery('.wrapper');
+
 	if (!jQuery('[data-dialogueid]').length) {
-		jQuery('body').data('overflow', jQuery('body').css('overflow'));
-		jQuery('body').css('overflow', 'hidden');
+		$wrapper.data('overflow', $wrapper.css('overflow'));
+		$wrapper.css('overflow', 'hidden');
 	}
 
-	this.$backdrop.appendTo(document.body);
-	this.$dialogue.appendTo(document.body);
+	this.$backdrop.appendTo($wrapper);
+	this.$dialogue.appendTo($wrapper);
 
 	this.body_mutation_observer.observe(this.$dialogue[0], {childList: true, subtree: true});
 	this.centerDialog();
@@ -426,6 +434,10 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'element':
 				this.element = obj[key];
+				break;
+
+			case 'data':
+				this.data = obj[key];
 				break;
 		}
 	}

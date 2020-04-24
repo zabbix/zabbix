@@ -1,25 +1,23 @@
 # uint mapping
 
 {
-   "settings" : {
-      "index" : {
-         "number_of_replicas" : 1,
-         "number_of_shards" : 5
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
       }
    },
-   "mappings" : {
-      "values" : {
-         "properties" : {
-            "itemid" : {
-               "type" : "long"
-            },
-            "clock" : {
-               "format" : "epoch_second",
-               "type" : "date"
-            },
-            "value" : {
-               "type" : "long"
-            }
+   "mappings": {
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "type": "long"
          }
       }
    }
@@ -29,25 +27,23 @@
 # dbl mapping
 
 {
-   "settings" : {
-      "index" : {
-         "number_of_replicas" : 1,
-         "number_of_shards" : 5
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
       }
    },
-   "mappings" : {
-      "values" : {
-         "properties" : {
-            "itemid" : {
-               "type" : "long"
-            },
-            "clock" : {
-               "format" : "epoch_second",
-               "type" : "date"
-            },
-            "value" : {
-               "type" : "double"
-            }
+   "mappings": {
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "type": "double"
          }
       }
    }
@@ -57,33 +53,31 @@
 # str mapping
 
 {
-   "settings" : {
-      "index" : {
-         "number_of_replicas" : 1,
-         "number_of_shards" : 5
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
       }
    },
-   "mappings" : {
-      "values" : {
-         "properties" : {
-            "itemid" : {
-               "type" : "long"
+   "mappings": {
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "fields": {
+               "analyzed": {
+                  "index": true,
+                  "type": "text",
+                  "analyzer": "standard"
+               }
             },
-            "clock" : {
-               "format" : "epoch_second",
-               "type" : "date"
-            },
-            "value" : {
-               "fields" : {
-                  "analyzed" : {
-                     "index" : true,
-                     "type" : "text",
-                     "analyzer" : "standard"
-                  }
-               },
-               "index" : false,
-               "type" : "text"
-            }
+            "index": false,
+            "type": "text"
          }
       }
    }
@@ -100,7 +94,6 @@
       }
    },
    "mappings" : {
-      "values" : {
          "properties" : {
             "itemid" : {
                "type" : "long"
@@ -121,7 +114,6 @@
                "type" : "text"
             }
          }
-      }
    }
 }
 
@@ -129,33 +121,31 @@
 # log mapping
 
 {
-   "settings" : {
-      "index" : {
-         "number_of_replicas" : 1,
-         "number_of_shards" : 5
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
       }
    },
-   "mappings" : {
-      "values" : {
-         "properties" : {
-            "itemid" : {
-               "type" : "long"
+   "mappings": {
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "fields": {
+               "analyzed": {
+                  "index": true,
+                  "type": "text",
+                  "analyzer": "standard"
+               }
             },
-            "clock" : {
-               "format" : "epoch_second",
-               "type" : "date"
-            },
-            "value" : {
-               "fields" : {
-                  "analyzed" : {
-                     "index" : true,
-                     "type" : "text",
-                     "analyzer" : "standard"
-                  }
-               },
-               "index" : false,
-               "type" : "text"
-            }
+            "index": false,
+            "type": "text"
          }
       }
    }

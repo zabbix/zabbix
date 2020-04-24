@@ -774,6 +774,7 @@ class CConfigurationExportBuilder {
 				'status' => $hostPrototype['status'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
+				'macros' => $this->formatMacros($hostPrototype['macros']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
 				'inventory_mode' => $hostPrototype['inventory_mode']
 			];
@@ -1319,7 +1320,7 @@ class CConfigurationExportBuilder {
 
 			// Sort selements by position asc.
 			if ($link['selementpos2'] < $link['selementpos1']) {
-				zbx_swap($link['selementpos1'], $link['selementpos2']);
+				[$link['selementpos1'], $link['selementpos2']] = [$link['selementpos2'], $link['selementpos1']];
 			}
 		}
 		unset($link);

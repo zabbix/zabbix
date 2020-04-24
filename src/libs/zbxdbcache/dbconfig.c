@@ -847,7 +847,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
-					"default_inventory_mode", "db_extension", "autoreg_tls_accept"};	/* sync with zbx_dbsync_compare_config() */
+					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
+					"compression_status", "compression_availability", "compress_older"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -909,10 +910,18 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	else
 		config->config->discovery_groupid = ZBX_DISCOVERY_GROUPID_UNDEFINED;
 
-	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
+	ZBX_STR2UCHAR(config->config->snmptrap_logging, row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
-	DCstrpool_replace(found, &config->config->db_extension, row[27]);
-	config->config->autoreg_tls_accept = (unsigned char)atoi(row[28]);
+	DCstrpool_replace(found, (const char **)&config->config->db.extension, row[27]);
+	ZBX_STR2UCHAR(config->config->autoreg_tls_accept, row[28]);
+	ZBX_STR2UCHAR(config->config->db.history_compression_status, row[29]);
+	ZBX_STR2UCHAR(config->config->db.history_compression_availability, row[30]);
+
+	if (SUCCEED != is_time_suffix(row[31], &config->config->db.history_compress_older, ZBX_LENGTH_UNLIMITED))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid history compression age: %s", row[31]);
+		config->config->db.history_compress_older = 0;
+	}
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
@@ -971,7 +980,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
-			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 	{
 		config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
 	}
@@ -990,7 +999,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
-			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
 	{
 		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
 	}
@@ -9597,34 +9606,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_expression_user_macro_validator                               *
- *                                                                            *
- * Purpose: validate user macro values in trigger expressions                 *
- *                                                                            *
- * Parameters: value   - [IN] the macro value                                 *
- *                                                                            *
- * Return value: SUCCEED - the macro value can be used in expression          *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dc_expression_user_macro_validator(const char *value)
-{
-	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
-		return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dc_expand_user_macros                                        *
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
+ * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
  *                                                                            *
  * Parameters: text           - [IN] the text value to expand                 *
  *             hostids        - [IN] an array of related hostids              *
  *             hostids_num    - [IN] the number of hostids                    *
- *             validator_func - [IN] an optional validator function           *
  *                                                                            *
  * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
@@ -9633,8 +9622,7 @@ static int	dc_expression_user_macro_validator(const char *value)
  *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_value_validator_func_t validator_func)
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, len, last_pos = 0;
@@ -9655,9 +9643,6 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
-		if (NULL != value && NULL != validator_func && FAIL == validator_func(value))
-			zbx_free(value);
-
 		if (NULL != value)
 		{
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
@@ -9675,6 +9660,121 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 		pos = token.loc.r;
 		last_pos = pos + 1;
+	}
+
+	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
+
+	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_expand_user_macros_for_triggers                           *
+ *                                                                            *
+ * Purpose: expand user macros for triggers in the specified text value       *
+ *          autoquote macros that are not already quoted that cannot be       *
+ *          casted to a double                                                *
+ *                                                                            *
+ * Parameters: text           - [IN] the text value to expand                 *
+ *             hostids        - [IN] an array of related hostids              *
+ *             hostids_num    - [IN] the number of hostids                    *
+ *                                                                            *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
+ *               macros will be left unresolved.                              *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *           This function must be used only by configuration syncer          *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num)
+{
+	zbx_token_t	token;
+	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
+	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL;
+	size_t		str_alloc = 0, str_offset = 0, i;
+
+	if ('\0' == *text)
+		return zbx_strdup(NULL, text);
+
+	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
+	{
+		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
+		{
+			switch (text[i])
+			{
+				case '\\':
+					if (0 != cur_token_inside_quote)
+						i++;
+					break;
+				case '"':
+					cur_token_inside_quote = !cur_token_inside_quote;
+					break;
+			}
+		}
+
+		if (ZBX_TOKEN_USER_MACRO != token.type)
+		{
+			prev_token_loc_r = token.loc.r;
+			continue;
+		}
+
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
+		{
+			prev_token_loc_r = token.loc.r;
+			continue;
+		}
+
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
+		dc_get_user_macro(hostids, hostids_num, name, context, &value);
+
+		if (NULL != value)
+		{
+			size_t	sz;
+			char	*tmp;
+
+			sz = zbx_get_escape_string_len(value, "\"\\");
+
+			if (0 == cur_token_inside_quote && ZBX_INFINITY == evaluate_string_to_double(value))
+			{
+				/* autoquote */
+				tmp = zbx_malloc(NULL, sz + 3);
+				tmp[0] = '\"';
+				zbx_escape_string(tmp + 1, sz + 1, value, "\"\\");
+				tmp[sz + 1] = '\"';
+				tmp[sz + 2] = '\0';
+				zbx_free(value);
+				value = tmp;
+			}
+			else
+			{
+				if (sz != strlen(value))
+				{
+					tmp = zbx_malloc(NULL, sz + 1);
+					zbx_escape_string(tmp, sz + 1, value, "\"\\");
+					tmp[sz] = '\0';
+					zbx_free(value);
+					value = tmp;
+				}
+			}
+		}
+
+		if (NULL != value)
+		{
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
+			zbx_free(value);
+		}
+		else
+		{
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
+		}
+
+		zbx_free(name);
+		zbx_free(context);
+
+		pos = token.loc.r;
+		last_pos = pos + 1;
+		prev_token_loc_r = token.loc.r;
 	}
 
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
@@ -9708,8 +9808,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	get_functionids(&functionids, expression);
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	out = zbx_dc_expand_user_macros(expression, hostids.values, hostids.values_num,
-			dc_expression_user_macro_validator);
+	out = zbx_dc_expand_user_macros_for_triggers(expression, hostids.values, hostids.values_num);
 
 	if (NULL != strstr(out, "{$"))
 	{
@@ -10642,7 +10741,12 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 		cfg->hk = config->config->hk;
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
-		cfg->db_extension = zbx_strdup(NULL, config->config->db_extension);
+	{
+		cfg->db.extension = zbx_strdup(NULL, config->config->db.extension);
+		cfg->db.history_compression_status = config->config->db.history_compression_status;
+		cfg->db.history_compression_availability = config->config->db.history_compression_availability;
+		cfg->db.history_compress_older = config->config->db.history_compress_older;
+	}
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT))
 		cfg->autoreg_tls_accept = config->config->autoreg_tls_accept;
@@ -10675,7 +10779,7 @@ void	zbx_config_clean(zbx_config_t *cfg)
 	}
 
 	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
-		zbx_free(cfg->db_extension);
+		zbx_free(cfg->db.extension);
 }
 
 /******************************************************************************

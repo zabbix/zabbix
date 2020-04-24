@@ -109,5 +109,17 @@
 				}
 			}
 		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
+
+		$(document).on('submit', '#problem_form', function(e) {
+			e.preventDefault();
+
+			var eventids = $('[id^="eventids_"]:checked', $(this)).map(function() {
+					return $(this).val();
+				}).get();
+
+			return PopUp('popup.acknowledge.edit', {
+				eventids: eventids
+			}, null, this);
+		});
 	});
 </script>

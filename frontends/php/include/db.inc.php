@@ -35,8 +35,6 @@ function DBconnect(&$error) {
 		return false;
 	}
 
-	$result = true;
-
 	$DB['DB'] = null; // global db handler
 	$DB['TRANSACTIONS'] = 0; // level of a nested transaction
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true; // true - if no statements failed in transaction, false - there are failed statements

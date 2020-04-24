@@ -108,7 +108,7 @@ class testFormLogin extends CLegacyWebTest {
 			$this->zbxTestTextNotPresent('Password');
 			$this->zbxTestTextNotPresent('Username');
 
-			$this->zbxTestClickXpathWait("//ul[@class='top-nav-icons']//a[@class='top-nav-signout']");
+			$this->zbxTestClickXpathWait('//a[@href="#signout"]');
 			$this->zbxTestTextPresent('Username');
 			$this->zbxTestTextPresent('Password');
 			$this->zbxTestTextNotPresent('Dashboard');

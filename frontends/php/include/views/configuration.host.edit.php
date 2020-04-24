@@ -617,6 +617,7 @@ if (!$data['readonly']) {
 }
 
 // macros
+$tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 $divTabs->addTab('macroTab', _('Macros'),
 	(new CFormList('macrosFormList'))
 		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
@@ -624,9 +625,8 @@ $divTabs->addTab('macroTab', _('Macros'),
 			->addValue(_('Inherited and host macros'), 1)
 			->setModern(true)
 		)
-		->addRow(null, new CPartial('hostmacros.list.html', [
+		->addRow(null, new CPartial($tmpl, [
 			'macros' => $data['macros'],
-			'show_inherited_macros' => $data['show_inherited_macros'],
 			'readonly' => $data['readonly']
 		]), 'macros_container')
 );
@@ -756,15 +756,15 @@ if ($data['hostid'] != 0) {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid')),
-			new CButtonCancel(url_param('groupid'))
+			new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid')),
+			new CButtonCancel()
 		]
 	));
 }
 else {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('groupid'))]
+		[new CButtonCancel()]
 	));
 }
 

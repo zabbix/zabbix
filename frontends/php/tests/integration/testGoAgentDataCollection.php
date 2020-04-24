@@ -237,7 +237,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'vfs.dev.write[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 10
+			'treshold' => 20
 		],
 		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
@@ -477,10 +477,11 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			$values = [];
 			foreach ($itemids as $type => $ids) {
 				$result = $this->call('history.get', [
-					'output' => ['itemid', 'value'],
+					'output' => ['itemid', 'value', 'clock', 'ns'],
 					'itemids' => $ids,
 					'history' => $type
 				]);
+				CTestArrayHelper::sort($result['result'], ['itemid', 'clock', 'ns']);
 
 				foreach ($result['result'] as $item) {
 					$values[$item['itemid']][] = $item['value'];

@@ -1,0 +1,184 @@
+// Notification & alert
+$red: #e33734 !default;
+$light-red: #ed9898 !default;
+
+$orange: #f24f1d !default;
+
+$yellow: #fad634 !default;
+$dark-yellow: #e99003 !default;
+$light-yellow: #fcf39d !default;
+$lighter-yellow: #fcf7c2 !default;
+
+$green: #429e47 !default;
+$light-green: #a5d6a7 !default;
+$lighter-green: #c5e3c6 !default;
+
+$blue: #1e87e3 !default;
+
+$alt-red: #e45959;
+$alt-orange: #ffa059;
+$alt-dark-orange: #e97659;
+$alt-yellow: #ffc859;
+$alt-green: #59db8f;
+$alt-light-green: #86cc89;
+$alt-dark-blue: #7499ff;
+$alt-blue-grey: #97aab3;
+
+$white: #ffffff !default;
+$transparent: transparent;
+
+$disabled-bg-color: #ebebeb !default;
+$disabled-item-color: #768d99 !default;
+$disabled-item-bg-color: #ccd5d9 !default;
+
+$teal: #0f998b;
+
+// Layout
+$header-bg-color: #ffffff !default;
+$sidebar-bg-color: #0a466a !default;
+
+$scrollbar-track-color: rgba(#acbbc2, .55) !default;
+$scrollbar-thumb-color: rgba(#878787, .85) !default;
+$scrollbar-thumb-color-darken: 5% !default;
+
+$sidebar-scrollbar-track-color: rgba(#87d1ff, .55) !default;
+$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85) !default;
+
+// Main
+$font-color: #1f2c33 !default;
+$font-selected-color: #ffffff !default;
+$font-alt-color: #768d99 !default;
+$body-bg-color: #ebeef0 !default;
+$overlay-bg-color: #ffffff !default;
+
+// Main menu
+$menu-main-color: #ebeef0 !default;
+$menu-main-hover-color: #ffffff !default;
+$menu-main-hover-bg-color: #092637 !default;
+$menu-main-hover-border-color: #ffffff !default;
+$menu-main-selected-color: #ffffff !default;
+$menu-main-selected-bg-color: #0a3c5b !default;
+$menu-main-selected-border-color: #87d1ff !default;
+$menu-main-expanded-color: #ffffff !default;
+$menu-main-expanded-bg-color: #092637 !default;
+$menu-main-expanded-border-color: transparent !default;
+
+$menu-main-submenu-color: #ebeef0 !default;
+$menu-main-submenu-bg-color: #0e354d !default;
+$menu-main-submenu-border-color: #051620 !default;
+$menu-main-submenu-hover-color: #ffffff !default;
+$menu-main-submenu-hover-bg-color: #092637 !default;
+$menu-main-submenu-hover-border-color: #ffffff !default;
+$menu-main-submenu-selected-color: #ffffff !default;
+$menu-main-submenu-selected-bg-color: #0b2d42 !default;
+$menu-main-submenu-selected-border-color: #87d1ff !default;
+
+$menu-user-color: #cedae1 !default;
+$menu-user-hover-color: #ffffff !default;
+$menu-user-disabled-color: $disabled-item-color !default;
+
+// Sidebar
+$sidebar-server-name-color: rgba($menu-user-color, 0.5) !default;
+
+// UI
+$ui-bg-color: #ffffff !default;
+$ui-border-color: #dfe4e7 !default;
+$ui-bg-selected-color: #768d99 !default;
+$ui-hover-color: #e8f5ff !default;
+$ui-placeholder-background-color: $body-bg-color !default;
+$ui-highlighted-parent-background-color: lighten($body-bg-color, 4%) !default;
+$ui-sortable-helper-background-color: $ui-bg-color !default;
+$ui-sortable-helper-border-color: $ui-border-color !default;
+
+$action-hover-color: #e8f5ff !default;
+$action-border-color: #ccd5d9 !default;
+$action-shadow-color: rgba(#768d99, .5) !default;
+
+$table-border-color: #ebeef0 !default;
+
+$ui-tab-bg-selected-color: #0275b8 !default;
+
+// Forms
+$form-font-color: #1f2c33 !default;
+$form-bg-color: #ffffff !default;
+$form-border-color: #acbbc2 !default;
+$form-border-focus-color: #02659f !default;
+$form-label-asterisk-color: $red;
+
+$form-disabled-font-color: #acbbc2 !default;
+$form-disabled-bg-color: #ebebeb !default;
+$form-disabled-border-color: #ccd5d9 !default;
+
+$input-placeholder-color: #9d9d9d !default;
+
+// Error messages
+$msg-bad-color: darken(desaturate($red, 10%), 20%) !default;
+$msg-bad-border-color: $light-red !default;
+$msg-good-color: darken(desaturate($green, 10%), 20%) !default;
+$msg-good-border-color: $light-green !default;
+$msg-warning-color: #9a7938 !default;
+$msg-warning-border-color: #ffd788 !default;
+
+// Buttons
+$btn-font-color: #ffffff !default;
+$btn-bg-color: #0275b8 !default;
+$btn-border-color: #0275b8 !default;
+
+$btn-alt-font-color: #0275b8 !default;
+$btn-alt-bg-color: transparent !default;
+
+$btn-form-font-color: #1f2c33 !default;
+$btn-form-bg-color: $form-bg-color !default;
+$btn-form-hover-color: #e8f5ff !default;
+$btn-form-border-color: $form-border-color !default;
+
+$btn-disabled-font-color: #acbbc2 !default;
+$btn-disabled-bg-color: #ebebeb !default;
+$btn-disabled-border-color: #ccd5d9 !default;
+
+$btn-back-map-background-color: rgba(255, 255, 255, .8) !default;
+$btn-back-text-color: #0275b8 !default;
+$btn-back-background-hover: $form-bg-color !default;
+
+// Links
+$link-color: #0275b8 !default;
+$link-hover-color: $link-color !default;
+$link-active-color: $link-color !default;
+$link-visited-color: $link-color !default;
+
+$link-alt-underline-color: #768d99 !default;
+
+$link-main-subnav-color: rgba(#ffffff, .8) !default;
+$link-main-subnav-hover-color: rgba(#ffffff, 1) !default;
+$link-main-subnav-active-color: rgba(#ffffff, 1) !default;
+$link-main-subnav-visited-color: rgba(#ffffff, .8) !default;
+
+// Analog clock
+$clock-face-color: #ebebeb !default;
+$clock-hand-color: #1f2c33 !default;
+$clock-hand-sec-color: #0275b8 !default;
+$clock-lines-color: #acbbc2 !default;
+
+// Statuses
+$problem-unack-fg-color: #cc0000 !default;
+$problem-ack-fg-color: #cc0000 !default;
+$ok-unack-fg-color: #009900 !default;
+$ok-ack-fg-color: #009900 !default;
+
+// Multiselect
+$multiselect-selected-bg-color: #93a5af !default;
+$multiselect-disabled-bg-color: $disabled-bg-color;
+$multiselect-item-disabled-color: $disabled-item-color;
+$multiselect-item-disabled-bg-color: $disabled-item-bg-color;
+
+// Host status
+$host-avail-true-bg-color: $alt-light-green !default;
+$host-avail-false-bg-color: $alt-red !default;
+$host-avail-unknown-bg-color: $alt-blue-grey !default;
+$host-avail-total-bg-color: $transparent !default;
+
+// Preloader
+$preloader-bg-color: $body-bg-color !default;
+$preloader-color: #ccd5d9 !default;
+$preloader-disabled-color: #fdfdfd !default;
+$preloader-accent-color: #0275b8 !default;

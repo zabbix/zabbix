@@ -60,13 +60,13 @@ class CMediatypeHelper {
 				'recovery' => ACTION_RECOVERY_OPERATION,
 				'name' => _('Problem recovery'),
 				'template' => [
-					'subject' => 'Resolved: {EVENT.NAME}',
+					'subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
 					'html' => '<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br>'.
-						'<b>Problem name:</b> {EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br>'.
+						'<b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br>'.
 						'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
-					'sms' => "RESOLVED: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
+					'sms' => "Resolved in {EVENT.DURATION}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' => "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-						"Problem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
+						"Problem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
 						"Original problem ID: {EVENT.ID}\n{TRIGGER.URL}"
 				]
 			],
@@ -75,16 +75,16 @@ class CMediatypeHelper {
 				'recovery' => ACTION_ACKNOWLEDGE_OPERATION,
 				'name' => _('Problem update'),
 				'template' => [
-					'subject' => 'Updated problem: {EVENT.NAME}',
+					'subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
 					'html' =>
 						'<b>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem</b> at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>'.
 						'{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:</b> {EVENT.STATUS}<br>'.
-						'<b>Acknowledged:</b> {EVENT.ACK.STATUS}.',
-					'sms' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}',
+						'<b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.',
+					'sms' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem in {EVENT.AGE} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}',
 					'text' =>
 						"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
 						"{EVENT.UPDATE.MESSAGE}\n\n".
-						"Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}."
+						"Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
 				]
 			],
 			self::MSG_TYPE_DISCOVERY => [

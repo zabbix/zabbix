@@ -54,13 +54,10 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 		*pfree = (100.0 *  s.ZBX_FFREE) / total;
 		*pused = 100.0 - (double)(100.0 * s.ZBX_FFREE) / total;
 	}
-	else
+	else if (NULL != mode && (0 == strcmp(mode, "pfree") || 0 == strcmp(mode, "pused")))
 	{
-		if (0 == strcmp(mode, "pfree") || 0 == strcmp(mode, "pused"))
-		{
-			*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
-			return SYSINFO_RET_FAIL;
-		}
+		*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
+		return SYSINFO_RET_FAIL;
 	}
 	return SYSINFO_RET_OK;
 }

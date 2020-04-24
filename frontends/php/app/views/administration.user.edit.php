@@ -101,6 +101,7 @@ if ($data['change_password']) {
 
 	$password1 = (new CPassBox('password1', $data['password1']))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAttribute('autocomplete', 'off')
 		->setAriaRequired();
 
 	if ($data['action'] !== 'user.edit') {
@@ -108,10 +109,17 @@ if ($data['change_password']) {
 	}
 
 	$user_form_list
-		->addRow((new CLabel(_('Password'), 'password1'))->setAsteriskMark(), $password1)
+		->addRow((new CLabel(_('Password'), 'password1'))->setAsteriskMark(), [
+			// Hidden dummy login field for protection against chrome error when password autocomplete.
+			(new CInput('text', null, null))
+				->setAttribute('tabindex', '-1')
+				->addStyle('position: absolute; left: -100vw;'),
+			$password1
+		])
 		->addRow((new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('autocomplete', 'off')
 				->setAriaRequired()
 		)
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));

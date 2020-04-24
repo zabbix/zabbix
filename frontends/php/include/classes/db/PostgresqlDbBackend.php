@@ -135,21 +135,54 @@ class PostgresqlDbBackend extends DbBackend {
 	}
 
 	/**
+	* Check if database is using IEEE754 compatible double precision columns.
+	*
+	* @return bool
+	*/
+	public function isDoubleIEEE754() {
+		global $DB;
+
+		$conditions_or = [
+			'(table_name=\'history\' AND column_name=\'value\')',
+			'(table_name=\'trends\' AND column_name IN (\'value_min\', \'value_avg\', \'value_max\'))'
+		];
+
+		$sql =
+			'SELECT COUNT(*) cnt FROM information_schema.columns'.
+				' WHERE table_catalog='.zbx_dbstr($DB['DATABASE']).
+					' AND table_schema='.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public').
+					' AND data_type=\'double precision\''.
+					' AND ('.implode(' OR ', $conditions_or).')';
+
+		$result = DBfetch(DBselect($sql));
+
+		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == 4);
+	}
+
+	/**
 	 * Check is current connection contain requested cipher list.
 	 *
 	 * @return bool
 	 */
 	public function isConnectionSecure() {
-		$row = DBfetch(DBselect('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl'.
-			' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
-				' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
+		$row = DBfetch(DBselect('SHOW server_version'));
+		$is_secure = false;
 
-		if (!$row ) {
-			$this->setError('Error connecting to database. Empty cipher.');
-			return false;
+		if (version_compare($row['server_version'], '9.5', '<')) {
+			$row = DBfetch(DBselect('SHOW ssl'));
+			$is_secure = ($row && $row['ssl'] === 'on');
+		}
+		else {
+			$is_secure = (bool) DBfetch(DBselect('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl'.
+				' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
+					' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
 		}
 
-		return true;
+		if (!$is_secure) {
+			$this->setError('Error connecting to database. Connection is not secure.');
+		}
+
+		return $is_secure;
 	}
 
 	/**
@@ -217,5 +250,23 @@ class PostgresqlDbBackend extends DbBackend {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check if tables have compressed data.
+	 *
+	 * @static
+	 *
+	 * @param array $tables  Tables list.
+	 *
+	 * @return bool
+	 */
+	public static function isCompressed(array $tables) :bool {
+		$result = DBfetch(DBselect('SELECT coalesce(sum(number_compressed_chunks),0) chunks'.
+			' FROM timescaledb_information.compressed_hypertable_stats'.
+			' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
+		));
+
+		return (bool) $result['chunks'];
 	}
 }

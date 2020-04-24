@@ -34,6 +34,7 @@
 #include "proxydata.h"
 #include "../alerter/alerter_protocol.h"
 #include "trapper_preproc.h"
+#include "trapper_expressions_evaluate.h"
 
 #include "daemon.h"
 #include "zbxcrypto.h"
@@ -843,7 +844,7 @@ static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t
 			zbx_json_adduint64(json, "count", counter_value.ui64);
 			break;
 		case ZBX_COUNTER_TYPE_DBL:
-			tmp = zbx_dsprintf(tmp, ZBX_FS_DBL, counter_value.dbl);
+			tmp = zbx_dsprintf(tmp, ZBX_FS_DBL64, counter_value.dbl);
 			zbx_json_addstring(json, "count", tmp, ZBX_JSON_TYPE_STRING);
 			break;
 		default:
@@ -1204,6 +1205,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					ret = zbx_trapper_preproc_test(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = zbx_trapper_expressions_evaluate(sock, &jp);
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 			{

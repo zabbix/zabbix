@@ -57,7 +57,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$httptest_count = CViewHelper::showNum($host['httpTests']);
 
 	$applications_link = $host['editable']
-		? [new CLink(_('Applications'), 'applications.php?'.$link), $app_count]
+		? [new CLink(_('Applications'), (new CUrl('applications.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $app_count]
 		: [_('Applications'), $app_count];
 
 	$items_link = $host['editable']
@@ -75,7 +78,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 		: [_('Triggers'), $trigger_count];
 
 	$graphs_link = $host['editable']
-		? [new CLink(_('Graphs'), 'graphs.php?'.$link), $graph_count]
+		? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $graph_count]
 		: [_('Graphs'), $graph_count];
 
 	$discovery_link = $host['editable']
@@ -83,7 +89,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 		: [_('Discovery'), $discovery_count];
 
 	$httptests_link = $host['editable']
-		? [new CLink(_('Web'), 'httpconf.php?'.$link), $httptest_count]
+		? [new CLink(_('Web'), (new CUrl('httpconf.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $httptest_count]
 		: [_('Web'), $httptest_count];
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -113,9 +122,18 @@ foreach ($data['hosts'] as $hostid => $host) {
 				->setArgument('filter_hostids[]', $hostid)
 				->setArgument('filter_set', '1')
 		),
-		new CLink(_('Graphs'), 'charts.php?'.$link),
+		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'charts.view')
+				->setArgument('view_as', HISTORY_GRAPH)
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
-		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
+		new CLink(_('Web'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_set', '1')
+		),
 		$applications_link,
 		$items_link,
 		$triggers_link,
@@ -138,7 +156,6 @@ $table = (new CTableInfo())
 		_('Host group'),
 		_('Latest data'),
 		_('Problems'),
-		_('Graphs'),
 		_('Web'),
 		$data['admin'] ? _('Hosts') : null,
 		$data['admin'] ? _('Templates') : null
@@ -153,15 +170,19 @@ foreach ($data['groups'] as $groupid => $group) {
 	if ($data['admin']) {
 		$hosts_link = $group['editable']
 			? $group['hosts']
-				? [new CLink(_('Hosts'), 'hosts.php?groupid='.$groupid), CViewHelper::showNum($group['hosts'])]
+				? [new CLink(_('Hosts'), (new CUrl('hosts.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_groups', [$groupid])
+				), CViewHelper::showNum($group['hosts'])]
 				: _('Hosts')
 			: _('Hosts');
 
 		$templates_link = $group['editable']
 			? $group['templates']
-				? [new CLink(_('Templates'), 'templates.php?groupid='.$groupid),
-					CViewHelper::showNum($group['templates'])
-				]
+				? [new CLink(_('Templates'), (new CUrl('templates.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_groups', [$groupid])
+				), CViewHelper::showNum($group['templates'])]
 				: _('Templates')
 			: _('Templates');
 	}
@@ -180,8 +201,12 @@ foreach ($data['groups'] as $groupid => $group) {
 				->setArgument('filter_groupids[]', $groupid)
 				->setArgument('filter_set', '1')
 		),
-		new CLink(_('Graphs'), 'charts.php?'.$link),
-		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
+		new CLink(_('Web'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('filter_groupids[]', $groupid)
+				->setArgument('filter_set', '1')
+		),
 		$hosts_link,
 		$templates_link
 	]);
@@ -201,7 +226,6 @@ if ($data['admin']) {
 	]);
 
 	foreach ($data['templates'] as $templateid => $template) {
-		$link = 'groupid='.$template['groups'][0]['groupid'].'&hostid='.$templateid;
 		$visible_name = make_decoration($template['name'], $data['search']);
 		$app_count = CViewHelper::showNum($template['applications']);
 		$item_count = CViewHelper::showNum($template['items']);
@@ -216,7 +240,10 @@ if ($data['admin']) {
 			: [new CSpan($visible_name)];
 
 		$applications_link = $template['editable']
-			? [new CLink(_('Applications'), 'applications.php?'.$link), $app_count]
+			? [new CLink(_('Applications'), (new CUrl('applications.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$templateid])
+			), $app_count]
 			: [_('Applications'), $app_count];
 
 		$items_link = $template['editable']
@@ -234,19 +261,26 @@ if ($data['admin']) {
 			: [_('Triggers'), $trigger_count];
 
 		$graphs_link = $template['editable']
-			? [new CLink(_('Graphs'), 'graphs.php?'.$link), $graph_count]
+			? [new CLink(_('Graphs'), (new CUrl('graphs.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$templateid])
+			), $graph_count]
 			: [_('Graphs'), $graph_count];
 
 		$screens_link = $template['editable']
 			? [new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid), $screen_count]
 			: [_('Screens'), $screen_count];
 
+		$discovery_link_url = (new CUrl('host_discovery.php'))->setArgument('hostid', $templateid);
 		$discovery_link = $template['editable']
-			? [new CLink(_('Discovery'), 'host_discovery.php?'.$link), $discovery_count]
+			? [new CLink(_('Discovery'), $discovery_link_url), $discovery_count]
 			: [_('Discovery'), $discovery_count];
 
 		$httptests_link = $template['editable']
-			? [new CLink(_('Web'), 'httpconf.php?'.$link), $httptest_count]
+			? [new CLink(_('Web'), (new CUrl('httpconf.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$templateid])
+			), $httptest_count]
 			: [_('Web'), $httptest_count];
 
 		if ($template['host'] !== $template['name'] && strpos($template['host'], $data['search']) !== false) {

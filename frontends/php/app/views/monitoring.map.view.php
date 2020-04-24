@@ -45,7 +45,7 @@ $web_layout_mode = $this->getLayoutMode();
 				->addItem([
 					new CLabel(_('Minimum severity'), 'severity_min'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getSeveritiesMinCB()
+					new CComboBox('severity_min', $data['severity_min'], 'javascript: submit();', $data['severities'])
 				])
 			),
 		(new CTag('nav', true, (new CList())
@@ -61,7 +61,7 @@ $web_layout_mode = $this->getLayoutMode();
 				'elname' => 'sysmapid',
 				'elid' => $data['map']['sysmapid']
 			]))
-			->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))
+			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]))
