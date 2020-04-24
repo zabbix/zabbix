@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-02-19T18:20:16Z</date>
+    <version>5.0</version>
+    <date>2020-04-20T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>PagerDuty</name>
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
-                    <name>token</name>
-                    <value>&lt;put your key&gt;</value>
+                    <name>eventack</name>
+                    <value>{EVENT.ACK.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>eventdate</name>
+                    <value>{EVENT.DATE}</value>
                 </parameter>
                 <parameter>
                     <name>eventid</name>
@@ -20,44 +24,12 @@
                     <value>{EVENT.NAME}</value>
                 </parameter>
                 <parameter>
-                    <name>hostname</name>
-                    <value>{HOST.NAME}</value>
-                </parameter>
-                <parameter>
-                    <name>hostip</name>
-                    <value>{HOST.IP}</value>
-                </parameter>
-                <parameter>
-                    <name>severity</name>
-                    <value>{EVENT.NSEVERITY}</value>
-                </parameter>
-                <parameter>
-                    <name>triggerdesc</name>
-                    <value>{TRIGGER.DESCRIPTION}</value>
-                </parameter>
-                <parameter>
-                    <name>triggeropdata</name>
-                    <value>{EVENT.OPDATA}</value>
-                </parameter>
-                <parameter>
                     <name>eventtags</name>
                     <value>{EVENT.TAGS}</value>
                 </parameter>
                 <parameter>
-                    <name>triggerid</name>
-                    <value>{TRIGGER.ID}</value>
-                </parameter>
-                <parameter>
-                    <name>eventdate</name>
-                    <value>{EVENT.DATE}</value>
-                </parameter>
-                <parameter>
                     <name>eventtime</name>
                     <value>{EVENT.TIME}</value>
-                </parameter>
-                <parameter>
-                    <name>eventack</name>
-                    <value>{EVENT.ACK.STATUS}</value>
                 </parameter>
                 <parameter>
                     <name>eventupdate</name>
@@ -66,6 +38,34 @@
                 <parameter>
                     <name>eventvalue</name>
                     <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>hostip</name>
+                    <value>{HOST.IP}</value>
+                </parameter>
+                <parameter>
+                    <name>hostname</name>
+                    <value>{HOST.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>severity</name>
+                    <value>{EVENT.NSEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>token</name>
+                    <value>&lt;put your key&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>triggerdesc</name>
+                    <value>{TRIGGER.DESCRIPTION}</value>
+                </parameter>
+                <parameter>
+                    <name>triggerid</name>
+                    <value>{TRIGGER.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>triggeropdata</name>
+                    <value>{EVENT.OPDATA}</value>
                 </parameter>
                 <parameter>
                     <name>url</name>
@@ -78,6 +78,10 @@
         req = new CurlHttpRequest(),&#13;
         fields = {},&#13;
         resp = '';&#13;
+&#13;
+    if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
+        req.SetProxy(params.HTTPProxy);&#13;
+    }&#13;
 &#13;
     if (isNaN(parseInt(params.eventid)) || params.eventid &lt; 1) {&#13;
         throw 'incorrect value for variable &quot;eventid&quot;. The value must be a positive number.';&#13;
@@ -181,7 +185,6 @@ catch (error) {&#13;
     Zabbix.Log(3, '[PagerDuty Webhook] Notification failed : ' + error);&#13;
     throw 'PagerDuty notification failed : ' + error;&#13;
 }</script>
-            <show_event_menu>NO</show_event_menu>
             <description>Please refer to https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2 and https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook#example_scripts.&#13;
   &#13;
 Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;

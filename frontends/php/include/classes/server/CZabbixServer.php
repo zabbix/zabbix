@@ -330,6 +330,38 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Evaluate trigger expressions.
+	 *
+	 * @param array  $data
+	 * @param string $sid
+	 *
+	 * @return bool|array
+	 */
+	public function expressionsEvaluate(array $data, string $sid) {
+		$response = $this->request([
+			'request' => 'expressions.evaluate',
+			'sid' => $sid,
+			'data' => $data
+		]);
+
+		if ($response === false) {
+			return false;
+		}
+
+		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
+			'expression' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'value' =>		['type' => API_INT32, 'in' => '0,1'],
+			'error' =>		['type' => API_STRING_UTF8]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $response, '/', $this->error)) {
+			return false;
+		}
+
+		return $response;
+	}
+
+	/**
 	 * Returns the error message.
 	 *
 	 * @return string

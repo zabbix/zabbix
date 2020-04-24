@@ -6,7 +6,8 @@ SERVER_tests = \
 	dc_maintenance_match_tags \
 	dc_check_maintenance_period \
 	is_item_processed_by_server \
-	dc_item_poller_type_update
+	dc_item_poller_type_update \
+	zbx_dc_expand_user_macros_for_triggers
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -26,6 +27,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 CACHE_LIBS = \
@@ -74,7 +76,6 @@ COMMON_WRAP_FUNCS = \
 
 zbx_vc_get_values_SOURCES = \
 	zbx_vc_get_values.c \
-	valuecache_mock.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
@@ -91,7 +92,6 @@ zbx_vc_get_values_CFLAGS = \
 
 zbx_vc_add_values_SOURCES = \
 	zbx_vc_add_values.c \
-	valuecache_mock.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
@@ -108,7 +108,6 @@ zbx_vc_add_values_CFLAGS = \
 
 zbx_vc_get_value_SOURCES = \
 	zbx_vc_get_value.c \
-	valuecache_mock.c \
 	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
@@ -148,4 +147,13 @@ dc_item_poller_type_update_SOURCES = dc_item_poller_type_update.c
 dc_item_poller_type_update_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
 dc_item_poller_type_update_LDFLAGS = @SERVER_LDFLAGS@
 dc_item_poller_type_update_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/libs/zbxdbcache
+
+zbx_dc_expand_user_macros_for_triggers_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-Wl,--wrap=zbx_hashset_search
+zbx_dc_expand_user_macros_for_triggers_SOURCES = zbx_dc_expand_user_macros_for_triggers.c
+zbx_dc_expand_user_macros_for_triggers_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
+zbx_dc_expand_user_macros_for_triggers_LDFLAGS = @SERVER_LDFLAGS@
+
 endif

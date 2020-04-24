@@ -144,7 +144,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 						]
 					],
 					'error_message' => 'Cannot add host prototype',
-					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists. '
+					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
 				]
 			]
 		];

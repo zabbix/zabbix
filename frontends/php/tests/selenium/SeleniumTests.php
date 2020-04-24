@@ -86,6 +86,7 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralValuemap.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralWorkperiod.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralInstallation.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
+require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
@@ -221,6 +222,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralWorkperiod');
 		$suite->addTestSuite('testFormAdministrationGeneralInstallation');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
+		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormConfigTriggerSeverity');

@@ -354,3 +354,4 @@ int	zbx_mock_str_to_family(const char *str)
 	fail_msg("Unknown family \"%s\"", str);
 	return AF_UNSPEC;
 }
+

@@ -36,6 +36,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	public function get(array $options) {
 		$hosts_fields = array_keys($this->getTableSchema('hosts')['fields']);
+		$output_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode'];
 		$link_fields = ['group_prototypeid', 'groupid', 'hostid', 'templateid'];
 		$group_fields = ['group_prototypeid', 'name', 'hostid', 'templateid'];
 		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
@@ -51,28 +52,18 @@ class CHostPrototype extends CHostBase {
 				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
 				'templateid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'tls_connect' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
-				'tls_accept' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])],
-				'tls_issuer' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'tls_subject' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'tls_psk_identity' =>		['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'tls_psk' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
 				'inventory_mode' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 			]],
 			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
 				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'tls_issuer' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'tls_subject' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'tls_psk_identity' =>		['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'tls_psk' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
 			]],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => 'inventory_mode,'.implode(',', $hosts_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => 'inventory_mode,'.implode(',', $output_fields), 'default' => $output_fields],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
 			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $link_fields), 'default' => null],
@@ -96,6 +87,10 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $output_fields;
+		}
 
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
@@ -1439,7 +1434,8 @@ class CHostPrototype extends CHostBase {
 
 		foreach ($update_macros as $hostid => $macros) {
 			foreach ($macros as $macro) {
-				if (array_key_exists($macro['macro'], $host_macros[$hostid])) {
+				if (array_key_exists($hostid, $host_macros)
+						&& array_key_exists($macro['macro'], $host_macros[$hostid])) {
 					$hostmacroid = $host_macros[$hostid][$macro['macro']];
 					$diff = array_diff($macro, $db_macros[$hostmacroid]);
 					unset($diff['hostid'], $diff['hostmacroid']);

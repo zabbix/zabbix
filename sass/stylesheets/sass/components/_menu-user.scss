@@ -12,7 +12,7 @@ $menu-user-icons: (
 		content: '';
 		width: 12px;
 		height: 12px;
-		background: url(../img/icon-sprite.svg) no-repeat;
+		background: url($sprite-path) no-repeat;
 	}
 }
 

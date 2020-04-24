@@ -87,9 +87,9 @@ if ($data['action']['filter']['conditions']) {
 		$condition_table->addRow(
 			[
 				$labelSpan,
-				getConditionDescription($condition['conditiontype'], $condition['operator'],
+				(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
 					$actionConditionStringValues[0][$cIdx], $condition['value2']
-				),
+				)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('javascript: removeCondition('.$i.');')
