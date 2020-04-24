@@ -4856,6 +4856,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'write_clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'proxy_dhistory' => [

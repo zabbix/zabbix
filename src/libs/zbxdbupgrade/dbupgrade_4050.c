@@ -1695,6 +1695,13 @@ static int	DBpatch_4050077(void)
 	return DBmodify_field_type("acknowledges", &field, NULL);
 }
 
+static int	DBpatch_4050078(void)
+{
+	const ZBX_FIELD	field = {"write_clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1773,5 +1780,6 @@ DBPATCH_ADD(4050074, 0, 1)
 DBPATCH_ADD(4050075, 0, 1)
 DBPATCH_ADD(4050076, 0, 1)
 DBPATCH_ADD(4050077, 0, 1)
+DBPATCH_ADD(4050078, 0, 1)
 
 DBPATCH_END()

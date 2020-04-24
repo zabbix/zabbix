@@ -1070,6 +1070,7 @@ FIELD		|state		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastlogsize	|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|write_clock	|t_time		|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|proxy_dhistory|id|0
@@ -1735,4 +1736,4 @@ FIELD		|contextname	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050077	|4050077
+ROW		|4050078	|4050078
