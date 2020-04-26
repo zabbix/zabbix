@@ -61,7 +61,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
+							'page' => 'zabbix.php?action=gui.edit',
 							'error' => 'Access denied'
 						],
 						// Login after logout.
@@ -110,7 +110,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
+							'page' => 'zabbix.php?action=gui.edit',
 							'error' => 'Access denied'
 						],
 						// Login after logout.
@@ -171,12 +171,12 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open Hosts page due access.
 						[
-							'page' => 'hosts.php?ddreset=1',
+							'page' => 'hosts.php',
 							'error' => 'Access denied'
 						],
 						// Couldn't open GUI page due access.
 						[
-							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
+							'page' => 'zabbix.php?action=gui.edit',
 							'error' => 'Access denied'
 						]
 					],
@@ -209,7 +209,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 //						// wait for ZBX-14774.
 //						// Redirect to HTTP login form and user is signed on hosts page.
 //						[
-//							'page' => 'hosts.php?ddreset=1',
+//							'page' => 'hosts.php',
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'Hosts'
 //						],
@@ -233,7 +233,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Redirect to HTTP login form and user is signed on GUI page.
 						[
-							'page' => 'zabbix.php?action=gui.edit&ddreset=1',
+							'page' => 'zabbix.php?action=gui.edit',
 							'action' => self::LOGIN_HTTP,
 							'target' => 'GUI'
 						]
@@ -317,7 +317,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 //						// Redirect to HTTP login form and user is signed on hosts page.
 //						// wait for ZBX-14774.
 //						[
-//							'page' => 'hosts.php?ddreset=1',
+//							'page' => 'hosts.php',
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'Hosts'
 //						],
@@ -371,7 +371,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 //						// wait for ZBX-14774.
 //						[
-//							'page' => 'hosts.php?ddreset=1',
+//							'page' => 'hosts.php',
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'hosts'
 //						],
@@ -590,7 +590,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	 * @param array $data	data array for HTTP settings setup.
 	 */
 	private function setHttpConfiguration($data) {
-		$this->page->login()->open('zabbix.php?action=authentication.edit&ddreset=1');
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
 		$this->assertPageTitle('Configuration of authentication');
 

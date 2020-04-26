@@ -1657,13 +1657,60 @@ static int	DBpatch_4050073(void)
 
 static int	DBpatch_4050074(void)
 {
+	int		i;
+	const char	*values[] = {
+			"web.latest.groupid", "web.latest.hostid", "web.latest.graphid", "web..groupid",
+			"web..hostid", "web.view.groupid", "web.view.hostid", "web.view.graphid",
+			"web.config.groupid", "web.config.hostid", "web.templates.php.groupid", "web.cm.groupid",
+			"web.httpmon.php.sort", "web.httpmon.php.sortorder", "web.avail_report.0.hostid",
+			"web.avail_report.0.groupid", "web.graphs.filter.to", "web.graphs.filter.from", "web.graphs.filter.active"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='%s'", values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4050075(void)
+{
+	return DBdrop_field("config", "dropdown_first_entry");
+}
+
+static int	DBpatch_4050076(void)
+{
+	return DBdrop_field("config", "dropdown_first_remember");
+}
+
+static int	DBpatch_4050077(void)
+{
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("acknowledges", &field, NULL);
+}
+
+static int	DBpatch_4050078(void)
+{
+	const ZBX_FIELD	field = {"write_clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
+static int	DBpatch_4050079(void)
+{
 	const ZBX_FIELD	old_field = {"script", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 	const ZBX_FIELD	field = {"script", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("media_type", &field, &old_field);
 }
 
-static int	DBpatch_4050075(void)
+static int	DBpatch_4050080(void)
 {
 	const ZBX_FIELD	old_field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 	const ZBX_FIELD	field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
@@ -1671,7 +1718,7 @@ static int	DBpatch_4050075(void)
 	return DBmodify_field_type("auditlog_details", &field, &old_field);
 }
 
-static int	DBpatch_4050076(void)
+static int	DBpatch_4050081(void)
 {
 	const ZBX_FIELD	old_field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 	const ZBX_FIELD	field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
@@ -1756,5 +1803,10 @@ DBPATCH_ADD(4050073, 0, 1)
 DBPATCH_ADD(4050074, 0, 1)
 DBPATCH_ADD(4050075, 0, 1)
 DBPATCH_ADD(4050076, 0, 1)
+DBPATCH_ADD(4050077, 0, 1)
+DBPATCH_ADD(4050078, 0, 1)
+DBPATCH_ADD(4050079, 0, 1)
+DBPATCH_ADD(4050080, 0, 1)
+DBPATCH_ADD(4050081, 0, 1)
 
 DBPATCH_END()

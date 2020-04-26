@@ -381,6 +381,8 @@ static void	elastic_writer_release(void)
 static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 {
 	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	CURLoption		opt;
+	CURLcode		err;
 
 	elastic_writer_init();
 
@@ -389,22 +391,42 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL session");
 		return;
 	}
-	curl_easy_setopt(data->handle, CURLOPT_URL, data->post_url);
-	curl_easy_setopt(data->handle, CURLOPT_POST, 1L);
-	curl_easy_setopt(data->handle, CURLOPT_POSTFIELDS, data->buf);
-	curl_easy_setopt(data->handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
-	curl_easy_setopt(data->handle, CURLOPT_WRITEDATA, &page_w[hist->value_type].page);
-	curl_easy_setopt(data->handle, CURLOPT_FAILONERROR, 1L);
-	curl_easy_setopt(data->handle, CURLOPT_ERRORBUFFER, page_w[hist->value_type].errbuf);
+
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_URL, data->post_url)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_POST, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_POSTFIELDS, data->buf)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_WRITEFUNCTION,
+					curl_write_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_WRITEDATA,
+					&page_w[hist->value_type].page)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_FAILONERROR, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ERRORBUFFER,
+					page_w[hist->value_type].errbuf)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+
 	*page_w[hist->value_type].errbuf = '\0';
-	curl_easy_setopt(data->handle, CURLOPT_PRIVATE, &page_w[hist->value_type]);
+
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PRIVATE, &page_w[hist->value_type])))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+
 	page_w[hist->value_type].page.offset = 0;
+
 	if (0 < page_w[hist->value_type].page.alloc)
 		*page_w[hist->value_type].page.data = '\0';
 
 	curl_multi_add_handle(writer.handle, data->handle);
 
 	zbx_vector_ptr_append(&writer.ifaces, hist);
+
+	return;
+out:
+	elastic_close(hist);
 }
 
 /************************************************************************************
@@ -420,13 +442,15 @@ static int	elastic_writer_flush(void)
 	int			i, running, previous, msgnum;
 	CURLMsg			*msg;
 	zbx_vector_ptr_t	retries;
+	CURLcode		err;
+	int			ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* The writer might be uninitialized only if the history */
 	/* was already flushed. In that case, return SUCCEED */
 	if (0 == writer.initialized)
-		return SUCCEED;
+		goto end;
 
 	zbx_vector_ptr_create(&retries);
 
@@ -437,7 +461,13 @@ static int	elastic_writer_flush(void)
 		zbx_history_iface_t	*hist = (zbx_history_iface_t *)writer.ifaces.values[i];
 		zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
 
-		(void)curl_easy_setopt(data->handle, CURLOPT_HTTPHEADER, curl_headers);
+		if (CURLE_OK != (err = curl_easy_setopt(data->handle, CURLOPT_HTTPHEADER, curl_headers)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)CURLOPT_HTTPHEADER,
+					curl_easy_strerror(err));
+			ret = FAIL;
+			goto clean;
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "sending %s", data->buf);
 	}
@@ -482,14 +512,13 @@ try_again:
 				else
 				{
 					char		http_status[MAX_STRING_LEN];
-					long int	err;
-					CURLcode	curl_err;
+					long int	response_code;
 
-					if (CURLE_OK == (curl_err = curl_easy_getinfo(msg->easy_handle,
-							CURLINFO_RESPONSE_CODE, &err)))
+					if (CURLE_OK == curl_easy_getinfo(msg->easy_handle,
+							CURLINFO_RESPONSE_CODE, &response_code))
 					{
 						zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld",
-								err);
+								response_code);
 					}
 					else
 					{
@@ -552,16 +581,17 @@ try_again:
 		sleep(ZBX_HISTORY_STORAGE_DOWN / 1000);
 		goto try_again;
 	}
-
+clean:
 	curl_slist_free_all(curl_headers);
 
 	zbx_vector_ptr_destroy(&retries);
 
 	elastic_writer_release();
 
+end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************************************************
@@ -619,6 +649,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 	struct zbx_json		query;
 	struct curl_slist	*curl_headers = NULL;
 	char			*scroll_id = NULL, *scroll_query = NULL, errbuf[CURL_ERROR_SIZE];
+	CURLoption		opt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -631,7 +662,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		return FAIL;
 	}
 
-	zbx_snprintf_alloc(&data->post_url, &url_alloc, &url_offset, "%s/%s*/values/_search?scroll=10s", data->base_url,
+	zbx_snprintf_alloc(&data->post_url, &url_alloc, &url_offset, "%s/%s*/_search?scroll=10s", data->base_url,
 			value_type_str[hist->value_type]);
 
 	/* prepare the json query for elasticsearch, apply ranges if needed */
@@ -679,13 +710,18 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 
 	curl_headers = curl_slist_append(curl_headers, "Content-Type: application/json");
 
-	curl_easy_setopt(data->handle, CURLOPT_URL, data->post_url);
-	curl_easy_setopt(data->handle, CURLOPT_POSTFIELDS, query.buffer);
-	curl_easy_setopt(data->handle, CURLOPT_WRITEFUNCTION, curl_write_cb);
-	curl_easy_setopt(data->handle, CURLOPT_WRITEDATA, &page_r);
-	curl_easy_setopt(data->handle, CURLOPT_HTTPHEADER, curl_headers);
-	curl_easy_setopt(data->handle, CURLOPT_FAILONERROR, 1L);
-	curl_easy_setopt(data->handle, CURLOPT_ERRORBUFFER, errbuf);
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_URL, data->post_url)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_POSTFIELDS, query.buffer)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_WRITEFUNCTION,
+					curl_write_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_WRITEDATA, &page_r)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_FAILONERROR, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ERRORBUFFER, errbuf)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "sending query to %s; post data: %s", data->post_url, query.buffer);
 
@@ -700,7 +736,12 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 	url_offset = 0;
 	zbx_snprintf_alloc(&data->post_url, &url_alloc, &url_offset, "%s/_search/scroll", data->base_url);
 
-	curl_easy_setopt(data->handle, CURLOPT_URL, data->post_url);
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, CURLOPT_URL, data->post_url)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)CURLOPT_URL,
+				curl_easy_strerror(err));
+		goto out;
+	}
 
 	total = (0 == count ? -1 : count);
 
@@ -766,7 +807,12 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		zbx_snprintf_alloc(&scroll_query, &scroll_alloc, &scroll_offset,
 				"{\"scroll\":\"10s\",\"scroll_id\":\"%s\"}\n", ZBX_NULL2EMPTY_STR(scroll_id));
 
-		curl_easy_setopt(data->handle, CURLOPT_POSTFIELDS, scroll_query);
+		if (CURLE_OK != (err = curl_easy_setopt(data->handle, CURLOPT_POSTFIELDS, scroll_query)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)CURLOPT_POSTFIELDS,
+					curl_easy_strerror(err));
+			break;
+		}
 
 		page_r.offset = 0;
 		*errbuf = '\0';
@@ -785,9 +831,16 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		zbx_snprintf_alloc(&data->post_url, &url_alloc, &url_offset, "%s/_search/scroll/%s", data->base_url,
 				scroll_id);
 
-		curl_easy_setopt(data->handle, CURLOPT_URL, data->post_url);
-		curl_easy_setopt(data->handle, CURLOPT_POSTFIELDS, NULL);
-		curl_easy_setopt(data->handle, CURLOPT_CUSTOMREQUEST, "DELETE");
+		if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_URL, data->post_url)) ||
+				CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_POSTFIELDS, NULL)) ||
+				CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_CUSTOMREQUEST, "DELETE")))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt,
+					curl_easy_strerror(err));
+			ret = FAIL;
+			goto out;
+		}
+
 
 		zabbix_log(LOG_LEVEL_DEBUG, "elasticsearch closing scroll %s", data->post_url);
 
@@ -839,7 +892,6 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 	zbx_json_addobject(&json_idx, "index");
 	zbx_json_addstring(&json_idx, "_index", value_type_str[hist->value_type], ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json_idx, "_type", "values", ZBX_JSON_TYPE_STRING);
 
 	if (1 == CONFIG_HISTORY_STORAGE_PIPELINES)
 	{

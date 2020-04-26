@@ -18,7 +18,7 @@ $menu-main-icons: (
 		content: '';
 		width: 24px;
 		height: 24px;
-		background: url(../img/icon-sprite.svg) no-repeat;
+		background: url($sprite-path) no-repeat;
 
 		@if $menu-main-icons-opacity < 1 {
 			opacity: $menu-main-icons-opacity;
@@ -111,7 +111,7 @@ $menu-main-icons: (
 					right: 14px;
 					width: 6px;
 					height: 4px;
-					background: url(../img/icon-sprite.svg) no-repeat $menu-main-arrow-bg-position;
+					background: url($sprite-path) no-repeat $menu-main-arrow-bg-position;
 					transform: rotate(0deg);
 					@if $menu-main-icons-opacity < 1 {
 						opacity: $menu-main-icons-opacity;

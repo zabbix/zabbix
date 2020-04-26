@@ -64,7 +64,7 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if ctx == nil || ctx.ClientID() <= agent.ActiveChecksClientID {
+	if ctx == nil || ctx.ClientID() <= agent.MaxBuiltinClientID {
 		return nil, fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, key)
 	}
 	meta := ctx.Meta()

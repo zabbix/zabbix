@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Configuration of services');
 $page['file'] = 'services.php';
-$page['scripts'] = ['class.calendar.js'];
+$page['scripts'] = ['class.calendar.js', 'multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

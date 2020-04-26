@@ -83,9 +83,9 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		SET_UI64_RESULT(result, DBget_row_count(param1));
 	}
-	else if (0 == strcmp(param1, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess"] */
+	else if (0 == strcmp(param1, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
 	{
-		int	lastaccess;
+		int	value, res;
 		char	*error = NULL;
 
 		/* this item is always processed by server */
@@ -97,19 +97,28 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 
 		param2 = get_rparam(request, 2);
-		if ('\0' == *param2 || 0 != strcmp(param2, "lastaccess"))
+
+		if (0 == strcmp(param2, "lastaccess"))
+		{
+			res = DBget_proxy_lastaccess(get_rparam(request, 1), &value, &error);
+		}
+		else if (0 == strcmp(param2, "delay"))
+		{
+			res = DCget_proxy_delay_by_name(get_rparam(request, 1), &value, &error);
+		}
+		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
 		}
 
-		if (FAIL == DBget_proxy_lastaccess(get_rparam(request, 1), &lastaccess, &error))
+		if (SUCCEED != res)
 		{
 			SET_MSG_RESULT(result, error);
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, lastaccess);
+		SET_UI64_RESULT(result, value);
 	}
 	else if (0 == strcmp(param1, "vcache"))
 	{

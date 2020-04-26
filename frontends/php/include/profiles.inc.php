@@ -254,12 +254,6 @@ function update_config($config) {
 		if (array_key_exists('default_theme', $config)) {
 			$msg[] = _s('Default theme "%1$s".', $config['default_theme']);
 		}
-		if (array_key_exists('dropdown_first_entry', $config)) {
-			$msg[] = _s('Dropdown first entry "%1$s".', $config['dropdown_first_entry']);
-		}
-		if (array_key_exists('dropdown_first_remember', $config)) {
-			$msg[] = _s('Dropdown remember selected "%1$s".', $config['dropdown_first_remember']);
-		}
 		if (array_key_exists('max_in_table', $config)) {
 			$msg[] = _s('Max count of elements to show inside table cell "%1$s".', $config['max_in_table']);
 		}

@@ -1,0 +1,200 @@
+---
+test case: Expand '{1} < {$A}' with {$A}=1
+in:
+  macros:
+    - name: '{$A}'
+      value: 1
+  expression: '{1} < {$A}'
+out:
+  expression: '{1} < 1'
+---
+test case: Expand '{1} < "{$A}"' with {$A}=1
+in:
+  macros:
+    - name: '{$A}'
+      value: 1
+  expression: '{1} < "{$A}"'
+out:
+  expression: '{1} < "1"'
+---
+test case: Expand '{1} < {$A}'
+in:
+  macros: []
+  expression: '{1} < {$A}'
+out:
+  expression: '{1} < {$A}'
+---
+test case: Expand '{1} < {$A}' with {$A}=x
+in:
+  macros:
+    - name: '{$A}'
+      value: x
+  expression: '{1} < {$A}'
+out:
+  expression: '{1} < "x"'
+---
+test case: Expand '{1} < {$A}' with {$A}="x"
+in:
+  macros:
+    - name: '{$A}'
+      value: '"x"'
+  expression: '{1} < {$A}'
+out:
+  expression: '{1} < "\"x\""'
+---
+test case: Expand '{1} < "{$A}"' with {$A}="x"
+in:
+  macros:
+    - name: '{$A}'
+      value: '"x"'
+  expression: '{1} < "{$A}"'
+out:
+  expression: '{1} < "\"x\""'
+---
+test case: Expand '{1} < "{$A}"'
+in:
+  macros: []
+  expression: '{1} < "{$A}"'
+out:
+  expression: '{1} < "{$A}"'
+---
+test case: Expand '{1} = "x" and {2} < {$A}' with {$A}="x"
+in:
+  macros:
+    - name: '{$A}'
+      value: '"x"'
+  expression: '{1} = "x" and {2} < {$A}'
+out:
+  expression: '{1} = "x" and {2} < "\"x\""'
+---
+test case: Expand '{1} < "{$A}{$B}"' with {$A}=1,'{$B}'="x"
+in:
+  macros:
+    - name: '{$A}'
+      value: 1
+    - name: '{$B}'
+      value: '"x"'
+  expression: '{1} < "{$A}{$B}"'
+out:
+  expression: '{1} < "1\"x\""'
+---
+test case: Expand '{1} < "{$A}{$B}"' with {$A}=1,'{$B}'=2
+in:
+  macros:
+    - name: '{$A}'
+      value: 1
+    - name: '{$B}'
+      value: 2
+  expression: '{1} < "{$A}{$B}"'
+out:
+  expression: '{1} < "12"'
+---
+test case: Expand '{1} < "{$A}{$B}"' with {$A}="x",'{$B}'="y"
+in:
+  macros:
+    - name: '{$A}'
+      value: '"x"'
+    - name: '{$B}'
+      value: '"y"'
+  expression: '{1} < "{$A}{$B}"'
+out:
+  expression: '{1} < "\"x\"\"y\""'
+---
+test case: Expand '{1} < {$A}{$B}' with {$A}="x",'{$B}'="y"
+in:
+  macros:
+    - name: '{$A}'
+      value: '"x"'
+    - name: '{$B}'
+      value: '"y"'
+  expression: '{1} < {$A}{$B}'
+out:
+  expression: '{1} < "\"x\"""\"y\""'
+---
+test case: Expand '{1} < {$A}{$B}' with {$A}=1,'{$B}'=0
+in:
+  macros:
+    - name: '{$A}'
+      value: 1
+    - name: '{$B}'
+      value: 0
+  expression: '{1} < {$A}{$B}'
+out:
+  expression: '{1} < 10'
+---
+test case: Expand '{1} < "\"{$A}\"{$B}\""' with {$A}=\",'{$B}'=\
+in:
+  macros:
+    - name: '{$A}'
+      value: '\"'
+    - name: '{$B}'
+      value: '\'
+  expression: '{1} < "\"{$A}\"{$B}\""'
+out:
+  expression: '{1} < "\"\\\"\"\\\""'
+---
+test case: Expand '{1} < " \" {$A}  \"  {$B}  \"  " and {$A}<>"\"{$B}" and " {$A} " = " {$A} "' with {$A}=",'{$B}'=\\
+in:
+  macros:
+    - name: '{$A}'
+      value: '"'
+    - name: '{$B}'
+      value: '\\'
+  expression: '{1} < " \" {$A}  \"  {$B}  \"  " and {$A}<>"\"{$B}" and " {$A} " = " {$A} "'
+out:
+  expression: '{1} < " \" \"  \"  \\\\  \"  " and "\""<>"\"\\\\" and " \" " = " \" "'
+---
+test case: Expand '{1} < {$A}' with {$A}=""
+in:
+  macros:
+    - name: '{$A}'
+      value: ''
+  expression: '{1} < {$A}'
+out:
+  expression: '{1} < ""'
+---
+test case: Expand '{1} < "{$A}"' with {$A}=""
+in:
+  macros:
+    - name: '{$A}'
+      value: ''
+  expression: '{1} < "{$A}"'
+out:
+  expression: '{1} < ""'
+---
+test case: Expand '{1} = {$A:"x:\"1\""} or {2} = {$A:"y"}' with {$A:"x:\"1\""}=ax, {$A}=a
+in:
+  macros:
+    - name: '{$A:"x:\"1\""}'
+      value: ax
+    - name: '{$A}'
+      value: a
+  expression: '{1} = {$A:"x:\"1\""} or {2} = {$A:"y"}'
+out:
+  expression: '{1} = "ax" or {2} = "a"'
+---
+test case: Expand '{1} < {$A:"x:\"1\""}'
+in:
+  macros: []
+  expression: '{1} < {$A:"x:\"1\""}'
+out:
+  expression: '{1} < {$A:"x:\"1\""}'
+---
+test case: Expand '{2000} < {$A}' with {$A}=2e+3
+in:
+  macros:
+    - name: '{$A}'
+      value: 2e+3
+  expression: '{2000} < {$A}'
+out:
+  expression: '{2000} < 2e+3'
+---
+test case: Expand '{1} < "\\\"a\"" and {1} = {$A}' with {$A}="b"
+in:
+  macros:
+    - name: '{$A}'
+      value: '"b"'
+  expression: '{1} < "\\\"a\"" and {1} = {$A}'
+out:
+  expression: '{1} < "\\\"a\"" and {1} = "\"b\""'
+...

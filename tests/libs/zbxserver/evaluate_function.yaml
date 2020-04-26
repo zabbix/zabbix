@@ -1,0 +1,1496 @@
+---
+test case: Evaluate last() <- 0.1, 0.2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.2
+---
+test case: Evaluate last(#2) <- 0.1, 0.2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: '#2'
+out:
+  return: SUCCEED
+  value: 0.1
+---
+test case: Evaluate last() <- 'xyz'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: xyz
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: ''
+out:
+  return: SUCCEED
+  value: '"xyz"'
+---
+test case: Evaluate last() <- '😓...'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value:    
+        page: 😓
+        pages: 20000
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: ''
+out:
+  return: SUCCEED
+  value: 
+     header: '"'
+     page: 😓
+     pages: 20000
+     footer: '"'
+---
+test case: Evaluate last() <- '123'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: 123
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: ''
+out:
+  return: SUCCEED
+  value: '"123"'
+---
+test case: Evaluate last() <- ' a b '
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: ' a b '
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: ''
+out:
+  return: SUCCEED
+  value: '" a b "'
+---
+test case: Evaluate last()  <- '\"c:\\\"'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: '"c:\"'
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: last
+  params: ''
+out:
+  return: SUCCEED
+  value: '"\"c:\\\""'
+---
+test case: Evaluate abschange() <- 0.1, 0.2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: abschange
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.1
+---
+test case: Evaluate abschange() <- 10, 7
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 10
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 7
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: abschange
+  params: ''
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate abschange() <- 'a', 'b'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: a
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: b
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: abschange
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate abschange() <- 'x', 'x'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: x
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: x
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: abschange
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate abschange() <- @log 'a', 'b'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: b
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: abschange
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate abschange() <- @log 'x', 'x'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: x
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: x
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: abschange
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate avg(#2) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: avg
+  params: '#2'
+out:
+  return: SUCCEED
+  value: 4.5
+---
+test case: Evaluate avg(3m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: avg
+  params: '3m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate avg(#2,1m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: avg
+  params: '#2,1m'
+out:
+  return: SUCCEED
+  value: 3.5
+---
+test case: Evaluate band(#1,1) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: band
+  params: '#1,1'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate band(#2,1) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: band
+  params: '#2,1'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate band(2m,2,1m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: band
+  params: '#2,2,1m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate change() <- 0.1, 0.2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.1
+---
+test case: Evaluate change() <- 10, 7
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 10
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 7
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: -3
+---
+test case: Evaluate change() <- 'a', 'b'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: a
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: b
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate change() <- 'x', 'x'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: x
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: x
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate change() <- @log 'a', 'b'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: b
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate change() <- @log 'x', 'x'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: x
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: x
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: change
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate count(#3,4,ge) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: count
+  params: '#3,4,ge'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate count(#3,o,like) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: Five
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: count
+  params: '5m,"o",like'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate count(#3,o$,regexp) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: Five
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: count
+  params: '5m,"o$",regexp'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate count(#3,o,iregexp) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: Five
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: count
+  params: '5m,"o",iregexp'
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate count(#3,1/3,band) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: count
+  params: '5m,1/3,band'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate count(#3,2/3,band) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: count
+  params: '5m,2/3,band'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate date() 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-12-23 12:34:56.000000000 +00:00
+  function: date
+  params: ''
+out:
+  return: SUCCEED
+  value: 20171223
+---
+test case: Evaluate dayofmonth() 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-12-23 12:34:53.000000000 +00:00
+  function: dayofmonth
+  params: ''
+out:
+  return: SUCCEED
+  value: 23
+---
+test case: Evaluate dayofweek() 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2020-03-17 12:34:53.000000000 +00:00
+  function: dayofweek
+  params: ''
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate time() 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-12-23 12:34:56.000000000 +00:00
+  function: time
+  params: ''
+out:
+  return: SUCCEED
+  value: 123456
+---
+test case: Evaluate delta(#4) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: delta
+  params: '#4'
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate delta(4m,1m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: delta
+  params: '4m,1m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate diff() <- 0.1, 0.2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: diff
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate diff() <- 0.123, 0.123
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.123
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.123
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: diff
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate diff() <- 10, 7
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 10
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 7
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: diff
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate diff() <- 1234567890, 1234567890
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1234567890
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 1234567890
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: diff
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate diff() <- 'a', 'b'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: a
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: b
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: diff
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate diff() <- 'x', 'x'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: x
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: x
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: diff
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate diff() <- @log 'a', 'b'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: b
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: diff
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate diff() <- @log 'x', 'x'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: x
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: x
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: diff
+  params: ''
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate forecast(#5,,1h) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: forecast
+  params: '#5,,1h'
+out:
+  return: SUCCEED
+  value: 65
+---
+test case: Evaluate forecast(#5,1h,1h) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: forecast
+  params: '#5,1h,1h'
+out:
+  return: SUCCEED
+  value: -1
+---
+test case: Evaluate fuzzytime(1) < @uint64
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: fuzzytime
+  params: '1'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case:  Evaluate fuzzytime(1) < @float 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1.0
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: fuzzytime
+  params: '1'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate iregexp(^o,#5) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: iregexp
+  params: '^o,#5'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate regexp(^o,#5) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: regexp
+  params: '^o,#5'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate str(o,#5) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: str
+  params: 'o,#5'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate logeventid(^12)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source:
+      logeventid: 1234
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: logeventid
+  params: '^12'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate logeventid(^34)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source:
+      logeventid: 1234
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: logeventid
+  params: '^34'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate logseverity()
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source:
+      logeventid: 1234
+      severity: 4
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: logseverity
+  params: ''
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate logsource('(Application|System)') <- Application
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source: Application
+      logeventid: 1234
+      severity: 4
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: logsource
+  params: '"(Application|System)"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate logsource("(Application|System)") <- Security
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: a
+      source: Security
+      logeventid: 1234
+      severity: 4
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: logsource
+  params: '"(Application|System)"'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate max(5m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: max
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 5
+---
+test case: Evaluate max(5m,2m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: max
+  params: '5m,2m'
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate min(4m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: min
+  params: '4m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate min(4m,2m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: min
+  params: '4m,2m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate nodata(1m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: nodata
+  params: '1m'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate nodata(5m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: nodata
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate now() 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: now
+  params: ''
+out:
+  return: SUCCEED
+  value: 1484042700
+---
+test case: Evaluate percentile(5m,,100) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: percentile
+  params: '5m,,100'
+out:
+  return: SUCCEED
+  value: 5
+---
+test case: Evaluate percentile(5m,,50) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: percentile
+  params: '5m,,50'
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate prev() <- 0.1, 0.2
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: 0.2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: prev
+  params: ''
+out:
+  return: SUCCEED
+  value: 0.1
+---
+test case: Evaluate strlen() 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: Five
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: strlen
+  params: ''
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate strlen(1m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: Five
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: strlen
+  params: '1m'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate strlen(,2m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: One
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: Two
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: Three
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: Four
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: Five
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: strlen
+  params: ',2m'
+out:
+  return: SUCCEED
+  value: 5
+---
+test case: Evaluate strlen() <- 😓
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: 😓
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: strlen
+  params: ''
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate strlen() <- @log
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: xyz
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: strlen
+  params: ''
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate sum(#4) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: sum
+  params: '#4'
+out:
+  return: SUCCEED
+  value: 14
+---
+test case: Evaluate sum(4m,1m) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: sum
+  params: '4m,1m'
+out:
+  return: SUCCEED
+  value: 10
+---
+test case: Evaluate time()
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-12-23 12:34:56.000000000 +00:00
+  function: time
+  params: ''
+out:
+  return: SUCCEED
+  value: 123456
+---
+test case: Evaluate timeleft(5m,,65) 
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,,65'
+out:
+  return: SUCCEED
+  value: 3600
+...
+

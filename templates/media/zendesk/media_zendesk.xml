@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-02T11:20:56Z</date>
+    <date>2020-04-20T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Zendesk</name>
@@ -166,6 +166,10 @@
             url = Zendesk.params.url + query,&#13;
             request = new CurlHttpRequest();&#13;
 &#13;
+        if (typeof Zendesk.HTTPProxy === 'string' &amp;&amp; Zendesk.HTTPProxy.trim() !== '') {&#13;
+            request.SetProxy(Zendesk.HTTPProxy);&#13;
+        }&#13;
+&#13;
         request.AddHeader('Content-Type: application/json');&#13;
         request.AddHeader('Authorization: Basic ' + btoa(Zendesk.params.token));&#13;
 &#13;
@@ -273,8 +277,7 @@ try {&#13;
             {name: 'resolved', color: '#009900'},&#13;
             {name: 'default', color: '#000000'}&#13;
         ],&#13;
-        priority,&#13;
-        color;&#13;
+        priority;&#13;
 &#13;
     Object.keys(params)&#13;
         .forEach(function (key) {&#13;
@@ -336,10 +339,10 @@ try {&#13;
         params.event_nseverity = '6';&#13;
     }&#13;
 &#13;
-    color = severities[params.event_nseverity].color;&#13;
     priority = params['severity_' + severities[params.event_nseverity].name] || severities[7].name;&#13;
 &#13;
     Zendesk.setParams(zendesk);&#13;
+    Zendesk.HTTPProxy = params.HTTPProxy;&#13;
 &#13;
     // Create issue for non trigger-based events.&#13;
     if (params.event_source !== '0' &amp;&amp; params.event_value !== '0') {&#13;
@@ -420,19 +423,19 @@ Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
 Operational data: {EVENT.OPDATA}&#13;
 Original problem ID: {EVENT.ID}&#13;
-{TRIGGER.URL}&#13;</message>
+{TRIGGER.URL}</message>
                 </message_template>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>RECOVERY</operation_mode>
                     <subject>{EVENT.NAME}</subject>
-                    <message>Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+                    <message>Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
 Operational data: {EVENT.OPDATA}&#13;
 Original problem ID: {EVENT.ID}&#13;
-{TRIGGER.URL}&#13;</message>
+{TRIGGER.URL}</message>
                 </message_template>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
@@ -441,7 +444,7 @@ Original problem ID: {EVENT.ID}&#13;
                     <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
 {EVENT.UPDATE.MESSAGE}&#13;
 &#13;
-Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.&#13;</message>
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.</message>
                 </message_template>
                 <message_template>
                     <event_source>DISCOVERY</event_source>
@@ -457,7 +460,7 @@ Device uptime: {DISCOVERY.DEVICE.UPTIME}&#13;
 Device service name: {DISCOVERY.SERVICE.NAME}&#13;
 Device service port: {DISCOVERY.SERVICE.PORT}&#13;
 Device service status: {DISCOVERY.SERVICE.STATUS}&#13;
-Device service uptime: {DISCOVERY.SERVICE.UPTIME}&#13;</message>
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
                 </message_template>
                 <message_template>
                     <event_source>AUTOREGISTRATION</event_source>
@@ -465,7 +468,7 @@ Device service uptime: {DISCOVERY.SERVICE.UPTIME}&#13;</message>
                     <subject>Autoregistration: {HOST.HOST}</subject>
                     <message>Host name: {HOST.HOST}&#13;
 Host IP: {HOST.IP}&#13;
-Agent port: {HOST.PORT}&#13;</message>
+Agent port: {HOST.PORT}</message>
                 </message_template>
                 <message_template>
                     <event_source>INTERNAL</event_source>
@@ -475,7 +478,7 @@ Agent port: {HOST.PORT}&#13;</message>
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
 Operational data: {EVENT.OPDATA}&#13;
-Original problem ID: {EVENT.ID}&#13;</message>
+Original problem ID: {EVENT.ID}</message>
                 </message_template>
             </message_templates>
         </media_type>

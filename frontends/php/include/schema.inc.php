@@ -2530,18 +2530,6 @@ return [
 				'length' => 128,
 				'default' => '',
 			],
-			'dropdown_first_entry' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
-			'dropdown_first_remember' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
 			'discovery_groupid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -4868,6 +4856,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'write_clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'proxy_dhistory' => [
@@ -5106,7 +5100,7 @@ return [
 			'message' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			],
 			'action' => [

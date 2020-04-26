@@ -175,8 +175,9 @@ typedef struct
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT | ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY |	\
 		ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK)
 
-	zbx_uint64_t		flags;
-	char			inventory_mode;
+	zbx_uint64_t			flags;
+	char				inventory_mode;
+	const struct zbx_json_parse	*jp_row;
 }
 zbx_lld_host_t;
 
@@ -697,6 +698,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host->flags |= ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
+	host->jp_row = jp_row;
 	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)host);
@@ -1631,7 +1633,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_hostmacros_get                                               *
+ * Function: lld_masterhostmacros_get                                         *
  *                                                                            *
  * Purpose: retrieve list of host macros which should be present on the each  *
  *          discovered host                                                   *
@@ -1639,7 +1641,7 @@ out:
  * Parameters: hostmacros - [OUT] list of host macros                         *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostmacros)
+static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostmacros)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1666,6 +1668,88 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: macro_str_compare_func                                           *
+ *                                                                            *
+ * Purpose: compare the name of host macros for search in vector              *
+ *                                                                            *
+ * Parameters: d1 - [IN] first zbx_lld_hostmacro_t                            *
+ *             d2 - [IN] second zbx_lld_hostmacro_t                           *
+ *                                                                            *
+ * Return value: 0 if name of macros are equal                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_str_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_hostmacro_t *hostmacro1 = *(const zbx_lld_hostmacro_t **)d1;
+	const zbx_lld_hostmacro_t *hostmacro2 = *(const zbx_lld_hostmacro_t **)d2;
+
+	return strcmp(hostmacro1->macro, hostmacro2->macro);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_hostmacros_get                                               *
+ *                                                                            *
+ * Purpose: retrieve list of host macros which should be present on the each  *
+ *          discovered host                                                   *
+ *                                                                            *
+ * Parameters: parent_hostid    - [IN] host prototype id                      *
+ *             masterhostmacros - [IN] list of master host macros             *
+ *             hostmacros       - [OUT] list of host macros                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *masterhostmacros,
+		zbx_vector_ptr_t *hostmacros)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_lld_hostmacro_t	*hostmacro;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	result = DBselect(
+			"select hm.macro,hm.value,hm.description,hm.type"
+			" from hostmacro hm"
+			" where hm.hostid=" ZBX_FS_UI64,
+			parent_hostid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
+
+		hostmacro->macro = zbx_strdup(NULL, row[0]);
+		hostmacro->value = zbx_strdup(NULL, row[1]);
+		hostmacro->description = zbx_strdup(NULL, row[2]);
+		ZBX_STR2UCHAR(hostmacro->type, row[3]);
+
+		zbx_vector_ptr_append(hostmacros, hostmacro);
+	}
+	DBfree_result(result);
+
+	for (i = 0; i < masterhostmacros->values_num; i++)
+	{
+		const zbx_lld_hostmacro_t	*masterhostmacro;
+
+		if (FAIL != zbx_vector_ptr_search(hostmacros, masterhostmacros->values[i], macro_str_compare_func))
+			continue;
+
+		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
+
+		masterhostmacro = (const zbx_lld_hostmacro_t *)masterhostmacros->values[i];
+		hostmacro->macro = zbx_strdup(NULL, masterhostmacro->macro);
+		hostmacro->value = zbx_strdup(NULL, masterhostmacro->value);
+		hostmacro->description = zbx_strdup(NULL, masterhostmacro->description);
+		hostmacro->type = masterhostmacro->type;
+
+		zbx_vector_ptr_append(hostmacros, hostmacro);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1723,7 +1807,8 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
  *                                      deleted                               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts)
+static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
+		const zbx_vector_ptr_t *lld_macros)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1756,6 +1841,8 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 			hostmacro->description = zbx_strdup(NULL,
 					((zbx_lld_hostmacro_t *)hostmacros->values[j])->description);
 			hostmacro->flags = 0x00;
+			substitute_lld_macros(&hostmacro->value, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&hostmacro->description, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
 
 			zbx_vector_ptr_append(&host->new_hostmacros, hostmacro);
 		}
@@ -3398,7 +3485,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_vector_ptr_t	hosts, group_prototypes, groups, interfaces, hostmacros;
+	zbx_vector_ptr_t	hosts, group_prototypes, groups, interfaces, masterhostmacros, hostmacros;
 	zbx_vector_uint64_t	groupids;		/* list of host groups which should be added */
 	zbx_vector_uint64_t	del_hostgroupids;	/* list of host groups which should be deleted */
 	zbx_uint64_t		proxy_hostid;
@@ -3446,10 +3533,11 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_vector_ptr_create(&groups);
 	zbx_vector_uint64_create(&del_hostgroupids);
 	zbx_vector_ptr_create(&interfaces);
+	zbx_vector_ptr_create(&masterhostmacros);
 	zbx_vector_ptr_create(&hostmacros);
 
 	lld_interfaces_get(lld_ruleid, &interfaces);
-	lld_hostmacros_get(lld_ruleid, &hostmacros);
+	lld_masterhostmacros_get(lld_ruleid, &masterhostmacros);
 
 	result = DBselect(
 			"select h.hostid,h.host,h.name,h.status,hi.inventory_mode"
@@ -3485,6 +3573,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 		lld_group_prototypes_get(parent_hostid, &group_prototypes);
 		lld_groups_get(parent_hostid, &groups);
+		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);
 
 		for (i = 0; i < lld_rows->values_num; i++)
 		{
@@ -3505,7 +3594,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		lld_hostgroups_make(&groupids, &hosts, &groups, &del_hostgroupids);
 		lld_templates_make(parent_hostid, &hosts);
 
-		lld_hostmacros_make(&hostmacros, &hosts);
+		lld_hostmacros_make(&hostmacros, &hosts, lld_macro_paths);
 
 		lld_groups_save(&groups, &group_prototypes);
 		lld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
@@ -3518,6 +3607,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		lld_hosts_remove(&hosts, lifetime, lastcheck);
 		lld_groups_remove(&groups, lifetime, lastcheck);
 
+		zbx_vector_ptr_clear_ext(&hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
 		zbx_vector_ptr_clear_ext(&groups, (zbx_clean_func_t)lld_group_free);
 		zbx_vector_ptr_clear_ext(&group_prototypes, (zbx_clean_func_t)lld_group_prototype_free);
 		zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)lld_host_free);
@@ -3527,10 +3617,11 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	}
 	DBfree_result(result);
 
-	zbx_vector_ptr_clear_ext(&hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
+	zbx_vector_ptr_clear_ext(&masterhostmacros, (zbx_clean_func_t)lld_hostmacro_free);
 	zbx_vector_ptr_clear_ext(&interfaces, (zbx_clean_func_t)lld_interface_free);
 
 	zbx_vector_ptr_destroy(&hostmacros);
+	zbx_vector_ptr_destroy(&masterhostmacros);
 	zbx_vector_ptr_destroy(&interfaces);
 	zbx_vector_uint64_destroy(&del_hostgroupids);
 	zbx_vector_ptr_destroy(&groups);

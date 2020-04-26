@@ -75,7 +75,8 @@ class CSvgGraph extends CSvg {
 	protected $points = [];
 
 	/**
-	 * Array of metric paths. Where key is metric index from $metrics array.
+	 * Array of metric paths. Where key is metric index from $metrics array, and value is either array of paths or
+	 * single path (in case of bar and points graphs).
 	 *
 	 * @var array
 	 */
@@ -248,11 +249,14 @@ class CSvgGraph extends CSvg {
 				$metrics_for_each_axes[$metric['options']['axisy']]++;
 
 				foreach ($metric['points'] as $point) {
-					if ($min_value === null || $min_value > $point['value']) {
-						$min_value = $point['value'];
-					}
-					if ($max_value === null || $max_value < $point['value']) {
-						$max_value = $point['value'];
+					// Point with value of null is used as marker in denoting missing point. It should not affect axis.
+					if ($point['value'] !== null) {
+						if ($min_value === null || $min_value > $point['value']) {
+							$min_value = $point['value'];
+						}
+						if ($max_value === null || $max_value < $point['value']) {
+							$max_value = $point['value'];
+						}
 					}
 
 					$this->points[$i][$point['clock']] = $point['value'];
@@ -450,7 +454,6 @@ class CSvgGraph extends CSvg {
 	 * @return CSvgGraph
 	 */
 	public function draw() {
-		$this->applyMissingDataFunc();
 		$this->calculateDimensions();
 		$this->calculatePaths();
 
@@ -829,10 +832,19 @@ class CSvgGraph extends CSvg {
 						$y = ($point > $max_value) ? max($y_min, $y) : min($y_max, $y);
 					}
 
-					$paths[$path_num][] = [$x, ceil($y), convertUnits([
-						'value' => $point,
-						'units' => $metric['units']
-					])];
+					if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR
+							|| $metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
+						$paths[] = [$x, ceil($y), convertUnits([
+							'value' => $point,
+							'units' => $metric['units']
+						])];
+					}
+					else {
+						$paths[$path_num][] = [$x, ceil($y), convertUnits([
+							'value' => $point,
+							'units' => $metric['units']
+						])];
+					}
 				}
 			}
 
@@ -840,93 +852,6 @@ class CSvgGraph extends CSvg {
 				$this->paths[$index] = $paths;
 			}
 		}
-	}
-
-	/**
-	 * Modifies metric data and Y value range according specified missing data function.
-	 */
-	protected function applyMissingDataFunc() {
-		foreach ($this->metrics as $index => $metric) {
-			/**
-			 * - Missing data points are calculated only between existing data points;
-			 * - Missing data points are not calculated for SVG_GRAPH_TYPE_POINTS && SVG_GRAPH_TYPE_BAR metrics;
-			 * - SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of SVG graphs, so no need to calculate anything
-			 *   here.
-			 */
-			if (array_key_exists($index, $this->points)
-					&& !in_array($metric['options']['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR])
-					&& $metric['options']['missingdatafunc'] != SVG_GRAPH_MISSING_DATA_CONNECTED) {
-				$points = &$this->points[$index];
-				$missing_data_points = $this->getMissingData($points, $metric['options']['missingdatafunc']);
-
-				// Sort according new clock times (array keys).
-				$points += $missing_data_points;
-				ksort($points);
-
-				// Missing data function can change min value of Y axis.
-				if ($missing_data_points
-						&& $metric['options']['missingdatafunc'] == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
-					if ($this->min_value_left > 0 && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
-						$this->min_value_left = 0;
-					}
-					elseif ($this->min_value_right > 0 && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
-						$this->min_value_right = 0;
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Calculate missing data for given set of $points according given $missingdatafunc.
-	 *
-	 * @param array $points           Array of metric points to modify, where key is metric timestamp.
-	 * @param int   $missingdatafunc  Type of function, allowed value:
-	 *                                SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_NONE,
-	 *                                SVG_GRAPH_MISSING_DATA_CONNECTED
-	 *
-	 * @return array  Array of calculated missing data points.
-	 */
-	protected function getMissingData(array $points, $missingdatafunc) {
-		// Get average distance between points to detect gaps of missing data.
-		$prev_clock = null;
-		$points_distance = [];
-		foreach ($points as $clock => $point) {
-			if ($prev_clock !== null) {
-				$points_distance[] = $clock - $prev_clock;
-			}
-			$prev_clock = $clock;
-		}
-
-		/**
-		 * $threshold          is a minimal period of time at what we assume that data point is missed;
-		 * $average_distance   is an average distance between existing data points;
-		 * $gap_interval       is a time distance between missing points used to fulfill gaps of missing data.
-		 *                     It's unique for each gap.
-		 */
-		$average_distance = $points_distance ? array_sum($points_distance) / count($points_distance) : 0;
-		$threshold = $points_distance ? $average_distance * 3 : 0;
-
-		// Add missing values.
-		$prev_clock = null;
-		$missing_points = [];
-		foreach ($points as $clock => $point) {
-			if ($prev_clock !== null && ($clock - $prev_clock) > $threshold) {
-				$gap_interval = floor(($clock - $prev_clock) / $threshold);
-
-				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
-					$missing_points[$prev_clock + $gap_interval] = null;
-				}
-				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
-					$missing_points[$prev_clock + $gap_interval] = 0;
-					$missing_points[$clock - $gap_interval] = 0;
-				}
-			}
-
-			$prev_clock = $clock;
-		}
-
-		return $missing_points;
 	}
 
 	/**
@@ -950,12 +875,130 @@ class CSvgGraph extends CSvg {
 			if (array_key_exists($index, $this->paths) && ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE)) {
 				if ($metric['options']['fill'] > 0) {
-					$this->drawMetricArea($metric, $this->paths[$index]);
+					$paths = $this->decoratePathVirualArea($this->paths[$index], $metric);
+					$this->drawMetricArea($metric, $paths);
 				}
 
-				$this->addItem(new CSvgGraphLineGroup($this->paths[$index], $metric));
+				$paths = $this->decoratePathVirualLine($this->paths[$index], $metric);
+				$this->addItem(new CSvgGraphLineGroup($paths, $metric));
 			}
 		}
+	}
+
+	/**
+	 * Edit the first and last path segments to stretch up till edge of graph.
+	 *
+	 * @param array $paths
+	 * @param array $metric
+	 *
+	 * @return array  Modified paths.
+	 */
+	protected function decoratePathVirualArea(array $paths, array $metric): array {
+		$connect_left = false;
+		$connect_right = false;
+
+		$timestamps = array_keys($this->points[$metric['options']['order']]);
+
+		$first_path =& $paths[0];
+		$first_point =& $first_path[0];
+		$first_point_time = reset($timestamps);
+
+		$last_path =& $paths[count($paths) - 1];
+		$last_point =& $last_path[count($last_path) - 1];
+		$last_point_time = end($timestamps);
+
+		if ($metric['options']['frequency'] <= 0) {
+			$connect_left = true;
+			$connect_right = true;
+		}
+		else {
+			$diff_left = $first_point_time - $this->time_from;
+			$connect_left = $diff_left < 3 * $metric['options']['frequency'];
+
+			$diff_right = min($this->time_till, time()) - $last_point_time;
+			$connect_right = $diff_right < 3 * $metric['options']['frequency'];
+		}
+
+		if ($connect_left) {
+			if (count($paths) > 1) {
+				$first_point[0] = 0;
+			}
+			else {
+				array_unshift($first_path, [0 => 0] + $first_point);
+			}
+		}
+
+		if ($connect_right) {
+			if ($this->time_till > time()) {
+				$seconds_in_pixel = ($this->time_till - $this->time_from) / $this->width;
+				$right_edge = (time() - $this->time_from) / $seconds_in_pixel;
+			}
+			else {
+				$right_edge = $this->width;
+			}
+
+			if (count($paths) > 1) {
+				$last_point[0] = $right_edge;
+			}
+			else {
+				$last_path[] = [0 => $right_edge] + $last_point;
+			}
+		}
+
+		return $paths;
+	}
+
+	/**
+	 * Extend first and last path segments till edge of graph.
+	 *
+	 * @param array $paths
+	 * @param array $metric
+	 *
+	 * @return array  Modified paths.
+	 */
+	protected function decoratePathVirualLine(array $paths, array $metric): array {
+		$connect_left = false;
+		$connect_right = false;
+
+		$timestamps = array_keys($this->points[$metric['options']['order']]);
+
+		$first_path =& $paths[0];
+		$first_point = $first_path[0];
+		$first_point_time = reset($timestamps);
+
+		$last_path =& $paths[count($paths) - 1];
+		$last_point = $last_path[count($last_path) - 1];
+		$last_point_time = end($timestamps);
+
+		if ($metric['options']['frequency'] <= 0) {
+			$connect_left = true;
+			$connect_right = true;
+		}
+		else {
+			$diff_left = $first_point_time - $this->time_from;
+			$connect_left = $diff_left < 3 * $metric['options']['frequency'];
+
+			$diff_right = min($this->time_till, time()) - $last_point_time;
+			$connect_right = $diff_right < 3 * $metric['options']['frequency'];
+		}
+
+		if ($connect_left) {
+			array_unshift($first_path, [0 => 0] + $first_point);
+		}
+
+		if ($connect_right) {
+			if ($this->time_till > time()) {
+				$seconds_in_pixel = ($this->time_till - $this->time_from) / $this->width;
+				$right_edge = (time() - $this->time_from) / $seconds_in_pixel;
+			}
+			else {
+				$right_edge = $this->width;
+			}
+
+			$last_path[] = [0 => $right_edge] + $last_point;
+		}
+
+		return $paths;
 	}
 
 	/**
@@ -964,7 +1007,7 @@ class CSvgGraph extends CSvg {
 	protected function drawMetricsPoint() {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS && array_key_exists($index, $this->paths)) {
-				$this->addItem(new CSvgGraphPoints(reset($this->paths[$index]), $metric));
+				$this->addItem(new CSvgGraphPoints($this->paths[$index], $metric));
 			}
 		}
 	}
@@ -989,7 +1032,6 @@ class CSvgGraph extends CSvg {
 				$y_axis_side = $this->metrics[$index]['options']['axisy'];
 				$time_points = array_keys($this->points[$index]);
 				$last_point = 0;
-				$path = reset($path);
 
 				foreach ($path as $point_index => $point) {
 					$time_point = ($sec_per_px > $px_per_sec)
@@ -1015,16 +1057,16 @@ class CSvgGraph extends CSvg {
 				foreach ($paths as $path_index => $point_index) {
 					$group_x = $bar_groups_position[$y_axis][$time_point][$point_index];
 					if ($group_count > 1) {
-						$this->paths[$path_index][0][$point_index][0] = $group_x
+						$this->paths[$path_index][$point_index][0] = $group_x
 							// Calculate the leftmost X-coordinate including gap size.
 							- $group_width * .375
 							// Calculate the X-offset for the each bar in the group.
 							+ ceil($bar_width * ($group_index + .5));
 						$group_index++;
 					}
-					$this->paths[$path_index][0][$point_index][3] = max(1, $bar_width);
+					$this->paths[$path_index][$point_index][3] = max(1, $bar_width);
 					// X position for bars group.
-					$this->paths[$path_index][0][$point_index][4] = $group_x - $group_width * .375;
+					$this->paths[$path_index][$point_index][4] = $group_x - $group_width * .375;
 				}
 			}
 		}
@@ -1036,7 +1078,7 @@ class CSvgGraph extends CSvg {
 					: $this->left_y_zero;
 				$metric['options']['bar_width'] = $bar_min_width[$metric['options']['axisy']];
 
-				$this->addItem(new CSvgGraphBar(reset($this->paths[$index]), $metric));
+				$this->addItem(new CSvgGraphBar($this->paths[$index], $metric));
 			}
 		}
 	}

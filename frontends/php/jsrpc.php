@@ -122,7 +122,7 @@ switch ($data['method']) {
 	 * Create multi select data.
 	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers", "application_prototypes"
 	 *
-	 * @param string $data['objectName']
+	 * @param string $data['object_name']
 	 * @param string $data['search']
 	 * @param int    $data['limit']
 	 *
@@ -131,15 +131,25 @@ switch ($data['method']) {
 	case 'multiselect.get':
 		$config = select_config();
 
-		switch ($data['objectName']) {
+		switch ($data['object_name']) {
 			case 'hostGroup':
 				$options = [
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
-					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null
+					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null,
+					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
+					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
+					'with_hosts_and_templates' => array_key_exists('with_hosts_and_templates', $data)
+						? $data['with_hosts_and_templates']
+						: null,
+					'with_monitored_triggers' => array_key_exists('with_monitored_triggers', $data)
+						? $data['with_monitored_triggers']
+						: null,
+					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
+					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
 				];
 				$hostGroups = API::HostGroup()->get($options);
 
@@ -162,15 +172,37 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'host_templates':
 			case 'hosts':
-				$hosts = API::Host()->get([
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
+				$options = [
 					'output' => ['hostid', 'name'],
 					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
+					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
+					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
+					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'limit' => $config['search_limit']
-				]);
+				];
 
+				if ($data['object_name'] === 'host_templates') {
+					$options['templated_hosts'] = true;
+				}
+
+				if (array_key_exists('with_monitored_triggers', $data)) {
+					$options += [
+						'with_monitored_triggers' => true
+					];
+				}
+
+				if (array_key_exists('with_monitored_items', $data)) {
+					$options += [
+						'with_monitored_items' => true,
+						'monitored_hosts' => true
+					];
+				}
+
+				$hosts = API::Host()->get($options);
 
 				if ($hosts) {
 					CArrayHelper::sort($hosts, [
@@ -197,7 +229,7 @@ switch ($data['method']) {
 					'limit' => $config['search_limit']
 				];
 
-				if ($data['objectName'] === 'item_prototypes') {
+				if ($data['object_name'] === 'item_prototypes') {
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
@@ -238,7 +270,7 @@ switch ($data['method']) {
 					'limit' => $config['search_limit']
 				];
 
-				if ($data['objectName'] === 'graph_prototypes') {
+				if ($data['object_name'] === 'graph_prototypes') {
 					$records = API::GraphPrototype()->get($options);
 				}
 				else {
@@ -487,7 +519,7 @@ switch ($data['method']) {
 		$wildcard_enabled = (strpos($search, '*') !== false);
 		$result = [];
 
-		switch ($data['objectName']) {
+		switch ($data['object_name']) {
 			case 'hosts':
 				$options = [
 					'output' => ['name'],
@@ -515,6 +547,28 @@ switch ($data['method']) {
 				];
 
 				$db_result = API::Item()->get($options);
+				break;
+
+			case 'graphs':
+				if (!array_key_exists('monitored_hosts', $data) && array_key_exists('real_hosts', $data)) {
+					$templated = false;
+				}
+				elseif (array_key_exists('templated_hosts')) {
+					$templated = true;
+				}
+				else {
+					$templated = null;
+				}
+
+				$options = [
+					'output' => ['name'],
+					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
+					'templated' => $templated,
+					'searchWildcardsEnabled' => $wildcard_enabled,
+					'limit' => $config['search_limit']
+				];
+
+				$db_result = API::Graph()->get($options);
 				break;
 		}
 
