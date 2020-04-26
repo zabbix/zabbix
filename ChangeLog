@@ -1,6 +1,14 @@
 Changes for 5.0.0beta2
 
 New features:
+..F....PS. [ZBXNEXT-1891] added option 'delay' for zabbix[proxy] internal check and calculate nodata() to respect proxy availability (asestakovs, gcalenko, MVekslers)
+...G...... [ZBXNEXT-1686] added persistent queue for active items in Zabbix agent 2 (akozlovs)
+A......... [ZBXNEXT-5849] added support of search and filter by macro value (gcalenko)
+.........T [ZBXNEXT-5864] added {EVENT.DURATION} in recovery message of webhooks (mchudinov)
+.........T [ZBXNEXT-5678] added proxy support for all media (afayantsev)
+.........T [ZBXNEXT-5832] Added ServiceNow mediatype (tuskov)
+.........T [ZBXNEXT-5670] added "Template App Elasticsearch Cluster by HTTP" (mchudinov)
+.......PS. [ZBXNEXT-1578] added ability to use user macros for IPMI user and password (akozlovs)
 A.F.....S. [ZBXNEXT-702] Implemented ability to compare string values in triggers (arimdjonoks, Ivo, Sasha)
 .........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
 .........T [ZBXNEXT-5658] added media "Zammad" (afayantsev)
@@ -8,6 +16,13 @@ A.F.....S. [ZBXNEXT-702] Implemented ability to compare string values in trigger
 .........T [ZBXNEXT-5833] added "Template DB ClickHouse by HTTP" (ychukina)
 
 Bug fixes:
+........S. [ZBX-17614] fixed oracle sql error while sending notifications (asestakovs)
+..F....... [ZBX-17617] fixed broken markup in host selection on dashborad (talbergs)
+..F....... [ZBX-17608] fixed broken multiselect in "Discovery rule" field in monitoring discovery view (talbergs)
+..F....... [ZBX-17540] fixed text overflow in table (rlataria)
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
+..F....... [ZBX-16162] fixed graph line interruptions when discarding values with heartbeat (talbergs)
+..F....... [ZBX-17589] fixed occasional blank pages when viewing host graphs as values (averza)
 ..F....... [ZBX-17524] fixed time selector button state (rlataria)
 A......... [ZBX-17496] fixed UserMacro API validation (miks)
 ..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
