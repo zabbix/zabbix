@@ -3681,6 +3681,7 @@
 						$.unsubscribe('widget.update.dimensions', warning_msg_remove);
 					};
 
+				$('#dashbrd-save').prop('disabled', true);
 				warning_msg_remove();
 
 				// In case if selected space is 2x2 cells (represents simple click), use pasted widget size.
@@ -3790,6 +3791,15 @@
 					.always(function() {
 						// Mark dashboard as updated.
 						data['options']['updated'] = true;
+
+						// Activate 'Save' button.
+						var active_placeholders = data['widgets'].filter(w => {
+							return !w['type'];
+						}).length;
+
+						if (!active_placeholders) {
+							$('#dashbrd-save').prop('disabled', false);
+						}
 					});
 			});
 		},
