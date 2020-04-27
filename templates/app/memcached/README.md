@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-Setup and configure zabbix-agent2 compiled with the Memcached monitoring plugin (ZBXNEXT-5767-4.5).
+Setup and configure zabbix-agent2 compiled with the Memcached monitoring [plugin](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/memcached).
 
 Test availability: `zabbix_get -s memcached-host -k memcached.ping`
 

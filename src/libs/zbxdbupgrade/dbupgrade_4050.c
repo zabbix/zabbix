@@ -1688,6 +1688,27 @@ static int	DBpatch_4050076(void)
 	return DBdrop_field("config", "dropdown_first_remember");
 }
 
+static int	DBpatch_4050077(void)
+{
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("acknowledges", &field, NULL);
+}
+
+static int	DBpatch_4050078(void)
+{
+	const ZBX_FIELD	field = {"write_clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_history", &field);
+}
+
+static int	DBpatch_4050079(void)
+{
+	const ZBX_FIELD	field = {"instanceid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1765,5 +1786,8 @@ DBPATCH_ADD(4050073, 0, 1)
 DBPATCH_ADD(4050074, 0, 1)
 DBPATCH_ADD(4050075, 0, 1)
 DBPATCH_ADD(4050076, 0, 1)
+DBPATCH_ADD(4050077, 0, 1)
+DBPATCH_ADD(4050078, 0, 1)
+DBPATCH_ADD(4050079, 0, 1)
 
 DBPATCH_END()

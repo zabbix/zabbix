@@ -38,9 +38,9 @@
 
 #define ZBX_IPC_IPMI_SCRIPT_RESULT	301
 
-zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t objectid, const char *addr,
-		unsigned short port, signed char authtype, unsigned char privilege, const char *username,
-		const char *password, const char *sensor, int command, const char *key);
+zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hostid, zbx_uint64_t objectid,
+		const char *addr, unsigned short port, signed char authtype, unsigned char privilege,
+		const char *username, const char *password, const char *sensor, int command, const char *key);
 
 void	zbx_ipmi_deserialize_request(const unsigned char *data, zbx_uint64_t *objectid, char **addr,
 		unsigned short *port, signed char *authtype, unsigned char *privilege, char **username, char **password,

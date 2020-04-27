@@ -102,6 +102,8 @@ typedef struct
 	zbx_uint64_t	mediatypeid;
 	zbx_uint64_t	alertpoolid;
 	zbx_uint64_t	eventid;
+	/* the problem event id for recovery events */
+	zbx_uint64_t	p_eventid;
 	int		nextsend;
 
 	/* alert data */
@@ -759,9 +761,8 @@ static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediat
  *                                                                            *
  * Return value: The alert object.                                            *
  *                                                                            *
- * Comments: The string pointers are copied over instead of allocating new    *
- *           strings. This means that the db_alert must not be freed after    *
- *           copying.                                                         *
+ * Comments: The db_alert is destroyed during copying process and should not  *
+ *           be accessed/freed afterwards.                                    *
  *                                                                            *
  ******************************************************************************/
 static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
@@ -773,6 +774,7 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	alert->mediatypeid = db_alert->mediatypeid;
 	alert->alertpoolid = am_calc_alertpoolid(db_alert->source, db_alert->object, db_alert->objectid);
 	alert->eventid = db_alert->eventid;
+	alert->p_eventid = db_alert->p_eventid;
 
 	alert->sendto = db_alert->sendto;
 	alert->subject = db_alert-> subject;
@@ -1455,7 +1457,7 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 	zbx_am_mediatype_t	*mediatype;
 	unsigned char		*data = NULL;
 	size_t			data_len;
-	zbx_uint64_t		command;
+	zbx_uint64_t		command, p_eventid;
 	char			*cmd = NULL, *error = NULL;
 	int			ret = FAIL;
 
@@ -1483,12 +1485,13 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 	{
 		case MEDIA_TYPE_EMAIL:
 			command = ZBX_IPC_ALERTER_EMAIL;
-			data_len = zbx_alerter_serialize_email(&data, alert->alertid, alert->sendto, alert->subject,
-					alert->message, mediatype->smtp_server, mediatype->smtp_port,
-					mediatype->smtp_helo, mediatype->smtp_email, mediatype->smtp_security,
-					mediatype->smtp_verify_peer, mediatype->smtp_verify_host,
-					mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
-					mediatype->content_type);
+			p_eventid = (0 == alert->p_eventid ? alert->eventid : alert->p_eventid);
+			data_len = zbx_alerter_serialize_email(&data, alert->alertid, alert->mediatypeid,
+					p_eventid, alert->sendto, alert->subject, alert->message,
+					mediatype->smtp_server, mediatype->smtp_port, mediatype->smtp_helo,
+					mediatype->smtp_email, mediatype->smtp_security, mediatype->smtp_verify_peer,
+					mediatype->smtp_verify_host, mediatype->smtp_authentication,
+					mediatype->username, mediatype->passwd, mediatype->content_type);
 			break;
 		case MEDIA_TYPE_SMS:
 			command = ZBX_IPC_ALERTER_SMS;

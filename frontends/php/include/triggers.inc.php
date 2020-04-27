@@ -1527,7 +1527,8 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 					}
 					break;
 				case '{':
-					// Skip any previously found tokens starting with brace.
+				case '"':
+					// Skip any previously found tokens starting with brace or double quote.
 					foreach ($expressionData->result->getTokens() as $expression_token) {
 						if ($expression_token['pos'] == $i) {
 							$i += $expression_token['length'] - 1;
@@ -1849,12 +1850,13 @@ function makeExpression(array $expressionTree, $level = 0, $operator = null) {
 }
 
 function get_item_function_info($expr) {
-	$suffix = '['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?';
-	$rule_float = [_('Numeric (float)'), 'preg_match("/^'.ZBX_PREG_NUMBER.$suffix.'$/", {})'];
-	$rule_int = [_('Numeric (integer)'), 'preg_match("/^'.ZBX_PREG_INT.$suffix.'$/", {})'];
-	$rule_0or1 = [_('0 or 1'), IN('0,1')];
+	$rule_float = ['value_type' => _('Numeric (float)'), 'values' => null];
+	$rule_int = ['value_type' => _('Numeric (integer)'), 'values' => null];
+	$rule_str = ['value_type' => _('String'), 'values' => null];
+	$rule_any = ['value_type' => _('Any'), 'values' => null];
+	$rule_0or1 = ['value_type' => _('0 or 1'), 'values' => [0 => 0, 1 => 1]];
 	$rules = [
-		// Every nested array should have two elements: label, validation.
+		// Every nested array should have two elements: label, values.
 		'integer' => [
 			ITEM_VALUE_TYPE_UINT64 => $rule_int
 		],
@@ -1884,10 +1886,10 @@ function get_item_function_info($expr) {
 			ITEM_VALUE_TYPE_STR => $rule_int,
 			ITEM_VALUE_TYPE_LOG => $rule_int
 		],
-		'string_as_float' => [
-			ITEM_VALUE_TYPE_TEXT => $rule_float,
-			ITEM_VALUE_TYPE_STR => $rule_float,
-			ITEM_VALUE_TYPE_LOG => $rule_float
+		'string' => [
+			ITEM_VALUE_TYPE_TEXT => $rule_str,
+			ITEM_VALUE_TYPE_STR => $rule_str,
+			ITEM_VALUE_TYPE_LOG => $rule_str
 		],
 		'log_as_uint' => [
 			ITEM_VALUE_TYPE_LOG => $rule_int
@@ -1896,16 +1898,16 @@ function get_item_function_info($expr) {
 			ITEM_VALUE_TYPE_LOG => $rule_0or1
 		],
 		'date' => [
-			'any' => ['YYYYMMDD', '{}>=19700101&&{}<=99991231']
+			'any' => ['value_type' => 'YYYYMMDD', 'values' => null]
 		],
 		'time' => [
-			'any' => ['HHMMSS', 'preg_match("/^([01]?\d|2[0-3])([0-5]?\d)([0-5]?\d)$/", {})']
+			'any' => ['value_type' => 'HHMMSS', 'values' => null]
 		],
 		'day_of_month' => [
-			'any' => ['1-31', '{}>=1&&{}<=31']
+			'any' => ['value_type' => '1-31', 'values' => null]
 		],
 		'day_of_week' => [
-			'any' => ['1-7', IN('1,2,3,4,5,6,7')]
+			'any' => ['value_type' => '1-7', 'values' => [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7]]
 		]
 	];
 
@@ -1923,7 +1925,7 @@ function get_item_function_info($expr) {
 		'forecast' => $rules['numeric_as_float'],
 		'fuzzytime' => $rules['numeric_as_0or1'],
 		'iregexp' => $rules['string_as_0or1'],
-		'last' => $rules['numeric'] + $rules['string_as_float'],
+		'last' => $rules['numeric'] + $rules['string'],
 		'logeventid' => $rules['log_as_0or1'],
 		'logseverity' => $rules['log_as_uint'],
 		'logsource' => $rules['log_as_0or1'],
@@ -1932,7 +1934,7 @@ function get_item_function_info($expr) {
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'now' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'percentile' => $rules['numeric'],
-		'prev' => $rules['numeric'] + $rules['string_as_float'],
+		'prev' => $rules['numeric'] + $rules['string'],
 		'regexp' => $rules['string_as_0or1'],
 		'str' => $rules['string_as_0or1'],
 		'strlen' => $rules['string_as_uint'],
@@ -1950,20 +1952,12 @@ function get_item_function_info($expr) {
 
 	switch (true) {
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_MACRO)):
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $rule_0or1[0],
-				'validation' => $rule_0or1[1]
-			];
+			$result = $rule_0or1;
 			break;
 
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)):
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO)):
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $rule_float[0],
-				'validation' => $rule_float[1]
-			];
+			$result = $rule_any;
 			break;
 
 		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
@@ -2020,11 +2014,7 @@ function get_item_function_info($expr) {
 				break;
 			}
 
-			$result = [
-				'type' => T_ZBX_STR,
-				'value_type' => $function[$value_type][0],
-				'validation' => $function[$value_type][1]
-			];
+			$result = $function[$value_type];
 			break;
 
 		default:
@@ -2033,114 +2023,6 @@ function get_item_function_info($expr) {
 	}
 
 	return $result;
-}
-
-/**
- * Substitute macros in the expression with the given values and evaluate its result.
- *
- * @param string $expression               a trigger expression
- * @param array  $replace_function_macros  an array of macro - value pairs
- *
- * @return bool  the calculated value of the expression
- */
-function evalExpressionData($expression, $replace_function_macros) {
-	// Sort by longest array key which in this case contains macros.
-	uksort($replace_function_macros, function($key1, $key2) {
-		$s1 = strlen($key1);
-		$s2 = strlen($key2);
-
-		if ($s1 == $s2) {
-			return 0;
-		}
-
-		return ($s1 > $s2) ? -1 : 1;
-	});
-
-	// Replace function macros with their values.
-	$expression = str_replace(
-		array_keys($replace_function_macros), array_values($replace_function_macros), $expression
-	);
-
-	$parser = new CTriggerExpression(['calc_constant_values' => true]);
-	$parse_result = $parser->parse($expression);
-
-	// The $replaceFunctionMacros array may contain string values which after substitution
-	// will result in an invalid expression. In such cases we should just return false.
-	if (!$parse_result) {
-		return false;
-	}
-
-	// Turn the expression into valid PHP code.
-	$eval_expression = '';
-	$replace_operators = ['not' => '!', '=' => '=='];
-	foreach ($parse_result->getTokens() as $token) {
-		$value = $token['value'];
-
-		switch ($token['type']) {
-			case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
-				// Replace specific operators with their PHP analogues.
-				if (array_key_exists($token['value'], $replace_operators)) {
-					$value = $replace_operators[$token['value']];
-				}
-				break;
-
-			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
-				// Use calculated (unsuffixed) number value.
-				$value = $token['data']['calc_value'];
-				break;
-		}
-
-		$eval_expression .= ' '.$value;
-	}
-
-	// Execute expression.
-	return eval('return ('.$eval_expression.');');
-}
-
-/**
- * Converts a string representation of various time and byte measures into corresponding SI unit value.
- *
- * @param string $value  String value with byte or time suffix.
- *
- * @return string|int  Corresponding SI unit value.
- */
-function convert($value) {
-	$value = trim($value);
-
-	if (!preg_match('/(?P<value>[\-+]?([.][0-9]+|[0-9]+[.]?[0-9]*))(?P<mult>['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/',
-			$value, $arr)) {
-		return $value;
-	}
-
-	$value = $arr['value'];
-	switch ($arr['mult']) {
-		case 'T':
-			$value = bcmul($value, bcmul(ZBX_KIBIBYTE, ZBX_GIBIBYTE));
-			break;
-		case 'G':
-			$value = bcmul($value, ZBX_GIBIBYTE);
-			break;
-		case 'M':
-			$value = bcmul($value, ZBX_MEBIBYTE);
-			break;
-		case 'K':
-			$value = bcmul($value, ZBX_KIBIBYTE);
-			break;
-		case 'm':
-			$value *= 60;
-			break;
-		case 'h':
-			$value *= 60 * 60;
-			break;
-		case 'd':
-			$value *= 60 * 60 * 24;
-			break;
-		case 'w':
-			$value *= 60 * 60 * 24 * 7;
-			break;
-	}
-
-	return $value;
 }
 
 /**

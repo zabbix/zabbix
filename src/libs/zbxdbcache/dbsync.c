@@ -80,27 +80,7 @@ static void	dbsync_strfree(char *str)
 	}
 }
 
-/* macro valie validators */
-
-/******************************************************************************
- *                                                                            *
- * Function: dbsync_numeric_validator                                         *
- *                                                                            *
- * Purpose: validate numeric value                                            *
- *                                                                            *
- * Parameters: value   - [IN] the value to validate                           *
- *                                                                            *
- * Return value: SUCCEED - the value contains valid numeric value             *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dbsync_numeric_validator(const char *value)
-{
-	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
-		return SUCCEED;
-
-	return FAIL;
-}
+/* macro value validators */
 
 /******************************************************************************
  *                                                                            *
@@ -452,7 +432,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	DB_RESULT	result;
 
-#define SELECTED_CONFIG_FIELD_COUNT	32	/* number of columns in the following DBselect() */
+#define SELECTED_CONFIG_FIELD_COUNT	33	/* number of columns in the following DBselect() */
 
 	if (NULL == (result = DBselect("select refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
@@ -462,7 +442,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
 				"hk_trends_global,hk_trends,default_inventory_mode,db_extension,autoreg_tls_accept,"
-				"compression_status,compression_availability,compress_older"
+				"compression_status,compression_availability,compress_older,instanceid"
 			" from config"
 			" order by configid")))	/* if you change number of columns in DBselect(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */
@@ -1167,8 +1147,10 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	ZBX_DC_HMACRO		*macro;
 
 	if (NULL == (result = DBselect(
-			"select hostmacroid,hostid,macro,value,type"
-			" from hostmacro")))
+			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type"
+			" from hostmacro m"
+			" inner join hosts h on m.hostid=h.hostid"
+			" where h.flags<>%d", ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;
 	}
@@ -1777,13 +1759,13 @@ static char	**dbsync_item_preproc_row(char **row)
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
-		row[8] = zbx_dc_expand_user_macros(row[8], &hostid, 1, NULL);
+		row[8] = zbx_dc_expand_user_macros(row[8], &hostid, 1);
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_HISTORY))
-		row[22] = zbx_dc_expand_user_macros(row[22], &hostid, 1, NULL);
+		row[22] = zbx_dc_expand_user_macros(row[22], &hostid, 1);
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_TRENDS))
-		row[23] = zbx_dc_expand_user_macros(row[23], &hostid, 1, NULL);
+		row[23] = zbx_dc_expand_user_macros(row[23], &hostid, 1);
 
 	return row;
 
@@ -2134,15 +2116,11 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
-	{
-		row[2] = zbx_dc_expand_user_macros(row[2], hostids.values, hostids.values_num,
-				dbsync_numeric_validator);
-	}
+		row[2] = zbx_dc_expand_user_macros_for_triggers(row[2], hostids.values, hostids.values_num);
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
 	{
-		row[11] = zbx_dc_expand_user_macros(row[11], hostids.values, hostids.values_num,
-				dbsync_numeric_validator);
+		row[11] = zbx_dc_expand_user_macros_for_triggers(row[11], hostids.values, hostids.values_num);
 	}
 
 	zbx_vector_uint64_destroy(&functionids);
@@ -3497,10 +3475,10 @@ static char	**dbsync_item_pp_preproc_row(char **row)
 		ZBX_STR2UINT64(hostid, row[5]);
 
 		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM))
-			row[3] = zbx_dc_expand_user_macros(row[3], &hostid, 1, NULL);
+			row[3] = zbx_dc_expand_user_macros(row[3], &hostid, 1);
 
 		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM))
-			row[7] = zbx_dc_expand_user_macros(row[7], &hostid, 1, NULL);
+			row[7] = zbx_dc_expand_user_macros(row[7], &hostid, 1);
 	}
 
 	return row;

@@ -1,11 +1,67 @@
-Changes for 5.0.0alpha5
+Changes for 5.0.0beta2
 
 New features:
+........S. [ZBXNEXT-1899] added support of threaded email notifications (wiper)
+..F....PS. [ZBXNEXT-1891] added option 'delay' for zabbix[proxy] internal check and calculate nodata() to respect proxy availability (asestakovs, gcalenko, MVekslers)
+...G...... [ZBXNEXT-1686] added persistent queue for active items in Zabbix agent 2 (akozlovs)
+A......... [ZBXNEXT-5849] added support of search and filter by macro value (gcalenko)
+.........T [ZBXNEXT-5864] added {EVENT.DURATION} in recovery message of webhooks (mchudinov)
+.........T [ZBXNEXT-5678] added proxy support for all media (afayantsev)
+.........T [ZBXNEXT-5832] Added ServiceNow mediatype (tuskov)
+.........T [ZBXNEXT-5670] added "Template App Elasticsearch Cluster by HTTP" (mchudinov)
+.......PS. [ZBXNEXT-1578] added ability to use user macros for IPMI user and password (akozlovs)
+A.F.....S. [ZBXNEXT-702] Implemented ability to compare string values in triggers (arimdjonoks, Ivo, Sasha)
+.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
+.........T [ZBXNEXT-5658] added media "Zammad" (afayantsev)
+.........T [ZBXNEXT-5821] added "Template App Memcached" (ychukina)
+.........T [ZBXNEXT-5833] added "Template DB ClickHouse by HTTP" (ychukina)
+
+Bug fixes:
+........S. [ZBX-17614] fixed oracle sql error while sending notifications (asestakovs)
+..F....... [ZBX-17617] fixed broken markup in host selection on dashborad (talbergs)
+..F....... [ZBX-17608] fixed broken multiselect in "Discovery rule" field in monitoring discovery view (talbergs)
+..F....... [ZBX-17540] fixed text overflow in table (rlataria)
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
+..F....... [ZBX-16162] fixed graph line interruptions when discarding values with heartbeat (talbergs)
+..F....... [ZBX-17589] fixed occasional blank pages when viewing host graphs as values (averza)
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17521] fixed closing multi-level pop-up menus when selected with a mouse click (vasilijs)
+..F....... [ZBX-15914] fixed map elements label inconsistency (agriscenko)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17140] fixed builtin counter index rewrite on localized Windows systems (atumilovics)
+.......PS. [ZBX-17412] fixed updating metadata, ip, port for hosts with TLS certificate encryption monitored via proxy (mabele)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.0beta1
+
+New features:
+..F....PS. [ZBXNEXT-5851] added ability to monitor versions of all other Zabbix servers and proxies with zabbix.stats and zabbix[version] internal items (vso)
+A.F....PS. [ZBXNEXT-2297] added user defined macros creation/edition for host prototypes (gcalenko, MVekslers)
+........S. [ZBXNEXT-5825,ZBXNEXT-5826] fixed support of Elasticsearch version 7.x (viktors, vjaceslavs, vmurzins)
+...G...... [ZBXNEXT-5325] added Docker plugin (afayantsev)
+.........T [ZBXNEXT-5622] added Zendesk media (mchudinov)
+.........T [ZBXCTR-1] added Telegram media type (ableev)
+.........T [ZBXNEXT-5824] added media "Redmine" (afayantsev)
+..F.I..... [ZBXNEXT-5861] added {EVENT.DURATION} macro to subject of message templates (MVekslers)
+..F.....S. [ZBXNEXT-5848] Expand acknowledge message maximum size to more than 256 characters (arimdjonoks)
+..F.I..... [ZBXNEXT-5702] improved UI performance for large installations (miks, talbergs)
 .........T [ZBXNEXT-5599] Added MS Teams media type (tuskov)
 .........T [ZBXNEXT-5715] Added Jira media type (tuskov)
 ...G...... [ZBXNEXT-5767] added Memcached plugin (vadimipatov)
 
 Bug fixes:
+...G...... [ZBX-17558] fixed Zabbix agent 2 compilation on MS Windows (vso)
+........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
+..F....... [ZBX-17423] fixed "reset" button in history page (talbergs)
+...G...... [ZBX-17551] fixed duktape crash on ppc64le architecture (wiper)
+..F....... [ZBX-16112] fixed connection timeout issue with media type testing by increasing timeout to 65 seconds (Ivo)
+...G...... [ZBX-17377] fixed HostInterfaceItem not being refreshed during active checks  (esneiders)
+..F....... [ZBX-17526] fixed severity checkboxes in the firefox browser (ashubin)
+..F....... [ZBX-17395] fixed deletion of templated applications that were linked to items when importing templates (Ivo)
 A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
 ...G...... [ZBX-17541] fixed Zabbix agent compilation on MS Windows (vso)
 ...G...... [ZBX-16772] enabled zabbix_agent2 to use OpenSSL 1.0.1, 1.0.2 on Unix platforms (Andris)
@@ -175,13 +231,35 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 ....I..... [ZBX-11764] fixed automake scripts; thanks to Tomasz Kłoczko for the patch (akozlovs)
 
 --------------------------------------------------------------------------------
+Changes for 4.4.8
+
+4.4.8rc1 was released as 4.4.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.4.8rc1
 
 New features:
+.........T [ZBXCTR-1] added Telegram media type (ableev)
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 .......PS. [ZBXNEXT-5734] added base64 encode, decode functions to webhook (mabele)
 
 Bug fixes:
+.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
+.......PS. [ZBX-17412] fixed updating metadata, ip, port for hosts with TLS certificate encryption monitored via proxy (mabele)
+...G...... [ZBX-17558] fixed Zabbix agent 2 compilation on MS Windows (vso)
+...G...... [ZBX-17140] fixed builtin counter index rewrite on localized Windows systems (atumilovics)
+........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
+..F....... [ZBX-17423] fixed "reset" button in history page (talbergs)
+...G...... [ZBX-17551] fixed duktape crash on ppc64le architecture (wiper)
+..F....... [ZBX-16112] fixed connection timeout issue with media type testing by increasing timeout to 65 seconds (Ivo)
+...G...... [ZBX-17377] fixed HostInterfaceItem not being refreshed during active checks  (esneiders)
+..F....... [ZBX-17395] fixed deletion of templated applications that were linked to items when importing templates (Ivo)
 A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
 ...G...... [ZBX-16772] enabled zabbix_agent2 to use OpenSSL 1.0.1, 1.0.2 on Unix platforms (Andris)
 .D........ [ZBX-17500] fixed errors in zabbix_agent2 man-page (akozlovs)
@@ -1297,12 +1375,26 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.20
+
+4.0.20rc1 was released as 4.0.20 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.20rc1
 
 New features:
 ..F....... [ZBXNEXT-4829] changed web setup wizard to not create and drop tables for DB connectivity test purposes (Ivo)
 
 Bug fixes:
+..F....... [ZBX-17524] fixed time selector button state (rlataria)
+A......... [ZBX-17496] fixed UserMacro API validation (miks)
+..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
+..F....... [ZBX-17501] fixed overlapping multiselect suggest with browser autocomplete (vasilijs)
+..F....... [ZBX-17402] fixed search field accidentally transform value to lowercase (rlataria)
+...G...... [ZBX-17505] fixed crash inside a fork when calling vfs.fs.inode (mabele)
+........S. [ZBX-16959] fixed return code check of curl_easy_setopt (atumilovics)
+..F....... [ZBX-17423] fixed "reset" button in history page (talbergs)
+..F....... [ZBX-17395] fixed deletion of templated applications that were linked to items when importing templates (Ivo)
 A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
 .......PS. [ZBX-17336] fixed wrong error message when fping fails (mabele)
 ..F....... [ZBX-17427] fixed top busiest triggers filter (miks)
@@ -4132,11 +4224,15 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.31
+
+3.0.31rc1 was released as 3.0.31 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.31rc1
 
-New features:
-
 Bug fixes:
+...G...PS. [ZBX-17600] fixed security vulnerability CVE-2020-11800 (remote code execution) (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.30

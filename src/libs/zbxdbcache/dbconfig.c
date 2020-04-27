@@ -36,6 +36,7 @@
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
 #include "dbsync.h"
+#include "proxy.h"
 
 int	sync_in_progress = 0;
 
@@ -135,6 +136,7 @@ static char	*dc_strdup(const char *source)
  *           | Zabbix internal  | zabbix[host,discovery,interfaces]    |      *
  *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
+ *           | Zabbix internal  | zabbix[proxy,<proxyname>,delay]      |      *
  *           | Zabbix aggregate | *                                    |      *
  *           | Calculated       | *                                    |      *
  *           '------------------+--------------------------------------'      *
@@ -179,7 +181,8 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
 						ret = SUCCEED;
 				}
-				else if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg3, "lastaccess"))
+				else if (0 == strcmp(arg1, "proxy") &&
+						(0 == strcmp(arg3, "lastaccess") || 0 == strcmp(arg3, "delay")))
 					ret = SUCCEED;
 clean:
 				free_request(&request);
@@ -848,7 +851,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
 					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
-					"compression_status", "compression_availability", "compress_older"};	/* sync with zbx_dbsync_compare_config() */
+					"compression_status", "compression_availability", "compress_older",
+					"instanceid"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -925,6 +929,10 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
+
+	/* instance id cannot be changed - update it only at first sync to avoid read locks later */
+	if (0 == found)
+		DCstrpool_replace(found, &config->config->instanceid, row[32]);
 
 #if TRIGGER_SEVERITY_COUNT != 6
 #	error "row indexes below are based on assumption of six trigger severity levels"
@@ -1043,6 +1051,18 @@ static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
+{
+	if (ZBX_LOC_QUEUE == proxy->location)
+	{
+		zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
+		proxy->location = ZBX_LOC_NOWHERE;
+	}
+
+	zbx_strpool_release(proxy->proxy_address);
+	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
 
 static void	DCsync_hosts(zbx_dbsync_t *sync)
@@ -1446,6 +1466,10 @@ done:
 				proxy->version = 0;
 				proxy->lastaccess = atoi(row[24]);
 				proxy->last_cfg_error_time = 0;
+				proxy->proxy_delay = 0;
+				proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
+				proxy->nodata_win.values_num = 0;
+				proxy->nodata_win.period_end = 0;
 			}
 
 			proxy->auto_compress = atoi(row[32 + ZBX_HOST_TLS_OFFSET]);
@@ -1470,16 +1494,7 @@ done:
 			proxy->last_version_error_time = time(NULL);
 		}
 		else if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		{
-			if (ZBX_LOC_QUEUE == proxy->location)
-			{
-				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
-				proxy->location = ZBX_LOC_NOWHERE;
-			}
-
-			zbx_strpool_release(proxy->proxy_address);
-			zbx_hashset_remove_direct(&config->proxies, proxy);
-		}
+			DCsync_proxy_remove(proxy);
 
 		host->status = status;
 	}
@@ -1505,16 +1520,7 @@ done:
 		/* proxies */
 
 		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		{
-			if (ZBX_LOC_QUEUE == proxy->location)
-			{
-				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
-				proxy->location = ZBX_LOC_NOWHERE;
-			}
-
-			zbx_strpool_release(proxy->proxy_address);
-			zbx_hashset_remove_direct(&config->proxies, proxy);
-		}
+			DCsync_proxy_remove(proxy);
 
 		/* hosts */
 
@@ -9606,34 +9612,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_expression_user_macro_validator                               *
- *                                                                            *
- * Purpose: validate user macro values in trigger expressions                 *
- *                                                                            *
- * Parameters: value   - [IN] the macro value                                 *
- *                                                                            *
- * Return value: SUCCEED - the macro value can be used in expression          *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	dc_expression_user_macro_validator(const char *value)
-{
-	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
-		return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dc_expand_user_macros                                        *
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
+ * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
  *                                                                            *
  * Parameters: text           - [IN] the text value to expand                 *
  *             hostids        - [IN] an array of related hostids              *
  *             hostids_num    - [IN] the number of hostids                    *
- *             validator_func - [IN] an optional validator function           *
  *                                                                            *
  * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
@@ -9642,8 +9628,7 @@ static int	dc_expression_user_macro_validator(const char *value)
  *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_value_validator_func_t validator_func)
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, len, last_pos = 0;
@@ -9664,9 +9649,6 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
-		if (NULL != value && NULL != validator_func && FAIL == validator_func(value))
-			zbx_free(value);
-
 		if (NULL != value)
 		{
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
@@ -9684,6 +9666,121 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 		pos = token.loc.r;
 		last_pos = pos + 1;
+	}
+
+	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
+
+	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_expand_user_macros_for_triggers                           *
+ *                                                                            *
+ * Purpose: expand user macros for triggers in the specified text value       *
+ *          autoquote macros that are not already quoted that cannot be       *
+ *          casted to a double                                                *
+ *                                                                            *
+ * Parameters: text           - [IN] the text value to expand                 *
+ *             hostids        - [IN] an array of related hostids              *
+ *             hostids_num    - [IN] the number of hostids                    *
+ *                                                                            *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
+ *               macros will be left unresolved.                              *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *           This function must be used only by configuration syncer          *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num)
+{
+	zbx_token_t	token;
+	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
+	char		*str = NULL, *name = NULL, *context = NULL, *value = NULL;
+	size_t		str_alloc = 0, str_offset = 0, i;
+
+	if ('\0' == *text)
+		return zbx_strdup(NULL, text);
+
+	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
+	{
+		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
+		{
+			switch (text[i])
+			{
+				case '\\':
+					if (0 != cur_token_inside_quote)
+						i++;
+					break;
+				case '"':
+					cur_token_inside_quote = !cur_token_inside_quote;
+					break;
+			}
+		}
+
+		if (ZBX_TOKEN_USER_MACRO != token.type)
+		{
+			prev_token_loc_r = token.loc.r;
+			continue;
+		}
+
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
+		{
+			prev_token_loc_r = token.loc.r;
+			continue;
+		}
+
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
+		dc_get_user_macro(hostids, hostids_num, name, context, &value);
+
+		if (NULL != value)
+		{
+			size_t	sz;
+			char	*tmp;
+
+			sz = zbx_get_escape_string_len(value, "\"\\");
+
+			if (0 == cur_token_inside_quote && ZBX_INFINITY == evaluate_string_to_double(value))
+			{
+				/* autoquote */
+				tmp = zbx_malloc(NULL, sz + 3);
+				tmp[0] = '\"';
+				zbx_escape_string(tmp + 1, sz + 1, value, "\"\\");
+				tmp[sz + 1] = '\"';
+				tmp[sz + 2] = '\0';
+				zbx_free(value);
+				value = tmp;
+			}
+			else
+			{
+				if (sz != strlen(value))
+				{
+					tmp = zbx_malloc(NULL, sz + 1);
+					zbx_escape_string(tmp, sz + 1, value, "\"\\");
+					tmp[sz] = '\0';
+					zbx_free(value);
+					value = tmp;
+				}
+			}
+		}
+
+		if (NULL != value)
+		{
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
+			zbx_free(value);
+		}
+		else
+		{
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
+		}
+
+		zbx_free(name);
+		zbx_free(context);
+
+		pos = token.loc.r;
+		last_pos = pos + 1;
+		prev_token_loc_r = token.loc.r;
 	}
 
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
@@ -9717,8 +9814,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	get_functionids(&functionids, expression);
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	out = zbx_dc_expand_user_macros(expression, hostids.values, hostids.values_num,
-			dc_expression_user_macro_validator);
+	out = zbx_dc_expand_user_macros_for_triggers(expression, hostids.values, hostids.values_num);
 
 	if (NULL != strstr(out, "{$"))
 	{
@@ -12075,6 +12171,54 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_proxy_update_nodata                                       *
+ *                                                                            *
+ * Purpose: stop suppress mode of the nodata() trigger                        *
+ *                                                                            *
+ * Parameter: subscriptions - [IN] the array of trigger id and time of values *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_proxy_update_nodata(zbx_vector_uint64_pair_t *subscriptions)
+{
+	ZBX_DC_PROXY		*proxy = NULL;
+	int			i;
+	zbx_uint64_pair_t	p;
+
+	WRLOCK_CACHE;
+
+	for (i = 0; i < subscriptions->values_num; i++)
+	{
+		p = subscriptions->values[i];
+
+		if ((NULL == proxy || p.first != proxy->hostid) &&
+				NULL == (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &p.first)))
+		{
+			continue;
+		}
+
+		if (0 == (proxy->nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+			continue;
+
+		if (0 != (proxy->nodata_win.flags & ZBX_PROXY_SUPPRESS_MORE) &&
+				(int)p.second > proxy->nodata_win.period_end)
+		{
+			continue;
+		}
+
+		proxy->nodata_win.values_num --;
+
+		if (0 < proxy->nodata_win.values_num || 0 != (proxy->nodata_win.flags & ZBX_PROXY_SUPPRESS_MORE))
+			continue;
+
+		proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
+		proxy->nodata_win.period_end = 0;
+		proxy->nodata_win.values_num = 0;
+	}
+
+	UNLOCK_CACHE;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -12099,7 +12243,18 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 	{
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS))
 		{
-			if (proxy->lastaccess != diff->lastaccess)
+			int	lost = 0;	/* communication lost */
+
+			if (0 != (diff->flags &
+					(ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT | ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG)))
+			{
+				int	delay = diff->lastaccess - proxy->lastaccess;
+
+				if (NET_DELAY_MAX < delay)
+					lost = 1;
+			}
+
+			if (0 == lost && proxy->lastaccess != diff->lastaccess)
 				proxy->lastaccess = diff->lastaccess;
 
 			/* proxy last access in database is updated separately in  */
@@ -12124,9 +12279,36 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		}
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR))
 		{
-			if (proxy-> last_version_error_time != diff->last_version_error_time)
+			if (proxy->last_version_error_time != diff->last_version_error_time)
 				proxy->last_version_error_time = diff->last_version_error_time;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR);
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY))
+		{
+			if (proxy->proxy_delay != diff->proxy_delay)
+				proxy->proxy_delay = diff->proxy_delay;
+
+			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY);
+		}
+
+		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN))
+		{
+			zbx_proxy_suppress_t	*ps_win = &proxy->nodata_win, *ds_win = &diff->nodata_win;
+
+			if ((ps_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE) != (ds_win->flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+			{
+				ps_win->period_end = ds_win->period_end;
+			}
+
+			if (ps_win->flags != ds_win->flags)
+				ps_win->flags = ds_win->flags;
+
+			if (0 > ps_win->values_num)	/* some new values was processed faster than old */
+				ps_win->values_num = 0;	/* we will suppress more                         */
+
+			ps_win->values_num += ds_win->values_num;
+			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);
 		}
 	}
 
@@ -12363,9 +12545,120 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCget_proxy_nodata_win                                           *
+ *                                                                            *
+ * Purpose: retrieves proxy suppress window data from the cache               *
+ *                                                                            *
+ * Parameters: hostid     - [IN] proxy host id                                *
+ *             nodata_win - [OUT] suppress window data                        *
+ *             lastaccess - [OUT] proxy last access time                      *
+ *                                                                            *
+ * Return value: SUCCEED - the data is retrieved                              *
+ *               FAIL    - the data cannot be retrieved, proxy not found in   *
+ *                         configuration cache                                *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess)
+{
+	const ZBX_DC_PROXY	*dc_proxy;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
+	{
+		const zbx_proxy_suppress_t	*proxy_nodata_win = &dc_proxy->nodata_win;
+
+		nodata_win->period_end = proxy_nodata_win->period_end;
+		nodata_win->values_num = proxy_nodata_win->values_num;
+		nodata_win->flags = proxy_nodata_win->flags;
+		*lastaccess = dc_proxy->lastaccess;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_proxy_delay                                                *
+ *                                                                            *
+ * Purpose: retrieves proxy delay from the cache                              *
+ *                                                                            *
+ * Parameters: hostid - [IN] proxy host id                                    *
+ *             delay  - [OUT] proxy delay                                     *
+ *                                                                            *
+ * Return value: SUCCEED - the delay is retrieved                             *
+ *               FAIL    - the delay cannot be retrieved, proxy not found in  *
+ *                         configuration cache                                *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_proxy_delay(zbx_uint64_t hostid, int *delay)
+{
+	const ZBX_DC_PROXY	*dc_proxy;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
+	{
+		*delay = dc_proxy->proxy_delay;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_proxy_delay_by_name                                        *
+ *                                                                            *
+ * Purpose: retrieves proxy delay from the cache                              *
+ *                                                                            *
+ * Parameters: name  - [IN] proxy host name                                   *
+ *             delay - [OUT] proxy delay                                      *
+ *             error - [OUT] error                                            *
+ *                                                                            *
+ * Return value: SUCCEED - proxy delay is retrieved                           *
+ *               FAIL    - proxy delay cannot be retrieved                    *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error)
+{
+	const ZBX_DC_HOST	*dc_host;
+
+	RDLOCK_CACHE;
+	dc_host = DCfind_proxy(name);
+	UNLOCK_CACHE;
+
+	if (NULL == dc_host)
+	{
+		*error = zbx_dsprintf(*error, "proxy \"%s\" not found", name);
+		return FAIL;
+	}
+
+	if (SUCCEED != DCget_proxy_delay(dc_host->hostid, delay))
+	{
+		*error = zbx_dsprintf(*error, "proxy \"%s\" not found in configuration cache", name);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dc_set_macro_env                                             *
  *                                                                            *
- * Purpose: sts user macro environment security level                         *
+ * Purpose: sets user macro environment security level                        *
  *                                                                            *
  * Parameter: env - [IN] the security level (see ZBX_MACRO_ENV_* defines)     *
  *                                                                            *
@@ -12378,6 +12671,22 @@ unsigned char	zbx_dc_set_macro_env(unsigned char env)
 	unsigned char	old_env = macro_env;
 	macro_env = env;
 	return old_env;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_instanceid                                            *
+ *                                                                            *
+ * Purpose: returns server/proxy instance id                                  *
+ *                                                                            *
+ * Return value: the instance id                                              *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_dc_get_instanceid(void)
+{
+	/* instanceid is initialized during the first configuration cache synchronization */
+	/* and is never updated - so it can be accessed without locking cache             */
+	return config->config->instanceid;
 }
 
 #ifdef HAVE_TESTS

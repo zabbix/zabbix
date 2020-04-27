@@ -34,7 +34,6 @@
 
 static zbx_timeperiod_type_t	get_period_type(const char *path)
 {
-	zbx_mock_error_t	err;
 	const char		*data;
 
 	data = zbx_mock_get_parameter_string(path);

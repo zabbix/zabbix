@@ -24,6 +24,10 @@ header {
 		margin: 0 -2px 0 auto;
 		padding: 2px;
 		white-space: nowrap;
+
+		label {
+			line-height: 24px;
+		}
 	}
 
 	a.link-action {

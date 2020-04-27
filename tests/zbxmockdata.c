@@ -140,7 +140,7 @@ static int	zbx_yaml_add_node(yaml_document_t *dst_doc, yaml_document_t *src_doc,
 	return new_node;
 }
 
-static int	zbx_yaml_include(yaml_document_t *dst_doc, yaml_node_pair_t *dst, const char *filename)
+static int	zbx_yaml_include(yaml_document_t *dst_doc, const char *filename)
 {
 	yaml_parser_t		parser;
 	yaml_document_t		doc;
@@ -159,8 +159,7 @@ static int	zbx_yaml_include(yaml_document_t *dst_doc, yaml_node_pair_t *dst, con
 
 	if (0 != yaml_parser_load(&parser, &doc) &&  NULL != (src_root = yaml_document_get_root_node(&doc)))
 	{
-		if (-1 != (index = zbx_yaml_add_node(dst_doc, &doc, src_root)))
-			dst->value = index;
+		index = zbx_yaml_add_node(dst_doc, &doc, src_root);
 	}
 	else
 		printf("Cannot parse include file '%s'\n", filename);
@@ -241,6 +240,47 @@ static void	zbx_yaml_replace_node(yaml_document_t *doc, int old_index, int new_i
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_yaml_include_rec                                             *
+ *                                                                            *
+ * Purpose: recursively include yaml documents from first level 'include'     *
+ *          mapping scalar value or sequence                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_yaml_include_rec(yaml_document_t *doc, int *index)
+{
+	char			filename[MAX_STRING_LEN];
+	const yaml_node_t	*node;
+	int			new_index;
+
+	node = yaml_document_get_node(doc, *index);
+
+	if (YAML_SEQUENCE_NODE == node->type)
+	{
+		yaml_node_item_t	*item;
+
+		for (item = node->data.sequence.items.start; item < node->data.sequence.items.top; item++)
+			zbx_yaml_include_rec(doc, item);
+		return;
+	}
+
+	if (YAML_SCALAR_NODE != node->type)
+		return;
+
+	memcpy(filename, node->data.scalar.value, node->data.scalar.length);
+	filename[node->data.scalar.length] = '\0';
+
+	if (-1 != (new_index = zbx_yaml_include(doc, filename)))
+	{
+		zbx_yaml_replace_node(doc, *index, new_index);
+
+		/* re-acquire root node - after changes to the document */
+		/* the previously acquired node pointers are not valid  */
+		root = yaml_document_get_root_node(&test_case);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_yaml_check_include                                           *
  *                                                                            *
  * Purpose: includes another yaml document if include tag is set              *
@@ -256,8 +296,6 @@ static void	zbx_yaml_replace_node(yaml_document_t *doc, int old_index, int new_i
 static int	zbx_yaml_check_include(yaml_document_t *doc)
 {
 	yaml_node_pair_t	*pair;
-	int			old_index, new_index;
-	char			filename[MAX_STRING_LEN];
 
 	root = yaml_document_get_root_node(doc);
 
@@ -268,26 +306,7 @@ static int	zbx_yaml_check_include(yaml_document_t *doc)
 	{
 		if (0 == zbx_yaml_scalar_cmp("include", yaml_document_get_node(doc, pair->key)))
 		{
-			const yaml_node_t	*node;
-
-			old_index = pair->value;
-			node = yaml_document_get_node(doc, pair->value);
-
-			if (YAML_SCALAR_NODE != node->type)
-				continue;
-
-			memcpy(filename, node->data.scalar.value, node->data.scalar.length);
-			filename[node->data.scalar.length] = '\0';
-
-			if (-1 != (new_index = zbx_yaml_include(doc, pair, filename)))
-			{
-				zbx_yaml_replace_node(doc, old_index, new_index);
-
-				/* re-acquire root node - after changes to the document */
-				/* the previously acquired node pointers are not valid  */
-				root = yaml_document_get_root_node(&test_case);
-			}
-
+			zbx_yaml_include_rec(doc, &pair->value);
 			break;
 		}
 	}
@@ -919,4 +938,74 @@ zbx_mock_error_t	zbx_mock_float(zbx_mock_handle_t object, double *value)
 	zbx_free(tmp);
 
 	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_string_ex                                               *
+ *                                                                            *
+ * Purpose: return string object contents                                     *
+ *                                                                            *
+ * Comments: The object can be either scalar value or a mapping. In the first *
+ *           case the scalar value is returned. In the other case the string  *
+ *           is assembled from the object properties:                         *
+ *             <header> + <page> * <pages> + <footer>                         *
+ *           (<header>, <page>, <pages>, <footer> properties are optional and *
+ *           by default are empty except pages, which is 1 by default).       *
+ *                                                                            *
+ ******************************************************************************/
+zbx_mock_error_t	zbx_mock_string_ex(zbx_mock_handle_t hobject, const char **value)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 0, tmp_offset = 0;
+
+	/* if the object is string - return the value */
+	if (ZBX_MOCK_SUCCESS == (err = zbx_mock_string(hobject, value)))
+		return ZBX_MOCK_SUCCESS;
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hobject, "header", &handle))
+	{
+		const char	*header;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &header)))
+			fail_msg("Cannot read header property: %s", zbx_mock_error_string(err));
+		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, header);
+	}
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hobject, "page", &handle))
+	{
+		const char	*page;
+		int		i, pages_num = 1;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &page)))
+			fail_msg("Cannot read page property: %s", zbx_mock_error_string(err));
+
+		if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hobject, "pages", &handle))
+		{
+			const char	*pages;
+
+			if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &pages)))
+				fail_msg("Cannot read pages property: %s", zbx_mock_error_string(err));
+			pages_num = atoi(pages);
+		}
+
+		for (i = 0; i < pages_num; i++)
+			zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, page);
+	}
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hobject, "footer", &handle))
+	{
+		const char	*footer;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &footer)))
+			fail_msg("Cannot read footer property: %s", zbx_mock_error_string(err));
+		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, footer);
+	}
+
+	zbx_vector_str_append(&string_pool, tmp);
+	*value = tmp;
+
+	return ZBX_MOCK_SUCCESS;
 }

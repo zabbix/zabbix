@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.0alpha5');
+define('ZABBIX_VERSION',		'5.0.0beta2');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050076);
+define('ZABBIX_DB_VERSION',		4050079);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -40,7 +40,8 @@ define('ZBX_GIBIBYTE',	'1073741824');
 define('ZBX_TEBIBYTE',	'1099511627776');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-// the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1
+// The maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1.
+// Both dates are included to the period, so one second is needed to cover the case from "now" till "now-2y".
 define('ZBX_MAX_PERIOD',		63162001);
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
@@ -79,8 +80,6 @@ define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font (GD > 2.0.18)
 define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
-
-define('ZBX_SCRIPT_TIMEOUT',		60); // in seconds
 
 define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
@@ -1230,7 +1229,10 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
-define('ZBX_SOCKET_TIMEOUT',        3);                 // socket timeout limit
+define('ZBX_SOCKET_TIMEOUT',			3);		// Socket timeout limit.
+define('ZBX_CONNECT_TIMEOUT',			3);		// Zabbix server connect timeout limit.
+define('ZBX_MEDIA_TYPE_TEST_TIMEOUT',	65);	// Timeout limit set for media type test.
+define('ZBX_SCRIPT_TIMEOUT',			60);	// Timeout limit set for scripts.
 define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
 // value is also used in servercheck.js file
@@ -1360,6 +1362,7 @@ define('ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH',		218);
 define('ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH',	218);
 define('ZBX_TEXTAREA_MACRO_WIDTH',				250);
 define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		300);
+define('ZBX_TEXTAREA_MACRO_INHERITED_WIDTH',	180);
 define('ZBX_TEXTAREA_TAG_WIDTH',				250);
 define('ZBX_TEXTAREA_TAG_VALUE_WIDTH',			300);
 define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
@@ -1771,6 +1774,7 @@ define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
 define('ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN', 'table-forms-second-column');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
+define('ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK', 'overflow-break');
 define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');

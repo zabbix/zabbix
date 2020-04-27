@@ -33,6 +33,7 @@ import (
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/remotecontrol"
+	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/agent/serverconnector"
 	"zabbix.com/internal/agent/serverlistener"
@@ -337,6 +338,10 @@ func main() {
 	addresses, err := serverconnector.ParseServerActive()
 	if err != nil {
 		fatalExit("cannot parse the \"ServerActive\" parameter", err)
+	}
+
+	if err = resultcache.Prepare(&agent.Options, addresses); err != nil {
+		fatalExit("cannot prepare result cache", err)
 	}
 
 	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {

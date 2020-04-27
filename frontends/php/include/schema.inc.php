@@ -2873,6 +2873,12 @@ return [
 				'length' => 32,
 				'default' => '7d',
 			],
+			'instanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
+			],
 		],
 	],
 	'triggers' => [
@@ -4856,6 +4862,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'write_clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'proxy_dhistory' => [
@@ -5094,7 +5106,7 @@ return [
 			'message' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			],
 			'action' => [
