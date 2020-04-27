@@ -1969,7 +1969,9 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
  * @return CTable
  */
 function makeEventHistoryTable(array $actions, array $users, array $config) {
-	$table = (new CTable())->setHeader([_('Time'), _('User'), _('User action'), _('Message')]);
+	$table = (new CTable())
+		->addStyle('width: 100%;')
+		->setHeader([_('Time'), _('User'), _('User action'), _('Message')]);
 
 	foreach ($actions as $action) {
 		// Added in order to reuse makeActionTableUser() and makeActionTableIcon()
@@ -1979,7 +1981,7 @@ function makeEventHistoryTable(array $actions, array $users, array $config) {
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
 			makeActionTableIcon($action, $config),
-			zbx_nl2br($action['message'])
+			(new CCol(zbx_nl2br($action['message'])))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK)
 		]);
 	}
 

@@ -507,7 +507,7 @@ class CScreenHistory extends CScreenBase {
 					foreach ($items as $item) {
 						$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
 
-						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT && $value !== '') {
 							$value = formatFloat($value, null, ZBX_UNITS_ROUNDOFF_UNSUFFIXED);
 						}
 

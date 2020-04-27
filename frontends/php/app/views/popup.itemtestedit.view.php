@@ -48,7 +48,7 @@ foreach ($data['inputs'] as $name => $value) {
 		$form->addVar('hostid', $value['hostid']);
 		continue;
 	}
-	elseif (in_array($name, ['proxy_hostid'])) {
+	elseif ($name === 'proxy_hostid') {
 		continue;
 	}
 

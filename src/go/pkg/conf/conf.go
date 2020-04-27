@@ -43,6 +43,10 @@ type Meta struct {
 	min          int64
 	max          int64
 }
+type Suffix struct {
+	suffix string
+	factor int
+}
 
 func validateParameterName(key []byte) (err error) {
 	for i, b := range key {
@@ -137,6 +141,40 @@ loop:
 	return &m, nil
 }
 
+func getTimeSuffix(str string) (string, int) {
+	suffixes := []Suffix{
+		Suffix{
+			suffix: "s",
+			factor: 1,
+		},
+		Suffix{
+			suffix: "m",
+			factor: 60,
+		},
+		Suffix{
+			suffix: "h",
+			factor: 3600,
+		},
+		Suffix{
+			suffix: "d",
+			factor: 86400,
+		},
+		Suffix{
+			suffix: "w",
+			factor: (7 * 86400),
+		},
+	}
+
+	for _, s := range suffixes {
+		if strings.HasSuffix(str, s.suffix) == true {
+			str = strings.TrimSuffix(str, s.suffix)
+			return str, s.factor
+		}
+	}
+	return str, 1
+
+}
+
 func setBasicValue(value reflect.Value, meta *Meta, str *string) (err error) {
 	if str == nil {
 		return nil
@@ -146,7 +184,10 @@ func setBasicValue(value reflect.Value, meta *Meta, str *string) (err error) {
 		value.SetString(*str)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		var v int64
+		var r int
+		*str, r = getTimeSuffix(*str)
 		if v, err = strconv.ParseInt(*str, 10, 64); err == nil {
+			v = v * int64(r)
 			if meta != nil {
 				if meta.min != -1 && v < meta.min || meta.max != -1 && v > meta.max {
 					return errors.New("value out of range")
@@ -156,7 +197,10 @@ func setBasicValue(value reflect.Value, meta *Meta, str *string) (err error) {
 		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		var v uint64
+		var r int
+		*str, r = getTimeSuffix(*str)
 		if v, err = strconv.ParseUint(*str, 10, 64); err == nil {
+			v = v * uint64(r)
 			if meta != nil {
 				if meta.min != -1 && v < uint64(meta.min) || meta.max != -1 && v > uint64(meta.max) {
 					return errors.New("value out of range")

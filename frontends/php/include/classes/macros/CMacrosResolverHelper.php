@@ -316,19 +316,17 @@ class CMacrosResolverHelper {
 	 * @static
 	 *
 	 * @param string $expression
-	 * @param array  $options		see resolveTriggerExpressions() for more details ('sources' is not supported here)
+	 * @param array  $options     See CMacrosResolver::resolveTriggerExpressions() for more details.
+	 *                            'sources' is not supported here.
 	 *
 	 * @return string
 	 */
 	public static function resolveTriggerExpression($expression, array $options = []) {
 		self::init();
 
-		return self::$macrosResolver->resolveTriggerExpressions([['expression' => $expression]], [
-			'html' => array_key_exists('html', $options) && $options['html'],
-			'resolve_usermacros' => array_key_exists('resolve_usermacros', $options) && $options['resolve_usermacros'],
-			'resolve_macros' => array_key_exists('resolve_macros', $options) && $options['resolve_macros'],
-			'sources' => ['expression']
-		])[0]['expression'];
+		return self::$macrosResolver->resolveTriggerExpressions(
+			[['expression' => $expression]], $options
+		)[0]['expression'];
 	}
 
 	/**
@@ -336,45 +334,15 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array  $triggers
-	 * @param string $triggers[]['expression']
-	 * @param array  $options
-	 * @param bool   $options['html']				(optional) returns formatted trigger expression
-	 * @param bool   $options['resolve_usermacros']	(optional) resolve user macros
-	 * @param bool   $options['resolve_macros']		(optional) resolve macros in item keys and functions
-	 * @param array  $options['sources']			(optional) an array of the field names; default ['expression']
+	 * @param array $triggers
+	 * @param array $options   See CMacrosResolver::resolveTriggerExpressions() for more details.
 	 *
 	 * @return array
 	 */
 	public static function resolveTriggerExpressions(array $triggers, array $options = []) {
 		self::init();
 
-		return self::$macrosResolver->resolveTriggerExpressions($triggers, [
-			'html' => array_key_exists('html', $options) && $options['html'],
-			'resolve_usermacros' => array_key_exists('resolve_usermacros', $options) && $options['resolve_usermacros'],
-			'resolve_macros' => array_key_exists('resolve_macros', $options) && $options['resolve_macros'],
-			'sources' => array_key_exists('sources', $options) ? $options['sources'] : ['expression']
-		]);
-	}
-
-	/**
-	 * Resolve user macros in trigger expression.
-	 *
-	 * @static
-	 *
-	 * @param array $trigger
-	 * @param array $trigger['triggerid']
-	 * @param array $trigger['expression']
-	 *
-	 * @return string
-	 */
-	public static function resolveTriggerExpressionUserMacro(array $trigger) {
-		self::init();
-
-		$triggers = self::$macrosResolver->resolveTriggerExpressionUserMacro(zbx_toHash([$trigger], 'triggerid'));
-		$trigger = reset($triggers);
-
-		return $trigger['expression'];
+		return self::$macrosResolver->resolveTriggerExpressions($triggers, $options);
 	}
 
 	/**

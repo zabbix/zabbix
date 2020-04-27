@@ -1,0 +1,227 @@
+---
+test case: Expand '{1} < {#A}' with {#A}=1
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":1}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} < {#A}'
+out:
+  expression: '{1} < 1'
+  return: SUCCEED
+---
+test case: Expand '{1} < "{#A}"' with {#A}=1
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":1}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} < "{#A}"'
+out:
+  expression: '{1} < "1"'
+  return: SUCCEED
+---
+test case: Expand '{1} < {#A}'
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":1}'
+  macros: []
+  expression: '{1} < {#A}'
+out:
+  expression: '{1} < {#A}'
+  return: SUCCEED
+---
+test case: Expand '{1} < {#A}' with {#A}=x
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"x"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} < {#A}'
+out:
+  expression: '{1} < "x"'
+  return: SUCCEED
+---
+test case: Expand '{1} < {#A}' with {#A}="x"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\"x\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} < {#A}'
+out:
+  expression: '{1} < "\"x\""'
+  return: SUCCEED
+---
+test case: Expand '{1} < "{#A}"' with {#A}="x"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\"x\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} < "{#A}"'
+out:
+  expression: '{1} < "\"x\""'
+  return: SUCCEED
+---
+test case: Expand '{1} < "{#A}"'
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\"x\""}'
+  macros: []
+  expression: '{1} < "{#A}"'
+out:
+  expression: '{1} < "{#A}"'
+  return: SUCCEED
+---
+test case: Expand '{1} = "x" and {2} < {#A}' with {#A}="x"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\"x\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} = "x" and {2} < {#A}'
+out:
+  expression: '{1} = "x" and {2} < "\"x\""'
+  return: SUCCEED
+---
+test case: Expand '{1} < "{#A}{#B}"' with {#A}=1,'{#B}'="x"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":1, "b":"\"x\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+    - {macro: '{#B}', path: $.b}
+  expression: '{1} < "{#A}{#B}"'
+out:
+  expression: '{1} < "1\"x\""'
+  return: SUCCEED
+---
+test case: Expand '{1} < "{#A}{#B}"' with {#A}=1,'{#B}'=2
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":1, "b":2}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+    - {macro: '{#B}', path: $.b}
+  expression: '{1} < "{#A}{#B}"'
+out:
+  expression: '{1} < "12"'
+  return: SUCCEED
+---
+test case: Expand '{1} < "{#A}{#B}"' with {#A}="x",'{#B}'="y"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\"x\"", "b":"\"y\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+    - {macro: '{#B}', path: $.b}
+  expression: '{1} < "{#A}{#B}"'
+out:
+  expression: '{1} < "\"x\"\"y\""'
+  return: SUCCEED
+---
+test case: Expand '{1} < {#A}{#B}' with {#A}="x",'{#B}'="y"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\"x\"", "b":"\"y\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+    - {macro: '{#B}', path: $.b}
+  expression: '{1} < {#A}{#B}'
+out:
+  expression: '{1} < "\"x\"""\"y\""'
+  return: SUCCEED
+---
+test case: Expand '{1} < {#A}{#B}' with {#A}=1,'{#B}'=0
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":1, "b":0}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+    - {macro: '{#B}', path: $.b}
+  expression: '{1} < {#A}{#B}'
+out:
+  expression: '{1} < 10'
+  return: SUCCEED
+---
+test case: Expand '{1} < "\"{#A}\"{#B}\""' with {#A}=\",'{#B}'=\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\\\"", "b":"\\"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+    - {macro: '{#B}', path: $.b}
+  expression: '{1} < "\"{#A}\"{#B}\""'
+  return: SUCCEED
+out:
+  expression: '{1} < "\"\\\"\"\\\""'
+  return: SUCCEED
+---  
+test case: Expand '{1} < " \" {#A}  \"  {#B}  \"  " and {#A}<>"\"{#B}" and " {#A} " = " {#A} "' with {#A}=",'{#B}'=\\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\"", "b":"\\\\"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+    - {macro: '{#B}', path: $.b}
+  expression: '{1} < " \" {#A}  \"  {#B}  \"  " and {#A}<>"\"{#B}" and " {#A} " = " {#A} "'
+out:
+  expression: '{1} < " \" \"  \"  \\\\  \"  " and "\""<>"\"\\\\" and " \" " = " \" "'
+  return: SUCCEED
+---
+test case: Expand '{1} < {#A}' with {#A}=""
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"", "b":"\\\\"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} < {#A}'
+out:
+  expression: '{1} < ""'
+  return: SUCCEED
+---
+test case: Expand '{1} < "{#A}"' with {#A}=""
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"", "b":"\\\\"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} < "{#A}"'
+out:
+  expression: '{1} < ""'
+  return: SUCCEED
+---
+test case: Expand '{2000} < {#A}' with {#A}=2e+3
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":2e+3}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{2000} < {#A}'
+out:
+  expression: '{2000} < 2e+3'
+  return: SUCCEED
+---
+test case: Expand '{1} < "\\\"a\"" and {1} = {#A}' with {#A}="b"
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"\"b\""}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{1} < "\\\"a\"" and {1} = {#A}'
+out:
+  expression: '{1} < "\\\"a\"" and {1} = "\"b\""'
+  return: SUCCEED
+---
+test case: Expand '{2} <> {$M:"context:\"\\/\""} and {1} < {#A}' with {#A}=x
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_TRIGGER]
+  lld: '{"a":"x"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{2} <> {$M:"context:\"\\/\""} and {1} < {#A}'
+out:
+  expression: '{2} <> {$M:"context:\"\\/\""} and {1} < "x"'
+  return: SUCCEED
+...

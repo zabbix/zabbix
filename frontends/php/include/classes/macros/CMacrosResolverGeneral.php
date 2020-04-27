@@ -53,32 +53,30 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function resolveTriggerReferences($expression, $references) {
-		$matched_macros = $this->getMacroPositions($expression, ['usermacros' => true]);
+		$values = [];
+		$expression_data = new CTriggerExpression(['collapsed_expression' => true]);
 
-		// Replace user macros with string 'macro' to make values search easier.
-		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-			$expression = substr_replace($expression, 'macro', $pos, strlen($macro));
+		if (($result = $expression_data->parse($expression)) !== false) {
+			foreach ($result->getTokens() as $token) {
+				switch ($token['type']) {
+					case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
+					case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
+						$values[] = $token['value'];
+						break;
+
+					case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+						$values[] = $token['data']['string'];
+						break;
+				}
+			}
 		}
 
-		// Replace functionids with string 'function' to make values search easier.
-		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
-
-		// Replace whitespace with emptyness to make value search easier.
-		$expression = str_replace(" \r\n\t", '', $expression);
-
-		// Search for numeric values in expression.
-		preg_match_all('/(?<![\w\)])('.ZBX_PREG_NUMBER.'['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)/', $expression,
-			$values
-		);
-
-		$macro_values = [];
-
-		foreach (array_keys($references) as $reference) {
-			$i = (int) $reference[1] - 1;
-			$macro_values[$reference] = array_key_exists($i, $values[0]) ? $values[0][$i] : '';
+		foreach ($references as $macro => $value) {
+			$i = (int) $macro[1] - 1;
+			$references[$macro] = array_key_exists($i, $values) ? $values[$i] : '';
 		}
 
-		return $macro_values;
+		return $references;
 	}
 
 	/**
@@ -252,7 +250,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	public function extractMacros(array $texts, array $types) {
+	public static function extractMacros(array $texts, array $types) {
 		$macros = [];
 		$extract_usermacros = array_key_exists('usermacros', $types);
 		$extract_macros = array_key_exists('macros', $types);
@@ -488,7 +486,7 @@ class CMacrosResolverGeneral {
 			$item_key_parameters = $this->getItemKeyParameters($item_key_parser->getParamsRaw());
 		}
 
-		return $this->extractMacros($item_key_parameters, $types);
+		return self::extractMacros($item_key_parameters, $types);
 	}
 
 	/**
@@ -517,7 +515,7 @@ class CMacrosResolverGeneral {
 			}
 		}
 
-		return $this->extractMacros($function_parameters, $types);
+		return self::extractMacros($function_parameters, $types);
 	}
 
 	/**
@@ -949,12 +947,13 @@ class CMacrosResolverGeneral {
 	 * Get macros with values.
 	 *
 	 * @param array $data
-	 * @param array $data[n]['hostids']  the list of host ids; [<hostid1>, ...]
-	 * @param array $data[n]['macros']   the list of user macros to resolve, ['<usermacro1>' => null, ...]
+	 * @param array $data[n]['hostids']  The list of host ids; [<hostid1>, ...].
+	 * @param array $data[n]['macros']   The list of user macros to resolve, ['<usermacro1>' => null, ...].
+	 * @param bool  $unset_undefined     Unset undefined macros.
 	 *
 	 * @return array
 	 */
-	protected function getUserMacros(array $data) {
+	protected function getUserMacros(array $data, bool $unset_undefined = false) {
 		if (!$data) {
 			return $data;
 		}
@@ -1133,22 +1132,23 @@ class CMacrosResolverGeneral {
 			unset($element);
 		}
 
-		foreach ($data as &$element) {
-			foreach ($element['macros'] as $usermacro => &$value) {
+		foreach ($data as $key => $element) {
+			foreach ($element['macros'] as $usermacro => $value) {
 				if ($value['value'] !== null) {
-					$value = $value['value'];
+					$data[$key]['macros'][$usermacro] = $value['value'];
 				}
 				elseif ($value['value_default'] !== null) {
-					$value = $value['value_default'];
+					$data[$key]['macros'][$usermacro] = $value['value_default'];
+				}
+				// Unresolved macro.
+				elseif ($unset_undefined) {
+					unset($data[$key]['macros'][$usermacro]);
 				}
 				else {
-					// Unresolved macro.
-					$value = $usermacro;
+					$data[$key]['macros'][$usermacro] = $usermacro;
 				}
 			}
-			unset($value);
 		}
-		unset($element);
 
 		return $data;
 	}

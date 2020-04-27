@@ -132,6 +132,7 @@ tests/libs/zbxdbcache/is_item_processed_by_server
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values
+tests/libs/zbxdbcache/zbx_dc_expand_user_macros_for_triggers
 tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
@@ -170,6 +171,11 @@ tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
+tests/libs/zbxcommon/zbx_truncate_itemkey
+tests/libs/zbxcommon/zbx_truncate_value
+tests/libs/zbxserver/evaluate_function
+tests/libs/zbxserver/get_trigger_expression_constant
+tests/libs/zbxserver/substitute_lld_macros
 /zabbix-*.tar.gz
 .vscode
 sbin/zabbix_agentd
@@ -197,6 +203,7 @@ bin/agent
 bin/mock_server
 bin/zabbix_get
 bin/zabbix_sender
+bin/zabbix_js
 .cproject
 etc/agent.conf
 sbin/zabbix_agent2
