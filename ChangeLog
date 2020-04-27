@@ -1,6 +1,7 @@
 Changes for 5.0.0beta2
 
 New features:
+........S. [ZBXNEXT-1899] added support of threaded email notifications (wiper)
 ..F....PS. [ZBXNEXT-1891] added option 'delay' for zabbix[proxy] internal check and calculate nodata() to respect proxy availability (asestakovs, gcalenko, MVekslers)
 ...G...... [ZBXNEXT-1686] added persistent queue for active items in Zabbix agent 2 (akozlovs)
 A......... [ZBXNEXT-5849] added support of search and filter by macro value (gcalenko)
