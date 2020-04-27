@@ -54,6 +54,11 @@ aside,
 	& > .debug-output {
 		flex-shrink: 0;
 	}
+
+	& > output {
+		box-sizing: border-box;
+		min-width: 1200px;
+	}
 }
 
 header,
