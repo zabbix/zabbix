@@ -85,7 +85,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 		: [_('Graphs'), $graph_count];
 
 	$discovery_link = $host['editable']
-		? [new CLink(_('Discovery'), 'host_discovery.php?'.$link), $discovery_count]
+		? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$hostid])
+		), $discovery_count]
 		: [_('Discovery'), $discovery_count];
 
 	$httptests_link = $host['editable']
@@ -271,9 +274,11 @@ if ($data['admin']) {
 			? [new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid), $screen_count]
 			: [_('Screens'), $screen_count];
 
-		$discovery_link_url = (new CUrl('host_discovery.php'))->setArgument('hostid', $templateid);
 		$discovery_link = $template['editable']
-			? [new CLink(_('Discovery'), $discovery_link_url), $discovery_count]
+			? [new CLink(_('Discovery'), (new CUrl('host_discovery.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$templateid])
+			), $discovery_count]
 			: [_('Discovery'), $discovery_count];
 
 		$httptests_link = $template['editable']

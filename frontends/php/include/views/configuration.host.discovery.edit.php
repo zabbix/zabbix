@@ -761,14 +761,14 @@ if (!empty($data['itemid'])) {
 
 	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid'])))
 		->setEnabled(!$data['limited']);
-	$buttons[] = new CButtonCancel(url_param('hostid'));
+	$buttons[] = new CButtonCancel();
 
 	$tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_param('hostid'))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel()]
 	));
 }
 
