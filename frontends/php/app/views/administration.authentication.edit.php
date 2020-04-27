@@ -147,19 +147,21 @@ $saml_tab = (new CFormList('list_saml'))
 			->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
 	)
 	->addRow((new CLabel(_('IdP entity ID'), 'saml_idp_entityid'))->setAsteriskMark(),
-		(new CTextBox('saml_idp_entityid', $data['saml_idp_entityid']))
+		(new CTextBox('saml_idp_entityid', $data['saml_idp_entityid'], false,
+			DB::getFieldLength('config', 'saml_idp_entityid')
+		))
 			->setEnabled($is_saml_auth_enabled)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('SSO service URL'), 'saml_sso_url'))->setAsteriskMark(),
-		(new CTextBox('saml_sso_url', $data['saml_sso_url']))
+		(new CTextBox('saml_sso_url', $data['saml_sso_url'], false, DB::getFieldLength('config', 'saml_sso_url')))
 			->setEnabled($is_saml_auth_enabled)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(new CLabel(_('SLO service URL'), 'saml_slo_url'),
-		(new CTextBox('saml_slo_url', $data['saml_slo_url']))
+		(new CTextBox('saml_slo_url', $data['saml_slo_url'], false, DB::getFieldLength('config', 'saml_slo_url')))
 			->setEnabled($is_saml_auth_enabled)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
@@ -172,12 +174,16 @@ $saml_tab = (new CFormList('list_saml'))
 			->setAriaRequired()
 	)
 	->addRow(new CLabel(_('SP entity ID'), 'saml_sp_entityid'),
-		(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid']))
+		(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false,
+			DB::getFieldLength('config', 'saml_sp_entityid')
+		))
 			->setEnabled($is_saml_auth_enabled)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('SP name ID format'), 'saml_nameid_format'),
-		(new CTextBox('saml_nameid_format', $data['saml_nameid_format']))
+		(new CTextBox('saml_nameid_format', $data['saml_nameid_format'], false,
+			DB::getFieldLength('config', 'saml_nameid_format')
+		))
 			->setEnabled($is_saml_auth_enabled)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('placeholder', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient')
