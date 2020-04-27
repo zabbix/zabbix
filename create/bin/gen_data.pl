@@ -209,6 +209,10 @@ sub process_row
 
 							$move_to_next = $2;
 						}
+						else
+						{
+							$move_to_next = "$move_to_next$_";
+						}
 					}
 
 					if (length($move_to_next) > 0)
