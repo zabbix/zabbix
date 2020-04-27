@@ -863,6 +863,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'trapper_hosts' => '',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'master_item' => []
 				],
 				'empty-lld-rule-jmx' => [
@@ -912,6 +913,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'trapper_hosts' => '',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'master_item' => []
 				],
 				'lld-rule' => [
@@ -1196,6 +1198,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'trapper_hosts' => '',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'master_item' => []
 				]
 			],
@@ -1246,6 +1249,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'trapper_hosts' => '',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'master_item' => []
 				],
 				'lld-rule-jmx' => [
@@ -1294,6 +1298,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'trapper_hosts' => '',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'master_item' => []
 				],
 				'lld-rule' => [
@@ -1572,6 +1577,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'trapper_hosts' => '',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'master_item' => []
 				]
 			]
@@ -3287,6 +3293,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'key_' => 'drule',
 					'trapper_hosts' => ''
 				],
@@ -3383,6 +3390,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'key_' => 'drule2',
 					'trapper_hosts' => ''
 				],
@@ -3479,6 +3487,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'key_' => 'drule3',
 					'trapper_hosts' => ''
 				]
@@ -4068,6 +4077,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'key_' => 'drule',
 					'trapper_hosts' => ''
 				],
@@ -4166,6 +4176,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'key_' => 'drule2',
 					'trapper_hosts' => ''
 				],
@@ -4264,6 +4275,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'verify_host' => '0',
 					'lld_macro_paths' => [],
 					'preprocessing' => [],
+					'overrides' => [],
 					'key_' => 'drule3',
 					'trapper_hosts' => ''
 				]
