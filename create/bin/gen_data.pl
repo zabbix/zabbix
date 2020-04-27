@@ -182,7 +182,7 @@ sub process_row
 
 				if (length($_) > $oracle_field_limit)
 				{
-					my @sections = unpack("(A$oracle_field_limit)*", $_);
+					my @sections = unpack("(a$oracle_field_limit)*", $_);
 					my $move_to_next;
 					my $first_part = 1;
 					my $script;
