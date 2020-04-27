@@ -2077,6 +2077,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	char			*buffer = NULL, err[MAX_STRING_LEN];
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
 	const char		*delay, *history, *trends;
+	unsigned char		status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2094,8 +2095,9 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	delay = item_prototype->delay;
 	history = item_prototype->history;
 	trends = item_prototype->trends;
+	status = item_prototype->status;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, NULL);
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &status);
 
 	if (0 != strcmp(item->key_proto, item_prototype->key))
 	{
@@ -2388,7 +2390,9 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD;
 	}
 
-	item->flags |= ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	if (ITEM_STATUS_NO_CREATE != status)
+		item->flags |= ZBX_FLAG_LLD_ITEM_DISCOVERED;
+
 	item->lld_row = lld_row;
 
 	zbx_free(buffer);
