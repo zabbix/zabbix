@@ -140,6 +140,8 @@ class CRouter {
 		'popup.itemtest.edit'			=> ['CControllerPopupItemTestEdit',					'layout.json',			'popup.itemtestedit.view'],
 		'popup.itemtest.getvalue'		=> ['CControllerPopupItemTestGetValue',				'layout.json',			null],
 		'popup.itemtest.send'			=> ['CControllerPopupItemTestSend',					'layout.json',			null],
+		'popup.lldoperation'			=> ['CControllerPopupLldOperation',					'layout.json',			'popup.lldoperation'],
+		'popup.lldoverride'				=> ['CControllerPopupLldOverride',					'layout.json',			'popup.lldoverride'],
 		'popup.maintenance.period'		=> ['CControllerPopupMaintenancePeriod',			'layout.json',			'popup.maintenance.period'],
 		'popup.media'					=> ['CControllerPopupMedia',						'layout.json',			'popup.media'],
 		'popup.mediatype.message'		=> ['CControllerPopupMediatypeMessage',				'layout.json',			'popup.mediatype.message'],

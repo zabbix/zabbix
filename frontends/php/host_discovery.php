@@ -180,6 +180,7 @@ $fields = [
 									_('Password')
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
+	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null], // TODO VM: check validation rules
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
@@ -243,6 +244,7 @@ if (getRequest('itemid', false)) {
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'selectLLDMacroPaths' => ['lld_macro', 'path'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+		'selectOverrides' => API_OUTPUT_EXTEND, // TODO VM: replace by exact fields
 		'editable' => true
 	]);
 	$item = reset($item);
@@ -577,6 +579,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
+		$overrides = getRequest('overrides', []);
+		// TODO VM: make necessary updates?
+		$newItem['overrides'] = $overrides;
+
 		if (hasRequest('update')) {
 			DBstart();
 
@@ -627,6 +633,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$newItem['preprocessing'] = $preprocessing;
 			}
 
+			// TODO VM: remove overrides, if not changed.
+
 			$result = API::DiscoveryRule()->update($newItem);
 			$result = DBend($result);
 		}
@@ -638,6 +646,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($preprocessing) {
 				$newItem['preprocessing'] = $preprocessing;
 			}
+
+			// TODO VM: remove overrides, if empty.
 
 			$result = API::DiscoveryRule()->create([$newItem]);
 		}
@@ -745,6 +755,8 @@ if (hasRequest('form')) {
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
+	$data['overrides'] = getRequest('overrides', []);
+	$data['templated'] = false; // TODO VM: implement correctly
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
@@ -768,6 +780,122 @@ if (hasRequest('form')) {
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
+		$data['overrides'] = $item['overrides'];
+		// TODO VM: API validation error? Operations are not mandatory?
+		// TODO VM: sort entries by 'step'. Is API not already managing it?
+		// Sort overides to be listed in step order.
+		CArrayHelper::sort($data['overrides'], [
+			['field' => 'step', 'order' => ZBX_SORT_UP]
+		]);
+		// TODO VM: remove test data
+		$data['overrides'] = [
+			[
+				'step' => '1',
+				'name' => 'Test name',
+				'stop' => '1',
+				'filter' => [
+					'evaltype' => '2',
+					'formula' => '',
+					'conditions' => [
+						[
+							'macro' => '{#MACROA1}',
+							'operator' => '8',
+							'value' => 'Value A',
+							'formulaid' => 'A'
+						],
+						[
+							'macro' => '{#MACROB1}',
+							'operator' => '9',
+							'value' => 'Value B',
+							'formulaid' => 'B'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationobject' => '0',
+						'operator' => '2',
+						'value' => 'test',
+						'opstatus' => [
+							'status' => '2'
+						],
+						'opperiod' => [
+							'delay' => '0;10s/1-7,08:00-20:00;wd7h1m55'
+						],
+						'ophistory' => [
+							'history' => '5d'
+						],
+						'optrends' => [
+							'trends' => '5d'
+						]
+					],
+					[
+						'operationobject' => '1',
+						'operator' => '1',
+						'value' => 'test',
+						'opstatus' => [
+							'status' => '2'
+						],
+						'opseverity' => [
+							'severity' => '5'
+						],
+						'optag' => [
+							[
+							'tag' => 'tag name',
+							'value' => 'tag value'
+							]
+						]
+					],
+					[
+						'operationobject' => '2',
+						'operator' => '0',
+						'value' => 'test',
+						'opstatus' => [
+							'status' => '2'
+						]
+					],
+					[
+						'operationobject' => '3',
+						'operator' => '0',
+						'value' => 'test',
+						'opstatus' => [
+							'status' => '1'
+						],
+						'optemplate' => [
+							[
+								'templateid' => '31243'
+							]
+						],
+						'opinventory' => [
+							'inventory_mode' => '-1'
+						]
+					]
+				]
+			],
+			[
+				'step' => '2',
+				'name' => 'Test name2',
+				'stop' => '0',
+				'filter' => [
+					'evaltype' => '3',
+					'formula' => 'A and B',
+					'conditions' => [
+						[
+							'macro' => '{#MACROA2}',
+							'operator' => '8',
+							'value' => 'Value A',
+							'formulaid' => 'A'
+						],
+						[
+							'macro' => '{#MACROB2}',
+							'operator' => '9',
+							'value' => 'Value B',
+							'formulaid' => 'B'
+						]
+					]
+				]
+			]
+		];
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
