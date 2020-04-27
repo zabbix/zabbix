@@ -105,7 +105,7 @@ class CMenu extends CTag {
 	/**
 	 * Insert new menu item after the one with specified label, or insert as the last item, if not found.
 	 *
-	 * @param string $label         Visual label to insert item after.
+	 * @param string    $label      Visual label to insert item after.
 	 * @param CMenuItem $menu_item  Menu item object.
 	 *
 	 * @return CMenu
@@ -117,7 +117,7 @@ class CMenu extends CTag {
 	/**
 	 * Insert new menu item before the one with specified label, or insert as the first item, if not found.
 	 *
-	 * @param string $label         Visual label to insert item before.
+	 * @param string    $label      Visual label to insert item before.
 	 * @param CMenuItem $menu_item  Menu item object.
 	 *
 	 * @return CMenu

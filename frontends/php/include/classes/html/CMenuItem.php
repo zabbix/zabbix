@@ -89,7 +89,7 @@ class CMenuItem extends CTag {
 	/**
 	 * Set action name and derive a corresponding URL for menu item link.
 	 *
-	 * @param string  Action name.
+	 * @param string $action_name  Action name.
 	 *
 	 * @return CMenuItem
 	 */
@@ -269,7 +269,7 @@ class CMenuItem extends CTag {
 	/**
 	 * Set url for the menu item link.
 	 *
-	 * @param CUrl $url
+	 * @param CUrl        $url
 	 * @param string|null $action_name  Associate action name to be matched by setSelected method.
 	 *
 	 * @return CMenuItem
