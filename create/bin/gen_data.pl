@@ -53,7 +53,7 @@ my %sqlite3 = (
 # Maximum line length that SQL*Plus can read from .sql file is 2499 characters.
 # Splitting long entries in 'media_type' table have to happen before SQL*Plus limit has been reached and end-of-lien
 # character has to stay intact in one line.
-my $oracle_field_limit = 2047;
+my $oracle_field_limit = 2048;
 my $media_type = 0;
 
 sub process_table
