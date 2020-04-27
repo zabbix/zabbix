@@ -54,23 +54,10 @@ my %sqlite3 = (
 # Splitting long entries in 'media_type' table have to happen before SQL*Plus limit has been reached and end-of-lien
 # character has to stay intact in one line.
 my $oracle_field_limit = 2048;
-my $media_type = 0;
 
 sub process_table
 {
 	my $line = $_[0];
-
-	if ($output{'database'} eq 'oracle')
-	{
-		if ($line =~ m/media_type$/)
-		{
-			$media_type = 1;
-		}
-		elsif ($media_type == 1)
-		{
-			$media_type = 0;
-		}
-	}
 
 	$line = "`$line`" if ($output{'database'} eq 'mysql');
 
