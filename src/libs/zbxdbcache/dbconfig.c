@@ -6624,16 +6624,32 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &src_item->itemid);
 			snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &src_item->interfaceid);
 
-			strscpy(dst_item->snmp_community_orig, snmp->community);
-			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
-			strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
-			dst_item->snmpv3_securitylevel = snmp->securitylevel;
-			strscpy(dst_item->snmpv3_authpassphrase_orig, snmp->authpassphrase);
-			strscpy(dst_item->snmpv3_privpassphrase_orig, snmp->privpassphrase);
-			dst_item->snmpv3_authprotocol = snmp->authprotocol;
-			dst_item->snmpv3_privprotocol = snmp->privprotocol;
-			strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
-			dst_item->snmp_version = snmp->version;
+			if (NULL != snmpitem && NULL != snmp)
+			{
+				strscpy(dst_item->snmp_community_orig, snmp->community);
+				strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
+				strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
+				dst_item->snmpv3_securitylevel = snmp->securitylevel;
+				strscpy(dst_item->snmpv3_authpassphrase_orig, snmp->authpassphrase);
+				strscpy(dst_item->snmpv3_privpassphrase_orig, snmp->privpassphrase);
+				dst_item->snmpv3_authprotocol = snmp->authprotocol;
+				dst_item->snmpv3_privprotocol = snmp->privprotocol;
+				strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
+				dst_item->snmp_version = snmp->version;
+			}
+			else
+			{
+				*dst_item->snmp_community_orig = '\0';
+				*dst_item->snmp_oid_orig = '\0';
+				*dst_item->snmpv3_securityname_orig = '\0';
+				dst_item->snmpv3_securitylevel = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+				*dst_item->snmpv3_authpassphrase_orig = '\0';
+				*dst_item->snmpv3_privpassphrase_orig = '\0';
+				dst_item->snmpv3_authprotocol = 0;
+				dst_item->snmpv3_privprotocol = 0;
+				*dst_item->snmpv3_contextname_orig = '\0';
+				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+			}
 
 			dst_item->snmp_community = NULL;
 			dst_item->snmp_oid = NULL;
