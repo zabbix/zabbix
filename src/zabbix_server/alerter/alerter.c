@@ -233,6 +233,14 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 		ret = zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, params, &output, &error);
 	}
 
+	if (ZBX_ALERT_DEBUG == debug && SUCCEED == zbx_es_is_env_initialized(&es_engine))
+	{
+		alerter_send_result(socket, output, ret, error, zbx_es_debug_info(&es_engine));
+		zbx_es_debug_disable(&es_engine);
+	}
+	else
+		alerter_send_result(socket, output, ret, error, NULL);
+
 	if (SUCCEED == zbx_es_fatal_error(&es_engine))
 	{
 		char	*errmsg = NULL;
@@ -243,14 +251,6 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			zbx_free(errmsg);
 		}
 	}
-
-	if (ZBX_ALERT_DEBUG == debug && SUCCEED == zbx_es_is_env_initialized(&es_engine))
-	{
-		alerter_send_result(socket, output, ret, error, zbx_es_debug_info(&es_engine));
-		zbx_es_debug_disable(&es_engine);
-	}
-	else
-		alerter_send_result(socket, output, ret, error, NULL);
 
 	zbx_free(output);
 	zbx_free(error);
