@@ -22,7 +22,7 @@
 /**
  * Controller to sanitize widget fields before copied widget is created.
  *
- * This involves unset of unaccessible values specified in copied widget fields and unset of reference field.
+ * This involves unset of unaccessible values specified in copied widget fields.
  */
 class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 
@@ -63,35 +63,29 @@ class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 		];
 
 		foreach ($form->getFields() as $field) {
-			// Reference fields need to be unset.
-			if ($field instanceof CWidgetFieldReference) {
-				$output['fields'][$field->getName()] = '';
+			$value = $field->getValue();
+			$is_value_set = ($value !== null && $value != $field->getDefault());
+
+			if (!$is_value_set) {
+				continue;
+			}
+			elseif (in_array($field->getSaveType(), $sanitizable_types)) {
+				// Resource fields are prepared for sanitization.
+				if (!is_array($value)) {
+					$value = [$value];
+				}
+
+				foreach ($value as $val) {
+					$resource_fields[] = [
+						'type' => $field->getSaveType(),
+						'name' => $field->getName(),
+						'value' => $val
+					];
+				}
 			}
 			else {
-				$value = $field->getValue();
-				$is_value_set = ($value !== null && $value != $field->getDefault());
-
-				if (!$is_value_set) {
-					continue;
-				}
-				elseif (in_array($field->getSaveType(), $sanitizable_types)) {
-					// Resource fields are prepared for sanitization.
-					if (!is_array($value)) {
-						$value = [$value];
-					}
-
-					foreach ($value as $val) {
-						$resource_fields[] = [
-							'type' => $field->getSaveType(),
-							'name' => $field->getName(),
-							'value' => $val
-						];
-					}
-				}
-				else {
-					// Non resource fields are returned unchanged.
-					$output['fields'][$field->getName()] = $value;
-				}
+				// Non resource fields are returned unchanged.
+				$output['fields'][$field->getName()] = $value;
 			}
 		}
 

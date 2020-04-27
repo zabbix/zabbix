@@ -3684,6 +3684,11 @@
 				$('#dashbrd-save').prop('disabled', true);
 				warning_msg_remove();
 
+				// Regenerate reference field values.
+				if ('reference' in new_widget.fields) {
+					new_widget.fields['reference'] = methods.makeReference.call($this);
+				}
+
 				// In case if selected space is 2x2 cells (represents simple click), use pasted widget size.
 				if (widget === null && pos !== null && pos.width == 2 && pos.height == 2) {
 					pos.width = new_widget.pos.width;
