@@ -2873,6 +2873,12 @@ return [
 				'length' => 32,
 				'default' => '7d',
 			],
+			'instanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
+			],
 		],
 	],
 	'triggers' => [

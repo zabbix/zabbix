@@ -58,8 +58,8 @@ zbx_am_db_t;
  *                                                                            *
  ******************************************************************************/
 static zbx_am_db_alert_t	*am_db_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediatypeid, int source,
-		int object, zbx_uint64_t objectid, zbx_uint64_t eventid, const char *sendto, const char *subject,
-		const char *message, const char *params, int status, int retries)
+		int object, zbx_uint64_t objectid, zbx_uint64_t eventid, zbx_uint64_t p_eventid, const char *sendto,
+		const char *subject, const char *message, const char *params, int status, int retries)
 {
 	zbx_am_db_alert_t	*alert;
 
@@ -70,6 +70,7 @@ static zbx_am_db_alert_t	*am_db_create_alert(zbx_uint64_t alertid, zbx_uint64_t 
 	alert->object = object;
 	alert->objectid = objectid;
 	alert->eventid = eventid;
+	alert->p_eventid = p_eventid;
 
 	alert->sendto = zbx_strdup(NULL, sendto);
 	alert->subject = zbx_strdup(NULL, subject);
@@ -122,7 +123,7 @@ static void	am_db_clear(zbx_am_db_t *amdb)
  *                                                                            *
  * Parameters: alerts - [OUT] the new alerts                                  *
  *                                                                            *
- * Comments: One the first call this function will return new and not sent    *
+ * Comments: On the first call this function will return new and not sent     *
  *           alerts. After that only new alerts are returned.                 *
  *                                                                            *
  * Return value: SUCCEED - the alerts were read successfully                  *
@@ -137,7 +138,7 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 	DB_ROW			row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		alertid, mediatypeid, objectid, eventid;
+	zbx_uint64_t		alertid, mediatypeid, objectid, eventid, p_eventid;
 	int			status, attempts, source, object, ret = SUCCEED;
 	zbx_am_db_alert_t	*alert;
 	zbx_vector_uint64_t	alertids;
@@ -148,7 +149,7 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,"
-				"e.source,e.object,e.objectid,a.parameters,a.eventid"
+				"e.source,e.object,e.objectid,a.parameters,a.eventid,a.p_eventid"
 			" from alerts a"
 			" left join events e"
 				" on a.eventid=e.eventid"
@@ -169,6 +170,7 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 		ZBX_STR2UINT64(alertid, row[0]);
 		ZBX_STR2UINT64(mediatypeid, row[1]);
 		ZBX_STR2UINT64(eventid, row[11]);
+		ZBX_DBROW2UINT64(p_eventid, row[12]);
 		status = atoi(row[5]);
 		attempts = atoi(row[6]);
 
@@ -186,8 +188,8 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 		object = atoi(row[8]);
 		ZBX_STR2UINT64(objectid, row[9]);
 
-		alert = am_db_create_alert(alertid, mediatypeid, source, object, objectid, eventid, row[2], row[3],
-				row[4], row[10], status, attempts);
+		alert = am_db_create_alert(alertid, mediatypeid, source, object, objectid, eventid, p_eventid, row[2],
+				row[3], row[4], row[10], status, attempts);
 
 		zbx_vector_ptr_append(alerts, alert);
 

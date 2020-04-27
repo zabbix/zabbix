@@ -980,4 +980,6 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 
 unsigned char	zbx_dc_set_macro_env(unsigned char env);
 
+const char	*zbx_dc_get_instanceid(void);
+
 #endif
