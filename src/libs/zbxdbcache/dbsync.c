@@ -1247,7 +1247,7 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const DB_
 
 	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
-		if (NULL == snmp)
+		if (NULL == snmp || SUCCEED == DBis_null(dbrow[8])) /* race condition, when interface_snmp is no yet */
 			return FAIL;
 
 		if (FAIL == dbsync_compare_uchar(dbrow[8], snmp->version))
