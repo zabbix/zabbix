@@ -164,7 +164,9 @@ $saml_tab = (new CFormList('list_saml'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow((new CLabel(_('Username attribute'), 'saml_username_attribute'))->setAsteriskMark(),
-		(new CTextBox('saml_username_attribute', $data['saml_username_attribute']))
+		(new CTextBox('saml_username_attribute', $data['saml_username_attribute'], false,
+			DB::getFieldLength('config', 'saml_username_attribute')
+		))
 			->setEnabled($is_saml_auth_enabled)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
