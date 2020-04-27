@@ -25,11 +25,11 @@
 ?>
 
 <script type="text/javascript">
-	jQuery(function ($) {
-		var form = $('[name=form_auth]'),
+	jQuery(function($) {
+		var $form = $('[name=form_auth]'),
 			warn = true;
 
-		form.submit(function () {
+		$form.submit(function() {
 			var proceed = !warn
 				|| $('[name=authentication_type]:checked').val() == $('[name=db_authentication_type]').val()
 				|| confirm(<?= json_encode(
@@ -37,20 +37,24 @@
 				) ?>);
 			warn = true;
 
+			$form.trimValues(['#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url', '#saml_username_attribute',
+				'#saml_sp_entityid', '#saml_nameid_format'
+			]);
+
 			return proceed;
 		});
 
-		form.find('#http_auth_enabled, #ldap_configured, #saml_auth_enabled').on('change', function () {
+		$form.find('#http_auth_enabled, #ldap_configured, #saml_auth_enabled').on('change', function() {
 			var fields;
 
 			if ($(this).is('#http_auth_enabled')) {
-				fields = form.find('[name^=http_]');
+				fields = $form.find('[name^=http_]');
 			}
 			else if ($(this).is('#ldap_configured')) {
-				fields = form.find('[name^=ldap_],button[name=change_bind_password]');
+				fields = $form.find('[name^=ldap_],button[name=change_bind_password]');
 			}
 			else {
-				fields = form.find('[name^=saml_]');
+				fields = $form.find('[name^=saml_]');
 			}
 
 			fields
@@ -58,14 +62,14 @@
 				.prop('disabled', !this.checked);
 		});
 
-		form.find('button#change_bind_password').click(function () {
-			form.find('[name=action]')
-				.val(form.find('[name=action_passw_change]').val());
+		$form.find('button#change_bind_password').click(function() {
+			$form.find('[name=action]')
+				.val($form.find('[name=action_passw_change]').val());
 
 			submitFormWithParam('form_auth', 'change_bind_password', '1');
 		});
 
-		form.find('[name=ldap_test]').click(function () {
+		$form.find('[name=ldap_test]').click(function() {
 			warn = false;
 		});
 	});
