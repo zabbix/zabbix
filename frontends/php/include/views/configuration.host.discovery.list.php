@@ -293,7 +293,8 @@ $discoveryForm->addItem([
 			'discoveryrule.massdelete' => ['name' => _('Delete'),
 				'confirm' =>_('Delete selected discovery rules?')
 			]
-		]
+		],
+		$data['checkbox_hash']
 	)
 ]);
 
