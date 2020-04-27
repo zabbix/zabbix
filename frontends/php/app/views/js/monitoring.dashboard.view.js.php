@@ -258,13 +258,13 @@
 	});
 
 	function dashboardAddMessages(messages) {
-		var $message_div = jQuery('<div>').attr('id','dashbrd-messages');
-		$message_div.append(messages);
-		jQuery('main').prepend($message_div);
+		var $outputs = jQuery(messages);
+		$outputs.addClass('msg-dashboard-js');
+		$outputs.insertBefore('main');
 	}
 
 	function dashboardRemoveMessages() {
-		jQuery('#dashbrd-messages').remove();
+		jQuery('.msg-dashboard-js').remove();
 		jQuery('.msg-good').remove();
 	}
 
