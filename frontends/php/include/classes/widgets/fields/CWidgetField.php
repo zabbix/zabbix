@@ -64,6 +64,13 @@ class CWidgetField {
 	}
 
 	/**
+	 * Returns widget field default value.
+	 */
+	public function getDefault() {
+		return $this->default;
+	}
+
+	/**
 	 * Set JS code that will be called on field change.
 	 *
 	 * @param string $action  JS function to call on field change.

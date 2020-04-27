@@ -220,6 +220,11 @@
 
 		var result = false;
 		data['widgets'].forEach(function(widget) {
+			// Widget placeholder doesn't have header.
+			if (!widget['content_header']) {
+				return;
+			}
+
 			// Widget popup open (refresh rate)?
 			if (widget['content_header'].find('[data-expanded="true"]').length > 0
 					// Widget being dragged or resized in dashboard edit mode?
@@ -354,6 +359,11 @@
 	 * @param {object} except_widget  Dashboard widget object.
 	 */
 	function doLeaveWidget($obj, data, widget) {
+		// Widget placeholder doesn't have header.
+		if (!widget['content_header']) {
+			return;
+		}
+
 		if (widget['content_header'].has(document.activeElement).length) {
 			document.activeElement.blur();
 		}
@@ -3211,6 +3221,45 @@
 		return (typeof buffer === 'object' && buffer !== null);
 	}
 
+	/**
+	 * Function creates widget placeholder with loader.
+	 *
+	 * @param {jQuery} $obj  Dashboard object.
+	 * @param {object} data  Dashboard data object.
+	 * @param {object} pos   New widget position.
+	 *
+	 * @returns {object}
+	 */
+	function makeWidgetPlaceholder($obj, data, pos) {
+		var $div, placeholder;
+
+		$div = $('<div>', {'class': 'dashbrd-grid-widget widget-placeholder'})
+			.append(
+				$('<div>', {'class': 'dashbrd-grid-widget-container'}).append(
+					$('<div>', {'class': 'dashbrd-grid-widget-content'})
+				)
+			)
+			.data('widget-index', data['widgets'].length)
+			.css({
+				'min-height': data['options']['widget-height'] + 'px',
+				'min-width': data['options']['widget-width'] + '%'
+			});
+
+		placeholder = {
+			'uniqueid': generateUniqueId($obj, data),
+			'parent': false,
+			'div': $div,
+			'pos': pos
+		};
+
+		data['widgets'].push(placeholder);
+		$obj.append(placeholder['div']);
+		setDivPosition(placeholder['div'], data, placeholder['pos']);
+		showPreloader(placeholder);
+
+		return placeholder;
+	};
+
 	var	methods = {
 		init: function(options) {
 			options = $.extend({
@@ -3632,11 +3681,6 @@
 						$.unsubscribe('widget.update.dimensions', warning_msg_remove);
 					};
 
-				// Regenerate reference field values.
-				if ('reference' in new_widget.fields) {
-					new_widget.fields['reference'] = methods.makeReference.call($this);
-				}
-
 				warning_msg_remove();
 
 				// In case if selected space is 2x2 cells (represents simple click), use pasted widget size.
@@ -3692,34 +3736,61 @@
 					removeWidget($this, data, widget);
 				}
 
-				if (pos['y'] + pos['height'] > data['options']['rows']) {
-					resizeDashboardGrid($this, data, pos['y'] + pos['height']);
+				// Create placeholder.
+				var widget_placeholder = makeWidgetPlaceholder($this, data, new_widget.pos);
 
-					// Body height should be adjusted to animate scrollTop work.
-					$('body').css('height', Math.max(
-						$('body').height(), (pos['y'] + pos['height']) * data['options']['widget-height']
-					));
-				}
+				var url = new Curl('zabbix.php');
+				url.setArgument('action', 'dashboard.widget.sanitize');
 
-				// 5px shift is widget padding.
-				$('html, body')
-					.animate({scrollTop: pos['y'] * data['options']['widget-height']
-						+ $('.dashbrd-grid-container').position().top - 5})
-					.promise()
-					.then(function() {
-						methods.addWidget.call($this, new_widget);
+				$.ajax({
+					url: url.getUrl(),
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						fields: JSON.stringify(new_widget.fields),
+						type: new_widget.type
+					}
+				})
+					.done(function(response) {
+						if (!('errors' in response)) {
+							new_widget = $.extend(new_widget, {fields: response.fields});
 
-						// New widget is last element in data['widgets'] array.
-						new_widget = data['widgets'].slice(-1)[0];
-						setWidgetModeEdit($this, data, new_widget);
-						updateWidgetContent($this, data, new_widget);
+							if (pos['y'] + pos['height'] > data['options']['rows']) {
+								resizeDashboardGrid($this, data, pos['y'] + pos['height']);
 
-						// Remove height attribute set for scroll animation.
-						$('body').css('height', '');
+								// Body height should be adjusted to animate scrollTop work.
+								$('body').css('height', Math.max(
+									$('body').height(), (pos['y'] + pos['height']) * data['options']['widget-height']
+								));
+							}
+
+							// 5px shift is widget padding.
+							$('html, body')
+								.animate({scrollTop: pos['y'] * data['options']['widget-height']
+									+ $('.dashbrd-grid-container').position().top - 5})
+								.promise()
+								.then(function() {
+									removeWidget($this, data, widget_placeholder);
+									methods.addWidget.call($this, new_widget);
+
+									// New widget is last element in data['widgets'] array.
+									new_widget = data['widgets'].slice(-1)[0];
+									setWidgetModeEdit($this, data, new_widget);
+									updateWidgetContent($this, data, new_widget);
+
+									// Remove height attribute set for scroll animation.
+									$('body').css('height', '');
+								});
+						}
+						else {
+							removeWidget($this, data, widget_placeholder);
+							resizeDashboardGrid($this, data, pos['y'] + pos['height']);
+						}
+					})
+					.always(function() {
+						// Mark dashboard as updated.
+						data['options']['updated'] = true;
 					});
-
-				// Mark dashboard as updated.
-				data['options']['updated'] = true;
 			});
 		},
 

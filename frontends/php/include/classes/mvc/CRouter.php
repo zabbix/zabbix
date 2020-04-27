@@ -74,6 +74,7 @@ class CRouter {
 		'dashboard.widget.configure'	=> ['CControllerDashboardWidgetConfigure',			'layout.json',			null],
 		'dashboard.widget.edit'			=> ['CControllerDashboardWidgetEdit',				'layout.json',			'monitoring.dashboard.widget.edit'],
 		'dashboard.widget.rfrate'		=> ['CControllerDashboardWidgetRfRate',				'layout.json',			null],
+		'dashboard.widget.sanitize'		=> ['CControllerDashboardWidgetSanitize',			'layout.json',			null],
 		'discovery.view'				=> ['CControllerDiscoveryView',						'layout.htmlpage',		'monitoring.discovery.view'],
 		'export.hosts.xml'				=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.mediatypes.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
