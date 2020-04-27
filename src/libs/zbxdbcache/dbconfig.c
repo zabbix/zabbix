@@ -2035,26 +2035,6 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	snmp = (ZBX_DC_SNMPINTERFACE *)DCfind_id(&config->interfaces_snmp, interfaceid, sizeof(ZBX_DC_SNMPINTERFACE),
 			&found);
 
-	if (SUCCEED == DBis_null(row[8]))	/* race condition, when interface_snmp is no yet */
-	{
-		*bulk_changed = 1;
-
-		if (0 != found)
-			return snmp;
-
-		snmp->version = ZBX_IF_SNMP_VERSION_2;
-		DCstrpool_replace(found, &snmp->community, "");
-		DCstrpool_replace(found, &snmp->securityname, "");
-		snmp->securitylevel = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
-		DCstrpool_replace(found, &snmp->authpassphrase, "");
-		DCstrpool_replace(found, &snmp->privpassphrase, "");
-		snmp->authprotocol = 0;
-		snmp->privprotocol = 0;
-		DCstrpool_replace(found, &snmp->contextname, "");
-
-		return snmp;
-	}
-
 	ZBX_STR2UCHAR(bulk, row[9]);
 
 	if (0 == found)
@@ -2234,13 +2214,18 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
 			}
 
-			snmp = dc_interface_snmp_set(interfaceid, (const char **)row, &bulk_changed);
-
-			if (1 == reset_snmp_stats || 0 != bulk_changed)
+			if (FAIL == DBis_null(row[8]))
 			{
-				snmp->max_succeed = 0;
-				snmp->min_fail = MAX_SNMP_ITEMS + 1;
+				snmp = dc_interface_snmp_set(interfaceid, (const char **)row, &bulk_changed);
+
+				if (1 == reset_snmp_stats || 0 != bulk_changed)
+				{
+					snmp->max_succeed = 0;
+					snmp->min_fail = MAX_SNMP_ITEMS + 1;
+				}
 			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
 		/* first resolve macros for ip and dns fields in main agent interface  */
