@@ -780,6 +780,7 @@ static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
 			zabbix_log(LOG_LEVEL_TRACE, "    operator: %d", override_operation->operator);
 			zabbix_log(LOG_LEVEL_TRACE, "    value '%s'", override_operation->value);
 			zabbix_log(LOG_LEVEL_TRACE, "    status: %d", override_operation->status);
+			zabbix_log(LOG_LEVEL_TRACE, "    discover: %d", override_operation->discover);
 			zabbix_log(LOG_LEVEL_TRACE, "    delay '%s'", ZBX_NULL2STR(override_operation->delay));
 			zabbix_log(LOG_LEVEL_TRACE, "    history '%s'", ZBX_NULL2STR(override_operation->history));
 			zabbix_log(LOG_LEVEL_TRACE, "    trends '%s'", ZBX_NULL2STR(override_operation->trends));
@@ -942,10 +943,10 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 			{
 				switch (override_operation->status)
 				{
-					case ZBX_PROTOTYPE_STATUS_CREATE_ENABLED:
+					case ZBX_PROTOTYPE_STATUS_ENABLED:
 						*status = ITEM_STATUS_ACTIVE;
 						break;
-					case ZBX_PROTOTYPE_STATUS_CREATE_DISABLED:
+					case ZBX_PROTOTYPE_STATUS_DISABLED:
 						*status = ITEM_STATUS_DISABLED;
 						break;
 					case ZBX_PROTOTYPE_STATUS_COUNT:
@@ -1005,10 +1006,10 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 			{
 				switch (override_operation->status)
 				{
-					case ZBX_PROTOTYPE_STATUS_CREATE_ENABLED:
+					case ZBX_PROTOTYPE_STATUS_ENABLED:
 						*status = TRIGGER_STATUS_ENABLED;
 						break;
-					case ZBX_PROTOTYPE_STATUS_CREATE_DISABLED:
+					case ZBX_PROTOTYPE_STATUS_DISABLED:
 						*status = TRIGGER_STATUS_DISABLED;
 						break;
 					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
@@ -1071,10 +1072,10 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 			{
 				switch (override_operation->status)
 				{
-					case ZBX_PROTOTYPE_STATUS_CREATE_ENABLED:
+					case ZBX_PROTOTYPE_STATUS_ENABLED:
 						*status = HOST_STATUS_MONITORED;
 						break;
-					case ZBX_PROTOTYPE_STATUS_CREATE_DISABLED:
+					case ZBX_PROTOTYPE_STATUS_DISABLED:
 						*status = HOST_STATUS_NOT_MONITORED;
 						break;
 					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
@@ -1130,7 +1131,7 @@ void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, uns
 			{
 				switch (override_operation->status)
 				{
-					case ZBX_PROTOTYPE_STATUS_CREATE_ENABLED:
+					case ZBX_PROTOTYPE_STATUS_ENABLED:
 						*status = GRAPH_STATUS_ENABLED;
 						break;
 					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
