@@ -892,7 +892,7 @@ static int	regexp_strmatch_condition(const char *value, const char *pattern, uns
 }
 
 void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, const char **delay,
-		const char **history, const char **trends, unsigned char *status)
+		const char **history, const char **trends, unsigned char *status, unsigned char *discover)
 {
 	int	i, j;
 
@@ -935,6 +935,9 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 			if (NULL != override_operation->trends)
 				*trends = override_operation->trends;
 
+			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
+				*discover = override_operation->discover;
+
 			if (NULL != status)
 			{
 				switch (override_operation->status)
@@ -944,9 +947,6 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 						break;
 					case ZBX_PROTOTYPE_STATUS_CREATE_DISABLED:
 						*status = ITEM_STATUS_DISABLED;
-						break;
-					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
-						*status = ITEM_STATUS_NO_CREATE;
 						break;
 					case ZBX_PROTOTYPE_STATUS_COUNT:
 						break;

@@ -71,6 +71,7 @@ typedef struct
 	unsigned char		status;
 	unsigned char		authtype;
 	unsigned char		allow_traps;
+	unsigned char		discover;
 	zbx_vector_ptr_t	lld_rows;
 	zbx_vector_ptr_t	applications;
 	zbx_vector_ptr_t	preproc_ops;
@@ -1864,6 +1865,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	char				err[MAX_STRING_LEN];
 	int				ret;
 	const char			*delay, *history, *trends;
+	unsigned char			discover;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1886,8 +1888,9 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	history = item_prototype->history;
 	trends = item_prototype->trends;
 	item->status = item_prototype->status;
+	discover = item_prototype->status;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->status);
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->status, &discover);
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
@@ -2048,7 +2051,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	zbx_vector_ptr_create(&item->preproc_ops);
 	zbx_vector_ptr_create(&item->dependent_items);
 
-	if (SUCCEED != ret || ITEM_STATUS_NO_CREATE == item->status)
+	if (SUCCEED != ret || ZBX_PROTOTYPE_NO_DISCOVER == discover)
 	{
 		lld_item_free(item);
 		item = NULL;
@@ -2077,7 +2080,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	char			*buffer = NULL, err[MAX_STRING_LEN];
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
 	const char		*delay, *history, *trends;
-	unsigned char		status;
+	unsigned char		discover;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2095,9 +2098,9 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	delay = item_prototype->delay;
 	history = item_prototype->history;
 	trends = item_prototype->trends;
-	status = item_prototype->status;
+	discover = item_prototype->discover;
 
-	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &status);
+	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, NULL, &discover);
 
 	if (0 != strcmp(item->key_proto, item_prototype->key))
 	{
@@ -2390,7 +2393,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SSL_KEY_PASSWORD;
 	}
 
-	if (ITEM_STATUS_NO_CREATE != status)
+	if (ZBX_PROTOTYPE_NO_DISCOVER != discover)
 		item->flags |= ZBX_FLAG_LLD_ITEM_DISCOVERED;
 
 	item->lld_row = lld_row;
@@ -5005,7 +5008,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 				"i.jmx_endpoint,i.master_itemid,i.timeout,i.url,i.query_fields,"
 				"i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,"
 				"i.retrieve_mode,i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,"
-				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps"
+				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps,i.discover"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
@@ -5060,6 +5063,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		ZBX_STR2UCHAR(item_prototype->verify_peer, row[41]);
 		ZBX_STR2UCHAR(item_prototype->verify_host, row[42]);
 		ZBX_STR2UCHAR(item_prototype->allow_traps, row[43]);
+		ZBX_STR2UCHAR(item_prototype->discover, row[44]);
 
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_ptr_create(&item_prototype->applications);
