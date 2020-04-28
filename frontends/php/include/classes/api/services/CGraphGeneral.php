@@ -502,7 +502,7 @@ abstract class CGraphGeneral extends CApiService {
 			];
 		}
 
-		foreach ($graphs as $graph) {
+		foreach ($graphs as $key => $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_set, $graph['name']);
 
 			if (array_key_exists('status', $graph)) {
@@ -649,7 +649,7 @@ abstract class CGraphGeneral extends CApiService {
 			];
 		}
 
-		foreach ($graphs as $graph) {
+		foreach ($graphs as $key => $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_update, $graph['name']);
 
 			if (array_key_exists('status', $graph)) {
