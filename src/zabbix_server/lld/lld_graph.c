@@ -612,7 +612,7 @@ out:
  ******************************************************************************/
 static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
-		unsigned char status_proto, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
+		unsigned char discover_proto, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
 {
 	zbx_lld_graph_t			*graph = NULL;
 	char				*buffer = NULL;
@@ -644,6 +644,11 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_NAME;
 		}
 
+		lld_override_graph(&lld_row->overrides, graph->name, &discover_proto);
+
+		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
+			goto out;
+
 		if (graph->ymin_itemid != ymin_itemid)
 		{
 			graph->ymin_itemid = ymin_itemid;
@@ -667,9 +672,9 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 		substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_SIMPLE, NULL, 0);
 		zbx_lrtrim(graph->name, ZBX_WHITESPACE);
 
-		lld_override_graph(&lld_row->overrides, graph->name, &status_proto);
+		lld_override_graph(&lld_row->overrides, graph->name, &discover_proto);
 
-		if (GRAPH_STATUS_NO_CREATE == status_proto)
+		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
 		{
 			zbx_free(graph->name);
 			zbx_free(graph);
@@ -697,7 +702,7 @@ out:
 
 static void	lld_graphs_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
-		unsigned char status_proto, const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths)
+		unsigned char discover_proto, const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths)
 {
 	int	i;
 
@@ -706,7 +711,7 @@ static void	lld_graphs_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 		lld_graph_make(gitems_proto, graphs, items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
-				status_proto, lld_row, lld_macro_paths);
+				discover_proto, lld_row, lld_macro_paths);
 	}
 
 	zbx_vector_ptr_sort(graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1304,7 +1309,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 	result = DBselect(
 			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
 				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
-				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,g.status"
+				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,g.discover"
 			" from graphs g,graphs_items gi,items i,item_discovery id"
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
@@ -1319,7 +1324,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		int		width, height;
 		double		yaxismin, yaxismax, percent_left, percent_right;
 		unsigned char	show_work_period, show_triggers, graphtype, show_legend, show_3d,
-				ymin_type, ymax_type, status_proto;
+				ymin_type, ymax_type, discover_proto;
 
 		ZBX_STR2UINT64(parent_graphid, row[0]);
 		name_proto = row[1];
@@ -1338,7 +1343,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		ZBX_DBROW2UINT64(ymin_itemid_proto, row[14]);
 		ZBX_STR2UCHAR(ymax_type, row[15]);
 		ZBX_DBROW2UINT64(ymax_itemid_proto, row[16]);
-		status_proto = (unsigned char)atoi(row[17]);
+		ZBX_STR2UCHAR(discover_proto, row[17]);
 
 		lld_graphs_get(parent_graphid, &graphs, width, height, yaxismin, yaxismax, show_work_period,
 				show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right,
@@ -1349,7 +1354,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		/* making graphs */
 
 		lld_graphs_make(&gitems_proto, &graphs, &items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
-				status_proto, lld_rows, lld_macro_paths);
+				discover_proto, lld_rows, lld_macro_paths);
 		lld_graphs_validate(hostid, &graphs, error);
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,

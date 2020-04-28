@@ -577,7 +577,6 @@ typedef enum
 {
 	ZBX_PROTOTYPE_STATUS_ENABLED,
 	ZBX_PROTOTYPE_STATUS_DISABLED,
-	ZBX_PROTOTYPE_STATUS_NO_CREATE,
 	ZBX_PROTOTYPE_STATUS_COUNT
 }
 zbx_prototype_status_t;
@@ -610,12 +609,10 @@ zbx_prototype_discover_t;
 
 /* graph statuses */
 #define GRAPH_STATUS_ENABLED		0
-#define GRAPH_STATUS_NO_CREATE		2
 
 /* host statuses */
 #define HOST_STATUS_MONITORED		0
 #define HOST_STATUS_NOT_MONITORED	1
-#define HOST_STATUS_NO_CREATE		2
 /*#define HOST_STATUS_UNREACHABLE	2*/
 #define HOST_STATUS_TEMPLATE		3
 /*#define HOST_STATUS_DELETED		4*/
@@ -643,7 +640,6 @@ zbx_prototype_discover_t;
 /* trigger statuses */
 #define TRIGGER_STATUS_ENABLED		0
 #define TRIGGER_STATUS_DISABLED		1
-#define TRIGGER_STATUS_NO_CREATE	2
 
 /* trigger types */
 #define TRIGGER_TYPE_NORMAL		0

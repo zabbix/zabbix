@@ -1078,9 +1078,6 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 					case ZBX_PROTOTYPE_STATUS_DISABLED:
 						*status = HOST_STATUS_NOT_MONITORED;
 						break;
-					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
-						*status = HOST_STATUS_NO_CREATE;
-						break;
 					case ZBX_PROTOTYPE_STATUS_COUNT:
 						break;
 					default:
@@ -1096,7 +1093,7 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *status)
+void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name,	unsigned char *discover)
 {
 	int	i, j;
 
@@ -1130,22 +1127,8 @@ void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, uns
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s():SUCCEED", __func__);
 
-			if (NULL != status)
-			{
-				switch (override_operation->status)
-				{
-					case ZBX_PROTOTYPE_STATUS_ENABLED:
-						*status = GRAPH_STATUS_ENABLED;
-						break;
-					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
-						*status = GRAPH_STATUS_NO_CREATE;
-						break;
-					case ZBX_PROTOTYPE_STATUS_COUNT:
-						break;
-					default:
-						THIS_SHOULD_NEVER_HAPPEN;
-				}
-			}
+			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
+				*discover = override_operation->discover;
 		}
 	}
 
