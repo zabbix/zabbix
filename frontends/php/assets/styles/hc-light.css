@@ -244,6 +244,8 @@ header {
     margin: 0 -2px 0 auto;
     padding: 2px;
     white-space: nowrap; }
+    header .header-controls label {
+      line-height: 24px; }
   header a.link-action {
     box-sizing: border-box;
     display: block;
@@ -1690,6 +1692,11 @@ pre, pre a, pre td, pre span {
         vertical-align: middle; }
         .table-forms .table-forms-td-right td.center .btn-grey {
           margin: 3px 0; }
+      .table-forms .table-forms-td-right td.overflow-break {
+        max-width: 150px;
+        overflow-wrap: break-word;
+        white-space: initial;
+        word-wrap: break-word; }
       .table-forms .table-forms-td-right td:last-child {
         padding-right: 0; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {

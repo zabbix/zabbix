@@ -2873,6 +2873,12 @@ return [
 				'length' => 32,
 				'default' => '7d',
 			],
+			'instanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
+			],
 		],
 	],
 	'triggers' => [
@@ -4851,6 +4857,12 @@ return [
 				'default' => '0',
 			],
 			'flags' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'write_clock' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

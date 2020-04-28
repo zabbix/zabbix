@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-03T00:00:00Z</date>
+    <date>2020-04-20T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Redmine</name>
@@ -146,8 +146,8 @@
             url = Redmine.params.url + query,&#13;
             request = new CurlHttpRequest();&#13;
 &#13;
-        if (typeof Redmine.params.HTTPProxy !== 'undefined' &amp;&amp; Redmine.params.HTTPProxy.trim() !== '') {&#13;
-            request.SetProxy(Redmine.params.HTTPProxy);&#13;
+        if (typeof Redmine.HTTPProxy === 'string' &amp;&amp; Redmine.HTTPProxy.trim() !== '') {&#13;
+            request.SetProxy(Redmine.HTTPProxy);&#13;
         }&#13;
 &#13;
         request.AddHeader('Content-Type: application/json');&#13;
@@ -359,6 +359,7 @@ try {&#13;
     priority = priority &amp;&amp; priority.trim() || severities[7].name;&#13;
 &#13;
     Redmine.setParams(params_redmine);&#13;
+    Redmine.HTTPProxy = params.HTTPProxy;&#13;
 &#13;
     // Create issue for non trigger-based events.&#13;
     if (params.event_source !== '0'&#13;
@@ -410,7 +411,7 @@ Original problem ID: {EVENT.ID}&#13;
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>RECOVERY</operation_mode>
                     <subject>Resolved: {EVENT.NAME}</subject>
-                    <message>Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+                    <message>Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
 Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;

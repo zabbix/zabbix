@@ -62,6 +62,8 @@ class CSvgGraphHelper {
 		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
 		self::getMetricsAggregatedData($metrics);
+		// Add "missing data" markers in respect to "data frequency" and "missing data" function.
+		self::applyMissingData($metrics);
 
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
 		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_TYPE_SHORT) ? $options['legend_lines'] * 18 : 0;
@@ -313,7 +315,7 @@ class CSvgGraphHelper {
 						usort($points, [__CLASS__, 'sortByClock']);
 						$metric['points'] = $points;
 
-						unset($metric['source'], $metric['history'], $metric['trends']);
+						unset($metric['history'], $metric['trends']);
 					}
 				}
 				unset($metric);
@@ -542,9 +544,11 @@ class CSvgGraphHelper {
 			if ($hosts) {
 				$items = API::Item()->get([
 					'output' => [
-						'itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid', 'key_'
+						'itemid', 'hostid', 'name', 'history', 'trends', 'units', 'delay', 'value_type', 'valuemapid',
+						'key_'
 					],
 					'selectHosts' => ['hostid', 'name'],
+					'selectPreprocessing' => ['type', 'params'],
 					'hostids' => array_keys($hosts),
 					'webitems' => true,
 					'filter' => [
@@ -575,13 +579,139 @@ class CSvgGraphHelper {
 
 				$colors = getColorVariations('#'.$data_set['color'], count($items));
 
+				$aggr_interval = ($data_set['aggregate_function'] == GRAPH_AGGREGATE_NONE)
+					? 0
+					: (int) timeUnitToSeconds($data_set['aggregate_interval']);
+
 				foreach ($items as $item) {
 					$data_set['color'] = array_shift($colors);
-					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+
+					$metric_frequecy = [$aggr_interval, (int) timeUnitToSeconds($item['delay'])];
+
+					foreach ($item['preprocessing'] as $preprocessing) {
+						if ($preprocessing['type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE) {
+							$metric_frequecy[] = (int) timeUnitToSeconds($preprocessing['params']);
+
+							// Only one throttling step is allowed.
+							break;
+						}
+						elseif ($preprocessing['type'] == ZBX_PREPROC_THROTTLE_VALUE) {
+							$metric_frequecy = [-1];
+
+							// Only one throttling step is allowed.
+							break;
+						}
+					}
+
+					$metric_options = [
+						'frequency' => max($metric_frequecy)
+					];
+
+					$metrics[] = $item + ['data_set' => $index, 'options' => $metric_options + $data_set];
 					$max_metrics--;
 				}
 			}
 		}
+	}
+
+	/**
+	 * Apply overrides for each pattern matchig metric.
+	 * Modifies each metric by first determining frequency if needed, then applying missing data markers to data set
+	 * according to missingdatafunc configuration.
+	 *
+	 * @param array $metrics                                  List of data sets.
+	 * @param array $metrics[]['options']['frequency']        Interval at which each data should arrive in seconds.
+	 * @param array $metrics[]['options']['missingdatafunc']  Data set missing data setting.
+	 * @param array $metrics[]['source']                      Metric source.
+	 * @param array $metrics[]['points'][]['value']           Point value.
+	 * @param array $metrics[]['points'][]['clock']           Point timestamp.
+	 */
+	protected static function applyMissingData(array &$metrics = []) {
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['frequency'] == -1) {
+				continue;
+			}
+
+			if ($metric['options']['missingdatafunc'] == SVG_GRAPH_MISSING_DATA_CONNECTED) {
+				continue;
+			}
+
+			if ($metric['options']['frequency'] == 0 || $metric['source'] == SVG_GRAPH_DATA_SOURCE_TRENDS) {
+				$metric['options']['frequency'] = self::getAverageDistance($metric['points']);
+			}
+
+			$missing_points = self::getMissingData($metric['points'], $metric['options']['frequency'],
+				$metric['options']['missingdatafunc']
+			);
+
+			if ($missing_points) {
+				$metric['points'] = array_merge($missing_points, $metric['points']);
+				CArrayHelper::sort($metric['points'], ['clock']);
+			}
+		}
+
+		unset($metric);
+	}
+
+	/**
+	 * Computes the average interval between given points.
+	 *
+	 * @param array $points             Data set points.
+	 * @param array $points[]['clock']  Point timestamp.
+	 *
+	 * @return int
+	 */
+	protected static function getAverageDistance(array $points = []) {
+		$distances = [];
+		$prev_clock = null;
+		foreach ($points as $point) {
+			if ($prev_clock !== null) {
+				$distances[] = $point['clock'] - $prev_clock;
+			}
+			$prev_clock = $point['clock'];
+		}
+
+		return $distances ? array_sum($distances) / count($distances) : 0;
+	}
+
+	/**
+	 * Based on expected data frequency. Produces a list of points that represent.
+	 *
+	 * @param array $points             Data set points.
+	 * @param array $points[]['value']  Point value.
+	 * @param array $points[]['clock']  Point timestamp.
+	 * @param int   $frequency          Interval or rate at which each data should arrive in seconds.
+	 * @param int   $missingdatafunc    Data set missing data setting, either to connect missing data or threat as zero.
+	 *
+	 * @return array
+	 */
+	protected static function getMissingData(array $points, $frequency, $missingdatafunc) {
+		$missing_points = [];
+
+		if ($frequency == 0) {
+			return $missing_points;
+		}
+
+		$prev_clock = null;
+		$threshold = $frequency * 3;
+
+		foreach ($points as $point) {
+			if ($prev_clock !== null && ($point['clock'] - $prev_clock) > $threshold) {
+				$gap_interval = floor(($point['clock'] - $prev_clock) / $threshold);
+
+				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
+					$missing_points[] = ['clock' => $prev_clock + $gap_interval, 'value' => null];
+				}
+				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
+					$missing_points[] = ['clock' => $prev_clock + $gap_interval, 'value' => 0];
+					$missing_points[] = ['clock' => $point['clock'] - $gap_interval, 'value' => 0];
+				}
+			}
+
+			$prev_clock = $point['clock'];
+		}
+
+		return $missing_points;
 	}
 
 	/**

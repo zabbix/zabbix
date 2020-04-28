@@ -1234,7 +1234,8 @@ class CControllerPopupGeneric extends CController {
 			case 'drules':
 				$records = API::DRule()->get([
 					'output' => ['druleid', 'name'],
-					'filter' => ['status' => DRULE_STATUS_ACTIVE]
+					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'preservekeys' => true
 				]);
 
 				CArrayHelper::sort($records, ['name']);
