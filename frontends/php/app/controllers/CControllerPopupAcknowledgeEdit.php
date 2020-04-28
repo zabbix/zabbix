@@ -155,7 +155,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 		}
 
 		$data['has_ack_events'] = ($ack_count > 0);
-		$data['has_unack_events'] = ($ack_count != count($event));
+		$data['has_unack_events'] = ($ack_count != count($events));
 
 		// Severity can be changed only for editable triggers.
 		$data['problem_severity_can_be_changed'] = !!$editable_triggers;
