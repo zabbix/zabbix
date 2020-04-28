@@ -342,28 +342,37 @@
 	}
 
 	/**
-	 * Find and refresh widget, from which the "Update problem" popup form was launched and submitted.
+	 * Find and refresh widget responsible for launching the "Update problem" popup after it was submitted.
 	 *
 	 * @param {String} type      Widget type to search for.
 	 * @param {object} response  The response object from the "acknowledge.create" action.
 	 * @param {object} overlay   The overlay object of the "Update problem" popup form.
 	 */
 	function refreshWidgetOnAcknowledgeCreate(type, response, overlay) {
-		// Find element which does not get replaced on widget refresh.
-		var element = (overlays_stack.length
-			? overlays_stack.end().element
-			: overlay.trigger_parents.filter('.dashbrd-grid-widget-content')
-		);
+		var handle_selector = '.dashbrd-grid-widget-content',
+			handle = overlay.trigger_parents.filter(handle_selector).get(0);
 
-		if (element) {
-			element = (element instanceof jQuery) ? element[0] : element;
+		if (!handle) {
+			var dialogue = overlay.trigger_parents.filter('.overlay-dialogue');
+			if (dialogue.length) {
+				var dialogue_overlay = overlays_stack.getById(dialogue.data('hintboxid'));
+				if (dialogue_overlay && dialogue_overlay.type === 'hintbox') {
+					handle = dialogue_overlay.element.closest(handle_selector);
+				}
+			}
+		}
+
+		if (handle) {
 			var widgets = $('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'type', type);
 			widgets.forEach(widget => {
-				if ($.contains(widget.container[0], element)) {
-					if (overlays_stack.length) {
-						var overlay_end = overlays_stack.end();
-						if (overlay_end.type === 'hintbox') {
-							hintBox.hideHint(overlay_end.element, true);
+				if ($.contains(widget.container[0], handle)) {
+					for (var i = overlays_stack.length - 1; i >= 0; i--) {
+						var hintbox = overlays_stack.getById(overlays_stack.stack[i]);
+						if (hintbox.type === 'hintbox') {
+							hintbox_handle = hintbox.element.closest(handle_selector);
+							if ($.contains(widget.container[0], hintbox_handle)) {
+								hintBox.hideHint(hintbox.element, true);
+							}
 						}
 					}
 

@@ -404,10 +404,6 @@ function make_small_eventlist(array $startEvent) {
  *                                             - PROBLEMS_TAG_NAME_SHORTENED;
  *                                             - PROBLEMS_TAG_NAME_NONE.
  * @param string $tag_priority               A list of comma-separated tag names.
- * @param array  $options
- * @param string $options['widget']          (optional) Holds widget reference if loaded through widget.
- * @param bool   $options['reload']          (optional) Either to make full page reload after successful update problem
- *                                           operation.
  *
  * @return CDiv
  */

@@ -27,32 +27,44 @@
 <script type="text/javascript">
 	var monitoringScreen = {
 		refreshOnAcknowledgeCreateSubscribed: false,
+
+		/**
+		 * Find and refresh screen responsible for launching the "Update problem" popup after it was submitted.
+		 *
+		 * @param {object} response  The response object from the "acknowledge.create" action.
+		 * @param {object} overlay   The overlay object of the "Update problem" popup form.
+		 */
 		refreshOnAcknowledgeCreateHandler: function(response, overlay) {
-			var element;
+			var handle_selector = '.screenitem',
+				handle = overlay.trigger_parents.filter(handle_selector).get(0);
 
-			if (overlays_stack.length) {
-				var overlay_end = overlays_stack.end();
-
-				element = overlay_end.element;
-
-				// Hide hintbox to allow refreshing of the screen.
-				if (overlay_end.type === 'hintbox') {
-					hintBox.hideHint(element, true);
+			if (!handle) {
+				var dialogue = overlay.trigger_parents.filter('.overlay-dialogue');
+				if (dialogue.length) {
+					var dialogue_overlay = overlays_stack.getById(dialogue.data('hintboxid'));
+					if (dialogue_overlay && dialogue_overlay.type === 'hintbox') {
+						handle = dialogue_overlay.element.closest(handle_selector);
+					}
 				}
 			}
-			else {
-				// Find element which does not get replaced on screen refresh.
-				element = overlay.trigger_parents.filter('.screenitem');
-			}
 
-			if (element) {
-				element = (element instanceof jQuery) ? element[0] : element;
+			if (handle) {
 				for (var id in flickerfreeScreen.screens) {
 					if (flickerfreeScreen.screens.hasOwnProperty(id)) {
-						var flickerfreescreen = $("#flickerfreescreen_" + id)[0];
-						if ($.contains(flickerfreescreen, element) || $.contains(element, flickerfreescreen)) {
+						var screen = document.getElementById('flickerfreescreen_' + id);
+						if ($.contains(screen, handle) || $.contains(handle, screen)) {
+							for (var i = overlays_stack.length - 1; i >= 0; i--) {
+								var hintbox = overlays_stack.getById(overlays_stack.stack[i]);
+								if (hintbox.type === 'hintbox') {
+									hintbox_handle = hintbox.element.closest(handle_selector);
+									if ($.contains(screen, hintbox_handle) || $.contains(hintbox_handle, screen)) {
+										hintBox.hideHint(hintbox.element, true);
+									}
+								}
+							}
+
 							clearMessages();
-							addMessage(makeMessageBox("good", response.message, null, true));
+							addMessage(makeMessageBox('good', response.message, null, true));
 							flickerfreeScreen.refresh(id);
 						}
 					}

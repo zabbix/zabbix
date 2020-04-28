@@ -261,9 +261,9 @@ function objectSize(obj) {
 }
 
 /**
- * Add standard message (having class name .msg-good, .msg-bad or .msg-warning) to the top of the site.
+ * Add standard message to the top of the site.
  *
- * @param html
+ * @param html  String of jQuery object representing HTML message with class name .msg-good, .msg-bad or .msg-warning.
  */
 function addMessage(html) {
 	var $wrapper = $('.wrapper'),
