@@ -525,7 +525,7 @@ abstract class CTriggerGeneral extends CApiService {
 			'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED, TRIGGER_STATUS_NO_CREATE])]
 		];
 
-		foreach ($triggers as &$trigger) {
+		foreach ($triggers as $key => &$trigger) {
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_wrong_fields);
 			}
@@ -540,8 +540,8 @@ abstract class CTriggerGeneral extends CApiService {
 			if (get_class($this) === 'CTriggerPrototype' && array_key_exists('status', $trigger)) {
 				$path = '/'.($key + 1);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules],
-						array_intersect_key($trigger, $rules), $path, $error)) {
+				$data = array_intersect_key($trigger, $rules);
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
@@ -767,10 +767,10 @@ abstract class CTriggerGeneral extends CApiService {
 
 			// Validate trigger prototype status field.
 			if (get_class($this) === 'CTriggerPrototype' && array_key_exists('status', $trigger)) {
-				$path = '/'.($key + 1);
+				$path = '/'.($tnum + 1);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules],
-						array_intersect_key($trigger, $rules), $path, $error)) {
+				$data = array_intersect_key($trigger, $rules);
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
