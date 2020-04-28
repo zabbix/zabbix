@@ -112,6 +112,41 @@ out:
   value: 1
   return: 'SUCCEED'
 ---
+test case: 'strings comparison, carriage return 1'
+in:
+  expression: "\"a\r\nb\"=\"a\nb\""
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 2'
+in:
+  expression: "\"a\nb\"=\"a\r\nb\""
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 3'
+in:
+  expression: "\"a\r\rb\"=\"a\r\n\rb\""
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 4'
+in:
+  expression: "(\"a\r\rb\"=\"a\r\n\rb\") + (\"\r\"=\"\") + (\"\r\"=\"\r\")"
+out:
+  value: 2
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 5'
+in:
+  expression: "\"\r\r\r\ra\\\"\"=\"a\\\"\r\""
+out:
+  value: 1
+  return: 'SUCCEED'
+---
 test case: 'strings comparison, operands are different'
 in:
   expression: '"ccc"<>("cccc")'

@@ -83,7 +83,7 @@ static void	evaluate_string(zbx_variant_t *res)
 {
 	const char	*p0 = ptr, *prev = ptr;
 	char		*res_temp = NULL;
-	int		prev_prev_is_escape = 0, prev_escape_is_binded = 0, first_iter = 1, i = 0, str_len = 0;
+	int		prev_prev_is_escape = 0, prev_escape_is_binded = 0, first_iter = 1, j = 0, k = 0, str_len = 0;
 
 	while ('"' != *ptr || ((!prev_prev_is_escape || !prev_escape_is_binded) && ('\\' == *prev) && ('"' == *ptr)))
 	{
@@ -115,10 +115,16 @@ static void	evaluate_string(zbx_variant_t *res)
 	str_len = ptr - p0;
 	res_temp = zbx_malloc(NULL, str_len + 1);
 
-	for (i = 0; i < str_len; i++)
-		*(res_temp + i) = *(p0 + i);
+	for (j = 0; j < str_len; j++)
+	{
+		if ('\r' == p0[j])
+			continue;
 
-	*(res_temp + str_len) = '\0';
+		*(res_temp + k) = *(p0 + j);
+		k++;
+	}
+
+	*(res_temp + k) = '\0';
 	zbx_variant_set_str(res, res_temp);
 }
 
