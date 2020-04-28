@@ -76,6 +76,7 @@ typedef struct
 	unsigned char		inventory_link;
 	unsigned char		evaltype;
 	unsigned char		allow_traps;
+	unsigned char		discover;
 	zbx_vector_ptr_t	dependent_items;
 }
 zbx_template_item_t;
@@ -211,7 +212,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				"ti.jmx_endpoint,ti.master_itemid,ti.timeout,ti.url,ti.query_fields,ti.posts,"
 				"ti.status_codes,ti.follow_redirects,ti.post_type,ti.http_proxy,ti.headers,"
 				"ti.retrieve_mode,ti.request_method,ti.output_format,ti.ssl_cert_file,ti.ssl_key_file,"
-				"ti.ssl_key_password,ti.verify_peer,ti.verify_host,ti.allow_traps"
+				"ti.ssl_key_password,ti.verify_peer,ti.verify_host,ti.allow_traps,ti.discover"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -301,6 +302,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->verify_peer, row[45]);
 		ZBX_STR2UCHAR(item->verify_host, row[46]);
 		ZBX_STR2UCHAR(item->allow_traps, row[47]);
+		ZBX_STR2UCHAR(item->discover, row[48]);
 		zbx_vector_ptr_create(&item->dependent_items);
 		zbx_vector_ptr_append(items, item);
 	}
@@ -656,6 +658,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					"verify_peer=%d,"
 					"verify_host=%d,"
 					"allow_traps=%d"
+					"discover=%d"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				name_esc, (int)item->type, (int)item->value_type, delay_esc,
 				history_esc, trends_esc, (int)item->status, trapper_hosts_esc, units_esc,
@@ -668,7 +671,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->follow_redirects, item->post_type, http_proxy_esc, headers_esc,
 				item->retrieve_mode, item->request_method, item->output_format, ssl_cert_file_esc,
 				ssl_key_file_esc, ssl_key_password_esc, item->verify_peer, item->verify_host,
-				item->allow_traps, item->itemid);
+				item->allow_traps, item->discover, item->itemid);
 
 		zbx_free(jmx_endpoint_esc);
 		zbx_free(lifetime_esc);
@@ -712,7 +715,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 				item->posts, item->status_codes, item->follow_redirects, item->post_type,
 				item->http_proxy, item->headers, item->retrieve_mode, item->request_method,
 				item->output_format, item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password,
-				item->verify_peer, item->verify_host, item->allow_traps);
+				item->verify_peer, item->verify_host, item->allow_traps, item->discover);
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
@@ -773,7 +776,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				"timeout", "url", "query_fields", "posts", "status_codes", "follow_redirects",
 				"post_type", "http_proxy", "headers", "retrieve_mode", "request_method",
 				"output_format", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "verify_peer",
-				"verify_host", "allow_traps", NULL);
+				"verify_host", "allow_traps", "discover", NULL);
 
 		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", NULL);
 	}
