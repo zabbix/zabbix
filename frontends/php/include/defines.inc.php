@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.0.0beta2');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050081);
+define('ZABBIX_DB_VERSION',		4050117);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');

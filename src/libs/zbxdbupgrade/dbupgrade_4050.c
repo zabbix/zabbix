@@ -1726,6 +1726,294 @@ static int	DBpatch_4050081(void)
 	return DBmodify_field_type("auditlog_details", &field, &old_field);
 }
 
+static int	DBpatch_4050082(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("maintenances", &field, &old_field);
+}
+
+static int	DBpatch_4050083(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hosts", &field, &old_field);
+}
+
+static int	DBpatch_4050084(void)
+{
+	const ZBX_FIELD	old_field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("httpstep", &field, &old_field);
+}
+
+static int	DBpatch_4050085(void)
+{
+	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_4050086(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_4050087(void)
+{
+	const ZBX_FIELD	old_field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_4050088(void)
+{
+	const ZBX_FIELD	old_field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("items", &field, &old_field);
+}
+
+static int	DBpatch_4050089(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media_type", &field, &old_field);
+}
+
+static int	DBpatch_4050090(void)
+{
+	const ZBX_FIELD	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media_type_message", &field, &old_field);
+}
+
+static int	DBpatch_4050091(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("scripts", &field, &old_field);
+}
+
+static int	DBpatch_4050092(void)
+{
+	const ZBX_FIELD	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("opmessage", &field, &old_field);
+}
+
+static int	DBpatch_4050093(void)
+{
+	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("opcommand", &field, &old_field);
+}
+
+static int	DBpatch_4050094(void)
+{
+	const ZBX_FIELD	old_field = {"comments", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"comments", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, &old_field);
+}
+
+static int	DBpatch_4050095(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("globalmacro", &field, &old_field);
+}
+
+static int	DBpatch_4050096(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hostmacro", &field, &old_field);
+}
+
+static int	DBpatch_4050097(void)
+{
+	const ZBX_FIELD	old_field = {"test_string", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"test_string", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("regexps", &field, &old_field);
+}
+
+static int	DBpatch_4050098(void)
+{
+	const ZBX_FIELD	old_field = {"parameters", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"parameters", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("alerts", &field, &old_field);
+}
+
+static int	DBpatch_4050099(void)
+{
+	const ZBX_FIELD	old_field = {"hardware_full", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"hardware_full", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050100(void)
+{
+	const ZBX_FIELD	old_field = {"software_full", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"software_full", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050101(void)
+{
+	const ZBX_FIELD	old_field = {"contact", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"contact", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050102(void)
+{
+	const ZBX_FIELD	old_field = {"location", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"location", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050103(void)
+{
+	const ZBX_FIELD	old_field = {"notes", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"notes", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050104(void)
+{
+	const ZBX_FIELD	old_field = {"host_networks", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"host_networks", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050105(void)
+{
+	const ZBX_FIELD	old_field = {"site_notes", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"site_notes", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050106(void)
+{
+	const ZBX_FIELD	old_field = {"poc_1_notes", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"poc_1_notes", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050107(void)
+{
+	const ZBX_FIELD	old_field = {"poc_2_notes", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"poc_2_notes", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, &old_field);
+}
+
+static int	DBpatch_4050108(void)
+{
+	const ZBX_FIELD	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("correlation", &field, &old_field);
+}
+
+static int	DBpatch_4050109(void)
+{
+	const ZBX_FIELD	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("item_preproc", &field, &old_field);
+}
+
+static int	DBpatch_4050110(void)
+{
+	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_remote_command", &field, &old_field);
+}
+
+static int	DBpatch_4050111(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_remote_command_result", &field, &old_field);
+}
+
+static int	DBpatch_4050112(void)
+{
+	const ZBX_FIELD	old_field = {"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"data", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_data", &field, &old_field);
+}
+
+static int	DBpatch_4050113(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
+static int	DBpatch_4050114(void)
+{
+	const ZBX_FIELD	old_field = {"text", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"text", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmap_shape", &field, &old_field);
+}
+
+static int	DBpatch_4050115(void)
+{
+	const ZBX_FIELD	old_field = {"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"value", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("httptest_field", &field, &old_field);
+}
+
+static int	DBpatch_4050116(void)
+{
+	const ZBX_FIELD	old_field = {"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"value", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("httpstep_field", &field, &old_field);
+}
+
+static int	DBpatch_4050117(void)
+{
+	const ZBX_FIELD	old_field = {"config", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"config", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("module", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1808,5 +2096,41 @@ DBPATCH_ADD(4050078, 0, 1)
 DBPATCH_ADD(4050079, 0, 1)
 DBPATCH_ADD(4050080, 0, 1)
 DBPATCH_ADD(4050081, 0, 1)
+DBPATCH_ADD(4050082, 0, 1)
+DBPATCH_ADD(4050083, 0, 1)
+DBPATCH_ADD(4050084, 0, 1)
+DBPATCH_ADD(4050085, 0, 1)
+DBPATCH_ADD(4050086, 0, 1)
+DBPATCH_ADD(4050087, 0, 1)
+DBPATCH_ADD(4050088, 0, 1)
+DBPATCH_ADD(4050089, 0, 1)
+DBPATCH_ADD(4050090, 0, 1)
+DBPATCH_ADD(4050091, 0, 1)
+DBPATCH_ADD(4050092, 0, 1)
+DBPATCH_ADD(4050093, 0, 1)
+DBPATCH_ADD(4050094, 0, 1)
+DBPATCH_ADD(4050095, 0, 1)
+DBPATCH_ADD(4050096, 0, 1)
+DBPATCH_ADD(4050097, 0, 1)
+DBPATCH_ADD(4050098, 0, 1)
+DBPATCH_ADD(4050099, 0, 1)
+DBPATCH_ADD(4050100, 0, 1)
+DBPATCH_ADD(4050101, 0, 1)
+DBPATCH_ADD(4050102, 0, 1)
+DBPATCH_ADD(4050103, 0, 1)
+DBPATCH_ADD(4050104, 0, 1)
+DBPATCH_ADD(4050105, 0, 1)
+DBPATCH_ADD(4050106, 0, 1)
+DBPATCH_ADD(4050107, 0, 1)
+DBPATCH_ADD(4050108, 0, 1)
+DBPATCH_ADD(4050109, 0, 1)
+DBPATCH_ADD(4050110, 0, 1)
+DBPATCH_ADD(4050111, 0, 1)
+DBPATCH_ADD(4050112, 0, 1)
+DBPATCH_ADD(4050113, 0, 1)
+DBPATCH_ADD(4050114, 0, 1)
+DBPATCH_ADD(4050115, 0, 1)
+DBPATCH_ADD(4050116, 0, 1)
+DBPATCH_ADD(4050117, 0, 1)
 
 DBPATCH_END()
