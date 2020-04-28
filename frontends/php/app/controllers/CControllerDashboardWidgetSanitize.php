@@ -84,7 +84,7 @@ class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 				}
 			}
 			else {
-				// Non resource fields are returned unchanged.
+				// Other fields are returned unchanged.
 				$output['fields'][$field->getName()] = $value;
 			}
 		}

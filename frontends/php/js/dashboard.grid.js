@@ -3793,6 +3793,10 @@
 							resizeDashboardGrid($this, data, pos['y'] + pos['height']);
 						}
 					})
+					.fail(function() {
+						removeWidget($this, data, widget_placeholder);
+						resizeDashboardGrid($this, data, pos['y'] + pos['height']);
+					})
 					.always(function() {
 						// Mark dashboard as updated.
 						data['options']['updated'] = true;
