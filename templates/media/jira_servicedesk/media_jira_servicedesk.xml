@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-28T09:15:55Z</date>
+    <date>2020-04-28T10:16:41Z</date>
     <media_types>
         <media_type>
             <name>Jira ServiceDesk</name>
@@ -85,7 +85,7 @@
 &#13;
     setTags: function(event_tags_json) {&#13;
         if (!Jira.schema) {&#13;
-            Zabbix.Log(4, '[ Jira Service Desk Webhook ] Can not add labels because failed to retrieve field schema.');&#13;
+            Zabbix.Log(4, '[ Jira Service Desk Webhook ] Cannot add labels because failed to retrieve field schema.');&#13;
 &#13;
             return;&#13;
         }&#13;
@@ -148,7 +148,7 @@
                     });&#13;
             }&#13;
             else {&#13;
-                Zabbix.Log(4, '[ Jira Service Desk Webhook ] Can not add custom fields' +&#13;
+                Zabbix.Log(4, '[ Jira Service Desk Webhook ] Cannot add custom fields' +&#13;
                     'because failed to retrieve field schema.');&#13;
             }&#13;
         }&#13;
@@ -289,7 +289,7 @@ try {&#13;
                 fields[key] = params[key];&#13;
             }&#13;
             else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
-                throw 'Parameter &quot;' + key + '&quot; can\'t be empty.';&#13;
+                throw 'Parameter &quot;' + key + '&quot; cannot be empty.';&#13;
             }&#13;
         });&#13;
 &#13;
