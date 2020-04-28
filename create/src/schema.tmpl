@@ -94,6 +94,7 @@ FIELD		|tls_psk_identity|t_varchar(128)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|proxy_address	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|auto_compress	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -344,6 +345,7 @@ FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|verify_peer	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|hostid,key_(1021)
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -642,6 +644,7 @@ FIELD		|correlation_mode|t_integer	|'0'	|NOT NULL	|0
 FIELD		|correlation_tag|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|manual_close	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|opdata		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|status
 INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
@@ -683,6 +686,7 @@ FIELD		|ymin_itemid	|t_id		|	|NULL		|0			|2|items	|itemid		|RESTRICT
 FIELD		|ymax_itemid	|t_id		|	|NULL		|0			|3|items	|itemid		|RESTRICT
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|name
 INDEX		|2		|templateid
 INDEX		|3		|ymin_itemid
@@ -1231,6 +1235,8 @@ FIELD		|snmp_lastsize	|t_bigint	|'0'	|NOT NULL	|0
 TABLE|graph_discovery|graphid|0
 FIELD		|graphid	|t_id		|	|NOT NULL	|0			|1|graphs
 FIELD		|parent_graphid	|t_id		|	|NOT NULL	|0			|2|graphs	|graphid	|RESTRICT
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|parent_graphid
 
 TABLE|host_inventory|hostid|0
@@ -1365,6 +1371,8 @@ INDEX		|1		|userid,status,lastaccess
 TABLE|trigger_discovery|triggerid|0
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
 FIELD		|parent_triggerid|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid	|RESTRICT
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|parent_triggerid
 
 TABLE|application_template|application_templateid|ZBX_TEMPLATE
@@ -1762,6 +1770,10 @@ INDEX	|1				|lld_overrideid
 TABLE|lld_override_opstatus|lld_override_operationid|ZBX_TEMPLATE
 FIELD	|lld_override_operationid	|t_id		|	|NOT NULL	|0	|1|lld_override_operation
 FIELD	|status				|t_integer	|'0'	|NOT NULL	|0
+
+TABLE|lld_override_opdiscovery|lld_override_operationid|ZBX_TEMPLATE
+FIELD	|lld_override_operationid	|t_id		|	|NOT NULL	|0	|1|lld_override_operation
+FIELD	|discovery			|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|lld_override_opperiod|lld_override_operationid|ZBX_TEMPLATE
 FIELD	|lld_override_operationid	|t_id		|	|NOT NULL	|0	|1|lld_override_operation
