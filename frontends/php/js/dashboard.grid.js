@@ -3002,8 +3002,9 @@
 		// This function may be called for widget that is not in data['widgets'] array yet.
 		if (typeof widget['fields']['dynamic'] !== 'undefined') {
 			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
+				var dynamic_hosts = data['dashboard']['dynamic']['host'];
 				widget['dynamic'] = {
-					'hostid': data['dashboard']['dynamic']['host'][0]['id']
+					'hostid': dynamic_hosts.length ? dynamic_hosts[0]['id'] : undefined
 				};
 			}
 			else {
