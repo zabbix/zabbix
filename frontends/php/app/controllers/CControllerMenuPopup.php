@@ -507,7 +507,6 @@ class CControllerMenuPopup extends CController {
 	 * @param int    $data['severity_min']            (optional)
 	 * @param bool   $data['show_suppressed']         (optional)
 	 * @param array  $data['urls']                    (optional)
-	 *                                                after successful change. Supports value '1'.
 	 * @param string $data['urls']['name']
 	 * @param string $data['urls']['url']
 	 *

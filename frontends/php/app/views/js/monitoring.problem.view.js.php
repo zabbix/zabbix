@@ -110,7 +110,6 @@
 			}
 		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
 
-		// Subscribe to 'acknowledge.create' event.
 		$.subscribe('acknowledge.create', function(event, response) {
 			// Clear all selected checkboxes in Monitoring->Problems.
 			if (chkbxRange.prefix === 'problem') {
@@ -118,12 +117,10 @@
 				chkbxRange.clearSelectedOnFilterChange();
 			}
 
-			// Reload content.
 			window.flickerfreeScreen.refresh('problem');
 
-			// Display message.
-			$('.msg-bad, .msg-good, .msg-warning', $('.wrapper')).not('.msg-global-footer').remove();
-			$(makeMessageBox('good', response.message, null, true)).insertBefore('main');
+			clearMessages();
+			addMessage(makeMessageBox("good", response.message, null, true));
 		});
 
 		$(document).on('submit', '#problem_form', function(e) {
@@ -133,9 +130,7 @@
 					return $(this).val();
 				}).get();
 
-			return acknowledgePopUp({
-				eventids: eventids
-			}, this);
+			return acknowledgePopUp({eventids: eventids}, this);
 		});
 	});
 </script>

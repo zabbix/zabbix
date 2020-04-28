@@ -260,30 +260,48 @@ function objectSize(obj) {
 	return size;
 }
 
+/**
+ * Add standard message (having class name .msg-good, .msg-bad or .msg-warning) to the top of the site.
+ *
+ * @param html
+ */
 function addMessage(html) {
 	var $wrapper = $('.wrapper'),
-		$main = $wrapper.find('> main');
-		$header = $wrapper.find('> header');
+		$main = $wrapper.find('> main'),
+		$footer = $wrapper.find('> footer');
 
 	if ($main.length) {
 		$main.before(html);
 	}
-	else if ($header.length) {
-		$header.after(html);
+	else if ($footer.length) {
+		$footer.before(html);
 	}
 	else {
-		$wrapper.prepend(html);
+		$wrapper.append(html);
 	}
 }
 
+/**
+ * Clear standard messages.
+ */
 function clearMessages() {
-	$('.wrapper').find('> .msg-good, > .msg-bad, > .msg-warning').remove();
+	$('.wrapper').find('> .msg-good, > .msg-bad, > .msg-warning').not('.msg-global-footer').remove();
 }
 
+/**
+ * Prepare Ok message for displaying after page reload.
+ *
+ * @param {String} message
+ */
 function postMessageOk(message) {
 	cookie.create('messageOk', message);
 }
 
+/**
+ * Prepare Error message for displaying after page reload.
+ *
+ * @param {String} message
+ */
 function postMessageError(message) {
 	cookie.create('messageError', message);
 }
