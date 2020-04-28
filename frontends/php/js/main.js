@@ -76,8 +76,9 @@ var PageRefresh = {
 			return false;
 		}
 
-		this.delayLeft -= 1000;
-		if (this.delayLeft < 0) {
+		this.delayLeft = Math.max(-1, this.delayLeft - 1000);
+
+		if (this.delayLeft < 0 && !overlays_stack.length) {
 			if (ED) {
 				sessionStorage.scrollTop = jQuery(window).scrollTop();
 			}
