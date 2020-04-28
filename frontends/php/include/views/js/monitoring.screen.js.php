@@ -28,12 +28,29 @@
 	var monitoringScreen = {
 		refreshOnAcknowledgeCreateSubscribed: false,
 		refreshOnAcknowledgeCreateHandler: function(response, overlay) {
-			var element = overlays_stack.length ? overlays_stack.end().element : overlay.element;
+			var element;
+
+			if (overlays_stack.length) {
+				var overlay_end = overlays_stack.end();
+
+				element = overlay_end.element;
+
+				// Hide hintbox to allow refreshing of the screen.
+				if (overlay_end.type === 'hintbox') {
+					hintBox.hideHint(element, true);
+				}
+			}
+			else {
+				// Find element which does not get replaced on screen refresh.
+				element = overlay.trigger_parents.filter('.screenitem');
+			}
+
 			if (element) {
 				element = (element instanceof jQuery) ? element[0] : element;
 				for (var id in flickerfreeScreen.screens) {
 					if (flickerfreeScreen.screens.hasOwnProperty(id)) {
-						if ($.contains($("#flickerfreescreen_" + id)[0], element)) {
+						var flickerfreescreen = $("#flickerfreescreen_" + id)[0];
+						if ($.contains(flickerfreescreen, element) || $.contains(element, flickerfreescreen)) {
 							clearMessages();
 							addMessage(makeMessageBox("good", response.message, null, true));
 							flickerfreeScreen.refresh(id);

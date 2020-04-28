@@ -173,12 +173,7 @@ function make_event_details(array $event) {
 			(new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('return acknowledgePopUp('.
-					json_encode([
-						'eventids' => [$event['eventid']],
-						'reload' => 1
-					]).', this);'
-				)
+				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);')
 		]);
 
 	if ($event['r_eventid'] != 0) {
@@ -364,12 +359,7 @@ function make_small_eventlist(array $startEvent) {
 		$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->onClick('return acknowledgePopUp('.
-				json_encode([
-					'eventids' => [$event['eventid']],
-					'reload' => 1
-				]).', this);'
-			);
+			->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);');
 
 		$table->addRow([
 			(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),

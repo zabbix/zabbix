@@ -401,6 +401,9 @@ function acknowledgePopUp(options, trigger_elmnt) {
 	var overlay = PopUp('popup.acknowledge.edit', options, null, trigger_elmnt),
 		backurl = location.href;
 
+	// Save all parents of the trigger element, since closest parents might get replaced on partial refresh.
+	overlay.trigger_parents = $(trigger_elmnt).parents();
+
 	overlay.xhr.then(function() {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'popup');

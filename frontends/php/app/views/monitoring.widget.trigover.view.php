@@ -39,7 +39,10 @@ if ($data['initial_load']) {
 	$output['script_inline'] =
 		'if (typeof refreshTrigOverViewWidget !== typeof(Function)) {'.
 			'function refreshTrigOverViewWidget(event, response, overlay) {'.
-				'var element = overlays_stack.length ? overlays_stack.end().element : overlay.element;'.
+				'var element = (overlays_stack.length'.
+					'? overlays_stack.end().element'.
+					': overlay.trigger_parents.filter(".dashbrd-grid-widget-content")'.
+				');'.
 				'if (element) {'.
 					'element = (element instanceof jQuery) ? element[0] : element;'.
 					'var widgets = $(".dashbrd-grid-container").dashboardGrid("getWidgetsBy", "type", "trigover");'.

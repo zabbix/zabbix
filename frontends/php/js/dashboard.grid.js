@@ -1650,7 +1650,7 @@
 
 		if (rf_rate) {
 			widget['rf_timeoutid'] = setTimeout(function() {
-				// Do not update widget content if there are active popup or hintbox.
+				// Do not update widget if displaying static hintbox.
 				var active = widget['content_body'].find('[data-expanded="true"]');
 
 				if (!active.length && !doAction('timer_refresh', $obj, data, widget)) {

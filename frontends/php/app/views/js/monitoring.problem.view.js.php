@@ -130,7 +130,7 @@
 					return $(this).val();
 				}).get();
 
-			return acknowledgePopUp({eventids: eventids}, this);
+			acknowledgePopUp({eventids: eventids}, this);
 		});
 	});
 </script>
