@@ -66,6 +66,8 @@ const (
 	PERF_DETAIL_WIZARD = 400
 )
 
+const uint32Size = 4
+
 func newPdhError(ret uintptr) (err error) {
 	flags := uint32(windows.FORMAT_MESSAGE_FROM_HMODULE | windows.FORMAT_MESSAGE_IGNORE_INSERTS)
 	var len uint32
@@ -204,8 +206,7 @@ func PdhLookupPerfNameByIndex(index int) (path string, err error) {
 }
 
 func PdhLookupPerfIndexByName(name string) (idx int, err error) {
-	size := uint32(PDH_MAX_COUNTER_NAME)
-	buf := make([]int, size)
+	buf := make([]int, uint32(uint32Size))
 	nameUTF16, err := syscall.UTF16PtrFromString(name)
 	if err != nil {
 		return 0, err
@@ -248,7 +249,7 @@ func PdhEnumObjectItems(objectName string) (instances []string, err error) {
 		return nil, newPdhError(ret)
 	}
 
-	return utf16ToStringSlice(instbuf), nil
+	return utf16ToUniqueStringSlice(instbuf), nil
 }
 
 func PdhEnumObject() (objects []string, err error) {
@@ -267,7 +268,7 @@ func PdhEnumObject() (objects []string, err error) {
 		return nil, newPdhError(ret)
 	}
 
-	return utf16ToStringSlice(objectBuf), nil
+	return utf16ToUniqueStringSlice(objectBuf), nil
 }
 
 func init() {

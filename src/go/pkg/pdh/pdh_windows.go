@@ -31,6 +31,14 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+var Objects map[int]*Object
+
+type Object struct {
+	Idx     int
+	EngName string
+	Name    string
+}
+
 type sysCounter struct {
 	name  string
 	index string
@@ -46,8 +54,6 @@ const (
 	ObjectTerminalServices
 	CounterTotalSessions
 )
-
-var Counters map[string]string
 
 var sysCounters []sysCounter = []sysCounter{
 	{name: "System"},
@@ -71,24 +77,9 @@ type CounterPathElements struct {
 	CounterName    string
 }
 
-func locateDefaultCounters() (err error) {
-	if err = locateCounters(); err != nil {
-		return
-	}
-	for idx, name := range Counters {
-		for i := range sysCounters {
-			if sysCounters[i].name == name {
-				sysCounters[i].index = idx
-				break
-			}
-		}
-	}
-	return
-}
-
-func locateCounters() (err error) {
+func locateObjectsAndDefaultCounters() (err error) {
 	var size uint32
-	Counters = make(map[string]string)
+	Objects = make(map[int]*Object)
 	counter := windows.StringToUTF16Ptr("Counter")
 	err = windows.RegQueryValueEx(HKEY_PERFORMANCE_TEXT, counter, nil, nil, nil, &size)
 	if err != nil {
@@ -100,19 +91,45 @@ func locateCounters() (err error) {
 	if err != nil {
 		return
 	}
+	locNames, err := win32.PdhEnumObject()
+	if err != nil {
+		return err
+	}
+
+	for _, name := range locNames {
+		idx, err := win32.PdhLookupPerfIndexByName(name)
+		if err != nil {
+			continue
+		}
+		Objects[idx] = &Object{idx, "", name}
+	}
 
 	var wcharIndex, wcharName []uint16
 	for len(buf) != 0 {
-		wcharIndex, buf = win32.RemoveSingleField(buf)
+		wcharIndex, buf = win32.NextField(buf)
 		if len(wcharIndex) == 0 {
 			break
 		}
-		wcharName, buf = win32.RemoveSingleField(buf)
+		wcharName, buf = win32.NextField(buf)
 		if len(wcharName) == 0 {
 			break
 		}
 
-		Counters[windows.UTF16ToString(wcharIndex)] = windows.UTF16ToString(wcharName)
+		name := windows.UTF16ToString(wcharName)
+		idx := windows.UTF16ToString(wcharIndex)
+		for i := range sysCounters {
+			if sysCounters[i].name == name {
+				sysCounters[i].index = idx
+			}
+		}
+		i, err := strconv.Atoi(idx)
+		if err != nil {
+			return err
+		}
+
+		if obj, ok := Objects[i]; ok {
+			obj.EngName = name
+		}
 	}
 
 	return
@@ -232,7 +249,7 @@ func MakePath(elements *CounterPathElements) (path string, err error) {
 }
 
 func init() {
-	if err := locateDefaultCounters(); err != nil {
+	if err := locateObjectsAndDefaultCounters(); err != nil {
 		panic(err.Error())
 	}
 }
