@@ -936,9 +936,6 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 			if (NULL != override_operation->trends)
 				*trends = override_operation->trends;
 
-			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
-				*discover = override_operation->discover;
-
 			if (NULL != status)
 			{
 				switch (override_operation->status)
@@ -955,6 +952,9 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 						THIS_SHOULD_NEVER_HAPPEN;
 				}
 			}
+
+			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
+				*discover = override_operation->discover;
 		}
 	}
 
@@ -1028,7 +1028,7 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 }
 
 void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_vector_uint64_t *lnk_templateids,
-		char *inventory_mode, unsigned char *status)
+		char *inventory_mode, unsigned char *status, unsigned char *discover)
 {
 	int	i, j, k;
 
@@ -1087,6 +1087,9 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 						THIS_SHOULD_NEVER_HAPPEN;
 				}
 			}
+
+			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
+				*discover = override_operation->discover;
 		}
 	}
 

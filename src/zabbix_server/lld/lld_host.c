@@ -623,8 +623,8 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 }
 
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
-		char inventory_mode_proto, unsigned char status_proto, const zbx_lld_row_t *lld_row,
-		const zbx_vector_ptr_t *lld_macros)
+		char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
+		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros)
 {
 	char		*buffer = NULL;
 	int		i;
@@ -666,9 +666,9 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		zbx_vector_uint64_create(&host->lnk_templateids);
 
 		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode,
-				&host->status);
+				&host->status, &discover_proto);
 
-		if (HOST_STATUS_NO_CREATE == host->status)
+		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
 		{
 			zbx_vector_uint64_destroy(&host->lnk_templateids);
 			zbx_free(host->host);
@@ -704,7 +704,8 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 		host->inventory_mode = inventory_mode_proto;
 
-		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, NULL);
+		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, NULL,
+				&discover_proto);
 
 		/* host visible name */
 		buffer = zbx_strdup(buffer, name_proto);
@@ -718,7 +719,8 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_NAME;
 		}
 
-		host->flags |= ZBX_FLAG_LLD_HOST_DISCOVERED;
+		if (ZBX_PROTOTYPE_NO_DISCOVER != discover_proto)
+			host->flags |= ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
 	host->jp_row = &lld_row->jp_row;
@@ -3600,7 +3602,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	lld_masterhostmacros_get(lld_ruleid, &masterhostmacros);
 
 	result = DBselect(
-			"select h.hostid,h.host,h.name,h.status,hi.inventory_mode"
+			"select h.hostid,h.host,h.name,h.status,h.discover,hi.inventory_mode"
 			" from hosts h,host_discovery hd"
 				" left join host_inventory hi"
 					" on hd.hostid=hi.hostid"
@@ -3613,17 +3615,18 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		zbx_uint64_t	parent_hostid;
 		const char	*host_proto, *name_proto;
 		zbx_lld_host_t	*host;
-		unsigned char	status;
+		unsigned char	status, discover;
 		int		i;
 
 		ZBX_STR2UINT64(parent_hostid, row[0]);
 		host_proto = row[1];
 		name_proto = row[2];
-		status = (unsigned char)atoi(row[3]);
-		if (SUCCEED == DBis_null(row[4]))
+		ZBX_STR2UCHAR(status, row[3]);
+		ZBX_STR2UCHAR(discover, row[4]);
+		if (SUCCEED == DBis_null(row[5]))
 			inventory_mode_proto = HOST_INVENTORY_DISABLED;
 		else
-			inventory_mode_proto = (char)atoi(row[4]);
+			inventory_mode_proto = (char)atoi(row[5]);
 
 		lld_hosts_get(parent_hostid, &hosts, proxy_hostid, ipmi_authtype, ipmi_privilege, ipmi_username,
 				ipmi_password, tls_connect, tls_accept, tls_issuer, tls_subject,
@@ -3640,7 +3643,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
-					status, lld_row, lld_macro_paths)))
+					status, discover, lld_row, lld_macro_paths)))
 			{
 				continue;
 			}
