@@ -67,16 +67,6 @@ builtin_counter_map[] =
 	{ 0,	POI_TERMINAL_SERVICES,		L"Total Sessions" }
 };
 
-struct object_name_ref
-{
-	char		*eng_name;
-	wchar_t		*loc_name;
-	unsigned long	idx;
-};
-
-static struct object_name_ref	*object_names = NULL;
-static int			object_num = 0;
-
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath)
 {
 	DWORD		dwSize = PDH_MAX_COUNTER_PATH;
@@ -334,7 +324,7 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
  *                                                                            *
  * Function: get_all_counter_eng_names                                        *
  *                                                                            *
- * Purpose: helper function for init_builtin_counter_indexes()                *
+ * Purpose: function to read English counter names/help from registry         *
  *                                                                            *
  * Parameters: reg_value_name    - [IN] name of the registry value            *
  *                                                                            *
@@ -347,7 +337,7 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
  *           The return buffer must be freed by the caller.                   *
  *                                                                            *
  ******************************************************************************/
-static wchar_t	*get_all_counter_eng_names(wchar_t *reg_value_name)
+wchar_t	*get_all_counter_eng_names(wchar_t *reg_value_name)
 {
 	wchar_t		*buffer = NULL;
 	DWORD		buffer_size = 0;
@@ -512,78 +502,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: init_object_names                                                *
- *                                                                            *
- * Purpose: obtains PDH object names and indices to be able to assign/read    *
- *          English object names later                                        *
- *                                                                            *
- * Return value: SUCCEED/FAIL                                                 *
- *                                                                            *
- * Comments: This function should be normally called during agent             *
- *           initialization from init_perf_collector().                       *
- *                                                                            *
- ******************************************************************************/
-int	init_object_names(void)
-{
-	DWORD		sz = 0;
-	wchar_t		*objects_list = NULL, *object;
-	PDH_STATUS	pdh_status;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (PDH_MORE_DATA != (pdh_status = PdhEnumObjects(NULL, NULL, NULL, &sz, PERF_DETAIL_WIZARD, TRUE)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot obtain required buffer size: %s",
-				strerror_from_module(pdh_status, L"PDH.DLL"));
-		goto out;
-	}
-
-	objects_list = zbx_malloc(NULL, (++sz) * sizeof(wchar_t));
-
-	if (ERROR_SUCCESS != (pdh_status = PdhEnumObjects(NULL, NULL, objects_list, &sz, PERF_DETAIL_WIZARD, FALSE)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot obtain objects list: %s",
-				strerror_from_module(pdh_status, L"PDH.DLL"));
-		goto out;
-	}
-
-	for (object = objects_list; L'\0' != *object; object += wcslen(object) + 1)
-	{
-		object_names = zbx_realloc(object_names, sizeof(struct object_name_ref) * (object_num + 1));
-
-		object_names[object_num].eng_name = NULL;
-		object_names[object_num].loc_name = zbx_malloc(NULL, sizeof(wchar_t) * sz);
-		memcpy(object_names[object_num].loc_name, object, sizeof(wchar_t) * sz);
-
-		if (ERROR_SUCCESS !=
-				(pdh_status = PdhLookupPerfIndexByName(NULL, object, &object_names[object_num].idx)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain object index: %s",
-					strerror_from_module(pdh_status, L"PDH.DLL"));
-			object_names[object_num].idx = 0;
-		}
-
-		object_num++;
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_free(objects_list);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: init_builtin_counter_indexes                                     *
  *                                                                            *
  * Purpose: Scans registry key with all performance counter English names     *
  *          and obtains system-dependent PDH counter indexes for further      *
- *          use by corresponding items. Also adds English translation to      *
- *          object names table.                                               *
+ *          use by corresponding items.                                       *
  *                                                                            *
  * Return value: SUCCEED/FAIL                                                 *
  *                                                                            *
@@ -611,7 +534,7 @@ int	init_builtin_counter_indexes(void)
 	counter_base += wcslen(counter_base) + 1;
 	counter_base += wcslen(counter_base) + 1;
 
-	/* get object names */
+	/* get builtin object names */
 	for (counter_text = counter_base; 0 != *counter_text; counter_text += wcslen(counter_text) + 1)
 	{
 		counter_index = (DWORD)_wtoi(counter_text);
@@ -623,16 +546,6 @@ int	init_builtin_counter_indexes(void)
 					0 == wcscmp(builtin_object_map[i].eng_name, counter_text))
 			{
 				builtin_object_map[i].pdhIndex = counter_index;
-				break;
-			}
-		}
-
-		for (i = 0; i < object_num; i++)
-		{
-			if (object_names[i].idx == counter_index || (0 == object_names[i].idx &&
-					0 == wcscmp(object_names[i].loc_name, counter_text)))
-			{
-				object_names[i].eng_name = zbx_unicode_to_utf8(counter_text);
 				break;
 			}
 		}
@@ -791,30 +704,4 @@ clean:
 	zbx_free(wcounterPath);
 
 	return ret;
-}
-
-wchar_t	*get_object_name_local(char *eng_name)
-{
-	int	i;
-
-	for (i = 0; i < object_num; i++)
-	{
-		if (NULL != object_names[i].eng_name && 0 == strcmp(object_names[i].eng_name, eng_name))
-			return object_names[i].loc_name;
-	}
-
-	return NULL;
-}
-
-void	free_object_name_ref(void)
-{
-	int	i;
-
-	for (i = 0; i < object_num; i++)
-	{
-		zbx_free(object_names[i].eng_name);
-		zbx_free(object_names[i].loc_name);
-	}
-
-	zbx_free(object_names);
 }

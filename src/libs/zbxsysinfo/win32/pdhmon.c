@@ -136,7 +136,7 @@ int	perf_instance_get_ex(const char *function, AGENT_REQUEST *request, AGENT_RES
 		zbx_perf_counter_lang_t lang)
 {
 	char		*tmp;
-	wchar_t		*object_name;
+	wchar_t		*object_name = NULL;
 	DWORD		cnt_len = 0, inst_len = 0;
 	struct zbx_json	j;
 	PDH_STATUS	status;
@@ -169,16 +169,14 @@ int	perf_instance_get_ex(const char *function, AGENT_REQUEST *request, AGENT_RES
 	else
 		object_name = zbx_utf8_to_unicode(tmp);
 
-	if (PDH_MORE_DATA != PdhEnumObjects(NULL, NULL, NULL, &cnt_len, PERF_DETAIL_WIZARD, TRUE))
+	if (SUCCEED != refresh_object_cache())
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot refresh object cache."));
 		goto err;
 	}
 
-	cnt_len = 0;
-
-	if (PDH_CSTATUS_NO_OBJECT == (status = PdhEnumObjectItems(NULL, NULL, object_name, NULL, &cnt_len, NULL, &inst_len,
-			PERF_DETAIL_WIZARD, 0)))
+	if (PDH_CSTATUS_NO_OBJECT == (status = PdhEnumObjectItems(NULL, NULL, object_name, NULL, &cnt_len, NULL,
+			&inst_len, PERF_DETAIL_WIZARD, 0)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find object."));
 		goto err;
@@ -242,8 +240,7 @@ int	perf_instance_get_ex(const char *function, AGENT_REQUEST *request, AGENT_RES
 	zbx_json_free(&j);
 	ret = SYSINFO_RET_OK;
 err:
-	if (PERF_COUNTER_LANG_EN != lang)
-		zbx_free(object_name);
+	zbx_free(object_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", function);
 
