@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-27T06:24:55Z</date>
+    <date>2020-04-28T09:15:55Z</date>
     <media_types>
         <media_type>
             <name>Jira ServiceDesk</name>
@@ -84,35 +84,36 @@
     },&#13;
 &#13;
     setTags: function(event_tags_json) {&#13;
-        if (Jira.schema) {&#13;
-            var block = Jira.schema.requestTypeFields.filter(function(object) {&#13;
-                return object.fieldId == 'labels';&#13;
-            });&#13;
+        if (!Jira.schema) {&#13;
+            Zabbix.Log(4, '[ Jira Service Desk Webhook ] Can not add labels because failed to retrieve field schema.');&#13;
 &#13;
-            if (block[0] &amp;&amp; typeof event_tags_json !== 'undefined' &amp;&amp; event_tags_json !== ''&#13;
-                &amp;&amp; event_tags_json !== '{EVENT.TAGSJSON}') {&#13;
-                try {&#13;
-                    var tags = JSON.parse(event_tags_json),&#13;
-                        label;&#13;
-&#13;
-                    Jira.labels = [];&#13;
-&#13;
-                    tags.forEach(function (tag) {&#13;
-                        if (typeof tag.tag !== 'undefined' &amp;&amp; typeof tag.value !== 'undefined' ) {&#13;
-                            label = (tag.tag + (tag.value ? (':' + tag.value) : '')).replace(/\s/g, '_');&#13;
-                            if (label.length &lt; 255) {&#13;
-                                Jira.labels.push(label);&#13;
-                            }&#13;
-                        }&#13;
-                    });&#13;
-                }&#13;
-                catch (error) {&#13;
-                    // Code is not missing here.&#13;
-                }&#13;
-            }&#13;
+            return;&#13;
         }&#13;
-        else {&#13;
-            Zabbix.Log(4, '[ Jira SD Webhook ] Can not add labels because failed to retrieve field schema.');&#13;
+&#13;
+        var block = Jira.schema.requestTypeFields.filter(function(object) {&#13;
+            return object.fieldId == 'labels';&#13;
+        });&#13;
+&#13;
+        if (block[0] &amp;&amp; typeof event_tags_json !== 'undefined' &amp;&amp; event_tags_json !== ''&#13;
+            &amp;&amp; event_tags_json !== '{EVENT.TAGSJSON}') {&#13;
+            try {&#13;
+                var tags = JSON.parse(event_tags_json),&#13;
+                    label;&#13;
+&#13;
+                Jira.labels = [];&#13;
+&#13;
+                tags.forEach(function (tag) {&#13;
+                    if (typeof tag.tag !== 'undefined' &amp;&amp; typeof tag.value !== 'undefined' ) {&#13;
+                        label = (tag.tag + (tag.value ? (':' + tag.value) : '')).replace(/\s/g, '_');&#13;
+                        if (label.length &lt; 255) {&#13;
+                            Jira.labels.push(label);&#13;
+                        }&#13;
+                    }&#13;
+                });&#13;
+            }&#13;
+            catch (error) {&#13;
+                // Code is not missing here.&#13;
+            }&#13;
         }&#13;
     },&#13;
 &#13;
@@ -147,7 +148,8 @@
                     });&#13;
             }&#13;
             else {&#13;
-                Zabbix.Log(4, '[ Jira SD Webhook ] Can not add custom fields because failed to retrieve field schema.');&#13;
+                Zabbix.Log(4, '[ Jira Service Desk Webhook ] Can not add custom fields' +&#13;
+                    'because failed to retrieve field schema.');&#13;
             }&#13;
         }&#13;
 &#13;
@@ -178,7 +180,7 @@
             data = JSON.stringify(data);&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[ Jira SD Webhook ] Sending request: ' + url +&#13;
+        Zabbix.Log(4, '[ Jira Service Desk Webhook ] Sending request: ' + url +&#13;
             ((typeof data === 'string') ? ('\n' + data) : ''));&#13;
 &#13;
         switch (method) {&#13;
@@ -198,14 +200,15 @@
                 throw 'Unsupported HTTP request method: ' + method;&#13;
         }&#13;
 &#13;
-        Zabbix.Log(4, '[ Jira SD Webhook ] Received response with status code ' + request.Status() + '\n' + response);&#13;
+        Zabbix.Log(4, '[ Jira Service Desk Webhook ] Received response with status code ' +&#13;
+            request.Status() + '\n' + response);&#13;
 &#13;
         if (response !== null) {&#13;
             try {&#13;
                 response = JSON.parse(response);&#13;
             }&#13;
             catch (error) {&#13;
-                Zabbix.Log(4, '[ Jira SD Webhook ] Failed to parse response received from Jira');&#13;
+                Zabbix.Log(4, '[ Jira Service Desk Webhook ] Failed to parse response received from Jira');&#13;
                 response = null;&#13;
             }&#13;
         }&#13;
@@ -339,7 +342,7 @@ try {&#13;
     return JSON.stringify(result);&#13;
 }&#13;
 catch (error) {&#13;
-    Zabbix.Log(3, '[ Jira SD Webhook ] ERROR: ' + error);&#13;
+    Zabbix.Log(3, '[ Jira Service Desk Webhook ] ERROR: ' + error);&#13;
     throw 'Sending failed: ' + error;&#13;
 }</script>
             <process_tags>YES</process_tags>
