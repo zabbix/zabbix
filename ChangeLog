@@ -17,6 +17,7 @@ A.F.....S. [ZBXNEXT-702] Implemented ability to compare string values in trigger
 .........T [ZBXNEXT-5833] added "Template DB ClickHouse by HTTP" (ychukina)
 
 Bug fixes:
+.......PS. [ZBX-17567] fixed possible pooler crash if interface_snmp is missing in configuration cache (MVekslers)
 ........S. [ZBX-17614] fixed oracle sql error while sending notifications (asestakovs)
 ..F....... [ZBX-17617] fixed broken markup in host selection on dashborad (talbergs)
 ..F....... [ZBX-17608] fixed broken multiselect in "Discovery rule" field in monitoring discovery view (talbergs)
