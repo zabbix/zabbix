@@ -501,14 +501,17 @@ abstract class CGraphGeneral extends CApiService {
 				'status' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_STATUS_CREATE, GRAPH_STATUS_NO_CREATE])]
 			];
 		}
+		else {
+			$rules = [];
+		}
 
 		foreach ($graphs as $key => $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_set, $graph['name']);
 
-			if (array_key_exists('status', $graph)) {
+			$data = array_intersect_key($graph, $rules);
+			if ($data) {
 				$path = '/'.($key + 1);
 
-				$data = array_intersect_key($graph, $rules);
 				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
@@ -648,14 +651,17 @@ abstract class CGraphGeneral extends CApiService {
 				'status' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_STATUS_CREATE, GRAPH_STATUS_NO_CREATE])]
 			];
 		}
+		else {
+			$rules = [];
+		}
 
 		foreach ($graphs as $key => $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_update, $graph['name']);
 
-			if (array_key_exists('status', $graph)) {
+			$data = array_intersect_key($graph, $rules);
+			if ($data) {
 				$path = '/'.($key + 1);
 
-				$data = array_intersect_key($graph, $rules);
 				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
