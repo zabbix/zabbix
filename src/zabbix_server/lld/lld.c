@@ -962,7 +962,7 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 }
 
 void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity,
-		zbx_vector_ptr_pair_t *override_tags, unsigned char *status)
+		zbx_vector_ptr_pair_t *override_tags, unsigned char *status, unsigned char *discover)
 {
 	int	i, j, k;
 
@@ -1012,15 +1012,15 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 					case ZBX_PROTOTYPE_STATUS_DISABLED:
 						*status = TRIGGER_STATUS_DISABLED;
 						break;
-					case ZBX_PROTOTYPE_STATUS_NO_CREATE:
-						*status = TRIGGER_STATUS_NO_CREATE;
-						break;
 					case ZBX_PROTOTYPE_STATUS_COUNT:
 						break;
 					default:
 						THIS_SHOULD_NEVER_HAPPEN;
 				}
 			}
+
+			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
+				*discover = override_operation->discover;
 		}
 	}
 

@@ -39,6 +39,7 @@ typedef struct
 	unsigned char		recovery_mode;
 	unsigned char		correlation_mode;
 	unsigned char		manual_close;
+	unsigned char		discover;
 	zbx_vector_ptr_t	functions;
 	zbx_vector_ptr_t	dependencies;
 	zbx_vector_ptr_t	tags;
@@ -297,7 +298,7 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
 				"t.url,t.recovery_expression,t.recovery_mode,t.correlation_mode,t.correlation_tag,"
-				"t.manual_close,t.opdata"
+				"t.manual_close,t.opdata,t.discover"
 			" from triggers t,functions f,items i,item_discovery id"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -324,6 +325,7 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 		trigger_prototype->correlation_tag = zbx_strdup(NULL, row[11]);
 		ZBX_STR2UCHAR(trigger_prototype->manual_close, row[12]);
 		trigger_prototype->opdata = zbx_strdup(NULL, row[13]);
+		ZBX_STR2UCHAR(trigger_prototype->discover, row[14]);
 
 		zbx_vector_ptr_create(&trigger_prototype->functions);
 		zbx_vector_ptr_create(&trigger_prototype->dependencies);
@@ -1193,6 +1195,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	char				*err_msg = NULL;
 	const char			*operation_msg;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
+	unsigned char			discover;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1211,6 +1214,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		goto out;
 	}
 
+	discover = trigger_prototype->discover;
+
 	if (NULL != trigger)
 	{
 		unsigned char	priority;
@@ -1220,7 +1225,10 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		priority = trigger_prototype->priority;
 
-		lld_override_trigger(&lld_row->overrides, buffer, &priority, &trigger->override_tags, NULL);
+		lld_override_trigger(&lld_row->overrides, buffer, &priority, &trigger->override_tags, NULL, &discover);
+
+		if (ZBX_PROTOTYPE_NO_DISCOVER == discover)
+			goto out;
 
 		if (0 != strcmp(trigger->description, buffer))
 		{
@@ -1314,9 +1322,9 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_vector_ptr_pair_create(&trigger->override_tags);
 
 		lld_override_trigger(&lld_row->overrides, trigger->description, &trigger->priority,
-				&trigger->override_tags, &trigger->status);
+				&trigger->override_tags, &trigger->status, &discover);
 
-		if (TRIGGER_STATUS_NO_CREATE == trigger->status)
+		if (ZBX_PROTOTYPE_NO_DISCOVER == discover)
 		{
 			zbx_vector_ptr_pair_destroy(&trigger->override_tags);
 			zbx_free(trigger->description);
