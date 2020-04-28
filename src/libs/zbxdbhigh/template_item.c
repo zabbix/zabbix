@@ -144,7 +144,7 @@ typedef struct
 	unsigned char		status;
 	unsigned char		severity;
 	unsigned char		inventory_mode;
-
+	unsigned char		discover;
 }
 lld_override_operation_t;
 
@@ -1480,6 +1480,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select o.lld_overrideid,o.lld_override_operationid,o.operationobject,o.operator,o.value,"
 				"s.status,"
+				"d.discovery,"
 				"p.delay,"
 				"h.history,"
 				"t.trends,"
@@ -1490,6 +1491,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			" from lld_override_operation o"
 			" left join lld_override_opstatus s"
 				" on o.lld_override_operationid=s.lld_override_operationid"
+			" left join lld_override_opdiscovery d"
+				" on o.lld_override_operationid=d.lld_override_operationid"
 			" left join lld_override_opperiod p"
 				" on o.lld_override_operationid=p.lld_override_operationid"
 			" left join lld_override_ophistory h"
@@ -1545,38 +1548,41 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			override_operation->status = FAIL == DBis_null(row[5]) ? (unsigned char)atoi(row[5]) :
 					ZBX_PROTOTYPE_STATUS_COUNT;
 
+			override_operation->discover = FAIL == DBis_null(row[6]) ? (unsigned char)atoi(row[6]) :
+					ZBX_PROTOTYPE_DISCOVER_COUNT;
+
 			zbx_vector_ptr_append(&override->override_operations, override_operation);
 		}
 
-		override_operation->delay = FAIL == DBis_null(row[6]) ? zbx_strdup(NULL, row[6]) :
+		override_operation->delay = FAIL == DBis_null(row[7]) ? zbx_strdup(NULL, row[7]) :
 				NULL;
-		override_operation->history = FAIL == DBis_null(row[7]) ? zbx_strdup(NULL, row[7]) :
+		override_operation->history = FAIL == DBis_null(row[8]) ? zbx_strdup(NULL, row[8]) :
 				NULL;
-		override_operation->trends = FAIL == DBis_null(row[8]) ? zbx_strdup(NULL, row[8]) :
+		override_operation->trends = FAIL == DBis_null(row[9]) ? zbx_strdup(NULL, row[9]) :
 				NULL;
-		override_operation->severity = FAIL == DBis_null(row[9]) ? (unsigned char)atoi(row[9]) :
+		override_operation->severity = FAIL == DBis_null(row[10]) ? (unsigned char)atoi(row[10]) :
 				TRIGGER_SEVERITY_COUNT;
 
-		if (FAIL == DBis_null(row[10]))
+		if (FAIL == DBis_null(row[11]))
 		{
 			zbx_ptr_pair_t	pair;
 
-			pair.first = zbx_strdup(NULL, row[10]);
-			pair.second = zbx_strdup(NULL, row[11]);
+			pair.first = zbx_strdup(NULL, row[11]);
+			pair.second = zbx_strdup(NULL, row[12]);
 
 			zbx_vector_ptr_pair_append(&override_operation->trigger_tags, pair);
 		}
 
-		if (FAIL == DBis_null(row[12]))
+		if (FAIL == DBis_null(row[13]))
 		{
 			zbx_uint64_t	templateid;
 
-			ZBX_STR2UINT64(templateid, row[12]);
+			ZBX_STR2UINT64(templateid, row[13]);
 			zbx_vector_uint64_append(&override_operation->templateids, templateid);
 		}
 
-		override_operation->inventory_mode = FAIL == DBis_null(row[13]) ?
-				(unsigned char)atoi(row[13]) : HOST_INVENTORY_COUNT;
+		override_operation->inventory_mode = FAIL == DBis_null(row[14]) ?
+				(unsigned char)atoi(row[14]) : HOST_INVENTORY_COUNT;
 	}
 	DBfree_result(result);
 
@@ -1587,8 +1593,8 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 {
 	zbx_uint64_t			overrideid, override_operationid, override_conditionid;
 	zbx_db_insert_t			db_insert, db_insert_oconditions, db_insert_ooperations, db_insert_opstatus,
-					db_insert_opperiod, db_insert_ophistory, db_insert_optrends,
-					db_insert_opseverity, db_insert_optag, db_insert_optemplate,
+					db_insert_opdiscover, db_insert_opperiod, db_insert_ophistory,
+					db_insert_optrends, db_insert_opseverity, db_insert_optag, db_insert_optemplate,
 					db_insert_opinventory;
 	int				i, j, k, conditions_num, operations_num;
 	lld_override_t			*override;
@@ -1622,6 +1628,9 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 				"lld_overrideid", "operationobject", "operator", "value", NULL);
 
 	zbx_db_insert_prepare(&db_insert_opstatus, "lld_override_opstatus", "lld_override_operationid", "status", NULL);
+
+	zbx_db_insert_prepare(&db_insert_opdiscover, "lld_override_opstatus", "lld_override_operationid", "discover",
+			NULL);
 
 	zbx_db_insert_prepare(&db_insert_opperiod, "lld_override_opperiod", "lld_override_operationid", "delay",
 			NULL);
@@ -1688,6 +1697,12 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 						(int)override_operation->status);
 			}
 
+			if (ZBX_PROTOTYPE_DISCOVER_COUNT != override_operation->discover)
+			{
+				zbx_db_insert_add_values(&db_insert_opdiscover, override_operationid,
+						(int)override_operation->discover);
+			}
+
 			if (NULL != override_operation->delay)
 			{
 				zbx_db_insert_add_values(&db_insert_opperiod, override_operationid,
@@ -1749,6 +1764,9 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 
 	zbx_db_insert_execute(&db_insert_opstatus);
 	zbx_db_insert_clean(&db_insert_opstatus);
+
+	zbx_db_insert_execute(&db_insert_opdiscover);
+	zbx_db_insert_clean(&db_insert_opdiscover);
 
 	zbx_db_insert_execute(&db_insert_opperiod);
 	zbx_db_insert_clean(&db_insert_opperiod);
