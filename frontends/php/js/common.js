@@ -389,6 +389,40 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 }
 
 /**
+ * Open "Update problem" dialog and manage URL change.
+ *
+ * @param {array}  options
+ * @param {array}  options['eventids']  Eventids to update.
+ * @param {object} trigger_elmnt        (optional) UI element which was clicked to open overlay dialogue.
+ *
+ * @returns {Overlay}
+ */
+function acknowledgePopUp(options, trigger_elmnt) {
+	var overlay = PopUp('popup.acknowledge.edit', options, null, trigger_elmnt),
+		backurl = location.href;
+
+	overlay.xhr.then(function() {
+		var url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'popup');
+		url.setArgument('popup_action', 'acknowledge.edit');
+		url.setArgument('eventids', options.eventids);
+
+		history.replaceState({}, '', url.getUrl());
+	});
+
+	var close = function(e, dialogue) {
+		if (dialogue.dialogueid === overlay.dialogueid) {
+			history.replaceState({}, '', backurl);
+			$.unsubscribe('overlay.close', close);
+		}
+	};
+
+	$.subscribe('overlay.close', close);
+
+	return overlay;
+}
+
+/**
  * Function to add details about overlay UI elements in global overlays_stack variable.
  *
  * @param {string|Overlay} id       Unique overlay element identifier or Overlay object.
@@ -512,37 +546,6 @@ function reloadPopup(form, action) {
 	});
 
 	PopUp(action, options, dialogueid);
-}
-
-/**
- * Open "Update problem" dialog and manage URL change.
- *
- * @param {array}  options
- * @param {string} options['widget']    (optional) Widget's uniqueid.
- * @param {bool}   options['reload']    (optional) Either to make complete page refresh after acknowledge.create.
- * @param {array}  options['eventids']  Eventids to update.
- * @param {type} trigger_elmnt          Trigger element.
- *
- * @returns {Overlay}
- */
-function acknowledgePopUp(options, trigger_elmnt) {
-	options.backurl = location.href;
-	if (options.reload) {
-		options.reload = 1;
-	}
-
-	var overlay = PopUp('popup.acknowledge.edit', options, null, trigger_elmnt);
-
-	overlay.xhr.then(function(resp) {
-		var url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'popup');
-		url.setArgument('popup_action', 'acknowledge.edit');
-		url.setArgument('eventids', options.eventids);
-
-		history.replaceState({}, '', url.getUrl());
-	});
-
-	return overlay;
 }
 
 /**

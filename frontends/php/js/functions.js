@@ -261,13 +261,31 @@ function objectSize(obj) {
 }
 
 function addMessage(html) {
-	var $message_div = jQuery('<div>').attr('id', 'messages');
-	$message_div.append(html);
-	jQuery('.wrapper main').before($message_div);
+	var $wrapper = $('.wrapper'),
+		$main = $wrapper.find('> main');
+		$header = $wrapper.find('> header');
+
+	if ($main.length) {
+		$main.before(html);
+	}
+	else if ($header.length) {
+		$header.after(html);
+	}
+	else {
+		$wrapper.prepend(html);
+	}
 }
 
-function removeMessages() {
-	jQuery('#messages', '.wrapper').remove();
+function clearMessages() {
+	$('.wrapper').find('> .msg-good, > .msg-bad, > .msg-warning').remove();
+}
+
+function postMessageOk(message) {
+	cookie.create('messageOk', message);
+}
+
+function postMessageError(message) {
+	cookie.create('messageError', message);
 }
 
 /**
@@ -772,10 +790,16 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 
 		$msg_box.append($msg_details);
 	}
+	else if (title === null) {
+		jQuery('<span>')
+			.text(messages ? messages : ' ')
+			.appendTo($msg_box);
+	}
 	else {
 		jQuery('<li>')
 			.text(messages ? messages : ' ')
 			.appendTo($list);
+
 		$msg_box.append($msg_details);
 	}
 

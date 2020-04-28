@@ -144,7 +144,9 @@ class CScreenHostTriggers extends CScreenBase {
 			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
-		return $this->getOutput(new CUiWidget('hat_trstatus', [$header, $table, $footer]));
+		$script = new CScriptTag('monitoringScreen.refreshOnAcknowledgeCreate();');
+
+		return $this->getOutput(new CUiWidget('hat_trstatus', [$header, $table, $footer, $script]));
 	}
 
 	/**
@@ -259,18 +261,14 @@ class CScreenHostTriggers extends CScreenBase {
 			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('return acknowledgePopUp('.json_encode([
-					'eventids' => [$problem['eventid']],
-					'reload' => 1
-				]).', this);');
+				->onClick('return acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
 
 			$table->addRow([
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
 						->setHint(make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-							'triggerid' => $trigger['triggerid']], $problem['eventid'], true, PROBLEMS_SHOW_TAGS_3, [],
-							PROBLEMS_TAG_NAME_FULL, '', ['reload' => 1]
+							'triggerid' => $trigger['triggerid']], $problem['eventid']
 						))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,

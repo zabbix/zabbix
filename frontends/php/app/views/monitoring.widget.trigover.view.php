@@ -37,24 +37,24 @@ $output = [
 
 if ($data['initial_load']) {
 	$output['script_inline'] =
-		'jQuery(function($) {' .
-			'$.subscribe("acknowledge.create", function(event, response, overlay) {' .
-				'if ("'.$data['menu_options']['widget'].'" !== overlay.options.widget) {' .
-					'return;' .
-				'}' .
+		'if (typeof refreshTrigOverViewWidget !== typeof(Function)) {'.
+			'function refreshTrigOverViewWidget(event, response, overlay) {'.
+				'var element = overlays_stack.length ? overlays_stack.end().element : overlay.element;'.
+				'if (element) {'.
+					'element = (element instanceof jQuery) ? element[0] : element;'.
+					'var widgets = $(".dashbrd-grid-container").dashboardGrid("getWidgetsBy", "type", "trigover");'.
+					'widgets.forEach(widget => {'.
+						'if ($.contains(widget.container[0], element)) {'.
+							'clearMessages();'.
+							'addMessage(makeMessageBox("good", response.message, null, true));'.
+							'$(".dashbrd-grid-container").dashboardGrid("refreshWidget", widget.uniqueid);'.
+						'}'.
+					'});'.
+				'}'.
+			'}'.
 
-				// Update message box.
-				'$(".dashbrd-grid-container").closest("main")' .
-					'.siblings(".msg-good, .msg-bad .msg-warning").not(".msg-global-footer")' .
-					'.remove();' .
-
-				'var msg_box = makeMessageBox("good", response.message, null, true);' .
-				'$(".dashbrd-grid-container").closest("main").before(msg_box);' .
-
-				// Upadate widget.
-				'$(".dashbrd-grid-container").dashboardGrid("refreshWidget", overlay.options.widget);' .
-			'});' .
-		'});';
+			'$.subscribe("acknowledge.create", refreshTrigOverViewWidget);'.
+		'}';
 }
 
 if (($messages = getMessages()) !== null) {

@@ -25,49 +25,42 @@
 class CControllerPopup extends CController {
 
 	/**
-	 * Properties for supported popups.
+	 * List of supported popups.
 	 *
 	 * @var array
 	 */
 	protected $supported_popups;
 
 	/**
-	 * Instance of popup.
+	 * Controller instance of the popup.
 	 *
 	 * @var CController
 	 */
-	protected $popup_instance;
-
-	/**
-	 * Properties of called popup.
-	 *
-	 * @var array
-	 */
-	protected $popup_data;
+	protected $popup_controller;
 
 	protected function init() {
 		$this->disableSIDValidation();
 
-		// List of supported popups and properties for each of them.
 		$this->supported_popups = [
-			'acknowledge.edit' => [
-				'title' => _('Update problem'),
-				'action' => 'popup.acknowledge.edit',
-				'controller' => 'CControllerPopupAcknowledgeEdit'
-			]
+			'acknowledge.edit' => _('Update problem')
 		];
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'popup_action' => 'required|in acknowledge.edit'
+			'popup_action' => 'required|in '.implode(',', array_keys($this->supported_popups))
 		];
 
-		if (($ret = $this->validateInput($fields)) === true) {
-			$this->popup_data = $this->supported_popups[$this->getInput('popup_action')];
-			$this->popup_instance = new $this->popup_data['controller']();
+		$ret = $this->validateInput($fields);
 
-			$ret = $this->popup_instance->checkInput();
+		if ($ret) {
+			/** @var CRouter $router */
+			$router = clone APP::Component()->get('router');
+			$router->setAction('popup.'.$this->getInput('popup_action'));
+			$popup_controller_class = $router->getController();
+			$this->popup_controller = new $popup_controller_class;
+
+			$ret = $this->popup_controller->checkInput();
 		}
 
 		if (!$ret) {
@@ -78,19 +71,19 @@ class CControllerPopup extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER && $this->popup_instance->checkPermissions());
+		return $this->popup_controller->checkPermissions();
 	}
 
 	protected function doAction() {
 		$data = [
 			'popup' => [
-				'action' => $this->popup_data['action'],
-				'options' => $this->popup_instance->getInputAll()
+				'action' => 'popup.'.$this->getInput('popup_action'),
+				'options' => $this->popup_controller->getInputAll()
 			]
 		];
 
 		$response = (new CControllerResponseData($data));
-		$response->setTitle($this->popup_data['title']);
+		$response->setTitle($this->supported_popups[$this->getInput('popup_action')]);
 
 		$this->setResponse($response);
 	}

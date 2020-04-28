@@ -23,17 +23,13 @@
  * @var CView $this
  */
 
-if ($data['popup']['action'] === 'popup.acknowledge.edit') {
-	(new CScriptTag(
-		// Load 'Update problem' dialog.
-		'PopUp("popup.acknowledge.edit", '.json_encode($data['popup']['options']).', null, null);' .
+(new CScriptTag(
+	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).', null, null);'.
 
-		// Subscribe to 'acknowledge.create' event.
-		'$.subscribe("acknowledge.create", function(event, response) {' .
-			'$(".wrapper").prepend(makeMessageBox("good", response.message, null, true, false));' .
-			'$.unsubscribe("acknowledge.create");' .
-		'});'
-	))
-		->setOnDocumentReady()
-		->show();
-}
+	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
+		'clearMessages();'.
+		'addMessage(makeMessageBox("good", response.message, null, true));'.
+	'});'
+))
+	->setOnDocumentReady()
+	->show();

@@ -172,6 +172,7 @@ class ZBase {
 				$this->initDB();
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
+				$this->initMessages();
 				$this->setLayoutModeByUrl();
 				$this->initComponents();
 				$this->initModuleManager();
@@ -179,7 +180,7 @@ class ZBase {
 				$file = basename($_SERVER['SCRIPT_NAME']);
 				$action_name = ($file === 'zabbix.php') ? getRequest('action', '') : $file;
 
-				$router = new CRouter();
+				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
 				$router->setAction($action_name);
 
@@ -412,6 +413,15 @@ class ZBase {
 		require_once 'include/translateDefines.inc.php';
 	}
 
+	private function initMessages(): void {
+		foreach (['messageOk', 'messageError'] as $message_type) {
+			if (array_key_exists($message_type, $_COOKIE)) {
+				CSession::setValue($message_type, $_COOKIE[$message_type]);
+				zbx_setcookie($message_type, null, 1);
+			}
+		}
+	}
+
 	/**
 	 * Authenticate user.
 	 */
@@ -590,7 +600,7 @@ class ZBase {
 	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
 	private function initComponents() {
-
+		$this->component_registry->register('router', new CRouter());
 		$this->component_registry->register('menu.main', getMainMenu());
 		$this->component_registry->register('menu.user', getUserMenu());
 	}

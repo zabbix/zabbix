@@ -30,7 +30,6 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',
-			'uniqueid' => 'required|string',
 			'initial_load' => 'in 0,1'
 		]);
 	}
@@ -65,6 +64,7 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'data' => $data,
 			'severity_names' => [
 				'severity_name_0' => $config['severity_name_0'],
@@ -77,9 +77,7 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'filter' => $filter,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'initial_load' => (bool) $this->getInput('initial_load', false),
-			'uniqueid' => $this->getInput('uniqueid')
+			]
 		]));
 	}
 }

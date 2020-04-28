@@ -182,7 +182,8 @@
 		 */
 		function respHandler(handle_data) {
 			return function(resp) {
-				removeMessages();
+				clearMessages();
+
 				if (resp.messages) {
 					addMessage(resp.messages);
 				}

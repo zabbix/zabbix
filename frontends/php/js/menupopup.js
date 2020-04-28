@@ -700,18 +700,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
-				var ack_options = {
-					eventids: [options.eventid]
-				};
-
-				if ('widget' in options) {
-					ack_options.widget = options.widget;
-				}
-				else if ('reload' in options) {
-					ack_options.reload = 1;
-				}
-
-				return acknowledgePopUp(ack_options, trigger_elmnt);
+				return acknowledgePopUp({eventids: [options.eventid]}, trigger_elmnt);
 			}
 		};
 	}

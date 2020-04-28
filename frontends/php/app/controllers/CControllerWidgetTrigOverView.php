@@ -28,7 +28,6 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',
-			'uniqueid' => 'required|string',
 			'initial_load' => 'in 0,1'
 		]);
 	}
@@ -38,13 +37,10 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 
 		$data = [
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'style' => $fields['style'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'initial_load' => (bool) $this->getInput('initial_load', false),
-			'menu_options' => [
-				'widget' => $this->getInput('uniqueid')
 			]
 		];
 

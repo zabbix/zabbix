@@ -507,8 +507,6 @@ class CControllerMenuPopup extends CController {
 	 * @param int    $data['severity_min']            (optional)
 	 * @param bool   $data['show_suppressed']         (optional)
 	 * @param array  $data['urls']                    (optional)
-	 * @param string $data['widget']                  (optional) Refers to widget in which popup was opened.
-	 * @param int    $data['reload']                  (optional) Either to make full page reload when closing popup
 	 *                                                after successful change. Supports value '1'.
 	 * @param string $data['urls']['name']
 	 * @param string $data['urls']['url']
@@ -618,13 +616,6 @@ class CControllerMenuPopup extends CController {
 
 			if (array_key_exists('acknowledge', $data)) {
 				$menu_data['acknowledge'] = $data['acknowledge'];
-			}
-
-			if (array_key_exists('widget', $data)) {
-				$menu_data['widget'] = $data['widget'];
-			}
-			elseif (array_key_exists('reload', $data)) {
-				$menu_data['reload'] = 1;
 			}
 
 			return $menu_data;

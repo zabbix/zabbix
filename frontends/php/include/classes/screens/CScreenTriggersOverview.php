@@ -37,12 +37,7 @@ class CScreenTriggersOverview extends CScreenBase {
 			(new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		$data = [
-			'menu_options' => [
-				'reload' => 1
-			]
-		];
-
+		$data = [];
 		list($data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 			$data['hosts_by_name'], $data['exceeded_hosts'], $data['exceeded_trigs']
 		) = getTriggersOverviewData((array) $this->screenitem['resourceid'], $this->screenitem['application']);
@@ -58,6 +53,8 @@ class CScreenTriggersOverview extends CScreenBase {
 			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
-		return $this->getOutput(new CUiWidget(uniqid(), [$header, $table, $footer]));
+		$script = new CScriptTag('monitoringScreen.refreshOnAcknowledgeCreate();');
+
+		return $this->getOutput(new CUiWidget(uniqid(), [$header, $table, $footer, $script]));
 	}
 }

@@ -968,11 +968,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
  *
  * @param array  $trigger
  * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
- * @param array  $options       Additional properties to forward to context menu generation function.
  *
  * @return CCol
  */
-function getTriggerOverviewCell(array $trigger, array $dependencies, array $options = []): CCol {
+function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 	$ack = $trigger['problem']['acknowledged'] == 1 ? (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN) : null;
 	$desc = array_key_exists($trigger['triggerid'], $dependencies)
 		? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
@@ -1001,9 +1000,7 @@ function getTriggerOverviewCell(array $trigger, array $dependencies, array $opti
 		$acknowledge = false;
 	}
 
-	$tr_menu = CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge);
-	$tr_menu['data'] += $options;
-	$column->setMenuPopup($tr_menu);
+	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
 
 	return $column;
 }
@@ -1210,9 +1207,6 @@ function make_trigger_details($trigger, $eventid) {
 	}
 	array_pop($hostNames);
 
-	$tr_menu = CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid);
-	$tr_menu['data']['reload'] = 1;
-
 	$table = (new CTableInfo())
 		->addRow([
 			new CCol(_n('Host', 'Hosts', count($hosts))),
@@ -1220,7 +1214,9 @@ function make_trigger_details($trigger, $eventid) {
 		])
 		->addRow([
 			new CCol(_('Trigger')),
-			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))->setMenuPopup($tr_menu))
+			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid))
+			)
 		])
 		->addRow([
 			_('Severity'),

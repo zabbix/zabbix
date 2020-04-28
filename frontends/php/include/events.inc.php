@@ -422,7 +422,7 @@ function make_small_eventlist(array $startEvent) {
  * @return CDiv
  */
 function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $show_tags = PROBLEMS_SHOW_TAGS_3,
-		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '', array $options = []) {
+		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '') {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -605,10 +605,7 @@ function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $s
 			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('return acknowledgePopUp('.json_encode([
-						'eventids' => [$problem['eventid']]
-					] + $options).', this);'
-				);
+				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
 
 			$table->addRow(array_merge($row, [
 				$cell_r_clock,

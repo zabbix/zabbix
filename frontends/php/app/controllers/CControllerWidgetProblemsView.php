@@ -28,7 +28,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',
-			'uniqueid' => 'required|string',
 			'initial_load' => 'in 0,1'
 		]);
 	}
@@ -84,6 +83,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'fields' => [
 				'show' => $fields['show'],
 				'show_lines' => $fields['show_lines'],
@@ -105,8 +105,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'severity_name_4' => $config['severity_name_4'],
 				'severity_name_5' => $config['severity_name_5']
 			],
-			'uniqueid' => $this->getInput('uniqueid'),
-			'initial_load' => (bool) $this->getInput('initial_load', false),
 			'data' => $data,
 			'info' => $info,
 			'sortfield' => $sortfield,

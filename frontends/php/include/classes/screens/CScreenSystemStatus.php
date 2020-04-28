@@ -50,8 +50,10 @@ class CScreenSystemStatus extends CScreenBase {
 			->addItem(_s('Updated: %1$s', zbx_date2str(TIME_FORMAT_SECONDS)))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
+		$script = new CScriptTag('monitoringScreen.refreshOnAcknowledgeCreate();');
+
 		return $this->getOutput(
-			(new CUiWidget('hat_syssum', [$table, $footer]))->setHeader(_('Problems by severity'))
+			(new CUiWidget('hat_syssum', [$table, $footer, $script]))->setHeader(_('Problems by severity'))
 		);
 	}
 }

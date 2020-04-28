@@ -54,8 +54,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
 			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
-			'reload' =>					'in 1'
+			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
 		$ret = $this->validateInput($fields);
@@ -142,13 +141,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$output = [];
 
 		if ($result) {
-			$msg_ok = _n('Event updated', 'Events updated', $updated_events_count);
-			if ($this->hasInput('reload')) {
-				CSession::setValue('messageOk', $msg_ok);
-			}
-			else {
-				$output['message'] = $msg_ok;
-			}
+			$output['message'] = _n('Event updated', 'Events updated', $updated_events_count);
 		}
 		else {
 			error(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)

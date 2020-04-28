@@ -33,9 +33,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
 			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
-			'backurl' =>				'string',
-			'reload' =>					'in 1'
+			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
 		$ret = $this->validateInput($fields);
@@ -79,9 +77,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
 			'problem_can_be_acknowledged' => false,
-			'problem_severity_can_be_changed' => false,
-			'backurl' => $this->getInput('backurl', ''),
-			'reload' => $this->getInput('reload', false)
+			'problem_severity_can_be_changed' => false
 		];
 
 		// Select events.
