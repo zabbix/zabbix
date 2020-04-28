@@ -340,4 +340,38 @@
 	function removeUserShares(userid) {
 		jQuery('#user_shares_' + userid).remove();
 	}
+
+	/**
+	 * Find and refresh widget, from which the "Update problem" popup form was launched and submitted.
+	 *
+	 * @param {String} type      Widget type to search for.
+	 * @param {object} response  The response object from the "acknowledge.create" action.
+	 * @param {object} overlay   The overlay object of the "Update problem" popup form.
+	 */
+	function refreshWidgetOnAcknowledgeCreate(type, response, overlay) {
+		// Find element which does not get replaced on widget refresh.
+		var element = (overlays_stack.length
+			? overlays_stack.end().element
+			: overlay.trigger_parents.filter('.dashbrd-grid-widget-content')
+		);
+
+		if (element) {
+			element = (element instanceof jQuery) ? element[0] : element;
+			var widgets = $('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'type', type);
+			widgets.forEach(widget => {
+				if ($.contains(widget.container[0], element)) {
+					if (overlays_stack.length) {
+						var overlay_end = overlays_stack.end();
+						if (overlay_end.type === 'hintbox') {
+							hintBox.hideHint(overlay_end.element, true);
+						}
+					}
+
+					clearMessages();
+					addMessage(makeMessageBox('good', response.message, null, true));
+					$('.dashbrd-grid-container').dashboardGrid('refreshWidget', widget.uniqueid);
+				}
+			});
+		}
+	}
 </script>
