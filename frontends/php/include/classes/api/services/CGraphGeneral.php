@@ -508,8 +508,8 @@ abstract class CGraphGeneral extends CApiService {
 			if (array_key_exists('status', $graph)) {
 				$path = '/'.($key + 1);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules],
-						array_intersect_key($graph, $rules), $path, $error)) {
+				$data = array_intersect_key($graph, $rules);
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
@@ -655,8 +655,8 @@ abstract class CGraphGeneral extends CApiService {
 			if (array_key_exists('status', $graph)) {
 				$path = '/'.($key + 1);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules],
-						array_intersect_key($graph, $rules), $path, $error)) {
+				$data = array_intersect_key($graph, $rules);
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
