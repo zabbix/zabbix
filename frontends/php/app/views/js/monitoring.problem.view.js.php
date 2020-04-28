@@ -120,7 +120,7 @@
 			window.flickerfreeScreen.refresh('problem');
 
 			clearMessages();
-			addMessage(makeMessageBox("good", response.message, null, true));
+			addMessage(makeMessageBox('good', response.message, null, true));
 		});
 
 		$(document).on('submit', '#problem_form', function(e) {
