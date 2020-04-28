@@ -92,7 +92,8 @@ if ($httptestid = getRequest('httptestid', false)) {
 		$graph_items[] = $item + [
 			'color' => ($color === false) ? reset($colors) : $color,
 			'host' => $hosts[$item['hostid']]['host'],
-			'hostname' => $hosts[$item['hostid']]['name']
+			'hostname' => $hosts[$item['hostid']]['name'],
+			'preprocessing' => []
 		];
 		$color = next($colors);
 	}
