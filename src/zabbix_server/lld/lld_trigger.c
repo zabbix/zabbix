@@ -91,6 +91,8 @@ typedef struct
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_MODE | ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG |	\
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE | ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA)
 	zbx_uint64_t		flags;
+	int			lastcheck;
+	int			ts_delete;
 	unsigned char		status;
 	unsigned char		priority;
 }
@@ -377,7 +379,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select td.parent_triggerid,t.triggerid,t.description,t.expression,t.type,t.priority,"
 				"t.comments,t.url,t.recovery_expression,t.recovery_mode,t.correlation_mode,"
-				"t.correlation_tag,t.manual_close,t.opdata"
+				"t.correlation_tag,t.manual_close,t.opdata,t.lastcheck,t.ts_delete"
 			" from triggers t,trigger_discovery td"
 			" where t.triggerid=td.triggerid"
 				" and");
@@ -443,6 +445,8 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		trigger->correlation_tag_orig = NULL;
 		trigger->opdata = zbx_strdup(NULL, row[13]);
 		trigger->opdata_orig = NULL;
+		trigger->lastcheck = atoi(row[14]);
+		trigger->ts_delete = atoi(row[15]);
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
@@ -1309,6 +1313,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger = (zbx_lld_trigger_t *)zbx_malloc(NULL, sizeof(zbx_lld_trigger_t));
 
 		trigger->triggerid = 0;
+		trigger->lastcheck = 0;
+		trigger->ts_delete = 0;
 		trigger->parent_triggerid = trigger_prototype->triggerid;
 
 		trigger->description = zbx_strdup(NULL, trigger_prototype->description);
@@ -3491,7 +3497,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
  *                                                                            *
  ******************************************************************************/
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	zbx_vector_ptr_t		trigger_prototypes;
 	zbx_vector_ptr_t		triggers;
