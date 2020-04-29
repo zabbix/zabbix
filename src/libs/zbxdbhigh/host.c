@@ -3726,8 +3726,9 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			host_prototype->hostid = hostid++;
 
 			zbx_db_insert_add_values(&db_insert, host_prototype->hostid, host_prototype->host,
-					host_prototype->name, (int)host_prototype->status, (int)host_prototype->discover,
-					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid);
+					host_prototype->name, (int)host_prototype->status,
+					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid,
+					(int)host_prototype->discover);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
 		}
