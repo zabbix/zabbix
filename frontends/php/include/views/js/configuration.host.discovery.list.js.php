@@ -47,7 +47,7 @@
 
 				$status
 					.prop('disabled', true)
-					.val(<?php echo ITEM_STATUS_ACTIVE ?>);
+					.val(<?= ITEM_STATUS_ACTIVE ?>);
 			}
 		})
 		.trigger('change', false);
