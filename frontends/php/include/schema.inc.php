@@ -2915,12 +2915,6 @@ return [
 				'length' => 2048,
 				'default' => '',
 			],
-			'saml_sign_metadata' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 			'saml_sign_messages' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
