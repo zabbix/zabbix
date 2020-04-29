@@ -3534,6 +3534,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 		hostmacro->value = zbx_strdup(NULL, row[2]);
 		hostmacro->description = zbx_strdup(NULL, row[3]);
 		ZBX_STR2UCHAR(hostmacro->type, row[4]);
+		hostmacro->flags = 0;
 
 		zbx_vector_macros_append(&host_prototype->hostmacros, hostmacro);
 	}
