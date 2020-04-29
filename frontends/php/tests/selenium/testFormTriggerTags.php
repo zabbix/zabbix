@@ -192,7 +192,7 @@ class testFormTriggerTags extends CWebTest {
 		$form->fill($data['fields']);
 
 		$form->selectTab('Tags');
-		$this->fillTags($data['tags']);
+		$this->fillParameters($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -303,7 +303,7 @@ class testFormTriggerTags extends CWebTest {
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
-		$this->fillTags($data['tags']);
+		$this->fillParameters($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -342,7 +342,7 @@ class testFormTriggerTags extends CWebTest {
 
 		$form->getField('Name')->clear()->type($new_name);
 		$form->selectTab('Tags');
-		$tags = $this->getTags();
+		$tags = $this->getValues();
 		$this->query('button:Clone')->one()->click();
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -362,7 +362,7 @@ class testFormTriggerTags extends CWebTest {
 		$this->assertEquals($new_name, $name);
 
 		$form->selectTab('Tags');
-		$this->assertTags($tags);
+		$this->assertValues($tags);
 	}
 
 	private function checkTagFields($data) {
@@ -370,6 +370,6 @@ class testFormTriggerTags extends CWebTest {
 		$this->page->open('triggers.php?form=update&triggerid='.$id.'&groupid=0');
 		$form = $this->query('name:triggersForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
-		$this->assertTags($data['tags']);
+		$this->assertValues($data['tags']);
 	}
 }

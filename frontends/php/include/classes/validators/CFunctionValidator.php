@@ -205,7 +205,8 @@ class CFunctionValidator extends CValidator {
 			],
 			'nodata'=> [
 				'args' => [
-					['type' => 'sec', 'mandat' => true]
+					['type' => 'sec', 'mandat' => true],
+					['type' => 'nodata_mode', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesAll
 			],
@@ -389,6 +390,9 @@ class CFunctionValidator extends CValidator {
 
 			case 'num_suffix':
 				return $this->validateNumSuffix($param);
+
+			case 'nodata_mode':
+				return ($param === 'strict');
 
 			case 'fit':
 				return $this->validateFit($param);

@@ -18,7 +18,7 @@ This section describes the setup and configuration of the SIGNL4 webhook for Zab
 If not already done, sign up for your SIGNL4 account at https://www.signl4.com or directly from within your SIGNL4 app you can download from the Play Store or App Store.
 
 2. Get the Webhook XML  
-Get the XML file (zabbix-signl4.xml) for Zabbix from [Git](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/signl4).
+Get the XML file (media_signl4.xml) for Zabbix from [Git](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/signl4).
 
 3. Import the Media Type  
 In Zabbix you can now import a new Media Type under Administration -> Media types -> Import. Select the file zabbix-signl4.xml here.
