@@ -624,6 +624,10 @@ class CConfigurationExport {
 							$operation['status'] = $operation['opstatus']['status'];
 							unset($operation['opstatus']);
 						}
+						if (array_key_exists('opdiscover', $operation)) {
+							$operation['discover'] = $operation['opdiscover']['discover'];
+							unset($operation['opdiscover']);
+						}
 						if (array_key_exists('opperiod', $operation)) {
 							$operation['delay'] = $operation['opperiod']['delay'];
 							unset($operation['opperiod']);

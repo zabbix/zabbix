@@ -314,5 +314,6 @@ class CXmlConstantName {
 	const CONDITION_OPERATOR_NOT_REGEXP = 'NOT_REGEXP';
 	// const ENABLED = 'ENABLED'; // Duplicate.
 	// const DISABLED = 'DISABLED'; // Duplicate.
-	const NO_CREATE = 'NO_CREATE';
+	const LLD_OVERRIDE_OPERATION_DISCOVER = 'DISCOVER';
+	const LLD_OVERRIDE_OPERATION_NO_DISCOVER = 'NO_DISCOVER';
 }
