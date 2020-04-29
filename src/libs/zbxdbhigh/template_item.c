@@ -657,7 +657,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					"ssl_key_password='%s',"
 					"verify_peer=%d,"
 					"verify_host=%d,"
-					"allow_traps=%d"
+					"allow_traps=%d,"
 					"discover=%d"
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				name_esc, (int)item->type, (int)item->value_type, delay_esc,

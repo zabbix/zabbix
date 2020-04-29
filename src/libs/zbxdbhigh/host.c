@@ -4170,7 +4170,7 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 					"ymax_type=%d,"
 					"ymin_itemid=%s,"
 					"ymax_itemid=%s,"
-					"flags=%d"
+					"flags=%d,"
 					"discover=%d"
 				" where graphid=" ZBX_FS_UI64 ";\n",
 				name_esc, width, height, yaxismin, yaxismax,
