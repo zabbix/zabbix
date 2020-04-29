@@ -60,7 +60,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 		const zbx_vector_ptr_t *lld_macros, char **error, int lifetime, int lastcheck);
 
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macros, char **error);
+		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macros,
 		char **error, int lifetime, int lastcheck);

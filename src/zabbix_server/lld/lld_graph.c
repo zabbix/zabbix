@@ -59,6 +59,8 @@ typedef struct
 		ZBX_FLAG_LLD_GRAPH_UPDATE_YMIN_TYPE | ZBX_FLAG_LLD_GRAPH_UPDATE_YMIN_ITEMID |		\
 		ZBX_FLAG_LLD_GRAPH_UPDATE_YMAX_TYPE | ZBX_FLAG_LLD_GRAPH_UPDATE_YMAX_ITEMID)
 	zbx_uint64_t		flags;
+	int			lastcheck;
+	int			ts_delete;
 }
 zbx_lld_graph_t;
 
@@ -161,7 +163,7 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 	result = DBselect(
 			"select g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
 				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
-				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid"
+				"g.ymin_type,g.ymin_itemid,g.ymax_type,g.ymax_itemid,gd.lastcheck,gd.ts_delete"
 			" from graphs g,graph_discovery gd"
 			" where g.graphid=gd.graphid"
 				" and gd.parent_graphid=" ZBX_FS_UI64,
@@ -219,6 +221,9 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 			graph->flags |= ZBX_FLAG_LLD_GRAPH_UPDATE_YMAX_TYPE;
 
 		ZBX_DBROW2UINT64(graph->ymax_itemid, row[16]);
+
+		graph->lastcheck = atoi(row[17]);
+		graph->ts_delete = atoi(row[18]);
 
 		zbx_vector_ptr_create(&graph->gitems);
 
@@ -666,6 +671,8 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 		graph = (zbx_lld_graph_t *)zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
 
 		graph->graphid = 0;
+		graph->lastcheck = 0;
+		graph->ts_delete = 0;
 
 		graph->name = zbx_strdup(NULL, name_proto);
 		graph->name_orig = NULL;
@@ -1272,6 +1279,19 @@ out:
 	return ret;
 }
 
+static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
+		int *ts_delete)
+{
+	zbx_lld_graph_t	*graph;
+
+	graph = (zbx_lld_graph_t *)object;
+
+	*id = graph->graphid;
+	*discovery_flag = graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED;
+	*lastcheck = graph->lastcheck;
+	*ts_delete = graph->ts_delete;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_update_graphs                                                *
@@ -1290,7 +1310,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	int			ret = SUCCEED;
 	DB_RESULT		result;
@@ -1359,6 +1379,9 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
 				percent_right, ymin_type, ymax_type);
+
+		lld_remove_lost_objects("graph_discovery", "graphid", &graphs, lifetime, lastcheck, DBdelete_graphs,
+				get_graph_info);
 
 		lld_items_free(&items);
 		lld_gitems_free(&gitems_proto);
