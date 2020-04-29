@@ -37,7 +37,6 @@ class DB {
 	const FIELD_TYPE_FLOAT = 'float';
 	const FIELD_TYPE_UINT = 'uint';
 	const FIELD_TYPE_BLOB = 'blob';
-	const FIELD_TYPE_TEXT = 'text';
 	const FIELD_TYPE_NCLOB = 'nclob';
 
 	private static $schema = null;
@@ -266,10 +265,6 @@ class DB {
 
 		$schema = self::getSchema($table_name);
 
-		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_TEXT) {
-			return ($DB['TYPE'] == ZBX_DB_ORACLE) ? 2048 : 65535;
-		}
-
 		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_NCLOB) {
 			return 65535;
 		}
@@ -282,8 +277,7 @@ class DB {
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 			foreach ($tableSchema['fields'] as $name => $field) {
-				if (($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB)
-						&& !$field['null']) {
+				if ($field['type'] == self::FIELD_TYPE_NCLOB && !$field['null']) {
 					foreach ($values as &$value) {
 						if (!isset($value[$name])) {
 							$value[$name] = '';
@@ -380,17 +374,6 @@ class DB {
 					case self::FIELD_TYPE_FLOAT:
 						if (!is_numeric($values[$field])) {
 							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
-						}
-						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-					case self::FIELD_TYPE_TEXT:
-						if ($DB['TYPE'] == ZBX_DB_ORACLE) {
-							$length = mb_strlen($values[$field]);
-
-							if ($length > 2048) {
-								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
-									$values[$field], $field, $length, 2048));
-							}
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
@@ -1108,7 +1091,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if ($field_schema['type'] == self::FIELD_TYPE_TEXT || $field_schema['type'] == self::FIELD_TYPE_NCLOB) {
+			if ($field_schema['type'] == self::FIELD_TYPE_NCLOB) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);

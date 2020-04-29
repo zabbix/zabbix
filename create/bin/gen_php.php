@@ -59,10 +59,6 @@ function parse_schema($path) {
 						$type = 'DB::FIELD_TYPE_NCLOB';
 						$length = false;
 						break;
-					case 't_shorttext':
-						$type = 'DB::FIELD_TYPE_TEXT';
-						$length = false;
-						break;
 					case 't_image':
 						$type = 'DB::FIELD_TYPE_BLOB';
 						$length = 2048;
