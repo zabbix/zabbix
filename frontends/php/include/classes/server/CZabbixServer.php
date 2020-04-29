@@ -112,6 +112,11 @@ class CZabbixServer {
 	protected $total;
 
 	/**
+	 * @var array $debug  Section 'debug' data from server response.
+	 */
+	protected $debug = [];
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param string $host
@@ -380,6 +385,15 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Returns debug section from server response.
+	 *
+	 * @return array
+	 */
+	public function getDebug() {
+		return $this->debug;
+	}
+
+	/**
 	 * Executes a given JSON request and returns the result. Returns false if an error has occurred.
 	 *
 	 * @param array $params
@@ -390,6 +404,7 @@ class CZabbixServer {
 		// Reset object state.
 		$this->error = null;
 		$this->total = null;
+		$this->debug = [];
 
 		// Connect to the server.
 		if (!$this->connect()) {
@@ -479,6 +494,10 @@ class CZabbixServer {
 			$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 
 			return false;
+		}
+
+		if (array_key_exists('debug', $response)) {
+			$this->debug = $response['debug'];
 		}
 
 		// Request executed successfully.

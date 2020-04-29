@@ -487,6 +487,27 @@ int	zbx_day_in_month(int year, int mon)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_get_duration_ms                                              *
+ *                                                                            *
+ * Purpose: get duration in milliseconds since time stamp till current time   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     start_time - [IN] time from when duration should be counted            *
+ *                                                                            *
+ * Return value: duration in milliseconds since time stamp till current time  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
+{
+	zbx_timespec_t	now;
+
+	zbx_timespec(&now);
+
+	return (now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_calloc2                                                      *
  *                                                                            *
  * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
