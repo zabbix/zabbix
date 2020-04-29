@@ -3981,7 +3981,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 				(unsigned char)atoi(row[11]),	/* correlation_mode */
 				row[12],			/* correlation_tag */
 				(unsigned char)atoi(row[13]),	/* manual_close */
-				row[14],
+				row[14],			/* opdata */
 				(unsigned char)atoi(row[15]));	/* discover */
 
 		if (0 != new_triggerid)				/* new trigger added */
