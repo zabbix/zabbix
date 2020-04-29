@@ -393,6 +393,12 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
+			'discover' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'hstgrp' => [
@@ -1595,6 +1601,12 @@ return [
 				'default' => '0',
 			],
 			'allow_traps' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'discover' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -3003,6 +3015,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'discover' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'trigger_depends' => [
@@ -3094,13 +3112,11 @@ return [
 			'yaxismin' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'yaxismax' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '100',
 			],
 			'templateid' => [
@@ -3143,13 +3159,11 @@ return [
 			'percent_left' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'percent_right' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'ymin_type' => [
@@ -3184,7 +3198,7 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'status' => [
+			'discover' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -3628,7 +3642,6 @@ return [
 			'goodsla' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '99.9',
 			],
 			'sortorder' => [
@@ -4641,7 +4654,6 @@ return [
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'ns' => [
@@ -5031,19 +5043,16 @@ return [
 			'value_min' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_avg' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_max' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 		],
@@ -5590,6 +5599,18 @@ return [
 				'length' => 20,
 				'ref_table' => 'graphs',
 				'ref_field' => 'graphid',
+			],
+			'lastcheck' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -6289,6 +6310,18 @@ return [
 				'length' => 20,
 				'ref_table' => 'triggers',
 				'ref_field' => 'triggerid',
+			],
+			'lastcheck' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -8063,6 +8096,24 @@ return [
 				'ref_field' => 'lld_override_operationid',
 			],
 			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'lld_override_opdiscover' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'discover' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
