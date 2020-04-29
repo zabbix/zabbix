@@ -413,6 +413,9 @@ class ZBase {
 		require_once 'include/translateDefines.inc.php';
 	}
 
+	/**
+	 * Set messages received in cookies.
+	 */
 	private function initMessages(): void {
 		foreach (['messageOk', 'messageError'] as $message_type) {
 			if (array_key_exists($message_type, $_COOKIE)) {

@@ -263,21 +263,21 @@ function objectSize(obj) {
 /**
  * Add standard message to the top of the site.
  *
- * @param html  String of jQuery object representing HTML message with class name .msg-good, .msg-bad or .msg-warning.
+ * @param {jQuery}  jQuery object representing HTML message box with class name .msg-good, .msg-bad or .msg-warning.
  */
-function addMessage(html) {
+function addMessage($msg_box) {
 	var $wrapper = $('.wrapper'),
 		$main = $wrapper.find('> main'),
 		$footer = $wrapper.find('> footer');
 
 	if ($main.length) {
-		$main.before(html);
+		$main.before($msg_box);
 	}
 	else if ($footer.length) {
-		$footer.before(html);
+		$footer.before($msg_box);
 	}
 	else {
-		$wrapper.append(html);
+		$wrapper.append($msg_box);
 	}
 }
 
@@ -807,11 +807,6 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		});
 
 		$msg_box.append($msg_details);
-	}
-	else if (title === null) {
-		jQuery('<span>')
-			.text(messages ? messages : ' ')
-			.appendTo($msg_box);
 	}
 	else {
 		jQuery('<li>')
