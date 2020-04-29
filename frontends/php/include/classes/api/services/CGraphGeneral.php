@@ -498,7 +498,7 @@ abstract class CGraphGeneral extends CApiService {
 
 		if (get_class($this) === 'CGraphPrototype') {
 			$rules = [
-				'status' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_STATUS_CREATE, GRAPH_STATUS_NO_CREATE])]
+				'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 			];
 		}
 		else {
@@ -648,7 +648,7 @@ abstract class CGraphGeneral extends CApiService {
 
 		if (get_class($this) === 'CGraphPrototype') {
 			$rules = [
-				'status' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_STATUS_CREATE, GRAPH_STATUS_NO_CREATE])]
+				'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 			];
 		}
 		else {

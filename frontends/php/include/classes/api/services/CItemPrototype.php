@@ -373,9 +373,10 @@ class CItemPrototype extends CItemGeneral {
 		}
 		unset($item);
 
-		// Validate item prototype status field.
+		// Validate item prototype status and discover status fields.
 		$rules = [
-			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NO_CREATE])]
+			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
 		];
 
 		foreach ($items as $key => $item) {

@@ -316,10 +316,12 @@ define('EVENT_TYPE_TRIGGER_UNKNOWN',		4);
 
 define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
-define('HOST_STATUS_NO_CREATE',		2);
 define('HOST_STATUS_TEMPLATE',		3);
 define('HOST_STATUS_PROXY_ACTIVE',	5);
 define('HOST_STATUS_PROXY_PASSIVE',	6);
+
+define('HOST_DISCOVER',		0);
+define('HOST_NO_DISCOVER',	1);
 
 define('HOST_ENCRYPTION_NONE',			1);
 define('HOST_ENCRYPTION_PSK',			2);
@@ -520,7 +522,8 @@ define('ZBX_ICON_PREVIEW_WIDTH',	24);
 
 define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
-define('ITEM_STATUS_NO_CREATE',		2);
+define('ITEM_DISCOVER',	0);
+define('ITEM_NO_DISCOVER',	1);
 
 /**
  * Starting from Zabbix 2.2 items could not have ITEM_STATUS_NOTSUPPORTED status
@@ -603,9 +606,8 @@ define('OPERATION_OBJECT_TRIGGER_PROTOTYPE', 1);
 define('OPERATION_OBJECT_GRAPH_PROTOTYPE', 2);
 define('OPERATION_OBJECT_HOST_PROTOTYPE', 3);
 
-// Graph prototype status.
-define('GRAPH_STATUS_CREATE',		0);
-define('GRAPH_STATUS_NO_CREATE',	2);
+define('GRAPH_DISCOVER',	0);
+define('GRAPH_NO_DISCOVER',	1);
 
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
@@ -646,7 +648,8 @@ define('ZBX_RECOVERY_MODE_NONE',				2);
 
 define('TRIGGER_STATUS_ENABLED',	0);
 define('TRIGGER_STATUS_DISABLED',	1);
-define('TRIGGER_STATUS_NO_CREATE',	2);
+define('TRIGGER_DISCOVER',		0);
+define('TRIGGER_NO_DISCOVER',	1);
 
 define('TRIGGER_VALUE_FALSE',	0);
 define('TRIGGER_VALUE_TRUE',	1);

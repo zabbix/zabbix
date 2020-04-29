@@ -498,14 +498,19 @@ abstract class CTriggerGeneral extends CApiService {
 				$error_duplicate = _('Duplicate trigger with name "%1$s".');
 				$error_wrong_fields = _('Wrong fields for trigger.');
 				$error_cannot_set = _('Cannot set "%1$s" for trigger "%2$s".');
-				$supported_status_values = [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED];
+				$rules = [
+					'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])]
+				];
 				break;
 
 			case 'CTriggerPrototype':
 				$error_duplicate = _('Duplicate trigger prototype with name "%1$s".');
 				$error_wrong_fields = _('Wrong fields for trigger prototype.');
 				$error_cannot_set = _('Cannot set "%1$s" for trigger prototype "%2$s".');
-				$supported_status_values = [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED, TRIGGER_STATUS_NO_CREATE];
+				$rules = [
+					'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])],
+					'discover' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])]
+				];
 				break;
 
 			default:
@@ -523,10 +528,6 @@ abstract class CTriggerGeneral extends CApiService {
 		];
 		$read_only_fields = ['triggerid', 'value', 'lastchange', 'error', 'templateid', 'state', 'flags'];
 
-		$rules = [
-			'status' => ['type' => API_INT32, 'in' => implode(',', $supported_status_values)]
-		];
-
 		foreach ($triggers as $key => &$trigger) {
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_wrong_fields);
@@ -538,7 +539,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_set, $trigger['description']);
 
-			// Validate status field.
+			// Validate status and discover status fields.
 			$data = array_intersect_key($trigger, $rules);
 			if ($data) {
 				$path = '/'.($key + 1);
@@ -672,14 +673,19 @@ abstract class CTriggerGeneral extends CApiService {
 				$error_wrong_fields = _('Wrong fields for trigger.');
 				$error_cannot_update = _('Cannot update "%1$s" for trigger "%2$s".');
 				$error_cannot_update_tmpl = _('Cannot update "%1$s" for templated trigger "%2$s".');
-				$supported_status_values = [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED];
+				$rules = [
+					'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])]
+				];
 				break;
 
 			case 'CTriggerPrototype':
 				$error_wrong_fields = _('Wrong fields for trigger prototype.');
 				$error_cannot_update = _('Cannot update "%1$s" for trigger prototype "%2$s".');
 				$error_cannot_update_tmpl = _('Cannot update "%1$s" for templated trigger prototype "%2$s".');
-				$supported_status_values = [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED, TRIGGER_STATUS_NO_CREATE];
+				$rules = [
+					'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])],
+					'discover' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])]
+				];
 				break;
 
 			default:
@@ -742,10 +748,6 @@ abstract class CTriggerGeneral extends CApiService {
 		$_db_triggers = $this->createRelationMap($_db_trigger_tags, 'triggerid', 'triggertagid')
 			->mapMany($_db_triggers, $_db_trigger_tags, 'tags');
 
-		$rules = [
-			'status' => ['type' => API_INT32, 'in' => implode(',', $supported_status_values)]
-		];
-
 		foreach ($triggers as $tnum => &$trigger) {
 			// check permissions
 			if (!array_key_exists($trigger['triggerid'], $_db_triggers)) {
@@ -767,7 +769,7 @@ abstract class CTriggerGeneral extends CApiService {
 				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $_db_trigger);
 			}
 
-			// Validate status field.
+			// Validate status and discover status fields.
 			$data = array_intersect_key($trigger, $rules);
 			if ($data) {
 				$path = '/'.($tnum + 1);
