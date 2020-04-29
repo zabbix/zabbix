@@ -25,26 +25,29 @@
 ?>
 
 <script type="text/javascript">
-	jQuery(function() {
-		// disable the status filter when using the state filter
-		jQuery('#filter_state').change(function(event, saveValue) {
-			var stateObj = jQuery(this),
-				statusObj = jQuery('#filter_status'),
-				saveValue = (saveValue === undefined) ? true : saveValue;
+	jQuery(function($) {
+		// Disable the status filter when using the state filter.
+		$('#filter_state').on('change', (event, save_value = true) => {
+			const $state = $(event.currentTarget);
+			const $status = $('#filter_status');
 
-			if (stateObj.val() == -1) {
-				// restore the last remembered status filter value
-				if (statusObj.prop('disabled') && statusObj.data('last-value') !== undefined) {
-					statusObj.val(statusObj.data('last-value'));
+			if ($state.val() == -1) {
+				// Restore the last remembered status filter value.
+				if ($status.prop('disabled') && typeof $status.data('last-value') !== 'undefined') {
+					$status.val($status.data('last-value'));
 				}
-				statusObj.prop('disabled', false);
+
+				$status.prop('disabled', false);
 			}
 			else {
-				// remember the last status filter value
-				if (!statusObj.prop('disabled') && saveValue) {
-					statusObj.data('last-value', statusObj.val());
+				// Remember the last status filter value.
+				if (!$status.prop('disabled') && save_value) {
+					$status.data('last-value', $status.val());
 				}
-				statusObj.prop('disabled', true).val(<?php echo ITEM_STATUS_ACTIVE ?>);
+
+				$status
+					.prop('disabled', true)
+					.val(<?php echo ITEM_STATUS_ACTIVE ?>);
 			}
 		})
 		.trigger('change', false);

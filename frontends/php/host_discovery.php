@@ -313,7 +313,7 @@ $filter = [
 	'lifetime' => CProfile::get('web.host_discovery.filter.lifetime', ''),
 	'snmp_oid' => CProfile::get('web.host_discovery.filter.snmp_oid', ''),
 	'state' => CProfile::get('web.host_discovery.filter.state', -1),
-	'status' => CProfile::get('web.host_discovery.filter.status', -1),
+	'status' => CProfile::get('web.host_discovery.filter.status', -1)
 ];
 
 $filter_groupids = [];
