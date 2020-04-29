@@ -1888,7 +1888,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	history = item_prototype->history;
 	trends = item_prototype->trends;
 	item->status = item_prototype->status;
-	discover = item_prototype->status;
+	discover = item_prototype->discover;
 
 	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->status, &discover);
 
