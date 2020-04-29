@@ -107,8 +107,8 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			int	lastaccess;
 
 			if (SUCCEED == (res = DCget_proxy_delay_by_name(get_rparam(request, 1), &value, &error)) &&
-					SUCCEED == (res =
-					DBget_proxy_lastaccess(get_rparam(request, 1), &lastaccess, &error)))
+					SUCCEED == (res = DBget_proxy_lastaccess(get_rparam(request, 1), &lastaccess,
+					&error)))
 			{
 				value += (int)time(NULL) - lastaccess;
 			}
