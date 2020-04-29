@@ -4323,7 +4323,7 @@ static void	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_
 				ymin_itemid,
 				ymax_itemid,
 				(unsigned char)atoi(row[17]),	/* flags */
-				(unsigned char)atoi(row[18]));	/* flags */
+				(unsigned char)atoi(row[18]));	/* discover */
 	}
 	DBfree_result(result);
 
