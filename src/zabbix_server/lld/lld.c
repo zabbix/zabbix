@@ -615,7 +615,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select o.lld_overrideid,o.lld_override_operationid,o.operationobject,o.operator,o.value,"
 				"s.status,"
-				"d.discovery,"
+				"d.discover,"
 				"p.delay,"
 				"h.history,"
 				"t.trends,"
@@ -626,7 +626,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			" from lld_override_operation o"
 			" left join lld_override_opstatus s"
 				" on o.lld_override_operationid=s.lld_override_operationid"
-			" left join lld_override_opdiscovery d"
+			" left join lld_override_opdiscover d"
 				" on o.lld_override_operationid=d.lld_override_operationid"
 			" left join lld_override_opperiod p"
 				" on o.lld_override_operationid=p.lld_override_operationid"
