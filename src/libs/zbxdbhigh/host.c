@@ -2989,7 +2989,9 @@ typedef struct
 	unsigned char		status;
 #define ZBX_FLAG_HPLINK_UPDATE_NAME	0x01
 #define ZBX_FLAG_HPLINK_UPDATE_STATUS	0x02
+#define	ZBX_FLAG_HPLINK_UPDATE_DISCOVER 0x04
 	unsigned char		flags;
+	unsigned char		discover;
 }
 zbx_host_prototype_t;
 
@@ -3068,7 +3070,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 	/* selects host prototypes from templates */
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hi.itemid,th.hostid,th.host,th.name,th.status"
+			"select hi.itemid,th.hostid,th.host,th.name,th.status,th.discover"
 			" from items hi,items ti,host_discovery thd,hosts th"
 			" where hi.templateid=ti.itemid"
 				" and ti.itemid=thd.parent_itemid"
@@ -3094,6 +3096,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		host_prototype->name = zbx_strdup(NULL, row[3]);
 		host_prototype->status = (unsigned char)atoi(row[4]);
 		host_prototype->flags = 0;
+		host_prototype->discover = (unsigned char)atoi(row[5]);
 
 		zbx_vector_ptr_append(host_prototypes, host_prototype);
 		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
@@ -3113,7 +3116,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select i.itemid,h.hostid,h.host,h.name,h.status"
+				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover"
 				" from items i,host_discovery hd,hosts h"
 				" where i.itemid=hd.parent_itemid"
 					" and hd.hostid=h.hostid"
@@ -3139,6 +3142,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_NAME;
 					if (host_prototype->status != (status = (unsigned char)atoi(row[4])))
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_STATUS;
+					if (host_prototype->discover != (unsigned char)atoi(row[5]))
+						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_DISCOVER;
 					break;
 				}
 			}
@@ -3660,7 +3665,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		hostid = DBget_maxid_num("hosts", new_hosts);
 
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "status", "flags", "templateid",
-				NULL);
+				"discover", NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_itemid", NULL);
 	}
@@ -3721,7 +3726,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			host_prototype->hostid = hostid++;
 
 			zbx_db_insert_add_values(&db_insert, host_prototype->hostid, host_prototype->host,
-					host_prototype->name, (int)host_prototype->status,
+					host_prototype->name, (int)host_prototype->status, (int)host_prototype->discover,
 					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
@@ -3740,6 +3745,11 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			{
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",status=%d",
 						host_prototype->status);
+			}
+			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_DISCOVER))
+			{
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",discover=%d",
+						host_prototype->discover);
 			}
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
