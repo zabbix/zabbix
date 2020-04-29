@@ -410,9 +410,10 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
  ******************************************************************************/
 static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, char **out)
 {
-	char	*buf = NULL, *prefixes[] = {"", ", ", ", ", ", "};
-	size_t	buf_alloc = 0, buf_offset = 0;
-	int	i, index, flags;
+	const char	*prefixes[] = {"", ", ", ", ", ", ", ", "};
+	char		*buf = NULL;
+	size_t		buf_alloc = 0, buf_offset = 0;
+	int		i, index, flags;
 
 	if (0 == (flags = ack->action & actions))
 		return FAIL;
@@ -432,6 +433,12 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, ch
 	{
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "acknowledged");
 		index++;
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "unacknowledged");
 	}
 
 	if (0 != (flags & ZBX_PROBLEM_UPDATE_MESSAGE))
@@ -1690,6 +1697,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 				user_name);
 
 		if (SUCCEED == get_problem_update_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
 					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY, &actions))
 		{
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
@@ -2996,6 +3004,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
 					{
 						get_problem_update_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+								ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
 								ZBX_PROBLEM_UPDATE_SEVERITY, &replace_to);
 					}
