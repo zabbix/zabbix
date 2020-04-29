@@ -224,7 +224,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New(formatZabbixError(err.Error()))
 	}
 
-	if len(params) > 0 {
+	if key == keyPostgresDatabasesSize || key == keyPostgresDatabasesAge {
 		path := strings.TrimLeft(u.Path, "/")
 		handlerParams = []string{path}
 	} else {

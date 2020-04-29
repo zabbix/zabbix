@@ -34,7 +34,10 @@ func (p *Plugin) databasesSizeHandler(conn *postgresConn, key string, params []s
 	var countSize int64
 	// for now we are expecting only database name as a param
 	if len(params) == 0 {
-		return nil, errorFourthParam
+		return nil, errorFourthParamEmpty
+	}
+	if len(params[0]) == 0 {
+		return nil, errorFourthParamLen
 	}
 
 	err := conn.postgresPool.QueryRow(context.Background(),
