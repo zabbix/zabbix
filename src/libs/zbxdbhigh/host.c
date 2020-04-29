@@ -1035,7 +1035,7 @@ out:
  * Parameters: triggerids - [IN] trigger identificators from database         *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
+void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;

@@ -379,7 +379,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select td.parent_triggerid,t.triggerid,t.description,t.expression,t.type,t.priority,"
 				"t.comments,t.url,t.recovery_expression,t.recovery_mode,t.correlation_mode,"
-				"t.correlation_tag,t.manual_close,t.opdata,t.lastcheck,t.ts_delete"
+				"t.correlation_tag,t.manual_close,t.opdata,td.lastcheck,td.ts_delete"
 			" from triggers t,trigger_discovery td"
 			" where t.triggerid=td.triggerid"
 				" and");
@@ -2089,6 +2089,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			zbx_vector_ptr_create(&db_trigger->dependencies);
 			zbx_vector_ptr_create(&db_trigger->dependents);
 			zbx_vector_ptr_create(&db_trigger->tags);
+			zbx_vector_ptr_pair_create(&db_trigger->override_tags);
 
 			zbx_vector_ptr_append(&db_triggers, db_trigger);
 		}
@@ -3485,6 +3486,19 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
+		int *ts_delete)
+{
+	zbx_lld_trigger_t	*trigger;
+
+	trigger = (zbx_lld_trigger_t *)object;
+
+	*id = trigger->triggerid;
+	*discovery_flag = trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
+	*lastcheck = trigger->lastcheck;
+	*ts_delete = trigger->ts_delete;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_update_triggers                                              *
@@ -3552,6 +3566,8 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_trigger_tags_validate(&triggers, error);
 	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers);
 
+	lld_remove_lost_objects("trigger_discovery", "triggerid", &triggers, lifetime, lastcheck, DBdelete_triggers,
+			get_trigger_info);
 	/* cleaning */
 
 	zbx_vector_ptr_clear_ext(&items, (zbx_mem_free_func_t)lld_item_free);
