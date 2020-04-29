@@ -169,9 +169,6 @@ sub process_row
 
 				if (length($_) > $oracle_field_limit)
 				{
-					# escape "\n" that have to remain as is in the code
-					$_ =~ s/\\n/\\\\n/g;
-
 					my @sections = unpack("(a$oracle_field_limit)*", $_);
 					my $move_to_next;
 					my $first_part = 1;
