@@ -607,9 +607,6 @@ zbx_prototype_discover_t;
 #define DRULE_STATUS_MONITORED		0
 #define DRULE_STATUS_NOT_MONITORED	1
 
-/* graph statuses */
-#define GRAPH_STATUS_ENABLED		0
-
 /* host statuses */
 #define HOST_STATUS_MONITORED		0
 #define HOST_STATUS_NOT_MONITORED	1
