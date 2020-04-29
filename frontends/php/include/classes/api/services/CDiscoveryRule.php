@@ -165,6 +165,19 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
+		// groupids
+		if ($options['groupids'] !== null) {
+			zbx_value2array($options['groupids']);
+
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = 'hg.hostid=i.hostid';
+
+			if ($options['groupCount']) {
+				$sqlParts['group']['hg'] = 'hg.groupid';
+			}
+		}
+
 		// inherited
 		if (!is_null($options['inherited'])) {
 			if ($options['inherited']) {
