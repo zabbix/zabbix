@@ -132,7 +132,7 @@ tests/libs/zbxdbcache/is_item_processed_by_server
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values
-tests/libs/zbxdbcache/zbx_dc_expand_user_macros_for_triggers
+tests/libs/zbxdbcache/zbx_dc_expand_user_macros_in_expression
 tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
@@ -210,3 +210,4 @@ sbin/zabbix_agent2
 etc/zabbix_agent2.conf
 bin/win32
 bin/win64
+/Debug/

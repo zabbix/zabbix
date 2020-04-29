@@ -820,4 +820,5 @@ zbx_db_mock_field_t;
 void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len);
 int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
+int	zbx_db_check_instanceid(void);
 #endif

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-19 14:15+0300\n"
+"POT-Creation-Date: 2020-04-27 12:51+0300\n"
 "PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -194,7 +194,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: app/views/monitoring.widget.actionlog.view.php:45
-#: include/actions.inc.php:2165 include/classes/screens/CScreenActions.php:129
+#: include/actions.inc.php:2167 include/classes/screens/CScreenActions.php:129
 #: include/views/administration.auditacts.list.php:82
 #, c-format
 msgid "%1$s retry left"
@@ -405,7 +405,7 @@ msgstr "Onay"
 msgid "Acknowledge"
 msgstr "Onay"
 
-#: app/views/popup.condition.common.php:652 include/actions.inc.php:2072
+#: app/views/popup.condition.common.php:652 include/actions.inc.php:2074
 #: include/events.inc.php:172
 msgid "Acknowledged"
 msgstr "Onaylandı"
@@ -632,8 +632,8 @@ msgstr "Şu zamana kadar aktif"
 #: include/views/configuration.action.edit.php:454
 #: include/views/configuration.action.edit.php:495
 #: include/views/configuration.application.edit.php:64
-#: include/views/configuration.correlation.edit.php:96
-#: include/views/configuration.correlation.edit.php:175
+#: include/views/configuration.correlation.edit.php:97
+#: include/views/configuration.correlation.edit.php:176
 #: include/views/configuration.discovery.edit.php:78
 #: include/views/configuration.discovery.edit.php:149
 #: include/views/configuration.graph.edit.php:398
@@ -866,7 +866,7 @@ msgstr ""
 msgid "Aggregation interval"
 msgstr ""
 
-#: include/actions.inc.php:2099
+#: include/actions.inc.php:2101
 msgid "Alert message"
 msgstr ""
 
@@ -965,7 +965,7 @@ msgstr "Alternatif olarak elle yükleyebilirsiniz:"
 
 #: app/views/popup.operation.common.php:717 include/triggers.inc.php:1317
 #: include/views/configuration.action.edit.php:117
-#: include/views/configuration.correlation.edit.php:107
+#: include/views/configuration.correlation.edit.php:108
 #: include/views/configuration.host.discovery.edit.php:572
 #: include/views/configuration.trigger.prototype.edit.php:143
 #: include/views/configuration.trigger.prototype.edit.php:336
@@ -982,7 +982,7 @@ msgstr "Ve"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:383
 #: include/views/configuration.action.edit.php:116
-#: include/views/configuration.correlation.edit.php:106
+#: include/views/configuration.correlation.edit.php:107
 #: include/views/configuration.host.discovery.edit.php:571
 #: include/views/configuration.host.list.php:53
 #: include/views/configuration.maintenance.edit.php:143
@@ -1208,7 +1208,7 @@ msgstr "En azından bir tane bakım periyodu yaratılmalı."
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr ""
 
-#: include/views/configuration.correlation.edit.php:149
+#: include/views/configuration.correlation.edit.php:150
 msgid "At least one operation must be selected."
 msgstr ""
 
@@ -1533,7 +1533,7 @@ msgid "CERT"
 msgstr "SERT"
 
 #: app/views/monitoring.widget.problems.view.php:95
-#: include/classes/graph/CSvgGraph.php:1077
+#: include/classes/graph/CSvgGraph.php:1119
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:993
 #: include/classes/screens/CScreenProblem.php:1198 include/events.inc.php:344
@@ -1894,7 +1894,7 @@ msgstr[1] "Tetikleyiciler kopyalanamıyor"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "\"%1$s:%2$s\" tetikleyicisi kopyalanamıyor, çünkü ifadede birden çok ana makine var."
 
-#: include/classes/api/services/CHostPrototype.php:260
+#: include/classes/api/services/CHostPrototype.php:255
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
 msgstr "Keşfedilmiş \"%1$s\" ana makinesi üzerinde bir ana makine prototipi oluşturulamıyor."
@@ -2140,7 +2140,7 @@ msgstr ""
 msgid "Cannot delete templated graph."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:1161
+#: include/classes/api/services/CHostPrototype.php:1156
 msgid "Cannot delete templated host prototype."
 msgstr "Şablonlanmış ana makine prototipi silinemiyor."
 
@@ -2479,7 +2479,7 @@ msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not 
 msgstr[0] "\"%1$s\" şablonu içe aktarılamıyor, \"%2$s\" bağlantılı şablonu mevcut değil."
 msgstr[1] "\"%1$s\" şablonu içe aktarılamıyor, \"%2$s\" bağlantılı şablonları mevcut değil."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:703
+#: app/controllers/CControllerPopupTriggerExpr.php:717
 msgid "Cannot insert trigger expression"
 msgstr "Tetikleyici ifadesi eklenemiyor"
 
@@ -3285,7 +3285,7 @@ msgstr "Saat"
 #: app/views/administration.valuemap.edit.php:112
 #: include/views/configuration.action.edit.php:484
 #: include/views/configuration.application.edit.php:56
-#: include/views/configuration.correlation.edit.php:164
+#: include/views/configuration.correlation.edit.php:165
 #: include/views/configuration.discovery.edit.php:141
 #: include/views/configuration.graph.edit.php:473
 #: include/views/configuration.host.discovery.edit.php:750
@@ -3322,12 +3322,12 @@ msgid "Close expression constructor"
 msgstr "İfade düzenleyicisini kapat"
 
 #: include/correlation.inc.php:70
-#: include/views/configuration.correlation.edit.php:144
+#: include/views/configuration.correlation.edit.php:145
 msgid "Close new event"
 msgstr "Yeni olayı kapat"
 
 #: include/correlation.inc.php:69
-#: include/views/configuration.correlation.edit.php:138
+#: include/views/configuration.correlation.edit.php:139
 msgid "Close old events"
 msgstr "Eski olayları kapat"
 
@@ -3432,7 +3432,7 @@ msgstr ""
 msgid "Concurrent sessions"
 msgstr "Eşzamanlı oturumlar"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:726
+#: app/controllers/CControllerPopupTriggerExpr.php:740
 msgid "Condition"
 msgstr "Koşul"
 
@@ -3469,7 +3469,7 @@ msgstr "\"%1$s\" keşif kuralı için \"%3$s\" formülünde kullanılan \"%2$s\"
 #: app/views/popup.operation.common.php:739
 #: include/views/configuration.action.edit.php:139
 #: include/views/configuration.action.list.php:89
-#: include/views/configuration.correlation.edit.php:119
+#: include/views/configuration.correlation.edit.php:120
 #: include/views/configuration.correlation.list.php:65
 msgid "Conditions"
 msgstr "Koşullar"
@@ -3857,7 +3857,7 @@ msgstr "Koordinatlar"
 msgid "Copy"
 msgstr "Kopyala"
 
-#: include/views/configuration.correlation.edit.php:153
+#: include/views/configuration.correlation.edit.php:154
 msgid "Correlation"
 msgstr "Korelasyon"
 
@@ -3909,7 +3909,7 @@ msgstr "Korelasyon güncellendi"
 msgid "Could not save image!"
 msgstr "Resim kaydedilemedi!"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:46
+#: app/controllers/CControllerPopupTriggerExpr.php:47
 msgid "Count"
 msgstr "Sayı"
 
@@ -4141,7 +4141,7 @@ msgid "Custom"
 msgstr "Özel"
 
 #: include/views/configuration.action.edit.php:119
-#: include/views/configuration.correlation.edit.php:109
+#: include/views/configuration.correlation.edit.php:110
 #: include/views/configuration.host.discovery.edit.php:574
 msgid "Custom expression"
 msgstr "Özel ifade"
@@ -4300,7 +4300,7 @@ msgstr "Kesikli çizgi"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Veri önbellek istatistikleri. Önbellek - değerlerden biri (kipler: all, float, uint, str, log, text), geçmiş (kipler: pfree, total, used, free), eğilim (kipler: pfree, total, used, free), metin (kipler: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2213
+#: include/classes/graphdraw/CLineGraphDraw.php:2246
 #: include/classes/graphdraw/CPieGraphDraw.php:770
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4560,7 +4560,7 @@ msgstr "Uygulama silinsin mi?"
 msgid "Delete current action?"
 msgstr "Şu anki eylem silinsin mi?"
 
-#: include/views/configuration.correlation.edit.php:166
+#: include/views/configuration.correlation.edit.php:167
 msgid "Delete current correlation?"
 msgstr "Mevcut korelasyon silinsin mi?"
 
@@ -4823,7 +4823,7 @@ msgstr "Web senaryosu silinsin mi?"
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Silindi: \"%1$s\" ana makinesi."
 
-#: include/classes/api/services/CHostPrototype.php:1029
+#: include/classes/api/services/CHostPrototype.php:1024
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" ana makine prototipi."
@@ -4883,7 +4883,7 @@ msgstr "Dağıtım durumu"
 #: app/views/popup.triggerwizard.php:129
 #: app/views/reports.auditlog.list.php:67
 #: include/classes/screens/CScreenEvents.php:32 include/events.inc.php:239
-#: include/views/configuration.correlation.edit.php:127
+#: include/views/configuration.correlation.edit.php:128
 #: include/views/configuration.host.discovery.edit.php:555
 #: include/views/configuration.host.edit.php:191
 #: include/views/configuration.host.massupdate.php:87
@@ -5599,7 +5599,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:576
 #: include/classes/api/services/CHost.php:1373
-#: include/classes/api/services/CHostPrototype.php:957
+#: include/classes/api/services/CHostPrototype.php:952
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CMaintenance.php:533
 #: include/classes/api/services/CMap.php:555
@@ -5617,7 +5617,7 @@ msgstr ""
 #: include/classes/api/services/CTemplate.php:588
 #: include/classes/api/services/CTrigger.php:678
 #: include/classes/api/services/CTrigger.php:802
-#: include/classes/api/services/CUserMacro.php:622
+#: include/classes/api/services/CUserMacro.php:609
 msgid "Empty input parameter."
 msgstr "Boş giriş parametresi."
 
@@ -5799,7 +5799,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:145
 #: include/views/configuration.action.list.php:71
 #: include/views/configuration.action.list.php:126
-#: include/views/configuration.correlation.edit.php:130
+#: include/views/configuration.correlation.edit.php:131
 #: include/views/configuration.correlation.list.php:49
 #: include/views/configuration.correlation.list.php:108
 #: include/views/configuration.discovery.edit.php:131
@@ -5995,7 +5995,7 @@ msgstr ""
 msgid "Execute on"
 msgstr "Üzerinde çalıştır"
 
-#: include/actions.inc.php:2120
+#: include/actions.inc.php:2122
 #: include/views/administration.auditacts.list.php:76
 msgid "Executed"
 msgstr "Çalıştırılmış"
@@ -6134,7 +6134,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Başarısız"
 
-#: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2132
+#: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2134
 #: include/views/administration.auditacts.list.php:86
 msgid "Failed"
 msgstr "Başarısız"
@@ -6378,8 +6378,8 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "İlk"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:179
-#: app/controllers/CControllerPopupTriggerExpr.php:208
+#: app/controllers/CControllerPopupTriggerExpr.php:193
+#: app/controllers/CControllerPopupTriggerExpr.php:222
 msgid "Fit"
 msgstr "Sığdır"
 
@@ -6883,7 +6883,7 @@ msgstr "Keşfedilen ana bilgisayar \"%1$s\" için grup."
 msgid "Group name"
 msgstr "Grup adı"
 
-#: include/classes/api/services/CHostPrototype.php:1119
+#: include/classes/api/services/CHostPrototype.php:1114
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Grup prototipi, keşfedilmiş \"%1$s\" ana makine grubuna dayalı olamaz."
@@ -6918,8 +6918,8 @@ msgstr ""
 msgid "H:i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1049
-#: include/classes/graphdraw/CLineGraphDraw.php:1056
+#: include/classes/graphdraw/CLineGraphDraw.php:1057
+#: include/classes/graphdraw/CLineGraphDraw.php:1064
 #: include/translateDefines.inc.php:34
 msgid "H:i:s"
 msgstr "H:i:s"
@@ -7405,12 +7405,12 @@ msgstr "Ana makine ağları"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:837
+#: include/classes/api/services/CHostPrototype.php:832
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "\"%2$s\" üzerinde \"%1$s\" ana makine prototipi zaten var, başka bir şablondan miras kalmış."
 
-#: include/classes/api/services/CHostPrototype.php:825
+#: include/classes/api/services/CHostPrototype.php:820
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "\"%2$s\" üzerinde \"%1$s\" ana makine prototipi zaten var."
@@ -7433,12 +7433,12 @@ msgid_plural "Host prototypes updated"
 msgstr[0] "Ana makine prototipi güncellendi"
 msgstr[1] "Ana makine prototipleri güncellendi"
 
-#: include/classes/api/services/CHostPrototype.php:185
+#: include/classes/api/services/CHostPrototype.php:180
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Ana makine adı \"%1$s\" olan ana makine prototipi, \"%2$s\" keşif kuralında halihazırda mevcut."
 
-#: include/classes/api/services/CHostPrototype.php:186
+#: include/classes/api/services/CHostPrototype.php:181
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Görünür adı \"%1$s\" olan ana makine prototipi, \"%2$s\" keşif kuralında halihazırda mevcut."
@@ -7836,7 +7836,7 @@ msgstr ""
 msgid "In maintenance"
 msgstr "Bakımda"
 
-#: include/actions.inc.php:2127
+#: include/actions.inc.php:2129
 #: include/views/administration.auditacts.list.php:80
 msgid "In progress"
 msgstr "İşlemde"
@@ -7899,8 +7899,8 @@ msgid "Inaccessible trigger"
 msgstr ""
 
 #: app/controllers/CControllerDashboardView.php:384
-#: include/actions.inc.php:2005 include/actions.inc.php:2028
-#: include/actions.inc.php:2033 include/events.inc.php:226
+#: include/actions.inc.php:2007 include/actions.inc.php:2030
+#: include/actions.inc.php:2035 include/events.inc.php:226
 #: include/views/monitoring.screen.edit.php:92
 #: include/views/monitoring.slideconf.edit.php:82
 #: include/views/monitoring.sysmap.edit.php:80
@@ -8164,8 +8164,8 @@ msgstr "Fonksiyona yanlış değişkenler geçildi"
 #: include/classes/api/services/CHostInterface.php:1083
 #: include/classes/api/services/CHostInterface.php:1101
 #: include/classes/api/services/CHostInterface.php:1118
-#: include/classes/api/services/CHostPrototype.php:464
-#: include/classes/api/services/CHostPrototype.php:485
+#: include/classes/api/services/CHostPrototype.php:459
+#: include/classes/api/services/CHostPrototype.php:480
 #: include/classes/api/services/CItemGeneral.php:248
 #: include/classes/api/services/CItemGeneral.php:1221
 #: include/classes/api/services/CItemGeneral.php:1254
@@ -8439,7 +8439,7 @@ msgstr "Ekran öğesi için yanlış öğe prototip ID'si \"%1$s\" sağlandı."
 msgid "Incorrect item value type"
 msgstr "Yanlış öğe değeri türü"
 
-#: include/classes/validators/CFunctionValidator.php:299
+#: include/classes/validators/CFunctionValidator.php:300
 #, c-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "Tetikleyici fonksiyonu \"%2$s\" için yanlış öğe değer türü \"%1$s\" sağlandı."
@@ -8625,10 +8625,10 @@ msgstr "Yanlış tetikleyici ifadesi. \"%1$s\" ana makinesi mevcut değil veya b
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Yanlış tetikleyici ifadesi. Tetikleyici ifade elemanları aynı anda bir şablona ve bir ana makineye ait olmamalıdır."
 
-#: include/classes/validators/CFunctionValidator.php:293
-#: include/classes/validators/CFunctionValidator.php:305
-#: include/classes/validators/CFunctionValidator.php:327
-#: include/classes/validators/CFunctionValidator.php:352
+#: include/classes/validators/CFunctionValidator.php:294
+#: include/classes/validators/CFunctionValidator.php:306
+#: include/classes/validators/CFunctionValidator.php:328
+#: include/classes/validators/CFunctionValidator.php:353
 #, c-format
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "İfadede \"%1$s\" yanlış tetikleyici işlevi sağlandı."
@@ -8976,8 +8976,8 @@ msgstr ""
 #: include/classes/graphdraw/CLineGraphDraw.php:253
 #: include/classes/graphdraw/CPieGraphDraw.php:168
 #: include/classes/graphdraw/CPieGraphDraw.php:178
-#: include/classes/helpers/CSvgGraphHelper.php:373
-#: include/classes/helpers/CSvgGraphHelper.php:385
+#: include/classes/helpers/CSvgGraphHelper.php:375
+#: include/classes/helpers/CSvgGraphHelper.php:387
 #: include/classes/import/CConfigurationImport.php:761
 #: include/classes/import/CConfigurationImport.php:846
 #: include/classes/import/CConfigurationImport.php:884
@@ -9293,15 +9293,15 @@ msgstr ""
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr ""
 
-#: include/classes/validators/CFunctionValidator.php:315
+#: include/classes/validators/CFunctionValidator.php:316
 msgid "Invalid fifth parameter."
 msgstr "Geçersiz beşinci parametre."
 
-#: include/classes/validators/CFunctionValidator.php:311
+#: include/classes/validators/CFunctionValidator.php:312
 msgid "Invalid first parameter."
 msgstr "Geçersiz ilk parametre."
 
-#: include/classes/validators/CFunctionValidator.php:314
+#: include/classes/validators/CFunctionValidator.php:315
 msgid "Invalid fourth parameter."
 msgstr "Geçersiz dördüncü parametre."
 
@@ -9310,7 +9310,7 @@ msgstr "Geçersiz dördüncü parametre."
 msgid "Invalid history data storage period: %1$s."
 msgstr "Geçersiz geçmiş verisi depolama süresi: %1$s."
 
-#: include/classes/api/services/CUserMacro.php:767
+#: include/classes/api/services/CUserMacro.php:754
 #, c-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Makro \"%1$s\" için geçersiz hostid."
@@ -9350,7 +9350,7 @@ msgstr "\"%3$s\" üzerindeki \"%2$s\" öğe prototipi için geçersiz anahtar %1
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Geçersiz anahtar \"%1$s\": %2$s."
 
-#: include/classes/api/services/CUserMacro.php:737
+#: include/classes/api/services/CUserMacro.php:724
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
 msgstr "Geçersiz makro \"%1$s\": %2$s."
@@ -9370,7 +9370,7 @@ msgstr "Geçersiz yöntem parametreleri."
 msgid "Invalid network discovery data storage period: %1$s."
 msgstr "Geçersiz ağ keşfi verisi depolama süresi: %1$s."
 
-#: include/classes/validators/CFunctionValidator.php:306
+#: include/classes/validators/CFunctionValidator.php:307
 msgid "Invalid number of parameters."
 msgstr "Geçersiz parametre sayısı."
 
@@ -9494,7 +9494,7 @@ msgstr "Desteklenmeyen öğelerin geçersiz tazelemesi: %1$s"
 msgid "Invalid response code \"%1$s\"."
 msgstr "Geçersiz yanıt kodu \"%1$s\"."
 
-#: include/classes/validators/CFunctionValidator.php:312
+#: include/classes/validators/CFunctionValidator.php:313
 msgid "Invalid second parameter."
 msgstr "Geçersiz ikinci parametre."
 
@@ -9543,7 +9543,7 @@ msgstr "Geçersiz ikinci parametre."
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Geçersiz etiket \"%1$s\": %2$s."
 
-#: include/classes/validators/CFunctionValidator.php:313
+#: include/classes/validators/CFunctionValidator.php:314
 msgid "Invalid third parameter."
 msgstr "Geçersiz üçüncü parametre."
 
@@ -9561,7 +9561,7 @@ msgstr "Geçersiz eğilim verileri depolama süresi: %1$s."
 msgid "Invalid trigger data storage period: %1$s."
 msgstr "Geçersiz tetikleyici verisi depolama süresi: %1$s."
 
-#: include/classes/api/services/CUserMacro.php:750
+#: include/classes/api/services/CUserMacro.php:737
 #, c-format
 msgid "Invalid type for macro \"%1$s\"."
 msgstr ""
@@ -9634,7 +9634,7 @@ msgstr "İtalyanca (it_IT)"
 msgid "Item"
 msgstr "Öğe"
 
-#: include/classes/api/services/CHostPrototype.php:1063
+#: include/classes/api/services/CHostPrototype.php:1058
 #: include/classes/api/services/CItem.php:51
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -9705,7 +9705,7 @@ msgstr[1] "Öğeler etkin"
 msgid "Item in \"not supported\" state"
 msgstr "\"Desteklenmeyen\" durumundaki öğe"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:698
+#: app/controllers/CControllerPopupTriggerExpr.php:712
 msgid "Item not selected"
 msgstr "Öğe seçilmedi"
 
@@ -9786,7 +9786,7 @@ msgstr "Öğe, üst olmayan ana makineden ana makine arayüzü kullanıyor."
 msgid "Item uses incorrect interface type."
 msgstr "Öğe, yanlış arayüz türü kullanıyor."
 
-#: chart.php:101 chart.php:104
+#: chart.php:102 chart.php:105
 msgid "Item values"
 msgstr "Öğe değerleri"
 
@@ -10167,14 +10167,15 @@ msgstr "Son saat grafiği"
 msgid "Last month graph"
 msgstr "Son ayın grafiği"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:57
-#: app/controllers/CControllerPopupTriggerExpr.php:71
-#: app/controllers/CControllerPopupTriggerExpr.php:92
-#: app/controllers/CControllerPopupTriggerExpr.php:101
-#: app/controllers/CControllerPopupTriggerExpr.php:125
-#: app/controllers/CControllerPopupTriggerExpr.php:144
-#: app/controllers/CControllerPopupTriggerExpr.php:163
-#: app/controllers/CControllerPopupTriggerExpr.php:192
+#: app/controllers/CControllerPopupTriggerExpr.php:58
+#: app/controllers/CControllerPopupTriggerExpr.php:72
+#: app/controllers/CControllerPopupTriggerExpr.php:93
+#: app/controllers/CControllerPopupTriggerExpr.php:102
+#: app/controllers/CControllerPopupTriggerExpr.php:115
+#: app/controllers/CControllerPopupTriggerExpr.php:139
+#: app/controllers/CControllerPopupTriggerExpr.php:158
+#: app/controllers/CControllerPopupTriggerExpr.php:177
+#: app/controllers/CControllerPopupTriggerExpr.php:206
 msgid "Last of"
 msgstr "Sonuncu"
 
@@ -10468,7 +10469,7 @@ msgstr "Kayıp"
 msgid "Low-level discovery rule in \"not supported\" state"
 msgstr "\"Desteklenmiyor\" durumundaki düşük seviye keşif kuralı"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1017
+#: include/classes/graphdraw/CLineGraphDraw.php:1025
 msgid "M"
 msgstr "M"
 
@@ -10508,22 +10509,22 @@ msgstr "Dosyanın MD5 özeti. Karakter stringi döndürür (dosyanın MD5 sağla
 msgid "Macro"
 msgstr "Makro"
 
-#: include/classes/api/services/CUserMacro.php:936
+#: include/classes/api/services/CUserMacro.php:923
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "\"%2$s\" üzerinde \"%1$s\" makrosu zaten var."
 
-#: include/classes/api/services/CUserMacro.php:423
+#: include/classes/api/services/CUserMacro.php:410
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "\"%1$s\" makrosu halihazırda mevcut."
 
-#: include/classes/api/services/CUserMacro.php:852
+#: include/classes/api/services/CUserMacro.php:839
 #, c-format
 msgid "Macro \"%1$s\" is not unique."
 msgstr "\"%1$s\" makrosu benzersiz değil."
 
-#: include/classes/api/services/CUserMacro.php:959
+#: include/classes/api/services/CUserMacro.php:946
 #, c-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "\"%1$s\" hostmacroid'li makro mevcut değil."
@@ -10625,7 +10626,7 @@ msgstr "Veri toplamayarak bakım"
 msgid "Maintenance: %1$s"
 msgstr ""
 
-#: include/classes/validators/CFunctionValidator.php:328
+#: include/classes/validators/CFunctionValidator.php:329
 msgid "Mandatory parameter is missing."
 msgstr "Zorunlu parametre eksik."
 
@@ -10637,7 +10638,7 @@ msgstr "Zorunlu parametre eksik."
 msgid "Manual"
 msgstr "Elle"
 
-#: include/actions.inc.php:2067
+#: include/actions.inc.php:2069
 msgid "Manually closed"
 msgstr ""
 
@@ -10758,7 +10759,7 @@ msgstr "Diğerlerini işaretle"
 msgid "Mark selected"
 msgstr "Seçileni işaretle"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:150
+#: app/controllers/CControllerPopupTriggerExpr.php:164
 msgid "Mask"
 msgstr "Maske"
 
@@ -10958,7 +10959,7 @@ msgstr ""
 #: app/views/popup.mediatype.message.php:77
 #: app/views/popup.mediatypetest.edit.php:71
 #: app/views/popup.operation.common.php:267 include/actions.inc.php:1703
-#: include/actions.inc.php:1972 include/actions.inc.php:2076
+#: include/actions.inc.php:1974 include/actions.inc.php:2078
 #: include/classes/screens/CScreenActions.php:115
 #: include/views/administration.auditacts.list.php:65
 #: include/views/administration.auditacts.list.php:96
@@ -11114,7 +11115,7 @@ msgstr "Grafik prototipi \"%1$s\" için eksik öğeler."
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "\"%2$s\" ana makinesi için eksik anahtar \"%1$s\"."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:184
+#: app/controllers/CControllerPopupTriggerExpr.php:198
 #: app/views/administration.proxy.list.php:47
 #: app/views/administration.proxy.list.php:73 report2.php:195
 msgid "Mode"
@@ -11743,7 +11744,7 @@ msgstr "Hiçbir grafik eklenmemiş."
 msgid "No host IDs given."
 msgstr "Hiçbir ana makine ID'si verilmemiş."
 
-#: include/classes/api/services/CUserMacro.php:763
+#: include/classes/api/services/CUserMacro.php:750
 #, c-format
 msgid "No host given for macro \"%1$s\"."
 msgstr "\"%1$s\" makrosu için hiçbir ana makine verilmemiş."
@@ -11819,7 +11820,7 @@ msgstr "Ekran öğesi için hiçbir öğe prototip ID'si sağlanmadı."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "itemid'si \"%1$s\" olan hiçbir öğe yok."
 
-#: chart3.php:137 chart7.php:53
+#: chart3.php:138 chart7.php:53
 msgid "No items defined."
 msgstr "Hiçbir öğe tanımlanmamış."
 
@@ -11933,12 +11934,12 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CHost.php:1377
 #: include/classes/api/services/CHost.php:1986
 #: include/classes/api/services/CHost.php:2118
-#: include/classes/api/services/CHostPrototype.php:425
-#: include/classes/api/services/CHostPrototype.php:471
-#: include/classes/api/services/CHostPrototype.php:492
-#: include/classes/api/services/CHostPrototype.php:1088
-#: include/classes/api/services/CHostPrototype.php:1110
-#: include/classes/api/services/CHostPrototype.php:1144
+#: include/classes/api/services/CHostPrototype.php:420
+#: include/classes/api/services/CHostPrototype.php:466
+#: include/classes/api/services/CHostPrototype.php:487
+#: include/classes/api/services/CHostPrototype.php:1083
+#: include/classes/api/services/CHostPrototype.php:1105
+#: include/classes/api/services/CHostPrototype.php:1139
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12004,9 +12005,9 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CTriggerPrototype.php:729
 #: include/classes/api/services/CUserGroup.php:329
 #: include/classes/api/services/CUserGroup.php:876
-#: include/classes/api/services/CUserMacro.php:381
-#: include/classes/api/services/CUserMacro.php:468
-#: include/classes/api/services/CUserMacro.php:816
+#: include/classes/api/services/CUserMacro.php:368
+#: include/classes/api/services/CUserMacro.php:455
+#: include/classes/api/services/CUserMacro.php:803
 #: include/classes/api/services/CUser.php:424
 #: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
@@ -12663,7 +12664,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:303
 #: include/views/configuration.action.edit.php:473
 #: include/views/configuration.action.list.php:90
-#: include/views/configuration.correlation.edit.php:154
+#: include/views/configuration.correlation.edit.php:155
 #: include/views/configuration.correlation.list.php:66
 msgid "Operations"
 msgstr "İşlemler"
@@ -12711,7 +12712,7 @@ msgstr "Seçenekler"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:384
 #: include/triggers.inc.php:1317
 #: include/views/configuration.action.edit.php:118
-#: include/views/configuration.correlation.edit.php:108
+#: include/views/configuration.correlation.edit.php:109
 #: include/views/configuration.host.discovery.edit.php:573
 #: include/views/configuration.host.list.php:54
 #: include/views/configuration.maintenance.edit.php:144
@@ -13020,7 +13021,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:95 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:1072
+#: include/classes/graph/CSvgGraph.php:1114
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:993
 #: include/classes/screens/CScreenProblem.php:1198 include/events.inc.php:344
@@ -13211,7 +13212,7 @@ msgstr ""
 msgid "Peak memory usage: %1$s"
 msgstr "En üst bellek kullanımı: %1$s"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:136
+#: app/controllers/CControllerPopupTriggerExpr.php:150
 msgid "Percentage"
 msgstr "Yüzde oranı"
 
@@ -13527,7 +13528,7 @@ msgstr "Öncelik seviyesi"
 msgid "Problem"
 msgstr "Problem"
 
-#: include/actions.inc.php:2056
+#: include/actions.inc.php:2058
 msgid "Problem created"
 msgstr ""
 
@@ -13564,7 +13565,7 @@ msgstr "Üzerinde problem"
 msgid "Problem recovery"
 msgstr ""
 
-#: include/actions.inc.php:2059
+#: include/actions.inc.php:2061
 msgid "Problem resolved"
 msgstr ""
 
@@ -13767,7 +13768,7 @@ msgid "Queue overview by proxy"
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:81
-#: include/classes/graph/CSvgGraph.php:1068
+#: include/classes/graph/CSvgGraph.php:1110
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:979
 #: include/classes/screens/CScreenProblem.php:1186 include/events.inc.php:349
@@ -13975,7 +13976,7 @@ msgid "Remember me for 30 days"
 msgstr "30 gün için beni hatırla"
 
 #: include/actions.inc.php:1054 include/actions.inc.php:1851
-#: include/actions.inc.php:2098
+#: include/actions.inc.php:2100
 msgid "Remote command"
 msgstr "Uzak komut"
 
@@ -14020,7 +14021,7 @@ msgstr "Uzak komut"
 #: include/views/configuration.action.edit.php:280
 #: include/views/configuration.action.edit.php:359
 #: include/views/configuration.action.edit.php:439
-#: include/views/configuration.correlation.edit.php:81
+#: include/views/configuration.correlation.edit.php:82
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:226
 #: include/views/configuration.host.discovery.edit.php:521
@@ -15094,7 +15095,7 @@ msgstr "Kullanıcılara Gönder"
 msgid "Send to back"
 msgstr "Geriye gönder"
 
-#: include/actions.inc.php:2121
+#: include/actions.inc.php:2123
 #: include/views/administration.auditacts.list.php:75
 msgid "Sent"
 msgstr "Gönderildi"
@@ -16592,7 +16593,7 @@ msgstr "Bu sene"
 msgid "This year so far"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:203
+#: app/controllers/CControllerPopupTriggerExpr.php:217
 msgid "Threshold"
 msgstr "Alt sınır"
 
@@ -16615,15 +16616,15 @@ msgstr "Perşembe"
 msgid "Till"
 msgstr "Kadar"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:45
-#: app/controllers/CControllerPopupTriggerExpr.php:174
+#: app/controllers/CControllerPopupTriggerExpr.php:46
+#: app/controllers/CControllerPopupTriggerExpr.php:188
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:36
 #: app/views/popup.itemtestedit.view.php:137
 #: app/views/popup.triggerexpr.php:136 app/views/popup.triggerexpr.php:140
 #: app/views/reports.auditlog.list.php:61 include/actions.inc.php:1703
 #: include/actions.inc.php:1757 include/actions.inc.php:1838
-#: include/actions.inc.php:1922 include/actions.inc.php:1972
+#: include/actions.inc.php:1922 include/actions.inc.php:1974
 #: include/blocks.inc.php:742 include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:846
@@ -16654,20 +16655,20 @@ msgid "Time a particular Zabbix process or a group of processes (identified by <
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1011
-msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
-msgstr "Vekil sunucu son erişim zamanı. Ad - vekil sunucu adı. Parametre - lastaccess. Unix zaman damgası."
+msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
+msgstr ""
 
 #: include/actions.inc.php:51
 #: include/classes/widgets/views/widget.svggraph.form.view.php:290
 msgid "Time period"
 msgstr "Zaman dönemi"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:63
-#: app/controllers/CControllerPopupTriggerExpr.php:117
+#: app/controllers/CControllerPopupTriggerExpr.php:64
 #: app/controllers/CControllerPopupTriggerExpr.php:131
-#: app/controllers/CControllerPopupTriggerExpr.php:155
+#: app/controllers/CControllerPopupTriggerExpr.php:145
 #: app/controllers/CControllerPopupTriggerExpr.php:169
-#: app/controllers/CControllerPopupTriggerExpr.php:198
+#: app/controllers/CControllerPopupTriggerExpr.php:183
+#: app/controllers/CControllerPopupTriggerExpr.php:212
 #: include/classes/widgets/CWidgetHelper.php:736
 #: include/classes/widgets/CWidgetHelper.php:812
 #: include/classes/widgets/CWidgetHelper.php:1081
@@ -16826,7 +16827,7 @@ msgstr "Yönelimler"
 #: app/controllers/CControllerPopupTriggerWizard.php:221
 #: app/controllers/CControllerPopupTriggerWizard.php:293
 #: app/views/popup.services.php:48 include/actions.inc.php:46
-#: include/classes/graphdraw/CLineGraphDraw.php:475 include/events.inc.php:231
+#: include/classes/graphdraw/CLineGraphDraw.php:483 include/events.inc.php:231
 #: include/maps.inc.php:26 include/triggers.inc.php:1216
 #: include/views/configuration.services.edit.php:91
 #: include/views/configuration.services.edit.php:121
@@ -17174,7 +17175,7 @@ msgstr "Tür (azalan)"
 
 #: app/views/popup.operation.common.php:722
 #: include/views/configuration.action.edit.php:123
-#: include/views/configuration.correlation.edit.php:104
+#: include/views/configuration.correlation.edit.php:105
 #: include/views/configuration.host.discovery.edit.php:568
 msgid "Type of calculation"
 msgstr "Hesaplama türü"
@@ -17360,12 +17361,12 @@ msgstr "Bilinmeyen eylem"
 msgid "Unknown error"
 msgstr "Bilinmeyen hata"
 
-#: include/classes/validators/CFunctionValidator.php:294
+#: include/classes/validators/CFunctionValidator.php:295
 msgid "Unknown function."
 msgstr "Bilinmeyen fonksiyon."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
-#: app/controllers/CControllerPopupTriggerExpr.php:547
+#: app/controllers/CControllerPopupTriggerExpr.php:561
 #: include/triggers.inc.php:1399
 msgid "Unknown host item, no such item in selected host"
 msgstr "Bilinmeyen ana makine öğesi, seçilen ana makinede böyle bir öğe yok"
@@ -17531,7 +17532,7 @@ msgstr "Açık"
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:483
 #: include/views/configuration.application.edit.php:54
-#: include/views/configuration.correlation.edit.php:163
+#: include/views/configuration.correlation.edit.php:164
 #: include/views/configuration.discovery.edit.php:139
 #: include/views/configuration.graph.edit.php:457
 #: include/views/configuration.host.discovery.edit.php:766
@@ -17652,7 +17653,7 @@ msgstr "Öğelerde kullanılır"
 #: app/views/reports.auditlog.list.php:30
 #: app/views/reports.auditlog.list.php:62 httpconf.php:58
 #: include/actions.inc.php:1703 include/actions.inc.php:1757
-#: include/actions.inc.php:1972 include/classes/setup/CSetupWizard.php:245
+#: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:245
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:167
 msgid "User"
 msgstr "Kullanıcı"
@@ -17687,7 +17688,7 @@ msgstr "\"%1$s\" kullanıcısı \"%2$s\" slayt gösterisinin sahibidir."
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "\"%1$s\" kullanıcısı \"%2$s\" eyleminde kullanılıyor."
 
-#: include/actions.inc.php:1972
+#: include/actions.inc.php:1974
 msgid "User action"
 msgstr "Kullanıcı eylemi"
 
@@ -17806,8 +17807,8 @@ msgstr "Kullanıcı grupları"
 msgid "User is not allowed to delete himself."
 msgstr "Kullanıcının kendisini silmesine izin verilmez."
 
-#: include/classes/api/services/CUserMacro.php:532
-#: include/classes/api/services/CUserMacro.php:729
+#: include/classes/api/services/CUserMacro.php:519
+#: include/classes/api/services/CUserMacro.php:716
 #, c-format
 msgid "User macro missing parameters: %1$s"
 msgstr "Kullanıcı makrosunda eksik parametreler: %1$s"
@@ -18590,8 +18591,8 @@ msgstr "\"%1$s\" servisi için olan bağımlılıklar için yanlış alanlar."
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için yanlış alanlar."
 
-#: include/classes/api/services/CUserMacro.php:492
-#: include/classes/api/services/CUserMacro.php:563
+#: include/classes/api/services/CUserMacro.php:479
+#: include/classes/api/services/CUserMacro.php:550
 #, c-format
 msgid "Wrong fields for macro \"%1$s\"."
 msgstr "\"%1$s\" makrosu için yanlış alanlar."
@@ -18686,7 +18687,7 @@ msgid "Y axis MAX value must be greater than Y axis MIN value"
 msgstr ""
 
 #: include/classes/api/services/CGraphGeneral.php:314
-#: include/classes/graphdraw/CLineGraphDraw.php:1874
+#: include/classes/graphdraw/CLineGraphDraw.php:1922
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y ekseni MAKS değeri, Y ekseni MİN değerinden büyük olmalıdır."
 
@@ -18829,9 +18830,9 @@ msgstr ""
 #: include/classes/api/services/CTemplate.php:600
 #: include/classes/api/services/CTemplate.php:1017
 #: include/classes/api/services/CTemplate.php:1123
-#: include/classes/api/services/CUserMacro.php:265
-#: include/classes/api/services/CUserMacro.php:356
-#: include/classes/api/services/CUserMacro.php:451
+#: include/classes/api/services/CUserMacro.php:252
+#: include/classes/api/services/CUserMacro.php:343
+#: include/classes/api/services/CUserMacro.php:438
 msgid "You do not have permission to perform this operation."
 msgstr "Bu işlemi gerçekleştirmek için izniniz yok."
 
@@ -19068,7 +19069,7 @@ msgstr "bir zaman birimi bekleniyor"
 msgid "a user macro is expected"
 msgstr "bir kullanıcı makrosu bekleniyor"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:243
+#: app/controllers/CControllerPopupTriggerExpr.php:257
 msgid "abschange() - Absolute difference between last and previous value"
 msgstr ""
 
@@ -19080,7 +19081,7 @@ msgstr "yalnızca filtrelenmiş verileri etkiler"
 msgid "agent"
 msgstr "aracı"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1399
+#: include/classes/graphdraw/CLineGraphDraw.php:1407
 #: include/classes/html/CSeverity.php:73
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
@@ -19190,19 +19191,19 @@ msgstr ""
 msgid "autoregistration"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1381
-#: include/classes/graphdraw/CLineGraphDraw.php:1403
+#: include/classes/graphdraw/CLineGraphDraw.php:1389
+#: include/classes/graphdraw/CLineGraphDraw.php:1411
 #: include/classes/graphdraw/CPieGraphDraw.php:302 include/graphs.inc.php:80
 #: include/views/js/configuration.graph.edit.js.php:76
 #: include/views/js/configuration.graph.edit.js.php:84
 msgid "avg"
 msgstr "ort"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:248
+#: app/controllers/CControllerPopupTriggerExpr.php:262
 msgid "avg() - Average value of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:389
+#: app/controllers/CControllerPopupTriggerExpr.php:403
 msgid "band() - Bitwise AND of last (most recent) T value and mask"
 msgstr ""
 
@@ -19343,7 +19344,7 @@ msgstr ""
 msgid "cannot update property for templated discovery rule"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:260
+#: app/controllers/CControllerPopupTriggerExpr.php:274
 msgid "change() - Difference between last and previous value"
 msgstr ""
 
@@ -19383,7 +19384,7 @@ msgstr ""
 msgid "count"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:265
+#: app/controllers/CControllerPopupTriggerExpr.php:279
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr ""
 
@@ -19396,15 +19397,15 @@ msgstr "g"
 msgid "d.M"
 msgstr "d.M"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:323
+#: app/controllers/CControllerPopupTriggerExpr.php:337
 msgid "date() - Current date"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:333
+#: app/controllers/CControllerPopupTriggerExpr.php:347
 msgid "dayofmonth() - Day of month"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:328
+#: app/controllers/CControllerPopupTriggerExpr.php:342
 msgid "dayofweek() - Day of week"
 msgstr ""
 
@@ -19421,7 +19422,7 @@ msgstr "gün"
 msgid "default"
 msgstr "öntanımlı"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:254
+#: app/controllers/CControllerPopupTriggerExpr.php:268
 msgid "delta() - Difference between MAX and MIN value of a period T"
 msgstr ""
 
@@ -19447,7 +19448,7 @@ msgstr "azalan"
 msgid "description"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:271
+#: app/controllers/CControllerPopupTriggerExpr.php:285
 msgid "diff() - Difference between last and preceding values (1 - true, 0 - false)"
 msgstr ""
 
@@ -19516,7 +19517,7 @@ msgstr ""
 msgid "first parameter is expected"
 msgstr "ilk parametre bekleniyor"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:395
+#: app/controllers/CControllerPopupTriggerExpr.php:409
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr ""
 
@@ -19524,7 +19525,7 @@ msgstr ""
 msgid "fourth"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:338
+#: app/controllers/CControllerPopupTriggerExpr.php:352
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
@@ -19642,7 +19643,7 @@ msgstr "geçersiz gecikme"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:244
 #: include/classes/graphdraw/CPieGraphDraw.php:169
-#: include/classes/helpers/CSvgGraphHelper.php:374
+#: include/classes/helpers/CSvgGraphHelper.php:376
 msgid "invalid history storage period"
 msgstr "geçersiz geçmiş depolama süresi"
 
@@ -19660,11 +19661,11 @@ msgstr "geçersiz düzenli ifade"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:254
 #: include/classes/graphdraw/CPieGraphDraw.php:179
-#: include/classes/helpers/CSvgGraphHelper.php:386
+#: include/classes/helpers/CSvgGraphHelper.php:388
 msgid "invalid trend storage period"
 msgstr "geçersiz eğilim depolama süresi"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:350
+#: app/controllers/CControllerPopupTriggerExpr.php:364
 msgid "iregexp() - Regular expression V matching last value in period T (non case-sensitive; 1 - match, 0 - no match)"
 msgstr ""
 
@@ -19698,18 +19699,18 @@ msgid "key is empty"
 msgstr "anahtar boş"
 
 #: app/views/popup.maintenance.period.php:120
-#: include/classes/graphdraw/CLineGraphDraw.php:1379
+#: include/classes/graphdraw/CLineGraphDraw.php:1387
 #: include/classes/graphdraw/CPieGraphDraw.php:297 include/graphs.inc.php:88
 #: include/maintenances.inc.php:109
 #: include/views/js/configuration.graph.edit.js.php:78
 msgid "last"
 msgstr "son"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:276
+#: app/controllers/CControllerPopupTriggerExpr.php:290
 msgid "last() - Last (most recent) T value"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1518
+#: include/classes/graphdraw/CLineGraphDraw.php:1526
 msgid "left"
 msgstr "sol"
 
@@ -19717,15 +19718,15 @@ msgstr "sol"
 msgid "list of characters"
 msgstr "karakter listesi"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:356
+#: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "logeventid() - Event ID of last log entry matching regular expression T (1 - match, 0 - no match)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:362
+#: app/controllers/CControllerPopupTriggerExpr.php:376
 msgid "logseverity() - Log severity of the last log entry"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:367
+#: app/controllers/CControllerPopupTriggerExpr.php:381
 msgid "logsource() - Log source of the last log entry matching parameter T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -19743,9 +19744,9 @@ msgctxt "month short"
 msgid "m"
 msgstr "ay"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1017
 #: include/classes/graphdraw/CLineGraphDraw.php:1025
-#: include/classes/graphdraw/CLineGraphDraw.php:1032
+#: include/classes/graphdraw/CLineGraphDraw.php:1033
+#: include/classes/graphdraw/CLineGraphDraw.php:1040
 msgid "m-d"
 msgstr "a-g"
 
@@ -19773,8 +19774,8 @@ msgid "matches"
 msgstr "eşleşmeler"
 
 #: include/classes/api/services/CItemGeneral.php:1388
-#: include/classes/graphdraw/CLineGraphDraw.php:1382
-#: include/classes/graphdraw/CLineGraphDraw.php:1396
+#: include/classes/graphdraw/CLineGraphDraw.php:1390
+#: include/classes/graphdraw/CLineGraphDraw.php:1404
 #: include/classes/graphdraw/CPieGraphDraw.php:293 include/forms.inc.php:1267
 #: include/graphs.inc.php:78
 #: include/views/js/configuration.graph.edit.js.php:77
@@ -19783,7 +19784,7 @@ msgstr "eşleşmeler"
 msgid "max"
 msgstr "maks"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:282
+#: app/controllers/CControllerPopupTriggerExpr.php:296
 msgid "max() - Maximum value for period T"
 msgstr ""
 
@@ -19798,8 +19799,8 @@ msgid "maximum number of dependency levels reached"
 msgstr "maksimum bağımlılık düzeyi sayısına ulaşıldı"
 
 #: include/classes/api/services/CItemGeneral.php:1388
-#: include/classes/graphdraw/CLineGraphDraw.php:1380
-#: include/classes/graphdraw/CLineGraphDraw.php:1393
+#: include/classes/graphdraw/CLineGraphDraw.php:1388
+#: include/classes/graphdraw/CLineGraphDraw.php:1401
 #: include/classes/graphdraw/CPieGraphDraw.php:289 include/forms.inc.php:1266
 #: include/graphs.inc.php:76
 #: include/views/js/configuration.graph.edit.js.php:75
@@ -19808,7 +19809,7 @@ msgstr "maksimum bağımlılık düzeyi sayısına ulaşıldı"
 msgid "min"
 msgstr "min"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:288
+#: app/controllers/CControllerPopupTriggerExpr.php:302
 msgid "min() - Minimum value for period T"
 msgstr ""
 
@@ -19871,13 +19872,13 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "yeni"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1476
+#: include/classes/graphdraw/CLineGraphDraw.php:1484
 #: include/classes/graphdraw/CPieGraphDraw.php:323
 msgid "no data"
 msgstr "veri yok"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:383
-msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
+#: app/controllers/CControllerPopupTriggerExpr.php:397
+msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:1083 include/graphs.inc.php:74
@@ -19897,7 +19898,7 @@ msgstr "içinde değil"
 msgid "not selected"
 msgstr "seçilen yok"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:373
+#: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "now() - Number of seconds since the Epoch"
 msgstr ""
 
@@ -19970,11 +19971,11 @@ msgstr "çıktı"
 msgid "pattern"
 msgstr "desen"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:294
+#: app/controllers/CControllerPopupTriggerExpr.php:308
 msgid "percentile() - Percentile P of a period T"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:300
+#: app/controllers/CControllerPopupTriggerExpr.php:314
 msgid "prev() - Previous value"
 msgstr ""
 
@@ -19991,7 +19992,7 @@ msgstr ""
 msgid "refreshed every %1$s sec."
 msgstr "her %1$s saniyede bir yenilendi."
 
-#: app/controllers/CControllerPopupTriggerExpr.php:344
+#: app/controllers/CControllerPopupTriggerExpr.php:358
 msgid "regexp() - Regular expression V matching last value in period T (1 - match, 0 - no match)"
 msgstr ""
 
@@ -20004,7 +20005,7 @@ msgstr "düzenli ifade"
 msgid "replacement"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1518
+#: include/classes/graphdraw/CLineGraphDraw.php:1526
 msgid "right"
 msgstr "sağ"
 
@@ -20097,11 +20098,11 @@ msgstr "simge haritalarını göster"
 msgid "show value mappings"
 msgstr "değer eşlemelerini göster"
 
-#: app/controllers/CControllerPopupTriggerExpr.php:305
+#: app/controllers/CControllerPopupTriggerExpr.php:319
 msgid "str() - Find string V in last (most recent) value (1 - found, 0 - not found)"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:311
+#: app/controllers/CControllerPopupTriggerExpr.php:325
 msgid "strlen() - Length of last (most recent) T value in characters"
 msgstr ""
 
@@ -20109,7 +20110,7 @@ msgstr ""
 msgid "sum"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:317
+#: app/controllers/CControllerPopupTriggerExpr.php:331
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
@@ -20184,11 +20185,11 @@ msgstr ""
 msgid "time shift"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:378
+#: app/controllers/CControllerPopupTriggerExpr.php:392
 msgid "time() - Current time"
 msgstr ""
 
-#: app/controllers/CControllerPopupTriggerExpr.php:401
+#: app/controllers/CControllerPopupTriggerExpr.php:415
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr ""
 
