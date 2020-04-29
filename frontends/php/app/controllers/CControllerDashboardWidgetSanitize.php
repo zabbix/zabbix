@@ -51,49 +51,16 @@ class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
-		$sanitizable_types = [ZBX_WIDGET_FIELD_TYPE_GROUP, ZBX_WIDGET_FIELD_TYPE_HOST, ZBX_WIDGET_FIELD_TYPE_ITEM,
-			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE, ZBX_WIDGET_FIELD_TYPE_GRAPH, ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
-			ZBX_WIDGET_FIELD_TYPE_MAP
-		];
-
 		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', '{}'));
-		$resource_fields = [];
+		$widget_fields = $this->unsetInaccessibleFields([['fields' => $form->fieldsToApi()]]);
+
 		$output = [
 			'fields' => []
 		];
 
-		foreach ($form->getFields() as $field) {
-			$value = $field->getValue();
-			$is_value_set = ($value !== null && $value != $field->getDefault());
-
-			if (!$is_value_set) {
-				continue;
-			}
-			elseif (in_array($field->getSaveType(), $sanitizable_types)) {
-				// Resource fields are prepared for sanitization.
-				if (!is_array($value)) {
-					$value = [$value];
-				}
-
-				foreach ($value as $val) {
-					$resource_fields[] = [
-						'type' => $field->getSaveType(),
-						'name' => $field->getName(),
-						'value' => $val
-					];
-				}
-			}
-			else {
-				// Other fields are returned unchanged.
-				$output['fields'][$field->getName()] = $value;
-			}
-		}
-
-		if ($resource_fields) {
-			$resource_fields = $this->unsetInaccessibleFields([['fields' => $resource_fields]]);
-
-			foreach ($resource_fields[0]['fields'] as $field) {
-				$output['fields'][$field['name']][] = $field['value'];
+		foreach ($widget_fields[0]['fields'] as $field) {
+			if ($field['value']) {
+				$output['fields'][$field['name']] = $field['value'];
 			}
 		}
 
