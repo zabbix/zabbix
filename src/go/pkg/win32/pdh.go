@@ -238,15 +238,21 @@ func PdhEnumObjectItems(objectName string) (instances []string, err error) {
 	var instptr uintptr
 	var instbuf []uint16
 
-	if instanceListSize != 0 {
-		instbuf = make([]uint16, instanceListSize)
-		instptr = uintptr(unsafe.Pointer(&instbuf[0]))
-	}
-	ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0, ptrNameUTF16, uintptr(unsafe.Pointer(&counterbuf[0])),
-		uintptr(unsafe.Pointer(&counterListSize)), instptr, uintptr(unsafe.Pointer(&instanceListSize)),
-		uintptr(PERF_DETAIL_WIZARD), 0)
-	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
-		return nil, newPdhError(ret)
+	for {
+		if instanceListSize != 0 {
+			instbuf = make([]uint16, instanceListSize)
+			instptr = uintptr(unsafe.Pointer(&instbuf[0]))
+		}
+		ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0, ptrNameUTF16, uintptr(unsafe.Pointer(&counterbuf[0])),
+			uintptr(unsafe.Pointer(&counterListSize)), instptr, uintptr(unsafe.Pointer(&instanceListSize)),
+			uintptr(PERF_DETAIL_WIZARD), 0)
+		if ret == PDH_MORE_DATA {
+			continue
+		}
+		if syscall.Errno(ret) != windows.ERROR_SUCCESS {
+			return nil, newPdhError(ret)
+		}
+		break
 	}
 
 	return utf16ToUniqueStringSlice(instbuf), nil

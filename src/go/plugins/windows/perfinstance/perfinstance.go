@@ -38,9 +38,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "perf_instance.get":
 		name = params[0]
 	case "perf_instance_en.get":
-		name, err = getLocalName(params[0])
-		if err != nil {
-			return
+		if name = getLocalName(params[0]); name == "" {
+			if err = pdh.LocateObjectsAndDefaultCounters(false); err != nil {
+				return nil, fmt.Errorf("Failed to get instance object English names: %s.", err.Error())
+			}
+			if name = getLocalName(params[0]); name == "" {
+				return nil, errors.New("Unsupported metric.")
+			}
 		}
 	default:
 		return nil, plugin.UnsupportedMetricError
@@ -48,7 +52,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	var instances []string
 	if instances, err = win32.PdhEnumObjectItems(name); err != nil {
-		return nil, fmt.Errorf("Failed to get performance instance object: %s.", err.Error())
+		return nil, fmt.Errorf("Failed to get performance instance objects: %s.", err.Error())
 	}
 
 	resp := []interface{}{}
@@ -90,12 +94,12 @@ func (p *Plugin) refreshObjects() error {
 	return nil
 }
 
-func getLocalName(engName string) (string, error) {
+func getLocalName(engName string) string {
 	for _, obj := range pdh.Objects {
 		if obj.EngName == engName {
-			return obj.Name, nil
+			return obj.Name
 		}
 	}
 
-	return "", errors.New("Unsupported English object name.")
+	return ""
 }

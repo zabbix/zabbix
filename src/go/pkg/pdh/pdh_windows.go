@@ -22,6 +22,7 @@ package pdh
 import (
 	"fmt"
 	"strconv"
+	"sync"
 	"syscall"
 	"unsafe"
 
@@ -32,6 +33,7 @@ import (
 )
 
 var Objects map[int]*Object
+var mux sync.Mutex
 
 type Object struct {
 	Idx     int
@@ -77,9 +79,8 @@ type CounterPathElements struct {
 	CounterName    string
 }
 
-func locateObjectsAndDefaultCounters() (err error) {
+func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 	var size uint32
-	Objects = make(map[int]*Object)
 	counter := windows.StringToUTF16Ptr("Counter")
 	err = windows.RegQueryValueEx(HKEY_PERFORMANCE_TEXT, counter, nil, nil, nil, &size)
 	if err != nil {
@@ -96,6 +97,9 @@ func locateObjectsAndDefaultCounters() (err error) {
 		return err
 	}
 
+	Objects = make(map[int]*Object)
+	mux.Lock()
+	defer mux.Unlock()
 	for _, name := range locNames {
 		idx, err := win32.PdhLookupPerfIndexByName(name)
 		if err != nil {
@@ -117,11 +121,14 @@ func locateObjectsAndDefaultCounters() (err error) {
 
 		name := windows.UTF16ToString(wcharName)
 		idx := windows.UTF16ToString(wcharIndex)
-		for i := range sysCounters {
-			if sysCounters[i].name == name {
-				sysCounters[i].index = idx
+		if resetDefCounters {
+			for i := range sysCounters {
+				if sysCounters[i].name == name {
+					sysCounters[i].index = idx
+				}
 			}
 		}
+
 		i, err := strconv.Atoi(idx)
 		if err != nil {
 			return err
@@ -249,7 +256,7 @@ func MakePath(elements *CounterPathElements) (path string, err error) {
 }
 
 func init() {
-	if err := locateObjectsAndDefaultCounters(); err != nil {
+	if err := LocateObjectsAndDefaultCounters(true); err != nil {
 		panic(err.Error())
 	}
 }
