@@ -2661,9 +2661,10 @@
 					placeholder = $obj.data('dashboardGrid').new_widget_placeholder,
 					options = {
 						position: {
-							of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
+							of: placeholder.container,
 							my: ['left', 'top'],
-							at: ['right', 'bottom']
+							at: ['right', 'bottom'],
+							collision: 'fit'
 						},
 						closeCallback: function() {
 							data['pos-action'] = '';
