@@ -232,7 +232,7 @@
                 }&#13;
             };&#13;
 &#13;
-        result = OTRS.request('put', OTRS.entrypoint + OTRS.params.ticket_id, data);&#13;
+        result = OTRS.request('put', OTRS.entrypoint + encodeURIComponent(OTRS.params.ticket_id), data);&#13;
 &#13;
         if (typeof result.response !== 'object'&#13;
             || typeof result.response.TicketID === 'undefined'&#13;
