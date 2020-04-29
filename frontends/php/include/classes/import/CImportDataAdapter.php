@@ -553,12 +553,15 @@ class CImportDataAdapter {
 		if ($discovery_rule['overrides']) {
 			foreach ($discovery_rule['overrides'] as &$override) {
 				foreach ($override['operations'] as &$operation) {
-					if (array_key_exists('status', $operation) && $operation['status'] !== '') {
-						$operation['opstatus']['status'] = $operation['status'];
+					if (array_key_exists('discover', $operation) && $operation['discover'] !== '') {
+						$operation['opdiscover']['discover'] = $operation['discover'];
 					}
 
 					switch ($operation['operationobject']) {
 						case OPERATION_OBJECT_ITEM_PROTOTYPE:
+							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
+								$operation['opstatus']['status'] = $operation['status'];
+							}
 							if (array_key_exists('delay', $operation) && $operation['delay'] !== '') {
 								$operation['opperiod']['delay'] = $operation['delay'];
 							}
@@ -571,6 +574,9 @@ class CImportDataAdapter {
 							break;
 
 						case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
+								$operation['opstatus']['status'] = $operation['status'];
+							}
 							if (array_key_exists('severity', $operation) && $operation['severity'] !== '') {
 								$operation['opseverity']['severity'] = $operation['severity'];
 							}
@@ -583,6 +589,9 @@ class CImportDataAdapter {
 							break;
 
 						case OPERATION_OBJECT_HOST_PROTOTYPE:
+							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
+								$operation['opstatus']['status'] = $operation['status'];
+							}
 							if (array_key_exists('templates', $operation)) {
 								$operation['optemplate'] = [];
 								foreach ($operation['templates'] as $template) {
@@ -595,8 +604,8 @@ class CImportDataAdapter {
 							break;
 					}
 
-					unset($operation['status'], $operation['delay'], $operation['history'], $operation['trends'],
-						$operation['severity'], $operation['tags'], $operation['templates'],
+					unset($operation['status'], $operation['discover'], $operation['delay'], $operation['history'],
+						$operation['trends'], $operation['severity'], $operation['tags'], $operation['templates'],
 						$operation['inventory_mode']
 					);
 				}
