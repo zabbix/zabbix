@@ -102,7 +102,7 @@
 					'17': ['mode', 'resourcetype', 'pageFile', 'page'],
 					'21': ['mode', 'resourcetype', 'profileIdx2'],
 					'22': ['mode', 'resourcetype', 'data'],
-					'23': ['mode', 'groupid', 'hostid', 'resourcetype', 'data', 'page'],
+					'23': ['mode', 'resourcetype', 'data', 'page'],
 					'24': ['mode', 'resourcetype', 'data', 'page'],
 					'default': ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
 						'screenitemid'
@@ -196,11 +196,6 @@
 					}
 					break;
 
-				// SCREEN_RESOURCE_CHART
-				case 18:
-					self.refreshImg(id);
-					break;
-
 				// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 				// SCREEN_RESOURCE_LLD_GRAPH
 				case 20:
@@ -276,9 +271,9 @@
 							screen.timestamp = request_start;
 							screen.isRefreshing = false;
 
-							$('main .msg-bad').remove();
+							$('.wrapper .msg-bad').remove();
 							$('#flickerfreescreen_' + id).replaceWith(html);
-							$('main .msg-bad').insertBefore('main > :first-child');
+							$('.wrapper .msg-bad').insertBefore('.wrapper main');
 
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}

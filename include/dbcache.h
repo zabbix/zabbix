@@ -89,6 +89,7 @@ typedef struct
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	bulk;
+	unsigned char	snmp_version;
 	unsigned char	useip;
 	char		ip_orig[INTERFACE_IP_LEN_MAX];
 	char		dns_orig[INTERFACE_DNS_LEN_MAX];
@@ -146,6 +147,7 @@ typedef struct
 	zbx_uint64_t		lastlogsize;
 	zbx_uint64_t		valuemapid;
 	unsigned char		type;
+	unsigned char		snmp_version;
 	unsigned char		value_type;
 	unsigned char		state;
 	unsigned char		snmpv3_securitylevel;
@@ -348,6 +350,15 @@ typedef struct
 }
 zbx_config_hk_t;
 
+typedef struct
+{
+	char		*extension;
+	unsigned char	history_compression_status;
+	unsigned char	history_compression_availability;
+	int		history_compress_older;
+}
+zbx_config_db_t;
+
 /* global configuration data (loaded from config table) */
 typedef struct
 {
@@ -360,7 +371,9 @@ typedef struct
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
-	char		*db_extension;
+
+	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
+	zbx_config_db_t	db;
 
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
@@ -726,6 +739,14 @@ size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *p
 void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
 		unsigned char *psk_buf, size_t psk_buf_len);
 
+#define ZBX_MACRO_ENV_SECURE	0
+#define ZBX_MACRO_ENV_NONSECURE	1
+
+#define ZBX_MACRO_VALUE_TEXT	0
+#define ZBX_MACRO_VALUE_SECRET	1
+
+#define ZBX_MACRO_SECRET_MASK	"******"
+
 void	DCget_user_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 char	*DCexpression_expand_user_macros(const char *expression);
 
@@ -760,6 +781,10 @@ int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hashset_t *hosts);
+
+int	DCget_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
+int	DCget_proxy_delay(zbx_uint64_t hostid, int *delay);
+int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
 
 unsigned int	DCget_internal_action_count(void);
 
@@ -858,6 +883,7 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 
 void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff);
 void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess);
+void	zbx_dc_proxy_update_nodata(zbx_vector_uint64_pair_t *subscriptions);
 
 typedef struct
 {
@@ -951,5 +977,9 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 
 void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);
+
+unsigned char	zbx_dc_set_macro_env(unsigned char env);
+
+const char	*zbx_dc_get_instanceid(void);
 
 #endif

@@ -41,6 +41,7 @@ import (
 )
 
 const hostMetadataLen = 255
+const hostInterfaceLen = 255
 const defaultAgentPort = 10050
 
 type Connector struct {
@@ -49,7 +50,7 @@ type Connector struct {
 	address     string
 	localAddr   net.Addr
 	lastError   error
-	resultCache *resultcache.ResultCache
+	resultCache resultcache.ResultCache
 	taskManager scheduler.Scheduler
 	options     *agent.AgentOptions
 	tlsConfig   *tls.Config
@@ -123,39 +124,24 @@ func (c *Connector) refreshActiveChecks() {
 	var err error
 
 	a := activeChecksRequest{
-		Request:       "active checks",
-		Host:          c.options.Hostname,
-		Version:       version.Short(),
-		HostInterface: c.options.HostInterface,
+		Request: "active checks",
+		Host:    c.options.Hostname,
+		Version: version.Short(),
 	}
 
 	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
 
-	if len(c.options.HostMetadata) > 0 {
-		if len(c.options.HostMetadataItem) > 0 {
-			log.Warningf("both \"HostMetadata\" and \"HostMetadataItem\" configuration parameter defined, using \"HostMetadata\"")
-		}
+	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostInterface",
+		c.options.HostInterface, c.options.HostInterfaceItem, hostInterfaceLen, agent.LocalChecksClientID); err != nil {
+		log.Errf("cannot get host interface: %s", err)
+		return
+	}
 
-		a.HostMetadata = c.options.HostMetadata
-	} else if len(c.options.HostMetadataItem) > 0 {
-		a.HostMetadata, err = c.taskManager.PerformTask(c.options.HostMetadataItem, time.Duration(c.options.Timeout)*time.Second, agent.LocalChecksClientID)
-		if err != nil {
-			log.Errf("cannot get host metadata: %s", err)
-			return
-		}
-
-		if !utf8.ValidString(a.HostMetadata) {
-			log.Errf("cannot get host metadata: value is not an UTF-8 string")
-			return
-		}
-
-		var n int
-
-		if a.HostMetadata, n = agent.CutAfterN(a.HostMetadata, hostMetadataLen); n != hostMetadataLen {
-			log.Warningf("the returned value of \"%s\" item specified by \"HostMetadataItem\" configuration parameter"+
-				" is too long, using first %d characters", c.options.HostMetadataItem, n)
-		}
+	if a.HostMetadata, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostMetadata",
+		c.options.HostMetadata, c.options.HostMetadataItem, hostMetadataLen, agent.LocalChecksClientID); err != nil {
+		log.Errf("cannot get host metadata: %s", err)
+		return
 	}
 
 	if len(c.options.ListenIP) > 0 {
@@ -206,7 +192,7 @@ func (c *Connector) refreshActiveChecks() {
 		} else {
 			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address)
 		}
-		c.taskManager.UpdateTasks(c.clientID, c.resultCache, 0, []*glexpr.Expression{}, []*plugin.Request{})
+		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), 0, []*glexpr.Expression{}, []*plugin.Request{})
 		return
 	}
 
@@ -298,7 +284,7 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Expressions, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), *response.RefreshUnsupported, response.Expressions, response.Data)
 }
 
 func (c *Connector) run() {
@@ -315,7 +301,7 @@ run:
 		case <-ticker.C:
 			now := time.Now()
 			if now.Sub(lastFlush) >= time.Second*time.Duration(c.options.BufferSend) {
-				c.resultCache.Flush()
+				c.resultCache.Upload(nil)
 				lastFlush = now
 			}
 			if now.Sub(lastRefresh) > time.Second*time.Duration(c.options.RefreshActiveChecks) {
@@ -361,7 +347,7 @@ func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOp
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
 	}
-	c.resultCache = resultcache.NewActive(c.clientID, ac)
+	c.resultCache = resultcache.New(&agent.Options, c.clientID, ac)
 
 	return c, nil
 }
@@ -382,4 +368,32 @@ func (c *Connector) StopCache() {
 
 func (c *Connector) UpdateOptions() {
 	c.input <- &agent.Options
+}
+
+func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, name, value, item string, length int, clientID uint64) (string, error) {
+	if len(item) > 0 {
+		if len(value) > 0 {
+			log.Warningf("both \"%s\" and \"%sItem\" configuration parameter defined, using \"%s\"", name, name, name)
+			return value, nil
+		}
+
+		var err error
+		value, err = taskManager.PerformTask(item, timeout, clientID)
+		if err != nil {
+			return "", err
+		}
+
+		if !utf8.ValidString(value) {
+			return "", fmt.Errorf("value is not an UTF-8 string")
+		}
+
+		if len(value) > length {
+			log.Warningf("the returned value of \"%s\" item specified by \"%sItem\" configuration parameter"+
+				" is too long, using first %d characters", item, name, length)
+
+			return agent.CutAfterN(value, length), nil
+		}
+	}
+
+	return value, nil
 }

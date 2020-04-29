@@ -421,6 +421,7 @@ $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 ]));
 
 // macros
+$tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 $divTabs->addTab('macroTab', _('Macros'),
 	(new CFormList('macrosFormList'))
 		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
@@ -428,9 +429,8 @@ $divTabs->addTab('macroTab', _('Macros'),
 			->addValue(_('Inherited and template macros'), 1)
 			->setModern(true)
 		)
-		->addRow(null, new CPartial('hostmacros.list.html', [
+		->addRow(null, new CPartial($tmpl, [
 			'macros' => $data['macros'],
-			'show_inherited_macros' => $data['show_inherited_macros'],
 			'readonly' => $data['readonly']
 		]), 'macros_container')
 );
@@ -442,21 +442,21 @@ if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').url_param('groupid')),
+			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid')),
 			new CButtonQMessage(
 				'delete_and_clear',
 				_('Delete and clear'),
 				_('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
-				url_param('form').url_param('templateid').url_param('groupid')
+				url_param('form').url_param('templateid')
 			),
-			new CButtonCancel(url_param('groupid'))
+			new CButtonCancel()
 		]
 	));
 }
 else {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('groupid'))]
+		[new CButtonCancel()]
 	));
 }
 

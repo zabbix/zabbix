@@ -340,7 +340,7 @@ function add_slideshow($data) {
 	));
 
 	if ($db_slideshow) {
-		error(_s('Slide show "%s" already exists.', $data['name']));
+		error(_s('Slide show "%1$s" already exists.', $data['name']));
 
 		return false;
 	}

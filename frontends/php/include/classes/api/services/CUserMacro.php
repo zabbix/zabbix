@@ -166,22 +166,6 @@ class CUserMacro extends CApiService {
 			$sqlParts['where']['hht'] = 'hm.hostid=ht.hostid';
 		}
 
-		// search
-		if (is_array($options['search'])) {
-			zbx_db_search('hostmacro hm', $options, $sqlParts);
-			zbx_db_search('globalmacro gm', $options, $sqlPartsGlobal);
-		}
-
-		// filter
-		if (is_array($options['filter'])) {
-			if (isset($options['filter']['macro'])) {
-				zbx_value2array($options['filter']['macro']);
-
-				$sqlParts['where'][] = dbConditionString('hm.macro', $options['filter']['macro']);
-				$sqlPartsGlobal['where'][] = dbConditionString('gm.macro', $options['filter']['macro']);
-			}
-		}
-
 		// sorting
 		$sqlParts = $this->applyQuerySortOptions('hostmacro', 'hm', $options, $sqlParts);
 		$sqlPartsGlobal = $this->applyQuerySortOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
@@ -194,6 +178,7 @@ class CUserMacro extends CApiService {
 
 		// init GLOBALS
 		if (!is_null($options['globalmacro'])) {
+			$sqlPartsGlobal = $this->applyQueryFilterOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
 			$sqlPartsGlobal = $this->applyQueryOutputOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
 			$res = DBselect($this->createSelectQueryFromParts($sqlPartsGlobal), $sqlPartsGlobal['limit']);
 			while ($macro = DBfetch($res)) {
@@ -207,6 +192,7 @@ class CUserMacro extends CApiService {
 		}
 		// init HOSTS
 		else {
+			$sqlParts = $this->applyQueryFilterOptions('hostmacro', 'hm', $options, $sqlParts);
 			$sqlParts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sqlParts);
 			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 			while ($macro = DBfetch($res)) {
@@ -225,7 +211,7 @@ class CUserMacro extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'type'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -269,6 +255,7 @@ class CUserMacro extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'macro')],
 			'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'value')],
+			'type' =>			['type' => API_INT32, 'in' => ZBX_MACRO_TYPE_TEXT.','.ZBX_MACRO_TYPE_SECRET],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacros, '/', $error)) {
@@ -294,11 +281,16 @@ class CUserMacro extends CApiService {
 			$upd_globalmacro = [];
 
 			// strings
-			foreach (['macro', 'value', 'description'] as $field_name) {
+			foreach (['macro', 'value', 'description', 'type'] as $field_name) {
 				if (array_key_exists($field_name, $globalmacro)
 						&& $globalmacro[$field_name] !== $db_globalmacro[$field_name]) {
 					$upd_globalmacro[$field_name] = $globalmacro[$field_name];
 				}
+			}
+
+			if (array_key_exists('type', $globalmacro) && $globalmacro['type'] != $db_globalmacro['type']
+					&& $db_globalmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				$upd_globalmacro += ['value' => ''];
 			}
 
 			if ($upd_globalmacro) {
@@ -355,6 +347,7 @@ class CUserMacro extends CApiService {
 			'globalmacroid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('globalmacro', 'macro')],
 			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'value')],
+			'type' =>			['type' => API_INT32, 'in' => ZBX_MACRO_TYPE_TEXT.','.ZBX_MACRO_TYPE_SECRET],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacros, '/', $error)) {
@@ -362,7 +355,7 @@ class CUserMacro extends CApiService {
 		}
 
 		$db_globalmacros = DB::select('globalmacro', [
-			'output' => ['globalmacroid', 'macro', 'value', 'description'],
+			'output' => ['globalmacroid', 'macro', 'value', 'description', 'type'],
 			'globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid'),
 			'preservekeys' => true
 		]);
@@ -484,6 +477,7 @@ class CUserMacro extends CApiService {
 			$this->checkMacro($hostmacro);
 			$this->checkUnsupportedFields('hostmacro', $hostmacro,
 				_s('Wrong fields for macro "%1$s".', $hostmacro['macro']));
+			$this->checkMacroType($hostmacro);
 		}
 
 		$this->checkDuplicateMacros($hostmacros);
@@ -555,6 +549,7 @@ class CUserMacro extends CApiService {
 			$this->checkUnsupportedFields('hostmacro', $hostmacro,
 				_s('Wrong fields for macro "%1$s".', $hostmacro['macro'])
 			);
+			$this->checkMacroType($hostmacro);
 		}
 
 		$this->checkDuplicateMacros($hostmacros);
@@ -573,9 +568,21 @@ class CUserMacro extends CApiService {
 
 		$this->validateUpdate($hostmacros);
 
+		$db_macros = DB::select('hostmacro', [
+			'output' => ['type'],
+			'filter' => ['hostmacroid' => array_column($hostmacros, 'hostmacroid')],
+			'preservekeys' => true
+		]);
 		$data = [];
 
 		foreach ($hostmacros as $macro) {
+			$db_macro = $db_macros[$macro['hostmacroid']];
+
+			if (array_key_exists('type', $macro) && $macro['type'] != $db_macro['type']
+					&& $db_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				$macro += ['value' => ''];
+			}
+
 			$hostmacroid = $macro['hostmacroid'];
 			unset($macro['hostmacroid']);
 
@@ -587,7 +594,7 @@ class CUserMacro extends CApiService {
 
 		DB::update('hostmacro', $data);
 
-		return ['hostmacroids' => zbx_objectValues($hostmacros, 'hostmacroid')];
+		return ['hostmacroids' => array_column($hostmacros, 'hostmacroid')];
 	}
 
 	/**
@@ -720,6 +727,18 @@ class CUserMacro extends CApiService {
 	}
 
 	/**
+	 * Validate the "type" field.
+	 *
+	 * @param array $macro
+	 */
+	protected function checkMacroType(array $macro) {
+		if (array_key_exists('type', $macro) && $macro['type'] != ZBX_MACRO_TYPE_TEXT
+				&& $macro['type'] != ZBX_MACRO_TYPE_SECRET) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid type for macro "%1$s".', $macro['macro']));
+		}
+	}
+
+	/**
 	 * Validates the "hostid" field.
 	 *
 	 * @param array $hostmacro
@@ -750,6 +769,9 @@ class CUserMacro extends CApiService {
 			$count = API::Host()->get([
 				'countOutput' => true,
 				'hostids' => $hostids,
+				'filter' => [
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				],
 				'editable' => true
 			]);
 
@@ -760,6 +782,19 @@ class CUserMacro extends CApiService {
 			$count += API::Template()->get([
 				'countOutput' => true,
 				'templateids' => $hostids,
+				'filter' => [
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				],
+				'editable' => true
+			]);
+
+			if ($count == count($hostids)) {
+				return;
+			}
+
+			$count += API::HostPrototype()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
 				'editable' => true
 			]);
 
@@ -816,7 +851,7 @@ class CUserMacro extends CApiService {
 	 * @param array $hostmacros
 	 * @param int $hostmacros[]['hostmacroid']
 	 * @param int $hostmacros[]['hostid']
-	 * @paramt string $hostmacros['macro']
+	 * @param string $hostmacros['macro']
 	 *
 	 * @throws APIException if any of the given macros already exist.
 	 */
@@ -915,6 +950,11 @@ class CUserMacro extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// Added type to query because it required to check macro is secret or not.
+		if (!$this->outputIsRequested('type', $options['output'])) {
+			$options['output'][] = 'type';
+		}
+
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['output'] != API_OUTPUT_COUNT && $options['globalmacro'] === null) {
@@ -924,6 +964,47 @@ class CUserMacro extends CApiService {
 		}
 
 		return $sqlParts;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function applyQueryFilterOptions($table, $alias, array $options, $sql_parts) {
+		if (is_array($options['search'])) {
+			// Do not allow to search by value for macro of type ZBX_MACRO_TYPE_SECRET.
+			if (array_key_exists('value', $options['search'])) {
+				$sql_parts['where']['search'] = $alias.'.type!='.ZBX_MACRO_TYPE_SECRET;
+				zbx_db_search($table.' '.$alias, [
+						'searchByAny' => false,
+						'search' => ['value' => $options['search']['value']]
+					] + $options, $sql_parts
+				);
+				unset($options['search']['value']);
+			}
+
+			if ($options['search']) {
+				zbx_db_search($table.' '.$alias, $options, $sql_parts);
+			}
+		}
+
+		if (is_array($options['filter'])) {
+			// Do not allow to filter by value for macro of type ZBX_MACRO_TYPE_SECRET.
+			if (array_key_exists('value', $options['filter'])) {
+				$sql_parts['where']['filter'] = $alias.'.type!='.ZBX_MACRO_TYPE_SECRET;
+				$this->dbFilter($table.' '.$alias, [
+						'searchByAny' => false,
+						'filter' => ['value' => $options['filter']['value']]
+					] + $options, $sql_parts
+				);
+				unset($options['filter']['value']);
+			}
+
+			if ($options['filter']) {
+				$this->dbFilter($table.' '.$alias, $options, $sql_parts);
+			}
+		}
+
+		return $sql_parts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -980,5 +1061,16 @@ class CUserMacro extends CApiService {
 		}
 
 		return $result;
+	}
+
+	protected function unsetExtraFields(array $objects, array $fields, $output) {
+		foreach ($objects as &$object) {
+			if ($object['type'] == ZBX_MACRO_TYPE_SECRET) {
+				unset($object['value']);
+			}
+		}
+		unset($object);
+
+		return parent::unsetExtraFields($objects, $fields, $output);
 	}
 }

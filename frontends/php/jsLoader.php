@@ -64,10 +64,13 @@ $availableJScripts = [
 	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
 	'textareaflexible.js' => '',
+	'inputsecret.js' => '',
+	'macrovalue.js' => '',
 	// vendors
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
 	// classes
+	'class.base-component.js' => '',
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cclock.js' => '',
@@ -75,6 +78,8 @@ $availableJScripts = [
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
 	'class.localstorage.js' => '',
+	'class.menu.js' => '',
+	'class.menu-item.js' => '',
 	'class.notifications.js' => '',
 	'class.notification.js' => '',
 	'class.notification.collection.js' => '',
@@ -93,6 +98,8 @@ $availableJScripts = [
 	'class.overlay.js' => '',
 	'class.cverticalaccordion.js' => '',
 	'class.mapWidget.js' => '',
+	'class.scrollable.js' => '',
+	'class.sidebar.js' => '',
 	'class.svg.canvas.js' => 'vector/',
 	'class.svg.map.js' => 'vector/',
 	'class.cviewswitcher.js' => '',
@@ -276,8 +283,9 @@ $tranStrings = [
 		'Go to' => _('Go to'),
 		'Graphs' => _('Graphs'),
 		'History' => _('History'),
-		'Host inventory' => _('Host inventory'),
-		'Host screens' => _('Host screens'),
+		'Host' => _('Host'),
+		'Inventory' => _('Inventory'),
+		'Screens' => _('Screens'),
 		'Latest data' => _('Latest data'),
 		'Latest values' => _('Latest values'),
 		'Last hour graph' => _('Last hour graph'),
@@ -291,6 +299,7 @@ $tranStrings = [
 		'S_TRIGGER' => _('Trigger'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
+		'Web' => _('Web'),
 		'No refresh' => _('No refresh'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
@@ -329,6 +338,9 @@ $tranStrings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel')
+	],
+	'macrovalue.js' => [
+		'Set new value' => _('Set new value')
 	]
 ];
 
@@ -339,15 +351,20 @@ if (empty($_GET['files'])) {
 		'jquery.js',
 		'jquery-ui.js',
 		'common.js',
+		'class.base-component.js',
 		'class.cdebug.js',
 		'class.overlaycollection.js',
 		'class.overlay.js',
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',
+		'class.menu.js',
+		'class.menu-item.js',
 		'class.rpc.js',
 		'class.bbcode.js',
 		'class.csuggest.js',
+		'class.scrollable.js',
+		'class.sidebar.js',
 		'class.template.js',
 		'main.js',
 		'chkbxrange.js',

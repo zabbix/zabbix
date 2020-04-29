@@ -87,9 +87,9 @@ if ($data['action']['filter']['conditions']) {
 		$condition_table->addRow(
 			[
 				$labelSpan,
-				getConditionDescription($condition['conditiontype'], $condition['operator'],
+				(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
 					$actionConditionStringValues[0][$cIdx], $condition['value2']
-				),
+				)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('javascript: removeCondition('.$i.');')
@@ -229,7 +229,7 @@ if ($data['action']['operations']) {
 			$esc_delay_txt = ($delays[$operation['esc_step_from']] === null)
 				? _('Unknown')
 				: ($delays[$operation['esc_step_from']] != 0
-					? convert_units(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
+					? convertUnits(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
 					: _('Immediately')
 				);
 

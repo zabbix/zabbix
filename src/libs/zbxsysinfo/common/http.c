@@ -169,7 +169,8 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &page)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADER, 1L)) ||
 			(NULL != CONFIG_SOURCE_IP &&
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP))))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP))) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, (long)CONFIG_TIMEOUT)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
 		goto out;
@@ -480,8 +481,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL,
-			*ptr = NULL, *str, *newline, *regexp, *length_str;
+	char		*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL, *regexp, *length_str;
 	const char	*output;
 	int		length, ret;
 
@@ -505,7 +505,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	output = get_rparam(request, 5);
 
 	if (NULL == length_str || '\0' == *length_str)
-		length = MAX_BUFFER_LEN - 1;
+		length = ZBX_MAX_UINT31_1;
 	else if (FAIL == is_uint31_1(length_str, &length))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
@@ -518,8 +518,12 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_OK == (ret = get_http_page(hostname, path_str, port_str, &buffer, &error)))
 	{
+		char	*ptr = NULL, *str;
+
 		for (str = buffer; ;)
 		{
+			char	*newline;
+
 			if (NULL != (newline = strchr(str, '\n')))
 			{
 				if (str != newline && '\r' == newline[-1])
@@ -538,7 +542,12 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 
 		if (NULL != ptr)
+		{
+			if ((size_t)length < zbx_strlen_utf8(ptr))
+				ptr[zbx_strlen_utf8_nchars(ptr, length)] = '\0';
+
 			SET_STR_RESULT(result, ptr);
+		}
 		else
 			SET_STR_RESULT(result, zbx_strdup(NULL, ""));
 

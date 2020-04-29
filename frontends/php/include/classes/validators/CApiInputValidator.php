@@ -121,6 +121,9 @@ class CApiInputValidator {
 			case API_PSK:
 				return self::validatePSK($rule, $data, $path, $error);
 
+			case API_SORTORDER:
+				return self::validateSortOrder($rule, $data, $path, $error);
+
 			case API_IDS:
 				return self::validateIds($rule, $data, $path, $error);
 
@@ -198,6 +201,7 @@ class CApiInputValidator {
 			case API_FLAG:
 			case API_OUTPUT:
 			case API_PSK:
+			case API_SORTORDER:
 			case API_HG_NAME:
 			case API_H_NAME:
 			case API_NUMERIC:
@@ -437,12 +441,12 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ((!is_int($data) && !is_string($data)) || preg_match('/^\-?[0-9]+$/', strval($data)) !== 1) {
+		if ((!is_int($data) && !is_string($data)) || !preg_match('/^'.ZBX_PREG_INT.'$/', strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
 			return false;
 		}
 
-		if (bccomp($data, ZBX_MIN_INT32) < 0 || bccomp($data, ZBX_MAX_INT32) > 0) {
+		if ($data < ZBX_MIN_INT32 || $data > ZBX_MAX_INT32) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -564,13 +568,30 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (is_int($data) || (is_string($data) && preg_match('/^-?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$/', $data) === 1)) {
-			$data = (float) $data;
+		if (is_int($data) || is_float($data)) {
+			$value = (float) $data;
 		}
-		elseif (!is_float($data)) {
+		elseif (is_string($data)) {
+			$number_parser = new CNumberParser();
+
+			if ($number_parser->parse($data) == CParser::PARSE_SUCCESS) {
+				$value = (float) $number_parser->getMatch();
+			}
+			else {
+				$value = NAN;
+			}
+		}
+		else {
+			$value = NAN;
+		}
+
+		if (is_nan($value)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a floating point value is expected'));
+
 			return false;
 		}
+
+		$data = $value;
 
 		return true;
 	}
@@ -770,6 +791,7 @@ class CApiInputValidator {
 	 * Boolean validator.
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']  (optional) API_ALLOW_NULL
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -777,6 +799,12 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateBoolean($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
 		if (!is_bool($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a boolean is expected'));
 			return false;
@@ -878,7 +906,7 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * APPI output validator.
+	 * API output validator.
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_COUNT, API_ALLOW_NULL
@@ -954,6 +982,51 @@ class CApiInputValidator {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * API sort order validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateSortOrder($rule, &$data, $path, &$error) {
+		$in = ZBX_SORT_UP.','.ZBX_SORT_DOWN;
+
+		if (self::validateStringUtf8(['in' => $in], $data, $path, $e)) {
+			return true;
+		}
+
+		if (is_string($data)) {
+			$error = $e;
+			return false;
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or a character string is expected'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = [
+			'type' => API_STRING_UTF8,
+			'in' => $in
+		];
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
 
 		return true;
 	}
@@ -1158,6 +1231,8 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateNumeric($rule, &$data, $path, &$error) {
+		global $DB;
+
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (is_int($data)) {
@@ -1170,6 +1245,7 @@ class CApiInputValidator {
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
 			return false;
 		}
 
@@ -1177,22 +1253,41 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$pattern = '/^(-?)0*(0|[1-9][0-9]*)(\.?[0-9]+)?(['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.'])?$/';
+		$number_parser = new CNumberParser(['with_suffix' => true]);
 
-		if (preg_match($pattern, strval($data)) !== 1) {
+		if ($number_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+
 			return false;
 		}
 
-		$value = convertFunctionValue($data, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+		$value = $number_parser->calcValue();
 
-		if (bccomp($value, ZBX_MIN_INT64) < 0 || bccomp($value, ZBX_MAX_INT64) > 0) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
-			return false;
+		if ($DB['DOUBLE_IEEE754']) {
+			if (abs($value) > ZBX_FLOAT_MAX) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+
+				return false;
+			}
+		}
+		else {
+			if (abs($value) >= 1E+16) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+
+				return false;
+			}
+			elseif ($value != round($value, 4)) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number has too many fractional digits'));
+
+				return false;
+			}
 		}
 
-		// Trim leading zeroes.
-		$data = preg_replace($pattern, '${1}${2}${3}${4}', (string) $data);
+		// Remove leading zeros.
+		$data = preg_replace('/^(-)?(0+)?(\d.*)$/', '${1}${3}', $data);
+
+		// Add leading zero.
+		$data = preg_replace('/^(-)?(\..*)$/', '${1}0${2}', $data);
 
 		return true;
 	}
@@ -1443,7 +1538,7 @@ class CApiInputValidator {
 
 		$seconds = timeUnitToSeconds($data);
 
-		if (bccomp(ZBX_MIN_INT32, $seconds) > 0 || bccomp($seconds, ZBX_MAX_INT32) > 0) {
+		if ($seconds < ZBX_MIN_INT32 || $seconds > ZBX_MAX_INT32) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}

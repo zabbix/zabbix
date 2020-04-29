@@ -34,6 +34,7 @@
 #include "proxydata.h"
 #include "../alerter/alerter_protocol.h"
 #include "trapper_preproc.h"
+#include "trapper_expressions_evaluate.h"
 
 #include "daemon.h"
 #include "zbxcrypto.h"
@@ -200,7 +201,7 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	}
 
 	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), time(NULL),
-			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT);
 
 	if (0 != proxy.auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
@@ -479,7 +480,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	DB_ROW			row;
 	int			ret = FAIL, errcode;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], sessionid[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
-				*message = NULL, *error = NULL, *params = NULL, *value = NULL;
+				*message = NULL, *error = NULL, *params = NULL, *value = NULL, *debug = NULL;
 	zbx_uint64_t		mediatypeid;
 	size_t			string_alloc;
 	struct zbx_json		json;
@@ -490,8 +491,9 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	zbx_user_t		user;
 	unsigned short		smtp_port;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid), NULL) ||
 			SUCCEED != DBget_user_by_active_session(sessionid, &user) || USER_TYPE_SUPER_ADMIN > user.type)
@@ -568,25 +570,30 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 		goto fail;
 	}
 
-	zbx_alerter_deserialize_result(response, &value, &errcode, &error);
+	zbx_alerter_deserialize_result(response, &value, &errcode, &error, &debug);
 	zbx_free(response);
 
-	if (SUCCEED != errcode)
-		goto fail;
+	if (SUCCEED == errcode)
+		ret = SUCCEED;
+fail:
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, SUCCEED == ret ? ZBX_PROTO_VALUE_SUCCESS :
+				ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-	if (NULL != value)
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_DATA, value, ZBX_JSON_TYPE_STRING);
+	if (SUCCEED == ret)
+	{
+		if (NULL != value)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_DATA, value, ZBX_JSON_TYPE_STRING);
+	}
+	else
+	{
+		if (NULL != error && '\0' != *error)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
+	}
+
+	if (NULL != debug)
+		zbx_json_addraw(&json, "debug", debug);
 
 	(void)zbx_tcp_send(sock, json.buffer);
-
-	zbx_json_free(&json);
-
-	ret = SUCCEED;
-fail:
-	if (SUCCEED != ret)
-		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 
 	zbx_free(params);
 	zbx_free(message);
@@ -595,6 +602,8 @@ fail:
 	zbx_free(data);
 	zbx_free(value);
 	zbx_free(error);
+	zbx_free(debug);
+	zbx_json_free(&json);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
@@ -843,7 +852,7 @@ static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t
 			zbx_json_adduint64(json, "count", counter_value.ui64);
 			break;
 		case ZBX_COUNTER_TYPE_DBL:
-			tmp = zbx_dsprintf(tmp, ZBX_FS_DBL, counter_value.dbl);
+			tmp = zbx_dsprintf(tmp, ZBX_FS_DBL64, counter_value.dbl);
 			zbx_json_addstring(json, "count", tmp, ZBX_JSON_TYPE_STRING);
 			break;
 		default:
@@ -1205,6 +1214,11 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					ret = zbx_trapper_preproc_test(sock, &jp);
 			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
+			{
+				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+					ret = zbx_trapper_expressions_evaluate(sock, &jp);
+			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -1274,7 +1288,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			av.state = ITEM_STATE_NOTSUPPORTED;
 
 		DCconfig_get_items_by_keys(&item, &hk, &errcode, 1);
-		process_history_data(&item, &av, &errcode, 1);
+		process_history_data(&item, &av, &errcode, 1, NULL);
 		DCconfig_clean_items(&item, &errcode, 1);
 
 		zbx_alarm_on(CONFIG_TIMEOUT);

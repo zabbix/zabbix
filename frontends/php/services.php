@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Configuration of services');
 $page['file'] = 'services.php';
-$page['scripts'] = ['class.calendar.js'];
+$page['scripts'] = ['class.calendar.js', 'multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -36,7 +36,7 @@ $fields = [
 	'name' => 					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'algorithm' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
 	'showsla' =>				[T_ZBX_INT, O_OPT, null,	IN([SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]),	null],
-	'goodsla' => 				[T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null,
+	'goodsla' => 				[T_ZBX_DBL, O_OPT, null,	BETWEEN_DBL(0, 100, 4), null,
 									_('Calculate SLA, acceptable SLA (in %)')
 								],
 	'sortorder' => 				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')],
@@ -179,7 +179,7 @@ elseif (hasRequest('add_service_time') && hasRequest('new_service_time')) {
 		if (!validateDateInterval($new_service_time_from->format('Y'), $new_service_time_from->format('m'),
 				$new_service_time_from->format('d'))) {
 			$result = false;
-			error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
+			error(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('From')));
 		}
 
 		$absolute_time_parser->parse(getRequest('new_service_time_till'));
@@ -188,7 +188,7 @@ elseif (hasRequest('add_service_time') && hasRequest('new_service_time')) {
 		if (!validateDateInterval($new_service_time_till->format('Y'), $new_service_time_till->format('m'),
 				$new_service_time_till->format('d'))) {
 			$result = false;
-			error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
+			error(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
 		}
 
 		if ($result) {

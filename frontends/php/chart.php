@@ -56,6 +56,7 @@ $items = API::Item()->get([
 	'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
 		'value_type', 'key_'
 	],
+	'selectPreprocessing' => ['type', 'params'],
 	'selectHosts' => ['name', 'host'],
 	'itemids' => $itemIds,
 	'webitems' => true,
@@ -131,12 +132,12 @@ foreach ($items as $item) {
 	]);
 }
 
-$min_dimentions = $graph->getMinDimensions();
-if ($min_dimentions['width'] > $graph->getWidth()) {
-	$graph->setWidth($min_dimentions['width']);
+$min_dimensions = $graph->getMinDimensions();
+if ($min_dimensions['width'] > $graph->getWidth()) {
+	$graph->setWidth($min_dimensions['width']);
 }
-if ($min_dimentions['height'] > $graph->getHeight()) {
-	$graph->setHeight($min_dimentions['height']);
+if ($min_dimensions['height'] > $graph->getHeight()) {
+	$graph->setHeight($min_dimensions['height']);
 }
 
 if (getRequest('onlyHeight', '0') === '1') {

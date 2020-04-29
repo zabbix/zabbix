@@ -45,6 +45,12 @@ $fields = [
 	'user' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
 	'password' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'schema' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
+	'tls_encryption' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'verify_host' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),			null],
+	'key_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
+	'cert_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
+	'ca_file' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
+	'cipher_list' =>		[T_ZBX_STR, O_OPT, null,	null, 				null],
 	'zbx_server' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_name' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_port' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')],
@@ -117,7 +123,11 @@ $link = (new CLink('GPL v2', 'https://www.zabbix.com/license'))
 	->addClass(ZBX_STYLE_LINK_ALT);
 $sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_LINKS);
 
-(new CTag('body', true, [(new CTag('main', true, [$ZBX_SETUP_WIZARD, $sub_footer])), makePageFooter()]))
+(new CTag('body', true,
+	(new CDiv([
+		(new CTag('main', true, [$ZBX_SETUP_WIZARD, $sub_footer])), makePageFooter()])
+	)->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
+))
 	->setAttribute('lang', CWebUser::getLang())
 	->show();
 ?>

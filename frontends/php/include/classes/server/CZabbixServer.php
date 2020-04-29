@@ -112,6 +112,11 @@ class CZabbixServer {
 	protected $total;
 
 	/**
+	 * @var array $debug  Section 'debug' data from server response.
+	 */
+	protected $debug = [];
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param string $host
@@ -330,6 +335,38 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Evaluate trigger expressions.
+	 *
+	 * @param array  $data
+	 * @param string $sid
+	 *
+	 * @return bool|array
+	 */
+	public function expressionsEvaluate(array $data, string $sid) {
+		$response = $this->request([
+			'request' => 'expressions.evaluate',
+			'sid' => $sid,
+			'data' => $data
+		]);
+
+		if ($response === false) {
+			return false;
+		}
+
+		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
+			'expression' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'value' =>		['type' => API_INT32, 'in' => '0,1'],
+			'error' =>		['type' => API_STRING_UTF8]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $response, '/', $this->error)) {
+			return false;
+		}
+
+		return $response;
+	}
+
+	/**
 	 * Returns the error message.
 	 *
 	 * @return string
@@ -348,6 +385,15 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Returns debug section from server response.
+	 *
+	 * @return array
+	 */
+	public function getDebug() {
+		return $this->debug;
+	}
+
+	/**
 	 * Executes a given JSON request and returns the result. Returns false if an error has occurred.
 	 *
 	 * @param array $params
@@ -358,6 +404,7 @@ class CZabbixServer {
 		// Reset object state.
 		$this->error = null;
 		$this->total = null;
+		$this->debug = [];
 
 		// Connect to the server.
 		if (!$this->connect()) {
@@ -449,6 +496,10 @@ class CZabbixServer {
 			return false;
 		}
 
+		if (array_key_exists('debug', $response)) {
+			$this->debug = $response['debug'];
+		}
+
 		// Request executed successfully.
 		if ($response['response'] == self::RESPONSE_SUCCESS) {
 			// saves total count
@@ -475,22 +526,22 @@ class CZabbixServer {
 				return false;
 			}
 
-			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->timeout)) {
+			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, ZBX_CONNECT_TIMEOUT)) {
 				switch ($errorMsg) {
 					case 'Connection refused':
-						$dErrorMsg = _s("Connection to Zabbix server \"%s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
 						break;
 
 					case 'No route to host':
-						$dErrorMsg = _s("Zabbix server \"%s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $this->host);
+						$dErrorMsg = _s("Zabbix server \"%1\$s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $this->host);
 						break;
 
 					case 'Connection timed out':
-						$dErrorMsg = _s("Connection to Zabbix server \"%s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
 						break;
 
 					default:
-						$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
 				}
 
 				$this->error = $dErrorMsg.$errorMsg;

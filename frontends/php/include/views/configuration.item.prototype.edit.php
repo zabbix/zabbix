@@ -379,6 +379,7 @@ if (!$readonly) {
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
+		->removeId()
 		->onClick('return PopUp("popup.generic",'.
 			json_encode([
 				'srctbl' => 'items',
@@ -396,6 +397,7 @@ if (!$readonly) {
 	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$master_item[] = (new CButton('button', _('Select prototype')))
 		->addClass(ZBX_STYLE_BTN_GREY)
+		->removeId()
 		->onClick('return PopUp("popup.generic",'.
 			json_encode([
 				'srctbl' => 'item_prototypes',
@@ -463,58 +465,6 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'row_snmp_oid'
-	)
-	->addRow(_('Context name'),
-		(new CTextBox('snmpv3_contextname', $data['snmpv3_contextname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_contextname'
-	)
-	->addRow(
-		(new CLabel(_('SNMP community'), 'snmp_community'))->setAsteriskMark(),
-		(new CTextBox('snmp_community', $data['snmp_community'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		'row_snmp_community'
-	)
-	->addRow(_('Security name'),
-		(new CTextBox('snmpv3_securityname', $data['snmpv3_securityname'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_securityname'
-	)
-	// Append SNMPv3 security level to form list.
-	->addRow(_('Security level'),
-		new CComboBox('snmpv3_securitylevel', $data['snmpv3_securitylevel'], null, [
-			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-		]),
-		'row_snmpv3_securitylevel'
-	)
-	->addRow((new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
-		(new CRadioButtonList('snmpv3_authprotocol', (int) $data['snmpv3_authprotocol']))
-			->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
-			->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
-			->setModern(true),
-		'row_snmpv3_authprotocol'
-	)
-	->addRow(_('Authentication passphrase'),
-		(new CTextBox('snmpv3_authpassphrase', $data['snmpv3_authpassphrase'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_authpassphrase'
-	)
-	->addRow((new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
-		(new CRadioButtonList('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']))
-			->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
-			->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
-			->setModern(true),
-		'row_snmpv3_privprotocol'
-	)
-	->addRow(_('Privacy passphrase'),
-		(new CTextBox('snmpv3_privpassphrase', $data['snmpv3_privpassphrase'], false, 64))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'row_snmpv3_privpassphrase'
-	)
-	->addRow(_('Port'),
-		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
 	)
 	->addRow(_('IPMI sensor'),
 		(new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

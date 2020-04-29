@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ final class CComponentRegistry {
 	 */
 	final public function get(string $name): object {
 		if (!$this->has($name)) {
-			throw new Exception(_s('Component %s is not registered.', $name));
+			throw new Exception(_s('Component %1$s is not registered.', $name));
 		}
 
 		return $this->components[$name];
@@ -50,7 +50,7 @@ final class CComponentRegistry {
 	 */
 	final public function register(string $name, object $instance): void {
 		if ($this->has($name)) {
-			throw new Exception(_s('Component %s already registered.', $name));
+			throw new Exception(_s('Component %1$s already registered.', $name));
 		}
 
 		$this->components[$name] = $instance;

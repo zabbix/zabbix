@@ -143,14 +143,6 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	const char	*snmp_oid;
-	const char	*snmp_community;
-	const char	*snmpv3_securityname;
-	const char	*snmpv3_authpassphrase;
-	const char	*snmpv3_privpassphrase;
-	const char	*snmpv3_contextname;
-	unsigned char	snmpv3_securitylevel;
-	unsigned char	snmpv3_authprotocol;
-	unsigned char	snmpv3_privprotocol;
 	unsigned char	snmp_oid_type;
 }
 ZBX_DC_SNMPITEM;
@@ -375,22 +367,24 @@ ZBX_DC_HOST_H;
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	zbx_uint64_t	hosts_monitored;	/* number of enabled hosts assigned to proxy */
-	zbx_uint64_t	hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
-	double		required_performance;
-	int		proxy_config_nextcheck;
-	int		proxy_data_nextcheck;
-	int		proxy_tasks_nextcheck;
-	int		nextcheck;
-	int		lastaccess;
-	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
-						/* or 0 if no error */
-	int		version;
-	unsigned char	location;
-	unsigned char	auto_compress;
-	const char	*proxy_address;
-	int		last_version_error_time;
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		hosts_monitored;	/* number of enabled hosts assigned to proxy */
+	zbx_uint64_t		hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
+	double			required_performance;
+	int			proxy_config_nextcheck;
+	int			proxy_data_nextcheck;
+	int			proxy_tasks_nextcheck;
+	int			nextcheck;
+	int			lastaccess;
+	int			proxy_delay;
+	zbx_proxy_suppress_t	nodata_win;
+	int			last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
+							/* or 0 if no error */
+	int			version;
+	unsigned char		location;
+	unsigned char		auto_compress;
+	const char		*proxy_address;
+	int			last_version_error_time;
 }
 ZBX_DC_PROXY;
 
@@ -417,6 +411,7 @@ typedef struct
 	const char	*macro;
 	const char	*context;
 	const char	*value;
+	unsigned char	type;
 }
 ZBX_DC_GMACRO;
 
@@ -434,6 +429,7 @@ typedef struct
 	const char	*macro;
 	const char	*context;
 	const char	*value;
+	unsigned char	type;
 }
 ZBX_DC_HMACRO;
 
@@ -455,11 +451,26 @@ typedef struct
 	unsigned char	type;
 	unsigned char	main;
 	unsigned char	useip;
-	unsigned char	bulk;
-	unsigned char	max_snmp_succeed;
-	unsigned char	min_snmp_fail;
 }
 ZBX_DC_INTERFACE;
+
+typedef struct
+{
+	zbx_uint64_t	interfaceid;
+	const char	*community;
+	const char	*securityname;
+	const char	*authpassphrase;
+	const char	*privpassphrase;
+	const char	*contextname;
+	unsigned char	securitylevel;
+	unsigned char	authprotocol;
+	unsigned char	privprotocol;
+	unsigned char	version;
+	unsigned char	bulk;
+	unsigned char	max_succeed;
+	unsigned char	min_fail;
+}
+ZBX_DC_SNMPINTERFACE;
 
 typedef struct
 {
@@ -504,12 +515,16 @@ ZBX_DC_EXPRESSION;
 typedef struct
 {
 	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
+	const char	*instanceid;
 	zbx_uint64_t	discovery_groupid;
 	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	unsigned char	autoreg_tls_accept;
-	const char	*db_extension;
+
+	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
+	zbx_config_db_t	db;
+
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
 }
@@ -779,6 +794,7 @@ typedef struct
 	zbx_hashset_t		hmacros;
 	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
 	zbx_hashset_t		interfaces;
+	zbx_hashset_t		interfaces_snmp;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
 	zbx_hashset_t		interface_snmpaddrs;	/* addr, interfaceids for SNMP interfaces */
 	zbx_hashset_t		interface_snmpitems;	/* interfaceid, itemids for SNMP trap items */
@@ -825,24 +841,15 @@ extern zbx_rwlock_t	config_lock;
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
 
-/* validator function optionally used to validate macro values when expanding user macros */
-
 /******************************************************************************
  *                                                                            *
- * Function: zbx_macro_value_validator_func_t                                 *
- *                                                                            *
- * Purpose: validate macro value when expanding user macros                   *
- *                                                                            *
- * Parameters: value   - [IN] the macro value                                 *
- *                                                                            *
- * Return value: SUCCEED - the value is valid                                 *
- *               FAIL    - otherwise                                          *
+ * zbx_dc_expand_user_macros - has no autoquoting                             *
+ * zbx_dc_expand_user_macros_for_triggers - autoquotes macros that are not    *
+ * already quoted and cannot be casted to a double                            *
  *                                                                            *
  ******************************************************************************/
-typedef int (*zbx_macro_value_validator_func_t)(const char *value);
-
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_value_validator_func_t validator_func);
+char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
+char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num);
 
 void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids);

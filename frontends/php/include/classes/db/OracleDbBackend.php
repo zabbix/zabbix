@@ -41,6 +41,56 @@ class OracleDbBackend extends DbBackend {
 	}
 
 	/**
+	 * Check is current connection contain requested cipher list.
+	 *
+	 * @return bool
+	 */
+	public function isConnectionSecure() {
+		$this->setError('Secure connection for Oracle is not supported.');
+		return false;
+	}
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $host         Host name.
+	 * @param string $port         Port.
+	 * @param string $user         User name.
+	 * @param string $password     Password.
+	 * @param string $dbname       Database name.
+	 * @param string $schema       DB schema.
+	 *
+	 * @param
+	 * @return resource|null
+	 */
+	public function connect($host, $port, $user, $password, $dbname, $schema) {
+		$connect = '';
+
+		if ($host) {
+			$connect = '//'.$host.(($port) ? ':'.$port : '').(($dbname) ? '/'.$dbname : '');
+		}
+
+		$resource = @oci_connect($user, $password, $connect, 'UTF8');
+
+		if (!$resource) {
+			$ociError = oci_error();
+			$this->setError('Error connecting to database: '.$ociError['message']);
+			return null;
+		}
+
+		return $resource;
+	}
+
+	/**
+	 * Initialize connection.
+	 *
+	 * @return bool
+	 */
+	public function init() {
+		DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
+	}
+
+	/**
 	 * Create INSERT SQL query.
 	 * Creation example:
 	 *	BEGIN
@@ -76,20 +126,39 @@ class OracleDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDatabaseEncoding() {
-		$db_params = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
+		$row = DBfetch(DBselect('SELECT value, parameter FROM NLS_DATABASE_PARAMETERS'.
 			' WHERE '.dbConditionString('parameter', ['NLS_CHARACTERSET', 'NLS_NCHAR_CHARACTERSET']).
 				' AND value!='.zbx_dbstr(ZBX_DB_DEFAULT_CHARSET)
 		));
 
-		foreach ($db_params as $db_param) {
-			if ($db_param['value'] != ZBX_DB_DEFAULT_CHARSET) {
-				$this->setWarning((_s('Incorrect parameter "%1$s" value: %2$s.',
-					$db_param['parameter'], _s('"%1$s" instead "%2$s"', $db_param['value'], ZBX_DB_DEFAULT_CHARSET)
-				)));
-				return false;
-			}
+		if ($row) {
+			$this->setWarning((_s('Incorrect parameter "%1$s" value: %2$s.',
+				$row['parameter'], _s('"%1$s" instead "%2$s"', $row['value'], ZBX_DB_DEFAULT_CHARSET)
+			)));
 		}
 
-		return true;
+		return !$row;
+	}
+
+	/**
+	* Check if database is using IEEE754 compatible double precision columns.
+	*
+	* @return bool
+	*/
+	public function isDoubleIEEE754() {
+		global $DB;
+
+		$conditions_or = [
+			'(table_name=\'HISTORY\' AND column_name=\'VALUE\')',
+			'(table_name=\'TRENDS\' AND column_name IN (\'VALUE_MIN\', \'VALUE_AVG\', \'VALUE_MAX\'))'
+		];
+
+		$sql =
+			'SELECT COUNT(*) cnt FROM user_tab_columns'.
+				' WHERE data_type=\'BINARY_DOUBLE\' AND ('.implode(' OR ', $conditions_or).')';
+
+		$result = DBfetch(DBselect($sql));
+
+		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == 4);
 	}
 }

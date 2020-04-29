@@ -30,6 +30,8 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $fields['rf_rate']
 );
 
+$scripts = [];
+
 // Show.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show']), CWidgetHelper::getRadioButtonList($fields['show']));
 
@@ -39,7 +41,15 @@ $field_groupids = CWidgetHelper::getGroup($fields['groupids'],
 	$form->getName()
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
-$scripts = [$field_groupids->getPostJS()];
+$scripts[] = $field_groupids->getPostJS();
+
+// Hosts.
+$field_hostids = CWidgetHelper::getHost($fields['hostids'],
+	$data['captions']['ms']['hosts']['hostids'],
+	$form->getName()
+);
+$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
+$scripts[] = $field_hostids->getPostJS();
 
 // Application.
 $form_list->addRow(CWidgetHelper::getLabel($fields['application']),

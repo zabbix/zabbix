@@ -30,7 +30,7 @@ import (
 	"time"
 
 	"github.com/docker/go-connections/nat"
-	log "github.com/sirupsen/logrus"
+	"zabbix.com/pkg/log"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -50,7 +50,7 @@ func сreateConnection(connString string) error {
 	}
 	versionPG, err := GetPostgresVersion(newConn)
 	if err != nil {
-		log.Panicf("[сreateConnection] cannot get Postgres version: %s", err.Error())
+		log.Critf("[сreateConnection] cannot get Postgres version: %s", err.Error())
 	}
 	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: versionPG}
 	return nil
@@ -75,11 +75,11 @@ func waitForPostgresAndCreateConfig(pool testcontainers.Container, ctx context.C
 
 	if !ok {
 		_ = pool.Terminate(ctx)
-		log.Panicf("[waitForPostgresAndCreateConfig] couldn't connect to PostgreSQL")
+		log.Critf("[waitForPostgresAndCreateConfig] couldn't connect to PostgreSQL")
 	} else {
-		log.Infoln("[TestMain] creating sharedConn of type *postgresConn")
+		log.Infof("[TestMain] creating sharedConn of type *postgresConn")
 		сreateConnection(connString)
-		log.Infoln("[TestMain] sharedConn of type *postgresConn created")
+		log.Infof("[TestMain] sharedConn of type *postgresConn created")
 	}
 	сreateConnection(connString)
 	tmpl, err := template.New("config").Parse(`
@@ -89,7 +89,7 @@ db:url: {{.ConnString}}
 `)
 	if err != nil {
 		_ = pool.Terminate(ctx)
-		log.Panicf("[waitForPostgresAndCreateConfig] template.Parse failed: %v", err)
+		log.Critf("[waitForPostgresAndCreateConfig] template.Parse failed: %v", err)
 	}
 
 	configArgs := struct {
@@ -101,13 +101,13 @@ db:url: {{.ConnString}}
 	err = tmpl.Execute(&configBuff, configArgs)
 	if err != nil {
 		_ = pool.Terminate(ctx)
-		log.Panicf("[waitForPostgresAndCreateConfig] tmpl.Execute failed: %v", err)
+		log.Critf("[waitForPostgresAndCreateConfig] tmpl.Execute failed: %v", err)
 	}
 
 	confFile, err := ioutil.TempFile("", "config.*.yaml")
 	if err != nil {
 		_ = pool.Terminate(ctx)
-		log.Panicf("[waitForPostgresAndCreateConfig] ioutil.TempFile failed: %v", err)
+		log.Critf("[waitForPostgresAndCreateConfig] ioutil.TempFile failed: %v", err)
 	}
 
 	log.Infof("[waitForPostgresAndCreateConfig] confFile.Name = %s", confFile.Name())
@@ -115,25 +115,25 @@ db:url: {{.ConnString}}
 	_, err = confFile.WriteString(configBuff.String())
 	if err != nil {
 		_ = pool.Terminate(ctx)
-		log.Panicf("[waitForPostgresAndCreateConfig] confFile.WriteString failed: %v", err)
+		log.Critf("[waitForPostgresAndCreateConfig] confFile.WriteString failed: %v", err)
 	}
 
 	err = confFile.Close()
 	if err != nil {
 		_ = pool.Terminate(ctx)
-		log.Panicf("[waitForPostgresAndCreateConfig] confFile.Close failed: %v", err)
+		log.Critf("[waitForPostgresAndCreateConfig] confFile.Close failed: %v", err)
 	}
 
 	cleanerFunc := func() {
 		// Terminate the container
 		err := pool.Terminate(ctx)
 		if err != nil {
-			log.Panicf("[waitForPostgresAndCreateConfig] pool.Terminate failed: %v", err)
+			log.Critf("[waitForPostgresAndCreateConfig] pool.Terminate failed: %v", err)
 		}
 
 		err = os.Remove(confFile.Name())
 		if err != nil {
-			log.Panicf("[waitForPostgresAndCreateConfig] os.Remove failed: %v", err)
+			log.Critf("[waitForPostgresAndCreateConfig] os.Remove failed: %v", err)
 		}
 	}
 
@@ -163,17 +163,17 @@ func startPostgreSQL(versionPG uint32) (confPath string, cleaner func()) {
 		Started:          true,
 	})
 	if err != nil {
-		log.Panicf("[startPostgreSQL] GenericContainer failed: %v", err)
+		log.Critf("[startPostgreSQL] GenericContainer failed: %v", err)
 	}
 
 	ip, err := pg.Host(ctx)
 	if err != nil {
-		log.Panicf("[startPostgreSQL] pg.Host failed: %v", err)
+		log.Critf("[startPostgreSQL] pg.Host failed: %v", err)
 	}
 
 	port, err := pg.MappedPort(ctx, nat.Port(cport))
 	if err != nil {
-		log.Panicf("[startPostgreSQL] pg.MappedPort failed: %v", err)
+		log.Critf("[startPostgreSQL] pg.MappedPort failed: %v", err)
 	}
 
 	log.Infof(fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",

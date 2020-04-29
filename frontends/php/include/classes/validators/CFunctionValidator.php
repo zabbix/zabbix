@@ -205,7 +205,8 @@ class CFunctionValidator extends CValidator {
 			],
 			'nodata'=> [
 				'args' => [
-					['type' => 'sec', 'mandat' => true]
+					['type' => 'sec', 'mandat' => true],
+					['type' => 'nodata_mode', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesAll
 			],
@@ -390,6 +391,9 @@ class CFunctionValidator extends CValidator {
 			case 'num_suffix':
 				return $this->validateNumSuffix($param);
 
+			case 'nodata_mode':
+				return ($param === 'strict');
+
 			case 'fit':
 				return $this->validateFit($param);
 
@@ -494,7 +498,7 @@ class CFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateNumSuffix($param) {
-		return preg_match('/^(\-?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)$/', $param);
+		return ((new CNumberParser(['with_suffix' => true]))->parse($param) == CParser::PARSE_SUCCESS);
 	}
 
 	/**

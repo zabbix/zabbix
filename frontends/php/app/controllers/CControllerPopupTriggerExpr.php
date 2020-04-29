@@ -25,6 +25,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $param1Sec = [];
 	private $param1Str = [];
 	private $param2SecCount = [];
+	private $param2SecMode = [];
 	private $param3SecVal = [];
 	private $param3SecPercent = [];
 	private $paramSecIntCount = [];
@@ -92,6 +93,19 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
+				'A' => false
+			]
+		];
+
+		$this->param2SecMode = [
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'mode' => [
+				'C' => 'Mode',
+				'T' => T_ZBX_STR,
 				'A' => false
 			]
 		];
@@ -380,8 +394,8 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'nodata' => [
-				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false)'),
-				'params' => $this->param1Sec,
+				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)'),
+				'params' => $this->param2SecMode,
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
@@ -508,7 +522,19 @@ class CControllerPopupTriggerExpr extends CController {
 									&& in_array($tokens[$key + 1]['value'],
 										$this->functions[$function]['operators'])) {
 								$operator = $tokens[$key + 1]['value'];
-								$value = $tokens[$key + 2]['value'];
+
+								$value = '';
+								$i = 2;
+
+								if (array_key_exists($key + 3, $tokens)
+										&& $tokens[$key + 2]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR) {
+									$value .= $tokens[$key + 2]['value'];
+									$i++;
+								}
+
+								$value .= ($tokens[$key + $i]['type'] == CTriggerExprParserResult::TOKEN_TYPE_STRING)
+									? $tokens[$key + $i]['data']['string']
+									: $tokens[$key + $i]['value'];
 							}
 							else {
 								break;
@@ -584,7 +610,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'value' => $value,
 			'params' => $params,
 			'paramtype' => $param_type,
-			'description' => $description,
+			'item_description' => $description,
 			'functions' => $this->functions,
 			'function' => $function,
 			'operator' => $operator,
@@ -625,7 +651,7 @@ class CControllerPopupTriggerExpr extends CController {
 		// Create and validate trigger expression before inserting it into textarea field.
 		if ($this->getInput('add', false)) {
 			try {
-				if ($data['description']) {
+				if ($data['item_description']) {
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {
@@ -649,7 +675,7 @@ class CControllerPopupTriggerExpr extends CController {
 						$function,
 						rtrim(implode(',', $quoted_params), ','),
 						$operator,
-						$data['value']
+						CTriggerExpression::quoteString($data['value'])
 					);
 
 					// Validate trigger expression.

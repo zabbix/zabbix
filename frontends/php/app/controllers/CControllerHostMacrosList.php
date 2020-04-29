@@ -21,11 +21,17 @@
 
 class CControllerHostMacrosList extends CController {
 
+	/**
+	 * @var array  Array of parent host defined macros.
+	 */
+	protected $parent_macros = [];
+
 	protected function checkInput() {
 		$fields = [
 			'macros'				=> 'array',
 			'show_inherited_macros' => 'required|in 0,1',
 			'templateids'			=> 'array_db hosts.hostid',
+			'parent_hostid'			=> 'id',
 			'readonly'				=> 'required|in 0,1'
 		];
 
@@ -41,36 +47,57 @@ class CControllerHostMacrosList extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
+		$allow = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
+
+		if ($allow && $this->hasInput('parent_hostid')) {
+			$parent_host = API::Host()->get([
+				'output' => ['hostid'],
+				'hostids' => [$this->getInput('parent_hostid')]
+			]);
+			$allow = (bool) reset($parent_host);
+
+			if (!$allow) {
+				$parent_template = API::Template()->get([
+					'output' => ['hostid'],
+					'templateids' => [$this->getInput('parent_hostid')]
+				]);
+
+				return (bool) reset($parent_template);
+			}
+		}
+
+		return $allow;
 	}
 
 	protected function doAction() {
 		$macros = $this->getInput('macros', []);
 		$show_inherited_macros = (bool) $this->getInput('show_inherited_macros', 0);
 		$readonly = (bool) $this->getInput('readonly', 0);
+		$parent_hostid = $this->hasInput('parent_hostid') ? $this->getInput('parent_hostid') : null;
 
 		if ($macros) {
 			$macros = cleanInheritedMacros($macros);
 
 			// Remove empty new macro lines.
-			foreach ($macros as $idx => $macro) {
-				if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
-						&& $macro['description'] === '') {
-					unset($macros[$idx]);
-				}
-			}
+			$macros = array_filter($macros, function($macro) {
+				$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
+
+				return (bool) array_filter(array_intersect_key($macro, $keys));
+			});
 		}
 
 		if ($show_inherited_macros) {
-			$macros = mergeInheritedMacros($macros, getInheritedMacros($this->getInput('templateids', [])));
+			$macros = mergeInheritedMacros($macros,
+				getInheritedMacros($this->getInput('templateids', []), $parent_hostid)
+			);
 		}
 
 		$macros = array_values(order_macros($macros, 'macro'));
 
 		if (!$macros && !$readonly) {
-			$macro = ['macro' => '', 'value' => '', 'description' => ''];
+			$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
 			if ($show_inherited_macros) {
-				$macro['type'] = ZBX_PROPERTY_OWN;
+				$macro['inherited_type'] = ZBX_PROPERTY_OWN;
 			}
 			$macros[] = $macro;
 		}
@@ -83,6 +110,10 @@ class CControllerHostMacrosList extends CController {
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
+
+		if ($parent_hostid !== null) {
+			$data['parent_hostid'] = $parent_hostid;
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

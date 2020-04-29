@@ -27,7 +27,7 @@ import (
 	"reflect"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
+	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
 )
 
@@ -36,19 +36,26 @@ func TestMain(m *testing.M) {
 	var confPath string
 	var stopDB func()
 	var code int
-	log.Infoln("[TestMain] About to start PostgreSQL...")
+
+	_ = log.Open(log.Console, log.Debug, "", 0)
+
+	log.Infof("[TestMain] About to start PostgreSQL...")
 	versionsPG := []uint32{10, 11, 12}
 	for _, versionPG := range versionsPG {
 		confPath, stopDB = startPostgreSQL(versionPG)
-		log.Infoln("[TestMain] PostgreSQL started!")
+		log.Infof("[TestMain] PostgreSQL started!")
 		log.Infof("[TestMain] conf path  = %v", confPath)
+
+		// initialize plugin
+		impl.Init(pluginName)
+		impl.Configure(&plugin.GlobalOptions{}, nil)
 
 		code = m.Run()
 		if code != 0 {
-			log.Panicf("failed on PostgreSQL version %v", versionPG)
+			log.Critf("failed on PostgreSQL version %v", versionPG)
 			os.Exit(code)
 		}
-		log.Infoln("[TestMain] Cleaning up...")
+		log.Infof("[TestMain] Cleaning up...")
 		stopDB()
 
 	}
@@ -62,8 +69,6 @@ func TestPlugin_pingHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	impl.Configure(&plugin.GlobalOptions{}, nil)
 
 	type args struct {
 		conn   *postgresConn

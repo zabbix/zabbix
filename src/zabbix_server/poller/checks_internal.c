@@ -140,6 +140,23 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 		{
 			zbx_snprintf(buf, sizeof(buf), "%hhu", interfaces[i].bulk);
 			zbx_json_addstring(j, "{#IF.SNMP.BULK}", buf, ZBX_JSON_TYPE_INT);
+
+			switch (interfaces[i].snmp_version)
+			{
+				case ZBX_IF_SNMP_VERSION_1:
+					p = "SNMPv1";
+					break;
+				case ZBX_IF_SNMP_VERSION_2:
+					p = "SNMPv2c";
+					break;
+				case ZBX_IF_SNMP_VERSION_3:
+					p = "SNMPv3";
+					break;
+				default:
+					p = "UNKNOWN";
+			}
+
+			zbx_json_addstring(j, "{#IF.SNMP.VERSION}", p, ZBX_JSON_TYPE_STRING);
 		}
 
 		zbx_json_close(j);
@@ -207,6 +224,16 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		}
 
 		SET_UI64_RESULT(result, DCget_item_count(0));
+	}
+	else if (0 == strcmp(tmp, "version"))			/* zabbix["version"] */
+	{
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		SET_STR_RESULT(result, zbx_strdup(NULL, ZABBIX_VERSION));
 	}
 	else if (0 == strcmp(tmp, "items_unsupported"))		/* zabbix["items_unsupported"] */
 	{

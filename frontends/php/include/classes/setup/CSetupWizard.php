@@ -93,12 +93,10 @@ class CSetupWizard extends CForm {
 	}
 
 	protected function bodyToString($destroy = true) {
-		$setup_left = (new CDiv([
-			(new CDiv())
-				->addClass(ZBX_STYLE_SIGNIN_LOGO)
-				->addStyle(CBrandHelper::getLogoStyle()),
-			$this->getList()
-		]))->addClass(ZBX_STYLE_SETUP_LEFT);
+		$setup_left = (new CDiv())
+			->addClass(ZBX_STYLE_SETUP_LEFT)
+			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
+			->addItem($this->getList());
 
 		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
 
@@ -212,7 +210,9 @@ class CSetupWizard extends CForm {
 	function stage2() {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE');
 
-		$table = new CFormList();
+		$table = (new CFormList())
+			->addVar('tls_encryption', '0', 'tls_encryption_off')
+			->addVar('verify_host', '0', 'verify_host_off');
 
 		$table->addRow(_('Database type'),
 			new CComboBox('type', $DB['TYPE'], 'submit()', CFrontendSetup::getSupportedDatabases())
@@ -248,6 +248,59 @@ class CSetupWizard extends CForm {
 		$table->addRow(_('Password'),
 			(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
+
+		If ($DB['TYPE'] === null || $DB['TYPE'] == ZBX_DB_MYSQL || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+			$table->addRow(_('TLS encryption'),
+				(new CCheckBox('tls_encryption'))
+					->setChecked($this->getConfig('DB_ENCRYPTION'))
+					->onChange('submit()')
+			);
+			$show_tls = true;
+		}
+		else {
+			$show_tls = false;
+		}
+
+		if ($show_tls && $this->getConfig('DB_ENCRYPTION')) {
+			$table->addRow(_('TLS key file'),
+				(new CTextBox('key_file', $this->getConfig('DB_KEY_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			);
+
+			$table->addRow(_('TLS certificate file'),
+				(new CTextBox('cert_file', $this->getConfig('DB_CERT_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			);
+
+			$table->addRow(_('TLS certificate authority file'),
+				(new CTextBox('ca_file', $this->getConfig('DB_CA_FILE')))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			);
+
+			$verify_host_box = new CCheckBox('verify_host');
+
+			if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+				$verify_host_box
+					->setChecked(true)
+					->setAttribute('readonly', true);
+			}
+			else {
+				$verify_host_box->setChecked($this->getConfig('DB_VERIFY_HOST'));
+			}
+
+			$table->addRow(_('With host verification'), $verify_host_box);
+
+			If ($DB['TYPE'] == ZBX_DB_MYSQL) {
+				$table->addRow(_('TLS cipher list'),
+					(new CTextBox('cipher_list', $this->getConfig('DB_CIPHER_LIST')))
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				);
+			}
+		}
+		else {
+			$table
+				->addVar('key_file', '')
+				->addVar('cert_file', '')
+				->addVar('ca_file', '')
+				->addVar('cipher_list', '');
+		}
 
 		if ($this->STEP_FAILED) {
 			global $ZBX_MESSAGES;
@@ -314,6 +367,23 @@ class CSetupWizard extends CForm {
 		if ($db_type == ZBX_DB_POSTGRESQL) {
 			$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 		}
+		$table->addRow((new CSpan(_('TLS encryption')))->addClass(ZBX_STYLE_GREY),
+			$this->getConfig('DB_ENCRYPTION') ? 'true' : 'false');
+		if ($this->getConfig('DB_ENCRYPTION')) {
+			$table->addRow((new CSpan(_('TLS key file')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_KEY_FILE'));
+			$table->addRow((new CSpan(_('TLS certificate file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_CERT_FILE')
+			);
+			$table->addRow((new CSpan(_('TLS certificate authority file')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_CA_FILE')
+			);
+			$table->addRow((new CSpan(_('With host verification')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_VERIFY_HOST') ? 'true' : 'false'
+			);
+			$table->addRow((new CSpan(_('TLS cipher list')))->addClass(ZBX_STYLE_GREY),
+				$this->getConfig('DB_CIPHER_LIST')
+			);
+		}
 
 		$table->addRow(null, null);
 
@@ -343,7 +413,14 @@ class CSetupWizard extends CForm {
 				'DATABASE' => $this->getConfig('DB_DATABASE'),
 				'USER' => $this->getConfig('DB_USER'),
 				'PASSWORD' => $this->getConfig('DB_PASSWORD'),
-				'SCHEMA' => $this->getConfig('DB_SCHEMA')
+				'SCHEMA' => $this->getConfig('DB_SCHEMA'),
+				'ENCRYPTION' => $this->getConfig('DB_ENCRYPTION'),
+				'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
+				'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
+				'CA_FILE' => $this->getConfig('DB_CA_FILE'),
+				'VERIFY_HOST' => $this->getConfig('DB_VERIFY_HOST'),
+				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
+				'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
 			],
 			'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 			'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
@@ -392,7 +469,7 @@ class CSetupWizard extends CForm {
 		];
 	}
 
-	function checkConnection() {
+	function dbConnect() {
 		global $DB;
 
 		if (!$this->getConfig('check_fields_result')) {
@@ -410,36 +487,54 @@ class CSetupWizard extends CForm {
 		$DB['USER'] = $this->getConfig('DB_USER', 'root');
 		$DB['PASSWORD'] = $this->getConfig('DB_PASSWORD', '');
 		$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
+		$DB['ENCRYPTION'] = (bool) $this->getConfig('DB_ENCRYPTION', true);
+		$DB['VERIFY_HOST'] = (bool) $this->getConfig('DB_VERIFY_HOST', true);
+		$DB['KEY_FILE'] = $this->getConfig('DB_KEY_FILE', '');
+		$DB['CERT_FILE'] = $this->getConfig('DB_CERT_FILE', '');
+		$DB['CA_FILE'] = $this->getConfig('DB_CA_FILE', '');
+		$DB['CIPHER_LIST'] = $this->getConfig('DB_CIPHER_LIST', '');
 
 		$error = '';
 
 		// During setup set debug to false to avoid displaying unwanted PHP errors in messages.
-		if (!$result = DBconnect($error)) {
-			error($error);
+		if (DBconnect($error)) {
+			return true;
 		}
 		else {
-			$result = true;
-			if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-				$db_schema = DBselect('SELECT schema_name FROM information_schema.schemata WHERE schema_name = \''.pg_escape_string($DB['SCHEMA']).'\';');
-				$result = DBfetch($db_schema);
-			}
-
-			if ($result) {
-				$result = DBexecute('CREATE TABLE zabbix_installation_test (test_row INTEGER)');
-				$result &= DBexecute('DROP TABLE zabbix_installation_test');
-			}
-
-			$db = DB::getDbBackend();
-
-			if (!$db->checkEncoding()) {
-				error($db->getWarning());
-				return false;
-			}
+			return $error;
 		}
+	}
+
+	function dbClose() {
+		global $DB;
 
 		DBclose();
 
 		$DB = null;
+	}
+
+	function checkConnection() {
+		global $DB;
+
+		$result = true;
+
+		if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+			$db_schema = DBselect(
+				"SELECT schema_name".
+				" FROM information_schema.schemata".
+				" WHERE schema_name='".pg_escape_string($DB['SCHEMA'])."'"
+			);
+			$result = DBfetch($db_schema);
+		}
+
+		$db = DB::getDbBackend();
+
+		if (!$db->checkEncoding()) {
+			error($db->getWarning());
+
+			return false;
+		}
+
 		return $result;
 	}
 
@@ -474,9 +569,36 @@ class CSetupWizard extends CForm {
 			$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
 			$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 			$this->setConfig('DB_SCHEMA', getRequest('schema', $this->getConfig('DB_SCHEMA', '')));
+			$this->setConfig('DB_ENCRYPTION',
+				getRequest('tls_encryption', $this->getConfig('DB_ENCRYPTION', true))
+			);
+			$this->setConfig('DB_VERIFY_HOST',
+				getRequest('verify_host', $this->getConfig('DB_VERIFY_HOST', true))
+			);
+			$this->setConfig('DB_KEY_FILE', getRequest('key_file', $this->getConfig('DB_KEY_FILE', '')));
+			$this->setConfig('DB_CERT_FILE', getRequest('cert_file', $this->getConfig('DB_CERT_FILE', '')));
+			$this->setConfig('DB_CA_FILE', getRequest('ca_file', $this->getConfig('DB_CA_FILE', '')));
+			$this->setConfig('DB_CIPHER_LIST', getRequest('cipher_list', $this->getConfig('DB_CIPHER_LIST', '')));
 
 			if (hasRequest('next') && array_key_exists(2, getRequest('next'))) {
-				if ($this->checkConnection()) {
+				$db_connected = $this->dbConnect();
+				if ($db_connected === true) {
+					$db_connection_checked = $this->checkConnection();
+				}
+				else {
+					error($db_connected);
+					$db_connection_checked = false;
+				}
+
+				if ($db_connection_checked) {
+					$this->setConfig('DB_DOUBLE_IEEE754', DB::getDbBackend()->isDoubleIEEE754());
+				}
+
+				if ($db_connected === true) {
+					$this->dbClose();
+				}
+
+				if ($db_connection_checked) {
 					$this->doNext();
 				}
 				else {
@@ -513,7 +635,14 @@ class CSetupWizard extends CForm {
 						'DATABASE' => $this->getConfig('DB_DATABASE'),
 						'USER' => $this->getConfig('DB_USER'),
 						'PASSWORD' => $this->getConfig('DB_PASSWORD'),
-						'SCHEMA' => $this->getConfig('DB_SCHEMA')
+						'SCHEMA' => $this->getConfig('DB_SCHEMA'),
+						'ENCRYPTION' => (bool) $this->getConfig('DB_ENCRYPTION'),
+						'VERIFY_HOST' => (bool) $this->getConfig('DB_VERIFY_HOST'),
+						'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
+						'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
+						'CA_FILE' => $this->getConfig('DB_CA_FILE'),
+						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
+						'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
 					],
 					'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 					'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),

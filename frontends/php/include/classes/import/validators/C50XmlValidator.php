@@ -48,7 +48,8 @@ class C50XmlValidator {
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
 		CXmlConstantValue::PROMETHEUS_PATTERN => CXmlConstantName::PROMETHEUS_PATTERN,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
-		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON
+		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
+		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
@@ -61,7 +62,8 @@ class C50XmlValidator {
 		CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT,
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
-		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON
+		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
+		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
@@ -212,12 +214,9 @@ class C50XmlValidator {
 
 	private $ITEM_TYPE = [
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE,
-		CXmlConstantValue::ITEM_TYPE_SNMPV1 => CXmlConstantName::SNMPV1,
 		CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP,
 		CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE,
-		CXmlConstantValue::ITEM_TYPE_SNMPV2 => CXmlConstantName::SNMPV2,
 		CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL,
-		CXmlConstantValue::ITEM_TYPE_SNMPV3 => CXmlConstantName::SNMPV3,
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE,
 		CXmlConstantValue::ITEM_TYPE_AGGREGATE => CXmlConstantName::AGGREGATE,
 		CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL,
@@ -229,17 +228,15 @@ class C50XmlValidator {
 		CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX,
 		CXmlConstantValue::ITEM_TYPE_SNMP_TRAP => CXmlConstantName::SNMP_TRAP,
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
-		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT
+		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
+		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT
 	];
 
 	private $ITEM_TYPE_DRULE = [
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE,
-		CXmlConstantValue::ITEM_TYPE_SNMPV1 => CXmlConstantName::SNMPV1,
 		CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP,
 		CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE,
-		CXmlConstantValue::ITEM_TYPE_SNMPV2 => CXmlConstantName::SNMPV2,
 		CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL,
-		CXmlConstantValue::ITEM_TYPE_SNMPV3 => CXmlConstantName::SNMPV3,
 		CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE,
 		CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL,
 		CXmlConstantValue::ITEM_TYPE_ODBC => CXmlConstantName::ODBC,
@@ -248,7 +245,8 @@ class C50XmlValidator {
 		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
 		CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX,
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
-		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT
+		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
+		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT
 	];
 
 	private $ITEM_VALUE_TYPE = [
@@ -366,7 +364,18 @@ class C50XmlValidator {
 							'ip' =>						['type' => XML_STRING, 'default' => '127.0.0.1'],
 							'dns' =>					['type' => XML_STRING, 'default' => ''],
 							'port' =>					['type' => XML_STRING, 'default' => '10050'],
-							'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'details' =>				['type' => XML_ARRAY, 'rules' => [
+								'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3,]],
+								'community' =>				['type' => XML_STRING, 'default' => ''],
+								'contextname' =>			['type' => XML_STRING, 'default' => ''],
+								'securityname' =>			['type' => XML_STRING, 'default' => ''],
+								'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+								'authprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+								'authpassphrase' =>			['type' => XML_STRING, 'default' => ''],
+								'privprotocol' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+								'privpassphrase' =>			['type' => XML_STRING, 'default' => ''],
+								'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+							]],
 							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
@@ -379,7 +388,6 @@ class C50XmlValidator {
 						'item' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-							'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
@@ -389,13 +397,6 @@ class C50XmlValidator {
 							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 							'units' =>					['type' => XML_STRING, 'default' => ''],
-							'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
-							'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
-							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
@@ -403,7 +404,6 @@ class C50XmlValidator {
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
-							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
@@ -492,19 +492,11 @@ class C50XmlValidator {
 						'discovery_rule' =>			['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
-							'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
-							'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
-							'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
-							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
@@ -512,7 +504,6 @@ class C50XmlValidator {
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
-							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
 								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
@@ -532,7 +523,6 @@ class C50XmlValidator {
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-									'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 									'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_STRING, 'default' => '1m'],
@@ -542,13 +532,6 @@ class C50XmlValidator {
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 									'units' =>					['type' => XML_STRING, 'default' => ''],
-									'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
-									'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
-									'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-									'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-									'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-									'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-									'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 									'params' =>					['type' => XML_STRING, 'default' => ''],
 									'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
@@ -556,7 +539,6 @@ class C50XmlValidator {
 									'password' =>				['type' => XML_STRING, 'default' => ''],
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
-									'port' =>					['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
@@ -734,6 +716,14 @@ class C50XmlValidator {
 										'template' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
+									]],
+									'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
+										'macro' =>					['type' => XML_ARRAY, 'rules' => [
+											'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET]],
+											'value' =>					['type' => XML_STRING, 'default' => ''],
+											'description' =>			['type' => XML_STRING, 'default' => '']
+										]]
 									]]
 								]]
 							]],
@@ -856,6 +846,7 @@ class C50XmlValidator {
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>					['type' => XML_ARRAY, 'rules' => [
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET]],
 							'value' =>					['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => '']
 						]]
@@ -959,7 +950,6 @@ class C50XmlValidator {
 						'item' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-							'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
@@ -969,13 +959,6 @@ class C50XmlValidator {
 							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 							'units' =>					['type' => XML_STRING, 'default' => ''],
-							'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
-							'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
-							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
@@ -983,7 +966,6 @@ class C50XmlValidator {
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
-							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
@@ -1071,19 +1053,11 @@ class C50XmlValidator {
 						'discovery_rule' =>			['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
-							'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
 							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
-							'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
-							'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
-							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
@@ -1091,7 +1065,6 @@ class C50XmlValidator {
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
-							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
 								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
@@ -1110,7 +1083,6 @@ class C50XmlValidator {
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-									'snmp_community' =>			['type' => XML_STRING, 'default' => ''],
 									'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 									'key' =>					['type' => XML_STRING | XML_REQUIRED],
 									'delay' =>					['type' => XML_STRING, 'default' => '1m'],
@@ -1120,13 +1092,6 @@ class C50XmlValidator {
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 									'units' =>					['type' => XML_STRING, 'default' => ''],
-									'snmpv3_contextname' =>		['type' => XML_STRING, 'default' => ''],
-									'snmpv3_securityname' =>	['type' => XML_STRING, 'default' => ''],
-									'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-									'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-									'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-									'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-									'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 									'params' =>					['type' => XML_STRING, 'default' => ''],
 									'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
@@ -1134,7 +1099,6 @@ class C50XmlValidator {
 									'password' =>				['type' => XML_STRING, 'default' => ''],
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
-									'port' =>					['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
@@ -1310,6 +1274,14 @@ class C50XmlValidator {
 										'template' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
+									]],
+									'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
+										'macro' =>					['type' => XML_ARRAY, 'rules' => [
+											'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET]],
+											'value' =>					['type' => XML_STRING, 'default' => ''],
+											'description' =>			['type' => XML_STRING, 'default' => '']
+										]]
 									]]
 								]]
 							]],
@@ -1432,6 +1404,7 @@ class C50XmlValidator {
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>					['type' => XML_ARRAY, 'rules' => [
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET]],
 							'value' =>					['type' => XML_STRING, 'default' => ''],
 							'description' =>			['type' => XML_STRING, 'default' => '']
 						]]

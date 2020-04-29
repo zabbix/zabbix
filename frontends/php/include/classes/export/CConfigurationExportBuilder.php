@@ -558,19 +558,11 @@ class CConfigurationExportBuilder {
 			$data = [
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
-				'snmp_community' => $discoveryRule['snmp_community'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
 				'key' => $discoveryRule['key_'],
 				'delay' => $discoveryRule['delay'],
 				'status' => $discoveryRule['status'],
 				'allowed_hosts' => $discoveryRule['trapper_hosts'],
-				'snmpv3_contextname' => $discoveryRule['snmpv3_contextname'],
-				'snmpv3_securityname' => $discoveryRule['snmpv3_securityname'],
-				'snmpv3_securitylevel' => $discoveryRule['snmpv3_securitylevel'],
-				'snmpv3_authprotocol' => $discoveryRule['snmpv3_authprotocol'],
-				'snmpv3_authpassphrase' => $discoveryRule['snmpv3_authpassphrase'],
-				'snmpv3_privprotocol' => $discoveryRule['snmpv3_privprotocol'],
-				'snmpv3_privpassphrase' => $discoveryRule['snmpv3_privpassphrase'],
 				'params' => $discoveryRule['params'],
 				'ipmi_sensor' => $discoveryRule['ipmi_sensor'],
 				'authtype' => $discoveryRule['authtype'],
@@ -578,7 +570,6 @@ class CConfigurationExportBuilder {
 				'password' => $discoveryRule['password'],
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
-				'port' => $discoveryRule['port'],
 				'filter' => $discoveryRule['filter'],
 				'lifetime' => $discoveryRule['lifetime'],
 				'description' => $discoveryRule['description'],
@@ -783,6 +774,7 @@ class CConfigurationExportBuilder {
 				'status' => $hostPrototype['status'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
+				'macros' => $this->formatMacros($hostPrototype['macros']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
 				'inventory_mode' => $hostPrototype['inventory_mode']
 			];
@@ -909,7 +901,7 @@ class CConfigurationExportBuilder {
 				'ip' => $interface['ip'],
 				'dns' => $interface['dns'],
 				'port' => $interface['port'],
-				'bulk' => $interface['bulk'],
+				'details' => $interface['details'],
 				'interface_ref' => $interface['interface_ref']
 			];
 		}
@@ -956,7 +948,6 @@ class CConfigurationExportBuilder {
 			$data = [
 				'name' => $item['name'],
 				'type' => $item['type'],
-				'snmp_community' => $item['snmp_community'],
 				'snmp_oid' => $item['snmp_oid'],
 				'key' => $item['key_'],
 				'delay' => $item['delay'],
@@ -966,13 +957,6 @@ class CConfigurationExportBuilder {
 				'value_type' => $item['value_type'],
 				'allowed_hosts' => $item['trapper_hosts'],
 				'units' => $item['units'],
-				'snmpv3_contextname' => $item['snmpv3_contextname'],
-				'snmpv3_securityname' => $item['snmpv3_securityname'],
-				'snmpv3_securitylevel' => $item['snmpv3_securitylevel'],
-				'snmpv3_authprotocol' => $item['snmpv3_authprotocol'],
-				'snmpv3_authpassphrase' => $item['snmpv3_authpassphrase'],
-				'snmpv3_privprotocol' => $item['snmpv3_privprotocol'],
-				'snmpv3_privpassphrase' => $item['snmpv3_privpassphrase'],
 				'params' => $item['params'],
 				'ipmi_sensor' => $item['ipmi_sensor'],
 				'authtype' => $item['authtype'],
@@ -980,7 +964,6 @@ class CConfigurationExportBuilder {
 				'password' => $item['password'],
 				'publickey' => $item['publickey'],
 				'privatekey' => $item['privatekey'],
-				'port' => $item['port'],
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
 				'applications' => $this->formatApplications($item['applications']),
@@ -1123,7 +1106,8 @@ class CConfigurationExportBuilder {
 		foreach ($macros as $macro) {
 			$result[] = [
 				'macro' => $macro['macro'],
-				'value' => $macro['value'],
+				'type' => $macro['type'],
+				'value' => array_key_exists('value', $macro) ? $macro['value'] : '',
 				'description' => $macro['description']
 			];
 		}
@@ -1336,7 +1320,7 @@ class CConfigurationExportBuilder {
 
 			// Sort selements by position asc.
 			if ($link['selementpos2'] < $link['selementpos1']) {
-				zbx_swap($link['selementpos1'], $link['selementpos2']);
+				[$link['selementpos1'], $link['selementpos2']] = [$link['selementpos2'], $link['selementpos1']];
 			}
 		}
 		unset($link);

@@ -489,7 +489,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 
 	if (0 != mediatypeid)
 	{
-		result = DBselect("select subject,message,mediatypeid from media_type_message"
+		result = DBselect("select mediatype_messageid,subject,message,mediatypeid from media_type_message"
 				" where eventsource=%d and recovery=%d and mediatypeid=" ZBX_FS_UI64,
 				evt_src, op_mode, mediatypeid);
 
@@ -498,22 +498,25 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 	else
 	{
 		result = DBselect(
-				"select mtm.subject,mtm.message,mt.mediatypeid from media_type mt"
-				" left join (select mediatypeid,subject,message from media_type_message"
-				" where eventsource=%d and recovery=%d) as mtm"
-				" on mt.mediatypeid=mtm.mediatypeid"
-				" join (select distinct mediatypeid from media where userid=" ZBX_FS_UI64 ") as m"
+				"select mm.mediatype_messageid,mm.subject,mm.message,mt.mediatypeid from media_type mt"
+				" left join (select mediatypeid,subject,message,mediatype_messageid"
+				" from media_type_message where eventsource=%d and recovery=%d) mm"
+				" on mt.mediatypeid=mm.mediatypeid"
+				" join (select distinct mediatypeid from media where userid=" ZBX_FS_UI64 ") m"
 				" on mt.mediatypeid=m.mediatypeid",
 				evt_src, op_mode, userid);
 	}
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(mediatypeid, row[2]);
+		zbx_uint64_t	mtmid;
 
-		if (FAIL == DBis_null(row[0]))
+		ZBX_DBROW2UINT64(mtmid, row[0]);
+		ZBX_STR2UINT64(mediatypeid, row[3]);
+
+		if (0 != mtmid)
 		{
-			add_user_msg(userid, mediatypeid, user_msg, row[0], row[1], actionid, event, r_event, ack,
+			add_user_msg(userid, mediatypeid, user_msg, row[1], row[2], actionid, event, r_event, ack,
 					macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE);
 		}
 		else
@@ -1059,8 +1062,11 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[12]);
-			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
+			script.command_orig = zbx_strdup(script.command_orig, row[12]);
+			substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
 					NULL, NULL, NULL, ack, &script.command, macro_type, NULL, 0);
+			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
+					NULL, NULL, NULL, ack, &script.command_orig, macro_type, NULL, 0);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
@@ -1150,7 +1156,7 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			status = ALERT_STATUS_FAILED;
 
 		add_command_alert(&db_insert, alerts_num++, alertid, &host, event, r_event, actionid, esc_step,
-				script.command, status, error);
+				script.command_orig, status, error);
 skip:
 		zbx_script_clean(&script);
 	}
@@ -1194,7 +1200,7 @@ static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event,
 
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
 				ack, &name, message_type, NULL, 0);
-		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
+		substitute_simple_macros_unmasked(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
 				ack, &value, message_type, NULL, 0);
 
 		zbx_json_addstring(&json, name, value, ZBX_JSON_TYPE_STRING);

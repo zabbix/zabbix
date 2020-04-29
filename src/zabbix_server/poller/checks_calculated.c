@@ -251,10 +251,8 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 			ret_unknown = 1;
 		}
 
-		f->value = (char *)zbx_malloc(f->value, MAX_BUFFER_LEN);
-
 		if (0 == ret_unknown &&
-				SUCCEED != evaluate_function(f->value, &items[i], f->func, f->params, &ts, &errstr))
+				SUCCEED != evaluate_function(&(f->value), &items[i], f->func, f->params, &ts, &errstr))
 		{
 			/* compose and store error message for future use */
 			if (NULL != errstr)
@@ -350,9 +348,11 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	if (ITEM_VALUE_TYPE_UINT64 == dc_item->value_type && 0 > value)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [" ZBX_FS_DBL "]"
-				" is not suitable for value type [%s].",
-				value, zbx_item_value_type_string((zbx_item_value_type_t)dc_item->value_type)));
+		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
+
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [%s] is not suitable for value type [%s].",
+				zbx_print_double(buffer, sizeof(buffer), value),
+				zbx_item_value_type_string((zbx_item_value_type_t)dc_item->value_type)));
 		ret = NOTSUPPORTED;
 		goto clean;
 	}

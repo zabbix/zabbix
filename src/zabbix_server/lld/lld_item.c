@@ -42,18 +42,12 @@ typedef struct
 	char			*logtimefmt;
 	char			*params;
 	char			*ipmi_sensor;
-	char			*snmp_community;
 	char			*snmp_oid;
-	char			*snmpv3_securityname;
-	char			*snmpv3_authpassphrase;
-	char			*snmpv3_privpassphrase;
-	char			*snmpv3_contextname;
 	char			*username;
 	char			*password;
 	char			*publickey;
 	char			*privatekey;
 	char			*description;
-	char			*port;
 	char			*jmx_endpoint;
 	char			*timeout;
 	char			*url;
@@ -75,9 +69,6 @@ typedef struct
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		status;
-	unsigned char		snmpv3_securitylevel;
-	unsigned char		snmpv3_authprotocol;
-	unsigned char		snmpv3_privprotocol;
 	unsigned char		authtype;
 	unsigned char		allow_traps;
 	zbx_vector_ptr_t	lld_rows;
@@ -118,15 +109,7 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID		__UINT64_C(0x0000000000010000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS			__UINT64_C(0x0000000000020000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR		__UINT64_C(0x0000000000040000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY		__UINT64_C(0x0000000000080000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID		__UINT64_C(0x0000000000100000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PORT			__UINT64_C(0x0000000000200000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME	__UINT64_C(0x0000000000400000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL	__UINT64_C(0x0000000000800000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPROTOCOL	__UINT64_C(0x0000000001000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE	__UINT64_C(0x0000000002000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPROTOCOL	__UINT64_C(0x0000000004000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE	__UINT64_C(0x0000000008000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE		__UINT64_C(0x0000000010000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME		__UINT64_C(0x0000000020000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD		__UINT64_C(0x0000000040000000)
@@ -134,7 +117,6 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY		__UINT64_C(0x0000000100000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION		__UINT64_C(0x0000000200000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID		__UINT64_C(0x0000000400000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME	__UINT64_C(0x0000000800000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT		__UINT64_C(0x0000001000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM		__UINT64_C(0x0000002000000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_TIMEOUT		__UINT64_C(0x0000004000000000)
@@ -481,18 +463,12 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_free(item_prototype->logtimefmt);
 	zbx_free(item_prototype->params);
 	zbx_free(item_prototype->ipmi_sensor);
-	zbx_free(item_prototype->snmp_community);
 	zbx_free(item_prototype->snmp_oid);
-	zbx_free(item_prototype->snmpv3_securityname);
-	zbx_free(item_prototype->snmpv3_authpassphrase);
-	zbx_free(item_prototype->snmpv3_privpassphrase);
-	zbx_free(item_prototype->snmpv3_contextname);
 	zbx_free(item_prototype->username);
 	zbx_free(item_prototype->password);
 	zbx_free(item_prototype->publickey);
 	zbx_free(item_prototype->privatekey);
 	zbx_free(item_prototype->description);
-	zbx_free(item_prototype->port);
 	zbx_free(item_prototype->jmx_endpoint);
 	zbx_free(item_prototype->timeout);
 	zbx_free(item_prototype->url);
@@ -611,11 +587,9 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select id.itemid,id.key_,id.lastcheck,id.ts_delete,i.name,i.key_,i.type,i.value_type,"
 				"i.delay,i.history,i.trends,i.trapper_hosts,i.units,"
-				"i.formula,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,"
-				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
-				"i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,"
-				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.description,i.interfaceid,i.snmpv3_contextname,i.jmx_endpoint,i.master_itemid,"
+				"i.formula,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_oid,"
+				"i.authtype,i.username,i.password,i.publickey,i.privatekey,"
+				"i.description,i.interfaceid,i.jmx_endpoint,i.master_itemid,"
 				"i.timeout,i.url,i.query_fields,i.posts,i.status_codes,i.follow_redirects,i.post_type,"
 				"i.http_proxy,i.headers,i.retrieve_mode,i.request_method,i.output_format,"
 				"i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,i.verify_host,"
@@ -632,7 +606,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(itemid, row[54]);
+		ZBX_STR2UINT64(itemid, row[45]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &itemid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -694,115 +668,88 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->ipmi_sensor = zbx_strdup(NULL, row[17]);
 		item->ipmi_sensor_orig = NULL;
 
-		if (0 != strcmp(row[18], item_prototype->snmp_community))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY;
-
-		item->snmp_oid = zbx_strdup(NULL, row[19]);
+		item->snmp_oid = zbx_strdup(NULL, row[18]);
 		item->snmp_oid_orig = NULL;
 
-		if (0 != strcmp(row[20], item_prototype->port))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PORT;
-
-		if (0 != strcmp(row[21], item_prototype->snmpv3_securityname))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME;
-
-		if ((unsigned char)atoi(row[22]) != item_prototype->snmpv3_securitylevel)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL;
-
-		if ((unsigned char)atoi(row[23]) != item_prototype->snmpv3_authprotocol)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPROTOCOL;
-
-		if (0 != strcmp(row[24], item_prototype->snmpv3_authpassphrase))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE;
-
-		if ((unsigned char)atoi(row[25]) != item_prototype->snmpv3_privprotocol)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPROTOCOL;
-
-		if (0 != strcmp(row[26], item_prototype->snmpv3_privpassphrase))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE;
-
-		if ((unsigned char)atoi(row[27]) != item_prototype->authtype)
+		if ((unsigned char)atoi(row[19]) != item_prototype->authtype)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE;
 
-		item->username = zbx_strdup(NULL, row[28]);
+		item->username = zbx_strdup(NULL, row[20]);
 		item->username_orig = NULL;
 
-		item->password = zbx_strdup(NULL, row[29]);
+		item->password = zbx_strdup(NULL, row[21]);
 		item->password_orig = NULL;
 
-		if (0 != strcmp(row[30], item_prototype->publickey))
+		if (0 != strcmp(row[20], item_prototype->publickey))
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY;
 
-		if (0 != strcmp(row[31], item_prototype->privatekey))
+		if (0 != strcmp(row[23], item_prototype->privatekey))
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY;
 
-		item->description = zbx_strdup(NULL, row[32]);
+		item->description = zbx_strdup(NULL, row[24]);
 		item->description_orig = NULL;
 
-		ZBX_DBROW2UINT64(db_interfaceid, row[33]);
+		ZBX_DBROW2UINT64(db_interfaceid, row[25]);
 		if (db_interfaceid != item_prototype->interfaceid)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID;
 
-		if (0 != strcmp(row[34], item_prototype->snmpv3_contextname))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME;
-
-		item->jmx_endpoint = zbx_strdup(NULL, row[35]);
+		item->jmx_endpoint = zbx_strdup(NULL, row[26]);
 		item->jmx_endpoint_orig = NULL;
 
-		ZBX_DBROW2UINT64(item->master_itemid, row[36]);
+		ZBX_DBROW2UINT64(item->master_itemid, row[27]);
 
-		item->timeout = zbx_strdup(NULL, row[37]);
+		item->timeout = zbx_strdup(NULL, row[28]);
 		item->timeout_orig = NULL;
 
-		item->url = zbx_strdup(NULL, row[38]);
+		item->url = zbx_strdup(NULL, row[29]);
 		item->url_orig = NULL;
 
-		item->query_fields = zbx_strdup(NULL, row[39]);
+		item->query_fields = zbx_strdup(NULL, row[30]);
 		item->query_fields_orig = NULL;
 
-		item->posts = zbx_strdup(NULL, row[40]);
+		item->posts = zbx_strdup(NULL, row[31]);
 		item->posts_orig = NULL;
 
-		item->status_codes = zbx_strdup(NULL, row[41]);
+		item->status_codes = zbx_strdup(NULL, row[32]);
 		item->status_codes_orig = NULL;
 
-		if ((unsigned char)atoi(row[42]) != item_prototype->follow_redirects)
+		if ((unsigned char)atoi(row[33]) != item_prototype->follow_redirects)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_FOLLOW_REDIRECTS;
 
-		if ((unsigned char)atoi(row[43]) != item_prototype->post_type)
+		if ((unsigned char)atoi(row[34]) != item_prototype->post_type)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_POST_TYPE;
 
-		item->http_proxy = zbx_strdup(NULL, row[44]);
+		item->http_proxy = zbx_strdup(NULL, row[35]);
 		item->http_proxy_orig = NULL;
 
-		item->headers = zbx_strdup(NULL, row[45]);
+		item->headers = zbx_strdup(NULL, row[36]);
 		item->headers_orig = NULL;
 
-		if ((unsigned char)atoi(row[46]) != item_prototype->retrieve_mode)
+		if ((unsigned char)atoi(row[37]) != item_prototype->retrieve_mode)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_RETRIEVE_MODE;
 
-		if ((unsigned char)atoi(row[47]) != item_prototype->request_method)
+		if ((unsigned char)atoi(row[38]) != item_prototype->request_method)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_REQUEST_METHOD;
 
-		if ((unsigned char)atoi(row[48]) != item_prototype->output_format)
+		if ((unsigned char)atoi(row[39]) != item_prototype->output_format)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_OUTPUT_FORMAT;
 
-		item->ssl_cert_file = zbx_strdup(NULL, row[49]);
+		item->ssl_cert_file = zbx_strdup(NULL, row[40]);
 		item->ssl_cert_file_orig = NULL;
 
-		item->ssl_key_file = zbx_strdup(NULL, row[50]);
+		item->ssl_key_file = zbx_strdup(NULL, row[41]);
 		item->ssl_key_file_orig = NULL;
 
-		item->ssl_key_password = zbx_strdup(NULL, row[51]);
+		item->ssl_key_password = zbx_strdup(NULL, row[42]);
 		item->ssl_key_password_orig = NULL;
 
-		if ((unsigned char)atoi(row[52]) != item_prototype->verify_peer)
+		if ((unsigned char)atoi(row[43]) != item_prototype->verify_peer)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER;
 
-		if ((unsigned char)atoi(row[53]) != item_prototype->verify_host)
+		if ((unsigned char)atoi(row[44]) != item_prototype->verify_host)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_HOST;
 
-		if ((unsigned char)atoi(row[55]) != item_prototype->allow_traps)
+		if ((unsigned char)atoi(row[46]) != item_prototype->allow_traps)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_ALLOW_TRAPS;
 
 		item->lld_row = NULL;
@@ -1359,7 +1306,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN], *errmsg = NULL;
 	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
-	const char*	regexp_err = NULL;
+	const char	*regexp_err = NULL;
 	zbx_uint64_t	value_ui64;
 	zbx_jsonpath_t	jsonpath;
 
@@ -1503,6 +1450,14 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 				ret = FAIL;
 				break;
 			}
+			break;
+		case ZBX_PREPROC_STR_REPLACE:
+			if ('\n' == *pp->params)
+			{
+				zbx_snprintf(err, sizeof(err), "first parameter is expected");
+				ret = FAIL;
+			}
+			break;
 	}
 
 	if (SUCCEED != ret)
@@ -1927,7 +1882,12 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
-	ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY, err, sizeof(err));
+
+	if (FAIL == (ret = substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
+			err, sizeof(err))))
+	{
+		*error = zbx_strdcatf(*error, "Cannot create item, error in item key parameters %s.\n", err);
+	}
 
 	item->delay = zbx_strdup(NULL, item_prototype->delay);
 	item->delay_orig = NULL;
@@ -1954,8 +1914,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 	{
-		if (SUCCEED == ret)
-			ret = substitute_formula_macros(&item->params, jp_row, lld_macro_paths, err, sizeof(err));
+		if (SUCCEED == ret && FAIL == (ret = substitute_formula_macros(&item->params, jp_row, lld_macro_paths,
+				err, sizeof(err))))
+		{
+			*error = zbx_strdcatf(*error, "Cannot create item, error in formula: %s.\n", err);
+		}
 	}
 	else
 		substitute_lld_macros(&item->params, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
@@ -1969,11 +1932,14 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
 	item->snmp_oid_orig = NULL;
-	if (SUCCEED == ret && (ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
-			ITEM_TYPE_SNMPv3 == item_prototype->type))
+
+	if (SUCCEED == ret && ITEM_TYPE_SNMP == item_prototype->type &&
+			FAIL == (ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, lld_macro_paths,
+			MACRO_TYPE_SNMP_OID, err, sizeof(err))))
 	{
-		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_SNMP_OID, err, sizeof(err));
+		*error = zbx_strdcatf(*error, "Cannot create item, error in SNMP OID key parameters: %s.\n", err);
 	}
+
 	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 
 	item->username = zbx_strdup(NULL, item_prototype->username);
@@ -2009,8 +1975,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
 
-	if (SUCCEED == ret)
-		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, lld_macro_paths, err, sizeof(err));
+	if (SUCCEED == ret && FAIL == (ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row,
+			lld_macro_paths, err, sizeof(err))))
+	{
+		*error = zbx_strdcatf(*error, "Cannot create item, error in JSON: %s.\n", err);
+	}
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
@@ -2025,6 +1994,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 					lld_macro_paths, err, sizeof(err))))
 			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
+				*error = zbx_strdcatf(*error, "Cannot create item, error in XML: %s.\n", err);
 			}
 			break;
 		default:
@@ -2071,7 +2041,6 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	if (SUCCEED != ret)
 	{
-		*error = zbx_strdcatf(*error, "Cannot create item: %s.\n", err);
 		lld_item_free(item);
 		item = NULL;
 	}
@@ -2125,7 +2094,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 		}
 		else
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in item key parameters: %s.\n", err);
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->delay);
@@ -2189,7 +2158,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 			}
 		}
 		else
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in formula: %s.\n", err);
 	}
 	else
 	{
@@ -2217,7 +2186,13 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
-	substitute_key_macros(&buffer, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_SNMP_OID, NULL, 0);
+
+	if (ITEM_TYPE_SNMP == item_prototype->type && FAIL == substitute_key_macros(&buffer, NULL, NULL, jp_row,
+			lld_macro_paths, MACRO_TYPE_SNMP_OID, err, sizeof(err)))
+	{
+		*error = zbx_strdcatf(*error, "Cannot update item, error in SNMP OID key parameters: %s.\n", err);
+	}
+
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->snmp_oid, buffer))
 	{
@@ -2296,7 +2271,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
 
 	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, lld_macro_paths, err, sizeof(err)))
-		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+		*error = zbx_strdcatf(*error, "Cannot update item, error in JSON: %s.\n", err);
 
 	if (0 != strcmp(item->query_fields, buffer))
 	{
@@ -2317,7 +2292,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		if (FAIL == substitute_macros_xml(&buffer, NULL, jp_row, lld_macro_paths, err, sizeof(err)))
 		{
 			zbx_lrtrim(err, ZBX_WHITESPACE);
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+			*error = zbx_strdcatf(*error, "Cannot update item, error in XML: %s.\n", err);
 		}
 	}
 	else
@@ -2562,6 +2537,11 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
 			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_JSONPATH;
 			params_num = 1;
 			break;
+		case ZBX_PREPROC_STR_REPLACE:
+			flags1 = ZBX_MACRO_ANY | ZBX_TOKEN_STR_REPLACE;
+			flags2 = ZBX_MACRO_ANY | ZBX_TOKEN_STR_REPLACE;
+			params_num = 2;
+			break;
 		default:
 			flags1 = ZBX_MACRO_ANY;
 			params_num = 1;
@@ -2771,15 +2751,10 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 				item->delay, item->history, item->trends,
 				(int)item_prototype->status, item_prototype->trapper_hosts, item->units,
 				item_prototype->formula, item_prototype->logtimefmt, item_prototype->valuemapid,
-				item->params, item->ipmi_sensor, item_prototype->snmp_community, item->snmp_oid,
-				item_prototype->port, item_prototype->snmpv3_securityname,
-				(int)item_prototype->snmpv3_securitylevel,
-				(int)item_prototype->snmpv3_authprotocol, item_prototype->snmpv3_authpassphrase,
-				(int)item_prototype->snmpv3_privprotocol, item_prototype->snmpv3_privpassphrase,
-				(int)item_prototype->authtype, item->username,
-				item->password, item_prototype->publickey, item_prototype->privatekey,
+				item->params, item->ipmi_sensor, item->snmp_oid, (int)item_prototype->authtype,
+				item->username, item->password, item_prototype->publickey, item_prototype->privatekey,
 				item->description, item_prototype->interfaceid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				item_prototype->snmpv3_contextname, item->jmx_endpoint, item->master_itemid,
+				item->jmx_endpoint, item->master_itemid,
 				item->timeout, item->url, item->query_fields, item->posts, item->status_codes,
 				item_prototype->follow_redirects, item_prototype->post_type, item->http_proxy,
 				item->headers, item_prototype->retrieve_mode, item_prototype->request_method,
@@ -2920,63 +2895,10 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_free(value_esc);
 		d = ",";
 	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY))
-	{
-		value_esc = DBdyn_escape_string(item_prototype->snmp_community);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmp_community='%s'", d, value_esc);
-		zbx_free(value_esc);
-		d = ",";
-	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID))
 	{
 		value_esc = DBdyn_escape_string(item->snmp_oid);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmp_oid='%s'", d, value_esc);
-		zbx_free(value_esc);
-		d = ",";
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PORT))
-	{
-		value_esc = DBdyn_escape_string(item_prototype->port);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sport='%s'", d, value_esc);
-		zbx_free(value_esc);
-		d = ",";
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME))
-	{
-		value_esc = DBdyn_escape_string(item_prototype->snmpv3_securityname);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmpv3_securityname='%s'", d, value_esc);
-		zbx_free(value_esc);
-		d = ",";
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL))
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmpv3_securitylevel=%d", d,
-				(int)item_prototype->snmpv3_securitylevel);
-		d = ",";
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPROTOCOL))
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmpv3_authprotocol=%d", d,
-				(int)item_prototype->snmpv3_authprotocol);
-		d = ",";
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE))
-	{
-		value_esc = DBdyn_escape_string(item_prototype->snmpv3_authpassphrase);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmpv3_authpassphrase='%s'", d, value_esc);
-		zbx_free(value_esc);
-		d = ",";
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPROTOCOL))
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmpv3_privprotocol=%d", d,
-				(int)item_prototype->snmpv3_privprotocol);
-		d = ",";
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE))
-	{
-		value_esc = DBdyn_escape_string(item_prototype->snmpv3_privpassphrase);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmpv3_privpassphrase='%s'", d, value_esc);
 		zbx_free(value_esc);
 		d = ",";
 	}
@@ -3025,13 +2947,6 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sinterfaceid=%s",
 				d, DBsql_id_ins(item_prototype->interfaceid));
-		d = ",";
-	}
-	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME))
-	{
-		value_esc = DBdyn_escape_string(item_prototype->snmpv3_contextname);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssnmpv3_contextname='%s'", d, value_esc);
-		zbx_free(value_esc);
 		d = ",";
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_JMX_ENDPOINT))
@@ -3318,10 +3233,8 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		zbx_db_insert_prepare(&db_insert_items, "items", "itemid", "name", "key_", "hostid", "type",
 				"value_type", "delay", "history", "trends", "status", "trapper_hosts",
 				"units", "formula", "logtimefmt", "valuemapid", "params",
-				"ipmi_sensor", "snmp_community", "snmp_oid", "port", "snmpv3_securityname",
-				"snmpv3_securitylevel", "snmpv3_authprotocol", "snmpv3_authpassphrase",
-				"snmpv3_privprotocol", "snmpv3_privpassphrase", "authtype", "username", "password",
-				"publickey", "privatekey", "description", "interfaceid", "flags", "snmpv3_contextname",
+				"ipmi_sensor", "snmp_oid", "authtype", "username", "password",
+				"publickey", "privatekey", "description", "interfaceid", "flags",
 				"jmx_endpoint", "master_itemid", "timeout", "url", "query_fields", "posts",
 				"status_codes", "follow_redirects", "post_type", "http_proxy", "headers",
 				"retrieve_mode", "request_method", "output_format", "ssl_cert_file", "ssl_key_file",
@@ -5067,11 +4980,9 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 	result = DBselect(
 			"select i.itemid,i.name,i.key_,i.type,i.value_type,i.delay,"
 				"i.history,i.trends,i.status,i.trapper_hosts,i.units,i.formula,"
-				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_community,i.snmp_oid,"
-				"i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,"
-				"i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.authtype,"
+				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_oid,i.authtype,"
 				"i.username,i.password,i.publickey,i.privatekey,i.description,i.interfaceid,"
-				"i.snmpv3_contextname,i.jmx_endpoint,i.master_itemid,i.timeout,i.url,i.query_fields,"
+				"i.jmx_endpoint,i.master_itemid,i.timeout,i.url,i.query_fields,"
 				"i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,"
 				"i.retrieve_mode,i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,"
 				"i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps"
@@ -5100,44 +5011,35 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		ZBX_DBROW2UINT64(item_prototype->valuemapid, row[13]);
 		item_prototype->params = zbx_strdup(NULL, row[14]);
 		item_prototype->ipmi_sensor = zbx_strdup(NULL, row[15]);
-		item_prototype->snmp_community = zbx_strdup(NULL, row[16]);
-		item_prototype->snmp_oid = zbx_strdup(NULL, row[17]);
-		item_prototype->port = zbx_strdup(NULL, row[18]);
-		item_prototype->snmpv3_securityname = zbx_strdup(NULL, row[19]);
-		ZBX_STR2UCHAR(item_prototype->snmpv3_securitylevel, row[20]);
-		ZBX_STR2UCHAR(item_prototype->snmpv3_authprotocol, row[21]);
-		item_prototype->snmpv3_authpassphrase = zbx_strdup(NULL, row[22]);
-		ZBX_STR2UCHAR(item_prototype->snmpv3_privprotocol, row[23]);
-		item_prototype->snmpv3_privpassphrase = zbx_strdup(NULL, row[24]);
-		ZBX_STR2UCHAR(item_prototype->authtype, row[25]);
-		item_prototype->username = zbx_strdup(NULL, row[26]);
-		item_prototype->password = zbx_strdup(NULL, row[27]);
-		item_prototype->publickey = zbx_strdup(NULL, row[28]);
-		item_prototype->privatekey = zbx_strdup(NULL, row[29]);
-		item_prototype->description = zbx_strdup(NULL, row[30]);
-		ZBX_DBROW2UINT64(item_prototype->interfaceid, row[31]);
-		item_prototype->snmpv3_contextname = zbx_strdup(NULL, row[32]);
-		item_prototype->jmx_endpoint = zbx_strdup(NULL, row[33]);
-		ZBX_DBROW2UINT64(item_prototype->master_itemid, row[34]);
+		item_prototype->snmp_oid = zbx_strdup(NULL, row[16]);
+		ZBX_STR2UCHAR(item_prototype->authtype, row[17]);
+		item_prototype->username = zbx_strdup(NULL, row[18]);
+		item_prototype->password = zbx_strdup(NULL, row[19]);
+		item_prototype->publickey = zbx_strdup(NULL, row[20]);
+		item_prototype->privatekey = zbx_strdup(NULL, row[21]);
+		item_prototype->description = zbx_strdup(NULL, row[22]);
+		ZBX_DBROW2UINT64(item_prototype->interfaceid, row[23]);
+		item_prototype->jmx_endpoint = zbx_strdup(NULL, row[24]);
+		ZBX_DBROW2UINT64(item_prototype->master_itemid, row[25]);
 
-		item_prototype->timeout = zbx_strdup(NULL, row[35]);
-		item_prototype->url = zbx_strdup(NULL, row[36]);
-		item_prototype->query_fields = zbx_strdup(NULL, row[37]);
-		item_prototype->posts = zbx_strdup(NULL, row[38]);
-		item_prototype->status_codes = zbx_strdup(NULL, row[39]);
-		ZBX_STR2UCHAR(item_prototype->follow_redirects, row[40]);
-		ZBX_STR2UCHAR(item_prototype->post_type, row[41]);
-		item_prototype->http_proxy = zbx_strdup(NULL, row[42]);
-		item_prototype->headers = zbx_strdup(NULL, row[43]);
-		ZBX_STR2UCHAR(item_prototype->retrieve_mode, row[44]);
-		ZBX_STR2UCHAR(item_prototype->request_method, row[45]);
-		ZBX_STR2UCHAR(item_prototype->output_format, row[46]);
-		item_prototype->ssl_cert_file = zbx_strdup(NULL, row[47]);
-		item_prototype->ssl_key_file = zbx_strdup(NULL, row[48]);
-		item_prototype->ssl_key_password = zbx_strdup(NULL, row[49]);
-		ZBX_STR2UCHAR(item_prototype->verify_peer, row[50]);
-		ZBX_STR2UCHAR(item_prototype->verify_host, row[51]);
-		ZBX_STR2UCHAR(item_prototype->allow_traps, row[52]);
+		item_prototype->timeout = zbx_strdup(NULL, row[26]);
+		item_prototype->url = zbx_strdup(NULL, row[27]);
+		item_prototype->query_fields = zbx_strdup(NULL, row[28]);
+		item_prototype->posts = zbx_strdup(NULL, row[29]);
+		item_prototype->status_codes = zbx_strdup(NULL, row[30]);
+		ZBX_STR2UCHAR(item_prototype->follow_redirects, row[31]);
+		ZBX_STR2UCHAR(item_prototype->post_type, row[32]);
+		item_prototype->http_proxy = zbx_strdup(NULL, row[33]);
+		item_prototype->headers = zbx_strdup(NULL, row[34]);
+		ZBX_STR2UCHAR(item_prototype->retrieve_mode, row[35]);
+		ZBX_STR2UCHAR(item_prototype->request_method, row[36]);
+		ZBX_STR2UCHAR(item_prototype->output_format, row[37]);
+		item_prototype->ssl_cert_file = zbx_strdup(NULL, row[38]);
+		item_prototype->ssl_key_file = zbx_strdup(NULL, row[39]);
+		item_prototype->ssl_key_password = zbx_strdup(NULL, row[40]);
+		ZBX_STR2UCHAR(item_prototype->verify_peer, row[41]);
+		ZBX_STR2UCHAR(item_prototype->verify_host, row[42]);
+		ZBX_STR2UCHAR(item_prototype->allow_traps, row[43]);
 
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_ptr_create(&item_prototype->applications);

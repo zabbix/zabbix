@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ class CControllerModuleEdit extends CController {
 				->setArgument('action', 'module.list')
 				->setArgument('page', CPagerHelper::loadPage('module.list', null))
 			);
-			$response->setMessageError(_s('Cannot load module at: %s.', $this->module['relative_path']));
+			$response->setMessageError(_s('Cannot load module at: %1$s.', $this->module['relative_path']));
 			$this->setResponse($response);
 		}
 	}

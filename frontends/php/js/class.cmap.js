@@ -186,16 +186,9 @@ ZABBIX.apps.map = (function($) {
 					class: 'overlay-dialogue',
 					style: 'display: none; top: 0; left: 0;'
 				})
-				.appendTo('body')
+				.appendTo('.wrapper')
 				.draggable({
-					containment: [0, 0, 3200, 3200],
-					start: function(){
-						$(this).data("scroll", {top: window.pageYOffset, left: window.pageXOffset});
-					},
-					drag: function(event, ui){
-						ui.position.top -= parseInt($(this).data("scroll").top);
-						ui.position.left -= parseInt($(this).data("scroll").left);
-					}
+					containment: [0, 0, 3200, 3200]
 				});
 
 			this.updateImage();
@@ -847,8 +840,7 @@ ZABBIX.apps.map = (function($) {
 
 				// application selection pop up
 				$('#application-select').click(function(event) {
-					var data = $('#elementNameHost').multiSelect('getData'),
-						popup_options = {
+					var popup_options = {
 							srctbl: 'applications',
 							srcfld1: 'name',
 							dstfrm: 'selementForm',
@@ -857,8 +849,10 @@ ZABBIX.apps.map = (function($) {
 							with_applications: '1'
 						};
 
-					if (data.length > 0 && $('#elementType').val() == '4') {
-						popup_options['hostid'] = data[0].id;
+					if ($('#elementType').val() == '3') {
+						popup_options = jQuery.extend(popup_options,
+							getFirstMultiselectValue('elementNameHost', 'elementNameHostGroup')
+						);
 					}
 
 					PopUp('popup.generic', popup_options, null, event.target);
@@ -957,25 +951,25 @@ ZABBIX.apps.map = (function($) {
 					});
 
 					if ((last_value === SVGMapShape.TYPE_LINE) !== (value === SVGMapShape.TYPE_LINE)) {
-						var x = parseInt($('#shapeForm #x').val(), 10),
-							y = parseInt($('#shapeForm #y').val(), 10),
-							width = parseInt($('#shapeForm #areaSizeWidth').val(), 10),
-							height = parseInt($('#shapeForm #areaSizeHeight').val(), 10);
+						var x = parseInt($('#shapeX').val(), 10),
+							y = parseInt($('#shapeY').val(), 10),
+							width = parseInt($('#shapeAreaSizeWidth').val(), 10),
+							height = parseInt($('#shapeAreaSizeHeight').val(), 10);
 
 						if (value === SVGMapShape.TYPE_LINE) {
 							// Switching from figures to line.
-							$('#shapeForm #areaSizeWidth').val(x + width);
-							$('#shapeForm #areaSizeHeight').val(y + height);
+							$('#shapeAreaSizeWidth').val(x + width);
+							$('#shapeAreaSizeHeight').val(y + height);
 						}
 						else {
 							// Switching from line to figures.
 							var mx = Math.min(x, width),
 								my = Math.min(y, height);
 
-							$('#shapeForm #x').val(mx);
-							$('#shapeForm #y').val(my);
-							$('#shapeForm #areaSizeWidth').val(Math.max(x, width) - mx);
-							$('#shapeForm #areaSizeHeight').val(Math.max(y, height) - my);
+							$('#shapeX').val(mx);
+							$('#shapeY').val(my);
+							$('#shapeAreaSizeWidth').val(Math.max(x, width) - mx);
+							$('#shapeAreaSizeHeight').val(Math.max(y, height) - my);
 						}
 					}
 
@@ -2696,7 +2690,7 @@ ZABBIX.apps.map = (function($) {
 			// hosts
 			$('#elementNameHost').multiSelectHelper({
 				id: 'elementNameHost',
-				objectName: 'hosts',
+				object_name: 'hosts',
 				name: 'elementValue',
 				selectedLimit: 1,
 				popup: {
@@ -2712,7 +2706,7 @@ ZABBIX.apps.map = (function($) {
 			// triggers
 			$('#elementNameTriggers').multiSelectHelper({
 				id: 'elementNameTriggers',
-				objectName: 'triggers',
+				object_name: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
 					real_hosts: true
@@ -2734,7 +2728,7 @@ ZABBIX.apps.map = (function($) {
 			// host group
 			$('#elementNameHostGroup').multiSelectHelper({
 				id: 'elementNameHostGroup',
-				objectName: 'hostGroup',
+				object_name: 'hostGroup',
 				name: 'elementValue',
 				selectedLimit: 1,
 				popup: {
@@ -3867,8 +3861,8 @@ ZABBIX.apps.map = (function($) {
 		Shape.prototype.bind('afterMove', function(event, element) {
 			if (sysmap.selection.count.shapes === 1 && sysmap.selection.count.selements === 0
 					&& sysmap.selection.shapes[element.id] !== void(0)) {
-				$('#shapeForm input[name=x]').val(element.data.x);
-				$('#shapeForm input[name=y]').val(element.data.y);
+				$('#shapeX').val(element.data.x);
+				$('#shapeY').val(element.data.y);
 
 				if (typeof element.data.width !== 'undefined') {
 					$('#shapeForm input[name=width]').val(element.data.width);
@@ -3927,18 +3921,27 @@ jQuery(function ($) {
 	 */
 	$.fn.positionOverlayDialogue = function () {
 		var $map = $('#map-area'),
+			map_offset = $map.offset(),
 			map_margin = 10,
-			obj_pos = this.offset(),
-			obj_size = {width: this.outerWidth(), height: this.outerHeight()},
-			scroll_pos = {left: $(window).scrollLeft(), top: $(window).scrollTop()};
-
-		if (obj_pos.left == 0 && obj_pos.top == 0) {
-			obj_pos = {left: $map.offset().left + $map.width(), top: $map.offset().top - map_margin};
-		}
+			$dialogue = $(this),
+			$dialogue_host = $dialogue.offsetParent(),
+			dialogue_host_offset = $dialogue_host.offset(),
+			// Usable area relative to host.
+			dialogue_host_x_min = $dialogue_host.scrollLeft(),
+			dialogue_host_x_max = Math.min($dialogue_host[0].scrollWidth,
+				$(window).width() + $(window).scrollLeft() - dialogue_host_offset.left + $dialogue_host.scrollLeft()
+			) - 1,
+			dialogue_host_y_min = $dialogue_host.scrollTop(),
+			dialogue_host_y_max = Math.min($dialogue_host[0].scrollHeight,
+				$(window).height() + $(window).scrollTop() - dialogue_host_offset.top + $dialogue_host.scrollTop()
+			) - 1,
+			// Coordinates of map's top right corner relative to dialogue host.
+			pos_x = map_offset.left + $map[0].scrollWidth - dialogue_host_offset.left + $dialogue_host.scrollLeft(),
+			pos_y = map_offset.top - map_margin - dialogue_host_offset.top + $dialogue_host.scrollTop();
 
 		return this.css({
-			left: Math.max(0, Math.min(obj_pos.left, $(window).width() - obj_size.width)) + scroll_pos.left,
-			top: Math.max(scroll_pos.top, Math.min(obj_pos.top, $(window).height() - obj_size.height + scroll_pos.top))
+			left: Math.max(dialogue_host_x_min, Math.min(dialogue_host_x_max - $dialogue.outerWidth(), pos_x)),
+			top: Math.max(dialogue_host_y_min, Math.min(dialogue_host_y_max - $dialogue.outerHeight(), pos_y))
 		});
 	};
 });

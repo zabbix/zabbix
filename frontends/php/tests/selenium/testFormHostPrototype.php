@@ -45,15 +45,15 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check layout at Host tab.
 		$this->zbxTestAssertElementValue('host', $name);
 		$this->zbxTestAssertElementValue('name', $visible_name);
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-dns"]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_1" and text()="IP"]/../input[@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_0" and text()="DNS"]/../input[@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-port"]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-default"]/input[@class="mainInterface checkbox-radio"][@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-default")]/input[@disabled]');
 
 		foreach (['SNMP', 'JMX', 'IPMI'] as $interface) {
-			$this->zbxTestAssertElementText('//tr[@id="'.$interface.'InterfacesFooter"]', 'No '.$interface.' interfaces found.');
+			$this->zbxTestAssertElementNotPresentXpath('//div[contains(@class,"interface-cell-type") and contains(text(),"'.$interface.'")]');
 		}
 
 		// Check layout at IPMI tab.
@@ -65,12 +65,21 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check layout at Macros tab.
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
+		// Compare host prototype's macros from DB and frontend.
+		$expected_macros = CDBHelper::getAll('SELECT macro, value, description '
+			. 'FROM hostmacro WHERE hostid ='.self::HOST_PROTOTYPE_ID);
+		$this->assertEquals($expected_macros, $this->getMacros());
+
+		// Check global macros.
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
 		$this->zbxTestWaitForPageToLoad();
 
 		// Create two macros arrays: from DB and from Frontend form.
 		$macros = [
-			'database' => CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+			'database' => array_merge(
+					CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+					$expected_macros
+				),
 			'frontend' => []
 		];
 
@@ -81,7 +90,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$macro = [];
 			$row = $table->getRow($i);
 			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
-			$macro['value'] = $row->query('xpath:./td[3]/textarea')->one()->getValue();
+			$macro['value'] = $row->query('xpath:./td[2]/div/textarea')->one()->getValue();
 			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
 
 			$macros['frontend'][] = $macro;
@@ -413,9 +422,18 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'visible_name' => 'Host with all fields visible name',
 					'hostgroup' => 'Virtual machines',
 					'group_prototype' => '{#FSNAME}',
-					'template' => 'Form test template',
+					'template' => 'Template-layout-test-001',
 					'inventory' => 'Automatic',
-					'checkbox' => false
+					'checkbox' => false,
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$NEW_MACRO}',
+							'value' => 'Macro_Value',
+							'description' => 'Macro Description'
+						]
+					]
 				]
 			]
 		];
@@ -451,8 +469,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
+		}
+
+
+		if (array_key_exists('macros', $data)) {
+			$this->zbxTestTabSwitch('Macros');
+			$this->fillMacros($data['macros']);
 		}
 
 		if (array_key_exists('inventory', $data)) {
@@ -471,6 +495,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['name'].'"]');
 		}
 
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 		// Check the results in form.
 		$this->checkFormFields($data);
 
@@ -565,8 +590,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-			$this->zbxTestClickLinkText($data['template']);
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
+			$this->query('link', $data['template'])->waitUntilClickable()->one()->click();
 		}
 
 		// Change inventory mode.
@@ -835,7 +860,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+			COverlayDialogElement::find()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
@@ -890,6 +915,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestAssertElementText('//div[@id="templateTab"]//a', $data['template']);
+		}
+
+		if (array_key_exists('macros', $data)) {
+			$this->zbxTestTabSwitch('Macros');
+			$this->assertMacros($data['macros']);
 		}
 
 		if (array_key_exists('inventory', $data)) {

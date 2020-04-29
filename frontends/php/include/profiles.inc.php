@@ -143,8 +143,19 @@ function update_config($config) {
 			'max' => SEC_PER_DAY,
 			'allow_zero' => false,
 			'message' => _('Invalid refresh of unsupported items: %1$s')
-		]
+		],
+		'compress_older' => [
+			'min' => SEC_PER_DAY * 7,
+			'max' => 25 * SEC_PER_YEAR,
+			'allow_zero' => false,
+			'message' => _s('Invalid parameter "%1$s": %2$s.', _('Compress records older than'), '%1$s')
+		],
 	];
+
+	if (array_key_exists('compression_status', $config) && $config['compression_status'] === 0) {
+		unset($fields['compress_older']);
+		unset($config['compress_older']);
+	}
 
 	foreach ($fields as $field => $args) {
 		if (array_key_exists($field, $config)
@@ -173,7 +184,7 @@ function update_config($config) {
 			}
 
 			if (isset($names[$config[$varName]])) {
-				error(_s('Duplicate severity name "%s".', $config[$varName]));
+				error(_s('Duplicate severity name "%1$s".', $config[$varName]));
 				return false;
 			}
 			else {
@@ -242,12 +253,6 @@ function update_config($config) {
 		}
 		if (array_key_exists('default_theme', $config)) {
 			$msg[] = _s('Default theme "%1$s".', $config['default_theme']);
-		}
-		if (array_key_exists('dropdown_first_entry', $config)) {
-			$msg[] = _s('Dropdown first entry "%1$s".', $config['dropdown_first_entry']);
-		}
-		if (array_key_exists('dropdown_first_remember', $config)) {
-			$msg[] = _s('Dropdown remember selected "%1$s".', $config['dropdown_first_remember']);
 		}
 		if (array_key_exists('max_in_table', $config)) {
 			$msg[] = _s('Max count of elements to show inside table cell "%1$s".', $config['max_in_table']);

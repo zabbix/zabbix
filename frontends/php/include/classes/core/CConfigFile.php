@@ -112,6 +112,34 @@ class CConfigFile {
 			$this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
 		}
 
+		if (isset($DB['ENCRYPTION'])) {
+			$this->config['DB']['ENCRYPTION'] = $DB['ENCRYPTION'];
+		}
+
+		if (isset($DB['VERIFY_HOST'])) {
+			$this->config['DB']['VERIFY_HOST'] = $DB['VERIFY_HOST'];
+		}
+
+		if (isset($DB['KEY_FILE'])) {
+			$this->config['DB']['KEY_FILE'] = $DB['KEY_FILE'];
+		}
+
+		if (isset($DB['CERT_FILE'])) {
+			$this->config['DB']['CERT_FILE'] = $DB['CERT_FILE'];
+		}
+
+		if (isset($DB['CA_FILE'])) {
+			$this->config['DB']['CA_FILE'] = $DB['CA_FILE'];
+		}
+
+		if (isset($DB['CIPHER_LIST'])) {
+			$this->config['DB']['CIPHER_LIST'] = $DB['CIPHER_LIST'];
+		}
+
+		if (isset($DB['DOUBLE_IEEE754'])) {
+			$this->config['DB']['DOUBLE_IEEE754'] = $DB['DOUBLE_IEEE754'];
+		}
+
 		if (isset($ZBX_SERVER)) {
 			$this->config['ZBX_SERVER'] = $ZBX_SERVER;
 		}
@@ -122,18 +150,28 @@ class CConfigFile {
 			$this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
 		}
 
+		if (isset($IMAGE_FORMAT_DEFAULT)) {
+			$this->config['IMAGE_FORMAT_DEFAULT'] = $IMAGE_FORMAT_DEFAULT;
+		}
+
+		if (isset($HISTORY)) {
+			$this->config['HISTORY'] = $HISTORY;
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
 		$ZBX_SERVER_PORT = $this->config['ZBX_SERVER_PORT'];
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
+		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
+		$HISTORY = $this->config['HISTORY'];
 	}
 
 	public function save() {
@@ -167,23 +205,44 @@ class CConfigFile {
 		return
 '<?php
 // Zabbix GUI configuration file.
-global $DB;
 
-$DB[\'TYPE\']     = \''.addcslashes($this->config['DB']['TYPE'], "'\\").'\';
-$DB[\'SERVER\']   = \''.addcslashes($this->config['DB']['SERVER'], "'\\").'\';
-$DB[\'PORT\']     = \''.addcslashes($this->config['DB']['PORT'], "'\\").'\';
-$DB[\'DATABASE\'] = \''.addcslashes($this->config['DB']['DATABASE'], "'\\").'\';
-$DB[\'USER\']     = \''.addcslashes($this->config['DB']['USER'], "'\\").'\';
-$DB[\'PASSWORD\'] = \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
+$DB[\'TYPE\']				= \''.addcslashes($this->config['DB']['TYPE'], "'\\").'\';
+$DB[\'SERVER\']			= \''.addcslashes($this->config['DB']['SERVER'], "'\\").'\';
+$DB[\'PORT\']				= \''.addcslashes($this->config['DB']['PORT'], "'\\").'\';
+$DB[\'DATABASE\']			= \''.addcslashes($this->config['DB']['DATABASE'], "'\\").'\';
+$DB[\'USER\']				= \''.addcslashes($this->config['DB']['USER'], "'\\").'\';
+$DB[\'PASSWORD\']			= \''.addcslashes($this->config['DB']['PASSWORD'], "'\\").'\';
 
 // Schema name. Used for PostgreSQL.
-$DB[\'SCHEMA\'] = \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
+$DB[\'SCHEMA\']			= \''.addcslashes($this->config['DB']['SCHEMA'], "'\\").'\';
 
-$ZBX_SERVER      = \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';
-$ZBX_SERVER_PORT = \''.addcslashes($this->config['ZBX_SERVER_PORT'], "'\\").'\';
-$ZBX_SERVER_NAME = \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
+// Used for TLS connection.
+$DB[\'ENCRYPTION\']		= '.($this->config['DB']['ENCRYPTION'] ? 'true' : 'false').';
+$DB[\'KEY_FILE\']			= \''.addcslashes($this->config['DB']['KEY_FILE'], "'\\").'\';
+$DB[\'CERT_FILE\']		= \''.addcslashes($this->config['DB']['CERT_FILE'], "'\\").'\';
+$DB[\'CA_FILE\']			= \''.addcslashes($this->config['DB']['CA_FILE'], "'\\").'\';
+$DB[\'VERIFY_HOST\']		= '.($this->config['DB']['VERIFY_HOST'] ? 'true' : 'false').';
+$DB[\'CIPHER_LIST\']		= \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\").'\';
 
-$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
+// Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
+// This option is enabled by default for new Zabbix installations.
+// For upgraded installations, please read database upgrade notes before enabling this option.
+$DB[\'DOUBLE_IEEE754\']	= '.($this->config['DB']['DOUBLE_IEEE754'] ? 'true' : 'false').';
+
+$ZBX_SERVER				= \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';
+$ZBX_SERVER_PORT		= \''.addcslashes($this->config['ZBX_SERVER_PORT'], "'\\").'\';
+$ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
+
+$IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
+
+// Uncomment this block only if you are using Elasticsearch.
+// Elasticsearch url (can be string if same url is used for all types).
+//$HISTORY[\'url\'] = [
+//	\'uint\' => \'http://localhost:9200\',
+//	\'text\' => \'http://localhost:9200\'
+//];
+// Value types stored in Elasticsearch.
+//$HISTORY[\'types\'] = [\'uint\', \'text\'];
 ';
 	}
 
@@ -195,11 +254,20 @@ $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 			'DATABASE' => null,
 			'USER' => '',
 			'PASSWORD' => '',
-			'SCHEMA' => ''
+			'SCHEMA' => '',
+			'ENCRYPTION' => false,
+			'KEY_FILE' => '',
+			'CERT_FILE' => '',
+			'CA_FILE' => '',
+			'VERIFY_HOST' => true,
+			'CIPHER_LIST' => '',
+			'DOUBLE_IEEE754' => false
 		];
 		$this->config['ZBX_SERVER'] = 'localhost';
 		$this->config['ZBX_SERVER_PORT'] = '10051';
 		$this->config['ZBX_SERVER_NAME'] = '';
+		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
+		$this->config['HISTORY'] = null;
 	}
 
 	protected function check() {

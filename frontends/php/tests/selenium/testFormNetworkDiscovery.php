@@ -608,6 +608,8 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="'.$button.'"]');
 					if (!array_key_exists('error_in_checks', $data)) {
 						$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::id('overlay-bg'));
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@id="dcheckList"]'.
+								'//div[contains(text(), "'.$check['type'].'")]'));
 					}
 				}
 			}

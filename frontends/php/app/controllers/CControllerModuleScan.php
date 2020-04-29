@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,13 +99,13 @@ class CControllerModuleScan extends CController {
 			$result = API::Module()->create($db_modules_create);
 
 			if ($result) {
-				info(_n('Module added: %s.', 'Modules added: %s.', implode(', ', $db_modules_create_names),
+				info(_n('Module added: %1$s.', 'Modules added: %1$s.', implode(', ', $db_modules_create_names),
 					count($db_modules_create)
 				));
 			}
 			else {
-				error(_n('Cannot add module: %s.', 'Cannot add modules: %s.', implode(', ', $db_modules_create_names),
-					count($db_modules_create)
+				error(_n('Cannot add module: %1$s.', 'Cannot add modules: %1$s.',
+					implode(', ', $db_modules_create_names), count($db_modules_create)
 				));
 			}
 		}
@@ -114,12 +114,12 @@ class CControllerModuleScan extends CController {
 			$result = API::Module()->delete($db_modules_delete);
 
 			if ($result) {
-				info(_n('Module deleted: %s.', 'Modules deleted: %s.', implode(', ', $db_modules_delete_names),
+				info(_n('Module deleted: %1$s.', 'Modules deleted: %1$s.', implode(', ', $db_modules_delete_names),
 					count($db_modules_delete)
 				));
 			}
 			else {
-				error(_n('Cannot delete module: %s.', 'Cannot delete modules: %s.',
+				error(_n('Cannot delete module: %1$s.', 'Cannot delete modules: %1$s.',
 					implode(', ', $db_modules_delete_names), count($db_modules_delete)
 				));
 			}

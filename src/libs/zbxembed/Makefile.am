@@ -11,4 +11,7 @@ libzbxembed_a_SOURCES = \
 	httprequest.c \
 	httprequest.h \
 	zabbix.c \
-	zabbix.h
+	zabbix.h \
+	global.c \
+	global.h
+

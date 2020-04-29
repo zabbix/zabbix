@@ -78,7 +78,6 @@ class CTag extends CObject {
 			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= '>';
-//		$res .= ($this->paired) ? '>' : ' />';
 
 		return $res;
 	}
@@ -207,6 +206,12 @@ class CTag extends CObject {
 	 */
 	public function setMenuPopup(array $data) {
 		$this->setAttribute('data-menu-popup', $data);
+		$this->setAttribute('aria-expanded', 'false');
+
+		if (!$this->getAttribute('disabled')) {
+			$this->setAttribute('aria-haspopup', 'true');
+		}
+
 		return $this;
 	}
 

@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of applications');
 $page['file'] = 'applications.php';
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -32,7 +33,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'applications' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({applicationid})'],
-	'groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'applicationid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'],
 	'appname' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	// actions
@@ -45,33 +45,95 @@ $fields = [
 	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
-	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,			null,	null],
+	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		null,	null],
+	// filter
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
-$pageFilter = new CPageFilter([
-	'groups' => ['editable' => true, 'with_hosts_and_templates' => true],
-	'hosts' => ['editable' => true, 'templated_hosts' => true],
-	'hostid' => getRequest('hostid'),
-	'groupid' => getRequest('groupid')
-]);
-
 /*
  * Permissions
  */
 if (isset($_REQUEST['applicationid'])) {
 	$dbApplication = API::Application()->get([
+		'output' => ['name', 'hostid'],
 		'applicationids' => [$_REQUEST['applicationid']],
-		'output' => ['name', 'hostid']
+		'editable' => true
 	]);
 	if (!$dbApplication) {
 		access_deny();
 	}
 }
+elseif (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+	access_deny();
+}
+
+/**
+ * Select filters.
+ */
+$sort_field = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+$sort_order = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+CProfile::update('web.'.$page['file'].'.sort', $sort_field, PROFILE_TYPE_STR);
+CProfile::update('web.'.$page['file'].'.sortorder', $sort_order, PROFILE_TYPE_STR);
+
+if (hasRequest('filter_set')) {
+	CProfile::updateArray('web.applications.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
+	CProfile::updateArray('web.applications.filter_hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
+}
+elseif (hasRequest('filter_rst')) {
+	CProfile::deleteIdx('web.applications.filter_groups');
+
+	$filter_hostids = getRequest('filter_hostids', CProfile::getArray('web.applications.filter_hostids', []));
+	if (count($filter_hostids) != 1) {
+		CProfile::deleteIdx('web.applications.filter_hostids');
+	}
+}
+
+$filter = [
+	'groups' => CProfile::getArray('web.applications.filter_groups', null),
+	'hosts' => CProfile::getArray('web.applications.filter_hostids', null)
+];
+
+// Get host groups.
+$filter['groups'] = $filter['groups']
+	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
+		'groupids' => $filter['groups'],
+		'with_hosts_and_templates' => true,
+		'editable' => true,
+		'preservekeys' => true
+	]), ['groupid' => 'id'])
+	: [];
+
+$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
+if ($filter_groupids) {
+	$filter_groupids = getSubGroups($filter_groupids);
+}
+
+// Get hosts.
+$filter['hosts'] = $filter['hosts']
+	? CArrayHelper::renameObjectsKeys(API::Host()->get([
+		'output' => ['hostid', 'name'],
+		'hostids' => $filter['hosts'],
+		'templated_hosts' => true,
+		'editable' => true,
+		'preservekeys' => true
+	]), ['hostid' => 'id'])
+	: [];
+
+$hostid = (count($filter['hosts']) == 1) ? reset($filter['hosts'])['id'] : getRequest('hostid', 0);
+
+/**
+ * Do uncheck.
+ */
 if (hasRequest('action')) {
 	if (!hasRequest('applications') || !is_array(getRequest('applications'))) {
 		access_deny();
@@ -79,18 +141,13 @@ if (hasRequest('action')) {
 	else {
 		$applications = API::Application()->get([
 			'output' => [],
-			'applicationids' => getRequest('applications')
+			'applicationids' => getRequest('applications'),
+			'editable' => true
 		]);
 		if (count($applications) != count(getRequest('applications'))) {
-			uncheckTableRows($pageFilter->hostid, zbx_objectValues($applications, 'applicationid'));
+			uncheckTableRows($hostid, zbx_objectValues($applications, 'applicationid'));
 		}
 	}
-}
-if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
-	access_deny();
-}
-if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
-	access_deny();
 }
 
 /*
@@ -115,7 +172,7 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows($hostid);
 		unset($_REQUEST['form']);
 	}
 }
@@ -138,7 +195,7 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 	$result = (bool) API::Application()->delete($applicationids);
 
 	if ($result) {
-		uncheckTableRows($pageFilter->hostid);
+		uncheckTableRows($hostid);
 	}
 	show_messages($result,
 		_n('Application deleted', 'Applications deleted', count($applicationids)),
@@ -162,7 +219,7 @@ elseif (hasRequest('applications')
 	$result = (bool) API::Item()->update($items);
 
 	if ($result) {
-		uncheckTableRows($pageFilter->hostid);
+		uncheckTableRows($hostid);
 	}
 
 	$updated = count($items);
@@ -203,96 +260,80 @@ if (isset($_REQUEST['form'])) {
 	echo (new CView('configuration.application.edit', $data))->getOutput();
 }
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
-
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
-	$pageFilter = new CPageFilter([
-		'groups' => ['editable' => true, 'with_hosts_and_templates' => true],
-		'hosts' => ['editable' => true, 'templated_hosts' => true],
-		'hostid' => getRequest('hostid'),
-		'groupid' => getRequest('groupid')
-	]);
 
 	$data = [
-		'pageFilter' => $pageFilter,
-		'sort' => $sortField,
-		'sortorder' => $sortOrder,
-		'hostid' => $pageFilter->hostid,
-		'groupid' => $pageFilter->groupid,
-		'showInfoColumn' => false
+		'filter' => $filter,
+		'sort' => $sort_field,
+		'sortorder' => $sort_order,
+		'hostid' => $hostid,
+		'showInfoColumn' => false,
+		'profileIdx' => 'web.applications.filter',
+		'active_tab' => CProfile::get('web.applications.filter.active', 1)
 	];
 
-	if ($pageFilter->hostsSelected) {
-		$config = select_config();
+	$config = select_config();
 
-		// Get applications.
-		$data['applications'] = API::Application()->get([
-			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
-			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
-			'groupids' => $pageFilter->groupids,
-			'selectHost' => ['hostid', 'name'],
-			'selectItems' => ['itemid'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectApplicationDiscovery' => ['ts_delete'],
-			'editable' => true,
-			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1
-		]);
+	// Get applications.
+	$data['applications'] = API::Application()->get([
+		'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
+		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
+		'groupids' => $filter_groupids,
+		'selectHost' => ['hostid', 'name'],
+		'selectItems' => ['itemid'],
+		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectApplicationDiscovery' => ['ts_delete'],
+		'editable' => true,
+		'sortfield' => $sort_field,
+		'limit' => $config['search_limit'] + 1
+	]);
 
-		order_result($data['applications'], $sortField, $sortOrder);
+	order_result($data['applications'], $sort_field, $sort_order);
 
-		$data['parent_templates'] = getApplicationParentTemplates($data['applications']);
+	$data['parent_templates'] = getApplicationParentTemplates($data['applications']);
 
-		/*
-		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
-		 * deleted. Also we need only 'ts_delete' for view, so get rid of the multidimensional array inside
-		 * 'applicationDiscovery' property.
-		 */
-		foreach ($data['applications'] as &$application) {
-			if ($application['applicationDiscovery']) {
-				if (count($application['applicationDiscovery']) > 1) {
-					$ts_delete = zbx_objectValues($application['applicationDiscovery'], 'ts_delete');
+	/*
+	 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
+	 * deleted. Also we need only 'ts_delete' for view, so get rid of the multidimensional array inside
+	 * 'applicationDiscovery' property.
+	 */
+	foreach ($data['applications'] as &$application) {
+		if ($application['applicationDiscovery']) {
+			if (count($application['applicationDiscovery']) > 1) {
+				$ts_delete = zbx_objectValues($application['applicationDiscovery'], 'ts_delete');
 
-					if (min($ts_delete) == 0) {
-						// One rule stops discovering application, but other rule continues to discover it.
-						unset($application['applicationDiscovery']);
-						$application['applicationDiscovery']['ts_delete'] = 0;
-					}
-					else {
-						// Both rules stop discovering application. Find maximum clock.
-						unset($application['applicationDiscovery']);
-						$application['applicationDiscovery']['ts_delete'] = max($ts_delete);
-					}
+				if (min($ts_delete) == 0) {
+					// One rule stops discovering application, but other rule continues to discover it.
+					unset($application['applicationDiscovery']);
+					$application['applicationDiscovery']['ts_delete'] = 0;
 				}
 				else {
-					// Application is discovered by one rule.
-					$ts_delete = $application['applicationDiscovery'][0]['ts_delete'];
+					// Both rules stop discovering application. Find maximum clock.
 					unset($application['applicationDiscovery']);
-					$application['applicationDiscovery']['ts_delete'] = $ts_delete;
+					$application['applicationDiscovery']['ts_delete'] = max($ts_delete);
 				}
 			}
-		}
-		unset($application);
-
-		// Info column is show when all hosts are selected or current host is not a template.
-		if ($pageFilter->hostid > 0) {
-			$hosts = API::Host()->get([
-				'output' => ['status'],
-				'hostids' => [$pageFilter->hostid]
-			]);
-
-			$data['showInfoColumn'] = $hosts
-				&& ($hosts[0]['status'] == HOST_STATUS_MONITORED || $hosts[0]['status'] == HOST_STATUS_NOT_MONITORED);
-		}
-		else {
-			$data['showInfoColumn'] = true;
+			else {
+				// Application is discovered by one rule.
+				$ts_delete = $application['applicationDiscovery'][0]['ts_delete'];
+				unset($application['applicationDiscovery']);
+				$application['applicationDiscovery']['ts_delete'] = $ts_delete;
+			}
 		}
 	}
+	unset($application);
+
+	// Info column is show when all hosts are selected or current host is not a template.
+	if ($data['hostid'] > 0) {
+		$hosts = API::Host()->get([
+			'output' => ['status'],
+			'hostids' => [$data['hostid']]
+		]);
+
+		$data['showInfoColumn'] = $hosts
+			&& ($hosts[0]['status'] == HOST_STATUS_MONITORED || $hosts[0]['status'] == HOST_STATUS_NOT_MONITORED);
+	}
 	else {
-		$data['applications'] = [];
+		$data['showInfoColumn'] = true;
 	}
 
 	// pager
@@ -308,11 +349,7 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['applications'], $sortOrder,
-		(new CUrl('applications.php'))
-			->setArgument('groupid', $data['groupid'])
-			->setArgument('hostid', $data['hostid'])
-	);
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['applications'], $sort_order, new CUrl($page['file']));
 
 	// render view
 	echo (new CView('configuration.application.list', $data))->getOutput();

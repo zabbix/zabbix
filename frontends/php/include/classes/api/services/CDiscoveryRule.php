@@ -38,7 +38,7 @@ class CDiscoveryRule extends CItemGeneral {
 	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
 		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_XPATH, ZBX_PREPROC_ERROR_FIELD_XML,
-		ZBX_PREPROC_CSV_TO_JSON
+		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE
 	];
 
 	public function __construct() {
@@ -1541,12 +1541,10 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
 			'itemids' => $discoveryid,
-			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
-				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'url',
+				'mtime', 'flags', 'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url',
 				'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
 				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
@@ -1662,14 +1660,13 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	protected function copyItemPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$item_prototypes = API::ItemPrototype()->get([
-			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
-				'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname', 'snmpv3_securitylevel',
-				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor',
-				'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description',
-				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'master_itemid',
-				'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes', 'follow_redirects',
-				'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
-				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
+			'output' => ['itemid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
+				'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port', 'description', 'jmx_endpoint',
+				'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
+				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
+				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
+				'allow_traps'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
@@ -1968,6 +1965,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
 			'selectTemplates' => ['templateid'],
+			'selectMacros' => ['macro', 'type', 'value', 'description'],
 			'preservekeys' => true
 		]);
 
@@ -1986,6 +1984,12 @@ class CDiscoveryRule extends CItemGeneral {
 					unset($groupPrototype['group_prototypeid']);
 				}
 				unset($groupPrototype);
+
+				foreach ($prototype['macros'] as &$macro) {
+					$macro['type'] = ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_TYPE_TEXT : $macro['type'];
+					$macro += ['value' => ''];
+				}
+				unset($macro);
 			}
 			unset($prototype);
 

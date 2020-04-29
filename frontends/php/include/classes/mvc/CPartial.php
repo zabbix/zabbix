@@ -80,11 +80,11 @@ class CPartial {
 		}
 
 		if ($this->directory === null) {
-			throw new RuntimeException(_s('Partial not found: "%s".', $name));
+			throw new RuntimeException(sprintf('Partial not found: "%s".', $name));
 		}
 
 		if (!is_readable($file_path)) {
-			throw new RuntimeException(_s('Partial not readable: "%s".', $file_path));
+			throw new RuntimeException(sprintf('Partial not readable: "%s".', $file_path));
 		}
 
 		$this->name = $name;
@@ -109,7 +109,7 @@ class CPartial {
 		if ((include $file_path) === false) {
 			ob_end_clean();
 
-			throw new RuntimeException(_s('Cannot render partial: "%s".', $file_path));
+			throw new RuntimeException(sprintf('Cannot render partial: "%s".', $file_path));
 		}
 
 		return ob_get_clean();
@@ -122,13 +122,14 @@ class CPartial {
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
 	 * @param string $file_name
+	 * @param array  $data
 	 *
 	 * @throws RuntimeException if the file not found, not readable or returned false.
 	 *
 	 * @return string
 	 */
-	public function readJsFile($file_name) {
-		$data = $this->data;
+	public function readJsFile(string $file_name, ?array $data = null): string {
+		$data = ($data === null) ? $this->data : $data;
 
 		$file_path = $this->directory.'/js/'.$file_name;
 
@@ -137,7 +138,7 @@ class CPartial {
 		if ((include $file_path) === false) {
 			ob_end_clean();
 
-			throw new RuntimeException(_s('Cannot read file: "%s".', $file_path));
+			throw new RuntimeException(sprintf('Cannot read file: "%s".', $file_path));
 		}
 
 		return ob_get_clean();
@@ -150,11 +151,12 @@ class CPartial {
 	 *   - A copy of $data variable will be available for using within the file.
 	 *
 	 * @param string $file_name
+	 * @param array  $data
 	 *
 	 * @throws RuntimeException if the file not found, not readable or returned false.
 	 */
-	public function includeJsFile($file_name) {
-		echo $this->readJsFile($file_name);
+	public function includeJsFile(string $file_name, array $data = null) {
+		echo $this->readJsFile($file_name, $data);
 	}
 
 	/**

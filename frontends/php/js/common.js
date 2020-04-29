@@ -308,13 +308,6 @@ function getPosition(obj) {
 	return pos;
 }
 
-function get_bodywidth() {
-	var w = parseInt(document.body.scrollWidth);
-	var w2 = parseInt(document.body.offsetWidth);
-
-	return (w2 < w) ? w2 : w;
-}
-
 /**
  * Opens popup content in overlay dialogue.
  *
@@ -381,7 +374,8 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 					controls: resp.controls,
 					buttons: buttons,
 					debug: resp.debug,
-					script_inline: resp.script_inline
+					script_inline: resp.script_inline,
+					data: resp.data || null
 				});
 			}
 
@@ -424,6 +418,11 @@ function addToOverlaysStack(id, element, type, xhr) {
 // Keydown handler. Closes last opened overlay UI element.
 function closeDialogHandler(event) {
 	if (event.which == 27) { // ESC
+		// Do not catch multiselect events.
+		if (jQuery(event.target).closest('.multiselect').data('multiSelect') !== undefined) {
+			return;
+		}
+
 		var dialog = overlays_stack.end();
 		if (typeof dialog !== 'undefined') {
 			switch (dialog.type) {
@@ -523,9 +522,11 @@ function reloadPopup(form, action) {
  * @param {string} parentid			parent id
  */
 function addValue(object, single_value, parentid) {
-	var value = {};
-	if (isset(single_value, popup_reference)) {
-		value = popup_reference[single_value];
+	var overlay = overlays_stack.end(),
+		value = {};
+
+	if (isset(single_value, overlay.data)) {
+		value = overlay.data[single_value];
 	}
 	else {
 		value[object] = single_value;
@@ -583,32 +584,22 @@ function addValues(frame, values, submit_parent) {
 /**
  * Collects checked values and passes them to add.popup trigger.
  *
- * @param {string} form			source form where checkbox are collected
  * @param {string} object		refers to object that is selected from popup
  * @param {string} parentid		parent id
  */
-function addSelectedValues(form, object, parentid) {
-	form = document.getElementById(form);
-
+function addSelectedValues(object, parentid) {
 	if (typeof parentid === 'undefined') {
 		var parentid = null;
 	}
 
-	var data = {object: object, values: [], parentId: parentid};
-	var chk_boxes = jQuery(form).find('input[type="checkbox"]');
+	var data = {object: object, values: [], parentId: parentid},
+		overlay = overlays_stack.end();
 
-	for (var i = 0; i < chk_boxes.length; i++) {
-		if (chk_boxes[i].checked && (chk_boxes[i].name.indexOf('all_') < 0)) {
-			var value = {};
-			if (isset(chk_boxes[i].value, popup_reference)) {
-				value = popup_reference[chk_boxes[i].value];
-			}
-			else {
-				value[object] = chk_boxes[i].value;
-			}
-			data['values'].push(value);
+	overlay.$dialogue.find('input[type="checkbox"]').filter(':checked').each((i, c) => {
+		if (c.name.indexOf('all_') == -1) {
+			data['values'].push(overlay.data[c.value] || c.value);
 		}
-	}
+	});
 
 	jQuery(document).trigger('add.popup', data);
 }
@@ -910,3 +901,30 @@ Function.prototype.bindAsEventListener = function (context) {
 		return method.apply(context, [event || window.event].concat(args));
 	};
 };
+
+/**
+ * Get first selected host from multiselect field.
+ *
+ * @param {string} host_field_id       Host field element ID.
+ * @param {string} hostgroup_field_id  Host group field element ID.
+ *
+ * @return {object}
+ */
+function getFirstMultiselectValue(host_field_id, hostgroup_field_id) {
+	var host_values = (typeof host_field_id !== 'undefined')
+			? jQuery('#'+host_field_id).multiSelect('getData')
+			: [],
+		hostgroup_values = (typeof hostgroup_field_id !== 'undefined')
+			? jQuery('#'+hostgroup_field_id).multiSelect('getData')
+			: [],
+		ret = {};
+
+	if (host_values.length != 0) {
+		ret.hostid = host_values[0].id;
+	}
+	if (hostgroup_values.length != 0) {
+		ret.groupid = hostgroup_values[0].id;
+	}
+
+	return ret;
+}

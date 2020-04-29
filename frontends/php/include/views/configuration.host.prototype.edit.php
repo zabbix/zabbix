@@ -72,92 +72,41 @@ $visiblenameTB = (new CTextBox('name', $name, (bool) $hostPrototype['templateid'
 	->setAttribute('maxlength', 128);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
-// display inherited parameters only for hosts prototypes on hosts
+// Display inherited parameters only for hosts prototypes on hosts.
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$existingInterfaceTypes = [];
 	foreach ($parentHost['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
 
-	zbx_add_post_js('hostInterfacesManager.add('.json_encode(array_values($parentHost['interfaces'])).');');
-	zbx_add_post_js('hostInterfacesManager.disable();');
+	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode(array_values($parentHost['interfaces'])).');');
+	zbx_add_post_js('hostInterfaceManager.render();');
+	zbx_add_post_js('HostInterfaceManager.disableEdit();');
 
-	// Zabbix agent interfaces
-	$ifTab = (new CTable())
+	$interface_header = renderInterfaceHeaders();
+
+	$agent_interfaces = (new CDiv())
 		->setId('agentInterfaces')
-		->setHeader([
-			'',
-			_('IP address'),
-			_('DNS name'),
-			_('Connect to'),
-			_('Port'),
-			(new CColHeader(_('Default')))->setColSpan(2)
-		]);
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+		->setAttribute('data-type', 'agent');
 
-	$row = (new CRow())->setId('agentInterfacesFooter');
-	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
-	}
-	$ifTab->addRow($row);
+	$snmp_interfaces = (new CDiv())
+		->setId('SNMPInterfaces')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER.' '.ZBX_STYLE_LIST_VERTICAL_ACCORDION)
+		->setAttribute('data-type', 'snmp');
 
-	$hostList->addRow(_('Agent interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'agent')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
+	$jmx_interfaces = (new CDiv())
+		->setId('JMXInterfaces')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+		->setAttribute('data-type', 'jmx');
 
-	// SNMP interfaces
-	$ifTab = (new CTable())->setId('SNMPInterfaces');
+	$ipmi_interfaces = (new CDiv())
+		->setId('IPMIInterfaces')
+		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
+		->setAttribute('data-type', 'ipmi');
 
-	$row = (new CRow())->setId('SNMPInterfacesFooter');
-	if (!array_key_exists(INTERFACE_TYPE_SNMP, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
-	}
-	$ifTab->addRow($row);
-
-	$hostList->addRow(_('SNMP interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'snmp')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
-
-	// JMX interfaces
-	$ifTab = (new CTable())->setId('JMXInterfaces');
-
-	$row = (new CRow())->setId('JMXInterfacesFooter');
-	if (!array_key_exists(INTERFACE_TYPE_JMX, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
-	}
-	$ifTab->addRow($row);
-
-	$hostList->addRow(_('JMX interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'jmx')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
-	);
-
-	// IPMI interfaces
-	$ifTab = (new CTable())->setId('IPMIInterfaces');
-
-	$row = (new CRow())->setId('IPMIInterfacesFooter');
-	if (!array_key_exists(INTERFACE_TYPE_IPMI, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
-	}
-	$ifTab->addRow($row);
-
-	$hostList->addRow(
-		_('IPMI interfaces'),
-		(new CDiv($ifTab))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('data-type', 'ipmi')
-			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
+	$hostList->addRow(new CLabel(_('Interfaces')),
+		[new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces])]
 	);
 
 	// proxy
@@ -342,22 +291,23 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	);
 
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
-
-	// macros
-	$divTabs->addTab('macroTab', _('Macros'),
-		(new CFormList('macrosFormList'))
-			->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
-				->addValue(_('Host macros'), 0)
-				->addValue(_('Inherited and host macros'), 1)
-				->setModern(true)
-			)
-			->addRow(null, new CPartial('hostmacros.list.html', [
-				'macros' => $data['macros'],
-				'show_inherited_macros' => $data['show_inherited_macros'],
-				'readonly' => $data['readonly']
-			]), 'macros_container')
-	);
 }
+
+// macros
+$tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
+$divTabs->addTab('macroTab', _('Macros'),
+	(new CFormList('macrosFormList'))
+		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+			->addValue(_('Host prototype macros'), 0)
+			->addValue(_('Inherited and host prototype macros'), 1)
+			->setModern(true)
+		)
+		->addRow(null, new CPartial($tmpl, [
+			'macros' => $data['macros'],
+			'parent_hostid' => $data['parent_host']['hostid'],
+			'readonly' => $data['readonly']
+		]), 'macros_container')
+);
 
 $inventoryFormList = (new CFormList('inventorylist'))
 	->addRow(null,

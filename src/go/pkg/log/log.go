@@ -57,15 +57,6 @@ type LogStat struct {
 	f        *os.File
 }
 
-type Logger interface {
-	Infof(format string, args ...interface{})
-	Critf(format string, args ...interface{})
-	Errf(format string, args ...interface{})
-	Warningf(format string, args ...interface{})
-	Debugf(format string, args ...interface{})
-	Tracef(format string, args ...interface{})
-}
-
 var logStat LogStat
 var logAccess sync.Mutex
 

@@ -32,6 +32,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/alias.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/threads.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/iprange.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/md5.o
@@ -41,9 +42,11 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/algodefs.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/logfiles.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dns.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
 #cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o
-#cgo LDFLAGS: -lpcre -lDbghelp -lpsapi -lws2_32 -lWevtapi
+#cgo LDFLAGS: -lpcre -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group
 
@@ -96,6 +99,11 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 
 DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
+{
+	return 0;
+}
+
+DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
 {
 	return 0;
 }

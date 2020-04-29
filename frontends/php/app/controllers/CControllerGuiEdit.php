@@ -28,8 +28,6 @@ class CControllerGuiEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'default_theme'           => 'db config.default_theme',
-			'dropdown_first_entry'    => 'db config.dropdown_first_entry',
-			'dropdown_first_remember' => 'db config.dropdown_first_remember',
 			'search_limit'            => 'db config.search_limit',
 			'max_in_table'            => 'db config.max_in_table',
 			'server_check_interval'   => 'db config.server_check_interval'
@@ -52,8 +50,6 @@ class CControllerGuiEdit extends CController {
 		$config = select_config();
 		$data = [
 			'default_theme'           => $this->getInput('default_theme',           $config['default_theme']),
-			'dropdown_first_entry'    => $this->getInput('dropdown_first_entry',    $config['dropdown_first_entry']),
-			'dropdown_first_remember' => $this->getInput('dropdown_first_remember', $config['dropdown_first_remember']),
 			'search_limit'            => $this->getInput('search_limit',            $config['search_limit']),
 			'max_in_table'            => $this->getInput('max_in_table',            $config['max_in_table']),
 			'server_check_interval'   => $this->getInput('server_check_interval',   $config['server_check_interval'])

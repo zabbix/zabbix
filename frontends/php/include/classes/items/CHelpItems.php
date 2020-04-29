@@ -1008,7 +1008,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'zabbix[proxy,<name>,<param>]',
-					'description' => _('Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp.')
+					'description' => _('Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds.')
 				],
 				[
 					'key' => 'zabbix[proxy_history]',
@@ -1059,6 +1059,10 @@ class CHelpItems {
 					'description' => _('Value cache effectiveness. Valid parameters are: requests, hits and misses.')
 				],
 				[
+					'key' => 'zabbix[version]',
+					'description' => _('Version of Zabbix server or proxy')
+				],
+				[
 					'key' => 'zabbix[vmware,buffer,<mode>]',
 					'description' => _('VMware cache statistics. Valid modes are: total, free, pfree, used and pused.')
 				],
@@ -1069,15 +1073,15 @@ class CHelpItems {
 			],
 			ITEM_TYPE_DB_MONITOR => [
 				[
-					'key' => 'db.odbc.select[<unique short description>,dsn]',
+					'key' => 'db.odbc.select[<unique short description>,<dsn>,<connection string>]',
 					'description' => _('Return first column of the first row of the SQL query result.')
 				],
 				[
-					'key' => 'db.odbc.discovery[<unique short description>,dsn]',
+					'key' => 'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',
 					'description' => _('Transform SQL query result into a JSON array for low-level discovery.')
 				],
 				[
-					'key' => 'db.odbc.get[<unique short description>,dsn]',
+					'key' => 'db.odbc.get[<unique short description>,<dsn>,<connection string>]',
 					'description' => _('Transform SQL query result into a JSON array.')
 				]
 			],

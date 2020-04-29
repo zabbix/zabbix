@@ -21,6 +21,7 @@
 /**
  * An object that is used to namespace objects, allows to retrieve and write objects via arbitrary path.
  */
+
 window.ZABBIX = Object.create({
 
 	/**
@@ -68,12 +69,20 @@ jQuery(function($) {
 	if ($search.length) {
 		createSuggest('search');
 
-		$search.keyup(function() {
-			$search
-				.siblings('button')
-				.prop('disabled', ($.trim($search.val()) === ''));
-		}).closest('form').submit(function() {
-			if ($.trim($search.val()) === '') {
+		var $search_icon = $search.siblings('.search-icon');
+
+		$search.on('keyup', function() {
+			$search_icon.prop('disabled', $.trim($search.val()) === '');
+		});
+
+		$search.closest('form').on('submit', function() {
+			return ($.trim($search.val()) !== '');
+		});
+
+		$search_icon.on('click', function() {
+			if ($('.sidebar').is('.is-compact:not(.is-opened)')) {
+				$search.focus();
+
 				return false;
 			}
 		});
@@ -174,6 +183,10 @@ jQuery(function($) {
 				sections = getMenuPopupItemPrototype(data);
 				break;
 
+			case 'dropdown':
+				sections = getMenuPopupDropdown(data, $obj);
+				break;
+
 			case 'submenu':
 				sections = getMenuPopupSubmenu(data);
 				break;
@@ -220,6 +233,7 @@ jQuery(function($) {
 	 */
 	function isServerRequestRequired(type) {
 		switch (type) {
+			case 'dropdown':
 			case 'submenu':
 				return false;
 
@@ -237,6 +251,14 @@ jQuery(function($) {
 	 */
 	function makeDefaultPosition($obj, data, event) {
 		switch (data.type) {
+			case 'dropdown':
+				return {
+					of: $obj,
+					my: 'left top',
+					at: 'left top+24',
+					collision: 'none'
+				};
+
 			case 'submenu':
 				return {
 					of: $obj,

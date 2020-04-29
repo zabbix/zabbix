@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2020 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -152,14 +152,14 @@ final class CModuleManager {
 		$conflicting_manifests = [];
 
 		foreach ($ids as $id => $relative_paths) {
-			$conflicts[] = _s('Identical ID (%s) is used by modules located at %s.', $id,
+			$conflicts[] = _s('Identical ID (%1$s) is used by modules located at %2$s.', $id,
 				implode(', ', $relative_paths)
 			);
 			$conflicting_manifests = array_merge($conflicting_manifests, $relative_paths);
 		}
 
 		foreach ($namespaces as $namespace => $relative_paths) {
-			$conflicts[] = _s('Identical namespace (%s) is used by modules located at %s.', $namespace,
+			$conflicts[] = _s('Identical namespace (%1$s) is used by modules located at %2$s.', $namespace,
 				implode(', ', $relative_paths)
 			);
 			$conflicting_manifests = array_merge($conflicting_manifests, $relative_paths);
@@ -170,7 +170,7 @@ final class CModuleManager {
 		}, []));
 
 		if ($relative_paths) {
-			$conflicts[] = _s('Identical actions are used by modules located at %s.', implode(', ', $relative_paths));
+			$conflicts[] = _s('Identical actions are used by modules located at %1$s.', implode(', ', $relative_paths));
 			$conflicting_manifests = array_merge($conflicting_manifests, $relative_paths);
 		}
 
@@ -200,7 +200,7 @@ final class CModuleManager {
 				$module_class = implode('\\', ['Modules', $manifest['namespace'], 'Module']);
 
 				if (!class_exists($module_class, true)) {
-					$this->errors[] = _s('Wrong Module.php class name for module located at %s.', $relative_path);
+					$this->errors[] = _s('Wrong Module.php class name for module located at %1$s.', $relative_path);
 
 					continue;
 				}
@@ -219,13 +219,13 @@ final class CModuleManager {
 					$this->modules[$instance->getId()] = $instance;
 				}
 				else {
-					$this->errors[] = _s('Module.php class must extend %s for module located at %s.', CModule::class,
-						$relative_path
+					$this->errors[] = _s('Module.php class must extend %1$s for module located at %2$s.',
+						CModule::class, $relative_path
 					);
 				}
 			}
 			catch (Exception $e) {
-				$this->errors[] = _s('%s - thrown by module located at %s.', $e->getMessage(), $relative_path);
+				$this->errors[] = _s('%1$s - thrown by module located at %2$s.', $e->getMessage(), $relative_path);
 			}
 		}
 

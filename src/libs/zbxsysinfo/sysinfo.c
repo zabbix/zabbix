@@ -849,11 +849,13 @@ void	test_parameter(const char *key)
 
 	if (SUCCEED == process(key, PROCESS_WITH_ALIAS, &result))
 	{
+		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
+
 		if (0 != ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 
 		if (0 != ISSET_DBL(&result))
-			printf(" [d|" ZBX_FS_DBL "]", result.dbl);
+			printf(" [d|%s]", zbx_print_double(buffer, sizeof(buffer), result.dbl));
 
 		if (0 != ISSET_STR(&result))
 			printf(" [s|%s]", result.str);
@@ -1515,6 +1517,13 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
 #endif
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if defined(WITH_AGENT2_METRICS)
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	/* calling fork() in a multithreaded program may result in deadlock on mutex */
+	return metric_func(request, result);
+}
+#else
 /******************************************************************************
  *                                                                            *
  * Function: serialize_agent_result                                           *
@@ -1822,6 +1831,7 @@ out:
 			ISSET_MSG(result) ? result->msg : "");
 	return ret;
 }
+#endif
 #else
 
 static ZBX_THREAD_LOCAL zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;

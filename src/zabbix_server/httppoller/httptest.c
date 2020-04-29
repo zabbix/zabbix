@@ -390,8 +390,8 @@ static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
 		value = zbx_strdup(NULL, row[1]);
 
 		/* from now on variable values can contain macros so proper URL encoding can be performed */
-		if (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
-				&value, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
+		if (SUCCEED != (ret = substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+				NULL, &value, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
 		{
 			zbx_free(value);
 			goto out;
@@ -570,8 +570,8 @@ static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
 		value = zbx_strdup(NULL, row[1]);
 
 		/* from now on variable values can contain macros so proper URL encoding can be performed */
-		if (SUCCEED != (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
-				&value, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
+		if (SUCCEED != (ret = substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+				NULL, &value, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
 		{
 			zbx_free(value);
 			goto out;
@@ -722,7 +722,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		db_httpstep.name = row[2];
 
 		db_httpstep.url = zbx_strdup(NULL, row[3]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
+		substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 				&db_httpstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 		http_substitute_variables(httptest, &db_httpstep.url);
 
@@ -739,7 +739,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		if (ZBX_POSTTYPE_RAW == db_httpstep.post_type)
 		{
 			db_httpstep.posts = zbx_strdup(NULL, row[5]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 					&db_httpstep.posts, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 			http_substitute_variables(httptest, &db_httpstep.posts);
 		}
@@ -1125,11 +1125,11 @@ int	process_httptests(int httppoller_num, int now)
 		if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[6])))
 		{
 			httptest.httptest.http_user = zbx_strdup(NULL, row[7]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
 					&httptest.httptest.http_user, MACRO_TYPE_COMMON, NULL, 0);
 
 			httptest.httptest.http_password = zbx_strdup(NULL, row[8]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
 					&httptest.httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
@@ -1153,7 +1153,7 @@ int	process_httptests(int httppoller_num, int now)
 				&httptest.httptest.ssl_key_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[13]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
+		substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
 				&httptest.httptest.ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
 
 		httptest.httptest.verify_peer = atoi(row[14]);

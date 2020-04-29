@@ -27,13 +27,10 @@
 /* this struct must be only modified along with mapping builtin_counter_ref[] in perfmon.c */
 typedef enum
 {
-	PCI_SYSTEM = 0,
-	PCI_PROCESSOR,
-	PCI_PROCESSOR_INFORMATION,
-	PCI_PROCESSOR_TIME,
-	PCI_PROCESSOR_QUEUE_LENGTH,
+	PCI_PROCESSOR_QUEUE_LENGTH = 0,
 	PCI_SYSTEM_UP_TIME,
-	PCI_TERMINAL_SERVICES,
+	PCI_PROCESSOR_TIME,
+	PCI_INFORMATION_PROCESSOR_TIME,
 	PCI_TOTAL_SESSIONS,
 	PCI_MAX_INDEX = PCI_TOTAL_SESSIONS
 }
@@ -92,6 +89,10 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 wchar_t		*get_counter_name(DWORD pdhIndex);
 int		check_counter_path(char *counterPath, int convert_from_numeric);
 int		init_builtin_counter_indexes(void);
+DWORD 		get_builtin_object_index(zbx_builtin_counter_ref_t ref);
 DWORD 		get_builtin_counter_index(zbx_builtin_counter_ref_t ref);
+
+#define	get_builtin_object_name(ctr)	get_counter_name(get_builtin_object_index(ctr))
+#define	get_builtin_counter_name(ctr)	get_counter_name(get_builtin_counter_index(ctr))
 
 #endif /* ZABBIX_PERFMON_H */

@@ -23,13 +23,16 @@
  * @var CView $this
  */
 
-$back_url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
-
-$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style']);
+if ($data['style'] == STYLE_TOP) {
+	$table = (new CPartial('trigoverview.table.top', $data))->getOutput();
+}
+else {
+	$table = (new CPartial('trigoverview.table.left', $data))->getOutput();
+}
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString()
+	'body' => $table
 ];
 
 if (($messages = getMessages()) !== null) {

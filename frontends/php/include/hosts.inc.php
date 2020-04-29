@@ -484,7 +484,7 @@ function get_hostgroup_by_groupid($groupid) {
 		return $groups;
 	}
 
-	error(_s('No host groups with groupid "%s".', $groupid));
+	error(_s('No host groups with groupid "%1$s".', $groupid));
 
 	return false;
 }
@@ -527,7 +527,7 @@ function get_host_by_hostid($hostid, $no_error_message = 0) {
 	}
 
 	if ($no_error_message == 0) {
-		error(_s('No host with hostid "%s".', $hostid));
+		error(_s('No host with hostid "%1$s".', $hostid));
 	}
 
 	return false;
@@ -710,7 +710,9 @@ function makeApplicationTemplatePrefix($applicationid, array $parent_templates) 
 	foreach ($templates as $template) {
 		if ($template['permission'] == PERM_READ_WRITE) {
 			$name = (new CLink(CHtml::encode($template['name']),
-				(new CUrl('applications.php'))->setArgument('hostid', $template['hostid'])
+				(new CUrl('applications.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$template['hostid']])
 			))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
@@ -983,6 +985,11 @@ function isTemplate($hostId) {
  *   array(
  *       '{$MACRO}' => array(
  *           'macro' => '{$MACRO}',
+ *           'parent_host' => array(                <- optional
+ *               'value' => 'parent host level value',
+ *               'type' => 0,
+ *               'description' => ''
+ *           ),
  *           'template' => array(                   <- optional
  *               'value' => 'template-level value'
  *               'templateid' => 10001,
@@ -994,26 +1001,28 @@ function isTemplate($hostId) {
  *       )
  *   )
  *
- * @param array $hostids
+ * @param array     $hostids        Host or template ids.
+ * @param int|null  $parent_hostid  Parent host id of host prototype.
  *
  * @return array
  */
-function getInheritedMacros(array $hostids) {
+function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 	$user_macro_parser = new CUserMacroParser();
 
 	$all_macros = [];
 	$global_macros = [];
 
 	$db_global_macros = API::UserMacro()->get([
-		'output' => ['macro', 'value', 'description'],
+		'output' => ['macro', 'value', 'description', 'type'],
 		'globalmacro' => true
 	]);
 
 	foreach ($db_global_macros as $db_global_macro) {
 		$all_macros[$db_global_macro['macro']] = true;
 		$global_macros[$db_global_macro['macro']] = [
-			'value' => $db_global_macro['value'],
-			'description' => $db_global_macro['description']
+			'value' => CMacrosResolverGeneral::getMacroValue($db_global_macro),
+			'description' => $db_global_macro['description'],
+			'type' => $db_global_macro['type']
 		];
 	}
 
@@ -1026,7 +1035,7 @@ function getInheritedMacros(array $hostids) {
 		$db_templates = API::Template()->get([
 			'output' => ['name'],
 			'selectParentTemplates' => ['templateid'],
-			'selectMacros' => ['macro', 'value', 'description'],
+			'selectMacros' => ['macro', 'value', 'description', 'type'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -1049,8 +1058,9 @@ function getInheritedMacros(array $hostids) {
 			foreach ($db_template['macros'] as $dbMacro) {
 				if (array_key_exists($dbMacro['macro'], $all_macros)) {
 					$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-						'value' => $dbMacro['value'],
-						'description' => $dbMacro['description']
+						'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+						'description' => $dbMacro['description'],
+						'type' => $dbMacro['type']
 					];
 					$all_macros[$dbMacro['macro']] = true;
 				}
@@ -1061,8 +1071,9 @@ function getInheritedMacros(array $hostids) {
 
 					if ($tpl_context === null) {
 						$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-							'value' => $dbMacro['value'],
-							'description' => $dbMacro['description']
+							'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+							'description' => $dbMacro['description'],
+							'type' => $dbMacro['type']
 						];
 						$all_macros[$dbMacro['macro']] = true;
 					}
@@ -1082,8 +1093,9 @@ function getInheritedMacros(array $hostids) {
 								);
 
 								$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-									'value' => $dbMacro['value'],
-									'description' => $dbMacro['description']
+									'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+									'description' => $dbMacro['description'],
+									'type' => $dbMacro['type']
 								];
 								$all_macros[$dbMacro['macro']] = true;
 								$global_macros[$dbMacro['macro']] = $global_value;
@@ -1094,8 +1106,9 @@ function getInheritedMacros(array $hostids) {
 
 						if (!$match_found) {
 							$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-								'value' => $dbMacro['value'],
-								'description' => $dbMacro['description']
+								'value' => CMacrosResolverGeneral::getMacroValue($dbMacro),
+								'description' => $dbMacro['description'],
+								'type' => $dbMacro['type']
 							];
 							$all_macros[$dbMacro['macro']] = true;
 						}
@@ -1114,18 +1127,38 @@ function getInheritedMacros(array $hostids) {
 		}
 	} while ($templateids);
 
-	$all_macros = array_keys($all_macros);
 	$all_templates = [];
 	$inherited_macros = [];
+	$parent_host_macros = [];
+
+	if ($parent_hostid !== null) {
+		$parent_host_macros = API::UserMacro()->get([
+			'output' => ['macro', 'type', 'value', 'description'],
+			'hostids' => [$parent_hostid]
+		]);
+
+		$parent_host_macros = array_column($parent_host_macros, null, 'macro');
+		$all_macros += array_fill_keys(array_keys($parent_host_macros), true);
+	}
+
+	$all_macros = array_keys($all_macros);
 
 	// resolving
 	foreach ($all_macros as $macro) {
 		$inherited_macro = ['macro' => $macro];
 
-		if (array_key_exists($macro, $global_macros)) {
+		if (array_key_exists($macro, $parent_host_macros)) {
+			$inherited_macro['parent_host'] = [
+				'value' => CMacrosResolverGeneral::getMacroValue($parent_host_macros[$macro]),
+				'description' => $parent_host_macros[$macro]['description'],
+				'type' => $parent_host_macros[$macro]['type']
+			];
+		}
+		elseif (array_key_exists($macro, $global_macros)) {
 			$inherited_macro['global'] = [
 				'value' => $global_macros[$macro]['value'],
-				'description' => $global_macros[$macro]['description']
+				'description' => $global_macros[$macro]['description'],
+				'type' => $global_macros[$macro]['type']
 			];
 		}
 
@@ -1141,7 +1174,8 @@ function getInheritedMacros(array $hostids) {
 						'description' => $hosts[$templateid]['macros'][$macro]['description'],
 						'templateid' => $hosts[$templateid]['templateid'],
 						'name' => $hosts[$templateid]['name'],
-						'rights' => PERM_READ
+						'rights' => PERM_READ,
+						'type' => $hosts[$templateid]['macros'][$macro]['type']
 					];
 
 					if (!array_key_exists($hosts[$templateid]['templateid'], $all_templates)) {
@@ -1195,9 +1229,15 @@ function getInheritedMacros(array $hostids) {
  *   array(
  *       '{$MACRO}' => array(
  *           'macro' => '{$MACRO}',
- *           'type' => 0x03,                        <- ZBX_PROPERTY_INHERITED, ZBX_PROPERTY_OWN or ZBX_PROPERTY_BOTH
+ *           'type' => 0,                           <- ZBX_MACRO_TYPE_TEXT or ZBX_MACRO_TYPE_SECRET
+ *           'inherited_type' => 0x03,              <- ZBX_PROPERTY_INHERITED, ZBX_PROPERTY_OWN or ZBX_PROPERTY_BOTH
  *           'value' => 'effective value',
  *           'hostmacroid' => 7532,                 <- optional
+ *           'parent_host' => array(                <- optional
+ *               'value' => 'parent host value',
+ *               'type' => 0,
+ *               'description' => ''
+ *           ),
  *           'template' => array(                   <- optional
  *               'value' => 'template-level value'
  *               'templateid' => 10001,
@@ -1214,18 +1254,21 @@ function getInheritedMacros(array $hostids) {
  *
  * @return array
  */
-function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
+function mergeInheritedMacros(array $host_macros, array $inherited_macros): array {
 	$user_macro_parser = new CUserMacroParser();
+	$inherit_order = ['parent_host', 'template', 'global'];
 
 	foreach ($inherited_macros as &$inherited_macro) {
-		$inherited_macro['type'] = ZBX_PROPERTY_INHERITED;
-		if (array_key_exists('template', $inherited_macro)) {
-			$inherited_macro['value'] = $inherited_macro['template']['value'];
-			$inherited_macro['description'] = $inherited_macro['template']['description'];
-		}
-		else {
-			$inherited_macro['value'] = $inherited_macro['global']['value'];
-			$inherited_macro['description'] = $inherited_macro['global']['description'];
+		[$inherited_level] = array_values(array_intersect($inherit_order, array_keys($inherited_macro)));
+		$inherited_macro['inherited_type'] = ZBX_PROPERTY_INHERITED;
+		$inherited_macro['inherited_level'] = $inherited_level;
+		$inherited_macro['value'] = $inherited_macro[$inherited_level]['value'];
+		$inherited_macro['type'] = $inherited_macro[$inherited_level]['type'];
+		$inherited_macro['description'] = $inherited_macro[$inherited_level]['description'];
+
+		// Secret macro value cannot be inherited.
+		if ($inherited_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+			unset($inherited_macro['value']);
 		}
 	}
 	unset($inherited_macro);
@@ -1235,6 +1278,11 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 	 * checking for contexts, since {$MACRO:} is the same as {$MACRO:""}.
 	 */
 	foreach ($host_macros as &$host_macro) {
+		// Secret macro value cannot be inherited.
+		if ($host_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+			unset($inherited_macros[$host_macro['macro']]['value']);
+		}
+
 		if (array_key_exists($host_macro['macro'], $inherited_macros)) {
 			$host_macro = array_merge($inherited_macros[$host_macro['macro']], $host_macro);
 			unset($inherited_macros[$host_macro['macro']]);
@@ -1249,7 +1297,7 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 				$hst_context = $user_macro_parser->getContext();
 
 				if ($hst_context === null) {
-					$host_macro['type'] = 0x00;
+					$host_macro['inherited_type'] = 0x00;
 				}
 				else {
 					$match_found = false;
@@ -1271,16 +1319,16 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 					}
 
 					if (!$match_found) {
-						$host_macro['type'] = 0x00;
+						$host_macro['inherited_type'] = 0x00;
 					}
 				}
 			}
 			else {
-				$host_macro['type'] = 0x00;
+				$host_macro['inherited_type'] = 0x00;
 			}
 		}
 
-		$host_macro['type'] |= ZBX_PROPERTY_OWN;
+		$host_macro['inherited_type'] |= ZBX_PROPERTY_OWN;
 	}
 	unset($host_macro);
 
@@ -1300,11 +1348,11 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
  */
 function cleanInheritedMacros(array $macros) {
 	foreach ($macros as $idx => $macro) {
-		if (array_key_exists('type', $macro) && !($macro['type'] & ZBX_PROPERTY_OWN)) {
+		if (array_key_exists('inherited_type', $macro) && !($macro['inherited_type'] & ZBX_PROPERTY_OWN)) {
 			unset($macros[$idx]);
 		}
 		else {
-			unset($macros[$idx]['type'], $macros[$idx]['inherited']);
+			unset($macros[$idx]['inherited_type'], $macros[$idx]['inherited']);
 		}
 	}
 
@@ -1353,32 +1401,7 @@ function isReadableTemplates(array $templateids) {
 }
 
 /**
- * Check if user has read permissions for hosts or templates.
- *
- * @param array $hostids
- *
- * @return bool
- */
-function isReadableHostTemplates(array $hostids) {
-	$count = API::Host()->get([
-		'countOutput' => true,
-		'hostids' => $hostids
-	]);
-
-	if ($count == count($hostids)) {
-		return true;
-	}
-
-	$count += API::Template()->get([
-		'countOutput' => true,
-		'templateids' => $hostids
-	]);
-
-	return ($count == count($hostids));
-}
-
-/**
- * Check if user has read permissions for hosts or templates.
+ * Check if user has write permissions for hosts or templates.
  *
  * @param array $hostids
  *
@@ -1402,4 +1425,59 @@ function isWritableHostTemplates(array $hostids) {
 	]);
 
 	return ($count == count($hostids));
+}
+
+function getAddNewInterfaceSubmenu() {
+	return [
+		'main_section' => [
+			'items' => [
+				"javascript:hostInterfaceManager.addAgent();" => _('Agent'),
+				"javascript:hostInterfaceManager.addSnmp();" => _('SNMP'),
+				"javascript:hostInterfaceManager.addJmx();" => _('JMX'),
+				"javascript:hostInterfaceManager.addIpmi();" => _('IPMI')
+			]
+		]
+	];
+}
+
+function renderInterfaceHeaders() {
+	return (new CDiv())
+		->addClass(implode(' ', [ZBX_STYLE_HOST_INTERFACE_CONTAINER, ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER]))
+		->addItem(
+			(new CDiv())
+				->addClass(implode(' ', [ZBX_STYLE_HOST_INTERFACE_ROW, ZBX_STYLE_HOST_INTERFACE_ROW_HEADER]))
+				->addItem([
+					(new CDiv())->addClass(ZBX_STYLE_HOST_INTERFACE_CELL),
+					(new CDiv(_('Type')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_TYPE
+						])
+					),
+					(new CDiv(_('IP address')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_IP
+						])
+					),
+					(new CDiv(_('DNS name')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_DNS
+						])
+					),
+					(new CDiv(_('Connect to')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_USEIP
+						])
+					),
+					(new CDiv(_('Port')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_PORT
+						])
+					),
+					(new CDiv(_('Default')))->addClass(
+						implode(' ', [ZBX_STYLE_HOST_INTERFACE_CELL, ZBX_STYLE_HOST_INTERFACE_CELL_HEADER,
+							ZBX_STYLE_HOST_INTERFACE_CELL_ACTION
+						])
+					)
+				])
+		);
 }

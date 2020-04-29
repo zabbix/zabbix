@@ -35,11 +35,11 @@ $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(
-		(new CTag('nav', true, (new CList())->addItem(get_icon('fullscreen', ['mode' => $web_layout_mode]))))
+		(new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'latest.view')))
 		->setProfile('web.latest.filter')
 		->setActiveTab($data['active_tab'])
@@ -69,6 +69,9 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 						'object_name' => 'hosts',
 						'data' => $data['multiselect_host_data'],
 						'popup' => [
+							'filter_preselect_fields' => [
+								'hostgroups' => 'filter_groupids_'
+							],
 							'parameters' => [
 								'srctbl' => 'hosts',
 								'srcfld1' => 'hostid',
@@ -84,7 +87,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('application_name', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
-						->onClick('return PopUp("popup.generic",'.
+						->onClick('return PopUp("popup.generic", jQuery.extend('.
 							json_encode([
 								'srctbl' => 'applications',
 								'srcfld1' => 'name',
@@ -92,7 +95,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 								'dstfld1' => 'filter_application',
 								'real_hosts' => '1',
 								'with_applications' => '1'
-							]).', null, this);'
+							]).', getFirstMultiselectValue("filter_hostids_")), null, this);'
 						)
 				]),
 			(new CFormList())
@@ -110,15 +113,12 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 }
 
 $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip([
-	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set',
-	'paging'
+	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'paging'
 ]))));
 
 $widget->show();
 
-// Initialize page refresh only if the filter is sufficient for data selection.
-if ($data['filter_set']) {
-	(new CScriptTag('latest_page.start();'))
-		->setOnDocumentReady()
-		->show();
-}
+// Initialize page refresh.
+(new CScriptTag('latest_page.start();'))
+	->setOnDocumentReady()
+	->show();

@@ -30,11 +30,11 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Host groups', 'Hosts', 'Severity', 'Filter', 'From', 'Till');
 		$this->zbxTestClickXpathWait('//button[text()="Reset"]');
 
-		// Check selected severities
+		// Check unselected severities
 		$severities = ['Not classified', 'Warning', 'High', 'Information', 'Average', 'Disaster'];
 		foreach ($severities as $severity) {
 			$severity_id = $this->zbxTestGetAttributeValue('//label[text()=\''.$severity.'\']', 'for');
-			$this->assertTrue($this->zbxTestCheckboxSelected($severity_id));
+			$this->assertTrue($this->query('id', $severity_id)->waitUntilPresent()->one()->isSelected(false));
 		}
 
 		// Check closed filter
@@ -143,9 +143,9 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 				[
 					'filter' => [
 						'severities' => [
-							'Not classified',
-							'Information',
-							'Warning'
+							'Average',
+							'High',
+							'Disaster'
 						]
 					],
 					'date' => [
@@ -160,10 +160,8 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 				[
 					'filter' => [
 						'severities' => [
-							'Not classified',
-							'Warning',
-							'Information',
-							'Average'
+							'High',
+							'Disaster'
 						]
 					],
 					'date' => [
@@ -210,10 +208,14 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			if (array_key_exists('host', $filter)) {
 				$this->zbxTestClickButtonMultiselect('hostids_');
 				$this->zbxTestLaunchOverlayDialog('Hosts');
-				$this->zbxTestDropdownHasOptions('groupid', ['Host group for tag permissions', 'Zabbix servers',
-					'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers']
-				);
-				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				$this->zbxTestLaunchOverlayDialog('Host groups');
+				$groups_form = $this->query('name:hostGroupsform')->one();
+				$all_groups = $groups_form->query('xpath:.//a')->all()->asText();
+				$groups = ['Host group for tag permissions', 'Zabbix servers', 'ZBX6648 All Triggers',
+					'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers'];
+				$this->assertTrue(count(array_diff($groups, $all_groups)) === 0);
+				$groups_form->query('xpath://a[text()="Zabbix servers"]')->one()->click();
 				$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//a[text()="'.
 						$filter['host'].'"]');
 				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));

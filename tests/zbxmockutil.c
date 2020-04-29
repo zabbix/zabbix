@@ -154,23 +154,14 @@ int	zbx_mock_str_to_item_type(const char *str)
 	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX"))
 		return ITEM_TYPE_ZABBIX;
 
-	if (0 == strcmp(str, "ITEM_TYPE_SNMPv1"))
-		return ITEM_TYPE_SNMPv1;
-
 	if (0 == strcmp(str, "ITEM_TYPE_TRAPPER"))
 		return ITEM_TYPE_TRAPPER;
 
 	if (0 == strcmp(str, "ITEM_TYPE_SIMPLE"))
 		return ITEM_TYPE_SIMPLE;
 
-	if (0 == strcmp(str, "ITEM_TYPE_SNMPv2c"))
-		return ITEM_TYPE_SNMPv2c;
-
 	if (0 == strcmp(str, "ITEM_TYPE_INTERNAL"))
 		return ITEM_TYPE_INTERNAL;
-
-	if (0 == strcmp(str, "ITEM_TYPE_SNMPv3"))
-		return ITEM_TYPE_SNMPv3;
 
 	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX_ACTIVE"))
 		return ITEM_TYPE_ZABBIX_ACTIVE;
@@ -210,6 +201,9 @@ int	zbx_mock_str_to_item_type(const char *str)
 
 	if (0 == strcmp(str, "ITEM_TYPE_HTTPAGENT"))
 		return ITEM_TYPE_HTTPAGENT;
+
+	if (0 == strcmp(str, "ITEM_TYPE_SNMP"))
+		return ITEM_TYPE_SNMP;
 
 	return FAIL;
 }
@@ -360,3 +354,4 @@ int	zbx_mock_str_to_family(const char *str)
 	fail_msg("Unknown family \"%s\"", str);
 	return AF_UNSPEC;
 }
+

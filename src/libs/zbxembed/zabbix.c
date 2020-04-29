@@ -25,6 +25,8 @@
 #include "duktape.h"
 #include "zabbix.h"
 
+#define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
+
 /******************************************************************************
  *                                                                            *
  * Function: es_zabbix_dtor                                              *
@@ -59,19 +61,46 @@ static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_zabbix_status                                            *
+ * Function: es_zabbix_status                                                 *
  *                                                                            *
- * Purpose: Curlzabbix.Status method                                     *
+ * Purpose: Curlzabbix.Status method                                          *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_zabbix_log(duk_context *ctx)
 {
-	zabbix_log(duk_to_int(ctx, 0), "%s", duk_to_string(ctx, 1));
+	zbx_es_env_t		*env;
+	const char		*message;
+	int			level;
+	duk_memory_functions	out_funcs;
+
+	level = duk_to_int(ctx, 0);
+	message = duk_to_string(ctx, 1);
+
+	zabbix_log(level, "%s", message);
+
+	duk_get_memory_functions(ctx, &out_funcs);
+	env = (zbx_es_env_t *)out_funcs.udata;
+
+	if (NULL == env->json)
+		return 0;
+
+	zbx_json_addobject(env->json, NULL);
+	zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
+	zbx_json_adduint64(env->json, "ms", zbx_get_duration_ms(&env->start_time));
+	zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(env->json);
+
+	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
+	{
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "log exceeds the maximum size of " ZBX_FS_UI64 " bytes.",
+				ZBX_ES_LOG_MEMORY_LIMIT);
+	}
+
 	return 0;
 }
 
 static const duk_function_list_entry	zabbix_methods[] = {
-	{"Log", es_zabbix_log, 2},
+	{"Log",			es_zabbix_log,		2},
 	{NULL, NULL, 0}
 };
 

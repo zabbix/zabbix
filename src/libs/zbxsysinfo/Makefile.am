@@ -27,7 +27,8 @@ EXTRA_DIST = \
 noinst_LIBRARIES = \
 	libzbxagentsysinfo.a \
 	libzbxproxysysinfo.a \
-	libzbxserversysinfo.a
+	libzbxserversysinfo.a \
+	libzbxagent2sysinfo.a
 
 # AGENT version of sysinfo library
 libzbxagentsysinfo_a_CFLAGS = \
@@ -39,6 +40,14 @@ libzbxagentsysinfo_a_CFLAGS = \
 
 libzbxagentsysinfo_a_SOURCES = \
 	specsysinfo.h \
+	sysinfo.c
+
+# AGENT2 version of sysinfo library
+libzbxagent2sysinfo_a_CFLAGS = \
+	-DWITH_COMMON_METRICS \
+	-DWITH_AGENT2_METRICS
+
+libzbxagent2sysinfo_a_SOURCES = \
 	sysinfo.c
 
 # SERVER version of sysinfo library

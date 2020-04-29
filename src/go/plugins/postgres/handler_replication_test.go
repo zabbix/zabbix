@@ -1,3 +1,5 @@
+// +build postgres_tests
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -22,8 +24,6 @@ package postgres
 import (
 	"fmt"
 	"testing"
-
-	"zabbix.com/pkg/plugin"
 )
 
 func TestPlugin_replicationHandler(t *testing.T) {
@@ -32,8 +32,6 @@ func TestPlugin_replicationHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	impl.Configure(&plugin.GlobalOptions{}, nil)
 
 	type args struct {
 		conn *postgresConn

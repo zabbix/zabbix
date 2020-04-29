@@ -1279,12 +1279,6 @@ return [
 				'length' => 64,
 				'default' => '10050',
 			],
-			'bulk' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
 		],
 	],
 	'valuemaps' => [
@@ -1316,12 +1310,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			],
-			'snmp_community' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
 			],
 			'snmp_oid' => [
 				'null' => false,
@@ -1388,30 +1376,6 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '',
-			],
-			'snmpv3_securityname' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			],
-			'snmpv3_securitylevel' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'snmpv3_authpassphrase' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			],
-			'snmpv3_privpassphrase' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
 				'default' => '',
 			],
 			'formula' => [
@@ -1494,12 +1458,6 @@ return [
 				'ref_table' => 'interface',
 				'ref_field' => 'interfaceid',
 			],
-			'port' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '',
-			],
 			'description' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
@@ -1516,24 +1474,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '30d',
-			],
-			'snmpv3_authprotocol' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'snmpv3_privprotocol' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'snmpv3_contextname' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
 			],
 			'evaltype' => [
 				'null' => false,
@@ -2590,18 +2530,6 @@ return [
 				'length' => 128,
 				'default' => '',
 			],
-			'dropdown_first_entry' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
-			'dropdown_first_remember' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
 			'discovery_groupid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -2927,6 +2855,30 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
+			'compression_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'compression_availability' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'compress_older' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '7d',
+			],
+			'instanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
+			],
 		],
 	],
 	'triggers' => [
@@ -3142,13 +3094,11 @@ return [
 			'yaxismin' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'yaxismax' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '100',
 			],
 			'templateid' => [
@@ -3191,13 +3141,11 @@ return [
 			'percent_left' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'percent_right' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0',
 			],
 			'ymin_type' => [
@@ -3401,6 +3349,12 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'hostmacro' => [
@@ -3434,6 +3388,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -3658,7 +3618,6 @@ return [
 			'goodsla' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '99.9',
 			],
 			'sortorder' => [
@@ -4671,7 +4630,6 @@ return [
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'ns' => [
@@ -4904,6 +4862,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'write_clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'proxy_dhistory' => [
@@ -5055,19 +5019,16 @@ return [
 			'value_min' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_avg' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 			'value_max' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
 				'default' => '0.0000',
 			],
 		],
@@ -5145,7 +5106,7 @@ return [
 			'message' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => '',
 			],
 			'action' => [
@@ -7883,6 +7844,78 @@ return [
 			'config' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => '',
+			],
+		],
+	],
+	'interface_snmp' => [
+		'key' => 'interfaceid',
+		'fields' => [
+			'interfaceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'interface',
+				'ref_field' => 'interfaceid',
+			],
+			'version' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2',
+			],
+			'bulk' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'community' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			],
+			'securityname' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			],
+			'securitylevel' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'authpassphrase' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			],
+			'privpassphrase' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			],
+			'authprotocol' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'privprotocol' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'contextname' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => '',
 			],
 		],

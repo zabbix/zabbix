@@ -31,6 +31,7 @@ zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_sdbm(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_djb2(const void *data, size_t len, zbx_hash_t seed);
+zbx_hash_t	zbx_hash_splittable64(const void *data);
 
 #define ZBX_DEFAULT_HASH_ALGO		zbx_hash_modfnv
 #define ZBX_DEFAULT_PTR_HASH_ALGO	zbx_hash_modfnv
@@ -40,14 +41,13 @@ zbx_hash_t	zbx_hash_djb2(const void *data, size_t len, zbx_hash_t seed);
 typedef zbx_hash_t (*zbx_hash_func_t)(const void *data);
 
 zbx_hash_t	zbx_default_ptr_hash_func(const void *data);
-zbx_hash_t	zbx_default_uint64_hash_func(const void *data);
 zbx_hash_t	zbx_default_string_hash_func(const void *data);
 zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 
 #define ZBX_DEFAULT_HASH_SEED		0
 
 #define ZBX_DEFAULT_PTR_HASH_FUNC		zbx_default_ptr_hash_func
-#define ZBX_DEFAULT_UINT64_HASH_FUNC		zbx_default_uint64_hash_func
+#define ZBX_DEFAULT_UINT64_HASH_FUNC		zbx_hash_splittable64
 #define ZBX_DEFAULT_STRING_HASH_FUNC		zbx_default_string_hash_func
 #define ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC	zbx_default_uint64_pair_hash_func
 
@@ -355,6 +355,7 @@ unsigned int	zbx_isqrt32(unsigned int value);
 int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
 		zbx_vector_ptr_t *unknown_msgs);
 int	evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
+double	evaluate_string_to_double(const char *in);
 
 /* forecasting */
 

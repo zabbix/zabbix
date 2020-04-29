@@ -48,6 +48,7 @@ class testUserMacro extends CAPITest {
 				'expect_db_row' => [
 					'macro' => '{$ADD_2}',
 					'value' => 'test',
+					'type' => '0',
 					'hostid' => '90020',
 					'description' => ''
 				]
@@ -455,13 +456,15 @@ class testUserMacro extends CAPITest {
 						'globalmacroid' => '13',
 						'macro' => '{$MACRO_UPDATED1}',
 						'value' => 'updated1',
-						'description' => 'desc'
+						'description' => 'desc',
+						'type' => '0'
 					],
 					[
 						'globalmacroid' => '14',
 						'macro' => '{$MACRO_UPDATED2}',
 						'value' => 'updated2',
-						'description' => 'æų'
+						'description' => 'æų',
+						'type' => '0'
 					]
 				]
 			],

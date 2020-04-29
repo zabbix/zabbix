@@ -24,8 +24,6 @@ package postgres
 import (
 	"fmt"
 	"testing"
-
-	"zabbix.com/pkg/plugin"
 )
 
 func TestPlugin_connectionsHandler(t *testing.T) {
@@ -33,8 +31,6 @@ func TestPlugin_connectionsHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	impl.Configure(&plugin.GlobalOptions{}, nil)
 
 	type args struct {
 		conn   *postgresConn

@@ -121,6 +121,7 @@ class ZBase {
 		require_once 'include/func.inc.php';
 		require_once 'include/html.inc.php';
 		require_once 'include/perm.inc.php';
+		require_once 'include/menu.inc.php';
 		require_once 'include/audit.inc.php';
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
@@ -172,7 +173,7 @@ class ZBase {
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->setLayoutModeByUrl();
-				$this->initMainMenu();
+				$this->initComponents();
 				$this->initModuleManager();
 
 				$file = basename($_SERVER['SCRIPT_NAME']);
@@ -182,7 +183,10 @@ class ZBase {
 				$router->addActions($this->module_manager->getActions());
 				$router->setAction($action_name);
 
-				$this->component_registry->get('menu.main')->setSelected($action_name);
+				$this->component_registry->get('menu.main')
+					->setSelectedByAction($action_name,
+						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+					);
 
 				CProfiler::getInstance()->start();
 
@@ -436,13 +440,13 @@ class ZBase {
 
 		try {
 			if (!class_exists($action_class, true)) {
-				throw new Exception(_s('Class %s not found for action %s.', $action_class, $action_name));
+				throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
 			}
 
 			$action = new $action_class();
 
 			if (!is_subclass_of($action, CAction::class)) {
-				throw new Exception(_s('Action class %s must extend %s class.', $action_class, CAction::class));
+				throw new Exception(_s('Action class %1$s must extend %2$s class.', $action_class, CAction::class));
 			}
 
 			$action->setAction($action_name);
@@ -531,7 +535,7 @@ class ZBase {
 		// Action has layout?
 		if ($router->getLayout() !== null) {
 			if (!($response instanceof CControllerResponseData)) {
-				throw new Exception(_s('Unexpected response for action %s.', $router->getAction()));
+				throw new Exception(_s('Unexpected response for action %1$s.', $router->getAction()));
 			}
 
 			$layout_data_defaults = [
@@ -571,27 +575,24 @@ class ZBase {
 	}
 
 	/**
-	 * Set layout to fullscreen or kiosk mode if URL contains 'fullscreen' and/or 'kiosk' arguments.
+	 * Set layout to kiosk mode if URL contains 'kiosk' arguments.
 	 */
 	private function setLayoutModeByUrl() {
-		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
-			CViewHelper::saveLayoutMode(ZBX_LAYOUT_KIOSKMODE);
-		}
-		elseif (array_key_exists('fullscreen', $_GET)) {
-			CViewHelper::saveLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
-		}
+		if (hasRequest('kiosk')) {
+			CViewHelper::saveLayoutMode(getRequest('kiosk') === '1' ? ZBX_LAYOUT_KIOSKMODE : ZBX_LAYOUT_NORMAL);
 
-		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
-		unset($_GET['fullscreen'], $_GET['kiosk']);
+			// Remove $_GET arguments to prevent CUrl from generating URL with 'kiosk' arguments.
+			unset($_GET['kiosk']);
+		}
 	}
 
 	/**
 	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
-	private function initMainMenu() {
-		$menu = new CMenu('menu.main', []);
-		$this->component_registry->register('menu.main', $menu);
-		include 'include/menu.inc.php';
+	private function initComponents() {
+
+		$this->component_registry->register('menu.main', getMainMenu());
+		$this->component_registry->register('menu.user', getUserMenu());
 	}
 
 	/**
@@ -619,7 +620,7 @@ class ZBase {
 		}
 
 		if ($modules_missing) {
-			error(_n('Cannot load module at: %s.', 'Cannot load modules at: %s.', implode(', ', $modules_missing),
+			error(_n('Cannot load module at: %1$s.', 'Cannot load modules at: %1$s.', implode(', ', $modules_missing),
 				count($modules_missing)
 			));
 		}

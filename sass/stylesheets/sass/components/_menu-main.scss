@@ -1,0 +1,245 @@
+$menu-main-icons-opacity: .75 !default;
+
+$menu-main-arrow-bg-position: -606px -434px !default;
+$menu-main-arrow-hover-bg-position: -606px -434px !default;
+
+$menu-main-icons: (
+		dashboard: -540px -664px,
+		problems: -540px -688px,
+		monitoring: -540px -712px,
+		inventory: -540px -736px,
+		reports: -540px -760px,
+		configuration: -540px -784px,
+		administration: -540px -808px
+) !default;
+
+%menu-main-icon-common {
+	&::before {
+		content: '';
+		width: 24px;
+		height: 24px;
+		background: url($sprite-path) no-repeat;
+
+		@if $menu-main-icons-opacity < 1 {
+			opacity: $menu-main-icons-opacity;
+		}
+	}
+}
+
+// Dynamically generated classes for icons:
+//  .icon-dashboard
+//  .icon-problems
+//  .icon-monitoring
+//  .icon-inventory
+//  .icon-reports
+//  .icon-configuration
+//  .icon-administration
+@each $class, $bg-position in $menu-main-icons {
+	.icon-#{$class} {
+		@extend %menu-main-icon-common;
+
+		&::before {
+			background-position: $bg-position;
+
+			@if $ui-transitions and $menu-main-icons-opacity < 1 {
+				transition: opacity $ui-transition-duration;
+			}
+		}
+	}
+}
+
+.menu-main {
+	& > li {
+		line-height: 16px;
+
+		&.is-selected {
+			> a {
+				background: $menu-main-selected-bg-color;
+				border-left-color: $menu-main-selected-border-color;
+				color: $menu-main-selected-color;
+			}
+		}
+
+		&.is-expanded {
+			& > a {
+				&,
+				&:focus {
+					background: $menu-main-expanded-bg-color;
+					border-left-color: $menu-main-expanded-border-color;
+					color: $menu-main-expanded-color;
+				}
+			}
+		}
+
+		&:not(.is-expanded) {
+			.submenu {
+				max-height: 0 !important;
+			}
+		}
+
+		& > a {
+			color: $menu-main-color;
+
+			&::before {
+				position: absolute;
+				top: 7px;
+				left: 9px;
+			}
+
+			&:hover,
+			&:focus {
+				background: $menu-main-hover-bg-color;
+				border-left-color: $menu-main-hover-border-color;
+				color: $menu-main-hover-color;
+
+				&::before {
+					background-position-x: -570px;
+
+					@if $menu-main-icons-opacity < 1 {
+						opacity: 1;
+					}
+				}
+			}
+		}
+
+		&.has-submenu {
+			& > a {
+				&::after {
+					content: '';
+					position: absolute;
+					top: 19px;
+					right: 14px;
+					width: 6px;
+					height: 4px;
+					background: url($sprite-path) no-repeat $menu-main-arrow-bg-position;
+					transform: rotate(0deg);
+					@if $menu-main-icons-opacity < 1 {
+						opacity: $menu-main-icons-opacity;
+					}
+
+					@if $ui-transitions {
+						transition: transform $ui-transition-duration,
+						opacity $ui-transition-duration;
+					}
+				}
+
+				&:hover,
+				&:focus {
+					&::after {
+						background-position: $menu-main-arrow-hover-bg-position;
+
+						@if $menu-main-icons-opacity < 1 {
+							opacity: 1;
+						}
+					}
+				}
+			}
+
+			&.is-expanded {
+				& > a {
+					&::after {
+						background-position: $menu-main-arrow-hover-bg-position;
+						transform: rotate(-180deg);
+					}
+
+					@if $menu-main-icons-opacity < 1 {
+						&::before,
+						&::after {
+							opacity: 1;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	a {
+		position: relative;
+		display: block;
+		padding: 12px 34px 12px 44px;
+		font-size: 14px;
+		line-height: inherit;
+		white-space: nowrap;
+		border-left: 3px solid transparent;
+
+		&:active,
+		&:hover,
+		&:link,
+		&:visited {
+			border-bottom: 0;
+		}
+
+		@if $ui-transitions {
+			transition: color $ui-transition-duration,
+						border-color $ui-transition-duration,
+						background-color $ui-transition-duration;
+		}
+	}
+
+	.submenu {
+		position: relative;
+		padding-left: 24px;
+		overflow: hidden;
+		background: $menu-main-submenu-border-color;
+
+		li {
+			line-height: 14px;
+
+			&.is-selected {
+				a {
+					background: $menu-main-submenu-selected-bg-color;
+					border-left-color: $menu-main-submenu-selected-border-color;
+					color: $menu-main-submenu-selected-color;
+
+					&:hover,
+					&:focus {
+						background: $menu-main-submenu-hover-bg-color;
+						color: $menu-main-submenu-hover-color;
+					}
+				}
+			}
+
+			&:not(:last-child) {
+				border-bottom: 1px solid $menu-main-submenu-border-color;
+			}
+		}
+
+		a {
+			padding: 8px 12px 8px 20px;
+			font-size: 12px;
+			background: $menu-main-submenu-bg-color;
+			color: $menu-main-submenu-color;
+
+			&:hover,
+			&:focus {
+				background: $menu-main-submenu-hover-bg-color;
+				border-left-color: $menu-main-submenu-hover-border-color;
+				color: $menu-main-submenu-hover-color;
+			}
+		}
+
+		&::before,
+		&::after {
+			content: '';
+			position: absolute;
+			right: 0;
+			left: 0;
+			z-index: 999;
+			box-shadow: 0 0 6px 2px rgba(0, 0, 0, .35);
+		}
+
+		&::before {
+			top: 0;
+		}
+
+		&::after {
+			bottom: 0;
+		}
+
+		@if $ui-transitions {
+			transition: max-height $ui-transition-duration ease;
+			will-change: max-height;
+			transform: translate3d(0, 0, 0);
+		}
+	}
+}
