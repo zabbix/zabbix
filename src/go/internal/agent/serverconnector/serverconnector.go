@@ -50,7 +50,7 @@ type Connector struct {
 	address     string
 	localAddr   net.Addr
 	lastError   error
-	resultCache *resultcache.ResultCache
+	resultCache resultcache.ResultCache
 	taskManager scheduler.Scheduler
 	options     *agent.AgentOptions
 	tlsConfig   *tls.Config
@@ -192,7 +192,7 @@ func (c *Connector) refreshActiveChecks() {
 		} else {
 			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address)
 		}
-		c.taskManager.UpdateTasks(c.clientID, c.resultCache, 0, []*glexpr.Expression{}, []*plugin.Request{})
+		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), 0, []*glexpr.Expression{}, []*plugin.Request{})
 		return
 	}
 
@@ -284,7 +284,7 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Expressions, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), *response.RefreshUnsupported, response.Expressions, response.Data)
 }
 
 func (c *Connector) run() {
@@ -301,7 +301,7 @@ run:
 		case <-ticker.C:
 			now := time.Now()
 			if now.Sub(lastFlush) >= time.Second*time.Duration(c.options.BufferSend) {
-				c.resultCache.Flush()
+				c.resultCache.Upload(nil)
 				lastFlush = now
 			}
 			if now.Sub(lastRefresh) > time.Second*time.Duration(c.options.RefreshActiveChecks) {
@@ -347,7 +347,7 @@ func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOp
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
 	}
-	c.resultCache = resultcache.NewActive(c.clientID, ac)
+	c.resultCache = resultcache.New(&agent.Options, c.clientID, ac)
 
 	return c, nil
 }

@@ -1676,16 +1676,18 @@ out:
  ******************************************************************************/
 static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, char **error)
 {
-	int				arg1, ret = FAIL;
+	int				arg1, num, period, lazy = 1, ret = FAIL;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts;
+	char				*arg2 = NULL;
+	zbx_proxy_suppress_t		nodata_win;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_history_record_vector_create(&values);
 
-	if (1 < num_param(parameters))
+	if (2 < (num = num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1698,10 +1700,35 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 		goto out;
 	}
 
-	zbx_timespec(&ts);
+	if (1 < num && (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 2, &arg2) ||
+			('\0' != *arg2 && 0 != (lazy = strcmp("strict", arg2)))))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto out;
+	}
 
-	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, arg1, 1, &ts) &&
-			1 == values.values_num)
+	zbx_timespec(&ts);
+	nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
+
+	if (0 != item->host.proxy_hostid && 0 != lazy)
+	{
+		int			lastaccess;
+
+		if (SUCCEED != DCget_proxy_nodata_win(item->host.proxy_hostid, &nodata_win, &lastaccess))
+		{
+			*error = zbx_strdup(*error, "cannot retrieve proxy last access");
+			goto out;
+		}
+
+		if (0 == (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+			period = arg1 + (ts.sec - lastaccess);
+	}
+	else
+		period = arg1;
+
+	if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE) ||
+			(SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, period, 1, &ts) &&
+			1 == values.values_num))
 	{
 		*value = zbx_strdup(*value, "0");
 	}
@@ -1723,11 +1750,18 @@ static int	evaluate_NODATA(char **value, DC_ITEM *item, const char *parameters, 
 		}
 
 		*value = zbx_strdup(*value, "1");
+
+		if (0 != item->host.proxy_hostid && 0 != lazy)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "Nodata in %s() flag:%d values_num:%d start_time:%d period:%d",
+					__func__, nodata_win.flags, nodata_win.values_num, ts.sec - period, period);
+		}
 	}
 
 	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
+	zbx_free(arg2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

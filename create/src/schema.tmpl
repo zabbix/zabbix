@@ -620,6 +620,7 @@ FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|compression_status	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compression_availability	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compress_older	|t_varchar(32)	|'7d'	|NOT NULL	|ZBX_NODATA
+FIELD		|instanceid	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1074,6 +1075,7 @@ FIELD		|state		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastlogsize	|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|write_clock	|t_time		|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|proxy_dhistory|id|0
@@ -1811,4 +1813,4 @@ FIELD	|inventory_mode			|t_integer	|'0'	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4050107	|4050107
+ROW		|4050118	|4050118

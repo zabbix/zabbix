@@ -952,6 +952,24 @@ typedef struct
 }
 ZBX_TASK_EX;
 
+#define NET_DELAY_MAX	(SEC_PER_MIN / 4)
+
+typedef struct
+{
+	int	values_num;
+	int	period_end;
+#define ZBX_PROXY_SUPPRESS_DISABLE	0x00
+#define ZBX_PROXY_SUPPRESS_ACTIVE	0x01
+#define ZBX_PROXY_SUPPRESS_MORE		0x02
+#define ZBX_PROXY_SUPPRESS_EMPTY	0x04
+#define ZBX_PROXY_SUPPRESS_ENABLE	(	\
+		ZBX_PROXY_SUPPRESS_ACTIVE |	\
+		ZBX_PROXY_SUPPRESS_MORE |	\
+		ZBX_PROXY_SUPPRESS_EMPTY)
+	int	flags;
+}
+zbx_proxy_suppress_t;
+
 #define ZBX_RTC_MSG_SHIFT	0
 #define ZBX_RTC_SCOPE_SHIFT	8
 #define ZBX_RTC_DATA_SHIFT	16
