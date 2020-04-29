@@ -97,12 +97,6 @@ $settings = [
 		'authnRequestsSigned' => (bool) $config['saml_sign_authn_requests'],
 		'logoutRequestSigned' => (bool) $config['saml_sign_logout_requests'],
 		'logoutResponseSigned' => (bool) $config['saml_sign_logout_responses'],
-		'signMetadata' => (bool) $config['saml_sign_metadata']
-			? [
-				'x509cert' => $sp_cert,
-				'privateKey' => $sp_key
-			]
-			: false,
 		'wantMessagesSigned' => (bool) $config['saml_sign_messages'],
 		'wantAssertionsEncrypted' => (bool) $config['saml_encrypt_assertions'],
 		'wantAssertionsSigned' => (bool) $config['saml_sign_assertions'],
