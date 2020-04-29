@@ -37,7 +37,7 @@ class DB {
 	const FIELD_TYPE_FLOAT = 'float';
 	const FIELD_TYPE_UINT = 'uint';
 	const FIELD_TYPE_BLOB = 'blob';
-	const FIELD_TYPE_NCLOB = 'nclob';
+	const FIELD_TYPE_TEXT = 'text';
 
 	private static $schema = null;
 
@@ -265,7 +265,7 @@ class DB {
 
 		$schema = self::getSchema($table_name);
 
-		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_NCLOB) {
+		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_TEXT) {
 			return 65535;
 		}
 
@@ -277,7 +277,7 @@ class DB {
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 			foreach ($tableSchema['fields'] as $name => $field) {
-				if ($field['type'] == self::FIELD_TYPE_NCLOB && !$field['null']) {
+				if ($field['type'] == self::FIELD_TYPE_TEXT && !$field['null']) {
 					foreach ($values as &$value) {
 						if (!isset($value[$name])) {
 							$value[$name] = '';
@@ -377,7 +377,7 @@ class DB {
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
-					case self::FIELD_TYPE_NCLOB:
+					case self::FIELD_TYPE_TEXT:
 						// Using strlen because 4000 bytes is largest possible string literal in oracle query.
 						if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > ORACLE_MAX_STRING_SIZE) {
 							$chunks = zbx_dbstr(self::chunkMultibyteStr($values[$field], ORACLE_MAX_STRING_SIZE));
@@ -1091,7 +1091,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if ($field_schema['type'] == self::FIELD_TYPE_NCLOB) {
+			if ($field_schema['type'] == self::FIELD_TYPE_TEXT) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);

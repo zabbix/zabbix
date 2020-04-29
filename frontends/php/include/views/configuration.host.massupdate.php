@@ -234,7 +234,7 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 		$data['host_inventory'][$field] = '';
 	}
 
-	if ($hostInventoryTable['fields'][$field]['type'] == DB::FIELD_TYPE_NCLOB) {
+	if ($hostInventoryTable['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT) {
 		$fieldInput = (new CTextArea('host_inventory['.$field.']', $data['host_inventory'][$field]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}

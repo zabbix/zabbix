@@ -120,7 +120,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'active_since' => [
@@ -342,7 +342,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'tls_connect' => [
@@ -1193,7 +1193,7 @@ return [
 			],
 			'posts' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'required' => [
@@ -1406,7 +1406,7 @@ return [
 			],
 			'params' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'ipmi_sensor' => [
@@ -1460,7 +1460,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'inventory_link' => [
@@ -1514,7 +1514,7 @@ return [
 			],
 			'posts' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'status_codes' => [
@@ -1543,7 +1543,7 @@ return [
 			],
 			'headers' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'retrieve_mode' => [
@@ -1792,7 +1792,7 @@ return [
 			],
 			'script' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'timeout' => [
@@ -1827,7 +1827,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -1894,7 +1894,7 @@ return [
 			],
 			'message' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -1999,7 +1999,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'confirmation' => [
@@ -2151,7 +2151,7 @@ return [
 			],
 			'message' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'mediatypeid' => [
@@ -2278,7 +2278,7 @@ return [
 			],
 			'command' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -2927,7 +2927,7 @@ return [
 			],
 			'comments' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'error' => [
@@ -3340,7 +3340,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'type' => [
@@ -3380,7 +3380,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'type' => [
@@ -4427,7 +4427,7 @@ return [
 			],
 			'test_string' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -4551,7 +4551,7 @@ return [
 			],
 			'message' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'status' => [
@@ -4600,7 +4600,7 @@ return [
 			],
 			'parameters' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '{}',
 			],
 		],
@@ -4730,7 +4730,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'logeventid' => [
@@ -4765,7 +4765,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'ns' => [
@@ -4817,7 +4817,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'logeventid' => [
@@ -5210,12 +5210,12 @@ return [
 			],
 			'oldvalue' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'newvalue' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -5674,7 +5674,7 @@ return [
 			],
 			'hardware_full' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'software' => [
@@ -5685,7 +5685,7 @@ return [
 			],
 			'software_full' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'software_app_a' => [
@@ -5720,12 +5720,12 @@ return [
 			],
 			'contact' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'location' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'location_lat' => [
@@ -5742,7 +5742,7 @@ return [
 			],
 			'notes' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'chassis' => [
@@ -5807,7 +5807,7 @@ return [
 			],
 			'host_networks' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'host_netmask' => [
@@ -5914,7 +5914,7 @@ return [
 			],
 			'site_notes' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'poc_1_name' => [
@@ -5955,7 +5955,7 @@ return [
 			],
 			'poc_1_notes' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'poc_2_name' => [
@@ -5996,7 +5996,7 @@ return [
 			],
 			'poc_2_notes' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -6752,7 +6752,7 @@ return [
 			],
 			'description' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'evaltype' => [
@@ -7006,7 +7006,7 @@ return [
 			],
 			'params' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'error_handler' => [
@@ -7083,7 +7083,7 @@ return [
 			],
 			'command' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'alertid' => [
@@ -7134,7 +7134,7 @@ return [
 			],
 			'info' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -7157,7 +7157,7 @@ return [
 			],
 			'data' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'parent_taskid' => [
@@ -7194,7 +7194,7 @@ return [
 			],
 			'info' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -7265,7 +7265,7 @@ return [
 			],
 			'text' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 			'font' => [
@@ -7383,7 +7383,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -7417,7 +7417,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
@@ -7837,7 +7837,7 @@ return [
 			],
 			'config' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_NCLOB,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
 		],
