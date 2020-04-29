@@ -1558,6 +1558,13 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				foreach ($item['overrides'] as $ovrd_idx => $override) {
+					if (array_key_exists('step', $override) && $override['step'] <= 0
+							|| $override['step'] > ZBX_MAX_INT32) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+							'step', _s('must be between "%1$s" and "%2$s"', 1, ZBX_MAX_INT32)
+						));
+					}
+
 					if (array_key_exists('filter', $override)) {
 						$condition_validator->setObjectName($override['name']);
 
