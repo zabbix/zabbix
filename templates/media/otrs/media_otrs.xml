@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-24T17:49:39Z</date>
+    <date>2020-04-29T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>OTRS</name>
@@ -68,6 +68,10 @@
                     <value>new</value>
                 </parameter>
                 <parameter>
+                    <name>otrs_time_unit</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
                     <name>otrs_url</name>
                     <value>&lt;PUT YOUR OTRS URL&gt;</value>
                 </parameter>
@@ -82,6 +86,7 @@
             </parameters>
             <script>var OTRS = {&#13;
     params: {},&#13;
+    entrypoint: 'nph-genericinterface.pl/Webservice/ZabbixTicketConnector/Ticket/',&#13;
 &#13;
     setParams: function (params) {&#13;
         if (typeof params !== 'object') {&#13;
@@ -113,7 +118,7 @@
 &#13;
     request: function (method, query, data) {&#13;
         ['url', 'auth_user', 'auth_password', 'queue',&#13;
-            'customer', 'ticket_state', 'default_priority_id'].forEach(function (field) {&#13;
+            'customer', 'ticket_state', 'default_priority_id', 'time_unit'].forEach(function (field) {&#13;
             if (typeof OTRS.params !== 'object' || typeof OTRS.params[field] === 'undefined'&#13;
                 || OTRS.params[field] === '' ) {&#13;
                 throw 'Required param is not set: &quot;' + field + '&quot;.';&#13;
@@ -123,8 +128,8 @@
         var response,&#13;
             request = new CurlHttpRequest(),&#13;
             url = OTRS.params.url + query +&#13;
-                '?UserLogin=' + OTRS.params.auth_user +&#13;
-                '&amp;Password=' + OTRS.params.auth_password;&#13;
+                '?UserLogin=' + encodeURIComponent(OTRS.params.auth_user) +&#13;
+                '&amp;Password=' + encodeURIComponent(OTRS.params.auth_password);&#13;
 &#13;
         if (typeof OTRS.HTTPProxy !== 'undefined' &amp;&amp; OTRS.HTTPProxy.trim() !== '') {&#13;
             request.SetProxy(OTRS.HTTPProxy);&#13;
@@ -188,7 +193,8 @@
     },&#13;
 &#13;
     createTicket: function(subject, message, priority, fields) {&#13;
-        var data = {&#13;
+        var result,&#13;
+            data = {&#13;
                 Ticket: {&#13;
                     Title: subject,&#13;
                     Queue: OTRS.params.queue,&#13;
@@ -199,13 +205,12 @@
                 Article: {&#13;
                     Subject: subject,&#13;
                     Body: message,&#13;
+                    TimeUnit: OTRS.params.time_unit,&#13;
                     ContentType: 'text/plain; charset=utf8'&#13;
                 }&#13;
-            },&#13;
-            result;&#13;
+            };&#13;
 &#13;
-        result = OTRS.request('post', 'nph-genericinterface.pl/Webservice/ZabbixTicketConnector/Ticket',&#13;
-            OTRS.addDynamicFields(data, fields));&#13;
+        result = OTRS.request('post', OTRS.entrypoint, OTRS.addDynamicFields(data, fields));&#13;
 &#13;
         if (typeof result.response !== 'object'&#13;
             || typeof result.response.TicketID === 'undefined'&#13;
@@ -217,17 +222,17 @@
     },&#13;
 &#13;
     updateTicket: function(subject, message) {&#13;
-        var data = {&#13;
-            Article: {&#13;
-                Subject: subject,&#13;
-                Body: message || '',&#13;
-                ContentType: 'text/plain; charset=utf8'&#13;
-            }&#13;
-        };&#13;
+        var result,&#13;
+            data = {&#13;
+                Article: {&#13;
+                    Subject: subject,&#13;
+                    Body: message || '',&#13;
+                    TimeUnit: OTRS.params.time_unit,&#13;
+                    ContentType: 'text/plain; charset=utf8'&#13;
+                }&#13;
+            };&#13;
 &#13;
-        result = OTRS.request('put',&#13;
-            'nph-genericinterface.pl/Webservice/ZabbixTicketConnector/Ticket/' + OTRS.params.ticket_id,&#13;
-            data);&#13;
+        result = OTRS.request('put', OTRS.entrypoint + OTRS.params.ticket_id, data);&#13;
 &#13;
         if (typeof result.response !== 'object'&#13;
             || typeof result.response.TicketID === 'undefined'&#13;
@@ -317,12 +322,12 @@ try {&#13;
     OTRS.setParams(params_otrs);&#13;
     OTRS.HTTPProxy = params.HTTPProxy;&#13;
 &#13;
-    // Create issue for non trigger-based events.&#13;
+    // Create ticket for non trigger-based events.&#13;
     if (params.event_source !== '0'&#13;
         &amp;&amp; params.event_value !== '0') {&#13;
         OTRS.createTicket(params.alert_subject, params.alert_message, priority);&#13;
     }&#13;
-    // Create issue for trigger-based events.&#13;
+    // Create ticket for trigger-based events.&#13;
     else if (params.event_value === '1' &amp;&amp; params_update.status === '0') {&#13;
         var ticket_id = OTRS.createTicket(params.alert_subject,&#13;
             params.alert_subject + '\n' + params.alert_message + '\n' +&#13;
@@ -335,7 +340,7 @@ try {&#13;
         result.tags.__zbx_otrs_ticketlink = params.otrs_url +&#13;
             (params.otrs_url.endsWith('/') ? '' : '/') + 'index.pl?Action=AgentTicketZoom;TicketID=' + ticket_id;&#13;
     }&#13;
-    // Update created issue for trigger-based event.&#13;
+    // Update created ticket for trigger-based event.&#13;
     else {&#13;
         OTRS.updateTicket(params.alert_subject, params.alert_message);&#13;
     }&#13;
