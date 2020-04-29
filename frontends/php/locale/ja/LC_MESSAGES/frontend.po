@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-27 12:51+0300\n"
-"PO-Revision-Date: 2020-04-20 02:10+0300\n"
+"PO-Revision-Date: 2020-04-28 01:24+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1587341424.000000\n"
+"X-POOTLE-MTIME: 1588029884.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:67
 #: include/classes/db/OracleDbBackend.php:136
@@ -16561,7 +16561,7 @@ msgstr "特定のZabbixのプロセスもしくはプロセスグループ(<type
 
 #: include/classes/items/CHelpItems.php:1011
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
-msgstr ""
+msgstr "最後にプロキシにアクセスした時間。name - プロキシの名前。有効なparamsの値：lastaccess - UNIXタイムスタンプ、delay - 秒数。"
 
 #: include/actions.inc.php:51
 #: include/classes/widgets/views/widget.svggraph.form.view.php:290
@@ -19774,7 +19774,7 @@ msgstr "データなし"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:397
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
-msgstr ""
+msgstr "nodata() - 期間Tの間取得データなし (1 - 取得データなし、0 - それ以外)、Mode (strict - 送られてきたデータ内のプロキシでの遅延を無視)"
 
 #: include/classes/widgets/CWidgetHelper.php:1083 include/graphs.inc.php:74
 msgid "none"

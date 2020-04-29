@@ -2214,13 +2214,18 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
 			}
 
-			snmp = dc_interface_snmp_set(interfaceid, (const char **)row, &bulk_changed);
-
-			if (1 == reset_snmp_stats || 0 != bulk_changed)
+			if (FAIL == DBis_null(row[8]))
 			{
-				snmp->max_succeed = 0;
-				snmp->min_fail = MAX_SNMP_ITEMS + 1;
+				snmp = dc_interface_snmp_set(interfaceid, (const char **)row, &bulk_changed);
+
+				if (1 == reset_snmp_stats || 0 != bulk_changed)
+				{
+					snmp->max_succeed = 0;
+					snmp->min_fail = MAX_SNMP_ITEMS + 1;
+				}
 			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
 		/* first resolve macros for ip and dns fields in main agent interface  */
@@ -6624,16 +6629,32 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &src_item->itemid);
 			snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &src_item->interfaceid);
 
-			strscpy(dst_item->snmp_community_orig, snmp->community);
-			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
-			strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
-			dst_item->snmpv3_securitylevel = snmp->securitylevel;
-			strscpy(dst_item->snmpv3_authpassphrase_orig, snmp->authpassphrase);
-			strscpy(dst_item->snmpv3_privpassphrase_orig, snmp->privpassphrase);
-			dst_item->snmpv3_authprotocol = snmp->authprotocol;
-			dst_item->snmpv3_privprotocol = snmp->privprotocol;
-			strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
-			dst_item->snmp_version = snmp->version;
+			if (NULL != snmpitem && NULL != snmp)
+			{
+				strscpy(dst_item->snmp_community_orig, snmp->community);
+				strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
+				strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
+				dst_item->snmpv3_securitylevel = snmp->securitylevel;
+				strscpy(dst_item->snmpv3_authpassphrase_orig, snmp->authpassphrase);
+				strscpy(dst_item->snmpv3_privpassphrase_orig, snmp->privpassphrase);
+				dst_item->snmpv3_authprotocol = snmp->authprotocol;
+				dst_item->snmpv3_privprotocol = snmp->privprotocol;
+				strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
+				dst_item->snmp_version = snmp->version;
+			}
+			else
+			{
+				*dst_item->snmp_community_orig = '\0';
+				*dst_item->snmp_oid_orig = '\0';
+				*dst_item->snmpv3_securityname_orig = '\0';
+				dst_item->snmpv3_securitylevel = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+				*dst_item->snmpv3_authpassphrase_orig = '\0';
+				*dst_item->snmpv3_privpassphrase_orig = '\0';
+				dst_item->snmpv3_authprotocol = 0;
+				dst_item->snmpv3_privprotocol = 0;
+				*dst_item->snmpv3_contextname_orig = '\0';
+				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+			}
 
 			dst_item->snmp_community = NULL;
 			dst_item->snmp_oid = NULL;
@@ -9675,11 +9696,11 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros_for_triggers                           *
+ * Function: zbx_dc_expand_user_macros_in_expression                          *
  *                                                                            *
- * Purpose: expand user macros for triggers in the specified text value       *
- *          autoquote macros that are not already quoted that cannot be       *
- *          casted to a double                                                *
+ * Purpose: expand user macros for triggers and calculated items in the       *
+ *          specified text value and autoquote macros that are not already    *
+ *          quoted that cannot be casted to a double                          *
  *                                                                            *
  * Parameters: text           - [IN] the text value to expand                 *
  *             hostids        - [IN] an array of related hostids              *
@@ -9689,10 +9710,9 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  *               macros will be left unresolved.                              *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *
- *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num)
+char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
@@ -9814,7 +9834,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	get_functionids(&functionids, expression);
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	out = zbx_dc_expand_user_macros_for_triggers(expression, hostids.values, hostids.values_num);
+	out = zbx_dc_expand_user_macros_in_expression(expression, hostids.values, hostids.values_num);
 
 	if (NULL != strstr(out, "{$"))
 	{

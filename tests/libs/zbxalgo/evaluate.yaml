@@ -7,6 +7,13 @@ out:
   value: 1
   return: 'SUCCEED'
 ---
+test case: 'strings comparison, broken expression'
+in:
+  expression: '("c\"c\"c")="ccc'
+out:
+  error: 'Cannot evaluate expression: unterminated string at "ccc".'
+  return: 'FAIL'
+---
 test case: 'strings comparison, location of brackets around operands is different'
 in:
   expression: '("ccc")="(ccc)"'
@@ -67,7 +74,7 @@ test case: 'strings null terminators'
 in:
   expression: '"\0"="\0"'
 out:
-  error: 'Cannot evaluate expression: unescaped character at "0"="\0""'
+  error: 'Cannot evaluate expression: invalid escape sequence at "\0"="\0"".'
   return: 'FAIL'
 ---
 test case: 'strings are quotes 1'
@@ -88,7 +95,7 @@ test case: 'strings are escapes 1'
 in:
   expression: '"\"="\"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\"=".'
+  error: 'Cannot evaluate expression: value ""=" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'strings are escapes 2'
@@ -102,12 +109,47 @@ test case: 'strings are escapes 3'
 in:
   expression: '"\\\"="\\\"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\\\"=".'
+  error: 'Cannot evaluate expression: value "\"=" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'strings are escapes 4'
 in:
   expression: '"\\\\"="\\\\"'
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 1'
+in:
+  expression: "\"a\r\nb\"=\"a\nb\""
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 2'
+in:
+  expression: "\"a\nb\"=\"a\r\nb\""
+out:
+  value: 1
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 3'
+in:
+  expression: "\"a\r\rb\"=\"a\r\n\rb\""
+out:
+  value: 0
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 4'
+in:
+  expression: "(\"a\r\rb\"=\"a\r\n\rb\") + (\"\r\"=\"\") + (\"\r\"=\"\r\")"
+out:
+  value: 2
+  return: 'SUCCEED'
+---
+test case: 'strings comparison, carriage return 5'
+in:
+  expression: "\"\r\r\r\ra\\\"\"=\"a\\\"\r\""
 out:
   value: 1
   return: 'SUCCEED'
@@ -151,7 +193,7 @@ test case: 'strings comparison, empty operands 2'
 in:
   expression: '("\0")<>("\0")'
 out:
-  error: 'Cannot evaluate expression: unescaped character at "0")<>("\0")"'
+  error: 'Cannot evaluate expression: invalid escape sequence at "\0")<>("\0")".'
   return: 'FAIL'
 ---
 test case: 'strings comparison, empty operands 3'
@@ -186,21 +228,21 @@ test case: 'not_castable_str 1'
 in:
   expression: '"11x"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "11x".'
+  error: 'Cannot evaluate expression: value "11x" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'not_castable_str 2'
 in:
   expression: '"11_"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "11_".'
+  error: 'Cannot evaluate expression: value "11_" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'not_castable_str 3'
 in:
   expression: '"11_!@#$%^&*()"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "11_!@#$%^&*()".'
+  error: 'Cannot evaluate expression: value "11_!@#$%^&*()" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'string castable negative'
@@ -372,28 +414,28 @@ test case: 'term 8, not_castable_str negative 1'
 in:
   expression: '-"a"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "a".'
+  error: 'Cannot evaluate expression: value "a" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 8, not_castable_str negative 2'
 in:
   expression: '"-a"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "-a".'
+  error: 'Cannot evaluate expression: value "-a" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 8, not_castable_str quotes'
 in:
   expression: '"\""'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\"".'
+  error: 'Cannot evaluate expression: value """ is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 8, not_castable_str quotes 2'
 in:
   expression: '"\"\""'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\"\"".'
+  error: 'Cannot evaluate expression: value """" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 8, not_castable_str quotes 3'
@@ -458,7 +500,7 @@ test case: 'term 7, not_castable_str'
 in:
   expression: 'not "a"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "a".'
+  error: 'Cannot evaluate expression: value "a" is not a numeric operand.'
   return: 'FAIL'
 
 # '/' and '*' operator tests
@@ -488,49 +530,49 @@ test case: 'term 6 / not_castable_str and int'
 in:
   expression: '"a"/2'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "a".'
+  error: 'Cannot evaluate expression: value "a" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 / int and not_castable_str'
 in:
   expression: '2/"y"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "y".'
+  error: 'Cannot evaluate expression: value "y" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 / int and not_castable_string negative'
 in:
   expression: '2/"-y"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "-y".'
+  error: 'Cannot evaluate expression: value "-y" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 / not_castable_str and not_castable_str'
 in:
   expression: '"-"/"-y"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "-".'
+  error: 'Cannot evaluate expression: value "-" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 / castable_str and not_castable_str'
 in:
   expression: '"9"/"-y"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "-y".'
+  error: 'Cannot evaluate expression: value "-y" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 / not_castable_str and zero int'
 in:
   expression: '"-z"/0'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "-z".'
+  error: 'Cannot evaluate expression: value "-z" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 / not_castable_str and zero str'
 in:
   expression: '"-z"/"0"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "-z".'
+  error: 'Cannot evaluate expression: value "-z" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 / str and zero str'
@@ -565,21 +607,21 @@ test case: 'term 6 * int and not_castable_str'
 in:
   expression: '3*"3a"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "3a".'
+  error: 'Cannot evaluate expression: value "3a" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 * not_castable_str and int'
 in:
   expression: '"bb"*3'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "bb".'
+  error: 'Cannot evaluate expression: value "bb" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 6 * not_castable_str and not_castable_str'
 in:
   expression: '"bb"*""'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "bb".'
+  error: 'Cannot evaluate expression: value "bb" is not a numeric operand.'
   return: 'FAIL'
 
 # '+' and '-' operator tests
@@ -609,21 +651,21 @@ test case: 'term 5 + int and not_castable_str'
 in:
   expression: '3+"a"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "a".'
+  error: 'Cannot evaluate expression: value "a" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 5 + not_castable_str and int'
 in:
   expression: '"a"+"0"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "a".'
+  error: 'Cannot evaluate expression: value "a" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 5 + castable_str and not_castable_str'
 in:
   expression: '"3"+"a"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "a".'
+  error: 'Cannot evaluate expression: value "a" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 5 - str and str'
@@ -651,14 +693,14 @@ test case: 'term 5 - not_castable_str and int'
 in:
   expression: '"a"-3'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "a".'
+  error: 'Cannot evaluate expression: value "a" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 5 - int and not_castable_str'
 in:
   expression: '4-"aa"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "aa".'
+  error: 'Cannot evaluate expression: value "aa" is not a numeric operand.'
   return: 'FAIL'
 
 # '<=', '=>', '<' and '>' operator tests
@@ -695,14 +737,14 @@ test case: 'term 4 <= int and not_castable_str'
 in:
   expression: '3<="badger"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "badger".'
+  error: 'Cannot evaluate expression: value "badger" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 4 <= not_castable_str and castable_str'
 in:
   expression: '"badger"<="3"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "badger".'
+  error: 'Cannot evaluate expression: value "badger" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 4 >= str and str 1'
@@ -716,14 +758,14 @@ test case: 'term 4 >= not_castable_str and int'
 in:
   expression: '"```````">=2'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "```````".'
+  error: 'Cannot evaluate expression: value "```````" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 4 >= int and not_castable_str'
 in:
   expression: '-(10)>="()"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "()".'
+  error: 'Cannot evaluate expression: value "()" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 4 >= str and str 2'
@@ -780,14 +822,14 @@ in:
   expression: '"4g4"<5'
 out:
   out:
-  error: 'Cannot evaluate expression: expected numeric token at "4g4".'
+  error: 'Cannot evaluate expression: value "4g4" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 4 < str and not_castable_str'
 in:
   expression: '"999999999999"<"5_"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "5_".'
+  error: 'Cannot evaluate expression: value "5_" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 4 > str and str 1'
@@ -822,14 +864,14 @@ test case: 'term 4 > str and not_castable_str'
 in:
   expression: '"3">"+"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "+".'
+  error: 'Cannot evaluate expression: value "+" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 4 > not_castable_str and int'
 in:
   expression: '"d3">7'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "d3".'
+  error: 'Cannot evaluate expression: value "d3" is not a numeric operand.'
   return: 'FAIL'
 
 #  '=' and '<>' operator tests
@@ -1015,21 +1057,21 @@ test case: 'term 2 and str and not_castable_str'
 in:
   expression: '"1" and "\\t"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\\t".'
+  error: 'Cannot evaluate expression: value "\t" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 2 and not_castable_str and int'
 in:
   expression: '"\\t" and 1'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\\t".'
+  error: 'Cannot evaluate expression: value "\t" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 2 and not_castable_str and not_castable_str'
 in:
   expression: '"\\t" and "\\t"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\\t".'
+  error: 'Cannot evaluate expression: value "\t" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 2 and str and int 1'
@@ -1080,28 +1122,28 @@ test case: 'term 1 or str and not_castable_str'
 in:
   expression: '"1" or "\\n"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\\n".'
+  error: 'Cannot evaluate expression: value "\n" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 1 or not_castable_str and int'
 in:
   expression: '"\\n\\n\\n" and 1'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\\n\\n\\n".'
+  error: 'Cannot evaluate expression: value "\n\n\n" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 1 or not_castable_str and not_castable_str 1'
 in:
   expression: '"\\n" and "\\n"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\\n".'
+  error: 'Cannot evaluate expression: value "\n" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 1 or not_castable_str and not_castable_str 2'
 in:
   expression: '"\\n" and "\\n"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "\\n".'
+  error: 'Cannot evaluate expression: value "\n" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'term 1 or str and int 1'
@@ -1418,7 +1460,7 @@ test case: 'Valid expression "-1-2-3-4" int str not_castable_str str'
 in:
   expression: '-1-"2"-"badger"-"4"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "badger".'
+  error: 'Cannot evaluate expression: value "badger" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'Valid expression "-1-(2-3-4)"'
@@ -1726,7 +1768,7 @@ test case: 'Valid expression "-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(
 in:
   expression: '-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-("-")))))))))))))))))))))))))))))))' # 32 levels
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "-".'
+  error: 'Cannot evaluate expression: value "-" is not a numeric operand.'
   return: 'FAIL'
 
 ---
@@ -1909,7 +1951,7 @@ test case: 'Invalid expression "--1" string 3'
 in:
   expression: '"--1"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "--1".'
+  error: 'Cannot evaluate expression: value "--1" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'Invalid expression "not1"'
@@ -2084,7 +2126,7 @@ test case: 'Invalid expression "1.K2" string 3'
 in:
   expression: '"1.K2"'
 out:
-  error: 'Cannot evaluate expression: expected numeric token at "1.K2".'
+  error: 'Cannot evaluate expression: value "1.K2" is not a numeric operand.'
   return: 'FAIL'
 ---
 test case: 'Invalid expression "1.K2" string 4'

@@ -1247,7 +1247,7 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const DB_
 
 	if (INTERFACE_TYPE_SNMP == interface->type)
 	{
-		if (NULL == snmp)
+		if (NULL == snmp || SUCCEED == DBis_null(dbrow[8]))	/* should never happen */
 			return FAIL;
 
 		if (FAIL == dbsync_compare_uchar(dbrow[8], snmp->version))
@@ -2116,12 +2116,10 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
-		row[2] = zbx_dc_expand_user_macros_for_triggers(row[2], hostids.values, hostids.values_num);
+		row[2] = zbx_dc_expand_user_macros_in_expression(row[2], hostids.values, hostids.values_num);
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
-	{
-		row[11] = zbx_dc_expand_user_macros_for_triggers(row[11], hostids.values, hostids.values_num);
-	}
+		row[11] = zbx_dc_expand_user_macros_in_expression(row[11], hostids.values, hostids.values_num);
 
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);

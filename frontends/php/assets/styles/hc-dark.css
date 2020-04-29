@@ -5017,6 +5017,7 @@ svg {
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
+.icon-action-unack,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -5041,6 +5042,7 @@ svg {
   .icon-action-severity-changed::before,
   .icon-action-message::before,
   .icon-action-ack::before,
+  .icon-action-unack::before,
   .icon-invisible::before,
   .icon-problem-generated::before,
   .icon-problem-recovery::before,
@@ -5091,6 +5093,9 @@ svg {
 
 .icon-action-ack::before {
   background-position: -323px -245px; }
+
+.icon-action-unack::before {
+  background-position: -173px -245px; }
 
 .icon-invisible::before {
   background-position: -89px -803px; }
@@ -5461,6 +5466,14 @@ table.preprocessing-test-results .rel-container {
   display: block; }
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
+
+#mediatype_testlog .logitems {
+  overflow: auto;
+  margin-bottom: 10px; }
+  #mediatype_testlog .logitems pre {
+    white-space: nowrap; }
+#mediatype_testlog .logtotalms {
+  margin-bottom: 10px; }
 
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #000000; }
@@ -6131,6 +6144,9 @@ td.inactive-bg {
 
 .icon-action-ack::before {
   background-position: -323px -325px; }
+
+.icon-action-unack::before {
+  background-position: -173px -325px; }
 
 .icon-invisible::before {
   background-position: -401px -803px; }

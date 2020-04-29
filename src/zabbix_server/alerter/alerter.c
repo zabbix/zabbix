@@ -90,14 +90,16 @@ static void	alerter_register(zbx_ipc_socket_t *socket)
  * Parameters: socket  - [IN] the connections socket                          *
  *             errcode - [IN] the error code                                  *
  *             value   - [IN] the value or error message                      *
+ *             debug   - [IN] debug message                                   *
  *                                                                            *
  ******************************************************************************/
-static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int errcode, const char *error)
+static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int errcode, const char *error,
+		const char *debug)
 {
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
 
-	data_len = zbx_alerter_serialize_result(&data, value, errcode, error);
+	data_len = zbx_alerter_serialize_result(&data, value, errcode, error, debug);
 	zbx_ipc_socket_write(socket, ZBX_IPC_ALERTER_RESULT, data, data_len);
 
 	zbx_free(data);
@@ -168,7 +170,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
 			content_type, ALARM_ACTION_TIMEOUT, error, sizeof(error));
 
-	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error));
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(inreplyto);
 	zbx_free(sendto);
@@ -203,7 +205,7 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 
 	/* SMS uses its own timeouts */
 	ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
-	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error));
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(sendto);
 	zbx_free(message);
@@ -231,7 +233,7 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 	zbx_alerter_deserialize_exec(ipc_message->data, &alertid, &command);
 
 	ret = execute_script_alert(command, error, sizeof(error));
-	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error));
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(command);
 }
@@ -249,19 +251,32 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
  ******************************************************************************/
 static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
 {
-	char	*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
-	int	script_bin_sz, ret, timeout;
+	char			*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
+	int			script_bin_sz, ret, timeout;
+	unsigned char		debug;
 
-	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params);
+	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params, &debug);
 
-		if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
+	if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
 		ret = zbx_es_init_env(&es_engine, &error);
 
 	if (SUCCEED == ret)
 	{
 		zbx_es_set_timeout(&es_engine, timeout);
+
+		if (ZBX_ALERT_DEBUG == debug)
+			zbx_es_debug_enable(&es_engine);
+
 		ret = zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, params, &output, &error);
 	}
+
+	if (ZBX_ALERT_DEBUG == debug && SUCCEED == zbx_es_is_env_initialized(&es_engine))
+	{
+		alerter_send_result(socket, output, ret, error, zbx_es_debug_info(&es_engine));
+		zbx_es_debug_disable(&es_engine);
+	}
+	else
+		alerter_send_result(socket, output, ret, error, NULL);
 
 	if (SUCCEED == zbx_es_fatal_error(&es_engine))
 	{
@@ -273,8 +288,6 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			zbx_free(errmsg);
 		}
 	}
-
-	alerter_send_result(socket, output, ret, error);
 
 	zbx_free(output);
 	zbx_free(error);

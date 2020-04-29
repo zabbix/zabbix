@@ -749,6 +749,7 @@ out:
 	ZBX_UNUSED(smtp_helo);
 	ZBX_UNUSED(from_mails);
 	ZBX_UNUSED(to_mails);
+	ZBX_UNUSED(inreplyto);
 	ZBX_UNUSED(mailsubject);
 	ZBX_UNUSED(mailbody);
 	ZBX_UNUSED(smtp_security);

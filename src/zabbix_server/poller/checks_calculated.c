@@ -86,13 +86,13 @@ static int	calcitem_add_function(expression_t *exp, char *host, char *key, char 
 
 static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
-	char		*e, *buf = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
-	int		ret = NOTSUPPORTED;
+	char	*e, *buf = NULL, *tmp_exp;
+	size_t	exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
+	int	ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, dc_item->params);
 
-	exp->exp = (char *)zbx_malloc(exp->exp, exp_alloc);
+	tmp_exp = (char *)zbx_malloc(NULL, exp_alloc);
 
 	for (e = dc_item->params; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, error, max_error_len);
 			e += par_r + 1)
@@ -102,7 +102,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		int	functionid, quoted;
 
 		/* copy the part of the string preceding function */
-		zbx_strncpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e, f_pos);
+		zbx_strncpy_alloc(&tmp_exp, &exp_alloc, &exp_offset, e, f_pos);
 
 		/* extract the first function parameter and <host:>key reference from it */
 
@@ -141,24 +141,23 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 				__func__, functionid, host, key, func, params);
 
 		/* substitute function with id in curly brackets */
-		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, "{%d}", functionid);
+		zbx_snprintf_alloc(&tmp_exp, &exp_alloc, &exp_offset, "{%d}", functionid);
 	}
 
 	if (par_l > par_r)
 		goto out;
 
 	/* copy the remaining part */
-	zbx_strcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, e);
+	zbx_strcpy_alloc(&tmp_exp, &exp_alloc, &exp_offset, e);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __func__, exp->exp);
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL, NULL,
-			&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len))
-	{
-		ret = SUCCEED;
-	}
+	exp->exp = zbx_dc_expand_user_macros_in_expression(tmp_exp, &dc_item->host.hostid, 1);
+
+	ret = SUCCEED;
 out:
 	zbx_free(buf);
+	zbx_free(tmp_exp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
