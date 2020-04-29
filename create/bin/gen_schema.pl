@@ -28,7 +28,7 @@ my ($fkeys, $fkeys_prefix, $fkeys_suffix, $uniq);
 my %c = (
 	"type"		=>	"code",
 	"database"	=>	"",
-	"after"		=>	"\t{0}\n};\n",
+	"after"		=>	"\t{0}\n\n#undef ZBX_TYPE_LONGTEXT_LEN\n#undef ZBX_TYPE_SHORTTEXT_LEN\n\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_double"	=>	"ZBX_TYPE_FLOAT",
@@ -38,6 +38,7 @@ my %c = (
 	"t_longtext"	=>	"ZBX_TYPE_LONGTEXT",
 	"t_nanosec"	=>	"ZBX_TYPE_INT",
 	"t_serial"	=>	"ZBX_TYPE_UINT",
+	"t_shorttext"	=>	"ZBX_TYPE_SHORTTEXT",
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_varchar"	=>	"ZBX_TYPE_CHAR"
 );
@@ -66,6 +67,12 @@ $c{"before"} = "/*
 
 const ZBX_TABLE\ttables[] = {
 
+#if defined(HAVE_ORACLE)
+#	define ZBX_TYPE_SHORTTEXT_LEN	2048
+#else
+#	define ZBX_TYPE_SHORTTEXT_LEN	65535
+#endif
+
 #define ZBX_TYPE_LONGTEXT_LEN	0
 #define ZBX_TYPE_TEXT_LEN	65535
 
@@ -86,6 +93,7 @@ my %mysql = (
 	"t_longtext"	=>	"longtext",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigint unsigned",
+	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar"
 );
@@ -105,6 +113,7 @@ my %oracle = (
 	"t_longtext"	=>	"nclob",
 	"t_nanosec"	=>	"number(10)",
 	"t_serial"	=>	"number(20)",
+	"t_shorttext"	=>	"nvarchar2(2048)",
 	"t_time"	=>	"number(10)",
 	"t_varchar"	=>	"nvarchar2"
 );
@@ -124,6 +133,7 @@ my %postgresql = (
 	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigserial",
+	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar"
 );
@@ -143,6 +153,7 @@ my %sqlite3 = (
 	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"integer",
+	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar"
 );
@@ -268,6 +279,10 @@ sub process_field
 		elsif ($type eq "ZBX_TYPE_TEXT")
 		{
 			$length = "ZBX_TYPE_TEXT_LEN";
+		}
+		elsif ($type eq "ZBX_TYPE_SHORTTEXT")
+		{
+			$length = "ZBX_TYPE_SHORTTEXT_LEN";
 		}
 		elsif ($type eq "ZBX_TYPE_LONGTEXT")
 		{

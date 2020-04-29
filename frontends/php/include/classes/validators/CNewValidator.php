@@ -380,6 +380,7 @@ class CNewValidator {
 
 				return (mb_strlen($value) <= $field_schema['length']);
 
+			case DB::FIELD_TYPE_NCLOB:
 			case DB::FIELD_TYPE_TEXT:
 				if ($flags & P_CRLF) {
 					$value = CRLFtoLF($value);

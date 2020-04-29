@@ -536,6 +536,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 		}
 
 		if ($tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CHAR
+				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_NCLOB
 				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_TEXT) {
 			continue;
 		}
@@ -549,7 +550,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				? $start.$pattern.'%'
 				: str_replace('*', '%', $pattern);
 
-			if ($DB['TYPE'] == ZBX_DB_ORACLE && $tableSchema['fields'][$field]['type'] === DB::FIELD_TYPE_TEXT
+			if ($DB['TYPE'] == ZBX_DB_ORACLE && $tableSchema['fields'][$field]['type'] === DB::FIELD_TYPE_NCLOB
 					&& strlen($pattern) > ORACLE_MAX_STRING_SIZE) {
 				$chunks = zbx_dbstr(DB::chunkMultibyteStr($pattern, ORACLE_MAX_STRING_SIZE));
 				$pattern = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
