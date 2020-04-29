@@ -4059,7 +4059,7 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 		double percent_left, double percent_right,
 		unsigned char ymin_type, unsigned char ymax_type,
 		zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid,
-		unsigned char flags)
+		unsigned char flags, unsigned char discover)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -4160,12 +4160,13 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 					"ymin_itemid=%s,"
 					"ymax_itemid=%s,"
 					"flags=%d"
+					"discover=%d"
 				" where graphid=" ZBX_FS_UI64 ";\n",
 				name_esc, width, height, yaxismin, yaxismax,
 				graphid, (int)show_work_period, (int)show_triggers,
 				(int)graphtype, (int)show_legend, (int)show_3d,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags,
+				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags, (int)discover,
 				hst_graphid);
 
 		for (i = 0; i < gitems_num; i++)
@@ -4201,15 +4202,15 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 				" (graphid,name,width,height,yaxismin,yaxismax,templateid,"
 				"show_work_period,show_triggers,graphtype,show_legend,"
 				"show_3d,percent_left,percent_right,ymin_type,ymax_type,"
-				"ymin_itemid,ymax_itemid,flags)"
+				"ymin_itemid,ymax_itemid,flags,discover)"
 				" values (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL64_SQL ","
 				ZBX_FS_DBL64_SQL "," ZBX_FS_UI64 ",%d,%d,%d,%d,%d," ZBX_FS_DBL64_SQL ","
-				ZBX_FS_DBL64_SQL ",%d,%d,%s,%s,%d);\n",
+				ZBX_FS_DBL64_SQL ",%d,%d,%s,%s,%d,%d);\n",
 				hst_graphid, name_esc, width, height, yaxismin, yaxismax,
 				graphid, (int)show_work_period, (int)show_triggers,
 				(int)graphtype, (int)show_legend, (int)show_3d,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags);
+				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags, (int)discover);
 
 		hst_gitemid = DBget_maxid_num("graphs_items", gitems_num);
 
@@ -4276,7 +4277,7 @@ static void	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_
 				"g.yaxismax,g.show_work_period,g.show_triggers,"
 				"g.graphtype,g.show_legend,g.show_3d,g.percent_left,"
 				"g.percent_right,g.ymin_type,g.ymax_type,g.ymin_itemid,"
-				"g.ymax_itemid,g.flags"
+				"g.ymax_itemid,g.flags,g.discover"
 			" from graphs g,graphs_items gi,items i"
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
@@ -4310,7 +4311,8 @@ static void	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_
 				(unsigned char)atoi(row[14]),	/* ymax_type */
 				ymin_itemid,
 				ymax_itemid,
-				(unsigned char)atoi(row[17]));	/* flags */
+				(unsigned char)atoi(row[17]),	/* flags */
+				(unsigned char)atoi(row[18]));	/* flags */
 	}
 	DBfree_result(result);
 
