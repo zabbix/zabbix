@@ -2681,14 +2681,22 @@
 					};
 
 				// Adopt menu position to direction in which placeholder was drawn.
+				if (dimension.x + dimension.width >= data.options['max-columns'] - 4) {
+					options.position.my[0] = (dimension.left > dimension.x) ? 'left' : 'right';
+				}
 				if (dimension.left > dimension.x) {
-					options.position.my[0] = 'right';
 					options.position.at[0] = 'left';
 				}
-				if (dimension.top > dimension.y) {
+
+				if (dimension.y == 0) {
+					options.position.my[1] = 'top';
+					options.position.at[1] = (dimension.top > dimension.y) ? 'top' : 'bottom';
+				}
+				else if (dimension.top > dimension.y) {
 					options.position.my[1] = 'bottom';
 					options.position.at[1] = 'top';
 				}
+
 				options.position.my = options.position.my.join(' ');
 				options.position.at = options.position.at.join(' ');
 
