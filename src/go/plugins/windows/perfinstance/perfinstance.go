@@ -16,7 +16,7 @@ import (
 type Plugin struct {
 	plugin.Base
 	refreshMux         sync.Mutex
-	reloadMux          sync.Mutex
+	reloadMux          sync.RWMutex
 	instances          []string
 	nextObjectRefresh  time.Time
 	nextEngNameRefresh time.Time
@@ -40,13 +40,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "perf_instance.get":
 		name = params[0]
 	case "perf_instance_en.get":
-		if name = getLocalName(params[0]); name == "" {
+		if name = p.getLocalName(params[0]); name == "" {
 			var reloaded bool
 			if reloaded, err = p.reloadEngObjectNames(); err != nil {
 				return nil, fmt.Errorf("Failed to get instance object English names: %s.", err.Error())
 			}
 			if reloaded {
-				if name = getLocalName(params[0]); name == "" {
+				if name = p.getLocalName(params[0]); name == "" {
 					return nil, errors.New("Unsupported metric.")
 				}
 			} else {
@@ -109,9 +109,9 @@ func (p *Plugin) reloadEngObjectNames() (bool, error) {
 	return false, nil
 }
 
-func getLocalName(engName string) string {
-	pdh.RWMux.RLock()
-	defer pdh.RWMux.RUnlock()
+func (p *Plugin) getLocalName(engName string) string {
+	p.reloadMux.RLock()
+	defer p.reloadMux.RUnlock()
 	for _, obj := range pdh.Objects {
 		if obj.EngName == engName {
 			return obj.Name

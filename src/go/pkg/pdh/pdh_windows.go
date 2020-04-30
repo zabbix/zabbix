@@ -22,7 +22,6 @@ package pdh
 import (
 	"fmt"
 	"strconv"
-	"sync"
 	"syscall"
 	"unsafe"
 
@@ -33,7 +32,6 @@ import (
 )
 
 var Objects map[int]*Object
-var RWMux sync.RWMutex
 
 type Object struct {
 	Idx     int
@@ -98,8 +96,6 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 	}
 
 	Objects = make(map[int]*Object)
-	RWMux.Lock()
-	defer RWMux.Unlock()
 	for _, name := range locNames {
 		idx, err := win32.PdhLookupPerfIndexByName(name)
 		if err != nil {
