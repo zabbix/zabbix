@@ -12661,13 +12661,13 @@ int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error)
 
 	if (NULL == dc_host)
 	{
-		*error = zbx_dsprintf(*error, "proxy \"%s\" not found", name);
+		*error = zbx_dsprintf(*error, "Proxy \"%s\" not found.", name);
 		return FAIL;
 	}
 
 	if (SUCCEED != DCget_proxy_delay(dc_host->hostid, delay))
 	{
-		*error = zbx_dsprintf(*error, "proxy \"%s\" not found in configuration cache", name);
+		*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", name);
 		return FAIL;
 	}
 
