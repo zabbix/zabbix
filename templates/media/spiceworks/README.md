@@ -7,7 +7,7 @@ Please note that recovery and update operations are unavailable for Spiceworks.
 1\. Set up an [Email media](https://www.zabbix.com/documentation/current/manual/config/notifications/media/email) type if it doesn't exist yet.
 
 2\. Create a **Zabbix user** and add **Media** with the Email media type. <br>
-The Send to field must contain your helpdesk email address (e.g. help@zabbix.on.spiceworks.com).<br>
+The **Send to** field must contain your helpdesk email address (e.g. help@zabbix.on.spiceworks.com).<br>
 Make sure this user has access to all hosts for which you would like the problem notifications to be converted into Spiceworks tickets.<br>
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
