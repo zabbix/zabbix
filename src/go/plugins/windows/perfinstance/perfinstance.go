@@ -50,23 +50,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, plugin.UnsupportedMetricError
 	}
 
-	var instances []string
+	var instances []win32.Instance
 	if instances, err = win32.PdhEnumObjectItems(name); err != nil {
 		return nil, fmt.Errorf("Failed to get performance instance objects: %s.", err.Error())
 	}
 
-	resp := []interface{}{}
-	for _, inst := range instances {
-		instance := struct {
-			Instance string `json:"{#INSTANCE}"`
-		}{
-			inst,
-		}
-		resp = append(resp, instance)
-	}
-
 	var respJSON []byte
-	if respJSON, err = json.Marshal(resp); err != nil {
+	if respJSON, err = json.Marshal(instances); err != nil {
 		return
 	}
 

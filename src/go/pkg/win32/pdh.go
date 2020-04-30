@@ -43,7 +43,7 @@ var (
 	pdhLookupPerfNameByIndex    uintptr
 	pdhLookupPerfIndexByName    uintptr
 	pdhRemoveCounter            uintptr
-	pdhEnumObjItem              uintptr
+	pdhEnumObjectItem           uintptr
 	pdhEnumObjectItems          uintptr
 	pdhEnumObjects              uintptr
 )
@@ -67,6 +67,10 @@ const (
 )
 
 const uint32Size = 4
+
+type Instance struct {
+	Name string `json:"{#INSTANCE}"`
+}
 
 func newPdhError(ret uintptr) (err error) {
 	flags := uint32(windows.FORMAT_MESSAGE_FROM_HMODULE | windows.FORMAT_MESSAGE_IGNORE_INSERTS)
@@ -220,7 +224,7 @@ func PdhLookupPerfIndexByName(name string) (idx int, err error) {
 	return buf[0], nil
 }
 
-func PdhEnumObjectItems(objectName string) (instances []string, err error) {
+func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	var counterListSize, instanceListSize uint32
 	nameUTF16, err := syscall.UTF16FromString(objectName)
 	if err != nil {
@@ -252,10 +256,26 @@ func PdhEnumObjectItems(objectName string) (instances []string, err error) {
 		if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 			return nil, newPdhError(ret)
 		}
+
 		break
 	}
 
-	return utf16ToUniqueStringSlice(instbuf), nil
+	var singleName []uint16
+	m := make(map[string]bool)
+	for len(instbuf) != 0 {
+		singleName, instbuf = NextField(instbuf)
+		if len(singleName) == 0 {
+			break
+		}
+
+		strName := windows.UTF16ToString(singleName)
+		if _, ok := m[strName]; !ok {
+			m[strName] = true
+			instances = append(instances, Instance{strName})
+		}
+	}
+
+	return instances, nil
 }
 
 func PdhEnumObject() (objects []string, err error) {
@@ -274,12 +294,27 @@ func PdhEnumObject() (objects []string, err error) {
 		return nil, newPdhError(ret)
 	}
 
-	return utf16ToUniqueStringSlice(objectBuf), nil
+	var singleName []uint16
+	m := make(map[string]bool)
+	for len(objectBuf) != 0 {
+		singleName, objectBuf = NextField(objectBuf)
+		if len(singleName) == 0 {
+			break
+		}
+
+		strName := windows.UTF16ToString(singleName)
+		if _, ok := m[strName]; !ok {
+			m[strName] = true
+			objects = append(objects, strName)
+		}
+	}
+
+	return objects, nil
 }
 
 func init() {
 	hPdh = mustLoadLibrary("pdh.dll")
-	pdhLookupPerfIndexByName = hPdh.mustGetProcAddress("PdhLookupPerfIndexByNameW")
+
 	pdhOpenQuery = hPdh.mustGetProcAddress("PdhOpenQuery")
 	pdhCloseQuery = hPdh.mustGetProcAddress("PdhCloseQuery")
 	pdhAddCounter = hPdh.mustGetProcAddress("PdhAddCounterW")
@@ -289,6 +324,7 @@ func init() {
 	pdhParseCounterPath = hPdh.mustGetProcAddress("PdhParseCounterPathW")
 	pdhMakeCounterPath = hPdh.mustGetProcAddress("PdhMakeCounterPathW")
 	pdhLookupPerfNameByIndex = hPdh.mustGetProcAddress("PdhLookupPerfNameByIndexW")
+	pdhLookupPerfIndexByName = hPdh.mustGetProcAddress("PdhLookupPerfIndexByNameW")
 	pdhRemoveCounter = hPdh.mustGetProcAddress("PdhRemoveCounter")
 	pdhEnumObjectItems = hPdh.mustGetProcAddress("PdhEnumObjectItemsW")
 	pdhEnumObjects = hPdh.mustGetProcAddress("PdhEnumObjectsW")
