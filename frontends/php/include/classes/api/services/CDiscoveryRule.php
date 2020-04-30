@@ -2947,7 +2947,7 @@ class CDiscoveryRule extends CItemGeneral {
 				if ($trigger_prototype_objectids) {
 					$opstatus = DB::select('lld_override_opstatus', [
 						'output' => ['lld_override_operationid', 'status'],
-						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
 					]);
 					$opseverity = DB::select('lld_override_opseverity', [
 						'output' => ['lld_override_operationid', 'severity'],
@@ -2962,7 +2962,7 @@ class CDiscoveryRule extends CItemGeneral {
 				if ($host_prototype_objectids) {
 					$opstatus = DB::select('lld_override_opstatus', [
 						'output' => ['lld_override_operationid', 'status'],
-						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
 					]);
 					$optemplate = DB::select('lld_override_optemplate', [
 						'output' => ['lld_override_operationid', 'templateid'],
