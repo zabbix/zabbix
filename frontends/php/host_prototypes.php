@@ -34,11 +34,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hostid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
+	'hostid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID, '(isset({form}) && ({form} == "update")) || (isset({action}) && {action} == "hostprototype.updatediscover")'],
 	'parent_discoveryid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null],
 	'host' =>					[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
 	'name' =>					[T_ZBX_STR, O_OPT, null,		null,		'isset({add}) || isset({update})'],
 	'status' =>					[T_ZBX_INT, O_OPT, null,		IN([HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED]), null],
+	'discover' =>				[T_ZBX_INT, O_OPT, null, IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'inventory_mode' =>			[T_ZBX_INT, O_OPT, null, IN([HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]), null],
 	'templates' =>				[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
 	'add_templates' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
@@ -51,7 +52,7 @@ $fields = [
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
-										'"hostprototype.massenable"'
+										'"hostprototype.massenable","hostprototype.updatediscover"'
 									),
 									null
 								],
@@ -63,7 +64,7 @@ $fields = [
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
+	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status","discover"'),						null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
@@ -167,6 +168,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'host' => getRequest('host', ''),
 		'name' => (getRequest('name', '') === '') ? getRequest('host', '') : getRequest('name', ''),
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+		'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
 		'macros' => $macros,
@@ -256,6 +258,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 	}
 }
+elseif (getRequest('hostid', '') && getRequest('action', '') === 'hostprototype.updatediscover') {
+	$result = API::HostPrototype()->update([
+		'hostid' => getRequest('hostid'),
+		'discover' => getRequest('discover', DB::getDefault('hosts', 'discover'))
+	]);
+
+	show_messages($result, _('Host prototype updated'), _('Cannot update host prototype'));
+}
 // GO
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototype.massenable', 'hostprototype.massdisable']) && hasRequest('group_hostid')) {
 	$status = (getRequest('action') == 'hostprototype.massenable') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
@@ -316,6 +326,7 @@ if (hasRequest('form')) {
 			'host' => getRequest('host'),
 			'name' => getRequest('name'),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
+			'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
 			'templates' => [],
 			'add_templates' => [],
 			'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
