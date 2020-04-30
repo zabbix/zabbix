@@ -173,12 +173,13 @@ $saml_tab = (new CFormList('list_saml'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow(new CLabel(_('SP entity ID'), 'saml_sp_entityid'),
+	->addRow((new CLabel(_('SP entity ID'), 'saml_sp_entityid'))->setAsteriskMark(),
 		(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false,
 			DB::getFieldLength('config', 'saml_sp_entityid')
 		))
 			->setEnabled($is_saml_auth_enabled)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(new CLabel(_('SP name ID format'), 'saml_nameid_format'),
 		(new CTextBox('saml_nameid_format', $data['saml_nameid_format'], false,

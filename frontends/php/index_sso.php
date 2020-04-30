@@ -71,7 +71,7 @@ elseif (file_exists('conf/certs/idp.crt')) {
 
 $settings = [
 	'sp' => [
-		'entityId' => $baseurl.'?metadata',
+		'entityId' => $config['saml_sp_entityid'],
 		'assertionConsumerService' => [
 			'url' => $baseurl.'?acs'
 		],
@@ -100,7 +100,7 @@ $settings = [
 		'wantMessagesSigned' => (bool) $config['saml_sign_messages'],
 		'wantAssertionsEncrypted' => (bool) $config['saml_encrypt_assertions'],
 		'wantAssertionsSigned' => (bool) $config['saml_sign_assertions'],
-		'wantNameIdEncrypted' => (bool) $config['saml_encrypt_nameid'],
+		'wantNameIdEncrypted' => (bool) $config['saml_encrypt_nameid']
 	]
 ];
 
@@ -134,9 +134,9 @@ if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
 	}
 
 	if (array_key_exists('security', $SSO['SETTINGS'])) {
-		foreach (['wantNameId', 'requestedAuthnContext', 'requestedAuthnContextComparison', 'wantXMLValidation',
-				'relaxDestinationValidation', 'destinationStrictlyMatches', 'signatureAlgorithm', 'digestAlgorithm',
-				'rejectUnsolicitedResponsesWithInResponseTo', 'lowercaseUrlencoding'] as $option) {
+		foreach (['signMetadata', 'wantNameId', 'requestedAuthnContext', 'requestedAuthnContextComparison',
+				'wantXMLValidation', 'relaxDestinationValidation', 'destinationStrictlyMatches', 'lowercaseUrlencoding',
+				'rejectUnsolicitedResponsesWithInResponseTo', 'signatureAlgorithm', 'digestAlgorithm'] as $option) {
 			if (array_key_exists($option, $SSO['SETTINGS']['security'])) {
 				$settings['security'][$option] = $SSO['SETTINGS']['security'][$option];
 			}
