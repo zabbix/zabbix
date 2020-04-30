@@ -33,32 +33,25 @@ import (
 
 // TestMain does the before and after setup
 func TestMain(m *testing.M) {
-	var confPath string
-	var stopDB func()
 	var code int
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	log.Infof("[TestMain] About to start PostgreSQL...")
-	versionsPG := []uint32{10, 11, 12}
-	for _, versionPG := range versionsPG {
-		confPath, stopDB = startPostgreSQL(versionPG)
-		log.Infof("[TestMain] PostgreSQL started!")
-		log.Infof("[TestMain] conf path  = %v", confPath)
-
-		// initialize plugin
-		impl.Init(pluginName)
-		impl.Configure(&plugin.GlobalOptions{}, nil)
-
-		code = m.Run()
-		if code != 0 {
-			log.Critf("failed on PostgreSQL version %v", versionPG)
-			os.Exit(code)
-		}
-		log.Infof("[TestMain] Cleaning up...")
-		stopDB()
-
+	log.Infof("[TestMain] Start connecting to PostgreSQL...")
+	if err := сreateConnection(); err != nil {
+		log.Infof("failed to create connection to PostgreSQL for tests")
+		os.Exit(code)
 	}
+	// initialize plugin
+	impl.Init(pluginName)
+	impl.Configure(&plugin.GlobalOptions{}, nil)
+
+	code = m.Run()
+	if code != 0 {
+		log.Critf("failed to run PostgreSQL tests")
+		os.Exit(code)
+	}
+	log.Infof("[TestMain] Cleaning up...")
 	os.Exit(code)
 }
 
