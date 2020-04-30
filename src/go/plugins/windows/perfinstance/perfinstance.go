@@ -62,6 +62,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Failed to get performance instance objects: %s.", err.Error())
 	}
 
+	if len(instances) < 1 {
+		return "[]", nil
+	}
+
 	var respJSON []byte
 	if respJSON, err = json.Marshal(instances); err != nil {
 		return

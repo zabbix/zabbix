@@ -210,18 +210,17 @@ func PdhLookupPerfNameByIndex(index int) (path string, err error) {
 }
 
 func PdhLookupPerfIndexByName(name string) (idx int, err error) {
-	buf := make([]int, uint32(uint32Size))
 	nameUTF16, err := syscall.UTF16PtrFromString(name)
 	if err != nil {
 		return 0, err
 	}
 
-	ret, _, _ := syscall.Syscall(pdhLookupPerfIndexByName, 3, 0, uintptr(unsafe.Pointer(nameUTF16)), uintptr(unsafe.Pointer(&buf[0])))
+	ret, _, _ := syscall.Syscall(pdhLookupPerfIndexByName, 3, 0, uintptr(unsafe.Pointer(nameUTF16)), uintptr(unsafe.Pointer(&idx)))
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return 0, newPdhError(ret)
 	}
 
-	return buf[0], nil
+	return idx, nil
 }
 
 func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
