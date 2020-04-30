@@ -81,44 +81,51 @@ static int	is_operator_delimiter(char c)
  ******************************************************************************/
 static void	evaluate_string(zbx_variant_t *res)
 {
-	const char	*p0 = ptr, *prev = ptr;
-	char		*res_temp = NULL;
-	int		prev_prev_is_escape = 0, prev_escape_is_binded = 0, first_iter = 1, i = 0, str_len = 0;
+	const char	*start;
+	char		*res_temp = NULL, *dst;
+	int		str_len = 0;
 
-	while ('"' != *ptr || ((!prev_prev_is_escape || !prev_escape_is_binded) && ('\\' == *prev) && ('"' == *ptr)))
+	for (start = ptr; '"' != *ptr; ptr++)
 	{
-		if (prev_escape_is_binded)
+		if ('\\' == *ptr)
 		{
-			prev_escape_is_binded = 0;
+			ptr++;
+
+			if ('\\' != *ptr && '\"' != *ptr && '\0' != *ptr)
+			{
+				zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
+						" invalid escape sequence at \"%s\".", ptr - 1);
+				zbx_variant_set_dbl(res, ZBX_INFINITY);
+				return;
+			}
+
 		}
-		else if (!first_iter && '\\' == *prev && '\\'==*ptr)
+
+		if ('\0' == *ptr)
 		{
-			prev_escape_is_binded = 1;
-		}
-		else if (!first_iter && '\\' == *prev && ('\\' != *ptr && '\"' != *ptr))
-		{
-			zbx_snprintf(buffer, max_buffer_len,
-					"Cannot evaluate expression: unescaped character at \"%s\"", ptr);
 			zbx_variant_set_dbl(res, ZBX_INFINITY);
+			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
+					" unterminated string at \"%s\".", start);
 			return;
 		}
-
-		if (first_iter)
-			first_iter = 0;
-		else
-			prev_prev_is_escape = ('\\' == *prev);
-
-		prev = ptr;
-		ptr++;
 	}
 
-	str_len = ptr - p0;
+	str_len = ptr - start;
 	res_temp = zbx_malloc(NULL, str_len + 1);
 
-	for (i = 0; i < str_len; i++)
-		*(res_temp + i) = *(p0 + i);
-
-	*(res_temp + str_len) = '\0';
+	for (dst = res_temp; start != ptr; start++)
+	{
+		switch (*start)
+		{
+			case '\\':
+				start++;
+				break;
+			case '\r':
+				continue;
+		}
+		*dst++ = *start;
+	}
+	*dst = '\0';
 	zbx_variant_set_str(res, res_temp);
 }
 
@@ -186,7 +193,7 @@ static void	variant_convert_to_double(zbx_variant_t *var)
 		if (ZBX_INFINITY == var_double_value)
 		{
 			zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
-					" expected numeric token at \"%s\".", var->data.str);
+					" value \"%s\" is not a numeric operand.", var->data.str);
 		}
 		zbx_variant_clear(var);
 		zbx_variant_set_dbl(var, var_double_value);
@@ -277,12 +284,6 @@ static zbx_variant_t	evaluate_term9(int *unknown_idx)
 
 			if (ZBX_VARIANT_DBL == res.type && ZBX_INFINITY == res.data.dbl)
 				return res;
-
-			if ('"' != *ptr)
-			{
-				zbx_snprintf(buffer, max_buffer_len, "Cannot evaluate expression:"
-						" expected closing quote at \"%s\".", ptr);
-			}
 
 			ptr++;
 

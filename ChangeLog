@@ -224,7 +224,7 @@ A.F.I..PS. [ZBXNEXT-5592] dropped IBM DB2 database support for Zabbix server (ta
 A.F....... [ZBXNEXT-5412] reworked new condition forms as popup (rlataria)
 A.FG...PS. [ZBXNEXT-1989] increased maximum item key length to 2048 chars (MVekslers, rlataria)
 ..F....... [ZBXNEXT-5414] moved maintenance period configuration settings to modal window to decrease page refresh count (gcalenko)
-A.F.I..... [ZBXNEXT-5538] moved Adminitration->User groups pages to MVC framework (Sasha, talbergs)
+A.F.I..... [ZBXNEXT-5538] moved Administration->User groups pages to MVC framework (Sasha, talbergs)
 ..F....... [ZBX-11991] reworked event correlation operations page (rlataria)
 ..F....... [ZBXNEXT-5413] reworked discovery checks form as popup (agriscenko, rlataria)
 ..F....... [ZBXNEXT-170] implemented possibility to "unlink" specific templates in hosts and templates massupdate (talbergs)
@@ -726,7 +726,7 @@ A.F....... [ZBXNEXT-5344] extended LLD preprocessing to support XML related prep
 ..F....... [ZBX-11280] implemented auto-resizing of macro and tag fields on user input (agriscenko)
 ..F....... [ZBXNEXT-5251] extended widget "Problems by severity" with aggregated view (ashubin, vasilijs)
 ..F....... [ZBX-11299] changed font for fields of trigger expressions and scripts to monospaced (agriscenko)
-..F....... [ZBX-16157] moved Adminitration->Users pages to MVC framework (Ivo, Sasha)
+..F....... [ZBX-16157] moved Administration->Users pages to MVC framework (Ivo, Sasha)
 
 Bug fixes:
 ..F....... [ZBX-16501] fixed log out form being resubmitted when user is already logged back in another tab (Ivo)
