@@ -1294,7 +1294,7 @@ class CTrigger extends CTriggerGeneral {
 			unset($trigger);
 
 			$sql_select = ['triggerid'];
-			foreach (['parent_triggerid'] as $field) {
+			foreach (['parent_triggerid', 'ts_delete'] as $field) {
 				if ($this->outputIsRequested($field, $options['selectTriggerDiscovery'])) {
 					$sql_select[] = $field;
 				}
