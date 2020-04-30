@@ -188,7 +188,9 @@ if ($data['rwHost']) {
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);
 	$discoveryLink = new CLink(_('Discovery'),
-		(new CUrl('host_discovery.php'))->setArgument('hostid',$data['host']['hostid'])
+		(new CUrl('host_discovery.php'))
+			->setArgument('filter_set', '1')
+			->setArgument('filter_hostids', [$data['host']['hostid']])
 	);
 	$webLink = new CLink(_('Web'), (new CUrl('httpconf.php'))
 			->setArgument('filter_set', '1')

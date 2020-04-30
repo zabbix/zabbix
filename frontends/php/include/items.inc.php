@@ -918,7 +918,9 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 
 	if ($template['permission'] == PERM_READ_WRITE) {
 		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-			$url = (new CUrl('host_discovery.php'))->setArgument('hostid', $template['hostid']);
+			$url = (new CUrl('host_discovery.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$template['hostid']]);
 		}
 		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url = (new CUrl('disc_prototypes.php'))
@@ -927,8 +929,8 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
 			$url = (new CUrl('items.php'))
-				->setArgument('hostid', $template['hostid'])
-				->setArgument('filter_set', 1);
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$template['hostid']]);
 		}
 
 		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
