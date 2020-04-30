@@ -711,7 +711,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
 				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'manual_close', 'opdata'
+				'manual_close', 'opdata', 'discover'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -1087,6 +1087,9 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			if (array_key_exists('status', $trigger) && $trigger['status'] != $db_trigger['status']) {
 				$upd_trigger['values']['status'] = $trigger['status'];
+			}
+			if (array_key_exists('discover', $trigger) && $trigger['discover'] != $db_trigger['discover']) {
+				$upd_trigger['values']['discover'] = $trigger['discover'];
 			}
 			if (array_key_exists('priority', $trigger) && $trigger['priority'] != $db_trigger['priority']) {
 				$upd_trigger['values']['priority'] = $trigger['priority'];

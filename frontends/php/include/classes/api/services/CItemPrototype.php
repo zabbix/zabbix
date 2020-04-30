@@ -26,7 +26,7 @@ class CItemPrototype extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
-	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
+	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status', 'discover'];
 
 	/**
 	 * Define a set of supported pre-processing rules.
@@ -756,7 +756,7 @@ class CItemPrototype extends CItemGeneral {
 
 		// Validate item prototype status field.
 		$rules = [
-			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NO_CREATE])]
+			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])]
 		];
 
 		foreach ($items as $key => $item) {
