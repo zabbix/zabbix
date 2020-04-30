@@ -21,29 +21,6 @@
 
 package win32
 
-import (
-	"golang.org/x/sys/windows"
-)
-
-func utf16ToUniqueStringSlice(buf []uint16) (out []string) {
-	var singleName []uint16
-	m := make(map[string]bool)
-
-	for len(buf) != 0 {
-		singleName, buf = NextField(buf)
-		if len(singleName) == 0 {
-			break
-		}
-		strName := windows.UTF16ToString(singleName)
-		if _, ok := m[strName]; !ok {
-			m[strName] = true
-			out = append(out, strName)
-		}
-	}
-
-	return
-}
-
 func NextField(buf []uint16) (field []uint16, left []uint16) {
 	start := -1
 	for i, c := range buf {
