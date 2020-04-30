@@ -217,10 +217,18 @@ int	perf_instance_discovery_ex(const char *function, AGENT_REQUEST *request, AGE
 		zbx_vector_str_create(&instances);
 
 		for (instance = inst_list; L'\0' != *instance; instance += wcslen(instance) + 1)
-			zbx_vector_str_append(&instances, zbx_unicode_to_utf8(instance));
+		{
+			char	*instance_utf8;
+
+			instance_utf8 = zbx_unicode_to_utf8(instance);
+
+			if (FAIL == zbx_vector_str_search(&instances, instance_utf8, ZBX_DEFAULT_STR_COMPARE_FUNC))
+				zbx_vector_str_append(&instances, instance_utf8);
+			else
+				zbx_free(instance_utf8);
+		}
 
 		zbx_vector_str_sort(&instances, ZBX_DEFAULT_STR_COMPARE_FUNC);
-		zbx_vector_str_uniq(&instances, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 		for (i = 0; i < instances.values_num; i++)
 		{
