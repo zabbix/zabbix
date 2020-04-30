@@ -61,6 +61,7 @@ $fields = [
 									],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
 	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]), null],
+	'discover' =>					[T_ZBX_INT, O_OPT, null,	IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
@@ -246,7 +247,7 @@ $fields = [
 	'filter_set' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// sort and sortorder
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
-										IN('"delay","history","key_","name","status","trends","type"'), null
+										IN('"delay","history","key_","name","status","trends","type","discover"'), null
 									],
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
@@ -479,6 +480,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'interfaceid'	=> getRequest('interfaceid'),
 			'delay'			=> $delay,
 			'status'		=> getRequest('status', ITEM_STATUS_DISABLED),
+			'discover'		=> getRequest('discover', ZBX_PROTOTYPE_DISCOVER),
 			'type'			=> getRequest('type'),
 			'snmp_oid'		=> getRequest('snmp_oid'),
 			'value_type'	=> getRequest('value_type'),
@@ -842,6 +844,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'applications' => [],
 					'applicationPrototypes' => [],
 					'status' => getRequest('status'),
+					'discover' => getRequest('discover'),
 					'master_itemid' => getRequest('master_itemid'),
 					'url' =>  getRequest('url'),
 					'post_type' => getRequest('post_type'),
@@ -1138,7 +1141,7 @@ if (isset($_REQUEST['form'])) {
 				'interfaceid', 'description', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields',
 				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host', 'allow_traps'
+				'verify_peer', 'verify_host', 'allow_traps', 'discover'
 			],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params']
 		]);
@@ -1242,6 +1245,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'delay_flex' => getRequest('delay_flex', []),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', 0),
+		'discover' => getRequest('discover', DB::getDefault('items', 'discover')),
 		'type' => getRequest('type', 0),
 		'interfaceid' => getRequest('interfaceid', 0),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),

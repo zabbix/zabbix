@@ -60,7 +60,8 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Trends'), 'trends', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
-		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url)
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
@@ -149,6 +150,21 @@ foreach ($data['items'] as $item) {
 		(new CButton(null))->addClass(ZBX_STYLE_ICON_WZRD_ACTION)->setMenuPopup($item_menu)
 	))->addClass(ZBX_STYLE_REL_CONTAINER);
 
+	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
+			(new CUrl('disc_prototypes.php'))
+				->setArgument('group_itemid[]', $item['itemid'])
+				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				->setArgument('visible[discover]', '1')
+				->setArgument('massupdate', 'discover')
+				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgumentSID()
+				->getUrl()
+		))
+			->addSID()
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
@@ -159,7 +175,8 @@ foreach ($data['items'] as $item) {
 		$item['trends'],
 		item_type2str($item['type']),
 		$applications,
-		$status
+		$status,
+		$discover
 	]);
 }
 

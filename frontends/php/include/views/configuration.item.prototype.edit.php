@@ -713,6 +713,12 @@ $form_list
 	// Append status to form list.
 	->addRow(_('Create enabled'),
 		(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE)
+	)
+	->addRow(_('Discover'),
+		(new CRadioButtonList('discover', (int) $data['discover']))
+			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
+			->setModern(true)
 	);
 
 // Append tabs to form.
