@@ -295,8 +295,8 @@ static int	set_object_names(void)
 
 		object_num++;
 	}
-	zbx_free(objects);
 
+	zbx_free(objects);
 	ppsd.lastupdate_names = time(NULL);
 	ret = SUCCEED;
 out:
