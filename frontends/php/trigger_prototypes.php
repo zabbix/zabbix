@@ -46,6 +46,7 @@ $fields = [
 	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	null],
 	'correlation_tag' =>						[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'status' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'discover' =>								[T_ZBX_INT, O_OPT, null,	IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'expression_constructor' =>					[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_expression_constructor})'],
 	'recovery_expression_constructor' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,		'isset({toggle_recovery_expression_constructor})'],
 	'expr_temp' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Expression')],
@@ -103,7 +104,7 @@ $fields = [
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>									[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
+	'sort' =>									[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status","discover"'),		null],
 	'sortorder' =>								[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
@@ -213,6 +214,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$correlation_tag = getRequest('correlation_tag', '');
 	$manual_close = getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED);
 	$status = getRequest('status', TRIGGER_STATUS_ENABLED);
+	$discover = getRequest('discover', DB::getDefault('triggers', 'discover'));
 
 	if (hasRequest('add')) {
 		$trigger_prototype = [
@@ -227,7 +229,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'tags' => $tags,
 			'manual_close' => $manual_close,
 			'dependencies' => $dependencies,
-			'status' => $status
+			'status' => $status,
+			'discover' => $discover
 		];
 		switch ($recovery_mode) {
 			case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
@@ -249,7 +252,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	else {
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+				'discover'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -329,6 +333,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if ($db_trigger_prototype['status'] != $status) {
 			$trigger_prototype['status'] = $status;
+		}
+		if ($db_trigger_prototype['discover'] != $discover) {
+			$trigger_prototype['discover'] = $discover;
 		}
 
 		if ($trigger_prototype) {
@@ -447,6 +454,10 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 						$trigger['manual_close'] = getRequest('manual_close');
 					}
 
+					if (array_key_exists('discover', $visible)) {
+						$trigger['discover'] = getRequest('discover');
+					}
+
 					$triggers_to_update[] = $trigger;
 				}
 			}
@@ -552,6 +563,7 @@ elseif (isset($_REQUEST['form'])) {
 		'type' => getRequest('type', 0),
 		'priority' => getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'status' => getRequest('status', TRIGGER_STATUS_ENABLED),
+		'discover' => getRequest('discover', DB::getDefault('triggers', 'discover')),
 		'comments' => getRequest('comments', ''),
 		'url' => getRequest('url', ''),
 		'expression_constructor' => getRequest('expression_constructor', IM_ESTABLISHED),
@@ -621,7 +633,7 @@ else {
 
 	$data['triggers'] = API::TriggerPrototype()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid', 'recovery_mode',
-			'recovery_expression', 'opdata'
+			'recovery_expression', 'opdata', 'discover'
 		],
 		'selectHosts' => ['hostid', 'host'],
 		'selectDependencies' => ['triggerid', 'description'],
