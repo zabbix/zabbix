@@ -2925,11 +2925,17 @@ class CDiscoveryRule extends CItemGeneral {
 					}
 				}
 
-				if ($item_prototype_objectids) {
+				if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
+					$ids = array_merge(array_keys($item_prototype_objectids), array_keys($trigger_prototype_objectids));
+					$ids = array_merge($ids, array_keys($host_prototype_objectids));
+
 					$opstatus = DB::select('lld_override_opstatus', [
 						'output' => ['lld_override_operationid', 'status'],
-						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						'filter' => ['lld_override_operationid' => $ids]
 					]);
+				}
+
+				if ($item_prototype_objectids) {
 					$ophistory = DB::select('lld_override_ophistory', [
 						'output' => ['lld_override_operationid', 'history'],
 						'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
@@ -2945,10 +2951,6 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				if ($trigger_prototype_objectids) {
-					$opstatus = DB::select('lld_override_opstatus', [
-						'output' => ['lld_override_operationid', 'status'],
-						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
-					]);
 					$opseverity = DB::select('lld_override_opseverity', [
 						'output' => ['lld_override_operationid', 'severity'],
 						'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
@@ -2960,10 +2962,6 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				if ($host_prototype_objectids) {
-					$opstatus = DB::select('lld_override_opstatus', [
-						'output' => ['lld_override_operationid', 'status'],
-						'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
-					]);
 					$optemplate = DB::select('lld_override_optemplate', [
 						'output' => ['lld_override_operationid', 'templateid'],
 						'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
