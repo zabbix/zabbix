@@ -173,11 +173,7 @@ function make_event_details(array $event) {
 			(new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('return PopUp("popup.acknowledge.edit",'.
-					json_encode([
-						'eventids' => [$event['eventid']]
-					]).', null, this);'
-				)
+				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);')
 		]);
 
 	if ($event['r_eventid'] != 0) {
@@ -363,11 +359,7 @@ function make_small_eventlist(array $startEvent) {
 		$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->onClick('return PopUp("popup.acknowledge.edit",'.
-				json_encode([
-					'eventids' => [$event['eventid']]
-				]).', null, this);'
-			);
+			->onClick('acknowledgePopUp('.json_encode(['eventids' => [$event['eventid']]]).', this);');
 
 		$table->addRow([
 			(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -599,11 +591,7 @@ function make_popup_eventlist($trigger, $eventid_till, $show_timeline = true, $s
 			$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('return PopUp("popup.acknowledge.edit",'.
-					json_encode([
-						'eventids' => [$problem['eventid']]
-					]).', null, this);'
-				);
+				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
 
 			$table->addRow(array_merge($row, [
 				$cell_r_clock,

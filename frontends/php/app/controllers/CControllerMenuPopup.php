@@ -638,16 +638,16 @@ class CControllerMenuPopup extends CController {
 	 * Prepare data for widget actions menu popup.
 	 *
 	 * @param array  $data
-	 * @param string $data['widgetName']   Widget index in array of widgets on dashboard.
-	 * @param string $data['currentRate']  Refresh rate for widget.
-	 * @param bool   $data['multiplier']   Multiplier or time mode.
+	 * @param string $data['widget_uniqueid']  Widget instance unique id.
+	 * @param string $data['currentRate']      Refresh rate for widget.
+	 * @param bool   $data['multiplier']       Multiplier or time mode.
 	 *
 	 * @return mixed
 	 */
 	private static function getMenuDataWidgetActions(array $data) {
 		$menu_data = [
 			'type' => 'widget_actions',
-			'widgetName' => $data['widgetName'],
+			'widget_uniqueid' => $data['widget_uniqueid'],
 			'currentRate' => $data['currentRate'],
 			'multiplier' => (bool) $data['multiplier']
 		];

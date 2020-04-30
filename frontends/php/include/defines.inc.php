@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.0beta2');
+define('ZABBIX_VERSION',		'5.0.0rc1');
 define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		4050118);
+define('ZABBIX_DB_VERSION',		4050121);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -146,6 +146,7 @@ define('ZBX_DB_MAX_INSERTS', 10000);
 // Default db and field character set
 define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
 define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+define('ORACLE_MAX_STRING_SIZE', 4000);
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
@@ -958,6 +959,7 @@ define('ZBX_PROBLEM_UPDATE_CLOSE',			0x01);
 define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',	0x02);
 define('ZBX_PROBLEM_UPDATE_MESSAGE',		0x04);
 define('ZBX_PROBLEM_UPDATE_SEVERITY',		0x08);
+define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',	0x10);
 
 define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
 define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
@@ -1585,7 +1587,6 @@ define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
 define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
-define('ZBX_STYLE_BTN_WIDGET_DELETE', 'btn-widget-delete');
 define('ZBX_STYLE_BTN_WIDGET_EDIT', 'btn-widget-edit');
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_BOTTOM', 'bottom');
@@ -1688,6 +1689,7 @@ define('ZBX_STYLE_ACTION_ICON_SEV_DOWN', 'icon-action-severity-down');
 define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
 define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
 define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
+define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
 define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');

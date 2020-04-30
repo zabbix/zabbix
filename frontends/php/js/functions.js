@@ -260,14 +260,50 @@ function objectSize(obj) {
 	return size;
 }
 
-function addMessage(html) {
-	var $message_div = jQuery('<div>').attr('id', 'messages');
-	$message_div.append(html);
-	jQuery('.wrapper main').before($message_div);
+/**
+ * Add standard message to the top of the site.
+ *
+ * @param {jQuery}  jQuery object representing HTML message box with class name .msg-good, .msg-bad or .msg-warning.
+ */
+function addMessage($msg_box) {
+	var $wrapper = $('.wrapper'),
+		$main = $wrapper.find('> main'),
+		$footer = $wrapper.find('> footer');
+
+	if ($main.length) {
+		$main.before($msg_box);
+	}
+	else if ($footer.length) {
+		$footer.before($msg_box);
+	}
+	else {
+		$wrapper.append($msg_box);
+	}
 }
 
-function removeMessages() {
-	jQuery('#messages', '.wrapper').remove();
+/**
+ * Clear standard messages.
+ */
+function clearMessages() {
+	$('.wrapper').find('> .msg-good, > .msg-bad, > .msg-warning').not('.msg-global-footer').remove();
+}
+
+/**
+ * Prepare Ok message for displaying after page reload.
+ *
+ * @param {String} message
+ */
+function postMessageOk(message) {
+	cookie.create('messageOk', message);
+}
+
+/**
+ * Prepare Error message for displaying after page reload.
+ *
+ * @param {String} message
+ */
+function postMessageError(message) {
+	cookie.create('messageError', message);
 }
 
 /**
@@ -776,6 +812,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		jQuery('<li>')
 			.text(messages ? messages : ' ')
 			.appendTo($list);
+
 		$msg_box.append($msg_details);
 	}
 

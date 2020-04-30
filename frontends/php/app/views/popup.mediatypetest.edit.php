@@ -48,7 +48,11 @@ if ($data['type'] == MEDIA_TYPE_WEBHOOK) {
 				->setId('webhook_response_value')
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setEnabled(false),
-			(new CDiv(''))->setId('webhook_response_type')
+			(new CDiv(''))->setId('webhook_response_type'),
+			(new CDiv((new CLinkAction('Open log'))
+				->setId('mediatypetest_log')
+				->addClass(ZBX_STYLE_DISABLED)
+				->onClick('openLogPopup(this)')))
 		]);
 }
 else {

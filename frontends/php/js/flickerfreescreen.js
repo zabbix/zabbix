@@ -91,6 +91,16 @@
 				return;
 			}
 
+			// Do not update screen if displaying static hintbox.
+			if ($('#flickerfreescreen_' + id + ' [data-expanded="true"]').length) {
+				if (screen.isFlickerfree && screen.interval > 0) {
+					clearTimeout(screen.timeoutHandler);
+					screen.timeoutHandler = setTimeout(() => flickerfreeScreen.refresh(id), 1000);
+				}
+
+				return;
+			}
+
 			/**
 			 * 17   SCREEN_RESOURCE_HISTORY
 			 * 21   SCREEN_RESOURCE_HTTPTEST_DETAILS
@@ -211,13 +221,7 @@
 			// set next refresh execution time
 			if (screen.isFlickerfree && screen.interval > 0) {
 				clearTimeout(screen.timeoutHandler);
-
-				screen.timeoutHandler = window.setTimeout(
-					function() {
-						window.flickerfreeScreen.refresh(id);
-					},
-					screen.interval
-				);
+				screen.timeoutHandler = setTimeout(() => flickerfreeScreen.refresh(id), screen.interval);
 			}
 		},
 

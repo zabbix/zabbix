@@ -29,7 +29,8 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 		$this->setType(WIDGET_PROBLEMS_BY_SV);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'initial_load' => 'in 0,1'
 		]);
 	}
 
@@ -63,6 +64,7 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'data' => $data,
 			'severity_names' => [
 				'severity_name_0' => $config['severity_name_0'],

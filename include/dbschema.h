@@ -59,7 +59,7 @@ ZBX_FIELD;
 
 typedef struct
 {
-	const char    	*table;
+	const char	*table;
 	const char	*recid;
 	unsigned char	flags;
 	ZBX_FIELD	fields[ZBX_MAX_FIELDS];

@@ -33,6 +33,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
 			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+			'unacknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE,
 			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
@@ -73,16 +74,16 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'change_severity' => $this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE),
 			'severity' => $this->hasInput('severity') ? (int) $this->getInput('severity') : null,
 			'acknowledge_problem' => $this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
+			'unacknowledge_problem' => $this->getInput('unacknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
-			'problem_can_be_acknowledged' => false,
 			'problem_severity_can_be_changed' => false
 		];
 
 		// Select events.
 		$events = API::Event()->get([
-			'output' => ['eventid', 'objectid', 'acknowledged', 'value', 'r_eventid'],
+			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid'],
 			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -108,6 +109,10 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				'userids' => array_keys($history['userids']),
 				'preservekeys' => true
 			]);
+			$data['problem_name'] = reset($events)['name'];
+		}
+		else {
+			$data['problem_name'] = _s('%1$d problems selected.', count($events));
 		}
 
 		$triggerids = array_column($events, 'objectid', 'objectid');
@@ -118,6 +123,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		$ack_count = 0;
 
 		// Loop through events to figure out what operations should be allowed.
 		foreach ($events as $event) {
@@ -148,11 +155,11 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				$data['problem_can_be_closed'] = true;
 			}
 
-			// If at least one event is not acknowledged, enable 'Acknowledge' checkbox.
-			if ($event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-				$data['problem_can_be_acknowledged'] = true;
-			}
+			$ack_count += ($event['acknowledged'] == EVENT_ACKNOWLEDGED) ? 1 : 0;
 		}
+
+		$data['has_ack_events'] = ($ack_count > 0);
+		$data['has_unack_events'] = ($ack_count != count($events));
 
 		// Severity can be changed only for editable triggers.
 		$data['problem_severity_can_be_changed'] = !!$editable_triggers;

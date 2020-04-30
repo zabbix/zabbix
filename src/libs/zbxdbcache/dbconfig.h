@@ -844,12 +844,12 @@ extern zbx_rwlock_t	config_lock;
 /******************************************************************************
  *                                                                            *
  * zbx_dc_expand_user_macros - has no autoquoting                             *
- * zbx_dc_expand_user_macros_for_triggers - autoquotes macros that are not    *
- * already quoted and cannot be casted to a double                            *
+ * for triggers and calculated items use                                      *
+ * zbx_dc_expand_user_macros_in_expression - which autoquotes macros that are *
+ * not already quoted and cannot be casted to a double                        *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
-char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num);
 
 void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids);

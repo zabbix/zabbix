@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('monitoring.screen.js.php');
+
 $widget = (new CWidget())->setTitle(_('Screens').': '.$data['screen']['name']);
 
 if (array_key_exists('templateid', $data['screen'])) {
