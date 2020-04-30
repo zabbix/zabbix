@@ -910,6 +910,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 		// item prototype
 		elseif ($data['parent_discoveryid'] != 0) {
+			$data['discover'] = $data['item']['discover'];
 			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		// plain item
@@ -967,7 +968,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['jmx_endpoint'] = $data['item']['jmx_endpoint'];
 		$data['new_application'] = getRequest('new_application', '');
-		$data['discover'] = $data['item']['discover'];
 		// ITEM_TYPE_HTTPAGENT
 		$data['timeout'] = $data['item']['timeout'];
 		$data['url'] = $data['item']['url'];
