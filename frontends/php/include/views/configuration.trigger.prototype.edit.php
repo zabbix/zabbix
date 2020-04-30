@@ -521,7 +521,13 @@ $triggersFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 	)
-	->addRow(_('Create enabled'), (new CCheckBox('status'))->setChecked($status));
+	->addRow(_('Create enabled'), (new CCheckBox('status'))->setChecked($status))
+	->addRow(_('Discover'),
+		(new CRadioButtonList('discover', (int) $data['discover']))
+			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
+			->setModern(true)
+	);
 
 // append tabs to form
 $triggersTab = new CTabView();
