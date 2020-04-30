@@ -116,6 +116,15 @@ if (!empty($this->data['parent_discoveryid'])) {
 
 // create table
 $url = (new CUrl('graphs.php'))->getUrl();
+$discover = null;
+$info_column = null;
+
+if ($data['parent_discoveryid']) {
+	$discover = make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url);
+}
+else {
+	$info_column = _('Info');
+}
 
 $graphTable = (new CTableInfo())
 	->setHeader([
@@ -126,7 +135,9 @@ $graphTable = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
 		_('Width'),
 		_('Height'),
-		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'], $url)
+		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'], $url),
+		$discover,
+		$info_column
 	]);
 
 foreach ($data['graphs'] as $graph) {
@@ -172,6 +183,26 @@ foreach ($data['graphs'] as $graph) {
 	}
 
 	$name[] = new CLink(CHtml::encode($graph['name']), $url);
+	$info_icons = [];
+	$discover = null;
+
+	if ($data['parent_discoveryid']) {
+		$nodiscover = ($graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+		$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
+				(new CUrl('graphs.php'))
+					->setArgument('action', 'graph.updatediscover')
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('graphid', $graphid)
+					->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+					->getUrl()
+			))
+				->addSID()
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+	}
+	else if (array_key_exists('ts_delete', $graph['graphDiscovery']) && $graph['graphDiscovery']['ts_delete'] > 0) {
+		$info_icons[] = getItemLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
+	}
 
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
@@ -179,7 +210,9 @@ foreach ($data['graphs'] as $graph) {
 		$name,
 		$graph['width'],
 		$graph['height'],
-		$graph['graphtype']
+		$graph['graphtype'],
+		$discover,
+		($info_column === null) ? null : makeInformationList($info_icons)
 	]);
 }
 

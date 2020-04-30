@@ -370,6 +370,15 @@ $item_form_list
 			->setChecked(array_key_exists('status', $data['visible'])),
 		$status_combo_box
 	)
+	->addRow(
+		(new CVisibilityBox('visible[discover]', 'discover', _('Original')))
+			->setLabel(_('Discover'))
+			->setChecked(array_key_exists('discover', $data['visible'])),
+		(new CRadioButtonList('discover', (int) $data['discover']))
+			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
+			->setModern(true)
+	)
 	// Append logtime to form list.
 	->addRow(
 		(new CVisibilityBox('visible[logtimefmt]', 'logtimefmt', _('Original')))

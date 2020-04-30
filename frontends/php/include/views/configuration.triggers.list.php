@@ -267,6 +267,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
 			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDWRAP));
 		}
+
+		if (array_key_exists('ts_delete', $trigger['triggerDiscovery'])
+				&& $trigger['triggerDiscovery']['ts_delete'] > 0) {
+			$info_icons[] = getItemLifetimeIndicator(time(), $trigger['triggerDiscovery']['ts_delete']);
+		}
 	}
 
 	// status

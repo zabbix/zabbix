@@ -781,6 +781,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
+		'discover' => getRequest('discover', DB::getDefault('items', 'discover')),
 		'type' => getRequest('type', 0),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
@@ -966,6 +967,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['jmx_endpoint'] = $data['item']['jmx_endpoint'];
 		$data['new_application'] = getRequest('new_application', '');
+		$data['discover'] = $data['item']['discover'];
 		// ITEM_TYPE_HTTPAGENT
 		$data['timeout'] = $data['item']['timeout'];
 		$data['url'] = $data['item']['url'];
@@ -1732,6 +1734,7 @@ function getTriggerFormData(array $data) {
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];
 			$data['url'] = $trigger['url'];
+			$data['discover'] = $trigger['discover'];
 
 			$db_triggers = DBselect(
 				'SELECT t.triggerid,t.description'.

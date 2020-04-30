@@ -121,6 +121,12 @@ $hostList->addRow(_('Create enabled'),
 	(new CCheckBox('status', HOST_STATUS_MONITORED))
 		->setChecked(HOST_STATUS_MONITORED == $hostPrototype['status'])
 );
+$hostList->addRow(_('Discover'),
+	(new CRadioButtonList('discover', (int) $hostPrototype['discover']))
+		->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+		->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
+		->setModern(true)
+);
 
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 

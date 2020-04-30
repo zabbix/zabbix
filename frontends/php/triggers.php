@@ -856,11 +856,40 @@ else {
 			'selectHosts' => ['hostid', 'host', 'name', 'status'],
 			'selectDependencies' => ['triggerid', 'description'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectTriggerDiscovery' => ['ts_delete'],
 			'selectTags' => ['tag', 'value'],
 			'triggerids' => array_keys($prefetched_triggers),
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
+
+		$items = API::Item()->get([
+			'output' => ['itemid'],
+			'triggerids' => array_keys($triggers),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+			'selectTriggers' => ['triggerid'],
+			'selectItemDiscovery' => ['ts_delete']
+		]);
+
+		foreach ($items as $item) {
+			$ts_delete = $item['itemDiscovery']['ts_delete'];
+
+			if ($ts_delete == 0) {
+				continue;
+			}
+
+			foreach (array_column($item['triggers'], 'triggerid') as $triggerid) {
+				if (!array_key_exists('ts_delete', $triggers[$triggerid]['triggerDiscovery'])) {
+					$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = $ts_delete;
+				}
+				else {
+					$trigger_ts_delete = $triggers[$triggerid]['triggerDiscovery']['ts_delete'];
+					$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = ($trigger_ts_delete > 0)
+						? min($ts_delete, $trigger_ts_delete)
+						: $ts_delete;
+				}
+			}
+		}
 
 		// We must maintain sort order that is applied on prefetched_triggers array.
 		foreach ($triggers as $triggerid => $trigger) {

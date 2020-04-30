@@ -56,7 +56,8 @@ $hostTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Templates'),
-		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url)
 	]);
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
@@ -139,11 +140,26 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		->addClass(itemIndicatorStyle($hostPrototype['status']))
 		->addSID();
 
+	$nodiscover = ($hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
+			(new CUrl('host_prototypes.php'))
+				->setArgument('hostid', $hostPrototype['hostid'])
+				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
+				->setArgument('action', 'hostprototype.updatediscover')
+				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgumentSID()
+				->getUrl()
+		))
+			->addSID()
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+
 	$hostTable->addRow([
 		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', $hostPrototype['hostid']),
 		$name,
 		$hostTemplates,
-		$status
+		$status,
+		$discover
 	]);
 }
 
