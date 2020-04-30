@@ -874,6 +874,7 @@ class CApiService {
 			// skip missing fields and text fields (not supported by Oracle)
 			// skip empty values
 			if (!isset($tableSchema['fields'][$field]) || $tableSchema['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT
+					|| $tableSchema['fields'][$field]['type'] == DB::FIELD_TYPE_NCLOB
 					|| zbx_empty($value)) {
 				continue;
 			}

@@ -326,7 +326,7 @@ function DBaddLimit($query, $limit = 0, $offset = 0) {
 	return $query;
 }
 
-function DBexecute($query, $skip_error_messages = 0) {
+function DBexecute($query) {
 	global $DB;
 
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
@@ -509,6 +509,7 @@ function zbx_db_distinct($sql_parts) {
 }
 
 function zbx_db_search($table, $options, &$sql_parts) {
+	global $DB;
 	list($table, $tableShort) = explode(' ', $table);
 
 	$tableSchema = DB::getSchema($table);
@@ -534,33 +535,31 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			continue;
 		}
 
-		if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR
-			&& $tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_TEXT) {
+		if ($tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CHAR
+				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_NCLOB
+				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_TEXT) {
 			continue;
 		}
 
 		$fieldSearch = [];
 		foreach ($patterns as $pattern) {
 			// escaping parameter that is about to be used in LIKE statement
-			$pattern = str_replace("!", "!!", $pattern);
-			$pattern = str_replace("%", "!%", $pattern);
-			$pattern = str_replace("_", "!_", $pattern);
+			$pattern = mb_strtoupper(strtr($pattern, ['!' => '!!', '%' => '!%', '_' => '!_']));
 
-			if (!$options['searchWildcardsEnabled']) {
-				$fieldSearch[] =
-					'UPPER('.$tableShort.'.'.$field.')'.
-					$exclude.' LIKE '.
-					zbx_dbstr($start.mb_strtoupper($pattern).'%').
-					" ESCAPE '!'";
+			$pattern = !$options['searchWildcardsEnabled']
+				? $start.$pattern.'%'
+				: str_replace('*', '%', $pattern);
+
+			if ($DB['TYPE'] == ZBX_DB_ORACLE && $tableSchema['fields'][$field]['type'] === DB::FIELD_TYPE_NCLOB
+					&& strlen($pattern) > ORACLE_MAX_STRING_SIZE) {
+				$chunks = zbx_dbstr(DB::chunkMultibyteStr($pattern, ORACLE_MAX_STRING_SIZE));
+				$pattern = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
 			}
 			else {
-				$pattern = str_replace("*", "%", $pattern);
-				$fieldSearch[] =
-					' UPPER('.$tableShort.'.'.$field.') '.
-					$exclude.' LIKE '.
-					zbx_dbstr(mb_strtoupper($pattern)).
-					" ESCAPE '!'";
+				$pattern = zbx_dbstr($pattern);
 			}
+
+			$fieldSearch[] = 'UPPER('.$tableShort.'.'.$field.')'.$exclude.' LIKE '.$pattern." ESCAPE '!'";
 		}
 
 		$search[$field] = '('.implode($glue, $fieldSearch).')';

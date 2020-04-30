@@ -429,7 +429,8 @@ jQuery(function ($) {
 			t = e.pageY - offset.top,
 			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
 				? t + mouse_distance
-				: t - mouse_distance - hbox.outerHeight();
+				: t - mouse_distance - hbox.outerHeight(),
+			t = (t + offset.top < 0) ? -offset.top : t;
 
 		hbox.css({'left': l, 'top': t});
 	}

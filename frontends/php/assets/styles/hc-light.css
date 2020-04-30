@@ -244,6 +244,8 @@ header {
     margin: 0 -2px 0 auto;
     padding: 2px;
     white-space: nowrap; }
+    header .header-controls label {
+      line-height: 24px; }
   header a.link-action {
     box-sizing: border-box;
     display: block;
@@ -1690,6 +1692,11 @@ pre, pre a, pre td, pre span {
         vertical-align: middle; }
         .table-forms .table-forms-td-right td.center .btn-grey {
           margin: 3px 0; }
+      .table-forms .table-forms-td-right td.overflow-break {
+        max-width: 150px;
+        overflow-wrap: break-word;
+        white-space: initial;
+        word-wrap: break-word; }
       .table-forms .table-forms-td-right td:last-child {
         padding-right: 0; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
@@ -2099,9 +2106,6 @@ button {
 .btn-widget-edit {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -619px; }
 
-.btn-widget-delete {
-  background: url("../img/icon-sprite.svg?20200407") no-repeat -42px -582px; }
-
 .btn-alarm-on {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -6px -546px; }
 
@@ -2350,7 +2354,7 @@ button {
   .btn-dashbrd-normal.hidden {
     opacity: 0; }
 
-.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
+.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   width: 24px;
   height: 24px;
   margin: 2px 2px 0 0; }
@@ -2359,7 +2363,7 @@ button {
   width: 24px;
   height: 24px; }
 
-.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-widget-delete, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashbrd-conf {
+.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashbrd-conf {
   border: 0;
   min-height: 0;
   padding: 0;
@@ -2389,7 +2393,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
 
-.btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-widget-delete:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashbrd-conf:hover, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-widget-delete:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashbrd-conf:focus, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-widget-delete:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashbrd-conf:active {
+.btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashbrd-conf:hover, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashbrd-conf:focus, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashbrd-conf:active {
   background-color: transparent;
   opacity: 1; }
 
@@ -2728,6 +2732,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-widget-content .msg-good,
   .dashbrd-grid-widget-content .msg-warning {
     margin: 0 10px; }
+
+.widget-placeholder .dashbrd-grid-widget-container .dashbrd-grid-widget-content {
+  margin-top: 0;
+  height: 100%; }
 
 .dashbrd-grid-widget-mask {
   position: absolute;
@@ -5010,6 +5018,7 @@ svg {
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
+.icon-action-unack,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -5034,6 +5043,7 @@ svg {
   .icon-action-severity-changed::before,
   .icon-action-message::before,
   .icon-action-ack::before,
+  .icon-action-unack::before,
   .icon-invisible::before,
   .icon-problem-generated::before,
   .icon-problem-recovery::before,
@@ -5084,6 +5094,9 @@ svg {
 
 .icon-action-ack::before {
   background-position: -323px -245px; }
+
+.icon-action-unack::before {
+  background-position: -173px -245px; }
 
 .icon-invisible::before {
   background-position: -89px -803px; }
@@ -5455,6 +5468,14 @@ table.preprocessing-test-results .rel-container {
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   display: inline-block; }
 
+#mediatype_testlog .logitems {
+  overflow: auto;
+  margin-bottom: 10px; }
+  #mediatype_testlog .logitems pre {
+    white-space: nowrap; }
+#mediatype_testlog .logtotalms {
+  margin-bottom: 10px; }
+
 .sidebar .logo:focus .sidebar-logo {
   box-shadow: 0 0 0 2px #ffffff; }
 .sidebar button:focus {
@@ -5542,9 +5563,6 @@ table.preprocessing-test-results .rel-container {
 
 .btn-widget-edit {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -201px -619px; }
-
-.btn-widget-delete {
-  background: url("../img/icon-sprite.svg?20200407") no-repeat -201px -582px; }
 
 .btn-alarm-on {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -165px -546px; }
@@ -6046,6 +6064,9 @@ td.inactive-bg {
 
 .icon-action-ack::before {
   background-position: -323px -285px; }
+
+.icon-action-unack::before {
+  background-position: -173px -285px; }
 
 .icon-invisible::before {
   background-position: -249px -803px; }

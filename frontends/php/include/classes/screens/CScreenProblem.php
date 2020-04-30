@@ -813,7 +813,6 @@ class CScreenProblem extends CScreenBase {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
 		}
 
-
 		$show_opdata = $this->data['filter']['compact_view']
 			? OPERATIONAL_DATA_SHOW_NONE
 			: $this->data['filter']['show_opdata'];
@@ -1042,8 +1041,8 @@ class CScreenProblem extends CScreenBase {
 					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
 
 				$opdata = null;
-				if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
 
+				if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
 					if ($trigger['opdata'] === '') {
 						if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
 							$opdata = (new CCol(self::getLatestValues($trigger['items'])))->addClass('latest-values');
@@ -1114,11 +1113,7 @@ class CScreenProblem extends CScreenBase {
 				$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->onClick('return PopUp("popup.acknowledge.edit",'.
-						json_encode([
-							'eventids' => [$problem['eventid']]
-						]).', null, this);'
-					);
+					->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
 
 				// Add table row.
 				$table->addRow(array_merge($row, [

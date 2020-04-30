@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-04-14T08:34:54Z</date>
+   <date>2020-04-23T08:57:33Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -735,7 +735,7 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                      <expression>{min(5m)}&gt;{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}</expression>
                      <name>ClickHouse: Too many network errors (over {$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} in 5m)</name>
                      <priority>WARNING</priority>
-                     <description>Number of errors (timeouts and connection failures) during query execution, background pool tasks and DNS cache update is too hight.</description>
+                     <description>Number of errors (timeouts and connection failures) during query execution, background pool tasks and DNS cache update is too high.</description>
                   </trigger>
                </triggers>
             </item>
@@ -950,7 +950,7 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <query_fields>
                   <query_field>
                      <name>query</name>
-                     <value>SELECT database, table, is_readonly, is_session_expired, future_parts, parts_to_check, queue_size, inserts_in_queue, merges_in_queue, log_max_index, log_pointer, total_replicas, active_replicas FROM system.replicas format JSON</value>
+                     <value>SELECT database, table, is_readonly, is_session_expired, future_parts, parts_to_check, queue_size, inserts_in_queue, merges_in_queue, log_max_index, log_pointer, total_replicas, active_replicas, log_max_index - log_pointer as replica_lag FROM system.replicas format JSON</value>
                   </query_field>
                </query_fields>
             </item>
@@ -979,7 +979,7 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$CLICKHOUSE.REPLICA.MAX.WARN}</expression>
-                     <name>ClickHouse: Replication lag is too hight (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)</name>
+                     <name>ClickHouse: Replication lag is too high (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)</name>
                      <priority>WARNING</priority>
                      <description>"When replica have too much lag, it can be skipped from Distributed SELECT Queries without errors &#13;
 and you will have wrong query results."</description>
@@ -1854,6 +1854,36 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
+                     <name>ClickHouse: {#DB}.{#TABLE}: Replica lag</name>
+                     <type>DEPENDENT</type>
+                     <key>clickhouse.replica.lag["{#DB}.{#TABLE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Difference between log_max_index and log_pointer</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>ClickHouse: "{#DB}.{#TABLE}" replica status</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.database == "{#DB}" &amp;&amp; @.table == "{#TABLE}")].replica_lag.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>clickhouse.replicas</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)} &gt; {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN}</expression>
+                           <name>ClickHouse: {#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high (More than {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN} for 5m)</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
                      <name>ClickHouse: {#DB}.{#TABLE}: Replica log max index</name>
                      <type>DEPENDENT</type>
                      <key>clickhouse.replica.log_max_index["{#DB}.{#TABLE}"]</key>
@@ -1965,7 +1995,7 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$CLICKHOUSE.QUEUE.SIZE.MAX.WARN:"{#TABLE}"}</expression>
-                           <name>ClickHouse: Too many operations in queue (over {$CLICKHOUSE.QUEUE.SIZE.MAX.WARN} for 5m)</name>
+                           <name>ClickHouse: {#DB}.{#TABLE}: Too many operations in queue (over {$CLICKHOUSE.QUEUE.SIZE.MAX.WARN} for 5m)</name>
                            <priority>WARNING</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -1995,17 +2025,32 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template DB ClickHouse by HTTP:clickhouse.replica.log_max_index["{#DB}.{#TABLE}"].last()} - {Template DB ClickHouse by HTTP:clickhouse.replica.log_pointer["{#DB}.{#TABLE}"].last()} &gt; {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN}</expression>
-                     <name>ClickHouse: Differense between log_max_index and log_pointer is too hight (More than {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN})</name>
-                     <priority>WARNING</priority>
-                  </trigger_prototype>
-                  <trigger_prototype>
                      <expression>{Template DB ClickHouse by HTTP:clickhouse.replica.active_replicas["{#DB}.{#TABLE}"].max(5m)} &lt; {Template DB ClickHouse by HTTP:clickhouse.replica.total_replicas["{#DB}.{#TABLE}"].last()}</expression>
-                     <name>ClickHouse: Number of active replicas less than number of total replicas</name>
+                     <name>ClickHouse: {#DB}.{#TABLE}: Number of active replicas less than number of total replicas</name>
                      <priority>WARNING</priority>
                   </trigger_prototype>
                </trigger_prototypes>
                <graph_prototypes>
+                  <graph_prototype>
+                     <name>ClickHouse: {#DB}.{#TABLE}: Replica log activity</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB ClickHouse by HTTP</host>
+                              <key>clickhouse.replica.log_max_index["{#DB}.{#TABLE}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB ClickHouse by HTTP</host>
+                              <key>clickhouse.replica.log_pointer["{#DB}.{#TABLE}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
                   <graph_prototype>
                      <name>ClickHouse: {#DB}.{#TABLE}: Replica queues</name>
                      <graph_items>

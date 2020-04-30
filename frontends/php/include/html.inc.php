@@ -421,7 +421,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		// discovery rules
 		$lld_rules = new CSpan([
-			new CLink(_('Discovery rules'), 'host_discovery.php?hostid='.$db_host['hostid']),
+			new CLink(_('Discovery rules'), (new CUrl('host_discovery.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$db_host['hostid']])
+			),
 			CViewHelper::showNum($db_host['discoveries'])
 		]);
 		if ($current_element == 'discoveries') {
@@ -457,7 +460,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 		$list->addItem([
 			(new CSpan())->addItem(
-				new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'])
+				new CLink(_('Discovery list'), (new CUrl('host_discovery.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$db_host['hostid']])
+				)
 			),
 			'/',
 			$discovery_rule

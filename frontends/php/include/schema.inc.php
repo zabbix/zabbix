@@ -1792,7 +1792,7 @@ return [
 			],
 			'script' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'timeout' => [
@@ -2872,6 +2872,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
 				'default' => '7d',
+			],
+			'instanceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
 			],
 			'saml_auth_enabled' => [
 				'null' => false,
@@ -4641,7 +4647,7 @@ return [
 			],
 			'message' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'status' => [
@@ -4820,7 +4826,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'logeventid' => [
@@ -4855,7 +4861,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'ns' => [
@@ -4907,7 +4913,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'logeventid' => [
@@ -4941,6 +4947,12 @@ return [
 				'default' => '0',
 			],
 			'flags' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'write_clock' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -5294,12 +5306,12 @@ return [
 			],
 			'oldvalue' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'newvalue' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 		],

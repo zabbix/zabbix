@@ -53,13 +53,8 @@ function submitAcknowledge(overlay) {
 			jQuery(response.errors).insertBefore($form);
 		}
 		else {
-			// Clear all selected checkboxes in Monitoring->Problems.
-			if (chkbxRange.prefix === 'problem') {
-				chkbxRange.clearSelectedOnFilterChange();
-			}
-
-			// Reload the page.
-			location.href = location.href;
+			overlayDialogueDestroy(overlay.dialogueid);
+			$.publish('acknowledge.create', [response, overlay]);
 		}
 	});
 }

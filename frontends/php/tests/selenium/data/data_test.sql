@@ -1716,8 +1716,8 @@ INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, send
 
 -- testInheritanceHostPrototype
 INSERT INTO hstgrp (groupid, name, internal) VALUES (15, 'Inheritance test', 0);
-INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99000, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, NULL, 'testInheritanceHostPrototype {#TEST}');
-INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99001, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, 99000, 'testInheritanceHostPrototype {#TEST}');
+INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99000, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, NULL, '');
+INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99001, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, 99000, '');
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99001, NULL, 15016, '', 0, 0);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1010, 99000, '', 15, NULL);
@@ -2366,8 +2366,8 @@ INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUE
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1008, 102, 'Message', '{ALERT.MESSAGE}');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1009, 102, 'HTTPProxy', '');
 INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (103, 4, 'Webhook to delete', 0, 'return 0;', 1, 'Unique webhook url', 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}', 'Webhook media type to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1009, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1010, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1010, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
+INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1011, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
 
 -- testPageProblems_ProblemLinks
 INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (104, 4, 'URL test webhook', 0, 'return 0;', 1, 'Webhook url for all', 'zabbix.php?action=mediatype.edit&mediatypeid=101', 'Webhook media type for URL test');

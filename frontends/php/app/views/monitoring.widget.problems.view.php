@@ -245,11 +245,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 		->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 		->addClass(ZBX_STYLE_LINK_ALT)
-		->onClick('return PopUp("popup.acknowledge.edit",'.
-			json_encode([
-				'eventids' => [$problem['eventid']]
-			]).', null, this);'
-		);
+		->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
 
 	$table->addRow(array_merge($row, [
 		$show_recovery_data ? $cell_r_clock : null,
@@ -281,6 +277,17 @@ $output = [
 	'header' => $data['name'],
 	'body' => $table->toString()
 ];
+
+if ($data['initial_load']) {
+	$output['script_inline'] =
+		'if (typeof refreshProblemsWidget !== typeof(Function)) {'.
+			'function refreshProblemsWidget(event, response, overlay) {'.
+				'refreshWidgetOnAcknowledgeCreate("problems", response, overlay);'.
+			'}'.
+
+			'$.subscribe("acknowledge.create", refreshProblemsWidget);'.
+		'}';
+}
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

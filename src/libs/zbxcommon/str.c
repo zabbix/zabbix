@@ -4126,11 +4126,31 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 static size_t	zbx_no_function(const char *expr)
 {
 	const char	*ptr = expr;
-	int		len, c_l, c_r;
+	int		inside_quote = 0, len, c_l, c_r;
 	zbx_token_t	token;
 
 	while ('\0' != *ptr)
 	{
+		switch  (*ptr)
+		{
+			case '\\':
+				if (0 != inside_quote)
+					ptr++;
+				break;
+			case '"':
+				inside_quote = !inside_quote;
+				ptr++;
+				continue;
+		}
+
+		if (inside_quote)
+		{
+			if ('\0' == *ptr)
+				break;
+			ptr++;
+			continue;
+		}
+
 		if ('{' == *ptr && '$' == *(ptr + 1) && SUCCEED == zbx_user_macro_parse(ptr, &len, &c_l, &c_r))
 		{
 			ptr += len + 1;	/* skip to the position after user macro */

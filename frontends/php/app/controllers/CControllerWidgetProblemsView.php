@@ -27,7 +27,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$this->setType(WIDGET_PROBLEMS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'initial_load' => 'in 0,1'
 		]);
 	}
 
@@ -82,6 +83,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
+			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'fields' => [
 				'show' => $fields['show'],
 				'show_lines' => $fields['show_lines'],

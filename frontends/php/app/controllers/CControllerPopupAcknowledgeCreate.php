@@ -34,6 +34,11 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	/**
 	 * @var bool
 	 */
+	private $unacknowledge;
+
+	/**
+	 * @var bool
+	 */
 	private $acknowledge;
 
 	/**
@@ -54,6 +59,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			'change_severity' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SEVERITY,
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
 			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+			'unacknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE,
 			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
 		];
 
@@ -93,6 +99,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$this->close_problems = ($this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_CLOSE);
 		$this->change_severity = ($this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SEVERITY);
 		$this->acknowledge = ($this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE);
+		$this->unacknowledge = ($this->getInput('unacknowledge_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE);
 		$this->new_severity = $this->getInput('severity', '');
 		$this->message = $this->getInput('message', '');
 
@@ -141,7 +148,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$output = [];
 
 		if ($result) {
-			CSession::setValue('messageOk', _n('Event updated', 'Events updated', $updated_events_count));
+			$output['message'] = _n('Event updated', 'Events updated', $updated_events_count);
 		}
 		else {
 			error(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)
@@ -224,6 +231,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	 *  - closable events (events are writable + configured to be closed manually + not closed before);
 	 *  - editable events (events are writable);
 	 *  - acknowledgeable (events are not yet acknowledged);
+	 *  - unacknowledgeable (events are not yet unacknowledged);
 	 *  - readable events (events that user has at least read permissions).
 	 *
 	 * @param array $events
@@ -241,6 +249,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			'closable' => [],
 			'editable' => [],
 			'acknowledgeable' => [],
+			'unacknowledgeable' => [],
 			'readable' => []
 		];
 
@@ -255,6 +264,10 @@ class CControllerPopupAcknowledgeCreate extends CController {
 
 			if ($this->acknowledge && $event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 				$eventid_groups['acknowledgeable'][] = $event['eventid'];
+			}
+
+			if ($this->unacknowledge && $event['acknowledged'] == EVENT_ACKNOWLEDGED) {
+				$eventid_groups['unacknowledgeable'][] = $event['eventid'];
 			}
 
 			$eventid_groups['readable'][] = $event['eventid'];
@@ -299,6 +312,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	 * @param array $eventids['closable']            Event ids that user is allowed to close manually.
 	 * @param array $eventids['editable']            Event ids that user is allowed to make changes.
 	 * @param array $eventids['acknowledgeable']     Event ids that user is allowed to make acknowledgement.
+	 * @param array $eventids['unacknowledgeable']   Event ids that user is allowed to make unacknowledgement.
 	 * @param array $eventids['readable']            Event ids that user is allowed to read.
 	 *
 	 * @return array
@@ -332,6 +346,15 @@ class CControllerPopupAcknowledgeCreate extends CController {
 
 			$data['action'] |= ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
 			$eventid_groups['acknowledgeable'] = array_diff($eventid_groups['acknowledgeable'], $data['eventids']);
+		}
+
+		if ($this->unacknowledge && $eventid_groups['unacknowledgeable']) {
+			if (!$data['eventids']) {
+				$data['eventids'] = $eventid_groups['unacknowledgeable'];
+			}
+
+			$data['action'] |= ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE;
+			$eventid_groups['unacknowledgeable'] = array_diff($eventid_groups['unacknowledgeable'], $data['eventids']);
 		}
 
 		if ($this->message !== '' && $eventid_groups['readable']) {

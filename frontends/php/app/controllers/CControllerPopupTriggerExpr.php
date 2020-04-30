@@ -25,6 +25,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $param1Sec = [];
 	private $param1Str = [];
 	private $param2SecCount = [];
+	private $param2SecMode = [];
 	private $param3SecVal = [];
 	private $param3SecPercent = [];
 	private $paramSecIntCount = [];
@@ -92,6 +93,19 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
+				'A' => false
+			]
+		];
+
+		$this->param2SecMode = [
+			'last' => [
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'A' => true
+			],
+			'mode' => [
+				'C' => 'Mode',
+				'T' => T_ZBX_STR,
 				'A' => false
 			]
 		];
@@ -380,8 +394,8 @@ class CControllerPopupTriggerExpr extends CController {
 				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'nodata' => [
-				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false)'),
-				'params' => $this->param1Sec,
+				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)'),
+				'params' => $this->param2SecMode,
 				'allowed_types' => $this->allowedTypesAny,
 				'operators' => ['=', '<>']
 			],
