@@ -261,10 +261,11 @@ static int	set_object_names(void)
 	names += wcslen(names) + 1;
 	names += wcslen(names) + 1;
 
-	for (loc_name = objects; L'\0' != *loc_name; loc_name += wcslen(loc_name) + 1)
+	for (loc_name = objects; L'\0' != *loc_name; loc_name += sz)
 	{
 		wchar_t	*eng_name;
 
+		sz = (DWORD)wcslen(loc_name) + 1;
 		object_names = zbx_realloc(object_names, sizeof(struct object_name_ref) * (object_num + 1));
 
 		object_names[object_num].eng_name = NULL;
