@@ -996,10 +996,6 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($items as $item) {
 			if (array_key_exists('overrides', $item)) {
 				foreach ($item['overrides'] as $num => $override) {
-					if (!array_key_exists('step', $override)) {
-						$override['step'] = $num + 1;
-					}
-
 					// Formula will be added after conditions.
 					$overrides[$override['step']] = [
 						'itemid' => $item['itemid'],
@@ -1511,11 +1507,13 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @param array $items   Low-level discovery rules.
 	 * @param bool  $update  True if caller method is an update method.
+	 *
+	 * @throws APIException
 	 */
-	protected function validateOverrides(array $items, $update) {
-		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
-			'step' =>			['type' => API_INT32],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => $update ? 0x00 : (API_REQUIRED | API_NOT_EMPTY), 'length' => DB::getFieldLength('lld_override', 'name')],
+	protected function validateOverrides(array $items, $update): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name'], ['step']], 'fields' => [
+			'step' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.ZBX_MAX_INT32],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => $update ? 0x00 : (API_REQUIRED | API_NOT_EMPTY), 'length' => DB::getFieldLength('lld_override', 'name')],//?
 			'stop' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_OVERRIDE_STOP_NO, ZBX_LLD_OVERRIDE_STOP_YES]), 'default' => ZBX_LLD_OVERRIDE_STOP_NO],
 			'filter' =>			['type' => API_OBJECT, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
@@ -1584,13 +1582,6 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				foreach ($item['overrides'] as $ovrd_idx => $override) {
-					if (array_key_exists('step', $override) && ($override['step'] <= 0
-							|| $override['step'] > ZBX_MAX_INT32)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'step', _s('must be between "%1$s" and "%2$s"', 1, ZBX_MAX_INT32)
-						));
-					}
-
 					if (array_key_exists('filter', $override)) {
 						$condition_validator->setObjectName($override['name']);
 
@@ -1735,8 +1726,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 								if (array_key_exists('optemplate', $operation)) {
 									$templates_cnt = API::Template()->get([
-										'templateids' => zbx_objectValues($operation['optemplate'], 'templateid'),
-										'countOutput' => true
+										'countOutput' => true,
+										'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
 									]);
 
 									if (count($operation['optemplate']) != $templates_cnt) {
