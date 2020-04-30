@@ -26,7 +26,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 	protected $tableName = 'graphs';
 	protected $tableAlias = 'g';
-	protected $sortColumns = ['graphid', 'name', 'graphtype'];
+	protected $sortColumns = ['graphid', 'name', 'graphtype', 'discover'];
 
 	public function __construct() {
 		parent::__construct();
