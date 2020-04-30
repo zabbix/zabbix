@@ -102,7 +102,7 @@ class CConfigurationExport {
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps'
+				'verify_host', 'allow_traps', 'discover'
 			]
 		];
 	}
@@ -799,8 +799,9 @@ class CConfigurationExport {
 
 		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
-				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+				'discover'
 			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
@@ -1065,8 +1066,8 @@ class CConfigurationExport {
 		$hostIds = array_merge($hostIds, $templateIds);
 
 		$triggers = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
-				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],

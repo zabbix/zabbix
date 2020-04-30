@@ -568,6 +568,7 @@ class C50XmlValidator {
 									'history' =>				['type' => XML_STRING, 'default' => '90d'],
 									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 									'units' =>					['type' => XML_STRING, 'default' => ''],
@@ -646,6 +647,7 @@ class C50XmlValidator {
 											'opdata' =>					['type' => XML_STRING, 'default' => ''],
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 											'description' =>			['type' => XML_STRING, 'default' => ''],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -678,6 +680,7 @@ class C50XmlValidator {
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -730,7 +733,8 @@ class C50XmlValidator {
 												'key' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
-									]]
+									]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
 								]]
 							]],
 							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
@@ -738,6 +742,7 @@ class C50XmlValidator {
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
@@ -834,7 +839,7 @@ class C50XmlValidator {
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING | XML_REQUIRED],
 											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
-											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::LLD_OVERRIDE_OPERATION_DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::LLD_OVERRIDE_OPERATION_NO_DISCOVER]],
+											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'delay' =>					['type' => XML_STRING, 'default' => ''],
 											'history' =>				['type' => XML_STRING, 'default' => ''],
 											'trends' =>					['type' => XML_STRING, 'default' => ''],
@@ -1172,6 +1177,7 @@ class C50XmlValidator {
 									'history' =>				['type' => XML_STRING, 'default' => '90d'],
 									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 									'units' =>					['type' => XML_STRING, 'default' => ''],
@@ -1249,6 +1255,7 @@ class C50XmlValidator {
 											'opdata' =>					['type' => XML_STRING, 'default' => ''],
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 											'description' =>			['type' => XML_STRING, 'default' => ''],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -1281,6 +1288,7 @@ class C50XmlValidator {
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -1333,7 +1341,8 @@ class C50XmlValidator {
 												'key' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
-									]]
+									]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
 								]]
 							]],
 							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
@@ -1341,6 +1350,7 @@ class C50XmlValidator {
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1436,7 +1446,7 @@ class C50XmlValidator {
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING | XML_REQUIRED],
 											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
-											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::LLD_OVERRIDE_OPERATION_DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::LLD_OVERRIDE_OPERATION_NO_DISCOVER]],
+											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'delay' =>					['type' => XML_STRING, 'default' => ''],
 											'history' =>				['type' => XML_STRING, 'default' => ''],
 											'trends' =>					['type' => XML_STRING, 'default' => ''],

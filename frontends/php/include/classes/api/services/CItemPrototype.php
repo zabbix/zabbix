@@ -380,8 +380,8 @@ class CItemPrototype extends CItemGeneral {
 		];
 
 		foreach ($items as $key => $item) {
-			if (array_key_exists('status', $item)) {
-				$item = array_intersect_key($item, $rules);
+			$item = array_intersect_key($item, $rules);
+			if ($item) {
 				$path = '/'.($key + 1);
 
 				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
