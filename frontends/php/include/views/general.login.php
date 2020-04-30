@@ -45,6 +45,11 @@ $http_login_link = $data['http_login_url']
 	? (new CListItem(new CLink(_('Sign in with HTTP'), $data['http_login_url'])))->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
 
+$saml_login_link = $data['saml_login_url']
+	? (new CListItem(new CLink(_('Sign in with Single Sign-On (SAML)'), $data['saml_login_url'])))
+		->addClass(ZBX_STYLE_SIGN_IN_TXT)
+	: null;
+
 global $ZBX_SERVER_NAME;
 
 (new CDiv([
@@ -65,7 +70,10 @@ global $ZBX_SERVER_NAME;
 							(new CTextBox('name'))->setAttribute('autofocus', 'autofocus'),
 							$error
 						])
-						->addItem([new CLabel(_('Password'), 'password'), (new CTextBox('password'))->setType('password')])
+						->addItem([
+							new CLabel(_('Password'), 'password'),
+							(new CTextBox('password'))->setType('password')
+						])
 						->addItem(
 							(new CCheckBox('autologin'))
 								->setLabel(_('Remember me for 30 days'))
@@ -74,6 +82,7 @@ global $ZBX_SERVER_NAME;
 						->addItem(new CSubmit('enter', _('Sign in')))
 						->addItem($guest)
 						->addItem($http_login_link)
+						->addItem($saml_login_link)
 				)
 		]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
 		(new CDiv([
@@ -85,9 +94,9 @@ global $ZBX_SERVER_NAME;
 			CBrandHelper::isRebranded()
 				? null
 				: (new CLink(_('Support'), getSupportUrl()))
-				->setTarget('_blank')
-				->addClass(ZBX_STYLE_GREY)
-				->addClass(ZBX_STYLE_LINK_ALT)
+					->setTarget('_blank')
+					->addClass(ZBX_STYLE_GREY)
+					->addClass(ZBX_STYLE_LINK_ALT)
 		]))->addClass(ZBX_STYLE_SIGNIN_LINKS)
 	])),
 	makePageFooter(false)

@@ -66,7 +66,9 @@ if ($http_user) {
 	}
 
 	try {
-		$user = API::getApiService('user')->loginHttp($http_user, false);
+		$user = API::getApiService('user')->loginByAlias($http_user,
+			($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE), $config['authentication_type']
+		);
 
 		if ($user) {
 			CWebUser::setSessionCookie($user['sessionid']);

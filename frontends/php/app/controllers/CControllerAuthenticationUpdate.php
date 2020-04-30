@@ -37,25 +37,40 @@ class CControllerAuthenticationUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' => 'string',
-			'ldap_test_user' => 'string',
-			'ldap_test_password' => 'string',
-			'ldap_test' => 'in 1',
-			'db_authentication_type' => 'int32',
-			'change_bind_password' => 'in 0,1',
-			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'http_case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_configured' => 'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
-			'ldap_host' => 'db config.ldap_host',
-			'ldap_port' => 'int32',
-			'ldap_base_dn' => 'db config.ldap_base_dn',
-			'ldap_bind_dn' => 'db config.ldap_bind_dn',
-			'ldap_search_attribute' => 'db config.ldap_search_attribute',
-			'ldap_bind_password' => 'db config.ldap_bind_password',
-			'http_auth_enabled' => 'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
-			'http_login_form' => 'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-			'http_strip_domains' => 'db config.http_strip_domains'
+			'form_refresh' =>				'string',
+			'ldap_test_user' =>				'string',
+			'ldap_test_password' =>			'string',
+			'ldap_test' =>					'in 1',
+			'db_authentication_type' =>		'int32',
+			'change_bind_password' =>		'in 0,1',
+			'authentication_type' =>		'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
+			'http_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'ldap_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
+			'ldap_configured' =>			'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
+			'ldap_host' =>					'db config.ldap_host',
+			'ldap_port' =>					'int32',
+			'ldap_base_dn' =>				'db config.ldap_base_dn',
+			'ldap_bind_dn' =>				'db config.ldap_bind_dn',
+			'ldap_search_attribute' =>		'db config.ldap_search_attribute',
+			'ldap_bind_password' =>			'db config.ldap_bind_password',
+			'http_auth_enabled' =>			'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
+			'http_login_form' =>			'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
+			'http_strip_domains' =>			'db config.http_strip_domains',
+			'saml_auth_enabled' =>			'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
+			'saml_idp_entityid' =>			'db config.saml_idp_entityid',
+			'saml_sso_url' =>				'db config.saml_sso_url',
+			'saml_slo_url' =>				'db config.saml_slo_url',
+			'saml_username_attribute' =>	'db config.saml_username_attribute',
+			'saml_sp_entityid' =>			'db config.saml_sp_entityid',
+			'saml_nameid_format' =>			'db config.saml_nameid_format',
+			'saml_sign_messages' =>			'in 0,1',
+			'saml_sign_assertions' =>		'in 0,1',
+			'saml_sign_authn_requests' =>	'in 0,1',
+			'saml_sign_logout_requests' =>	'in 0,1',
+			'saml_sign_logout_responses' =>	'in 0,1',
+			'saml_encrypt_nameid' =>		'in 0,1',
+			'saml_encrypt_assertions' =>	'in 0,1',
+			'saml_case_sensitive' =>		'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
 		];
 
 		$ret = $this->validateInput($fields);
@@ -114,7 +129,7 @@ class CControllerAuthenticationUpdate extends CController {
 			$ldap_fields[] = 'ldap_bind_dn';
 		}
 
-		foreach($ldap_fields as $field) {
+		foreach ($ldap_fields as $field) {
 			if (trim($config[$field]) === '') {
 				$this->response->setMessageError(
 					_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
@@ -163,6 +178,29 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	/**
+	 * Validate SAML authentication settings.
+	 *
+	 * @return bool
+	 */
+	private function validateSamlAuth() {
+		$saml_fields = ['saml_idp_entityid', 'saml_sso_url', 'saml_sp_entityid', 'saml_username_attribute'];
+		$config = select_config();
+		$this->getInputs($config, $saml_fields);
+
+		foreach ($saml_fields as $field) {
+			if (trim($config[$field]) === '') {
+				$this->response->setMessageError(
+					_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
+				);
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Validate is user allowed to change configuration.
 	 *
 	 * @return bool
@@ -175,6 +213,10 @@ class CControllerAuthenticationUpdate extends CController {
 		$auth_valid = ($this->getInput('ldap_configured', '') == ZBX_AUTH_LDAP_ENABLED)
 			? $this->validateLdap()
 			: $this->validateDefaultAuth();
+
+		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
+			$auth_valid &= $this->validateSamlAuth();
+		}
 
 		if (!$auth_valid) {
 			$this->response->setFormData($this->getInputAll());
@@ -194,7 +236,8 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
-			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED
+			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
+			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED
 		];
 
 		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
@@ -221,6 +264,25 @@ class CControllerAuthenticationUpdate extends CController {
 			else {
 				unset($config['ldap_bind_password']);
 			}
+		}
+
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
+			$fields += [
+				'saml_idp_entityid' => '',
+				'saml_sso_url' => '',
+				'saml_slo_url' => '',
+				'saml_username_attribute' => '',
+				'saml_sp_entityid' => '',
+				'saml_nameid_format' => '',
+				'saml_sign_messages' => 0,
+				'saml_sign_assertions' => 0,
+				'saml_sign_authn_requests' => 0,
+				'saml_sign_logout_requests' => 0,
+				'saml_sign_logout_responses' => 0,
+				'saml_encrypt_nameid' => 0,
+				'saml_encrypt_assertions' => 0,
+				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
+			];
 		}
 
 		$data = array_merge($config, $fields);
