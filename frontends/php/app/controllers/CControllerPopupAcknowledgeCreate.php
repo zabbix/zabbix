@@ -148,7 +148,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$output = [];
 
 		if ($result) {
-			CSession::setValue('messageOk', _n('Event updated', 'Events updated', $updated_events_count));
+			$output['message'] = _n('Event updated', 'Events updated', $updated_events_count);
 		}
 		else {
 			error(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)

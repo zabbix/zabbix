@@ -152,4 +152,11 @@ else {
 
 $widget->addItem($table);
 
+$widget->addItem((new CScriptTag(
+	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
+		'postMessageOk(response.message);'.
+		'location.href = location.href;'.
+	'});'
+))->setOnDocumentReady());
+
 $widget->show();

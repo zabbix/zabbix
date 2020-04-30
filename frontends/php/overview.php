@@ -137,7 +137,7 @@ $data = [
 	'triggers_by_name' => [],
 	'hosts_by_name' => [],
 	'exceeded_hosts' => false,
-	'exceeded_trigs' => false,
+	'exceeded_trigs' => false
 ];
 
 // fetch trigger data

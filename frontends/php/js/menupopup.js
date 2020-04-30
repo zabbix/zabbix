@@ -730,9 +730,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
-				return PopUp('popup.acknowledge.edit', {
-					eventids: [options.eventid]
-				}, null, trigger_elmnt);
+				acknowledgePopUp({eventids: [options.eventid]}, trigger_elmnt);
 			}
 		};
 	}

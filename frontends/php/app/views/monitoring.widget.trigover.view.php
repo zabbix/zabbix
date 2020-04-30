@@ -35,6 +35,17 @@ $output = [
 	'body' => $table
 ];
 
+if ($data['initial_load']) {
+	$output['script_inline'] =
+		'if (typeof refreshTrigOverViewWidget !== typeof(Function)) {'.
+			'function refreshTrigOverViewWidget(event, response, overlay) {'.
+				'refreshWidgetOnAcknowledgeCreate("trigover", response, overlay);'.
+			'}'.
+
+			'$.subscribe("acknowledge.create", refreshTrigOverViewWidget);'.
+		'}';
+}
+
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }

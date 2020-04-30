@@ -866,11 +866,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		$problem_update_link = (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->onClick('return PopUp("popup.acknowledge.edit",'.
-				json_encode([
-					'eventids' => [$problem['eventid']]
-				]).', null, this);'
-			);
+			->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);');
 
 		$table->addRow(array_merge($row, [
 			makeInformationList($info_icons),

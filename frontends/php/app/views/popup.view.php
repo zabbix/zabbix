@@ -23,25 +23,13 @@
  * @var CView $this
  */
 
-$this->includeJsFile('monitoring.screen.js.php');
+(new CScriptTag(
+	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).', null, null);'.
 
-$widget = (new CWidget())->setTitle(_('Screens').': '.$data['screen']['name']);
-
-if (array_key_exists('templateid', $data['screen'])) {
-	$widget->addItem(get_header_host_table('screens', $data['screen']['templateid']));
-}
-
-$screenBuilder = new CScreenBuilder([
-	'isFlickerfree' => false,
-	'screen' => $data['screen'],
-	'mode' => SCREEN_MODE_EDIT
-]);
-
-$widget->addItem(
-	(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-);
-
-$screenBuilder->insertInitScreenJs($data['screenid']);
-$screenBuilder->insertProcessObjectsJs();
-
-$widget->show();
+	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
+		'clearMessages();'.
+		'addMessage(makeMessageBox("good", response.message, null, true));'.
+	'});'
+))
+	->setOnDocumentReady()
+	->show();

@@ -188,6 +188,13 @@ $event_tab = (new CDiv([
 	->addClass(ZBX_STYLE_COLUMNS)
 	->addClass(ZBX_STYLE_COLUMNS_2);
 
+$script = (new CScriptTag(
+	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
+		'postMessageOk(response.message);'.
+		'location.href = location.href;'.
+	'});'
+))->setOnDocumentReady();
+
 (new CWidget())
 	->setTitle(_('Event details'))
 	->setWebLayoutMode($page['web_layout_mode'])
@@ -198,6 +205,7 @@ $event_tab = (new CDiv([
 		->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($event_tab)
+	->addItem($script)
 	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

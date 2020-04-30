@@ -30,6 +30,7 @@ $form = (new CForm())
 	->addVar('eventids', $data['eventids']);
 
 $form_list = (new CFormList())
+	->addRow(new CLabel(_('Problem')), $data['problem_name'])
 	->addRow(
 		new CLabel(_('Message'), 'message'),
 		(new CTextArea('message', $data['message']))

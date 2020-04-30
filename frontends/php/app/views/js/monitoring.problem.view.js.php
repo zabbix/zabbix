@@ -110,6 +110,19 @@
 			}
 		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
 
+		$.subscribe('acknowledge.create', function(event, response) {
+			// Clear all selected checkboxes in Monitoring->Problems.
+			if (chkbxRange.prefix === 'problem') {
+				chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+				chkbxRange.clearSelectedOnFilterChange();
+			}
+
+			window.flickerfreeScreen.refresh('problem');
+
+			clearMessages();
+			addMessage(makeMessageBox('good', response.message, null, true));
+		});
+
 		$(document).on('submit', '#problem_form', function(e) {
 			e.preventDefault();
 
@@ -117,9 +130,7 @@
 					return $(this).val();
 				}).get();
 
-			return PopUp('popup.acknowledge.edit', {
-				eventids: eventids
-			}, null, this);
+			acknowledgePopUp({eventids: eventids}, this);
 		});
 	});
 </script>

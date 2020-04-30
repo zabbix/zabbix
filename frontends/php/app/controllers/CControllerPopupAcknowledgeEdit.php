@@ -83,7 +83,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 		// Select events.
 		$events = API::Event()->get([
-			'output' => ['eventid', 'objectid', 'acknowledged', 'value', 'r_eventid'],
+			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid'],
 			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -109,6 +109,10 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				'userids' => array_keys($history['userids']),
 				'preservekeys' => true
 			]);
+			$data['problem_name'] = reset($events)['name'];
+		}
+		else {
+			$data['problem_name'] = _s('%1$d problems selected.', count($events));
 		}
 
 		$triggerids = array_column($events, 'objectid', 'objectid');

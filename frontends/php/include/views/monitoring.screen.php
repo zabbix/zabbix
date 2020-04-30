@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('monitoring.screen.js.php');
+
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
 $widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
