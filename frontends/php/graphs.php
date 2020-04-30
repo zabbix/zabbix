@@ -56,12 +56,13 @@ $fields = [
 	'percent_right' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (right)')],
 	'visible' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null],
 	'items' =>				[T_ZBX_STR, O_OPT, null,		null,			null],
+	'discover' =>			[T_ZBX_INT, O_OPT, null,		IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'show_work_period' =>	[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	// actions
-	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete"'),	null],
+	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
@@ -76,7 +77,7 @@ $fields = [
 	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	// sort and sortorder
-	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name"'),					null],
+	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name","discover"'),					null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 $percentVisible = getRequest('visible');
@@ -210,6 +211,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	// create and update graph prototypes
 	if (hasRequest('parent_discoveryid')) {
+		$graph['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
+
 		if (hasRequest('graphid')) {
 			$graph['graphid'] = getRequest('graphid');
 			$result = API::GraphPrototype()->update($graph);
@@ -288,6 +291,14 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 	if ($result) {
 		unset($_REQUEST['form']);
 	}
+}
+elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updatediscover') {
+	$result = API::GraphPrototype()->update([
+		'graphid' => getRequest('graphid'),
+		'discover' => getRequest('discover', DB::getDefault('graphs', 'discover'))
+	]);
+
+	show_messages($result, _('Graph updated'), _('Cannot update graph'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
@@ -519,6 +530,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
 		$data['templates'] = [];
+		$data['discover'] = $graph['discover'];
 
 		if ($data['parent_discoveryid'] === null) {
 			$data['flags'] = $graph['flags'];
@@ -575,6 +587,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = 0;
 		$data['visible'] = getRequest('visible');
 		$data['items'] = getRequest('items', []);
+		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
 		$data['templates'] = [];
 
 		if (isset($data['visible']['percent_left'])) {
@@ -699,19 +712,50 @@ else {
 
 	// Get graphs after paging.
 	$options = [
-		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
+		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height', 'discover'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
 		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
-		'graphids' => zbx_objectValues($data['graphs'], 'graphid')
+		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
+		'preservekeys' => true
 	];
 
 	$data['graphs'] = hasRequest('parent_discoveryid')
 		? API::GraphPrototype()->get($options)
-		: API::Graph()->get($options);
+		: API::Graph()->get($options + ['selectGraphDiscovery' => ['ts_delete']]);
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
+	}
+
+	if (!hasRequest('parent_discoveryid')) {
+		$items = API::Item()->get([
+			'output' => ['itemid'],
+			'graphids' => array_keys($data['graphs']),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+			'selectGraphs' => ['graphid'],
+			'selectItemDiscovery' => ['ts_delete']
+		]);
+
+		foreach ($items as $item) {
+			$ts_delete = $item['itemDiscovery']['ts_delete'];
+
+			if ($ts_delete == 0) {
+				continue;
+			}
+
+			foreach (array_column($item['graphs'], 'graphid') as $graphid) {
+				if (!array_key_exists('ts_delete', $data['graphs'][$graphid]['graphDiscovery'])) {
+					$data['graphs'][$graphid]['graphDiscovery']['ts_delete'] = $ts_delete;
+				}
+				else {
+					$graph_ts_delete = $data['graphs'][$graphid]['graphDiscovery']['ts_delete'];
+					$data['graphs'][$graphid]['graphDiscovery']['ts_delete'] = ($graph_ts_delete > 0)
+						? min($ts_delete, $graph_ts_delete)
+						: $ts_delete;
+				}
+			}
+		}
 	}
 
 	order_result($data['graphs'], $sort_field, $sort_order);

@@ -435,6 +435,15 @@ $graphFormList->addRow(
 	(new CDiv($items_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
+if ($data['parent_discoveryid']) {
+	$graphFormList->addRow(_('Discover'),
+		(new CRadioButtonList('discover', (int) $data['discover']))
+			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
+			->setModern(true)
+	);
+}
+
 // Append tabs to form.
 $graphTab = (new CTabView())
 	->setSelected(0)
