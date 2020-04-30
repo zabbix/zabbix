@@ -777,20 +777,27 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	unsigned char	compress;
-	int		version;
-	int		lastaccess;
-	int		last_version_error_time;
+	zbx_uint64_t		hostid;
+	unsigned char		compress;
+	int			version;
+	int			lastaccess;
+	int			last_version_error_time;
+	int			proxy_delay;
+	int			more_data;
+	zbx_proxy_suppress_t	nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT			__UINT64_C(0x0040)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
-		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION | 	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
 	zbx_uint64_t	flags;
 }
@@ -813,4 +820,5 @@ zbx_db_mock_field_t;
 void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len);
 int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
+int	zbx_db_check_instanceid(void);
 #endif
