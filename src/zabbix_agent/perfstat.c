@@ -255,6 +255,7 @@ static int	set_object_names(void)
 	}
 
 	zbx_free(object_names);
+	object_num = 0;
 
 	/* skip number of records */
 	names += wcslen(names) + 1;
@@ -383,6 +384,7 @@ static void	free_object_names(void)
 	}
 
 	zbx_free(object_names);
+	object_num = 0;
 
 	UNLOCK_PERFCOUNTERS;
 }
