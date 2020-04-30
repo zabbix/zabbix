@@ -15,9 +15,11 @@ import (
 //Plugin -
 type Plugin struct {
 	plugin.Base
-	mutex       sync.Mutex
-	instances   []string
-	nextRefresh time.Time
+	refreshMux         sync.Mutex
+	reloadMux          sync.Mutex
+	instances          []string
+	nextObjectRefresh  time.Time
+	nextEngNameRefresh time.Time
 }
 
 var impl Plugin
@@ -39,10 +41,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		name = params[0]
 	case "perf_instance_en.get":
 		if name = getLocalName(params[0]); name == "" {
-			if err = pdh.LocateObjectsAndDefaultCounters(false); err != nil {
+			var reloaded bool
+			if reloaded, err = p.reloadEngObjectNames(); err != nil {
 				return nil, fmt.Errorf("Failed to get instance object English names: %s.", err.Error())
 			}
-			if name = getLocalName(params[0]); name == "" {
+			if reloaded {
+				if name = getLocalName(params[0]); name == "" {
+					return nil, errors.New("Unsupported metric.")
+				}
+			} else {
 				return nil, errors.New("Unsupported metric.")
 			}
 		}
@@ -71,20 +78,36 @@ func init() {
 }
 
 func (p *Plugin) refreshObjects() error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-	if time.Now().After(p.nextRefresh) {
-		p.Debugf("refreshing local windows object cache")
+	p.refreshMux.Lock()
+	defer p.refreshMux.Unlock()
+	if time.Now().After(p.nextObjectRefresh) {
+		p.Debugf("refreshing local Windows object cache")
 		if _, err := win32.PdhEnumObject(); err != nil {
 			return fmt.Errorf("Failed to refresh object cache: %s.", err.Error())
 		}
-		p.nextRefresh = time.Now().Add(time.Minute)
+		p.nextObjectRefresh = time.Now().Add(time.Minute)
 	}
 
 	return nil
 }
 
+func (p *Plugin) reloadEngObjectNames() (bool, error) {
+	p.reloadMux.Lock()
+	defer p.reloadMux.Unlock()
+	if time.Now().After(p.nextEngNameRefresh) {
+		p.Debugf("loading English Windows objects")
+		if err := pdh.LocateObjectsAndDefaultCounters(false); err != nil {
+			return true, fmt.Errorf("Failed to load English Windows objects: %s.", err.Error())
+		}
+		p.nextEngNameRefresh = time.Now().Add(time.Minute)
+	}
+
+	return false, nil
+}
+
 func getLocalName(engName string) string {
+	pdh.RWMux.RLock()
+	defer pdh.RWMux.RUnlock()
 	for _, obj := range pdh.Objects {
 		if obj.EngName == engName {
 			return obj.Name

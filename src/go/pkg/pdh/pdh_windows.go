@@ -33,7 +33,7 @@ import (
 )
 
 var Objects map[int]*Object
-var mux sync.Mutex
+var RWMux sync.RWMutex
 
 type Object struct {
 	Idx     int
@@ -98,8 +98,8 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 	}
 
 	Objects = make(map[int]*Object)
-	mux.Lock()
-	defer mux.Unlock()
+	RWMux.Lock()
+	defer RWMux.Unlock()
 	for _, name := range locNames {
 		idx, err := win32.PdhLookupPerfIndexByName(name)
 		if err != nil {
