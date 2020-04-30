@@ -212,7 +212,7 @@ try {
 
 		CWebUser::setSessionCookie($user['sessionid']);
 
-		$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
+		$redirect = array_filter([$user['url'], ZBX_DEFAULT_URL]);
 		redirect(reset($redirect));
 	}
 
