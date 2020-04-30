@@ -754,19 +754,18 @@ class CItemPrototype extends CItemGeneral {
 
 		$this->checkInput($items, true);
 
-		// Validate item prototype status field.
+		// Validate item prototype status and discover status fields.
 		$rules = [
-			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])]
+			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
 		];
 
 		foreach ($items as $key => $item) {
-			if (array_key_exists('status', $item)) {
-				$item = array_intersect_key($item, $rules);
-				$path = '/'.($key + 1);
+			$item = array_intersect_key($item, $rules);
+			$path = '/'.($key + 1);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+			if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 
