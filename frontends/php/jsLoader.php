@@ -122,6 +122,9 @@ $tranStrings = [
 	'dashboard.grid.js' => [
 		'Edit widget' => _('Edit widget'),
 		'Add widget' => _('Add widget'),
+		'Paste widget' => _('Paste widget'),
+		'S_COPY' => _('Copy'),
+		'S_PASTE' => _('Paste'),
 		'Apply' => _('Apply'),
 		'Add' => _('Add'),
 		'Edit' => _('Edit'),
@@ -132,7 +135,7 @@ $tranStrings = [
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
 		'Add a new widget' => _('Add a new widget'),
-		'Release to create a new widget.' => _('Release to create a new widget.'),
+		'Release to create a widget.' => _('Release to create a widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Previous page' => _('Previous page'),
 		'Next page' => _('Next page'),
@@ -373,15 +376,15 @@ if (empty($_GET['files'])) {
 		'init.js'
 	];
 
+	require_once dirname(__FILE__).'/include/defines.inc.php';
+
+	if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
+		$js .= 'window.ZBX_SESSION_NAME = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
+		$files[] = 'class.localstorage.js';
+	}
+
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
-		require_once dirname(__FILE__).'/include/defines.inc.php';
-
-		if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
-			$js .= 'window.ZBX_SESSION_NAME = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
-		}
-
-		$files[] = 'class.localstorage.js';
 		$files[] = 'class.browsertab.js';
 		$files[] = 'class.notification.collection.js';
 		$files[] = 'class.notifications.audio.js';

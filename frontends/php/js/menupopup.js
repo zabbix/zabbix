@@ -540,22 +540,52 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 /**
  * Get menu popup widget actions data.
  *
- * @param {string}   options['widgetName']   Widget name.
- * @param {string}   options['currentRate']  Current rate value.
- * @param {bool}     options['multiplier']   Multiplier or time mode.
- * @param {callback} options['callback']     Callback function on success (optional).
- * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
+ * @param {string}   options['currentRate']      Current rate value.
+ * @param {bool}     options['multiplier']       Multiplier or time mode.
+ * @param {callback} options['callback']         Callback function on success (optional).
+ * @param {string}   options['widget_uniqueid']  Widget instance unique id.
+ * @param {object}   trigger_elmnt               UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
 function getMenuPopupWidgetActions(options, trigger_elmnt) {
-	var menu = getMenuPopupRefresh(options, trigger_elmnt),
-		widget_actions = [],
-		widget = jQuery('.dashbrd-grid-container').dashboardGrid('getWidgetsBy', 'widgetid', options.widgetName).pop(),
+	var $dashboard = jQuery('.dashbrd-grid-container'),
+		editMode = $dashboard.dashboardGrid('isEditMode'),
+		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
-		loading = !widget['ready'] || widget['content_body'].find('.is-loading').length > 0;
+		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
+		menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
+		widget_actions = [];
 
-	if ('download' in options) {
+	widget_actions.push({
+		label: t('S_COPY'),
+		clickCallback: function() {
+			jQuery('.dashbrd-grid-container').dashboardGrid('copyWidget', widget);
+			jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+			jQuery('#dashbrd-paste-widget').attr('disabled', false);
+		}
+	});
+
+	if (editMode) {
+		widget_actions.push({
+			label: t('S_PASTE'),
+			disabled: !$dashboard.dashboardGrid('isWidgetCopied'),
+			clickCallback: function() {
+				$dashboard.dashboardGrid('pasteWidget', widget, widget.pos);
+				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+			}
+		});
+
+		widget_actions.push({
+			label: t('Delete'),
+			clickCallback: function() {
+				jQuery('.dashbrd-grid-container').dashboardGrid('deleteWidget', widget);
+				jQuery(this).closest('.menu-popup').menuPopup('close', trigger_elmnt);
+			}
+		});
+	}
+
+	if ('download' in options && !editMode) {
 		widget_actions.push({
 			label: t('Download image'),
 			disabled: loading || !options.download,
@@ -1071,6 +1101,37 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 	return getMenuPopupScriptItems(tree, trigger_elmnt);
 }
 
+/**
+ * Create menu for dashboard widget area selector.
+ *
+ * @param {object} area_selected  Area in which new widget will be created.
+ *
+ * @returns {array}
+ */
+function getDashboardWidgetActionMenu(area_selected) {
+	return [{
+		items: [{
+			label: t('Add widget'),
+			clickCallback: function() {
+				jQuery('.dashbrd-grid-container').dashboardGrid('addNewWidget', null, area_selected);
+			}
+		}, {
+			label: t('Paste widget'),
+			clickCallback: function() {
+				var widget_dims = {
+					x: area_selected.x,
+					y: area_selected.y,
+					width: area_selected.width,
+					height: area_selected.height
+				};
+
+				jQuery('.dashbrd-grid-container').dashboardGrid('pasteWidget', null, widget_dims);
+				jQuery('.dashbrd-grid-new-widget-placeholder').hide();
+			}
+		}]
+	}];
+}
+
 jQuery(function($) {
 
 	/**
@@ -1137,6 +1198,10 @@ jQuery(function($) {
 		}
 	}
 
+	var defaultOptions = {
+		closeCallback: function(){}
+	};
+
 	var methods = {
 		init: function(sections, event, options) {
 			// Don't display empty menu.
@@ -1156,7 +1221,7 @@ jQuery(function($) {
 					my: 'left top',
 					at: 'left bottom'
 				}
-			}, options || {});
+			}, defaultOptions, options || {});
 
 			// Close other action menus and prevent focus jumping before opening a new popup.
 			$('.menu-popup-top').menuPopup('close', null, false);
@@ -1180,6 +1245,8 @@ jQuery(function($) {
 			});
 			addMenuPopupItems($menu_popup, sections);
 
+			$menu_popup.data('menu_popup', options);
+
 			$('.wrapper').append($menu_popup);
 
 			// Position the menu (before hiding).
@@ -1193,15 +1260,19 @@ jQuery(function($) {
 
 			addToOverlaysStack('menu-popup', event.target, 'menu-popup');
 
-			$(document)
-				.on('click', {menu: $menu_popup, opener: $opener}, menuPopupDocumentCloseHandler)
-				.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
+			// Need to be postponed.
+			setTimeout(function() {
+				$(document)
+					.on('click', {menu: $menu_popup, opener: $opener}, menuPopupDocumentCloseHandler)
+					.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
+			});
 
 			$menu_popup.focus();
 		},
 
 		close: function(trigger_elem, return_focus) {
-			var menu_popup = $(this);
+			var menu_popup = $(this),
+				options = $(menu_popup).data('menu_popup') || {};
 
 			if (!menu_popup.is(trigger_elem) && menu_popup.has(trigger_elem).length === 0) {
 				$('[aria-expanded="true"]', trigger_elem).attr({'aria-expanded': 'false'});
@@ -1222,6 +1293,9 @@ jQuery(function($) {
 				}
 
 				menu_popup.remove();
+
+				// Call menu close callback function.
+				typeof options.closeCallback === 'function' && options.closeCallback.apply();
 			}
 		},
 
@@ -1414,6 +1488,7 @@ jQuery(function($) {
 	 * @param string options['css']            Item class.
 	 * @param array  options['data']           Item data ("key" => "value").
 	 * @param array  options['items']          Item sub menu.
+	 * @param {bool} options['disabled']       Item disable status.
 	 * @param object options['clickCallback']  Item click callback.
 	 *
 	 * @return object

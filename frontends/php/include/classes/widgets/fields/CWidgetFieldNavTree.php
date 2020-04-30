@@ -62,6 +62,14 @@ class CWidgetFieldNavTree extends CWidgetField {
 				'name' => $this->name.'.name.'.$index,
 				'value' => $val['name']
 			];
+
+			// Add default values to avoid check of key existance.
+			$val = array_merge([
+				'order' => 1,
+				'parent' => 0,
+				'sysmapid' => 0
+			], $val);
+
 			if ($val['order'] != 1) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,

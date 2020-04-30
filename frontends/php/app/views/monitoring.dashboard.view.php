@@ -107,6 +107,9 @@ else {
 					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
 					(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
 						->addClass(ZBX_STYLE_BTN_ALT),
+					(new CButton('dashbrd-paste-widget', _('Paste widget')))
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->setEnabled(false),
 					(new CButton('dashbrd-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
 					''
