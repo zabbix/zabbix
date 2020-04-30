@@ -1709,6 +1709,30 @@ static int	DBpatch_4050079(void)
 	return DBadd_field("config", &field);
 }
 
+static int	DBpatch_4050080(void)
+{
+	const ZBX_FIELD	old_field = {"script", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"script", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("media_type", &field, &old_field);
+}
+
+static int	DBpatch_4050081(void)
+{
+	const ZBX_FIELD	old_field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("auditlog_details", &field, &old_field);
+}
+
+static int	DBpatch_4050082(void)
+{
+	const ZBX_FIELD	old_field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("auditlog_details", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(4050)
@@ -1789,5 +1813,8 @@ DBPATCH_ADD(4050076, 0, 1)
 DBPATCH_ADD(4050077, 0, 1)
 DBPATCH_ADD(4050078, 0, 1)
 DBPATCH_ADD(4050079, 0, 1)
+DBPATCH_ADD(4050080, 0, 1)
+DBPATCH_ADD(4050081, 0, 1)
+DBPATCH_ADD(4050082, 0, 1)
 
 DBPATCH_END()

@@ -1792,7 +1792,7 @@ return [
 			],
 			'script' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'timeout' => [
@@ -4557,7 +4557,7 @@ return [
 			],
 			'message' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'status' => [
@@ -4736,7 +4736,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'logeventid' => [
@@ -4771,7 +4771,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'ns' => [
@@ -4823,7 +4823,7 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'logeventid' => [
@@ -5216,12 +5216,12 @@ return [
 			],
 			'oldvalue' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 			'newvalue' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => '',
 			],
 		],
