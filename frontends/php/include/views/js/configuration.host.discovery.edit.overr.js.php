@@ -22,6 +22,7 @@
 /**
  * @var CView $this
  */
+insert_javascript_for_visibilitybox();
 ?>
 
 <script type="text/x-jquery-tmpl" id="lldoverride-row-templated">
@@ -83,7 +84,7 @@
 
 <script type="text/x-jquery-tmpl" id="lldoverride-operation-row-templated">
 	<?= (new CRow([
-			'#{condition}',
+			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			'#{actions}',
 			(new CCol(
 				// TODO VM: replace by button.
@@ -95,7 +96,7 @@
 
 <script type="text/x-jquery-tmpl" id="lldoverride-operation-row">
 	<?= (new CRow([
-			'#{condition}',
+			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			'#{actions}',
 			(new CCol([
 				// TODO VM: replace by button.
@@ -106,6 +107,30 @@
 					->addClass('element-table-remove')
 			]))->addClass(ZBX_STYLE_NOWRAP) // TODO VM: why do I need this class?
 		]))->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="lldoverride-custom-intervals-row">
+	<?= (new CRow([
+			(new CRadioButtonList('opperiod[delay_flex][#{rowNum}][type]', 0))
+				->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+				->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
+				->setModern(true),
+			[
+				(new CTextBox('opperiod[delay_flex][#{rowNum}][delay]'))
+					->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
+				(new CTextBox('opperiod[delay_flex][#{rowNum}][schedule]'))
+					->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
+					->setAttribute('style', 'display: none;')
+			],
+			(new CTextBox('opperiod[delay_flex][#{rowNum}][period]'))
+				->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
+			(new CButton('opperiod[delay_flex][#{rowNum}][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))
+			->addClass('form_row')
+			->toString()
 	?>
 </script>
 
@@ -574,7 +599,8 @@
 			var override = this.data[id],
 				prefix_override = 'overrides[' + (iter_step ++) + ']',
 				prefix_filter = prefix_override + '[filter]',
-				iter_filters = 0;
+				iter_filters = 0,
+				iter_operations = 0;
 
 			// TODO VM: fix naming to be consistent with API.
 			frag.appendChild(hiddenInput('step',     iter_step,                        prefix_override)); // TODO VM: maybe should add "-1"
@@ -591,7 +617,55 @@
 				frag.appendChild(hiddenInput('operator',  override_filter.operator,  prefix));
 			});
 
-			// TODO VM: add operations
+			override.data.operations.forEach(function(operation) {
+				var prefix = prefix_override + '[operations][' + (iter_operations ++) + ']';
+				frag.appendChild(hiddenInput('operationobject', operation.operationobject, prefix));
+				frag.appendChild(hiddenInput('operator', operation.operator, prefix));
+				frag.appendChild(hiddenInput('value', operation.value, prefix));
+
+				if ('opstatus' in operation) {
+					frag.appendChild(hiddenInput('status', operation.opstatus.status, prefix + '[opstatus]'));
+				}
+				// TODO VM: uncomment after update to latest.
+//				if ('opdiscover' in operation) {
+//					frag.appendChild(hiddenInput('discover', operation.opdiscover.discover, prefix + '[opdiscover]'));
+//				}
+				if ('opperiod' in operation) {
+					frag.appendChild(hiddenInput('delay', operation.opperiod.delay, prefix + '[opperiod]'));
+				}
+				if ('ophistory' in operation) {
+					frag.appendChild(hiddenInput('history', operation.ophistory.history, prefix + '[ophistory]'));
+				}
+				if ('optrends' in operation) {
+					frag.appendChild(hiddenInput('trends', operation.optrends.trends, prefix + '[optrends]'));
+				}
+				if ('opseverity' in operation) {
+					frag.appendChild(hiddenInput('severity', operation.opseverity.severity, prefix + '[opseverity]'));
+				}
+				if ('optag' in operation) {
+					var iter_tags = 0;
+
+					operation.optag.forEach(function(tag) {
+						var prefix_tag = prefix + '[optag][' + (iter_tags ++) + ']';
+						frag.appendChild(hiddenInput('tag', tag.tag, prefix_tag));
+
+						if (('value' in tag) && 'value' !== '') {
+							frag.appendChild(hiddenInput('value', tag.value, prefix_tag));
+						}
+					});
+				}
+				if ('optemplate' in operation) {
+					var iter_templates = 0;
+
+					operation.optemplate.forEach(function(template) {
+						var prefix_template = prefix + '[optemplate][' + (iter_templates ++) + ']';
+						frag.appendChild(hiddenInput('templateid', template.templateid, prefix_template));
+					});
+				}
+				if ('opinventory' in operation) {
+					frag.appendChild(hiddenInput('inventory_mode', operation.opinventory.inventory_mode, prefix + '[opinventory]'));
+				}
+			});
 		}.bind(this));
 
 		return frag;
@@ -798,24 +872,6 @@
 		jQuery('#overrides_evaltype').trigger('change');
 	};
 
-	// TODO VM: where this function was used?
-	/**
-	 * @param {string} msg                 Error message.
-	 * @param {Node|jQuery} trigger_elmnt  An element that the focus will be returned to.
-	 */
-	OverrideEditForm.prototype.errorDialog = function(msg, trigger_elmnt) {
-		overlayDialogue({
-			'title': lldoverrides.msg.error,
-			'content': jQuery('<span>').html(msg),
-			'buttons': [{
-				title: lldoverrides.msg.ok,
-				class: 'btn-alt',
-				focused: true,
-				action: function() {}
-			}]
-		}, trigger_elmnt);
-	};
-
 	/**
 	 * This method is bound via popup button attribute. It posts serialized version of current form to be validated.
 	 * Note that we do not bother posting dynamic fields, since they are not validated at this point.
@@ -851,7 +907,10 @@
 				lldoverrides.overrides.data[ret.params.no] = this.override;
 			}
 
-//			ret.params.pairs = curr_pairs;
+			this.operations.sort_index.forEach(function(data_index) {
+				ret.params.operations.push(this.operations.data[data_index].data);
+			}.bind(this));
+
 			lldoverrides.overrides.data[ret.params.no].update(ret.params);
 			lldoverrides.overrides.renderData();
 
@@ -874,8 +933,9 @@
 		this.$container.find('.element-table-add').on('click', this.openNew.bind(this));
 
 		this.$container.on('dynamic_rows.beforerender', function(e, dynamic_rows) {
-//			e.view_data.no = (dynamic_rows.data_index + 1); // TODO VM: it should be possible here, instead as parameter in operation.
-			e.view_data.condition = that.conditionHtml(e.view_data);
+//			e.view_data.no = (dynamic_rows.data_index + 1); // TODO VM: it should be possible here, instead of as parameter in operation.
+			e.view_data.condition_object = that.operationobjectName(e.view_data.operationobject);
+			e.view_data.condition_operator = that.operatorName(e.view_data.operator);
 			e.view_data.actions = '<actions here>';
 
 		});
@@ -989,7 +1049,7 @@
 	 */
 	Operations.prototype.onOperationOverlayReadyCb = function(no) {
 		var operation_ref = this.data[no] ? this.data[no] : this.new_operation;
-		this.edit_form = new OverrideEditForm(jQuery('#lldoverride_form'), operation_ref);
+		this.edit_form = new OperationEditForm(jQuery('#lldoperation_form'), operation_ref);
 	};
 
 	/**
@@ -1036,7 +1096,8 @@
 	 * Merges old data with new data.
 	 */
 	Operation.prototype.update = function(data) {
-		jQuery.extend(this.data, data);
+//		jQuery.extend(this.data, data); // TODO VM: why it was like this, is it safe to be changed?
+		this.data = data;
 	};
 
 	/**
@@ -1048,21 +1109,131 @@
 	 */
 	Operation.prototype.open = function(no, refocus) {
 		// TODO VM: maybe parameters should be limited to only ones used by operationobject, but it will be yet another place, where such case would be defined.
-		return PopUp('popup.lldoperation', {
+		var params = {
 			no:                 no,
 			templated:          lldoverrides.templated,
 			operationobject:    this.data.operationobject,
 			operator:           this.data.operator,
 			value:              this.data.value,
-			opstatus:           this.data.opstatus,
-			opperiod:           this.data.opperiod,
-			ophistory:          this.data.ophistory,
-			optrends:           this.data.optrends,
-			opseverity:         this.data.opseverity,
-			optag:              this.data.optag,
-			optemplate:         this.data.optemplate,
-			opinventory:        this.data.opinventory,
 //			overrides_names:    lldoverrides.overrides.getOverrideNames() // TODO VM: same operation should not be added twice? (is this checked in API?)
-		}, null, refocus);
+		};
+
+		var actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity', 'optag',
+			'optemplate', 'opinventory'];
+		actions.forEach(function(action) {
+			if (action in this.data) {
+				params[action] = this.data[action];
+			}
+		}.bind(this));
+
+		return PopUp('popup.lldoperation', params, null, refocus);
+	};
+
+	/**
+	 * Represents popup form.
+	 *
+	 * @param {jQuery} $form
+	 * @param {Operation} operation_ref  Reference to override instance from Overrides object.
+	 */
+	function OperationEditForm($form, operation_ref) {
+		this.$form = $form;
+		this.operation = operation_ref;
+
+//		// TODO VM: should be moved elsewhere
+//		this.$actions_add_row = jQuery('#operation_action_add_row', this.$form);
+
+//		var discover_template = new Template(jQuery('#lldoverride-action-discover').html());
+
+//		this.$actions_list = this.$actions_add_row.before(discover_template.evaluate({}));
+
+
+		// TODO VM: custom interval js (move to function)
+		var $custom_intervals = jQuery('#lld_overrides_custom_intervals', this.$form);
+		$custom_intervals.on('click', 'input[type="radio"]', function() {
+			var rowNum = jQuery(this).attr('id').split('_')[3];
+
+			if (jQuery(this).val() == <?= ITEM_DELAY_FLEXIBLE; ?>) {
+				jQuery('#opperiod_delay_flex_' + rowNum + '_schedule', $custom_intervals).hide();
+				jQuery('#opperiod_delay_flex_' + rowNum + '_delay', $custom_intervals).show();
+				jQuery('#opperiod_delay_flex_' + rowNum + '_period', $custom_intervals).show();
+			}
+			else {
+				jQuery('#opperiod_delay_flex_' + rowNum + '_delay', $custom_intervals).hide();
+				jQuery('#opperiod_delay_flex_' + rowNum + '_period', $custom_intervals).hide();
+				jQuery('#opperiod_delay_flex_' + rowNum + '_schedule', $custom_intervals).show();
+			}
+		});
+
+		$custom_intervals.dynamicRows({
+			template: '#lldoverride-custom-intervals-row'
+		});
+
+
+		// TODO VM: move to function
+		jQuery('#ophistory_history_mode', this.$form)
+			.change(function() {
+				if (jQuery('[name="ophistory[history_mode]"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
+					jQuery('#ophistory_history').prop('disabled', true).hide();
+				}
+				else {
+					jQuery('#ophistory_history').prop('disabled', false).show();
+				}
+			})
+			.trigger('change');
+
+		jQuery('#optrends_trends_mode', this.$form)
+			.change(function() {
+				if (jQuery('[name="optrends[trends_mode]"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
+					jQuery('#optrends_trends').prop('disabled', true).hide();
+				}
+				else {
+					jQuery('#optrends_trends').prop('disabled', false).show();
+				}
+			})
+			.trigger('change');
+
+	}
+
+	/**
+	 * This method is bound via popup button attribute. It posts serialized version of current form to be validated.
+	 * Note that we do not bother posting dynamic fields, since they are not validated at this point.
+	 *
+	 * @param {Overlay} overlay
+	 */
+	OperationEditForm.prototype.validate = function(overlay) {
+		var url = new Curl(this.$form.attr('action'));
+		url.setArgument('validate', 1);
+
+		this.$form.trimValues(['#value']); // TODO VM: check, what should be here
+		this.$form.parent().find('.msg-bad, .msg-good').remove();
+
+//		var curr_pairs = this.stepPairsData();
+
+		overlay.setLoading();
+		overlay.xhr = jQuery.ajax({
+			url: url.getUrl(),
+			data: this.$form.serialize(),
+			dataType: 'json',
+			type: 'post'
+		})
+		.always(function() {
+			overlay.unsetLoading();
+		})
+		.done(function(ret) {
+			if (typeof ret.errors !== 'undefined') {
+				return jQuery(ret.errors).insertBefore(this.$form);
+			}
+
+			if (!lldoverrides.operations.data[ret.params.no]) {
+				lldoverrides.operations.sort_index.push(ret.params.no);
+				lldoverrides.operations.data[ret.params.no] = this.operation;
+			}
+
+//			ret.params.pairs = curr_pairs;
+			lldoverrides.operations.data[ret.params.no].update(ret.params);
+			lldoverrides.operations.renderData();
+
+			overlayDialogueDestroy(overlay.dialogueid);
+		}.bind(this));
 	};
 </script>

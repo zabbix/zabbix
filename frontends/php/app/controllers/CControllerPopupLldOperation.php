@@ -34,6 +34,7 @@ class CControllerPopupLldOperation extends CController {
 			'operator' =>			'in '.implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]),
 			'value' =>				'string',
 			'opstatus' =>			'array',
+			'opdiscover' =>			'array',
 			'opperiod' =>			'array',
 			'ophistory' =>			'array',
 			'optrends' =>			'array',
@@ -66,22 +67,49 @@ class CControllerPopupLldOperation extends CController {
 	}
 
 	protected function doAction() {
+		$actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity', 'optag', 'optemplate',
+			'opinventory'
+		];
+		$defaults = [
+			'opstatus' => [
+				'status' => 0 // TODO VM: use define
+			],
+			'opdiscover' => [
+				'discover' => 1 // TODO VM: use define
+			],
+			'opperiod' => [
+				'delay' => ''
+			],
+			'ophistory' => [
+				'history' => ''
+			],
+			'optrends' => [
+				'trends' => ''
+			],
+			'opseverity' => [
+				'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+			],
+			'optag' => [],
+			'optemplate' => [],
+			'opinventory' => [
+				'inventory_mode' => HOST_INVENTORY_MANUAL // TODO VM: are we sure this should be the default for new override action?
+			],
+		];
+
 		$page_options = [
 			'no' => $this->getInput('no', -1),
 			'templated' => $this->getInput('templated', 0),
 			'operationobject' => $this->getInput('operationobject', OPERATION_OBJECT_ITEM_PROTOTYPE),
 			'operator' => $this->getInput('operator', CONDITION_OPERATOR_EQUAL),
 			'value' => $this->getInput('value', ''),
-			'opstatus' => $this->getInput('opstatus', []),
-			'opperiod' => $this->getInput('opperiod', []),
-			'ophistory' => $this->getInput('ophistory', []),
-			'optrends' => $this->getInput('optrends', []),
-			'opseverity' => $this->getInput('opseverity', []),
-			'optag' => $this->getInput('optag', []),
-			'optemplate' => $this->getInput('optemplate', []),
-			'opinventory' => $this->getInput('opinventory', []),
-//			'overrides_names' => $this->getInput('overrides_names', [])
+//			'overrides_names' => $this->getInput('overrides_names', []) // TODO VM: replace by list of all conditions
 		];
+
+		foreach ($actions as $action) {
+			if ($this->hasInput($action)) {
+				$page_options[$action] = $this->getInput($action);
+			}
+		}
 
 //		$page_options['follow_redirects'] = $this->getInput('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF);
 //		$page_options['retrieve_mode'] = $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
@@ -103,6 +131,56 @@ class CControllerPopupLldOperation extends CController {
 //				}
 //			}
 
+			/*
+			 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
+			 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
+			 */
+			if (array_key_exists('opperiod', $page_options) && array_key_exists('delay_flex', $page_options['opperiod'])) {
+				$intervals = [];
+				$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
+				$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
+				$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
+
+				foreach ($page_options['opperiod']['delay_flex'] as $interval) {
+					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
+						if ($interval['delay'] === '' && $interval['period'] === '') {
+							continue;
+						}
+
+						if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
+							$result = false;
+							error(_s('Invalid interval "%1$s".', $interval['delay']));
+							break;
+						}
+						elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
+							$result = false;
+							error(_s('Invalid interval "%1$s".', $interval['period']));
+							break;
+						}
+
+						$intervals[] = $interval['delay'].'/'.$interval['period'];
+					}
+					else {
+						if ($interval['schedule'] === '') {
+							continue;
+						}
+
+						if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
+							$result = false;
+							error(_s('Invalid interval "%1$s".', $interval['schedule']));
+							break;
+						}
+
+						$intervals[] = $interval['schedule'];
+					}
+				}
+
+				if ($intervals) {
+					// TODO VM: check, if delay is empty, return error(?)
+					$page_options['opperiod']['delay'] .= ';'.implode(';', $intervals);
+				}
+			}
+
 			// Return collected error messages.
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
@@ -113,16 +191,29 @@ class CControllerPopupLldOperation extends CController {
 					'operationobject' => $page_options['operationobject'],
 					'operator' => $page_options['operator'],
 					'value' => $page_options['value'],
-					'opstatus' => $page_options['opstatus'],
-					'opperiod' => $page_options['opperiod'],
-					'ophistory' => $page_options['ophistory'],
-					'optrends' => $page_options['optrends'],
-					'opseverity' => $page_options['opseverity'],
-					'optag' => $page_options['optag'],
-					'optemplate' => $page_options['optemplate'],
-					'opinventory' => $page_options['opinventory'],
 					'no' => $page_options['no']
 				];
+
+				foreach ($page_options as $action => $values) {
+					if ($action === 'opperiod') {
+						$params['opperiod'] = [
+							'delay' => $values['delay']
+						];
+					}
+					elseif ($action === 'ophistory') {
+						$params['ophistory'] = [
+							'history' => ($values['history_mode'] == ITEM_STORAGE_OFF) ? '' : $values['history']
+						];
+					}
+					elseif ($action === 'optrends') {
+						$params['optrends'] = [
+							'trends' => ($values['trends_mode'] == ITEM_STORAGE_OFF) ? '' : $values['trends']
+						];
+					}
+					else {
+						$params[$action] = $values;
+					}
+				}
 
 				$output = [
 					'params' => $params
@@ -134,10 +225,74 @@ class CControllerPopupLldOperation extends CController {
 			);
 		}
 		else {
+			// Combines received values and default, to use as values for all action fields.
+			$field_values = [];
+			foreach ($actions as $action) {
+				if ($this->hasInput($action)) {
+					$field_values[$action] = $page_options[$action];
+				}
+				else {
+					$field_values[$action] = $defaults[$action];
+				}
+			}
+
+			if (!array_key_exists('history_mode', $field_values['ophistory'])) {
+				$field_values['ophistory']['history_mode'] = ($field_values['ophistory']['history'] === '')
+					? ITEM_STORAGE_OFF
+					: ITEM_STORAGE_CUSTOM;
+			}
+			if (!array_key_exists('trends_mode', $field_values['optrends'])) {
+				$field_values['optrends']['trends_mode'] = ($field_values['optrends']['trends'] === '')
+					? ITEM_STORAGE_OFF
+					: ITEM_STORAGE_CUSTOM;
+			}
+
+			// TODO VM: strange solution
+			if ($field_values['ophistory']['history_mode'] === ITEM_STORAGE_OFF
+					&& $field_values['ophistory']['history'] === '') {
+				$field_values['ophistory']['history'] = DB::getDefault('items', 'history');
+			}
+			if ($field_values['optrends']['trends_mode'] === ITEM_STORAGE_OFF
+					&& $field_values['optrends']['trends'] === '') {
+				$field_values['optrends']['trends'] = DB::getDefault('items', 'trends');
+			}
+
+			/* Delay calculation */
+			$update_interval_parser = new CUpdateIntervalParser([
+				'usermacros' => true,
+				'lldmacros' => true
+			]);
+			$field_values['opperiod']['delay_flex'] = [];
+
+			if ($update_interval_parser->parse($field_values['opperiod']['delay']) == CParser::PARSE_SUCCESS) {
+				$field_values['opperiod']['delay'] = $update_interval_parser->getDelay();
+
+				foreach ($update_interval_parser->getIntervals() as $interval) {
+					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
+						$field_values['opperiod']['delay_flex'][] = [
+							'delay' => $interval['update_interval'],
+							'period' => $interval['time_period'],
+							'type' => ITEM_DELAY_FLEXIBLE
+						];
+					}
+					else {
+						$field_values['opperiod']['delay_flex'][] = [
+							'schedule' => $interval['interval'],
+							'type' => ITEM_DELAY_SCHEDULING
+						];
+					}
+				}
+			}
+			else {
+				$field_values['opperiod']['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+			}
+			/* EOF Delay calculation */ // TODO VM: Remove
+
 			$data = [
-				// TODO VM: is this check working?
+				// TODO VM: is this check working in all cases?
 				'title' => ($page_options['no'] > 0) ? _('Edit Operation') : _('New Operation'), // TODO VM: are these final translations?
 				'options' => $page_options,
+				'field_values' => $field_values,
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

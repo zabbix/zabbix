@@ -153,9 +153,10 @@ $overrides_popup_form_list->addRow(_('Filters'),
 /*OPERATIONS*/ // TODO VM: remove comment
 $operations_list = (new CTable())
 	->addClass('lld-overrides-operations-table')
+	->addStyle('white-space:normal;') // TODO VM: move to css
 	// TODO VM: new text variables?
 	->setHeader([
-		(new CColHeader(_('Condition')))->setWidth('150'), // TODO VM: maybe this can be made more dynamic
+		(new CColHeader(_('Condition')))->setWidth('350'), // TODO VM: maybe this can be made more dynamic
 		(new CColHeader(_('Actions')))->setWidth('150'),
 		(new CColHeader(''))->setWidth('50')
 	])

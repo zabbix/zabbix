@@ -817,12 +817,16 @@ if (hasRequest('form')) {
 						'operator' => '2',
 						'value' => 'test',
 						'opstatus' => [
-							'status' => '2'
+							'status' => '0'
+						],
+						'opdiscover' => [
+							'discover' => '1'
 						],
 						'opperiod' => [
 							'delay' => '0;10s/1-7,08:00-20:00;wd7h1m55'
 						],
 						'ophistory' => [
+//							'history' => ''
 							'history' => '5d'
 						],
 						'optrends' => [
@@ -863,7 +867,7 @@ if (hasRequest('form')) {
 						],
 						'optemplate' => [
 							[
-								'templateid' => '31243'
+								'templateid' => '10323'
 							]
 						],
 						'opinventory' => [
