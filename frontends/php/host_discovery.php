@@ -838,7 +838,10 @@ if (hasRequest('form')) {
 						'operator' => '1',
 						'value' => 'test',
 						'opstatus' => [
-							'status' => '2'
+							'status' => '1'
+						],
+						'opdiscover' => [
+							'discover' => '1'
 						],
 						'opseverity' => [
 							'severity' => '5'
@@ -854,8 +857,8 @@ if (hasRequest('form')) {
 						'operationobject' => '2',
 						'operator' => '0',
 						'value' => 'test',
-						'opstatus' => [
-							'status' => '2'
+						'opdiscover' => [
+							'discover' => '0'
 						]
 					],
 					[
@@ -865,9 +868,12 @@ if (hasRequest('form')) {
 						'opstatus' => [
 							'status' => '1'
 						],
+						'opdiscover' => [
+							'discover' => '1'
+						],
 						'optemplate' => [
 							[
-								'templateid' => '10323'
+								'templateid' => '10325'
 							]
 						],
 						'opinventory' => [

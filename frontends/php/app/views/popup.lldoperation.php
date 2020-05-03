@@ -68,19 +68,16 @@ $operations_popup_form_list = (new CFormList())
 			->setAttribute('placeholder', _('pattern')),
 	])
 	->addRow(
-		(new CVisibilityBox('visible[opstatus_status]', 'opstatus_status', _('Original')))
+		(new CVisibilityBox('visible[opstatus]', 'opstatus_status', _('Original')))
 			->setLabel(_('Create enabled'))
 			->setChecked(array_key_exists('opstatus', $options)),
-		// TODO VM: remove, if not decided othervise
-//		(new CCheckBox('opstatus[status]', $field_values['opstatus']['status']))
-//			->setChecked($field_values['opstatus']['status'] == 0) // TODO VM: use define
 		(new CRadioButtonList('opstatus[status]', (int) $field_values['opstatus']['status']))
 			->addValue(_('Yes'), 0) // TODO VM: use define
 			->addValue(_('No'), 1) // TODO VM: use define
 			->setModern(true)
 	)
 	->addRow(
-		(new CVisibilityBox('visible[opdiscover_discover]', 'opdiscover_discover', _('Original')))
+		(new CVisibilityBox('visible[opdiscover]', 'opdiscover_discover', _('Original')))
 			->setLabel(_('Discover'))
 			->setChecked(array_key_exists('opdiscover', $options)),
 		(new CRadioButtonList('opdiscover[discover]', (int) $field_values['opdiscover']['discover']))
@@ -152,13 +149,13 @@ $update_interval->addRow(
 
 $operations_popup_form_list
 	->addRow(
-		(new CVisibilityBox('visible[opperiod_delay]', 'opperiod_delay_div', _('Original')))
+		(new CVisibilityBox('visible[opperiod]', 'opperiod_div', _('Original')))
 			->setLabel(_('Update interval'))
 			->setChecked(array_key_exists('opperiod', $options)),
-		(new CDiv($update_interval))->setId('opperiod_delay_div')
+		(new CDiv($update_interval))->setId('opperiod_div')
 	)
 	->addRow(
-		(new CVisibilityBox('visible[ophistory_history]', 'ophistory_history_div', _('Original')))
+		(new CVisibilityBox('visible[ophistory]', 'ophistory_div', _('Original')))
 			->setLabel(_('History storage period'))
 			->setChecked(array_key_exists('ophistory', $options)),
 		(new CDiv([
@@ -172,10 +169,10 @@ $operations_popup_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('ophistory_history_div')
+			->setId('ophistory_div')
 	)
 	->addRow(
-		(new CVisibilityBox('visible[optrends_trends]', 'optrends_trends_div', _('Original')))
+		(new CVisibilityBox('visible[optrends]', 'optrends_div', _('Original')))
 			->setLabel(_('Trend storage period'))
 			->setChecked(array_key_exists('optrends', $options)),
 		(new CDiv([
@@ -189,7 +186,17 @@ $operations_popup_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('optrends_trends_div')
+			->setId('optrends_div')
+	)
+	->addRow(
+		(new CVisibilityBox('visible[optag]', 'optag_div', _('Original')))
+			->setLabel(_('Tags'))
+			->setChecked(array_key_exists('optag', $options)),
+		(new CDiv(
+			renderTagTable($field_values['optag'], false, ['field_name' => 'optag', 'add_post_js' => false])
+				->setHeader([_('Name'), _('Value'), _('Action')])
+				->setId('tags-table')
+		))->setId('optag_div')
 	);
 
 $output['buttons'] = [

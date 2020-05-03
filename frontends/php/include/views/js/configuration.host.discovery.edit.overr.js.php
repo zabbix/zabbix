@@ -134,6 +134,10 @@ insert_javascript_for_visibilitybox();
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="lldoverride-tag-row">
+	<?= renderTagTableRow('#{rowNum}', '', '', ['field_name' => 'optag', 'add_post_js' => false]) ?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		window.lldoverrides = {
@@ -626,10 +630,9 @@ insert_javascript_for_visibilitybox();
 				if ('opstatus' in operation) {
 					frag.appendChild(hiddenInput('status', operation.opstatus.status, prefix + '[opstatus]'));
 				}
-				// TODO VM: uncomment after update to latest.
-//				if ('opdiscover' in operation) {
-//					frag.appendChild(hiddenInput('discover', operation.opdiscover.discover, prefix + '[opdiscover]'));
-//				}
+				if ('opdiscover' in operation) {
+					frag.appendChild(hiddenInput('discover', operation.opdiscover.discover, prefix + '[opdiscover]'));
+				}
 				if ('opperiod' in operation) {
 					frag.appendChild(hiddenInput('delay', operation.opperiod.delay, prefix + '[opperiod]'));
 				}
@@ -1192,6 +1195,12 @@ insert_javascript_for_visibilitybox();
 			})
 			.trigger('change');
 
+		jQuery('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
+		jQuery('#tags-table', this.$form)
+			.dynamicRows({template: '#lldoverride-tag-row'})
+			.on('click', 'button.element-table-add', function() {
+				jQuery('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
+			});
 	}
 
 	/**
