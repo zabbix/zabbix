@@ -1,8 +1,20 @@
 Changes for 5.0.0rc1
 
 New features:
+..F.....S. [ZBXNEXT-2663] Support SAML authentication in zabbix frontend (agriscenko, arimdjonoks)
+..F....... [ZBXNEXT-5300] implemented widget copy/paste possibility in dashboard (miks)
+A.F....... [ZBXNEXT-5879] added filter to Configuration->Templates/Hosts->Discovery rules (agriscenko)
+.........T [ZBXNEXT-5907] Added Jira ServiceDesk mediatype (tuskov)
+A.F.....S. [ZBXNEXT-1882,ZBXNEXT-5865] added problem unacknowledge option (Andris, talbergs)
 
 Bug fixes:
+A.F.I..... [ZBX-17512] fixed length restriction for media type script import into Oracle database (Sasha, talbergs, viktors)
+..F....... [ZBX-17584] implemented dedicated page for "update problem" popup dialog (averza, miks)
+..F....... [ZBX-17618] fixed dynamic item switching for URL widget (talbergs)
+........S. [ZBX-17650] fixed formula for zabbix[proxy,,delay] calculation (asestakovs)
+........S. [ZBX-17655] fixed possible use of uninitialized variable (MVekslers)
+..F....... [ZBX-17520] fixed opening Problems popup from SVG graph outside webview boundaries (vasilijs)
+..F....PS. [ZBXNEXT-5711] added ability to view logs in frontend when testing web hook media type (gcalenko, vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.0beta2
