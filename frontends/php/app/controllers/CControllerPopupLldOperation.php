@@ -309,7 +309,7 @@ class CControllerPopupLldOperation extends CController {
 			$data = [
 				// TODO VM: is this check working in all cases?
 				'title' => ($page_options['no'] > 0) ? _('Edit Operation') : _('New Operation'), // TODO VM: are these final translations?
-				'options' => $page_options,
+				'options' => $page_options, // TODO VM: use 'visible' array?
 				'field_values' => $field_values,
 				'user' => [
 					'debug_mode' => $this->getDebugMode()

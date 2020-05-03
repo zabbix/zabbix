@@ -1093,6 +1093,8 @@ insert_javascript_for_visibilitybox();
 		};
 		this.data = jQuery.extend(true, defaults, data); // TODO VM: why it is other way around in httptest??
 		this.data.no = no; // TODO VM: this should be possible in dynamic_rows.beforerender instead
+		this.actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity', 'optag',
+			'optemplate', 'opinventory'];
 	}
 
 	/**
@@ -1121,9 +1123,7 @@ insert_javascript_for_visibilitybox();
 //			overrides_names:    lldoverrides.overrides.getOverrideNames() // TODO VM: same operation should not be added twice? (is this checked in API?)
 		};
 
-		var actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity', 'optag',
-			'optemplate', 'opinventory'];
-		actions.forEach(function(action) {
+		this.actions.forEach(function(action) {
 			if (action in this.data) {
 				params[action] = this.data[action];
 			}
@@ -1141,6 +1141,8 @@ insert_javascript_for_visibilitybox();
 	function OperationEditForm($form, operation_ref) {
 		this.$form = $form;
 		this.operation = operation_ref;
+
+		var that = this;
 
 //		// TODO VM: should be moved elsewhere
 //		this.$actions_add_row = jQuery('#operation_action_add_row', this.$form);
@@ -1176,10 +1178,10 @@ insert_javascript_for_visibilitybox();
 		jQuery('#ophistory_history_mode', this.$form)
 			.change(function() {
 				if (jQuery('[name="ophistory[history_mode]"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
-					jQuery('#ophistory_history').prop('disabled', true).hide();
+					jQuery('#ophistory_history', that.$form).prop('disabled', true).hide();
 				}
 				else {
-					jQuery('#ophistory_history').prop('disabled', false).show();
+					jQuery('#ophistory_history', that.$form).prop('disabled', false).show();
 				}
 			})
 			.trigger('change');
@@ -1187,10 +1189,10 @@ insert_javascript_for_visibilitybox();
 		jQuery('#optrends_trends_mode', this.$form)
 			.change(function() {
 				if (jQuery('[name="optrends[trends_mode]"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
-					jQuery('#optrends_trends').prop('disabled', true).hide();
+					jQuery('#optrends_trends', that.$form).prop('disabled', true).hide();
 				}
 				else {
-					jQuery('#optrends_trends').prop('disabled', false).show();
+					jQuery('#optrends_trends', that.$form).prop('disabled', false).show();
 				}
 			})
 			.trigger('change');
@@ -1201,7 +1203,64 @@ insert_javascript_for_visibilitybox();
 			.on('click', 'button.element-table-add', function() {
 				jQuery('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
 			});
-	}
+
+		// Override actions available per override object.
+		var available_actions = {
+			'<?= OPERATION_OBJECT_ITEM_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends'],
+			'<?= OPERATION_OBJECT_TRIGGER_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'opseverity', 'optag'],
+			'<?= OPERATION_OBJECT_GRAPH_PROTOTYPE ?>': ['opdiscover'],
+			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'opinventory']
+		};
+
+		jQuery('#operation_object', this.$form)
+			.change(function() {
+				that.operation.actions.forEach(function(action) {
+					if (available_actions[this.value].indexOf(action) !== -1) {
+						that.showActionRow(action + '_row');
+					}
+					else {
+						that.hideActionRow(action + '_row');
+					}
+				}.bind(this));
+			});
+	};
+
+	OperationEditForm.prototype.initHideActionRows = function() {
+		jQuery('#operation_object', this.$form).trigger('change');
+	};
+
+	OperationEditForm.prototype.showActionRow = function(row_id) {
+		var obj = document.getElementById(row_id);
+		if (is_null(obj)) {
+			throw "Cannot find action row with id [" + row_id +"]";
+		}
+
+		// I need to show it only, if it was previously hidden.
+		if (obj.originalObject) {
+			obj.parentNode.replaceChild(obj.originalObject, obj);
+		}
+	};
+
+	OperationEditForm.prototype.hideActionRow = function(row_id) {
+		var obj = document.getElementById(row_id);
+		if (is_null(obj)) {
+			throw "Cannot find action row with id [" + row_id +"]";
+		}
+
+		// I need to hide it only, if it was previously visible.
+		if (!('originalObject' in obj)) {
+			try {
+				var new_obj = document.createElement("li");
+				new_obj.setAttribute("id", obj.id);
+			}
+			catch(e) {
+				throw "Cannot create new element";
+			}
+
+			new_obj.originalObject = obj;
+			obj.parentNode.replaceChild(new_obj, obj);
+		}
+	};
 
 	/**
 	 * This method is bound via popup button attribute. It posts serialized version of current form to be validated.
