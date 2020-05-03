@@ -212,6 +212,15 @@ class CControllerPopupLldOperation extends CController {
 							'trends' => ($values['trends_mode'] == ITEM_STORAGE_OFF) ? '' : $values['trends']
 						];
 					}
+					elseif ($action === 'optemplate') {
+						// TODO VM: validate permissions to these templateids
+						$params['optemplate'] = [];
+						foreach ($values as $template) {
+							$params['optemplate'][] = [
+								'templateid' => $template
+							];
+						}
+					}
 					else {
 						$params[$action] = $values;
 					}
@@ -289,6 +298,13 @@ class CControllerPopupLldOperation extends CController {
 				$field_values['opperiod']['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 			}
 			/* EOF Delay calculation */ // TODO VM: Remove
+
+			$field_values['optemplate'] = $field_values['optemplate']
+				? CArrayHelper::renameObjectsKeys(API::Template()->get([
+					'output' => ['templateid', 'name'],
+					'templateids' => array_column($field_values['optemplate'], 'templateid')
+				]), ['templateid' => 'id'])
+				: [];
 
 			$data = [
 				// TODO VM: is this check working in all cases?
