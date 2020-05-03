@@ -564,21 +564,21 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	protected function createConfigurationFiles($data) {
 		switch (CTestArrayHelper::get($data, 'file')) {
 			case 'htaccess':
-				$this->assertTrue(file_put_contents(PHPUNIT_BASEDIR.'/frontends/php/.htaccess', 'SetEnv REMOTE_USER "'.
+				$this->assertTrue(file_put_contents(PHPUNIT_BASEDIR.'/ui/.htaccess', 'SetEnv REMOTE_USER "'.
 						$data['user'].'"') !== false);
 
 				break;
 
 			case 'pwfile':
-				$this->assertTrue(exec('htpasswd -c -b "'.PHPUNIT_BASEDIR.'/frontends/php/.pwd" "'.$data['user'].'" "'.
+				$this->assertTrue(exec('htpasswd -c -b "'.PHPUNIT_BASEDIR.'/ui/.pwd" "'.$data['user'].'" "'.
 						$data['password'].'" > /dev/null 2>&1') !== false);
 				$content = '<Files index_http.php>'."\n".
 						'	AuthType Basic'."\n".
 						'	AuthName "Password Required"'."\n".
-						'	AuthUserFile "'.PHPUNIT_BASEDIR.'/frontends/php/.pwd"'."\n".
+						'	AuthUserFile "'.PHPUNIT_BASEDIR.'/ui/.pwd"'."\n".
 						'	Require valid-user'."\n".
 						'</Files>';
-				$this->assertTrue(file_put_contents(PHPUNIT_BASEDIR.'/frontends/php/.htaccess', $content) !== false);
+				$this->assertTrue(file_put_contents(PHPUNIT_BASEDIR.'/ui/.htaccess', $content) !== false);
 
 				break;
 		}
@@ -665,12 +665,12 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	 * Remove file after every test case.
 	 */
 	public function removeConfigurationFiles() {
-		if (file_exists(PHPUNIT_BASEDIR.'/frontends/php/.htaccess')) {
-			unlink(PHPUNIT_BASEDIR.'/frontends/php/.htaccess');
+		if (file_exists(PHPUNIT_BASEDIR.'/ui/.htaccess')) {
+			unlink(PHPUNIT_BASEDIR.'/ui/.htaccess');
 		}
 
-		if (file_exists(PHPUNIT_BASEDIR.'/frontends/php/.pwd')) {
-			unlink(PHPUNIT_BASEDIR.'/frontends/php/.pwd');
+		if (file_exists(PHPUNIT_BASEDIR.'/ui/.pwd')) {
+			unlink(PHPUNIT_BASEDIR.'/ui/.pwd');
 		}
 
 		// Cleanup is required to avoid browser sending Basic auth header.
