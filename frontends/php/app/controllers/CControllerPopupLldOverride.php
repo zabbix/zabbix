@@ -30,7 +30,7 @@ class CControllerPopupLldOverride extends CController {
 		$fields = [
 			'no' =>					'int32', // TODO VM: doublecheck validation rule
 			'templated' =>			'in 0,1',
-			'name' =>				'string|not_empty',
+			'name' =>				'string', // TODO VM: doublecheck, where validation for empty should have been.
 			'old_name' =>			'string',
 			'stop' =>				'in 0,1',
 			'overrides_evaltype' =>	'in '.implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]),

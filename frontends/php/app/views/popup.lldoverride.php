@@ -157,7 +157,7 @@ $operations_list = (new CTable())
 	// TODO VM: new text variables?
 	->setHeader([
 		(new CColHeader(_('Condition')))->setWidth('350'), // TODO VM: maybe this can be made more dynamic
-		(new CColHeader(_('Actions')))->setWidth('150'),
+//		(new CColHeader(_('Actions')))->setWidth('150'), // TODO VM: add actions column
 		(new CColHeader(''))->setWidth('50')
 	])
 	->addRow(

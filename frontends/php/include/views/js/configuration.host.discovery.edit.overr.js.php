@@ -939,7 +939,7 @@ insert_javascript_for_visibilitybox();
 //			e.view_data.no = (dynamic_rows.data_index + 1); // TODO VM: it should be possible here, instead of as parameter in operation.
 			e.view_data.condition_object = that.operationobjectName(e.view_data.operationobject);
 			e.view_data.condition_operator = that.operatorName(e.view_data.operator);
-			e.view_data.actions = '<actions here>';
+//			e.view_data.actions = '<actions here>'; // TODO VM: add actions column
 
 		});
 
@@ -953,7 +953,11 @@ insert_javascript_for_visibilitybox();
 //			this.$container.sortable('option', 'update', this.onSortOrderChange.bind(this));
 			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
 				delete this.data[e.data_index];
-//				this.onSortOrderChange();
+
+				var index = this.sort_index.indexOf(e.data_index);
+				if (index > -1) {
+					this.sort_index.splice(index, 1);
+				}
 			}.bind(this));
 
 //			dynamicRowsBindSortableDisable(this.$container);
@@ -1016,19 +1020,6 @@ insert_javascript_for_visibilitybox();
 				+ ' ' + operation.value; // TODO VM: check if jsencoding is necessary
 		// TODO VM: make value "italic"
 	};
-
-//	/**
-//	 * This method maintains property for iterating overrides in the order that rows have in DOM at the moment,
-//	 * also updates visual counter in DOM for override rows.
-//	 */
-//	Operations.prototype.onSortOrderChange = function() {
-//		var order = [];
-//		this.$container.find('[data-index]').each(function(index) {
-//			this.querySelector('[data-row-num]').innerText = (index + 1) + ':';
-//			order.push(this.attributes.getNamedItem('data-index').value);
-//		});
-//		this.sort_index = order;
-//	};
 
 //	/**
 //	 * Used to validate override names with server, on PopUp form validate event.
