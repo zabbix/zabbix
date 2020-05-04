@@ -33,7 +33,6 @@ $overrides_popup_form = (new CForm())
 	->cleanItems()
 	->setId('lldoverride_form')
 	->addVar('no', $options['no'])
-//	->addVar('httpstepid', $options['httpstepid'])
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('overrides_names', $options['overrides_names'])
@@ -54,7 +53,7 @@ $overrides_popup_form_list = (new CFormList())
 $overrides_popup_form_list
 	->addRow(_('Stop processing next overrides if matches'),
 		(new CCheckBox('stop'))
-			->setChecked($options['stop'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON) // TODO VM: change to propper define.
+			->setChecked($options['stop'] == ZBX_LLD_OVERRIDE_STOP_YES)
 	);
 
 // filters
@@ -186,7 +185,6 @@ $output['buttons'] = [
 
 $overrides_popup_form->addItem($overrides_popup_form_list);
 
-// HTTP test step editing form.
 $output['body'] = (new CDiv($overrides_popup_form))->toString();
 $output['script_inline'] = 'lldoverrides.overrides.onStepOverlayReadyCb('.$options['no'].');';
 

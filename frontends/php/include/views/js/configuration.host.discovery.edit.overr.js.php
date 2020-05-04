@@ -94,8 +94,10 @@ insert_javascript_for_visibilitybox();
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			'#{actions}',
 			(new CCol(
-				// TODO VM: replace by button.
-				(new CLink(_('View'), 'javascript:lldoverrides.operations.open(#{no});'))
+				(new CButton(null, _('View')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-open')
+					->onClick("lldoverrides.operations.open(#{no});")
 			))->addClass(ZBX_STYLE_NOWRAP) // TODO VM: why do I need this class?
 		]))->toString()
 	?>
@@ -108,6 +110,7 @@ insert_javascript_for_visibilitybox();
 			(new CCol([
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-open')
 					->onClick("lldoverrides.operations.open(#{no});")
 					->addStyle('margin-right:5px;'), // TODO VM: do with some class (probably already exists)
 				(new CButton(null, _('Remove')))
@@ -206,22 +209,6 @@ insert_javascript_for_visibilitybox();
 		});
 	});
 
-// TODO VM: untouched
-	/**
-	 * Implementation of jQuery.val for radio buttons. Use this methon within scoped jQuery object;
-	 * Use with jQuery collection of input nodes.
-	 *
-	 * @param {string} value  Check button by value. Read value if no param is given.
-	 *
-	 * @return {string}
-	 */
-	function radioVal(value) {
-		if (typeof value === 'undefined') {
-			return this.filter(':checked').val();
-		}
-		this.filter('[value="' + value + '"]').get(0).checked = true;
-	}
-
 	/**
 	 * Returns common $.sortable options.
 	 *
@@ -242,65 +229,6 @@ insert_javascript_for_visibilitybox();
 		};
 	}
 
-// TODO VM: do I need it?
-	/**
-	 * A helper method for truncating string in middle.
-	 *
-	 * @param {string} str  String to be shortened into mid-elliptic.
-	 * @param {int}    max  Max length of resulting string (inclusive).
-	 */
-//	function midEllipsis(str, max) {
-//		if (str.length < max) {
-//			return str;
-//		}
-
-//		var sep = '...',
-//			max = max - sep.length,
-//			len = max / 2,
-//			pt1 = str.slice(0, Math.floor(len)),
-//			pt2 = str.slice(- Math.ceil(len));
-
-//		return pt1 + sep + pt2;
-//	}
-
-	// TODO VM: untouched, but unneded here.
-	/**
-	 * Trait method for DynamicRows, that renders disabled state.
-	 *
-	 * @param {bool} disable
-	 */
-	function dynamicRowsToggleDisable(disable) {
-		this.options.disabled = disable;
-
-		this.$element.sortable('option', 'disabled', disable);
-		this.$element.toggleClass('disabled', disable);
-		this.$element.find('input, button').prop('disabled', disable);
-
-		if (!disable) {
-			this.$element.trigger('dynamic_rows.updated', this);
-		}
-	}
-
-	// TODO VM: untouched?
-	/**
-	 * Helper that drys up repetitive code. Extracts pair objects from rows, in the order they are in DOM.
-	 * Not a part of DynamicRows plugin as this method follows tight conventions with templates.
-	 *
-	 * @param {callable} cb  Callback will get passed pair object, and it's data index as second argument.
-	 * @param {bool} allowed_empty  This can be set to true, to return empty pairs also.
-	 */
-	function eachPair(cb, allow_empty) {
-		this.$element.find('[data-index]').each(function(i, node) {
-			var name = node.querySelector('[data-type="name"]').value,
-				value = node.querySelector('[data-type="value"]').value;
-
-			if (name || value || allow_empty) {
-				cb({name: name, value: value}, node.getAttribute('data-index'));
-			}
-		});
-	}
-
-	// TODO VM: untouched
 	/**
 	 * Writes data index as new nodes attribute. Bind remove event.
 	 */
@@ -317,24 +245,6 @@ insert_javascript_for_visibilitybox();
 					$el.trigger('dynamic_rows.updated', dynamic_rows);
 				});
 			});
-		});
-	}
-
-	// TODO VM: untouched
-	/**
-	 * Implements disabling remove button if last pair is considered empty.
-	 */
-	function dynamicRowsBindRemoveDisable($el) {
-		$el.on('dynamic_rows.updated', function(e, dynamic_rows) {
-			var $remove_btns = dynamic_rows.$element.find('.element-table-remove');
-
-			if (dynamic_rows.length == 1) {
-				return eachPair.call(dynamic_rows, function(pair) {
-					$remove_btns.prop('disabled', !pair.name && !pair.value);
-				}, true);
-			}
-
-			$remove_btns.prop('disabled', false);
 		});
 	}
 
@@ -356,7 +266,6 @@ insert_javascript_for_visibilitybox();
 		});
 	}
 
-	// TODO VM: untouched
 	/**
 	 * A helper method for creating hidden input nodes.
 	 *
@@ -764,7 +673,6 @@ insert_javascript_for_visibilitybox();
 			.open(no, this.$container.find('[data-index="' + no + '"] a'));
 	};
 
-	// TODO VM: update defautls
 	/**
 	 * This object represents a override of web scenario.
 	 *
@@ -807,7 +715,6 @@ insert_javascript_for_visibilitybox();
 	 * @param {Node} refocus  A node to set focus to, when popup is closed.
 	 */
 	Override.prototype.open = function(no, refocus) {
-		// TODO VM: update parameters
 		return PopUp('popup.lldoverride', {
 			no:                 no,
 			templated:          lldoverrides.templated,
@@ -909,8 +816,6 @@ insert_javascript_for_visibilitybox();
 		this.$form.trimValues(['#override_name']); // TODO VM: check, what should be here
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
-//		var curr_pairs = this.stepPairsData();
-
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
@@ -946,7 +851,7 @@ insert_javascript_for_visibilitybox();
 		var that = this;
 		this.data = {};
 		this.new_id = 0;
-		this.sort_index = []; // TODO VM: no sort index needed for operations
+		this.sort_index = [];
 
 		operations.forEach(function(operation, no) {
 			this.data[no + 1] = new Operation(operation, no + 1);
@@ -961,7 +866,6 @@ insert_javascript_for_visibilitybox();
 			e.view_data.condition_object = that.operationobjectName(e.view_data.operationobject);
 			e.view_data.condition_operator = that.operatorName(e.view_data.operator);
 //			e.view_data.actions = '<actions here>'; // TODO VM: add actions column
-
 		});
 
 		this.operations_dynamic_rows = new DynamicRows(this.$container, {
@@ -970,8 +874,6 @@ insert_javascript_for_visibilitybox();
 		});
 
 		if (!lldoverrides.templated) {
-//			this.$container.sortable(sortableOpts());
-//			this.$container.sortable('option', 'update', this.onSortOrderChange.bind(this));
 			this.$container.on('dynamic_rows.afterremove', function(e, dynamic_rows) {
 				delete this.data[e.data_index];
 
@@ -981,7 +883,6 @@ insert_javascript_for_visibilitybox();
 				}
 			}.bind(this));
 
-//			dynamicRowsBindSortableDisable(this.$container);
 			dynamicRowsBindNewRow(this.$container);
 		}
 		else {
@@ -995,16 +896,16 @@ insert_javascript_for_visibilitybox();
 
 	Operations.prototype.operationobjectName = function(operationobject) {
 		var operationobject_name = '';
-		if (operationobject === '0') { // TODO VM: constant?
+		if (operationobject === '<?= OPERATION_OBJECT_ITEM_PROTOTYPE ?>') {
 			operationobject_name = window.lldoverrides.msg.item_prototype;
 		}
-		else if (operationobject === '1') { // TODO VM: constant?
+		else if (operationobject === '<?= OPERATION_OBJECT_TRIGGER_PROTOTYPE ?>') {
 			operationobject_name = window.lldoverrides.msg.trigger_prototype;
 		}
-		else if (operationobject === '2') { // TODO VM: constant?
+		else if (operationobject === '<?= OPERATION_OBJECT_GRAPH_PROTOTYPE ?>') {
 			operationobject_name = window.lldoverrides.msg.graph_prototype;
 		}
-		else if (operationobject === '3') { // TODO VM: constant?
+		else if (operationobject === '<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>') {
 			operationobject_name = window.lldoverrides.msg.host_prototype;
 		}
 
@@ -1013,49 +914,27 @@ insert_javascript_for_visibilitybox();
 
 	Operations.prototype.operatorName = function(operator) {
 		var operator_name = '';
-		if (operator === '0') { // TODO VM: constant?
+		if (operator === '<?= CONDITION_OPERATOR_EQUAL ?>') {
 			operator_name = window.lldoverrides.msg.equals;
 		}
-		else if (operator === '1') { // TODO VM: constant?
+		else if (operator === '<?= CONDITION_OPERATOR_NOT_EQUAL ?>') {
 			operator_name = window.lldoverrides.msg.does_not_equal;
 		}
-		else if (operator === '2') { // TODO VM: constant?
+		else if (operator === '<?= CONDITION_OPERATOR_LIKE ?>') {
 			operator_name = window.lldoverrides.msg.contains;
 		}
-		else if (operator === '3') { // TODO VM: constant?
+		else if (operator === '<?= CONDITION_OPERATOR_NOT_LIKE ?>') {
 			operator_name = window.lldoverrides.msg.does_not_contain;
 		}
-		else if (operator === '8') { // TODO VM: constant?
+		else if (operator === '<?= CONDITION_OPERATOR_REGEXP ?>') {
 			operator_name = window.lldoverrides.msg.matches;
 		}
-		else if (operator === '9') { // TODO VM: constant?
+		else if (operator === '<?= CONDITION_OPERATOR_NOT_REGEXP ?>') {
 			operator_name = window.lldoverrides.msg.does_not_match;
 		}
 
 		return operator_name;
 	};
-
-	Operations.prototype.conditionHtml = function(operation) {
-		return this.operationobjectName(operation.operationobject)
-				+ ' ' + this.operatorName(operation.operator)
-				+ ' ' + operation.value; // TODO VM: check if jsencoding is necessary
-		// TODO VM: make value "italic"
-	};
-
-//	/**
-//	 * Used to validate override names with server, on PopUp form validate event.
-//	 *
-//	 * @return {array}  Array of strings.
-//	 */
-//	Operations.prototype.getOverrideNames = function() {
-//		var names = [];
-
-//		for (var no in this.data) {
-//			names.push(this.data[no].data.name);
-//		}
-
-//		return names;
-//	};
 
 	/**
 	 * This method hydrates the parsed html PopUp form with data from specific override.
@@ -1084,8 +963,6 @@ insert_javascript_for_visibilitybox();
 		this.sort_index.forEach(function(data_index) {
 			this.operations_dynamic_rows.addRow(this.data[data_index].data, data_index);
 		}.bind(this));
-
-//		this.onSortOrderChange();
 	}
 
 	/**
@@ -1095,7 +972,7 @@ insert_javascript_for_visibilitybox();
 	 */
 	Operations.prototype.open = function(no) {
 		this.data[no]
-			.open(no, this.$container.find('[data-index="' + no + '"] a'));
+			.open(no, this.$container.find('[data-index="' + no + '"] .element-table-open'));
 	};
 
 	function Operation(data, no) {
@@ -1154,14 +1031,6 @@ insert_javascript_for_visibilitybox();
 
 		var that = this;
 
-//		// TODO VM: should be moved elsewhere
-//		this.$actions_add_row = jQuery('#operation_action_add_row', this.$form);
-
-//		var discover_template = new Template(jQuery('#lldoverride-action-discover').html());
-
-//		this.$actions_list = this.$actions_add_row.before(discover_template.evaluate({}));
-
-
 		// TODO VM: custom interval js (move to function)
 		var $custom_intervals = jQuery('#lld_overrides_custom_intervals', this.$form);
 		$custom_intervals.on('click', 'input[type="radio"]', function() {
@@ -1182,7 +1051,6 @@ insert_javascript_for_visibilitybox();
 		$custom_intervals.dynamicRows({
 			template: '#lldoverride-custom-intervals-row'
 		});
-
 
 		// TODO VM: move to function
 		jQuery('#ophistory_history_mode', this.$form)
@@ -1285,8 +1153,6 @@ insert_javascript_for_visibilitybox();
 		this.$form.trimValues(['#value']); // TODO VM: check, what should be here
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
-//		var curr_pairs = this.stepPairsData();
-
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
@@ -1307,7 +1173,6 @@ insert_javascript_for_visibilitybox();
 				lldoverrides.operations.data[ret.params.no] = this.operation;
 			}
 
-//			ret.params.pairs = curr_pairs;
 			lldoverrides.operations.data[ret.params.no].update(ret.params);
 			lldoverrides.operations.renderData();
 

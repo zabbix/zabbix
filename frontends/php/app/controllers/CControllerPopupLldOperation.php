@@ -74,10 +74,10 @@ class CControllerPopupLldOperation extends CController {
 		];
 		$defaults = [
 			'opstatus' => [
-				'status' => ITEM_STATUS_ACTIVE
+				'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 			],
 			'opdiscover' => [
-				'discover' => ITEM_NO_DISCOVER
+				'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 			],
 			'opperiod' => [
 				'delay' => ''
@@ -151,7 +151,7 @@ class CControllerPopupLldOperation extends CController {
 				$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
 				$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
 
-				// TODO VM: it is not checkedfor min and max values. It is checked only in API.
+				// TODO VM: it is not checked for min and max values. It is checked only in API.
 				if (!array_key_exists('delay', $page_options['opperiod'])
 						|| $simple_interval_parser->parse($page_options['opperiod']['delay']) != CParser::PARSE_SUCCESS
 				) {
@@ -195,7 +195,6 @@ class CControllerPopupLldOperation extends CController {
 					}
 
 					if ($intervals) {
-						// TODO VM: check, if delay is empty, return error(?)
 						$page_options['opperiod']['delay'] .= ';'.implode(';', $intervals);
 					}
 				}
@@ -324,7 +323,7 @@ class CControllerPopupLldOperation extends CController {
 				: [];
 
 			$data = [
-				// TODO VM: is this check working in all cases?
+				// TODO VM: is this check working in all cases? (it is not working for unsaved operations)
 				'title' => ($page_options['no'] > 0) ? _('Edit operation') : _('New operation'), // TODO VM: new translations
 				'options' => $page_options, // TODO VM: use 'visible' array?
 				'field_values' => $field_values,

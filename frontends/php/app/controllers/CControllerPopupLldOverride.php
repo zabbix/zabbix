@@ -76,6 +76,11 @@ class CControllerPopupLldOverride extends CController {
 		];
 
 		if ($this->hasInput('validate')) {
+			// TODO VM: doublecheck, where validation for empty should have been.
+			if ($page_options['name'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
+			}
+
 			if ($page_options['overrides_evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
 					&& $page_options['overrides_formula'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));

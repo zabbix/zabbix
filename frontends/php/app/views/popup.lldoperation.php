@@ -43,15 +43,13 @@ $operations_popup_form = (new CForm())
 
 $operations_popup_form_list = (new CFormList())
 	->addRow(
-		(new CLabel(_('Object'), 'operationobject'))->setAsteriskMark(), // TODO VM: do I need asterix here?
+		(new CLabel(_('Object'), 'operationobject')),
 		(new CComboBox('operationobject', $options['operationobject'], null, [
 			OPERATION_OBJECT_ITEM_PROTOTYPE => _('Item prototype'),
 			OPERATION_OBJECT_TRIGGER_PROTOTYPE => _('Trigger prototype'),
 			OPERATION_OBJECT_GRAPH_PROTOTYPE => _('Graph prototype'),
 			OPERATION_OBJECT_HOST_PROTOTYPE => _('Host prototype')
-		]))
-			->setAriaRequired() // TODO VM: do I need asterix here?
-			->setId('operation_object')
+		]))->setId('operation_object')
 	)
 	->addRow((new CLabel(_('Condition'), 'operator')), [
 		(new CComboBox('operator', $options['operator'], null, [
@@ -72,8 +70,8 @@ $operations_popup_form_list = (new CFormList())
 			->setLabel(_('Create enabled'))
 			->setChecked(array_key_exists('opstatus', $options)),
 		(new CRadioButtonList('opstatus[status]', (int) $field_values['opstatus']['status']))
-			->addValue(_('Yes'), 0) // TODO VM: use define
-			->addValue(_('No'), 1) // TODO VM: use define
+			->addValue(_('Yes'), ZBX_PROTOTYPE_STATUS_ENABLED)
+			->addValue(_('No'), ZBX_PROTOTYPE_STATUS_DISABLED)
 			->setModern(true),
 		'opstatus_row'
 	)
@@ -82,8 +80,8 @@ $operations_popup_form_list = (new CFormList())
 			->setLabel(_('Discover'))
 			->setChecked(array_key_exists('opdiscover', $options)),
 		(new CRadioButtonList('opdiscover[discover]', (int) $field_values['opdiscover']['discover']))
-			->addValue(_('Yes'), 0) // TODO VM: use define
-			->addValue(_('No'), 1) // TODO VM: use define
+			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
+			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
 			->setModern(true),
 		'opdiscover_row'
 	);
@@ -91,7 +89,9 @@ $operations_popup_form_list = (new CFormList())
 $update_interval = (new CTable())
 	->setId('update_interval')
 	->addRow([_('Delay'),
-		(new CDiv((new CTextBox('opperiod[delay]', $field_values['opperiod']['delay']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))
+		(new CDiv((new CTextBox('opperiod[delay]', $field_values['opperiod']['delay']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		))
 	]);
 
 $custom_intervals = (new CTable())
