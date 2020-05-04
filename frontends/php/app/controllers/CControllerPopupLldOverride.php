@@ -75,25 +75,14 @@ class CControllerPopupLldOverride extends CController {
 			'overrides_names' => $this->getInput('overrides_names', [])
 		];
 
-//		$page_options['follow_redirects'] = $this->getInput('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF);
-//		$page_options['retrieve_mode'] = $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
-
 		if ($this->hasInput('validate')) {
-//			// Validate "Timeout" field manually, since it cannot be properly added into MVC validation rules.
-//			$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
+			if ($page_options['overrides_evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+					&& $page_options['overrides_formula'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
+			}
 
-//			if ($simple_interval_parser->parse($page_options['timeout']) != CParser::PARSE_SUCCESS) {
-//				error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a time unit is expected')));
-//			}
-//			elseif ($page_options['timeout'][0] !== '{') {
-//				$seconds = timeUnitToSeconds($page_options['timeout']);
-
-//				if ($seconds < 1 || $seconds > SEC_PER_HOUR) {
-//					error(_s('Invalid parameter "%1$s": %2$s.', 'timeout',
-//						_s('value must be one of %1$s', '1-'.SEC_PER_HOUR)
-//					));
-//				}
-//			}
+			// TODO VM: Add validation, that, if filter row is present, macro field should not be empty.
+			// TODO VM: don't add filter row when editing override. (if no filter row was configured)
 
 			// Validate if override names are unique.
 			if ($page_options['name'] !== $page_options['old_name']) {

@@ -36,7 +36,7 @@ $overrides_popup_form = (new CForm())
 //	->addVar('httpstepid', $options['httpstepid'])
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
-//	->addVar('steps_names', $options['steps_names'])
+	->addVar('overrides_names', $options['overrides_names'])
 	->addVar('action', 'popup.lldoverride')
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
@@ -55,7 +55,7 @@ $overrides_popup_form_list
 			->setChecked($options['stop'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON) // TODO VM: change to propper define.
 	);
 
-/*FILTERS*/ // TODO VM: remove comment
+// filters
 // TODO VM: improve styles
 $override_evaltype = (new CDiv([
 	_('Type of calculation'),
@@ -77,7 +77,6 @@ $override_evaltype = (new CDiv([
 	->addClass('overrideRow');
 
 // TODO VM: rename macros to filters, where necessary
-// macros
 $filterTable = (new CTable())
 	->setId('overrides_filters')
 	->setAttribute('style', 'width: 100%;')
@@ -101,15 +100,12 @@ $operators = [
 	CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
 ];
 
-// fields
 foreach ($overrides_filters as $i => $overrides_filter) {
-	// formula id
 	$formulaId = [
 		new CSpan($overrides_filter['formulaid']),
 		new CVar('overrides_filters['.$i.'][formulaid]', $overrides_filter['formulaid'])
 	];
 
-	// macro
 	$macro = (new CTextBox('overrides_filters['.$i.'][macro]', $overrides_filter['macro'], false, DB::getFieldLength('lld_override_condition', 'macro')))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass(ZBX_STYLE_UPPERCASE)
@@ -117,12 +113,10 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $overrides_filter['formulaid']);
 
-	// value
 	$value = (new CTextBox('overrides_filters['.$i.'][value]', $overrides_filter['value'], false, DB::getFieldLength('lld_override_condition', 'value')))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
-	// delete button
 	$deleteButtonCell = [
 		(new CButton('overrides_filters_'.$i.'_remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
@@ -148,9 +142,8 @@ $overrides_popup_form_list->addRow(_('Filters'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
-/*EOF FILTERS*/ // TODO VM: remove comment
 
-/*OPERATIONS*/ // TODO VM: remove comment
+// operations
 $operations_list = (new CTable())
 	->addClass('lld-overrides-operations-table')
 	->addStyle('white-space:normal;') // TODO VM: move to css
@@ -178,7 +171,6 @@ $overrides_popup_form_list->addRow(_('Operations'),
 	(new CDiv($operations_list))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
-/*EOF OPERATIONS*/ // TODO VM: remove comment
 
 $output['buttons'] = [
 	[

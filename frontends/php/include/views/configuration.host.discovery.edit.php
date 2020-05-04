@@ -739,7 +739,7 @@ $overrides_list = (new CTable())
 	->setHeader([
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader())->setWidth('15'),
-		(new CColHeader(_('Name')))->setWidth('150'), // TODO VM: maybe this can be made more dynamic
+		(new CColHeader(_('Name')))->setWidth('350'), // TODO VM: maybe this can be made more dynamic
 		(new CColHeader(_('Stop processing')))->setWidth('100'),
 		(new CColHeader(_('Action')))->setWidth('50')
 	])

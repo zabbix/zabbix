@@ -244,7 +244,7 @@ if (getRequest('itemid', false)) {
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'selectLLDMacroPaths' => ['lld_macro', 'path'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-		'selectOverrides' => API_OUTPUT_EXTEND, // TODO VM: replace by exact fields
+		'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 		'editable' => true
 	]);
 	$item = reset($item);
@@ -581,6 +581,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$overrides = getRequest('overrides', []);
 		// TODO VM: make necessary updates?
+		// TODO VM: huge depth for trivial change. Do it differently?
+//		foreach ($overrides as &$override) {
+//			if (array_key_exists('operations', $override)) {
+//				foreach ($override['operations'] as &$operation) {
+//					if (array_key_exists('visible', $operation)) {
+//						foreach (explode(',', $operation['visible']) as $visible_action) {
+//							if (!array_key_exists($visible_action, $operation)) {
+//								$operation[$visible_action] = [];
+//							}
+//						}
+//					}
+//					unset($operation['visible']);
+//				}
+//				unset($operation);
+//			}
+//		}
+//		unset($override);
 		$newItem['overrides'] = $overrides;
 
 		if (hasRequest('update')) {

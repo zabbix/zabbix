@@ -44,8 +44,8 @@ class CControllerPopupLldOperation extends CController {
 			'optag' =>				'array',
 			'optemplate' =>			'array',
 			'opinventory' =>		'array',
-//			'overrides_names' =>	'array',
-			'validate' =>			'in 1'
+			'validate' =>			'in 1',
+			'visible' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -74,10 +74,10 @@ class CControllerPopupLldOperation extends CController {
 		];
 		$defaults = [
 			'opstatus' => [
-				'status' => 0 // TODO VM: use define
+				'status' => ITEM_STATUS_ACTIVE
 			],
 			'opdiscover' => [
-				'discover' => 1 // TODO VM: use define
+				'discover' => ITEM_NO_DISCOVER
 			],
 			'opperiod' => [
 				'delay' => ''
@@ -94,7 +94,7 @@ class CControllerPopupLldOperation extends CController {
 			'optag' => [],
 			'optemplate' => [],
 			'opinventory' => [
-				'inventory_mode' => HOST_INVENTORY_MANUAL // TODO VM: are we sure this should be the default for new override action?
+				'inventory_mode' => HOST_INVENTORY_MANUAL
 			],
 		];
 
@@ -103,83 +103,101 @@ class CControllerPopupLldOperation extends CController {
 			'templated' => $this->getInput('templated', 0),
 			'operationobject' => $this->getInput('operationobject', OPERATION_OBJECT_ITEM_PROTOTYPE),
 			'operator' => $this->getInput('operator', CONDITION_OPERATOR_EQUAL),
-			'value' => $this->getInput('value', ''),
-//			'overrides_names' => $this->getInput('overrides_names', []) // TODO VM: replace by list of all conditions
+			'value' => $this->getInput('value', '')
 		];
+
+		$visible = $this->getInput('visible', []);
 
 		foreach ($actions as $action) {
 			if ($this->hasInput($action)) {
 				$page_options[$action] = $this->getInput($action);
 			}
+			elseif (array_key_exists($action, $visible)) {
+				// Some actions can not have relevant input fields, if override intent was to clear them.
+				$page_options[$action] = $defaults[$action];
+			}
 		}
 
-//		$page_options['follow_redirects'] = $this->getInput('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF);
-//		$page_options['retrieve_mode'] = $this->getInput('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT);
-
 		if ($this->hasInput('validate')) {
-//			// Validate "Timeout" field manually, since it cannot be properly added into MVC validation rules.
-//			$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
+			if (!$visible) {
+				// TODO VM: new translation
+				error(_('At least one action is mandatory.'));
+			}
 
-//			if ($simple_interval_parser->parse($page_options['timeout']) != CParser::PARSE_SUCCESS) {
-//				error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a time unit is expected')));
-//			}
-//			elseif ($page_options['timeout'][0] !== '{') {
-//				$seconds = timeUnitToSeconds($page_options['timeout']);
+			if (array_key_exists('optag', $page_options)) {
+				foreach ($page_options['optag'] as $i => $optag) {
+					if ($optag['tag'] === '') {
+						unset($page_options['optag'][$i]);
+					}
+				}
 
-//				if ($seconds < 1 || $seconds > SEC_PER_HOUR) {
-//					error(_s('Invalid parameter "%1$s": %2$s.', 'timeout',
-//						_s('value must be one of %1$s', '1-'.SEC_PER_HOUR)
-//					));
-//				}
-//			}
+				$page_options['optag'] = array_values($page_options['optag']);
+
+				if (!$page_options['optag']) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'), _('cannot be empty')));
+				}
+			}
+
+			if (array_key_exists('optemplate', $page_options) && !$page_options['optemplate']) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Link new templates'), _('cannot be empty')));
+			}
 
 			/*
 			 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 			 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 			 */
-			if (array_key_exists('opperiod', $page_options) && array_key_exists('delay_flex', $page_options['opperiod'])) {
-				$intervals = [];
+			if (array_key_exists('opperiod', $page_options)) {
 				$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
 				$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
 				$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
 
-				foreach ($page_options['opperiod']['delay_flex'] as $interval) {
-					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-						if ($interval['delay'] === '' && $interval['period'] === '') {
-							continue;
-						}
-
-						if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
-							$result = false;
-							error(_s('Invalid interval "%1$s".', $interval['delay']));
-							break;
-						}
-						elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
-							$result = false;
-							error(_s('Invalid interval "%1$s".', $interval['period']));
-							break;
-						}
-
-						$intervals[] = $interval['delay'].'/'.$interval['period'];
-					}
-					else {
-						if ($interval['schedule'] === '') {
-							continue;
-						}
-
-						if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
-							$result = false;
-							error(_s('Invalid interval "%1$s".', $interval['schedule']));
-							break;
-						}
-
-						$intervals[] = $interval['schedule'];
-					}
+				// TODO VM: it is not checkedfor min and max values. It is checked only in API.
+				if (!array_key_exists('delay', $page_options['opperiod'])
+						|| $simple_interval_parser->parse($page_options['opperiod']['delay']) != CParser::PARSE_SUCCESS
+				) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'Delay', _('a time unit is expected')));
 				}
+				elseif (array_key_exists('delay_flex', $page_options['opperiod'])) {
+					$intervals = [];
 
-				if ($intervals) {
-					// TODO VM: check, if delay is empty, return error(?)
-					$page_options['opperiod']['delay'] .= ';'.implode(';', $intervals);
+					foreach ($page_options['opperiod']['delay_flex'] as $interval) {
+						if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
+							if ($interval['delay'] === '' && $interval['period'] === '') {
+								continue;
+							}
+
+							if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
+								$result = false;
+								error(_s('Invalid interval "%1$s".', $interval['delay']));
+								break;
+							}
+							elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
+								$result = false;
+								error(_s('Invalid interval "%1$s".', $interval['period']));
+								break;
+							}
+
+							$intervals[] = $interval['delay'].'/'.$interval['period'];
+						}
+						else {
+							if ($interval['schedule'] === '') {
+								continue;
+							}
+
+							if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
+								$result = false;
+								error(_s('Invalid interval "%1$s".', $interval['schedule']));
+								break;
+							}
+
+							$intervals[] = $interval['schedule'];
+						}
+					}
+
+					if ($intervals) {
+						// TODO VM: check, if delay is empty, return error(?)
+						$page_options['opperiod']['delay'] .= ';'.implode(';', $intervals);
+					}
 				}
 			}
 
@@ -268,7 +286,7 @@ class CControllerPopupLldOperation extends CController {
 				$field_values['optrends']['trends'] = DB::getDefault('items', 'trends');
 			}
 
-			/* Delay calculation */
+			// Delay calculation
 			$update_interval_parser = new CUpdateIntervalParser([
 				'usermacros' => true,
 				'lldmacros' => true
@@ -297,7 +315,6 @@ class CControllerPopupLldOperation extends CController {
 			else {
 				$field_values['opperiod']['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 			}
-			/* EOF Delay calculation */ // TODO VM: Remove
 
 			$field_values['optemplate'] = $field_values['optemplate']
 				? CArrayHelper::renameObjectsKeys(API::Template()->get([
@@ -308,7 +325,7 @@ class CControllerPopupLldOperation extends CController {
 
 			$data = [
 				// TODO VM: is this check working in all cases?
-				'title' => ($page_options['no'] > 0) ? _('Edit Operation') : _('New Operation'), // TODO VM: are these final translations?
+				'title' => ($page_options['no'] > 0) ? _('Edit operation') : _('New operation'), // TODO VM: new translations
 				'options' => $page_options, // TODO VM: use 'visible' array?
 				'field_values' => $field_values,
 				'user' => [

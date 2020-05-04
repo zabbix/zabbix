@@ -38,14 +38,21 @@ insert_javascript_for_visibilitybox();
 
 <script type="text/x-jquery-tmpl" id="lldoverride-row">
 	<?= (new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan('1:'))->setAttribute('data-row-num', ''),
-			(new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});')),
-			'#{stop_verbose}',
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
+				->addClass(ZBX_STYLE_TD_DRAG_ICON)
+				->setWidth('15'),
+			(new CCol((new CSpan('1:'))->setAttribute('data-row-num', '')))
+				->setWidth('15'),
+			(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});'))))
+				->setWidth('350'),
+			(new CCol('#{stop_verbose}'))
+				->setWidth('100'),
 			(new CCol((new CButton(null, _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
+			))
+				->addClass(ZBX_STYLE_NOWRAP)
+				->setWidth('50')
 		]))
 			->addClass('sortable')
 			->toString()
@@ -99,8 +106,9 @@ insert_javascript_for_visibilitybox();
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			'#{actions}',
 			(new CCol([
-				// TODO VM: replace by button.
-				(new CLink(_('Edit'), 'javascript:lldoverrides.operations.open(#{no});'))
+				(new CButton(null, _('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick("lldoverrides.operations.open(#{no});")
 					->addStyle('margin-right:5px;'), // TODO VM: do with some class (probably already exists)
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -177,8 +185,10 @@ insert_javascript_for_visibilitybox();
 			? '#lldoverride-operation-row-templated'
 			: '#lldoverride-operation-row'
 		).html());
-// TODO VM: fix styles for dragged placeholder.
+
 		window.lldoverrides.overrides = new Overrides($('#overridesTab'), <?= json_encode(array_values($data['overrides'])) ?>);
+		window.lldoverrides.actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity',
+			'optag', 'optemplate', 'opinventory'];
 
 		window.lldoverrides.$form = $('form[name="itemForm"]').on('submit', function(e) {
 			var hidden_form = this.querySelector('#hidden-form');
@@ -626,6 +636,14 @@ insert_javascript_for_visibilitybox();
 				frag.appendChild(hiddenInput('operationobject', operation.operationobject, prefix));
 				frag.appendChild(hiddenInput('operator', operation.operator, prefix));
 				frag.appendChild(hiddenInput('value', operation.value, prefix));
+
+//				var visible = [];
+//				window.lldoverrides.actions.forEach(function(action) {
+//					if (action in operation) {
+//						visible.push(action);
+//					}
+//				});
+//				frag.appendChild(hiddenInput('visible', visible.join(','), prefix));
 
 				if ('opstatus' in operation) {
 					frag.appendChild(hiddenInput('status', operation.opstatus.status, prefix + '[opstatus]'));
@@ -1084,8 +1102,6 @@ insert_javascript_for_visibilitybox();
 		};
 		this.data = jQuery.extend(true, defaults, data); // TODO VM: why it is other way around in httptest??
 		this.data.no = no; // TODO VM: this should be possible in dynamic_rows.beforerender instead
-		this.actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity', 'optag',
-			'optemplate', 'opinventory'];
 	}
 
 	/**
@@ -1104,19 +1120,19 @@ insert_javascript_for_visibilitybox();
 	 * @param {Node} refocus  A node to set focus to, when popup is closed.
 	 */
 	Operation.prototype.open = function(no, refocus) {
-		// TODO VM: maybe parameters should be limited to only ones used by operationobject, but it will be yet another place, where such case would be defined.
 		var params = {
 			no:                 no,
 			templated:          lldoverrides.templated,
 			operationobject:    this.data.operationobject,
 			operator:           this.data.operator,
-			value:              this.data.value,
-//			overrides_names:    lldoverrides.overrides.getOverrideNames() // TODO VM: same operation should not be added twice? (is this checked in API?)
+			value:              this.data.value
+//			visible:            {}
 		};
 
-		this.actions.forEach(function(action) {
+		window.lldoverrides.actions.forEach(function(action) {
 			if (action in this.data) {
 				params[action] = this.data[action];
+//				params['visible'][action] = 1;
 			}
 		}.bind(this));
 
@@ -1205,7 +1221,7 @@ insert_javascript_for_visibilitybox();
 
 		jQuery('#operation_object', this.$form)
 			.change(function() {
-				that.operation.actions.forEach(function(action) {
+				window.lldoverrides.actions.forEach(function(action) {
 					if (available_actions[this.value].indexOf(action) !== -1) {
 						that.showActionRow(action + '_row');
 					}
