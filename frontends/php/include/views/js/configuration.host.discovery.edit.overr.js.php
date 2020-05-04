@@ -149,7 +149,7 @@ insert_javascript_for_visibilitybox();
 <script type="text/javascript">
 	jQuery(function($) {
 		window.lldoverrides = {
-			templated:                           <?= $data['templated'] ? 1 : 0 ?>,
+			templated:                           <?= $data['limited'] ? 1 : 0 ?>,
 			ZBX_STYLE_DRAG_ICON:                 <?= zbx_jsvalue(ZBX_STYLE_DRAG_ICON) ?>,
 			ZBX_STYLE_TD_DRAG_ICON:              <?= zbx_jsvalue(ZBX_STYLE_TD_DRAG_ICON) ?>,
 			ZBX_STYLE_DISABLED:                  <?= zbx_jsvalue(ZBX_STYLE_DISABLED) ?>,
@@ -176,15 +176,18 @@ insert_javascript_for_visibilitybox();
 			}
 		};
 
-		window.lldoverrides.override_row_template = new Template(jQuery(lldoverrides.templated
-			? '#lldoverride-row-templated'
-			: '#lldoverride-row'
-		).html());
+		// TODO VM: what should be possible, with templated overrides?
+//		window.lldoverrides.override_row_template = new Template(jQuery(lldoverrides.templated
+//			? '#lldoverride-row-templated'
+//			: '#lldoverride-row'
+//		).html());
+		window.lldoverrides.override_row_template = new Template(jQuery('#lldoverride-row').html());
 
-		window.lldoverrides.operations_row_template = new Template(jQuery(lldoverrides.templated
-			? '#lldoverride-operation-row-templated'
-			: '#lldoverride-operation-row'
-		).html());
+//		window.lldoverrides.operations_row_template = new Template(jQuery(lldoverrides.templated
+//			? '#lldoverride-operation-row-templated'
+//			: '#lldoverride-operation-row'
+//		).html());
+		window.lldoverrides.operations_row_template = new Template(jQuery('#lldoverride-operation-row').html());
 
 		window.lldoverrides.overrides = new Overrides($('#overridesTab'), <?= json_encode(array_values($data['overrides'])) ?>);
 		window.lldoverrides.actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity',

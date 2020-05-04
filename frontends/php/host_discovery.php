@@ -773,7 +773,6 @@ if (hasRequest('form')) {
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
-	$data['templated'] = false; // TODO VM: implement correctly
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;

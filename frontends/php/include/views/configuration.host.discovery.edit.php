@@ -749,7 +749,7 @@ $overrides_list = (new CTable())
 				(new CButton('param_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
-					->setEnabled(!$templated)
+//					->setEnabled(!$templated) // TODO VM: what should be possible with temaplted overrides?
 					// TODO VM: check this class, most likely it should be changed.
 			))->addClass('step-action')
 		// TODO VM: check, how this class is used.
