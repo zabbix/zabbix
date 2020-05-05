@@ -154,7 +154,7 @@ class CMenuPopupHelper {
 
 		if ($eventid != 0) {
 			$data['data']['eventid'] = $eventid;
-			$data['data']['acknowledge'] = $acknowledge;
+			$data['data']['acknowledge'] = $acknowledge ? '1' : '0';
 		}
 
 		return $data;
