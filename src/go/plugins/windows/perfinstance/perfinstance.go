@@ -39,9 +39,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	var name string
 	switch key {
-	case "perf_instance.get":
+	case "perf_instance.discovery":
 		name = params[0]
-	case "perf_instance_en.get":
+	case "perf_instance_en.discovery":
 		if name = p.getLocalName(params[0]); name == "" {
 			if err = p.reloadEngObjectNames(); err != nil {
 				return nil, fmt.Errorf("Cannot reload English names: %s", err.Error())
@@ -73,23 +73,20 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	plugin.RegisterMetrics(&impl, "WindowsPerfInstance",
-		"perf_instance.get", "Get Windows performance instance object list.",
-		"perf_instance_en.get", "Get Windows performance instance object English list.",
+		"perf_instance.discovery", "Get Windows performance instance object list.",
+		"perf_instance_en.discovery", "Get Windows performance instance object English list.",
 	)
 }
 
-func (p *Plugin) refreshObjects() error {
+func (p *Plugin) refreshObjects() (err error) {
 	p.refreshMux.Lock()
 	defer p.refreshMux.Unlock()
 	if time.Now().After(p.nextObjectRefresh) {
-		p.Debugf("refreshing local Windows object cache")
-		if _, err := win32.PdhEnumObject(); err != nil {
-			return fmt.Errorf("Failed to refresh object cache: %s.", err.Error())
-		}
+		_, err = win32.PdhEnumObject()
 		p.nextObjectRefresh = time.Now().Add(time.Minute)
 	}
 
-	return nil
+	return
 }
 
 func (p *Plugin) reloadEngObjectNames() (err error) {
@@ -106,10 +103,8 @@ func (p *Plugin) reloadEngObjectNames() (err error) {
 func (p *Plugin) getLocalName(engName string) string {
 	p.reloadMux.RLock()
 	defer p.reloadMux.RUnlock()
-	for _, obj := range pdh.Objects {
-		if obj.EngName == engName {
-			return obj.Name
-		}
+	if name, ok := pdh.ObjectsNames[engName]; ok {
+		return name
 	}
 
 	return ""

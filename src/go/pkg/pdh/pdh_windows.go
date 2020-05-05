@@ -31,12 +31,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-var Objects map[int]*Object
-
-type Object struct {
-	EngName string
-	Name    string
-}
+var ObjectsNames map[string]string
 
 type sysCounter struct {
 	name  string
@@ -78,6 +73,10 @@ type CounterPathElements struct {
 
 func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 	var size uint32
+	var objectsLocal map[int]string
+
+	ObjectsNames = make(map[string]string)
+
 	counter := windows.StringToUTF16Ptr("Counter")
 	err = windows.RegQueryValueEx(HKEY_PERFORMANCE_TEXT, counter, nil, nil, nil, &size)
 	if err != nil {
@@ -94,13 +93,13 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 		return err
 	}
 
-	Objects = make(map[int]*Object)
+	objectsLocal = make(map[int]string)
 	for _, name := range locNames {
 		idx, err := win32.PdhLookupPerfIndexByName(name)
 		if err != nil {
 			continue
 		}
-		Objects[idx] = &Object{Name: name}
+		objectsLocal[idx] = name
 	}
 
 	var wcharIndex, wcharName []uint16
@@ -129,8 +128,8 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 			return err
 		}
 
-		if obj, ok := Objects[i]; ok {
-			obj.EngName = name
+		if objectLocal, ok := objectsLocal[i]; ok {
+			ObjectsNames[name] = objectLocal
 		}
 	}
 
