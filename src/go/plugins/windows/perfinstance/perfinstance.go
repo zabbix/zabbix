@@ -33,23 +33,21 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("Invalid first parameter.")
 	}
 
-	p.refreshObjects()
+	if err = p.refreshObjects(); err != nil {
+		return nil, fmt.Errorf("Cannot refresh objects: %s", err.Error())
+	}
+
 	var name string
 	switch key {
 	case "perf_instance.get":
 		name = params[0]
 	case "perf_instance_en.get":
 		if name = p.getLocalName(params[0]); name == "" {
-			var reloaded bool
-			if reloaded, err = p.reloadEngObjectNames(); err != nil {
-				return nil, fmt.Errorf("Failed to get instance object English names: %s.", err.Error())
+			if err = p.reloadEngObjectNames(); err != nil {
+				return nil, fmt.Errorf("Cannot reload English names: %s", err.Error())
 			}
-			if reloaded {
-				if name = p.getLocalName(params[0]); name == "" {
-					return nil, errors.New("Unsupported metric.")
-				}
-			} else {
-				return nil, errors.New("Unsupported metric.")
+			if name = p.getLocalName(params[0]); name == "" {
+				return nil, errors.New("Cannot get local name")
 			}
 		}
 	default:
@@ -58,7 +56,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	var instances []win32.Instance
 	if instances, err = win32.PdhEnumObjectItems(name); err != nil {
-		return nil, fmt.Errorf("Failed to get performance instance objects: %s.", err.Error())
+		return nil, fmt.Errorf("Cannot get instances list: %s", err.Error())
 	}
 
 	if len(instances) < 1 {
@@ -94,18 +92,15 @@ func (p *Plugin) refreshObjects() error {
 	return nil
 }
 
-func (p *Plugin) reloadEngObjectNames() (bool, error) {
+func (p *Plugin) reloadEngObjectNames() (err error) {
 	p.reloadMux.Lock()
 	defer p.reloadMux.Unlock()
 	if time.Now().After(p.nextEngNameRefresh) {
-		p.Debugf("loading English Windows objects")
-		if err := pdh.LocateObjectsAndDefaultCounters(false); err != nil {
-			return true, fmt.Errorf("Failed to load English Windows objects: %s.", err.Error())
-		}
+		err = pdh.LocateObjectsAndDefaultCounters(false)
 		p.nextEngNameRefresh = time.Now().Add(time.Minute)
 	}
 
-	return false, nil
+	return
 }
 
 func (p *Plugin) getLocalName(engName string) string {

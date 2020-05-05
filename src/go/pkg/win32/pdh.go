@@ -235,11 +235,11 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	if ret != PDH_MORE_DATA {
 		return nil, newPdhError(ret)
 	}
-	counterbuf := make([]uint16, counterListSize)
 	var instptr uintptr
 	var instbuf []uint16
 
 	for {
+		counterbuf := make([]uint16, counterListSize)
 		if instanceListSize != 0 {
 			instbuf = make([]uint16, instanceListSize)
 			instptr = uintptr(unsafe.Pointer(&instbuf[0]))
