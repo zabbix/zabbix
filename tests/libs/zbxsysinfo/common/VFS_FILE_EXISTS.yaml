@@ -8,6 +8,28 @@ in:
 out:
   result: SYSINFO_RET_OK
   file_exists: 1
+
+---
+test case: file exists, include all
+files:
+  file.txt: |
+    123456
+in:
+  key: "vfs.file.exists[file.txt, all]"
+out:
+  result: SYSINFO_RET_OK
+  file_exists: 1
+---
+test case: file exists, exclude sockets
+files:
+  file.txt: |
+    123456
+in:
+  key: "vfs.file.exists[file.txt,, sock]"
+out:
+  result: SYSINFO_RET_OK
+  file_exists: 1
+
 ---
 test case: file does not exist
 files:
@@ -15,6 +37,16 @@ files:
     123456
 in:
   key: "vfs.file.exists[nonexistent.txt]"
+out:
+  result: SYSINFO_RET_OK
+  file_exists: 0
+---
+test case: file exist but is excluded
+files:
+  file.txt: |
+    123456
+in:
+  key: "vfs.file.exists[file.txt,, file]"
 out:
   result: SYSINFO_RET_OK
   file_exists: 0
@@ -28,7 +60,7 @@ out:
 ---
 test case: too many parameters
 in:
-  key: "vfs.file.exists[foo, bar]"
+  key: "vfs.file.exists[foo, bar, buz, qux]"
 out:
   result: SYSINFO_RET_FAIL
   error: "Too many parameters."

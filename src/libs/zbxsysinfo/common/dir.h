@@ -29,6 +29,21 @@
 
 #define TRAVERSAL_DEPTH_UNLIMITED	-1	/* directory traversal depth is not limited */
 
+/* File Types */
+#define FT_FILE		0x001
+#define FT_DIR		0x002
+#define FT_SYM		0x004
+#define FT_SOCK		0x008
+#define FT_BDEV		0x010
+#define FT_CDEV		0x020
+#define FT_FIFO		0x040
+#define FT_ALL		0x080
+#define FT_DEV		0x100
+#define FT_OVERFLOW	0x200
+#define FT_TEMPLATE	"file\0dir\0sym\0sock\0bdev\0cdev\0fifo\0all\0dev\0"
+#define FT_ALLMASK	(FT_FILE | FT_DIR | FT_SYM | FT_SOCK | FT_BDEV | FT_CDEV | FT_FIFO)
+#define FT_DEV2		(FT_BDEV | FT_CDEV)
+
 typedef struct
 {
 	int depth;
@@ -43,5 +58,7 @@ typedef struct
 
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+int	zbx_etypes_to_mask(char *etypes, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_DIR_H */

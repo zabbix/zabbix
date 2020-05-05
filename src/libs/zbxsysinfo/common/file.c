@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 #include "md5.h"
 #include "file.h"
+#include "dir.h"
 #include "zbxregexp.h"
 #include "log.h"
 
@@ -109,9 +110,9 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	char		*filename;
-	int		ret = SYSINFO_RET_FAIL, file_exists;
+	int		ret = SYSINFO_RET_FAIL, file_exists, types, types_incl, types_excl;
 
-	if (1 < request->nparam)
+	if (3 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
@@ -125,9 +126,42 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 == zbx_stat(filename, &buf))
+	types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result);
+	types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result);
+
+	if (FT_OVERFLOW & (types_incl | types_excl))
 	{
-		file_exists = S_ISREG(buf.st_mode) ? 1 : 0;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second or third parameter."));
+		goto err;
+	}
+
+	if (0 == types_incl)
+	{
+		if (0 == types_excl)
+			types_incl = FT_FILE;
+		else
+			types_incl = FT_ALLMASK;
+	}
+
+	types = types_incl & (~types_excl) & FT_ALLMASK;
+
+	if(0 != (types & FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+	{
+		file_exists = 1;
+	}
+	else if (0 != (types_excl & FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+	{
+		file_exists = 0;
+	}
+	else if (0 == zbx_stat(filename, &buf) && (
+			(S_ISREG(buf.st_mode)  && 0 != (types & FT_FILE)) ||
+			(S_ISDIR(buf.st_mode)  && 0 != (types & FT_DIR)) ||
+			(S_ISSOCK(buf.st_mode) && 0 != (types & FT_SOCK)) ||
+			(S_ISBLK(buf.st_mode)  && 0 != (types & FT_BDEV)) ||
+			(S_ISCHR(buf.st_mode)  && 0 != (types & FT_CDEV)) ||
+			(S_ISFIFO(buf.st_mode) && 0 != (types & FT_FIFO))))
+	{
+		file_exists = 1;
 	}
 	else if (errno == ENOENT)
 	{
