@@ -32,8 +32,8 @@ class testAuditLog extends CAPITest {
 			[
 				'api_request' => [
 					'userids' => '1',
-					'time_from' => '1582268400', //2020-02-21 09:00
-					'time_till' => '1582270200', //2020-02-21 09:30
+					'time_from' => '1582268400', // 2020-02-21 09:00
+					'time_till' => '1582270200', // 2020-02-21 09:30
 					'selectDetails' => ['field_name', 'oldvalue', 'newvalue'],
 					'output' => ['auditid', 'userid', 'clock', 'action', 'resourcetype', 'ip', 'resourceid', 'resourcename', 'note'],
 					'filter' => [
@@ -85,8 +85,8 @@ class testAuditLog extends CAPITest {
 			[
 				'api_request' => [
 					'userids' => '1',
-					'time_from' => '1582268400', //2020-02-21 09:00
-					'time_till' => '1582270200', //2020-02-21 09:30
+					'time_from' => '1582268400', // 2020-02-21 09:00
+					'time_till' => '1582270200', // 2020-02-21 09:30
 					'output' => 'extend',
 					'selectDetails' => 'extend',
 					'filter' => [
@@ -120,8 +120,8 @@ class testAuditLog extends CAPITest {
 			[
 				'api_request' => [
 					'userids' => '1',
-					'time_from' => '1582268400', //2020-02-21 09:00
-					'time_till' => '1582270200', //2020-02-21 09:30
+					'time_from' => '1582268400', // 2020-02-21 09:00
+					'time_till' => '1582270200', // 2020-02-21 09:30
 					'output' => ['resourcename'],
 					'selectDetails' => ['newvalue'],
 					'filter' => [
@@ -145,8 +145,8 @@ class testAuditLog extends CAPITest {
 			[
 				'api_request' => [
 					'userids' => '4',
-					'time_from' => '1582268400', //2020-02-21 09:00
-					'time_till' => '1582270200', //2020-02-21 09:30
+					'time_from' => '1582268400', // 2020-02-21 09:00
+					'time_till' => '1582270200', // 2020-02-21 09:30
 					'output' => ['clock'],
 					'selectDetails' => 'extend',
 					'filter' => [
@@ -165,8 +165,8 @@ class testAuditLog extends CAPITest {
 			[
 				'api_request' => [
 					'userids' => ['1', '4'],
-					'time_from' => '1582268400', //2020-02-21 09:00
-					'time_till' => '1582270200', //2020-02-21 09:30
+					'time_from' => '1582268400', // 2020-02-21 09:00
+					'time_till' => '1582270200', // 2020-02-21 09:30
 					'output' => ['auditid'],
 					'filter' => [
 						'action' => '0'

@@ -96,7 +96,7 @@ class CConditionHelper {
 	 * Aliases will be generated in the order they appear in the formula.
 	 *
 	 * Example:
-	 * var_dump(CFormulaHelper::getFormulaIds('1 or (2 and 3) or 2'));
+	 * CFormulaHelper::getFormulaIds('1 or (2 and 3) or 2');
 	 *
 	 * // array(1 => 'A', 2 => 'B', 3 => 'C')
 	 *
