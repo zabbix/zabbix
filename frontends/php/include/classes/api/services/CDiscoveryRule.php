@@ -1010,7 +1010,7 @@ class CDiscoveryRule extends CItemGeneral {
 			if (array_key_exists('overrides', $item)) {
 				foreach ($item['overrides'] as $override) {
 					// Formula will be added after conditions.
-					$overrides[$override['step']] = [
+					$new_override = [
 						'itemid' => $item['itemid'],
 						'name' => $override['name'],
 						'step' => $override['step'],
@@ -1018,10 +1018,10 @@ class CDiscoveryRule extends CItemGeneral {
 					];
 
 					if (array_key_exists('filter', $override)) {
-						$overrides[$override['step']]['evaltype'] = $override['filter']['evaltype'];
+						$new_override['evaltype'] = $override['filter']['evaltype'];
 					}
 
-					$overrides = array_values($overrides);
+					$overrides[] = $new_override;
 				}
 			}
 		}
