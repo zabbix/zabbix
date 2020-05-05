@@ -2412,6 +2412,22 @@
     </templates>
     <triggers>
         <trigger>
+            <expression>{Template App Remote Zabbix proxy:version.diff()}=1 and {Template App Remote Zabbix proxy:version.strlen()}&gt;0</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>Zabbix version has changed (new version: {ITEM.VALUE})</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>1</priority>
+            <description>Zabbix proxy version has changed. Ack to close.</description>
+            <type>0</type>
+            <manual_close>1</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
             <expression>{Template App Remote Zabbix proxy:rcache.buffer.pused.max(10m)}&gt;75</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
