@@ -33,7 +33,6 @@ struct object_name_ref
 {
 	char		*eng_name;
 	wchar_t		*loc_name;
-	unsigned long	idx;
 };
 
 typedef struct
@@ -203,7 +202,8 @@ static void	extend_perf_counter_interval(zbx_perf_counter_data_t *counter, int i
  *                                                                            *
  * Function: set_object_names                                                 *
  *                                                                            *
- * Purpose: obtains PDH object localized and English names with indices       *
+ * Purpose: obtains PDH object localized names and associates them with       *
+ *          English names, to be used by perf_instance_en.discovery           *
  *                                                                            *
  * Return value: SUCCEED/FAIL                                                 *
  *                                                                            *
@@ -264,6 +264,7 @@ static int	set_object_names(void)
 	for (loc_name = objects; L'\0' != *loc_name; loc_name += sz)
 	{
 		wchar_t	*eng_name;
+		DWORD	idx, eng_idx;
 
 		sz = (DWORD)wcslen(loc_name) + 1;
 		object_names = zbx_realloc(object_names, sizeof(struct object_name_ref) * (object_num + 1));
@@ -272,23 +273,24 @@ static int	set_object_names(void)
 		object_names[object_num].loc_name = zbx_malloc(NULL, sizeof(wchar_t) * sz);
 		memcpy(object_names[object_num].loc_name, loc_name, sizeof(wchar_t) * sz);
 
-		if (ERROR_SUCCESS !=
-				(pdh_status = PdhLookupPerfIndexByName(NULL, loc_name, &object_names[object_num].idx)))
+		/* For some objects the localized name might be missing and PdhEnumObjects() will return English */
+		/* name instead. However PdhLookupPerfIndexByName() does not accept English names as argument so */
+		/* it will return an error but not index. In that case for localized name use name returned by   */
+		/* PdhEnumObjects() if such name exists in English names registry (HKEY_PERFORMANCE_TEXT)        */
+
+		if (ERROR_SUCCESS != (pdh_status = PdhLookupPerfIndexByName(NULL, loc_name, &idx)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain object index: %s",
 					strerror_from_module(pdh_status, L"PDH.DLL"));
-			object_names[object_num].idx = 0;
+			idx = 0;
 		}
 
 		for (eng_name = names; L'\0' != *eng_name; eng_name += wcslen(eng_name) + 1)
 		{
-			DWORD	idx;
-
-			idx = (DWORD)_wtoi(eng_name);
+			eng_idx = (DWORD)_wtoi(eng_name);
 			eng_name += wcslen(eng_name) + 1;
 
-			if (object_names[object_num].idx == idx || (0 == object_names[object_num].idx &&
-					0 == wcscmp(object_names[object_num].loc_name, eng_name)))
+			if (idx == eng_idx || (0 == idx && 0 == wcscmp(object_names[object_num].loc_name, eng_name)))
 			{
 				object_names[object_num].eng_name = zbx_unicode_to_utf8(eng_name);
 				break;
