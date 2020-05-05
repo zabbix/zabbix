@@ -1407,6 +1407,7 @@ Changes for 4.0.21rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-17186] fixed context-aware LLD macro expansion in JsonPath preprocessing (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.20
