@@ -1008,7 +1008,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		foreach ($items as $item) {
 			if (array_key_exists('overrides', $item)) {
-				foreach ($item['overrides'] as $num => $override) {
+				foreach ($item['overrides'] as $override) {
 					// Formula will be added after conditions.
 					$overrides[$override['step']] = [
 						'itemid' => $item['itemid'],
