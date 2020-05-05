@@ -729,6 +729,36 @@ $lld_macro_paths_form_list->addRow(_('LLD macros'),
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
+/*
+ * Overrides tab.
+ */
+$overrides_form_list = new CFormList();
+$overrides_list = (new CTable())
+	->addClass('lld-overrides-table')
+	->setHeader([
+		(new CColHeader())->setWidth('15'),
+		(new CColHeader())->setWidth('15'),
+		(new CColHeader(_('Name')))->setWidth('350'),
+		(new CColHeader(_('Stop processing')))->setWidth('100'),
+		(new CColHeader(_('Action')))->setWidth('50')
+	])
+	->addRow(
+		(new CCol(
+			(new CDiv(
+				(new CButton('param_add', _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-add')
+					->setEnabled(!$templated)
+			))->addClass('step-action')
+		))
+			->addClass('lld-overrides-table-foot')
+	);
+
+$overrides_form_list->addRow(_('Overrides'),
+	(new CDiv($overrides_list))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+);
+
 // Append tabs to form.
 $tab = (new CTabView())
 	->addTab('itemTab', $data['caption'], $form_list)
@@ -739,7 +769,8 @@ $tab = (new CTabView())
 			)
 	)
 	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)
-	->addTab('macroTab', _('Filters'), $conditionFormList);
+	->addTab('macroTab', _('Filters'), $conditionFormList)
+	->addTab('overridesTab', _('Overrides'), $overrides_form_list);
 
 if (!hasRequest('form_refresh')) {
 	$tab->setSelected(0);

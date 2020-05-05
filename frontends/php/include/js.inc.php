@@ -146,3 +146,13 @@ function insertPagePostJs() {
 		echo get_js(implode("\n", $ZBX_PAGE_POST_JS), true);
 	}
 }
+
+function getPagePostJs() {
+	global $ZBX_PAGE_POST_JS;
+
+	if ($ZBX_PAGE_POST_JS) {
+		return implode("\n", $ZBX_PAGE_POST_JS);
+	}
+
+	return '';
+}
