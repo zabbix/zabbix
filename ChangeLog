@@ -1,6 +1,8 @@
 Changes for 5.0.0rc1
 
 New features:
+A.F.I..... [ZBX-17667] moved "frontends/php" to "ui" directory (Sasha)
+A.F.I...S. [ZBXNEXT-3035] added ability of filtering out items, triggers, hosts and graphs or overriding their attributes during Low-level discovery based on LLD object and prototype name (Ivo, vmurzins, vso)
 ..F.....S. [ZBXNEXT-2663] Support SAML authentication in zabbix frontend (agriscenko, arimdjonoks)
 ..F....... [ZBXNEXT-5300] implemented widget copy/paste possibility in dashboard (miks)
 A.F....... [ZBXNEXT-5879] added filter to Configuration->Templates/Hosts->Discovery rules (agriscenko)
@@ -8,6 +10,7 @@ A.F....... [ZBXNEXT-5879] added filter to Configuration->Templates/Hosts->Discov
 A.F.....S. [ZBXNEXT-1882,ZBXNEXT-5865] added problem unacknowledge option (Andris, talbergs)
 
 Bug fixes:
+........S. [ZBX-17676] updated ZBX_MAX_FIELDS in dbschema.h to accomodate new SAML fields (arimdjonoks)
 A.F.I..... [ZBX-17512] fixed length restriction for media type script import into Oracle database (Sasha, talbergs, viktors)
 ..F....... [ZBX-17584] implemented dedicated page for "update problem" popup dialog (averza, miks)
 ..F....... [ZBX-17618] fixed dynamic item switching for URL widget (talbergs)
