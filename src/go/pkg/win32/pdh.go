@@ -277,15 +277,15 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 
 func PdhEnumObject() (objects []string, err error) {
 	var objectListSize uint32
-	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, uintptr(0), uintptr(0), uintptr(0),
-		uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
+	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSize)),
+		uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
 	if ret != PDH_MORE_DATA {
 		return nil, newPdhError(ret)
 	}
 
 	objectBuf := make([]uint16, objectListSize)
-	ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, uintptr(0), uintptr(0),
-		uintptr(unsafe.Pointer(&objectBuf[0])), uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD),
+	ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objectBuf[0])),
+		uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD),
 		bool2uintptr(false))
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return nil, newPdhError(ret)
