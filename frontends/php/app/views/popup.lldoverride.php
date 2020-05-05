@@ -42,9 +42,7 @@ $overrides_popup_form = (new CForm())
 $overrides_popup_form_list = (new CFormList())
 	->addRow(
 		(new CLabel(_('Name'), 'override_name'))->setAsteriskMark(),
-		// TODO VM: what should be possible with temaplted overrides?
-		(new CTextBox('name', $options['old_name'], false, DB::getFieldLength('lld_override', 'name')))
-//		(new CTextBox('name', $options['old_name'], (bool) $options['templated'], DB::getFieldLength('lld_override', 'name')))
+		(new CTextBox('name', $options['old_name'], (bool) $options['templated'], DB::getFieldLength('lld_override', 'name')))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('override_name')
