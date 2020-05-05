@@ -846,13 +846,16 @@ static wchar_t	*get_object_name(char *eng_name)
 {
 	wchar_t	*loc_name = NULL;
 	int	i;
+	size_t	len;
 
 	LOCK_PERFCOUNTERS;
 
+	len = strlen(eng_name);
+
 	for (i = 0; i < object_num; i++)
 	{
-		if (NULL != object_names[i].eng_name &&
-				0 == zbx_strncasecmp(object_names[i].eng_name, eng_name, strlen(eng_name)))
+		if (NULL != object_names[i].eng_name && len == strlen(object_names[i].eng_name) &&
+				0 == zbx_strncasecmp(object_names[i].eng_name, eng_name, len))
 		{
 			size_t	sz;
 
