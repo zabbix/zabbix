@@ -198,6 +198,24 @@ static void	extend_perf_counter_interval(zbx_perf_counter_data_t *counter, int i
 	counter->interval = interval;
 }
 
+static void	free_object_names(void)
+{
+	int	i;
+
+	LOCK_PERFCOUNTERS;
+
+	for (i = 0; i < object_num; i++)
+	{
+		zbx_free(object_names[i].eng_name);
+		zbx_free(object_names[i].loc_name);
+	}
+
+	zbx_free(object_names);
+	object_num = 0;
+
+	UNLOCK_PERFCOUNTERS;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: set_object_names                                                 *
@@ -254,8 +272,7 @@ static int	set_object_names(void)
 		goto out;
 	}
 
-	zbx_free(object_names);
-	object_num = 0;
+	free_object_names();
 
 	/* skip number of records */
 	names += wcslen(names) + 1;
@@ -370,24 +387,6 @@ static void	free_perf_counter_list(void)
 		zbx_free(cptr->value_array);
 		zbx_free(cptr);
 	}
-
-	UNLOCK_PERFCOUNTERS;
-}
-
-static void	free_object_names(void)
-{
-	int	i;
-
-	LOCK_PERFCOUNTERS;
-
-	for (i = 0; i < object_num; i++)
-	{
-		zbx_free(object_names[i].eng_name);
-		zbx_free(object_names[i].loc_name);
-	}
-
-	zbx_free(object_names);
-	object_num = 0;
 
 	UNLOCK_PERFCOUNTERS;
 }
