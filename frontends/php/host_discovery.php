@@ -180,7 +180,7 @@ $fields = [
 									_('Password')
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null], // TODO VM: check validation rules
+	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
@@ -580,24 +580,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		$overrides = getRequest('overrides', []);
-		// TODO VM: make necessary updates?
-		// TODO VM: huge depth for trivial change. Do it differently?
-//		foreach ($overrides as &$override) {
-//			if (array_key_exists('operations', $override)) {
-//				foreach ($override['operations'] as &$operation) {
-//					if (array_key_exists('visible', $operation)) {
-//						foreach (explode(',', $operation['visible']) as $visible_action) {
-//							if (!array_key_exists($visible_action, $operation)) {
-//								$operation[$visible_action] = [];
-//							}
-//						}
-//					}
-//					unset($operation['visible']);
-//				}
-//				unset($operation);
-//			}
-//		}
-//		unset($override);
 		$newItem['overrides'] = $overrides;
 
 		if (hasRequest('update')) {
@@ -650,8 +632,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$newItem['preprocessing'] = $preprocessing;
 			}
 
-			// TODO VM: remove overrides, if not changed.
-
 			$result = API::DiscoveryRule()->update($newItem);
 			$result = DBend($result);
 		}
@@ -663,8 +643,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($preprocessing) {
 				$newItem['preprocessing'] = $preprocessing;
 			}
-
-			// TODO VM: remove overrides, if empty.
 
 			$result = API::DiscoveryRule()->create([$newItem]);
 		}
@@ -797,8 +775,6 @@ if (hasRequest('form')) {
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
-		// TODO VM: API validation error? Operations are not mandatory?
-		// TODO VM: sort entries by 'step'. Is API not already managing it?
 		// Sort overides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], [
 			['field' => 'step', 'order' => ZBX_SORT_UP]

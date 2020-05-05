@@ -55,7 +55,6 @@ $overrides_popup_form_list
 	);
 
 // filters
-// TODO VM: improve styles
 $override_evaltype = (new CDiv([
 	_('Type of calculation'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -75,7 +74,6 @@ $override_evaltype = (new CDiv([
 ]))
 	->addClass('overrideRow');
 
-// TODO VM: rename macros to filters, where necessary
 $filterTable = (new CTable())
 	->setId('overrides_filters')
 	->setAttribute('style', 'width: 100%;')
@@ -145,11 +143,9 @@ $overrides_popup_form_list->addRow(_('Filters'),
 // operations
 $operations_list = (new CTable())
 	->addClass('lld-overrides-operations-table')
-	->addStyle('white-space:normal;') // TODO VM: move to css
-	// TODO VM: new text variables?
+	->addStyle('white-space:normal;')
 	->setHeader([
-		(new CColHeader(_('Condition')))->setWidth('350'), // TODO VM: maybe this can be made more dynamic
-//		(new CColHeader(_('Actions')))->setWidth('150'), // TODO VM: add actions column
+		(new CColHeader(_('Condition')))->setWidth('350'),
 		(new CColHeader(''))->setWidth('50')
 	])
 	->addRow(
@@ -158,10 +154,7 @@ $operations_list = (new CTable())
 				(new CButton('param_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
-//					->setEnabled(!$templated) // TODO VM: should I be able to see overrides, for templated discovery rule
-					// TODO VM: check this class, most likely it should be changed.
 			))->addClass('step-action')
-		// TODO VM: check, how this class is used.
 		))
 			->addClass('lld-overrides-operations-table-foot')
 	);

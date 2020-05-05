@@ -104,7 +104,7 @@ insert_javascript_for_visibilitybox();
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-open')
 					->onClick("lldoverrides.operations.open(#{no});")
-			))->addClass(ZBX_STYLE_NOWRAP) // TODO VM: why do I need this class?
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()
 	?>
 </script>
@@ -118,11 +118,11 @@ insert_javascript_for_visibilitybox();
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-open')
 					->onClick("lldoverrides.operations.open(#{no});")
-					->addStyle('margin-right:5px;'), // TODO VM: do with some class (probably already exists)
+					->addStyle('margin-right:5px;'),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
-			]))->addClass(ZBX_STYLE_NOWRAP) // TODO VM: why do I need this class?
+			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()
 	?>
 </script>
@@ -176,7 +176,6 @@ insert_javascript_for_visibilitybox();
 				matches:                    <?= json_encode(_('matches')) ?>,
 				does_not_match:             <?= json_encode(_('does not match')) ?>,
 
-				// TODO VM: do I need all of them?
 				data_not_encoded:           <?= json_encode(_('Data is not properly encoded.')) ?>,
 				name_filed_length_exceeded: <?= json_encode(_('Name of the form field should not exceed 255 characters.')) ?>,
 				value_without_name:         <?= json_encode(_('Values without names are not allowed in form fields.')) ?>,
@@ -241,7 +240,6 @@ insert_javascript_for_visibilitybox();
 			e.new_node.querySelector('.element-table-remove')
 				.addEventListener('click', dynamic_rows.removeRow.bind(dynamic_rows, e.data_index));
 
-			// TODO VM: do I need it?
 			// Because IE does not have NodeList.prototype.forEach method.
 			Array.prototype.forEach.call(e.new_node.querySelectorAll('input'), function(input_node) {
 				input_node.addEventListener('keyup', function(e) {
@@ -425,7 +423,7 @@ insert_javascript_for_visibilitybox();
 	 * @return {Node}
 	 */
 	DynamicRows.prototype.createRowNode = function(data) {
-		var evt = this.dispatch('beforerender', {view_data: data}); // TODO VM: unused here
+		var evt = this.dispatch('beforerender', {view_data: data});
 		var html_str = this.options.template.evaluate(evt.view_data);
 
 		return jQuery(html_str).get(0);
@@ -531,12 +529,11 @@ insert_javascript_for_visibilitybox();
 				iter_filters = 0,
 				iter_operations = 0;
 
-			// TODO VM: fix naming to be consistent with API.
-			frag.appendChild(hiddenInput('step',     iter_step,                        prefix_override)); // TODO VM: maybe should add "-1"
+			frag.appendChild(hiddenInput('step',     iter_step,                        prefix_override));
 			frag.appendChild(hiddenInput('name',     override.data.name,               prefix_override));
 			frag.appendChild(hiddenInput('stop',     override.data.stop,               prefix_override));
 			frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
-			frag.appendChild(hiddenInput('formula',  override.data.overrides_formula,  prefix_filter)); // TODO VM: may be missing, don't add?
+			frag.appendChild(hiddenInput('formula',  override.data.overrides_formula,  prefix_filter));
 
 			override.data.overrides_filters.forEach(function(override_filter) {
 				var prefix = prefix_filter + '[conditions][' + (iter_filters ++) + ']';
@@ -551,14 +548,6 @@ insert_javascript_for_visibilitybox();
 				frag.appendChild(hiddenInput('operationobject', operation.operationobject, prefix));
 				frag.appendChild(hiddenInput('operator', operation.operator, prefix));
 				frag.appendChild(hiddenInput('value', operation.value, prefix));
-
-//				var visible = [];
-//				window.lldoverrides.actions.forEach(function(action) {
-//					if (action in operation) {
-//						visible.push(action);
-//					}
-//				});
-//				frag.appendChild(hiddenInput('visible', visible.join(','), prefix));
 
 				if ('opstatus' in operation) {
 					frag.appendChild(hiddenInput('status', operation.opstatus.status, prefix + '[opstatus]'));
@@ -682,7 +671,6 @@ insert_javascript_for_visibilitybox();
 	 * @param {object} data  Optional override initial data.
 	 */
 	function Override(data) {
-		// TODO VM: doublecheck, what should be in defaults
 		var defaults = {
 			name: '',
 			stop: '0',
@@ -693,9 +681,8 @@ insert_javascript_for_visibilitybox();
 			},
 			operations: []
 		};
-		this.data = jQuery.extend(true, defaults, data); // TODO VM: why it is other way around in httptest??
+		this.data = jQuery.extend(true, defaults, data);
 
-		// TODO VM: reorganize id's to match these values, then remove this part.
 		this.data.no = this.data.step;
 		this.data.overrides_evaltype = this.data.filter.evaltype;
 		this.data.overrides_formula = this.data.filter.formula;
@@ -746,7 +733,7 @@ insert_javascript_for_visibilitybox();
 		this.filterDynamicRows();
 		this.operations = new Operations(this.$form, this.override.data.operations);
 		// This will be used for link on edit button.
-		window.lldoverrides.operations = this.operations; // TODO VM: do I need "this.operations", or I can save directly to window.lldoverrides?
+		window.lldoverrides.operations = this.operations;
 	}
 
 	OverrideEditForm.prototype.updateExpression = function() {
@@ -771,7 +758,7 @@ insert_javascript_for_visibilitybox();
 		jQuery('#overrides_filters')
 			.dynamicRows({
 				template: '#override-filters-row',
-				dataCallback: function(data) { // TODO VM: why do I need this?
+				dataCallback: function(data) {
 					data.formulaId = num2letter(data.rowNum);
 
 					return data;
@@ -816,7 +803,7 @@ insert_javascript_for_visibilitybox();
 		var url = new Curl(this.$form.attr('action'));
 		url.setArgument('validate', 1);
 
-		this.$form.trimValues(['#override_name']); // TODO VM: check, what should be here
+		this.$form.trimValues(['#override_name']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		overlay.setLoading();
@@ -865,10 +852,8 @@ insert_javascript_for_visibilitybox();
 		this.$container.find('.element-table-add').on('click', this.openNew.bind(this));
 
 		this.$container.on('dynamic_rows.beforerender', function(e, dynamic_rows) {
-//			e.view_data.no = (dynamic_rows.data_index + 1); // TODO VM: it should be possible here, instead of as parameter in operation.
 			e.view_data.condition_object = that.operationobjectName(e.view_data.operationobject);
 			e.view_data.condition_operator = that.operatorName(e.view_data.operator);
-//			e.view_data.actions = '<actions here>'; // TODO VM: add actions column
 		});
 
 		this.operations_dynamic_rows = new DynamicRows(this.$container, {
@@ -979,19 +964,17 @@ insert_javascript_for_visibilitybox();
 	};
 
 	function Operation(data, no) {
-		// TODO VM: do I need default here?
 		var defaults = {
 
 		};
-		this.data = jQuery.extend(true, defaults, data); // TODO VM: why it is other way around in httptest??
-		this.data.no = no; // TODO VM: this should be possible in dynamic_rows.beforerender instead
+		this.data = jQuery.extend(true, defaults, data);
+		this.data.no = no;
 	}
 
 	/**
 	 * Merges old data with new data.
 	 */
 	Operation.prototype.update = function(data) {
-//		jQuery.extend(this.data, data); // TODO VM: why it was like this, is it safe to be changed?
 		this.data = data;
 	};
 
@@ -1009,13 +992,11 @@ insert_javascript_for_visibilitybox();
 			operationobject:    this.data.operationobject,
 			operator:           this.data.operator,
 			value:              this.data.value
-//			visible:            {}
 		};
 
 		window.lldoverrides.actions.forEach(function(action) {
 			if (action in this.data) {
 				params[action] = this.data[action];
-//				params['visible'][action] = 1;
 			}
 		}.bind(this));
 
@@ -1034,7 +1015,6 @@ insert_javascript_for_visibilitybox();
 
 		var that = this;
 
-		// TODO VM: custom interval js (move to function)
 		var $custom_intervals = jQuery('#lld_overrides_custom_intervals', this.$form);
 		$custom_intervals.on('click', 'input[type="radio"]', function() {
 			var rowNum = jQuery(this).attr('id').split('_')[3];
@@ -1055,7 +1035,6 @@ insert_javascript_for_visibilitybox();
 			template: '#lldoverride-custom-intervals-row'
 		});
 
-		// TODO VM: move to function
 		jQuery('#ophistory_history_mode', this.$form)
 			.change(function() {
 				if (jQuery('[name="ophistory[history_mode]"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
@@ -1153,7 +1132,7 @@ insert_javascript_for_visibilitybox();
 		var url = new Curl(this.$form.attr('action'));
 		url.setArgument('validate', 1);
 
-		this.$form.trimValues(['#value']); // TODO VM: check, what should be here
+		this.$form.trimValues(['#value']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		overlay.setLoading();

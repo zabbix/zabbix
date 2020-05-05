@@ -735,11 +735,10 @@ $lld_macro_paths_form_list->addRow(_('LLD macros'),
 $overrides_form_list = new CFormList();
 $overrides_list = (new CTable())
 	->addClass('lld-overrides-table')
-	// TODO VM: new text variables?
 	->setHeader([
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader())->setWidth('15'),
-		(new CColHeader(_('Name')))->setWidth('350'), // TODO VM: maybe this can be made more dynamic
+		(new CColHeader(_('Name')))->setWidth('350'),
 		(new CColHeader(_('Stop processing')))->setWidth('100'),
 		(new CColHeader(_('Action')))->setWidth('50')
 	])
@@ -750,9 +749,7 @@ $overrides_list = (new CTable())
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
 					->setEnabled(!$templated)
-					// TODO VM: check this class, most likely it should be changed.
 			))->addClass('step-action')
-		// TODO VM: check, how this class is used.
 		))
 			->addClass('lld-overrides-table-foot')
 	);
@@ -773,7 +770,6 @@ $tab = (new CTabView())
 	)
 	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)
 	->addTab('macroTab', _('Filters'), $conditionFormList)
-// TODO VM: new text variables?
 	->addTab('overridesTab', _('Overrides'), $overrides_form_list);
 
 if (!hasRequest('form_refresh')) {

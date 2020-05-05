@@ -28,9 +28,9 @@ class CControllerPopupLldOverride extends CController {
 	protected function checkInput() {
 
 		$fields = [
-			'no' =>					'int32', // TODO VM: doublecheck validation rule
+			'no' =>					'int32',
 			'templated' =>			'in 0,1',
-			'name' =>				'string', // TODO VM: doublecheck, where validation for empty should have been.
+			'name' =>				'string',
 			'old_name' =>			'string',
 			'stop' =>				'in 0,1',
 			'overrides_evaltype' =>	'in '.implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]),
@@ -76,7 +76,6 @@ class CControllerPopupLldOverride extends CController {
 		];
 
 		if ($this->hasInput('validate')) {
-			// TODO VM: doublecheck, where validation for empty should have been.
 			if ($page_options['name'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
 			}
@@ -86,14 +85,10 @@ class CControllerPopupLldOverride extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
 			}
 
-			// TODO VM: Add validation, that, if filter row is present, macro field should not be empty.
-			// TODO VM: don't add filter row when editing override. (if no filter row was configured)
-
 			// Validate if override names are unique.
 			if ($page_options['name'] !== $page_options['old_name']) {
 				foreach ($page_options['overrides_names'] as $name) {
 					if ($name === $page_options['name']) {
-						// TODO VM: new translation string
 						error(_s('Override with name "%1$s" already exists.', $name));
 					}
 				}
