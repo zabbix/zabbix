@@ -256,6 +256,7 @@ Changes for 4.4.9rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.8
