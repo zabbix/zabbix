@@ -1092,16 +1092,17 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($items as $item) {
 				if (array_key_exists('overrides', $item)) {
 					foreach ($item['overrides'] as $override) {
-						foreach ($override['operations'] as $operation) {
-							$operations[] = [
-								'lld_overrideid' => $override['lld_overrideid'],
-								'operationobject' => $operation['operationobject'],
-								'operator' => array_key_exists('operator', $operation)
-									? $operation['operator']
-									: CONDITION_OPERATOR_EQUAL,
-								'value' => array_key_exists('value', $operation) ? $operation['value'] : ''
-							];
-
+						if (array_key_exists('operations', $override)) {
+							foreach ($override['operations'] as $operation) {
+								$operations[] = [
+									'lld_overrideid' => $override['lld_overrideid'],
+									'operationobject' => $operation['operationobject'],
+									'operator' => array_key_exists('operator', $operation)
+										? $operation['operator']
+										: CONDITION_OPERATOR_EQUAL,
+									'value' => array_key_exists('value', $operation) ? $operation['value'] : ''
+								];
+							}
 						}
 					}
 				}
@@ -1123,98 +1124,102 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($items as $item) {
 				if (array_key_exists('overrides', $item)) {
 					foreach ($item['overrides'] as $override) {
-						foreach ($override['operations'] as $operation) {
-							$operation['lld_override_operationid'] = $operationids[$opr_idx++];
+						if (array_key_exists('operations', $override)) {
+							foreach ($override['operations'] as $operation) {
+								$operation['lld_override_operationid'] = $operationids[$opr_idx++];
 
-							// Discover status applies to all operation object types.
-							if (array_key_exists('opdiscover', $operation)) {
-								$opdiscover[] = [
-									'lld_override_operationid' => $operation['lld_override_operationid'],
-									'discover' => $operation['opdiscover']['discover']
-								];
-							}
+								// Discover status applies to all operation object types.
+								if (array_key_exists('opdiscover', $operation)) {
+									$opdiscover[] = [
+										'lld_override_operationid' => $operation['lld_override_operationid'],
+										'discover' => $operation['opdiscover']['discover']
+									];
+								}
 
-							switch ($operation['operationobject']) {
-								case OPERATION_OBJECT_ITEM_PROTOTYPE:
-									if (array_key_exists('opstatus', $operation)) {
-										$opstatus[] = [
-											'lld_override_operationid' => $operation['lld_override_operationid'],
-											'status' => $operation['opstatus']['status']
-										];
-									}
-
-									if (array_key_exists('opperiod', $operation)) {
-										$opperiod[] = [
-											'lld_override_operationid' => $operation['lld_override_operationid'],
-											'delay' => $operation['opperiod']['delay']
-										];
-									}
-
-									if (array_key_exists('ophistory', $operation)) {
-										$ophistory[] = [
-											'lld_override_operationid' => $operation['lld_override_operationid'],
-											'history' => $operation['ophistory']['history']
-										];
-									}
-
-									if (array_key_exists('optrends', $operation)) {
-										$optrends[] = [
-											'lld_override_operationid' => $operation['lld_override_operationid'],
-											'trends' => $operation['optrends']['trends']
-										];
-									}
-									break;
-
-								case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-									if (array_key_exists('opstatus', $operation)) {
-										$opstatus[] = [
-											'lld_override_operationid' => $operation['lld_override_operationid'],
-											'status' => $operation['opstatus']['status']
-										];
-									}
-
-									if (array_key_exists('opseverity', $operation)) {
-										$opseverity[] = [
-											'lld_override_operationid' => $operation['lld_override_operationid'],
-											'severity' => $operation['opseverity']['severity']
-										];
-									}
-
-									if (array_key_exists('optag', $operation)) {
-										foreach ($operation['optag'] as $tag) {
-											$optag[] = [
+								switch ($operation['operationobject']) {
+									case OPERATION_OBJECT_ITEM_PROTOTYPE:
+										if (array_key_exists('opstatus', $operation)) {
+											$opstatus[] = [
 												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'tag' => $tag['tag'],
-												'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
+												'status' => $operation['opstatus']['status']
 											];
 										}
-									}
-									break;
 
-								case OPERATION_OBJECT_HOST_PROTOTYPE:
-									if (array_key_exists('opstatus', $operation)) {
-										$opstatus[] = [
-											'lld_override_operationid' => $operation['lld_override_operationid'],
-											'status' => $operation['opstatus']['status']
-										];
-									}
-
-									if (array_key_exists('optemplate', $operation)) {
-										foreach ($operation['optemplate'] as $template) {
-											$optemplate[] = [
+										if (array_key_exists('opperiod', $operation)) {
+											$opperiod[] = [
 												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'templateid' => $template['templateid']
+												'delay' => $operation['opperiod']['delay']
 											];
 										}
-									}
 
-									if (array_key_exists('opinventory', $operation)) {
-										$opinventory[] = [
-											'lld_override_operationid' => $operation['lld_override_operationid'],
-											'inventory_mode' => $operation['opinventory']['inventory_mode']
-										];
-									}
-									break;
+										if (array_key_exists('ophistory', $operation)) {
+											$ophistory[] = [
+												'lld_override_operationid' => $operation['lld_override_operationid'],
+												'history' => $operation['ophistory']['history']
+											];
+										}
+
+										if (array_key_exists('optrends', $operation)) {
+											$optrends[] = [
+												'lld_override_operationid' => $operation['lld_override_operationid'],
+												'trends' => $operation['optrends']['trends']
+											];
+										}
+										break;
+
+									case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+										if (array_key_exists('opstatus', $operation)) {
+											$opstatus[] = [
+												'lld_override_operationid' => $operation['lld_override_operationid'],
+												'status' => $operation['opstatus']['status']
+											];
+										}
+
+										if (array_key_exists('opseverity', $operation)) {
+											$opseverity[] = [
+												'lld_override_operationid' => $operation['lld_override_operationid'],
+												'severity' => $operation['opseverity']['severity']
+											];
+										}
+
+										if (array_key_exists('optag', $operation)) {
+											foreach ($operation['optag'] as $tag) {
+												$optag[] = [
+													'lld_override_operationid' =>
+														$operation['lld_override_operationid'],
+													'tag' => $tag['tag'],
+													'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
+												];
+											}
+										}
+										break;
+
+									case OPERATION_OBJECT_HOST_PROTOTYPE:
+										if (array_key_exists('opstatus', $operation)) {
+											$opstatus[] = [
+												'lld_override_operationid' => $operation['lld_override_operationid'],
+												'status' => $operation['opstatus']['status']
+											];
+										}
+
+										if (array_key_exists('optemplate', $operation)) {
+											foreach ($operation['optemplate'] as $template) {
+												$optemplate[] = [
+													'lld_override_operationid' =>
+														$operation['lld_override_operationid'],
+													'templateid' => $template['templateid']
+												];
+											}
+										}
+
+										if (array_key_exists('opinventory', $operation)) {
+											$opinventory[] = [
+												'lld_override_operationid' => $operation['lld_override_operationid'],
+												'inventory_mode' => $operation['opinventory']['inventory_mode']
+											];
+										}
+										break;
+								}
 							}
 						}
 					}
@@ -1632,124 +1637,136 @@ class CDiscoveryRule extends CItemGeneral {
 					}
 
 					// Check integrity of 'overrideobject' and its fields.
-					foreach ($override['operations'] as $opr_idx => $operation) {
-						$opr_path = $path.'/'.($ovrd_idx + 1).'/operations/'.($opr_idx + 1);
+					if (array_key_exists('operations', $override)) {
+						foreach ($override['operations'] as $opr_idx => $operation) {
+							$opr_path = $path.'/'.($ovrd_idx + 1).'/operations/'.($opr_idx + 1);
 
-						switch ($operation['operationobject']) {
-							case OPERATION_OBJECT_ITEM_PROTOTYPE:
-								foreach (['opseverity', 'optag', 'optemplate', 'opinventory'] as $field) {
-									if (array_key_exists($field, $operation)) {
+							switch ($operation['operationobject']) {
+								case OPERATION_OBJECT_ITEM_PROTOTYPE:
+									foreach (['opseverity', 'optag', 'optemplate', 'opinventory'] as $field) {
+										if (array_key_exists($field, $operation)) {
+											self::exception(ZBX_API_ERROR_PARAMETERS,
+												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
+													_s('unexpected parameter "%1$s"', $field)
+												)
+											);
+										}
+									}
+
+									if (!array_key_exists('opstatus', $operation)
+											&& !array_key_exists('opperiod', $operation)
+											&& !array_key_exists('ophistory', $operation)
+											&& !array_key_exists('optrends', $operation)
+											&& !array_key_exists('opdiscover', $operation)) {
 										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-											$opr_path, _s('unexpected parameter "%1$s"', $field)
+											$opr_path, _s('value must be one of %1$s',
+												'opstatus, opdiscover, opperiod, ophistory, optrends'
+											)
 										));
 									}
-								}
 
-								if (!array_key_exists('opstatus', $operation)
-										&& !array_key_exists('opperiod', $operation)
-										&& !array_key_exists('ophistory', $operation)
-										&& !array_key_exists('optrends', $operation)
-										&& !array_key_exists('opdiscover', $operation)) {
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-										$opr_path, _s('value must be one of %1$s',
-											'opstatus, opdiscover, opperiod, ophistory, optrends'
-										)
-									));
-								}
-
-								if (array_key_exists('opperiod', $operation)) {
-									$this->validateDelay($update_interval_parser, $operation['opperiod']['delay']);
-								}
-
-								if (array_key_exists('ophistory', $operation)
-										&& !validateTimeUnit($operation['ophistory']['history'], SEC_PER_HOUR,
-												25 * SEC_PER_YEAR, true, $error,
-												['usermacros' => true, 'lldmacros' => true])) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
-									);
-								}
-
-								if (array_key_exists('optrends', $operation)
-										&& !validateTimeUnit($operation['optrends']['trends'], SEC_PER_HOUR,
-												25 * SEC_PER_YEAR, true, $error,
-												['usermacros' => true, 'lldmacros' => true])) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
-									);
-								}
-								break;
-
-							case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-								foreach (['opperiod', 'ophistory', 'optrends', 'optemplate', 'opinventory'] as $field) {
-									if (array_key_exists($field, $operation)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-											$opr_path, _s('unexpected parameter "%1$s"', $field)
-										));
+									if (array_key_exists('opperiod', $operation)) {
+										$this->validateDelay($update_interval_parser, $operation['opperiod']['delay']);
 									}
-								}
 
-								if (!array_key_exists('opstatus', $operation)
-										&& !array_key_exists('opseverity', $operation)
-										&& !array_key_exists('optag', $operation)
-										&& !array_key_exists('opdiscover', $operation)) {
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-										$opr_path,
-										_s('value must be one of %1$s', 'opstatus, opdiscover, opseverity, optag')
-									));
-								}
-								break;
-
-							case OPERATION_OBJECT_GRAPH_PROTOTYPE:
-								foreach (['opstatus', 'opperiod', 'ophistory', 'optrends', 'opseverity', 'optag',
-										'optemplate', 'opinventory'] as $field) {
-									if (array_key_exists($field, $operation)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-											$opr_path, _s('unexpected parameter "%1$s"', $field)
-										));
-									}
-								}
-
-								if (!array_key_exists('opdiscover', $operation)) {
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-										$opr_path,
-										_s('value must be one of %1$s', 'opdiscover')
-									));
-								}
-								break;
-
-							case OPERATION_OBJECT_HOST_PROTOTYPE:
-								foreach (['opperiod', 'ophistory', 'optrends', 'opseverity', 'optag'] as $field) {
-									if (array_key_exists($field, $operation)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-											$opr_path, _s('unexpected parameter "%1$s"', $field)
-										));
-									}
-								}
-
-								if (!array_key_exists('opstatus', $operation)
-										&& !array_key_exists('optemplate', $operation)
-										&& !array_key_exists('opinventory', $operation)
-										&& !array_key_exists('opdiscover', $operation)) {
-									self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-										$opr_path,
-										_s('value must be one of %1$s', 'opstatus, opdiscover, optemplate, opinventory')
-									));
-								}
-
-								if (array_key_exists('optemplate', $operation)) {
-									$templates_cnt = API::Template()->get([
-										'countOutput' => true,
-										'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
-									]);
-
-									if (count($operation['optemplate']) != $templates_cnt) {
-										self::exception(ZBX_API_ERROR_PERMISSIONS,
-											_('No permissions to referred object or it does not exist!')
+									if (array_key_exists('ophistory', $operation)
+											&& !validateTimeUnit($operation['ophistory']['history'], SEC_PER_HOUR,
+													25 * SEC_PER_YEAR, true, $error,
+													['usermacros' => true, 'lldmacros' => true])) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
 										);
 									}
-								}
-								break;
+
+									if (array_key_exists('optrends', $operation)
+											&& !validateTimeUnit($operation['optrends']['trends'], SEC_PER_HOUR,
+													25 * SEC_PER_YEAR, true, $error,
+													['usermacros' => true, 'lldmacros' => true])) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
+										);
+									}
+									break;
+
+								case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+									foreach (['opperiod', 'ophistory', 'optrends', 'optemplate', 'opinventory'] as
+											$field) {
+										if (array_key_exists($field, $operation)) {
+											self::exception(ZBX_API_ERROR_PARAMETERS,
+												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
+													_s('unexpected parameter "%1$s"', $field)
+												)
+											);
+										}
+									}
+
+									if (!array_key_exists('opstatus', $operation)
+											&& !array_key_exists('opseverity', $operation)
+											&& !array_key_exists('optag', $operation)
+											&& !array_key_exists('opdiscover', $operation)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+											$opr_path,
+											_s('value must be one of %1$s', 'opstatus, opdiscover, opseverity, optag')
+										));
+									}
+									break;
+
+								case OPERATION_OBJECT_GRAPH_PROTOTYPE:
+									foreach (['opstatus', 'opperiod', 'ophistory', 'optrends', 'opseverity', 'optag',
+											'optemplate', 'opinventory'] as $field) {
+										if (array_key_exists($field, $operation)) {
+											self::exception(ZBX_API_ERROR_PARAMETERS,
+												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
+													_s('unexpected parameter "%1$s"', $field)
+												)
+											);
+										}
+									}
+
+									if (!array_key_exists('opdiscover', $operation)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+											$opr_path,
+											_s('value must be one of %1$s', 'opdiscover')
+										));
+									}
+									break;
+
+								case OPERATION_OBJECT_HOST_PROTOTYPE:
+									foreach (['opperiod', 'ophistory', 'optrends', 'opseverity', 'optag'] as $field) {
+										if (array_key_exists($field, $operation)) {
+											self::exception(ZBX_API_ERROR_PARAMETERS,
+												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
+													_s('unexpected parameter "%1$s"', $field)
+												)
+											);
+										}
+									}
+
+									if (!array_key_exists('opstatus', $operation)
+											&& !array_key_exists('optemplate', $operation)
+											&& !array_key_exists('opinventory', $operation)
+											&& !array_key_exists('opdiscover', $operation)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+											$opr_path, _s('value must be one of %1$s',
+												'opstatus, opdiscover, optemplate, opinventory'
+											)
+										));
+									}
+
+									if (array_key_exists('optemplate', $operation)) {
+										$templates_cnt = API::Template()->get([
+											'countOutput' => true,
+											'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
+										]);
+
+										if (count($operation['optemplate']) != $templates_cnt) {
+											self::exception(ZBX_API_ERROR_PERMISSIONS,
+												_('No permissions to referred object or it does not exist!')
+											);
+										}
+									}
+									break;
+							}
 						}
 					}
 				}
