@@ -202,8 +202,6 @@ static void	free_object_names(void)
 {
 	int	i;
 
-	LOCK_PERFCOUNTERS;
-
 	for (i = 0; i < object_num; i++)
 	{
 		zbx_free(object_names[i].eng_name);
@@ -212,8 +210,6 @@ static void	free_object_names(void)
 
 	zbx_free(object_names);
 	object_num = 0;
-
-	UNLOCK_PERFCOUNTERS;
 }
 
 /******************************************************************************
@@ -375,8 +371,6 @@ static void	free_perf_counter_list(void)
 {
 	zbx_perf_counter_data_t	*cptr;
 
-	LOCK_PERFCOUNTERS;
-
 	while (NULL != ppsd.pPerfCounterList)
 	{
 		cptr = ppsd.pPerfCounterList;
@@ -387,8 +381,6 @@ static void	free_perf_counter_list(void)
 		zbx_free(cptr->value_array);
 		zbx_free(cptr);
 	}
-
-	UNLOCK_PERFCOUNTERS;
 }
 
 /******************************************************************************
@@ -487,8 +479,12 @@ void	free_perf_collector(void)
 	PdhCloseQuery(ppsd.pdh_query);
 	ppsd.pdh_query = NULL;
 
+	LOCK_PERFCOUNTERS;
+
 	free_perf_counter_list();
 	free_object_names();
+
+	UNLOCK_PERFCOUNTERS;
 
 	zbx_mutex_destroy(&perfstat_access);
 }
