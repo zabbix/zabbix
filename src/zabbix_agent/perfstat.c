@@ -851,7 +851,8 @@ static wchar_t	*get_object_name(char *eng_name)
 
 	for (i = 0; i < object_num; i++)
 	{
-		if (NULL != object_names[i].eng_name && 0 == strcmp(object_names[i].eng_name, eng_name))
+		if (NULL != object_names[i].eng_name &&
+				0 == zbx_strncasecmp(object_names[i].eng_name, eng_name, strlen(eng_name)))
 		{
 			size_t	sz;
 
