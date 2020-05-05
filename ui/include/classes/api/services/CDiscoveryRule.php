@@ -1591,9 +1591,10 @@ class CDiscoveryRule extends CItemGeneral {
 			'lldmacros' => true
 		]);
 
-		foreach ($items as $lld_idx => $item) {
+		$lld_idx = 0;
+		foreach ($items as $item) {
 			if (array_key_exists('overrides', $item)) {
-				$path = '/'.($lld_idx + 1).'/overrides';
+				$path = '/'.(++$lld_idx).'/overrides';
 
 				if (!CApiInputValidator::validate($api_input_rules, $item['overrides'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
