@@ -69,7 +69,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			'items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Items',
 			'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Triggers',
 			'graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Graphs',
-			'host_discovery.php?hostid='.$hostid => 'Discovery rules',
+			'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Discovery rules',
 			'httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Web scenarios',
 		];
 		$count_items = CDBHelper::getCount('SELECT NULL FROM items WHERE hostid='.$hostid);
