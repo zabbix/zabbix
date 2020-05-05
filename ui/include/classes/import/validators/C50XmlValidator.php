@@ -297,6 +297,45 @@ class C50XmlValidator {
 		CXmlConstantValue::OPERATION_MODE_UPDATE => CXmlConstantName::UPDATE
 	];
 
+	private $LLD_OVERRIDE_STOP = [
+		CXmlConstantValue::LLD_OVERRIDE_STOP_NO => CXmlConstantName::LLD_OVERRIDE_STOP_NO,
+		CXmlConstantValue::LLD_OVERRIDE_STOP_YES => CXmlConstantName::LLD_OVERRIDE_STOP_YES
+	];
+
+	private $EVALTPYE = [
+		CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR,
+		CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND,
+		CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR,
+		CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA
+	];
+
+	private $FILTER_CONDITION_OPERATOR = [
+		CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
+		CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX
+	];
+
+	private $LLD_OVERRIDE_OPERATION_OBJECT = [
+		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
+		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_GRAPH_PROTOTYPE,
+		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
+	];
+
+	private $CONDITION_OPERATOR = [
+		CXmlConstantValue::CONDITION_OPERATOR_EQUAL => CXmlConstantName::CONDITION_OPERATOR_EQUAL,
+		CXmlConstantValue::CONDITION_OPERATOR_NOT_EQUAL => CXmlConstantName::CONDITION_OPERATOR_NOT_EQUAL,
+		CXmlConstantValue::CONDITION_OPERATOR_LIKE => CXmlConstantName::CONDITION_OPERATOR_LIKE,
+		CXmlConstantValue::CONDITION_OPERATOR_NOT_LIKE => CXmlConstantName::CONDITION_OPERATOR_NOT_LIKE,
+		CXmlConstantValue::CONDITION_OPERATOR_REGEXP => CXmlConstantName::CONDITION_OPERATOR_REGEXP,
+		CXmlConstantValue::CONDITION_OPERATOR_NOT_REGEXP => CXmlConstantName::CONDITION_OPERATOR_NOT_REGEXP
+	];
+
+	private $INVENTORY_MODE = [
+		CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED,
+		CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL,
+		CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC
+	];
+
 	/**
 	 * Format of import source.
 	 *
@@ -505,13 +544,13 @@ class C50XmlValidator {
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
-								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
 										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 										'value' =>					['type' => XML_STRING, 'default' => ''],
-										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => [CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX]],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
 										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 									]]
 								]]
@@ -529,6 +568,7 @@ class C50XmlValidator {
 									'history' =>				['type' => XML_STRING, 'default' => '90d'],
 									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 									'units' =>					['type' => XML_STRING, 'default' => ''],
@@ -607,6 +647,7 @@ class C50XmlValidator {
 											'opdata' =>					['type' => XML_STRING, 'default' => ''],
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 											'description' =>			['type' => XML_STRING, 'default' => ''],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -639,6 +680,7 @@ class C50XmlValidator {
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -691,7 +733,8 @@ class C50XmlValidator {
 												'key' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
-									]]
+									]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
 								]]
 							]],
 							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
@@ -699,7 +742,8 @@ class C50XmlValidator {
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+									'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -770,6 +814,50 @@ class C50XmlValidator {
 									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
+								]]
+							]],
+							'overrides'	=>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
+								'override' =>				['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'step' =>					['type' => XML_STRING | XML_REQUIRED],
+									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
+									'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+										'formula' =>				['type' => XML_STRING, 'default' => ''],
+										'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+											'condition' =>				['type' => XML_ARRAY, 'rules' => [
+												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+												'value' =>					['type' => XML_STRING, 'default' => ''],
+												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+												'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
+											]]
+										]]
+									]],
+									'operations' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
+										'operation' =>				['type' => XML_ARRAY, 'rules' => [
+											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
+											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED],
+											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+											'delay' =>					['type' => XML_STRING, 'default' => ''],
+											'history' =>				['type' => XML_STRING, 'default' => ''],
+											'trends' =>					['type' => XML_STRING, 'default' => ''],
+											'severity' =>				['type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
+													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+													'value' =>					['type' => XML_STRING, 'default' => '']
+												]]
+											]],
+											'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+												'template' =>				['type' => XML_ARRAY, 'rules' => [
+													'name' =>					['type' => XML_STRING | XML_REQUIRED]
+												]]
+											]],
+											'inventory_mode' =>			['type' => XML_STRING, 'in' => $this->INVENTORY_MODE]
+										]]
+									]]
 								]]
 							]]
 						]]
@@ -923,7 +1011,7 @@ class C50XmlValidator {
 						'poc_2_screen' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_2_notes' =>			['type' => XML_STRING, 'default' => '']
 					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]]
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE]
 				]]
 			]],
 			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
@@ -1066,13 +1154,13 @@ class C50XmlValidator {
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
-								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
 										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 										'value' =>					['type' => XML_STRING, 'default' => ''],
-										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => [CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX]],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
 										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 									]]
 								]]
@@ -1089,6 +1177,7 @@ class C50XmlValidator {
 									'history' =>				['type' => XML_STRING, 'default' => '90d'],
 									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_DISCOVER, 'in' => [CXmlConstantValue::ITEM_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::ITEM_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 									'units' =>					['type' => XML_STRING, 'default' => ''],
@@ -1166,6 +1255,7 @@ class C50XmlValidator {
 											'opdata' =>					['type' => XML_STRING, 'default' => ''],
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 											'description' =>			['type' => XML_STRING, 'default' => ''],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -1198,6 +1288,7 @@ class C50XmlValidator {
 									'opdata' =>					['type' => XML_STRING, 'default' => ''],
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISCOVER, 'in' => [CXmlConstantValue::TRIGGER_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::TRIGGER_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
@@ -1250,7 +1341,8 @@ class C50XmlValidator {
 												'key' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
-									]]
+									]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::GRAPH_DISCOVER, 'in' => [CXmlConstantValue::GRAPH_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::GRAPH_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]]
 								]]
 							]],
 							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
@@ -1258,6 +1350,7 @@ class C50XmlValidator {
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'discover' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::HOST_DISCOVER, 'in' => [CXmlConstantValue::HOST_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::HOST_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1328,6 +1421,50 @@ class C50XmlValidator {
 									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
+								]]
+							]],
+							'overrides'	=>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
+								'override' =>				['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'step' =>					['type' => XML_STRING | XML_REQUIRED],
+									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
+									'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+										'formula' =>				['type' => XML_STRING, 'default' => ''],
+										'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+											'condition' =>				['type' => XML_ARRAY, 'rules' => [
+												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+												'value' =>					['type' => XML_STRING, 'default' => ''],
+												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+												'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
+											]]
+										]]
+									]],
+									'operations' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
+										'operation' =>				['type' => XML_ARRAY, 'rules' => [
+											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
+											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED],
+											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
+											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
+											'delay' =>					['type' => XML_STRING, 'default' => ''],
+											'history' =>				['type' => XML_STRING, 'default' => ''],
+											'trends' =>					['type' => XML_STRING, 'default' => ''],
+											'severity' =>				['type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
+													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+													'value' =>					['type' => XML_STRING, 'default' => '']
+												]]
+											]],
+											'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+												'template' =>				['type' => XML_ARRAY, 'rules' => [
+													'name' =>					['type' => XML_STRING | XML_REQUIRED]
+												]]
+											]],
+											'inventory_mode' =>			['type' => XML_STRING, 'in' => $this->INVENTORY_MODE]
+										]]
+									]]
 								]]
 							]]
 						]]
@@ -1439,7 +1576,7 @@ class C50XmlValidator {
 							]]
 						]]
 					]],
-					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]]
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => $this->INVENTORY_MODE]
 				]]
 			]],
 			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [

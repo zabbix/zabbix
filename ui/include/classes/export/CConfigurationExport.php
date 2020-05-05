@@ -102,7 +102,7 @@ class CConfigurationExport {
 				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
 				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps'
+				'verify_host', 'allow_traps', 'discover'
 			]
 		];
 	}
@@ -555,6 +555,7 @@ class CConfigurationExport {
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'preservekeys' => true
@@ -597,19 +598,102 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function prepareDiscoveryRules(array $items) {
+		$templateids = [];
+
 		foreach ($items as &$item) {
 			$item['itemPrototypes'] = [];
 			$item['graphPrototypes'] = [];
 			$item['triggerPrototypes'] = [];
 			$item['hostPrototypes'] = [];
 
-			// unset unnecessary condition fields
+			// Unset unnecessary condition fields.
 			foreach ($item['filter']['conditions'] as &$condition) {
 				unset($condition['item_conditionid'], $condition['itemid']);
 			}
 			unset($condition);
+
+			// Unset unnecessary filter field and prepare the operations.
+			if ($item['overrides']) {
+				foreach ($item['overrides'] as &$override) {
+					if (array_key_exists('filter', $override)) {
+						unset($override['filter']['eval_formula']);
+					}
+
+					foreach ($override['operations'] as &$operation) {
+						if (array_key_exists('opstatus', $operation)) {
+							$operation['status'] = $operation['opstatus']['status'];
+							unset($operation['opstatus']);
+						}
+						if (array_key_exists('opdiscover', $operation)) {
+							$operation['discover'] = $operation['opdiscover']['discover'];
+							unset($operation['opdiscover']);
+						}
+						if (array_key_exists('opperiod', $operation)) {
+							$operation['delay'] = $operation['opperiod']['delay'];
+							unset($operation['opperiod']);
+						}
+						if (array_key_exists('ophistory', $operation)) {
+							$operation['history'] = $operation['ophistory']['history'];
+							unset($operation['ophistory']);
+						}
+						if (array_key_exists('optrends', $operation)) {
+							$operation['trends'] = $operation['optrends']['trends'];
+							unset($operation['optrends']);
+						}
+						if (array_key_exists('opseverity', $operation)) {
+							$operation['severity'] = $operation['opseverity']['severity'];
+							unset($operation['opseverity']);
+						}
+						if (array_key_exists('optag', $operation)) {
+							$operation['tags'] = [];
+							foreach ($operation['optag'] as $tag) {
+								$operation['tags'][] = $tag;
+							}
+							unset($operation['optag']);
+						}
+						if (array_key_exists('optemplate', $operation)) {
+							foreach ($operation['optemplate'] as $template) {
+								$templateids[$template['templateid']] = true;
+							}
+						}
+						if (array_key_exists('opinventory', $operation)) {
+							$operation['inventory_mode'] = $operation['opinventory']['inventory_mode'];
+							unset($operation['opinventory']);
+						}
+					}
+					unset($operation);
+				}
+				unset($override);
+
+			}
 		}
 		unset($item);
+
+		if ($templateids) {
+			$templates = API::Template()->get([
+				'output' => ['name'],
+				'templateids' => array_keys($templateids),
+				'preservekeys' => true
+			]);
+			foreach ($items as &$item) {
+				if ($item['overrides']) {
+					foreach ($item['overrides'] as &$override) {
+						foreach ($override['operations'] as &$operation) {
+							if (array_key_exists('optemplate', $operation)) {
+								$operation['templates'] = [];
+								foreach ($operation['optemplate'] as $template) {
+									$operation['templates'][] = ['name' => $templates[$template['templateid']]['name']];
+								}
+								unset($operation['optemplate']);
+							}
+						}
+						unset($operation);
+					}
+					unset($override);
+				}
+			}
+			unset($item);
+		}
 
 		// gather item prototypes
 		$item_prototypes = API::ItemPrototype()->get([
@@ -715,8 +799,9 @@ class CConfigurationExport {
 
 		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
-				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+				'discover'
 			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
@@ -981,8 +1066,8 @@ class CConfigurationExport {
 		$hostIds = array_merge($hostIds, $templateIds);
 
 		$triggers = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
-				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],

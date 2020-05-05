@@ -26,7 +26,7 @@ class CItemPrototype extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
-	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
+	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status', 'discover'];
 
 	/**
 	 * Define a set of supported pre-processing rules.
@@ -372,6 +372,23 @@ class CItemPrototype extends CItemGeneral {
 			unset($item['itemid']);
 		}
 		unset($item);
+
+		// Validate item prototype status and discover status fields.
+		$rules = [
+			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
+		];
+
+		foreach ($items as $key => $item) {
+			$item = array_intersect_key($item, $rules);
+			if ($item) {
+				$path = '/'.($key + 1);
+
+				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+		}
 
 		$this->validateDependentItems($items);
 
@@ -736,6 +753,21 @@ class CItemPrototype extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$this->checkInput($items, true);
+
+		// Validate item prototype status and discover status fields.
+		$rules = [
+			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
+		];
+
+		foreach ($items as $key => $item) {
+			$item = array_intersect_key($item, $rules);
+			$path = '/'.($key + 1);
+
+			if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
 
 		$db_items = $this->get([
 			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],

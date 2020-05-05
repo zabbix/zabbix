@@ -596,7 +596,8 @@ class CConfigurationExportBuilder {
 				'verify_peer' => $discoveryRule['verify_peer'],
 				'verify_host' => $discoveryRule['verify_host'],
 				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
-				'preprocessing' => $discoveryRule['preprocessing']
+				'preprocessing' => $discoveryRule['preprocessing'],
+				'overrides' => $discoveryRule['overrides']
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {
@@ -731,7 +732,7 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($graphs, ['name']);
 
 		foreach ($graphs as $graph) {
-			$result[] = [
+			$data = [
 				'name' => $graph['name'],
 				'width' => $graph['width'],
 				'height' => $graph['height'],
@@ -750,6 +751,12 @@ class CConfigurationExportBuilder {
 				'ymax_item_1' => $graph['ymax_itemid'],
 				'graph_items' => $this->formatGraphItems($graph['gitems'])
 			];
+
+			if ($graph['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$data['discover'] = $graph['discover'];
+			}
+
+			$result[] = $data;
 		}
 
 		return $result;
@@ -772,6 +779,7 @@ class CConfigurationExportBuilder {
 				'host' => $hostPrototype['host'],
 				'name' => $hostPrototype['name'],
 				'status' => $hostPrototype['status'],
+				'discover' => $hostPrototype['discover'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
 				'macros' => $this->formatMacros($hostPrototype['macros']),
@@ -859,7 +867,7 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($triggers, ['description', 'expression', 'recovery_expression']);
 
 		foreach ($triggers as $trigger) {
-			$result[] = [
+			$data = [
 				'expression' => $trigger['expression'],
 				'recovery_mode' => $trigger['recovery_mode'],
 				'recovery_expression' => $trigger['recovery_expression'],
@@ -876,6 +884,12 @@ class CConfigurationExportBuilder {
 				'dependencies' => $this->formatDependencies($trigger['dependencies']),
 				'tags' => $this->formatTags($trigger['tags'])
 			];
+
+			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$data['discover'] = $trigger['discover'];
+			}
+
+			$result[] = $data;
 		}
 
 		return $result;
@@ -995,6 +1009,7 @@ class CConfigurationExportBuilder {
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
+				$data['discover'] = $item['discover'];
 			}
 
 			$data['master_item'] = $master_item;

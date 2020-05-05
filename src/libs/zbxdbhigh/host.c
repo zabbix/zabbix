@@ -1035,7 +1035,7 @@ out:
  * Parameters: triggerids - [IN] trigger identificators from database         *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
+void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
@@ -2087,7 +2087,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		const char *recovery_expression, unsigned char recovery_mode, unsigned char status, unsigned char type,
 		unsigned char priority, const char *comments, const char *url, unsigned char flags,
 		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
-		const char *opdata)
+		const char *opdata, unsigned char discover)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2146,9 +2146,10 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 					",correlation_tag='%s'"
 					",manual_close=%d"
 					",opdata='%s'"
+					",discover=%d"
 				" where triggerid=" ZBX_FS_UI64 ";\n",
 				triggerid, (int)flags, (int)recovery_mode, (int)correlation_mode, correlation_tag_esc,
-				(int)manual_close, opdata_esc, h_triggerid);
+				(int)manual_close, opdata_esc, (int)discover, h_triggerid);
 
 		*new_triggerid = 0;
 		*cur_triggerid = h_triggerid;
@@ -2175,14 +2176,14 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
 						"comments,url,type,value,state,templateid,flags,recovery_mode,"
-						"correlation_mode,correlation_tag,manual_close,opdata)"
+						"correlation_mode,correlation_tag,manual_close,opdata,discover)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
 						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,%d,"
-						"%d,'%s',%d,'%s');\n",
+						"%d,'%s',%d,'%s',%d);\n",
 					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
 					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL, triggerid,
 					(int)flags, (int)recovery_mode, (int)correlation_mode, correlation_tag_esc,
-					(int)manual_close, opdata_esc);
+					(int)manual_close, opdata_esc, (int)discover);
 
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
@@ -2988,7 +2989,9 @@ typedef struct
 	unsigned char		status;
 #define ZBX_FLAG_HPLINK_UPDATE_NAME	0x01
 #define ZBX_FLAG_HPLINK_UPDATE_STATUS	0x02
+#define	ZBX_FLAG_HPLINK_UPDATE_DISCOVER 0x04
 	unsigned char		flags;
+	unsigned char		discover;
 }
 zbx_host_prototype_t;
 
@@ -3067,7 +3070,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 	/* selects host prototypes from templates */
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hi.itemid,th.hostid,th.host,th.name,th.status"
+			"select hi.itemid,th.hostid,th.host,th.name,th.status,th.discover"
 			" from items hi,items ti,host_discovery thd,hosts th"
 			" where hi.templateid=ti.itemid"
 				" and ti.itemid=thd.parent_itemid"
@@ -3093,6 +3096,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		host_prototype->name = zbx_strdup(NULL, row[3]);
 		host_prototype->status = (unsigned char)atoi(row[4]);
 		host_prototype->flags = 0;
+		host_prototype->discover = (unsigned char)atoi(row[5]);
 
 		zbx_vector_ptr_append(host_prototypes, host_prototype);
 		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
@@ -3112,7 +3116,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select i.itemid,h.hostid,h.host,h.name,h.status"
+				"select i.itemid,h.hostid,h.host,h.name,h.status,h.discover"
 				" from items i,host_discovery hd,hosts h"
 				" where i.itemid=hd.parent_itemid"
 					" and hd.hostid=h.hostid"
@@ -3138,6 +3142,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_NAME;
 					if (host_prototype->status != (status = (unsigned char)atoi(row[4])))
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_STATUS;
+					if (host_prototype->discover != (unsigned char)atoi(row[5]))
+						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_DISCOVER;
 					break;
 				}
 			}
@@ -3660,7 +3666,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		hostid = DBget_maxid_num("hosts", new_hosts);
 
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "status", "flags", "templateid",
-				NULL);
+				"discover", NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_itemid", NULL);
 	}
@@ -3722,7 +3728,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 			zbx_db_insert_add_values(&db_insert, host_prototype->hostid, host_prototype->host,
 					host_prototype->name, (int)host_prototype->status,
-					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid);
+					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid,
+					(int)host_prototype->discover);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
 		}
@@ -3740,6 +3747,11 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			{
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",status=%d",
 						host_prototype->status);
+			}
+			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_DISCOVER))
+			{
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",discover=%d",
+						host_prototype->discover);
 			}
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
@@ -3941,7 +3953,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid,t.description,t.expression,t.status,"
 				"t.type,t.priority,t.comments,t.url,t.flags,t.recovery_expression,t.recovery_mode,"
-				"t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata"
+				"t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.discover"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -3970,7 +3982,8 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 				(unsigned char)atoi(row[11]),	/* correlation_mode */
 				row[12],			/* correlation_tag */
 				(unsigned char)atoi(row[13]),	/* manual_close */
-				row[14]);			/* opdata */
+				row[14],			/* opdata */
+				(unsigned char)atoi(row[15]));	/* discover */
 
 		if (0 != new_triggerid)				/* new trigger added */
 			zbx_vector_uint64_append(&new_triggerids, new_triggerid);
@@ -4058,7 +4071,7 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 		double percent_left, double percent_right,
 		unsigned char ymin_type, unsigned char ymax_type,
 		zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid,
-		unsigned char flags)
+		unsigned char flags, unsigned char discover)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -4158,13 +4171,14 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 					"ymax_type=%d,"
 					"ymin_itemid=%s,"
 					"ymax_itemid=%s,"
-					"flags=%d"
+					"flags=%d,"
+					"discover=%d"
 				" where graphid=" ZBX_FS_UI64 ";\n",
 				name_esc, width, height, yaxismin, yaxismax,
 				graphid, (int)show_work_period, (int)show_triggers,
 				(int)graphtype, (int)show_legend, (int)show_3d,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags,
+				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags, (int)discover,
 				hst_graphid);
 
 		for (i = 0; i < gitems_num; i++)
@@ -4200,15 +4214,15 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 				" (graphid,name,width,height,yaxismin,yaxismax,templateid,"
 				"show_work_period,show_triggers,graphtype,show_legend,"
 				"show_3d,percent_left,percent_right,ymin_type,ymax_type,"
-				"ymin_itemid,ymax_itemid,flags)"
+				"ymin_itemid,ymax_itemid,flags,discover)"
 				" values (" ZBX_FS_UI64 ",'%s',%d,%d," ZBX_FS_DBL64_SQL ","
 				ZBX_FS_DBL64_SQL "," ZBX_FS_UI64 ",%d,%d,%d,%d,%d," ZBX_FS_DBL64_SQL ","
-				ZBX_FS_DBL64_SQL ",%d,%d,%s,%s,%d);\n",
+				ZBX_FS_DBL64_SQL ",%d,%d,%s,%s,%d,%d);\n",
 				hst_graphid, name_esc, width, height, yaxismin, yaxismax,
 				graphid, (int)show_work_period, (int)show_triggers,
 				(int)graphtype, (int)show_legend, (int)show_3d,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags);
+				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), (int)flags, (int)discover);
 
 		hst_gitemid = DBget_maxid_num("graphs_items", gitems_num);
 
@@ -4275,7 +4289,7 @@ static void	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_
 				"g.yaxismax,g.show_work_period,g.show_triggers,"
 				"g.graphtype,g.show_legend,g.show_3d,g.percent_left,"
 				"g.percent_right,g.ymin_type,g.ymax_type,g.ymin_itemid,"
-				"g.ymax_itemid,g.flags"
+				"g.ymax_itemid,g.flags,g.discover"
 			" from graphs g,graphs_items gi,items i"
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
@@ -4309,7 +4323,8 @@ static void	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_
 				(unsigned char)atoi(row[14]),	/* ymax_type */
 				ymin_itemid,
 				ymax_itemid,
-				(unsigned char)atoi(row[17]));	/* flags */
+				(unsigned char)atoi(row[17]),	/* flags */
+				(unsigned char)atoi(row[18]));	/* discover */
 	}
 	DBfree_result(result);
 

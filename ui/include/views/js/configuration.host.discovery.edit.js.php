@@ -34,6 +34,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 include dirname(__FILE__).'/item.preprocessing.js.php';
 include dirname(__FILE__).'/editabletable.js.php';
 include dirname(__FILE__).'/itemtest.js.php';
+include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="condition-row">
 	<?=

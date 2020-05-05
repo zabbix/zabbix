@@ -781,6 +781,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
+		'discover' => getRequest('discover', DB::getDefault('items', 'discover')),
 		'type' => getRequest('type', 0),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
@@ -909,6 +910,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 		// item prototype
 		elseif ($data['parent_discoveryid'] != 0) {
+			$data['discover'] = $data['item']['discover'];
 			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		// plain item
@@ -1732,6 +1734,7 @@ function getTriggerFormData(array $data) {
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];
 			$data['url'] = $trigger['url'];
+			$data['discover'] = $trigger['discover'];
 
 			$db_triggers = DBselect(
 				'SELECT t.triggerid,t.description'.
@@ -1902,20 +1905,23 @@ function getTriggerFormData(array $data) {
  * @return CRow
  */
 function renderTagTableRow($index, $tag = '', $value = '', array $options = []) {
-	$options = array_merge(['readonly' => false], $options);
+	$options = array_merge([
+		'readonly' => false,
+		'field_name' => 'tags'
+	], $options);
 
 	return (new CRow([
 		(new CCol(
-			(new CTextAreaFlexible('tags['.$index.'][tag]', $tag, $options))
+			(new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag, $options))
 				->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 				->setAttribute('placeholder', _('tag'))
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
-			(new CTextAreaFlexible('tags['.$index.'][value]', $value, $options))
+			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $value, $options))
 				->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 				->setAttribute('placeholder', _('value'))
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CButton('tags['.$index.'][remove]', _('Remove')))
+		(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 			->setEnabled(!$options['readonly'])
@@ -1932,11 +1938,17 @@ function renderTagTableRow($index, $tag = '', $value = '', array $options = []) 
  *
  * @return CTable
  */
-function renderTagTable(array $tags, $readonly = false) {
+function renderTagTable(array $tags, $readonly = false, array $options = []) {
 	$table = (new CTable())->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
 
+	$row_options = ['readonly' => $readonly];
+
+	if (array_key_exists('field_name', $options)) {
+		$row_options['field_name'] = $options['field_name'];
+	}
+
 	foreach ($tags as $index => $tag) {
-		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], ['readonly' => $readonly]));
+		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], $row_options));
 	}
 
 	return $table->setFooter(new CCol(

@@ -393,6 +393,12 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
+			'discover' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'hstgrp' => [
@@ -1595,6 +1601,12 @@ return [
 				'default' => '0',
 			],
 			'allow_traps' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'discover' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -3093,6 +3105,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'discover' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'trigger_depends' => [
@@ -3265,6 +3283,12 @@ return [
 				'ref_field' => 'itemid',
 			],
 			'flags' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'discover' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -5666,6 +5690,18 @@ return [
 				'ref_table' => 'graphs',
 				'ref_field' => 'graphid',
 			],
+			'lastcheck' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'host_inventory' => [
@@ -6364,6 +6400,18 @@ return [
 				'length' => 20,
 				'ref_table' => 'triggers',
 				'ref_field' => 'triggerid',
+			],
+			'lastcheck' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -8007,6 +8055,302 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			],
+		],
+	],
+	'lld_override' => [
+		'key' => 'lld_overrideid',
+		'fields' => [
+			'lld_overrideid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'step' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'evaltype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'formula' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'stop' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'lld_override_condition' => [
+		'key' => 'lld_override_conditionid',
+		'fields' => [
+			'lld_override_conditionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'lld_overrideid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override',
+				'ref_field' => 'lld_overrideid',
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '8',
+			],
+			'macro' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'lld_override_operation' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'lld_overrideid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override',
+				'ref_field' => 'lld_overrideid',
+			],
+			'operationobject' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'lld_override_opstatus' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'lld_override_opdiscover' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'discover' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'lld_override_opperiod' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'delay' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => '0',
+			],
+		],
+	],
+	'lld_override_ophistory' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'history' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '90d',
+			],
+		],
+	],
+	'lld_override_optrends' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'trends' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '365d',
+			],
+		],
+	],
+	'lld_override_opseverity' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'lld_override_optag' => [
+		'key' => 'lld_override_optagid',
+		'fields' => [
+			'lld_override_optagid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'lld_override_optemplate' => [
+		'key' => 'lld_override_optemplateid',
+		'fields' => [
+			'lld_override_optemplateid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'templateid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			],
+		],
+	],
+	'lld_override_opinventory' => [
+		'key' => 'lld_override_operationid',
+		'fields' => [
+			'lld_override_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'lld_override_operation',
+				'ref_field' => 'lld_override_operationid',
+			],
+			'inventory_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],

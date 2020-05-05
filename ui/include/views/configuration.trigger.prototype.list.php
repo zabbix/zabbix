@@ -56,6 +56,7 @@ $triggersTable = (new CTableInfo())
 		_('Operational data'),
 		_('Expression'),
 		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url),
 		_('Tags')
 	]);
 
@@ -129,6 +130,23 @@ foreach ($this->data['triggers'] as $trigger) {
 		->addClass(triggerIndicatorStyle($trigger['status']))
 		->addSID();
 
+
+	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
+			(new CUrl('trigger_prototypes.php'))
+				->setArgument('g_triggerid[]', $triggerid)
+				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				->setArgument('action', 'triggerprototype.massupdate')
+				->setArgument('visible[discover]', '1')
+				->setArgument('massupdate', 'discover')
+				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgumentSID()
+				->getUrl()
+		))
+			->addSID()
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+
 	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 		$expression = [
 			_('Problem'), ': ', $trigger['expression'], BR(),
@@ -149,6 +167,7 @@ foreach ($this->data['triggers'] as $trigger) {
 		$trigger['opdata'],
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 		$status,
+		$discover,
 		$data['tags'][$triggerid]
 	]);
 }

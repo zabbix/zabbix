@@ -513,6 +513,7 @@ class CImportDataAdapter {
 	 */
 	protected function formatDiscoveryRule(array $discovery_rule, $host) {
 		$discovery_rule = $this->renameItemFields($discovery_rule);
+		$discovery_rule = $this->formatDiscoveryRuleOverrideFields($discovery_rule);
 
 		foreach ($discovery_rule['item_prototypes'] as &$item_prototype) {
 			if (array_key_exists('trigger_prototypes', $item_prototype)) {
@@ -537,6 +538,81 @@ class CImportDataAdapter {
 			$graph_prototype = $this->renameGraphFields($graph_prototype);
 		}
 		unset($graph_prototype);
+
+		return $discovery_rule;
+	}
+
+	/**
+	 * Format low-level disovery rule overrides.
+	 *
+	 * @param array $discovery_rule  Data of single low-level discovery rule.
+	 *
+	 * @return array
+	 */
+	protected function formatDiscoveryRuleOverrideFields(array $discovery_rule) {
+		if ($discovery_rule['overrides']) {
+			foreach ($discovery_rule['overrides'] as &$override) {
+				foreach ($override['operations'] as &$operation) {
+					if (array_key_exists('discover', $operation) && $operation['discover'] !== '') {
+						$operation['opdiscover']['discover'] = $operation['discover'];
+					}
+
+					switch ($operation['operationobject']) {
+						case OPERATION_OBJECT_ITEM_PROTOTYPE:
+							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
+								$operation['opstatus']['status'] = $operation['status'];
+							}
+							if (array_key_exists('delay', $operation) && $operation['delay'] !== '') {
+								$operation['opperiod']['delay'] = $operation['delay'];
+							}
+							if (array_key_exists('history', $operation) && $operation['history'] !== '') {
+								$operation['ophistory']['history'] = $operation['history'];
+							}
+							if (array_key_exists('trends', $operation) && $operation['trends'] !== '') {
+								$operation['optrends']['trends'] = $operation['trends'];
+							}
+							break;
+
+						case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
+								$operation['opstatus']['status'] = $operation['status'];
+							}
+							if (array_key_exists('severity', $operation) && $operation['severity'] !== '') {
+								$operation['opseverity']['severity'] = $operation['severity'];
+							}
+							if (array_key_exists('tags', $operation) && $operation['tags']) {
+								$operation['optag'] = [];
+								foreach ($operation['tags'] as $tag) {
+									$operation['optag'][] = $tag;
+								}
+							}
+							break;
+
+						case OPERATION_OBJECT_HOST_PROTOTYPE:
+							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
+								$operation['opstatus']['status'] = $operation['status'];
+							}
+							if (array_key_exists('templates', $operation)) {
+								$operation['optemplate'] = [];
+								foreach ($operation['templates'] as $template) {
+									$operation['optemplate'][] = $template;
+								}
+							}
+							if (array_key_exists('inventory_mode', $operation)) {
+								$operation['opinventory']['inventory_mode'] = $operation['inventory_mode'];
+							}
+							break;
+					}
+
+					unset($operation['status'], $operation['discover'], $operation['delay'], $operation['history'],
+						$operation['trends'], $operation['severity'], $operation['tags'], $operation['templates'],
+						$operation['inventory_mode']
+					);
+				}
+				unset($operation);
+			}
+			unset($override);
+		}
 
 		return $discovery_rule;
 	}

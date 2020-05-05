@@ -180,6 +180,7 @@ $fields = [
 									_('Password')
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
+	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
@@ -243,6 +244,7 @@ if (getRequest('itemid', false)) {
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'selectLLDMacroPaths' => ['lld_macro', 'path'],
 		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+		'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 		'editable' => true
 	]);
 	$item = reset($item);
@@ -577,6 +579,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
+		$overrides = getRequest('overrides', []);
+		$newItem['overrides'] = $overrides;
+
 		if (hasRequest('update')) {
 			DBstart();
 
@@ -745,6 +750,7 @@ if (hasRequest('form')) {
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
+	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
@@ -768,6 +774,11 @@ if (hasRequest('form')) {
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
+		$data['overrides'] = $item['overrides'];
+		// Sort overides to be listed in step order.
+		CArrayHelper::sort($data['overrides'], [
+			['field' => 'step', 'order' => ZBX_SORT_UP]
+		]);
 	}
 	// clone form
 	elseif (hasRequest('clone')) {

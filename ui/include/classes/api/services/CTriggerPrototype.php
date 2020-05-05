@@ -26,7 +26,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
-	protected $sortColumns = ['triggerid', 'description', 'status', 'priority'];
+	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'discover'];
 
 	/**
 	 * Get trigger prototypes from database.
