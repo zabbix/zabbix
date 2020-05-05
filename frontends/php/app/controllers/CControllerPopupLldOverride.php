@@ -94,6 +94,13 @@ class CControllerPopupLldOverride extends CController {
 				}
 			}
 
+			foreach ($page_options['overrides_filters'] as $i => $filter) {
+				if ($filter['macro'] === '' && $filter['value'] === '') {
+					unset($page_options['overrides_filters'][$i]);
+				}
+			}
+			$page_options['overrides_filters'] = array_values($page_options['overrides_filters']);
+
 			// Return collected error messages.
 			if (($messages = getMessages()) !== null) {
 				$output['errors'] = $messages->toString();
