@@ -17,7 +17,6 @@ type Plugin struct {
 	plugin.Base
 	refreshMux         sync.Mutex
 	reloadMux          sync.RWMutex
-	instances          []string
 	nextObjectRefresh  time.Time
 	nextEngNameRefresh time.Time
 }
