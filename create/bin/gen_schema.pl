@@ -607,7 +607,7 @@ EOF
 	for ("trends", "trends_uint")
 	{
 		print<<EOF
-SELECT create_hypertable('$_', 'clock', chunk_time_interval => 2628000, migrate_data => true);
+SELECT create_hypertable('$_', 'clock', chunk_time_interval => 2592000, migrate_data => true);
 EOF
 		;
 	}
