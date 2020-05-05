@@ -1,0 +1,2762 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-05-05T17:55:47Z</date>
+   <groups>
+      <group>
+         <name>Templates/Databases</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template DB MSSQL by ODBC</template>
+         <name>Template DB MSSQL by ODBC</name>
+         <description>1.Create MSSQL user for monitoring.&#13;
+For more information read the MSSQL documentation, please. &#13;
+2.Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).&#13;
+&#13;
+&#13;
+You can discuss this template or leave feedback on our forum &#13;
+&#13;
+Template tooling version used: 0.35</description>
+         <groups>
+            <group>
+               <name>Templates/Databases</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>MSSQL</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>MSSQL: Get performance counters</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT object_name, counter_name, instance_name, cntr_value FROM master.sys.dm_os_performance_counters</params>
+               <username>{$MSSQL.USER}</username>
+               <password>{$MSSQL.PASSWORD}</password>
+               <description>The item gets server global status information.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>MSSQL: Version</name>
+               <type>ODBC</type>
+               <key>db.odbc.select[version,{$MSSQL.DSN}]</key>
+               <delay>15m</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <params>SELECT @@VERSION;</params>
+               <username>{$MSSQL.USER}</username>
+               <password>{$MSSQL.PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>MSSQL: Version has changed (new version value received: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>MSSQL version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Auto-Param Attempts/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.autoparam_attempts_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of auto-parameterization attempts per second. Total should&#13;
+be the sum of the failed, safe, and unsafe auto-parameterizations. Auto-parameterization&#13;
+occurs when an instance of SQL Server tries to parameterize a Transact-SQL request&#13;
+by replacing some literals with parameters so that reuse of the resulting cached&#13;
+execution plan across multiple similar-looking requests is possible. Note that&#13;
+auto-parameterizations are also known as simple parameterizations in newer versions&#13;
+of SQL Server. This counter does not include forced parameterizations.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Auto-Param Attempts/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Average Latch Wait Time</name>
+               <type>DEPENDENT</type>
+               <key>mssql.average_latch_wait_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>Average latch wait time (in milliseconds) for latch requests that&#13;
+had to wait.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time (ms)')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Average Wait Time (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.average_wait_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>Total wait time (in milliseconds) for locks in the last second.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Average Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;500</expression>
+                     <name>MSSQL: Average Wait Time (Total)</name>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Batch Requests/Sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.batch_requests_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of Transact-SQL command batches received per second. This&#13;
+statistic is affected by all constraints (such as I/O, number of users, cache&#13;
+size, complexity of requests, and so on). High batch requests mean good throughput.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Batch Requests/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: % Buffer cache hit ratio</name>
+               <type>DEPENDENT</type>
+               <key>mssql.buffer_cache_hit_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Indicates the percentage of pages found in the buffer cache without&#13;
+having to read from disk. The ratio is the total number of cache hits divided&#13;
+by the total number of cache lookups over the last few thousand page accesses.&#13;
+After a long period of time, the ratio moves very little. Because reading from&#13;
+the cache is much less expensive than reading from disk, you want this ratio&#13;
+to be high. Generally, you can increase the buffer cache hit ratio by increasing&#13;
+the amount of memory available to SQL Server or by using the buffer pool extension&#13;
+feature.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Buffer cache hit ratio')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{max(5m)}&lt;{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</expression>
+                     <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT} for 5m</name>
+                     <priority>HIGH</priority>
+                     <description>Too low buffer cache hit ratio.</description>
+                  </trigger>
+                  <trigger>
+                     <expression>{max(5m)}&lt;{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}</expression>
+                     <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN} for 5m</name>
+                     <priority>WARNING</priority>
+                     <description>Low buffer cache hit ratio.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT} for 5m</name>
+                           <expression>{Template DB MSSQL by ODBC:mssql.buffer_cache_hit_ratio.max(5m)}&lt;{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Cache Hit Ratio</name>
+               <type>DEPENDENT</type>
+               <key>mssql.cache_hit_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Ratio between cache hits and lookups.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='Cache Hit Ratio' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Cache Object Counts</name>
+               <type>DEPENDENT</type>
+               <key>mssql.cache_object_counts</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of cache objects in the cache.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='Cache Object Counts' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Cache Objects in use</name>
+               <type>DEPENDENT</type>
+               <key>mssql.cache_objects_in_use</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of cache objects in use.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='Cache Objects in use' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Cache Pages</name>
+               <type>DEPENDENT</type>
+               <key>mssql.cache_pages</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of 8-kilobyte (KB) pages used by cache objects.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='Cache Pages' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Checkpoint pages/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.checkpoint_pages_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Indicates the number of pages flushed to disk per second by a checkpoint&#13;
+or other operation that require all dirty pages to be flushed.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Checkpoint pages/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Data File Size (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.data_files_size</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Total size (in kilobytes) of all the data files.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Database pages</name>
+               <type>DEPENDENT</type>
+               <key>mssql.database_pages</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Indicates the number of pages in the buffer pool with database content.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Database pages')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Errors/sec (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.errors_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of errors/sec.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Failed Auto-Params/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.failed_autoparams_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of failed auto-parameterization attempts per second. This&#13;
+should be small. Note that auto-parameterizations are also known as simple parameterizations&#13;
+in later versions of SQL Server.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Failed Auto-Params/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Forwarded Records/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.forwarded_records_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of records per second fetched through forwarded record pointers.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Forwarded Records/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Free list stalls/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.free_list_stalls_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Indicates the number of requests per second that had to wait for a free page.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Free list stalls/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;2</expression>
+                     <name>MSSQL: Free list stalls/sec</name>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Full Scans/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.full_scans_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of unrestricted full scans per second. These can be either&#13;
+base-table or full-index scans.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Full Scans/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Granted Workspace Memory</name>
+               <type>DEPENDENT</type>
+               <key>mssql.granted_workspace_memory</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Specifies the total amount of memory currently granted to executing&#13;
+processes, such as hash, sort, bulk copy, and index creation operations.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Granted Workspace Memory (KB)')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Index Searches/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.index_searches_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of index searches per second. These are used to start a range&#13;
+scan, reposition a range scan, revalidate a scan point, fetch a single index&#13;
+record, and search down the index to locate where to insert a new row.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Index Searches/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Errors/sec (Info Errors)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.info_errors_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of errors/sec.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Info Errors')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Errors/sec (Kill Connection Errors)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.kill_connection_errors_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of errors/sec.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='Kill Connection Errors')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Latch Waits/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.latch_waits_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of latch requests that could not be granted immediately.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Latch Waits/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Lazy writes/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.lazy_writes_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Indicates the number of buffers written per second by the buffer&#13;
+manager's lazy writer. The lazy writer is a system process that flushes out&#13;
+batches of dirty, aged buffers (buffers that contain changes that must be written&#13;
+back to disk before the buffer can be reused for a different page) and makes&#13;
+them available to user processes. The lazy writer eliminates the need to perform&#13;
+frequent checkpoints in order to create available buffers.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Lazy writes/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;20</expression>
+                     <name>MSSQL: Lazy writes/sec</name>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Lock Requests/sec (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.lock_requests_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of new locks and lock conversions per second requested from&#13;
+the lock manager.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Requests/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;3000</expression>
+                     <name>MSSQL: Lock Requests/sec (Total)</name>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Lock Timeouts/sec (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.lock_timeouts_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of lock requests per second that timed out, including requests&#13;
+for NOWAIT locks.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Timeouts/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;1</expression>
+                     <name>MSSQL: Lock Timeouts/sec (Total)</name>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Lock Wait Time (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.lock_wait_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>Average amount of wait time (in milliseconds) for each lock request&#13;
+that resulted in a wait.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Lock Waits/sec (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.lock_waits_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of lock requests per second that required the caller to wait.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Waits/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Log File Size (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.log_files_size</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Total size (in kilobytes) of all the transaction log files.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Log File Used Size (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.log_files_used_size</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>The cumulative used size of all the log files in the database.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Logins/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.logins_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Total number of logins started per second. This does not include&#13;
+pooled connections.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:General Statistics' &amp;&amp; @.counter_name=='Logins/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Logouts/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.logouts_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Total number of logout operations started per second.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:General Statistics' &amp;&amp; @.counter_name=='Logouts/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Maximum Workspace Memory</name>
+               <type>DEPENDENT</type>
+               <key>mssql.maximum_workspace_memory</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Indicates the maximum amount of memory available for executing processes,&#13;
+such as hash, sort, bulk copy, and index creation operations.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Maximum Workspace Memory (KB)')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Memory Grants Outstanding</name>
+               <type>DEPENDENT</type>
+               <key>mssql.memory_grants_outstanding</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Specifies the total number of processes that have successfully acquired&#13;
+a workspace memory grant.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Outstanding')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Memory Grants Pending</name>
+               <type>DEPENDENT</type>
+               <key>mssql.memory_grants_pending</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Specifies the total number of processes waiting for a workspace&#13;
+memory grant.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Memory Grants Pending')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Number of Deadlocks/sec (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.number_deadlocks_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of lock requests per second that resulted in a deadlock.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Number of Deadlocks/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{max(5m)}&gt;0</expression>
+                     <name>MSSQL: Deadlocks exists for 5m</name>
+                     <priority>AVERAGE</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Errors/sec (DB Offline Errors)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.offline_errors_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of errors per second.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='DB Offline Errors')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Page life expectancy</name>
+               <type>DEPENDENT</type>
+               <key>mssql.page_life_expectancy</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>min</units>
+               <description>Indicates the number of seconds a page will stay in the buffer pool&#13;
+without references.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page life expectancy')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01667</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{max(5m)}&lt;5</expression>
+                     <name>MSSQL: Page life expectancy</name>
+                     <priority>HIGH</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Page lookups/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.page_lookups_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Indicates the number of requests per second to find a page in the&#13;
+buffer pool.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page lookups/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Page reads/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.page_reads_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Indicates the number of physical database page reads that are issued&#13;
+per second. This statistic displays the total number of physical page reads&#13;
+across all databases. Because physical I/O is expensive, you may be able to&#13;
+minimize the cost, either by using a larger data cache, intelligent indexes,&#13;
+and more efficient queries, or by changing the database design.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page reads/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;90</expression>
+                     <name>MSSQL: Page reads/sec</name>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Page Splits/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.page_splits_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of page splits per second that occur as the result of overflowing&#13;
+index pages.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Page Splits/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Page writes/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.page_writes_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Indicates the number of physical database page writes that are issued per second.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page writes/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;90</expression>
+                     <name>MSSQL: Page writes/sec</name>
+                     <priority>WARNING</priority>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Number of Blocked Processes</name>
+               <type>DEPENDENT</type>
+               <key>mssql.processes_blocked</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of currently blocked processes.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:General Statistics' &amp;&amp; @.counter_name=='Processes blocked')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Read-ahead pages/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.readahead_pages_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Indicates the number of pages read per second in anticipation of use.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Readahead pages/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Safe Auto-Params/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.safe_autoparams_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of safe auto-parameterization attempts per second. Safe refers&#13;
+to a determination that a cached execution plan can be shared between different&#13;
+similar-looking Transact-SQL statements. SQL Server makes many auto-parameterization&#13;
+attempts some of which turn out to be safe and others fail. Note that auto-parameterizations&#13;
+are also known as simple parameterizations in later versions of SQL Server.&#13;
+This does not include forced parameterizations.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Safe Auto-Params/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: SQL Compilations/Sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.sql_compilations_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of SQL compilations per second. Indicates the number of times&#13;
+the compile code path is entered. Includes compiles caused by statement-level&#13;
+recompilations in SQL Server. After SQL Server user activity is stable, this&#13;
+value reaches a steady state.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='SQL Compilations/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: SQL Re-Compilations/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.sql_recompilations_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of statement recompiles per second. Counts the number of&#13;
+times statement recompiles are triggered. Generally, you want the recompiles&#13;
+to be low.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='SQL Re-Compilations/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Target pages</name>
+               <type>DEPENDENT</type>
+               <key>mssql.target_pages</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The optimum number of pages in the buffer pool.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Target pages')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Target Server Memory</name>
+               <type>DEPENDENT</type>
+               <key>mssql.target_server_memory</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Indicates the ideal amount of memory the server can consume.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Target Server Memory (KB)')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Total Latch Wait Time</name>
+               <type>DEPENDENT</type>
+               <key>mssql.total_latch_wait_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <description>Total latch wait time (in milliseconds) for latch requests in the&#13;
+last second.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Total Latch Wait Time (ms)')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Total Server Memory</name>
+               <type>DEPENDENT</type>
+               <key>mssql.total_server_memory</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Specifies the amount of memory the server has committed using the&#13;
+memory manager.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Memory Manager' &amp;&amp; @.counter_name=='Total Server Memory (KB)')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Transactions Number (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.transactions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of currently active transactions of all types.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Transactions' &amp;&amp; @.counter_name=='Transactions')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Transactions/sec (Total)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.transactions_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Total number of transactions started for all databases per second.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Unsafe Auto-Params/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.unsafe_autoparams_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of unsafe auto-parameterization attempts per second. For&#13;
+example, the query has some characteristics that prevent the cached plan from&#13;
+being shared. These are designated as unsafe. This does not count the number&#13;
+of forced parameterizations.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Statistics' &amp;&amp; @.counter_name=='Unsafe Auto-Params/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Number Users Connected</name>
+               <type>DEPENDENT</type>
+               <key>mssql.user_connections</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of users connected to MS SQL Server.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:General Statistics' &amp;&amp; @.counter_name=='User Connections')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Errors/sec (User Errors)</name>
+               <type>DEPENDENT</type>
+               <key>mssql.user_errors_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of errors/sec.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:SQL Errors' &amp;&amp; @.counter_name=='Errors/sec' &amp;&amp; @.instance_name=='User Errors')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Work files created/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.workfiles_created_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of work files created per second. For example, work files&#13;
+could be used to store temporary results for hash joins and hash aggregates.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Workfiles Created/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$MSSQL.WORK_FILES.MAX}</expression>
+                     <name>MSSQL: Number work files created/sec is over {$MSSQL.WORK_FILES.MAX} for 5m</name>
+                     <priority>AVERAGE</priority>
+                     <description>Too many work files created per second to store temporary results for hash joins and hash aggregates.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Work tables created/sec</name>
+               <type>DEPENDENT</type>
+               <key>mssql.worktables_created_sec</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of work tables created per second. For example, work tables&#13;
+could be used to store temporary results for query spool, lob variables, XML&#13;
+variables, and cursors.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Worktables Created/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$MSSQL.WORK_TABLES.MAX}</expression>
+                     <name>MSSQL: Number work tables created/sec is over {$MSSQL.WORK_TABLES.MAX} for 5m</name>
+                     <priority>AVERAGE</priority>
+                     <description>Too many work tables created per second to store temporary results for query spool, lob variables, XML variables, and cursors.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Port Availability</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}]</key>
+               <delay>30s</delay>
+               <history>7d</history>
+               <description>Test the availability of MS SQL Server on TCP port.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{max(#3)}=0</expression>
+                     <name>Server port is unavailable</name>
+                     <priority>DISASTER</priority>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Database discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[dbname,{$MSSQL.DSN}]</key>
+               <delay>1h</delay>
+               <params>select Name As DBNAME FROM master..sysdatabases</params>
+               <username>{$MSSQL.USER}</username>
+               <password>{$MSSQL.PASSWORD}</password>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#DBNAME}</macro>
+                        <value>{$MSSQL.DBNAME.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#DBNAME}</macro>
+                        <value>{$MSSQL.DBNAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Scanning databases in DBMS.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} status</name>
+                     <type>ODBC</type>
+                     <key>db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}]</key>
+                     <delay>30s</delay>
+                     <history>7d</history>
+                     <params>select coalesce(max(status),999) from master..sysdatabases where name = '{#DBNAME}'</params>
+                     <username>{$MSSQL.USER}</username>
+                     <password>{$MSSQL.PASSWORD}</password>
+                     <description>32 = loading&#13;
+128 = recovering&#13;
+256 = not recovered&#13;
+512 = offline (ALTER DATABASE)&#13;
+32768 = emergency mode</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{band(,32768)}&lt;&gt;0</expression>
+                           <name>MSSQL: DB {#DBNAME} in emergency mode</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{band(,32)}&lt;&gt;0</expression>
+                           <name>MSSQL: DB {#DBNAME} is loading</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{band(,256)}&lt;&gt;0</expression>
+                           <name>MSSQL: DB {#DBNAME} is not recovered</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{band(,512)}&lt;&gt;0</expression>
+                           <name>MSSQL: DB {#DBNAME} is offline</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{band(,128)}&lt;&gt;0</expression>
+                           <name>MSSQL: DB {#DBNAME} is recovering</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Active Transactions</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.active_transactions[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Number of active transactions for the database.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Active Transactions' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Data File Size</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.data_files_size[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <description>Cumulative size (in kilobytes) of all the data files in the database&#13;
+including any automatic growth. Monitoring this counter is useful, for example,&#13;
+for determining the correct size of tempdb.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Data File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1024</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log Bytes Flushed/sec</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_bytes_flushed_sec[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of log bytes flushed per second. Useful for determining&#13;
+trends and utilization of the transaction log.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Bytes Flushed/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log File Size</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_files_size[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <description>Cumulative size (in kilobytes) of all the transaction log files&#13;
+in the database.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log File(s) Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1024</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log File Used Size</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_files_used_size[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <description>The cumulative used size of all the log files in the database.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log File(s) Used Size (KB)' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1024</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log Flush Wait Time</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_flush_wait_time[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>ms</units>
+                     <description>Total wait time (in milliseconds) to flush the log. On an AlwaysOn&#13;
+secondary database, this value indicates the wait time for log records to&#13;
+be hardened to disk.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Flush Wait Time' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;5</expression>
+                           <name>MSSQL: Log Flush Wait Time {#DBNAME}</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log Flush Waits/sec</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_flush_waits_sec[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Number of commits per second waiting for the log flush.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Flush Waits/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;1</expression>
+                           <name>MSSQL: Log Flush Waits/sec {#DBNAME}</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log Flushes/sec</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_flushes_sec[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Number of log flushes per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Flushes/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log Growths</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_growths[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of times the transaction log for the database has&#13;
+been expanded.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Growths' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                        <step>
+                           <type>SIMPLE_CHANGE</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;1</expression>
+                           <name>MSSQL: Log Growths {#DBNAME}</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log Shrinks</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_shrinks[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Total number of times the transaction log for the database has&#13;
+been shrunk.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Shrinks' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;15</expression>
+                           <name>MSSQL: Log Shrinks {#DBNAME}</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Log Truncations</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_truncations[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>The number of times the transaction log has been shrunk.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Truncations' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Percent Log Used</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.percent_log_used[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>Percentage of space in the log that is in use.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Percent Log Used' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;80</expression>
+                           <name>MSSQL: Percent Log Used {#DBNAME}</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>MSSQL: {#DBNAME} Transactions/sec</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.transactions_sec[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Number of transactions started for the database per second.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>MSSQL {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Transactions/sec' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+               </item_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</macro>
+               <value>30</value>
+               <description>The % buffer cache hit ratio for high trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}</macro>
+               <value>50</value>
+               <description>The % buffer cache hit ratio for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.DBNAME.MATCHES}</macro>
+               <value>.*</value>
+               <description>This macro is used in database discovery. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.DBNAME.NOT_MATCHES}</macro>
+               <value>master|tempdb|model|msdb</value>
+               <description>This macro is used in database discovery. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.DSN}</macro>
+               <value>&lt;Put your DSN here&gt;</value>
+               <description>System data source name.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.HOST}</macro>
+               <value>localhost</value>
+               <description>MSSQL host IP address or FQDN.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.PASSWORD}</macro>
+               <value>&lt;Put your password here&gt;</value>
+               <description>MSSQL user password.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.PORT}</macro>
+               <value>1433</value>
+               <description>MSSQL tcp port.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.USER}</macro>
+               <value>&lt;Put your username here&gt;</value>
+               <description>MSSQL username.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.WORK_FILES.MAX}</macro>
+               <value>300</value>
+               <description>The number of work files created per second for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.WORK_TABLES.MAX}</macro>
+               <value>50</value>
+               <description>The number of work tables created per second for trigger expression.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <name>MSSQL: Access Methods</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.forwarded_records_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.full_scans_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.index_searches_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.page_splits_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.workfiles_created_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>5</sortorder>
+               <color>6C59DC</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.worktables_created_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Auto-Params</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.autoparam_attempts_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.failed_autoparams_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.safe_autoparams_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.unsafe_autoparams_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Cache Objects</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.cache_object_counts</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.cache_objects_in_use</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Compilations</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.sql_recompilations_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.sql_recompilations_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Database pages</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.database_pages</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.target_pages</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Errors</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.errors_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.offline_errors_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.info_errors_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.kill_connection_errors_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.user_errors_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Locks</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.lock_requests_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.lock_timeouts_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.number_deadlocks_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Logins/sec and Logouts/sec</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.logins_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.logouts_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Memory/Cache load</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.cache_hit_ratio</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.buffer_cache_hit_ratio</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Memory Grants Outstanding and Pending</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.memory_grants_outstanding</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.memory_grants_pending</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Page life expectancy</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.page_life_expectancy</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Pages</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.page_lookups_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.page_reads_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.page_writes_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.readahead_pages_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.checkpoint_pages_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>5</sortorder>
+               <color>6C59DC</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.free_list_stalls_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>6</sortorder>
+               <color>AC8C14</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.lazy_writes_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Processes blocked</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.processes_blocked</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Server Memory</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.target_server_memory</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.total_server_memory</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.granted_workspace_memory</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.maximum_workspace_memory</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Transactions</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.transactions_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.batch_requests_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Waits per second</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.latch_waits_sec</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.lock_waits_sec</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>MSSQL: Wait Times</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.average_latch_wait_time</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.total_latch_wait_time</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.average_wait_time</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.lock_wait_time</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>
