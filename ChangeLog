@@ -4,6 +4,7 @@ New features:
 A.F.I..... [ZBX-17667] moved "frontends/php" to "ui" directory (Sasha)
 A.F.I...S. [ZBXNEXT-3035] added ability of filtering out items, triggers, hosts and graphs or overriding their attributes during Low-level discovery based on LLD object and prototype name (Ivo, vmurzins, vso)
 ..F.....S. [ZBXNEXT-2663] Support SAML authentication in zabbix frontend (agriscenko, arimdjonoks)
+..F....PS. [ZBXNEXT-5711] added ability to view logs in frontend when testing web hook media type (gcalenko, vso)
 ..F....... [ZBXNEXT-5300] implemented widget copy/paste possibility in dashboard (miks)
 A.F....... [ZBXNEXT-5879] added filter to Configuration->Templates/Hosts->Discovery rules (agriscenko)
 .........T [ZBXNEXT-5907] Added Jira ServiceDesk mediatype (tuskov)
@@ -17,7 +18,6 @@ A.F.I..... [ZBX-17512] fixed length restriction for media type script import int
 ........S. [ZBX-17650] fixed formula for zabbix[proxy,,delay] calculation (asestakovs)
 ........S. [ZBX-17655] fixed possible use of uninitialized variable (MVekslers)
 ..F....... [ZBX-17520] fixed opening Problems popup from SVG graph outside webview boundaries (vasilijs)
-..F....PS. [ZBXNEXT-5711] added ability to view logs in frontend when testing web hook media type (gcalenko, vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.0beta2
