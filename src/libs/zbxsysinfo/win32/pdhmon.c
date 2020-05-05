@@ -198,7 +198,7 @@ int	perf_instance_discovery_ex(const char *function, AGENT_REQUEST *request, AGE
 	if (2 < inst_len)
 	{
 		wchar_t			*cnt_list, *inst_list, *instance;
-		zbx_vector_str_t	instances;
+		zbx_vector_str_t	instances, instances_uniq;
 		int			i;
 
 		cnt_list = zbx_malloc(NULL, sizeof(wchar_t) * cnt_len);
@@ -217,28 +217,25 @@ int	perf_instance_discovery_ex(const char *function, AGENT_REQUEST *request, AGE
 		zbx_vector_str_create(&instances);
 
 		for (instance = inst_list; L'\0' != *instance; instance += wcslen(instance) + 1)
-		{
-			char	*instance_utf8;
+			zbx_vector_str_append(&instances, zbx_unicode_to_utf8(instance));
 
-			instance_utf8 = zbx_unicode_to_utf8(instance);
+		zbx_vector_str_create(&instances_uniq);
+		zbx_vector_str_append_array(&instances_uniq, instances.values, instances.values_num);
 
-			if (FAIL == zbx_vector_str_search(&instances, instance_utf8, ZBX_DEFAULT_STR_COMPARE_FUNC))
-				zbx_vector_str_append(&instances, instance_utf8);
-			else
-				zbx_free(instance_utf8);
-		}
+		zbx_vector_str_sort(&instances_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_str_uniq(&instances_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
-		zbx_vector_str_sort(&instances, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-		for (i = 0; i < instances.values_num; i++)
+		for (i = 0; i < instances_uniq.values_num; i++)
 		{
 			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "{#INSTANCE}", instances.values[i], ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#INSTANCE}", instances_uniq.values[i], ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 
 		zbx_vector_str_clear_ext(&instances, zbx_str_free);
 		zbx_vector_str_destroy(&instances);
+		zbx_vector_str_destroy(&instances_uniq);
+
 		zbx_free(cnt_list);
 		zbx_free(inst_list);
 	}
