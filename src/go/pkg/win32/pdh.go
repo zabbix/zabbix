@@ -292,18 +292,13 @@ func PdhEnumObject() (objects []string, err error) {
 	}
 
 	var singleName []uint16
-	m := make(map[string]bool)
+
 	for len(objectBuf) != 0 {
 		singleName, objectBuf = NextField(objectBuf)
 		if len(singleName) == 0 {
 			break
 		}
-
-		strName := windows.UTF16ToString(singleName)
-		if _, ok := m[strName]; !ok {
-			m[strName] = true
-			objects = append(objects, strName)
-		}
+		objects = append(objects, windows.UTF16ToString(singleName))
 	}
 
 	return objects, nil
