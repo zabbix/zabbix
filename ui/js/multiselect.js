@@ -792,6 +792,9 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
+
+						// preventScroll not work in IE.
+						$('input[type="text"]', $obj)[0].focus({preventScroll: true});
 					}
 				});
 
