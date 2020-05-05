@@ -34,7 +34,6 @@ import (
 var Objects map[int]*Object
 
 type Object struct {
-	Idx     int
 	EngName string
 	Name    string
 }
@@ -101,7 +100,7 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 		if err != nil {
 			continue
 		}
-		Objects[idx] = &Object{idx, "", name}
+		Objects[idx] = &Object{Name: name}
 	}
 
 	var wcharIndex, wcharName []uint16

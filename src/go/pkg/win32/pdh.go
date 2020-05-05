@@ -66,8 +66,6 @@ const (
 	PERF_DETAIL_WIZARD = 400
 )
 
-const uint32Size = 4
-
 type Instance struct {
 	Name string `json:"{#INSTANCE}"`
 }
