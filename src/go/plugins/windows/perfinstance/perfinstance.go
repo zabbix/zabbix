@@ -31,7 +31,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if err = p.refreshObjects(); err != nil {
-		return nil, fmt.Errorf("Cannot refresh object cache: %s", err.Error())
+		p.Warningf("Cannot refresh object cache: %s", err.Error())
 	}
 
 	var name string
