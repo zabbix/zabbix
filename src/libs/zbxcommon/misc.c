@@ -362,7 +362,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 	if (NULL != tz)
 	{
 		long	offset;
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 		offset = zbx_get_timezone_offset(current_time.time, tm);
 #else
 		offset = zbx_get_timezone_offset(current_time.tv_sec, tm);
@@ -398,7 +398,7 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 #ifdef HAVE_TM_TM_GMTOFF
 	offset = tm->tm_gmtoff;
 #else
-#ifdef _WINDOWS
+#if defined(_WINDOWS) || defined(__MINGW32__)
 	tm_utc = *gmtime(&t);
 #else
 	gmtime_r(&t, &tm_utc);
@@ -483,6 +483,27 @@ int	zbx_day_in_month(int year, int mon)
 		return month[mon - 1] + (2 == mon && SUCCEED == is_leap_year(year) ? 1 : 0);
 
 	return 30;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_duration_ms                                              *
+ *                                                                            *
+ * Purpose: get duration in milliseconds since time stamp till current time   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     start_time - [IN] time from when duration should be counted            *
+ *                                                                            *
+ * Return value: duration in milliseconds since time stamp till current time  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
+{
+	zbx_timespec_t	now;
+
+	zbx_timespec(&now);
+
+	return (now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6;
 }
 
 /******************************************************************************

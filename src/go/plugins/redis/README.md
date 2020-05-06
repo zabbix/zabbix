@@ -7,7 +7,7 @@ template for your specific needs.
 
 ## Requirements
 - Zabbix Agent 2
-- Go >= 1.12 (required just to build from source)
+- Go >= 1.13
 
 ## Installation
 The plugin is supplied as a part of Zabbix Agent 2, and it does not require any special installation steps. Once 
@@ -21,16 +21,12 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* tcp://localhost:6379  
 *Limits:*
 - Must match the URI format.
-- The only supported schemas: "tcp" and "unix".
+- The only supported schemas are "tcp" and "unix".
   
 *Examples:*
 - tcp://localhost:6379
 - tcp://localhost
 - unix:/var/run/redis.sock
-
-**Plugins.Redis.Password** — A password to send to a protected Redis instance.  
-*Default value:* none.  
-*Limits:* Length is limited by 512 characters.
 
 **Plugins.Redis.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
 *Default value:* 300 sec.  
@@ -41,31 +37,20 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Limits:* 1-30
 
 ### Authentication
-The plugin can authenticate by a password if such is set in the Agent's configuration file. It's possible to 
-use different passwords for different Redis instances using named sessions in the configuration file (as well as 
-different URIs).
-
-**Note:** For security reasons, it's forbidden to pass embedded credentials within the connString (an item key's param, 
-can be either a Uri or a session name) — they will be just ignored. 
-
-- If you pass a Uri as the connString, and this connection requires authentication, you must use the
-Plugins.Redis.Password parameter (the 1st level password) in the configuration file. In other words, once defined this 
-parameter will be used for authenticating all connections where the connString is represented by Uri. 
-
-- If you want to use different passwords for different Redis instances, you should create named session in the config 
-for each instance and should define a session-level password.
+The plugin can authenticate using password specified as a key's param or within named sessions.
+Embedded URI credentials (userinfo) will be ignored.
  
 #### Named sessions
-Named sessions allow you to define specific parameters for each Redis instance. Currently, there are supported only two 
-parameters: Uri and password. It can be useful if you have multiple instances with different credentials. E.g: if you
-have two instances: "Redis1" and "Redis2", you need to add these options to your agent's config:   
+Named sessions allow you to define specific parameters for each Redis instance. Currently, there are only two supported  
+parameters: Uri and password. It's a little bit more secure way to store credentials than item's keys or macros. 
+E.g: if you have two instances: "Redis1" and "Redis2", you need to add these options to your agent's config:   
 
     Plugins.Redis.Sessions.Redis1.Uri=tcp://127.0.0.1:6379  
     Plugins.Redis.Sessions.Redis1.Password=<PasswordForRedis1>    
     Plugins.Redis.Sessions.Redis2.Uri=tcp://127.0.0.1:6380   
     Plugins.Redis.Sessions.Redis2.Password=<PasswordForRedis2>  
     
-Then you are able to use these names as a connStrings in keys instead of URIs, e.g:
+Then you will be able to use these names as a connStrings in keys instead of URIs, e.g:
 
     redis.info[Redis1]
     redis.info[Redis2]
@@ -79,18 +64,18 @@ There are 4 levels of parameters overwriting:
 
 ## Supported keys
 
-**redis.ping[connString]** — Tests if a connection is alive or not.  
+**redis.ping[connString][,password]** — Tests if a connection is alive or not.  
 *Returns:*
 - "1" if a connection is alive.
 - "0" if a connection is broken (if there is any error presented including AUTH and configuration issues).
 
-**redis.slowlog.count[connString]** — Returns the number of slow log entries since Redis was started.
+**redis.slowlog.count[connString][,password]** — Returns the number of slow log entries since Redis was started.
 
-**redis.info[connString][,section]** — Returns An output of the INFO command serialized to JSON.  
+**redis.info[connString][,password][,section]** — Returns an output of the INFO command serialized to JSON.  
 *Params:*  
 section — Section of information. The default section name is "default".
 
-**redis.config[connString][,pattern]** — Gets a configuration parameters of a Redis instance matching pattern.  
+**redis.config[connString][,password][,pattern]** — Gets a configuration parameters of a Redis instance matching pattern.  
 *Params:*  
 pattern — Glob-style pattern. The default value is "*".  
 *Returns:*

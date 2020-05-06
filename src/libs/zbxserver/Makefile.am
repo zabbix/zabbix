@@ -12,12 +12,12 @@ libzbxserver_a_SOURCES = \
 	zabbix_stats.h
 
 libzbxserver_server_a_SOURCES = \
-	 zabbix_stats.h \
-	 zabbix_stats_server.c
+	zabbix_stats.h \
+	zabbix_stats_server.c
 
 libzbxserver_proxy_a_SOURCES = \
 	zabbix_stats.h \
-	zabbix_stats_proxy.c 
+	zabbix_stats_proxy.c
 
 libzbxserver_a_CFLAGS = -I$(top_srcdir)/src/libs/zbxdbcache $(LIBXML2_CFLAGS)
 

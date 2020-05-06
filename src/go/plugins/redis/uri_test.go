@@ -32,6 +32,7 @@ func TestURI_Scheme(t *testing.T) {
 		socket   string
 		password string
 	}
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -43,6 +44,7 @@ func TestURI_Scheme(t *testing.T) {
 			"tcp",
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := &URI{
@@ -67,6 +69,7 @@ func TestURI_Addr(t *testing.T) {
 		socket   string
 		password string
 	}
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -83,6 +86,7 @@ func TestURI_Addr(t *testing.T) {
 			"unix:///var/run/redis.sock",
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := &URI{
@@ -99,6 +103,45 @@ func TestURI_Addr(t *testing.T) {
 	}
 }
 
+func TestURI_User(t *testing.T) {
+	type fields struct {
+		scheme   string
+		host     string
+		port     string
+		socket   string
+		user     string
+		password string
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			"Should return username from URI structure",
+			fields{user: "zabbix"},
+			"zabbix",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := &URI{
+				scheme:   tt.fields.scheme,
+				host:     tt.fields.host,
+				port:     tt.fields.port,
+				socket:   tt.fields.socket,
+				user:     tt.fields.user,
+				password: tt.fields.password,
+			}
+			if got := u.User(); got != tt.want {
+				t.Errorf("URI.User() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestURI_Password(t *testing.T) {
 	type fields struct {
 		scheme   string
@@ -107,6 +150,7 @@ func TestURI_Password(t *testing.T) {
 		socket   string
 		password string
 	}
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -118,6 +162,7 @@ func TestURI_Password(t *testing.T) {
 			"sEcReT",
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := &URI{
@@ -134,14 +179,16 @@ func TestURI_Password(t *testing.T) {
 	}
 }
 
-func TestURI_Uri(t *testing.T) {
+func TestURI_URI(t *testing.T) {
 	type fields struct {
 		scheme   string
 		host     string
 		port     string
 		socket   string
+		user     string
 		password string
 	}
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -149,8 +196,8 @@ func TestURI_Uri(t *testing.T) {
 	}{
 		{
 			"Should return URI with creds",
-			fields{scheme: "tcp", host: "127.0.0.1", port: "6379", password: "sEcReT"},
-			"tcp://user:sEcReT@127.0.0.1:6379",
+			fields{scheme: "tcp", host: "127.0.0.1", port: "6379", user: "zabbix", password: "sEcReT"},
+			"tcp://zabbix:sEcReT@127.0.0.1:6379",
 		},
 		{
 			"Should return URI without creds",
@@ -158,6 +205,7 @@ func TestURI_Uri(t *testing.T) {
 			"tcp://127.0.0.1:6379",
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := &URI{
@@ -165,142 +213,149 @@ func TestURI_Uri(t *testing.T) {
 				host:     tt.fields.host,
 				port:     tt.fields.port,
 				socket:   tt.fields.socket,
+				user:     tt.fields.user,
 				password: tt.fields.password,
 			}
-			if got := u.Uri(); got != tt.want {
-				t.Errorf("URI.Uri() = %v, want %v", got, tt.want)
+			if got := u.URI(); got != tt.want {
+				t.Errorf("URI.URI() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_newUriWithPassword(t *testing.T) {
+func Test_newURIWithCreds(t *testing.T) {
 	type args struct {
 		uri      string
+		user     string
 		password string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
-		wantU   URI
+		wantU   *URI
 		wantErr bool
 	}{
 		{
 			"Should return URI structure",
-			args{"tcp://192.168.1.1:6380", "sEcReT"},
-			URI{scheme: "tcp", host: "192.168.1.1", port: "6380", password: "sEcReT"},
+			args{"tcp://192.168.1.1:6379", "zabbix", "sEcReT"},
+			&URI{scheme: "tcp", host: "192.168.1.1", port: "6379", user: "zabbix", password: "sEcReT"},
 			false,
 		},
 		{
 			"Should return error if failed to parse URI",
-			args{"://", "sEcReT"},
-			URI{},
+			args{"://", "zabbix", "sEcReT"},
+			nil,
 			true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotU, err := newUriWithCreds(tt.args.uri, tt.args.password)
+			gotU, err := newURIWithCreds(tt.args.uri, tt.args.user, tt.args.password)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("newUriWithPassword() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("newURIWithPassword() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotU, tt.wantU) {
-				t.Errorf("newUriWithPassword() = %v, want %v", gotU, tt.wantU)
+				t.Errorf("newURIWithPassword() = %v, want %v", gotU, tt.wantU)
 			}
 		})
 	}
 }
 
-func Test_parseUri(t *testing.T) {
+func Test_parseURI(t *testing.T) {
 	type args struct {
 		uri string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
-		wantU   URI
+		wantU   *URI
 		wantErr bool
 	}{
 		{
 			"Parse URI with tcp scheme",
 			args{"tcp://localhost:6379"},
-			URI{scheme: "tcp", host: "localhost", port: "6379"},
+			&URI{scheme: "tcp", host: "localhost", port: "6379"},
 			false,
 		},
 		{
 			"Parse URI without scheme",
 			args{"localhost:6379"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail when URI without host is passed",
 			args{"tcp://:6379"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail if port is less than 1",
 			args{"tcp://localhost:0"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail if port is greater than 65535",
 			args{"tcp://localhost:99999"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail if port is not integer",
 			args{"tcp://:foo"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Parse URI without port",
 			args{"tcp://localhost"},
-			URI{scheme: "tcp", host: "localhost", port: "6379"},
+			&URI{scheme: "tcp", host: "localhost", port: "6379"},
 			false,
 		},
 		{
 			"Parse URI with unix scheme",
 			args{"unix:///var/run/redis.sock"},
-			URI{scheme: "unix", socket: "/var/run/redis.sock"},
+			&URI{scheme: "unix", socket: "/var/run/redis.sock"},
 			false,
 		},
 		{
 			"Should fail if an unknown scheme is passed",
 			args{"foo://bar"},
-			URI{},
+			nil,
 			true,
 		},
 		{
 			"Should fail if a wrong format URI is passed",
 			args{"!@#$%^&*()"},
-			URI{},
+			nil,
 			true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotU, err := parseUri(tt.args.uri)
+			gotU, err := parseURI(tt.args.uri)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("parseUri() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("parseURI() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotU, tt.wantU) {
-				t.Errorf("parseUri() = %v, want %v", gotU, tt.wantU)
+				t.Errorf("parseURI() = %v, want %v", gotU, tt.wantU)
 			}
 		})
 	}
 }
 
-func Test_validateUri(t *testing.T) {
+func Test_validateURI(t *testing.T) {
 	type args struct {
 		uri string
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -317,19 +372,21 @@ func Test_validateUri(t *testing.T) {
 			true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateUri(tt.args.uri); (err != nil) != tt.wantErr {
-				t.Errorf("validateUri() error = %v, wantErr %v", err, tt.wantErr)
+			if err := validateURI(tt.args.uri); (err != nil) != tt.wantErr {
+				t.Errorf("validateURI() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func Test_isLooksLikeUri(t *testing.T) {
+func Test_isLooksLikeURI(t *testing.T) {
 	type args struct {
 		s string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -351,10 +408,11 @@ func Test_isLooksLikeUri(t *testing.T) {
 			false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isLooksLikeUri(tt.args.s); got != tt.want {
-				t.Errorf("isUri() = %v, want %v", got, tt.want)
+			if got := isLooksLikeURI(tt.args.s); got != tt.want {
+				t.Errorf("isLooksLikeURI() = %v, want %v", got, tt.want)
 			}
 		})
 	}

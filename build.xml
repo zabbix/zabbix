@@ -33,27 +33,27 @@
 		<property environment="env"/>
 
 		<!-- Create bootstrap.php -->
-		<copy overwrite="true" file="frontends/php/tests/bootstrap.php.template" tofile="frontends/php/tests/bootstrap.php"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{URL}" value="${env.WORKSPACE_URL}${url}"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{BASEDIR}" value="${basedir}"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_DIR}" value="${env.SCREENSHOT_DIR}"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_URL}" value="${env.SCREENSHOT_URL}"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{BINARY_DIR}" value="${basedir}/sbin/"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{CONFIG_SOURCE_DIR}" value="${basedir}/conf/"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{CONFIG_DIR}" value="${basedir}/etc/"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/runtime/"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
+		<copy overwrite="true" file="ui/tests/bootstrap.php.template" tofile="ui/tests/bootstrap.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{URL}" value="${env.WORKSPACE_URL}${url}"/>
+		<replace file="ui/tests/bootstrap.php" token="{BASEDIR}" value="${basedir}"/>
+		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_DIR}" value="${env.SCREENSHOT_DIR}"/>
+		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_URL}" value="${env.SCREENSHOT_URL}"/>
+		<replace file="ui/tests/bootstrap.php" token="{BINARY_DIR}" value="${basedir}/sbin/"/>
+		<replace file="ui/tests/bootstrap.php" token="{CONFIG_SOURCE_DIR}" value="${basedir}/conf/"/>
+		<replace file="ui/tests/bootstrap.php" token="{CONFIG_DIR}" value="${basedir}/etc/"/>
+		<replace file="ui/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/runtime/"/>
+		<replace file="ui/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
+		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
 
 		<!-- Create PHP config file -->
-		<copy overwrite="true" file="frontends/php/tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>
-		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
-		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
-		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
-		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
-		<replace file="frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
-		<replace file="frontends/php/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
+		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
 	</target>
 
 	<target name="init-integration">
@@ -175,7 +175,7 @@
 	</target>
 
 	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
-		<exec executable="psql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
+		<exec executable="psql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
@@ -187,7 +187,7 @@
 	</target>
 
 	<target name="init-api-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
-		<exec executable="psql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
+		<exec executable="psql" input="ui/tests/api_json/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
@@ -199,7 +199,7 @@
 	</target>
 
 	<target name="init-integration-postgresql" depends="create-configs,init-integration,make-binaries-postgresql,init-server-postgresql,init-proxy-postgresql">
-		<exec executable="psql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
+		<exec executable="psql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
@@ -291,7 +291,7 @@
 	</target>
 
 	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,init-server-mysql">
-		<exec executable="mysql" input="frontends/php/tests/selenium/data/data_test.sql" failonerror="on">
+		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
@@ -300,7 +300,7 @@
 	</target>
 
 	<target name="init-api-mysql" depends="create-configs,make-dbschema,init-server-mysql">
-		<exec executable="mysql" input="frontends/php/tests/api_json/data/data_test.sql" failonerror="on">
+		<exec executable="mysql" input="ui/tests/api_json/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
@@ -309,7 +309,7 @@
 	</target>
 
 	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binaries-mysql,init-server-mysql,init-proxy-mysql">
-		<exec executable="mysql" input="frontends/php/tests/integration/data/data_test.sql" failonerror="on">
+		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
@@ -318,7 +318,7 @@
 	</target>
 
 	<target name="test-phpunit" depends="init-common">
-		<exec executable="phpunit" dir="frontends/php/tests/unit" failonerror="off">
+		<exec executable="phpunit" dir="ui/tests/unit" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="include/"/>
@@ -326,7 +326,7 @@
 	</target>
 
 	<target name="test-frontend">
-		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
+		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
 			<arg line="${phpunit_filter}"/>
@@ -335,7 +335,7 @@
 	</target>
 
 	<target name="test-api">
-		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
+		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
 			<arg line="${phpunit_filter}"/>
@@ -344,7 +344,7 @@
 	</target>
 
 	<target name="test-integration">
-		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
+		<exec executable="phpunit" dir="ui/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="--bootstrap=bootstrap.php"/>
 			<arg line="${phpunit_filter}"/>

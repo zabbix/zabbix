@@ -33,12 +33,15 @@ AC_DEFUN([CONF_TESTS],[
 		tests/libs/zbxsysinfo/common/Makefile
 		tests/libs/zbxcommshigh/Makefile
 		tests/libs/zbxalgo/Makefile
+		tests/libs/zbxserver/Makefile
 		tests/libs/zbxprometheus/Makefile
 		tests/zabbix_server/Makefile
 		tests/zabbix_server/preprocessor/Makefile
 		tests/libs/zbxcomms/Makefile
 		tests/zabbix_server/trapper/Makefile
 		tests/libs/zbxregexp/Makefile
+		tests/mocks/Makefile
+		tests/mocks/valuecache/Makefile
 		])
 		AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
 	])
