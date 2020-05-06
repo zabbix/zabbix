@@ -23,6 +23,7 @@ package win32
 
 import (
 	"errors"
+	"fmt"
 	"syscall"
 	"unsafe"
 
@@ -238,12 +239,16 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	var instptr uintptr
 	var instbuf []uint16
 
+	counterbuf := make([]uint16, counterListSize)
+
 	for {
-		counterbuf := make([]uint16, counterListSize)
-		if instanceListSize != 0 {
-			instbuf = make([]uint16, instanceListSize)
-			instptr = uintptr(unsafe.Pointer(&instbuf[0]))
+		if instanceListSize == 0 {
+			return nil, fmt.Errorf("Object does not support variable instances.")
 		}
+
+		instbuf = make([]uint16, instanceListSize)
+		instptr = uintptr(unsafe.Pointer(&instbuf[0]))
+
 		ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 8, 0, 0, ptrNameUTF16, uintptr(unsafe.Pointer(&counterbuf[0])),
 			uintptr(unsafe.Pointer(&counterListSize)), instptr, uintptr(unsafe.Pointer(&instanceListSize)),
 			uintptr(PERF_DETAIL_WIZARD), 0)

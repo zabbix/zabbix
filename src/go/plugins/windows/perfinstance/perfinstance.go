@@ -31,7 +31,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if err = p.refreshObjects(); err != nil {
-		return nil, fmt.Errorf("Cannot refresh objects: %s", err.Error())
+		return nil, fmt.Errorf("Cannot refresh object cache: %s", err.Error())
 	}
 
 	var name string
@@ -41,10 +41,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "perf_instance_en.discovery":
 		if name = p.getLocalName(params[0]); name == "" {
 			if err = p.reloadEngObjectNames(); err != nil {
-				return nil, fmt.Errorf("Cannot reload English names: %s", err.Error())
+				return nil, fmt.Errorf("Cannot obtain object's English names: %s", err.Error())
 			}
 			if name = p.getLocalName(params[0]); name == "" {
-				return nil, errors.New("Cannot get local name")
+				return nil, errors.New("Cannot obtain object's localized name.")
 			}
 		}
 	default:
@@ -53,7 +53,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	var instances []win32.Instance
 	if instances, err = win32.PdhEnumObjectItems(name); err != nil {
-		return nil, fmt.Errorf("Cannot get instances list: %s", err.Error())
+		return nil, fmt.Errorf("Cannot obtain object's instances: %s", err.Error())
 	}
 
 	if len(instances) < 1 {
