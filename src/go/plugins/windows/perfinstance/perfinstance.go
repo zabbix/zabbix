@@ -53,7 +53,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	var instances []win32.Instance
 	if instances, err = win32.PdhEnumObjectItems(name); err != nil {
-		return nil, fmt.Errorf("Cannot obtain object's instances: %s", err.Error())
+		return nil, err
 	}
 
 	if len(instances) < 1 {
