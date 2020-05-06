@@ -129,9 +129,15 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result);
 	types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result);
 
-	if (FT_OVERFLOW & (types_incl | types_excl))
+	if (FT_OVERFLOW & types_incl)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second or third parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto err;
+	}
+
+	if (FT_OVERFLOW & types_excl)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		goto err;
 	}
 
