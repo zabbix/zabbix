@@ -1536,7 +1536,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'filter' =>			['type' => API_OBJECT, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 				'formula' =>		['type' => API_STRING_UTF8],
-				'conditions' =>		['type' => API_OBJECTS, 'fields' => [
+				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 					'macro' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_condition', 'macro')],
 					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_REGEXP],
 					'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_condition', 'value')],
