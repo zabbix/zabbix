@@ -1017,9 +1017,9 @@ class CDiscoveryRule extends CItemGeneral {
 						'stop' => array_key_exists('stop', $override) ? $override['stop'] : ZBX_LLD_OVERRIDE_STOP_NO
 					];
 
-					if (array_key_exists('filter', $override)) {
-						$new_override['evaltype'] = $override['filter']['evaltype'];
-					}
+					$new_override['evaltype'] = array_key_exists('filter', $override)
+						? $override['filter']['evaltype']
+						: DB::getDefault('lld_override', 'evaltype');
 
 					$overrides[] = $new_override;
 				}
