@@ -26,13 +26,27 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$MSSQL.AVERAGE_WAIT_TIME.MAX} |<p>The average wait time in ms for trigger expression.</p> |`500` |
 |{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT} |<p>The % buffer cache hit ratio for high trigger expression.</p> |`30` |
 |{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN} |<p>The % buffer cache hit ratio for warning trigger expression.</p> |`50` |
 |{$MSSQL.DBNAME.MATCHES} |<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p> |`.*` |
 |{$MSSQL.DBNAME.NOT_MATCHES} |<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p> |`master|tempdb|model|msdb` |
+|{$MSSQL.DEADLOCKS.MAX} |<p>The deadlocks/sec for trigger expression.</p> |`0` |
 |{$MSSQL.DSN} |<p>System data source name.</p> |`<Put your DSN here>` |
+|{$MSSQL.FREE_LIST_STALLS.MAX} |<p>The free list stalls/sec for trigger expression.</p> |`2` |
 |{$MSSQL.HOST} |<p>MSSQL host IP address or FQDN.</p> |`localhost` |
+|{$MSSQL.LAZY_WRITES.MAX} |<p>The lazy writes/sec for trigger expression.</p> |`20` |
+|{$MSSQL.LOCK_REQUESTS.MAX} |<p>The lock requests/sec for trigger expression.</p> |`3000` |
+|{$MSSQL.LOCK_TIMEOUTS.MAX} |<p>The lock timeouts/sec for trigger expression.</p> |`1` |
+|{$MSSQL.LOG_FLUSH_WAITS.MAX} |<p>The log flush waits/sec for trigger expression.</p> |`1` |
+|{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX} |<p>The log flush wait time in ms for trigger expression.</p> |`5` |
+|{$MSSQL.LOG_GROWTHS.MAX} |<p>The log growths for trigger expression.</p> |`1` |
+|{$MSSQL.LOG_SHRINKS.MAX} |<p>The log shrinks for trigger expression.</p> |`15` |
+|{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN} |<p>The page life expectancy for trigger expression.</p> |`5` |
+|{$MSSQL.PAGE_READS.MAX} |<p>The page reads/sec for trigger expression.</p> |`90` |
+|{$MSSQL.PAGE_WRITES.MAX} |<p>The page writes/sec for trigger expression.</p> |`90` |
 |{$MSSQL.PASSWORD} |<p>MSSQL user password.</p> |`<Put your password here>` |
+|{$MSSQL.PERCENT_LOG_USED.MAX} |<p>The percent log used for trigger expression.</p> |`80` |
 |{$MSSQL.PORT} |<p>MSSQL tcp port.</p> |`1433` |
 |{$MSSQL.USER} |<p>MSSQL username.</p> |`<Put your username here>` |
 |{$MSSQL.WORK_FILES.MAX} |<p>The number of work files created per second for trigger expression.</p> |`300` |
@@ -111,7 +125,7 @@ There are no template links in this template.
 |MSSQL |MSSQL: SQL Re-Compilations/sec |<p>Number of statement recompiles per second. Counts the number of</p><p>times statement recompiles are triggered. Generally, you want the recompiles</p><p>to be low.</p> |DEPENDENT |mssql.sql_recompilations_sec<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='SQLServer:SQL Statistics' && @.counter_name=='SQL Re-Compilations/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND |
 |MSSQL |MSSQL: Unsafe Auto-Params/sec |<p>Number of unsafe auto-parameterization attempts per second. For</p><p>example, the query has some characteristics that prevent the cached plan from</p><p>being shared. These are designated as unsafe. This does not count the number</p><p>of forced parameterizations.</p> |DEPENDENT |mssql.unsafe_autoparams_sec<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='SQLServer:SQL Statistics' && @.counter_name=='Unsafe Auto-Params/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND |
 |MSSQL |MSSQL: Transactions Number (Total) |<p>The number of currently active transactions of all types.</p> |DEPENDENT |mssql.transactions<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='SQLServer:Transactions' && @.counter_name=='Transactions')].cntr_value.first()`</p> |
-|MSSQL |MSSQL: {#DBNAME} status |<p>32 = loading</p><p>128 = recovering</p><p>256 = not recovered</p><p>512 = offline (ALTER DATABASE)</p><p>32768 = emergency mode</p> |ODBC |db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}]<p>**Expression**:</p>`select coalesce(max(status),999) from master..sysdatabases where name = '{#DBNAME}'` |
+|MSSQL |MSSQL: {#DBNAME} status |<p>0 = ONLINE</p><p>1 = RESTORING</p><p>2 = RECOVERING | SQL Server 2008 and later</p><p>3 = RECOVERY_PENDING | SQL Server 2008 and later</p><p>4 = SUSPECT</p><p>5 = EMERGENCY | SQL Server 2008 and later</p><p>6 = OFFLINE | SQL Server 2008 and later</p><p>7 = COPYING | Azure SQL Database Active Geo-Replication</p><p>10 = OFFLINE_SECONDARY | Azure SQL Database Active Geo-Replication</p> |ODBC |db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}]<p>**Expression**:</p>`select state from master.sys.databases where name = '{#DBNAME}'` |
 |MSSQL |MSSQL: {#DBNAME} Active Transactions |<p>Number of active transactions for the database.</p> |DEPENDENT |mssql.active_transactions[{#DBNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='SQLServer:Databases' && @.counter_name=='Active Transactions' && @.instance_name=='{#DBNAME}')].cntr_value.first()`</p> |
 |MSSQL |MSSQL: {#DBNAME} Data File Size |<p>Cumulative size (in kilobytes) of all the data files in the database</p><p>including any automatic growth. Monitoring this counter is useful, for example,</p><p>for determining the correct size of tempdb.</p> |DEPENDENT |mssql.data_files_size[{#DBNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='SQLServer:Databases' && @.counter_name=='Data File(s) Size (KB)' && @.instance_name=='{#DBNAME}')].cntr_value.first()`</p><p>- MULTIPLIER: `1024`</p> |
 |MSSQL |MSSQL: {#DBNAME} Log Bytes Flushed/sec |<p>Total number of log bytes flushed per second. Useful for determining</p><p>trends and utilization of the transaction log.</p> |DEPENDENT |mssql.log_bytes_flushed_sec[{#DBNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='SQLServer:Databases' && @.counter_name=='Log Bytes Flushed/sec' && @.instance_name=='{#DBNAME}')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND |
@@ -135,27 +149,23 @@ There are no template links in this template.
 |Server port is unavailable | |`{TEMPLATE_NAME:net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}].max(#3)}=0` |DISASTER | |
 |MSSQL: Number work files created/sec is over {$MSSQL.WORK_FILES.MAX} for 5m |<p>Too many work files created per second to store temporary results for hash joins and hash aggregates.</p> |`{TEMPLATE_NAME:mssql.workfiles_created_sec.min(5m)}>{$MSSQL.WORK_FILES.MAX}` |AVERAGE | |
 |MSSQL: Number work tables created/sec is over {$MSSQL.WORK_TABLES.MAX} for 5m |<p>Too many work tables created per second to store temporary results for query spool, lob variables, XML variables, and cursors.</p> |`{TEMPLATE_NAME:mssql.worktables_created_sec.min(5m)}>{$MSSQL.WORK_TABLES.MAX}` |AVERAGE | |
-|MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT} for 5m |<p>Too low buffer cache hit ratio.</p> |`{TEMPLATE_NAME:mssql.buffer_cache_hit_ratio.max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}` |HIGH | |
-|MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN} for 5m |<p>Low buffer cache hit ratio.</p> |`{TEMPLATE_NAME:mssql.buffer_cache_hit_ratio.max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT} for 5m</p> |
-|MSSQL: Free list stalls/sec | |`{TEMPLATE_NAME:mssql.free_list_stalls_sec.min(5m)}>2` |WARNING | |
-|MSSQL: Lazy writes/sec | |`{TEMPLATE_NAME:mssql.lazy_writes_sec.min(5m)}>20` |WARNING | |
-|MSSQL: Page life expectancy | |`{TEMPLATE_NAME:mssql.page_life_expectancy.max(5m)}<5` |HIGH | |
-|MSSQL: Page reads/sec | |`{TEMPLATE_NAME:mssql.page_reads_sec.min(5m)}>90` |WARNING | |
-|MSSQL: Page writes/sec | |`{TEMPLATE_NAME:mssql.page_writes_sec.min(5m)}>90` |WARNING | |
-|MSSQL: Average Wait Time (Total) | |`{TEMPLATE_NAME:mssql.average_wait_time.min(5m)}>500` |WARNING | |
-|MSSQL: Lock Requests/sec (Total) | |`{TEMPLATE_NAME:mssql.lock_requests_sec.min(5m)}>3000` |WARNING | |
-|MSSQL: Lock Timeouts/sec (Total) | |`{TEMPLATE_NAME:mssql.lock_timeouts_sec.min(5m)}>1` |WARNING | |
-|MSSQL: Deadlocks exists for 5m | |`{TEMPLATE_NAME:mssql.number_deadlocks_sec.max(5m)}>0` |AVERAGE | |
-|MSSQL: DB {#DBNAME} in emergency mode | |`{TEMPLATE_NAME:db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}].band(,32768)}<>0` |HIGH | |
-|MSSQL: DB {#DBNAME} is loading | |`{TEMPLATE_NAME:db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}].band(,32)}<>0` |HIGH | |
-|MSSQL: DB {#DBNAME} is not recovered | |`{TEMPLATE_NAME:db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}].band(,256)}<>0` |HIGH | |
-|MSSQL: DB {#DBNAME} is offline | |`{TEMPLATE_NAME:db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}].band(,512)}<>0` |HIGH | |
-|MSSQL: DB {#DBNAME} is recovering | |`{TEMPLATE_NAME:db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}].band(,128)}<>0` |HIGH | |
-|MSSQL: Log Flush Waits/sec {#DBNAME} | |`{TEMPLATE_NAME:mssql.log_flush_waits_sec[{#DBNAME}].min(5m)}>1` |WARNING | |
-|MSSQL: Log Flush Wait Time {#DBNAME} | |`{TEMPLATE_NAME:mssql.log_flush_wait_time[{#DBNAME}].min(5m)}>5` |WARNING | |
-|MSSQL: Log Growths {#DBNAME} | |`{TEMPLATE_NAME:mssql.log_growths[{#DBNAME}].min(5m)}>1` |WARNING | |
-|MSSQL: Log Shrinks {#DBNAME} | |`{TEMPLATE_NAME:mssql.log_shrinks[{#DBNAME}].min(5m)}>15` |WARNING | |
-|MSSQL: Percent Log Used {#DBNAME} | |`{TEMPLATE_NAME:mssql.percent_log_used[{#DBNAME}].min(5m)}>80` |WARNING | |
+|MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m |<p>Too low buffer cache hit ratio.</p> |`{TEMPLATE_NAME:mssql.buffer_cache_hit_ratio.max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}` |HIGH | |
+|MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m |<p>Low buffer cache hit ratio.</p> |`{TEMPLATE_NAME:mssql.buffer_cache_hit_ratio.max(5m)}<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m</p> |
+|MSSQL: Free list stalls/sec | |`{TEMPLATE_NAME:mssql.free_list_stalls_sec.min(5m)}>{$MSSQL.FREE_LIST_STALLS.MAX}` |WARNING | |
+|MSSQL: Lazy writes/sec | |`{TEMPLATE_NAME:mssql.lazy_writes_sec.min(5m)}>{$MSSQL.LAZY_WRITES.MAX}` |WARNING | |
+|MSSQL: Page life expectancy | |`{TEMPLATE_NAME:mssql.page_life_expectancy.max(5m)}<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}` |HIGH | |
+|MSSQL: Page reads/sec | |`{TEMPLATE_NAME:mssql.page_reads_sec.min(5m)}>{$MSSQL.PAGE_READS.MAX}` |WARNING | |
+|MSSQL: Page writes/sec | |`{TEMPLATE_NAME:mssql.page_writes_sec.min(5m)}>{$MSSQL.PAGE_WRITES.MAX}` |WARNING | |
+|MSSQL: Average Wait Time (Total) | |`{TEMPLATE_NAME:mssql.average_wait_time.min(5m)}>{$MSSQL.AVERAGE_WAIT_TIME.MAX}` |WARNING | |
+|MSSQL: Lock Requests/sec (Total) | |`{TEMPLATE_NAME:mssql.lock_requests_sec.min(5m)}>{$MSSQL.LOCK_REQUESTS.MAX}` |WARNING | |
+|MSSQL: Lock Timeouts/sec (Total) | |`{TEMPLATE_NAME:mssql.lock_timeouts_sec.min(5m)}>{$MSSQL.LOCK_TIMEOUTS.MAX}` |WARNING | |
+|MSSQL: Deadlocks exists for 5m | |`{TEMPLATE_NAME:mssql.number_deadlocks_sec.min(5m)}>{$MSSQL.DEADLOCKS.MAX}` |AVERAGE | |
+|MSSQL: DB {#DBNAME} is {ITEM.VALUE} | |`{TEMPLATE_NAME:db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}].last()}>0` |HIGH | |
+|MSSQL: Log Flush Waits/sec {#DBNAME} | |`{TEMPLATE_NAME:mssql.log_flush_waits_sec[{#DBNAME}].min(5m)}>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}` |WARNING | |
+|MSSQL: Log Flush Wait Time {#DBNAME} | |`{TEMPLATE_NAME:mssql.log_flush_wait_time[{#DBNAME}].min(5m)}>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}` |WARNING | |
+|MSSQL: Log Growths {#DBNAME} | |`{TEMPLATE_NAME:mssql.log_growths[{#DBNAME}].min(5m)}>{$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"}` |WARNING | |
+|MSSQL: Log Shrinks {#DBNAME} | |`{TEMPLATE_NAME:mssql.log_shrinks[{#DBNAME}].min(5m)}>{$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"}` |WARNING | |
+|MSSQL: Percent Log Used {#DBNAME} | |`{TEMPLATE_NAME:mssql.percent_log_used[{#DBNAME}].min(5m)}>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}` |WARNING | |
 
 ## Feedback
 

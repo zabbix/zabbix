@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-05T17:55:47Z</date>
+   <date>2020-05-06T08:20:40Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -165,7 +165,7 @@ had to wait.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{min(5m)}&gt;500</expression>
+                     <expression>{min(5m)}&gt;{$MSSQL.AVERAGE_WAIT_TIME.MAX}</expression>
                      <name>MSSQL: Average Wait Time (Total)</name>
                      <priority>WARNING</priority>
                   </trigger>
@@ -233,18 +233,18 @@ feature.</description>
                <triggers>
                   <trigger>
                      <expression>{max(5m)}&lt;{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</expression>
-                     <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT} for 5m</name>
+                     <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m</name>
                      <priority>HIGH</priority>
                      <description>Too low buffer cache hit ratio.</description>
                   </trigger>
                   <trigger>
                      <expression>{max(5m)}&lt;{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}</expression>
-                     <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN} for 5m</name>
+                     <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m</name>
                      <priority>WARNING</priority>
                      <description>Low buffer cache hit ratio.</description>
                      <dependencies>
                         <dependency>
-                           <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT} for 5m</name>
+                           <name>MSSQL: Buffer cache hit ratio is below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m</name>
                            <expression>{Template DB MSSQL by ODBC:mssql.buffer_cache_hit_ratio.max(5m)}&lt;{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</expression>
                         </dependency>
                      </dependencies>
@@ -529,7 +529,7 @@ in later versions of SQL Server.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{min(5m)}&gt;2</expression>
+                     <expression>{min(5m)}&gt;{$MSSQL.FREE_LIST_STALLS.MAX}</expression>
                      <name>MSSQL: Free list stalls/sec</name>
                      <priority>WARNING</priority>
                   </trigger>
@@ -735,7 +735,7 @@ frequent checkpoints in order to create available buffers.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{min(5m)}&gt;20</expression>
+                     <expression>{min(5m)}&gt;{$MSSQL.LAZY_WRITES.MAX}</expression>
                      <name>MSSQL: Lazy writes/sec</name>
                      <priority>WARNING</priority>
                   </trigger>
@@ -770,7 +770,7 @@ the lock manager.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{min(5m)}&gt;3000</expression>
+                     <expression>{min(5m)}&gt;{$MSSQL.LOCK_REQUESTS.MAX}</expression>
                      <name>MSSQL: Lock Requests/sec (Total)</name>
                      <priority>WARNING</priority>
                   </trigger>
@@ -805,7 +805,7 @@ for NOWAIT locks.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{min(5m)}&gt;1</expression>
+                     <expression>{min(5m)}&gt;{$MSSQL.LOCK_TIMEOUTS.MAX}</expression>
                      <name>MSSQL: Lock Timeouts/sec (Total)</name>
                      <priority>WARNING</priority>
                   </trigger>
@@ -1071,7 +1071,7 @@ memory grant.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{max(5m)}&gt;0</expression>
+                     <expression>{min(5m)}&gt;{$MSSQL.DEADLOCKS.MAX}</expression>
                      <name>MSSQL: Deadlocks exists for 5m</name>
                      <priority>AVERAGE</priority>
                   </trigger>
@@ -1134,7 +1134,7 @@ without references.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{max(5m)}&lt;5</expression>
+                     <expression>{max(5m)}&lt;{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</expression>
                      <name>MSSQL: Page life expectancy</name>
                      <priority>HIGH</priority>
                   </trigger>
@@ -1200,7 +1200,7 @@ and more efficient queries, or by changing the database design.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{min(5m)}&gt;90</expression>
+                     <expression>{min(5m)}&gt;{$MSSQL.PAGE_READS.MAX}</expression>
                      <name>MSSQL: Page reads/sec</name>
                      <priority>WARNING</priority>
                   </trigger>
@@ -1262,7 +1262,7 @@ index pages.</description>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{min(5m)}&gt;90</expression>
+                     <expression>{min(5m)}&gt;{$MSSQL.PAGE_WRITES.MAX}</expression>
                      <name>MSSQL: Page writes/sec</name>
                      <priority>WARNING</priority>
                   </trigger>
@@ -1751,7 +1751,7 @@ variables, and cursors.</description>
                <type>ODBC</type>
                <key>db.odbc.discovery[dbname,{$MSSQL.DSN}]</key>
                <delay>1h</delay>
-               <params>select Name As DBNAME FROM master..sysdatabases</params>
+               <params>select name as DBNAME from master.sys.databases</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
                <filter>
@@ -1776,45 +1776,31 @@ variables, and cursors.</description>
                      <name>MSSQL: {#DBNAME} status</name>
                      <type>ODBC</type>
                      <key>db.odbc.select[{#DBNAME}_status,{$MSSQL.DSN}]</key>
-                     <delay>30s</delay>
                      <history>7d</history>
-                     <params>select coalesce(max(status),999) from master..sysdatabases where name = '{#DBNAME}'</params>
+                     <params>select state from master.sys.databases where name = '{#DBNAME}'</params>
                      <username>{$MSSQL.USER}</username>
                      <password>{$MSSQL.PASSWORD}</password>
-                     <description>32 = loading&#13;
-128 = recovering&#13;
-256 = not recovered&#13;
-512 = offline (ALTER DATABASE)&#13;
-32768 = emergency mode</description>
+                     <description>0 = ONLINE&#13;
+1 = RESTORING&#13;
+2 = RECOVERING | SQL Server 2008 and later&#13;
+3 = RECOVERY_PENDING | SQL Server 2008 and later&#13;
+4 = SUSPECT&#13;
+5 = EMERGENCY | SQL Server 2008 and later&#13;
+6 = OFFLINE | SQL Server 2008 and later&#13;
+7 = COPYING | Azure SQL Database Active Geo-Replication&#13;
+10 = OFFLINE_SECONDARY | Azure SQL Database Active Geo-Replication</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>MSSQL {#DBNAME}</name>
                         </application_prototype>
                      </application_prototypes>
+                     <valuemap>
+                        <name>DB state</name>
+                     </valuemap>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{band(,32768)}&lt;&gt;0</expression>
-                           <name>MSSQL: DB {#DBNAME} in emergency mode</name>
-                           <priority>HIGH</priority>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{band(,32)}&lt;&gt;0</expression>
-                           <name>MSSQL: DB {#DBNAME} is loading</name>
-                           <priority>HIGH</priority>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{band(,256)}&lt;&gt;0</expression>
-                           <name>MSSQL: DB {#DBNAME} is not recovered</name>
-                           <priority>HIGH</priority>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{band(,512)}&lt;&gt;0</expression>
-                           <name>MSSQL: DB {#DBNAME} is offline</name>
-                           <priority>HIGH</priority>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{band(,128)}&lt;&gt;0</expression>
-                           <name>MSSQL: DB {#DBNAME} is recovering</name>
+                           <expression>{last()}&gt;0</expression>
+                           <name>MSSQL: DB {#DBNAME} is {ITEM.VALUE}</name>
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -1984,7 +1970,7 @@ be hardened to disk.</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;5</expression>
+                           <expression>{min(5m)}&gt;{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}</expression>
                            <name>MSSQL: Log Flush Wait Time {#DBNAME}</name>
                            <priority>WARNING</priority>
                         </trigger_prototype>
@@ -2018,7 +2004,7 @@ be hardened to disk.</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;1</expression>
+                           <expression>{min(5m)}&gt;{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}</expression>
                            <name>MSSQL: Log Flush Waits/sec {#DBNAME}</name>
                            <priority>WARNING</priority>
                         </trigger_prototype>
@@ -2080,7 +2066,7 @@ been expanded.</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;1</expression>
+                           <expression>{min(5m)}&gt;{$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"}</expression>
                            <name>MSSQL: Log Growths {#DBNAME}</name>
                            <priority>WARNING</priority>
                         </trigger_prototype>
@@ -2111,7 +2097,7 @@ been shrunk.</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;15</expression>
+                           <expression>{min(5m)}&gt;{$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"}</expression>
                            <name>MSSQL: Log Shrinks {#DBNAME}</name>
                            <priority>WARNING</priority>
                         </trigger_prototype>
@@ -2165,7 +2151,7 @@ been shrunk.</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{min(5m)}&gt;80</expression>
+                           <expression>{min(5m)}&gt;{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}</expression>
                            <name>MSSQL: Percent Log Used {#DBNAME}</name>
                            <priority>WARNING</priority>
                         </trigger_prototype>
@@ -2209,6 +2195,11 @@ been shrunk.</description>
          </discovery_rules>
          <macros>
             <macro>
+               <macro>{$MSSQL.AVERAGE_WAIT_TIME.MAX}</macro>
+               <value>500</value>
+               <description>The average wait time in ms for trigger expression.</description>
+            </macro>
+            <macro>
                <macro>{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}</macro>
                <value>30</value>
                <description>The % buffer cache hit ratio for high trigger expression.</description>
@@ -2229,9 +2220,19 @@ been shrunk.</description>
                <description>This macro is used in database discovery. It can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
+               <macro>{$MSSQL.DEADLOCKS.MAX}</macro>
+               <value>0</value>
+               <description>The deadlocks/sec for trigger expression.</description>
+            </macro>
+            <macro>
                <macro>{$MSSQL.DSN}</macro>
                <value>&lt;Put your DSN here&gt;</value>
                <description>System data source name.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.FREE_LIST_STALLS.MAX}</macro>
+               <value>2</value>
+               <description>The free list stalls/sec for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.HOST}</macro>
@@ -2239,9 +2240,64 @@ been shrunk.</description>
                <description>MSSQL host IP address or FQDN.</description>
             </macro>
             <macro>
+               <macro>{$MSSQL.LAZY_WRITES.MAX}</macro>
+               <value>20</value>
+               <description>The lazy writes/sec for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.LOCK_REQUESTS.MAX}</macro>
+               <value>3000</value>
+               <description>The lock requests/sec for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.LOCK_TIMEOUTS.MAX}</macro>
+               <value>1</value>
+               <description>The lock timeouts/sec for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX}</macro>
+               <value>5</value>
+               <description>The log flush wait time in ms for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.LOG_FLUSH_WAITS.MAX}</macro>
+               <value>1</value>
+               <description>The log flush waits/sec for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.LOG_GROWTHS.MAX}</macro>
+               <value>1</value>
+               <description>The log growths for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.LOG_SHRINKS.MAX}</macro>
+               <value>15</value>
+               <description>The log shrinks for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</macro>
+               <value>5</value>
+               <description>The page life expectancy for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.PAGE_READS.MAX}</macro>
+               <value>90</value>
+               <description>The page reads/sec for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.PAGE_WRITES.MAX}</macro>
+               <value>90</value>
+               <description>The page writes/sec for trigger expression.</description>
+            </macro>
+            <macro>
                <macro>{$MSSQL.PASSWORD}</macro>
                <value>&lt;Put your password here&gt;</value>
                <description>MSSQL user password.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.PERCENT_LOG_USED.MAX}</macro>
+               <value>80</value>
+               <description>The percent log used for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PORT}</macro>
@@ -2755,6 +2811,47 @@ been shrunk.</description>
             <mapping>
                <value>1</value>
                <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>DB state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>ONLINE</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>RESTORING</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>RECOVERING</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>RECOVERY_PENDING</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>SUSPECT</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>EMERGENCY</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>OFFLINE</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>COPYING</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>OFFLINE_SECONDARY</newvalue>
             </mapping>
          </mappings>
       </value_map>
