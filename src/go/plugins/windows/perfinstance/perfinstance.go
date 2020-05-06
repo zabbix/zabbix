@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	"zabbix.com/pkg/pdh"
@@ -15,8 +14,6 @@ import (
 //Plugin -
 type Plugin struct {
 	plugin.Base
-	refreshMux         sync.Mutex
-	reloadMux          sync.RWMutex
 	nextObjectRefresh  time.Time
 	nextEngNameRefresh time.Time
 }
@@ -76,11 +73,10 @@ func init() {
 		"perf_instance.discovery", "Get Windows performance instance object list.",
 		"perf_instance_en.discovery", "Get Windows performance instance object English list.",
 	)
+	impl.SetCapacity(1)
 }
 
 func (p *Plugin) refreshObjects() (err error) {
-	p.refreshMux.Lock()
-	defer p.refreshMux.Unlock()
 	if time.Now().After(p.nextObjectRefresh) {
 		_, err = win32.PdhEnumObject()
 		p.nextObjectRefresh = time.Now().Add(time.Minute)
@@ -90,8 +86,6 @@ func (p *Plugin) refreshObjects() (err error) {
 }
 
 func (p *Plugin) reloadEngObjectNames() (err error) {
-	p.reloadMux.Lock()
-	defer p.reloadMux.Unlock()
 	if time.Now().After(p.nextEngNameRefresh) {
 		err = pdh.LocateObjectsAndDefaultCounters(false)
 		p.nextEngNameRefresh = time.Now().Add(time.Minute)
@@ -100,12 +94,7 @@ func (p *Plugin) reloadEngObjectNames() (err error) {
 	return
 }
 
-func (p *Plugin) getLocalName(engName string) string {
-	p.reloadMux.RLock()
-	defer p.reloadMux.RUnlock()
-	if name, ok := pdh.ObjectsNames[engName]; ok {
-		return name
-	}
-
-	return ""
+func (p *Plugin) getLocalName(engName string) (name string) {
+	name, _ = pdh.ObjectsNames[engName]
+	return
 }
