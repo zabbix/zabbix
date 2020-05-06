@@ -46,12 +46,13 @@ $overrides_popup_form_list = (new CFormList())
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('override_name')
-	);
-
-$overrides_popup_form_list
-	->addRow(_('Stop processing next overrides if matches'),
-		(new CCheckBox('stop'))
-			->setChecked($options['stop'] == ZBX_LLD_OVERRIDE_STOP_YES)
+	)
+	->addRow(
+		_('If filter matches'),
+		(new CRadioButtonList('stop', (int) $options['stop']))
+			->addValue(_('Continue overrides'), ZBX_LLD_OVERRIDE_STOP_NO)
+			->addValue(_('Stop processing'), ZBX_LLD_OVERRIDE_STOP_YES)
+			->setModern(true)
 	);
 
 // filters
@@ -145,8 +146,8 @@ $operations_list = (new CTable())
 	->addClass('lld-overrides-operations-table')
 	->addStyle('white-space:normal;')
 	->setHeader([
-		(new CColHeader(_('Condition')))->setWidth('350'),
-		(new CColHeader(''))->setWidth('50')
+		(new CColHeader(_('Condition')))->setWidth('364'),
+		(new CColHeader(''))->setWidth('72')
 	])
 	->addRow(
 		(new CCol(

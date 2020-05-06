@@ -98,7 +98,6 @@ insert_javascript_for_visibilitybox();
 <script type="text/x-jquery-tmpl" id="lldoverride-operation-row-templated">
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
-			'#{actions}',
 			(new CCol(
 				(new CButton(null, _('View')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -112,7 +111,6 @@ insert_javascript_for_visibilitybox();
 <script type="text/x-jquery-tmpl" id="lldoverride-operation-row">
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
-			'#{actions}',
 			(new CCol([
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
