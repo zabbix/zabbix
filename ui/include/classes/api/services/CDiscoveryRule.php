@@ -1671,6 +1671,7 @@ class CDiscoveryRule extends CItemGeneral {
 									}
 
 									if (array_key_exists('ophistory', $operation)
+											&& $operation['ophistory']['history'] !== ''
 											&& !validateTimeUnit($operation['ophistory']['history'], SEC_PER_HOUR,
 													25 * SEC_PER_YEAR, true, $error,
 													['usermacros' => true, 'lldmacros' => true])) {
@@ -1680,6 +1681,7 @@ class CDiscoveryRule extends CItemGeneral {
 									}
 
 									if (array_key_exists('optrends', $operation)
+											&& $operation['optrends']['trends'] !== ''
 											&& !validateTimeUnit($operation['optrends']['trends'], SEC_PER_HOUR,
 													25 * SEC_PER_YEAR, true, $error,
 													['usermacros' => true, 'lldmacros' => true])) {
