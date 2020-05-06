@@ -552,6 +552,10 @@ class CImportDataAdapter {
 	protected function formatDiscoveryRuleOverrideFields(array $discovery_rule) {
 		if ($discovery_rule['overrides']) {
 			foreach ($discovery_rule['overrides'] as &$override) {
+				if (!$override['filter']) {
+					unset($override['filter']);
+				}
+
 				foreach ($override['operations'] as &$operation) {
 					if (array_key_exists('discover', $operation) && $operation['discover'] !== '') {
 						$operation['opdiscover']['discover'] = $operation['discover'];

@@ -821,7 +821,7 @@ class C50XmlValidator {
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'step' =>					['type' => XML_STRING | XML_REQUIRED],
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
-									'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+									'filter' =>					['type' => XML_ARRAY, 'rules' => [
 										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
 										'formula' =>				['type' => XML_STRING, 'default' => ''],
 										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
@@ -1428,7 +1428,7 @@ class C50XmlValidator {
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'step' =>					['type' => XML_STRING | XML_REQUIRED],
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
-									'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+									'filter' =>					['type' => XML_ARRAY, 'rules' => [
 										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
 										'formula' =>				['type' => XML_STRING, 'default' => ''],
 										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
