@@ -745,7 +745,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'opdata'
+				'opdata', 'discover'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
@@ -2207,7 +2207,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-				'allow_traps'
+				'allow_traps', 'discover'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
@@ -2386,7 +2386,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$srcGraphs = API::GraphPrototype()->get([
 			'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period',
 				'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right',
-				'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid'
+				'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid', 'discover'
 			],
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
 			'selectHosts' => ['hostid'],
@@ -2502,7 +2502,7 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
 		$prototypes = API::HostPrototype()->get([
 			'discoveryids' => $srcid,
-			'output' => ['host', 'name', 'status', 'inventory_mode'],
+			'output' => ['host', 'name', 'status', 'inventory_mode', 'discover'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
 			'selectTemplates' => ['templateid'],
