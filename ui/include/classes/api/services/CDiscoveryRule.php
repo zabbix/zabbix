@@ -1557,10 +1557,10 @@ class CDiscoveryRule extends CItemGeneral {
 					'delay' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
 				]],
 				'ophistory' =>			['type' => API_OBJECT, 'fields' => [
-					'history' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
+					'history' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
 				]],
 				'optrends' =>			['type' => API_OBJECT, 'fields' => [
-					'trends' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
+					'trends' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
 				]],
 				'opseverity' =>			['type' => API_OBJECT, 'fields' => [
 					'severity' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))]
