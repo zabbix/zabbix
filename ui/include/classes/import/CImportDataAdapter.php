@@ -592,13 +592,13 @@ class CImportDataAdapter {
 							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
 								$operation['opstatus']['status'] = $operation['status'];
 							}
-							if (array_key_exists('templates', $operation)) {
+							if (array_key_exists('templates', $operation) && $operation['templates']) {
 								$operation['optemplate'] = [];
 								foreach ($operation['templates'] as $template) {
 									$operation['optemplate'][] = $template;
 								}
 							}
-							if (array_key_exists('inventory_mode', $operation)) {
+							if (array_key_exists('inventory_mode', $operation) && $operation['inventory_mode'] !== '') {
 								$operation['opinventory']['inventory_mode'] = $operation['inventory_mode'];
 							}
 							break;
