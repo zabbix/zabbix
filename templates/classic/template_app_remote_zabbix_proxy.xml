@@ -55,7 +55,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Zabbix server</name>
+                            <name>Zabbix proxy</name>
                         </application>
                     </applications>
                     <valuemap/>
