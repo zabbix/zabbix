@@ -234,6 +234,9 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 		ptrNameUTF16, 0, uintptr(unsafe.Pointer(&counterListSize)), 0,
 		uintptr(unsafe.Pointer(&instanceListSize)), uintptr(PERF_DETAIL_WIZARD), 0)
 	if ret != PDH_MORE_DATA {
+		if syscall.Errno(ret) == windows.ERROR_SUCCESS {
+			return
+		}
 		return nil, newPdhError(ret)
 	}
 	var instptr uintptr
