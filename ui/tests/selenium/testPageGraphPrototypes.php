@@ -75,7 +75,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//button[contains(@data-url, "form")]', 'Create graph prototype');
 
 		// Check table headers.
-		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type'],
+		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type', 'Discover'],
 				$this->getTextOfElements("//thead/tr/th[not(@class)]")
 		);
 

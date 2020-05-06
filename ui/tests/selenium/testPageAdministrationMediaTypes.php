@@ -72,11 +72,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'result' => ['Discord', 'Email', 'Email (HTML)', 'Jira', 'Jira with CustomFields', 'Mattermost',
-						'MS Teams', 'Opsgenie', 'PagerDuty', 'Pushover', 'Redmine', 'Reference webhook', 'SIGNL4',
-						'Slack', 'SMS', 'Telegram', 'URL test webhook', 'Validation webhook', 'Webhook to delete',
-						'Zendesk'
-					]
+					'get_db_result' => true
 				]
 			],
 			[
@@ -121,6 +117,13 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$form->fill($data['filter']);
 		$form->submit();
 		$this->page->waitUntilReady();
+
+		if (CTestArrayHelper::get($data, 'get_db_result', false)) {
+			foreach (CDBHelper::getAll('SELECT name FROM media_type WHERE status='.MEDIA_STATUS_ACTIVE.
+					' ORDER BY LOWER(name) ASC') as $name) {
+				$data['result'][] = $name['name'];
+			}
+		}
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 	}
 

@@ -90,7 +90,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		foreach ($get_headers as $row) {
 			$table_headers[] = $row->getText();
 		}
-		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type'], $table_headers);
+		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type', 'Info'], $table_headers);
 
 		// Check graph configuration parameters.
 		$types = ['Normal', 'Stacked', 'Pie', 'Exploded'];
