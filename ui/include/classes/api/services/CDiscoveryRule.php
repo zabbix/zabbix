@@ -1531,7 +1531,7 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function validateOverrides(array $items, $update): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name'], ['step']], 'fields' => [
 			'step' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:'.ZBX_MAX_INT32],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => $update ? 0x00 : (API_REQUIRED | API_NOT_EMPTY), 'length' => DB::getFieldLength('lld_override', 'name')],//?
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override', 'name')],
 			'stop' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_OVERRIDE_STOP_NO, ZBX_LLD_OVERRIDE_STOP_YES]), 'default' => ZBX_LLD_OVERRIDE_STOP_NO],
 			'filter' =>			['type' => API_OBJECT, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
@@ -2115,6 +2115,9 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($dstDiscovery['overrides']) {
 			foreach ($dstDiscovery['overrides'] as &$override) {
 				if (array_key_exists('filter', $override)) {
+					if (!$override['filter']['conditions']) {
+						unset($override['filter']);
+					}
 					unset($override['filter']['eval_formula']);
 				}
 			}
