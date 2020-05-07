@@ -716,6 +716,10 @@ class CTemplate extends CHostGeneral {
 			API::Application()->delete(array_keys($delApplications), true);
 		}
 
+		// Delete LLD override operations.
+		DB::delete('lld_override_optemplate', ['templateid' => $templateids]);
+
+		// Finally delete the template.
 		DB::delete('hosts', ['hostid' => $templateids]);
 
 		// TODO: remove info from API
