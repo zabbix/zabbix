@@ -28,7 +28,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 */
 	protected $configs = [
 		'scriptConfirmation' => [
-			'types' => ['host', 'interfaceWithoutPort', 'user'],
+			'types' => ['host', 'interfaceWithoutPort', 'user', 'user_related'],
 			'method' => 'resolveTexts'
 		],
 		'httpTestName' => [
@@ -115,6 +115,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$types['macros']['interface'] = ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'];
 		}
 
+		if ($this->isTypeAvailable('user_related')) {
+			$types['macros']['user'] = ['{USER.ALIAS}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'];
+		}
+
 		if ($this->isTypeAvailable('user')) {
 			$types['usermacros'] = true;
 		}
@@ -147,6 +151,40 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						$macros[$hostid][$macro] = UNRESOLVED_MACRO_STRING;
 					}
 					$interface_hostids[$hostid] = true;
+				}
+
+				if (array_key_exists('user', $matched_macros['macros']) && $matched_macros['macros']['user']) {
+					foreach ($matched_macros['macros']['user'] as $macro) {
+						switch ($macro) {
+							case '{USER.ALIAS}':
+								$macros[$hostid][$macro] = CWebUser::$data['alias'];
+								break;
+
+							case '{USER.FULLNAME}':
+								$fullname = '';
+
+								if (CWebUser::$data['name'] !== '') {
+									$fullname .= CWebUser::$data['name'].' ';
+								}
+
+								if (CWebUser::$data['surname'] !== '') {
+									$fullname .= CWebUser::$data['surname'].' ';
+								}
+
+								$macros[$hostid][$macro] = ($fullname !== '')
+									? $fullname.'('.CWebUser::$data['alias'].')'
+									: CWebUser::$data['alias'];
+								break;
+
+							case '{USER.NAME}':
+								$macros[$hostid][$macro] = CWebUser::$data['name'];
+								break;
+
+							case '{USER.SURNAME}':
+								$macros[$hostid][$macro] = CWebUser::$data['surname'];
+								break;
+						}
+					}
 				}
 			}
 
