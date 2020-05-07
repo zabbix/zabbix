@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-06T08:20:40Z</date>
+   <date>2020-05-07T18:06:32Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1747,6 +1747,467 @@ variables, and cursors.</description>
          </items>
          <discovery_rules>
             <discovery_rule>
+               <name>Availability groups discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[availability_groups,{$MSSQL.DSN}]</key>
+               <delay>1h</delay>
+               <params>SELECT name AS group_name FROM sys.availability_groups</params>
+               <username>{$MSSQL.USER}</username>
+               <password>{$MSSQL.PASSWORD}</password>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Availability group '{#GROUP_NAME}': Get replica states</name>
+                     <type>ODBC</type>
+                     <key>db.odbc.get[replica_states,{$MSSQL.DSN}]</key>
+                     <history>0h</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <params>SELECT ag.name as group_name ISNULL(ags.primary_recovery_health, 2) as primary_recovery_health, ISNULL(ags.primary_replica, 'Unknown') as primary_replica, ISNULL(ags.secondary_recovery_health, 2) as secondary_recovery_health, ags.synchronization_health as synchronization_health FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag ON ag.group_id = ags.group_id</params>
+                     <username>{$MSSQL.USER}</username>
+                     <password>{$MSSQL.PASSWORD}</password>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Availability group '{#GROUP_NAME}' {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Availability group '{#GROUP_NAME}': AG {#GROUP_NAME} Primary replica recovery health</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.primary_recovery_health[{#GROUP_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Indicates the recovery health of the primary replica:&#13;
+0 = In progress&#13;
+1 = Online&#13;
+2 = Unavailable</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Availability group '{#GROUP_NAME}' {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}')].primary_recovery_health.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replica_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=0</expression>
+                           <name>Availability group '{#GROUP_NAME}': Primary replica sync in progress</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Availability group '{#GROUP_NAME}': AG {#GROUP_NAME} Primary replica name</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.primary_replica[{#GROUP_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>CHAR</value_type>
+                     <description>Name of the server instance that is hosting the current primary replica.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Availability group '{#GROUP_NAME}' {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}')].primary_replica.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replica_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Availability group '{#GROUP_NAME}': AG {#GROUP_NAME} Secondary replica recovery health</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.secondary_recovery_health[{#GROUP_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Indicates the recovery health of a secondary replica replica:&#13;
+0 = In progress&#13;
+1 = Online&#13;
+2 = Unavailable</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Availability group '{#GROUP_NAME}' {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}')].secondary_recovery_health.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replica_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=0</expression>
+                           <name>Availability group '{#GROUP_NAME}': Secondary replica sync in progress</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Availability group '{#GROUP_NAME}': AG {#GROUP_NAME} Synchronization health</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.synchronization_health[{#GROUP_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Reflects a rollup of the synchronization_health of all availability&#13;
+replicas in the availability group:&#13;
+0: Not healthy. None of the availability replicas have a healthy.&#13;
+1: Partially healthy. The synchronization health of some, but not all, availability replicas is healthy.&#13;
+2: Healthy. The synchronization health of every availability replica is healthy.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Availability group '{#GROUP_NAME}' {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}')].synchronization_health.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replica_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=0</expression>
+                           <name>Availability group '{#GROUP_NAME}': All replicas unhealthy</name>
+                           <priority>DISASTER</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=1</expression>
+                           <name>Availability group '{#GROUP_NAME}': Some replicas unhealthy</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Local database discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[databases_local,{$MSSQL.DSN}]</key>
+               <delay>1h</delay>
+               <params>SELECT ag.name AS group_name, arcs.replica_server_name AS replica_name,
+db_name(drs.database_id) AS dbname, drs.is_local
+FROM sys.dm_hadr_database_replica_states drs JOIN sys.dm_hadr_availability_replica_cluster_states arcs
+ON arcs.replica_id = drs.replica_id
+JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+WHERE drs.is_local = 1</params>
+               <username>{$MSSQL.USER}</username>
+               <password>{$MSSQL.PASSWORD}</password>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Local database: Get local DB states</name>
+                     <type>ODBC</type>
+                     <key>db.odbc.get[local_db_states,{$MSSQL.DSN}]</key>
+                     <history>0h</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <params>SELECT drs.database_state as database_state, 
+drs.is_suspended as is_suspended, 
+drs.synchronization_health as synchronization_health, 
+ag.name as group_name,
+arcs.replica_server_name as replica_name,
+db_name(drs.database_id) AS dbname
+FROM sys.dm_hadr_database_replica_states drs 
+JOIN sys.dm_hadr_availability_replica_cluster_states arcs ON arcs.replica_id = drs.replica_id 
+JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id 
+JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id</params>
+                     <username>{$MSSQL.USER}</username>
+                     <password>{$MSSQL.PASSWORD}</password>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Local database: Local DB {#DBNAME} Suspended</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.local_db_is_suspended[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Database state:&#13;
+0 = Resumed&#13;
+1 = Suspended</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Local database {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].is_suspended.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[local_db_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Local database: Local DB {#DBNAME} State</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.local_db_state[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>0 = Online&#13;
+1 = Restoring&#13;
+2 = Recovering&#13;
+3 = Recovery pending&#13;
+4 = Suspect&#13;
+5 = Emergency&#13;
+6 = Offline</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Local database {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].database_state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[local_db_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&gt;0</expression>
+                           <name>AG '{#GROUP_NAME}' Local database: Local DB {#DBNAME} is {ITEM.VALUE}</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Local database: Local DB {#DBNAME} Synchronization health</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.local_db_synchronization_health[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Reflects the intersection of the synchronization state of a database that is joined &#13;
+to the availability group on the availability replica and the availability &#13;
+mode of the availability replica (synchronous-commit or asynchronous-commit mode):&#13;
+0 = Not healthy. The synchronization_state of the database is 0 (NOT SYNCHRONIZING).&#13;
+1 = Partially healthy. A database on a synchronous-commit availability replica is considered &#13;
+partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
+2 = Healthy. A database on an synchronous-commit availability replica is considered healthy &#13;
+if synchronization_state is 2 (SYNCHRONIZED), and a database on an asynchronous-commit &#13;
+availability replica is considered healthy if synchronization_state is 1 (SYNCHRONIZING).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Local database {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].synchronization_health.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[local_db_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=0</expression>
+                           <name>AG '{#GROUP_NAME}' Local database: Local DB {#DBNAME} is Not healthy</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=1</expression>
+                           <name>AG '{#GROUP_NAME}' Local database: Local DB {#DBNAME} is Partially healthy</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Non-local database discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[databases_non_local,{$MSSQL.DSN}]</key>
+               <delay>1h</delay>
+               <params>SELECT ag.name AS group_name, arcs.replica_server_name AS replica_name,
+db_name(drs.database_id) AS dbname, drs.is_local
+FROM sys.dm_hadr_database_replica_states drs JOIN sys.dm_hadr_availability_replica_cluster_states arcs 
+ON arcs.replica_id = drs.replica_id 
+JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+WHERE drs.is_local = 0</params>
+               <username>{$MSSQL.USER}</username>
+               <password>{$MSSQL.PASSWORD}</password>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Local database: Get non-local DB states</name>
+                     <type>ODBC</type>
+                     <key>db.odbc.get[non-local_db_states,{$MSSQL.DSN}]</key>
+                     <history>0h</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <params>SELECT drs.log_send_queue_size as log_send_queue_size,
+drs.redo_queue_size as redo_queue_size,
+ag.name as group_name,
+arcs.replica_server_name as replica_name,
+db_name(drs.database_id) AS dbname
+FROM sys.dm_hadr_database_replica_states drs 
+JOIN sys.dm_hadr_availability_replica_cluster_states arcs ON arcs.replica_id = drs.replica_id 
+JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id 
+JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id</params>
+                     <username>{$MSSQL.USER}</username>
+                     <password>{$MSSQL.PASSWORD}</password>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Non-Local database: Non-local DB {#DBNAME} Log queue size</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.log_send_queue_size[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Amount of log records of the primary database that has not been&#13;
+sent to the secondary databases, in kilobytes (KB).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Non-Local database {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].log_send_queue_size.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1024</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[non-local_db_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last(#1)}&gt;{last(#2)} and {last(#2)}&gt;{last(#3)}</expression>
+                           <name>AG '{#GROUP_NAME}' Non-Local database: Non-local DB {#DBNAME} Log queue size is growing</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Non-local database: Non-local DB {#DBNAME} Redo log queue size</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.redo_queue_size[{#DBNAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Amount of log records in the log files of the secondary replica&#13;
+that has not yet been redone, in kilobytes (KB).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Non-local database {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].redo_queue_size.first()</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1024</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[non-local_db_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last(#1)}&gt;{last(#2)} and {last(#2)}&gt;{last(#3)}</expression>
+                           <name>AG '{#GROUP_NAME}' Non-local database: Non-local DB {#DBNAME} Redo log queue size is growing</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
                <name>Database discovery</name>
                <type>ODBC</type>
                <key>db.odbc.discovery[dbname,{$MSSQL.DSN}]</key>
@@ -2191,6 +2652,313 @@ been shrunk.</description>
                      <params>1d</params>
                   </step>
                </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Replica discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[replicas,{$MSSQL.DSN}]</key>
+               <delay>1h</delay>
+               <params>SELECT ag.name AS group_name, arcs.replica_server_name AS replica_name
+FROM sys.dm_hadr_availability_replica_cluster_states AS arcs 
+JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id</params>
+               <username>{$MSSQL.USER}</username>
+               <password>{$MSSQL.PASSWORD}</password>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Replica: Get replicas states</name>
+                     <type>ODBC</type>
+                     <key>db.odbc.get[replicas_states,{$MSSQL.DSN}]</key>
+                     <history>0h</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <params>SELECT ars.connected_state as connected_state,
+ars.is_local as is_local,
+arcs.join_state as join_state,
+ISNULL(ars.operational_state,6) as operational_state,
+ISNULL(ars.recovery_health,2) as recovery_health,
+ars.role as role,
+ars.synchronization_health as synchronization_health,
+ag.name AS group_name, 
+arcs.replica_server_name AS replica_name
+FROM sys.dm_hadr_availability_replica_cluster_states AS arcs 
+JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id
+WHERE ag.name = '{#GROUP_NAME}' AND arcs.replica_server_name = '{#REPLICA_NAME}';"</params>
+                     <username>{$MSSQL.USER}</username>
+                     <password>{$MSSQL.PASSWORD}</password>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Replica: AG {#GROUP_NAME}:{#REPLICA_NAME} Connected state</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.replica_connected_state[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Whether a secondary replica is currently connected to the primary replica:&#13;
+0 : Disconnected. The response of an availability replica to the&#13;
+DISCONNECTED state depends on its role: On the primary replica, if a secondary&#13;
+replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED&#13;
+on the primary replica, which waits for the secondary to reconnect; On a secondary&#13;
+replica, upon detecting that it is disconnected, the secondary replica attempts&#13;
+to reconnect to the primary replica.&#13;
+1 : Connected. Each primary replica tracks the connection state for every secondary &#13;
+replica in the same availability group. Secondary replicas track the connection &#13;
+state of only the primary replica.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].connected_state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replicas_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Replica: AG {#GROUP_NAME}:{#REPLICA_NAME} Is local</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.replica_is_local[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Whether the replica is local:&#13;
+0 = Indicates a remote secondary replica in an availability group whose primary &#13;
+replica is hosted by the local server instance. This value occurs only on the &#13;
+primary replica location.&#13;
+1 = Indicates a local replica. On secondary replicas, this is the only available&#13;
+value for the availability group to which the replica belongs.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].is_local.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replicas_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Replica: AG {#GROUP_NAME}:{#REPLICA_NAME} Join state</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.replica_join_state[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>0 = Not joined&#13;
+1 = Joined, standalone instance&#13;
+2 = Joined, failover cluster instance</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].join_state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replicas_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Replica: AG {#GROUP_NAME}:{#REPLICA_NAME} Operational state</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.replica_operational_state[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Current operational state of the replica:&#13;
+0 = Pending failover&#13;
+1 = Pending&#13;
+2 = Online&#13;
+3 = Offline&#13;
+4 = Failed&#13;
+5 = Failed, no quorum&#13;
+6 = Not local</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].operational_state.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replicas_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=0 or {last()}=1 or {last()}=3</expression>
+                           <name>AG '{#GROUP_NAME}' Replica: Availability group {#GROUP_NAME}:{#REPLICA_NAME} is {ITEM.VALUE}</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=4</expression>
+                           <name>AG '{#GROUP_NAME}' Replica: Availability group {#GROUP_NAME}:{#REPLICA_NAME} is {ITEM.VALUE}</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=5</expression>
+                           <name>AG '{#GROUP_NAME}' Replica: Availability group {#GROUP_NAME}:{#REPLICA_NAME} is {ITEM.VALUE}</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Replica: AG {#GROUP_NAME}:{#REPLICA_NAME} Recovery health</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.replica_recovery_health[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Rollup of the database_state column of the sys.dm_hadr_database_replica_states&#13;
+dynamic management view:&#13;
+0 : In progress. At least one joined database has a database state other than ONLINE &#13;
+(database_state is not 0).&#13;
+1 : Online. All the joined databases have a database state of ONLINE (database_state is 0).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].recovery_health.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replicas_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=0</expression>
+                           <name>AG '{#GROUP_NAME}' Replica: Availability group {#GROUP_NAME}:{#REPLICA_NAME} Recovery in progress</name>
+                           <priority>INFO</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Replica: AG {#GROUP_NAME}:{#REPLICA_NAME} Role</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.replica_role[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Current Always On availability groups role of a local replica&#13;
+or a connected remote replica:&#13;
+0 = Resolving&#13;
+1 = Primary&#13;
+2 = Secondary</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].role.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replicas_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>AG '{#GROUP_NAME}' Replica: AG {#GROUP_NAME}:{#REPLICA_NAME} Sync health</name>
+                     <type>DEPENDENT</type>
+                     <key>mssql.replica_synchronization_health[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Reflects a rollup of the database synchronization state (synchronization_state)of&#13;
+all joined availability databases (also known as replicas) and the availability&#13;
+mode of the replica (synchronous-commit or asynchronous-commit mode). The&#13;
+rollup will reflect the least healthy accumulated state the databases on the&#13;
+replica:&#13;
+0 : Not healthy. At least one joined database is in the NOT SYNCHRONIZING state.&#13;
+1 : Partially healthy. Some replicas are not in the target synchronization&#13;
+state: synchronous-commit replicas should be synchronized, and asynchronous-commit&#13;
+replicas should be synchronizing.&#13;
+2 : Healthy. All replicas are in the target synchronization state: synchronous-commit &#13;
+replicas are synchronized, and asynchronous-commit replicas are synchronizing.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}')].synchronization_health.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[replicas_states,{$MSSQL.DSN}]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=0</expression>
+                           <name>AG '{#GROUP_NAME}' Replica: Availability group {#GROUP_NAME}:{#REPLICA_NAME} Not healthy</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}=1</expression>
+                           <name>AG '{#GROUP_NAME}' Replica: Availability group {#GROUP_NAME}:{#REPLICA_NAME} Partially healthy</name>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template DB MSSQL by ODBC:mssql.replica_connected_state[{#GROUP_NAME}_{#REPLICA_NAME}].last()}=0 and {Template DB MSSQL by ODBC:mssql.replica_role[{#GROUP_NAME}_{#REPLICA_NAME}].last()}=2</expression>
+                     <name>AG '{#GROUP_NAME}' Replica: Availability group {#GROUP_NAME}:{#REPLICA_NAME} Replica is disconnected</name>
+                     <priority>WARNING</priority>
+                  </trigger_prototype>
+               </trigger_prototypes>
             </discovery_rule>
          </discovery_rules>
          <macros>
