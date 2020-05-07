@@ -1578,6 +1578,10 @@ class CDiscoveryRule extends CItemGeneral {
 			]]
 		]];
 
+		if ($update) {
+			$items = $this->extendObjects('items', $items, ['templateid']);
+		}
+
 		// Schema for filter is already validated in API validator. Create the formula validator for filter.
 		$condition_validator = new CConditionValidator([
 			'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for override "%1$s": %3$s.'),
@@ -1598,6 +1602,14 @@ class CDiscoveryRule extends CItemGeneral {
 
 				if (!CApiInputValidator::validate($api_input_rules, $item['overrides'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if ($update && $item['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $path,
+							_('cannot update property for templated discovery rule')
+						)
+					);
 				}
 
 				foreach ($item['overrides'] as $ovrd_idx => $override) {
