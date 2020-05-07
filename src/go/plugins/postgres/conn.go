@@ -96,6 +96,15 @@ func (p *postgresConn) finalize() (err error) {
 	return
 }
 
+func (p *postgresConn) close() {
+	p.Lock()
+	defer p.Unlock()
+	if p.postgresPool != nil {
+		p.postgresPool.Close()
+		p.postgresPool = nil
+	}
+}
+
 // Thread-safe structure for manage connections.
 type connManager struct {
 	sync.Mutex
@@ -113,7 +122,7 @@ func (c *connManager) stop() {
 	defer c.Unlock()
 
 	for _, conn := range c.connections {
-		conn.postgresPool.Close()
+		conn.close()
 	}
 }
 
@@ -166,7 +175,7 @@ func (c *connManager) closeUnused() (err error) {
 
 	for connString, conn := range c.connections {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
-			conn.postgresPool.Close()
+			conn.close()
 			delete(c.connections, connString)
 			c.log.Debugf("closed unused connection: %s", connString)
 		}
