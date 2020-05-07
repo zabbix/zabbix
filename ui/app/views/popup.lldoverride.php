@@ -144,10 +144,10 @@ $overrides_popup_form_list->addRow(_('Filters'),
 // operations
 $operations_list = (new CTable())
 	->addClass('lld-overrides-operations-table')
-	->addStyle('white-space:normal;')
+	->addStyle('width: 100%;')
 	->setHeader([
-		(new CColHeader(_('Condition')))->setWidth('364'),
-		(new CColHeader(''))->setWidth('72')
+		_('Condition'),
+		(new CColHeader(''))->setWidth('50')
 	])
 	->addRow(
 		(new CCol(
@@ -157,12 +157,13 @@ $operations_list = (new CTable())
 					->addClass('element-table-add')
 			))->addClass('step-action')
 		))
-			->addClass('lld-overrides-operations-table-foot')
 	);
 
 $overrides_popup_form_list->addRow(_('Operations'),
 	(new CDiv($operations_list))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('width: 100%;')
 );
 
 $output['buttons'] = [

@@ -4611,6 +4611,10 @@ svg {
   .sysmap-widget-container svg {
     flex-grow: 1; }
 
+.lld-overrides-operations-table {
+  white-space: normal;
+  word-break: break-word; }
+
 .overrides-list {
   display: table;
   width: 90%;
