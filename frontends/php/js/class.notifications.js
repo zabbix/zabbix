@@ -928,84 +928,58 @@ ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
 /**
  * Appends list node to DOM when document is ready, then make it draggable.
  */
-jQuery(function() {
-	var notifications_node = ZABBIX.namespace('instances.notifications.collection.node');
-	var store = ZABBIX.namespace('instances.localStorage');
+$(function() {
+	let wrapper = document.querySelector(".wrapper"),
+		main = document.querySelector("main"),
+		ntf_node = ZABBIX.namespace('instances.notifications.collection.node'),
+		store = ZABBIX.namespace('instances.localStorage'),
+		ntf_pos = store.readKey('web.notifications.pos', null),
+		pos_top = 10,
+		pos_side = 10,
+		side = 'right';
 
-	var container = document.querySelector("main");
-	if (container === null) {
-		container = document.body;
-		notifications_node.style.top = '10px';
-	}
+	main.appendChild(ntf_node);
 
-	container.appendChild(notifications_node);
-
-	var notifications_pos = store.readKey('web.notifications.pos', null);
-	if (notifications_pos !== null) {
-		var side = ('right' in notifications_pos ? 'right' : ('left' in notifications_pos ? 'left' : null));
-		if (side !== null && 'top' in notifications_pos) {
-			var min_top = 0,
-				max_top = (container.scrollHeight - notifications_node.offsetHeight)
-				min_side = 0,
-				max_side = 0;
-
-			if (container.tagName == 'MAIN') {
-				min_top = -container.offsetTop;
-				max_top = (container.parentElement.scrollHeight - notifications_node.offsetHeight);
-			}
-
-			container_half_width = Math.floor(container.scrollWidth / 2)
-					+ (side == 'right' ? container.scrollWidth % 2 : 0);
-			node_half_width = Math.floor(notifications_node.offsetWidth / 2)
-					+ (side == 'right' ? notifications_node.offsetWidth % 2 : 0);
-			max_side = container_half_width - node_half_width;
-
-			if (notifications_pos.top >= min_top && notifications_pos.top <= max_top
-					&& notifications_pos[side] >= min_side && notifications_pos[side] <= max_side) {
-				notifications_node.style.top = notifications_pos.top + 'px';
-				notifications_node.style[side] = notifications_pos[side] + 'px';
-			}
+	if (ntf_pos !== null && 'top' in ntf_pos) {
+		side = ('right' in ntf_pos ? 'right' : ('left' in ntf_pos ? 'left' : null));
+		if (side !== null) {
+			pos_top = Math.max(-main.offsetTop, Math.min(ntf_pos.top, wrapper.scrollHeight - ntf_node.offsetHeight));
+			pos_side = Math.max(0, Math.min(ntf_pos[side], Math.floor(wrapper.scrollWidth - ntf_node.offsetWidth) / 2));
 		}
 	}
 
-	jQuery(notifications_node).draggable({handle: '>.dashbrd-widget-head',
+	ntf_node.style.top = pos_top + 'px';
+	ntf_node.style[side] = pos_side + 'px';
+
+	$(ntf_node).draggable({handle: '>.dashbrd-widget-head',
 		start: function(event, ui) {
-			var containment = {min_top: 0, max_top: 0, min_left: 0,
-				max_left: this.parentElement.scrollWidth - this.offsetWidth};
-
-			if (this.parentElement.tagName == 'MAIN') {
-				containment.min_top = -this.parentElement.offsetTop;
-				containment.max_top = this.parentElement.parentElement.scrollHeight + containment.min_top
-						- this.offsetHeight;
-			}
-			else {
-				containment.max_top = this.parentElement.scrollHeight - this.offsetHeight;
-			}
-
-			ui.helper.data('containment', containment);
+			ui.helper.data('containment', {
+				min_top: -main.offsetTop,
+				max_top: wrapper.scrollHeight - this.offsetHeight - main.offsetTop,
+				min_left: 0,
+				max_left: wrapper.scrollWidth - this.offsetWidth
+			});
 		},
 		drag: function(event, ui) {
-			var containment = ui.helper.data('containment');
+			let containment = ui.helper.data('containment');
 
 			ui.position.top = Math.max(Math.min(ui.position.top, containment.max_top), containment.min_top);
 			ui.position.left = Math.max(Math.min(ui.position.left, containment.max_left), containment.min_left);
 		},
 		stop: function(event, ui) {
-			var node_center_x = ui.position.left + Math.floor(this.offsetWidth  / 2);
-			var parent_center_x = Math.floor(this.parentElement.scrollWidth / 2);
-			var notifications_pos = {top: ui.position.top};
+			ntf_pos = {top: ui.position.top};
 
-			if (parent_center_x > node_center_x) {
-				notifications_pos.left = ui.position.left;
+			if (ui.position.left < (wrapper.scrollWidth - this.offsetWidth) / 2) {
+				ntf_pos.left = ui.position.left;
 				this.style.right = null;
 			}
 			else {
-				notifications_pos.right = this.parentElement.scrollWidth - (ui.position.left + this.offsetWidth);
+				ntf_pos.right = wrapper.scrollWidth - this.offsetWidth - ui.position.left;
 				this.style.left = null;
-				this.style.right = notifications_pos.right + 'px';
+				this.style.right = ntf_pos.right + 'px';
 			}
 
-			store.writeKey('web.notifications.pos', notifications_pos);
+			store.writeKey('web.notifications.pos', ntf_pos);
 		}
 	});
 });

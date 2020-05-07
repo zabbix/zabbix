@@ -206,10 +206,9 @@ aside,
   flex-direction: column;
   overflow: auto;
   position: relative; }
-  .wrapper > header + [class^="msg-"], .wrapper > [class^="msg-"] + [class^="msg-"] {
+  .wrapper > [class^="msg-"] + [class^="msg-"] {
     margin-top: 0; }
   .wrapper.layout-kioskmode main {
-    padding: 10px;
     transition: margin-top .3s; }
   .wrapper.layout-kioskmode.kiosk-slide-lines-1 main {
     margin-top: 2rem; }
@@ -223,13 +222,10 @@ footer {
   flex-shrink: 0;
   min-width: 1200px; }
 
-header {
-  margin-bottom: 10px; }
-
 main {
-  padding: 0 10px;
+  position: relative;
   min-width: 1200px;
-  position: relative; }
+  padding: 10px; }
 
 footer {
   margin-top: auto; }
