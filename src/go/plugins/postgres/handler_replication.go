@@ -38,15 +38,10 @@ const (
 // replicationHandler gets info about recovery state if all is OK or nil otherwise.
 func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var replicationResult int64
-	var status, version int
+	var status int
 	var query, stringResult string
 	var inRecovery bool
 	var err error
-
-	version, err = strconv.Atoi(conn.version)
-	if err != nil {
-		return nil, errorCannotConvertPostgresVersionInt
-	}
 
 	switch key {
 	case keyPostgresReplicationStatus:
@@ -72,7 +67,7 @@ func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []str
 		return strconv.Itoa(status), nil
 
 	case keyPostgresReplicationLagSec:
-		if version >= 100000 {
+		if conn.version >= 100000 {
 			query = `SELECT
   						CASE
     						WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
@@ -96,7 +91,7 @@ func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []str
 			return nil, errorCannotFetchData
 		}
 		if inRecovery {
-			if version >= 100000 {
+			if conn.version >= 100000 {
 				query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
 						   FROM pg_stat_wal_receiver;`
 			} else {

@@ -36,7 +36,7 @@ type postgresConn struct {
 	sync.Mutex
 	postgresPool   *pgxpool.Pool
 	lastTimeAccess time.Time
-	version        string `conf:"default=100006"`
+	version        int
 	connString     string
 	timeout        time.Duration
 }
@@ -91,6 +91,7 @@ func (p *postgresConn) finalize() (err error) {
 		return fmt.Errorf("Postgres version %s is not supported", versionPG)
 	}
 
+	p.version = version
 	p.postgresPool = newConn
 	return
 }

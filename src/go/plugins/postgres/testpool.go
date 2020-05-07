@@ -23,6 +23,7 @@ package postgres
 
 import (
 	"context"
+	"strconv"
 	"testing"
 	"time"
 
@@ -49,6 +50,11 @@ func сreateConnection() error {
 		log.Critf("[сreateConnection] cannot get Postgres version: %s", err.Error())
 		return err
 	}
-	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: versionPG}
+	version, err := strconv.Atoi(versionPG)
+	if err != nil {
+		log.Critf("[сreateConnection] invalkid Postgres version: %s", err.Error())
+		return err
+	}
+	sharedConn = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: version}
 	return nil
 }

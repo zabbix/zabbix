@@ -22,7 +22,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -35,13 +34,8 @@ const (
 // dbStatHandler executes select from pg_catalog.pg_stat_database command for each database and returns JSON if all is OK or nil otherwise.
 func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
 	var statJSON, query string
-	var version int
 	var err error
 
-	version, err = strconv.Atoi(conn.version)
-	if err != nil {
-		return nil, errorCannotConvertPostgresVersionInt
-	}
 	switch key {
 	case keyPostgresStatSum:
 		query = `
@@ -67,7 +61,7 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) 
       , sum(blk_write_time) as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if version >= 120000 {
+		if conn.version >= 120000 {
 			query = fmt.Sprintf(query, "sum(checksum_failures)")
 		} else {
 			query = fmt.Sprintf(query, "null")
@@ -98,7 +92,7 @@ func (p *Plugin) dbStatHandler(conn *postgresConn, key string, params []string) 
       , blk_write_time as blk_write_time
       FROM pg_catalog.pg_stat_database
     ) T ;`
-		if version >= 120000 {
+		if conn.version >= 120000 {
 			query = fmt.Sprintf(query, "checksum_failures")
 		} else {
 			query = fmt.Sprintf(query, "null")
