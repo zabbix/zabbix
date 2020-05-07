@@ -21,6 +21,8 @@ package postgres
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"strconv"
 	"sync"
 	"time"
@@ -31,20 +33,71 @@ import (
 
 // postgresConn holds pointer to the Pool of Postgres Instance
 type postgresConn struct {
+	sync.Mutex
 	postgresPool   *pgxpool.Pool
 	lastTimeAccess time.Time
 	version        string `conf:"default=100006"`
+	connString     string
+	timeout        time.Duration
 }
 
 // UpdateAccessTime updates the last time postgresCon was accessed.
-func (p *postgresConn) UpdateAccessTime() {
+func (p *postgresConn) updateAccessTime() {
 	p.lastTimeAccess = time.Now()
+}
+
+func (p *postgresConn) finalize() (err error) {
+	p.Lock()
+	defer p.Unlock()
+	if p.postgresPool != nil {
+		return
+	}
+
+	// get conn pool using url created in postgres.go
+	config, err := pgxpool.ParseConfig(p.connString)
+	if err != nil {
+		return fmt.Errorf("invalid connection string: %s:", err)
+	}
+	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
+		d := net.Dialer{}
+		newCtx, cancel := context.WithTimeout(context.Background(), p.timeout)
+		defer cancel()
+		conn, err := d.DialContext(newCtx, network, addr)
+		return conn, err
+	}
+
+	newConn, err := pgxpool.ConnectConfig(context.Background(), config)
+	if err != nil {
+		return
+	}
+
+	defer func() {
+		if err != nil {
+			newConn.Close()
+		}
+	}()
+
+	versionPG, err := GetPostgresVersion(newConn)
+	if err != nil {
+		return fmt.Errorf("cannot otain version information: %s", err)
+	}
+
+	version, err := strconv.Atoi(versionPG)
+	if err != nil {
+		return fmt.Errorf("invalid Postgres version: %s", err)
+	}
+
+	if version < 100000 {
+		return fmt.Errorf("Postgres version %s is not supported", versionPG)
+	}
+
+	p.postgresPool = newConn
+	return
 }
 
 // Thread-safe structure for manage connections.
 type connManager struct {
 	sync.Mutex
-	connMutex   sync.Mutex
 	connections map[string]*postgresConn
 	keepAlive   time.Duration
 	timeout     time.Duration
@@ -55,8 +108,8 @@ type connManager struct {
 func (c *connManager) stop() {
 	c.controlSink <- nil
 
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	for _, conn := range c.connections {
 		conn.postgresPool.Close()
@@ -83,7 +136,7 @@ func (p *Plugin) NewConnManager(keepAlive, timeout time.Duration) *connManager {
 				return
 			case <-ticker.C:
 				if err := connMgr.closeUnused(); err != nil {
-					p.Errf("[%s] Error occurred while closing postgresCon: %s", pluginName, err.Error())
+					p.Errf("[%s] Error occurred while closing postgresCon: %s", pluginName, err)
 				}
 			}
 		}
@@ -91,78 +144,30 @@ func (p *Plugin) NewConnManager(keepAlive, timeout time.Duration) *connManager {
 	return connMgr
 }
 
-// create creates a new connection
-func (c *connManager) create(connString string) (conn *postgresConn, err error) {
-
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
-
-	if _, ok := c.connections[connString]; ok {
-		// Should never happens
-		panic("connection already exists")
-	}
-
-	//get conn pool using url created in postgres.go
-	config, err := pgxpool.ParseConfig(connString)
-	if err != nil {
-		c.log.Errf("[%s] cannot parse config file: %s", connString, err.Error())
-		return nil, errorCannotParsePostgresURL
-	}
-
-	newConn, err := pgxpool.ConnectConfig(context.Background(), config)
-	if err != nil {
-		c.log.Errf("[%s] cannot connect to Postgres using connect string: %s", connString, err.Error())
-		return nil, errorCannotConnectPostgres
-	}
-
-	versionPG, err := GetPostgresVersion(newConn)
-	if err != nil {
-		c.log.Errf("[%s] cannot get Postgres version: %s", connString, err.Error())
-		return nil, errorCannotGetPostgresVersion
-	}
-
-	version, err := strconv.Atoi(versionPG)
-	if err != nil {
-		return nil, errorCannotConvertPostgresVersionInt
-	}
-
-	if version < 100000 {
-		c.log.Errf("[%s] current PG version is not supported : %s", versionPG, errorUnsupportePostgresVersion)
-		return nil, errorUnsupportePostgresVersion
-	}
-
-	// save new conn under URL string
-	c.connections[connString] = &postgresConn{postgresPool: newConn, lastTimeAccess: time.Now(), version: versionPG}
-
-	c.log.Debugf("[%s] Created new connection: %s", pluginName, connString)
-
-	return c.connections[connString], nil
-}
-
 // get returns a connection with given id if it exists and also updates lastTimeAccess, otherwise returns nil.
 func (c *connManager) get(connString string) *postgresConn {
-
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
-
-	if conn, ok := c.connections[connString]; ok {
-		conn.UpdateAccessTime()
-		return conn
+	c.Lock()
+	defer c.Unlock()
+	conn, ok := c.connections[connString]
+	if !ok {
+		conn = &postgresConn{connString: connString, timeout: c.timeout}
+		c.connections[connString] = conn
+		c.log.Debugf("created new connection %s", connString)
 	}
-
-	return nil
+	conn.updateAccessTime()
+	return conn
 }
 
-// CloseUnused closes each connection that has not been accessed within at least the keepalive interval.
+// closeUnused closes each connection that has not been accessed within at least the keepalive interval.
 func (c *connManager) closeUnused() (err error) {
-	c.connMutex.Lock()
-	defer c.connMutex.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	for connString, conn := range c.connections {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			conn.postgresPool.Close()
 			delete(c.connections, connString)
-			c.log.Debugf("[%s] Closed unused connection: %s", pluginName, connString)
+			c.log.Debugf("closed unused connection: %s", connString)
 		}
 	}
 	// Return the last error only
@@ -171,14 +176,14 @@ func (c *connManager) closeUnused() (err error) {
 
 // GetPostgresConnection returns the existed connection or creates a new one.
 func (c *connManager) GetPostgresConnection(connString string) (conn *postgresConn, err error) {
-	c.Lock()
-	defer c.Unlock()
-
 	conn = c.get(connString)
-	if conn == nil {
-		conn, err = c.create(connString)
+	if err = conn.finalize(); err != nil {
+		c.Lock()
+		defer c.Unlock()
+		delete(c.connections, connString)
+		c.log.Debugf("removed failed connection %s: %s", connString, err)
+		return nil, fmt.Errorf("Cannoe etabilish connection to Postgres server: %s", err)
 	}
-
 	return
 }
 
