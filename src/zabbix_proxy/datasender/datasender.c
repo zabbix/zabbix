@@ -64,7 +64,7 @@ static int	proxy_data_sender(int *more, int now)
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_tasks;
 	int			availability_ts, history_records = 0, discovery_records = 0,
-				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0;
+				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL;
@@ -141,6 +141,9 @@ static int	proxy_data_sender(int *more, int now)
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts.ns);
+
+		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+			zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 		if (SUCCEED != (upload_state = put_data_to_server(&sock, &j, &error)))
 		{

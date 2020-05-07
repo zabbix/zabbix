@@ -41,37 +41,28 @@ package resultcache
 
 import (
 	"crypto/md5"
+	"database/sql"
 	"encoding/binary"
 	"encoding/hex"
-	"encoding/json"
-	"sync/atomic"
+	"errors"
+	"fmt"
+	"os"
 	"time"
 
 	"zabbix.com/internal/agent"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/version"
 )
 
 const (
 	UploadRetryInterval = time.Second
 )
 
-type ResultCache struct {
-	input           chan interface{}
-	output          Uploader
-	results         []*AgentData
-	token           string
-	lastDataID      uint64
-	clientID        uint64
-	lastError       error
-	maxBufferSize   int32
-	totalValueNum   int32
-	persistValueNum int32
-	retry           *time.Timer
-	timeout         int
+type ResultCache interface {
+	Start()
+	Stop()
+	UpdateOptions(options *agent.AgentOptions)
+	Upload(u Uploader)
 }
 
 type AgentData struct {
@@ -104,181 +95,42 @@ type Uploader interface {
 	CanRetry() (enabled bool)
 }
 
-func (c *ResultCache) upload(u Uploader) (err error) {
-	if len(c.results) == 0 {
-		return
-	}
-
-	log.Debugf("[%d] upload history data, %d/%d value(s)", c.clientID, len(c.results), cap(c.results))
-
-	request := AgentDataRequest{
-		Request: "agent data",
-		Data:    c.results,
-		Session: c.token,
-		Host:    agent.Options.Hostname,
-		Version: version.Short(),
-	}
-
-	var data []byte
-
-	if data, err = json.Marshal(&request); err != nil {
-		log.Errf("[%d] cannot convert cached history to json: %s", c.clientID, err.Error())
-		return
-	}
-
-	timeout := len(c.results) * c.timeout
-	if timeout > 60 {
-		timeout = 60
-	}
-	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
-		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("[%d] history upload to [%s] started to fail: %s", c.clientID, u.Addr(), err)
-			c.lastError = err
-		}
-		return
-	}
-
-	if c.lastError != nil {
-		log.Warningf("[%d] history upload to [%s] is working again", c.clientID, u.Addr())
-		c.lastError = nil
-	}
-
-	// clear results slice to ensure that the data is garbage collected
-	c.results[0] = nil
-	for i := 1; i < len(c.results); i *= 2 {
-		copy(c.results[i:], c.results[:i])
-	}
-	c.results = c.results[:0]
-
-	c.totalValueNum = 0
-	c.persistValueNum = 0
-	return
+// common cache data
+type cacheData struct {
+	log.Logger
+	input      chan interface{}
+	uploader   Uploader
+	clientID   uint64
+	token      string
+	lastDataID uint64
+	lastError  error
+	retry      *time.Timer
+	timeout    int
 }
 
-func (c *ResultCache) flushOutput(u Uploader) {
-	if c.retry != nil {
-		c.retry.Stop()
-		c.retry = nil
-	}
+func (c *cacheData) Stop() {
+	c.input <- nil
+}
 
-	if c.upload(u) != nil && u.CanRetry() {
-		c.retry = time.AfterFunc(UploadRetryInterval, func() { c.FlushOutput(u) })
+func (c *cacheData) Write(result *plugin.Result) {
+	c.input <- result
+}
+
+func (c *cacheData) UpdateOptions(options *agent.AgentOptions) {
+	c.input <- options
+}
+
+func (c *cacheData) Upload(u Uploader) {
+	if u == nil {
+		u = c.uploader
+	}
+	if u != nil {
+		c.input <- u
 	}
 }
 
-// addResult appends received result at the end of results slice
-func (c *ResultCache) addResult(result *AgentData) {
-	full := c.persistValueNum >= c.maxBufferSize/2 || c.totalValueNum >= c.maxBufferSize
-	c.results = append(c.results, result)
-	c.totalValueNum++
-	if result.persistent {
-		c.persistValueNum++
-	}
-
-	if c.persistValueNum >= c.maxBufferSize/2 || c.totalValueNum >= c.maxBufferSize {
-		if !full && c.output != nil {
-			c.flushOutput(c.output)
-		}
-	}
-}
-
-// insertResult attempts to insert the received result into results slice by replacing existing value.
-// If no appropriate target was found it calls addResult to append value.
-func (c *ResultCache) insertResult(result *AgentData) {
-	index := -1
-	if !result.persistent {
-		for i, r := range c.results {
-			if r.Itemid == result.Itemid {
-				log.Debugf("[%d] cache is full, replacing oldest value for itemid:%d", c.clientID, r.Itemid)
-				index = i
-				break
-			}
-		}
-	}
-	if index == -1 && (!result.persistent || c.persistValueNum < c.maxBufferSize/2) {
-		for i, r := range c.results {
-			if !r.persistent {
-				if result.persistent {
-					c.persistValueNum++
-				}
-				log.Debugf("[%d] cache is full, removing oldest value for itemid:%d", c.clientID, r.Itemid)
-				index = i
-				break
-			}
-		}
-	}
-	if index == -1 {
-		log.Warningf("[%d] cache is full and cannot cannot find a value to replace, adding new instead", c.clientID)
-		c.addResult(result)
-		return
-	}
-
-	copy(c.results[index:], c.results[index+1:])
-	c.results[len(c.results)-1] = result
-}
-
-func (c *ResultCache) write(r *plugin.Result) {
-	c.lastDataID++
-	var value *string
-	var state *int
-	if r.Error == nil {
-		value = r.Value
-	} else {
-		errmsg := r.Error.Error()
-		value = &errmsg
-		tmp := itemutil.StateNotSupported
-		state = &tmp
-	}
-
-	var clock, ns int
-	if !r.Ts.IsZero() {
-		clock = int(r.Ts.Unix())
-		ns = r.Ts.Nanosecond()
-	}
-
-	data := &AgentData{
-		Id:             c.lastDataID,
-		Itemid:         r.Itemid,
-		LastLogsize:    r.LastLogsize,
-		Mtime:          r.Mtime,
-		Clock:          clock,
-		Ns:             ns,
-		Value:          value,
-		State:          state,
-		EventSource:    r.EventSource,
-		EventID:        r.EventID,
-		EventSeverity:  r.EventSeverity,
-		EventTimestamp: r.EventTimestamp,
-		persistent:     r.Persistent,
-	}
-
-	if c.totalValueNum >= c.maxBufferSize {
-		c.insertResult(data)
-	} else {
-		c.addResult(data)
-	}
-}
-
-func (c *ResultCache) run() {
-	defer log.PanicHook()
-	log.Debugf("[%d] starting result cache", c.clientID)
-
-	for {
-		u := <-c.input
-		if u == nil {
-			break
-		}
-		switch v := u.(type) {
-		case Uploader:
-			c.flushOutput(v)
-		case *plugin.Result:
-			c.write(v)
-		case *agent.AgentOptions:
-			c.updateOptions(v)
-		}
-	}
-	log.Debugf("[%d] result cache has been stopped", c.clientID)
-	monitor.Unregister(monitor.Output)
+func (c *cacheData) Flush() {
+	c.Upload(nil)
 }
 
 func newToken() string {
@@ -287,70 +139,182 @@ func newToken() string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func (c *ResultCache) updateOptions(options *agent.AgentOptions) {
-	c.maxBufferSize = int32(options.BufferSize)
-	c.timeout = options.Timeout
+func tableName(prefix string, index int) string {
+	return fmt.Sprintf("%s_%d", prefix, index)
 }
 
-func (c *ResultCache) init() {
-	c.updateOptions(&agent.Options)
-	c.input = make(chan interface{}, 100)
-	c.results = make([]*AgentData, 0, c.maxBufferSize)
+// fetchRowAndClose fetches and scans the next row. False is returned if there are no
+// rows to fetch or an error occured.
+func fetchRowAndClose(rows *sql.Rows, args ...interface{}) (ok bool, err error) {
+	if rows.Next() {
+		err = rows.Scan(args...)
+		rows.Close()
+		return err == nil, err
+	}
+	return false, rows.Err()
 }
 
-func (c *ResultCache) Start() {
-	// register with secondary group to stop result cache after other components are stopped
-	monitor.Register(monitor.Output)
-	go c.run()
-}
+func New(options *agent.AgentOptions, clientid uint64, output Uploader) ResultCache {
+	data := &cacheData{
+		Logger:   log.New(fmt.Sprintf("%d", clientid)),
+		clientID: clientid,
+		input:    make(chan interface{}, 100),
+		uploader: output,
+		token:    newToken(),
+	}
 
-func (c *ResultCache) Stop() {
-	c.input <- nil
-}
-
-func NewActive(clientid uint64, output Uploader) *ResultCache {
-	cache := &ResultCache{clientID: clientid, output: output, token: newToken()}
-	cache.init()
-	return cache
-}
-
-func NewPassive(clientid uint64) *ResultCache {
-	cache := &ResultCache{clientID: clientid, token: newToken()}
-	cache.init()
-	return cache
-}
-
-func (c *ResultCache) FlushOutput(u Uploader) {
-	c.input <- u
-}
-
-func (c *ResultCache) Flush() {
-	// only active connections with output set can be flushed without specifying output
-	if c.output != nil {
-		c.FlushOutput(c.output)
+	if options.EnablePersistentBuffer == 0 {
+		c := &MemoryCache{
+			cacheData: data,
+		}
+		c.init(options)
+		return c
+	} else {
+		c := &DiskCache{
+			cacheData: data,
+		}
+		c.init(options)
+		return c
 	}
 }
 
-func (c *ResultCache) Write(result *plugin.Result) {
-	c.input <- result
+func createTableQuery(table string, id int) string {
+	return fmt.Sprintf(
+		"CREATE TABLE IF NOT EXISTS %s_%d ("+
+			"id INTEGER,"+
+			"write_clock INTEGER,"+
+			"itemid INTEGER,"+
+			"lastlogsize INTEGER,"+
+			"mtime INTEGER,"+
+			"state INTEGER,"+
+			"value TEXT,"+
+			"eventsource TEXT,"+
+			"eventid INTEGER,"+
+			"eventseverity INTEGER,"+
+			"eventtimestamp INTEGER,"+
+			"clock INTEGER,"+
+			"ns INTEGER"+
+			")",
+		table, id)
 }
 
-func (c *ResultCache) UpdateOptions(options *agent.AgentOptions) {
-	c.input <- options
-}
-
-func (c *ResultCache) SlotsAvailable() int {
-	slots := atomic.LoadInt32(&c.maxBufferSize) - atomic.LoadInt32(&c.totalValueNum)
-	if slots < 0 {
-		slots = 0
+func prepareDiskCache(options *agent.AgentOptions, addresses []string) (err error) {
+	var database *sql.DB
+	database, err = sql.Open("sqlite3", options.PersistentBufferFile)
+	if err != nil {
+		return fmt.Errorf("Cannot open database %s : %s.", options.PersistentBufferFile, err)
 	}
-	return int(slots)
+	defer database.Close()
+
+	stmt, err := database.Prepare("CREATE TABLE IF NOT EXISTS registry (id INTEGER PRIMARY KEY,address TEXT,UNIQUE(address))")
+	if err != nil {
+		return err
+	}
+	if _, err = stmt.Exec(); err != nil {
+		return err
+	}
+
+	var id int
+	var address string
+	ids := make([]int, 0)
+	registeredAddresses := make([]string, 0)
+	rows, err := database.Query("SELECT id,address FROM registry")
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		if err = rows.Scan(&id, &address); err != nil {
+			rows.Close()
+			return err
+		}
+		ids = append(ids, id)
+		registeredAddresses = append(registeredAddresses, address)
+	}
+	if err = rows.Err(); err != nil {
+		return err
+	}
+addressCheck:
+	for i, address := range registeredAddresses {
+		for _, addr := range addresses {
+			if addr == address {
+				continue addressCheck
+			}
+		}
+		if _, err = database.Exec(fmt.Sprintf("DELETE FROM registry WHERE ID = %d", ids[i])); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("DROP TABLE data_%d", ids[i])); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("DROP TABLE log_%d", ids[i])); err != nil {
+			return err
+		}
+	}
+
+	for _, addr := range addresses {
+		stmt, err = database.Prepare("INSERT OR IGNORE INTO registry (address) VALUES (?)")
+		if err != nil {
+			return err
+		}
+		if _, err = stmt.Exec(addr); err != nil {
+			return err
+		}
+		rows, err = database.Query("SELECT id FROM registry WHERE address=?", addr)
+		if err != nil {
+			return err
+		}
+
+		if ok, err := fetchRowAndClose(rows, &id); !ok {
+			if err == nil {
+				err = fmt.Errorf("cannot select id for address %s", addr)
+			}
+			return err
+		}
+
+		stmt, err = database.Prepare(createTableQuery("data", id))
+		if err != nil {
+			return err
+		}
+		if _, err = stmt.Exec(); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS data_%d_1 ON data_%d (write_clock)", id, id)); err != nil {
+			return err
+		}
+
+		stmt, err = database.Prepare(createTableQuery("log", id))
+		if err != nil {
+			return err
+		}
+		if _, err = stmt.Exec(); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS log_%d_1 ON log_%d (write_clock)", id, id)); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("DELETE FROM log_%d", id)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (c *ResultCache) PersistSlotsAvailable() int {
-	slots := atomic.LoadInt32(&c.maxBufferSize)/2 - atomic.LoadInt32(&c.persistValueNum)
-	if slots < 0 {
-		slots = 0
+func Prepare(options *agent.AgentOptions, addresses []string) (err error) {
+	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
+		return errors.New("\"EnablePersistentBuffer\" parameter misconfiguration: \"PersistentBufferFile\" parameter is not set")
 	}
-	return int(slots)
+	if options.EnablePersistentBuffer == 0 {
+		if options.PersistentBufferFile != "" {
+			return errors.New("\"PersistentBufferFile\" parameter is not empty but \"EnablePersistentBuffer\" is not set")
+		}
+		return
+	}
+
+	if err = prepareDiskCache(options, addresses); err != nil {
+		if err = os.Remove(options.PersistentBufferFile); err != nil {
+			return
+		}
+		err = prepareDiskCache(options, addresses)
+	}
+	return
 }

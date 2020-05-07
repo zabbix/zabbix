@@ -1,13 +1,52 @@
+Changes for 5.0.0rc1
+
+New features:
+A.F.I..... [ZBX-17667] moved "frontends/php" to "ui" directory (Sasha)
+A.F.I...S. [ZBXNEXT-3035] added ability of filtering out items, triggers, hosts and graphs or overriding their attributes during Low-level discovery based on LLD object and prototype name (Ivo, vmurzins, vso)
+..F.....S. [ZBXNEXT-2663] Support SAML authentication in zabbix frontend (agriscenko, arimdjonoks)
+..F....PS. [ZBXNEXT-5711] added ability to view logs in frontend when testing web hook media type (gcalenko, vso)
+..F....... [ZBXNEXT-5300] implemented widget copy/paste possibility in dashboard (miks)
+A.F....... [ZBXNEXT-5879] added filter to Configuration->Templates/Hosts->Discovery rules (agriscenko)
+.........T [ZBXNEXT-5907] Added Jira ServiceDesk mediatype (tuskov)
+A.F.....S. [ZBXNEXT-1882,ZBXNEXT-5865] added problem unacknowledge option (Andris, talbergs)
+
+Bug fixes:
+........S. [ZBX-17676] updated ZBX_MAX_FIELDS in dbschema.h to accomodate new SAML fields (arimdjonoks)
+A.F.I..... [ZBX-17512] fixed length restriction for media type script import into Oracle database (Sasha, talbergs, viktors)
+..F....... [ZBX-17584] implemented dedicated page for "update problem" popup dialog (averza, miks)
+..F....... [ZBX-17618] fixed dynamic item switching for URL widget (talbergs)
+........S. [ZBX-17650] fixed formula for zabbix[proxy,,delay] calculation (asestakovs)
+........S. [ZBX-17655] fixed possible use of uninitialized variable (MVekslers)
+..F....... [ZBX-17520] fixed opening Problems popup from SVG graph outside webview boundaries (vasilijs)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.0beta2
 
 New features:
+........S. [ZBXNEXT-1899] added support of threaded email notifications (wiper)
+..F....PS. [ZBXNEXT-1891] added option 'delay' for zabbix[proxy] internal check and calculate nodata() to respect proxy availability (asestakovs, gcalenko, MVekslers)
+...G...... [ZBXNEXT-1686] added persistent queue for active items in Zabbix agent 2 (akozlovs)
+A......... [ZBXNEXT-5849] added support of search and filter by macro value (gcalenko)
+.........T [ZBXNEXT-5864] added {EVENT.DURATION} in recovery message of webhooks (mchudinov)
+.........T [ZBXNEXT-5678] added proxy support for all media (afayantsev)
+.........T [ZBXNEXT-5832] Added ServiceNow mediatype (tuskov)
+.........T [ZBXNEXT-5670] added "Template App Elasticsearch Cluster by HTTP" (mchudinov)
+.......PS. [ZBXNEXT-1578] added ability to use user macros for IPMI user and password (akozlovs)
 A.F.....S. [ZBXNEXT-702] Implemented ability to compare string values in triggers (arimdjonoks, Ivo, Sasha)
-.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
 .........T [ZBXNEXT-5658] added media "Zammad" (afayantsev)
 .........T [ZBXNEXT-5821] added "Template App Memcached" (ychukina)
 .........T [ZBXNEXT-5833] added "Template DB ClickHouse by HTTP" (ychukina)
 
 Bug fixes:
+.......PS. [ZBX-17567] fixed possible pooler crash if interface_snmp is missing in configuration cache (MVekslers)
+........S. [ZBX-17614] fixed oracle sql error while sending notifications (asestakovs)
+..F....... [ZBX-17617] fixed broken markup in host selection on dashborad (talbergs)
+..F....... [ZBX-17608] fixed broken multiselect in "Discovery rule" field in monitoring discovery view (talbergs)
+..F....... [ZBX-17540] fixed text overflow in table (rlataria)
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
+..F....... [ZBX-16162] fixed graph line interruptions when discarding values with heartbeat (talbergs)
+..F....... [ZBX-17589] fixed occasional blank pages when viewing host graphs as values (averza)
+.........T [ZBX-17571] changed preprocessing for the haproxy.version, discovery rules divided into HTTP and TCP services (mchudinov)
 ..F....... [ZBX-17524] fixed time selector button state (rlataria)
 A......... [ZBX-17496] fixed UserMacro API validation (miks)
 ..F....... [ZBX-17532] added css files and sprites versioning by query strings (rlataria)
@@ -200,7 +239,7 @@ A.F.I..PS. [ZBXNEXT-5592] dropped IBM DB2 database support for Zabbix server (ta
 A.F....... [ZBXNEXT-5412] reworked new condition forms as popup (rlataria)
 A.FG...PS. [ZBXNEXT-1989] increased maximum item key length to 2048 chars (MVekslers, rlataria)
 ..F....... [ZBXNEXT-5414] moved maintenance period configuration settings to modal window to decrease page refresh count (gcalenko)
-A.F.I..... [ZBXNEXT-5538] moved Adminitration->User groups pages to MVC framework (Sasha, talbergs)
+A.F.I..... [ZBXNEXT-5538] moved Administration->User groups pages to MVC framework (Sasha, talbergs)
 ..F....... [ZBX-11991] reworked event correlation operations page (rlataria)
 ..F....... [ZBXNEXT-5413] reworked discovery checks form as popup (agriscenko, rlataria)
 ..F....... [ZBXNEXT-170] implemented possibility to "unlink" specific templates in hosts and templates massupdate (talbergs)
@@ -213,6 +252,19 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 ..F....... [ZBX-402] fixed latest data reloading to updating asynchronously (averza)
 .........T [ZBX-16695] changed default width of various screen elements in Zabbix templates from 500 to 750 pixels (Ivo, talbergs, vasilijs)
 ....I..... [ZBX-11764] fixed automake scripts; thanks to Tomasz Kłoczko for the patch (akozlovs)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.9rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.8
+
+4.4.8rc1 was released as 4.4.8 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.4.8rc1
@@ -690,7 +742,7 @@ A.F....... [ZBXNEXT-5344] extended LLD preprocessing to support XML related prep
 ..F....... [ZBX-11280] implemented auto-resizing of macro and tag fields on user input (agriscenko)
 ..F....... [ZBXNEXT-5251] extended widget "Problems by severity" with aggregated view (ashubin, vasilijs)
 ..F....... [ZBX-11299] changed font for fields of trigger expressions and scripts to monospaced (agriscenko)
-..F....... [ZBX-16157] moved Adminitration->Users pages to MVC framework (Ivo, Sasha)
+..F....... [ZBX-16157] moved Administration->Users pages to MVC framework (Ivo, Sasha)
 
 Bug fixes:
 ..F....... [ZBX-16501] fixed log out form being resubmitted when user is already logged back in another tab (Ivo)
@@ -1352,6 +1404,19 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.21rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-17186] fixed context-aware LLD macro expansion in JsonPath preprocessing (atumilovics)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.20
+
+4.0.20rc1 was released as 4.0.20 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.20rc1
@@ -4196,6 +4261,18 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.32rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.0.31
+
+3.0.31rc1 was released as 3.0.31 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.31rc1

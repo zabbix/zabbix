@@ -355,7 +355,6 @@ $icon-widget-btn: (
 	widget-collapse: url($sprite-path) no-repeat -165px -654px,
 	widget-expand: url($sprite-path) no-repeat -165px -690px,
 	widget-edit: url($sprite-path) no-repeat -201px -619px,
-	widget-delete: url($sprite-path) no-repeat -201px -582px,
 	alarm-on: url($sprite-path) no-repeat -165px -546px,
 	alarm-off: url($sprite-path) no-repeat -165px -582px,
 	sound-on: url($sprite-path) no-repeat -165px -474px,
@@ -370,7 +369,6 @@ $icon-widget-btn: (
 //  .btn-widget-collapse
 //  .btn-widget-expand
 //  .btn-widget-edit
-//  .btn-widget-delete
 //  .btn-alarm-on
 //  .btn-alarm-off
 //  .btn-sound-on
@@ -1114,6 +1112,10 @@ td.inactive-bg {
 
 .icon-action-ack::before {
 	background-position: -323px -285px;
+}
+
+.icon-action-unack::before {
+	background-position: -173px -285px;
 }
 
 .icon-invisible::before {

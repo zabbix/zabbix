@@ -308,7 +308,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 {
 	struct zbx_json_parse	jp;
 	char			*error = NULL;
-	int			ret = FAIL;
+	int			ret = FAIL, version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -328,25 +328,21 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 		goto out;
 	}
 
-	proxy->version = zbx_get_proxy_protocol_version(&jp);
+	version = zbx_get_proxy_protocol_version(&jp);
 
-	if (SUCCEED != zbx_check_protocol_version(proxy))
+	if (SUCCEED != zbx_check_protocol_version(proxy, version))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, &error)))
+	proxy->version = version;
+
+	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, more, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->host, proxy->addr, error);
 	}
-	else
-	{
-		char	value[MAX_STRING_LEN];
 
-		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
-			*more = atoi(value);
-	}
 out:
 	zbx_free(error);
 
@@ -533,7 +529,7 @@ error:
 		if (proxy_old.version != proxy.version || proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)
 		{
-			zbx_update_proxy_data(&proxy_old, proxy.version, proxy.lastaccess, proxy.auto_compress);
+			zbx_update_proxy_data(&proxy_old, proxy.version, proxy.lastaccess, proxy.auto_compress, 0);
 		}
 
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);
