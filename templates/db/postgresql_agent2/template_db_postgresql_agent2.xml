@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-05-07T06:27:01Z</date>
+    <date>2020-05-07T11:41:26Z</date>
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -2248,11 +2248,6 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <max_columns>3</max_columns>
                         </screen_item>
                     </screen_items>
-                </screen>
-                <screen>
-                    <name>PostgreSQL stat</name>
-                    <hsize>2</hsize>
-                    <vsize>4</vsize>
                 </screen>
             </screens>
         </template>
