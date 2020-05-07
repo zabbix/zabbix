@@ -530,16 +530,19 @@ insert_javascript_for_visibilitybox();
 			frag.appendChild(hiddenInput('step',     iter_step,                        prefix_override));
 			frag.appendChild(hiddenInput('name',     override.data.name,               prefix_override));
 			frag.appendChild(hiddenInput('stop',     override.data.stop,               prefix_override));
-			frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
-			frag.appendChild(hiddenInput('formula',  override.data.overrides_formula,  prefix_filter));
 
-			override.data.overrides_filters.forEach(function(override_filter) {
-				var prefix = prefix_filter + '[conditions][' + (iter_filters ++) + ']';
-				frag.appendChild(hiddenInput('formulaid', override_filter.formulaid, prefix));
-				frag.appendChild(hiddenInput('macro',     override_filter.macro,     prefix));
-				frag.appendChild(hiddenInput('value',     override_filter.value,     prefix));
-				frag.appendChild(hiddenInput('operator',  override_filter.operator,  prefix));
-			});
+			if (override.data.overrides_filters.length > 0) {
+				frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
+				frag.appendChild(hiddenInput('formula',  override.data.overrides_formula,  prefix_filter));
+
+				override.data.overrides_filters.forEach(function(override_filter) {
+					var prefix = prefix_filter + '[conditions][' + (iter_filters ++) + ']';
+					frag.appendChild(hiddenInput('formulaid', override_filter.formulaid, prefix));
+					frag.appendChild(hiddenInput('macro',     override_filter.macro,     prefix));
+					frag.appendChild(hiddenInput('value',     override_filter.value,     prefix));
+					frag.appendChild(hiddenInput('operator',  override_filter.operator,  prefix));
+				});
+			}
 
 			override.data.operations.forEach(function(operation) {
 				var prefix = prefix_override + '[operations][' + (iter_operations ++) + ']';
