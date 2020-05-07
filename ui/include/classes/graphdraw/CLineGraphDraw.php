@@ -2196,9 +2196,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}
 
+			$stacked_data = ($this->type == GRAPH_TYPE_STACKED);
 			$elements = ($drawtype == GRAPH_ITEM_DRAWTYPE_DOT)
 				? $this->fmtPoints($data, $this->sizeX)
-				: $this->fmtLines($data, $this->sizeX, $data['missing_data_interval']);
+				: $this->fmtLines($data, $this->sizeX, $data['missing_data_interval'], $stacked_data);
 
 			foreach ($elements as $element) {
 				list($j, $i) = $element;
@@ -2281,13 +2282,14 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Produces lines according with expected data frequency. Points are connected only when they are no further apart
 	 * as given frequency.
 	 *
-	 * @param array $data       Data set.
-	 * @param int   $max_x      Number of pixels in graph.
-	 * @param int   $frequency  Expected metric frequency in seconds. If frequency is zero, lines are always connected.
+	 * @param array $data          Data set.
+	 * @param int   $max_x         Number of pixels in graph.
+	 * @param int   $frequency     Expected metric frequency in seconds. If frequency is zero, lines are always connected.
+	 * @param int   $stacked_data  If $data passed is stacked graph type data.
 	 *
 	 * @return array
 	 */
-	public function fmtLines(&$data, $max_x, $frequency) {
+	public function fmtLines(&$data, $max_x, $frequency, $stacked_data = false) {
 		$lines = [];
 
 		$pt = -1;
@@ -2311,7 +2313,12 @@ class CLineGraphDraw extends CGraphDraw {
 				$lines[++ $line] = [$pt, $pt];
 			}
 			elseif (!$frequency || $pt - $prev_pt < ZBX_GRAPH_MAX_SKIP_CELL) {
-				$lines[$line][1] = $pt;
+				if ($stacked_data) {
+					$lines[++ $line] = [$prev_pt, $pt];
+				}
+				else {
+					$lines[$line][1] = $pt;
+				}
 			}
 			else {
 				$lines[$line][1] = $pt;
