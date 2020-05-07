@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2020-04-22T14:06:45Z</date>
+    <date>2020-05-07T06:27:01Z</date>
     <groups>
         <group>
             <name>Templates/Databases</name>
@@ -1070,6 +1070,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                             <name>PostgreSQL</name>
                         </application>
                     </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;18000000</expression>
+                            <name>PostgreSQL oldest xid is too big</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>Status: Ping</name>
@@ -1175,6 +1182,13 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                             <name>PostgreSQL</name>
                         </application>
                     </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;600</expression>
+                            <name>PostgreSQL service was restarted (uptime={ITEM.LASTVALUE})</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                    </triggers>
                 </item>
                 <item>
                     <name>PostgreSQL: Get WAL</name>
@@ -1835,49 +1849,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                     </item_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
-                            <name>DB {#DBNAME}: Block hit/read</name>
-                            <ymin_type_1>FIXED</ymin_type_1>
+                            <name>DB {#DBNAME}: Locks</name>
                             <graph_items>
                                 <graph_item>
-                                    <color>66BB6A</color>
+                                    <color>199C0D</color>
                                     <item>
                                         <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.blks_hit.rate[&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>1</sortorder>
-                                    <color>42A5F5</color>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.blks_read.rate[&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                            </graph_items>
-                        </graph_prototype>
-                        <graph_prototype>
-                            <name>DB {#DBNAME}: Database size</name>
-                            <ymin_type_1>FIXED</ymin_type_1>
-                            <graph_items>
-                                <graph_item>
-                                    <color>66BB6A</color>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.db.size[{$PG.URI},{$PG.USER},{$PG.PASSWORD},&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                            </graph_items>
-                        </graph_prototype>
-                        <graph_prototype>
-                            <name>DB {#DBNAME}: Events</name>
-                            <ymin_type_1>FIXED</ymin_type_1>
-                            <graph_items>
-                                <graph_item>
-                                    <drawtype>GRADIENT_LINE</drawtype>
-                                    <color>1A7C11</color>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.xact_commit.rate[&quot;{#DBNAME}&quot;]</key>
+                                        <key>pgsql.locks.accessexclusive[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
@@ -1885,7 +1863,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <color>F63100</color>
                                     <item>
                                         <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.conflicts.rate[&quot;{#DBNAME}&quot;]</key>
+                                        <key>pgsql.locks.accessshare[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
@@ -1893,74 +1871,15 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <color>2774A4</color>
                                     <item>
                                         <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.deadlocks.rate[&quot;{#DBNAME}&quot;]</key>
+                                        <key>pgsql.locks.exclusive[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
                                     <sortorder>3</sortorder>
-                                    <color>A54F10</color>
+                                    <color>F7941D</color>
                                     <item>
                                         <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.xact_rollback.rate[&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                            </graph_items>
-                        </graph_prototype>
-                        <graph_prototype>
-                            <name>DB {#DBNAME}: Temp files</name>
-                            <graph_items>
-                                <graph_item>
-                                    <drawtype>GRADIENT_LINE</drawtype>
-                                    <color>66BB6A</color>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.temp_bytes.rate[&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>1</sortorder>
-                                    <color>42A5F5</color>
-                                    <yaxisside>RIGHT</yaxisside>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.temp_files.rate[&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                            </graph_items>
-                        </graph_prototype>
-                        <graph_prototype>
-                            <name>DB {#DBNAME}: Tuples</name>
-                            <ymin_type_1>FIXED</ymin_type_1>
-                            <graph_items>
-                                <graph_item>
-                                    <color>1A7C11</color>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.tup_deleted.rate[&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>1</sortorder>
-                                    <color>F63100</color>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.tup_fetched.rate[&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>2</sortorder>
-                                    <color>2774A4</color>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.tup_inserted.rate[&quot;{#DBNAME}&quot;]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>3</sortorder>
-                                    <color>A54F10</color>
-                                    <item>
-                                        <host>Template DB PostgreSQL Agent 2</host>
-                                        <key>pgsql.dbstat.tup_returned.rate[&quot;{#DBNAME}&quot;]</key>
+                                        <key>pgsql.locks.rowexclusive[&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
                                 <graph_item>
@@ -1968,7 +1887,171 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                                     <color>FC6EA3</color>
                                     <item>
                                         <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.locks.rowshare[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>5</sortorder>
+                                    <color>6C59DC</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.locks.share[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>6</sortorder>
+                                    <color>C7A72D</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.locks.sharerowexclusive[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>7</sortorder>
+                                    <color>BA2A5D</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.locks.shareupdateexclusive[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>8</sortorder>
+                                    <color>F230E0</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.locks.total[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>DB {#DBNAME}: Number of bloating tables</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>199C0D</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.db.bloating_tables[{$PG.URI},{$PG.USER},{$PG.PASSWORD},&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>DB {#DBNAME}: pg_stat_database metrics</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>199C0D</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.blks_hit.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>F63100</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.xact_commit.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.conflicts.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <color>F7941D</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.deadlocks.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>4</sortorder>
+                                    <color>FC6EA3</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.blks_read.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>5</sortorder>
+                                    <color>6C59DC</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.xact_rollback.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>6</sortorder>
+                                    <color>C7A72D</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.temp_bytes.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>7</sortorder>
+                                    <color>BA2A5D</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.temp_files.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>8</sortorder>
+                                    <color>F230E0</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.tup_deleted.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>9</sortorder>
+                                    <color>5CCD18</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.tup_fetched.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>10</sortorder>
+                                    <color>BB2A02</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.tup_inserted.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>11</sortorder>
+                                    <color>AC41A5</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.dbstat.tup_returned.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>12</sortorder>
+                                    <color>89ABF8</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
                                         <key>pgsql.dbstat.tup_updated.rate[&quot;{#DBNAME}&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>DB {#DBNAME}: Size</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>199C0D</color>
+                                    <item>
+                                        <host>Template DB PostgreSQL Agent 2</host>
+                                        <key>pgsql.db.size[{$PG.URI},{$PG.USER},{$PG.PASSWORD},&quot;{#DBNAME}&quot;]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -2074,17 +2157,17 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                 <screen>
                     <name>PostgreSQL databases</name>
                     <hsize>2</hsize>
-                    <vsize>4</vsize>
+                    <vsize>5</vsize>
                     <screen_items>
                         <screen_item>
                             <resourcetype>20</resourcetype>
                             <style>0</style>
                             <resource>
-                                <name>DB {#DBNAME}: Tuples</name>
+                                <name>DB {#DBNAME}: pg_stat_database metrics</name>
                                 <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
-                            <width>750</width>
-                            <height>200</height>
+                            <width>500</width>
+                            <height>100</height>
                             <x>0</x>
                             <y>0</y>
                             <colspan>1</colspan>
@@ -2102,11 +2185,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <resourcetype>20</resourcetype>
                             <style>0</style>
                             <resource>
-                                <name>DB {#DBNAME}: Events</name>
+                                <name>DB {#DBNAME}: Locks</name>
                                 <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
-                            <width>750</width>
-                            <height>200</height>
+                            <width>500</width>
+                            <height>100</height>
                             <x>1</x>
                             <y>0</y>
                             <colspan>1</colspan>
@@ -2124,11 +2207,11 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <resourcetype>20</resourcetype>
                             <style>0</style>
                             <resource>
-                                <name>DB {#DBNAME}: Block hit/read</name>
+                                <name>DB {#DBNAME}: Size</name>
                                 <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
-                            <width>750</width>
-                            <height>200</height>
+                            <width>500</width>
+                            <height>100</height>
                             <x>0</x>
                             <y>1</y>
                             <colspan>1</colspan>
@@ -2146,35 +2229,13 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                             <resourcetype>20</resourcetype>
                             <style>0</style>
                             <resource>
-                                <name>DB {#DBNAME}: Temp files</name>
+                                <name>DB {#DBNAME}: Number of bloating tables</name>
                                 <host>Template DB PostgreSQL Agent 2</host>
                             </resource>
-                            <width>750</width>
-                            <height>200</height>
+                            <width>500</width>
+                            <height>100</height>
                             <x>1</x>
                             <y>1</y>
-                            <colspan>1</colspan>
-                            <rowspan>1</rowspan>
-                            <elements>0</elements>
-                            <valign>0</valign>
-                            <halign>0</halign>
-                            <dynamic>0</dynamic>
-                            <sort_triggers>0</sort_triggers>
-                            <url/>
-                            <application/>
-                            <max_columns>3</max_columns>
-                        </screen_item>
-                        <screen_item>
-                            <resourcetype>20</resourcetype>
-                            <style>0</style>
-                            <resource>
-                                <name>DB {#DBNAME}: Database size</name>
-                                <host>Template DB PostgreSQL Agent 2</host>
-                            </resource>
-                            <width>750</width>
-                            <height>200</height>
-                            <x>1</x>
-                            <y>2</y>
                             <colspan>1</colspan>
                             <rowspan>1</rowspan>
                             <elements>0</elements>
