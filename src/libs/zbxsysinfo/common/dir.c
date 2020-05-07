@@ -261,7 +261,7 @@ int	zbx_etypes_to_mask(char *etypes, AGENT_RESULT *result)
 
 		if (FT_OVERFLOW & (type = etype_to_mask(etype)))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid file type \"%s\".", etype));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid type \"%s\".", etype));
 			zbx_free(etype);
 			return type;
 		}
