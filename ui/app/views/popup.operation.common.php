@@ -127,6 +127,12 @@ if (in_array($data['operationtype'], [
 		$opr_data['opmessage']['mediatypeid'] = 0;
 	}
 }
+// Set default inventory_mode.
+elseif ($data['operationtype'] == OPERATION_TYPE_HOST_INVENTORY) {
+	if (!array_key_exists('opinventory', $opr_data)) {
+		$opr_data['opinventory'] = ['inventory_mode' => HOST_INVENTORY_MANUAL];
+	}
+}
 
 switch ($data['operationtype']) {
 	// Send message form elements.
