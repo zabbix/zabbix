@@ -127,12 +127,6 @@ if (in_array($data['operationtype'], [
 		$opr_data['opmessage']['mediatypeid'] = 0;
 	}
 }
-// Set default inventory_mode.
-elseif ($data['operationtype'] == OPERATION_TYPE_HOST_INVENTORY) {
-	if (!array_key_exists('opinventory', $opr_data)) {
-		$opr_data['opinventory'] = ['inventory_mode' => HOST_INVENTORY_MANUAL];
-	}
-}
 
 switch ($data['operationtype']) {
 	// Send message form elements.
@@ -647,11 +641,13 @@ switch ($data['operationtype']) {
 		break;
 
 	case OPERATION_TYPE_HOST_INVENTORY:
+		$value = array_key_exists('opinventory', $opr_data)
+			? (int) $opr_data['opinventory']['inventory_mode']
+			: HOST_INVENTORY_MANUAL;
+
 		$form_list->addRow(
 			new CLabel(_('Inventory mode'), 'operation[opinventory][inventory_mode]'),
-			(new CRadioButtonList('operation[opinventory][inventory_mode]',
-				(int) $opr_data['opinventory']['inventory_mode']
-			))
+			(new CRadioButtonList('operation[opinventory][inventory_mode]', $value))
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
 				->setModern(true)
