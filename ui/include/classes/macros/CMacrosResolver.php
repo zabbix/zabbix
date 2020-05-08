@@ -28,7 +28,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 */
 	protected $configs = [
 		'scriptConfirmation' => [
-			'types' => ['host', 'interfaceWithoutPort', 'user', 'user_related'],
+			'types' => ['host', 'interfaceWithoutPort', 'user', 'user_data'],
 			'method' => 'resolveTexts'
 		],
 		'httpTestName' => [
@@ -115,8 +115,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$types['macros']['interface'] = ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'];
 		}
 
-		if ($this->isTypeAvailable('user_related')) {
-			$types['macros']['user'] = ['{USER.ALIAS}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'];
+		if ($this->isTypeAvailable('user_data')) {
+			$types['macros']['user_data'] = ['{USER.ALIAS}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'];
 		}
 
 		if ($this->isTypeAvailable('user')) {
@@ -153,26 +153,25 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$interface_hostids[$hostid] = true;
 				}
 
-				if (array_key_exists('user', $matched_macros['macros']) && $matched_macros['macros']['user']) {
-					foreach ($matched_macros['macros']['user'] as $macro) {
+				if (array_key_exists('user_data', $matched_macros['macros'])
+						&& $matched_macros['macros']['user_data']) {
+					foreach ($matched_macros['macros']['user_data'] as $macro) {
 						switch ($macro) {
 							case '{USER.ALIAS}':
 								$macros[$hostid][$macro] = CWebUser::$data['alias'];
 								break;
 
 							case '{USER.FULLNAME}':
-								$fullname = '';
+								$fullname = [];
 
-								if (CWebUser::$data['name'] !== '') {
-									$fullname .= CWebUser::$data['name'].' ';
+								foreach (['name', 'surname'] as $field) {
+									if (CWebUser::$data[$field] !== '') {
+										$fullname[] = CWebUser::$data[$field];
+									}
 								}
 
-								if (CWebUser::$data['surname'] !== '') {
-									$fullname .= CWebUser::$data['surname'].' ';
-								}
-
-								$macros[$hostid][$macro] = ($fullname !== '')
-									? $fullname.'('.CWebUser::$data['alias'].')'
+								$macros[$hostid][$macro] = $fullname
+									? implode(' ', array_merge($fullname, ['('.CWebUser::$data['alias'].')']))
 									: CWebUser::$data['alias'];
 								break;
 
