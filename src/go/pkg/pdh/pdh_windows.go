@@ -97,6 +97,7 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 	for _, name := range locNames {
 		idx, err := win32.PdhLookupPerfIndexByName(name)
 		if err != nil {
+			ObjectsNames[name] = name // use local object name as english name if there is no idx that can be used for translation
 			continue
 		}
 		objectsLocal[idx] = name
