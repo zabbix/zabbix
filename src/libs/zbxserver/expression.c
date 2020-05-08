@@ -108,7 +108,7 @@ int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *fun
 			{
 				int	macro_r, context_l, context_r;
 
-				if (SUCCEED == zbx_user_macro_parse(c, &macro_r, &context_l, &context_r))
+				if (SUCCEED == zbx_user_macro_parse(c, &macro_r, &context_l, &context_r, NULL))
 					c += macro_r;
 				else
 					c++;
@@ -296,7 +296,7 @@ static void	DCexpand_trigger_expression(char **expression)
 		{
 			int	macro_r, context_l, context_r;
 
-			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r, NULL))
 			{
 				zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, *expression + l, macro_r + 1);
 				l += macro_r;
@@ -503,7 +503,8 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 	while (NULL != (m = strchr(p, '$')))
 	{
-		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r))
+		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r,
+				NULL))
 		{
 			/* user macros */
 

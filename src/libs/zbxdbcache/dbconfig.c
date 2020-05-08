@@ -1773,7 +1773,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(globalmacroid, row[0]);
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL))
+		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL, NULL))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\"", row[1]);
 			continue;
@@ -1864,7 +1864,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(hostmacroid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL))
+		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL, NULL))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\"", row[1], row[2]);
 			continue;
@@ -9616,7 +9616,7 @@ void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __func__, macro);
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL, NULL))
 		goto out;
 
 	RDLOCK_CACHE;
@@ -9664,7 +9664,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len, NULL))
 			continue;
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
@@ -9744,7 +9744,7 @@ char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *ho
 			continue;
 		}
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len, NULL))
 		{
 			prev_token_loc_r = token.loc.r;
 			continue;
@@ -10020,7 +10020,7 @@ static int	dc_trigger_items_hosts_enabled(const char *expression)
 		{
 			int	macro_r, context_l, context_r;
 
-			if (SUCCEED == zbx_user_macro_parse(p, &macro_r, &context_l, &context_r))
+			if (SUCCEED == zbx_user_macro_parse(p, &macro_r, &context_l, &context_r, NULL))
 				p += macro_r;
 			else
 				p++;

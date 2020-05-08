@@ -75,7 +75,7 @@ static void	init_macros(const char *path)
 		macro_name = zbx_mock_get_object_member_string(handle, "name");
 		macro_value = zbx_mock_get_object_member_string(handle, "value");
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(macro_name, &name, &context, NULL))
+		if (SUCCEED != zbx_user_macro_parse_dyn(macro_name, &name, &context, NULL, NULL))
 			fail_msg("invalid user macro: %s", macro_name);
 
 		for (i = 0; i < macros.values_num; i++)
