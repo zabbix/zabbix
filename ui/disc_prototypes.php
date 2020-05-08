@@ -525,7 +525,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'jmx_endpoint',
 					'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes', 'follow_redirects',
 					'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
-					'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
+					'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps',
+					'discover'
 				],
 				'selectApplications' => ['applicationid'],
 				'selectApplicationPrototypes' => ['name'],

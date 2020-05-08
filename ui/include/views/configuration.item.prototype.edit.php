@@ -715,10 +715,9 @@ $form_list
 		(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE)
 	)
 	->addRow(_('Discover'),
-		(new CRadioButtonList('discover', (int) $data['discover']))
-			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
-			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
-			->setModern(true)
+		(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+			->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
+			->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
 	);
 
 // Append tabs to form.
