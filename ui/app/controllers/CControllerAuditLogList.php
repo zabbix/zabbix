@@ -169,7 +169,8 @@ class CControllerAuditLogList extends CController {
 			AUDIT_ACTION_UPDATE => _('Update'),
 			AUDIT_ACTION_DELETE => _('Delete'),
 			AUDIT_ACTION_ENABLE => _('Enable'),
-			AUDIT_ACTION_DISABLE => _('Disable')
+			AUDIT_ACTION_DISABLE => _('Disable'),
+			AUDIT_ACTION_EXECUTE => _('Execute')
 		];
 	}
 
