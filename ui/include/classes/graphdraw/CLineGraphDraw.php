@@ -2285,6 +2285,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$prev_pt = 0;
 		$line = -1;
 		$line_to_stretch = -1;
+		$line_gap = -1;
 
 		// Construct lines, of data points no less time apart in x axis as given in $frequency.
 		while (++ $pt < $max_x) {
@@ -2297,8 +2298,13 @@ class CLineGraphDraw extends CGraphDraw {
 				$line_to_stretch = $line;
 			}
 			elseif ($frequency && ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency)) {
-				$lines[++ $line] = [$pt, $pt];
+				if ($line == $line_gap) {
+					$line ++;
+				}
+
+				$lines[$line] = [$pt, $pt];
 				$line_to_stretch = $line;
+				$line_gap = $line;
 			}
 			elseif ($data['avg'][$pt] != $data['avg'][$prev_pt]) {
 				if ($line == $line_to_stretch) {
