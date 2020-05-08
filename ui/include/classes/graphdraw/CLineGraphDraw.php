@@ -2294,6 +2294,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			if (!$lines) {
 				$lines[++ $line] = [$pt, $pt];
+				$line_to_stretch = $line;
 			}
 			elseif ($data['avg'][$pt] != $data['avg'][$prev_pt]) {
 				if ($line == $line_to_stretch) {
