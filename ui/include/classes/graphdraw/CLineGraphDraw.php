@@ -2296,6 +2296,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$lines[++ $line] = [$pt, $pt];
 				$line_to_stretch = $line;
 			}
+			elseif ($frequency && ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency)) {
+				$lines[++ $line] = [$pt, $pt];
+				$line_to_stretch = $line;
+			}
 			elseif ($data['avg'][$pt] != $data['avg'][$prev_pt]) {
 				if ($line == $line_to_stretch) {
 					$lines[$line][1] = $pt;
@@ -2314,10 +2318,6 @@ class CLineGraphDraw extends CGraphDraw {
 				else {
 					$lines[$line][1] = $pt;
 				}
-			}
-			elseif ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency) {
-				$lines[++ $line] = [$pt, $pt];
-				$line_to_stretch = $line;
 			}
 			else {
 				$lines[$line][1] = $pt;
