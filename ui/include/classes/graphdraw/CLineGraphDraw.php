@@ -2320,6 +2320,7 @@ class CLineGraphDraw extends CGraphDraw {
 			elseif (!$frequency || $pt - $prev_pt < ZBX_GRAPH_MAX_SKIP_CELL) {
 				if ($stacked_data) {
 					$lines[++ $line] = [$prev_pt, $pt];
+					$line_to_stretch = $line;
 				}
 				else {
 					$lines[$line][1] = $pt;
