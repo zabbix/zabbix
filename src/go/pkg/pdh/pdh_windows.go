@@ -130,6 +130,8 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 
 		if objectLocal, ok := objectsLocal[i]; ok {
 			ObjectsNames[name] = objectLocal
+		} else {
+			ObjectsNames[name] = name
 		}
 	}
 
