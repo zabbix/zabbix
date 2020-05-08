@@ -40,7 +40,6 @@ Login and password are also set in macros:
 
 - {$CLICKHOUSE.USER}
 - {$CLICKHOUSE.PASSWORD}
-
 If you don't need authentication - remove headers from HTTP-Agent type items 
 
 
@@ -86,7 +85,7 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |ClickHouse |ClickHouse: Longest currently running query time |<p>Get longest running query.</p> |HTTP_AGENT |clickhouse.process.elapsed |
-|ClickHouse |ClickHouse: Check port availability |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|ClickHouse |ClickHouse: Check port availability |<p>-</p> |SIMPLE |net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |ClickHouse |ClickHouse: Ping | |HTTP_AGENT |clickhouse.ping<p>**Preprocessing**:</p><p>- REGEX: `Ok\. 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |ClickHouse |ClickHouse: Version |<p>Version of the server</p> |HTTP_AGENT |clickhouse.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |ClickHouse |ClickHouse: Revision |<p>Revision of the server.</p> |DEPENDENT |clickhouse.revision<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "Revision")].value.first()`</p> |

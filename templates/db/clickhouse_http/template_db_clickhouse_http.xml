@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-07T11:58:01Z</date>
+   <date>2020-05-08T07:25:12Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1583,6 +1583,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
             </item>
             <item>
                <name>ClickHouse: Check port availability</name>
+               <type>SIMPLE</type>
                <key>net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]</key>
                <history>7d</history>
                <applications>
