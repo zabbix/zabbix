@@ -732,7 +732,7 @@ else {
 		$items = API::Item()->get([
 			'output' => ['itemid'],
 			'selectGraphs' => ['graphid'],
-			'selectItemDiscovery' => ['ts_delete']
+			'selectItemDiscovery' => ['ts_delete'],
 			'graphids' => array_keys($data['graphs']),
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 		]);
