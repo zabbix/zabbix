@@ -2641,7 +2641,7 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *                       ending '"' for quoted context values or the last     *
  *                       character before the ending '}' character)           *
  *                       0 if macro does not have context specified.          *
- *    context_op - [OUT] the context matching operator (optional):            *
+ *     context_op - [OUT] the context matching operator (optional):           *
  *                          CONDITION_OPERATOR_EQUAL                          *
  *                          CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
@@ -2651,7 +2651,7 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *               is not defined.                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r, int *context_op)
+int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r, unsigned char *context_op)
 {
 	int	i;
 
@@ -2749,7 +2749,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
  *     context - [OUT] the unquoted macro context, NULL for macros without    *
  *                     context                                                *
  *     length  - [OUT] the length of parsed macro (optional)                  *
- *    context_op - [OUT] the context matching operator (optional):            *
+ *     context_op - [OUT] the context matching operator (optional):           *
  *                          CONDITION_OPERATOR_EQUAL                          *
  *                          CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
@@ -2758,7 +2758,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
  *     FAIL    - the macro parsing failed, invalid parameter syntax           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length, int *context_op)
+int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length, unsigned char *context_op)
 {
 	const char	*ptr;
 	int		macro_r, context_l, context_r;
@@ -2776,6 +2776,10 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 		/* find the context separator ':' by stripping spaces before context */
 		while (' ' == *(--ptr))
 			;
+
+		/* remove regex: prefix from macro name for regex contexts */
+		if (NULL != context_op && CONDITION_OPERATOR_REGEXP == *context_op)
+			ptr -= ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX);
 
 		/* extract the macro name and close with '}' character */
 		len = ptr - macro + 1;

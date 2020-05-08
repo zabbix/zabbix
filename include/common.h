@@ -1342,8 +1342,10 @@ int	zbx_strcmp_null(const char *s1, const char *s2);
 
 #define ZBX_MACRO_REGEX_PREFIX		"regex:"
 
-int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r, int *context_op);
-int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length, int *context_op);
+int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r,
+		unsigned char *context_op);
+int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length,
+		unsigned char *context_op);
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
 

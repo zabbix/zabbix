@@ -702,8 +702,10 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
  * Parameters: gmacro_index - [IN/OUT] a global macro index hashset           *
  *             gmacro       - [IN] the macro to index                         *
  *                                                                            *
+ * Return value: The macro index record.                                      *
+ *                                                                            *
  ******************************************************************************/
-static void	config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
+static ZBX_DC_GMACRO_M	*config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
 {
 	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
 
@@ -719,6 +721,7 @@ static void	config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *
 	}
 
 	zbx_vector_ptr_append(&gmacro_m->gmacros, gmacro);
+	return gmacro_m;
 }
 
 /******************************************************************************
@@ -731,7 +734,7 @@ static void	config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *
  *             gmacro       - [IN] the macro to remove                        *
  *                                                                            *
  ******************************************************************************/
-static void	config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
+static ZBX_DC_GMACRO_M	*config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
 {
 	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
 	int		index;
@@ -742,14 +745,37 @@ static void	config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACR
 	{
 		if (FAIL != (index = zbx_vector_ptr_search(&gmacro_m->gmacros, gmacro, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			zbx_vector_ptr_remove(&gmacro_m->gmacros, index);
-
-		if (0 == gmacro_m->gmacros.values_num)
-		{
-			zbx_strpool_release(gmacro_m->macro);
-			zbx_vector_ptr_destroy(&gmacro_m->gmacros);
-			zbx_hashset_remove(gmacro_index, &gmacro_m_local);
-		}
 	}
+	return gmacro_m;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: config_gmacro_context_compare                                    *
+ *                                                                            *
+ * Purpose: comparison function to sort global macro vector by context        *
+ *          operator, value and macro name                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	config_gmacro_context_compare(const void *d1, const void *d2)
+{
+	ZBX_DC_GMACRO	*m1 = *(const ZBX_DC_GMACRO **)d1;
+	ZBX_DC_GMACRO	*m2 = *(const ZBX_DC_GMACRO **)d2;
+
+	/* macros without context have higher priority than macros with */
+	if (NULL == m1->context)
+	{
+		if (NULL == m2->context)
+			return strcmp(m1->macro, m2->macro);
+		return -1;
+	}
+
+	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
+	if (NULL == m2->context)
+		return 1;
+
+	return strcmp(m1->context, m2->context);
 }
 
 /******************************************************************************
@@ -762,7 +788,7 @@ static void	config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACR
  *             hmacro       - [IN] the macro to index                         *
  *                                                                            *
  ******************************************************************************/
-static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
+static ZBX_DC_HMACRO_HM	*config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
 {
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
 
@@ -779,6 +805,7 @@ static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *
 	}
 
 	zbx_vector_ptr_append(&hmacro_hm->hmacros, hmacro);
+	return hmacro_hm;
 }
 
 /******************************************************************************
@@ -791,7 +818,7 @@ static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *
  *             hmacro       - [IN] the macro name to remove                   *
  *                                                                            *
  ******************************************************************************/
-static void	config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
+static ZBX_DC_HMACRO_HM	*config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
 {
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
 	int			index;
@@ -803,14 +830,37 @@ static void	config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACR
 	{
 		if (FAIL != (index = zbx_vector_ptr_search(&hmacro_hm->hmacros, hmacro, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			zbx_vector_ptr_remove(&hmacro_hm->hmacros, index);
-
-		if (0 == hmacro_hm->hmacros.values_num)
-		{
-			zbx_strpool_release(hmacro_hm->macro);
-			zbx_vector_ptr_destroy(&hmacro_hm->hmacros);
-			zbx_hashset_remove(hmacro_index, &hmacro_hm_local);
-		}
 	}
+	return hmacro_hm;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: config_hmacro_context_compare                                    *
+ *                                                                            *
+ * Purpose: comparison function to sort host macro vector by context          *
+ *          operator, value and macro name                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	config_hmacro_context_compare(const void *d1, const void *d2)
+{
+	ZBX_DC_HMACRO	*m1 = *(const ZBX_DC_HMACRO **)d1;
+	ZBX_DC_HMACRO	*m2 = *(const ZBX_DC_HMACRO **)d2;
+
+	/* macros without context have higher priority than macros with */
+	if (NULL == m1->context)
+	{
+		if (NULL == m2->context)
+			return strcmp(m1->macro, m2->macro);
+		return -1;
+	}
+
+	/* CONDITION_OPERATOR_EQUAL (0) has hiHher priority than CONDITION_OPERATOR_REHEXP (8) */
+	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
+	if (NULL == m2->context)
+		return 1;
+
+	return strcmp(m1->context, m2->context);
 }
 
 /******************************************************************************
@@ -1753,17 +1803,19 @@ static void	DCsync_htmpls(zbx_dbsync_t *sync)
 
 static void	DCsync_gmacros(zbx_dbsync_t *sync)
 {
-	char		**row;
-	zbx_uint64_t	rowid;
-	unsigned char	tag;
-
-	ZBX_DC_GMACRO	*gmacro;
-
-	int		found, context_existed, update_index, ret;
-	zbx_uint64_t	globalmacroid;
-	char		*macro = NULL, *context = NULL;
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag, context_op;
+	ZBX_DC_GMACRO		*gmacro;
+	int			found, context_existed, update_index, ret, i;
+	zbx_uint64_t		globalmacroid;
+	char			*macro = NULL, *context = NULL;
+	zbx_vector_ptr_t	indexes;
+	ZBX_DC_GMACRO_M		*gmacro_m;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&indexes);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1773,7 +1825,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(globalmacroid, row[0]);
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL, NULL))
+		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL, &context_op))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\"", row[1]);
 			continue;
@@ -1784,16 +1836,21 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		/* see whether we should and can update gmacros_m index at this point */
 		update_index = 0;
 
-		if (0 == found || 0 != strcmp(gmacro->macro, macro) || 0 != zbx_strcmp_null(gmacro->context, context))
+		if (0 == found || 0 != strcmp(gmacro->macro, macro) || 0 != zbx_strcmp_null(gmacro->context, context) ||
+				gmacro->context_op != context_op)
 		{
 			if (1 == found)
-				config_gmacro_remove_index(&config->gmacros_m, gmacro);
+			{
+				gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
+				zbx_vector_ptr_append(&indexes, gmacro_m);
+			}
 
 			update_index = 1;
 		}
 
 		/* store new information in macro structure */
 		ZBX_STR2UCHAR(gmacro->type, row[3]);
+		gmacro->context_op = context_op;
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
 
@@ -1815,16 +1872,20 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 
 		/* update gmacros_m index using new data */
 		if (1 == update_index)
-			config_gmacro_add_index(&config->gmacros_m, gmacro);
+		{
+			gmacro_m = config_gmacro_add_index(&config->gmacros_m, gmacro);
+			zbx_vector_ptr_append(&indexes, gmacro_m);
+		}
 	}
 
-	/* remove deleted globalmacros from buffer */
+	/* remove deleted global macros from cache */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		if (NULL == (gmacro = (ZBX_DC_GMACRO *)zbx_hashset_search(&config->gmacros, &rowid)))
 			continue;
 
-		config_gmacro_remove_index(&config->gmacros_m, gmacro);
+		gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
+		zbx_vector_ptr_append(&indexes, gmacro_m);
 
 		zbx_strpool_release(gmacro->macro);
 		zbx_strpool_release(gmacro->value);
@@ -1835,25 +1896,44 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->gmacros, gmacro);
 	}
 
+	zbx_vector_ptr_sort(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < indexes.values_num; i++)
+	{
+		gmacro_m = (ZBX_DC_GMACRO_M *)indexes.values[i];
+		if (0 == gmacro_m->gmacros.values_num)
+		{
+			zbx_strpool_release(gmacro_m->macro);
+			zbx_vector_ptr_destroy(&gmacro_m->gmacros);
+			zbx_hashset_remove_direct(&config->gmacros, gmacro_m);
+		}
+		else
+			zbx_vector_ptr_sort(&gmacro_m->gmacros, config_gmacro_context_compare);
+	}
+
 	zbx_free(context);
 	zbx_free(macro);
+	zbx_vector_ptr_destroy(&indexes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_hmacros(zbx_dbsync_t *sync)
 {
-	char		**row;
-	zbx_uint64_t	rowid;
-	unsigned char	tag;
-
-	ZBX_DC_HMACRO	*hmacro;
-
-	int		found, context_existed, update_index, ret;
-	zbx_uint64_t	hostmacroid, hostid;
-	char		*macro = NULL, *context = NULL;
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag, context_op;
+	ZBX_DC_HMACRO		*hmacro;
+	int			found, context_existed, update_index, ret, i;
+	zbx_uint64_t		hostmacroid, hostid;
+	char			*macro = NULL, *context = NULL;
+	zbx_vector_ptr_t	indexes;
+	ZBX_DC_HMACRO_HM	*hmacro_hm;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&indexes);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1864,7 +1944,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(hostmacroid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL, NULL))
+		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL, &context_op))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\"", row[1], row[2]);
 			continue;
@@ -1876,10 +1956,13 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		update_index = 0;
 
 		if (0 == found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, macro) ||
-				0 != zbx_strcmp_null(hmacro->context, context))
+				0 != zbx_strcmp_null(hmacro->context, context) || hmacro->context_op != context_op)
 		{
 			if (1 == found)
-				config_hmacro_remove_index(&config->hmacros_hm, hmacro);
+			{
+				hmacro_hm = config_hmacro_remove_index(&config->hmacros_hm, hmacro);
+				zbx_vector_ptr_append(&indexes, hmacro_hm);
+			}
 
 			update_index = 1;
 		}
@@ -1887,6 +1970,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
 		ZBX_STR2UCHAR(hmacro->type, row[4]);
+		hmacro->context_op = context_op;
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
 
@@ -1908,7 +1992,10 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 		/* update hmacros_hm index using new data */
 		if (1 == update_index)
-			config_hmacro_add_index(&config->hmacros_hm, hmacro);
+		{
+			hmacro_hm = config_hmacro_add_index(&config->hmacros_hm, hmacro);
+			zbx_vector_ptr_append(&indexes, hmacro_hm);
+		}
 	}
 
 	/* remove deleted host macros from buffer */
@@ -1917,7 +2004,8 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		if (NULL == (hmacro = (ZBX_DC_HMACRO *)zbx_hashset_search(&config->hmacros, &rowid)))
 			continue;
 
-		config_hmacro_remove_index(&config->hmacros_hm, hmacro);
+		hmacro_hm = config_hmacro_remove_index(&config->hmacros_hm, hmacro);
+		zbx_vector_ptr_append(&indexes, hmacro_hm);
 
 		zbx_strpool_release(hmacro->macro);
 		zbx_strpool_release(hmacro->value);
@@ -1928,8 +2016,25 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->hmacros, hmacro);
 	}
 
+	zbx_vector_ptr_sort(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < indexes.values_num; i++)
+	{
+		hmacro_hm = (ZBX_DC_HMACRO_HM *)indexes.values[i];
+		if (0 == hmacro_hm->hmacros.values_num)
+		{
+			zbx_strpool_release(hmacro_hm->macro);
+			zbx_vector_ptr_destroy(&hmacro_hm->hmacros);
+			zbx_hashset_remove_direct(&config->hmacros, hmacro_hm);
+		}
+		else
+			zbx_vector_ptr_sort(&hmacro_hm->hmacros, config_hmacro_context_compare);
+	}
+
 	zbx_free(context);
 	zbx_free(macro);
+	zbx_vector_ptr_destroy(&indexes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
