@@ -5237,7 +5237,7 @@ a.link-action {
 		}
 		@else {
 			a.link-action,
-			input[type="radio"]:checked + label {
+			input[type="radio"]:enabled:checked + label {
 				color: darken($color, 45%);
 			}
 		}

@@ -29,15 +29,13 @@ insert_javascript_for_visibilitybox();
 	<?= (new CRow([
 			'',
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
-			'#{name}',
+			(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});')))),
 			'#{stop_verbose}',
 			(new CCol((new CButton(null, _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 				->setEnabled(false)
-			))
-				->addClass(ZBX_STYLE_NOWRAP)
-				->setWidth('50')
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()
 	?>
 </script>
@@ -71,7 +69,8 @@ insert_javascript_for_visibilitybox();
 				new CSpan('#{formulaId}'),
 				new CVar('overrides_filters[#{rowNum}][formulaid]', '#{formulaId}')
 			],
-			(new CTextBox('overrides_filters[#{rowNum}][macro]', '', false, 64))
+			(new CTextBox('overrides_filters[#{rowNum}][macro]', '', false,
+					DB::getFieldLength('lld_override_condition', 'macro')))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->addClass(ZBX_STYLE_UPPERCASE)
 				->addClass('macro')
@@ -81,7 +80,8 @@ insert_javascript_for_visibilitybox();
 				CONDITION_OPERATOR_REGEXP => _('matches'),
 				CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
 			]))->addClass('operator'),
-			(new CTextBox('overrides_filters[#{rowNum}][value]', '', false, 255))
+			(new CTextBox('overrides_filters[#{rowNum}][value]', '', false,
+					DB::getFieldLength('lld_override_condition', 'value')))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setAttribute('placeholder', _('regular expression')),
 			(new CCol(
