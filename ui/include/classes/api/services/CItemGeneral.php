@@ -58,6 +58,7 @@ abstract class CItemGeneral extends CApiService {
 			'history'				=> [],
 			'trends'				=> [],
 			'status'				=> [],
+			'discover'				=> [],
 			'value_type'			=> ['template' => 1],
 			'trapper_hosts'			=> [],
 			'units'					=> ['template' => 1],
