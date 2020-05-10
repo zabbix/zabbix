@@ -257,8 +257,10 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 Changes for 4.4.9rc1
 
 New features:
+.......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
 
 Bug fixes:
+........S. [ZBX-17691] fixed server crashes on regexp preprocessing (MVekslers)
 ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
 
 --------------------------------------------------------------------------------
