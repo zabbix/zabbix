@@ -1409,8 +1409,11 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.21rc1
 
 New features:
+.......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
 
 Bug fixes:
+........S. [ZBX-17691] fixed server crashes on regexp preprocessing (MVekslers)
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
 ........S. [ZBX-17186] fixed context-aware LLD macro expansion in JsonPath preprocessing (atumilovics)
 
 --------------------------------------------------------------------------------
