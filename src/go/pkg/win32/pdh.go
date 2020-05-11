@@ -295,6 +295,10 @@ func PdhEnumObject() (objects []string, err error) {
 		return nil, newPdhError(ret)
 	}
 
+	if objectListSize < 1 {
+		return nil, fmt.Errorf("No objects found.")
+	}
+
 	objectBuf := make([]uint16, objectListSize)
 	ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objectBuf[0])),
 		uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD),
