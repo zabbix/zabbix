@@ -258,9 +258,9 @@
 	});
 
 	function dashboardAddMessages(messages) {
-		var $outputs = jQuery(messages);
-		$outputs.addClass('msg-dashboard-js');
-		$outputs.insertBefore('main');
+		jQuery(messages)
+			.addClass('msg-dashboard-js')
+			.insertBefore('main');
 	}
 
 	function dashboardRemoveMessages() {
