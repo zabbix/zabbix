@@ -3338,7 +3338,8 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
  *                                                                            *
  * Function: DBget_user_by_active_session                                     *
  *                                                                            *
- * Purpose: validate that session is active and get associated user data      *
+ * Purpose: validate that session is active and get associated user id and    *
+ *          type                                                              *
  *                                                                            *
  * Parameters: sessionid - [IN] the session id to validate                    *
  *             user      - [OUT] user information                             *
@@ -3374,6 +3375,60 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 
 	ZBX_STR2UINT64(user->userid, row[0]);
 	user->type = atoi(row[1]);
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sessionid_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_user_by_active_session2                                    *
+ *                                                                            *
+ * Purpose: validate that session is active and get associated user data      *
+ *                                                                            *
+ * Parameters: sessionid - [IN] the session id to validate                    *
+ *             user      - [OUT] extended user information                    *
+ *                                                                            *
+ * Return value:  SUCCEED - session is active and user data was retrieved     *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+int	DBget_user_by_active_session2(const char *sessionid, zbx_user2_t *user)
+{
+	char		*sessionid_esc;
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, sessionid);
+
+	sessionid_esc = DBdyn_escape_string(sessionid);
+
+	if (NULL == (result = DBselect(
+			"select u.userid,u.type,u.alias,u.name,u.surname"
+				" from sessions s,users u"
+			" where s.userid=u.userid"
+				" and s.sessionid='%s'"
+				" and s.status=%d",
+			sessionid_esc, ZBX_SESSION_ACTIVE)))
+	{
+		goto out;
+	}
+
+	if (NULL == (row = DBfetch(result)))
+		goto out;
+
+	ZBX_STR2UINT64(user->userid, row[0]);
+	user->type = atoi(row[1]);
+	user->alias = zbx_strdup(NULL, row[2]);
+	user->name = zbx_strdup(NULL, row[3]);
+	user->surname = zbx_strdup(NULL, row[4]);
 
 	ret = SUCCEED;
 out:

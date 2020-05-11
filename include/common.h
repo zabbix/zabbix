@@ -792,6 +792,16 @@ typedef struct
 }
 zbx_user_t;
 
+typedef struct		/* extended user information */
+{
+	zbx_uint64_t	userid;
+	zbx_user_type_t	type;
+	char		*alias;
+	char		*name;
+	char		*surname;
+}
+zbx_user2_t;
+
 typedef enum
 {
 	PERM_DENY = 0,
