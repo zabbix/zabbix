@@ -441,8 +441,8 @@ jQuery(function($) {
 	/**
 	 * Get current value from preselect filter field.
 	 *
-	 * @param {jQuery} $obj  Multiselect instance.
-	 * @param {int}    type  User action that caused preselection.
+	 * @param {jQuery} $obj    Multiselect instance.
+	 * @param {int}    action  User action that caused preselection.
 	 *
 	 * @return {object}
 	 */
