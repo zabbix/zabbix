@@ -171,8 +171,6 @@ class testFormHostTags extends CWebTest {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
 
-		var_dump($this->table_selector);
-
 		$this->page->login()->open('hosts.php');
 		$this->query('button:Create host')->waitUntilPresent()->one()->click();
 		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
