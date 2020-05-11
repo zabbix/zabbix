@@ -82,6 +82,7 @@ abstract class CItemGeneral extends CApiService {
 			'inventory_link'		=> [],
 			'lifetime'				=> [],
 			'preprocessing'			=> ['template' => 1],
+			'overrides'				=> ['template' => 1],
 			'jmx_endpoint'			=> [],
 			'url'					=> ['template' => 1],
 			'timeout'				=> ['template' => 1],
