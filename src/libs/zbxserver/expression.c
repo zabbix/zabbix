@@ -1966,10 +1966,10 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ALERT_SUBJECT		"{ALERT.SUBJECT}"
 #define MVAR_ALERT_MESSAGE		"{ALERT.MESSAGE}"
 
-#define MVAR_ACK_MESSAGE                "{ACK.MESSAGE}"			/* deprecated */
-#define MVAR_ACK_TIME	                "{ACK.TIME}"			/* deprecated */
-#define MVAR_ACK_DATE	                "{ACK.DATE}"			/* deprecated */
-#define MVAR_USER_FULLNAME          	"{USER.FULLNAME}"
+#define MVAR_ACK_MESSAGE		"{ACK.MESSAGE}"			/* deprecated */
+#define MVAR_ACK_TIME			"{ACK.TIME}"			/* deprecated */
+#define MVAR_ACK_DATE			"{ACK.DATE}"			/* deprecated */
+#define MVAR_USER_FULLNAME		"{USER.FULLNAME}"
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
