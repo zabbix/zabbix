@@ -110,6 +110,11 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					'name' => 'filter_graphids[]',
 					'object_name' => 'graphs',
 					'data' => $data['ms_graphs'],
+					'autosuggest' => [
+						'filter_preselect_fields' => [
+							'hosts' => 'filter_hostids_'
+						]
+					],
 					'popup' => [
 						'filter_preselect_fields' => [
 							'hosts' => 'filter_hostids_'
@@ -133,6 +138,11 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 					'name' => 'filter_graph_patterns[]',
 					'object_name' => 'graphs',
 					'data' => $data['ms_graph_patterns'],
+					'autosuggest' => [
+						'filter_preselect_fields' => [
+							'hosts' => 'filter_hostids_'
+						]
+					],
 					'popup' => [
 						'filter_preselect_fields' => [
 							'hosts' => 'filter_hostids_'
