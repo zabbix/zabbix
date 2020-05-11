@@ -242,6 +242,10 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	var instptr uintptr
 	var instbuf []uint16
 
+	if counterListSize < 1 {
+		return nil, fmt.Errorf("No counters found for given object.")
+	}
+
 	counterbuf := make([]uint16, counterListSize)
 
 	for {
