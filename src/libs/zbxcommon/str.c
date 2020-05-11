@@ -2670,6 +2670,10 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 		*macro_r = i;
 		*context_l = 0;
 		*context_r = 0;
+
+		if (NULL != context_op)
+			*context_op = CONDITION_OPERATOR_EQUAL;
+
 		return SUCCEED;
 	}
 
@@ -2682,7 +2686,6 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 	{
 		if (0 == strncmp(macro + i, ZBX_MACRO_REGEX_PREFIX, ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX)))
 		{
-			fprintf(stderr, "REGEX\n");
 			*context_op = CONDITION_OPERATOR_REGEXP;
 			i += ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX);
 		}

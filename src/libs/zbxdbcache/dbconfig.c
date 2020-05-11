@@ -757,10 +757,10 @@ static ZBX_DC_GMACRO_M	*config_gmacro_remove_index(zbx_hashset_t *gmacro_index, 
  *          operator, value and macro name                                    *
  *                                                                            *
  ******************************************************************************/
-int	config_gmacro_context_compare(const void *d1, const void *d2)
+static int	config_gmacro_context_compare(const void *d1, const void *d2)
 {
-	ZBX_DC_GMACRO	*m1 = *(const ZBX_DC_GMACRO **)d1;
-	ZBX_DC_GMACRO	*m2 = *(const ZBX_DC_GMACRO **)d2;
+	const ZBX_DC_GMACRO	*m1 = *(const ZBX_DC_GMACRO **)d1;
+	const ZBX_DC_GMACRO	*m2 = *(const ZBX_DC_GMACRO **)d2;
 
 	/* macros without context have higher priority than macros with */
 	if (NULL == m1->context)
@@ -769,11 +769,14 @@ int	config_gmacro_context_compare(const void *d1, const void *d2)
 			return strcmp(m1->macro, m2->macro);
 		return -1;
 	}
+	else
+	{
+		if (NULL == m2->context)
+			return 1;
+	}
 
 	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
 	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
-	if (NULL == m2->context)
-		return 1;
 
 	return strcmp(m1->context, m2->context);
 }
@@ -842,10 +845,10 @@ static ZBX_DC_HMACRO_HM	*config_hmacro_remove_index(zbx_hashset_t *hmacro_index,
  *          operator, value and macro name                                    *
  *                                                                            *
  ******************************************************************************/
-int	config_hmacro_context_compare(const void *d1, const void *d2)
+static int	config_hmacro_context_compare(const void *d1, const void *d2)
 {
-	ZBX_DC_HMACRO	*m1 = *(const ZBX_DC_HMACRO **)d1;
-	ZBX_DC_HMACRO	*m2 = *(const ZBX_DC_HMACRO **)d2;
+	const ZBX_DC_HMACRO	*m1 = *(const ZBX_DC_HMACRO **)d1;
+	const ZBX_DC_HMACRO	*m2 = *(const ZBX_DC_HMACRO **)d2;
 
 	/* macros without context have higher priority than macros with */
 	if (NULL == m1->context)
@@ -854,11 +857,11 @@ int	config_hmacro_context_compare(const void *d1, const void *d2)
 			return strcmp(m1->macro, m2->macro);
 		return -1;
 	}
+	if (NULL == m2->context)
+		return 1;
 
 	/* CONDITION_OPERATOR_EQUAL (0) has hiHher priority than CONDITION_OPERATOR_REHEXP (8) */
 	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
-	if (NULL == m2->context)
-		return 1;
 
 	return strcmp(m1->context, m2->context);
 }
@@ -9581,6 +9584,22 @@ static void	dc_get_host_macro_value(const ZBX_DC_HMACRO *macro, char **value)
 		*value = zbx_strdup(*value, macro->value);
 }
 
+static int	dc_match_macro_context(const char *context, const char *pattern, unsigned char op)
+{
+	switch (op)
+	{
+	case CONDITION_OPERATOR_EQUAL:
+		return 0 == zbx_strcmp_null(context, pattern) ? SUCCEED : FAIL;
+	case CONDITION_OPERATOR_REGEXP:
+		if (NULL == context)
+			return FAIL;
+		return NULL != zbx_regexp_match(context, pattern, NULL) ? SUCCEED : FAIL;
+	default:
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+}
+
 static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
@@ -9589,6 +9608,7 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 	ZBX_DC_HMACRO_HM	hmacro_hm_local;
 	const ZBX_DC_HTMPL	*htmpl;
 	zbx_vector_uint64_t	templateids;
+	const ZBX_DC_HMACRO	*hmacro;
 
 	if (0 == host_num)
 		return;
@@ -9603,21 +9623,19 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 		{
 			for (j = 0; j < hmacro_hm->hmacros.values_num; j++)
 			{
-				const ZBX_DC_HMACRO	*hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[j];
+				hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[j];
 
-				if (0 == strcmp(hmacro->macro, macro))
+				if (SUCCEED == dc_match_macro_context(context, hmacro->context, hmacro->context_op))
 				{
-					if (0 == zbx_strcmp_null(hmacro->context, context))
-					{
-						dc_get_host_macro_value(hmacro, value);
-						return;
-					}
-
-					/* check for the default (without parameters) macro value */
-					if (NULL == *value_default && NULL != context && NULL == hmacro->context)
-						dc_get_host_macro_value(hmacro, value_default);
+					dc_get_host_macro_value(hmacro, value);
+					return;
 				}
 			}
+			/* Check for the default (without context) macro value. If macro has a value without */
+			/* context it will be the first element in the macro index vector.                   */
+			hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[0];
+			if (NULL == *value_default && NULL != context && NULL == hmacro->context)
+				dc_get_host_macro_value(hmacro, value_default);
 		}
 	}
 
@@ -9655,6 +9673,7 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 	int			i;
 	const ZBX_DC_GMACRO_M	*gmacro_m;
 	ZBX_DC_GMACRO_M		gmacro_m_local;
+	const ZBX_DC_GMACRO	*gmacro;
 
 	gmacro_m_local.macro = macro;
 
@@ -9662,21 +9681,20 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 	{
 		for (i = 0; i < gmacro_m->gmacros.values_num; i++)
 		{
-			const ZBX_DC_GMACRO	*gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[i];
+			gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[i];
 
-			if (0 == strcmp(gmacro->macro, macro))
+			if (SUCCEED == dc_match_macro_context(context, gmacro->context, gmacro->context_op))
 			{
-				if (0 == zbx_strcmp_null(gmacro->context, context))
-				{
-					dc_get_global_macro_value(gmacro, value);
-					break;
-				}
-
-				/* check for the default (without parameters) macro value */
-				if (NULL == *value_default && NULL != context && NULL == gmacro->context)
-					dc_get_global_macro_value(gmacro, value_default);
+				dc_get_global_macro_value(gmacro, value);
+				break;
 			}
 		}
+
+		/* Check for the default (without context) macro value. If macro has a value without */
+		/* context it will be the first element in the macro index vector.                   */
+		gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[0];
+		if (NULL == *value_default && NULL != context && NULL == gmacro->context)
+			dc_get_global_macro_value(gmacro, value_default);
 	}
 }
 

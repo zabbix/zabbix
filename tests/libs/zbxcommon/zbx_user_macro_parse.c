@@ -25,9 +25,10 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			context_op, *match, exp_result, act_result;
+	int			exp_result, act_result;
 	int			exp_macro_r, exp_context_l, exp_context_r;
 	int			act_macro_r, act_context_l, act_context_r;
+	unsigned char		*match, context_op;
 	const char		*macro;
 	zbx_mock_handle_t	hmatch;
 

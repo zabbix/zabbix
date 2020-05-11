@@ -50,6 +50,31 @@ void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 	return NULL;
 }
 
+static int	config_gmacro_context_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_GMACRO	*m1 = *(const ZBX_DC_GMACRO **)d1;
+	const ZBX_DC_GMACRO	*m2 = *(const ZBX_DC_GMACRO **)d2;
+
+	/* macros without context have higher priority than macros with */
+	if (NULL == m1->context)
+	{
+		if (NULL == m2->context)
+			return strcmp(m1->macro, m2->macro);
+		return -1;
+	}
+	else
+	{
+		if (NULL == m2->context)
+			return 1;
+	}
+
+	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
+
+	return strcmp(m1->context, m2->context);
+}
+
+
 static void	init_macros(const char *path)
 {
 	zbx_mock_handle_t	hmacros, handle;
@@ -99,7 +124,12 @@ static void	init_macros(const char *path)
 		macro->context = context;
 		macro->value = macro_value;
 		zbx_vector_ptr_append(&gm->gmacros, macro);
+	}
 
+	for (i = 0; i < macros.values_num; i++)
+	{
+		gm = (ZBX_DC_GMACRO_M *)macros.values[i];
+		zbx_vector_ptr_sort(&gm->gmacros, config_gmacro_context_compare);
 	}
 }
 
