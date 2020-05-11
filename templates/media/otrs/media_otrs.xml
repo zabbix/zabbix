@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-29T00:00:00Z</date>
+    <date>2020-05-10T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>OTRS</name>
@@ -86,7 +86,7 @@
             </parameters>
             <script>var OTRS = {&#13;
     params: {},&#13;
-    entrypoint: 'nph-genericinterface.pl/Webservice/ZabbixTicketConnector/Ticket/',&#13;
+    entrypoint: 'nph-genericinterface.pl/Webservice/ZabbixTicketConnector/Ticket',&#13;
 &#13;
     setParams: function (params) {&#13;
         if (typeof params !== 'object') {&#13;
@@ -108,6 +108,10 @@
             Object.keys(fields)&#13;
                 .forEach(function(field) {&#13;
                     if (field !== undefined) {&#13;
+                        if (fields[field].match(/^\d{4}[.-]\d{2}[.-]\d{2}$/)) {&#13;
+                            fields[field] = fields[field].replace(/\./g, '-');&#13;
+                        }&#13;
+&#13;
                         data.DynamicField.push({Name: field, Value: fields[field]});&#13;
                     }&#13;
                 });&#13;
@@ -232,7 +236,7 @@
                 }&#13;
             };&#13;
 &#13;
-        result = OTRS.request('put', OTRS.entrypoint + encodeURIComponent(OTRS.params.ticket_id), data);&#13;
+        result = OTRS.request('put', OTRS.entrypoint + '/' + encodeURIComponent(OTRS.params.ticket_id), data);&#13;
 &#13;
         if (typeof result.response !== 'object'&#13;
             || typeof result.response.TicketID === 'undefined'&#13;
