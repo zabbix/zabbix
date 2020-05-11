@@ -26,8 +26,6 @@ require_once dirname(__FILE__).'/traits/TagTrait.php';
  */
 class testFormTriggerTags extends CWebTest {
 
-	use TagTrait;
-
 	/**
 	 * The name of the host for creating the trigger.
 	 *
@@ -48,6 +46,20 @@ class testFormTriggerTags extends CWebTest {
 	 * @var string
 	 */
 	protected $update_trigger = 'Trigger with tags for updating';
+
+	/**
+	 * Attach FormParametersBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			[
+				'class' => CFormParametersBehavior::class,
+				'table_selector' => 'id:tags-table'
+			]
+		];
+	}
 
 	public static function getCreateData() {
 		return [

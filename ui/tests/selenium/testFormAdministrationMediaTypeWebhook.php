@@ -19,17 +19,29 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/FormParametersTrait.php';
+require_once dirname(__FILE__).'/behaviors/FormParametersBehavior.php';
 
 /**
  * @backup media_type
  */
 class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
-	use FormParametersTrait;
-
 	// SQL query to get media_type and media_type_param tables to compare hash values.
 	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid';
+
+	/**
+	 * Attach FormParametersBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			[
+				'class' => CFormParametersBehavior::class,
+				'table_selector' => 'id:parameters_table'
+			]
+		];
+	}
 
 	public function getValidationWebhookData() {
 		return [
@@ -822,26 +834,6 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Media type deleted', $message->getTitle());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name=\'Webhook to delete\''));
-	}
-
-	/**
-	 * Get table element with mapping set.
-	 */
-	protected function getTable() {
-		return $this->query('id:parameters_table')->asMultifieldTable([
-			'mapping' => [
-				'Name' => [
-					'name' => 'name',
-					'selector' => 'xpath:./input',
-					'class' => 'CElement'
-				],
-				'Value' => [
-					'name' => 'value',
-					'selector' => 'xpath:./input',
-					'class' => 'CElement'
-				]
-			]
-		])->one();
 	}
 
 	/**
