@@ -580,8 +580,8 @@ class JMXItemChecker extends ItemChecker
 		JSONObject counter = new JSONObject();
 
 		String checkedDescription = null == descr ? name + "," + attrPath : descr;
-		String checkedType = null == attribute ? "null" : attribute.getClass().getName();
-		String checkedValue = null == value ? "null" : value.toString();
+		Object checkedType = null == attribute ? JSONObject.NULL : attribute.getClass().getName();
+		Object checkedValue = null == value ? JSONObject.NULL : value.toString();
 
 		if (propertiesAsMacros)
 		{
