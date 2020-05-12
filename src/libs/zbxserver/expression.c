@@ -1969,6 +1969,9 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ACK_MESSAGE		"{ACK.MESSAGE}"			/* deprecated */
 #define MVAR_ACK_TIME			"{ACK.TIME}"			/* deprecated */
 #define MVAR_ACK_DATE			"{ACK.DATE}"			/* deprecated */
+#define MVAR_USER_ALIAS			"{USER.ALIAS}"
+#define MVAR_USER_NAME			"{USER.NAME}"
+#define MVAR_USER_SURNAME		"{USER.SURNAME}"
 #define MVAR_USER_FULLNAME		"{USER.FULLNAME}"
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
@@ -2831,14 +2834,13 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 	char			c, *replace_to = NULL, sql[64];
 	const char		*m;
 	int			N_functionid, indexed_macro, require_address, ret, res = SUCCEED,
-				pos = 0, found,
-				raw_value;
+				pos = 0, found, user_names_found = 0, raw_value;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
 	zbx_token_t		token;
 	zbx_token_search_t	token_search;
-	char			*expression = NULL;
+	char			*expression = NULL, *user_alias = NULL, *user_name = NULL, *user_surname = NULL;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -4269,6 +4271,41 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					replace_to = zbx_strdup(replace_to, interface.addr);
 				require_address = 1;
 			}
+			else if (NULL != userid)
+			{
+				/* use only one DB request for all occurrences of 4 macros */
+				if (0 == user_names_found && (0 == strcmp(m, MVAR_USER_ALIAS) ||
+						0 == strcmp(m, MVAR_USER_NAME) || 0 == strcmp(m, MVAR_USER_SURNAME) ||
+						0 == strcmp(m, MVAR_USER_FULLNAME)))
+				{
+					if (SUCCEED == DBget_user_names(*userid, &user_alias, &user_name,
+							&user_surname))
+					{
+						user_names_found = 1;
+					}
+				}
+
+				if (0 != user_names_found)
+				{
+					if (0 == strcmp(m, MVAR_USER_ALIAS))
+					{
+						replace_to = zbx_strdup(replace_to, user_alias);
+					}
+					else if (0 == strcmp(m, MVAR_USER_NAME))
+					{
+						replace_to = zbx_strdup(replace_to, user_name);
+					}
+					else if (0 == strcmp(m, MVAR_USER_SURNAME))
+					{
+						replace_to = zbx_strdup(replace_to, user_surname);
+					}
+					else if (0 == strcmp(m, MVAR_USER_FULLNAME))
+					{
+						replace_to = zbx_dsprintf(replace_to, "%s %s (%s)", user_name,
+								user_surname, user_alias);
+					}
+				}
+			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_HTTPTEST_FIELD))
 		{
@@ -4582,6 +4619,9 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		pos++;
 	}
 
+	zbx_free(user_alias);
+	zbx_free(user_name);
+	zbx_free(user_surname);
 	zbx_free(expression);
 	zbx_vector_uint64_destroy(&hostids);
 
