@@ -2303,15 +2303,15 @@ class CLineGraphDraw extends CGraphDraw {
 			if (!$lines) {
 				$lines[++ $line] = [$pt, $pt];
 			}
+			elseif ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency) {
+				$lines[++ $line] = [$pt, $pt];
+			}
 			elseif ($data['avg'][$pt] != $data['avg'][$prev_pt]) {
 				$lines[++ $line] = [$prev_pt, $pt];
 				$lines[++ $line] = [$pt, $pt];
 			}
 			elseif (!$frequency || $pt - $prev_pt < ZBX_GRAPH_MAX_SKIP_CELL) {
 				$lines[$line][1] = $pt;
-			}
-			elseif ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency) {
-				$lines[++ $line] = [$pt, $pt];
 			}
 			else {
 				$lines[$line][1] = $pt;
