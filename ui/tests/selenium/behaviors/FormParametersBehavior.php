@@ -55,7 +55,7 @@ class CFormParametersBehavior extends CBehavior {
 	 */
 	protected function getTable() {
 		if ($this->table_selector === null) {
-			throw new Exception('');
+			throw new Exception('Table selector is not specified.');
 		}
 
 		$selector = (is_array($this->table_selector) && is_callable($this->table_selector))
