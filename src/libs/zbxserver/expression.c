@@ -3254,14 +3254,14 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
 					{
-						const char	*user_name;
+						const char	*user_name1;
 
 						if (SUCCEED == zbx_check_user_permissions(&ack->userid, userid))
-							user_name = zbx_user_string(ack->userid);
+							user_name1 = zbx_user_string(ack->userid);
 						else
-							user_name = "Inaccessible user";
+							user_name1 = "Inaccessible user";
 
-						replace_to = zbx_strdup(replace_to, user_name);
+						replace_to = zbx_strdup(replace_to, user_name1);
 					}
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
