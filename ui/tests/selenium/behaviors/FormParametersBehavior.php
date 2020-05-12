@@ -18,11 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/CBehavior.php';
 
 /**
- * Trait for name-value parameters in form related tests.
+ * Behavior for name-value parameters in form related tests.
  */
 class CFormParametersBehavior extends CBehavior {
 
