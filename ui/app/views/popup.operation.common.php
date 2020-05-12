@@ -286,8 +286,10 @@ switch ($data['operationtype']) {
 	// Remote command form elements.
 	case OPERATION_TYPE_COMMAND:
 		// Set default value to fields.
-		if (!array_key_exists('opcommand', $opr_data)) {
-			$opr_data['opcommand'] = [];
+		foreach (['opcommand', 'opcommand_grp', 'opcommand_hst'] as $field_name) {
+			if (!array_key_exists($field_name, $opr_data)) {
+				$opr_data[$field_name] = [];
+			}
 		}
 
 		foreach (['scriptid', 'publickey', 'privatekey', 'username', 'password', 'port', 'command'] as $field_name) {
@@ -319,6 +321,67 @@ switch ($data['operationtype']) {
 			}
 		}
 
+		// For new target list.
+		$checked_current_host = array_key_exists('0', $opr_data['opcommand_hst'])
+			? ($opr_data['opcommand_hst']['0'] === '0')
+			: false;
+
+		if ($checked_current_host) {
+			unset($opr_data['opcommand_hst']['0']);
+		}
+		else {
+			$checked_current_host = array_key_exists('opcommand_chst', $opr_data);
+		}
+
+		$hosts = API::Host()->get([
+			'hostids' => zbx_objectValues($opr_data['opcommand_hst'], 'hostid'),
+			'output' => ['name'],
+			'preservekeys' => true,
+			'editable' => true
+		]);
+
+		$opr_data['opcommand_hst'] = array_values($opr_data['opcommand_hst']);
+		foreach ($opr_data['opcommand_hst'] as $key => $value) {
+			$opr_data['opcommand_hst'][$key] = [
+				'hostid' => $value,
+				'name' => $hosts[$value]['name']
+			];
+		}
+		order_result($opr_data['opcommand_hst'], 'name');
+
+		$groups = API::HostGroup()->get([
+			'groupids' => zbx_objectValues($opr_data['opcommand_grp'], 'groupid'),
+			'output' => ['groupid', 'name'],
+			'preservekeys' => true,
+			'editable' => true
+		]);
+
+		$opr_data['opcommand_grp'] = array_values($opr_data['opcommand_grp']);
+		foreach ($opr_data['opcommand_grp'] as $key => $value) {
+			$opr_data['opcommand_grp'][$key] = [
+				'groupid' => $value,
+				'name' => $groups[$value]['name']
+			];
+		}
+		order_result($opr_data['opcommand_grp'], 'name');
+
+		// JS add commands.
+		$host_values = zbx_jsvalue([
+			'object' => 'hostid',
+			'values' => $opr_data['opcommand_hst'],
+			'parentId' => 'opCmdListFooter'
+		]);
+
+		$inline_js .= 'addPopupValues('.$host_values.');';
+
+		$group_values = zbx_jsvalue([
+			'object' => 'groupid',
+			'values' => $opr_data['opcommand_grp'],
+			'parentId' => 'opCmdListFooter'
+		]);
+
+		$inline_js .= 'addPopupValues('.$group_values.');';
+
 		// New target list.
 		$form_list->addRow(
 			(new CLabel(_('Target list'), 'opCmdList'))->setAsteriskMark(),
@@ -327,14 +390,14 @@ switch ($data['operationtype']) {
 					->cleanItems()
 					->addRow(
 						(new CLabel(_('Current host'))),
-						(new CCheckBox('operation[opcommand_chst]', '0'))->setChecked($opr_data['opcommand_chst'])
+						(new CCheckBox('operation[opcommand_chst]', '0'))->setChecked($checked_current_host)
 					)
 					->addRow(
 						(new CLabel(_('Host'))),
 						$target_list_multiselect_host = (new CMultiSelect([
 							'name' => 'operation[opcommand_hst][]',
 							'object_name' => 'hosts',
-							'data' => $opr_data['opcommand_hst'],
+							'data' => CArrayHelper::renameObjectsKeys($opr_data['opcommand_hst'], ['hostid' => 'id']),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -352,7 +415,7 @@ switch ($data['operationtype']) {
 						$target_list_multiselect_hostgroup = (new CMultiSelect([
 							'name' => 'operation[opcommand_grp][]',
 							'object_name' => 'hostGroup',
-							'data' => $opr_data['opcommand_grp'],
+							'data' => CArrayHelper::renameObjectsKeys($opr_data['opcommand_grp'], ['groupid' => 'id']),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'host_groups',

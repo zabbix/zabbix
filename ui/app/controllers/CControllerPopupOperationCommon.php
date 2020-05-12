@@ -95,30 +95,7 @@ class CControllerPopupOperationCommon extends CController {
 			'evaltype' => 0
 		]);
 
-		$data += [
-			'operationtype' => $this->getInput('operationtype', OPERATION_TYPE_MESSAGE),
-			'opcommand_hst' => $this->getInput('opcommand_hst', []),
-			'opcommand_grp' => $this->getInput('opcommand_grp', [])
-		];
-
-		// Check if 'Current host' need to be selected.
-		$data['opcommand_chst'] = in_array('0', $data['opcommand_hst']);
-
-		// Select hosts.
-		$data['opcommand_hst'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'hostids' => $data['opcommand_hst'],
-			'editable' => true
-		]), ['hostid' => 'id']);
-		order_result($data['opcommand_hst'], 'name');
-
-		// Select host groups.
-		$data['opcommand_grp'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $data['opcommand_grp'],
-			'editable' => true
-		]), ['groupid' => 'id']);
-		order_result($data['opcommand_grp'], 'name');
+		$data += ['operationtype' => $this->getInput('operationtype', OPERATION_TYPE_MESSAGE)];
 
 		if (hasRequest('opcondition')) {
 			$conditions = [];
