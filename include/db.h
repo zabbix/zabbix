@@ -739,10 +739,10 @@ typedef struct
 }
 zbx_host_availability_t;
 
+
 int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_host_availability_t *ha);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
-int	DBget_user_by_active_session2(const char *sessionid, zbx_user2_t *user);
 
 typedef struct
 {
