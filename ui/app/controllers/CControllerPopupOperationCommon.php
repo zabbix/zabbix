@@ -89,8 +89,6 @@ class CControllerPopupOperationCommon extends CController {
 
 		$data = $this->getInput('operation', [
 			'operationtype' => OPERATION_TYPE_MESSAGE,
-			'opcommand_hst' => [],
-			'opcommand_grp' => [],
 			'esc_period' => 0,
 			'esc_step_from' => 1,
 			'esc_step_to' => 1,
@@ -98,12 +96,29 @@ class CControllerPopupOperationCommon extends CController {
 		]);
 
 		$data += [
-			'operationtype' => $this->getInput('operationtype', OPERATION_TYPE_MESSAGE)
+			'operationtype' => $this->getInput('operationtype', OPERATION_TYPE_MESSAGE),
+			'opcommand_hst' => $this->getInput('opcommand_hst', []),
+			'opcommand_grp' => $this->getInput('opcommand_grp', [])
 		];
 
-		if ($data['operationtype'] == OPERATION_TYPE_COMMAND) {
-			$data = $this->getOperationTypeCommandProperties($data);
-		}
+		// Check if 'Current host' need to be selected.
+		$data['opcommand_chst'] = in_array('0', $data['opcommand_hst']);
+
+		// Select hosts.
+		$data['opcommand_hst'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'hostids' => $data['opcommand_hst'],
+			'editable' => true
+		]), ['hostid' => 'id']);
+		order_result($data['opcommand_hst'], 'name');
+
+		// Select host groups.
+		$data['opcommand_grp'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $data['opcommand_grp'],
+			'editable' => true
+		]), ['groupid' => 'id']);
+		order_result($data['opcommand_grp'], 'name');
 
 		if (hasRequest('opcondition')) {
 			$conditions = [];
@@ -166,40 +181,6 @@ class CControllerPopupOperationCommon extends CController {
 		];
 
 		return $this->setResponse(new CControllerResponseData($output));
-	}
-
-	/**
-	 * Function returns parameters specific for operation type = OPERATION_TYPE_COMMAND.
-	 *
-	 * @param array $data  Array of input parameters.
-	 *
-	 * @return array
-	 */
-	protected function getOperationTypeCommandProperties(array $data): array {
-		// Check if 'Current host' need to be selected.
-		$data['opcommand_chst'] = (array_key_exists('opcommand_hst', $data) && in_array('0', $data['opcommand_hst']));
-
-		// Select hosts.
-		$data['opcommand_hst'] = array_key_exists('opcommand_hst', $data)
-			? CArrayHelper::renameObjectsKeys(API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'hostids' => $data['opcommand_hst'],
-				'editable' => true
-			]), ['hostid' => 'id'])
-			: [];
-		order_result($data['opcommand_hst'], 'name');
-
-		// Select host groups.
-		$data['opcommand_grp'] = array_key_exists('opcommand_grp', $data)
-			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $data['opcommand_grp'],
-				'editable' => true
-			]), ['groupid' => 'id'])
-			: [];
-		order_result($data['opcommand_grp'], 'name');
-
-		return $data;
 	}
 
 	/**
