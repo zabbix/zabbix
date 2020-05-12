@@ -2378,7 +2378,7 @@ class CLineGraphDraw extends CGraphDraw {
 					if (array_key_exists($index - 1, $lines) && $lines[$index - 1][1] == $line[0]) {
 						unset($lines[$index]);
 					}
-					if (array_key_exists($index + 1, $lines) && $lines[$index + 1][0] == $line[0]) {
+					elseif (array_key_exists($index + 1, $lines) && $lines[$index + 1][0] == $line[0]) {
 						unset($lines[$index]);
 					}
 				}
