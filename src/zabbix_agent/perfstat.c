@@ -224,7 +224,7 @@ static void	free_object_names(void)
  ******************************************************************************/
 static int	set_object_names(void)
 {
-	wchar_t		*names, *loc_name, *objects, *saved_ptr = NULL;
+	wchar_t		*names_eng, *names_loc, *eng_name, *loc_name, *objects, *object, *p_eng = NULL, *p_loc = NULL;
 	DWORD		sz = 0;
 	PDH_STATUS	pdh_status;
 	BOOL		refresh;
@@ -239,9 +239,6 @@ static int	set_object_names(void)
 		ret = SUCCEED;
 		goto out;
 	}
-
-	if (NULL == (saved_ptr = names = get_all_counter_eng_names(L"Counter")))
-		goto out;
 
 	if (ppsd.lastrefresh_objects + OBJECT_CACHE_REFRESH_INTERVAL > time(NULL))
 		refresh = FALSE;
@@ -258,6 +255,18 @@ static int	set_object_names(void)
 	if (TRUE == refresh)
 		ppsd.lastrefresh_objects = time(NULL);
 
+	if (NULL == (p_eng = names_eng = get_all_counter_names(HKEY_PERFORMANCE_TEXT, L"Counter")) ||
+			NULL == (p_loc = names_loc = get_all_counter_names(HKEY_PERFORMANCE_NLSTEXT, L"Counter")))
+	{
+		goto out;
+	}
+
+	/* skip fields with number of records */
+	names_eng += wcslen(names_eng) + 1;
+	names_eng += wcslen(names_eng) + 1;
+	names_loc += wcslen(names_loc) + 1;
+	names_loc += wcslen(names_loc) + 1;
+
 	objects = zbx_malloc(NULL, (++sz) * sizeof(wchar_t));
 
 	if (ERROR_SUCCESS != (pdh_status = PdhEnumObjects(NULL, NULL, objects, &sz, PERF_DETAIL_WIZARD, FALSE)))
@@ -270,40 +279,44 @@ static int	set_object_names(void)
 
 	free_object_names();
 
-	/* skip number of records */
-	names += wcslen(names) + 1;
-	names += wcslen(names) + 1;
-
-	for (loc_name = objects; L'\0' != *loc_name; loc_name += sz)
+	for (object = objects; L'\0' != *object; object += sz)
 	{
-		wchar_t	*eng_name;
-		DWORD	idx, eng_idx;
+		DWORD	idx_eng, idx_loc;
 
-		sz = (DWORD)wcslen(loc_name) + 1;
+		sz = (DWORD)wcslen(object) + 1;
 		object_names = zbx_realloc(object_names, sizeof(struct object_name_ref) * (object_num + 1));
 
 		object_names[object_num].eng_name = NULL;
 		object_names[object_num].loc_name = zbx_malloc(NULL, sizeof(wchar_t) * sz);
-		memcpy(object_names[object_num].loc_name, loc_name, sizeof(wchar_t) * sz);
+		memcpy(object_names[object_num].loc_name, object, sizeof(wchar_t) * sz);
 
-		/* For some objects the localized name might be missing and PdhEnumObjects() will return English */
-		/* name instead. However PdhLookupPerfIndexByName() does not accept English names as argument so */
-		/* it will return an error but not index. In that case for localized name use name returned by   */
-		/* PdhEnumObjects() if such name exists in English names registry (HKEY_PERFORMANCE_TEXT)        */
+		/* For some objects the localized name might be missing and PdhEnumObjects() will return English    */
+		/* name instead. In that case for localized name use name returned by PdhEnumObjects() if such name */
+		/* exists in English names registry (HKEY_PERFORMANCE_TEXT).                                        */
 
-		if (ERROR_SUCCESS != (pdh_status = PdhLookupPerfIndexByName(NULL, loc_name, &idx)))
+		idx_loc = 0;
+
+		for (loc_name = names_loc; L'\0' != *loc_name; loc_name += wcslen(loc_name) + 1)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain object index: %s",
-					strerror_from_module(pdh_status, L"PDH.DLL"));
-			idx = 0;
+			DWORD	idx;
+
+			idx = (DWORD)_wtoi(loc_name);
+			loc_name += wcslen(loc_name) + 1;
+
+			if (0 == wcscmp(object, loc_name))
+			{
+				idx_loc = idx;
+				break;
+			}
 		}
 
-		for (eng_name = names; L'\0' != *eng_name; eng_name += wcslen(eng_name) + 1)
+		for (eng_name = names_eng; L'\0' != *eng_name; eng_name += wcslen(eng_name) + 1)
 		{
-			eng_idx = (DWORD)_wtoi(eng_name);
+			idx_eng = (DWORD)_wtoi(eng_name);
 			eng_name += wcslen(eng_name) + 1;
 
-			if (idx == eng_idx || (0 == idx && 0 == wcscmp(object_names[object_num].loc_name, eng_name)))
+			if (idx_loc == idx_eng ||
+					(0 == idx_loc && 0 == wcscmp(object_names[object_num].loc_name, eng_name)))
 			{
 				object_names[object_num].eng_name = zbx_unicode_to_utf8(eng_name);
 				break;
@@ -317,9 +330,10 @@ static int	set_object_names(void)
 	ppsd.lastupdate_names = time(NULL);
 	ret = SUCCEED;
 out:
-	UNLOCK_PERFCOUNTERS;
+	zbx_free(p_eng);
+	zbx_free(p_loc);
 
-	zbx_free(saved_ptr);
+	UNLOCK_PERFCOUNTERS;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -441,15 +455,15 @@ int	init_perf_collector(zbx_threadedness_t threadedness, char **error)
 	ppsd.lastrefresh_objects = 0;
 	ppsd.lastupdate_names = 0;
 
-	if (SUCCEED != set_object_names())
-	{
-		*error = zbx_strdup(*error, "cannot initialize object names");
-		goto out;
-	}
-
 	if (SUCCEED != init_builtin_counter_indexes())
 	{
 		*error = zbx_strdup(*error, "cannot initialize built-in counter indexes");
+		goto out;
+	}
+
+	if (SUCCEED != set_object_names())
+	{
+		*error = zbx_strdup(*error, "cannot initialize object names");
 		goto out;
 	}
 
