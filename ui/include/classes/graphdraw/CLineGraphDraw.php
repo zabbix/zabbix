@@ -2371,6 +2371,20 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 		}
 
+		// Removing any points that are adjacent to line.
+		if ($lines) {
+			foreach ($lines as $index => $line) {
+				if ($line[0] == $line[1]) {
+					if (array_key_exists($index - 1, $lines) && $lines[$index - 1][1] == $line[0]) {
+						unset($lines[$index]);
+					}
+					if (array_key_exists($index + 1, $lines) && $lines[$index + 1][0] == $line[0]) {
+						unset($lines[$index]);
+					}
+				}
+			}
+		}
+
 		return $lines;
 	}
 }
