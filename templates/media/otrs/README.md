@@ -48,7 +48,7 @@ This guide describes how to integrate your Zabbix 5.0 installation with OTRS usi
 
 [![](images/thumb.08.png?raw=true)](images/08.png)
 
-5\. If you have **dynamic fields** in **OTRS** and you want them to be filled with values from Zabbix, add parameters in the form **dynamicfield_\<OTRS dynamic field name\>**. DYnamic fields can only be of the **text**, **textarea**, **checkbox**, **dropdown**, **multiselect**, or **date** types.
+5\. If you have **dynamic fields** in **OTRS** and you want them to be filled with values from Zabbix, add parameters in the form **dynamicfield_\<OTRS dynamic field name\>**. DYnamic fields can only be of the **text**, **textarea**, **checkbox**, or **date** types.
 
 6\. Click the **Update** button to save the **Webhook** settings.
 
