@@ -1000,6 +1000,7 @@ class CMacrosResolverGeneral {
 					$hostid = $db_host_macro['hostid'];
 					$macro = $user_macro_parser->getMacro();
 					$context = $user_macro_parser->getContext();
+					$regex = $user_macro_parser->getRegex();
 					$value = self::getMacroValue($db_host_macro);
 
 					if (!array_key_exists($hostid, $host_macros)) {
@@ -1010,8 +1011,11 @@ class CMacrosResolverGeneral {
 						$host_macros[$hostid][$macro] = ['value' => null, 'contexts' => []];
 					}
 
-					if ($context === null) {
+					if ($context === null && $regex === null) {
 						$host_macros[$hostid][$macro]['value'] = $value;
+					}
+					elseif ($regex !== null) {
+						$host_macros[$hostid][$macro]['regex'][$regex] = $value;
 					}
 					else {
 						$host_macros[$hostid][$macro]['contexts'][$context] = $value;
@@ -1092,16 +1096,21 @@ class CMacrosResolverGeneral {
 				if ($user_macro_parser->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
 					$macro = $user_macro_parser->getMacro();
 					$context = $user_macro_parser->getContext();
+					$regex = $user_macro_parser->getRegex();
+					$value = self::getMacroValue($db_global_macro);
 
 					if (!array_key_exists($macro, $global_macros)) {
 						$global_macros[$macro] = ['value' => null, 'contexts' => []];
 					}
 
-					if ($context === null) {
-						$global_macros[$macro]['value'] = self::getMacroValue($db_global_macro);
+					if ($context === null && $regex === null) {
+						$global_macros[$macro]['value'] = $value;
+					}
+					elseif ($regex !== null) {
+						$global_macros[$macro]['regex'][$regex] = $value;
 					}
 					else {
-						$global_macros[$macro]['contexts'][$context] = $db_global_macro['value'];
+						$global_macros[$macro]['contexts'][$context] = $value;
 					}
 				}
 			}
@@ -1116,7 +1125,16 @@ class CMacrosResolverGeneral {
 							if ($context !== null && array_key_exists($context, $global_macros[$macro]['contexts'])) {
 								$value['value'] = $global_macros[$macro]['contexts'][$context];
 							}
-							elseif ($global_macros[$macro]['value'] !== null) {
+							elseif ($context !== null && array_key_exists('regex', $global_macros[$macro])) {
+								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
+									if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+										$value['value'] = $val;
+										break;
+									}
+								}
+							}
+
+							if ($value['value'] === null && $global_macros[$macro]['value'] !== null) {
 								if ($context === null) {
 									$value['value'] = $global_macros[$macro]['value'];
 								}
@@ -1181,6 +1199,16 @@ class CMacrosResolverGeneral {
 						'value' => $host_macros[$hostid][$macro]['contexts'][$context],
 						'value_default' => $value_default
 					];
+				}
+				elseif ($context !== null && array_key_exists('regex', $host_macros[$hostid][$macro])) {
+					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
+						if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+							return [
+								'value' => $val,
+								'value_default' => $value_default
+							];
+						}
+					}
 				}
 
 				if ($host_macros[$hostid][$macro]['value'] !== null) {

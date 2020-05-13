@@ -26,11 +26,14 @@ class CUserMacroParser extends CParser {
 	const STATE_UNQUOTED = 2;
 	const STATE_QUOTED = 3;
 	const STATE_END_OF_MACRO = 4;
+	private const REGEX_PREFIX = 'regex:';
+	private const REGEX_PREFIX_LENGTH = 6;
 
 	private $macro = '';
 	private $context = null;
 	private $context_quoted = false;
 	private $error = '';
+	private $regex = null;
 
 	/**
 	 * Returns an error message depending on input parameters.
@@ -66,6 +69,7 @@ class CUserMacroParser extends CParser {
 		$this->context = null;
 		$this->context_quoted = false;
 		$this->error = '';
+		$this->regex = null;
 
 		$p = $pos;
 
@@ -183,7 +187,14 @@ class CUserMacroParser extends CParser {
 			}
 		}
 
-		if ($state != self::STATE_END_OF_MACRO) {
+		if ($state === self::STATE_END_OF_MACRO) {
+			if (strpos($this->context, self::REGEX_PREFIX) === 0) {
+				$this->regex = substr($this->context, self::REGEX_PREFIX_LENGTH);
+				$this->context = null;
+				$this->context_quoted = false;
+			}
+		}
+		else {
 			$this->macro = '';
 			$this->context = null;
 			$this->context_quoted = false;
@@ -252,6 +263,15 @@ class CUserMacroParser extends CParser {
 	 */
 	public function getContext() {
 		return $this->context_quoted ? $this->unquoteContext($this->context) : $this->context;
+	}
+
+	/**
+	 * Returns parsed regex string.
+	 *
+	 * @return string
+	 */
+	public function getRegex(): ?string {
+		return $this->regex;
 	}
 
 	/**
