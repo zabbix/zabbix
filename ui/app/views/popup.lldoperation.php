@@ -252,7 +252,7 @@ $operations_popup_form_list
 				'name' => 'optemplate[]',
 				'object_name' => 'templates',
 				'data' => $field_values['optemplate'],
-				'disabled' => $options['templated'],
+				'disabled' => (bool) $options['templated'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'templates',
