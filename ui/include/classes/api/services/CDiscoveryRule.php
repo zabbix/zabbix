@@ -1557,10 +1557,10 @@ class CDiscoveryRule extends CItemGeneral {
 					'delay' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
 				]],
 				'ophistory' =>			['type' => API_OBJECT, 'fields' => [
-					'history' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
+					'history' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
 				]],
 				'optrends' =>			['type' => API_OBJECT, 'fields' => [
-					'trends' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
+					'trends' =>				['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
 				]],
 				'opseverity' =>			['type' => API_OBJECT, 'fields' => [
 					'severity' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))]
@@ -1668,26 +1668,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 									if (array_key_exists('opperiod', $operation)) {
 										$this->validateDelay($update_interval_parser, $operation['opperiod']['delay']);
-									}
-
-									if (array_key_exists('ophistory', $operation)
-											&& $operation['ophistory']['history'] !== ''
-											&& !validateTimeUnit($operation['ophistory']['history'], SEC_PER_HOUR,
-													25 * SEC_PER_YEAR, true, $error,
-													['usermacros' => true, 'lldmacros' => true])) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
-										);
-									}
-
-									if (array_key_exists('optrends', $operation)
-											&& $operation['optrends']['trends'] !== ''
-											&& !validateTimeUnit($operation['optrends']['trends'], SEC_PER_HOUR,
-													25 * SEC_PER_YEAR, true, $error,
-													['usermacros' => true, 'lldmacros' => true])) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
-										);
 									}
 									break;
 
