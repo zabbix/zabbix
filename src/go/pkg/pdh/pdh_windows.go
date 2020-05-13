@@ -61,6 +61,7 @@ var sysCounters []sysCounter = []sysCounter{
 }
 
 const HKEY_PERFORMANCE_TEXT = 0x80000050
+const HKEY_PERFORMANCE_NLSTEXT = 0x80000060
 
 type CounterPathElements struct {
 	MachineName    string
@@ -72,35 +73,35 @@ type CounterPathElements struct {
 }
 
 func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
-	var size uint32
 	var objectsLocal map[int]string
-
 	ObjectsNames = make(map[string]string)
 
-	counter := windows.StringToUTF16Ptr("Counter")
-	err = windows.RegQueryValueEx(HKEY_PERFORMANCE_TEXT, counter, nil, nil, nil, &size)
+	engBuf, err := getRegQueryCounters(HKEY_PERFORMANCE_NLSTEXT)
 	if err != nil {
 		return
-	}
-	buf := make([]uint16, size/2)
-
-	err = windows.RegQueryValueEx(HKEY_PERFORMANCE_TEXT, counter, nil, nil, (*byte)(unsafe.Pointer(&buf[0])), &size)
-	if err != nil {
-		return
-	}
-	locNames, err := win32.PdhEnumObject()
-	if err != nil {
-		return err
 	}
 
 	objectsLocal = make(map[int]string)
-	for _, name := range locNames {
-		idx, err := win32.PdhLookupPerfIndexByName(name)
-		if err != nil {
-			ObjectsNames[name] = name // use local object name as english name if there is no idx that can be used for translation
-			continue
+	var wcharEngIndex, wcharEngName []uint16
+	for len(engBuf) != 0 {
+		wcharEngIndex, engBuf = win32.NextField(engBuf)
+		if len(wcharEngIndex) == 0 {
+			break
 		}
-		objectsLocal[idx] = name
+		wcharEngName, engBuf = win32.NextField(engBuf)
+		if len(wcharEngName) == 0 {
+			break
+		}
+		idx, err := strconv.Atoi(windows.UTF16ToString(wcharEngIndex))
+		if err != nil {
+			return err
+		}
+		objectsLocal[idx] = windows.UTF16ToString(wcharEngName)
+	}
+
+	buf, err := getRegQueryCounters(HKEY_PERFORMANCE_TEXT)
+	if err != nil {
+		return
 	}
 
 	var wcharIndex, wcharName []uint16
@@ -133,6 +134,21 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 			ObjectsNames[name] = objectLocal
 		}
 	}
+
+	return
+}
+
+func getRegQueryCounters(key windows.Handle) (buf []uint16, err error) {
+	var size uint32
+	counter := windows.StringToUTF16Ptr("Counter")
+
+	err = windows.RegQueryValueEx(key, counter, nil, nil, nil, &size)
+	if err != nil {
+		return nil, err
+	}
+
+	buf = make([]uint16, size/2)
+	err = windows.RegQueryValueEx(key, counter, nil, nil, (*byte)(unsafe.Pointer(&buf[0])), &size)
 
 	return
 }
