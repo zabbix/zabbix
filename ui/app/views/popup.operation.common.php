@@ -323,8 +323,9 @@ switch ($data['operationtype']) {
 
 		// For new target list.
 		$checked_current_host = array_key_exists('0', $opr_data['opcommand_hst'])
-			? ($opr_data['opcommand_hst']['0']['hostid'] == '0')
+			? ($opr_data['opcommand_hst']['0'] === '0')
 			: false;
+
 		if ($checked_current_host) {
 			unset($opr_data['opcommand_hst']['0']);
 		}
@@ -640,11 +641,13 @@ switch ($data['operationtype']) {
 		break;
 
 	case OPERATION_TYPE_HOST_INVENTORY:
+		$value = array_key_exists('opinventory', $opr_data)
+			? (int) $opr_data['opinventory']['inventory_mode']
+			: HOST_INVENTORY_MANUAL;
+
 		$form_list->addRow(
 			new CLabel(_('Inventory mode'), 'operation[opinventory][inventory_mode]'),
-			(new CRadioButtonList('operation[opinventory][inventory_mode]',
-				(int) $opr_data['opinventory']['inventory_mode']
-			))
+			(new CRadioButtonList('operation[opinventory][inventory_mode]', $value))
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
 				->setModern(true)
