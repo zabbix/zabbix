@@ -601,12 +601,12 @@ FIELD		|hk_audit_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_audit	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_sessions_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_sessions	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_history_mode|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|hk_history_mode|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,0
 FIELD		|hk_history_global|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|hk_history	|t_varchar(32)	|'90d'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|hk_trends_mode	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|hk_trends	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|hk_trends_mode	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,0
+FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,0
+FIELD		|hk_trends	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_PROXY,0
 FIELD		|default_inventory_mode|t_integer|'-1'	|NOT NULL	|ZBX_NODATA
 FIELD		|custom_color	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|http_auth_enabled	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
