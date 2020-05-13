@@ -106,7 +106,117 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+#if defined(_WINDOWS) || defined(__MINGW32__)
+static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char			*filename;
+	int			ret = SYSINFO_RET_FAIL, file_exists, types, types_incl, types_excl;
+	HANDLE			handle;
+	wchar_t			*wpath;
+	WIN32_FIND_DATA		data;
+	zbx_stat_t		status;
+
+	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		goto err;
+	}
+
+	filename = get_rparam(request, 0);
+
+	if (NULL == filename || '\0' == *filename)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		goto err;
+	}
+
+	types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result);
+	types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result);
+
+	if (FT_OVERFLOW & (types_incl | types_excl))
+		goto err;
+
+	if (0 == types_incl)
+	{
+		if (0 == types_excl)
+			types_incl = FT_FILE;
+		else
+			types_incl = FT_ALLMASK;
+	}
+
+	types = types_incl & (~types_excl) & FT_ALLMASK;
+
+	if (0 != zbx_stat(filename, &status))
+	{
+		if (errno == ENOENT)
+		{
+			file_exists = 0;
+			goto exit;
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain directory information: %s",
+					zbx_strerror(errno)));
+			goto err;
+		}
+	}
+
+	if (NULL == (wpath = zbx_utf8_to_unicode(filename)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot convert file name to UTF-16."));
+		goto err;
+	}
+
+	handle = FindFirstFileW(wpath, &data);
+
+	if (INVALID_HANDLE_VALUE == handle)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
+		zbx_free(wpath);
+		goto err;
+	}
+
+	switch (data.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
+	{
+		case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
+			if (0 != (types & FT_SYM))
+				file_exists = 1;
+			else
+				file_exists = 0;
+			break;
+		case FILE_ATTRIBUTE_REPARSE_POINT:
+						/* not a symlink directory => symlink regular file*/
+						/* counting symlink files as MS explorer */
+			if (0 != (types & FT_FILE))
+				file_exists = 1;
+			else
+				file_exists = 0;
+			break;
+		case FILE_ATTRIBUTE_DIRECTORY:
+			if (0 != (types & FT_DIR))
+				file_exists = 1;
+			else
+				file_exists = 0;
+			break;
+		default:	/* not a directory => regular file */
+			if (0 != (types & FT_FILE))
+			{
+					file_exists = 1;
+			}
+			else
+				file_exists = 0;
+	}
+
+	zbx_free(wpath);
+
+exit:
+	SET_UI64_RESULT(result, file_exists);
+	ret = SYSINFO_RET_OK;
+err:
+	return ret;
+}
+#else /* not _WINDOWS or __MINGW32__ */
+static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	char		*filename;
@@ -174,6 +284,12 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ret = SYSINFO_RET_OK;
 err:
 	return ret;
+}
+#endif
+
+int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return vfs_file_exists(request, result);
 }
 
 int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
