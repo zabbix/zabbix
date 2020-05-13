@@ -73,7 +73,6 @@ type CounterPathElements struct {
 }
 
 func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
-	var objectsLocal map[int]string
 	ObjectsNames = make(map[string]string)
 
 	engBuf, err := getRegQueryCounters(HKEY_PERFORMANCE_NLSTEXT)
@@ -81,8 +80,13 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 		return
 	}
 
-	objectsLocal = make(map[int]string)
+	locNames, err := win32.PdhEnumObject()
+	if err != nil {
+		return err
+	}
+
 	var wcharEngIndex, wcharEngName []uint16
+	englishCounters := make(map[string]int)
 	for len(engBuf) != 0 {
 		wcharEngIndex, engBuf = win32.NextField(engBuf)
 		if len(wcharEngIndex) == 0 {
@@ -92,11 +96,22 @@ func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
 		if len(wcharEngName) == 0 {
 			break
 		}
+
 		idx, err := strconv.Atoi(windows.UTF16ToString(wcharEngIndex))
 		if err != nil {
 			return err
 		}
-		objectsLocal[idx] = windows.UTF16ToString(wcharEngName)
+		englishCounters[windows.UTF16ToString(wcharEngName)] = idx
+	}
+
+	objectsLocal := make(map[int]string)
+	for _, name := range locNames {
+		if idx, ok := englishCounters[name]; ok {
+			objectsLocal[idx] = name
+			continue
+		}
+
+		ObjectsNames[name] = name // use local object name as english name if there is no idx that can be used for translation
 	}
 
 	buf, err := getRegQueryCounters(HKEY_PERFORMANCE_TEXT)
