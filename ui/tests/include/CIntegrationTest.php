@@ -459,6 +459,7 @@ class CIntegrationTest extends CAPITest {
 			self::COMPONENT_AGENT2 => [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
+				'ControlSocket' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.sock',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
 			]
 		];
