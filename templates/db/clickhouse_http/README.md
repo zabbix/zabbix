@@ -40,7 +40,6 @@ Login and password are also set in macros:
 
 - {$CLICKHOUSE.USER}
 - {$CLICKHOUSE.PASSWORD}
-
 If you don't need authentication - remove headers from HTTP-Agent type items 
 
 
@@ -86,6 +85,7 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |ClickHouse |ClickHouse: Longest currently running query time |<p>Get longest running query.</p> |HTTP_AGENT |clickhouse.process.elapsed |
+|ClickHouse |ClickHouse: Check port availability |<p>-</p> |SIMPLE |net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |ClickHouse |ClickHouse: Ping | |HTTP_AGENT |clickhouse.ping<p>**Preprocessing**:</p><p>- REGEX: `Ok\. 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |ClickHouse |ClickHouse: Version |<p>Version of the server</p> |HTTP_AGENT |clickhouse.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |ClickHouse |ClickHouse: Revision |<p>Revision of the server.</p> |DEPENDENT |clickhouse.revision<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.metric == "Revision")].value.first()`</p> |
@@ -163,10 +163,11 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |ClickHouse: There are queries running more than {$CLICKHOUSE.QUERY_TIME.MAX.WARN} seconds |<p>-</p> |`{TEMPLATE_NAME:clickhouse.process.elapsed.last()}>{$CLICKHOUSE.QUERY_TIME.MAX.WARN}` |AVERAGE |<p>Manual close: YES</p> |
-|ClickHouse: ClickHouse: Service is down |<p>-</p> |`{TEMPLATE_NAME:clickhouse.ping.last()}=0` |AVERAGE |<p>Manual close: YES</p> |
+|ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
+|ClickHouse: Service is down |<p>-</p> |`{TEMPLATE_NAME:clickhouse.ping.last()}=0 or {Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</p> |
 |ClickHouse: Version has changed (new version: {ITEM.VALUE}) |<p>ClickHouse version has changed. Ack to close.</p> |`{TEMPLATE_NAME:clickhouse.version.diff()}=1 and {TEMPLATE_NAME:clickhouse.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |ClickHouse: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:clickhouse.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
-|ClickHouse: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:clickhouse.uptime.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: ClickHouse: Service is down</p> |
+|ClickHouse: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:clickhouse.uptime.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- ClickHouse: Service is down</p> |
 |ClickHouse: Too many throttled insert queries (over {$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN) for 5 min) |<p>Clickhouse have INSERT queries that are throttled due to high number of active data parts for partition in a MergeTree, please decrease INSERT frequency</p> |`{TEMPLATE_NAME:clickhouse.insert.delay.min(5m)}>{$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN}` |WARNING |<p>Manual close: YES</p> |
 |ClickHouse: Too many MergeTree parts (over 90% of {$CLICKHOUSE.PARTS.PER.PARTITION.WARN}) |<p>"Descease INSERT queries frequency.</p><p>Clickhouse MergeTree table engine split each INSERT query to partitions (PARTITION BY expression) </p><p>and add one or more PARTS per INSERT inside each partition, </p><p>after that background merge process run, and when you have too much unmerged parts inside partition, </p><p>SELECT queries performance can significate degrade, so clickhouse try delay insert, or abort it"</p> |`{TEMPLATE_NAME:clickhouse.max.part.count.for.partition.min(5m)}>{$CLICKHOUSE.PARTS.PER.PARTITION.WARN} * 0.9` |WARNING |<p>Manual close: YES</p> |
 |ClickHouse: Too many network errors (over {$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} in 5m) |<p>Number of errors (timeouts and connection failures) during query execution, background pool tasks and DNS cache update is too high.</p> |`{TEMPLATE_NAME:clickhouse.network.error.rate.min(5m)}>{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}` |WARNING | |
