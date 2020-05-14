@@ -573,6 +573,22 @@ typedef enum
 }
 zbx_maintenance_type_t;
 
+typedef enum
+{
+	ZBX_PROTOTYPE_STATUS_ENABLED,
+	ZBX_PROTOTYPE_STATUS_DISABLED,
+	ZBX_PROTOTYPE_STATUS_COUNT
+}
+zbx_prototype_status_t;
+
+typedef enum
+{
+	ZBX_PROTOTYPE_DISCOVER,
+	ZBX_PROTOTYPE_NO_DISCOVER,
+	ZBX_PROTOTYPE_DISCOVER_COUNT
+}
+zbx_prototype_discover_t;
+
 /* regular expressions */
 #define EXPRESSION_TYPE_INCLUDED	0
 #define EXPRESSION_TYPE_ANY_INCLUDED	1
@@ -609,6 +625,7 @@ zbx_maintenance_type_t;
 						/* only in server code, never in DB */
 #define HOST_INVENTORY_MANUAL		0
 #define HOST_INVENTORY_AUTOMATIC	1
+#define HOST_INVENTORY_COUNT		2
 
 #define HOST_INVENTORY_FIELD_COUNT	70
 
@@ -1250,6 +1267,8 @@ size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen);
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 void	zbx_replace_invalid_utf8(char *text);
+
+int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8);
 
 void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);

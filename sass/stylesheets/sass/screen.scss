@@ -2132,7 +2132,6 @@ $icon-widget-btn: (
 	widget-collapse: url($sprite-path) no-repeat -6px -654px,
 	widget-expand: url($sprite-path) no-repeat -6px -689px,
 	widget-edit: url($sprite-path) no-repeat -42px -619px,
-	widget-delete: url($sprite-path) no-repeat -42px -582px,
 	alarm-on: url($sprite-path) no-repeat -6px -546px,
 	alarm-off: url($sprite-path) no-repeat -6px -582px,
 	sound-on: url($sprite-path) no-repeat -6px -474px,
@@ -2147,7 +2146,6 @@ $icon-widget-btn: (
 //  .btn-widget-collapse
 //  .btn-widget-expand
 //  .btn-widget-edit
-//  .btn-widget-delete
 //  .btn-alarm-on
 //  .btn-alarm-off
 //  .btn-sound-on
@@ -3116,6 +3114,15 @@ $form-icon-btn: (
 	}
 }
 
+.widget-placeholder {
+	.dashbrd-grid-widget-container {
+		.dashbrd-grid-widget-content {
+			margin-top: 0;
+			height: 100%;
+		}
+	}
+}
+
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	top: .25rem;
@@ -4017,8 +4024,21 @@ $form-icon-btn: (
 			padding: 0 10px;
 			@extend %webkit-scrollbar;
 
-			.table-forms .table-forms-td-right {
-				padding-right: 8px;
+			.table-forms {
+				.table-forms-td-right {
+					padding-right: 8px;
+				}
+
+				.table-forms-row-with-second-field {
+					position: relative;
+					transform: scale(1);
+
+					.table-forms-second-column {
+						position: absolute;
+						top: 5px;
+						right: 8px;
+					}
+				}
 			}
 
 			.columns-wrapper {

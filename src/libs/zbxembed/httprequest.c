@@ -162,13 +162,18 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
+	char			*utf8 = NULL;
 
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
 
-	request->headers = curl_slist_append(request->headers, duk_to_string(ctx, 0));
+	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &utf8))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert header to utf8");
+
+	request->headers = curl_slist_append(request->headers, utf8);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	request->custom_header = 1;
+	zbx_free(utf8);
 
 	return 0;
 }
@@ -207,15 +212,30 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request)
 {
 	zbx_es_httprequest_t	*request;
-	const char		*url, *contents = NULL;
+	char			*url = NULL, *contents = NULL;
 	CURLcode		err;
+	duk_ret_t		ret;
 
-	url = duk_to_string(ctx, 0);
+	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &url))
+	{
+		ret = duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert URL to utf8");
+		goto out;
+	}
+
 	if (0 == duk_is_null_or_undefined(ctx, 1))
-		contents = duk_to_string(ctx, 1);
+	{
+		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &contents))
+		{
+			ret = duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert request contents to utf8");
+			goto out;
+		}
+	}
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+	{
+		ret = duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		goto out;
+	}
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_URL, url, err);
 
@@ -245,11 +265,18 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	request->data_offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(request->handle)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot get URL: %s.", curl_easy_strerror(err));
+	{
+		ret = duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot get URL: %s.", curl_easy_strerror(err));
+		goto out;
+	}
 
 	duk_push_string(ctx, request->data);
+	ret = 1;
+out:
+	zbx_free(url);
+	zbx_free(contents);
 
-	return 1;
+	return ret;
 }
 
 /******************************************************************************
