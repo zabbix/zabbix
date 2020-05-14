@@ -484,10 +484,14 @@ abstract class CGraphGeneral extends CApiService {
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
+				]];
 				break;
 
 			default:
@@ -496,25 +500,13 @@ abstract class CGraphGeneral extends CApiService {
 
 		$read_only_fields = ['templateid', 'flags'];
 
-		if (get_class($this) === 'CGraphPrototype') {
-			$rules = [
-				'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
-			];
-		}
-		else {
-			$rules = [];
-		}
-
 		foreach ($graphs as $key => $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_set, $graph['name']);
 
-			$data = array_intersect_key($graph, $rules);
-			if ($data) {
-				$path = '/'.($key + 1);
+			$data = array_intersect_key($graph, $api_input_rules['fields']);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($key + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			$templatedGraph = false;
@@ -634,10 +626,14 @@ abstract class CGraphGeneral extends CApiService {
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
+				]];
 				break;
 
 			default:
@@ -646,25 +642,13 @@ abstract class CGraphGeneral extends CApiService {
 
 		$read_only_fields = ['templateid', 'flags'];
 
-		if (get_class($this) === 'CGraphPrototype') {
-			$rules = [
-				'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
-			];
-		}
-		else {
-			$rules = [];
-		}
-
 		foreach ($graphs as $key => $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_update, $graph['name']);
 
-			$data = array_intersect_key($graph, $rules);
-			if ($data) {
-				$path = '/'.($key + 1);
+			$data = array_intersect_key($graph, $api_input_rules['fields']);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($key + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			$templatedGraph = false;
