@@ -9696,11 +9696,11 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros_for_triggers                           *
+ * Function: zbx_dc_expand_user_macros_in_expression                          *
  *                                                                            *
- * Purpose: expand user macros for triggers in the specified text value       *
- *          autoquote macros that are not already quoted that cannot be       *
- *          casted to a double                                                *
+ * Purpose: expand user macros for triggers and calculated items in the       *
+ *          specified text value and autoquote macros that are not already    *
+ *          quoted that cannot be casted to a double                          *
  *                                                                            *
  * Parameters: text           - [IN] the text value to expand                 *
  *             hostids        - [IN] an array of related hostids              *
@@ -9710,10 +9710,9 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  *               macros will be left unresolved.                              *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *
- *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros_for_triggers(const char *text, zbx_uint64_t *hostids, int hostids_num)
+char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
@@ -9835,7 +9834,7 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	get_functionids(&functionids, expression);
 	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	out = zbx_dc_expand_user_macros_for_triggers(expression, hostids.values, hostids.values_num);
+	out = zbx_dc_expand_user_macros_in_expression(expression, hostids.values, hostids.values_num);
 
 	if (NULL != strstr(out, "{$"))
 	{
@@ -12662,13 +12661,13 @@ int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error)
 
 	if (NULL == dc_host)
 	{
-		*error = zbx_dsprintf(*error, "proxy \"%s\" not found", name);
+		*error = zbx_dsprintf(*error, "Proxy \"%s\" not found.", name);
 		return FAIL;
 	}
 
 	if (SUCCEED != DCget_proxy_delay(dc_host->hostid, delay))
 	{
-		*error = zbx_dsprintf(*error, "proxy \"%s\" not found in configuration cache", name);
+		*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", name);
 		return FAIL;
 	}
 

@@ -573,6 +573,22 @@ typedef enum
 }
 zbx_maintenance_type_t;
 
+typedef enum
+{
+	ZBX_PROTOTYPE_STATUS_ENABLED,
+	ZBX_PROTOTYPE_STATUS_DISABLED,
+	ZBX_PROTOTYPE_STATUS_COUNT
+}
+zbx_prototype_status_t;
+
+typedef enum
+{
+	ZBX_PROTOTYPE_DISCOVER,
+	ZBX_PROTOTYPE_NO_DISCOVER,
+	ZBX_PROTOTYPE_DISCOVER_COUNT
+}
+zbx_prototype_discover_t;
+
 /* regular expressions */
 #define EXPRESSION_TYPE_INCLUDED	0
 #define EXPRESSION_TYPE_ANY_INCLUDED	1
@@ -609,6 +625,7 @@ zbx_maintenance_type_t;
 						/* only in server code, never in DB */
 #define HOST_INVENTORY_MANUAL		0
 #define HOST_INVENTORY_AUTOMATIC	1
+#define HOST_INVENTORY_COUNT		2
 
 #define HOST_INVENTORY_FIELD_COUNT	70
 
@@ -745,12 +762,13 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
 /* acknowledgement actions (flags) */
-#define ZBX_PROBLEM_UPDATE_CLOSE	0x0001
-#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE	0x0002
-#define ZBX_PROBLEM_UPDATE_MESSAGE	0x0004
-#define ZBX_PROBLEM_UPDATE_SEVERITY	0x0008
+#define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
+#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
+#define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
+#define ZBX_PROBLEM_UPDATE_SEVERITY		0x0008
+#define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE	0x0010
 
-#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	4
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	5
 
 /* database double precision upgrade states */
 #define ZBX_DB_DBL_PRECISION_DISABLED	0
@@ -1101,13 +1119,14 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
 
-double	zbx_time(void);
-void	zbx_timespec(zbx_timespec_t *ts);
-double	zbx_current_time(void);
-void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
-long	zbx_get_timezone_offset(time_t t, struct tm *tm);
-int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
-int	zbx_day_in_month(int year, int mon);
+double		zbx_time(void);
+void		zbx_timespec(zbx_timespec_t *ts);
+double		zbx_current_time(void);
+void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
+long		zbx_get_timezone_offset(time_t t, struct tm *tm);
+int		zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
+int		zbx_day_in_month(int year, int mon);
+zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);
 
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
@@ -1248,6 +1267,8 @@ size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen);
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 void	zbx_replace_invalid_utf8(char *text);
+
+int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8);
 
 void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);

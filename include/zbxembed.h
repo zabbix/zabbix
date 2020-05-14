@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXEMBED_H
 #define ZABBIX_ZBXEMBED_H
 
+#include "zbxjson.h"
+
 typedef struct zbx_es_env zbx_es_env_t;
 
 typedef struct
@@ -28,15 +30,18 @@ typedef struct
 }
 zbx_es_t;
 
-void	zbx_es_init(zbx_es_t *es);
-void	zbx_es_destroy(zbx_es_t *es);
-int	zbx_es_init_env(zbx_es_t *es, char **error);
-int	zbx_es_destroy_env(zbx_es_t *es, char **error);
-int	zbx_es_is_env_initialized(zbx_es_t *es);
-int	zbx_es_fatal_error(zbx_es_t *es);
-int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
-int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
-	char **error);
-void	zbx_es_set_timeout(zbx_es_t *es, int timeout);
+void		zbx_es_init(zbx_es_t *es);
+void		zbx_es_destroy(zbx_es_t *es);
+int		zbx_es_init_env(zbx_es_t *es, char **error);
+int		zbx_es_destroy_env(zbx_es_t *es, char **error);
+int		zbx_es_is_env_initialized(zbx_es_t *es);
+int		zbx_es_fatal_error(zbx_es_t *es);
+int		zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
+int		zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
+		char **error);
+void		zbx_es_set_timeout(zbx_es_t *es, int timeout);
+void		zbx_es_debug_enable(zbx_es_t *es);
+void		zbx_es_debug_disable(zbx_es_t *es);
+const char	*zbx_es_debug_info(const zbx_es_t *es);
 
 #endif /* ZABBIX_ZBXEMBED_H */
