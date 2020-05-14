@@ -3353,6 +3353,8 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	}
 	else
 	{
+		value = (char *)zbx_realloc(value, MAX_BUFFER_LEN);
+
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
 			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
