@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-06T15:36:02Z</date>
+   <date>2020-05-14T12:21:48Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -53,7 +53,7 @@ Template tooling version used: 0.35</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.version</key>
+                  <key>etcd.get_version</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -91,7 +91,7 @@ Template tooling version used: 0.35</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -116,7 +116,7 @@ Template tooling version used: 0.35</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -145,7 +145,7 @@ Template tooling version used: 0.35</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -174,7 +174,7 @@ Template tooling version used: 0.35</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -197,8 +197,54 @@ Template tooling version used: 0.35</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
+            </item>
+            <item>
+               <name>Etcd: Get node metrics</name>
+               <type>HTTP_AGENT</type>
+               <key>etcd.get_metrics</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <authtype>BASIC</authtype>
+               <username>{$ETCD.USER}</username>
+               <password>{$ETCD.PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/metrics</url>
+               <triggers>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>Etcd: Failed to fetch info data (or no data for 30m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 30 minutes</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Etcd: Service is unavailable</name>
+                           <expression>{Template App Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Etcd: Get version</name>
+               <type>HTTP_AGENT</type>
+               <key>etcd.get_version</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <url>{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/version</url>
             </item>
             <item>
                <name>Etcd: RPCs received per second</name>
@@ -232,7 +278,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -267,7 +313,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -302,11 +348,11 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
-               <name>Etcd: Server has leader</name>
+               <name>Etcd: Server has a leader</name>
                <type>DEPENDENT</type>
                <key>etcd.has.leader</key>
                <delay>0</delay>
@@ -332,7 +378,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -344,6 +390,56 @@ return valueArr.reduce(function(acc,obj){
                </triggers>
             </item>
             <item>
+               <name>Etcd: Node health</name>
+               <type>HTTP_AGENT</type>
+               <key>etcd.health</key>
+               <history>7d</history>
+               <authtype>BASIC</authtype>
+               <username>{$ETCD.USER}</username>
+               <password>{$ETCD.PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Etcd</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Etcd healthcheck</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.health</params>
+                  </step>
+                  <step>
+                     <type>BOOL_TO_DECIMAL</type>
+                     <params/>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+               <url>{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/health</url>
+               <status_codes/>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0</expression>
+                     <name>Etcd: Node healthcheck failed</name>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                     <priority>AVERAGE</priority>
+                     <description>https://etcd.io/docs/v3.4.0/op-guide/monitoring/#health-check</description>
+                     <dependencies>
+                        <dependency>
+                           <name>Etcd: Service is unavailable</name>
+                           <expression>{Template App Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
                <name>Etcd: HTTP 4XX</name>
                <type>DEPENDENT</type>
                <key>etcd.http.requests.4xx.rate</key>
@@ -351,7 +447,7 @@ return valueArr.reduce(function(acc,obj){
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>rps</units>
-               <description>Number of handle failures of requests (non-watches), by method (GET/PUT etc.) and code 4XX.</description>
+               <description>Number of handle failures of requests (non-watches), by method (GET/PUT etc.), and code 4XX.</description>
                <applications>
                   <application>
                      <name>Etcd</name>
@@ -375,7 +471,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -386,7 +482,7 @@ return valueArr.reduce(function(acc,obj){
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>rps</units>
-               <description>Number of handle failures of requests (non-watches), by method (GET/PUT etc.) and code 5XX.</description>
+               <description>Number of handle failures of requests (non-watches), by method (GET/PUT etc.), and code 5XX.</description>
                <applications>
                   <application>
                      <name>Etcd</name>
@@ -410,7 +506,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -453,11 +549,11 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
-               <name>Etcd: Server is leader</name>
+               <name>Etcd: Server is a leader</name>
                <type>DEPENDENT</type>
                <key>etcd.is.leader</key>
                <delay>0</delay>
@@ -485,7 +581,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -515,7 +611,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -543,7 +639,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -566,7 +662,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -589,7 +685,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -607,7 +703,7 @@ return valueArr.reduce(function(acc,obj){
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Maximum number of open file descriptors.</description>
+               <description>The Maximum number of open file descriptors.</description>
                <applications>
                   <application>
                      <name>Etcd</name>
@@ -621,37 +717,8 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
-            </item>
-            <item>
-               <name>Etcd: Get node metrics</name>
-               <type>HTTP_AGENT</type>
-               <key>etcd.metrics</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-               <url>{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/metrics</url>
-               <triggers>
-                  <trigger>
-                     <expression>{nodata(30m)}=1</expression>
-                     <name>Etcd: Failed to fetch info data (or no data for 30m)</name>
-                     <priority>WARNING</priority>
-                     <description>Zabbix has not received data for items for the last 30 minutes</description>
-                     <manual_close>YES</manual_close>
-                     <dependencies>
-                        <dependency>
-                           <name>Etcd: Service is down</name>
-                           <expression>{Template App Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>Etcd: Client gRPC received bytes per second</name>
@@ -679,7 +746,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -708,55 +775,8 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
-            </item>
-            <item>
-               <name>Etcd: Node health</name>
-               <type>HTTP_AGENT</type>
-               <key>etcd.node.health</key>
-               <history>7d</history>
-               <applications>
-                  <application>
-                     <name>Etcd</name>
-                  </application>
-               </applications>
-               <valuemap>
-                  <name>Etcd healthcheck</name>
-               </valuemap>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.health</params>
-                  </step>
-                  <step>
-                     <type>BOOL_TO_DECIMAL</type>
-                     <params/>
-                     <error_handler>CUSTOM_VALUE</error_handler>
-                     <error_handler_params>0</error_handler_params>
-                  </step>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
-                  </step>
-               </preprocessing>
-               <url>{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/health</url>
-               <status_codes/>
-               <triggers>
-                  <trigger>
-                     <expression>{last()}=0</expression>
-                     <name>Etcd: Node healthcheck failed</name>
-                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
-                     <priority>AVERAGE</priority>
-                     <description>https://etcd.io/docs/v3.4.0/op-guide/monitoring/#health-check</description>
-                     <dependencies>
-                        <dependency>
-                           <name>Etcd: Service is down</name>
-                           <expression>{Template App Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>Etcd: Open file descriptors</name>
@@ -779,7 +799,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -807,7 +827,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -835,7 +855,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -863,7 +883,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -895,7 +915,7 @@ longer downtime caused by a loss of quorum in the cluster."</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -932,7 +952,7 @@ longer downtime caused by a loss of quorum in the cluster."</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -961,7 +981,7 @@ longer downtime caused by a loss of quorum in the cluster."</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -997,7 +1017,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -1022,7 +1042,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -1050,7 +1070,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.version</key>
+                  <key>etcd.get_version</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1070,7 +1090,7 @@ return valueArr.reduce(function(acc,obj){
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>rps</units>
-               <description>The number of transaction seen by this member per second.</description>
+               <description>The number of transactions seen by this member per second.</description>
                <applications>
                   <application>
                      <name>Etcd</name>
@@ -1088,7 +1108,7 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -1118,7 +1138,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -1129,20 +1149,6 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
-            </item>
-            <item>
-               <name>Etcd: Get version</name>
-               <type>HTTP_AGENT</type>
-               <key>etcd.version</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-               <url>{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/version</url>
             </item>
             <item>
                <name>Etcd: Virtual memory</name>
@@ -1166,7 +1172,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
@@ -1201,11 +1207,11 @@ return valueArr.reduce(function(acc,obj){
                   </step>
                </preprocessing>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
             </item>
             <item>
-               <name>Etcd: Service ping</name>
+               <name>Etcd: Service's TCP port state</name>
                <type>SIMPLE</type>
                <key>net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"]</key>
                <history>7d</history>
@@ -1226,7 +1232,7 @@ return valueArr.reduce(function(acc,obj){
                <triggers>
                   <trigger>
                      <expression>{last()}=0</expression>
-                     <name>Etcd: Service is down</name>
+                     <name>Etcd: Service is unavailable</name>
                      <priority>AVERAGE</priority>
                      <manual_close>YES</manual_close>
                   </trigger>
@@ -1244,13 +1250,13 @@ return valueArr.reduce(function(acc,obj){
                   <conditions>
                      <condition>
                         <macro>{#GRPC.CODE}</macro>
-                        <value>{$GRPC.CODE.NOT_MATCHES}</value>
+                        <value>{$ETCD.GRPC_CODE.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>A</formulaid>
                      </condition>
                      <condition>
                         <macro>{#GRPC.CODE}</macro>
-                        <value>{$GRPC.CODE.MATCHES}</value>
+                        <value>{$ETCD.GRPC_CODE.MATCHES}</value>
                         <formulaid>B</formulaid>
                      </condition>
                   </conditions>
@@ -1288,12 +1294,12 @@ return valueArr.reduce(function(acc,obj){
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>etcd.metrics</key>
+                        <key>etcd.get_metrics</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -1314,6 +1320,10 @@ for (var item, i = 0; item = data[i++];) {
 }
 return JSON.stringify(result);</params>
                   </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
                </preprocessing>
             </discovery_rule>
             <discovery_rule>
@@ -1323,23 +1333,23 @@ return JSON.stringify(result);</params>
                <delay>0</delay>
                <item_prototypes>
                   <item_prototype>
-                     <name>Etcd: Bytes received from {#GRPC.PEER}</name>
+                     <name>Etcd: Etcd peer {#ETCD.PEER}: Bytes received</name>
                      <type>DEPENDENT</type>
-                     <key>etcd.bytes.received.rate[{#GRPC.PEER}]</key>
+                     <key>etcd.bytes.received.rate[{#ETCD.PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>Bps</units>
-                     <description>The number of bytes received from peer with ID {#GRPC.PEER}</description>
-                     <applications>
-                        <application>
-                           <name>Etcd</name>
-                        </application>
-                     </applications>
+                     <description>The number of bytes received from peer with ID {#ETCD.PEER}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Etcd peer {#ETCD.PEER}</name>
+                        </application_prototype>
+                     </application_prototypes>
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_PATTERN</type>
-                           <params>etcd_network_peer_received_bytes_total{From="{#GRPC.PEER}"}
+                           <params>etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}
 </params>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
@@ -1350,27 +1360,27 @@ return JSON.stringify(result);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>etcd.metrics</key>
+                        <key>etcd.get_metrics</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Etcd: Bytes sent to {#GRPC.PEER}</name>
+                     <name>Etcd: Etcd peer {#ETCD.PEER}: Bytes sent</name>
                      <type>DEPENDENT</type>
-                     <key>etcd.bytes.sent.rate[{#GRPC.PEER}]</key>
+                     <key>etcd.bytes.sent.rate[{#ETCD.PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>Bps</units>
-                     <description>The number of bytes sent to peer with ID {#GRPC.PEER}</description>
-                     <applications>
-                        <application>
-                           <name>Etcd</name>
-                        </application>
-                     </applications>
+                     <description>The number of bytes sent to peer with ID {#ETCD.PEER}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Etcd peer {#ETCD.PEER}</name>
+                        </application_prototype>
+                     </application_prototypes>
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_PATTERN</type>
-                           <params>etcd_network_peer_sent_bytes_total{To="{#GRPC.PEER}"}
+                           <params>etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}
 </params>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
@@ -1381,27 +1391,27 @@ return JSON.stringify(result);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>etcd.metrics</key>
+                        <key>etcd.get_metrics</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Etcd: Receive failures failures to {#GRPC.PEER}</name>
+                     <name>Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures</name>
                      <type>DEPENDENT</type>
-                     <key>etcd.received.fail.rate[{#GRPC.PEER}]</key>
+                     <key>etcd.received.fail.rate[{#ETCD.PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
-                     <units>Rps</units>
-                     <description>The number of receive failures from the peer with ID {#GRPC.PEER}</description>
-                     <applications>
-                        <application>
-                           <name>Etcd</name>
-                        </application>
-                     </applications>
+                     <units>rps</units>
+                     <description>The number of receive failures from the peer with ID {#ETCD.PEER}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Etcd peer {#ETCD.PEER}</name>
+                        </application_prototype>
+                     </application_prototypes>
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_PATTERN</type>
-                           <params>etcd_network_peer_received_failures_total{To="{#GRPC.PEER}"}
+                           <params>etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}
 </params>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
@@ -1412,27 +1422,27 @@ return JSON.stringify(result);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>etcd.metrics</key>
+                        <key>etcd.get_metrics</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Etcd: Send failures from {#GRPC.PEER}</name>
+                     <name>Etcd: Etcd peer {#ETCD.PEER}: Send failures</name>
                      <type>DEPENDENT</type>
-                     <key>etcd.sent.fail.rate[{#GRPC.PEER}]</key>
+                     <key>etcd.sent.fail.rate[{#ETCD.PEER}]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
-                     <units>Rps</units>
-                     <description>The number of send failures from peer with ID {#GRPC.PEER}</description>
-                     <applications>
-                        <application>
-                           <name>Etcd</name>
-                        </application>
-                     </applications>
+                     <units>rps</units>
+                     <description>The number of send failures from peer with ID {#ETCD.PEER}</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Etcd peer {#ETCD.PEER}</name>
+                        </application_prototype>
+                     </application_prototypes>
                      <preprocessing>
                         <step>
                            <type>PROMETHEUS_PATTERN</type>
-                           <params>etcd_network_peer_sent_failures_total{To="{#GRPC.PEER}"}
+                           <params>etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}
 </params>
                            <error_handler>CUSTOM_VALUE</error_handler>
                            <error_handler_params>0</error_handler_params>
@@ -1443,16 +1453,16 @@ return JSON.stringify(result);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>etcd.metrics</key>
+                        <key>etcd.get_metrics</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
                <master_item>
-                  <key>etcd.metrics</key>
+                  <key>etcd.get_metrics</key>
                </master_item>
                <lld_macro_paths>
                   <lld_macro_path>
-                     <lld_macro>{#GRPC.PEER}</lld_macro>
+                     <lld_macro>{#ETCD.PEER}</lld_macro>
                      <path>$.labels.To</path>
                   </lld_macro_path>
                </lld_macro_paths>
@@ -1465,6 +1475,16 @@ return JSON.stringify(result);</params>
             </discovery_rule>
          </discovery_rules>
          <macros>
+            <macro>
+               <macro>{$ETCD.GRPC_CODE.MATCHES}</macro>
+               <value>.*</value>
+               <description>Filter of discoverable grpc codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</description>
+            </macro>
+            <macro>
+               <macro>{$ETCD.GRPC_CODE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>Filter to exclude discovered grpc codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</description>
+            </macro>
             <macro>
                <macro>{$ETCD.HTTP.FAIL.MAX.WARN}</macro>
                <value>2</value>
@@ -1501,19 +1521,10 @@ return JSON.stringify(result);</params>
             <macro>
                <macro>{$ETCD.SCHEME}</macro>
                <value>http</value>
+               <description>Request scheme which may be http or https</description>
             </macro>
             <macro>
                <macro>{$ETCD.USER}</macro>
-            </macro>
-            <macro>
-               <macro>{$GRPC.CODE.MATCHES}</macro>
-               <value>.*</value>
-               <description>Filter of discoverable grpc codes</description>
-            </macro>
-            <macro>
-               <macro>{$GRPC.CODE.NOT_MATCHES}</macro>
-               <value>CHANGE_IF_NEEDED</value>
-               <description>Filter to exclude discovered grpc codes</description>
             </macro>
          </macros>
       </template>
@@ -1521,7 +1532,7 @@ return JSON.stringify(result);</params>
    <triggers>
       <trigger>
          <expression>{Template App Etcd by HTTP:etcd.open.fds.min(5m)}/{Template App Etcd by HTTP:etcd.max.fds.last()}*100&gt;{$ETCD.OPEN.FDS.MAX.WARN}</expression>
-         <name>Etcd: Current number of open file is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% in 5m)</name>
+         <name>Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)</name>
          <priority>WARNING</priority>
          <description>"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. &#13;
 If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files."</description>
@@ -1702,18 +1713,6 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
                <item>
                   <host>Template App Etcd by HTTP</host>
                   <key>etcd.writes.rate</key>
-               </item>
-            </graph_item>
-         </graph_items>
-      </graph>
-      <graph>
-         <name>Etcd: Uptime</name>
-         <graph_items>
-            <graph_item>
-               <color>1A7C11</color>
-               <item>
-                  <host>Template App Etcd by HTTP</host>
-                  <key>etcd.uptime</key>
                </item>
             </graph_item>
          </graph_items>
