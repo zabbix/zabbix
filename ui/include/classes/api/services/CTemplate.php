@@ -717,9 +717,9 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// Get host prototype operations from LLD overrides where this template is linked.
-		$lld_operationids = [];
+		$lld_override_operationids = [];
 
-		$db_lld_operationids = DBselect(
+		$db_lld_override_operationids = DBselect(
 			'SELECT loo.lld_override_operationid'.
 			' FROM lld_override_operation loo'.
 			' WHERE EXISTS('.
@@ -729,15 +729,17 @@ class CTemplate extends CHostGeneral {
 				' AND '.dbConditionId('lot.templateid', $templateids).
 			')'
 		);
-		while ($db_lld_operationid = DBfetch($db_lld_operationids)) {
-			$lld_operationids[] = $db_lld_operationid['lld_override_operationid'];
+		while ($db_lld_override_operationid = DBfetch($db_lld_override_operationids)) {
+			$lld_override_operationids[] = $db_lld_override_operationid['lld_override_operationid'];
 		}
 
-		if ($lld_operationids) {
-			// Check other operations and make sure this is the last one.
-			$delete_lld_operationids = [];
+		if ($lld_override_operationids) {
+			DB::delete('lld_override_optemplate', ['templateid' => $templateids]);
 
-			$db_delete_lld_operationids = DBselect(
+			// Make sure there no other operations left to safely delete the operation.
+			$delete_lld_override_operationids = [];
+
+			$db_delete_lld_override_operationids = DBselect(
 				'SELECT loo.lld_override_operationid'.
 				' FROM lld_override_operation loo'.
 				' WHERE NOT EXISTS('.
@@ -759,22 +761,16 @@ class CTemplate extends CHostGeneral {
 						'SELECT NULL'.
 						' FROM lld_override_optemplate lot'.
 						' WHERE lot.lld_override_operationid=loo.lld_override_operationid'.
-							' AND '.dbConditionId('lot.templateid', $templateids, true).
 					')'.
-					' AND '.dbConditionId('loo.lld_override_operationid', $lld_operationids)
+					' AND '.dbConditionId('loo.lld_override_operationid', $lld_override_operationids)
 			);
 
-			while ($db_delete_lld_operationid = DBfetch($db_delete_lld_operationids)) {
-				$delete_lld_operationids[] = $db_delete_lld_operationid['lld_override_operationid'];
+			while ($db_delete_lld_override_operationid = DBfetch($db_delete_lld_override_operationids)) {
+				$delete_lld_override_operationids[] = $db_delete_lld_override_operationid['lld_override_operationid'];
 			}
 
-			if ($delete_lld_operationids) {
-				// Will delete the templates on cascade.
-				DB::delete('lld_override_operation', ['lld_override_operationid' => $delete_lld_operationids]);
-			}
-			else {
-				// Otherwise delete LLD override template operations and leave the otherones.
-				DB::delete('lld_override_optemplate', ['templateid' => $templateids]);
+			if ($delete_lld_override_operationids) {
+				DB::delete('lld_override_operation', ['lld_override_operationid' => $delete_lld_override_operationids]);
 			}
 		}
 
