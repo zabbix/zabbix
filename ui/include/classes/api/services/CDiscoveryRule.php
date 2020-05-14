@@ -1523,12 +1523,11 @@ class CDiscoveryRule extends CItemGeneral {
 	/**
 	 * Validate low-level discovery rule overrides.
 	 *
-	 * @param array $items   Low-level discovery rules.
-	 * @param bool  $update  True if caller method is an update method.
+	 * @param array $items  Low-level discovery rules.
 	 *
 	 * @throws APIException
 	 */
-	protected function validateOverrides(array $items, $update): void {
+	protected function validateOverrides(array $items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name'], ['step']], 'fields' => [
 			'step' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:'.ZBX_MAX_INT32],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override', 'name')],
