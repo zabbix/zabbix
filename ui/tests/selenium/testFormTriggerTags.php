@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
+require_once dirname(__FILE__).'/behaviors/CFormParametersBehavior.php';
 
 /**
  * @backup triggers
