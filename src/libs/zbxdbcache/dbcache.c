@@ -2762,7 +2762,7 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != items[i].history)
 			continue;
 
-		/* store numeric items to handle data conversion errors on server */
+		/* store numeric items to handle data conversion errors on server and trends */
 		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
 			continue;
 
@@ -2777,6 +2777,8 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 		/* store items linked to host inventory */
 		if (0 != items[i].inventory_link)
 			continue;
+
+		dc_history_clean_value(history + i);
 
 		/* all checks passed, item value must not be stored in proxy history/sent to server */
 		history[i].flags |= ZBX_DC_FLAG_NOVALUE;
