@@ -3353,9 +3353,14 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	}
 	else
 	{
+		size_t	len;
+
+		len = strlen(value) + 1 + MAX_BUFFER_LEN;
+		value = (char *)zbx_realloc(value, len);
+
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
-			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
+			zbx_format_value(value, len, item.valuemapid, item.units, item.value_type);
 		}
 		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function,
 				','))
@@ -3364,7 +3369,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
-					add_value_suffix(value, MAX_BUFFER_LEN, item.units, item.value_type);
+					add_value_suffix(value, len, item.units, item.value_type);
 					break;
 				default:
 					;
@@ -3372,7 +3377,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 		}
 		else if (SUCCEED == str_in_list("timeleft", function, ','))
 		{
-			add_value_suffix(value, MAX_BUFFER_LEN, "s", ITEM_VALUE_TYPE_FLOAT);
+			add_value_suffix(value, len, "s", ITEM_VALUE_TYPE_FLOAT);
 		}
 
 		*result = zbx_strdup(NULL, value);
