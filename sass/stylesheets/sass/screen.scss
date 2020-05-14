@@ -5,6 +5,10 @@ $ui-transitions: true !default;
 // Sync with JavaScript variable: UI_TRANSITION_DURATION.
 $ui-transition-duration: .3s !default;
 
+// Sprite path
+$sprite-path: '../img/icon-sprite.svg?20200407';
+$browser-sprite-path: '../img/browser-sprite.png?20200407';
+
 @import "utils/mixins";
 
 @import "base/reset";
@@ -161,19 +165,19 @@ $ui-transition-duration: .3s !default;
 .zabbix-logo {
 	width: 114px;
 	height: 30px;
-	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
+	background: url($sprite-path) no-repeat 0 -864px;
 }
 
 .zabbix-sidebar-logo {
 	width: 91px;
 	height: 24px;
-	background: url(../img/icon-sprite.svg) no-repeat -570px -400px;
+	background: url($sprite-path) no-repeat -570px -400px;
 }
 
 .zabbix-sidebar-logo-compact {
 	width: 24px;
 	height: 24px;
-	background: url(../img/icon-sprite.svg) no-repeat -540px -400px;
+	background: url($sprite-path) no-repeat -540px -400px;
 }
 
 .object-group {
@@ -536,7 +540,7 @@ $ui-transition-duration: .3s !default;
 			}
 
 			.icon-wzrd-action {
-				background: url(../img/icon-sprite.svg) no-repeat -6px -624px;
+				background: url($sprite-path) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
 				margin: 0;
@@ -1439,6 +1443,13 @@ $ui-transition-duration: .3s !default;
 				}
 			}
 
+			&.overflow-break {
+				max-width: 150px;
+				overflow-wrap: break-word;
+				white-space: initial;
+				word-wrap: break-word;
+			}
+
 			&:last-child {
 				padding-right: 0;
 			}
@@ -2090,13 +2101,13 @@ button {
 }
 
 $icon-btn: (
-	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
-	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -259px,
-	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
-	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
-	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -329px,
-	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
-	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px
+	conf: $btn-bg-color url($sprite-path) no-repeat -7px -187px,
+	kiosk: $btn-bg-color url($sprite-path) no-repeat -79px -259px,
+	min: $btn-bg-color url($sprite-path) no-repeat -7px -259px,
+	add-fav: $btn-bg-color url($sprite-path) no-repeat -7px -295px,
+	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
+	action: $btn-bg-color url($sprite-path) no-repeat -7px -367px,
+	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px
 );
 
 // Dynamically generated classes:
@@ -2115,18 +2126,17 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	iterator-page-previous: url(../img/icon-sprite.svg) no-repeat -85px -657px,
-	iterator-page-next: url(../img/icon-sprite.svg) no-repeat -83px -623px,
-	widget-action: url(../img/icon-sprite.svg) no-repeat -6px -618px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -6px -654px,
-	widget-expand: url(../img/icon-sprite.svg) no-repeat -6px -689px,
-	widget-edit: url(../img/icon-sprite.svg) no-repeat -42px -619px,
-	widget-delete: url(../img/icon-sprite.svg) no-repeat -42px -582px,
-	alarm-on: url(../img/icon-sprite.svg) no-repeat -6px -546px,
-	alarm-off: url(../img/icon-sprite.svg) no-repeat -6px -582px,
-	sound-on: url(../img/icon-sprite.svg) no-repeat -6px -474px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -6px -510px,
-	info-clock: url(../img/icon-sprite.svg) no-repeat -87px -762px
+	iterator-page-previous: url($sprite-path) no-repeat -85px -657px,
+	iterator-page-next: url($sprite-path) no-repeat -83px -623px,
+	widget-action: url($sprite-path) no-repeat -6px -618px,
+	widget-collapse: url($sprite-path) no-repeat -6px -654px,
+	widget-expand: url($sprite-path) no-repeat -6px -689px,
+	widget-edit: url($sprite-path) no-repeat -42px -619px,
+	alarm-on: url($sprite-path) no-repeat -6px -546px,
+	alarm-off: url($sprite-path) no-repeat -6px -582px,
+	sound-on: url($sprite-path) no-repeat -6px -474px,
+	sound-off: url($sprite-path) no-repeat -6px -510px,
+	info-clock: url($sprite-path) no-repeat -87px -762px
 );
 
 // Dynamically generated classes:
@@ -2136,7 +2146,6 @@ $icon-widget-btn: (
 //  .btn-widget-collapse
 //  .btn-widget-expand
 //  .btn-widget-edit
-//  .btn-widget-delete
 //  .btn-alarm-on
 //  .btn-alarm-off
 //  .btn-sound-on
@@ -2227,7 +2236,7 @@ $icon-widget-btn: (
 			top: 0;
 			height: 24px;
 			width: 24px;
-			background: url(../img/icon-sprite.svg) no-repeat -87px -583px;
+			background: url($sprite-path) no-repeat -87px -583px;
 		}
 	}
 
@@ -2240,7 +2249,7 @@ $icon-widget-btn: (
 			top: 0;
 			height: 24px;
 			width: 24px;
-			background: url(../img/icon-sprite.svg) no-repeat -87px -547px;
+			background: url($sprite-path) no-repeat -87px -547px;
 		}
 	}
 
@@ -2327,7 +2336,7 @@ $icon-widget-btn: (
 
 .btn-time-left,
 .btn-time-right {
-	background: url(../img/icon-sprite.svg) no-repeat;
+	background: url($sprite-path) no-repeat;
 	content: '';
 	border: 0;
 	height: 24px;
@@ -2487,7 +2496,7 @@ $icon-widget-btn: (
 }
 
 .btn-dashbrd-conf {
-	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
+	background: url($sprite-path) no-repeat -42px -619px;
 	@extend %btn-dashbrd;
 }
 
@@ -2600,10 +2609,10 @@ button[disabled] {
 }
 
 $var-icons: (
-	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -729px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -765px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
+	maint: url($sprite-path) no-repeat -46px -802px,
+	depend-up: url($sprite-path) no-repeat -49px -729px,
+	depend-down: url($sprite-path) no-repeat -49px -765px,
+	ackn: url($sprite-path) no-repeat -45px -693px
 );
 
 // Dynamically generated classes:
@@ -2622,17 +2631,17 @@ $var-icons: (
 }
 
 $trigger-expression-tree-icons: (
-	top-bottom: url(../img/icon-sprite.svg) no-repeat -84px -300px,
-	top-bottom-right: url(../img/icon-sprite.svg) no-repeat -84px -334px,
-	top-right: url(../img/icon-sprite.svg) no-repeat -84px -372px,
-	empty: url(../img/icon-sprite.svg) no-repeat -84px -350px
+	top-bottom: url($sprite-path) no-repeat -84px -300px,
+	top-bottom-right: url($sprite-path) no-repeat -84px -334px,
+	top-right: url($sprite-path) no-repeat -84px -372px,
+	empty: url($sprite-path) no-repeat -84px -350px
 );
 
 %trigger-expression-tree-icons-common {
 	margin: 0 12px 0 0;
 
 	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat;
+		background: url($sprite-path) no-repeat;
 		display: inline-block;
 		width: 12px;
 		height: 12px;
@@ -2657,8 +2666,8 @@ $trigger-expression-tree-icons: (
 }
 
 $form-icon-btn: (
-	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -6px -617px
+	cal: url($sprite-path) no-repeat -42px -834px,
+	wzrd-action: url($sprite-path) no-repeat -6px -617px
 );
 
 // Dynamically generated classes:
@@ -2702,7 +2711,7 @@ $form-icon-btn: (
 .drag-icon {
 	margin-left: -9px;
 	height: 24px;
-	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
+	background: url($sprite-path) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
 
@@ -2737,7 +2746,7 @@ $form-icon-btn: (
 		left: 0;
 		width: 14px;
 		height: 14px;
-		background: url(../img/icon-sprite.svg) no-repeat -47px -659px;
+		background: url($sprite-path) no-repeat -47px -659px;
 	}
 }
 
@@ -2965,7 +2974,7 @@ $form-icon-btn: (
 		text-align: center;
 
 		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			background: url($sprite-path) no-repeat -157px -888px;
 			content: ' ';
 			height: $icon-height;
 			width: 36px;
@@ -2983,7 +2992,7 @@ $form-icon-btn: (
 			background-color: rgba($ui-bg-color, .7);
 
 			.dashbrd-grid-new-widget-label::before {
-				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
+				background: url($sprite-path) no-repeat -122px -284px;
 			}
 		}
 	}
@@ -2992,7 +3001,7 @@ $form-icon-btn: (
 .dashbrd-grid-widget-set-size {
 	.dashbrd-grid-new-widget-label {
 		&::before {
-			background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
+			background: url($sprite-path) no-repeat -345px -888px;
 		}
 	}
 }
@@ -3102,6 +3111,15 @@ $form-icon-btn: (
 	.msg-good,
 	.msg-warning {
 		margin: 0 10px;
+	}
+}
+
+.widget-placeholder {
+	.dashbrd-grid-widget-container {
+		.dashbrd-grid-widget-content {
+			margin-top: 0;
+			height: 100%;
+		}
 	}
 }
 
@@ -3924,7 +3942,7 @@ $form-icon-btn: (
 				position: absolute;
 				left: 0;
 				content: '';
-				background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
+				background: url($sprite-path) no-repeat -5px -835px;
 			}
 		}
 
@@ -4006,8 +4024,21 @@ $form-icon-btn: (
 			padding: 0 10px;
 			@extend %webkit-scrollbar;
 
-			.table-forms .table-forms-td-right {
-				padding-right: 8px;
+			.table-forms {
+				.table-forms-td-right {
+					padding-right: 8px;
+				}
+
+				.table-forms-row-with-second-field {
+					position: relative;
+					transform: scale(1);
+
+					.table-forms-second-column {
+						position: absolute;
+						top: 5px;
+						right: 8px;
+					}
+				}
 			}
 
 			.columns-wrapper {
@@ -4157,7 +4188,7 @@ $form-icon-btn: (
 		border-bottom-left-radius: 0;
 
 		&::after {
-			background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+			background: url($sprite-path) no-repeat -47px -478px;
 			content: '';
 			position: absolute;
 			left: 3px;
@@ -4330,7 +4361,7 @@ $form-icon-btn: (
 			width: 28px;
 			height: 24px;
 			vertical-align: middle;
-			background: url(../img/icon-sprite.svg) no-repeat -85px -691px;
+			background: url($sprite-path) no-repeat -85px -691px;
 		}
 	}
 }
@@ -4535,7 +4566,7 @@ $form-icon-btn: (
 		height: 14px;
 		float: left;
 		margin-top: 20px;
-		background: url(../img/icon-sprite.svg) no-repeat -11px -587px;
+		background: url($sprite-path) no-repeat -11px -587px;
 	}
 
 }
@@ -5437,7 +5468,7 @@ a.overlay-close-btn {
 		width: 18px;
 		height: 18px;
 		border: 1px solid $form-border-color;
-		background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
+		background: url($sprite-path) no-repeat -323px -411px;
 		cursor: pointer;
 	}
 
@@ -5593,7 +5624,7 @@ $browser-logos: (
 );
 
 %browser-logo-style {
-	background: url(../img/browser-sprite.png) no-repeat;
+	background: url($browser-sprite-path) no-repeat;
 	width: 66px;
 	height: 66px;
 	margin: 0 auto;
@@ -6296,19 +6327,19 @@ svg {
 						outline: none;
 					}
 					.add-child-btn {
-						background: url(../img/icon-sprite.svg) no-repeat -47px -551px;
+						background: url($sprite-path) no-repeat -47px -551px;
 						background-color: $transparent !important;
 						height: 15px;
 						width: 14px;
 					}
 					.edit-item-btn {
-						background: url(../img/icon-sprite.svg) no-repeat -47px -478px;
+						background: url($sprite-path) no-repeat -47px -478px;
 						background-color: $transparent !important;
 						height: 15px;
 						width: 14px;
 					}
 					.import-items-btn {
-						background: url(../img/icon-sprite.svg) no-repeat -47px -515px;
+						background: url($sprite-path) no-repeat -47px -515px;
 						background-color: $transparent !important;
 						height: 15px;
 						width: 14px;
@@ -6463,6 +6494,7 @@ svg {
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
+.icon-action-unack,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -6487,7 +6519,7 @@ svg {
 		left: 0;
 		width: 18px;
 		height: 18px;
-		background-image: url(../img/icon-sprite.svg);
+		background-image: url($sprite-path);
 		background-repeat: no-repeat;
 	}
 }
@@ -6533,6 +6565,10 @@ svg {
 
 .icon-action-ack::before {
 	background-position: -323px -245px;
+}
+
+.icon-action-unack::before {
+	background-position: -173px -245px;
 }
 
 .icon-invisible::before {
@@ -6906,7 +6942,7 @@ table.preprocessing-test-results {
 				width: 22px;
 				height: 22px;
 				content: '';
-				background: url(../img/icon-sprite.svg) no-repeat -119px -474px;
+				background: url($sprite-path) no-repeat -119px -474px;
 			}
 
 			&.is-focused {
@@ -6974,7 +7010,7 @@ table.preprocessing-test-results {
 
 .icon-text {
 	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -87px -474px;
+		background: url($sprite-path) no-repeat -87px -474px;
 	}
 
 	&:not(.highlighted):enabled {
@@ -6991,7 +7027,7 @@ table.preprocessing-test-results {
 
 .icon-secret {
 	&::before {
-		background: url(../img/icon-sprite.svg) no-repeat -87px -510px;
+		background: url($sprite-path) no-repeat -87px -510px;
 	}
 
 	&:not(.highlighted):enabled {
@@ -7032,7 +7068,7 @@ table.preprocessing-test-results {
 		width: 10px;
 		height: 10px;
 		content: '';
-		background: url(../img/icon-sprite.svg) no-repeat -547px -431px;
+		background: url($sprite-path) no-repeat -547px -431px;
 	}
 
 	&:enabled {
@@ -7049,14 +7085,14 @@ table.preprocessing-test-results {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 
 		&::after {
-			background: url(../img/icon-sprite.svg) no-repeat -604px -503px;
+			background: url($sprite-path) no-repeat -604px -503px;
 		}
 
 		&:hover,
 		&:focus,
 		&:active {
 			&::after {
-				background: url(../img/icon-sprite.svg) no-repeat -604px -503px;
+				background: url($sprite-path) no-repeat -604px -503px;
 			}
 		}
 	}
@@ -7171,5 +7207,21 @@ table.preprocessing-test-results {
 	.interface-btn-toggle {
 		display: inline-block;
 		@extend %btn-widget;
+	}
+}
+
+// Media type test log popup
+#mediatype_testlog {
+	.logitems {
+		overflow: auto;
+		margin-bottom: 10px;
+
+		pre {
+			white-space: nowrap;
+		}
+	}
+
+	.logtotalms {
+		margin-bottom: 10px;
 	}
 }

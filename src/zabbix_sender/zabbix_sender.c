@@ -977,20 +977,10 @@ static void	parse_commandline(int argc, char **argv)
 				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
 						" Zabbix sender was compiled with GnuTLS");
 				exit(EXIT_FAILURE);
-#elif defined(HAVE_POLARSSL)
-				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
-						" Zabbix sender was compiled with mbedTLS (PolarSSL)");
-				exit(EXIT_FAILURE);
 #endif
 				break;
 			case 'B':
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				CONFIG_TLS_CIPHER_CMD = zbx_strdup(CONFIG_TLS_CIPHER_CMD, zbx_optarg);
-#elif defined(HAVE_POLARSSL)
-				zbx_error("parameter \"--tls-cipher\" requires GnuTLS or OpenSSL."
-						" Zabbix sender was compiled with mbedTLS (PolarSSL)");
-				exit(EXIT_FAILURE);
-#endif
 				break;
 #else
 			case '1':
