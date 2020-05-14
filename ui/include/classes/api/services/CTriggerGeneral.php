@@ -145,7 +145,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
 				'status', 'priority', 'comments', 'type', 'templateid', 'correlation_mode', 'correlation_tag',
-				'manual_close', 'opdata'
+				'manual_close', 'opdata', 'discover'
 			],
 			'hostids' => $host['hostid'],
 			'filter' => ['templateid' => $trigger['templateid']],
@@ -652,6 +652,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['recovery_expression'] [OUT]
 	 * @param string $db_triggers[<tnum>]['url']                 [OUT]
 	 * @param int    $db_triggers[<tnum>]['status']              [OUT]
+	 * @param int    $db_triggers[<tnum>]['discover']            [OUT]
 	 * @param int    $db_triggers[<tnum>]['priority']            [OUT]
 	 * @param string $db_triggers[<tnum>]['comments']            [OUT]
 	 * @param int    $db_triggers[<tnum>]['type']                [OUT]
