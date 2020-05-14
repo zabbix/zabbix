@@ -342,6 +342,9 @@ class CFilter extends CDiv {
 
 		$js = 'jQuery("'.$id.'").tabs('.json_encode($this->tabs_options).').show();';
 
+		// Set the focus to a field with autofocus after the filter becomes visible.
+		$js .= 'jQuery("[autofocus=autofocus]", jQuery("'.$id.'")).filter(":visible").focus();';
+
 		if ($this->idx !== null && $this->idx !== '') {
 			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {'.
 				'var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0;'.

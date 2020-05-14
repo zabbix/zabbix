@@ -59,7 +59,12 @@ class CTabView extends CDiv {
 	}
 
 	public function setSelected($selected) {
+		if ($selected == 0) {
+			zbx_unsetcookie('tab');
+		}
+
 		$this->selectedTab = $selected;
+
 		return $this;
 	}
 
@@ -155,15 +160,20 @@ class CTabView extends CDiv {
 		$disabled_tabs = ($this->disabledTabs === null) ? '' : 'disabled: '.json_encode($this->disabledTabs).',';
 
 		return
-			'jQuery("#'.$this->id.'").tabs({'.
-				$create_event.
-				$disabled_tabs.
-				$active_tab.
-				'activate: function(event, ui) {'.
-					'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", ui.newTab.index().toString());'.
-					'jQuery.cookie("tab", ui.newTab.index().toString());'.
-					$this->tab_change_js.
-				'}'.
-			'})';
+			'jQuery("#'.$this->id.'")
+				.tabs({'.
+					$create_event.
+					$disabled_tabs.
+					$active_tab.
+					'activate: function(event, ui) {'.
+						'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", ui.newTab.index().toString());'.
+						'jQuery.cookie("tab", ui.newTab.index().toString());'.
+						$this->tab_change_js.
+					'}'.
+				'})'.
+				// Prevent changing the cookie value in a different tab.
+				'.parent().on("submit", function() {'.
+					'jQuery.cookie("tab", sessionStorage.getItem(ZBX_SESSION_NAME + "_tab") || 0);'.
+				'});';
 	}
 }
