@@ -2930,12 +2930,11 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
-					$ids = array_merge(array_keys($item_prototype_objectids), array_keys($trigger_prototype_objectids));
-					$ids = array_merge($ids, array_keys($host_prototype_objectids));
-
 					$opstatus = DB::select('lld_override_opstatus', [
 						'output' => ['lld_override_operationid', 'status'],
-						'filter' => ['lld_override_operationid' => $ids]
+						'filter' => ['lld_override_operationid' => array_keys(
+							$item_prototype_objectids + $trigger_prototype_objectids + $host_prototype_objectids
+						)]
 					]);
 				}
 
