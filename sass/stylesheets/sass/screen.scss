@@ -1481,6 +1481,15 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			display: inline-block;
 		}
 	}
+
+	.dynamic-row > td {
+		padding-top: 0;
+	}
+
+	.dynamic-row-control > td {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
 }
 
 .table-forms-separator {
