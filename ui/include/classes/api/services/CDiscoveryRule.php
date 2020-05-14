@@ -1580,6 +1580,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// Schema for filter is already validated in API validator. Create the formula validator for filter.
 		$condition_validator = new CConditionValidator([
+			'messageMissingFormula' => _('Formula missing for override "%1$s".'),
 			'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for override "%1$s": %3$s.'),
 			'messageMissingCondition' =>
 				_('Condition "%2$s" used in formula "%3$s" for override "%1$s" is not defined.'),
@@ -1784,6 +1785,7 @@ class CDiscoveryRule extends CItemGeneral {
 			],
 			'postValidators' => [
 				new CConditionValidator([
+					'messageMissingFormula' => _('Formula missing for discovery rule "%1$s".'),
 					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
 					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for discovery rule "%1$s" is not defined.'),
 					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".')
