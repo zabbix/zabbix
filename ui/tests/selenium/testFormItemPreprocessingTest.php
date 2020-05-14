@@ -525,12 +525,10 @@ class testFormItemPreprocessingTest extends CWebTest {
 				$prev_value_string = '100';
 				$prev_time_string  = 'now-1s';
 
-				$container_current = $form->getFieldContainer('Value');
-				$container_current->query('id:value')->asMultiline()->one()->fill($value_string);
+				$dialog->query('id:value')->asMultiline()->one()->fill($value_string);
 
-				$container_prev = $form->getFieldContainer('Previous value');
-				$prev_value = $container_prev->query('id:prev_value')->asMultiline()->one();
-				$prev_time = $container_prev->query('id:prev_time')->one();
+				$prev_value = $dialog->query('id:prev_value')->asMultiline()->one();
+				$prev_time = $dialog->query('id:prev_time')->one();
 
 				if ($prev_value->isEnabled(true) && $prev_time->isEnabled(true)) {
 					$prev_value->fill($prev_value_string);
