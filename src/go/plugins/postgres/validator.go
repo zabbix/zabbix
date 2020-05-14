@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,16 +17,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package postgres
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"errors"
 )
+
+func validateHost(host string) (err error) {
+	return
+}
+
+func validateUser(user string) (err error) {
+	return
+}
+
+func validateDatabase(database string) (err error) {
+	if len(database) < 1 || len(database) > 63 || database == "" {
+		return errors.New("size name of database must be between 1 and 63 bytes")
+	}
+	return
+}

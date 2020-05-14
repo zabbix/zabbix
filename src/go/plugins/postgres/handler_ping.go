@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,16 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package postgres
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+	"fmt"
 )
+
+const (
+	keyPostgresPing     = "pgsql.ping"
+	postgresPingUnknown = -1
+	postgresPingFailed  = 0
+	postgresPingOk      = 1
+)
+
+// pingHandler executes 'SELECT 1 as pingOk' commands and returns pingOK if a connection is alive or postgresPingFailed otherwise.
+func (p *Plugin) pingHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+	var pingOK int64 = postgresPingUnknown
+
+	_ = conn.postgresPool.QueryRow(context.Background(), fmt.Sprintf("SELECT %d as pingOk", postgresPingOk)).Scan(&pingOK)
+	if pingOK != postgresPingOk {
+		p.Errf(string(errorPostgresPing))
+		return postgresPingFailed, nil
+	}
+
+	return pingOK, nil
+}

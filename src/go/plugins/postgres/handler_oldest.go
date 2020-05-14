@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,16 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package postgres
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+
+	"github.com/jackc/pgx/v4"
 )
+
+const (
+	keyPostgresOldestXid = "pgsql.oldest.xid"
+)
+
+// oldestHandler gets age of the oldest xid if all is OK or nil otherwise.
+func (p *Plugin) oldestHandler(conn *postgresConn, key string, params []string) (interface{}, error) {
+	var resultXID int64
+
+	query := `SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
+				FROM pg_catalog.pg_stat_activity`
+
+	err := conn.postgresPool.QueryRow(context.Background(), query).Scan(&resultXID)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			p.Errf(err.Error())
+			return nil, errorEmptyResult
+		}
+		p.Errf(err.Error())
+		return nil, errorCannotFetchData
+	}
+	return resultXID, nil
+}
