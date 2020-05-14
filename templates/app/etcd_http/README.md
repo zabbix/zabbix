@@ -113,6 +113,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Etcd: Service is unavailable |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Etcd: Node healthcheck failed |<p>https://etcd.io/docs/v3.4.0/op-guide/monitoring/#health-check</p> |`{TEMPLATE_NAME:etcd.health.last()}=0` |AVERAGE |<p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
+|Etcd: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:etcd.is.leader.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 |Etcd: Member has no leader |<p>"If a member does not have a leader, it is totally unavailable."</p> |`{TEMPLATE_NAME:etcd.has.leader.last()}=0` |AVERAGE | |
 |Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)' |<p>Rapid leadership changes impact the performance of etcd significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the etcd cluster.</p> |`{TEMPLATE_NAME:etcd.leader.changes.delta(15m)}>{$ETCD.LEADER.CHANGES.MAX.WARN}` |WARNING | |
 |Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)' |<p>"Normally related to two issues: temporary failures related to a leader election or </p><p>longer downtime caused by a loss of quorum in the cluster."</p> |`{TEMPLATE_NAME:etcd.proposals.failed.rate.min(5m)}>{$ETCD.PROPOSAL.FAIL.MAX.WARN}` |WARNING | |
@@ -122,7 +123,6 @@ There are no template links in this template.
 |Etcd: Cluster version has changed (new version: {ITEM.VALUE}) |<p>Etcd version has changed. Ack to close.</p> |`{TEMPLATE_NAME:etcd.cluster.version.diff()}=1 and {TEMPLATE_NAME:etcd.cluster.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Etcd: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:etcd.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m) |<p>"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. </p><p>If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files."</p> |`{TEMPLATE_NAME:etcd.open.fds.min(5m)}/{Template App Etcd by HTTP:etcd.max.fds.last()}*100>{$ETCD.OPEN.FDS.MAX.WARN}` |WARNING | |
-|Etcd: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:etcd.get_metrics.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 
 ## Feedback
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-14T12:21:48Z</date>
+   <date>2020-05-14T18:25:34Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -216,21 +216,6 @@ Template tooling version used: 0.35</description>
                   </application>
                </applications>
                <url>{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/metrics</url>
-               <triggers>
-                  <trigger>
-                     <expression>{nodata(30m)}=1</expression>
-                     <name>Etcd: Failed to fetch info data (or no data for 30m)</name>
-                     <priority>WARNING</priority>
-                     <description>Zabbix has not received data for items for the last 30 minutes</description>
-                     <manual_close>YES</manual_close>
-                     <dependencies>
-                        <dependency>
-                           <name>Etcd: Service is unavailable</name>
-                           <expression>{Template App Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>Etcd: Get version</name>
@@ -583,6 +568,21 @@ return valueArr.reduce(function(acc,obj){
                <master_item>
                   <key>etcd.get_metrics</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>Etcd: Failed to fetch info data (or no data for 30m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 30 minutes</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Etcd: Service is unavailable</name>
+                           <expression>{Template App Etcd by HTTP:net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>Etcd: Keys compacted per second</name>
