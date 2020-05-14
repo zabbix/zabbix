@@ -742,22 +742,22 @@ class CTemplate extends CHostGeneral {
 			$db_delete_lld_override_operationids = DBselect(
 				'SELECT loo.lld_override_operationid'.
 				' FROM lld_override_operation loo'.
-				' WHERE NOT EXISTS('.
+				' WHERE NOT EXISTS ('.
 						'SELECT NULL'.
 						' FROM lld_override_opstatus los'.
 						' WHERE los.lld_override_operationid=loo.lld_override_operationid'.
 					')'.
-					' AND NOT EXISTS('.
+					' AND NOT EXISTS ('.
 						'SELECT NULL'.
 						' FROM lld_override_opdiscover lod'.
 						' WHERE lod.lld_override_operationid=loo.lld_override_operationid'.
 					')'.
-					' AND NOT EXISTS('.
+					' AND NOT EXISTS ('.
 						'SELECT NULL'.
 						' FROM lld_override_opinventory loi'.
 						' WHERE loi.lld_override_operationid=loo.lld_override_operationid'.
 					')'.
-					' AND NOT EXISTS('.
+					' AND NOT EXISTS ('.
 						'SELECT NULL'.
 						' FROM lld_override_optemplate lot'.
 						' WHERE lot.lld_override_operationid=loo.lld_override_operationid'.
