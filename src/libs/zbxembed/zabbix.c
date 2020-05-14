@@ -69,12 +69,17 @@ static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
 static duk_ret_t	es_zabbix_log(duk_context *ctx)
 {
 	zbx_es_env_t		*env;
-	const char		*message;
+	char			*message = NULL;
 	int			level;
 	duk_memory_functions	out_funcs;
 
 	level = duk_to_int(ctx, 0);
-	message = duk_to_string(ctx, 1);
+
+	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &message))
+	{
+		message = zbx_strdup(message, duk_to_string(ctx, 1));
+		zbx_replace_invalid_utf8(message);
+	}
 
 	zabbix_log(level, "%s", message);
 
@@ -82,13 +87,18 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 	env = (zbx_es_env_t *)out_funcs.udata;
 
 	if (NULL == env->json)
+	{
+		zbx_free(message);
 		return 0;
+	}
 
 	zbx_json_addobject(env->json, NULL);
 	zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
 	zbx_json_adduint64(env->json, "ms", zbx_get_duration_ms(&env->start_time));
 	zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(env->json);
+
+	zbx_free(message);
 
 	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
 	{

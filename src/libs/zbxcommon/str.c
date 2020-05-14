@@ -2344,6 +2344,116 @@ void	zbx_replace_invalid_utf8(char *text)
 	*out = '\0';
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: utf8_decode_3byte_sequence                                       *
+ *                                                                            *
+ * Purpose: decodes 3-byte utf-8 sequence                                     *
+ *                                                                            *
+ * Parameters: ptr - [IN] pointer to the 3 byte sequence                      *
+ *             out - [OUT] the decoded value                                  *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	utf8_decode_3byte_sequence(const char *ptr, zbx_uint32_t *out)
+{
+	*out = ((unsigned char)*ptr++ & 0xF) << 12;
+	if (0x80 != (*ptr & 0xC0))
+		return FAIL;
+
+	*out |= ((unsigned char)*ptr++ & 0x3F) << 6;
+	if (0x80 != (*ptr & 0xC0))
+		return FAIL;
+
+	*out |= ((unsigned char)*ptr & 0x3F);
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_cesu8_to_utf8                                                *
+ *                                                                            *
+ * Purpose: convert cesu8 encoded string to utf8                              *
+ *                                                                            *
+ * Parameters: cesu8 - [IN] pointer to the first char of NULL terminated CESU8*
+ *                     string                                                 *
+ *             utf8  - [OUT] on success, pointer to pointer to the first char *
+ *                     of allocated NULL terminated UTF8 string               *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8)
+{
+	const char	*in, *end;
+	char		*out;
+	size_t		len;
+
+	len = strlen(cesu8);
+	out = *utf8 = zbx_malloc(*utf8, len + 1);
+	end = cesu8 + len;
+
+	for (in = cesu8; in < end;)
+	{
+		if (0x7f >= (unsigned char)*in)
+		{
+			*out++ = *in++;
+			continue;
+		}
+
+		if (0xdf >= (unsigned char)*in)
+		{
+			if (2 > end - in)
+				goto fail;
+
+			*out++ = *in++;
+			*out++ = *in++;
+			continue;
+		}
+
+		if (0xef >= (unsigned char)*in)
+		{
+			zbx_uint32_t	c1, c2, u;
+
+			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c1))
+				goto fail;
+
+			if (0xd800 > c1 || 0xdbff < c1)
+			{
+				/* normal 3-byte sequence */
+				*out++ = *in++;
+				*out++ = *in++;
+				*out++ = *in++;
+				continue;
+			}
+
+			/* decode unicode supplementary character represented as surrogate pair */
+			in += 3;
+			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c2) || 0xdc00 > c2 || 0xdfff < c2)
+				goto fail;
+
+			u = 0x10000 + ((((uint32_t)c1 & 0x3ff) << 10) | (c2 & 0x3ff));
+			*out++ = 0xf0 |  u >> 18;
+			*out++ = 0x80 | (u >> 12 & 0x3f);
+			*out++ = 0x80 | (u >> 6 & 0x3f);
+			*out++ = 0x80 | (u & 0x3f);
+			in += 3;
+			continue;
+		}
+
+		/* the four-byte UTF-8 style supplementary character sequence is not supported by CESU-8 */
+		goto fail;
+	}
+	*out = '\0';
+	return SUCCEED;
+fail:
+	zbx_free(*utf8);
+	return FAIL;
+}
+
 void	dos2unix(char *str)
 {
 	char	*o = str;
@@ -4126,11 +4236,31 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 static size_t	zbx_no_function(const char *expr)
 {
 	const char	*ptr = expr;
-	int		len, c_l, c_r;
+	int		inside_quote = 0, len, c_l, c_r;
 	zbx_token_t	token;
 
 	while ('\0' != *ptr)
 	{
+		switch  (*ptr)
+		{
+			case '\\':
+				if (0 != inside_quote)
+					ptr++;
+				break;
+			case '"':
+				inside_quote = !inside_quote;
+				ptr++;
+				continue;
+		}
+
+		if (inside_quote)
+		{
+			if ('\0' == *ptr)
+				break;
+			ptr++;
+			continue;
+		}
+
 		if ('{' == *ptr && '$' == *(ptr + 1) && SUCCEED == zbx_user_macro_parse(ptr, &len, &c_l, &c_r))
 		{
 			ptr += len + 1;	/* skip to the position after user macro */

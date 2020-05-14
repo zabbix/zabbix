@@ -1,19 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-20T00:00:00Z</date>
+    <date>2020-04-24T15:46:34Z</date>
     <media_types>
         <media_type>
             <name>SIGNL4</name>
             <type>WEBHOOK</type>
             <parameters>
                 <parameter>
-                    <name>Host IP</name>
-                    <value>{HOST.IP}</value>
+                    <name>Event_Ack_Status</name>
+                    <value>{EVENT.ACK.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>Event_Date_Time</name>
+                    <value>{EVENT.DATE} {EVENT.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>Event_ID</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>Event_Update_Action</name>
+                    <value>{EVENT.UPDATE.ACTION}</value>
+                </parameter>
+                <parameter>
+                    <name>Event_Update_Status</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
                 </parameter>
                 <parameter>
                     <name>Hostname</name>
                     <value>{HOST.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>Host_IP</name>
+                    <value>{HOST.IP}</value>
                 </parameter>
                 <parameter>
                     <name>Message</name>
@@ -29,11 +49,23 @@
                 </parameter>
                 <parameter>
                     <name>teamsecret</name>
-                    <value>{ALERT.SENDTO}</value>
+                    <value>Your SIGNL4 Team Secret</value>
                 </parameter>
                 <parameter>
-                    <name>X-S4-ExternalID</name>
-                    <value>Zabbix event id: {EVENT.ID}</value>
+                    <name>Trigger_ID</name>
+                    <value>{TRIGGER.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>Trigger_Status</name>
+                    <value>{TRIGGER.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>User</name>
+                    <value>{USER.FULLNAME}</value>
+                </parameter>
+                <parameter>
+                    <name>Zabbix_URL</name>
+                    <value>Your Zabbix URL</value>
                 </parameter>
             </parameters>
             <script>// SIGNL4 Webhook&#13;
@@ -59,6 +91,29 @@ try {&#13;
     if (typeof params.Severity === 'string' &amp;&amp; params.Severity === '{EVENT.SEVERITY}') {&#13;
         params.Severity = 'Not classified';&#13;
     }&#13;
+&#13;
+	if (typeof params.User === 'string' &amp;&amp; params.User === '{USER.FULLNAME}') {&#13;
+        params.User = '';&#13;
+    }&#13;
+&#13;
+	if (typeof params.Event_Update_Action === 'string' &amp;&amp; params.Event_Update_Action === '{EVENT.UPDATE.ACTION}') {&#13;
+        params.Event_Update_Action = '';&#13;
+    }&#13;
+&#13;
+	// Assamble X-S4-ExternalID for two-way integration&#13;
+	// Format: &quot;ZabbixEventID: 222 ZabbixURL: https://your-zabbix-server/zabbix/&quot;&#13;
+	params['X-S4-ExternalID'] = 'ZabbixEventID: ' + params.Event_ID;&#13;
+	if (typeof params.Zabbix_URL === 'string' &amp;&amp; params.Zabbix_URL.indexOf('http') == 0) {&#13;
+		// Make sure the URL ends with '/'&#13;
+		if (params.Zabbix_URL.charAt(params.Zabbix_URL.length - 1) != '/') {&#13;
+			params.Zabbix_URL = params.Zabbix_URL + '/';&#13;
+		}&#13;
+&#13;
+		params['X-S4-ExternalID'] = params['X-S4-ExternalID'] + ' ZabbixURL: ' +  params.Zabbix_URL;&#13;
+&#13;
+		// Add Link parameter&#13;
+		params['Link'] = params.Zabbix_URL + &quot;tr_events.php?triggerid=&quot;+params.Trigger_ID + &quot;&amp;eventid=&quot; + params.Event_ID;&#13;
+	}&#13;
 &#13;
     payload = JSON.stringify(params);&#13;
     Zabbix.Log(4, '[ SIGNL4 Webhook ] Sending request: ' + payload);&#13;
@@ -146,3 +201,4 @@ Agent port: {HOST.PORT}</message>
         </media_type>
     </media_types>
 </zabbix_export>
+
