@@ -1517,7 +1517,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		$this->validateOverrides($validateItems, $update);
+		$this->validateOverrides($validateItems);
 	}
 
 	/**
