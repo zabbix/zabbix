@@ -22,6 +22,7 @@
 
 #include "sysinc.h"
 #include "zbxtypes.h"
+#include "module.h"
 #include "version.h"
 #include "md5.h"
 
@@ -1033,9 +1034,9 @@ char	*zbx_str_printable_dyn(const char *text);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	del_zeros(char *s);
-int	get_param(const char *param, int num, char *buf, size_t max_len);
+int	get_param(const char *param, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
 int	num_param(const char *param);
-char	*get_param_dyn(const char *param, int num);
+char	*get_param_dyn(const char *param, int num, zbx_request_parameter_type_t *type);
 
 /******************************************************************************
  *                                                                            *

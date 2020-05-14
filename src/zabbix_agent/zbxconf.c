@@ -175,19 +175,19 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 1, name, sizeof(name)))
+			if (0 != get_param(*pline, 1, name, sizeof(name), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse key.");
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath)))
+			if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse counter path.");
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 3, interval, sizeof(interval)))
+			if (0 != get_param(*pline, 3, interval, sizeof(interval), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse interval.");
 				goto pc_fail;
