@@ -147,10 +147,7 @@ class CControllerPopupMaintenancePeriod extends CController {
 			'dayofweek' =>			0,
 			'start_date' =>			date(ZBX_DATE_TIME),
 			'period' =>				SEC_PER_HOUR,
-			'start_time' =>			12 * SEC_PER_HOUR,
-			'month_date_type' =>	0,
-			'hour' =>				0,
-			'minute' =>				0
+			'start_time' =>			0
 		];
 		$fields = [
 			TIMEPERIOD_TYPE_ONETIME =>	['start_date'],
