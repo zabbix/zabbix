@@ -614,7 +614,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if (array_key_exists('acknowledge', $data)) {
-				$menu_data['acknowledge'] = $data['acknowledge'];
+				$menu_data['acknowledge'] = (bool) $data['acknowledge'];
 			}
 
 			return $menu_data;

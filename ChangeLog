@@ -1,20 +1,42 @@
+Changes for 5.2.0alpha1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.1rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.0
+
+5.0.0rc1 was released as 5.0.0 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.0rc1
 
 New features:
+A.F.I..... [ZBX-17667] moved "frontends/php" to "ui" directory (Sasha)
+A.F.I...S. [ZBXNEXT-3035] added ability of filtering out items, triggers, hosts and graphs or overriding their attributes during Low-level discovery based on LLD object and prototype name (Ivo, vmurzins, vso)
 ..F.....S. [ZBXNEXT-2663] Support SAML authentication in zabbix frontend (agriscenko, arimdjonoks)
+..F....PS. [ZBXNEXT-5711] added ability to view logs in frontend when testing web hook media type (gcalenko, vso)
 ..F....... [ZBXNEXT-5300] implemented widget copy/paste possibility in dashboard (miks)
 A.F....... [ZBXNEXT-5879] added filter to Configuration->Templates/Hosts->Discovery rules (agriscenko)
 .........T [ZBXNEXT-5907] Added Jira ServiceDesk mediatype (tuskov)
 A.F.....S. [ZBXNEXT-1882,ZBXNEXT-5865] added problem unacknowledge option (Andris, talbergs)
 
 Bug fixes:
+........S. [ZBX-17676] updated ZBX_MAX_FIELDS in dbschema.h to accomodate new SAML fields (arimdjonoks)
 A.F.I..... [ZBX-17512] fixed length restriction for media type script import into Oracle database (Sasha, talbergs, viktors)
 ..F....... [ZBX-17584] implemented dedicated page for "update problem" popup dialog (averza, miks)
 ..F....... [ZBX-17618] fixed dynamic item switching for URL widget (talbergs)
 ........S. [ZBX-17650] fixed formula for zabbix[proxy,,delay] calculation (asestakovs)
 ........S. [ZBX-17655] fixed possible use of uninitialized variable (MVekslers)
 ..F....... [ZBX-17520] fixed opening Problems popup from SVG graph outside webview boundaries (vasilijs)
-..F....PS. [ZBXNEXT-5711] added ability to view logs in frontend when testing web hook media type (gcalenko, vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.0beta2
@@ -129,7 +151,7 @@ A......... [ZBX-17177] removed "operationid" from lower level properties in Acti
 A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
 ....I..... [ZBX-17514] fixed db upgrade patch for Oracle (asestakovs)
 ...G...... [ZBX-17368] fixed HostMetadataItem and HostInterfaceItem handling in agent2 (esneiders)
-..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multistatement (talbergs)
 ........S. [ZBX-17275] optimized database requests in maintenance update (wiper)
 ...G...... [ZBX-17502] fixed possible hang in agent2 when executing some metrics that forked another process (vso)
 ........S. [ZBX-17398] fixed server crash when escalating internal events with OPDATA macro (asestakovs)
@@ -254,8 +276,11 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 Changes for 4.4.9rc1
 
 New features:
+.......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
 
 Bug fixes:
+........S. [ZBX-17691] fixed server crashes on regexp preprocessing (MVekslers)
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.8
@@ -300,7 +325,7 @@ A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
 .......PS. [ZBX-17518] fixed empty parameter handling in GET method of CurlHttpRequest (vso)
 A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
-..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multistatement (talbergs)
 ...G...... [ZBX-17368] fixed HostMetadataItem and HostInterfaceItem handling in agent2 (esneiders)
 ........S. [ZBX-17275] optimized database requests in maintenance update (wiper)
 ...G...... [ZBX-17502] fixed possible hang in agent2 when executing some metrics that forked another process (vso)
@@ -1405,8 +1430,12 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.21rc1
 
 New features:
+.......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
 
 Bug fixes:
+........S. [ZBX-17691] fixed server crashes on regexp preprocessing (MVekslers)
+........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
+........S. [ZBX-17186] fixed context-aware LLD macro expansion in JsonPath preprocessing (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.20
@@ -1432,12 +1461,12 @@ A......... [ZBX-17496] fixed UserMacro API validation (miks)
 A......... [ZBX-17359] fixed "sortorder": "DESC" option with multiple sortfields (Sasha)
 .......PS. [ZBX-17336] fixed wrong error message when fping fails (mabele)
 ..F....... [ZBX-17427] fixed top busiest triggers filter (miks)
-...G...... [ZBX-17523] fixed agent compilation on Windows is broken (akozlovs)
+...G...... [ZBX-17523] fixed agent compilation on Windows (akozlovs)
 ..F....... [ZBX-17508] fixed error in oracle database encoding check (gcalenko)
 ...G...... [ZBX-17442] fixed web.page.get to time out when there is no response (vso)
 ..F....... [ZBX-17429] fixed trigger expression condition popup to display negative numbers upon opening existing expression (Ivo)
 A.F....... [ZBX-17012] fixed URL validator to also accept relative URLs (Ivo)
-..F....... [ZBX-17507] fixed oracle query interpreted as a multisatement (talbergs)
+..F....... [ZBX-17507] fixed oracle query interpreted as a multistatement (talbergs)
 ........S. [ZBX-9387] fixed incorrect maintenance calculations when DST changed to summer time (akozlovs)
 ..F....... [ZBX-17390] fixed validation of the maximum selected period (Sasha)
 

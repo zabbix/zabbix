@@ -85,27 +85,30 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Add single item object to graph. If invalid 'delay' interval passed method will interrupt current request with
 	 * error message.
 	 *
-	 * @param array  $graph_item                   Array of graph item properties.
-	 * @param string $graph_item['itemid']         Item id.
-	 * @param string $graph_item['type']           Item type.
-	 * @param string $graph_item['name']           Item host display name.
-	 * @param string $graph_item['hostname']       Item hostname.
-	 * @param string $graph_item['key_']           Item key_ field value.
-	 * @param string $graph_item['value_type']     Item value type.
-	 * @param string $graph_item['history']        Item history field value.
-	 * @param string $graph_item['trends']         Item trends field value.
-	 * @param string $graph_item['delay']          Item delay.
-	 * @param string $graph_item['master_itemid']  Master item id for item of type ITEM_TYPE_DEPENDENT.
-	 * @param string $graph_item['units']          Item units value.
-	 * @param string $graph_item['hostid']         Item host id.
-	 * @param string $graph_item['hostname']       Item host name.
-	 * @param string $graph_item['color']          Item presentation color.
-	 * @param int    $graph_item['drawtype']       Item presentation draw type, could be one of
-	 *                                             GRAPH_ITEM_DRAWTYPE_* constants.
-	 * @param int    $graph_item['yaxisside']      Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
-	 * @param int    $graph_item['calc_fnc']       Item calculation function, could be one of CALC_FNC_* constants.
-	 * @param int    $graph_item['calc_type']      Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or
-	 *                                             GRAPH_ITEM_SUM.
+	 * @param array  $graph_item                              Array of graph item properties.
+	 * @param string $graph_item['itemid']                    Item id.
+	 * @param string $graph_item['type']                      Item type.
+	 * @param string $graph_item['name']                      Item host display name.
+	 * @param string $graph_item['hostname']                  Item hostname.
+	 * @param string $graph_item['key_']                      Item key_ field value.
+	 * @param string $graph_item['value_type']                Item value type.
+	 * @param string $graph_item['history']                   Item history field value.
+	 * @param string $graph_item['trends']                    Item trends field value.
+	 * @param string $graph_item['delay']                     Item delay.
+	 * @param string $graph_item['master_itemid']             Master item id for item of type ITEM_TYPE_DEPENDENT.
+	 * @param string $graph_item['units']                     Item units value.
+	 * @param string $graph_item['hostid']                    Item host id.
+	 * @param string $graph_item['hostname']                  Item host name.
+	 * @param string $graph_item['color']                     Item presentation color.
+	 * @param int    $graph_item['drawtype']                  Item presentation draw type, could be one of
+	 *                                                        GRAPH_ITEM_DRAWTYPE_* constants.
+	 * @param int    $graph_item['yaxisside']                 Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
+	 * @param int    $graph_item['calc_fnc']                  Item calculation function, could be one of CALC_FNC_* constants.
+	 * @param int    $graph_item['calc_type']                 Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or
+	 *                                                        GRAPH_ITEM_SUM.
+	 * @param array  $graph_item['preprocessing']             Item preprocessing steps.
+	 * @param string $graph_item['preprocessing'][]['type']   Item preprocessing step type.
+	 * @param string $graph_item['preprocessing'][]['params'] Item preprocessing step parameters.
 	 */
 	public function addItem(array $graph_item) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
@@ -2196,9 +2199,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}
 
+			$stacked_data = ($this->type == GRAPH_TYPE_STACKED);
 			$elements = ($drawtype == GRAPH_ITEM_DRAWTYPE_DOT)
 				? $this->fmtPoints($data, $this->sizeX)
-				: $this->fmtLines($data, $this->sizeX, $data['missing_data_interval']);
+				: $this->fmtLines($data, $this->sizeX, $data['missing_data_interval'], $stacked_data);
 
 			foreach ($elements as $element) {
 				list($j, $i) = $element;
@@ -2281,13 +2285,14 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Produces lines according with expected data frequency. Points are connected only when they are no further apart
 	 * as given frequency.
 	 *
-	 * @param array $data       Data set.
-	 * @param int   $max_x      Number of pixels in graph.
-	 * @param int   $frequency  Expected metric frequency in seconds. If frequency is zero, lines are always connected.
+	 * @param array $data          Data set.
+	 * @param int   $max_x         Number of pixels in graph.
+	 * @param int   $frequency     Expected metric frequency in seconds. If frequency is zero, lines are always connected.
+	 * @param int   $stacked_data  If $data passed is stacked graph type data.
 	 *
 	 * @return array
 	 */
-	public function fmtLines(&$data, $max_x, $frequency) {
+	public function fmtLines(&$data, $max_x, $frequency, $stacked_data = false) {
 		$lines = [];
 
 		$pt = -1;
@@ -2303,15 +2308,20 @@ class CLineGraphDraw extends CGraphDraw {
 			if (!$lines) {
 				$lines[++ $line] = [$pt, $pt];
 			}
+			elseif ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency) {
+				$lines[++ $line] = [$pt, $pt];
+			}
 			elseif ($data['avg'][$pt] != $data['avg'][$prev_pt]) {
 				$lines[++ $line] = [$prev_pt, $pt];
 				$lines[++ $line] = [$pt, $pt];
 			}
 			elseif (!$frequency || $pt - $prev_pt < ZBX_GRAPH_MAX_SKIP_CELL) {
-				$lines[$line][1] = $pt;
-			}
-			elseif ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency) {
-				$lines[++ $line] = [$pt, $pt];
+				if ($stacked_data) {
+					$lines[++ $line] = [$prev_pt, $pt];
+				}
+				else {
+					$lines[$line][1] = $pt;
+				}
 			}
 			else {
 				$lines[$line][1] = $pt;
@@ -2353,6 +2363,20 @@ class CLineGraphDraw extends CGraphDraw {
 					}
 					else {
 						$lines[] = [$pt_last, $px_last];
+					}
+				}
+			}
+		}
+
+		// Removing any points that are adjacent to line.
+		if ($lines) {
+			foreach ($lines as $index => $line) {
+				if ($line[0] == $line[1]) {
+					if (array_key_exists($index - 1, $lines) && $lines[$index - 1][1] == $line[0]) {
+						unset($lines[$index]);
+					}
+					elseif (array_key_exists($index + 1, $lines) && $lines[$index + 1][0] == $line[0]) {
+						unset($lines[$index]);
 					}
 				}
 			}

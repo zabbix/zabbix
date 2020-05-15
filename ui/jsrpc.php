@@ -563,6 +563,7 @@ switch ($data['method']) {
 				$options = [
 					'output' => ['name'],
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
+					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => $templated,
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'limit' => $config['search_limit']

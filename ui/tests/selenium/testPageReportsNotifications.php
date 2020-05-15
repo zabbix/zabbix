@@ -28,10 +28,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Notifications');
 
 		// Check dropdown elements
-		$this->zbxTestDropdownHasOptions('media_type', ['all', 'Discord', 'Email', 'Email (HTML)', 'Jira',
-			'Jira with CustomFields', 'Mattermost', 'MS Teams', 'Opsgenie', 'PagerDuty', 'Pushover', 'Reference webhook',
-			'Redmine','SIGNL4', 'Slack', 'SMS', 'Telegram', 'Test script', 'URL test webhook', 'Validation webhook',
-			'Webhook to delete', 'Zendesk']);
+		$all_media = [];
+		foreach (CDBHelper::getAll('SELECT name FROM media_type ORDER BY LOWER(name) ASC') as $name) {
+			$all_media[] = $name['name'];
+		}
+		$this->zbxTestDropdownHasOptions('media_type', $all_media);
 		$this->zbxTestDropdownHasOptions('period', ['Daily', 'Weekly', 'Monthly', 'Yearly']);
 		$this->zbxTestDropdownHasOptions('year', ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020']);
 		// Check default selected dropdown values
@@ -75,20 +76,20 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'alias' => 'admin-zabbix',
-							'notifications' => [ '', '', '', '4 (0/2/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0)', '', '',
-									'', '', '', '', '', '12 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0)'
+							'notifications' => [ '', '', '', '4 (0/2/0/0/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0/0)', '',
+									'', '', '', '', '', '', '12 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0/0)'
 							]
 						],
 						[
 							'alias' => 'guest',
-							'notifications' => [ '', '2 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0)', '', '', '', '', '',
-									'', '', '10 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/5/0/0/0/0/0/0)', '', ''
+							'notifications' => [ '', '2 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0)', '', '', '',
+									'', '', '', '', '10 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/0/0/5/0/0/0/0/0/0/0)', '', ''
 							]
 						],
 						[
 							'alias' => 'test-user',
-							'notifications' => [ '', '', '3 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0)', '', '', '', '',
-									'', '', '', '11 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0)', ''
+							'notifications' => [ '', '', '3 (0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/2/0/0/0/0/0/0/0)', '', '',
+								'', '', '', '', '', '11 (0/5/0/0/0/0/0/0/0/0/0/0/0/0/0/0/6/0/0/0/0/0/0/0)', ''
 							]
 						]
 					]
@@ -107,12 +108,12 @@ class testPageReportsNotifications extends CLegacyWebTest {
 						[
 							'alias' => 'disabled-user',
 							'notifications' => [ '', '', '', '', '', '', '', '', '', '',
-								'15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0)', '']
+								'15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0/0)', '']
 						],
 						[
 							'alias' => 'user-for-blocking',
 							'notifications' => [ '', '', '', '', '', '',
-								'14 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0)', '', '', '', '', '']
+								'14 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0/0)', '', '', '', '', '']
 						]
 					]
 				]
@@ -125,12 +126,12 @@ class testPageReportsNotifications extends CLegacyWebTest {
 						[
 							'alias' => 'admin-zabbix',
 							'notifications' => [ '', '', '', '', '',
-								'16 (0/8/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0)', '']
+								'16 (0/8/0/0/0/0/0/0/0/0/0/0/0/0/0/0/8/0/0/0/0/0/0/0)', '']
 						],
 						[
 							'alias' => 'disabled-user',
-							'notifications' => [ '', '', '', '', '15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0)',
-								'7 (0/3/0/0/0/0/0/0/0/0/0/0/0/0/4/0/0/0/0/0/0)', '']
+							'notifications' => [ '', '', '', '', '15 (0/6/0/0/0/0/0/0/0/0/0/0/0/0/0/0/9/0/0/0/0/0/0/0)',
+								'7 (0/3/0/0/0/0/0/0/0/0/0/0/0/0/0/0/4/0/0/0/0/0/0/0)', '']
 						]
 					]
 				]

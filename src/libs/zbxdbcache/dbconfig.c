@@ -11703,22 +11703,21 @@ void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zb
  *                                                                            *
  * Purpose: gets nested group ids for the specified host groups               *
  *                                                                            *
- * Parameter: names           - [IN] the parent group names                   *
- *            names_num       - [IN] the number of parent groups              *
+ * Parameter: groups          - [IN] the parent group names                   *
  *            nested_groupids - [OUT] the nested + parent group ids           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_nested_hostgroupids_by_names(char **names, int names_num, zbx_vector_uint64_t *nested_groupids)
+void	zbx_dc_get_nested_hostgroupids_by_names(zbx_vector_str_t *groups, zbx_vector_uint64_t *nested_groupids)
 {
 	int	i, index;
 
 	WRLOCK_CACHE;
 
-	for (i = 0; i < names_num; i++)
+	for (i = 0; i < groups->values_num; i++)
 	{
 		zbx_dc_hostgroup_t	group_local, *group;
 
-		group_local.name = names[i];
+		group_local.name = groups->values[i];
 
 		if (FAIL != (index = zbx_vector_ptr_bsearch(&config->hostgroups_name, &group_local,
 				dc_compare_hgroups)))

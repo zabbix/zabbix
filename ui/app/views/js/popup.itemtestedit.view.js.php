@@ -302,7 +302,7 @@ function itemCompleteTest(overlay) {
 
 				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
 					.append(jQuery('<div>').append(ret.final.action, $result))
-					.css('display', 'block');
+					.css({display: 'block', width: '675px'});
 
 				if (typeof ret.mapped_value !== 'undefined') {
 					$mapped_value = makeStepResult({result: ret.mapped_value});
@@ -454,9 +454,11 @@ jQuery(document).ready(function($) {
 
 	<?php if ($data['is_item_testable']): ?>
 		$('#get_value').on('change', function() {
-			$rows = $('#host_address_row, #proxy_hostid_row, #get_value_row'),
-			$form = $('#preprocessing-test-form'),
-			$submit_btn = overlays_stack.getById('item-test').$btn_submit;
+			var $rows = $('#host_address_row, #proxy_hostid_row, #get_value_row, #empty_row_1, #empty_row_2,'
+					+ ' #host_port_row'
+				),
+				$form = $('#preprocessing-test-form'),
+				$submit_btn = overlays_stack.getById('item-test').$btn_submit;
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
