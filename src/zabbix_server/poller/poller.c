@@ -715,6 +715,8 @@ void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *resul
 #ifndef HAVE_NETSNMP
 		int	i;
 
+		ZBX_UNUSED(poller_type);
+
 		for (i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
