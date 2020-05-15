@@ -1,0 +1,1 @@
+.......PS. [ZBX-17607] fixed unreachable poller being too busy due to SNMP checks being attempted twice at a time (mabele)
