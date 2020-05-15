@@ -216,6 +216,9 @@ aside,
     margin-top: 4rem; }
   .wrapper > .debug-output {
     flex-shrink: 0; }
+  .wrapper > output {
+    box-sizing: border-box;
+    min-width: 1200px; }
 
 header,
 footer {
