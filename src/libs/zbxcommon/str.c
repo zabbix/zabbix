@@ -2435,7 +2435,7 @@ int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8)
 			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c2) || 0xdc00 > c2 || 0xdfff < c2)
 				goto fail;
 
-			u = 0x10000 + ((((uint32_t)c1 & 0x3ff) << 10) | (c2 & 0x3ff));
+			u = 0x10000 + ((((zbx_uint32_t)c1 & 0x3ff) << 10) | (c2 & 0x3ff));
 			*out++ = 0xf0 |  u >> 18;
 			*out++ = 0x80 | (u >> 12 & 0x3f);
 			*out++ = 0x80 | (u >> 6 & 0x3f);
