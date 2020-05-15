@@ -523,10 +523,9 @@ $triggersFormList
 	)
 	->addRow(_('Create enabled'), (new CCheckBox('status'))->setChecked($status))
 	->addRow(_('Discover'),
-		(new CRadioButtonList('discover', (int) $data['discover']))
-			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
-			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
-			->setModern(true)
+		(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+			->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
+			->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
 	);
 
 // append tabs to form

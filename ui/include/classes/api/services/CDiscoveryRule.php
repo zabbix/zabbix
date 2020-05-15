@@ -745,7 +745,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'opdata'
+				'opdata', 'discover'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
@@ -1017,9 +1017,9 @@ class CDiscoveryRule extends CItemGeneral {
 						'stop' => array_key_exists('stop', $override) ? $override['stop'] : ZBX_LLD_OVERRIDE_STOP_NO
 					];
 
-					if (array_key_exists('filter', $override)) {
-						$new_override['evaltype'] = $override['filter']['evaltype'];
-					}
+					$new_override['evaltype'] = array_key_exists('filter', $override)
+						? $override['filter']['evaltype']
+						: DB::getDefault('lld_override', 'evaltype');
 
 					$overrides[] = $new_override;
 				}
@@ -1517,33 +1517,32 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		$this->validateOverrides($validateItems, $update);
+		$this->validateOverrides($validateItems);
 	}
 
 	/**
 	 * Validate low-level discovery rule overrides.
 	 *
-	 * @param array $items   Low-level discovery rules.
-	 * @param bool  $update  True if caller method is an update method.
+	 * @param array $items  Low-level discovery rules.
 	 *
 	 * @throws APIException
 	 */
-	protected function validateOverrides(array $items, $update): void {
+	protected function validateOverrides(array $items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name'], ['step']], 'fields' => [
 			'step' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:'.ZBX_MAX_INT32],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => $update ? 0x00 : (API_REQUIRED | API_NOT_EMPTY), 'length' => DB::getFieldLength('lld_override', 'name')],//?
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override', 'name')],
 			'stop' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_OVERRIDE_STOP_NO, ZBX_LLD_OVERRIDE_STOP_YES]), 'default' => ZBX_LLD_OVERRIDE_STOP_NO],
 			'filter' =>			['type' => API_OBJECT, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 				'formula' =>		['type' => API_STRING_UTF8],
-				'conditions' =>		['type' => API_OBJECTS, 'fields' => [
+				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 					'macro' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_condition', 'macro')],
 					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_REGEXP],
 					'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_condition', 'value')],
 					'formulaid' =>		['type' => API_STRING_UTF8]
 				]]
 			]],
-			'operations' =>	['type' => API_OBJECTS, 'flags' => $update ? 0x00 : (API_REQUIRED | API_NOT_EMPTY), 'fields' => [
+			'operations' =>	['type' => API_OBJECTS, 'fields' => [
 				'operationobject' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE])],
 				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_EQUAL],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_operation', 'value')],
@@ -1557,10 +1556,10 @@ class CDiscoveryRule extends CItemGeneral {
 					'delay' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
 				]],
 				'ophistory' =>			['type' => API_OBJECT, 'fields' => [
-					'history' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
+					'history' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
 				]],
 				'optrends' =>			['type' => API_OBJECT, 'fields' => [
-					'trends' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
+					'trends' =>				['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
 				]],
 				'opseverity' =>			['type' => API_OBJECT, 'fields' => [
 					'severity' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))]
@@ -1580,6 +1579,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// Schema for filter is already validated in API validator. Create the formula validator for filter.
 		$condition_validator = new CConditionValidator([
+			'messageMissingFormula' => _('Formula missing for override "%1$s".'),
 			'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for override "%1$s": %3$s.'),
 			'messageMissingCondition' =>
 				_('Condition "%2$s" used in formula "%3$s" for override "%1$s" is not defined.'),
@@ -1591,9 +1591,10 @@ class CDiscoveryRule extends CItemGeneral {
 			'lldmacros' => true
 		]);
 
-		foreach ($items as $lld_idx => $item) {
+		$lld_idx = 0;
+		foreach ($items as $item) {
 			if (array_key_exists('overrides', $item)) {
-				$path = '/'.($lld_idx + 1).'/overrides';
+				$path = '/'.(++$lld_idx).'/overrides';
 
 				if (!CApiInputValidator::validate($api_input_rules, $item['overrides'], $path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1667,24 +1668,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 									if (array_key_exists('opperiod', $operation)) {
 										$this->validateDelay($update_interval_parser, $operation['opperiod']['delay']);
-									}
-
-									if (array_key_exists('ophistory', $operation)
-											&& !validateTimeUnit($operation['ophistory']['history'], SEC_PER_HOUR,
-													25 * SEC_PER_YEAR, true, $error,
-													['usermacros' => true, 'lldmacros' => true])) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'history', $error)
-										);
-									}
-
-									if (array_key_exists('optrends', $operation)
-											&& !validateTimeUnit($operation['optrends']['trends'], SEC_PER_HOUR,
-													25 * SEC_PER_YEAR, true, $error,
-													['usermacros' => true, 'lldmacros' => true])) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'trends', $error)
-										);
 									}
 									break;
 
@@ -1801,6 +1784,7 @@ class CDiscoveryRule extends CItemGeneral {
 			],
 			'postValidators' => [
 				new CConditionValidator([
+					'messageMissingFormula' => _('Formula missing for discovery rule "%1$s".'),
 					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
 					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for discovery rule "%1$s" is not defined.'),
 					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".')
@@ -2112,6 +2096,9 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($dstDiscovery['overrides']) {
 			foreach ($dstDiscovery['overrides'] as &$override) {
 				if (array_key_exists('filter', $override)) {
+					if (!$override['filter']['conditions']) {
+						unset($override['filter']);
+					}
 					unset($override['filter']['eval_formula']);
 				}
 			}
@@ -2206,7 +2193,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-				'allow_traps'
+				'allow_traps', 'discover'
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
@@ -2385,7 +2372,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$srcGraphs = API::GraphPrototype()->get([
 			'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period',
 				'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right',
-				'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid'
+				'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid', 'discover'
 			],
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
 			'selectHosts' => ['hostid'],
@@ -2501,7 +2488,7 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
 		$prototypes = API::HostPrototype()->get([
 			'discoveryids' => $srcid,
-			'output' => ['host', 'name', 'status', 'inventory_mode'],
+			'output' => ['host', 'name', 'status', 'inventory_mode', 'discover'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
 			'selectTemplates' => ['templateid'],
@@ -2943,12 +2930,11 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
-					$ids = array_merge(array_keys($item_prototype_objectids), array_keys($trigger_prototype_objectids));
-					$ids = array_merge($ids, array_keys($host_prototype_objectids));
-
 					$opstatus = DB::select('lld_override_opstatus', [
 						'output' => ['lld_override_operationid', 'status'],
-						'filter' => ['lld_override_operationid' => $ids]
+						'filter' => ['lld_override_operationid' => array_keys(
+							$item_prototype_objectids + $trigger_prototype_objectids + $host_prototype_objectids
+						)]
 					]);
 				}
 
