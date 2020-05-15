@@ -403,7 +403,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		if ($first_load) {
 			// Each loaded module name is checked separatelly due to difference in their sorting on Jenkinsand locally.
 			$this->checkModulesMessage($message, 'Modules updated', ['Modules added:', '1st Module name',
-					'2nd Module name !@#$%^&*()_+', '4th Module.']);
+					'2nd Module name !@#$%^&*()_+', '4th Module']);
 		}
 		else {
 			$this->assertEquals($message->getTitle(), 'No new modules discovered');
