@@ -40,6 +40,7 @@
 		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="scan-build" failonerror="on">
 			<arg line="./configure"/>
+			<arg line="--quiet"/>
 			<arg line="--enable-server --enable-agent --enable-proxy --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent --with-ldap --with-libcurl"/>
 		</exec>
 		<exec executable="cppcheck" error="${SCANFILE}" failonerror="on">

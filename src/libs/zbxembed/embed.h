@@ -27,12 +27,13 @@ struct zbx_es_env
 {
 	duk_context	*ctx;
 	size_t		total_alloc;
-	time_t		start_time;
+	zbx_timespec_t	start_time;
 
 	char		*error;
 	int		rt_error_num;
 	int		fatal_error;
 	int		timeout;
+	struct zbx_json	*json;
 
 	jmp_buf		loc;
 };
