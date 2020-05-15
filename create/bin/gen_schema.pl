@@ -596,11 +596,18 @@ sub process_row
 
 sub timescaledb
 {
-	for ("history", "history_uint", "history_log", "history_text", 
-			"history_str", "trends", "trends_uint")
+	for ("history", "history_uint", "history_log", "history_text", "history_str")
 	{
 		print<<EOF
 SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
+EOF
+		;
+	}
+
+	for ("trends", "trends_uint")
+	{
+		print<<EOF
+SELECT create_hypertable('$_', 'clock', chunk_time_interval => 2592000, migrate_data => true);
 EOF
 		;
 	}
