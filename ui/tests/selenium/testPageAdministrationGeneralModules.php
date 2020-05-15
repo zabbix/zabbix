@@ -88,22 +88,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
 	}
 
-	private function loadModules($first_load = true) {
-		// Load modules
-		$this->query('button:Scan directory')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		// Check message after loading modules.
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		if ($first_load) {
-			$this->checkModulesMessage($message, 'Modules updated', 'Modules added: 1st Module name, 2nd Module name'.
-					' !@#$%^&*()_+, 4th Module.');
-		}
-		else {
-			$this->assertEquals($message->getTitle(), 'No new modules discovered');
-		}
-	}
-
 	public function getModuleDetails() {
 		return [
 			// Module 1.
@@ -404,6 +388,29 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	}
 
 	/**
+	 * Function loads modules in frontend and checks the message depending on whether new modules were loaded.
+	 *
+	 * @param bool		$first_load		flag that determines whether modules are loaded for the first time.
+	 */
+	private function loadModules($first_load = true) {
+		// Load modules
+		$this->query('button:Scan directory')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		// Check message after loading modules.
+		$message = CMessageElement::find()->one();
+		$this->assertTrue($message->isGood());
+
+		if ($first_load) {
+			// Each loaded module name is checked separatelly due to difference in their sorting on Jenkinsand locally.
+			$this->checkModulesMessage($message, 'Modules updated', ['Modules added:', '1st Module name',
+					'2nd Module name !@#$%^&*()_+', '4th Module.']);
+		}
+		else {
+			$this->assertEquals($message->getTitle(), 'No new modules discovered');
+		}
+	}
+
+	/**
 	 * Function checks if the corresponding menu option exists, clicks on it and checks the URL and header of the page.
 	 * If the module shouldn't be enabled, the function makes sure that the corresponding menu entry doesn't exist.
 	 */
@@ -427,7 +434,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 */
 	private function checkModulesMessage($message, $title, $details) {
 		$this->assertEquals($title, $message->getTitle());
-		$this->assertTrue($message->hasLine($details));
+		if (is_array($details)) {
+			foreach ($details as $detail) {
+				$this->assertTrue($message->hasLine($detail));
+			}
+		}
+		else {
+			$this->assertTrue($message->hasLine($details));
+		}
 	}
 
 	/**
