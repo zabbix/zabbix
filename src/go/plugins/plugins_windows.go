@@ -38,6 +38,7 @@ import (
 	_ "zabbix.com/plugins/vm/memory"
 	_ "zabbix.com/plugins/web"
 	_ "zabbix.com/plugins/windows/eventlog"
+	_ "zabbix.com/plugins/windows/perfinstance"
 	_ "zabbix.com/plugins/windows/perfmon"
 	_ "zabbix.com/plugins/windows/services"
 	_ "zabbix.com/plugins/windows/wmi"

@@ -23,10 +23,29 @@
 #include "common.h"
 #include "sysinfo.h"
 
+const char *request_parameter_type_to_str(zbx_request_parameter_type_t type)
+{
+	const char *ret = "undefined";
+
+	switch(type)
+	{
+		case REQUEST_PARAMETER_TYPE_STRING:
+			ret = "string";
+			break;
+		case REQUEST_PARAMETER_TYPE_ARRAY:
+			ret = "array";
+			break;
+		default:
+			break;
+	}
+
+	return ret;
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	error;
-	zbx_mock_handle_t	in_key, out_key, out_parameters;
+	zbx_mock_handle_t	in_key, out_key, out_parameters, out_types;
 	AGENT_REQUEST		request;
 	const char		*item_key, *expected_key;
 	int			expected_result = 123, actual_result;
@@ -46,11 +65,12 @@ void	zbx_mock_test_entry(void **state)
 	else
 		expected_result = SUCCEED;
 
-	if (ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("parameters", &out_parameters)) &&
+	if ((ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("parameters", &out_parameters)) ||
+			ZBX_MOCK_NO_PARAMETER == (error = zbx_mock_out_parameter("types", &out_types))) &&
 			SUCCEED == expected_result)
 	{
-		fail_msg("Malformed test case data, expected key and parameters should be either both present (for a"
-				" valid key) or both absent (for an invalid key).");
+		fail_msg("Malformed test case data, expected key, parameters and type should be either all present"
+				" (for a valid key) or all absent (for an invalid key).");
 	}
 	else if (ZBX_MOCK_SUCCESS != error && SUCCEED == expected_result)
 	{
@@ -67,16 +87,18 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == expected_result)
 	{
-		zbx_mock_handle_t	out_parameter;
-		const char		*expected_parameter;
+		zbx_mock_handle_t	out_parameter, out_type;
+		const char		*expected_parameter, *expected_type;
 		int			i;
 
 		if (0 != strcmp(expected_key, request.key))
 			fail_msg("Got '%s' instead of '%s' as a key.", request.key, expected_key);
 
-		for (i = 0; ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(out_parameters, &out_parameter)); i++)
+		for (i = 0; ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(out_parameters, &out_parameter)) &&
+			ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(out_types, &out_type)); i++)
 		{
-			if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(out_parameter, &expected_parameter)))
+			if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(out_parameter, &expected_parameter)) ||
+					ZBX_MOCK_SUCCESS != (error = zbx_mock_string(out_type, &expected_type)))
 				break;
 
 			if (i >= request.nparam)
@@ -87,11 +109,17 @@ void	zbx_mock_test_entry(void **state)
 				fail_msg("Unexpected parameter #%d: '%s' instead of '%s'.", i + 1, request.params[i],
 						expected_parameter);
 			}
+
+			if (0 != strcmp(expected_type, request_parameter_type_to_str(request.types[i])))
+			{
+				fail_msg("Unexpected parameter type #%d: '%s' instead of '%s'.", i + 1,
+						request_parameter_type_to_str(request.types[i]), expected_type);
+			}
 		}
 
 		if (ZBX_MOCK_END_OF_VECTOR != error)
 		{
-			fail_msg("Cannot get expected parameter #%d from test case data: %s", i,
+			fail_msg("Cannot get expected parameter/type #%d from test case data: %s", i,
 					zbx_mock_error_string(error));
 		}
 

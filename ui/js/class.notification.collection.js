@@ -29,8 +29,8 @@ function ZBX_NotificationCollection() {
 
 	this.makeNodes();
 
-	this.node.style.right = '0px';
-	this.node.style.top = '126px';
+	this.node.style.right = '10px';
+	this.node.style.top = '0px';
 }
 
 /**
@@ -129,7 +129,7 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	this.node.className = 'overlay-dialogue notif';
 
 	this.btn_close = document.createElement('button');
-	this.btn_close.setAttribute('title', locale['S_CLEAR']);
+	this.btn_close.setAttribute('title', locale['S_CLOSE']);
 	this.btn_close.setAttribute('type', 'button');
 	this.btn_close.className = 'overlay-close-btn';
 

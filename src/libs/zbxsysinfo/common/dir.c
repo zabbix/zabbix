@@ -271,7 +271,7 @@ static int	etypes_to_mask(char *etypes, AGENT_RESULT *result)
 	num = num_param(etypes);
 	for (n = 1; n <= num; n++)
 	{
-		if (NULL == (etype = get_param_dyn(etypes, n)))
+		if (NULL == (etype = get_param_dyn(etypes, n, NULL)))
 			continue;
 
 		if (DET_OVERFLOW & (type = etype_to_mask(etype)))

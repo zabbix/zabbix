@@ -97,6 +97,12 @@ class CMultiSelect extends CTag {
 			}
 		}
 
+		if (array_key_exists('autosuggest', $options)) {
+			if (array_key_exists('filter_preselect_fields', $options['autosuggest'])) {
+				$params['autosuggest']['filter_preselect_fields'] = $options['autosuggest']['filter_preselect_fields'];
+			}
+		}
+
 		if (array_key_exists('popup', $options)) {
 			if (array_key_exists('filter_preselect_fields', $options['popup'])) {
 				$params['popup']['filter_preselect_fields'] = $options['popup']['filter_preselect_fields'];
@@ -144,7 +150,7 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup', 'placeholder'
+			'add_post_js', 'styles', 'popup', 'placeholder', 'autosuggest'
 		];
 
 		foreach ($options as $field => $value) {
@@ -179,6 +185,32 @@ class CMultiSelect extends CTag {
 
 		$autocomplete_parameters = [];
 		$popup_parameters = [];
+
+		if (array_key_exists('autosuggest', $options)) {
+			$valid_fields = ['filter_preselect_fields'];
+
+			foreach (array_keys($options['autosuggest']) as $field) {
+				if (!in_array($field, $valid_fields)) {
+					error('unsupported option: $options[\'autosuggest\'][\''.$field.'\']');
+				}
+			}
+
+			if (array_key_exists('filter_preselect_fields', $options['autosuggest'])) {
+				if (is_array($options['autosuggest']['filter_preselect_fields'])) {
+					foreach ($options['autosuggest']['filter_preselect_fields'] as $field => $value) {
+						if (in_array($field, $this->preselect_fields) && is_string($value) && $value !== '') {
+							$mapped_options['autosuggest']['filter_preselect_fields'][$field] = $value;
+						}
+						else {
+							error('invalid property: $options[\'autosuggest\'][\'filter_preselect_fields\'][\''.$field.'\']');
+						}
+					}
+				}
+				else {
+					error('invalid property: $options[\'autosuggest\'][\'filter_preselect_fields\']');
+				}
+			}
+		}
 
 		if (array_key_exists('popup', $options)) {
 			$valid_fields = ['parameters', 'filter_preselect_fields'];

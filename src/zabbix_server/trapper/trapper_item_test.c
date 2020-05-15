@@ -340,7 +340,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);
 
-		zbx_check_items(&item, &errcode, 1, &result, &add_results);
+		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER);
 
 		switch (errcode)
 		{
