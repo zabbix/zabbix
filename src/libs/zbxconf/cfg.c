@@ -431,13 +431,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
 
-			if (0 == strcmp(parameter, "EnableRemoteCommands"))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "%s parameter is deprecated,"
-						" use AllowKey=system.run[*] or DenyKey=system.run[*] instead",
-						parameter);
-			}
-
 			if (0 == strcmp(parameter, "Include"))
 			{
 				if (FAIL == parse_cfg_object(value, cfg, level, strict))

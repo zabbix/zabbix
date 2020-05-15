@@ -21,7 +21,6 @@ package empty
 
 import (
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/std"
 )
 
 // Plugin -
@@ -30,7 +29,6 @@ type Plugin struct {
 }
 
 var impl Plugin
-var stdOs std.Os
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
@@ -38,6 +36,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	stdOs = std.NewOs()
 	plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.empty", "Returns empty value.")
 }

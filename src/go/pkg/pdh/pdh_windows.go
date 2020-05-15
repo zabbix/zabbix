@@ -31,6 +31,8 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+var ObjectsNames map[string]string
+
 type sysCounter struct {
 	name  string
 	index string
@@ -59,6 +61,7 @@ var sysCounters []sysCounter = []sysCounter{
 }
 
 const HKEY_PERFORMANCE_TEXT = 0x80000050
+const HKEY_PERFORMANCE_NLSTEXT = 0x80000060
 
 type CounterPathElements struct {
 	MachineName    string
@@ -69,56 +72,98 @@ type CounterPathElements struct {
 	CounterName    string
 }
 
-func nextField(buf []uint16) (field []uint16, left []uint16) {
-	start := -1
-	for i, c := range buf {
-		if c != 0 {
-			start = i
-			break
-		}
-	}
-	if start == -1 {
-		return []uint16{}, []uint16{}
-	}
-	for i, c := range buf[start:] {
-		if c == 0 {
-			return buf[start : start+i], buf[start+i+1:]
-		}
-	}
-	return buf[start:], []uint16{}
-}
+func LocateObjectsAndDefaultCounters(resetDefCounters bool) (err error) {
+	ObjectsNames = make(map[string]string)
 
-func locateDefaultCounters() (err error) {
-	var size uint32
-	counter := windows.StringToUTF16Ptr("Counter")
-	err = windows.RegQueryValueEx(HKEY_PERFORMANCE_TEXT, counter, nil, nil, nil, &size)
+	engBuf, err := getRegQueryCounters(HKEY_PERFORMANCE_NLSTEXT)
 	if err != nil {
 		return
 	}
-	buf := make([]uint16, size/2)
 
-	err = windows.RegQueryValueEx(HKEY_PERFORMANCE_TEXT, counter, nil, nil, (*byte)(unsafe.Pointer(&buf[0])), &size)
+	locNames, err := win32.PdhEnumObject()
+	if err != nil {
+		return err
+	}
+
+	var wcharEngIndex, wcharEngName []uint16
+	englishCounters := make(map[string]int)
+	for len(engBuf) != 0 {
+		wcharEngIndex, engBuf = win32.NextField(engBuf)
+		if len(wcharEngIndex) == 0 {
+			break
+		}
+		wcharEngName, engBuf = win32.NextField(engBuf)
+		if len(wcharEngName) == 0 {
+			break
+		}
+
+		idx, err := strconv.Atoi(windows.UTF16ToString(wcharEngIndex))
+		if err != nil {
+			return err
+		}
+		englishCounters[windows.UTF16ToString(wcharEngName)] = idx
+	}
+
+	objectsLocal := make(map[int]string)
+	for _, name := range locNames {
+		if idx, ok := englishCounters[name]; ok {
+			objectsLocal[idx] = name
+			continue
+		}
+
+		ObjectsNames[name] = name // use local object name as english name if there is no idx that can be used for translation
+	}
+
+	buf, err := getRegQueryCounters(HKEY_PERFORMANCE_TEXT)
 	if err != nil {
 		return
 	}
 
 	var wcharIndex, wcharName []uint16
 	for len(buf) != 0 {
-		wcharIndex, buf = nextField(buf)
+		wcharIndex, buf = win32.NextField(buf)
 		if len(wcharIndex) == 0 {
 			break
 		}
-		wcharName, buf = nextField(buf)
+		wcharName, buf = win32.NextField(buf)
 		if len(wcharName) == 0 {
 			break
 		}
+
 		name := windows.UTF16ToString(wcharName)
-		for i := range sysCounters {
-			if sysCounters[i].name == name {
-				sysCounters[i].index = windows.UTF16ToString(wcharIndex)
+		idx := windows.UTF16ToString(wcharIndex)
+		if resetDefCounters {
+			for i := range sysCounters {
+				if sysCounters[i].name == name {
+					sysCounters[i].index = idx
+				}
 			}
 		}
+
+		i, err := strconv.Atoi(idx)
+		if err != nil {
+			return err
+		}
+
+		if objectLocal, ok := objectsLocal[i]; ok {
+			ObjectsNames[name] = objectLocal
+		}
 	}
+
+	return
+}
+
+func getRegQueryCounters(key windows.Handle) (buf []uint16, err error) {
+	var size uint32
+	counter := windows.StringToUTF16Ptr("Counter")
+
+	err = windows.RegQueryValueEx(key, counter, nil, nil, nil, &size)
+	if err != nil {
+		return nil, err
+	}
+
+	buf = make([]uint16, size/2)
+	err = windows.RegQueryValueEx(key, counter, nil, nil, (*byte)(unsafe.Pointer(&buf[0])), &size)
 
 	return
 }
@@ -237,7 +282,7 @@ func MakePath(elements *CounterPathElements) (path string, err error) {
 }
 
 func init() {
-	if err := locateDefaultCounters(); err != nil {
+	if err := LocateObjectsAndDefaultCounters(true); err != nil {
 		panic(err.Error())
 	}
 }

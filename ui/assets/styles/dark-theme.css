@@ -206,10 +206,9 @@ aside,
   flex-direction: column;
   overflow: auto;
   position: relative; }
-  .wrapper > header + [class^="msg-"], .wrapper > [class^="msg-"] + [class^="msg-"] {
+  .wrapper > [class^="msg-"] + [class^="msg-"] {
     margin-top: 0; }
   .wrapper.layout-kioskmode main {
-    padding: 10px;
     transition: margin-top .3s; }
   .wrapper.layout-kioskmode.kiosk-slide-lines-1 main {
     margin-top: 2rem; }
@@ -217,18 +216,19 @@ aside,
     margin-top: 4rem; }
   .wrapper > .debug-output {
     flex-shrink: 0; }
+  .wrapper > output {
+    box-sizing: border-box;
+    min-width: 1200px; }
 
 header,
 footer {
   flex-shrink: 0;
   min-width: 1200px; }
 
-header {
-  margin-bottom: 10px; }
-
 main {
-  padding: 0 10px;
-  min-width: 1200px; }
+  position: relative;
+  min-width: 1200px;
+  padding: 10px; }
 
 footer {
   margin-top: auto; }
@@ -1756,6 +1756,11 @@ pre, pre a, pre td, pre span {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
     display: inline-block; }
+  .table-forms .dynamic-row > td {
+    padding-top: 0; }
+  .table-forms .dynamic-row-control > td {
+    padding-top: 0;
+    padding-bottom: 0; }
 
 .table-forms-separator {
   border: 1px solid #383838;
@@ -3347,6 +3352,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0 10px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
+      .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
+        position: relative;
+        transform: scale(1); }
+        .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field .table-forms-second-column {
+          position: absolute;
+          top: 5px;
+          right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
         margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {

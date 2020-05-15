@@ -18,12 +18,57 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CBehavior.php';
 
 /**
- * Trait for name-value parameters in form related tests.
+ * Behavior for name-value parameters in form related tests.
  */
-trait FormParametersTrait {
+class CFormParametersBehavior extends CBehavior {
+
+	protected $table_selector;
+	protected $table_mapping = [
+		'Name' => [
+			'name' => 'name',
+			'selector' => 'xpath:./input|./textarea',
+			'class' => 'CElement'
+		],
+		'Value' => [
+			'name' => 'value',
+			'selector' => 'xpath:./input|./textarea',
+			'class' => 'CElement'
+		]
+	];
+
+	/**
+	 * Set custom selector for table.
+	 *
+	 * @param string $selector    table selector
+	 */
+	public function setTableSelector($selector) {
+		$this->table_selector = $selector;
+	}
+
+	/**
+	 * Get table element with mapping set.
+	 *
+	 * @return CMultifieldTable
+	 */
+	protected function getTable() {
+		if ($this->table_selector === null) {
+			throw new Exception('Table selector is not specified.');
+		}
+
+		$selector = (is_array($this->table_selector) && is_callable($this->table_selector))
+				? call_user_func($this->table_selector)
+				: $this->table_selector;
+
+		$mapping = (is_array($this->table_mapping) && array_key_exists(0, $this->table_mapping)
+				&& !is_array($this->table_mapping[0]) && is_callable($this->table_mapping))
+				? call_user_func($this->table_mapping)
+				: $this->table_mapping;
+
+		return $this->test->query($selector)->asMultifieldTable(['mapping' => $mapping])->one();
+	}
 
 	/**
 	 * Fill parameters table with specified data.
@@ -64,7 +109,9 @@ trait FormParametersTrait {
 			];
 		}
 
-		$this->assertEquals($rows, $this->getValues(), 'Tags on a page does not match tags in data provider.');
+		$this->test->assertEquals($rows, $this->getValues(),
+				'Field values on a page does not match values in data provider.'
+		);
 	}
 
 	/**
