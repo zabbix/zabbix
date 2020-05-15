@@ -865,10 +865,10 @@ else {
 
 		$items = API::Item()->get([
 			'output' => ['itemid'],
-			'triggerids' => array_keys($triggers),
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
 			'selectTriggers' => ['triggerid'],
-			'selectItemDiscovery' => ['ts_delete']
+			'selectItemDiscovery' => ['ts_delete'],
+			'triggerids' => array_keys($triggers),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 		]);
 
 		foreach ($items as $item) {
