@@ -835,20 +835,15 @@ class CUserMacro extends CApiService {
 			 * Macros with same name can have different contexts. A macro with no context is not the same
 			 * as a macro with an empty context.
 			 */
-			$is_hostid_exist = array_key_exists($hostid, $existing_macros);
-			if ($is_hostid_exist) {
-				$is_host_macro_exist = array_key_exists($macro_name, $existing_macros[$hostid]);
-				if ($is_host_macro_exist) {
-					$is_context_exist = in_array($context, array_column($existing_macros[$hostid][$macro_name],
-							'context'), true
-					);
-					$is_regex_exist = in_array($regex, array_column($existing_macros[$hostid][$macro_name], 'regex'),
-						true
-					);
+			if (array_key_exists($hostid, $existing_macros)
+					&& array_key_exists($macro_name, $existing_macros[$hostid])) {
+				$has_context = in_array($context, array_column($existing_macros[$hostid][$macro_name], 'context'),
+					true
+				);
+				$has_regex = in_array($regex, array_column($existing_macros[$hostid][$macro_name], 'regex'), true);
 
-					if (($context !== null && $is_context_exist) || ($regex !== null && $is_regex_exist)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
-					}
+				if (($context !== null && $has_context) || ($regex !== null && $has_regex)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
 				}
 			}
 
@@ -925,32 +920,28 @@ class CUserMacro extends CApiService {
 			$context = $user_macro_parser->getContext();
 			$regex = $user_macro_parser->getRegex();
 
-			$is_hostid_exist = array_key_exists($hostid, $existing_macros);
-			if ($is_hostid_exist) {
-				$is_host_macro_exist = array_key_exists($macro_name, $existing_macros[$hostid]);
-				if ($is_host_macro_exist) {
-					$is_context_exist = in_array($context, array_column($existing_macros[$hostid][$macro_name],
-							'context'), true
-					);
-					$is_regex_exist = in_array($context, array_column($existing_macros[$hostid][$macro_name], 'regex'),
-						true
-					);
-					$is_macro_without_context = ($context === null && $regex === null);
-					if ($is_macro_without_context || (($context !== null && $is_context_exist)
-								|| ($regex !== null && $is_regex_exist))) {
-						foreach ($existing_macros[$hostid][$macro_name] as $hostmacroid => $macro_details) {
-							if ((!array_key_exists('hostmacroid', $hostmacro)
-										|| bccomp($hostmacro['hostmacroid'], $hostmacroid) != 0)
-									&& $context === $macro_details['context'] && $regex === $macro_details['regex']) {
-								$hosts = API::getApiService()->select('hosts', [
-									'output' => ['name'],
-									'hostids' => $hostmacro['hostid']
-								]);
+			if (array_key_exists($hostid, $existing_macros)
+					&& array_key_exists($macro_name, $existing_macros[$hostid])) {
+				$has_context = in_array($context, array_column($existing_macros[$hostid][$macro_name], 'context'),
+					true
+				);
+				$has_regex = in_array($context, array_column($existing_macros[$hostid][$macro_name], 'regex'), true);
+				$is_macro_without_context = ($context === null && $regex === null);
 
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Macro "%1$s" already exists on "%2$s".', $hostmacro['macro'], $hosts[0]['name'])
-								);
-							}
+				if ($is_macro_without_context || (($context !== null && $has_context)
+							|| ($regex !== null && $has_regex))) {
+					foreach ($existing_macros[$hostid][$macro_name] as $hostmacroid => $macro_details) {
+						if ((!array_key_exists('hostmacroid', $hostmacro)
+									|| bccomp($hostmacro['hostmacroid'], $hostmacroid) != 0)
+								&& $context === $macro_details['context'] && $regex === $macro_details['regex']) {
+							$hosts = API::getApiService()->select('hosts', [
+								'output' => ['name'],
+								'hostids' => $hostmacro['hostid']
+							]);
+
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Macro "%1$s" already exists on "%2$s".', $hostmacro['macro'], $hosts[0]['name'])
+							);
 						}
 					}
 				}
