@@ -1,0 +1,1 @@
+....I..... [ZBX-16347] increased TimescaleDB chunk interval for trends and trends_uint to 1 month (arimdjonoks)

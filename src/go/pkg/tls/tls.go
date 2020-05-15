@@ -767,9 +767,6 @@ static const char	*tls_version_static(void)
 #elif defined(HAVE_GNUTLS)
 #	error zabbix_agent2 does not support GnuTLS library. Compile with OpenSSL\
 		(configure parameter --with-openssl) or without encryption support.
-#elif defined(HAVE_POLARSSL)
-#	error zabbix_agent2 does not support mbedTLS (PolarSSL) library. Compile with OpenSSL\
-		(configure parameter --with-openssl) or without encryption support.
 #else // no crypto library requested, compile without encryption support
 
 typedef void * SSL_CTX_LP;
