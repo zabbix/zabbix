@@ -63,7 +63,7 @@
 
         <target name="init-frontend-modules">
 		<!-- Copy modules directory for selenium tests -->
-		<copydir forceoverwrite="true" src="frontends/php/tests/selenium/modules" dest="frontends/php/modules"/>
+		<copydir forceoverwrite="true" src="ui/tests/selenium/modules" dest="ui/modules"/>
         </target>
 
 	<target name="make-dbschema">
