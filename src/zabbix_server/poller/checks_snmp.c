@@ -1231,7 +1231,7 @@ out:
 
 static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
 		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
-		char *error, size_t max_error_len, int *max_succeed, int *min_fail)
+		char *error, size_t max_error_len, int *max_succeed, int *min_fail, unsigned char poller_type)
 {
 	int			i, j, status, ret = SUCCEED;
 	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
@@ -1283,7 +1283,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 		goto out;
 	}
 
-	ss->retries = (1 == mapping_num && 0 == level ? 1 : 0);
+	ss->retries = (1 == mapping_num && 0 == level && ZBX_POLLER_TYPE_UNREACHABLE != poller_type ? 1 : 0);
 retry:
 	status = snmp_synch_response(ss, pdu, &response);
 
@@ -1458,7 +1458,7 @@ halve:
 			int	base;
 
 			ret = zbx_snmp_get_values(ss, items, oids, results, errcodes, query_and_ignore_type, num / 2,
-					level + 1, error, max_error_len, max_succeed, min_fail);
+					level + 1, error, max_error_len, max_succeed, min_fail, poller_type);
 
 			if (SUCCEED != ret)
 				goto exit;
@@ -1467,7 +1467,7 @@ halve:
 
 			ret = zbx_snmp_get_values(ss, items + base, oids + base, results + base, errcodes + base,
 					NULL == query_and_ignore_type ? NULL : query_and_ignore_type + base, num - base,
-					level + 1, error, max_error_len, max_succeed, min_fail);
+					level + 1, error, max_error_len, max_succeed, min_fail, poller_type);
 		}
 		else if (1 == level)
 		{
@@ -1480,7 +1480,7 @@ halve:
 
 				ret = zbx_snmp_get_values(ss, items + i, oids + i, results + i, errcodes + i,
 						NULL == query_and_ignore_type ? NULL : query_and_ignore_type + i, 1,
-						level + 1, error, max_error_len, max_succeed, min_fail);
+						level + 1, error, max_error_len, max_succeed, min_fail, poller_type);
 
 				if (SUCCEED != ret)
 					goto exit;
@@ -1802,7 +1802,8 @@ static void	zbx_snmp_walk_cache_cb(void *arg, const char *snmp_oid, const char *
 }
 
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk)
+		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk,
+		unsigned char poller_type)
 {
 	int		i, j, k, ret;
 	int		to_walk[MAX_SNMP_ITEMS], to_walk_num = 0;
@@ -1869,7 +1870,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 	if (0 != to_verify_num)
 	{
 		ret = zbx_snmp_get_values(ss, items, to_verify_oids, results, errcodes, query_and_ignore_type, num, 0,
-				error, max_error_len, max_succeed, min_fail);
+				error, max_error_len, max_succeed, min_fail, poller_type);
 
 		if (SUCCEED != ret && NOTSUPPORTED != ret)
 			goto exit;
@@ -1993,7 +1994,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 	/* query values based on the indices verified and/or determined above */
 
 	ret = zbx_snmp_get_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len,
-			max_succeed, min_fail);
+			max_succeed, min_fail, poller_type);
 exit:
 	zbx_free(idx);
 
@@ -2003,7 +2004,8 @@ exit:
 }
 
 static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail)
+		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail,
+		unsigned char poller_type)
 {
 	int	i, ret;
 	char	oids_translated[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
@@ -2027,23 +2029,23 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 	}
 
 	ret = zbx_snmp_get_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len,
-			max_succeed, min_fail);
+			max_succeed, min_fail, poller_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
 
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type)
 {
 	int	errcode = SUCCEED;
 
-	get_values_snmp(item, result, &errcode, 1);
+	get_values_snmp(item, result, &errcode, 1, poller_type);
 
 	return errcode;
 }
 
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
+void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type)
 {
 	struct snmp_session	*ss;
 	char			error[MAX_STRING_LEN];
@@ -2082,12 +2084,12 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 		(void)DCconfig_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
 
 		err = zbx_snmp_process_dynamic(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail, bulk);
+				&max_succeed, &min_fail, bulk, poller_type);
 	}
 	else
 	{
 		err = zbx_snmp_process_standard(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail);
+				&max_succeed, &min_fail, poller_type);
 	}
 
 	zbx_snmp_close_session(ss);
