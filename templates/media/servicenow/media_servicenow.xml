@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2020-04-21T09:28:36Z</date>
+    <media_types>
+        <media_type>
+            <name>ServiceNow</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>alert_message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>alert_subject</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>event_nseverity</name>
+                    <value>{EVENT.NSEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>event_recovery_value</name>
+                    <value>{EVENT.RECOVERY.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_source</name>
+                    <value>{EVENT.SOURCE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_status</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_value</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>servicenow_password</name>
+                    <value>&lt;PLACE PASSWORD HERE&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>servicenow_sys_id</name>
+                    <value>{EVENT.TAGS.__zbx_servicenow_sys_id}</value>
+                </parameter>
+                <parameter>
+                    <name>servicenow_url</name>
+                    <value>{ALERT.SENDTO}</value>
+                </parameter>
+                <parameter>
+                    <name>servicenow_user</name>
+                    <value>&lt;PLACE USERNAME HERE&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>urgency_for_average</name>
+                    <value>2</value>
+                </parameter>
+                <parameter>
+                    <name>urgency_for_disaster</name>
+                    <value>1</value>
+                </parameter>
+                <parameter>
+                    <name>urgency_for_high</name>
+                    <value>2</value>
+                </parameter>
+                <parameter>
+                    <name>urgency_for_information</name>
+                    <value>3</value>
+                </parameter>
+                <parameter>
+                    <name>urgency_for_not_classified</name>
+                    <value>3</value>
+                </parameter>
+                <parameter>
+                    <name>urgency_for_warning</name>
+                    <value>3</value>
+                </parameter>
+            </parameters>
+            <script>var ServiceNow = {&#13;
+    params: {},&#13;
+&#13;
+    setParams: function (params) {&#13;
+        if (typeof params !== 'object') {&#13;
+            return;&#13;
+        }&#13;
+&#13;
+        ServiceNow.params = params;&#13;
+        if (typeof ServiceNow.params.url === 'string') {&#13;
+            if (!ServiceNow.params.url.endsWith('/')) {&#13;
+                ServiceNow.params.url += '/';&#13;
+            }&#13;
+&#13;
+            ServiceNow.params.url += 'api/now/table/incident';&#13;
+        }&#13;
+    },&#13;
+&#13;
+    setProxy: function (HTTPProxy) {&#13;
+        ServiceNow.HTTPProxy = HTTPProxy;&#13;
+    },&#13;
+&#13;
+    setFields: function (data, fields) {&#13;
+        if (typeof fields === 'object' &amp;&amp; Object.keys(fields).length) {&#13;
+            Object.keys(fields)&#13;
+                .forEach(function(field) {&#13;
+                    data[field] = (fields[field].match(/^\d{4}\.\d{2}\.\d{2}$/) !== null)&#13;
+                        ? fields[field].replace(/\./g, '-')&#13;
+                        : fields[field];&#13;
+                });&#13;
+        }&#13;
+    },&#13;
+&#13;
+    request: function (method, data) {&#13;
+        ['url', 'user', 'password'].forEach(function (field) {&#13;
+            if (typeof ServiceNow.params !== 'object' || typeof ServiceNow.params[field] === 'undefined'&#13;
+                || ServiceNow.params[field] === '' ) {&#13;
+                throw 'Required ServiceNow param is not set: &quot;' + field + '&quot;.';&#13;
+            }&#13;
+        });&#13;
+&#13;
+        var response,&#13;
+            url = ServiceNow.params.url,&#13;
+            request = new CurlHttpRequest();&#13;
+&#13;
+        request.AddHeader('Content-Type: application/json');&#13;
+        request.AddHeader('Authorization: Basic ' + btoa(ServiceNow.params.user + ':' + ServiceNow.params.password));&#13;
+&#13;
+        if (typeof ServiceNow.HTTPProxy !== 'undefined' &amp;&amp; ServiceNow.HTTPProxy !== '') {&#13;
+            request.SetProxy(ServiceNow.HTTPProxy);&#13;
+        }&#13;
+&#13;
+        if (typeof data !== 'undefined') {&#13;
+            data = JSON.stringify(data);&#13;
+        }&#13;
+&#13;
+        Zabbix.Log(4, '[ ServiceNow Webhook ] Sending request: ' + url + ((typeof data === 'string')&#13;
+            ? ('\n' + data)&#13;
+            : ''));&#13;
+&#13;
+        switch (method) {&#13;
+            case 'get':&#13;
+                response = request.Get(url, data);&#13;
+                break;&#13;
+&#13;
+            case 'post':&#13;
+                response = request.Post(url, data);&#13;
+                break;&#13;
+&#13;
+            case 'put':&#13;
+                response = request.Put(url, data);&#13;
+                break;&#13;
+&#13;
+            default:&#13;
+                throw 'Unsupported HTTP request method: ' + method;&#13;
+        }&#13;
+&#13;
+        Zabbix.Log(4, '[ ServiceNow Webhook ] Received response with status code ' +&#13;
+            request.Status() + '\n' + response);&#13;
+&#13;
+        if (response !== null) {&#13;
+            try {&#13;
+                response = JSON.parse(response);&#13;
+            }&#13;
+            catch (error) {&#13;
+                Zabbix.Log(4, '[ ServiceNow Webhook ] Failed to parse response received from ServiceNow');&#13;
+                response = null;&#13;
+            }&#13;
+        }&#13;
+&#13;
+        if (request.Status() &lt; 200 || request.Status() &gt;= 300) {&#13;
+            var message = 'Request failed with status code ' + request.Status();&#13;
+&#13;
+            if (response !== null &amp;&amp; typeof response.error.message !== 'undefined'&#13;
+                &amp;&amp; Object.keys(response.error).length &gt; 0) {&#13;
+                message += ': ' + JSON.stringify(response.error.message);&#13;
+            }&#13;
+&#13;
+            throw message + ' Check debug log for more information.';&#13;
+        }&#13;
+        else if (typeof response.result !== 'object' || typeof response.result.sys_id === 'undefined') {&#13;
+            throw 'Cannot create ServiceNow incident. Check debug log for more information.';&#13;
+        }&#13;
+&#13;
+        return response.result;&#13;
+    }&#13;
+};&#13;
+&#13;
+try {&#13;
+    var params = JSON.parse(value),&#13;
+        fields = {},&#13;
+        servicenow = {},&#13;
+        data = {},&#13;
+        result = {tags: {}},&#13;
+        required_params = [&#13;
+            'alert_subject', 'alert_message', 'event_source', 'event_value',&#13;
+            'event_update_status', 'event_recovery_value', 'event_nseverity'&#13;
+        ],&#13;
+        severities = [&#13;
+            {name: 'not_classified', color: '#97AAB3'},&#13;
+            {name: 'information', color: '#7499FF'},&#13;
+            {name: 'warning', color: '#FFC859'},&#13;
+            {name: 'average', color: '#FFA059'},&#13;
+            {name: 'high', color: '#E97659'},&#13;
+            {name: 'disaster', color: '#E45959'},&#13;
+            {name: 'resolved', color: '#009900'},&#13;
+            {name: 'default', color: '#000000'}&#13;
+        ],&#13;
+        method = 'post',&#13;
+        process_tags = true;&#13;
+&#13;
+    Object.keys(params)&#13;
+        .forEach(function (key) {&#13;
+            if (key.startsWith('servicenow_')) {&#13;
+                servicenow[key.substring(11)] = params[key];&#13;
+            }&#13;
+            else if (key.startsWith('u_')) {&#13;
+                fields[key] = params[key];&#13;
+            }&#13;
+            else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key] === '') {&#13;
+                throw 'Parameter &quot;' + key + '&quot; can\'t be empty.';&#13;
+            }&#13;
+        });&#13;
+&#13;
+    if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {&#13;
+        throw 'Incorrect &quot;event_source&quot; parameter given: ' + params.event_source + '\nMust be 0-3.';&#13;
+    }&#13;
+&#13;
+    if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {&#13;
+        params.event_nseverity = '7';&#13;
+    }&#13;
+&#13;
+    // Check {EVENT.VALUE} for trigger-based and internal events.&#13;
+    if (params.event_value !== '0' &amp;&amp; params.event_value !== '1'&#13;
+        &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {&#13;
+        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    // Check {EVENT.UPDATE.STATUS} only for trigger-based events.&#13;
+    if (params.event_update_status !== '0' &amp;&amp; params.event_update_status !== '1' &amp;&amp; params.event_source === '0') {&#13;
+        throw 'Incorrect &quot;event_update_status&quot; parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    if (params.event_source !== '0' &amp;&amp; params.event_recovery_value === '0') {&#13;
+        throw 'Recovery operations are supported only for trigger-based actions.';&#13;
+    }&#13;
+&#13;
+    data.short_description = params.alert_subject;&#13;
+    data.description = params.alert_message;&#13;
+&#13;
+    if (typeof params['urgency_for_' + severities[params.event_nseverity].name] !== 'undefined') {&#13;
+        data.urgency = params['urgency_for_' + severities[params.event_nseverity].name];&#13;
+    }&#13;
+&#13;
+    ServiceNow.setParams(servicenow);&#13;
+    ServiceNow.setProxy(params.HTTPProxy);&#13;
+    ServiceNow.setFields(data, fields);&#13;
+&#13;
+    if (params.event_source === '0' &amp;&amp; (params.event_value === '0' || params.event_update_status === '1')) {&#13;
+        process_tags = false;&#13;
+        method = 'put';&#13;
+        delete data.description;&#13;
+        delete data.urgency;&#13;
+        ServiceNow.params.url += '/' + params.servicenow_sys_id;&#13;
+        data.comments = params.alert_message;&#13;
+    }&#13;
+&#13;
+    var response = ServiceNow.request(method, data);&#13;
+&#13;
+    if (process_tags) {&#13;
+        result.tags.__zbx_servicenow_sys_id = response.sys_id;&#13;
+        result.tags.__zbx_servicenow_link = params.servicenow_url +&#13;
+            (params.servicenow_url.endsWith('/') ? '' : '/') + 'incident.do?sys_id=' + response.sys_id;&#13;
+        result.tags.__zbx_servicenow_number = response.number;&#13;
+    }&#13;
+&#13;
+    return JSON.stringify(result);&#13;
+}&#13;
+catch (error) {&#13;
+    Zabbix.Log(3, '[ ServiceNow Webhook ] ERROR: ' + error);&#13;
+    throw 'Sending failed: ' + error;&#13;
+}</script>
+            <process_tags>YES</process_tags>
+            <show_event_menu>YES</show_event_menu>
+            <event_menu_url>{EVENT.TAGS.__zbx_servicenow_link}</event_menu_url>
+            <event_menu_name>ServiceNow: {EVENT.TAGS.__zbx_servicenow_number}</event_menu_name>
+            <message_templates>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
+                    <message>Problem started at {EVENT.TIME} on {EVENT.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Operational data: {EVENT.OPDATA}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>RECOVERY</operation_mode>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
+                    <message>Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>UPDATE</operation_mode>
+                    <subject>[{EVENT.STATUS}] {EVENT.NAME}</subject>
+                    <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
+{EVENT.UPDATE.MESSAGE}&#13;
+&#13;
+Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.</message>
+                </message_template>
+                <message_template>
+                    <event_source>DISCOVERY</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}</subject>
+                    <message>Discovery rule: {DISCOVERY.RULE.NAME}&#13;
+&#13;
+Device IP: {DISCOVERY.DEVICE.IPADDRESS}&#13;
+Device DNS: {DISCOVERY.DEVICE.DNS}&#13;
+Device status: {DISCOVERY.DEVICE.STATUS}&#13;
+Device uptime: {DISCOVERY.DEVICE.UPTIME}&#13;
+&#13;
+Device service name: {DISCOVERY.SERVICE.NAME}&#13;
+Device service port: {DISCOVERY.SERVICE.PORT}&#13;
+Device service status: {DISCOVERY.SERVICE.STATUS}&#13;
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
+                </message_template>
+                <message_template>
+                    <event_source>AUTOREGISTRATION</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Autoregistration: {HOST.HOST}</subject>
+                    <message>Host name: {HOST.HOST}&#13;
+Host IP: {HOST.IP}&#13;
+Agent port: {HOST.PORT}</message>
+                </message_template>
+            </message_templates>
+        </media_type>
+    </media_types>
+</zabbix_export>

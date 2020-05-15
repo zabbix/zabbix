@@ -1129,6 +1129,45 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 	return dst;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_escape_string                                                *
+ *                                                                            *
+ * Purpose: escape characters in the source string to fixed output buffer     *
+ *                                                                            *
+ * Parameters: dst      - [OUT] the output buffer                             *
+ *             len      - [IN] the output buffer size                         *
+ *             src      - [IN] null terminated source string                  *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
+ *                                                                            *
+ * Return value: SUCCEED - the string was escaped successfully.               *
+ *               FAIL    - output buffer is too small.                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charlist)
+{
+	for (; '\0' != *src; src++)
+	{
+		if (NULL != strchr(charlist, *src))
+		{
+			if (0 == --len)
+				return FAIL;
+			*dst++ = '\\';
+		}
+		else
+		{
+			if (0 == --len)
+				return FAIL;
+		}
+
+		*dst++ = *src;
+	}
+
+	*dst = '\0';
+
+	return SUCCEED;
+}
+
 char	*zbx_age2str(int age)
 {
 	size_t		offset = 0;
@@ -2303,6 +2342,116 @@ void	zbx_replace_invalid_utf8(char *text)
 	}
 
 	*out = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: utf8_decode_3byte_sequence                                       *
+ *                                                                            *
+ * Purpose: decodes 3-byte utf-8 sequence                                     *
+ *                                                                            *
+ * Parameters: ptr - [IN] pointer to the 3 byte sequence                      *
+ *             out - [OUT] the decoded value                                  *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	utf8_decode_3byte_sequence(const char *ptr, zbx_uint32_t *out)
+{
+	*out = ((unsigned char)*ptr++ & 0xF) << 12;
+	if (0x80 != (*ptr & 0xC0))
+		return FAIL;
+
+	*out |= ((unsigned char)*ptr++ & 0x3F) << 6;
+	if (0x80 != (*ptr & 0xC0))
+		return FAIL;
+
+	*out |= ((unsigned char)*ptr & 0x3F);
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_cesu8_to_utf8                                                *
+ *                                                                            *
+ * Purpose: convert cesu8 encoded string to utf8                              *
+ *                                                                            *
+ * Parameters: cesu8 - [IN] pointer to the first char of NULL terminated CESU8*
+ *                     string                                                 *
+ *             utf8  - [OUT] on success, pointer to pointer to the first char *
+ *                     of allocated NULL terminated UTF8 string               *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8)
+{
+	const char	*in, *end;
+	char		*out;
+	size_t		len;
+
+	len = strlen(cesu8);
+	out = *utf8 = zbx_malloc(*utf8, len + 1);
+	end = cesu8 + len;
+
+	for (in = cesu8; in < end;)
+	{
+		if (0x7f >= (unsigned char)*in)
+		{
+			*out++ = *in++;
+			continue;
+		}
+
+		if (0xdf >= (unsigned char)*in)
+		{
+			if (2 > end - in)
+				goto fail;
+
+			*out++ = *in++;
+			*out++ = *in++;
+			continue;
+		}
+
+		if (0xef >= (unsigned char)*in)
+		{
+			zbx_uint32_t	c1, c2, u;
+
+			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c1))
+				goto fail;
+
+			if (0xd800 > c1 || 0xdbff < c1)
+			{
+				/* normal 3-byte sequence */
+				*out++ = *in++;
+				*out++ = *in++;
+				*out++ = *in++;
+				continue;
+			}
+
+			/* decode unicode supplementary character represented as surrogate pair */
+			in += 3;
+			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c2) || 0xdc00 > c2 || 0xdfff < c2)
+				goto fail;
+
+			u = 0x10000 + ((((uint32_t)c1 & 0x3ff) << 10) | (c2 & 0x3ff));
+			*out++ = 0xf0 |  u >> 18;
+			*out++ = 0x80 | (u >> 12 & 0x3f);
+			*out++ = 0x80 | (u >> 6 & 0x3f);
+			*out++ = 0x80 | (u & 0x3f);
+			in += 3;
+			continue;
+		}
+
+		/* the four-byte UTF-8 style supplementary character sequence is not supported by CESU-8 */
+		goto fail;
+	}
+	*out = '\0';
+	return SUCCEED;
+fail:
+	zbx_free(*utf8);
+	return FAIL;
 }
 
 void	dos2unix(char *str)
@@ -4087,11 +4236,31 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 static size_t	zbx_no_function(const char *expr)
 {
 	const char	*ptr = expr;
-	int		len, c_l, c_r;
+	int		inside_quote = 0, len, c_l, c_r;
 	zbx_token_t	token;
 
 	while ('\0' != *ptr)
 	{
+		switch  (*ptr)
+		{
+			case '\\':
+				if (0 != inside_quote)
+					ptr++;
+				break;
+			case '"':
+				inside_quote = !inside_quote;
+				ptr++;
+				continue;
+		}
+
+		if (inside_quote)
+		{
+			if ('\0' == *ptr)
+				break;
+			ptr++;
+			continue;
+		}
+
 		if ('{' == *ptr && '$' == *(ptr + 1) && SUCCEED == zbx_user_macro_parse(ptr, &len, &c_l, &c_r))
 		{
 			ptr += len + 1;	/* skip to the position after user macro */
@@ -4305,75 +4474,151 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_number_find                                                  *
+ * Function: zbx_expression_next_constant                                     *
  *                                                                            *
- * Purpose: finds number inside expression starting at specified position     *
+ * Purpose: gets next constant (numeric/string value or unresolved user       *
+ *          macro) from trigger expression.                                   *
  *                                                                            *
- * Parameters: str        - [IN] the expression                               *
- *             pos        - [IN] the starting position                        *
- *             number_loc - [OUT] the number location                         *
+ * Parameters: src - [IN] the expression                                      *
+ *             pos - [IN] the starting position                               *
+ *             loc - [IN] the substring location                              *
  *                                                                            *
- * Return value: SUCCEED - the number was parsed successfully                 *
- *               FAIL    - expression does not contain number                 *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *           The token field locations are specified as offsets from the      *
- *           beginning of the expression.                                     *
+ * Return value: SUCCEED - the next constant was located.                     *
+ *               FAIL    - otherwise.                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
+int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc)
 {
-	const char	*s, *e;
-	int		len;
+	const char	*s;
+	zbx_token_t	token;
+	int		offset = 0, len;
 
-	for (s = str + pos; '\0' != *s; s++)	/* find start of number */
+	for (s = str + pos; '\0' != *s; s++)
 	{
-		if (0 == isdigit(*s) && ('.' != *s || 0 == isdigit(s[1])))
-			continue;
-
-		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
+		switch (*s)
 		{
-			/* skip functions '{65432}' */
-			s = e;
-			continue;
+			case '"':
+				loc->l = s - str;
+
+				for (++s;'\0' != *s; s++)
+				{
+					if ('"' == *s)
+					{
+						loc->r = s - str;
+						return SUCCEED;
+					}
+					if ('\\' == *s)
+					{
+						if ('\\' != s[1] && '"' != s[1])
+							return FAIL;
+						s++;
+					}
+				}
+				return FAIL;
+			case '{':
+				if (SUCCEED == zbx_token_find(str, s - str, &token, ZBX_TOKEN_SEARCH_BASIC))
+				{
+					if (ZBX_TOKEN_USER_MACRO == token.type)
+					{
+						*loc = token.loc;
+						return SUCCEED;
+					}
+					/* Skip all other tokens. Currently it can be only {TRIGGER.VALUE} macro. */
+					s = str + token.loc.r;
+				}
+				continue;
+			case '-':
+				offset = 1;
+				continue;
+			case '0':
+				ZBX_FALLTHROUGH;
+			case '1':
+				ZBX_FALLTHROUGH;
+			case '2':
+				ZBX_FALLTHROUGH;
+			case '3':
+				ZBX_FALLTHROUGH;
+			case '4':
+				ZBX_FALLTHROUGH;
+			case '5':
+				ZBX_FALLTHROUGH;
+			case '6':
+				ZBX_FALLTHROUGH;
+			case '7':
+				ZBX_FALLTHROUGH;
+			case '8':
+				ZBX_FALLTHROUGH;
+			case '9':
+				ZBX_FALLTHROUGH;
+			case '.':
+				if (SUCCEED != zbx_suffixed_number_parse(s, &len))
+					return FAIL;
+
+				loc->l = s - str - offset;
+				loc->r = s - str + len - 1;
+				return SUCCEED;
+			default:
+				offset = 0;
 		}
-
-		if (SUCCEED != zbx_suffixed_number_parse(s, &len))
-			continue;
-
-		/* number found */
-
-		number_loc->r = s + len - str - 1;
-
-		/* check for minus before number */
-		if (s > str + pos && '-' == *(s - 1))
-		{
-			/* and make sure it's unary */
-			if (s - 1 > str)
-			{
-				e = s - 2;
-
-				if (e > str && NULL != strchr(ZBX_UNIT_SYMBOLS, *e))
-					e--;
-
-				/* check that minus is not preceded by function, parentheses or (suffixed) number */
-				if ('}' != *e && ')' != *e && '.' != *e && 0 == isdigit(*e))
-					s--;
-			}
-			else	/* nothing before minus, it's definitely unary */
-				s--;
-		}
-
-		number_loc->l = s - str;
-
-		return SUCCEED;
 	}
-
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_expression_extract_constant                                  *
+ *                                                                            *
+ * Purpose: extracts constant from trigger expression unquoting/escaping if   *
+ *          necessary                                                         *
+ *                                                                            *
+ * Parameters: src - [IN] the source string                                   *
+ *             loc - [IN] the substring location                              *
+ *                                                                            *
+ * Return value: The constant.                                                *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc)
+{
+	char		*str, *pout;
+	const char	*pin;
+	size_t		len;
+
+	len = loc->r - loc->l + 1;
+	str = zbx_malloc(NULL, len + 1);
+
+	if ('"' == src[loc->l])
+	{
+		for (pout = str, pin = src + loc->l + 1; pin <= src + loc->r - 1; pin++)
+		{
+			if ('\\' == *pin)
+			{
+				pin++;
+				switch (*pin)
+				{
+					case '\\':
+						*pout++ = '\\';
+						break;
+					case '"':
+						*pout++ = '"';
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+						*pout++ = '?';
+				}
+			}
+			else
+				*pout++ = *pin;
+		}
+		*pout++  ='\0';
+	}
+	else
+	{
+		memcpy(str, src + loc->l, len);
+		str[len] = '\0';
+	}
+
+	return str;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -4482,10 +4727,11 @@ int	num_param(const char *p)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      p       - parameter list                                              *
- *      num     - requested parameter index                                   *
- *      buf     - pointer of output buffer                                    *
- *      max_len - size of output buffer                                       *
+ *      p       - [IN]  parameter list                                        *
+ *      num     - [IN]  requested parameter index                             *
+ *      buf     - [OUT] pointer of output buffer                              *
+ *      max_len - [IN]  size of output buffer                                 *
+ *      type    - [OUT] parameter type (may be NULL)                          *
  *                                                                            *
  * Return value:                                                              *
  *      1 - requested parameter missing or buffer overflow                    *
@@ -4496,7 +4742,7 @@ int	num_param(const char *p)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_param(const char *p, int num, char *buf, size_t max_len)
+int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type)
 {
 #define ZBX_ASSIGN_PARAM				\
 {							\
@@ -4508,6 +4754,9 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
 	int	array, idx = 1;
 	size_t	buf_i = 0;
+
+	if (NULL != type)
+		*type = REQUEST_PARAMETER_TYPE_UNDEFINED;
 
 	if (0 == max_len)
 		return 1;	/* buffer overflow */
@@ -4530,13 +4779,26 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 				else if ('"' == *p)
 				{
 					state = 1;
-					if (0 != array && idx == num)
-						ZBX_ASSIGN_PARAM;
+
+					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_STRING;
+
+						if (0 != array)
+							ZBX_ASSIGN_PARAM;
+					}
 				}
 				else if ('[' == *p)
 				{
-					if (0 != array && idx == num)
-						ZBX_ASSIGN_PARAM;
+					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_ARRAY;
+
+						if (0 != array)
+							ZBX_ASSIGN_PARAM;
+					}
 					array++;
 				}
 				else if (']' == *p && 0 != array)
@@ -4555,7 +4817,13 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 				else if (' ' != *p)
 				{
 					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_STRING;
+
 						ZBX_ASSIGN_PARAM;
+					}
+
 					state = 2;
 				}
 				break;
@@ -4762,8 +5030,9 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      p   - [IN] parameter list                                             *
- *      num - [IN] requested parameter index                                  *
+ *      p    - [IN] parameter list                                            *
+ *      num  - [IN] requested parameter index                                 *
+ *      type - [OUT] parameter type (may be NULL)                             *
  *                                                                            *
  * Return value:                                                              *
  *      NULL - requested parameter missing                                    *
@@ -4775,7 +5044,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-char	*get_param_dyn(const char *p, int num)
+char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
 {
 	char	*buf = NULL;
 	size_t	sz;
@@ -4785,7 +5054,7 @@ char	*get_param_dyn(const char *p, int num)
 
 	buf = (char *)zbx_malloc(buf, sz + 1);
 
-	if (0 != get_param(p, num, buf, sz + 1))
+	if (0 != get_param(p, num, buf, sz + 1, type))
 		zbx_free(buf);
 
 	return buf;
@@ -5111,7 +5380,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
 		return 1;
 
 	*pr = '\0';
-	ret = get_param(pl + 1, num, buf, max_len);
+	ret = get_param(pl + 1, num, buf, max_len, NULL);
 	*pr = ']';
 
 	return ret;

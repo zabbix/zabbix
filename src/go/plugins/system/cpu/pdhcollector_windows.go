@@ -23,13 +23,13 @@ import (
 	"fmt"
 	"unsafe"
 
+	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/pdh"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
 
 type pdhCollector struct {
-	log      plugin.Logger
+	log      log.Logger
 	hQuery   win32.PDH_HQUERY
 	hCpuUtil []win32.PDH_HCOUNTER
 	hCpuLoad win32.PDH_HCOUNTER
@@ -170,6 +170,6 @@ func (c *pdhCollector) cpuUtil(cpuIndex int) (value float64) {
 	return
 }
 
-func newPdhCollector(log plugin.Logger) (c *pdhCollector) {
+func newPdhCollector(log log.Logger) (c *pdhCollector) {
 	return &pdhCollector{log: log}
 }

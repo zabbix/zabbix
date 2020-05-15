@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-02-20T14:29:11Z</date>
+    <version>5.0</version>
+    <date>2020-04-20T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Pushover</name>
@@ -12,20 +12,36 @@
                     <value>https://api.pushover.net/1/messages.json</value>
                 </parameter>
                 <parameter>
-                    <name>token</name>
-                    <value>&lt;PUSHOVER TOKEN HERE&gt;</value>
+                    <name>eventid</name>
+                    <value>{EVENT.ID}</value>
                 </parameter>
                 <parameter>
-                    <name>user</name>
-                    <value>{ALERT.SENDTO}</value>
+                    <name>expire</name>
+                    <value>1200</value>
                 </parameter>
                 <parameter>
                     <name>message</name>
                     <value>{ALERT.MESSAGE}</value>
                 </parameter>
                 <parameter>
+                    <name>priority</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
+                    <name>retry</name>
+                    <value>60</value>
+                </parameter>
+                <parameter>
                     <name>title</name>
                     <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>token</name>
+                    <value>&lt;PUSHOVER TOKEN HERE&gt;</value>
+                </parameter>
+                <parameter>
+                    <name>triggerid</name>
+                    <value>{TRIGGER.ID}</value>
                 </parameter>
                 <parameter>
                     <name>url</name>
@@ -36,24 +52,8 @@
                     <value>Zabbix</value>
                 </parameter>
                 <parameter>
-                    <name>priority</name>
-                    <value>0</value>
-                </parameter>
-                <parameter>
-                    <name>eventid</name>
-                    <value>{EVENT.ID}</value>
-                </parameter>
-                <parameter>
-                    <name>triggerid</name>
-                    <value>{TRIGGER.ID}</value>
-                </parameter>
-                <parameter>
-                    <name>retry</name>
-                    <value>60</value>
-                </parameter>
-                <parameter>
-                    <name>expire</name>
-                    <value>1200</value>
+                    <name>user</name>
+                    <value>{ALERT.SENDTO}</value>
                 </parameter>
             </parameters>
             <max_sessions>0</max_sessions>
@@ -62,6 +62,10 @@
         request = new CurlHttpRequest(),&#13;
         data,&#13;
         response;&#13;
+&#13;
+    if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
+        request.SetProxy(params.HTTPProxy);&#13;
+    }&#13;
 &#13;
     if (isNaN(params.priority) || params.priority &lt; -2 || params.priority &gt; 2) {&#13;
         throw 'field &quot;priority&quot; should be -2..2';&#13;

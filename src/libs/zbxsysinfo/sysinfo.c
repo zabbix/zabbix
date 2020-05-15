@@ -421,7 +421,7 @@ static int	parse_key_access_rule(const char *pattern, zbx_key_access_rule_t *rul
 
 	for (i = 0; i < size; i++)
 	{
-		if (NULL == (param = get_param_dyn(pl, i + 1)))
+		if (NULL == (param = get_param_dyn(pl, i + 1, NULL)))
 			return FAIL;
 
 		zbx_wildcard_minimize(param);
@@ -740,6 +740,7 @@ void	init_request(AGENT_REQUEST *request)
 	request->key = NULL;
 	request->nparam = 0;
 	request->params = NULL;
+	request->types = NULL;
 	request->lastlogsize = 0;
 	request->mtime = 0;
 }
@@ -760,6 +761,7 @@ static void	free_request_params(AGENT_REQUEST *request)
 	for (i = 0; i < request->nparam; i++)
 		zbx_free(request->params[i]);
 	zbx_free(request->params);
+	zbx_free(request->types);
 
 	request->nparam = 0;
 }
@@ -785,14 +787,19 @@ void	free_request(AGENT_REQUEST *request)
  *                                                                            *
  * Purpose: add a new parameter                                               *
  *                                                                            *
- * Parameters: request - pointer to the request structure                     *
+ * Parameters: request - [OUT] pointer to the request structure               *
+ *             pvalue  - [IN]  parameter value string                         *
+ *             type    - [IN]  parameter type                                 *
  *                                                                            *
  ******************************************************************************/
-static void	add_request_param(AGENT_REQUEST *request, char *pvalue)
+static void	add_request_param(AGENT_REQUEST *request, char *pvalue, zbx_request_parameter_type_t type)
 {
 	request->nparam++;
 	request->params = (char **)zbx_realloc(request->params, request->nparam * sizeof(char *));
 	request->params[request->nparam - 1] = pvalue;
+	request->types = (zbx_request_parameter_type_t*)zbx_realloc(request->types,
+			request->nparam * sizeof(zbx_request_parameter_type_t));
+	request->types[request->nparam - 1] = type;
 }
 
 /******************************************************************************
@@ -818,9 +825,13 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 		case ZBX_COMMAND_WITH_PARAMS:
 			if (0 == (request->nparam = num_param(params)))
 				goto out;	/* key is badly formatted */
+
 			request->params = (char **)zbx_malloc(request->params, request->nparam * sizeof(char *));
+			request->types = (zbx_request_parameter_type_t*)zbx_malloc(request->types,
+					request->nparam * sizeof(zbx_request_parameter_type_t));
+
 			for (i = 0; i < request->nparam; i++)
-				request->params[i] = get_param_dyn(params, i + 1);
+				request->params[i] = get_param_dyn(params, i + 1, &request->types[i]);
 			break;
 		case ZBX_COMMAND_ERROR:
 			goto out;	/* key is badly formatted */
@@ -1097,12 +1108,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			}
 
 			free_request_params(&request);
-			add_request_param(&request, parameters);
+			add_request_param(&request, parameters, REQUEST_PARAMETER_TYPE_STRING);
 		}
 		else
 		{
 			free_request_params(&request);
-			add_request_param(&request, zbx_strdup(NULL, command->test_param));
+			add_request_param(&request, zbx_strdup(NULL, command->test_param),
+					REQUEST_PARAMETER_TYPE_STRING);
 		}
 	}
 

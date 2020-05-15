@@ -25,7 +25,7 @@
 #include "common.h"
 #include "valuecache.h"
 #include "valuecache_test.h"
-#include "valuecache_mock.h"
+#include "mocks/valuecache/valuecache_mock.h"
 
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 
