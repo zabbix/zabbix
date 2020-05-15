@@ -125,8 +125,11 @@ class CControllerPopupLldOperation extends CController {
 
 			if (array_key_exists('optag', $page_options)) {
 				foreach ($page_options['optag'] as $i => $optag) {
-					if ($optag['tag'] === '') {
+					if ($optag['tag'] === '' && $optag['value'] === '') {
 						unset($page_options['optag'][$i]);
+					}
+					elseif ($optag['tag'] === '') {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 					}
 				}
 

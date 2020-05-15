@@ -111,12 +111,11 @@ insert_javascript_for_visibilitybox();
 <script type="text/x-jquery-tmpl" id="lldoverride-operation-row">
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
-			(new CCol([
+			(new CHorList([
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-open')
-					->onClick("lldoverrides.operations.open(#{no});")
-					->addStyle('margin-right:5px;'),
+					->onClick("lldoverrides.operations.open(#{no});"),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
@@ -172,13 +171,7 @@ insert_javascript_for_visibilitybox();
 				contains:                   <?= json_encode(_('contains')) ?>,
 				does_not_contain:           <?= json_encode(_('does not contain')) ?>,
 				matches:                    <?= json_encode(_('matches')) ?>,
-				does_not_match:             <?= json_encode(_('does not match')) ?>,
-
-				data_not_encoded:           <?= json_encode(_('Data is not properly encoded.')) ?>,
-				name_filed_length_exceeded: <?= json_encode(_('Name of the form field should not exceed 255 characters.')) ?>,
-				value_without_name:         <?= json_encode(_('Values without names are not allowed in form fields.')) ?>,
-				ok:                         <?= json_encode(_('Ok')) ?>,
-				error:                      <?= json_encode(_('Error')) ?>
+				does_not_match:             <?= json_encode(_('does not match')) ?>
 			}
 		};
 
@@ -533,7 +526,10 @@ insert_javascript_for_visibilitybox();
 
 			if (override.data.overrides_filters.length > 0) {
 				frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
-				frag.appendChild(hiddenInput('formula',  override.data.overrides_formula,  prefix_filter));
+
+				if (override.data.overrides_evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+					frag.appendChild(hiddenInput('formula',  override.data.overrides_formula,  prefix_filter));
+				}
 
 				override.data.overrides_filters.forEach(function(override_filter) {
 					var prefix = prefix_filter + '[conditions][' + (iter_filters ++) + ']';
@@ -689,6 +685,9 @@ insert_javascript_for_visibilitybox();
 		this.data.overrides_formula = this.data.filter.formula;
 		this.data.overrides_filters = this.data.filter.conditions;
 		delete this.data.filter;
+
+		// Used to add propper letter, when creating new dynamic row for filter.
+		this.filter_counter = this.data.overrides_filters.length;
 	}
 
 	/**
@@ -759,8 +758,10 @@ insert_javascript_for_visibilitybox();
 		jQuery('#overrides_filters')
 			.dynamicRows({
 				template: '#override-filters-row',
+				counter: this.override.filter_counter,
 				dataCallback: function(data) {
 					data.formulaId = num2letter(data.rowNum);
+					that.override.filter_counter++;
 
 					return data;
 				}
@@ -804,7 +805,7 @@ insert_javascript_for_visibilitybox();
 		var url = new Curl(this.$form.attr('action'));
 		url.setArgument('validate', 1);
 
-		this.$form.trimValues(['#override_name']);
+		this.$form.trimValues(['input[type="text"]']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		overlay.setLoading();
@@ -965,15 +966,12 @@ insert_javascript_for_visibilitybox();
 	};
 
 	function Operation(data, no) {
-		var defaults = {
-
-		};
-		this.data = jQuery.extend(true, defaults, data);
+		this.data = data;
 		this.data.no = no;
 	}
 
 	/**
-	 * Merges old data with new data.
+	 * Replaces data with new one.
 	 */
 	Operation.prototype.update = function(data) {
 		this.data = data;
@@ -1133,7 +1131,7 @@ insert_javascript_for_visibilitybox();
 		var url = new Curl(this.$form.attr('action'));
 		url.setArgument('validate', 1);
 
-		this.$form.trimValues(['#value']);
+		this.$form.trimValues(['input[type="text"]', 'textarea']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		overlay.setLoading();

@@ -63,7 +63,7 @@ $operations_popup_form_list = (new CFormList())
 			CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
 		]))
 			->setReadonly($options['templated'])
-			->addStyle('margin-right:5px;'),
+			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('value', $options['value'], $options['templated'],
 				DB::getFieldLength('lld_override_operation', 'value')))
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
