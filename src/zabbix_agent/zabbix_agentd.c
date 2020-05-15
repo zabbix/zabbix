@@ -34,7 +34,7 @@ char	*CONFIG_HOST_METADATA_ITEM	= NULL;
 char	*CONFIG_HOST_INTERFACE		= NULL;
 char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
-int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
+int	CONFIG_ENABLE_REMOTE_COMMANDS	= 1;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
@@ -726,6 +726,40 @@ static int	add_serveractive_host_cb(const char *host, unsigned short port)
 
 /******************************************************************************
  *                                                                            *
+ * Function: load_enable_remote_commands                                      *
+ *                                                                            *
+ * Purpose: aliases EnableRemoteCommands parameter to                         *
+ *          Allow/DenyKey=system.run[*]                                       *
+ *                                                                            *
+ * Parameters: value - [IN] key access rule parameter value                   *
+ *             cfg   - [IN] configuration parameter information               *
+ *                                                                            *
+ * Return value: SUCCEED - successful execution                               *
+ *               FAIL    - failed to add rule                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	load_enable_remote_commands(const char *value, struct cfg_line *cfg)
+{
+	unsigned char	rule_type;
+	char		sysrun[] = "system.run[*]";
+	int		ret;
+
+	if (0 == strcmp(value, "1"))
+		rule_type = ZBX_KEY_ACCESS_ALLOW;
+	else if (0 == strcmp(value, "0"))
+		rule_type = ZBX_KEY_ACCESS_DENY;
+	else
+		return FAIL;
+
+	zabbix_log(LOG_LEVEL_WARNING, "EnableRemoteCommands parameter is deprecated,"
+				" use AllowKey=system.run[*] or DenyKey=system.run[*] instead");
+
+	ret = add_key_access_rule(cfg->parameter, sysrun, rule_type);
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: load configuration from config file                               *
@@ -787,7 +821,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{"EnableRemoteCommands",	&CONFIG_ENABLE_REMOTE_COMMANDS,		TYPE_INT,
+		{"EnableRemoteCommands",	&load_enable_remote_commands,		TYPE_CUSTOM,
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
