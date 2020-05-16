@@ -20,6 +20,7 @@
 package keyaccess
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 
@@ -53,7 +54,6 @@ type Rule struct {
 }
 
 var rules []*Rule
-var noMoreRules bool = false
 
 func parse(rec Record) (r *Rule, err error) {
 	r = &Rule{}
@@ -103,29 +103,23 @@ func addRule(rec Record) (err error) {
 
 	if rule, err = parse(rec); err != nil {
 		return
-	} else if !noMoreRules {
-		if r := findRule(rule); r != nil {
-			var ruleType string
-			if rule.Permission == ALLOW {
-				ruleType = "AllowKey"
-			} else {
-				ruleType = "DenyKey"
-			}
-			if r.Permission == rule.Permission {
-				log.Warningf("key access rule \"%s=%s\" duplicates another rule defined above", ruleType, rec.Pattern)
-			} else {
-				log.Warningf("key access rule \"%s=%s\" conflicts with another rule defined above", ruleType, rec.Pattern)
-			}
-		} else if len(rule.Params) == 0 && rule.Key == "*" {
-			if rule.Permission == DENY {
-				rules = append(rules, rule)
-			}
-			noMoreRules = true // any rules after "allow/deny all" are meaningless
-		} else {
-			rules = append(rules, rule)
-		}
 	}
-	return nil
+	if r := findRule(rule); r != nil {
+		var ruleType string
+		if rule.Permission == ALLOW {
+			ruleType = "AllowKey"
+		} else {
+			ruleType = "DenyKey"
+		}
+		if r.Permission == rule.Permission {
+			log.Warningf("key access rule \"%s=%s\" duplicates another rule defined above", ruleType, rec.Pattern)
+		} else {
+			log.Warningf("key access rule \"%s=%s\" conflicts with another rule defined above", ruleType, rec.Pattern)
+		}
+		return
+	}
+	rules = append(rules, rule)
+	return
 }
 
 // GetNumberOfRules returns a number of access rules configured
@@ -134,12 +128,28 @@ func GetNumberOfRules() int {
 }
 
 // LoadRules adds key access records to access rule list
-func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
+func LoadRules(enableRemoteCommands interface{}, allowRecords interface{}, denyRecords interface{}) (err error) {
 	rules = rules[:0]
-	noMoreRules = false
-
 	var records []Record
 
+	// alias EnableRemoteCommands to AllowKey/DenyKey
+	if node, ok := enableRemoteCommands.(*conf.Node); ok {
+		log.Warningf("EnableRemoteCommands parameter is deprecated, use AllowKey=system.run[*] or DenyKey=system.run[*] instead")
+
+		for _, v := range node.Nodes {
+			if value, ok := v.(*conf.Value); ok {
+				switch string(value.Value) {
+				case "0":
+					records = append(records, Record{Pattern: "system.run[*]", Permission: DENY, Line: value.Line})
+				case "1":
+					records = append(records, Record{Pattern: "system.run[*]", Permission: ALLOW, Line: value.Line})
+				default:
+					return fmt.Errorf(`invalid EnableRemoteCommands parameter value "%s"`, string(value.Value))
+				}
+			}
+		}
+	}
+	// load AllowKey/DenyKey parameters
 	if node, ok := allowRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {
 			if value, ok := v.(*conf.Value); ok {
@@ -166,28 +176,44 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 		}
 	}
 
-	var allowRules, denyRules int = 0, 0
-	for _, r := range rules {
-		switch r.Permission {
-		case ALLOW:
-			allowRules++
-		case DENY:
-			denyRules++
+	rulesNum := len(rules)
+	// create system.run[*] deny rule to be appended at the end of rule list unless other
+	// system.run[*] rules are present
+	sysrunRule, err := parse(Record{Pattern: "system.run[*]", Permission: DENY, Line: 0})
+	if err != nil {
+		return
+	}
+	if r := findRule(sysrunRule); r != nil {
+		sysrunRule = nil
+		rulesNum--
+	}
+
+	// remove rules after 'full match' rule
+	for i, r := range rules {
+		if len(r.Params) == 0 && r.Key == "*" {
+			rules = rules[:i+1]
+			break
 		}
 	}
 
-	if allowRules > 0 && denyRules == 0 {
-		err = fmt.Errorf("\"AllowKey\" without \"DenyKey\" rules are meaningless")
-		return
-	} else {
-		// trailing AllowKey rules are meaningless, because AllowKey=* is default behavior
-		for i := len(rules) - 1; i >= 0; i-- {
-			r := rules[i]
-			if r.Permission == DENY {
-				break
-			}
-			rules = rules[:len(rules)-1]
+	// remove trailing 'allow' rules
+	cutoff := len(rules)
+	for i := len(rules) - 1; i >= 0; i-- {
+		if rules[i].Permission != ALLOW {
+			break
 		}
+		cutoff = i
+	}
+	rules = rules[:cutoff]
+
+	if rulesNum != 0 && len(rules) == 0 {
+		return errors.New("Item key access rules are configured to match all keys," +
+			" indicating possible configuration problem. " +
+			" Please remove the rules if that was the purpose.")
+	}
+
+	if sysrunRule != nil {
+		rules = append(rules, sysrunRule)
 	}
 
 	return nil

@@ -135,7 +135,7 @@ int	load_key_access_rule(const char *value, struct cfg_line *cfg)
 	else
 		return FAIL;
 
-	return add_key_access_rule(cfg->parameter, value, rule_type);
+	return add_key_access_rule(cfg->parameter, (char *)value, rule_type);
 }
 
 #ifdef _WINDOWS

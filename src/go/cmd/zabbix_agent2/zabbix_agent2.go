@@ -255,9 +255,6 @@ func main() {
 	}
 
 	if argTest || argPrint {
-		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
-			fatalExit("failed to load key access rules", err)
-		}
 		var level int
 		if argVerbose {
 			level = log.Trace
@@ -266,6 +263,10 @@ func main() {
 		}
 		if err := log.Open(log.Console, level, "", 0); err != nil {
 			fatalExit("cannot initialize logger", err)
+		}
+
+		if err := keyaccess.LoadRules(agent.Options.EnableRemoteCommands, agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+			fatalExit("failed to load key access rules", err)
 		}
 
 		var m *scheduler.Manager
@@ -361,7 +362,7 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+	if err := keyaccess.LoadRules(agent.Options.EnableRemoteCommands, agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 		log.Errf("Failed to load key access rules: %s", err.Error())
 		os.Exit(1)
 	}
