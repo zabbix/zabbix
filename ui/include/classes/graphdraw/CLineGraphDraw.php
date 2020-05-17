@@ -2199,10 +2199,9 @@ class CLineGraphDraw extends CGraphDraw {
 				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}
 
-			$stacked_data = ($this->type == GRAPH_TYPE_STACKED);
 			$elements = ($drawtype == GRAPH_ITEM_DRAWTYPE_DOT)
 				? $this->fmtPoints($data, $this->sizeX)
-				: $this->fmtLines($data, $this->sizeX, $data['missing_data_interval'], $stacked_data);
+				: $this->fmtLines($data, $this->sizeX, $data['missing_data_interval']);
 
 			foreach ($elements as $element) {
 				list($j, $i) = $element;
@@ -2285,14 +2284,13 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Produces lines according with expected data frequency. Points are connected only when they are no further apart
 	 * as given frequency.
 	 *
-	 * @param array $data          Data set.
-	 * @param int   $max_x         Number of pixels in graph.
-	 * @param int   $frequency     Expected metric frequency in seconds. If frequency is zero, lines are always connected.
-	 * @param int   $stacked_data  If $data passed is stacked graph type data.
+	 * @param array $data       Data set.
+	 * @param int   $max_x      Number of pixels in graph.
+	 * @param int   $frequency  Expected metric frequency in seconds. If frequency is zero, lines are always connected.
 	 *
 	 * @return array
 	 */
-	public function fmtLines(&$data, $max_x, $frequency, $stacked_data = false) {
+	public function fmtLines(&$data, $max_x, $frequency) {
 		$lines = [];
 
 		$pt = -1;
@@ -2308,20 +2306,15 @@ class CLineGraphDraw extends CGraphDraw {
 			if (!$lines) {
 				$lines[++ $line] = [$pt, $pt];
 			}
-			elseif ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency) {
-				$lines[++ $line] = [$pt, $pt];
-			}
 			elseif ($data['avg'][$pt] != $data['avg'][$prev_pt]) {
 				$lines[++ $line] = [$prev_pt, $pt];
 				$lines[++ $line] = [$pt, $pt];
 			}
 			elseif (!$frequency || $pt - $prev_pt < ZBX_GRAPH_MAX_SKIP_CELL) {
-				if ($stacked_data) {
-					$lines[++ $line] = [$prev_pt, $pt];
-				}
-				else {
-					$lines[$line][1] = $pt;
-				}
+				$lines[$line][1] = $pt;
+			}
+			elseif ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency) {
+				$lines[++ $line] = [$pt, $pt];
 			}
 			else {
 				$lines[$line][1] = $pt;
@@ -2363,20 +2356,6 @@ class CLineGraphDraw extends CGraphDraw {
 					}
 					else {
 						$lines[] = [$pt_last, $px_last];
-					}
-				}
-			}
-		}
-
-		// Removing any points that are adjacent to line.
-		if ($lines) {
-			foreach ($lines as $index => $line) {
-				if ($line[0] == $line[1]) {
-					if (array_key_exists($index - 1, $lines) && $lines[$index - 1][1] == $line[0]) {
-						unset($lines[$index]);
-					}
-					elseif (array_key_exists($index + 1, $lines) && $lines[$index + 1][0] == $line[0]) {
-						unset($lines[$index]);
 					}
 				}
 			}
