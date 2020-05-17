@@ -5072,6 +5072,27 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_UNKNOWN_STR "%d", unknown_msgs->values_num - 1);
 			func->value = zbx_strdup(func->value, buffer);
 		}
+		else
+		{
+			if (SUCCEED == str_in_list("last,prev", func->function, ',') && (ITEM_VALUE_TYPE_STR ==
+					items[i].value_type || ITEM_VALUE_TYPE_TEXT == items[i].value_type ||
+					ITEM_VALUE_TYPE_LOG == items[i].value_type))
+			{
+				size_t	len;
+				char	*ptr, *tmp;
+
+				len = zbx_get_escape_string_len(func->value, "\"\\");
+				ptr = tmp = zbx_malloc(NULL, len + 3);
+				*ptr++ = '"';
+				zbx_escape_string(ptr, len + 1, func->value, "\"\\");
+				ptr += len;
+				*ptr++ = '"';
+				*ptr = '\0';
+				zbx_free(func->value);
+
+				func->value = tmp;
+			}
+		}
 	}
 
 	DCconfig_clean_items(items, errcodes, itemids.values_num);
