@@ -686,8 +686,9 @@ insert_javascript_for_visibilitybox();
 		this.data.overrides_filters = this.data.filter.conditions;
 		delete this.data.filter;
 
-		// Used to add propper letter, when creating new dynamic row for filter.
-		this.filter_counter = this.data.overrides_filters.length;
+		// Used to add propper letter, when creating new dynamic row for filter. If no filters are configured,
+		// one empty row is created by View.
+		this.filter_counter = (this.data.overrides_filters.length > 0) ? this.data.overrides_filters.length : 1;
 	}
 
 	/**
