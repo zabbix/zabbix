@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-14T18:25:34Z</date>
+   <date>2020-05-18T11:52:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template App Etcd by HTTP</name>
          <description>Get Etcd metrics by HTTP agent.&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -1296,6 +1296,14 @@ return valueArr.reduce(function(acc,obj){
                      <master_item>
                         <key>etcd.get_metrics</key>
                      </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ETCD.GRPC.ERRORS.MAX.WARN}</expression>
+                           <name>Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m)</name>
+                           <priority>WARNING</priority>
+                           <discover>NO_DISCOVER</discover>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
                <master_item>
@@ -1325,6 +1333,30 @@ return JSON.stringify(result);</params>
                      <params>1h</params>
                   </step>
                </preprocessing>
+               <overrides>
+                  <override>
+                     <name>trigger</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#GRPC.CODE}</macro>
+                              <value>{$ETCD.GRPC_CODE.TRIGGER.MATCHES}</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>Too many failed gRPC requests</value>
+                           <status>ENABLED</status>
+                           <discover>DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
             </discovery_rule>
             <discovery_rule>
                <name>Peers discovery</name>
@@ -1478,17 +1510,27 @@ return JSON.stringify(result);</params>
             <macro>
                <macro>{$ETCD.GRPC_CODE.MATCHES}</macro>
                <value>.*</value>
-               <description>Filter of discoverable grpc codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</description>
+               <description>Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</description>
             </macro>
             <macro>
                <macro>{$ETCD.GRPC_CODE.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
-               <description>Filter to exclude discovered grpc codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</description>
+               <description>Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</description>
+            </macro>
+            <macro>
+               <macro>{$ETCD.GRPC_CODE.TRIGGER.MATCHES}</macro>
+               <value>Aborted|Unavailable</value>
+               <description>Filter of discoverable gRPC codes which will be create triggers</description>
+            </macro>
+            <macro>
+               <macro>{$ETCD.GRPC.ERRORS.MAX.WARN}</macro>
+               <value>1</value>
+               <description>Maximum number of gRPC requests failures</description>
             </macro>
             <macro>
                <macro>{$ETCD.HTTP.FAIL.MAX.WARN}</macro>
                <value>2</value>
-               <description>Maximum number of http requests failures</description>
+               <description>Maximum number of HTTP requests failures</description>
             </macro>
             <macro>
                <macro>{$ETCD.LEADER.CHANGES.MAX.WARN}</macro>

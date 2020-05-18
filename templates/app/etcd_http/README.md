@@ -20,7 +20,12 @@ This template was tested on:
 
 Add the template to each node with etcd. Make sure the host HOST.CONN matches with etcd  /metrics endpoint.
 
-If you use an atypical location Etcd API, don't forget to change the macros {$ETCD.SCHEME},{$ETCD.PORT}.
+Test by running:
+`curl -L http://localhost:2379/metrics`
+or
+`curl -L http://<etcd_node_adress>:2379/metrics`
+
+By default template use client port. You can configure metrics endpoint location by `--listen-metrics-urls` flag (See https://github.com/etcd-io/website/blob/master/content/docs/v3.4.0/op-guide/configuration.md#--listen-metrics-urls). Don't forget change  macros {$ETCD.SCHEME}, {$ETCD.PORT}.        
 
 If you need it, you can set {$ETCD.USERNAME} and {$ETCD.PASSWORD} macros in the template for using on the host level.
 
@@ -35,9 +40,11 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ETCD.GRPC_CODE.MATCHES} |<p>Filter of discoverable grpc codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</p> |`.*` |
-|{$ETCD.GRPC_CODE.NOT_MATCHES} |<p>Filter to exclude discovered grpc codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</p> |`CHANGE_IF_NEEDED` |
-|{$ETCD.HTTP.FAIL.MAX.WARN} |<p>Maximum number of http requests failures</p> |`2` |
+|{$ETCD.GRPC.ERRORS.MAX.WARN} |<p>Maximum number of gRPC requests failures</p> |`1` |
+|{$ETCD.GRPC_CODE.MATCHES} |<p>Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</p> |`.*` |
+|{$ETCD.GRPC_CODE.NOT_MATCHES} |<p>Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md</p> |`CHANGE_IF_NEEDED` |
+|{$ETCD.GRPC_CODE.TRIGGER.MATCHES} |<p>Filter of discoverable gRPC codes which will be create triggers</p> |`Aborted|Unavailable` |
+|{$ETCD.HTTP.FAIL.MAX.WARN} |<p>Maximum number of HTTP requests failures</p> |`2` |
 |{$ETCD.LEADER.CHANGES.MAX.WARN} |<p>Maximum number of leader changes</p> |`5` |
 |{$ETCD.OPEN.FDS.MAX.WARN} |<p>Maximum percentage of used file descriptors</p> |`90` |
 |{$ETCD.PASSWORD} |<p>-</p> |`` |
@@ -123,6 +130,7 @@ There are no template links in this template.
 |Etcd: Cluster version has changed (new version: {ITEM.VALUE}) |<p>Etcd version has changed. Ack to close.</p> |`{TEMPLATE_NAME:etcd.cluster.version.diff()}=1 and {TEMPLATE_NAME:etcd.cluster.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Etcd: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:etcd.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m) |<p>"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. </p><p>If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files."</p> |`{TEMPLATE_NAME:etcd.open.fds.min(5m)}/{Template App Etcd by HTTP:etcd.max.fds.last()}*100>{$ETCD.OPEN.FDS.MAX.WARN}` |WARNING | |
+|Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:etcd.grpc.handled.rate[{#GRPC.CODE}].min(5m)}>{$ETCD.GRPC.ERRORS.MAX.WARN}` |WARNING | |
 
 ## Feedback
 
