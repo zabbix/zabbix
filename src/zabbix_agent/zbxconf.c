@@ -124,7 +124,7 @@ void	load_user_parameters(char **lines)
  * Author: Andrejs Tumilovics                                                 *
  *                                                                            *
  ******************************************************************************/
-int	load_key_access_rule(const char *value, struct cfg_line *cfg)
+int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 {
 	unsigned char	rule_type;
 
