@@ -1,1 +1,0 @@
-.......PS. [ZBX-17747] fixed javascript preprocessing output variable initialization to not trigger false positive memory allocation warning (wiper)
