@@ -1433,6 +1433,12 @@ New features:
 .......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
 
 Bug fixes:
+........S. [ZBX-17662] fixed a failing query when updating existing host prototypes (viktors, vso)
+.......PS. [ZBX-15484] shadow global auto_increment variables for MySQL (arimdjonoks)
+.......PS. [ZBX-17607] fixed unreachable poller being too busy due to SNMP checks being attempted twice at a time (mabele)
+..F....... [ZBX-17629] fixed markup in User Media popup (vmaksimovs)
+........S. [ZBX-17109] fixed agent request parameter type parsing (atumilovics)
+..F....... [ZBX-17470] fixed element of filters is not focused on several pages (agriscenko)
 ........S. [ZBX-17691] fixed server crashes on regexp preprocessing (MVekslers)
 ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
 ........S. [ZBX-17186] fixed context-aware LLD macro expansion in JsonPath preprocessing (atumilovics)
