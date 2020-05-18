@@ -380,46 +380,48 @@ void	finalize_key_access_rules_configuration(void)
 
 	if (FAIL != zbx_vector_ptr_search(&key_access_rules, sysrun_deny, compare_key_access_rules))
 	{
-		/* exclude system.deny[*] from total number of rules */
+		/* exclude system.run[*] from total number of rules */
 		rules_num--;
 
 		zbx_key_access_rule_free(sysrun_deny);
 		sysrun_deny = NULL;
 	}
 
-	/* throw out all rules after '*', because they would never match */
-
-	for (i = 0; i < key_access_rules.values_num; i++)
+	if (0 != rules_num)
 	{
-		rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
-		if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
-			break;
-	}
+		/* throw out all rules after '*', because they would never match */
+		for (i = 0; i < key_access_rules.values_num; i++)
+		{
+			rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
+			if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
+				break;
+		}
 
-	for (j = ++i; j < key_access_rules.values_num; j++)
-	{
-		zbx_key_access_rule_free((zbx_key_access_rule_t*)key_access_rules.values[j]);
-		key_access_rules.values_num = i;
-	}
+		for (j = ++i; j < key_access_rules.values_num; j++)
+		{
+			zbx_key_access_rule_free((zbx_key_access_rule_t*)key_access_rules.values[j]);
+			key_access_rules.values_num = i;
+		}
 
-	/* trailing AllowKey rules are meaningless, because AllowKey=* is default behavior, */
-	for (i = key_access_rules.values_num - 1; 0 <= i; i--)
-	{
-		rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
+		/* trailing AllowKey rules are meaningless, because AllowKey=* is default behavior, */
+		for (i = key_access_rules.values_num - 1; 0 <= i; i--)
+		{
+			rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
 
-		if (ZBX_KEY_ACCESS_ALLOW != rule->type)
-			break;
+			if (ZBX_KEY_ACCESS_ALLOW != rule->type)
+				break;
 
-		zbx_key_access_rule_free(rule);
-		zbx_vector_ptr_remove(&key_access_rules, i);
-	}
+			zbx_key_access_rule_free(rule);
+			zbx_vector_ptr_remove(&key_access_rules, i);
+		}
 
-	if (0 != rules_num && 0 == key_access_rules.values_num)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Item key access rules are configured to match all keys,"
-				" indicating possible configuration problem. "
-				" Please remove the rules if that was the purpose.");
-		exit(EXIT_FAILURE);
+		if (0 == key_access_rules.values_num)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Item key access rules are configured to match all keys,"
+					" indicating possible configuration problem. "
+					" Please remove the rules if that was the purpose.");
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	if (NULL != sysrun_deny)
