@@ -279,6 +279,17 @@ New features:
 .......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
 
 Bug fixes:
+.......PS. [ZBX-17227] fixed 4-byte utf-8 sequence handling in embedded scripts (wiper)
+........S. [ZBX-17662] fixed a failing query when updating existing host prototypes (viktors, vso)
+....I..... [ZBX-16347] increased TimescaleDB chunk interval for trends and trends_uint to 1 month (arimdjonoks)
+.......PS. [ZBX-17747] fixed javascript preprocessing output variable initialization to not trigger false positive memory allocation warning (wiper)
+.......PS. [ZBX-15484] shadow global auto_increment variables for MySQL (arimdjonoks)
+.......PS. [ZBX-17607] fixed unreachable poller being too busy due to SNMP checks being attempted twice at a time (mabele)
+..F....... [ZBX-17629] fixed markup in User Media popup (vmaksimovs)
+.......... [ZBX-17733] fixed web.page.get,web.page,web.page.regexp keys on Zabbix agent2 not to verify server's certificate chain and host name (vso)
+........S. [ZBX-17109] fixed agent request parameter type parsing (atumilovics)
+..F....... [ZBX-17470] fixed element of filters is not focused on several pages (agriscenko)
+...G...... [ZBX-17550] fixed log level check in case of DebugLevel=0 (asestakovs)
 ........S. [ZBX-17691] fixed server crashes on regexp preprocessing (MVekslers)
 ........S. [ZBX-17445] fixed misleading error shown when formula cannot be updated during LLD (arimdjonoks)
 
