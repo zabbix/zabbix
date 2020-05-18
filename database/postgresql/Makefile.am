@@ -16,4 +16,5 @@ EXTRA_DIST = \
 	data.sql \
 	images.sql \
 	schema.sql \
+	double.sql \
 	$(DB_EXTENSION).sql
