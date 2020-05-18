@@ -90,24 +90,6 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &item, function, params, &ts, &error)))
 		printf("evaluate_function returned error: %s\n", error);
 
-	if (SUCCEED == str_in_list("last,prev", function, ',') && (ITEM_VALUE_TYPE_STR == item.value_type ||
-			ITEM_VALUE_TYPE_TEXT == item.value_type || ITEM_VALUE_TYPE_LOG == item.value_type))
-	{
-		size_t	len;
-		char	*ptr, *tmp;
-
-		len = zbx_get_escape_string_len(returned_value, "\"\\");
-		ptr = tmp = zbx_malloc(NULL, len + 3);
-		*ptr++ = '"';
-		zbx_escape_string(ptr, len + 1, returned_value, "\"\\");
-		ptr += len;
-		*ptr++ = '"';
-		*ptr = '\0';
-		zbx_free(returned_value);
-
-		returned_value = tmp;
-	}
-
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
 
