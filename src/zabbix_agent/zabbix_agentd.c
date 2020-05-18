@@ -738,11 +738,10 @@ static int	add_serveractive_host_cb(const char *host, unsigned short port)
  *               FAIL    - failed to add rule                                 *
  *                                                                            *
  ******************************************************************************/
-int	load_enable_remote_commands(const char *value, struct cfg_line *cfg)
+static int	load_enable_remote_commands(const char *value, const struct cfg_line *cfg)
 {
 	unsigned char	rule_type;
 	char		sysrun[] = "system.run[*]";
-	int		ret;
 
 	if (0 == strcmp(value, "1"))
 		rule_type = ZBX_KEY_ACCESS_ALLOW;
@@ -754,8 +753,7 @@ int	load_enable_remote_commands(const char *value, struct cfg_line *cfg)
 	zabbix_log(LOG_LEVEL_WARNING, "EnableRemoteCommands parameter is deprecated,"
 				" use AllowKey=system.run[*] or DenyKey=system.run[*] instead");
 
-	ret = add_key_access_rule(cfg->parameter, sysrun, rule_type);
-	return ret;
+	return add_key_access_rule(cfg->parameter, sysrun, rule_type);
 }
 
 /******************************************************************************
