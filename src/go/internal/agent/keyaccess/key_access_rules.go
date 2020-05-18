@@ -105,17 +105,19 @@ func addRule(rec Record) (err error) {
 		return
 	}
 	if r := findRule(rule); r != nil {
-		var ruleType string
+		var ruleType, desc string
 		if rule.Permission == ALLOW {
 			ruleType = "AllowKey"
 		} else {
 			ruleType = "DenyKey"
 		}
 		if r.Permission == rule.Permission {
-			log.Warningf("key access rule \"%s=%s\" duplicates another rule defined above", ruleType, rec.Pattern)
+			desc = "duplicates"
 		} else {
-			log.Warningf("key access rule \"%s=%s\" conflicts with another rule defined above", ruleType, rec.Pattern)
+			desc = "conflicts"
 		}
+		log.Warningf(`%s access rule "system.run[whoami]" was not added because it %s with another rule defined above`,
+			ruleType, desc)
 		return
 	}
 	rules = append(rules, rule)
@@ -128,27 +130,10 @@ func GetNumberOfRules() int {
 }
 
 // LoadRules adds key access records to access rule list
-func LoadRules(enableRemoteCommands interface{}, allowRecords interface{}, denyRecords interface{}) (err error) {
+func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	rules = rules[:0]
 	var records []Record
 
-	// alias EnableRemoteCommands to AllowKey/DenyKey
-	if node, ok := enableRemoteCommands.(*conf.Node); ok {
-		log.Warningf("EnableRemoteCommands parameter is deprecated, use AllowKey=system.run[*] or DenyKey=system.run[*] instead")
-
-		for _, v := range node.Nodes {
-			if value, ok := v.(*conf.Value); ok {
-				switch string(value.Value) {
-				case "0":
-					records = append(records, Record{Pattern: "system.run[*]", Permission: DENY, Line: value.Line})
-				case "1":
-					records = append(records, Record{Pattern: "system.run[*]", Permission: ALLOW, Line: value.Line})
-				default:
-					return fmt.Errorf(`invalid EnableRemoteCommands parameter value "%s"`, string(value.Value))
-				}
-			}
-		}
-	}
 	// load AllowKey/DenyKey parameters
 	if node, ok := allowRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {

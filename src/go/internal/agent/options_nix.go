@@ -61,9 +61,8 @@ type AgentOptions struct {
 	TLSServerCertIssuer    string   `conf:"optional"`
 	TLSServerCertSubject   string   `conf:"optional"`
 
-	EnableRemoteCommands interface{} `conf:"optional"`
-	AllowKey             interface{} `conf:"optional"`
-	DenyKey              interface{} `conf:"optional"`
+	AllowKey interface{} `conf:"optional"`
+	DenyKey  interface{} `conf:"optional"`
 
 	Plugins map[string]interface{} `conf:"optional"`
 }

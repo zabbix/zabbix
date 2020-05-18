@@ -51,7 +51,7 @@ func (r *accessRules) addRule(pattern string, ruleType RuleType) {
 func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRules int) {
 	var err error
 
-	if err := LoadRules(nil, &rules.allowRecords, &rules.denyRecords); err != nil {
+	if err := LoadRules(&rules.allowRecords, &rules.denyRecords); err != nil {
 		t.Errorf("Failed to load rules: %s", err.Error())
 	}
 
@@ -470,7 +470,7 @@ func TestIncompleteWhitelist(t *testing.T) {
 	records.addRule("system.localtime[*]", ALLOW)
 	// Trailing DenyKey=* is missing
 
-	var err error = LoadRules(nil, &records.allowRecords, &records.denyRecords)
+	var err error = LoadRules(&records.allowRecords, &records.denyRecords)
 
 	if err == nil {
 		t.Errorf("Failure expected while loading incomplete whitelist")

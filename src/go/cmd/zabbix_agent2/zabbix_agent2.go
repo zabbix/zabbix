@@ -265,7 +265,7 @@ func main() {
 			fatalExit("cannot initialize logger", err)
 		}
 
-		if err := keyaccess.LoadRules(agent.Options.EnableRemoteCommands, agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 			fatalExit("failed to load key access rules", err)
 		}
 
@@ -362,7 +362,7 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	if err := keyaccess.LoadRules(agent.Options.EnableRemoteCommands, agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 		log.Errf("Failed to load key access rules: %s", err.Error())
 		os.Exit(1)
 	}
