@@ -3361,7 +3361,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
 			/* last, prev functions can return quoted and escaped string values */
-			/* which must be unquoted and unescaped before further processing    */
+			/* which must be unquoted and unescaped before further processing   */
 			if ('"' == *value)
 			{
 				char	*src, *dst;
