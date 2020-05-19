@@ -123,9 +123,9 @@ class CUserMacroParser extends CParser {
 		}
 		$p++;
 
-		if (self::REGEX_PREFIX === substr($source, $p, strlen(self::REGEX_PREFIX))) {
+		if (preg_match("/^\s*regex:/", substr($source, $p)) === 1) {
 			$has_regex = true;
-			$p += strlen(self::REGEX_PREFIX);
+			$p += strpos(substr($source, $p), self::REGEX_PREFIX) + strlen(self::REGEX_PREFIX);
 		}
 
 		$this->context = '';
