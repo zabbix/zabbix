@@ -116,8 +116,8 @@ func addRule(rec Record) (err error) {
 		} else {
 			desc = "conflicts"
 		}
-		log.Warningf(`%s access rule "system.run[whoami]" was not added because it %s with another rule defined above`,
-			ruleType, desc)
+		log.Warningf(`%s access rule "%s" was not added because it %s with another rule defined above`,
+			ruleType, rec.Pattern, desc)
 		return
 	}
 	rules = append(rules, rule)
