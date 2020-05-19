@@ -1,0 +1,115 @@
+
+# Template App IIS by Zabbix agent
+
+## Overview
+
+For Zabbix version: 5.0  
+The template to monitor IIS (Internet Information Services) by Zabbix that work without any external scripts.<br>
+Your server must have the following roles:
+```text
+Web Server
+IIS Management Scripts and Tools
+```
+
+
+This template was tested on:
+
+- Windows Server, version 2012R2
+- Zabbix, version 5.0
+
+## Setup
+
+Set the value for the macros {$IIS.QUEUE.MAX.WARN} if you want to receive alerts when the number of requests in the application pool queue exceeds the threshold.
+
+If you use an atypical HTTP and HTTPS ports, don't forget to change the macros {$IIS.HTTP.PORT}, {$IIS.HTTPS.PORT} (80 and 443 by default).
+
+You can change the value of macros {$IIS.APPPOOL.MONITORED} to "0" if you want to disable all notifications about application pools state. Also you can add additional context macros {$IIS.APPPOOL.MONITORED:<AppPoolName>} for excluding specific application pools from monitoring.
+
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$IIS.APPPOOL.MONITORED} |<p>Monitorng status for discovered Application pools. Use context to avoid trigger firing for specific application pools. "1" - enabled, "0" - disbled.</p> |`1` |
+|{$IIS.HTTP.PORT} |<p>Listened port for HTTP.</p> |`80` |
+|{$IIS.HTTPS.PORT} |<p>Listened port for HTTPS.</p> |`443` |
+|{$IIS.QUEUE.MAX.WARN} |<p>Maximum application pool's request queue length for trigger expression</p> |`` |
+
+## Template links
+
+There are no template links in this template.
+
+## Discovery rules
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|----|
+|Application pools discovery |<p>-</p> |ZABBIX_PASSIVE |wmi.getall[root\webAdministration, select Name from ApplicationPool] |
+
+## Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+|IIS |IIS: World Wide Web Publishing Service (W3SVC) state |<p>The World Wide Web Publishing Service (W3SVC) provides web connectivity and administration of websites through the IIS snap-in. If the World Wide Web Publishing Service stops, the operating system cannot serve any form of web request. This service was dependent on "Windows Process Activation Service".</p> |ZABBIX_PASSIVE |service_state[W3SVC]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Windows process Activation Service (WAS) state |<p>Windows Process Activation Service (WAS) is a tool for managing worker processes that contain applications that host Windows Communication Foundation (WCF) services. Worker processes handle requests that are sent to a Web Server for specific application pools. Each application pool sets boundaries for the applications it contains.</p> |ZABBIX_PASSIVE |service_state[WAS]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: {$IIS.HTTP.PORT} port ping |<p>-</p> |SIMPLE |net.tcp.service[http,,"{$IIS.HTTP.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: {$IIS.HTTPS.PORT} port ping |<p>-</p> |SIMPLE |net.tcp.service[https,,"{$IIS.HTTPS.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Uptime |<p>Service uptime in seconds</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Service Uptime"] |
+|IIS |IIS: Bytes Received per second |<p>The average rate per minute at which data bytes are received by the service at the Application Layer. Does not include protocol headers or control bytes.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Bytes Received/sec",60] |
+|IIS |IIS: Bytes Sent per second |<p>The average rate per minute at which data bytes are sent by the service.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Bytes Sent/sec",60] |
+|IIS |IIS: Bytes Total per second |<p>The average rate per minute of total bytes/sec transferred by the Web service (sum of bytes sent/sec and bytes received/sec)</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Bytes Total/Sec",60] |
+|IIS |IIS: Current connections |<p>The number of active connections</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Current Connections"] |
+|IIS |IIS: Total connection attempts |<p>The total number of connections to the Web or FTP service that have been attempted since service startup. The count is the total for all Web sites or FTP sites combined.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Total Connection Attempts (all instances)"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Connection attempts per second |<p>The average rate per minute that connections using the Web service are being attempted. The count is the average for all Web sites combined.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Connection Attempts/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Anonymous users per second  |<p>The number of requests from users over an anonymous connection per second. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Anonymous Users/sec", 60] |
+|IIS |IIS: NonAnonymous users per second |<p>The number of requests from users over a non-anonymous connection per second. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\NonAnonymous Users/sec", 60] |
+|IIS |IIS: GET requests total |<p>The rate of HTTP requests using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: COPY requests per second |<p>The rate HTTP requests are made using the COPY method. Copy requests are used for copying files and directories. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Copy Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: CGI requests per second |<p>The rate of CGI requests that are simultaneously being processed by the Web service. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\CGI Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: DELETE requests per second |<p>The rate HTTP requests using the DELETE method are made. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Delete Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: HEAD requests per second |<p>The rate HTTP requests using the HEAD method are made. HEAD requests generally indicate a client is querying the state of a document they already have to see if it needs to be refreshed. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Head Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: ISAPI requests per second (1m, avg) |<p>The rate of ISAPI Extension requests that are simultaneously being processed by the Web service.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\ISAPI Extension Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: LOCK requests per second (1m, avg) |<p>The rate that HTTP requests are made using the LOCK method. Lock requests are used to lock a file for one user so that only that user can modify the file.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Lock Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: MKCOL requests per second (1m, avg) |<p>The rate HTTP requests using the MKCOL method are made. Mkcol requests are used to create directories on the server.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Mkcol Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: MOVE requests per second (1m, avg) |<p>The rate HTTP requests using the MOVE method are made. Move requests are used for moving files and directories.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Move Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: OPTIONS requests per second (1m, avg) |<p>The rate HTTP requests using the OPTIONS method are made.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Options Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: POST requests per second (1m, avg) |<p>Rate of HTTP requests using POST method. Generally used for forms or gateway requests.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Post Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: PROPFIND requests per second (1m, avg) |<p>The rate HTTP requests using the PROPFIND method are made. Propfind requests retrieve property values on files and directories.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Propfind Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: PROPPATCH requests per second |<p>The rate HTTP requests using the PROPPATCH method are made. Proppatch requests set property values on files and directories. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Proppatch Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: PUT requests per second |<p>The rate HTTP requests using the PUT method are made. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Put Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: MS-SEARCH requests per second |<p>The rate HTTP requests using the MS-SEARCH method are made. Search requests are used to query the server to find resources that match a set of conditions provided by the client. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Search Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: TRACE requests per second |<p>The rate of HTTP requests using the TRACE method are made. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Trace Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: TRACE requests per second |<p>The rate HTTP requests using the UNLOCK method are made. Unlock requests are used to remove locks from files. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Unlock Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Total Method requests per second |<p>The rate of all HTTP requests are received. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Total Other Method requests per second |<p>Total Other Request Methods is the number of HTTP requests that are not OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, MOVE, COPY, MKCOL, PROPFIND, PROPPATCH, SEARCH, LOCK or UNLOCK methods (since service startup). Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Locked errors per second |<p>The rate of errors due to requests that couldn't be satisfied by the server because the requested document was locked. These are generally reported as an HTTP 423 error code to the client. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Locked Errors/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: Not Found errors per second |<p>The rate of errors due to requests that couldn't be satisfied by the server because the requested document could not be found. These are generally reported to the client with HTTP error code 404. Average per minute.</p> |ZABBIX_PASSIVE |perf_counter_en["\Web Service(_Total)\Not Found Errors/Sec",60]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: {#APPPOOL} Uptime |<p>The web application uptime period since the last restart</p> |ZABBIX_PASSIVE |perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"] |
+|IIS |IIS: AppPool {#APPPOOL} state |<p>The state of application pool</p> |ZABBIX_PASSIVE |perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: AppPool {#APPPOOL} recycles |<p>The number of times that the application pool has been recycled since Windows Process Activation Service (WAS) started.</p> |ZABBIX_PASSIVE |perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|IIS |IIS: AppPool {#APPPOOL} current queue size |<p>The number of requests in the queue</p> |ZABBIX_PASSIVE |perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+
+## Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
+|IIS: The World Wide Web Publishing Service (W3SVC) is not running |<p>The World Wide Web Publishing Service (W3SVC) is not in running state. IIS cannot start.</p> |`{TEMPLATE_NAME:service_state[W3SVC].last()}<>0` |HIGH |<p>**Depends on**:</p><p>- IIS: Windows process Activation Service (WAS) is not running</p> |
+|IIS: Windows process Activation Service (WAS) is not running |<p>Windows process Activation Service (WAS) is not in running state. IIS cannot start.</p> |`{TEMPLATE_NAME:service_state[WAS].last()}<>0` |HIGH | |
+|IIS: Port {$IIS.HTTP.PORT} is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[http,,"{$IIS.HTTP.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- IIS: The World Wide Web Publishing Service (W3SVC) is not running</p> |
+|IIS: Port {$IIS.HTTPS.PORT} is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[https,,"{$IIS.HTTPS.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- IIS: The World Wide Web Publishing Service (W3SVC) is not running</p> |
+|IIS: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:perf_counter_en["\Web Service(_Total)\Service Uptime"].last()}<10m` |INFO |<p>Manual close: YES</p> |
+|IIS: {#APPPOOL} has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"].last()}<10m` |INFO |<p>Manual close: YES</p> |
+|IIS: Application pool {#APPPOOL} is not in Running state |<p>-</p> |`{TEMPLATE_NAME:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"].last()}<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |HIGH | |
+|IIS: Application pool {#APPPOOL} was recycled |<p>-</p> |`{TEMPLATE_NAME:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"].diff()}=1 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1` |INFO | |
+|IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN}) |<p>-</p> |`{TEMPLATE_NAME:perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"].last()}>{$IIS.QUEUE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- IIS: Application pool {#APPPOOL} is not in Running state</p> |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com
+
+You can also provide feedback, discuss the template or ask for help with it at
+[ZABBIX forums](none).
+
