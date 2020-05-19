@@ -39,6 +39,17 @@ const (
 	DENY
 )
 
+func (t RuleType) String() string {
+	switch t {
+	case ALLOW:
+		return "AllowKey"
+	case DENY:
+		return "DenyKey"
+	default:
+		return "unknown"
+	}
+}
+
 // Record key access record
 type Record struct {
 	Pattern    string
@@ -48,6 +59,7 @@ type Record struct {
 
 // Rule key access rule definition
 type Rule struct {
+	Pattern    string
 	Permission RuleType
 	Key        string
 	Params     []string
@@ -56,8 +68,10 @@ type Rule struct {
 var rules []*Rule
 
 func parse(rec Record) (r *Rule, err error) {
-	r = &Rule{}
-	r.Permission = rec.Permission
+	r = &Rule{
+		Permission: rec.Permission,
+		Pattern:    rec.Pattern,
+	}
 
 	if r.Key, r.Params, err = itemutil.ParseWildcardKey(rec.Pattern); err != nil {
 		return nil, err
@@ -105,19 +119,14 @@ func addRule(rec Record) (err error) {
 		return
 	}
 	if r := findRule(rule); r != nil {
-		var ruleType, desc string
-		if rule.Permission == ALLOW {
-			ruleType = "AllowKey"
-		} else {
-			ruleType = "DenyKey"
-		}
+		var desc string
 		if r.Permission == rule.Permission {
 			desc = "duplicates"
 		} else {
 			desc = "conflicts"
 		}
 		log.Warningf(`%s access rule "%s" was not added because it %s with another rule defined above`,
-			ruleType, rec.Pattern, desc)
+			rec.Permission, rec.Pattern, desc)
 		return
 	}
 	rules = append(rules, rule)
@@ -176,6 +185,9 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	// remove rules after 'full match' rule
 	for i, r := range rules {
 		if len(r.Params) == 0 && r.Key == "*" {
+			for j := i + 1; j < len(rules); j++ {
+				log.Warningf(`removed unreachable %s "%s" rule`, rules[j].Permission, rules[j].Pattern)
+			}
 			rules = rules[:i+1]
 			break
 		}
@@ -187,6 +199,7 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 		if rules[i].Permission != ALLOW {
 			break
 		}
+		log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
 		cutoff = i
 	}
 	rules = rules[:cutoff]
