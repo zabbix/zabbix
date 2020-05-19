@@ -28,7 +28,6 @@ class CControllerPopupLldOperation extends CController {
 	}
 
 	protected function checkInput() {
-
 		$fields = [
 			'no' =>					'int32',
 			'templated' =>			'in 0,1',
@@ -95,7 +94,7 @@ class CControllerPopupLldOperation extends CController {
 			'optemplate' => [],
 			'opinventory' => [
 				'inventory_mode' => HOST_INVENTORY_MANUAL
-			],
+			]
 		];
 
 		$page_options = [
@@ -145,17 +144,16 @@ class CControllerPopupLldOperation extends CController {
 			}
 
 			/*
-			 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
-			 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
+			 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated
+			 * by a semicolon. In the end, custom intervals together with "delay" are stored in the "delay" variable.
 			 */
 			if (array_key_exists('opperiod', $page_options)) {
 				$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
 				$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
 				$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
 
-				if (!array_key_exists('delay', $page_options['opperiod'])
-						|| $simple_interval_parser->parse($page_options['opperiod']['delay']) != CParser::PARSE_SUCCESS
-				) {
+				if ($simple_interval_parser->parse($page_options['opperiod']['delay']) != CParser::PARSE_SUCCESS
+						|| !array_key_exists('delay', $page_options['opperiod'])) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', 'Delay', _('a time unit is expected')));
 				}
 				elseif (array_key_exists('delay_flex', $page_options['opperiod'])) {
@@ -253,7 +251,7 @@ class CControllerPopupLldOperation extends CController {
 			);
 		}
 		else {
-			// Combines received values and default, to use as values for all action fields.
+			// Combines received and default values to use as values for all action fields.
 			$field_values = [];
 			foreach ($actions as $action) {
 				if ($this->hasInput($action)) {
@@ -284,7 +282,7 @@ class CControllerPopupLldOperation extends CController {
 				$field_values['optrends']['trends'] = DB::getDefault('items', 'trends');
 			}
 
-			// Delay calculation
+			// Delay calculation.
 			$update_interval_parser = new CUpdateIntervalParser([
 				'usermacros' => true,
 				'lldmacros' => true

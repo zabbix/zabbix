@@ -24,7 +24,7 @@
  */
 
 $output = [
-	'header' => $data['title'],
+	'header' => $data['title']
 ];
 
 $options = $data['options'];
@@ -68,8 +68,7 @@ $override_evaltype = (new CDiv([
 	]))
 		->setReadonly($options['templated']),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CSpan(''))
-		->setId('overrides_expression'),
+	(new CSpan(''))->setId('overrides_expression'),
 	(new CTextBox('overrides_formula', $options['overrides_formula'], $options['templated'],
 			DB::getFieldLength('lld_override', 'formula')))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -78,7 +77,7 @@ $override_evaltype = (new CDiv([
 ]))
 	->addClass('overrideRow');
 
-$filterTable = (new CTable())
+$filter_table = (new CTable())
 	->setId('overrides_filters')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
@@ -102,7 +101,7 @@ $operators = [
 ];
 
 foreach ($overrides_filters as $i => $overrides_filter) {
-	$formulaId = [
+	$formulaid = [
 		new CSpan($overrides_filter['formulaid']),
 		new CVar('overrides_filters['.$i.'][formulaid]', $overrides_filter['formulaid'])
 	];
@@ -120,24 +119,24 @@ foreach ($overrides_filters as $i => $overrides_filter) {
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
-	$deleteButtonCell = [
+	$delete_button_cell = [
 		(new CButton('overrides_filters_'.$i.'_remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
 			->setEnabled(!$options['templated'])
 	];
 
-	$row = [$formulaId, $macro,
+	$row = [$formulaid, $macro,
 		(new CComboBox('overrides_filters['.$i.'][operator]', $overrides_filter['operator'], null, $operators))
 			->addClass('operator')
 			->setReadonly($options['templated']),
 		$value,
-		(new CCol($deleteButtonCell))->addClass(ZBX_STYLE_NOWRAP)
+		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	];
-	$filterTable->addRow($row, 'form_row');
+	$filter_table->addRow($row, 'form_row');
 }
 
-$filterTable->setFooter(new CCol(
+$filter_table->setFooter(new CCol(
 	(new CButton('macro_add', _('Add')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
@@ -145,7 +144,7 @@ $filterTable->setFooter(new CCol(
 ));
 
 $overrides_popup_form_list->addRow(_('Filters'),
-	(new CDiv([$override_evaltype, $filterTable]))
+	(new CDiv([$override_evaltype, $filter_table]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
