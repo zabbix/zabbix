@@ -123,7 +123,7 @@ class CUserMacroParser extends CParser {
 		}
 		$p++;
 
-		if (preg_match("/^\s*regex:/", substr($source, $p)) === 1) {
+		if (preg_match("/^\s*".self::REGEX_PREFIX."/", substr($source, $p)) === 1) {
 			$has_regex = true;
 			$p += strpos(substr($source, $p), self::REGEX_PREFIX) + strlen(self::REGEX_PREFIX);
 		}
