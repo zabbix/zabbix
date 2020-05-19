@@ -400,14 +400,18 @@ void	finalize_key_access_rules_configuration(void)
 				break;
 		}
 
-		for (j = ++i; j < key_access_rules.values_num; j++)
+		if (i != key_access_rules.values_num)
 		{
-			rule = (zbx_key_access_rule_t*)key_access_rules.values[j];
-			zabbix_log(LOG_LEVEL_WARNING, "removed unreachable %s \"%s\" rule",
-					(ZBX_KEY_ACCESS_ALLOW == rule->type ? "AllowKey" : "DenyKey"), rule->pattern);
-			zbx_key_access_rule_free(rule);
+			for (j = ++i; j < key_access_rules.values_num; j++)
+			{
+				rule = (zbx_key_access_rule_t*)key_access_rules.values[j];
+				zabbix_log(LOG_LEVEL_WARNING, "removed unreachable %s \"%s\" rule",
+						(ZBX_KEY_ACCESS_ALLOW == rule->type ? "AllowKey" : "DenyKey"),
+						rule->pattern);
+				zbx_key_access_rule_free(rule);
+			}
+			key_access_rules.values_num = i;
 		}
-		key_access_rules.values_num = i;
 
 		/* trailing AllowKey rules are meaningless, because AllowKey=* is default behavior, */
 		for (i = key_access_rules.values_num - 1; 0 <= i; i--)
