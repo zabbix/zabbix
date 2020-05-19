@@ -76,8 +76,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->loadModules();
 
 		// Check parameters of modules in the modules table.
-		$table = $this->query('name:module-form')->asTable()->one();
-		$content = $table->index('Name', true);
 		$this->assertTableData($modules);
 
 		$count = CDBHelper::getCount('SELECT moduleid FROM module');
@@ -134,6 +132,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 	/**
 	 * @dataProvider getModuleDetails
+	 * @depends testPageAdministrationGeneralModules_Layout
 	 */
 	public function testPageAdministrationGeneralModules_Details($data) {
 		// Open corresponding module from the modules table.
@@ -143,8 +142,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$form = $this->query('name:module-form')->asForm()->waitUntilVisible()->one();
 		// Check value af every field in Module details form.
 		foreach ($data as $key => $value) {
-			$this->assertEquals($data[$key], $form->query('xpath://label[text()="'.$key.
-					'"]/../../div[@class="table-forms-td-right"]')->one()->getText());
+			$this->assertEquals($value, $form->getFieldContainer($key)->getText());
 		}
 	}
 
@@ -214,6 +212,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	/**
 	 * @backup module
 	 * @dataProvider getModuleData
+	 * @depends testPageAdministrationGeneralModules_Layout
 	 */
 	public function testPageAdministrationGeneralModules_EnableDisable($data) {
 		$this->page->login()->open('zabbix.php?action=module.list');
@@ -327,6 +326,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 	/**
 	 * @dataProvider getFilterData
+	 * @depends testPageAdministrationGeneralModules_Layout
 	 */
 	public function testPageAdministrationGeneralModules_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=module.list');
@@ -351,6 +351,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
 	}
 
+	/**
+	 * @depends testPageAdministrationGeneralModules_Layout
+	 */
 	public function testPageAdministrationGeneralModules_SimpleUpdate() {
 		$sql = 'SELECT * FROM module ORDER BY moduleid';
 		$initial_hash = CDBHelper::getHash($sql);
@@ -369,6 +372,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->assertEquals($initial_hash, CDBHelper::getHash($sql));
 	}
 
+	/**
+	 * @depends testPageAdministrationGeneralModules_Layout
+	 */
 	public function testPageAdministrationGeneralModules_Cancel() {
 		$sql = 'SELECT * FROM module ORDER BY moduleid';
 		$initial_hash = CDBHelper::getHash($sql);
@@ -434,18 +440,17 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 */
 	private function checkModulesMessage($message, $title, $details) {
 		$this->assertEquals($title, $message->getTitle());
-		if (is_array($details)) {
-			foreach ($details as $detail) {
-				$this->assertTrue($message->hasLine($detail));
-			}
+		if (!is_array($details)) {
+			$details = [$details];
 		}
-		else {
-			$this->assertTrue($message->hasLine($details));
+
+		foreach ($details as $detail) {
+			$this->assertTrue($message->hasLine($detail));
 		}
 	}
 
 	/**
-	 * Function enables modues from the list in modules page or from module details form, depending on input parameters.
+	 * Function enables modules from the list in modules page or from module details form, depending on input parameters.
 	 * @param array		$data			data array with module details
 	 * @param bool		$from_form		flag that determines whether the module is enabled from module details form.
 	 */
