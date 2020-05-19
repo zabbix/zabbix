@@ -404,7 +404,7 @@ void	finalize_key_access_rules_configuration(void)
 		{
 			rule = (zbx_key_access_rule_t*)key_access_rules.values[j];
 			zabbix_log(LOG_LEVEL_WARNING, "removed unreachable %s \"%s\" rule",
-					(ZBX_KEY_ACCESS_ALLOW == rule->type ? "allow" : "deny"), rule->pattern);
+					(ZBX_KEY_ACCESS_ALLOW == rule->type ? "AllowKey" : "DenyKey"), rule->pattern);
 			zbx_key_access_rule_free(rule);
 		}
 		key_access_rules.values_num = i;
@@ -417,7 +417,7 @@ void	finalize_key_access_rules_configuration(void)
 			if (ZBX_KEY_ACCESS_ALLOW != rule->type)
 				break;
 
-			zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing allow \"%s\" rule",  rule->pattern);
+			zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing AllowKey \"%s\" rule",  rule->pattern);
 
 			zbx_key_access_rule_free(rule);
 			zbx_vector_ptr_remove(&key_access_rules, i);
