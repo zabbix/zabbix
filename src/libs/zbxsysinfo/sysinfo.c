@@ -46,6 +46,7 @@
 
 typedef struct
 {
+	char				*pattern;
 	zbx_vector_str_t		elements;
 	zbx_key_access_rule_type_t	type;
 	int				empty_arguments;
@@ -321,6 +322,7 @@ void	init_key_access_rules(void)
  ******************************************************************************/
 static void	zbx_key_access_rule_free(zbx_key_access_rule_t *rule)
 {
+	zbx_free(rule->pattern);
 	zbx_vector_str_clear_ext(&rule->elements, zbx_str_free);
 	zbx_vector_str_destroy(&rule->elements);
 	zbx_free(rule);
@@ -344,6 +346,7 @@ static zbx_key_access_rule_t	*zbx_key_access_rule_create(char *pattern, zbx_key_
 
 	rule = zbx_malloc(NULL, sizeof(zbx_key_access_rule_t));
 	rule->type = type;
+	rule->pattern = zbx_strdup(NULL, pattern);
 	zbx_vector_str_create(&rule->elements);
 
 	if (SUCCEED != parse_key_access_rule(pattern, rule))
@@ -399,9 +402,12 @@ void	finalize_key_access_rules_configuration(void)
 
 		for (j = ++i; j < key_access_rules.values_num; j++)
 		{
-			zbx_key_access_rule_free((zbx_key_access_rule_t*)key_access_rules.values[j]);
-			key_access_rules.values_num = i;
+			rule = (zbx_key_access_rule_t*)key_access_rules.values[j];
+			zabbix_log(LOG_LEVEL_WARNING, "removed unreachable %s \"%s\" rule",
+					(ZBX_KEY_ACCESS_ALLOW == rule->type ? "allow" : "deny"), rule->pattern);
+			zbx_key_access_rule_free(rule);
 		}
+		key_access_rules.values_num = i;
 
 		/* trailing AllowKey rules are meaningless, because AllowKey=* is default behavior, */
 		for (i = key_access_rules.values_num - 1; 0 <= i; i--)
@@ -410,6 +416,8 @@ void	finalize_key_access_rules_configuration(void)
 
 			if (ZBX_KEY_ACCESS_ALLOW != rule->type)
 				break;
+
+			zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing allow \"%s\" rule",  rule->pattern);
 
 			zbx_key_access_rule_free(rule);
 			zbx_vector_ptr_remove(&key_access_rules, i);
