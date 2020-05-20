@@ -846,15 +846,12 @@ static int	config_hmacro_context_compare(const void *d1, const void *d2)
 
 	/* macros without context have higher priority than macros with */
 	if (NULL == m1->context)
-	{
-		if (NULL == m2->context)
-			return strcmp(m1->macro, m2->macro);
-		return -1;
-	}
+		return NULL == m2->context ? strcmp(m1->macro, m2->macro) : -1;
+
 	if (NULL == m2->context)
 		return 1;
 
-	/* CONDITION_OPERATOR_EQUAL (0) has hiHher priority than CONDITION_OPERATOR_REHEXP (8) */
+	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
 	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
 
 	return strcmp(m1->context, m2->context);
