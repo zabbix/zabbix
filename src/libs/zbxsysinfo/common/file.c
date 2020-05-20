@@ -109,7 +109,7 @@ err:
 #if defined(_WINDOWS) || defined(__MINGW32__)
 static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*filename;
+	const char		*filename;
 	int			ret = SYSINFO_RET_FAIL, file_exists, types, types_incl, types_excl;
 	HANDLE			handle;
 	wchar_t			*wpath;
@@ -162,7 +162,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain directory information: %s",
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
 					zbx_strerror(errno)));
 			goto err;
 		}
@@ -226,7 +226,7 @@ err:
 static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
-	char		*filename;
+	const char	*filename;
 	int		ret = SYSINFO_RET_FAIL, file_exists, types, types_incl, types_excl;
 
 	if (3 < request->nparam)
