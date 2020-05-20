@@ -1078,7 +1078,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		goto notsupported;
 	}
 
-	if (ZBX_KEY_ACCESS_ALLOW != check_request_access_rules(&request))
+	if (0 == (flags & PROCESS_LOCAL_COMMAND) && ZBX_KEY_ACCESS_ALLOW != check_request_access_rules(&request))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Key access denied: \"%s\"", in_command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
