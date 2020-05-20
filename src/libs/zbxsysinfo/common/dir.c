@@ -310,7 +310,14 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 	time_t	now;
 
 	types_incl = zbx_etypes_to_mask(get_rparam(request, 3), result);
+
+	if (ISSET_MSG(result))
+		return FAIL;
+
 	types_excl = zbx_etypes_to_mask(get_rparam(request, 4), result);
+
+	if (ISSET_MSG(result))
+		return FAIL;
 
 	if (FT_OVERFLOW & (types_incl | types_excl))
 		return FAIL;
