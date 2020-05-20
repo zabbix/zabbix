@@ -113,9 +113,9 @@ https://httpd.apache.org/docs/current/mod/mod_status.html</description>
 var lines = value.split('\n');
 var output = {},
     workers = {
-        _: 0, S: 0, R: 0, W: 0,
-        K: 0, D: 0, C: 0, L: 0,
-        G: 0, I: 0, '.': 0
+        '_': 0, 'S': 0, 'R': 0, 'W': 0,
+        'K': 0, 'D': 0, 'C': 0, 'L': 0,
+        'G': 0, 'I': 0, '.': 0
     };
 
 // Get all "Key: Value" pairs as an object
@@ -133,7 +133,7 @@ output.ServerVersion = output.Server || output.ServerVersion;
 
 // Parse "Scoreboard" to get worker count.
 if (typeof output.Scoreboard === 'string') {
-    for (i = 0; i &lt; output.Scoreboard.length; i++) {
+    for (var i = 0; i &lt; output.Scoreboard.length; i++) {
         var char = output.Scoreboard[i];
 
         workers[char]++;
