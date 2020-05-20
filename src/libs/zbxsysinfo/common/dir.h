@@ -59,6 +59,6 @@ typedef struct
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-int	zbx_etypes_to_mask(char *etypes, AGENT_RESULT *result);
+int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_DIR_H */

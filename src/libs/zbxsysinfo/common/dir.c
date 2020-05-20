@@ -228,7 +228,7 @@ static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *re
 	return SUCCEED;
 }
 
-static int	etype_to_mask(char *etype)
+static int	etype_to_mask(const char *etype)
 {
 	static const char	*template_list = ZBX_FT_TEMPLATE;
 	const char		*tmp;
@@ -245,10 +245,9 @@ static int	etype_to_mask(char *etype)
 	return ret;
 }
 
-int	zbx_etypes_to_mask(char *etypes, AGENT_RESULT *result)
+int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result)
 {
-	char	*etype;
-	int	n, num, type, ret = 0;
+	int	n, num, ret = 0;
 
 	if (NULL == etypes || '\0' == *etypes)
 		return 0;
@@ -256,6 +255,9 @@ int	zbx_etypes_to_mask(char *etypes, AGENT_RESULT *result)
 	num = num_param(etypes);
 	for (n = 1; n <= num; n++)
 	{
+		char	*etype;
+		int	type;
+
 		if (NULL == (etype = get_param_dyn(etypes, n)))
 			continue;
 
