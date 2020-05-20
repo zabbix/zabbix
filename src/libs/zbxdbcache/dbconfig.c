@@ -1903,7 +1903,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		{
 			zbx_strpool_release(gmacro_m->macro);
 			zbx_vector_ptr_destroy(&gmacro_m->gmacros);
-			zbx_hashset_remove_direct(&config->gmacros, gmacro_m);
+			zbx_hashset_remove_direct(&config->gmacros_m, gmacro_m);
 		}
 		else
 			zbx_vector_ptr_sort(&gmacro_m->gmacros, config_gmacro_context_compare);
@@ -2023,7 +2023,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		{
 			zbx_strpool_release(hmacro_hm->macro);
 			zbx_vector_ptr_destroy(&hmacro_hm->hmacros);
-			zbx_hashset_remove_direct(&config->hmacros, hmacro_hm);
+			zbx_hashset_remove_direct(&config->hmacros_hm, hmacro_hm);
 		}
 		else
 			zbx_vector_ptr_sort(&hmacro_hm->hmacros, config_hmacro_context_compare);
