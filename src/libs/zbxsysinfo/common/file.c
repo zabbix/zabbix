@@ -129,6 +129,10 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
+	/* remove directory suffix '\\' (if any, except for paths like "C:\\") as FindFirstFileW() fails */
+	if ('\0' != *(filename + 1) && ':' != *(filename + strlen(filename) - 2))
+		zbx_rtrim(filename, "/\\");
+
 	types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result);
 
 	if (ISSET_MSG(result))
