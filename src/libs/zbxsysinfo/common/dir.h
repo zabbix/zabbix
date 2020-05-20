@@ -30,19 +30,19 @@
 #define TRAVERSAL_DEPTH_UNLIMITED	-1	/* directory traversal depth is not limited */
 
 /* File Types */
-#define FT_FILE		0x001
-#define FT_DIR		0x002
-#define FT_SYM		0x004
-#define FT_SOCK		0x008
-#define FT_BDEV		0x010
-#define FT_CDEV		0x020
-#define FT_FIFO		0x040
-#define FT_ALL		0x080
-#define FT_DEV		0x100
-#define FT_OVERFLOW	0x200
-#define FT_TEMPLATE	"file\0dir\0sym\0sock\0bdev\0cdev\0fifo\0all\0dev\0"
-#define FT_ALLMASK	(FT_FILE | FT_DIR | FT_SYM | FT_SOCK | FT_BDEV | FT_CDEV | FT_FIFO)
-#define FT_DEV2		(FT_BDEV | FT_CDEV)
+#define ZBX_FT_FILE		0x001
+#define ZBX_FT_DIR		0x002
+#define ZBX_FT_SYM		0x004
+#define ZBX_FT_SOCK		0x008
+#define ZBX_FT_BDEV		0x010
+#define ZBX_FT_CDEV		0x020
+#define ZBX_FT_FIFO		0x040
+#define ZBX_FT_ALL		0x080
+#define ZBX_FT_DEV		0x100
+#define ZBX_FT_OVERFLOW	0x200
+#define ZBX_FT_TEMPLATE	"file\0dir\0sym\0sock\0bdev\0cdev\0fifo\0all\0dev\0"
+#define ZBX_FT_ALLMASK	(ZBX_FT_FILE | ZBX_FT_DIR | ZBX_FT_SYM | ZBX_FT_SOCK | ZBX_FT_BDEV | ZBX_FT_CDEV | ZBX_FT_FIFO)
+#define ZBX_FT_DEV2		(ZBX_FT_BDEV | ZBX_FT_CDEV)
 
 typedef struct
 {

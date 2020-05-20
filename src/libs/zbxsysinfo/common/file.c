@@ -140,18 +140,18 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (ISSET_MSG(result))
 		goto err;
 
-	if (FT_OVERFLOW & (types_incl | types_excl))
+	if (ZBX_FT_OVERFLOW & (types_incl | types_excl))
 		goto err;
 
 	if (0 == types_incl)
 	{
 		if (0 == types_excl)
-			types_incl = FT_FILE;
+			types_incl = ZBX_FT_FILE;
 		else
-			types_incl = FT_ALLMASK;
+			types_incl = ZBX_FT_ALLMASK;
 	}
 
-	types = types_incl & (~types_excl) & FT_ALLMASK;
+	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
 
 	if (0 != zbx_stat(filename, &status))
 	{
@@ -186,7 +186,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	switch (data.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
 	{
 		case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
-			if (0 != (types & FT_SYM))
+			if (0 != (types & ZBX_FT_SYM))
 				file_exists = 1;
 			else
 				file_exists = 0;
@@ -194,19 +194,19 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		case FILE_ATTRIBUTE_REPARSE_POINT:
 						/* not a symlink directory => symlink regular file*/
 						/* counting symlink files as MS explorer */
-			if (0 != (types & FT_FILE))
+			if (0 != (types & ZBX_FT_FILE))
 				file_exists = 1;
 			else
 				file_exists = 0;
 			break;
 		case FILE_ATTRIBUTE_DIRECTORY:
-			if (0 != (types & FT_DIR))
+			if (0 != (types & ZBX_FT_DIR))
 				file_exists = 1;
 			else
 				file_exists = 0;
 			break;
 		default:	/* not a directory => regular file */
-			if (0 != (types & FT_FILE))
+			if (0 != (types & ZBX_FT_FILE))
 			{
 					file_exists = 1;
 			}
@@ -253,34 +253,34 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (ISSET_MSG(result))
 		goto err;
 
-	if (FT_OVERFLOW & (types_incl | types_excl))
+	if (ZBX_FT_OVERFLOW & (types_incl | types_excl))
 		goto err;
 
 	if (0 == types_incl)
 	{
 		if (0 == types_excl)
-			types_incl = FT_FILE;
+			types_incl = ZBX_FT_FILE;
 		else
-			types_incl = FT_ALLMASK;
+			types_incl = ZBX_FT_ALLMASK;
 	}
 
-	types = types_incl & (~types_excl) & FT_ALLMASK;
+	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
 
-	if(0 != (types & FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+	if(0 != (types & ZBX_FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
 	{
 		file_exists = 1;
 	}
-	else if (0 != (types_excl & FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+	else if (0 != (types_excl & ZBX_FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
 	{
 		file_exists = 0;
 	}
 	else if (0 == zbx_stat(filename, &buf) && (
-			(S_ISREG(buf.st_mode)  && 0 != (types & FT_FILE)) ||
-			(S_ISDIR(buf.st_mode)  && 0 != (types & FT_DIR)) ||
-			(S_ISSOCK(buf.st_mode) && 0 != (types & FT_SOCK)) ||
-			(S_ISBLK(buf.st_mode)  && 0 != (types & FT_BDEV)) ||
-			(S_ISCHR(buf.st_mode)  && 0 != (types & FT_CDEV)) ||
-			(S_ISFIFO(buf.st_mode) && 0 != (types & FT_FIFO))))
+			(S_ISREG(buf.st_mode)  && 0 != (types & ZBX_FT_FILE)) ||
+			(S_ISDIR(buf.st_mode)  && 0 != (types & ZBX_FT_DIR)) ||
+			(S_ISSOCK(buf.st_mode) && 0 != (types & ZBX_FT_SOCK)) ||
+			(S_ISBLK(buf.st_mode)  && 0 != (types & ZBX_FT_BDEV)) ||
+			(S_ISCHR(buf.st_mode)  && 0 != (types & ZBX_FT_CDEV)) ||
+			(S_ISFIFO(buf.st_mode) && 0 != (types & ZBX_FT_FIFO))))
 	{
 		file_exists = 1;
 	}

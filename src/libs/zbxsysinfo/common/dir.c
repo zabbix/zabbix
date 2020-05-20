@@ -230,7 +230,7 @@ static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *re
 
 static int	etype_to_mask(char *etype)
 {
-	static const char	*template_list = FT_TEMPLATE;
+	static const char	*template_list = ZBX_FT_TEMPLATE;
 	const char		*tmp;
 	int			ret = 1;
 
@@ -259,7 +259,7 @@ int	zbx_etypes_to_mask(char *etypes, AGENT_RESULT *result)
 		if (NULL == (etype = get_param_dyn(etypes, n)))
 			continue;
 
-		if (FT_OVERFLOW & (type = etype_to_mask(etype)))
+		if (ZBX_FT_OVERFLOW & (type = etype_to_mask(etype)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid type \"%s\".", etype));
 			zbx_free(etype);
@@ -270,11 +270,11 @@ int	zbx_etypes_to_mask(char *etypes, AGENT_RESULT *result)
 		zbx_free(etype);
 	}
 
-	if (FT_DEV & ret)
-		ret |= FT_DEV2;
+	if (ZBX_FT_DEV & ret)
+		ret |= ZBX_FT_DEV2;
 
-	if (FT_ALL & ret)
-		ret |= FT_ALLMASK;
+	if (ZBX_FT_ALL & ret)
+		ret |= ZBX_FT_ALLMASK;
 
 	return ret;
 }
@@ -319,13 +319,13 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 	if (ISSET_MSG(result))
 		return FAIL;
 
-	if (FT_OVERFLOW & (types_incl | types_excl))
+	if (ZBX_FT_OVERFLOW & (types_incl | types_excl))
 		return FAIL;
 
 	if (0 == types_incl)
-		types_incl = FT_ALLMASK;
+		types_incl = ZBX_FT_ALLMASK;
 
-	*types_out = types_incl & (~types_excl) & FT_ALLMASK;
+	*types_out = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
 
 	/* min/max output variables must be already initialized to default values */
 
@@ -984,18 +984,18 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE ti
 				case FILE_ATTRIBUTE_REPARSE_POINT:
 								/* not a symlink directory => symlink regular file*/
 								/* counting symlink files as MS explorer */
-					if (0 != (types & FT_FILE) && 0 != match)
+					if (0 != (types & ZBX_FT_FILE) && 0 != match)
 						++count;
 					break;
 				case FILE_ATTRIBUTE_DIRECTORY:
 					if (SUCCEED != queue_directory(&list, path, item->depth, max_depth))
 						zbx_free(path);
 
-					if (0 != (types & FT_DIR) && 0 != match)
+					if (0 != (types & ZBX_FT_DIR) && 0 != match)
 						++count;
 					break;
 				default:	/* not a directory => regular file */
-					if (0 != (types & FT_FILE) && 0 != match)
+					if (0 != (types & ZBX_FT_FILE) && 0 != match)
 					{
 						wpath = zbx_utf8_to_unicode(path);
 						if (FAIL == link_processed(data.dwFileAttributes, wpath, &descriptors,
@@ -1117,13 +1117,13 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 				}
 
 				if (0 != filename_matches(entry->d_name, regex_incl, regex_excl) && (
-						(S_ISREG(status.st_mode)  && 0 != (types & FT_FILE)) ||
-						(S_ISDIR(status.st_mode)  && 0 != (types & FT_DIR)) ||
-						(S_ISLNK(status.st_mode)  && 0 != (types & FT_SYM)) ||
-						(S_ISSOCK(status.st_mode) && 0 != (types & FT_SOCK)) ||
-						(S_ISBLK(status.st_mode)  && 0 != (types & FT_BDEV)) ||
-						(S_ISCHR(status.st_mode)  && 0 != (types & FT_CDEV)) ||
-						(S_ISFIFO(status.st_mode) && 0 != (types & FT_FIFO))) &&
+						(S_ISREG(status.st_mode)  && 0 != (types & ZBX_FT_FILE)) ||
+						(S_ISDIR(status.st_mode)  && 0 != (types & ZBX_FT_DIR)) ||
+						(S_ISLNK(status.st_mode)  && 0 != (types & ZBX_FT_SYM)) ||
+						(S_ISSOCK(status.st_mode) && 0 != (types & ZBX_FT_SOCK)) ||
+						(S_ISBLK(status.st_mode)  && 0 != (types & ZBX_FT_BDEV)) ||
+						(S_ISCHR(status.st_mode)  && 0 != (types & ZBX_FT_CDEV)) ||
+						(S_ISFIFO(status.st_mode) && 0 != (types & ZBX_FT_FIFO))) &&
 						(min_size <= (zbx_uint64_t)status.st_size
 								&& (zbx_uint64_t)status.st_size <= max_size) &&
 						(min_time < status.st_mtime &&
