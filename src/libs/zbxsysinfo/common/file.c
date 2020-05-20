@@ -114,7 +114,6 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	HANDLE			handle;
 	wchar_t			*wpath;
 	WIN32_FIND_DATA		data;
-	zbx_stat_t		status;
 
 	if (3 < request->nparam)
 	{
@@ -153,21 +152,6 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
 
-	if (0 != zbx_stat(filename, &status))
-	{
-		if (errno == ENOENT)
-		{
-			file_exists = 0;
-			goto exit;
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
-					zbx_strerror(errno)));
-			goto err;
-		}
-	}
-
 	if (NULL == (wpath = zbx_utf8_to_unicode(filename)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot convert file name to UTF-16."));
@@ -176,12 +160,20 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	handle = FindFirstFileW(wpath, &data);
 
-	if (INVALID_HANDLE_VALUE == handle)
+	if (ERROR_FILE_NOT_FOUND == GetLastError())
+	{
+		file_exists = 0;
+		goto exit;
+	}
+	else if (INVALID_HANDLE_VALUE == handle)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		zbx_free(wpath);
 		goto err;
 	}
+
+	if (0 == FindClose(handle))
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot close file '%s': %s", __func__, filename, zbx_strerror(errno));
 
 	switch (data.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
 	{
@@ -214,9 +206,8 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 				file_exists = 0;
 	}
 
-	zbx_free(wpath);
-
 exit:
+	zbx_free(wpath);
 	SET_UI64_RESULT(result, file_exists);
 	ret = SYSINFO_RET_OK;
 err:
