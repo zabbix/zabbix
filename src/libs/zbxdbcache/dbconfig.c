@@ -9582,15 +9582,15 @@ static int	dc_match_macro_context(const char *context, const char *pattern, unsi
 {
 	switch (op)
 	{
-	case CONDITION_OPERATOR_EQUAL:
-		return 0 == zbx_strcmp_null(context, pattern) ? SUCCEED : FAIL;
-	case CONDITION_OPERATOR_REGEXP:
-		if (NULL == context)
+		case CONDITION_OPERATOR_EQUAL:
+			return 0 == zbx_strcmp_null(context, pattern) ? SUCCEED : FAIL;
+		case CONDITION_OPERATOR_REGEXP:
+			if (NULL == context)
+				return FAIL;
+			return NULL != zbx_regexp_match(context, pattern, NULL) ? SUCCEED : FAIL;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
-		return NULL != zbx_regexp_match(context, pattern, NULL) ? SUCCEED : FAIL;
-	default:
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
 	}
 }
 
