@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2020-05-20T06:20:09Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -16,7 +16,7 @@
   Description: If having problems accessing /proc/diskstats on CloudLinux, please read this https://docs.cloudlinux.com/cloudlinux_os_kernel/#virtualized-proc-filesystem.&#13;
   Device: CloudLinux&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -410,7 +410,7 @@ return JSON.stringify(parsed);</params>
       <template>
          <template>Template Module Linux CPU by Zabbix agent active</template>
          <name>Template Module Linux CPU by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -709,7 +709,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
       <template>
          <template>Template Module Linux filesystems by Zabbix agent active</template>
          <name>Template Module Linux filesystems by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -939,7 +939,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux generic by Zabbix agent active</template>
          <name>Template Module Linux generic by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1304,7 +1304,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux memory by Zabbix agent active</template>
          <name>Template Module Linux memory by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1313,6 +1313,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
          <applications>
             <application>
                <name>Memory</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
             </application>
          </applications>
          <items>
@@ -1370,9 +1373,38 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                </applications>
             </item>
             <item>
-               <name>Memory utilization</name>
+               <name>Available memory in %</name>
                <type>ZABBIX_ACTIVE</type>
                <key>vm.memory.size[pavailable]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Total memory</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>vm.memory.size[total]</key>
+               <history>7d</history>
+               <units>B</units>
+               <description>Total memory in Bytes</description>
+               <applications>
+                  <application>
+                     <name>Memory</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Memory utilization</name>
+               <type>DEPENDENT</type>
+               <key>vm.memory.utilization</key>
+               <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -1385,9 +1417,13 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>return (100-value);</params>
+                     <params>//Calculate utilization
+return (100-value);</params>
                   </step>
                </preprocessing>
+               <master_item>
+                  <key>vm.memory.size[pavailable]</key>
+               </master_item>
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
@@ -1402,19 +1438,6 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      </dependencies>
                   </trigger>
                </triggers>
-            </item>
-            <item>
-               <name>Total memory</name>
-               <type>ZABBIX_ACTIVE</type>
-               <key>vm.memory.size[total]</key>
-               <history>7d</history>
-               <units>B</units>
-               <description>Total memory in Bytes</description>
-               <applications>
-                  <application>
-                     <name>Memory</name>
-                  </application>
-               </applications>
             </item>
          </items>
          <macros>
@@ -1441,7 +1464,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
 &#13;
   Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.35</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1852,7 +1875,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.35</description>
          <templates>
             <template>
                <name>Template Module Linux block devices by Zabbix agent active</name>
@@ -2106,7 +2129,7 @@ Template tooling version used: 0.34</description>
          <dependencies>
             <dependency>
                <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
-               <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[pavailable].min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
+               <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.utilization.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
                <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
@@ -2278,7 +2301,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                <color>1A7C11</color>
                <item>
                   <host>Template Module Linux memory by Zabbix agent active</host>
-                  <key>vm.memory.size[pavailable]</key>
+                  <key>vm.memory.utilization</key>
                </item>
             </graph_item>
          </graph_items>
