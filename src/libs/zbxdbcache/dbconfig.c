@@ -764,7 +764,7 @@ static int	config_gmacro_context_compare(const void *d1, const void *d2)
 
 	/* macros without context have higher priority than macros with */
 	if (NULL == m1->context)
-		return NULL == m2->context ? strcmp(m1->macro, m2->macro) : -1;
+		return NULL == m2->context ? 0 : -1;
 
 	if (NULL == m2->context)
 		return 1;
@@ -846,7 +846,7 @@ static int	config_hmacro_context_compare(const void *d1, const void *d2)
 
 	/* macros without context have higher priority than macros with */
 	if (NULL == m1->context)
-		return NULL == m2->context ? strcmp(m1->macro, m2->macro) : -1;
+		return NULL == m2->context ? 0 : -1;
 
 	if (NULL == m2->context)
 		return 1;

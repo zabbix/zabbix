@@ -57,16 +57,10 @@ static int	config_gmacro_context_compare(const void *d1, const void *d2)
 
 	/* macros without context have higher priority than macros with */
 	if (NULL == m1->context)
-	{
-		if (NULL == m2->context)
-			return strcmp(m1->macro, m2->macro);
-		return -1;
-	}
-	else
-	{
-		if (NULL == m2->context)
-			return 1;
-	}
+		return NULL == m2->context ? 0 : -1;
+
+	if (NULL == m2->context)
+		return 1;
 
 	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
 	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
