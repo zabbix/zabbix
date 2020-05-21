@@ -114,6 +114,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	HANDLE			handle;
 	wchar_t			*wpath;
 	WIN32_FIND_DATA		data;
+	zbx_stat_t		status;
 
 	if (3 < request->nparam)
 	{
@@ -155,6 +156,22 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
+
+	/* do not allow use of wildcards in FindFirstFileW() to match unix-like system behavior */
+	if (0 != zbx_stat(filename, &status))
+	{
+		if (errno == ENOENT)
+		{
+			file_exists = 0;
+			goto exit;
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
+					zbx_strerror(errno)));
+			goto err;
+		}
+	}
 
 	if (NULL == (wpath = zbx_utf8_to_unicode(filename)))
 	{
