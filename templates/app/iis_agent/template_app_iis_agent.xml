@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-19T03:29:40Z</date>
+   <date>2020-05-21T07:16:57Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -111,7 +111,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Bytes Received per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Bytes Received/sec",60]</key>
+               <key>perf_counter_en["\Web Service(_Total)\Bytes Received/sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -125,7 +125,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Bytes Sent per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Bytes Sent/sec",60]</key>
+               <key>perf_counter_en["\Web Service(_Total)\Bytes Sent/sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -139,7 +139,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Bytes Total per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Bytes Total/Sec",60]</key>
+               <key>perf_counter_en["\Web Service(_Total)\Bytes Total/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -152,8 +152,8 @@ Template tooling version used: 0.35</description>
                </applications>
             </item>
             <item>
-               <name>IIS: CGI requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\CGI Requests/Sec",60]</key>
+               <name>IIS: Method CGI requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\CGI Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -190,8 +190,8 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: COPY requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Copy Requests/Sec",60]</key>
+               <name>IIS: Method COPY requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Copy Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -222,8 +222,8 @@ Template tooling version used: 0.35</description>
                </applications>
             </item>
             <item>
-               <name>IIS: DELETE requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Delete Requests/Sec",60]</key>
+               <name>IIS: Method DELETE requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -241,7 +241,7 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: GET requests total</name>
+               <name>IIS: Method Method GET requests per second</name>
                <key>perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -260,8 +260,8 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: HEAD requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Head Requests/Sec",60]</key>
+               <name>IIS: Method HEAD requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -279,12 +279,12 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: ISAPI requests per second (1m, avg)</name>
-               <key>perf_counter_en["\Web Service(_Total)\ISAPI Extension Requests/Sec",60]</key>
+               <name>IIS: Method ISAPI requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\ISAPI Extension Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of ISAPI Extension requests that are simultaneously being processed by the Web service.</description>
+               <description>The rate of ISAPI Extension requests that are simultaneously being processed by the Web service. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -299,7 +299,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Locked errors per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Locked Errors/Sec",60]</key>
+               <key>perf_counter_en["\Web Service(_Total)\Locked Errors/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -317,12 +317,12 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: LOCK requests per second (1m, avg)</name>
-               <key>perf_counter_en["\Web Service(_Total)\Lock Requests/Sec",60]</key>
+               <name>IIS: Method LOCK requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Lock Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate that HTTP requests are made using the LOCK method. Lock requests are used to lock a file for one user so that only that user can modify the file.</description>
+               <description>The rate that HTTP requests are made using the LOCK method. Lock requests are used to lock a file for one user so that only that user can modify the file. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -336,12 +336,12 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: MKCOL requests per second (1m, avg)</name>
-               <key>perf_counter_en["\Web Service(_Total)\Mkcol Requests/Sec",60]</key>
+               <name>IIS: Method MKCOL requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Mkcol Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate HTTP requests using the MKCOL method are made. Mkcol requests are used to create directories on the server.</description>
+               <description>The rate HTTP requests using the MKCOL method are made. Mkcol requests are used to create directories on the server. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -355,12 +355,12 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: MOVE requests per second (1m, avg)</name>
-               <key>perf_counter_en["\Web Service(_Total)\Move Requests/Sec",60]</key>
+               <name>IIS: Method MOVE requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Move Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate HTTP requests using the MOVE method are made. Move requests are used for moving files and directories.</description>
+               <description>The rate HTTP requests using the MOVE method are made. Move requests are used for moving files and directories. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -388,7 +388,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Not Found errors per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Not Found Errors/Sec",60]</key>
+               <key>perf_counter_en["\Web Service(_Total)\Not Found Errors/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -406,12 +406,12 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: OPTIONS requests per second (1m, avg)</name>
-               <key>perf_counter_en["\Web Service(_Total)\Options Requests/Sec",60]</key>
+               <name>IIS: Method OPTIONS requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Options Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate HTTP requests using the OPTIONS method are made.</description>
+               <description>The rate HTTP requests using the OPTIONS method are made. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -425,8 +425,8 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: Total Other Method requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec",60]</key>
+               <name>IIS: Method Total Other Method requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -444,12 +444,12 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: POST requests per second (1m, avg)</name>
-               <key>perf_counter_en["\Web Service(_Total)\Post Requests/Sec",60]</key>
+               <name>IIS: Method POST requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>Rate of HTTP requests using POST method. Generally used for forms or gateway requests.</description>
+               <description>Rate of HTTP requests using POST method. Generally used for forms or gateway requests. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -463,12 +463,12 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: PROPFIND requests per second (1m, avg)</name>
-               <key>perf_counter_en["\Web Service(_Total)\Propfind Requests/Sec",60]</key>
+               <name>IIS: Method PROPFIND requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Propfind Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate HTTP requests using the PROPFIND method are made. Propfind requests retrieve property values on files and directories.</description>
+               <description>The rate HTTP requests using the PROPFIND method are made. Propfind requests retrieve property values on files and directories. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -482,8 +482,8 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: PROPPATCH requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Proppatch Requests/Sec",60]</key>
+               <name>IIS: Method PROPPATCH requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Proppatch Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -501,8 +501,8 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: PUT requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Put Requests/Sec",60]</key>
+               <name>IIS: Method PUT requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -520,8 +520,8 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: MS-SEARCH requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Search Requests/Sec",60]</key>
+               <name>IIS: Method MS-SEARCH requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Search Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -582,8 +582,8 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: Total Method requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec",60]</key>
+               <name>IIS: Method Total Method requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -601,8 +601,8 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: TRACE requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Trace Requests/Sec",60]</key>
+               <name>IIS: Method TRACE requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
@@ -620,12 +620,88 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: TRACE requests per second</name>
-               <key>perf_counter_en["\Web Service(_Total)\Unlock Requests/Sec",60]</key>
+               <name>IIS: Method TRACE requests per second</name>
+               <key>perf_counter_en["\Web Service(_Total)\Unlock Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
                <description>The rate HTTP requests using the UNLOCK method are made. Unlock requests are used to remove locks from files. Average per minute.</description>
+               <applications>
+                  <application>
+                     <name>IIS</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>IIS: Files cache hits percentage</name>
+               <key>perf_counter_en["\Web Service Cache\File Cache Hits %"]</key>
+               <history>7d</history>
+               <trends>30d</trends>
+               <value_type>FLOAT</value_type>
+               <description>The ratio of user-mode file cache hits to total cache requests (since service startup). Note: This value might be low if the Kernel URI cache hits percentage is high.</description>
+               <applications>
+                  <application>
+                     <name>IIS</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>IIS: File cache misses</name>
+               <key>perf_counter_en["\Web Service Cache\File Cache Misses"]</key>
+               <history>7d</history>
+               <trends>30d</trends>
+               <value_type>FLOAT</value_type>
+               <description>Total number of unsuccessful lookups in the user-mode file cache since service startup.</description>
+               <applications>
+                  <application>
+                     <name>IIS</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>IIS: URIs cache hits percentage</name>
+               <key>perf_counter_en["\Web Service Cache\URI Cache Hits %"]</key>
+               <history>7d</history>
+               <trends>30d</trends>
+               <value_type>FLOAT</value_type>
+               <description>The ratio of user-mode URI Cache Hits to total cache requests (since service startup)</description>
+               <applications>
+                  <application>
+                     <name>IIS</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>IIS: URI cache misses</name>
+               <key>perf_counter_en["\Web Service Cache\URI Cache Misses"]</key>
+               <history>7d</history>
+               <trends>30d</trends>
+               <value_type>FLOAT</value_type>
+               <description>Total number of unsuccessful lookups in the user-mode URI cache since service startup.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -709,6 +785,22 @@ Template tooling version used: 0.35</description>
                <type>ZABBIX_PASSIVE</type>
                <key>wmi.getall[root\webAdministration, select Name from ApplicationPool]</key>
                <delay>1h</delay>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#APPPOOL}</macro>
+                        <value>{$IIS.APPPOOL.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#APPPOOL}</macro>
+                        <value>{$IIS.APPPOOL.MATCHES}</value>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
                <item_prototypes>
                   <item_prototype>
                      <name>IIS: AppPool {#APPPOOL} state</name>
@@ -783,7 +875,7 @@ Template tooling version used: 0.35</description>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{diff()}=1 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1</expression>
-                           <name>IIS: Application pool {#APPPOOL} was recycled</name>
+                           <name>IIS: Application pool {#APPPOOL} has been recycled</name>
                            <priority>INFO</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -791,7 +883,7 @@ Template tooling version used: 0.35</description>
                   <item_prototype>
                      <name>IIS: AppPool {#APPPOOL} current queue size</name>
                      <key>perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"]</key>
-                     <delay>5m</delay>
+                     <delay>30s</delay>
                      <history>7d</history>
                      <trends>30d</trends>
                      <description>The number of requests in the queue</description>
@@ -808,7 +900,7 @@ Template tooling version used: 0.35</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}&gt;{$IIS.QUEUE.MAX.WARN}</expression>
+                           <expression>{min({$IIS.QUEUE.MAX.TIME})}&gt;{$IIS.QUEUE.MAX.WARN}</expression>
                            <name>IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN})</name>
                            <priority>WARNING</priority>
                            <dependencies>
@@ -831,9 +923,19 @@ Template tooling version used: 0.35</description>
          </discovery_rules>
          <macros>
             <macro>
+               <macro>{$IIS.APPPOOL.MATCHES}</macro>
+               <value>.+</value>
+               <description>This macro is used in application pools discovery. Can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
                <macro>{$IIS.APPPOOL.MONITORED}</macro>
                <value>1</value>
                <description>Monitorng status for discovered Application pools. Use context to avoid trigger firing for specific application pools. "1" - enabled, "0" - disbled.</description>
+            </macro>
+            <macro>
+               <macro>{$IIS.APPPOOL.NOT_MATCHES}</macro>
+               <value>&lt;CHANGE_IF_NEEDED&gt;</value>
+               <description>This macro is used in application pools discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
                <macro>{$IIS.HTTP.PORT}</macro>
@@ -846,6 +948,11 @@ Template tooling version used: 0.35</description>
                <description>Listened port for HTTPS.</description>
             </macro>
             <macro>
+               <macro>{$IIS.QUEUE.MAX.TIME}</macro>
+               <value>5m</value>
+               <description>Еру time during which the йгeue length may exceed the threshold</description>
+            </macro>
+            <macro>
                <macro>{$IIS.QUEUE.MAX.WARN}</macro>
                <description>Maximum application pool's request queue length for trigger expression</description>
             </macro>
@@ -854,13 +961,36 @@ Template tooling version used: 0.35</description>
    </templates>
    <graphs>
       <graph>
-         <name>IIS: Requests rate</name>
+         <name>IIS: Cache hits percentage</name>
+         <type>STACKED</type>
+         <graph_items>
+            <graph_item>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App IIS by Zabbix agent</host>
+                  <key>perf_counter_en["\Web Service Cache\URI Cache Hits %"]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <drawtype>GRADIENT_LINE</drawtype>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App IIS by Zabbix agent</host>
+                  <key>perf_counter_en["\Web Service Cache\File Cache Hits %"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>IIS: Cache misses</name>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>
                <item>
                   <host>Template App IIS by Zabbix agent</host>
-                  <key>perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec",60]</key>
+                  <key>perf_counter_en["\Web Service Cache\URI Cache Misses"]</key>
                </item>
             </graph_item>
             <graph_item>
@@ -868,7 +998,27 @@ Template tooling version used: 0.35</description>
                <color>2774A4</color>
                <item>
                   <host>Template App IIS by Zabbix agent</host>
-                  <key>perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec",60]</key>
+                  <key>perf_counter_en["\Web Service Cache\File Cache Misses"]</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>IIS: Requests rate</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App IIS by Zabbix agent</host>
+                  <key>perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App IIS by Zabbix agent</host>
+                  <key>perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]</key>
                </item>
             </graph_item>
             <graph_item>
@@ -884,7 +1034,7 @@ Template tooling version used: 0.35</description>
                <color>A54F10</color>
                <item>
                   <host>Template App IIS by Zabbix agent</host>
-                  <key>perf_counter_en["\Web Service(_Total)\Post Requests/Sec",60]</key>
+                  <key>perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]</key>
                </item>
             </graph_item>
             <graph_item>
@@ -892,7 +1042,7 @@ Template tooling version used: 0.35</description>
                <color>FC6EA3</color>
                <item>
                   <host>Template App IIS by Zabbix agent</host>
-                  <key>perf_counter_en["\Web Service(_Total)\Put Requests/Sec",60]</key>
+                  <key>perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]</key>
                </item>
             </graph_item>
             <graph_item>
@@ -900,7 +1050,7 @@ Template tooling version used: 0.35</description>
                <color>6C59DC</color>
                <item>
                   <host>Template App IIS by Zabbix agent</host>
-                  <key>perf_counter_en["\Web Service(_Total)\Delete Requests/Sec",60]</key>
+                  <key>perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]</key>
                </item>
             </graph_item>
             <graph_item>
@@ -908,7 +1058,7 @@ Template tooling version used: 0.35</description>
                <color>AC8C14</color>
                <item>
                   <host>Template App IIS by Zabbix agent</host>
-                  <key>perf_counter_en["\Web Service(_Total)\Head Requests/Sec",60]</key>
+                  <key>perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]</key>
                </item>
             </graph_item>
             <graph_item>
@@ -916,7 +1066,7 @@ Template tooling version used: 0.35</description>
                <color>611F27</color>
                <item>
                   <host>Template App IIS by Zabbix agent</host>
-                  <key>perf_counter_en["\Web Service(_Total)\Trace Requests/Sec",60]</key>
+                  <key>perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]</key>
                </item>
             </graph_item>
          </graph_items>
