@@ -50,7 +50,32 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @var array
 	 */
-	protected $items_require_interface = [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP];
+	protected $items_require_interface = [
+		ITEM_TYPE_ZABBIX => [
+			'address' => true,
+			'port' => true
+		],
+		ITEM_TYPE_IPMI => [
+			'address' => true,
+			'port' => true
+		],
+		ITEM_TYPE_SIMPLE => [
+			'address' => true,
+			'port' => false
+		],
+		ITEM_TYPE_SNMP => [
+			'address' => true,
+			'port' => true
+		],
+		ITEM_TYPE_SSH => [
+			'address' => true,
+			'port' => false
+		],
+		ITEM_TYPE_TELNET => [
+			'address' => true,
+			'port' => false
+		]
+	];
 
 	/**
 	 * Item types with proxy support.
@@ -160,6 +185,14 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_lld_macros' => true
 		],
 		'snmp_oid' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'username' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'password' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		]
@@ -559,7 +592,8 @@ abstract class CControllerPopupItemTest extends CController {
 					'authtype' => array_key_exists('authtype', $input) ? $input['authtype'] : ITEM_AUTHTYPE_PASSWORD,
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : ITEM_AUTHTYPE_PASSWORD,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'interface' => $this->getHostInterface($interface_input)
 				];
 
 				if ($data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
@@ -575,7 +609,8 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $input['key'],
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : null,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'interface' => $this->getHostInterface($interface_input)
 				];
 				break;
 
