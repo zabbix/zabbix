@@ -24,12 +24,10 @@ function add_audit($action, $resourcetype, $note) {
 		$note = mb_substr($note, 0, 125).'...';
 	}
 
-	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
-
 	$values = [
 		'userid' => CWebUser::$data['userid'],
 		'clock' => time(),
-		'ip' => substr($ip, 0, 39),
+		'ip' => substr(CWebUser::getIp(), 0, 39),
 		'action' => $action,
 		'resourcetype' => $resourcetype,
 		'note' => $note
@@ -74,11 +72,10 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 		? $resourceid
 		: (CWebUser::$data ? CWebUser::$data['userid'] : null);
 
-	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 	$values = [
 		'userid' => $userid,
 		'clock' => time(),
-		'ip' => substr($ip, 0, 39),
+		'ip' => substr(CWebUser::getIp(), 0, 39),
 		'action' => $action,
 		'resourcetype' => $resourcetype,
 		'resourceid' => $resourceid,
@@ -119,12 +116,10 @@ function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $
 		$resourcename = mb_substr($resourcename, 0, 252).'...';
 	}
 
-	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
-
 	$values = [
 		'userid' => $userId,
 		'clock' => time(),
-		'ip' => substr($ip, 0, 39),
+		'ip' => substr(CWebUser::getIp(), 0, 39),
 		'action' => $action,
 		'resourcetype' => $resourcetype,
 		'resourceid' => $resourceid,

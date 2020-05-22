@@ -146,9 +146,7 @@ class CZabbixServer {
 			'scriptid' => $scriptId,
 			'hostid' => $hostId,
 			'sid' => $sid,
-			'clientip' => !empty($_SERVER['HTTP_X_FORWARDED_FOR'])
-				? $_SERVER['HTTP_X_FORWARDED_FOR']
-				: $_SERVER['REMOTE_ADDR']
+			'clientip' => CWebUser::getIp()
 		]);
 	}
 
