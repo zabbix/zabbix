@@ -33,8 +33,8 @@ http://zabbix/<br>
     - Use preformatted message with predefined set of fields for trigger-based notifications.<br>
     In internal, autoregistration and discovery notifications *{ALERT.MESSAGE}* as text a body of the message will be used.
     In this case you can customize the message template for trigger-based notifications by adding additional fields and up to four buttons with URLs.
-        - To add addditional field to message card, put a parameter with prefix **fact_** and field name. For example, *"fact_Data center"* as key and *{EVENT.TAGS.dc}* as value.
-        - To create new button with link to an external resource, add a parameter with prefix **openUri_** and button name. Value should be a valid URL. For example, *"openUri_Link to Zabbox.com"* as key and *https://www.zabbix.com/* as value.
+        - To add an additional field to message card, put a parameter with prefix **fact_** and field name. For example, *"fact_Data center"* as key and *{EVENT.TAGS.dc}* as value.
+        - To create a new button with a link to an external resource, add a parameter with prefix **openUri_** and button name. The value should be a valid URL. For example, *"openUri_Link to Zabbox.com"* as key and *https://www.zabbix.com/* as value.
 
 - **true**
     - Use {ALERT.MESSAGE} as text a body of the message in all types of notifications.
