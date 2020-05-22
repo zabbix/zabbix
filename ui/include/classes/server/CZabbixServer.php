@@ -145,7 +145,10 @@ class CZabbixServer {
 			'request' => 'command',
 			'scriptid' => $scriptId,
 			'hostid' => $hostId,
-			'sid' => $sid
+			'sid' => $sid,
+			'clientip' => !empty($_SERVER['HTTP_X_FORWARDED_FOR'])
+				? $_SERVER['HTTP_X_FORWARDED_FOR']
+				: $_SERVER['REMOTE_ADDR']
 		]);
 	}
 
