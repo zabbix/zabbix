@@ -922,10 +922,13 @@ class CUserMacro extends CApiService {
 
 			if (array_key_exists($hostid, $existing_macros)
 					&& array_key_exists($macro_name, $existing_macros[$hostid])) {
-				$has_context = in_array($context, array_column($existing_macros[$hostid][$macro_name], 'context'),
-					true
-				);
-				$has_regex = in_array($context, array_column($existing_macros[$hostid][$macro_name], 'regex'), true);
+				$has_context = ($context !== null && in_array($context,
+					array_column($existing_macros[$hostid][$macro_name], 'context'), true
+				));
+				$has_regex = ($regex !== null && in_array($regex, array_column($existing_macros[$hostid][$macro_name],
+						'regex'
+					), true
+				));
 				$is_macro_without_context = ($context === null && $regex === null);
 
 				if ($is_macro_without_context || (($context !== null && $has_context)
