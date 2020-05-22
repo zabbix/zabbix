@@ -9,8 +9,8 @@
    </groups>
    <templates>
       <template>
-         <template>Template App IIS by Zabbix agent</template>
-         <name>Template App IIS by Zabbix agent</name>
+         <template>Template App IIS by Zabbix agent active</template>
+         <name>Template App IIS by Zabbix agent active</name>
          <description>Get metrics from IIS using Zabbix agent running on Windows&#13;
 &#13;
 &#13;
@@ -56,7 +56,7 @@ Template tooling version used: 0.35</description>
                      <dependencies>
                         <dependency>
                            <name>IIS: The World Wide Web Publishing Service (W3SVC) is not running</name>
-                           <expression>{Template App IIS by Zabbix agent:service_state[W3SVC].last()}&lt;&gt;0</expression>
+                           <expression>{Template App IIS by Zabbix agent active:service_state[W3SVC].last()}&lt;&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -64,6 +64,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Anonymous users per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Anonymous Users/sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -77,6 +78,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Bytes Received per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Bytes Received/sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -91,6 +93,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Bytes Sent per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Bytes Sent/sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -105,6 +108,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Bytes Total per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Bytes Total/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -119,6 +123,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method CGI requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\CGI Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -138,6 +143,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Connection attempts per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Connection Attempts/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -157,6 +163,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method COPY requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Copy Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -176,6 +183,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Current connections</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Current Connections"]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -189,6 +197,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method DELETE requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -208,6 +217,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method Method GET requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -227,6 +237,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method HEAD requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -246,6 +257,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method ISAPI requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\ISAPI Extension Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -265,6 +277,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Locked errors per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Locked Errors/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -284,6 +297,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method LOCK requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Lock Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -303,6 +317,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method MKCOL requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Mkcol Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -322,6 +337,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method MOVE requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Move Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -341,6 +357,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: NonAnonymous users per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\NonAnonymous Users/sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -354,6 +371,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Not Found errors per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Not Found Errors/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -373,6 +391,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method OPTIONS requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Options Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -392,6 +411,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method Total Other Method requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -411,6 +431,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method POST requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -430,6 +451,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method PROPFIND requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Propfind Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -449,6 +471,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method PROPPATCH requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Proppatch Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -468,6 +491,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method PUT requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -487,6 +511,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method MS-SEARCH requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Search Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -506,6 +531,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Uptime</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Service Uptime"]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -529,6 +555,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Total connection attempts</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Total Connection Attempts (all instances)"]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -548,6 +575,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method Total Method requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -567,6 +595,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method TRACE requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -586,6 +615,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Method TRACE requests per second</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Unlock Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -605,6 +635,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Files cache hits percentage</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service Cache\File Cache Hits %"]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -624,6 +655,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: File cache misses</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service Cache\File Cache Misses"]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -643,6 +675,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: URIs cache hits percentage</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service Cache\URI Cache Hits %"]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -662,6 +695,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: URI cache misses</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service Cache\URI Cache Misses"]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -681,6 +715,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: World Wide Web Publishing Service (W3SVC) state</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>service_state[W3SVC]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -708,7 +743,7 @@ Template tooling version used: 0.35</description>
                      <dependencies>
                         <dependency>
                            <name>IIS: Windows process Activation Service (WAS) is not running</name>
-                           <expression>{Template App IIS by Zabbix agent:service_state[WAS].last()}&lt;&gt;0</expression>
+                           <expression>{Template App IIS by Zabbix agent active:service_state[WAS].last()}&lt;&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -716,6 +751,7 @@ Template tooling version used: 0.35</description>
             </item>
             <item>
                <name>IIS: Windows process Activation Service (WAS) state</name>
+               <type>ZABBIX_ACTIVE</type>
                <key>service_state[WAS]</key>
                <history>7d</history>
                <trends>30d</trends>
@@ -747,7 +783,7 @@ Template tooling version used: 0.35</description>
          <discovery_rules>
             <discovery_rule>
                <name>Application pools discovery</name>
-               <type>ZABBIX_PASSIVE</type>
+               <type>ZABBIX_ACTIVE</type>
                <key>wmi.getall[root\webAdministration, select Name from ApplicationPool]</key>
                <delay>1h</delay>
                <filter>
@@ -769,6 +805,7 @@ Template tooling version used: 0.35</description>
                <item_prototypes>
                   <item_prototype>
                      <name>IIS: AppPool {#APPPOOL} state</name>
+                     <type>ZABBIX_ACTIVE</type>
                      <key>perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"]</key>
                      <history>7d</history>
                      <trends>30d</trends>
@@ -797,6 +834,7 @@ Template tooling version used: 0.35</description>
                   </item_prototype>
                   <item_prototype>
                      <name>IIS: {#APPPOOL} Uptime</name>
+                     <type>ZABBIX_ACTIVE</type>
                      <key>perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"]</key>
                      <history>7d</history>
                      <trends>30d</trends>
@@ -820,6 +858,7 @@ Template tooling version used: 0.35</description>
                   </item_prototype>
                   <item_prototype>
                      <name>IIS: AppPool {#APPPOOL} recycles</name>
+                     <type>ZABBIX_ACTIVE</type>
                      <key>perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"]</key>
                      <history>7d</history>
                      <trends>30d</trends>
@@ -845,6 +884,7 @@ Template tooling version used: 0.35</description>
                   </item_prototype>
                   <item_prototype>
                      <name>IIS: AppPool {#APPPOOL} current queue size</name>
+                     <type>ZABBIX_ACTIVE</type>
                      <key>perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"]</key>
                      <delay>30s</delay>
                      <history>7d</history>
@@ -869,7 +909,7 @@ Template tooling version used: 0.35</description>
                            <dependencies>
                               <dependency>
                                  <name>IIS: Application pool {#APPPOOL} is not in Running state</name>
-                                 <expression>{Template App IIS by Zabbix agent:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"].last()}&lt;&gt;3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1</expression>
+                                 <expression>{Template App IIS by Zabbix agent active:perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"].last()}&lt;&gt;3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1</expression>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
@@ -931,7 +971,7 @@ Template tooling version used: 0.35</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service Cache\URI Cache Hits %"]</key>
                </item>
             </graph_item>
@@ -940,7 +980,7 @@ Template tooling version used: 0.35</description>
                <drawtype>GRADIENT_LINE</drawtype>
                <color>2774A4</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service Cache\File Cache Hits %"]</key>
                </item>
             </graph_item>
@@ -952,7 +992,7 @@ Template tooling version used: 0.35</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service Cache\URI Cache Misses"]</key>
                </item>
             </graph_item>
@@ -960,7 +1000,7 @@ Template tooling version used: 0.35</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service Cache\File Cache Misses"]</key>
                </item>
             </graph_item>
@@ -972,7 +1012,7 @@ Template tooling version used: 0.35</description>
             <graph_item>
                <color>1A7C11</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -980,7 +1020,7 @@ Template tooling version used: 0.35</description>
                <sortorder>1</sortorder>
                <color>2774A4</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]</key>
                </item>
             </graph_item>
@@ -988,7 +1028,7 @@ Template tooling version used: 0.35</description>
                <sortorder>2</sortorder>
                <color>F63100</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -996,7 +1036,7 @@ Template tooling version used: 0.35</description>
                <sortorder>3</sortorder>
                <color>A54F10</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -1004,7 +1044,7 @@ Template tooling version used: 0.35</description>
                <sortorder>4</sortorder>
                <color>FC6EA3</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -1012,7 +1052,7 @@ Template tooling version used: 0.35</description>
                <sortorder>5</sortorder>
                <color>6C59DC</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -1020,7 +1060,7 @@ Template tooling version used: 0.35</description>
                <sortorder>6</sortorder>
                <color>AC8C14</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]</key>
                </item>
             </graph_item>
@@ -1028,7 +1068,7 @@ Template tooling version used: 0.35</description>
                <sortorder>7</sortorder>
                <color>611F27</color>
                <item>
-                  <host>Template App IIS by Zabbix agent</host>
+                  <host>Template App IIS by Zabbix agent active</host>
                   <key>perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]</key>
                </item>
             </graph_item>
