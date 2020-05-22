@@ -821,11 +821,11 @@ class C50XmlValidator {
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'step' =>					['type' => XML_STRING | XML_REQUIRED],
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
-									'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+									'filter' =>					['type' => XML_ARRAY, 'rules' => [
 										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
 										'formula' =>				['type' => XML_STRING, 'default' => ''],
-										'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-											'condition' =>				['type' => XML_ARRAY, 'rules' => [
+										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 												'value' =>					['type' => XML_STRING, 'default' => ''],
 												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
@@ -837,7 +837,7 @@ class C50XmlValidator {
 										'operation' =>				['type' => XML_ARRAY, 'rules' => [
 											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
-											'value' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
 											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'delay' =>					['type' => XML_STRING, 'default' => ''],
@@ -1428,11 +1428,11 @@ class C50XmlValidator {
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'step' =>					['type' => XML_STRING | XML_REQUIRED],
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
-									'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+									'filter' =>					['type' => XML_ARRAY, 'rules' => [
 										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
 										'formula' =>				['type' => XML_STRING, 'default' => ''],
-										'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-											'condition' =>				['type' => XML_ARRAY, 'rules' => [
+										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 												'value' =>					['type' => XML_STRING, 'default' => ''],
 												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
@@ -1444,7 +1444,7 @@ class C50XmlValidator {
 										'operation' =>				['type' => XML_ARRAY, 'rules' => [
 											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
-											'value' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
 											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
 											'delay' =>					['type' => XML_STRING, 'default' => ''],

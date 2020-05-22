@@ -749,9 +749,8 @@ $overrides_list = (new CTable())
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
 					->setEnabled(!$templated)
-			))->addClass('step-action')
+			))
 		))
-			->addClass('lld-overrides-table-foot')
 	);
 
 $overrides_form_list->addRow(_('Overrides'),

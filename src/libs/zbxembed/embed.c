@@ -494,6 +494,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	{
 		if (0 != duk_check_type(es->env->ctx, -1, DUK_TYPE_NULL))
 		{
+			ret = SUCCEED;
 			*output = NULL;
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() output: null", __func__);
 		}

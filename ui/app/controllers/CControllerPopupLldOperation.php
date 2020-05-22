@@ -83,10 +83,10 @@ class CControllerPopupLldOperation extends CController {
 				'delay' => ''
 			],
 			'ophistory' => [
-				'history' => ''
+				'history' => '0'
 			],
 			'optrends' => [
-				'trends' => ''
+				'trends' => '0'
 			],
 			'opseverity' => [
 				'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
@@ -125,8 +125,11 @@ class CControllerPopupLldOperation extends CController {
 
 			if (array_key_exists('optag', $page_options)) {
 				foreach ($page_options['optag'] as $i => $optag) {
-					if ($optag['tag'] === '') {
+					if ($optag['tag'] === '' && $optag['value'] === '') {
 						unset($page_options['optag'][$i]);
+					}
+					elseif ($optag['tag'] === '') {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 					}
 				}
 
@@ -219,12 +222,12 @@ class CControllerPopupLldOperation extends CController {
 					}
 					elseif ($action === 'ophistory') {
 						$params['ophistory'] = [
-							'history' => ($values['history_mode'] == ITEM_STORAGE_OFF) ? '' : $values['history']
+							'history' => ($values['history_mode'] == ITEM_STORAGE_OFF) ? '0' : $values['history']
 						];
 					}
 					elseif ($action === 'optrends') {
 						$params['optrends'] = [
-							'trends' => ($values['trends_mode'] == ITEM_STORAGE_OFF) ? '' : $values['trends']
+							'trends' => ($values['trends_mode'] == ITEM_STORAGE_OFF) ? '0' : $values['trends']
 						];
 					}
 					elseif ($action === 'optemplate') {
@@ -262,22 +265,22 @@ class CControllerPopupLldOperation extends CController {
 			}
 
 			if (!array_key_exists('history_mode', $field_values['ophistory'])) {
-				$field_values['ophistory']['history_mode'] = ($field_values['ophistory']['history'] === '')
+				$field_values['ophistory']['history_mode'] = ($field_values['ophistory']['history'] === '0')
 					? ITEM_STORAGE_OFF
 					: ITEM_STORAGE_CUSTOM;
 			}
 			if (!array_key_exists('trends_mode', $field_values['optrends'])) {
-				$field_values['optrends']['trends_mode'] = ($field_values['optrends']['trends'] === '')
+				$field_values['optrends']['trends_mode'] = ($field_values['optrends']['trends'] === '0')
 					? ITEM_STORAGE_OFF
 					: ITEM_STORAGE_CUSTOM;
 			}
 
 			if ($field_values['ophistory']['history_mode'] === ITEM_STORAGE_OFF
-					&& $field_values['ophistory']['history'] === '') {
+					&& $field_values['ophistory']['history'] === '0') {
 				$field_values['ophistory']['history'] = DB::getDefault('items', 'history');
 			}
 			if ($field_values['optrends']['trends_mode'] === ITEM_STORAGE_OFF
-					&& $field_values['optrends']['trends'] === '') {
+					&& $field_values['optrends']['trends'] === '0') {
 				$field_values['optrends']['trends'] = DB::getDefault('items', 'trends');
 			}
 
