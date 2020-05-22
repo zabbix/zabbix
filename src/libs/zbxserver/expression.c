@@ -1535,6 +1535,49 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 /******************************************************************************
  *                                                                            *
+ * Function: format_user_fullname                                             *
+ *                                                                            *
+ * Purpose: formats full user name from name, surname and alias               *
+ *                                                                            *
+ * Parameters: name    - [IN] the user name, can be empty string              *
+ *             surname - [IN] the user surname, can be empty string           *
+ *             alias   - [IN] the user alias                                  *
+ *                                                                            *
+ * Return value: The formatted user name.                                     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*format_user_fullname(const char *name, const char *surname, const char *alias)
+{
+	char		*buf = NULL;
+	size_t		buf_alloc = 0, buf_offset = 0;
+
+	zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, name);
+
+	if ('\0' != *surname)
+	{
+		if (0 != buf_offset)
+			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ' ');
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, surname);
+	}
+
+	if ('\0' != *alias)
+	{
+		size_t	offset = buf_offset;
+
+		if (0 != buf_offset)
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " (");
+
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, alias);
+
+		if (0 != offset)
+			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ')');
+	}
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_escalation_history                                           *
  *                                                                            *
  * Purpose: retrieve escalation history                                       *
@@ -4301,8 +4344,8 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					}
 					else if (0 == strcmp(m, MVAR_USER_FULLNAME))
 					{
-						replace_to = zbx_dsprintf(replace_to, "%s %s (%s)", user_name,
-								user_surname, user_alias);
+						zbx_free(replace_to);
+						replace_to = format_user_fullname(user_name, user_surname, user_alias);
 					}
 				}
 			}
