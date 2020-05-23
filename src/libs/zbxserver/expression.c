@@ -1543,13 +1543,13 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
  *             surname - [IN] the user surname, can be empty string           *
  *             alias   - [IN] the user alias                                  *
  *                                                                            *
- * Return value: The formatted user name.                                     *
+ * Return value: the formatted user fullname                                  *
  *                                                                            *
  ******************************************************************************/
 static char	*format_user_fullname(const char *name, const char *surname, const char *alias)
 {
-	char		*buf = NULL;
-	size_t		buf_alloc = 0, buf_offset = 0;
+	char	*buf = NULL;
+	size_t	buf_alloc = 0, buf_offset = 0;
 
 	zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, name);
 
@@ -1557,6 +1557,7 @@ static char	*format_user_fullname(const char *name, const char *surname, const c
 	{
 		if (0 != buf_offset)
 			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ' ');
+
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, surname);
 	}
 
