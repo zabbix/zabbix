@@ -11,6 +11,7 @@ New features:
 .........T [ZBXNEXT-5880] added component version item to server and proxy remote monitoring templates (vjaceslavs)
 
 Bug fixes:
+.........T [ZBX-17771] fixed Zabbix event url in mattermost (afayantsev)
 A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed discover control in prototype edit forms (Ivo, Sasha, vmurzins)
 ....I..... [ZBX-17711] added double.sql file to source distribution tarball (yurii)
 ..F....... [ZBX-16162] reverted fix graph line interruptions when discarding values with heartbeat (talbergs)
