@@ -1,0 +1,10 @@
+{
+	"manifest_version": 0.01,
+	"id": "6",
+	"name": "6th Module",
+	"author": "",
+	"description": "Remove top-level item \"Reports\" and remove \"Administration\" submenu item \"Scripts\".",
+	"version": "",
+	"namespace": "Example_F",
+	"url": ""
+}
