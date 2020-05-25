@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-18 12:33+0300\n"
-"PO-Revision-Date: 2020-05-12 01:52+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"PO-Revision-Date: 2020-05-25 08:05+0300\n"
+"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1589241152.000000\n"
+"X-POOTLE-MTIME: 1590386740.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:67
 #: include/classes/db/OracleDbBackend.php:136
@@ -3821,7 +3821,7 @@ msgstr "コンテキスト名"
 
 #: app/views/popup.lldoverride.php:53
 msgid "Continue overrides"
-msgstr ""
+msgstr "上書きを続行"
 
 #: include/hosts.inc.php:254
 msgid "Contract number"
@@ -6461,17 +6461,17 @@ msgstr "式"
 #: include/classes/api/services/CAction.php:2722
 #, c-format
 msgid "Formula missing for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"の式が設定されていません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1787
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"の式が設定されていません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1582
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
-msgstr ""
+msgstr "上書き\"%1$s\"の式が設定されていません。"
 
 #: include/locales.inc.php:55
 msgid "French (fr_FR)"
@@ -7791,7 +7791,7 @@ msgstr "システムの識別文字列。文字列値を返す。"
 
 #: app/views/popup.lldoverride.php:51
 msgid "If filter matches"
-msgstr ""
+msgstr "フィルターが一致した場合"
 
 #: include/func.inc.php:1532 include/func.inc.php:1551
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -16673,7 +16673,7 @@ msgstr ""
 
 #: include/html.inc.php:734
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "グラフはディスカバリされなかったので次のディスカバリルールの処理後に削除されます。"
 
 #: include/html.inc.php:658
 #, c-format
@@ -16739,7 +16739,7 @@ msgstr ""
 
 #: include/html.inc.php:761
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "トリガーはディスカバリされなかったので次のディスカバリルールの処理後に削除されます。"
 
 #: include/classes/api/services/CHttpTest.php:710
 msgid "The web scenario application belongs to a different host than the web scenario host."
