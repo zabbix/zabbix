@@ -931,8 +931,7 @@ class CUserMacro extends CApiService {
 				));
 				$is_macro_without_context = ($context === null && $regex === null);
 
-				if ($is_macro_without_context || (($context !== null && $has_context)
-							|| ($regex !== null && $has_regex))) {
+				if ($is_macro_without_context || ($has_context || $has_regex)) {
 					foreach ($existing_macros[$hostid][$macro_name] as $hostmacroid => $macro_details) {
 						if ((!array_key_exists('hostmacroid', $hostmacro)
 									|| bccomp($hostmacro['hostmacroid'], $hostmacroid) != 0)
