@@ -106,7 +106,7 @@ typedef struct
 
 	zbx_list_t			direct_queue;	/* Queue of external requests that have to be */
 							/* forwarded to workers for preprocessing.    */
-	zbx_hashset_t			resultpool;	/* string pool */
+	zbx_hashset_t			resultpool;	/* result pool to be shared between master and dependent items */
 }
 zbx_preprocessing_manager_t;
 
