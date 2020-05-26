@@ -55,6 +55,8 @@ class CRouter {
 	 */
 	private $routes = [
 		// action						controller											layout					view
+		'action.operation.get'			=> ['CControllerActionOperationGet',				'layout.json',			null],
+		'action.operation.validate'		=> ['CControllerActionOperationValidate',			'layout.json',			null],
 		'auditlog.list'					=> ['CControllerAuditLogList',						'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'			=> ['CControllerAuthenticationEdit',				'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'			=> ['CControllerAuthenticationUpdate',				null,					null],
