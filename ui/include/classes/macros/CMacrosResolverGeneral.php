@@ -1088,6 +1088,8 @@ class CMacrosResolverGeneral {
 				'globalmacro' => true
 			]);
 
+			$db_global_macros = order_macros($db_global_macros, 'macro');
+
 			/*
 			 * @var array  $global_macros
 			 * @var array  $global_macros[<macro>]				macro base without curly braces
