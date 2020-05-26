@@ -58,23 +58,30 @@ $overrides_popup_form_list = (new CFormList())
 
 // filters
 $override_evaltype = (new CDiv([
-	_('Type of calculation'),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CComboBox('overrides_evaltype', $options['overrides_evaltype'], null, [
-		CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-		CONDITION_EVAL_TYPE_AND => _('And'),
-		CONDITION_EVAL_TYPE_OR => _('Or'),
-		CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-	]))
-		->setReadonly($options['templated']),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CSpan(''))->setId('overrides_expression'),
-	(new CTextBox('overrides_formula', $options['overrides_formula'], $options['templated'],
-			DB::getFieldLength('lld_override', 'formula')))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('overrides_formula')
-		->setAttribute('placeholder', 'A or (B and C) &hellip;')
+	(new CDiv([
+		_('Type of calculation'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CComboBox('overrides_evaltype', $options['overrides_evaltype'], null, [
+			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+			CONDITION_EVAL_TYPE_AND => _('And'),
+			CONDITION_EVAL_TYPE_OR => _('Or'),
+			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+		]))
+			->setReadonly($options['templated']),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+	]))->addClass(ZBX_STYLE_CELL),
+	(new CDiv([
+		(new CSpan(''))
+			->addStyle('white-space: normal;')
+			->setId('overrides_expression'),
+		(new CTextBox('overrides_formula', $options['overrides_formula'], $options['templated'],
+				DB::getFieldLength('lld_override', 'formula')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('overrides_formula')
+			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+	]))->addClass(ZBX_STYLE_CELL)
 ]))
+	->addClass(ZBX_STYLE_ROW)
 	->setId('overrideRow');
 
 $filter_table = (new CTable())
