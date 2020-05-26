@@ -1645,5 +1645,4 @@ int	zbx_str_extract(const char *text, size_t len, char **value);
 #define AUDIT_ACTION_EXECUTE	7
 #define AUDIT_RESOURCE_SCRIPT	25
 
-
 #endif
