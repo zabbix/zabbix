@@ -1001,7 +1001,7 @@ function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 	foreach ($macros as $key => $macro) {
 		// If we sort macro field, we need trim context quotes for valid result.
 		if ($sortfield === 'macro') {
-			// In preg_match we search quotes. If macro has qoutes then we replace this macro with macro without quotes.
+			// In preg_match we search quotes. If macro has quotes then we replace this macro with macro without quotes.
 			$macro[$sortfield] = (preg_match('/\:\s*\".+\"/', $macro[$sortfield]) === 1)
 				? preg_replace('/(\:)\s*(\")(.+)(\")/', '\1\3', $macro[$sortfield])
 				: $macro[$sortfield];
