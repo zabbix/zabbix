@@ -44,6 +44,10 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 	}
 
 	protected function getManuallyValidatedFields() {
+		$name = getConditionDescription($this->getInput('condition_type'), $this->getInput('operator'),
+			$this->getInput('value'), ''
+		);
+
 		return [
 			'form' => [
 				'name' => 'popup.operation',
@@ -54,7 +58,8 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 				'conditiontype' => $this->getInput('condition_type'),
 				'operator' => $this->getInput('operator'),
 				'value' => $this->getInput('value')
-			]
+			],
+			'name' => $name
 		];
 	}
 
