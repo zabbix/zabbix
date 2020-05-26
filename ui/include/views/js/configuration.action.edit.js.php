@@ -24,6 +24,10 @@
  */
 ?>
 
+<script type="text/x-jquery-tmpl" id="operation-popup-tmpl">
+	<?= (new CPartial('popup.operations'))->getOutput() ?>
+</script>
+
 <!-- Trigger Actions-->
 <script type="text/x-jquery-tmpl" id="opmsg-usrgrp-row-tmpl">
 <tr id="#{row}#{usrgrpid}">
