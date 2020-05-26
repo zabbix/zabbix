@@ -106,6 +106,8 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
 
+extern unsigned char	program_type;
+
 static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *db_error, const char *context)
 {
 	char	*s;
@@ -393,20 +395,25 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(EXIT_FAILURE);
 	}
 
-	/* shadow global auto_increment variables */
-
-	if (0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
-			"set @@session.auto_increment_increment=1"))
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_increment option.");
-		ret = ZBX_DB_FAIL;
-	}
+		/* Shadow global auto_increment variables. */
+		/* Setting session variables requires special permissions in MySQL 8.0.14-8.0.17. */
+		/* See ZBX-17801 for more details. */
 
-	if (ZBX_DB_OK == ret && 0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
-			"set @@session.auto_increment_offset=1"))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_offset option.");
-		ret = ZBX_DB_FAIL;
+		if (0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
+				"set @@session.auto_increment_increment=1"))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_increment option.");
+			ret = ZBX_DB_FAIL;
+		}
+
+		if (ZBX_DB_OK == ret && 0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
+				"set @@session.auto_increment_offset=1"))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_offset option.");
+			ret = ZBX_DB_FAIL;
+		}
 	}
 
 #if defined(HAVE_MYSQL_TLS)
