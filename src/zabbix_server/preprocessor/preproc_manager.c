@@ -936,32 +936,43 @@ static int	preprocessor_set_variant_result(zbx_hashset_t *resultpool, zbx_prepro
 
 	if (FAIL != (ret = zbx_variant_convert(value, type)))
 	{
-		preproc_item_result_free(resultpool, &request->value);
-		request->value.result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
-		init_result(request->value.result);
-		preproc_item_result_prepare(resultpool, request->value.result);
+		AGENT_RESULT *result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+
+		init_result(result);
 
 		switch (request->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				SET_DBL_RESULT(request->value.result, value->data.dbl);
+				SET_DBL_RESULT(result, value->data.dbl);
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				SET_STR_RESULT(request->value.result, value->data.str);
+				SET_STR_RESULT(result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
-				memset(log, 0, sizeof(zbx_log_t));
-				SET_LOG_RESULT(request->value.result, log);
+
+				if (ISSET_LOG(request->value.result))
+				{
+					*log = *request->value.result->log;
+					if (NULL != log->source)
+						log->source = zbx_strdup(NULL, log->source);
+				}
+				else
+					memset(log, 0, sizeof(zbx_log_t));
+
 				log->value = value->data.str;
+				SET_LOG_RESULT(result, log);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				SET_UI64_RESULT(request->value.result, value->data.ui64);
+				SET_UI64_RESULT(result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				SET_TEXT_RESULT(request->value.result, value->data.str);
+				SET_TEXT_RESULT(result, value->data.str);
 				break;
 		}
+
+		preproc_item_result_free(resultpool, &request->value);
+		preproc_item_result_prepare(resultpool, (request->value.result = result));
 
 		zbx_variant_set_none(value);
 	}
