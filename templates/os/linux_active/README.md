@@ -146,7 +146,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Memory |Memory utilization |<p>Memory used percentage is calculated as (100-pavailable)</p> |DEPENDENT |vm.memory.utilization<p>**Preprocessing**:</p><p>- JAVASCRIPT: `//Calculate utilization return (100-value);`</p> |
+|Memory |Memory utilization |<p>Memory used percentage is calculated as (100-pavailable)</p> |DEPENDENT |vm.memory.utilization<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (100-value);`</p> |
 |Memory |Total memory |<p>Total memory in Bytes</p> |ZABBIX_ACTIVE |vm.memory.size[total] |
 |Memory |Available memory |<p>Available memory, in Linux, available = free + buffers + cache. On other platforms calculation may vary. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</p> |ZABBIX_ACTIVE |vm.memory.size[available] |
 |Memory |Total swap space |<p>The total space of swap volume/file in bytes.</p> |ZABBIX_ACTIVE |system.swap.size[,total] |
