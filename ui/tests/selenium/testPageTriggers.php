@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
+use Facebook\WebDriver\WebDriverBy;
+
 class testPageTriggers extends CLegacyWebTest {
 
 	public $hostid = 99050;

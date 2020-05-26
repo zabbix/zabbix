@@ -20,6 +20,9 @@
 
 require_once 'vendor/autoload.php';
 
+use Facebook\WebDriver\Remote\HttpCommandExecutor;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+
 /**
  * Helper class that allows custom command execution.
  */
