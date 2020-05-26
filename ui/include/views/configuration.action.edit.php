@@ -185,6 +185,22 @@ if ($data['action']['operations']) {
 		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
 			continue;
 		}
+
+		if (array_key_exists('opcommand', $operation)) {
+			$operation['opcommand'] += [
+				'type' => (string) ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scriptid' => '0',
+				'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_AGENT,
+				'port' => '',
+				'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+				'username' => '',
+				'password' => '',
+				'publickey' => '',
+				'privatekey' => '',
+				'command' => ''
+			];
+		}
+
 		if (!isset($operation['opconditions'])) {
 			$operation['opconditions'] = [];
 		}
@@ -324,8 +340,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			if (!isset($operation['opconditions'])) {
 				$operation['opconditions'] = [];
 			}
-			if (!isset($operation['mediatypeid'])) {
-				$operation['mediatypeid'] = 0;
+			if (!array_key_exists('mediatypeid', $operation['opmessage'])) {
+				$operation['opmessage']['mediatypeid'] = 0;
 			}
 
 			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
