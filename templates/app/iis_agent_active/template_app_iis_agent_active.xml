@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-22T04:44:40Z</date>
+   <date>2020-05-26T10:18:58Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -114,7 +114,7 @@ Template tooling version used: 0.35</description>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
-               <description>The average rate per minute of total bytes/sec transferred by the Web service (sum of bytes sent/sec and bytes received/sec)</description>
+               <description>The average rate per minute of total bytes/sec transferred by the Web service (sum of bytes sent/sec and bytes received/sec).</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -168,7 +168,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests are made using the COPY method. Copy requests are used for copying files and directories. Average per minute.</description>
+               <description>The rate of HTTP requests made using the COPY method. Copy requests are used for copying files and directories. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -188,7 +188,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The number of active connections</description>
+               <description>The number of active connections.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -202,7 +202,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the DELETE method are made. Average per minute.</description>
+               <description>The rate of HTTP requests using the DELETE method made. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -222,7 +222,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.</description>
+               <description>The rate of HTTP requests made using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -242,7 +242,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the HEAD method are made. HEAD requests generally indicate a client is querying the state of a document they already have to see if it needs to be refreshed. Average per minute.</description>
+               <description>The rate of HTTP requests using the HEAD method made. HEAD requests generally indicate a client is querying the state of a document they already have to see if it needs to be refreshed. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -302,7 +302,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate that HTTP requests are made using the LOCK method. Lock requests are used to lock a file for one user so that only that user can modify the file. Average per minute.</description>
+               <description>The rate of HTTP requests made using the LOCK method. Lock requests are used to lock a file for one user so that only that user can modify the file. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -322,7 +322,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the MKCOL method are made. Mkcol requests are used to create directories on the server. Average per minute.</description>
+               <description>The rate of HTTP requests using the MKCOL method made. Mkcol requests are used to create directories on the server. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -342,7 +342,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the MOVE method are made. Move requests are used for moving files and directories. Average per minute.</description>
+               <description>The rate of HTTP requests using the MOVE method made. Move requests are used for moving files and directories. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -396,7 +396,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the OPTIONS method are made. Average per minute.</description>
+               <description>The rate of HTTP requests using the OPTIONS method made. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -410,7 +410,7 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: Method Total Other Method requests per second</name>
+               <name>IIS: Method Total Other requests per second</name>
                <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]</key>
                <history>7d</history>
@@ -456,7 +456,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the PROPFIND method are made. Propfind requests retrieve property values on files and directories. Average per minute.</description>
+               <description>The rate of HTTP requests using the PROPFIND method made. Propfind requests retrieve property values on files and directories. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -476,7 +476,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the PROPPATCH method are made. Proppatch requests set property values on files and directories. Average per minute.</description>
+               <description>The rate of HTTP requests using the PROPPATCH method made. Proppatch requests set property values on files and directories. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -496,7 +496,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the PUT method are made. Average per minute.</description>
+               <description>The rate of HTTP requests using the PUT method made. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -516,7 +516,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the MS-SEARCH method are made. Search requests are used to query the server to find resources that match a set of conditions provided by the client. Average per minute.</description>
+               <description>The rate of HTTP requests using the MS-SEARCH method made. Search requests are used to query the server to find resources that match a set of conditions provided by the client. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -537,7 +537,7 @@ Template tooling version used: 0.35</description>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
                <units>s</units>
-               <description>Service uptime in seconds</description>
+               <description>Service uptime in seconds.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -574,13 +574,13 @@ Template tooling version used: 0.35</description>
                </preprocessing>
             </item>
             <item>
-               <name>IIS: Method Total Method requests per second</name>
+               <name>IIS: Method Total requests per second</name>
                <type>ZABBIX_ACTIVE</type>
                <key>perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]</key>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of all HTTP requests are received. Average per minute.</description>
+               <description>The rate of all HTTP requests received. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -600,7 +600,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the TRACE method are made. Average per minute.</description>
+               <description>The rate of HTTP requests using the TRACE method made. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -620,7 +620,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>The rate of HTTP requests using the UNLOCK method are made. Unlock requests are used to remove locks from files. Average per minute.</description>
+               <description>The rate of HTTP requests using the UNLOCK method made. Unlock requests are used to remove locks from files. Average per minute.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -660,7 +660,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>Total number of unsuccessful lookups in the user-mode file cache since service startup.</description>
+               <description>The total number of unsuccessful lookups in the user-mode file cache since service startup.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -700,7 +700,7 @@ Template tooling version used: 0.35</description>
                <history>7d</history>
                <trends>30d</trends>
                <value_type>FLOAT</value_type>
-               <description>Total number of unsuccessful lookups in the user-mode URI cache since service startup.</description>
+               <description>The total number of unsuccessful lookups in the user-mode URI cache since service startup.</description>
                <applications>
                   <application>
                      <name>IIS</name>
@@ -742,7 +742,7 @@ Template tooling version used: 0.35</description>
                      <description>The World Wide Web Publishing Service (W3SVC) is not in running state. IIS cannot start.</description>
                      <dependencies>
                         <dependency>
-                           <name>IIS: Windows process Activation Service (WAS) is not running</name>
+                           <name>IIS: Windows process Activation Service (WAS) is not the running</name>
                            <expression>{Template App IIS by Zabbix agent active:service_state[WAS].last()}&lt;&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -750,7 +750,7 @@ Template tooling version used: 0.35</description>
                </triggers>
             </item>
             <item>
-               <name>IIS: Windows process Activation Service (WAS) state</name>
+               <name>IIS: Windows Process Activation Service (WAS) state</name>
                <type>ZABBIX_ACTIVE</type>
                <key>service_state[WAS]</key>
                <history>7d</history>
@@ -773,9 +773,9 @@ Template tooling version used: 0.35</description>
                <triggers>
                   <trigger>
                      <expression>{last()}&lt;&gt;0</expression>
-                     <name>IIS: Windows process Activation Service (WAS) is not running</name>
+                     <name>IIS: Windows process Activation Service (WAS) is not the running</name>
                      <priority>HIGH</priority>
-                     <description>Windows process Activation Service (WAS) is not in running state. IIS cannot start.</description>
+                     <description>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</description>
                   </trigger>
                </triggers>
             </item>
@@ -809,7 +809,7 @@ Template tooling version used: 0.35</description>
                      <key>perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"]</key>
                      <history>7d</history>
                      <trends>30d</trends>
-                     <description>The state of application pool</description>
+                     <description>The state of the application pool.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#APPPOOL}</name>
@@ -840,7 +840,7 @@ Template tooling version used: 0.35</description>
                      <trends>30d</trends>
                      <value_type>FLOAT</value_type>
                      <units>s</units>
-                     <description>The web application uptime period since the last restart</description>
+                     <description>The web application uptime period since the last restart.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#APPPOOL}</name>
@@ -862,7 +862,7 @@ Template tooling version used: 0.35</description>
                      <key>perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"]</key>
                      <history>7d</history>
                      <trends>30d</trends>
-                     <description>The number of times that the application pool has been recycled since Windows Process Activation Service (WAS) started.</description>
+                     <description>The number of times the application pool has been recycled since Windows Process Activation Service (WAS) started.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#APPPOOL}</name>
@@ -889,7 +889,7 @@ Template tooling version used: 0.35</description>
                      <delay>30s</delay>
                      <history>7d</history>
                      <trends>30d</trends>
-                     <description>The number of requests in the queue</description>
+                     <description>The number of requests in the queue.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>{#APPPOOL}</name>
@@ -933,7 +933,7 @@ Template tooling version used: 0.35</description>
             <macro>
                <macro>{$IIS.APPPOOL.MONITORED}</macro>
                <value>1</value>
-               <description>Monitoring status for discovered Application pools. Use context to avoid trigger firing for specific application pools. "1" - enabled, "0" - disabled.</description>
+               <description>Monitoring status for discovered application pools. Use context to avoid trigger firing for specific application pools. "1" - enabled, "0" - disabled.</description>
             </macro>
             <macro>
                <macro>{$IIS.APPPOOL.NOT_MATCHES}</macro>
@@ -943,7 +943,7 @@ Template tooling version used: 0.35</description>
             <macro>
                <macro>{$IIS.PORT}</macro>
                <value>80</value>
-               <description>Listened port.</description>
+               <description>Listening port.</description>
             </macro>
             <macro>
                <macro>{$IIS.QUEUE.MAX.TIME}</macro>
