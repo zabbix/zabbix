@@ -936,6 +936,7 @@ static int	preprocessor_set_variant_result(zbx_hashset_t *resultpool, zbx_prepro
 
 	if (FAIL != (ret = zbx_variant_convert(value, type)))
 	{
+		/* old result is shared between dependent and master items, it cannot be modified, create new result */
 		AGENT_RESULT *result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
 
 		init_result(result);
