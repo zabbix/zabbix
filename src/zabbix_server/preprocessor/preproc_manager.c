@@ -806,7 +806,7 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 			for (i = item->dep_itemids_num - 1; i >= 0; i--)
 			{
 				if (NULL != result_ptr)
-					result_ptr->refcount++;// += item->dep_itemids_num
+					result_ptr->refcount++;
 
 				preprocessor_copy_value(&value, source_value);
 				value.itemid = item->dep_itemids[i].first;
