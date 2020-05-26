@@ -110,6 +110,13 @@ typedef struct
 }
 zbx_preprocessing_manager_t;
 
+typedef struct
+{
+	void	*result;
+	int	refcount;
+}
+zbx_resultpool_t;
+
 static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 		zbx_preproc_item_value_t *value, zbx_list_item_t *master);
 
@@ -339,14 +346,7 @@ out:
 	return task;
 }
 
-typedef struct
-{
-	void	*result;
-	int	refcount;
-}
-zbx_resultpool_t;
-
-static void	preproc_item_result_prepare(zbx_hashset_t *resultpool, AGENT_RESULT *result)
+static void	preproc_item_result_prepare(zbx_hashset_t *resultpool, const AGENT_RESULT *result)
 {
 	zbx_resultpool_t	*result_ptr, result_local;
 
