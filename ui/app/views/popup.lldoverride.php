@@ -75,7 +75,7 @@ $override_evaltype = (new CDiv([
 		->setId('overrides_formula')
 		->setAttribute('placeholder', 'A or (B and C) &hellip;')
 ]))
-	->addClass('overrideRow');
+	->setId('overrideRow');
 
 $filter_table = (new CTable())
 	->setId('overrides_filters')
