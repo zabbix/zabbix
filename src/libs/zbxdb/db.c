@@ -399,7 +399,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		/* Shadow global auto_increment variables. */
 		/* Setting session variables requires special permissions in MySQL 8.0.14-8.0.17. */
-		/* See ZBX-17801 for more details. */
 
 		if (0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
 				"set @@session.auto_increment_increment=1"))
