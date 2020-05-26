@@ -844,7 +844,8 @@ static void	preprocessor_add_request(zbx_preprocessing_manager_t *manager, zbx_i
 	while (offset < message->size)
 	{
 		offset += zbx_preprocessor_unpack_value(&value, message->data + offset);
-		preproc_item_result_prepare(&manager->resultpool, value.result);
+		if (NULL != value.result)
+			preproc_item_result_prepare(&manager->resultpool, value.result);
 		preprocessor_enqueue(manager, &value, NULL);
 	}
 
