@@ -978,8 +978,10 @@ class CMacrosResolverGeneral {
 		 * @var array  $host_macros
 		 * @var array  $host_macros[<hostid>]
 		 * @var array  $host_macros[<hostid>][<macro>]				macro base without curly braces
-		 * @var string $host_macros[<hostid>][<macro>]['value']		base macro value (without context); can be null
+		 * @var string $host_macros[<hostid>][<macro>]['value']		base macro value (without context and regex);
+		 * 															can be null
 		 * @var array  $host_macros[<hostid>][<macro>]['contexts']	context values; ['<context>' => '<value>', ...]
+		 * @var array  $host_macros[<hostid>][<macro>]['regex']		regex values; ['<regex>' => '<value>', ...]
 		 */
 		$host_macros = [];
 
@@ -991,6 +993,8 @@ class CMacrosResolverGeneral {
 					'output' => ['macro', 'value', 'type', 'hostid'],
 					'hostids' => $hostids
 				]);
+
+				$db_host_macros = order_macros($db_host_macros, 'macro');
 
 				foreach ($db_host_macros as $db_host_macro) {
 					if ($user_macro_parser->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
