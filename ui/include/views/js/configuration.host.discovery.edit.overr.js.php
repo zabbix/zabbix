@@ -790,6 +790,8 @@ insert_javascript_for_visibilitybox();
 			if (!show_formula) {
 				that.updateExpression();
 			}
+
+			overlays_stack.end().centerDialog();
 		});
 
 		jQuery('#overrides_evaltype').trigger('change');
