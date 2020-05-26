@@ -18,18 +18,21 @@ This template was tested on:
 
 ## Setup
 
-Add the template to each node with etcd. Make sure the host HOST.CONN matches with etcd  /metrics endpoint.
+1. Import template into Zabbix
+2. After importing template make sure that etcd allows for metric collection.
+  Test by running: `curl -L http://localhost:2379/metrics`
+3. Check if etcd is accessible from Zabbix proxy or Zabbix server depending on where you are planning to do the monitoring. 
+  To verify run `curl -L  http://<etcd_node_adress>:2379/metrics`
+4. Add the template to each node with etcd. 
+  By default template use client port. You can configure metrics endpoint location by --listen-metrics-urls flag (See [etcd docs](https://github.com/etcd-io/website/blob/master/content/docs/v3.4.0/op-guide/configuration.md#--listen-metrics-urls)). 
+  
+  If you have specified a non-standard port for etcd, don't forget change macros {$ETCD.SCHEME}, {$ETCD.PORT}. 
+  
+  If you need it, you can set {$ETCD.USERNAME} and {$ETCD.PASSWORD} macros in the template for using on the host level. 
+  
+  Test availability: `zabbix_get -s etcd-host -k etcd.health`
 
-Test by running:
-`curl -L http://localhost:2379/metrics`
-or
-`curl -L http://<etcd_node_adress>:2379/metrics`
-
-By default template use client port. You can configure metrics endpoint location by `--listen-metrics-urls` flag (See https://github.com/etcd-io/website/blob/master/content/docs/v3.4.0/op-guide/configuration.md#--listen-metrics-urls). Don't forget change  macros {$ETCD.SCHEME}, {$ETCD.PORT}.        
-
-If you need it, you can set {$ETCD.USERNAME} and {$ETCD.PASSWORD} macros in the template for using on the host level.
-
-Test availability: `zabbix_get -s etcd-host -k etcd.health`
+Besides, see the macros section as it will set the trigger values.
 
 
 ## Zabbix configuration
@@ -91,7 +94,7 @@ There are no template links in this template.
 |Etcd |Etcd: Server version |<p>Version of the Etcd server.</p> |DEPENDENT |etcd.server.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.etcdserver`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Etcd |Etcd: Cluster version |<p>Version of the Etcd cluster.</p> |DEPENDENT |etcd.cluster.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.etcdcluster`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Etcd |Etcd: DB size |<p>Total size of the underlying database.</p> |DEPENDENT |etcd.db.size<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_db_total_size_in_bytes `</p> |
-|Etcd |Etcd: Keys compacted per second |<p>The number of db keys compacted per second.</p> |DEPENDENT |etcd.keys.compacted.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_db_compaction_keys_total `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND |
+|Etcd |Etcd: Keys compacted per second |<p>The number of DB keys compacted per second.</p> |DEPENDENT |etcd.keys.compacted.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_db_compaction_keys_total `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND |
 |Etcd |Etcd: Keys expired per second |<p>The number of expired keys per second.</p> |DEPENDENT |etcd.keys.expired.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_store_expires_total `</p><p>- CHANGE_PER_SECOND |
 |Etcd |Etcd: Keys total |<p>Total number of keys.</p> |DEPENDENT |etcd.keys.total<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_keys_total `</p> |
 |Etcd |Etcd: Uptime |<p>Etcd server uptime.</p> |DEPENDENT |etcd.uptime<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_start_time_seconds `</p><p>- JAVASCRIPT: `//use boottime to calculate uptime return (Math.floor(Date.now()/1000)-Number(value));`</p> |
