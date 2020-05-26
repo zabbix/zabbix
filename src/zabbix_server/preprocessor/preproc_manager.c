@@ -375,7 +375,6 @@ static void	preproc_item_result_free(zbx_hashset_t *resultpool, zbx_preproc_item
 	}
 	else
 		value->result = NULL;
-
 }
 
 /******************************************************************************
