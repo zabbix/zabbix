@@ -610,9 +610,10 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 	for (i = 0; i < ARRSIZE(match); i++)
 		match[i].rm_so = match[i].rm_eo = -1;
 
-	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
+	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match) &&
+			NULL != (*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX,
+			limit)))
 	{
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, limit);
 		return SUCCEED;
 	}
 

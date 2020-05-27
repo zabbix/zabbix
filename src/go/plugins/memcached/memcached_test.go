@@ -92,6 +92,7 @@ func TestPlugin_Export(t *testing.T) {
 	}
 
 	p := Plugin{}
+	p.Init(pluginName)
 	p.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
 
 	p.Start()

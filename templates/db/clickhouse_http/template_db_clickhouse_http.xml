@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-04-23T08:57:33Z</date>
+   <date>2020-05-08T07:25:12Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -767,14 +767,6 @@ This happens naturally due to caches for tables indexes and doesn't indicate mem
                </preprocessing>
                <url>{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/ping</url>
                <status_codes/>
-               <triggers>
-                  <trigger>
-                     <expression>{last()}=0</expression>
-                     <name>ClickHouse: ClickHouse: Service is down</name>
-                     <priority>AVERAGE</priority>
-                     <manual_close>YES</manual_close>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>ClickHouse: Longest currently running query time</name>
@@ -1318,8 +1310,8 @@ or due to startup without ZooKeeper configured."</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
-                           <name>ClickHouse: ClickHouse: Service is down</name>
-                           <expression>{Template DB ClickHouse by HTTP:clickhouse.ping.last()}=0</expression>
+                           <name>ClickHouse: Service is down</name>
+                           <expression>{Template DB ClickHouse by HTTP:clickhouse.ping.last()}=0 or {Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1588,6 +1580,34 @@ Should be no more than one, because using more than one connection to ZooKeeper 
                <master_item>
                   <key>clickhouse.system.metrics</key>
                </master_item>
+            </item>
+            <item>
+               <name>ClickHouse: Check port availability</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]</key>
+               <history>7d</history>
+               <applications>
+                  <application>
+                     <name>ClickHouse</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0</expression>
+                     <name>ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</name>
+                     <priority>AVERAGE</priority>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
             </item>
          </items>
          <discovery_rules>
@@ -2321,6 +2341,20 @@ This mode is turned on if the config doesn’t have sections with ZooKeeper, if 
          </macros>
       </template>
    </templates>
+   <triggers>
+      <trigger>
+         <expression>{Template DB ClickHouse by HTTP:clickhouse.ping.last()}=0 or {Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()} = 0</expression>
+         <name>ClickHouse: Service is down</name>
+         <priority>AVERAGE</priority>
+         <manual_close>YES</manual_close>
+         <dependencies>
+            <dependency>
+               <name>ClickHouse: Port {$CLICKHOUSE.PORT} is unavaliable</name>
+               <expression>{Template DB ClickHouse by HTTP:net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"].last()}=0</expression>
+            </dependency>
+         </dependencies>
+      </trigger>
+   </triggers>
    <graphs>
       <graph>
          <name>ClickHouse: Current activity</name>

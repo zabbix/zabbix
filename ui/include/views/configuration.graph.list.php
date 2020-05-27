@@ -201,7 +201,7 @@ foreach ($data['graphs'] as $graph) {
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
 	else if (array_key_exists('ts_delete', $graph['graphDiscovery']) && $graph['graphDiscovery']['ts_delete'] > 0) {
-		$info_icons[] = getItemLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
+		$info_icons[] = getGraphLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
 	}
 
 	$graphTable->addRow([

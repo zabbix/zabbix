@@ -39,13 +39,14 @@
  ******************************************************************************/
 static duk_ret_t	es_btoa(duk_context *ctx)
 {
-	duk_size_t	byte_len = 0;
-	const char	*str = NULL;
-	char		*b64str = NULL;
+	char	*str = NULL, *b64str = NULL;
 
-	str = duk_require_lstring(ctx, 0, &byte_len);
+	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+
 	str_base64_encode_dyn(str, &b64str, (int)strlen(str));
 	duk_push_string(ctx, b64str);
+	zbx_free(str);
 	zbx_free(b64str);
 	return 1;
 }
@@ -65,16 +66,17 @@ static duk_ret_t	es_btoa(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_atob(duk_context *ctx)
 {
-	char		*buffer = NULL;
-	const char	*str;
-	int		out_size, buffer_size;
-	duk_size_t	byte_len;
+	char	*buffer = NULL, *str = NULL;
+	int	out_size, buffer_size;
 
-	str = duk_require_lstring(ctx, 0, &byte_len);
+	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+
 	buffer_size = (int)strlen(str) * 3 / 4 + 1;
 	buffer = zbx_malloc(buffer, (size_t)buffer_size);
 	str_base64_decode(str, buffer, buffer_size, &out_size);
 	duk_push_lstring(ctx, buffer, (duk_size_t)out_size);
+	zbx_free(str);
 	zbx_free(buffer);
 	return 1;
 }

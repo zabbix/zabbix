@@ -2515,6 +2515,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/time_unit": a number is too large.'
 			],
 			[
+				['type' => API_TIME_UNIT, 'length' => 3],
+				'15s',
+				'/1/time_unit',
+				'15s'
+			],
+			[
+				['type' => API_TIME_UNIT, 'length' => 2],
+				'15s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": value is too long.'
+			],
+			[
 				['type' => API_TIME_UNIT],
 				'-2147483648s',
 				'/1/time_unit',

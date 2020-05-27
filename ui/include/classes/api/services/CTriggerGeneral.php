@@ -145,7 +145,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
 				'status', 'priority', 'comments', 'type', 'templateid', 'correlation_mode', 'correlation_tag',
-				'manual_close', 'opdata'
+				'manual_close', 'opdata', 'discover'
 			],
 			'hostids' => $host['hostid'],
 			'filter' => ['templateid' => $trigger['templateid']],
@@ -498,19 +498,19 @@ abstract class CTriggerGeneral extends CApiService {
 				$error_duplicate = _('Duplicate trigger with name "%1$s".');
 				$error_wrong_fields = _('Wrong fields for trigger.');
 				$error_cannot_set = _('Cannot set "%1$s" for trigger "%2$s".');
-				$rules = [
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])]
-				];
+				]];
 				break;
 
 			case 'CTriggerPrototype':
 				$error_duplicate = _('Duplicate trigger prototype with name "%1$s".');
 				$error_wrong_fields = _('Wrong fields for trigger prototype.');
 				$error_cannot_set = _('Cannot set "%1$s" for trigger prototype "%2$s".');
-				$rules = [
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])],
 					'discover' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])]
-				];
+				]];
 				break;
 
 			default:
@@ -540,13 +540,10 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_set, $trigger['description']);
 
 			// Validate status and discover status fields.
-			$data = array_intersect_key($trigger, $rules);
-			if ($data) {
-				$path = '/'.($key + 1);
+			$data = array_intersect_key($trigger, $api_input_rules['fields']);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($key + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			if (!array_key_exists('recovery_mode', $trigger)) {
@@ -652,6 +649,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['recovery_expression'] [OUT]
 	 * @param string $db_triggers[<tnum>]['url']                 [OUT]
 	 * @param int    $db_triggers[<tnum>]['status']              [OUT]
+	 * @param int    $db_triggers[<tnum>]['discover']            [OUT]
 	 * @param int    $db_triggers[<tnum>]['priority']            [OUT]
 	 * @param string $db_triggers[<tnum>]['comments']            [OUT]
 	 * @param int    $db_triggers[<tnum>]['type']                [OUT]
@@ -673,19 +671,19 @@ abstract class CTriggerGeneral extends CApiService {
 				$error_wrong_fields = _('Wrong fields for trigger.');
 				$error_cannot_update = _('Cannot update "%1$s" for trigger "%2$s".');
 				$error_cannot_update_tmpl = _('Cannot update "%1$s" for templated trigger "%2$s".');
-				$rules = [
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])]
-				];
+				]];
 				break;
 
 			case 'CTriggerPrototype':
 				$error_wrong_fields = _('Wrong fields for trigger prototype.');
 				$error_cannot_update = _('Cannot update "%1$s" for trigger prototype "%2$s".');
 				$error_cannot_update_tmpl = _('Cannot update "%1$s" for templated trigger prototype "%2$s".');
-				$rules = [
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'status' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])],
 					'discover' => ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])]
-				];
+				]];
 				break;
 
 			default:
@@ -770,13 +768,10 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			// Validate status and discover status fields.
-			$data = array_intersect_key($trigger, $rules);
-			if ($data) {
-				$path = '/'.($tnum + 1);
+			$data = array_intersect_key($trigger, $api_input_rules['fields']);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($tnum + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			if (array_key_exists('recovery_mode', $trigger)) {
@@ -1675,7 +1670,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggers = $this->get([
 			'output' => [
 				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+				'discover'
 			],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],

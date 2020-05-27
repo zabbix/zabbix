@@ -374,19 +374,16 @@ class CItemPrototype extends CItemGeneral {
 		unset($item);
 
 		// Validate item prototype status and discover status fields.
-		$rules = [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
-		];
+			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])]
+		]];
 
 		foreach ($items as $key => $item) {
-			$item = array_intersect_key($item, $rules);
-			if ($item) {
-				$path = '/'.($key + 1);
+			$item = array_intersect_key($item, $api_input_rules['fields']);
 
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
+			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($key + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 
@@ -755,16 +752,15 @@ class CItemPrototype extends CItemGeneral {
 		$this->checkInput($items, true);
 
 		// Validate item prototype status and discover status fields.
-		$rules = [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'status' => ['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])],
-		];
+			'discover' => ['type' => API_INT32, 'in' => implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER])]
+		]];
 
 		foreach ($items as $key => $item) {
-			$item = array_intersect_key($item, $rules);
-			$path = '/'.($key + 1);
+			$item = array_intersect_key($item, $api_input_rules['fields']);
 
-			if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
+			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($key + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}

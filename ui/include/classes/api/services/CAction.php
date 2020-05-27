@@ -2719,6 +2719,7 @@ class CAction extends CApiService {
 			],
 			'postValidators' => [
 				new CConditionValidator([
+					'messageMissingFormula' => _('Formula missing for action "%1$s".'),
 					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for action "%1$s": %3$s.'),
 					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for action "%1$s" is not defined.'),
 					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for action "%1$s".'),
