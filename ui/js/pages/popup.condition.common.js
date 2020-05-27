@@ -74,7 +74,7 @@ function submitConditionPopup(response, overlay) {
  */
 function validateConditionPopup(overlay) {
 	if (window.operation_popup && window.operation_popup.overlay.$dialogue.is(':visible')) {
-		return window.operation_popup.operation_condition.onConditionPopupSubmit(overlay);
+		return window.operation_popup.view.operation_condition.onConditionPopupSubmit(overlay);
 	}
 
 	var $form = overlay.$dialogue.find('form'),
