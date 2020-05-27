@@ -144,20 +144,27 @@ class CControllerPopupLldOperation extends CController {
 			}
 
 			/*
-			 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated
-			 * by a semicolon. In the end, custom intervals together with "delay" are stored in the "delay" variable.
+			 * $page_options['opperiod']['delay_flex'] is a temporary field that collects flexible and scheduling
+			 * intervals separated by a semicolon. In the end, custom intervals together with
+			 * $page_options['opperiod']['delay'] are stored in the $page_options['opperiod']['delay'] variable.
 			 */
 			if (array_key_exists('opperiod', $page_options)) {
-				$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
-				$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
-				$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
-
-				if ($simple_interval_parser->parse($page_options['opperiod']['delay']) != CParser::PARSE_SUCCESS
-						|| !array_key_exists('delay', $page_options['opperiod'])) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'Delay', _('a time unit is expected')));
+				if (!array_key_exists('delay', $page_options['opperiod'])) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Update interval'),
+						_('a time unit is expected'))
+					);
 				}
-				elseif (array_key_exists('delay_flex', $page_options['opperiod'])) {
+
+				$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
+				$result = true;
+
+				if (array_key_exists('delay_flex', $page_options['opperiod'])) {
 					$intervals = [];
+					$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true, 'lldmacros' => true]);
+					$time_period_parser = new CTimePeriodParser(['usermacros' => true, 'lldmacros' => true]);
+					$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true,
+						'lldmacros' => true]
+					);
 
 					foreach ($page_options['opperiod']['delay_flex'] as $interval) {
 						if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
@@ -196,6 +203,11 @@ class CControllerPopupLldOperation extends CController {
 					if ($intervals) {
 						$page_options['opperiod']['delay'] .= ';'.implode(';', $intervals);
 					}
+				}
+
+				if ($result && !validateDelay($update_interval_parser, _('Update interval'),
+						$page_options['opperiod']['delay'], $error)) {
+					error($error);
 				}
 			}
 

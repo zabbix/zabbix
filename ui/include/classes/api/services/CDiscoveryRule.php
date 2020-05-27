@@ -1666,8 +1666,10 @@ class CDiscoveryRule extends CItemGeneral {
 										));
 									}
 
-									if (array_key_exists('opperiod', $operation)) {
-										$this->validateDelay($update_interval_parser, $operation['opperiod']['delay']);
+									if (array_key_exists('opperiod', $operation)
+											&& !validateDelay($update_interval_parser, 'delay',
+												$operation['opperiod']['delay'], $error)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 									}
 									break;
 
