@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-20T06:20:09Z</date>
+   <date>2020-05-26T12:17:26Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1314,9 +1314,6 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
             <application>
                <name>Memory</name>
             </application>
-            <application>
-               <name>Zabbix raw items</name>
-            </application>
          </applications>
          <items>
             <item>
@@ -1376,14 +1373,13 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <name>Available memory in %</name>
                <type>ZABBIX_ACTIVE</type>
                <key>vm.memory.size[pavailable]</key>
-               <history>0</history>
-               <trends>0</trends>
+               <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
                <applications>
                   <application>
-                     <name>Zabbix raw items</name>
+                     <name>Memory</name>
                   </application>
                </applications>
             </item>
@@ -1417,8 +1413,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
-                     <params>//Calculate utilization
-return (100-value);</params>
+                     <params>return (100-value);</params>
                   </step>
                </preprocessing>
                <master_item>
