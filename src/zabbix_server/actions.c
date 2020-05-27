@@ -29,6 +29,30 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: compare_events                                                   *
+ *                                                                            *
+ * Purpose: compare events by objectid                                        *
+ *                                                                            *
+ * Parameters: d1 - [IN] event structure to compare to d2                     *
+ *             d2 - [IN] event structure to compare to d1                     *
+ *                                                                            *
+ * Return value: 0 - equal                                                    *
+ *               not 0 - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	compare_events(const void *d1, const void *d2)
+{
+	const DB_EVENT	*p1 = *(const DB_EVENT **)d1;
+	const DB_EVENT	*p2 = *(const DB_EVENT **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->objectid, p2->objectid);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->object, p2->object);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_condition_event_tag                                        *
  *                                                                            *
  * Purpose: check event tag condition                                         *
@@ -1351,34 +1375,75 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 
 /******************************************************************************
  *                                                                            *
- * Function: check_action_conditions                                          *
+ * Function: check_events_condition                                           *
  *                                                                            *
- * Purpose: check if actions have to be processed for the event               *
- *          (check all conditions of the action)                              *
+ * Purpose: check if multiple events matches single condition                 *
  *                                                                            *
- * Parameters: actionid - action ID for matching                              *
- *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
- *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             source     - [IN] specific event source that need checking     *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_action_conditions(zbx_action_eval_t *action)
+static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char source, zbx_condition_t *condition)
 {
-	DB_CONDITION	*condition;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
+			" cond.value2:'%s'", __func__, condition->actionid, condition->conditionid,
+			condition->value, condition->value2);
+
+	switch (source)
+	{
+		case EVENT_SOURCE_TRIGGERS:
+			//check_trigger_condition(esc_events, condition);
+			break;
+		case EVENT_SOURCE_DISCOVERY:
+			//check_discovery_condition(esc_events, condition);
+			break;
+		case EVENT_SOURCE_AUTOREGISTRATION:
+			//check_auto_registration_condition(esc_events, condition);
+			break;
+		case EVENT_SOURCE_INTERNAL:
+			//check_internal_condition(esc_events, condition);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
+					source, condition->conditionid);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_action_conditions                                          *
+ *                                                                            *
+ * Purpose: check if action have to be processed for the event                *
+ *          (check all conditions of the action)                              *
+ *                                                                            *
+ * Parameters: eventid - [IN] the id of event that will be checked            *
+ *             action  - [IN] action for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t *action)
+{
+	zbx_condition_t	*condition;
 	int		condition_result, ret = SUCCEED, id_len, i;
 	unsigned char	old_type = 0xff;
 	char		*expression = NULL, tmp[ZBX_MAX_UINT64_LEN + 2], *ptr, error[256];
 	double		eval_result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, action->actionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " eventsource:%d", __func__,
+			action->actionid, (int)action->eventsource);
 
 	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		expression = zbx_strdup(expression, action->formula);
 
 	for (i = 0; i < action->conditions.values_num; i++)
 	{
-		condition = (DB_CONDITION *)action->conditions.values[i];
+		condition = (zbx_condition_t *)action->conditions.values[i];
 
 		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype && old_type == condition->conditiontype &&
 				SUCCEED == ret)
@@ -1386,7 +1451,12 @@ static int	check_action_conditions(zbx_action_eval_t *action)
 			continue;	/* short-circuit true OR condition block to the next AND condition */
 		}
 
-		condition_result = condition->condition_result;
+		condition_result = FAIL == zbx_vector_uint64_search(&condition->eventids, eventid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC) ? FAIL : SUCCEED;
+
+		zabbix_log(LOG_LEVEL_DEBUG, " conditionid:" ZBX_FS_UI64 " conditiontype:%d cond.value:'%s' "
+				"cond.value2:'%s' result:%s", condition->conditionid, (int)condition->conditiontype,
+				condition->value, condition->value2, zbx_result_string(condition_result));
 
 		switch (action->evaltype)
 		{
@@ -1448,7 +1518,6 @@ static int	check_action_conditions(zbx_action_eval_t *action)
 		zbx_free(expression);
 	}
 clean:
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1943,6 +2012,18 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 	get_escalation_events(events, esc_events);
 
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
+		if (0 == esc_events[i].values_num)
+			continue;
+
+		zbx_vector_ptr_sort(&esc_events[i], compare_events);
+
+		zbx_hashset_iter_reset(&uniq_conditions[i], &iter);
+
+		while (NULL != (condition = (zbx_condition_t *)zbx_hashset_iter_next(&iter)))
+			check_events_condition(&esc_events[i], i, condition);
+	}
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION: execute operations (except command and message  */
@@ -1952,43 +2033,31 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 		int		j;
 		const DB_EVENT	*event;
 
-		event = (const DB_EVENT *)events->values[i];
-
-		/* OK events can't start escalations - skip them */
-		if (SUCCEED == is_recovery_event(event))
+		if (FAIL == is_escalation_event((event = (const DB_EVENT *)events->values[i])))
 			continue;
 
-		if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION) ||
-				0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+		for (j = 0; j < actions.values_num; j++)
 		{
-			continue;
-		}
+			zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
 
-		if (SUCCEED == check_event_conditions(event, uniq_conditions))
-		{
-			for (j = 0; j < actions.values_num; j++)
+			if (action->eventsource != event->source)
+				continue;
+
+			if (SUCCEED == check_action_conditions(event->eventid, action))
 			{
-				zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
+				zbx_escalation_new_t	*new_escalation;
 
-				if (action->eventsource != event->source)
-					continue;
+				/* command and message operations handled by escalators even for    */
+				/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTOREGISTRATION events */
+				new_escalation = (zbx_escalation_new_t *)zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
+				new_escalation->actionid = action->actionid;
+				new_escalation->event = event;
+				zbx_vector_ptr_append(&new_escalations, new_escalation);
 
-				if (SUCCEED == check_action_conditions(action))
+				if (EVENT_SOURCE_DISCOVERY == event->source ||
+						EVENT_SOURCE_AUTOREGISTRATION == event->source)
 				{
-					zbx_escalation_new_t	*new_escalation;
-
-					/* command and message operations handled by escalators even for    */
-					/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTOREGISTRATION events  */
-					new_escalation = (zbx_escalation_new_t *)zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
-					new_escalation->actionid = action->actionid;
-					new_escalation->event = event;
-					zbx_vector_ptr_append(&new_escalations, new_escalation);
-
-					if (EVENT_SOURCE_DISCOVERY == event->source ||
-							EVENT_SOURCE_AUTOREGISTRATION == event->source)
-					{
-						execute_operations(event, action->actionid);
-					}
+					execute_operations(event, action->actionid);
 				}
 			}
 		}
@@ -1996,11 +2065,6 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
-		zbx_hashset_iter_reset(&uniq_conditions[i], &iter);
-
-		while (NULL != (condition = (zbx_condition_t *)zbx_hashset_iter_next(&iter)))
-			zbx_vector_uint64_destroy(&condition->eventids);
-
 		zbx_vector_ptr_destroy(&esc_events[i]);
 		conditions_eval_clean(&uniq_conditions[i]);
 		zbx_hashset_destroy(&uniq_conditions[i]);
@@ -2153,13 +2217,19 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 	zbx_ack_task_t		*ack_task;
 	zbx_vector_ptr_t	ack_escalations, events;
 	zbx_ack_escalation_t	*ack_escalation;
+	zbx_vector_ptr_t	esc_events[EVENT_SOURCE_COUNT];
+	zbx_hashset_iter_t	iter;
+	zbx_condition_t		*condition;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&ack_escalations);
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
 		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
+		zbx_vector_ptr_create(&esc_events[i]);
+	}
 
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
@@ -2183,6 +2253,19 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 
 	zbx_db_get_events_by_eventids(&eventids, &events);
 
+	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
+		if (0 == esc_events[i].values_num)
+			continue;
+
+		zbx_vector_ptr_sort(&esc_events[i], compare_events);
+
+		zbx_hashset_iter_reset(&uniq_conditions[i], &iter);
+
+		while (NULL != (condition = (zbx_condition_t *)zbx_hashset_iter_next(&iter)))
+			check_events_condition(&esc_events[i], i, condition);
+	}
+
 	for (i = 0; i < eventids.values_num; i++)
 	{
 		int 		kcurr = knext;
@@ -2199,9 +2282,6 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 		if (0 == event->eventid || 0 == event->trigger.triggerid)
 			continue;
 
-		if (SUCCEED != check_event_conditions(event, uniq_conditions))
-			continue;
-
 		for (j = 0; j < actions.values_num; j++)
 		{
 			zbx_action_eval_t	*action = (zbx_action_eval_t *)actions.values[j];
@@ -2209,7 +2289,7 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 			if (action->eventsource != event->source)
 				continue;
 
-			if (SUCCEED != check_action_conditions(action))
+			if (SUCCEED != check_action_conditions(event->eventid, action))
 				continue;
 
 			for (k = kcurr; k < knext; k++)
@@ -2259,6 +2339,7 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 out:
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
+		zbx_vector_ptr_destroy(&esc_events[i]);
 		conditions_eval_clean(&uniq_conditions[i]);
 		zbx_hashset_destroy(&uniq_conditions[i]);
 	}
