@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/MessageBehavior.php';
 
 /**
  * @backup module
@@ -28,6 +29,19 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 class testPageAdministrationGeneralModules extends CWebTest {
 
 	use TableTrait;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			[
+				'class' => CMessageBehavior::class
+			]
+		];
+	}
 
 	public function testPageAdministrationGeneralModules_Layout() {
 		$modules = [
@@ -471,11 +485,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('button:Update')->one()->click();
 
-		// Check module update message.
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
 		// Please chenge the message below to "Module updated: 1st Module name" after ZBX-17721 is merged.
-		$this->assertEquals($message->getTitle(), 'Module disabled: 1st Module name.');
+		$this->assertMessage(TEST_GOOD, 'Module disabled: 1st Module name.');
 		// Check that Module has been updated and that there are no changes took place.
 		$this->assertEquals($initial_hash, CDBHelper::getHash($sql));
 	}
@@ -511,16 +522,13 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->query('button:Scan directory')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		// Check message after loading modules.
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-
 		if ($first_load) {
 			// Each loaded module name is checked separatelly due to difference in their sorting on Jenkinsand locally.
-			$this->assertMessage($message, 'Modules updated', ['Modules added:', '1st Module name',
+			$this->assertMessage(TEST_GOOD, 'Modules updated', ['Modules added:', '1st Module name',
 					'2nd Module name !@#$%^&*()_+', '4th Module', '5th Module', 'шестой модуль']);
 		}
 		else {
-			$this->assertEquals('No new modules discovered', $message->getTitle());
+			$this->assertMessage(TEST_GOOD, 'No new modules discovered');
 		}
 	}
 
@@ -544,6 +552,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		foreach ($module['menu_entries'] as $entry) {
 			$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
+			sleep(1);
 			$this->query($xpath.$entry['name'].'"]')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$this->assertContains('zabbix.php?action='.$entry['action'], $this->page->getCurrentURL());
@@ -587,20 +596,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	}
 
 	/**
-	 * Function checks the title and details of error messages or of messages displayed after scanning module directory.
-	 */
-	private function assertMessage($message, $title, $details) {
-		$this->assertEquals($title, $message->getTitle());
-		if (!is_array($details)) {
-			$details = [$details];
-		}
-
-		foreach ($details as $detail) {
-			$this->assertTrue($message->hasLine($detail));
-		}
-	}
-
-	/**
 	 * Function enables modules from the list in modules page or from module details form, depending on input parameters.
 	 * @param array		$data			data array with module details
 	 * @param bool		$from_form		flag that determines whether the module is enabled from module details form.
@@ -610,17 +605,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			// Change module status from Disabled to Enabled.
 			($from_form) ? $this->changeModuleStatusFromForm($module['module_name'], true) :
 					$this->changeModuleStatusFromPage($module['module_name'], 'Disabled');
-			$message = CMessageElement::find()->one();
 			// In case of negative test check error message and confirm that module wasn't applied.
 			if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
-				$this->assertTrue($message->isBad());
-				$this->assertMessage($message, $module['error_title'], $module['error_details']);
+				$this->assertMessage($module['expected'], $module['error_title'], $module['error_details']);
 				$this->assertModuleDisabled($module);
 				continue;
 			}
 			// Check message and confirm that changes, made by the enabled module, took place.
-			$this->assertTrue($message->isGood());
-			$this->assertEquals($message->getTitle(), 'Module enabled: '.$module['module_name'].'.');
+			$this->assertMessage(CTestArrayHelper::get($module, 'expected', TEST_GOOD), 'Module enabled: '.$module['module_name'].'.');
 			$this->assertModuleEnabled($module);
 		}
 	}
@@ -639,10 +631,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			// Change module status from Enabled to Disabled.
 			($from_form) ? $this->changeModuleStatusFromForm($module['module_name'], false) :
 					$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
-			$message = CMessageElement::find()->one();
 			// Check message and confirm that changes, made by the module, were revered.
-			$this->assertTrue($message->isGood());
-			$this->assertEquals($message->getTitle(), 'Module disabled: '.$module['module_name'].'.');
+			$this->assertMessage(TEST_GOOD, 'Module disabled: '.$module['module_name'].'.');
 			$this->assertModuleDisabled($module);
 		}
 	}
