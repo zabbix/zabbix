@@ -479,7 +479,7 @@ DB_ACKNOWLEDGE;
 int	DBinit(char **error);
 void	DBdeinit(void);
 
-void	DBinit_autoincrement_options();
+void	DBinit_autoincrement_options(void);
 
 int	DBconnect(int flag);
 void	DBclose(void);

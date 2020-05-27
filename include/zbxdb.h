@@ -82,7 +82,7 @@ zbx_db_value_t;
 int	zbx_db_init(const char *dbname, const char *const db_schema, char **error);
 void	zbx_db_deinit(void);
 
-void	zbx_db_init_autoincrement_options();
+void	zbx_db_init_autoincrement_options(void);
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
 			char *tlsmode, char *cert, char *key, char *ca, char *cipher, char *cipher_13);

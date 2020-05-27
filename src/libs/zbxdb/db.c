@@ -341,7 +341,7 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
  * Purpose: specify the autoincrement options during db connect               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_init_autoincrement_options()
+void	zbx_db_init_autoincrement_options(void)
 {
 	config_db_auto_increment = 1;
 }
