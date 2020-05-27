@@ -61,13 +61,15 @@ class CTriggerExpression {
 	 *   'allow_func_only' => true       Allow trigger expression without host:key pair, i.e. {func(param)}.
 	 *   'collapsed_expression' => true  Short trigger expression.
 	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
+	 *   'calculated' => false           Parse calculated item formula instead of trigger expression.
 	 *
 	 * @var array
 	 */
 	public $options = [
 		'lldmacros' => true,
 		'allow_func_only' => false,
-		'collapsed_expression' => false
+		'collapsed_expression' => false,
+		'calculated' => false
 	];
 
 	/**
@@ -180,9 +182,10 @@ class CTriggerExpression {
 	 * @param bool  $options['lldmacros']
 	 * @param bool  $options['allow_func_only']
 	 * @param bool  $options['collapsed_expression']
+	 * @param bool  $options['calculated']
 	 */
 	public function __construct(array $options = []) {
-		$this->options = array_merge($this->options, $options);
+		$this->options = $options + $this->options;
 
 		$this->binaryOperatorParser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
@@ -556,8 +559,17 @@ class CTriggerExpression {
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
 	private function parseConstant() {
-		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseString()
-				|| $this->parseUsing($this->user_macro_parser, CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)
+		if ($this->parseNumber() || $this->parseString()
+				|| $this->parseUsing($this->user_macro_parser, CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)) {
+			return true;
+		}
+
+		if ($this->options['calculated']) {
+			if ($this->parseFunction()) {
+				return true;
+			}
+		}
+		else if ($this->parseFunctionMacro()
 				|| $this->parseUsing($this->macro_parser, CTriggerExprParserResult::TOKEN_TYPE_MACRO)) {
 			return true;
 		}
@@ -571,7 +583,7 @@ class CTriggerExpression {
 			}
 		}
 
-		return ($this->options['allow_func_only'] && $this->parseFunction());
+		return ($this->options['allow_func_only'] && $this->parseFunctionOnly());
 	}
 
 	/**
@@ -580,7 +592,7 @@ class CTriggerExpression {
 	 *
 	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
-	private function parseFunction() {
+	private function parseFunctionOnly() {
 		$pos = $this->pos;
 
 		if ($this->expression[$pos] !== '{') {
@@ -691,6 +703,46 @@ class CTriggerExpression {
 			'host' => $this->function_macro_parser->getHost(),
 			'item' => $this->function_macro_parser->getItem(),
 			'function' => $this->function_macro_parser->getFunction(),
+			'functionName' => $this->function_parser->getFunction(),
+			'functionParam' => $this->function_parser->getParameters(),
+			'functionParamList' => $function_param_list
+		];
+
+		return true;
+	}
+
+	/**
+	 * Parses a function constant in the calculated item expression and
+	 * moves a current position ($this->pos) on a last symbol of the macro
+	 *
+	 * @return bool  returns true if parsed successfully, false otherwise
+	 */
+	private function parseFunction() {
+		$startPos = $this->pos;
+
+		if ($this->function_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
+			return false;
+		}
+
+		$this->pos += $this->function_parser->getLength() - 1;
+
+		$function_param_list = [];
+
+		for ($n = 0; $n < $this->function_parser->getParamsNum(); $n++) {
+			$function_param_list[] = $this->function_parser->getParam($n);
+		}
+
+		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION,
+			$this->function_parser->getMatch(), $startPos, $this->function_parser->getLength(),
+			[
+				'functionName' => $this->function_parser->getFunction(),
+				'functionParams' => $function_param_list
+			]
+		);
+
+		$this->expressions[] = [
+			'expression' => $this->function_parser->getMatch(),
+			'pos' => $startPos,
 			'functionName' => $this->function_parser->getFunction(),
 			'functionParam' => $this->function_parser->getParameters(),
 			'functionParamList' => $function_param_list
