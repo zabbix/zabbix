@@ -1102,6 +1102,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	DBinit_autoincrement_options();
+
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
@@ -1118,8 +1120,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
 	DBcheck_character_set();
-
-	DBinit_autoincrement_options();
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS

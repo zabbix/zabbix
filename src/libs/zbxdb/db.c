@@ -72,7 +72,7 @@ static char	*last_db_strerror = NULL;	/* last database error message */
 
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
-static int	CONFIG_DB_AUTO_INCREMENT;
+static int	config_db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
@@ -343,7 +343,7 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
  ******************************************************************************/
 void	zbx_db_init_autoincrement_options()
 {
-	CONFIG_DB_AUTO_INCREMENT = 1;
+	config_db_auto_increment = 1;
 }
 
 /******************************************************************************
@@ -407,7 +407,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(EXIT_FAILURE);
 	}
 
-	if (1 == CONFIG_DB_AUTO_INCREMENT)
+	if (1 == config_db_auto_increment)
 	{
 		/* Shadow global auto_increment variables. */
 		/* Setting session variables requires special permissions in MySQL 8.0.14-8.0.17. */
