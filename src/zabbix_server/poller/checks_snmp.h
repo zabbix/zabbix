@@ -30,8 +30,8 @@ extern int	CONFIG_TIMEOUT;
 
 #ifdef HAVE_NETSNMP
 void	zbx_init_snmp(void);
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result);
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num);
+int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type);
+void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type);
 void	zbx_clear_cache_snmp(void);
 #endif
 

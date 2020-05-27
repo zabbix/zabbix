@@ -436,7 +436,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	void		*buffer;
 	volatile int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:%s", __func__, param);
 
 	zbx_timespec(&es->env->start_time);
 
@@ -493,12 +493,18 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 	if (0 == duk_check_type(es->env->ctx, -1, DUK_TYPE_UNDEFINED))
 	{
 		if (0 != duk_check_type(es->env->ctx, -1, DUK_TYPE_NULL))
+		{
+			ret = SUCCEED;
 			*output = NULL;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() output: null", __func__);
+		}
 		else
-			*output = zbx_strdup(NULL, duk_safe_to_string(es->env->ctx, -1));
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, ZBX_NULL2EMPTY_STR(*output));
-		ret = SUCCEED;
+		{
+			if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), output)))
+				*error = zbx_strdup(*error, "could not convert return value to utf8");
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *output);
+		}
 	}
 	else
 		*error = zbx_strdup(*error, "undefined return value");

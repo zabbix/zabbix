@@ -269,18 +269,14 @@ static void	quote_string(char **str, size_t sz_src)
  * Purpose: quotes the individual groups in the list if necessary             *
  *                                                                            *
  ******************************************************************************/
-static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_offset, const char *groups)
+static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_offset, zbx_vector_str_t *groups)
 {
-	int	i, num;
+	int	i;
 	char	*group, *separator = "";
 
-	num = num_param(groups);
-
-	for (i = 1; i <= num; i++)
+	for (i = 1; i <= groups->values_num; i++)
 	{
-		if (NULL == (group = get_param_dyn(groups, i)))
-			continue;
-
+		group = zbx_strdup(NULL, groups->values[i - 1]);
 		zbx_strcpy_alloc(str, str_alloc, str_offset, separator);
 		separator = (char *)", ";
 
@@ -298,7 +294,7 @@ static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_of
  *          (including nested groups)                                         *
  *                                                                            *
  * Parameters: itemids - [OUT] list of item ids                               *
- *             groups  - [IN] list of comma-separated host groups             *
+ *             groups  - [IN] list of host groups                             *
  *             itemkey - [IN] item key to aggregate                           *
  *             error   - [OUT] the error message                              *
  *                                                                            *
@@ -306,35 +302,22 @@ static void	aggregate_quote_groups(char **str, size_t *str_alloc, size_t *str_of
  *               FAIL    - no items matching the specified groups or keys     *
  *                                                                            *
  ******************************************************************************/
-static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups, const char *itemkey, char **error)
+static int	aggregate_get_items(zbx_vector_uint64_t *itemids, zbx_vector_str_t *groups, const char *itemkey,
+		char **error)
 {
-	char			*group, *esc;
+	char			*esc;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		itemid;
 	char			*sql = NULL;
 	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0, error_alloc = 0, error_offset = 0;
-	int			num, n, ret = FAIL;
+	int			ret = FAIL;
 	zbx_vector_uint64_t	groupids;
-	zbx_vector_str_t	group_names;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:'%s' itemkey:'%s'", __func__, groups, itemkey);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemkey:'%s'", __func__, itemkey);
 
 	zbx_vector_uint64_create(&groupids);
-	zbx_vector_str_create(&group_names);
-
-	num = num_param(groups);
-	for (n = 1; n <= num; n++)
-	{
-		if (NULL == (group = get_param_dyn(groups, n)))
-			continue;
-
-		zbx_vector_str_append(&group_names, group);
-	}
-
-	zbx_dc_get_nested_hostgroupids_by_names(group_names.values, group_names.values_num, &groupids);
-	zbx_vector_str_clear_ext(&group_names, zbx_str_free);
-	zbx_vector_str_destroy(&group_names);
+	zbx_dc_get_nested_hostgroupids_by_names(groups, &groupids);
 
 	if (0 == groupids.values_num)
 	{
@@ -399,7 +382,7 @@ out:
  *                                                                            *
  * Parameters: item      - [IN] aggregated item                               *
  *             grp_func  - [IN] one of ZBX_GRP_FUNC_*                         *
- *             groups    - [IN] list of comma-separated host groups           *
+ *             groups    - [IN] list of host groups                           *
  *             itemkey   - [IN] item key to aggregate                         *
  *             item_func - [IN] one of ZBX_VALUE_FUNC_*                       *
  *             param     - [IN] item_func parameter (optional)                *
@@ -408,7 +391,7 @@ out:
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_aggregate(const DC_ITEM *item, AGENT_RESULT *res, int grp_func, const char *groups,
+static int	evaluate_aggregate(const DC_ITEM *item, AGENT_RESULT *res, int grp_func, zbx_vector_str_t *groups,
 		const char *itemkey, int item_func, const char *param)
 {
 	zbx_vector_uint64_t		itemids;
@@ -420,12 +403,12 @@ static int	evaluate_aggregate(const DC_ITEM *item, AGENT_RESULT *res, int grp_fu
 	char				*error = NULL;
 	zbx_timespec_t			ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
-			__func__, grp_func, groups, itemkey, item_func, ZBX_NULL2STR(param));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d itemkey:'%s' item_func:%d param:'%s'",
+			__func__, grp_func, itemkey, item_func, ZBX_NULL2STR(param));
 
 	zbx_timespec(&ts);
-
 	zbx_vector_uint64_create(&itemids);
+
 	if (FAIL == aggregate_get_items(&itemids, groups, itemkey, &error))
 	{
 		SET_MSG_RESULT(res, error);
@@ -543,14 +526,16 @@ clean1:
  ******************************************************************************/
 int	get_value_aggregate(const DC_ITEM *item, AGENT_RESULT *result)
 {
-	AGENT_REQUEST	request;
-	int		ret = NOTSUPPORTED;
-	const char	*tmp, *groups, *itemkey, *funcp = NULL;
-	int		grp_func, item_func, params_num;
+	AGENT_REQUEST		request;
+	int			ret = NOTSUPPORTED;
+	const char		*tmp, *groups, *itemkey, *funcp = NULL;
+	int			grp_func, item_func, params_num;
+	zbx_vector_str_t	group_names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key_orig);
 
 	init_request(&request);
+	zbx_vector_str_create(&group_names);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
@@ -598,6 +583,33 @@ int	get_value_aggregate(const DC_ITEM *item, AGENT_RESULT *result)
 	itemkey = get_rparam(&request, 1);
 	tmp = get_rparam(&request, 2);
 
+	if (REQUEST_PARAMETER_TYPE_ARRAY == get_rparam_type(&request, 0))
+	{
+		int				i, groups_num;
+		char				*group;
+		zbx_request_parameter_type_t	type;
+
+		groups_num = num_param(groups);
+
+		for (i = 1; i <= groups_num; i++)
+		{
+			if (NULL == (group = get_param_dyn(groups, i, &type)))
+				continue;
+
+			zbx_vector_str_append(&group_names, group);
+
+			if (REQUEST_PARAMETER_TYPE_STRING != type)
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid host group list: %s", groups));
+				goto out;
+			}
+		}
+	}
+	else
+		zbx_vector_str_append(&group_names, zbx_strdup(NULL, groups));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Host groups: '%s', Item key: '%s', Item function: '%s'", groups, itemkey, tmp);
+
 	if (0 == strcmp(tmp, "min"))
 		item_func = ZBX_VALUE_FUNC_MIN;
 	else if (0 == strcmp(tmp, "avg"))
@@ -626,11 +638,13 @@ int	get_value_aggregate(const DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (SUCCEED != evaluate_aggregate(item, result, grp_func, groups, itemkey, item_func, funcp))
+	if (SUCCEED != evaluate_aggregate(item, result, grp_func, &group_names, itemkey, item_func, funcp))
 		goto out;
 
 	ret = SUCCEED;
 out:
+	zbx_vector_str_clear_ext(&group_names, zbx_str_free);
+	zbx_vector_str_destroy(&group_names);
 	free_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

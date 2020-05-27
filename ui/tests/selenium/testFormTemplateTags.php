@@ -19,14 +19,11 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-
+require_once dirname(__FILE__).'/behaviors/FormParametersBehavior.php';
 /**
  * @backup hosts
  */
 class testFormTemplateTags extends CWebTest {
-
-	use TagTrait;
 
 	/**
 	 * The name of the template for cloning in the test data set.
@@ -41,6 +38,20 @@ class testFormTemplateTags extends CWebTest {
 	 * @var string
 	 */
 	protected $update_template = 'Template with tags for updating';
+
+	/**
+	 * Attach FormParametersBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			[
+				'class' => CFormParametersBehavior::class,
+				'table_selector' => 'id:tags-table'
+			]
+		];
+	}
 
 	public static function getCreateData() {
 		return [

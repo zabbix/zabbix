@@ -2344,6 +2344,116 @@ void	zbx_replace_invalid_utf8(char *text)
 	*out = '\0';
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: utf8_decode_3byte_sequence                                       *
+ *                                                                            *
+ * Purpose: decodes 3-byte utf-8 sequence                                     *
+ *                                                                            *
+ * Parameters: ptr - [IN] pointer to the 3 byte sequence                      *
+ *             out - [OUT] the decoded value                                  *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	utf8_decode_3byte_sequence(const char *ptr, zbx_uint32_t *out)
+{
+	*out = ((unsigned char)*ptr++ & 0xF) << 12;
+	if (0x80 != (*ptr & 0xC0))
+		return FAIL;
+
+	*out |= ((unsigned char)*ptr++ & 0x3F) << 6;
+	if (0x80 != (*ptr & 0xC0))
+		return FAIL;
+
+	*out |= ((unsigned char)*ptr & 0x3F);
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_cesu8_to_utf8                                                *
+ *                                                                            *
+ * Purpose: convert cesu8 encoded string to utf8                              *
+ *                                                                            *
+ * Parameters: cesu8 - [IN] pointer to the first char of NULL terminated CESU8*
+ *                     string                                                 *
+ *             utf8  - [OUT] on success, pointer to pointer to the first char *
+ *                     of allocated NULL terminated UTF8 string               *
+ *                                                                            *
+ * Return value: SUCCEED on success                                           *
+ *               FAIL on failure                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8)
+{
+	const char	*in, *end;
+	char		*out;
+	size_t		len;
+
+	len = strlen(cesu8);
+	out = *utf8 = zbx_malloc(*utf8, len + 1);
+	end = cesu8 + len;
+
+	for (in = cesu8; in < end;)
+	{
+		if (0x7f >= (unsigned char)*in)
+		{
+			*out++ = *in++;
+			continue;
+		}
+
+		if (0xdf >= (unsigned char)*in)
+		{
+			if (2 > end - in)
+				goto fail;
+
+			*out++ = *in++;
+			*out++ = *in++;
+			continue;
+		}
+
+		if (0xef >= (unsigned char)*in)
+		{
+			zbx_uint32_t	c1, c2, u;
+
+			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c1))
+				goto fail;
+
+			if (0xd800 > c1 || 0xdbff < c1)
+			{
+				/* normal 3-byte sequence */
+				*out++ = *in++;
+				*out++ = *in++;
+				*out++ = *in++;
+				continue;
+			}
+
+			/* decode unicode supplementary character represented as surrogate pair */
+			in += 3;
+			if (3 > end - in || FAIL == utf8_decode_3byte_sequence(in, &c2) || 0xdc00 > c2 || 0xdfff < c2)
+				goto fail;
+
+			u = 0x10000 + ((((zbx_uint32_t)c1 & 0x3ff) << 10) | (c2 & 0x3ff));
+			*out++ = 0xf0 |  u >> 18;
+			*out++ = 0x80 | (u >> 12 & 0x3f);
+			*out++ = 0x80 | (u >> 6 & 0x3f);
+			*out++ = 0x80 | (u & 0x3f);
+			in += 3;
+			continue;
+		}
+
+		/* the four-byte UTF-8 style supplementary character sequence is not supported by CESU-8 */
+		goto fail;
+	}
+	*out = '\0';
+	return SUCCEED;
+fail:
+	zbx_free(*utf8);
+	return FAIL;
+}
+
 void	dos2unix(char *str)
 {
 	char	*o = str;
@@ -4617,10 +4727,11 @@ int	num_param(const char *p)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      p       - parameter list                                              *
- *      num     - requested parameter index                                   *
- *      buf     - pointer of output buffer                                    *
- *      max_len - size of output buffer                                       *
+ *      p       - [IN]  parameter list                                        *
+ *      num     - [IN]  requested parameter index                             *
+ *      buf     - [OUT] pointer of output buffer                              *
+ *      max_len - [IN]  size of output buffer                                 *
+ *      type    - [OUT] parameter type (may be NULL)                          *
  *                                                                            *
  * Return value:                                                              *
  *      1 - requested parameter missing or buffer overflow                    *
@@ -4631,7 +4742,7 @@ int	num_param(const char *p)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_param(const char *p, int num, char *buf, size_t max_len)
+int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type)
 {
 #define ZBX_ASSIGN_PARAM				\
 {							\
@@ -4643,6 +4754,9 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
 	int	array, idx = 1;
 	size_t	buf_i = 0;
+
+	if (NULL != type)
+		*type = REQUEST_PARAMETER_TYPE_UNDEFINED;
 
 	if (0 == max_len)
 		return 1;	/* buffer overflow */
@@ -4665,13 +4779,26 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 				else if ('"' == *p)
 				{
 					state = 1;
-					if (0 != array && idx == num)
-						ZBX_ASSIGN_PARAM;
+
+					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_STRING;
+
+						if (0 != array)
+							ZBX_ASSIGN_PARAM;
+					}
 				}
 				else if ('[' == *p)
 				{
-					if (0 != array && idx == num)
-						ZBX_ASSIGN_PARAM;
+					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_ARRAY;
+
+						if (0 != array)
+							ZBX_ASSIGN_PARAM;
+					}
 					array++;
 				}
 				else if (']' == *p && 0 != array)
@@ -4690,7 +4817,13 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 				else if (' ' != *p)
 				{
 					if (idx == num)
+					{
+						if (NULL != type && REQUEST_PARAMETER_TYPE_UNDEFINED == *type)
+							*type = REQUEST_PARAMETER_TYPE_STRING;
+
 						ZBX_ASSIGN_PARAM;
+					}
+
 					state = 2;
 				}
 				break;
@@ -4897,8 +5030,9 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      p   - [IN] parameter list                                             *
- *      num - [IN] requested parameter index                                  *
+ *      p    - [IN] parameter list                                            *
+ *      num  - [IN] requested parameter index                                 *
+ *      type - [OUT] parameter type (may be NULL)                             *
  *                                                                            *
  * Return value:                                                              *
  *      NULL - requested parameter missing                                    *
@@ -4910,7 +5044,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-char	*get_param_dyn(const char *p, int num)
+char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type)
 {
 	char	*buf = NULL;
 	size_t	sz;
@@ -4920,7 +5054,7 @@ char	*get_param_dyn(const char *p, int num)
 
 	buf = (char *)zbx_malloc(buf, sz + 1);
 
-	if (0 != get_param(p, num, buf, sz + 1))
+	if (0 != get_param(p, num, buf, sz + 1, type))
 		zbx_free(buf);
 
 	return buf;
@@ -5246,7 +5380,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
 		return 1;
 
 	*pr = '\0';
-	ret = get_param(pl + 1, num, buf, max_len);
+	ret = get_param(pl + 1, num, buf, max_len, NULL);
 	*pr = ']';
 
 	return ret;
