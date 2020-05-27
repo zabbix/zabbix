@@ -109,12 +109,10 @@ err:
 #if defined(_WINDOWS) || defined(__MINGW32__)
 static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*filename;
-	int			ret = SYSINFO_RET_FAIL, file_exists, types, types_incl, types_excl;
-	HANDLE			handle;
-	wchar_t			*wpath;
-	WIN32_FIND_DATA		data;
-	zbx_stat_t		status;
+	const char	*filename;
+	int		ret = SYSINFO_RET_FAIL, file_exists = 0, types, types_incl, types_excl;
+	DWORD		file_attributes;
+	wchar_t		*wpath;
 
 	if (3 < request->nparam)
 	{
@@ -130,10 +128,6 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	/* remove directory suffix '\\' (if any, except for paths like "C:\\") as FindFirstFileW() fails */
-	if ('\0' != *(filename + 1) && ':' != *(filename + strlen(filename) - 2))
-		zbx_rtrim(filename, "/\\");
-
 	types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result);
 
 	if (ISSET_MSG(result))
@@ -142,9 +136,6 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result);
 
 	if (ISSET_MSG(result))
-		goto err;
-
-	if (ZBX_FT_OVERFLOW & (types_incl | types_excl))
 		goto err;
 
 	if (0 == types_incl)
@@ -157,78 +148,55 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
 
-	/* do not allow use of wildcards in FindFirstFileW() to match unix-like system behavior */
-	if (0 != zbx_stat(filename, &status))
-	{
-		if (errno == ENOENT)
-		{
-			file_exists = 0;
-			goto exit;
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
-					zbx_strerror(errno)));
-			goto err;
-		}
-	}
-
 	if (NULL == (wpath = zbx_utf8_to_unicode(filename)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot convert file name to UTF-16."));
 		goto err;
 	}
 
-	handle = FindFirstFileW(wpath, &data);
+	file_attributes = GetFileAttributesW(wpath);
+	zbx_free(wpath);
 
-	if (ERROR_FILE_NOT_FOUND == GetLastError())
+	if (INVALID_FILE_ATTRIBUTES == file_attributes)
 	{
-		file_exists = 0;
-		goto exit;
-	}
-	else if (INVALID_HANDLE_VALUE == handle)
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
-		zbx_free(wpath);
-		goto err;
+		DWORD	error;
+
+		switch (error = GetLastError())
+		{
+			case ERROR_FILE_NOT_FOUND:
+				goto exit;
+			case ERROR_BAD_NETPATH:	/* special case from GetFileAttributesW() documentation */
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "The specified file is a network share."
+						" Use a path to a subfolder on that share."));
+				goto err;
+			default:
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
+						strerror_from_system(error)));
+				goto err;
+		}
 	}
 
-	if (0 == FindClose(handle))
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot close file '%s': %s", __func__, filename, zbx_strerror(errno));
-
-	switch (data.dwFileAttributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
+	switch (file_attributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
 	{
 		case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
 			if (0 != (types & ZBX_FT_SYM))
 				file_exists = 1;
-			else
-				file_exists = 0;
 			break;
 		case FILE_ATTRIBUTE_REPARSE_POINT:
 						/* not a symlink directory => symlink regular file*/
 						/* counting symlink files as MS explorer */
 			if (0 != (types & ZBX_FT_FILE))
 				file_exists = 1;
-			else
-				file_exists = 0;
 			break;
 		case FILE_ATTRIBUTE_DIRECTORY:
 			if (0 != (types & ZBX_FT_DIR))
 				file_exists = 1;
-			else
-				file_exists = 0;
 			break;
 		default:	/* not a directory => regular file */
 			if (0 != (types & ZBX_FT_FILE))
-			{
-					file_exists = 1;
-			}
-			else
-				file_exists = 0;
+				file_exists = 1;
 	}
-
 exit:
-	zbx_free(wpath);
 	SET_UI64_RESULT(result, file_exists);
 	ret = SYSINFO_RET_OK;
 err:
