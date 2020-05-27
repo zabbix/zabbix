@@ -490,14 +490,18 @@ class CTriggerExpression {
 		}
 
 		if ($this->pos == 0) {
-			$this->error = _('Incorrect trigger expression.');
+			$this->error = $this->options['calculated']
+				? _('incorrect calculated item formula')
+				: _('Incorrect trigger expression.');
 			$this->isValid = false;
 		}
 
 		if ($level != 0 || isset($this->expression[$this->pos])
 				|| ($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)) {
-			$this->error = _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".',
-					substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1));
+			$exp_part = substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1);
+			$this->error = $this->options['calculated']
+				? _s('incorrect calculated item formula starting from "%1$s"', $exp_part)
+				: _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".', $exp_part);
 			$this->isValid = false;
 
 			return false;
