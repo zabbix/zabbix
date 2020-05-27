@@ -22,26 +22,24 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testPageLowLevelDiscovery extends CWebTest {
 
-	private $fields_names = ['Host groups', 'Hosts', 'Name', 'Key', 'Type', 'Update interval', 'Keep lost resources period', 'SNMP OID', 'State', 'Status'];
-	private $buttons_name = ['Apply', 'Reset'];
+
 	private $type_selection = ['Zabbix agent', 'Zabbix agent (active)', 'Simple check', 'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check',
 								'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'all'];
 	private $state_selection = ['Normal', 'Not supported', 'all'];
 	private $status_selection = ['all', 'Enabled', 'Disabled'];
-	private $headers_name = ['Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts', 'Key', 'Interval', 'Type', 'Status', 'Info'];
-	private $all_dropdown = ['Type', 'State', 'Status'];
-
 
 	public function testPageLowLevelDiscovery_CheckFilterForms() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check all field names.
+		$fields_names = ['Host groups', 'Hosts', 'Name', 'Key', 'Type', 'Update interval', 'Keep lost resources period', 'SNMP OID', 'State', 'Status'];
 		$labels = $form->getLabels()->asText();
-		$this->assertEquals($this->fields_names, $labels);
+		$this->assertEquals($fields_names, $labels);
 
 		// Check all dropdowns.
-		foreach ($this->all_dropdown as $dropdown) {
+		$all_dropdown = ['Type', 'State', 'Status'];
+		foreach ($all_dropdown as $dropdown) {
 			$true_dropdown = $form->query('name:filter_'.lcfirst($dropdown))->asDropdown();
 			switch ($dropdown) {
 				case 'Type':
@@ -69,12 +67,14 @@ class testPageLowLevelDiscovery extends CWebTest {
 		}
 
 		// Check that all buttons exists.
-		foreach ($this->buttons_name as $button){
+		$buttons_name = ['Apply', 'Reset'];
+		foreach ($buttons_name as $button){
 			$this->assertTrue($form->query('button:'.$button)->one()->isPresent());
 		}
 
 		// Check all headers that exists. Especially host.
-		foreach ($this->headers_name as $header) {
+		$headers_name = ['Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts', 'Key', 'Interval', 'Type', 'Status', 'Info'];
+		foreach ($headers_name as $header) {
 			$this->assertTrue($this->query('xpath://tr//*[contains(text(),"'.$header.'")]')->one()->isPresent());
 		}
 	}
@@ -120,12 +120,18 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	public function testPageLowLevelDiscovery_HostCheck() {
-		// Check that Hosts field and host displayed are similar.
+
+		// Check that Hosts field and host names displayed are similar.
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$hosts = $form->getField('Hosts')->asMultiselect();
-		$host_name = $hosts -> getValue();
+		$hosts_name = 'Host for host prototype tests';
+		$this->assertEquals([$hosts_name], $hosts->getSelected());
 		$table = $this->query('class:list-table')->asTable()->one();
-		$rows = $table->findRows($this->$host_name);
+		$header_names = ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'];
+		foreach ($header_names as $name) {
+			$row = $table -> findRow('Name', $name);
+			$this->assertEquals($row->getColumnData('Host', $hosts_name), $hosts_name);
+		}
 	}
 }
