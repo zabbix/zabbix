@@ -31,18 +31,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 	private $headers_name = ['Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts', 'Key', 'Interval', 'Type', 'Status', 'Info'];
 	private $all_dropdown = ['Type', 'State', 'Status'];
 
-//	// Returns all Discovery Rules
-//	public static function data() {
-//		return CDBHelper::getDataProvider(
-//			'SELECT h.hostid, i.itemid, i.name, h.host, h.status'.
-//			' FROM hosts h, items i'.
-//			' WHERE i.hostid=h.hostid'.
-//				' AND h.host LIKE \'%-layout-test%\''.
-//				' AND i.flags = '.ZBX_FLAG_DISCOVERY_RULE
-//		);
-//	}
-//
-
 
 	public function testPageLowLevelDiscovery_CheckFilterForms() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
@@ -85,7 +73,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			$this->assertTrue($form->query('button:'.$button)->one()->isPresent());
 		}
 
-		// Check all headers that exists. Especially host
+		// Check all headers that exists. Especially host.
 		foreach ($this->headers_name as $header) {
 			$this->assertTrue($this->query('xpath://tr//*[contains(text(),"'.$header.'")]')->one()->isPresent());
 		}
