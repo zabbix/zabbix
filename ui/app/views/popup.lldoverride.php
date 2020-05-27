@@ -171,6 +171,7 @@ $operations_list = (new CTable())
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
 					->setEnabled(!$options['templated'])
+					->removeId()
 			))->addClass('step-action')
 		))
 	);
