@@ -615,7 +615,7 @@ class CControllerPopupGeneric extends CController {
 				? API::HostGroup()->get([
 					'output' => ['name', 'groupid'],
 					'groupids' => $this->groupids
-				])
+				] + $group_options)
 				: [];
 
 			$filter['groups'] = [
