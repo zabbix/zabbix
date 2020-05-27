@@ -582,9 +582,10 @@ function convertUnitsS($value, $ignore_millisec = false) {
 				$parts['seconds'] = $value_abs_int;
 
 				if ($start === null || $start >= 4) {
-					$v = round(fmod($value_abs, 1) * 1000);
+					$v = fmod($value_abs, 1) * 1000;
+
 					if ($v > 0) {
-						$parts['milliseconds'] = $v;
+						$parts['milliseconds'] = formatFloat($v, null, ZBX_UNITS_ROUNDOFF_SUFFIXED);
 					}
 				}
 			}
