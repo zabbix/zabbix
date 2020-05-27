@@ -1395,16 +1395,16 @@ static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char s
 	switch (source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
-			//check_trigger_condition(esc_events, condition);
+			/* check_trigger_condition(esc_events, condition); */
 			break;
 		case EVENT_SOURCE_DISCOVERY:
-			//check_discovery_condition(esc_events, condition);
+			/* check_discovery_condition(esc_events, condition); */
 			break;
 		case EVENT_SOURCE_AUTOREGISTRATION:
-			//check_auto_registration_condition(esc_events, condition);
+			/* check_auto_registration_condition(esc_events, condition); */
 			break;
 		case EVENT_SOURCE_INTERNAL:
-			//check_internal_condition(esc_events, condition);
+			/* check_internal_condition(esc_events, condition); */
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
