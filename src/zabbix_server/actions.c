@@ -1648,6 +1648,33 @@ static int	is_recovery_event(const DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_escalation_event                                              *
+ *                                                                            *
+ * Purpose: to determine if event needs condition checks                      *
+ *                                                                            *
+ * Parameters: event - [IN] event to validate                                 *
+ *                                                                            *
+ * Return value: SUCCEED - escalations possible for event                     *
+ *               FAIL    - escalations not possible for event                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_escalation_event(const DB_EVENT *event)
+{
+	/* OK events can't start escalations - skip them */
+	if (SUCCEED == is_recovery_event(event))
+		return FAIL;
+
+	if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION))
+		return FAIL;
+
+	if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: uniq_conditions_compare_func                                     *
  *                                                                            *
  * Purpose: compare to find equal conditions                                  *
@@ -1732,6 +1759,31 @@ static int	check_event_conditions(const DB_EVENT *event, zbx_hashset_t *uniq_con
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_escalation_events                                            *
+ *                                                                            *
+ * Purpose: add events that have escalation possible and skip others, also    *
+ *          adds according to source                                          *
+ *                                                                            *
+ * Parameters: events       - [IN] events to apply actions for                *
+ *             events_num   - [IN] number of events                           *
+ *             esc_events   - [OUT] events that need condition checks         *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_escalation_events(const zbx_vector_ptr_t *events, zbx_vector_ptr_t *esc_events)
+{
+	const DB_EVENT	*event;
+	int		i;
+
+	for (i = 0; i < events->values_num; i++)
+	{
+		event = (DB_EVENT *)events->values[i];
+		if (SUCCEED == is_escalation_event(event) && EVENT_SOURCE_COUNT > (size_t)event->source)
+			zbx_vector_ptr_append(&esc_events[event->source], (void*)event);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
@@ -1748,6 +1800,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	zbx_vector_ptr_t 		new_escalations;
 	zbx_vector_uint64_pair_t	rec_escalations;
 	zbx_hashset_t			uniq_conditions[EVENT_SOURCE_COUNT];
+	zbx_vector_ptr_t		esc_events[EVENT_SOURCE_COUNT];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events->values_num);
 
@@ -1755,10 +1808,14 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	zbx_vector_uint64_pair_create(&rec_escalations);
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
+	{
 		zbx_hashset_create(&uniq_conditions[i], 0, uniq_conditions_hash_func, uniq_conditions_compare_func);
+		zbx_vector_ptr_create(&esc_events[i]);
+	}
 
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions, uniq_conditions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
+	get_escalation_events(events, esc_events);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION: execute operations (except command and message  */
@@ -1814,6 +1871,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	{
 		zbx_conditions_eval_clean(&uniq_conditions[i]);
 		zbx_hashset_destroy(&uniq_conditions[i]);
+		zbx_vector_ptr_destroy(&esc_events[i]);
 	}
 
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
