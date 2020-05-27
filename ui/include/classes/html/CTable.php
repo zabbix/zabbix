@@ -21,6 +21,7 @@
 
 class CTable extends CTag {
 
+	protected $colgroup;
 	protected $header;
 	protected $footer;
 	protected $colnum;
@@ -30,6 +31,7 @@ class CTable extends CTag {
 	public function __construct() {
 		parent::__construct('table', true);
 		$this->rownum = 0;
+		$this->colgroup = '';
 		$this->header = '';
 		$this->footer = '';
 		$this->colnum = 1;
@@ -69,6 +71,20 @@ class CTable extends CTag {
 		}
 
 		return $item;
+	}
+
+	public function setColgroup($cols_attributes) {
+		$cols = [];
+		foreach ($cols_attributes as $attributes) {
+			$col = new CTag('col');
+			foreach ($attributes as $attr_name => $attr_value) {
+				$col->setAttribute($attr_name, $attr_value);
+			}
+			$cols[] = $col;
+		}
+		$this->colgroup = new CTag('colgroup', true, $cols);
+
+		return $this;
 	}
 
 	public function setHeader($value = null) {
@@ -117,6 +133,7 @@ class CTable extends CTag {
 
 	protected function startToString() {
 		$ret = parent::startToString();
+		$ret .= $this->colgroup;
 		$ret .= $this->header;
 		$ret .= '<tbody>';
 		return $ret;

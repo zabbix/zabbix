@@ -42,6 +42,12 @@
 		<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
 			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
 		<?php endif ?>
+		<?php if ($this->data['graphtype'] != GRAPH_TYPE_NORMAL): ?>
+			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
+		<?php endif ?>
+		<?php if (!in_array($this->data['graphtype'], [GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED])): ?>
+			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+		<?php endif ?>
 	</td>
 
 	<!-- row number -->
@@ -96,8 +102,6 @@
 			<?php endforeach ?>
 			</select>
 		</td>
-	<?php else: ?>
-		<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
 	<?php endif ?>
 
 	<!-- yaxisside -->
@@ -108,8 +112,6 @@
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
 		</td>
-	<?php else: ?>
-		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
 		<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false) ?>
@@ -324,16 +326,7 @@
 
 <?php if (!$readonly): ?>
 	function initSortable() {
-		var itemsTable = jQuery('#itemsTable'),
-			itemsTableWidth = itemsTable.width(),
-			itemsTableColumns = jQuery('#itemsTable .header td'),
-			itemsTableColumnWidths = [];
-
-		itemsTableColumns.each(function() {
-			itemsTableColumnWidths[itemsTableColumnWidths.length] = jQuery(this).width();
-		});
-
-		itemsTable.sortable({
+		$('#itemsTable').sortable({
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
@@ -343,15 +336,9 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function() {
-				// force not to change table width
-				itemsTable.width(itemsTableWidth);
-			},
 			helper: function(e, ui) {
 				ui.children().each(function(i) {
-					var td = jQuery(this);
-
-					td.width(itemsTableColumnWidths[i]);
+					$(this).width($('#itemsTable th').eq(i).width());
 				});
 
 				// when dragging element on safari, it jumps out of the table
@@ -360,14 +347,15 @@
 					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
 
-				itemsTableColumns.each(function(i) {
-					jQuery(this).width(itemsTableColumnWidths[i]);
-				});
-
 				return ui;
 			},
 			start: function(e, ui) {
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+			},
+			stop: function(e, ui) {
+				ui.item.children().each(function(i) {
+					$(this).width('');
+				});
 			}
 		});
 	}

@@ -330,29 +330,48 @@ else {
 	);
 }
 
+$cols_attributes = [
+	['style' => 'width: 26px;'],
+	['style' => 'width: 20px;'],
+	['style' => 'width: ' . (($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 285 : 365) . 'px;']
+];
+if (in_array($this->data['graphtype'], [GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED])) {
+	$cols_attributes[] = ['style' => 'width: 85px;'];
+}
+$cols_attributes[] = ['style' => 'width: 85px;'];
+if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
+	$cols_attributes[] = ['style' => 'width: 85px;'];
+}
+if (in_array($this->data['graphtype'], [GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED])) {
+	$cols_attributes[] = ['style' => 'width: 85px;'];
+}
+$cols_attributes[] = ['style' => 'width: 105px;'];
+if (!$readonly) {
+	$cols_attributes[] = ['style' => 'width: 55px;'];
+}
+
 // Append items to form list.
 $items_table = (new CTable())
 	->setId('itemsTable')
+	->setColgroup($cols_attributes)
 	->setHeader([
-		(new CColHeader())->setWidth(15),
-		(new CColHeader())->setWidth(15),
-		(new CColHeader(_('Name')))->setWidth(($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
-		($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
-			? (new CColHeader(_('Type')))->setWidth(80)
+		(new CColHeader())->setAttribute('style', 'padding-right: 11px;'),
+		(new CColHeader()),
+		(new CColHeader(_('Name'))),
+		in_array($this->data['graphtype'], [GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED])
+			? new CColHeader(_('Type'))
 			: null,
-		(new CColHeader(_('Function')))->setWidth(80),
+		(new CColHeader(_('Function'))),
 		($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
 			? (new CColHeader(_('Draw style')))
 				->addClass(ZBX_STYLE_NOWRAP)
-				->setWidth(80)
 			: null,
-		($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
+		in_array($this->data['graphtype'], [GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED])
 			? (new CColHeader(_('Y axis side')))
 				->addClass(ZBX_STYLE_NOWRAP)
-				->setWidth(80)
 			: null,
-		(new CColHeader(_('Colour')))->setWidth(100),
-		$readonly ? null : (new CColHeader(_('Action')))->setWidth(50)
+		(new CColHeader(_('Colour'))),
+		$readonly ? null : (new CColHeader(_('Action')))
 	]);
 
 $popup_options_add = [
