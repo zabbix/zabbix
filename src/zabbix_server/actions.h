@@ -44,6 +44,18 @@ typedef struct
 }
 zbx_ack_escalation_t;
 
+typedef struct
+{
+	zbx_uint64_t			conditionid;
+	zbx_uint64_t			actionid;
+	char				*value;
+	char				*value2;
+	unsigned char			conditiontype;
+	unsigned char			operator;
+	zbx_vector_uint64_t		eventids;
+}
+zbx_condition_t;
+
 int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition);
 void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pair_t *closed_events);
 int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks);
