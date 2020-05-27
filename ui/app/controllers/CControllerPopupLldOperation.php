@@ -202,15 +202,17 @@ class CControllerPopupLldOperation extends CController {
 			if (array_key_exists('ophistory', $page_options)
 					&& array_key_exists('history_mode', $page_options['ophistory'])
 					&& $page_options['ophistory']['history_mode'] == ITEM_STORAGE_CUSTOM
-					&& null === timeUnitToSeconds($page_options['ophistory']['history'])) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('History storage period'), _('a time unit is expected')));
+					&& !validateTimeUnit($page_options['ophistory']['history'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true,
+						$error, ['usermacros' => true, 'lldmacros' => true])) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('History storage period'), $error));
 			}
 
 			if (array_key_exists('optrends', $page_options)
 					&& array_key_exists('trends_mode', $page_options['optrends'])
 					&& $page_options['optrends']['trends_mode'] == ITEM_STORAGE_CUSTOM
-					&& null === timeUnitToSeconds($page_options['optrends']['trends'])) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Trend storage period'), _('a time unit is expected')));
+					&& !validateTimeUnit($page_options['optrends']['trends'], SEC_PER_DAY, 25 * SEC_PER_YEAR, true,
+						$error, ['usermacros' => true, 'lldmacros' => true])) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Trend storage period'), $error));
 			}
 
 			// Return collected error messages.
