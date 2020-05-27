@@ -6,5 +6,11 @@
 	"description": "Adding top-level and sub-level menu",
 	"version": "",
 	"namespace": "Example_E",
-	"url": ""
+	"url": "",
+	"actions": {
+		"fifth.module": {
+			"class": "Test5",
+			"view": "fifth.module"
+		}
+	}
 }

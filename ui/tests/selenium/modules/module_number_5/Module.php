@@ -17,15 +17,17 @@ class Module extends CModule {
 		$menu = APP::Component()->get('menu.main');
 
 		$menu
-			->findOrAdd(_('Top level test'))
-			->setIcon('icon-administration')
+			->findOrAdd(_('Module 5 menu'))
+			->setIcon('icon-share')
 			->getSubmenu()
-			->add((new \CMenuItem('first sub menu'))->setAction('dashboard.view'));
+			->add(
+				(new \CMenuItem('пятый модуль'))->setAction('fifth.module')
+			);
 
 		$menu
-			->find(_('Top level test'))
+			->find(_('Module 5 menu'))
 			->getSubmenu()
-			->insertBefore('', (new \CMenuItem('before'))->setAction('dashboard.view'))
-			->insertAfter('', (new \CMenuItem('after'))->setAction('dashboard.view'));
+			->insertBefore('', (new \CMenuItem('Your profile'))->setAction('userprofile.edit'))
+			->insertAfter('', (new \CMenuItem('Module list'))->setAction('module.list'));
 	}
 }

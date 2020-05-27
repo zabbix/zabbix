@@ -51,6 +51,20 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Author' => '',
 				'Description' => '',
 				'Status' => 'Disabled'
+			],
+			[
+				'Name' => '5th Module',
+				'Version' => '',
+				'Author' => '',
+				'Description' => 'Adding top-level and sub-level menu',
+				'Status' => 'Disabled'
+			],
+			[
+				'Name' => 'шестой модуль',
+				'Version' => 'бета 2',
+				'Author' => 'Иосиф Кобзон',
+				'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Scripts" из секции "Administration".',
+				'Status' => 'Disabled'
 			]
 		];
 		// Open modules page and check header.
@@ -126,6 +140,32 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Homepage' => '-',
 					'Enabled' => false
 				]
+			],
+			// Module 5.
+			[
+				[
+					'Name' => '5th Module',
+					'Version' => '',
+					'Author' => '-',
+					'Description' => 'Adding top-level and sub-level menu',
+					'Directory' => 'module_number_5',
+					'Namespace' => 'Example_E',
+					'Homepage' => '-',
+					'Enabled' => false
+				]
+			],
+			// Module 6.
+			[
+				[
+					'Name' => 'шестой модуль',
+					'Version' => 'бета 2',
+					'Author' => 'Иосиф Кобзон',
+					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Scripts" из секции "Administration".',
+					'Directory' => 'module_number_6',
+					'Namespace' => 'Example_F',
+					'Homepage' => '-',
+					'Enabled' => false
+				]
 			]
 		];
 	}
@@ -148,42 +188,58 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 	public function getModuleData() {
 		return [
-			// Enable only 1st module.
+			// Enable only 1st module - '1st Module' entry added under Monitoring.
 			[
 				[
 					[
-						'name' => '1st Module name',
-						'menu_entry' => '1st Module',
-						'url' => 'zabbix.php?action=first.module',
-						'message' => 'If You see this message - 1st module is working'
+						'module_name' => '1st Module name',
+						'menu_entries' => [
+							[
+								'name' => '1st Module',
+								'action' => 'first.module',
+								'message' => 'If You see this message - 1st module is working'
+							]
+						]
 					]
 				]
 			],
-			// Enable only 2nd Module.
+			// Enable only 2nd Module - '2nd Module' entry added under Monitoring.
 			[
 				[
 					[
-						'name' => '2nd Module name !@#$%^&*()_+',
-						'menu_entry' => '2nd Module',
-						'url' => 'zabbix.php?action=second.module',
-						'message' => '2nd module is also working'
+						'module_name' => '2nd Module name !@#$%^&*()_+',
+						'menu_entries' => [
+							[
+								'name' => '2nd Module',
+								'action' => 'second.module',
+								'message' => '2nd module is also working'
+							]
+						]
 					]
 				]
 			],
-			// Enable both 1st and 2nd module.
+			// Enable both 1st and 2nd module - '1st Module' and '2nd Module' entries added under Monitoring.
 			[
 				[
 					[
-						'name' => '1st Module name',
-						'menu_entry' => '1st Module',
-						'url' => 'zabbix.php?action=first.module',
-						'message' => 'If You see this message - 1st module is working'
+						'module_name' => '1st Module name',
+						'menu_entries' => [
+							[
+								'name' => '1st Module',
+								'action' => 'first.module',
+								'message' => 'If You see this message - 1st module is working'
+							]
+						]
 					],
 					[
-						'name' => '2nd Module name !@#$%^&*()_+',
-						'menu_entry' => '2nd Module',
-						'url' => 'zabbix.php?action=second.module',
-						'message' => '2nd module is also working'
+						'module_name' => '2nd Module name !@#$%^&*()_+',
+						'menu_entries' => [
+							[
+								'name' => '2nd Module',
+								'action' => 'second.module',
+								'message' => '2nd module is also working'
+							]
+						]
 					]
 				]
 			],
@@ -191,18 +247,66 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			[
 				[
 					[
-						'name' => '1st Module name',
-						'menu_entry' => '1st Module',
-						'url' => 'zabbix.php?action=first.module',
-						'message' => 'If You see this message - 1st module is working'
+						'module_name' => '1st Module name',
+						'menu_entries' => [
+							[
+								'name' => '1st Module',
+								'action' => 'first.module',
+								'message' => 'If You see this message - 1st module is working'
+							]
+						]
 					],
 					[
 						'expected' => TEST_BAD,
-						'name' =>'4th Module',
-						'menu_entry' => '4th Module',
+						'module_name' =>'4th Module',
+						'menu_entries' => [
+							[
+								'name' => '4th Module',
+								'action' => 'forth.module'
+							]
+						],
 						'error_title' => 'Cannot enable module: 4th Module.',
 						'error_details' => 'Identical namespace (Example_A) is used by modules located at '.
 								'module_number_1, module_number_4.'
+					]
+				]
+			],
+			// Enable 5th Module - Module 5 menu top level menu is added with 3 entries.
+			[
+				[
+					[
+						'module_name' => '5th Module',
+						'top_menu_entry' => 'Module 5 menu',
+						'menu_entries' => [
+							[
+								'name' => 'Your profile',
+								'action' => 'userprofile.edit',
+								'message' => 'User profile: Zabbix Administrator',
+								'check_disabled' => false
+							],
+							[
+								'name' => 'пятый модуль',
+								'action' => 'fifth.module',
+								'message' => 'Если ты это читаешь то 5ый модуль работает'
+							],
+							[
+								'name' => 'Module list',
+								'action' => 'module.list',
+								'message' => 'Modules',
+								'check_disabled' => false
+							]
+						]
+					]
+				]
+			],
+			// Enable шестой модуль - Top level menu Reports and menu entry Screens are removed.
+			[
+				[
+					[
+						'module_name' => 'шестой модуль',
+						'remove' => true,
+						'top_menu_entry' => 'Reports',
+						'menu_entry' => 'Screens'
 					]
 				]
 			]
@@ -248,7 +352,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'expected' => [
 						'1st Module name',
 						'2nd Module name !@#$%^&*()_+',
-						'4th Module'
+						'4th Module',
+						'5th Module'
 					]
 				]
 			],
@@ -305,7 +410,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					],
 					'expected' => [
 						'1st Module name',
-						'4th Module'
+						'4th Module',
+						'5th Module',
+						'шестой модуль'
 					]
 				]
 			],
@@ -334,7 +441,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		// Before checking the filter one of the modules needs to be enabled.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Name', '2nd Module name !@#$%^&*()_+');
-		if ($row->getColumn('Status')->getText() != 'Enabled') {
+		if ($row->getColumn('Status')->getText() !== 'Enabled') {
 			$row->query('link:Disabled')->one()->click();
 		}
 
@@ -367,7 +474,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		// Check module update message.
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
-		$this->assertEquals($message->getTitle(), 'Module disabled: 1st Module name.'); // ZBX-17721
+		// Please chenge the message below to "Module updated: 1st Module name" after ZBX-17721 is merged.
+		$this->assertEquals($message->getTitle(), 'Module disabled: 1st Module name.');
 		// Check that Module has been updated and that there are no changes took place.
 		$this->assertEquals($initial_hash, CDBHelper::getHash($sql));
 	}
@@ -408,37 +516,80 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		if ($first_load) {
 			// Each loaded module name is checked separatelly due to difference in their sorting on Jenkinsand locally.
-			$this->checkModulesMessage($message, 'Modules updated', ['Modules added:', '1st Module name',
-					'2nd Module name !@#$%^&*()_+', '4th Module']);
+			$this->assertMessage($message, 'Modules updated', ['Modules added:', '1st Module name',
+					'2nd Module name !@#$%^&*()_+', '4th Module', '5th Module', 'шестой модуль']);
 		}
 		else {
-			$this->assertEquals($message->getTitle(), 'No new modules discovered');
+			$this->assertEquals('No new modules discovered', $message->getTitle());
 		}
 	}
 
 	/**
-	 * Function checks if the corresponding menu option exists, clicks on it and checks the URL and header of the page.
-	 * If the module shouldn't be enabled, the function makes sure that the corresponding menu entry doesn't exist.
+	 * Function checks if the corresponding menu entry exists, clicks on it and checks the URL and header of the page.
+	 * If the module should remove a menu entry, the function makes sure that the corresponding menu entry doesn't exist.
 	 */
-	private function checkChangesByModule($module, $presence = true) {
-		$xpath = 'xpath://ul[@class="menu-main"]//a[text()="'.$module['menu_entry'].'"]';
-		if ($presence) {
-			$this->query('link:Monitoring')->one()->click();
-			$this->query($xpath)->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
-			$this->assertContains($module['url'], $this->page->getCurrentURL());
-			$this->assertEquals($module['message'], $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-			$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
+	private function assertModuleEnabled($module) {
+		$xpath = 'xpath://ul[@class="menu-main"]//a[text()="';
+		// If module removes a menu entry or top level menu entry, check that such antries are not present.
+		if (CTestArrayHelper::get($module, 'remove', false)) {
+			$this->assertTrue($this->query($xpath.$module['menu_entry'].'"]')->count() === 0);
+			if (array_key_exists('top_menu_entry', $module)) {
+				$this->assertTrue($this->query($xpath.$module['top_menu_entry'].'"]')->count() === 0);
+			}
+
+			return;
 		}
-		else {
-			$this->assertTrue($this->query($xpath)->count() === 0);
+		// If module adds single or multiple menu entries, open each corresponding view, check view header and URL.
+		$top_entry = CTestArrayHelper::get($module, 'top_menu_entry', 'Monitoring');
+
+		foreach ($module['menu_entries'] as $entry) {
+			$this->query('link', $top_entry)->one()->waitUntilClickable()->click();
+			$this->query($xpath.$entry['name'].'"]')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+			$this->assertContains('zabbix.php?action='.$entry['action'], $this->page->getCurrentURL());
+			$this->assertEquals($entry['message'], $this->query('tag:h1')->waitUntilVisible()->one()->getText());
+		}
+		// Get back to modules list to enable or disable the next module.
+		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
+	}
+
+	/**
+	 * Function checks if the corresponding menu entry is removed and url is not active after the module is disabled.
+	 * If enabling the module removes a menu entry, the function checks that it is back after disabling the module.
+	 */
+	private function assertModuleDisabled($module) {
+		$xpath = 'xpath://ul[@class="menu-main"]//a[text()="';
+		// If module removes a menu entry or top level menu entry, check that entries are back after disabling the module.
+		if (CTestArrayHelper::get($module, 'remove', false)) {
+			$this->assertEquals(1, $this->query($xpath.$module['menu_entry'].'"]')->count());
+			if (array_key_exists('top_menu_entry', $module)) {
+				$this->assertEquals(1, $this->query($xpath.$module['top_menu_entry'].'"]')->count());
+			}
+
+			return;
+		}
+		// If module adds single or multiple menu entries, check that entries don't exist after disabling the module.
+		foreach ($module['menu_entries'] as $entry) {
+			$check_entry = CTestArrayHelper::get($module, 'top_menu_entry', $entry['name']);
+			$this->assertEquals(0, $this->query($xpath.$check_entry.'"]')->count());
+			// In case if module meny entry leads to an existing view, don't check that menu entry URL isn't available.
+			if (CTestArrayHelper::get($entry, 'check_disabled', true)) {
+				$this->page->open('zabbix.php?action='.$entry['action'])->waitUntilReady();
+				$message = CMessageElement::find()->one();
+				$this->assertContains('Class not found for action '.$entry['action'], $message->getText());
+				$this->page->open('zabbix.php?action=module.list');
+			}
+			else {
+
+				continue;
+			}
 		}
 	}
 
 	/**
 	 * Function checks the title and details of error messages or of messages displayed after scanning module directory.
 	 */
-	private function checkModulesMessage($message, $title, $details) {
+	private function assertMessage($message, $title, $details) {
 		$this->assertEquals($title, $message->getTitle());
 		if (!is_array($details)) {
 			$details = [$details];
@@ -457,24 +608,20 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	private function enableAndCheckModules($data, $from_form = false) {
 		foreach ($data as $module) {
 			// Change module status from Disabled to Enabled.
-			($from_form) ? $this->changeModuleStatusFromForm($module['name'], true) :
-					$this->changeModuleStatusFromPage($module['name'], 'Disabled');
+			($from_form) ? $this->changeModuleStatusFromForm($module['module_name'], true) :
+					$this->changeModuleStatusFromPage($module['module_name'], 'Disabled');
 			$message = CMessageElement::find()->one();
 			// In case of negative test check error message and confirm that module wasn't applied.
 			if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
 				$this->assertTrue($message->isBad());
-				$this->checkModulesMessage($message, $module['error_title'], $module['error_details']);
-				$this->checkChangesByModule($module, false);
-				if ($from_form) {
-					$this->query('button:Cancel')->one()->click();
-					$this->page->waitUntilReady();
-				}
+				$this->assertMessage($message, $module['error_title'], $module['error_details']);
+				$this->assertModuleDisabled($module);
 				continue;
 			}
 			// Check message and confirm that changes, made by the enabled module, took place.
 			$this->assertTrue($message->isGood());
-			$this->assertEquals($message->getTitle(), 'Module enabled: '.$module['name'].'.');
-			$this->checkChangesByModule($module, true);
+			$this->assertEquals($message->getTitle(), 'Module enabled: '.$module['module_name'].'.');
+			$this->assertModuleEnabled($module);
 		}
 	}
 
@@ -490,13 +637,13 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				continue;
 			}
 			// Change module status from Enabled to Disabled.
-			($from_form) ? $this->changeModuleStatusFromForm($module['name'], false) :
-					$this->changeModuleStatusFromPage($module['name'], 'Enabled');
+			($from_form) ? $this->changeModuleStatusFromForm($module['module_name'], false) :
+					$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
 			$message = CMessageElement::find()->one();
 			// Check message and confirm that changes, made by the module, were revered.
 			$this->assertTrue($message->isGood());
-			$this->assertEquals($message->getTitle(), 'Module disabled: '.$module['name'].'.');
-			$this->checkChangesByModule($module, false);
+			$this->assertEquals($message->getTitle(), 'Module disabled: '.$module['module_name'].'.');
+			$this->assertModuleDisabled($module);
 		}
 	}
 

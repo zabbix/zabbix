@@ -14,24 +14,24 @@ class Test extends CAction {
 	/**
 	 * @inheritDoc
 	 */
-	protected function checkPermissions()
-	{
+	protected function checkPermissions() {
+
 		return true;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	protected function checkInput()
-	{
+	protected function checkInput() {
+
 		return true;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	protected function doAction()
-	{
+	protected function doAction() {
+
 		$response = new \CControllerResponseData([]);
 		$response->setTitle('1st Module');
 

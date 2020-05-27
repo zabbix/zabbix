@@ -1,11 +1,11 @@
 <?php declare(strict_types = 1);
 
 
-namespace Modules\Example_A\Actions;
+namespace Modules\Example_E\Actions;
 
 use CController as CAction;
 
-class Test2 extends CAction {
+class Test5 extends CAction {
 
 	public function init() {
 		$this->disableSIDvalidation();
@@ -33,7 +33,7 @@ class Test2 extends CAction {
 	protected function doAction() {
 
 		$response = new \CControllerResponseData([]);
-		$response->setTitle('4th Module');
+		$response->setTitle('пятый модуль');
 
 		$this->setResponse($response);
 	}

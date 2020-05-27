@@ -19,8 +19,8 @@ class Module extends CModule {
 		$menu->remove(_('Reports'));
 
 		$menu
-			->find(_('Administration'))
+			->find(_('Monitoring'))
 			->getSubMenu()
-			->remove(_('Scripts'));
+			->remove(_('Screens'));
 	}
 }
