@@ -78,7 +78,7 @@ out:
   result: SYSINFO_RET_FAIL
   error: "Invalid type \"baz\"."
 ---
-test case: invalid both include and exclude types parameters
+test case: invalid both "include types" and "exclude types" parameters
 in:
   key: "vfs.file.exists[foo, bar, baz]"
 out:
