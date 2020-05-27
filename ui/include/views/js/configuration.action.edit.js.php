@@ -126,91 +126,6 @@
 		row.remove();
 	}
 
-	function removeOperationCondition(index) {
-		jQuery('#opconditions_' + index).find('*').remove();
-		jQuery('#opconditions_' + index).remove();
-
-		processOperationTypeOfCalculation();
-	}
-
-	function removeRow(id) {
-		jQuery('#' + id).remove();
-	}
-
-	function showOpTypeForm() {
-		var current_op_type,
-			optype_fieldids = {},
-			$opcommand_type = jQuery('#operation_opcommand_type'),
-			opcommand_script = '#operation_opcommand_script',
-			opcommand_execute_on = '#operation_opcommand_execute_on',
-			opcommand_port = '#operation_opcommand_port',
-			opcommand_command = '#operation_opcommand_command',
-			opcommand_command_ipmi = '#operation_opcommand_command_ipmi',
-			opcommand_authtype = '#operation_opcommand_authtype',
-			opcommand_username = '#operation_opcommand_username';
-
-		if ($opcommand_type.length == 0) {
-			return;
-		}
-
-		current_op_type = $opcommand_type.val();
-
-		optype_fieldids[opcommand_script] = [ZBX_SCRIPT_TYPES.userscript];
-		optype_fieldids[opcommand_execute_on] = [ZBX_SCRIPT_TYPES.script];
-		optype_fieldids[opcommand_port] = [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet];
-		optype_fieldids[opcommand_command] = [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet];
-		optype_fieldids[opcommand_command_ipmi] = [ZBX_SCRIPT_TYPES.ipmi];
-		optype_fieldids[opcommand_authtype] = [ZBX_SCRIPT_TYPES.ssh];
-		optype_fieldids[opcommand_username] = [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet];
-
-		for (var fieldId in optype_fieldids) {
-			var show = false;
-
-			for (var f = 0; f < optype_fieldids[fieldId].length; f++) {
-				if (current_op_type == optype_fieldids[fieldId][f]) {
-					show = true;
-				}
-			}
-
-			jQuery(fieldId)
-				.closest('li')
-				.toggle(show)
-				.find(':input')
-				.prop('disabled', !show);
-		}
-
-		showOpTypeAuth();
-	}
-
-	function showOpTypeAuth() {
-		var show_password = false,
-			show_publickey = false,
-			current_op_type = parseInt(jQuery('#operation_opcommand_type').val(), 10);
-
-		if (current_op_type === <?= ZBX_SCRIPT_TYPE_SSH ?>) {
-			var current_op_type_auth = parseInt(jQuery('#operation_opcommand_authtype').val(), 10);
-
-			show_password = (current_op_type_auth === <?= ITEM_AUTHTYPE_PASSWORD ?>);
-			show_publickey = !show_password;
-		}
-		else if (current_op_type === <?= ZBX_SCRIPT_TYPE_TELNET ?>) {
-			show_password = true;
-		}
-
-		jQuery('#operation_opcommand_password')
-			.closest('li')
-			.toggle(show_password)
-			.find(':input')
-			.prop('disabled', !show_password);
-		jQuery('#operation_opcommand_publickey, #operation_opcommand_privatekey, #opcommand_passphrase')
-			.closest('li')
-			.toggle(show_publickey)
-			.find(':input')
-			.prop('disabled', !show_publickey);
-
-		jQuery(window).trigger('resize');
-	}
-
 	function processTypeOfCalculation() {
 		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
 			$labels = jQuery('#conditionTable .label');
@@ -233,34 +148,6 @@
 
 			jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 		}
-	}
-
-	function processOperationTypeOfCalculation() {
-		var $labels = jQuery('#operationConditionTable .label');
-
-		jQuery('#operationEvaltype').closest('li').toggle($labels.length > 1);
-
-		if ($labels.length > 1) {
-			var conditions = [];
-
-			$labels.each(function(index, label) {
-				$label = jQuery(label);
-
-				conditions.push({
-					id: $label.data('formulaid'),
-					type: $label.data('conditiontype')
-				});
-			});
-
-			jQuery('#operationConditionLabel')
-				.html(getConditionFormula(conditions, +jQuery('#operationEvaltype').val()));
-		}
-	}
-
-	function resetOpmessage() {
-		jQuery('#operation_opmessage_mediatypeid').val(0);
-		jQuery('#operation_opmessage_default_msg').val(1);
-		jQuery('#operation_opmessage_subject, #operation_opmessage_message').val('');
 	}
 
 	jQuery(document).ready(function() {
