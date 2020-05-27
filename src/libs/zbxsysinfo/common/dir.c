@@ -265,7 +265,7 @@ int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid type \"%s\".", etype));
 			zbx_free(etype);
-			return type;
+			return FAIL;
 		}
 
 		ret |= type;
@@ -311,18 +311,11 @@ static int	prepare_count_parameters(const AGENT_REQUEST *request, AGENT_RESULT *
 	char	*min_size_str, *max_size_str, *min_age_str, *max_age_str;
 	time_t	now;
 
-	types_incl = zbx_etypes_to_mask(get_rparam(request, 3), result);
-
-	if (ISSET_MSG(result))
+	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 3), result)) ||
+			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 4), result)))
+	{
 		return FAIL;
-
-	types_excl = zbx_etypes_to_mask(get_rparam(request, 4), result);
-
-	if (ISSET_MSG(result))
-		return FAIL;
-
-	if (ZBX_FT_OVERFLOW & (types_incl | types_excl))
-		return FAIL;
+	}
 
 	if (0 == types_incl)
 		types_incl = ZBX_FT_ALLMASK;

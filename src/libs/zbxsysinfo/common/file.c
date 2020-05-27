@@ -128,15 +128,11 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result);
-
-	if (ISSET_MSG(result))
-		goto err;
-
-	types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result);
-
-	if (ISSET_MSG(result))
-		goto err;
+	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
+			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
+	{
+		return FAIL;
+	}
 
 	if (0 == types_incl)
 	{
@@ -223,18 +219,11 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result);
-
-	if (ISSET_MSG(result))
-		goto err;
-
-	types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result);
-
-	if (ISSET_MSG(result))
-		goto err;
-
-	if (ZBX_FT_OVERFLOW & (types_incl | types_excl))
-		goto err;
+	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
+			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
+	{
+		return FAIL;
+	}
 
 	if (0 == types_incl)
 	{
