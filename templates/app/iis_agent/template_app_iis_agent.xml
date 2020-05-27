@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-26T10:18:58Z</date>
+   <date>2020-05-27T15:26:30Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -14,7 +14,7 @@
          <description>Get metrics from IIS using Zabbix agent running on Windows&#13;
 &#13;
 &#13;
-You can discuss this template or leave feedback on our forum none&#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/401862-discussion-thread-for-official-zabbix-template-internet-information-services&#13;
 &#13;
 Template tooling version used: 0.35</description>
          <groups>
