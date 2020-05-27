@@ -131,7 +131,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
 			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
 	{
-		return FAIL;
+		goto err;
 	}
 
 	if (0 == types_incl)
@@ -222,7 +222,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
 			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
 	{
-		return FAIL;
+		goto err;
 	}
 
 	if (0 == types_incl)
