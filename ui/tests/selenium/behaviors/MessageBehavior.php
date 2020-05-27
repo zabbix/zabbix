@@ -21,12 +21,12 @@
 require_once dirname(__FILE__).'/../../include/CBehavior.php';
 
 /**
- * Behavior for name-value parameters in form related tests.
+ * Behavior for global messages.
  */
 class CMessageBehavior extends CBehavior {
 
 	/**
-	 * Function compares the title and details of messages with reference values.
+	 * Function check message type and compares the title and details of messages with reference values.
 	 *
 	 * @param constant			$expected	constant that defines whether the message should be good or bad
 	 * @param string			$title		reference title
