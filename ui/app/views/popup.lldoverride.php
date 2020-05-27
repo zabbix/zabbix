@@ -32,12 +32,15 @@ $options = $data['options'];
 $overrides_popup_form = (new CForm())
 	->cleanItems()
 	->setId('lldoverride_form')
-	->addVar('no', $options['no'])
+	->addItem((new CVar('no', $options['no']))->removeId())
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('overrides_names', $options['overrides_names'])
-	->addVar('action', 'popup.lldoverride')
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->addItem((new CVar('action', 'popup.lldoverride'))->removeId())
+	->addItem((new CInput('submit', 'submit'))
+		->addStyle('display: none;')
+		->removeId()
+	);
 
 $overrides_popup_form_list = (new CFormList())
 	->addRow(
@@ -148,6 +151,7 @@ $filter_table->setFooter(new CCol(
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
 		->setEnabled(!$options['templated'])
+		->removeId()
 ));
 
 $overrides_popup_form_list->addRow(_('Filters'),
