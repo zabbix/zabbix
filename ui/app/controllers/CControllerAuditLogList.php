@@ -28,7 +28,8 @@ class CControllerAuditLogList extends CController {
 			'resourcetype' =>		'in -1,'.implode(',', array_keys(self::getResourcesList())),
 			'filter_rst' =>			'in 1',
 			'filter_set' =>			'in 1',
-			'alias' =>				'string',
+			'userids' =>			'array_db users.userid',
+			'resourceid' =>			'string',
 			'from' =>				'range_time',
 			'to' =>					'range_time'
 		];
@@ -48,16 +49,10 @@ class CControllerAuditLogList extends CController {
 
 	protected function doAction(): void {
 		if ($this->getInput('filter_set', 0)) {
-			CProfile::update('web.auditlog.filter.alias', $this->getInput('alias', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.auditlog.filter.action', $this->getInput('auditlog_action', -1), PROFILE_TYPE_INT);
-			CProfile::update('web.auditlog.filter.resourcetype', $this->getInput('resourcetype', -1),
-				PROFILE_TYPE_INT
-			);
+			$this->updateProfiles();
 		}
 		elseif ($this->getInput('filter_rst', 0)) {
-			CProfile::delete('web.auditlog.filter.alias');
-			CProfile::delete('web.auditlog.filter.action');
-			CProfile::delete('web.auditlog.filter.resourcetype');
+			$this->deleteProfiles();
 		}
 
 		$timeselector_options = [
@@ -71,9 +66,10 @@ class CControllerAuditLogList extends CController {
 
 		$data = [
 			'page' => 1,
-			'alias' => CProfile::get('web.auditlog.filter.alias', ''),
+			'userids' => CProfile::getArray('web.auditlog.filter.userids', []),
 			'resourcetype' => CProfile::get('web.auditlog.filter.resourcetype', -1),
 			'auditlog_action' => CProfile::get('web.auditlog.filter.action', -1),
+			'resourceid' => CProfile::get('web.auditlog.filter.resourceid', ''),
 			'action' => $this->getAction(),
 			'actions' => $this->getActionsList(),
 			'resources' => $this->getResourcesList(),
@@ -91,6 +87,10 @@ class CControllerAuditLogList extends CController {
 
 		if (array_key_exists((int) $data['resourcetype'], $data['resources'])) {
 			$filter['resourcetype'] = $data['resourcetype'];
+		}
+
+		if ($data['resourceid'] !== '') {
+			$filter['resourceid'] = $data['resourceid'];
 		}
 
 		$config = select_config();
@@ -113,14 +113,16 @@ class CControllerAuditLogList extends CController {
 			$params['time_till'] = $data['timeline']['to_ts'];
 		}
 
-		if ($data['alias']) {
+		if ($data['userids']) {
 			$users = API::User()->get([
-				'output' => ['userid', 'alias'],
-				'filter' => ['alias' => $data['alias']]
+				'output' => ['userid', 'alias', 'name', 'surname'],
+				'userids' => $data['userids']
 			]);
 
+			$data['userids'] = $this->sanitizeUsersForMultiselect($users);
+
 			if ($users) {
-				$params['userids'] = $users[0]['userid'];
+				$params['userids'] = array_column($users, 'userid');
 				$data['auditlogs'] = API::AuditLog()->get($params);
 			}
 		}
@@ -217,5 +219,31 @@ class CControllerAuditLogList extends CController {
 			AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
 			AUDIT_RESOURCE_MODULE => _('Module')
 		];
+	}
+
+	private function updateProfiles(): void {
+		CProfile::updateArray('web.auditlog.filter.userids', $this->getInput('userids', []), PROFILE_TYPE_INT);
+		CProfile::update('web.auditlog.filter.action', $this->getInput('auditlog_action', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.auditlog.filter.resourcetype', $this->getInput('resourcetype', -1),
+			PROFILE_TYPE_INT
+		);
+		CProfile::update('web.auditlog.filter.resourceid', $this->getInput('resourceid', ''), PROFILE_TYPE_INT);
+	}
+
+	private function deleteProfiles(): void {
+		CProfile::delete('web.auditlog.filter.userids');
+		CProfile::delete('web.auditlog.filter.action');
+		CProfile::delete('web.auditlog.filter.resourcetype');
+		CProfile::delete('web.auditlog.filter.resourceid');
+	}
+
+	private function sanitizeUsersForMultiselect(array $users): array {
+		$users = array_map(function (array $value): array {
+			return ['id' => $value['userid'], 'name' => getUserFullname($value)];
+		}, $users);
+
+		CArrayHelper::sort($users, ['name']);
+
+		return $users;
 	}
 }
