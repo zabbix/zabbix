@@ -725,7 +725,6 @@ insert_javascript_for_visibilitybox();
 	 * @param {object} override_ref  Reference to override instance from Overrides object.
 	 */
 	function OverrideEditForm($form, override_ref) {
-		console.log(typeof override_ref);
 		this.$form = $form;
 		this.override = override_ref;
 
