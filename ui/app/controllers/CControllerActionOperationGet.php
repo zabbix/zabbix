@@ -224,7 +224,7 @@ class CControllerActionOperationGet extends CController {
 					'output' => ['userid', 'alias', 'name', 'surname'],
 					'userids' => array_column($operation['opmessage_usr'], 'userid')
 				]);
-				order_result($db_users, 'alias');
+				CArrayHelper::sort($db_users, ['alias']);
 
 				foreach ($db_users as $db_user) {
 					$users[] = [
@@ -234,14 +234,16 @@ class CControllerActionOperationGet extends CController {
 				}
 			}
 
+			$mediatypes = API::MediaType()->get(['output' => ['mediatypeid', 'name']]);
+			CArrayHelper::sort($mediatypes, ['name']);
+			$mediatypes = array_values($mediatypes);
+
 			return [
 				'custom_message' => $operation['opmessage']['default_msg'] === '0',
 				'subject' => $operation['opmessage']['subject'],
 				'body' => $operation['opmessage']['message'],
 				'mediatypeid' => $operation['opmessage']['mediatypeid'],
-				'mediatypes' => API::MediaType()->get([
-					'output' => ['mediatypeid', 'name']
-				]),
+				'mediatypes' => $mediatypes,
 				'usergroups' => $usergroups,
 				'users' => $users,
 			];
