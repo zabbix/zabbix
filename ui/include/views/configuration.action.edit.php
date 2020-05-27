@@ -327,9 +327,17 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			if (!isset($operation['opconditions'])) {
 				$operation['opconditions'] = [];
 			}
-			if (!array_key_exists('mediatypeid', $operation['opmessage'])) {
-				$operation['opmessage']['mediatypeid'] = 0;
+
+			if (!array_key_exists('opmessage', $operation)) {
+				$operation['opmessage'] = [];
 			}
+
+			$operation['opmessage'] += [
+				'mediatypeid' => '0',
+				'message' => '',
+				'subject' => '',
+				'default_msg' => '1'
+			];
 
 			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
 
