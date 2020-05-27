@@ -72,6 +72,8 @@ static char	*last_db_strerror = NULL;	/* last database error message */
 
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
+static int	CONFIG_DB_AUTO_INCREMENT;
+
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
@@ -105,8 +107,6 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #if defined(HAVE_ORACLE)
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
-
-extern unsigned char	program_type;
 
 static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *db_error, const char *context)
 {
@@ -336,6 +336,18 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_db_init_autoincrement_options                                *
+ *                                                                            *
+ * Purpose: specify the autoincrement options during db connect               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_init_autoincrement_options()
+{
+	CONFIG_DB_AUTO_INCREMENT = 1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_db_connect                                                   *
  *                                                                            *
  * Purpose: connect to the database                                           *
@@ -395,7 +407,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(EXIT_FAILURE);
 	}
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (1 == CONFIG_DB_AUTO_INCREMENT)
 	{
 		/* Shadow global auto_increment variables. */
 		/* Setting session variables requires special permissions in MySQL 8.0.14-8.0.17. */
