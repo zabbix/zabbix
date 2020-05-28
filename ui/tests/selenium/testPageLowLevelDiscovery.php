@@ -22,62 +22,43 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testPageLowLevelDiscovery extends CWebTest {
 
-
-	const HOST_ID = 90001;
-	private $type_selection = ['Zabbix agent', 'Zabbix agent (active)', 'Simple check', 'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check',
-								'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'all'];
-	private $state_selection = ['Normal', 'Not supported', 'all'];
-	private $status_selection = ['all', 'Enabled', 'Disabled'];
-
-	public function testPageLowLevelDiscovery_CheckFilterForms() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+	public function testPageLowLevelDiscovery_CheckLayout() {
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check all field names.
-		$fields_names = ['Host groups', 'Hosts', 'Name', 'Key', 'Type', 'Update interval', 'Keep lost resources period', 'SNMP OID', 'State', 'Status'];
+		$fields = ['Host groups', 'Hosts', 'Name', 'Key', 'Type', 'Update interval',
+			'Keep lost resources period', 'SNMP OID', 'State', 'Status'];
 		$labels = $form->getLabels()->asText();
-		$this->assertEquals($fields_names, $labels);
+		$this->assertEquals($fields, $labels);
 
 		// Check all dropdowns.
-		$all_dropdown = ['Type', 'State', 'Status'];
-		foreach ($all_dropdown as $dropdown) {
-			$true_dropdown = $form->query('name:filter_'.lcfirst($dropdown))->asDropdown();
-			switch ($dropdown) {
-				case 'Type':
-					foreach ($this -> type_selection as $type) {
-						$true_dropdown->one()->select($type);
-						$form->submit();
-						$this->assertEquals($true_dropdown->one()->getValue(), $type);
-					}
-					break;
-				case 'State':
-					foreach ($this->state_selection as $state) {
-						$true_dropdown->one()->select($state);
-						$form -> submit();
-						$this ->assertEquals($true_dropdown->one()->getValue(), $state);
-					}
-					break;
-				case 'Status':
-					foreach ($this->status_selection as $status) {
-						$true_dropdown->one()->select($status);
-						$form->submit();
-						$this->assertEquals($true_dropdown->one()->getValue(), $status);
-					}
-					break;
+		$dropdowns = [
+			'Type' => ['all','Zabbix agent', 'Zabbix agent (active)', 'Simple check', 'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check',
+					'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item'],
+			'State' => ['Normal', 'Not supported', 'all'],
+			'Status' => ['all', 'Enabled', 'Disabled']
+		];
+
+		foreach ($dropdowns as $name => $values) {
+			foreach ($values as $value) {
+				$form->fill([$name => $value]);
+				$form->submit();
+				$form->invalidate();
+				$this->assertEquals($form->getField($name)->getValue(), $value);
 			}
 		}
 
-		// Check that all buttons exists.
+		// Check that all buttons.
 		$buttons_name = ['Apply', 'Reset'];
 		foreach ($buttons_name as $button){
 			$this->assertTrue($form->query('button:'.$button)->one()->isPresent());
 		}
 
-		// Check all headers that exists. Especially host.
-		$headers_name = ['Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts', 'Key', 'Interval', 'Type', 'Status', 'Info'];
-		foreach ($headers_name as $header) {
-			$this->assertTrue($this->query('xpath://tr//*[contains(text(),"'.$header.'")]')->one()->isPresent());
-		}
+		// Check all headers.
+		$table = $this->query('class:list-table')->asTable()->one();
+		$headers = ['','Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts', 'Key', 'Interval', 'Type', 'Status', 'Info'];
+		$this->assertSame($headers, $table->getHeadersText());
 	}
 
 	public static function getForResetButtonCheck() {
@@ -100,7 +81,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getForResetButtonCheck
 	 */
 	public function testPageLowLevelDiscovery_ResetButton($data) {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Filling fields with neede discovery rule info.
@@ -109,30 +90,115 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Checking that needed discovery displayed and he is only one.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Name', 'Discovery rule 3');
-		$this->assertTrue($row->isPresent());
-		$row_count = $table->getRows()->count();
-		$this->assertEquals(1, $row_count);
+		$this->assertTrue($table->findRow('Name', 'Discovery rule 3')->isPresent());
+		$this->assertEquals(1, $table->getRows()->count());
 
 		// After pressing reset button, check that there is 3 discovery rules displayed again.
-		$this->query('button:Reset')->one()->click();
-		$row_count = $table->getRows()->count();
-		$this->assertEquals(3, $row_count);
+		$form->query('button:Reset')->one()->click();
+		$this->assertEquals(3, $table->getRows()->count());
 	}
 
-	public function testPageLowLevelDiscovery_HostCheck() {
+	public static function getFilterData() {
+		return [
+			[
+				[
+					'filter' => [
+						'Host groups' => 'Zabbix servers',
+					],
+					'expected' => [
+						'count' => 23
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Hosts' => [
+							'values' => ['Simple form test host'],
+							'context' => 'Zabbix servers'
+						]
+					],
+					'expected' => [
+						'count' => 5,
+						'names' => ['testFormDiscoveryRule',
+							'testFormDiscoveryRule1',
+							'testFormDiscoveryRule2',
+							'testFormDiscoveryRule3',
+							'testFormDiscoveryRule4']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'testFormDiscoveryRule2',
+					],
+					'expected' => [
+						'count' => 1,
+						'names' => ['testFormDiscoveryRule2']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Update interval' => '0',
+					],
+					'expected' => [
+						'count' => 2,
+						'names' => ['Test discovery rule', 'Test discovery rule']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Hosts' => [
+							'values' => ['Visible host for template linkage', 'Test item host'],
+							'context' => 'Zabbix servers'
+						]
+					],
+					'expected' => [
+						'count' => 2,
+						'names' => ['delete Discovery Rule', 'Test discovery rule']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Hosts' => [
+							'values' => ['Visible host for template linkage', 'Test item host'],
+							'context' => 'Zabbix servers'
+						],
+						'Key' => 'key'
+					],
+					'expected' => [
+						'count' => 1,
+						'names' => ['delete Discovery Rule']
+					]
+				]
+			]
+		];
+	}
 
-		// Check that Hosts field and host names displayed are similar.
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+	/**
+	 * @dataProvider getFilterData
+	 */
+	public function testPageLowLevelDiscovery_Filter($data) {
+		$this->page->login()->open('host_discovery.php?filter_name=&filter_key='
+			. '&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='
+			. '&filter_state=-1&filter_status=-1&filter_set=1');
 		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$hosts = $form->getField('Hosts')->asMultiselect();
-		$hosts_name = 'Host for host prototype tests';
-		$this->assertEquals([$hosts_name], $hosts->getSelected());
+		$form->fill($data['filter']);
+		$form->submit();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$header_names = ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'];
-		foreach ($header_names as $name) {
-			$row = $table -> findRow('Name', $name);
-			$this->assertEquals($row->getColumnData('Host', $hosts_name), $hosts_name);
+		$this->assertEquals($data['expected']['count'], $table->getRows()->count());
+
+		if (array_key_exists('names', $data['expected'])) {
+			foreach ($data['expected']['names'] as $i => $name){
+				$this->assertEquals($name, $table->getRow($i)->getColumn('Name')->getText());
+			}
 		}
 	}
 }
