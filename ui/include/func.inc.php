@@ -999,14 +999,6 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 	$temp = [];
 	foreach ($macros as $key => $macro) {
-		// When sort by "macro" field, then need trim context quotes for valid result.
-		if ($sortfield === 'macro') {
-			// preg_match search quotes. If macro has quotes then replace this macro with macro without quotes.
-			$macro[$sortfield] = (preg_match('/\:\s*\".+\"/', $macro[$sortfield]) === 1)
-				? preg_replace('/(\:)\s*(\")(.+)(\")/', '\1\3', $macro[$sortfield])
-				: $macro[$sortfield];
-		}
-
 		$temp[$key] = substr($macro[$sortfield], 2, strlen($macro[$sortfield]) - 3);
 	}
 	order_result($temp, null, $order);
