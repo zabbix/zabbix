@@ -46,6 +46,44 @@
 #   modification, are permitted in any medium without royalty provided
 #   the copyright notice and this notice are preserved.
 
+AC_DEFUN([LIBMYSQL_OPTIONS_TRY],
+[
+	AC_MSG_CHECKING([for MySQL init options function])
+	AC_TRY_LINK(
+[
+#include <mysql.h>
+],
+[
+	MYSQL		*mysql;
+
+	mysql_options(mysql, MYSQL_INIT_COMMAND, "set @@session.auto_increment_offset=1");
+],
+	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS], [mysql_options], [Define mysql options])
+	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS_ARGS_VOID_CAST], [], [Define void cast for mysql options args])
+	found_mysql_options="yes"
+	AC_MSG_RESULT(yes),
+	AC_MSG_RESULT(no))
+])
+
+AC_DEFUN([LIBMARIADB_OPTIONS_TRY],
+[
+	AC_MSG_CHECKING([for MariaDB init options function])
+	AC_TRY_LINK(
+[
+#include <mysql.h>
+],
+[
+	MYSQL	*mysql;
+
+	mysql_optionsv(mysql, MYSQL_INIT_COMMAND, (void *)"set @@session.auto_increment_offset=1");
+],
+	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS], [mysql_optionsv], [Define mysql options])
+	AC_DEFINE_UNQUOTED([MYSQL_OPTIONS_ARGS_VOID_CAST], [(void *)], [Define void cast for mysql options args])
+	found_mariadb_options="yes"
+	AC_MSG_RESULT(yes),
+	AC_MSG_RESULT(no))
+])
+
 AC_DEFUN([LIBMYSQL_TLS_TRY_LINK],
 [
 	AC_MSG_CHECKING([for TLS support in MySQL library])
@@ -202,6 +240,15 @@ AC_DEFUN([AX_LIB_MYSQL],
                 LIBMYSQL_TLS_CIPHERS_TRY_LINK([no])
             else
                 LIBMARIADB_TLS_TRY_LINK([no])
+            fi
+
+            LIBMARIADB_OPTIONS_TRY([no])
+            if test "$found_mariadb_options" != "yes"; then
+                LIBMYSQL_OPTIONS_TRY([no])
+                if test "$found_mysql_options" != "yes"; then
+                    AC_MSG_RESULT([no])
+                    AC_MSG_ERROR([Could not find the options function for mysql init])
+                fi
             fi
 
             LDFLAGS="${_save_mysql_ldflags}"

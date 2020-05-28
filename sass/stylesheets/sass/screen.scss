@@ -1481,6 +1481,15 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			display: inline-block;
 		}
 	}
+
+	.dynamic-row > td {
+		padding-top: 0;
+	}
+
+	.dynamic-row-control > td {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
 }
 
 .table-forms-separator {
@@ -2132,7 +2141,6 @@ $icon-widget-btn: (
 	widget-collapse: url($sprite-path) no-repeat -6px -654px,
 	widget-expand: url($sprite-path) no-repeat -6px -689px,
 	widget-edit: url($sprite-path) no-repeat -42px -619px,
-	widget-delete: url($sprite-path) no-repeat -42px -582px,
 	alarm-on: url($sprite-path) no-repeat -6px -546px,
 	alarm-off: url($sprite-path) no-repeat -6px -582px,
 	sound-on: url($sprite-path) no-repeat -6px -474px,
@@ -2147,7 +2155,6 @@ $icon-widget-btn: (
 //  .btn-widget-collapse
 //  .btn-widget-expand
 //  .btn-widget-edit
-//  .btn-widget-delete
 //  .btn-alarm-on
 //  .btn-alarm-off
 //  .btn-sound-on
@@ -3116,6 +3123,15 @@ $form-icon-btn: (
 	}
 }
 
+.widget-placeholder {
+	.dashbrd-grid-widget-container {
+		.dashbrd-grid-widget-content {
+			margin-top: 0;
+			height: 100%;
+		}
+	}
+}
+
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	top: .25rem;
@@ -4017,8 +4033,21 @@ $form-icon-btn: (
 			padding: 0 10px;
 			@extend %webkit-scrollbar;
 
-			.table-forms .table-forms-td-right {
-				padding-right: 8px;
+			.table-forms {
+				.table-forms-td-right {
+					padding-right: 8px;
+				}
+
+				.table-forms-row-with-second-field {
+					position: relative;
+					transform: scale(1);
+
+					.table-forms-second-column {
+						position: absolute;
+						top: 5px;
+						right: 8px;
+					}
+				}
 			}
 
 			.columns-wrapper {
@@ -5230,7 +5259,7 @@ a.link-action {
 		}
 		@else {
 			a.link-action,
-			input[type="radio"]:checked + label {
+			input[type="radio"]:enabled:checked + label {
 				color: darken($color, 45%);
 			}
 		}
@@ -5866,6 +5895,11 @@ svg {
 	}
 }
 
+.lld-overrides-operations-table {
+	white-space: normal;
+	word-break: break-word;
+}
+
 .overrides-list {
 	display: table;
 	width: 90%;
@@ -6474,6 +6508,7 @@ svg {
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
+.icon-action-unack,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -6544,6 +6579,10 @@ svg {
 
 .icon-action-ack::before {
 	background-position: -323px -245px;
+}
+
+.icon-action-unack::before {
+	background-position: -173px -245px;
 }
 
 .icon-invisible::before {
@@ -7182,5 +7221,21 @@ table.preprocessing-test-results {
 	.interface-btn-toggle {
 		display: inline-block;
 		@extend %btn-widget;
+	}
+}
+
+// Media type test log popup
+#mediatype_testlog {
+	.logitems {
+		overflow: auto;
+		margin-bottom: 10px;
+
+		pre {
+			white-space: nowrap;
+		}
+	}
+
+	.logtotalms {
+		margin-bottom: 10px;
 	}
 }

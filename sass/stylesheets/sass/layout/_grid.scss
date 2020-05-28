@@ -20,16 +20,12 @@ aside,
 	overflow: auto;
 	position: relative;
 
-	& > header + [class^="msg-"],
 	& > [class^="msg-"] + [class^="msg-"] {
 		margin-top: 0;
 	}
 
 	&.layout-kioskmode {
-
 		main {
-			padding: 10px;
-
 			// Set the same speed as for the sliding headers of the widgets.
 			@if $ui-transitions {
 				transition: margin-top .3s;
@@ -54,6 +50,11 @@ aside,
 	& > .debug-output {
 		flex-shrink: 0;
 	}
+
+	& > output {
+		box-sizing: border-box;
+		min-width: 1200px;
+	}
 }
 
 header,
@@ -62,13 +63,10 @@ footer {
 	min-width: 1200px;
 }
 
-header {
-	margin-bottom: 10px;
-}
-
 main {
-	padding: 0 10px;
+	position: relative;
 	min-width: 1200px;
+	padding: 10px;
 }
 
 footer {

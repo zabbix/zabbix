@@ -262,7 +262,7 @@ func main() {
 		if argVerbose {
 			level = log.Trace
 		} else {
-			level = log.Empty
+			level = log.None
 		}
 		if err := log.Open(log.Console, level, "", 0); err != nil {
 			fatalExit("cannot initialize logger", err)

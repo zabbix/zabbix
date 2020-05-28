@@ -258,7 +258,7 @@ int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result)
 		char	*etype;
 		int	type;
 
-		if (NULL == (etype = get_param_dyn(etypes, n)))
+		if (NULL == (etype = get_param_dyn(etypes, n, NULL)))
 			continue;
 
 		if (ZBX_FT_OVERFLOW & (type = etype_to_mask(etype)))
