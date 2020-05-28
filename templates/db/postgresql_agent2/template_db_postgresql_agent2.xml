@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-22T00:00:00Z</date>
+   <date>2020-05-28T22:25:10Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -114,7 +114,7 @@
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Collect all metrics from pg_stat_activity</description>
+               <description>Size of files to archive</description>
                <applications>
                   <application>
                      <name>PostgreSQL</name>
@@ -291,6 +291,38 @@
                </master_item>
             </item>
             <item>
+               <name>Checkpoint: Checkpoint write time</name>
+               <type>DEPENDENT</type>
+               <key>pgsql.bgwriter.checkpoint_write_time.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds</description>
+               <applications>
+                  <application>
+                     <name>PostgreSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.checkpoint_write_time</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>pgsql.bgwriter</key>
+               </master_item>
+            </item>
+            <item>
                <name>Checkpoint: Requested</name>
                <type>DEPENDENT</type>
                <key>pgsql.bgwriter.checkpoints_req.rate</key>
@@ -361,6 +393,38 @@
                   <step>
                      <type>JSONPATH</type>
                      <params>$.maxwritten_clean</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>pgsql.bgwriter</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Checkpoint: Checkpoint sync time</name>
+               <type>DEPENDENT</type>
+               <key>pgsql.bgwriter.sync_time.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk</description>
+               <applications>
+                  <application>
+                     <name>PostgreSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.sync_time</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
                   </step>
                   <step>
                      <type>CHANGE_PER_SECOND</type>
@@ -447,7 +511,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                <key>pgsql.connections.fastpath_function_call</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of connections in a transaction state, but not executing a query</description>
+               <description>Total number of connections executing a fast-path function</description>
                <applications>
                   <application>
                      <name>PostgreSQL</name>
@@ -660,6 +724,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
+               <units>s</units>
                <description>Time spent reading data file blocks by backends, in milliseconds</description>
                <applications>
                   <application>
@@ -670,6 +735,10 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   <step>
                      <type>JSONPATH</type>
                      <params>$.blk_read_time</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -683,6 +752,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
+               <units>s</units>
                <description>Time spent writing data file blocks by backends, in milliseconds</description>
                <applications>
                   <application>
@@ -693,6 +763,10 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   <step>
                      <type>JSONPATH</type>
                      <params>$.blk_read_time</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.001</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1172,7 +1246,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                <name>Replication: Lag in bytes</name>
                <key>pgsql.replication.lag.b</key>
                <history>7d</history>
-               <units>b</units>
+               <units>B</units>
                <description>Replication lag with Master in byte.</description>
                <applications>
                   <application>
@@ -1225,7 +1299,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                <key>pgsql.uptime</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <units>ms</units>
+               <units>s</units>
                <applications>
                   <application>
                      <name>PostgreSQL</name>
@@ -1336,7 +1410,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                      <name>DB {#DBNAME}: Get bloating tables</name>
                      <key>pgsql.db.bloating_tables[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"]</key>
                      <history>7d</history>
-                     <description>Number of scans done for table/index in the database</description>
+                     <description>Number оf bloating tables</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>PostgreSQL: DB {#DBNAME}</name>
@@ -1355,6 +1429,70 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                            <name>PostgreSQL: DB {#DBNAME}</name>
                         </application_prototype>
                      </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Disk blocks read per second</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>Time spent reading data file blocks by backends, in milliseconds</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].blk_read_time</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.dbstat</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>DB {#DBNAME}: Disk blocks read per second</name>
+                     <type>DEPENDENT</type>
+                     <key>pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>s</units>
+                     <description>Time spent writing data file blocks by backends, in milliseconds</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>PostgreSQL: DB {#DBNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$['{#DBNAME}'].blk_write_time</params>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>0.001</params>
+                        </step>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>pgsql.dbstat</key>
+                     </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>DB {#DBNAME}: Blocks hit per second</name>
@@ -1669,7 +1807,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
-                     <description>Total number of rows updated by queries in this database</description>
+                     <description>Number of rows returned by queries in this database</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>PostgreSQL: DB {#DBNAME}</name>

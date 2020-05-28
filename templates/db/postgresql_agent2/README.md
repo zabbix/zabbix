@@ -4,15 +4,35 @@
 ## Overview
 
 For Zabbix version: 5.0  
-
+The template is developed for monitoring DBMS PostgreSQL and its forks.
 
 
 
 This template was tested on:
 
-- PostgreSQL, version 12.0
+- PostgreSQL, version 10, 11, 12
+- Zabbix, version 5.0
 
 ## Setup
+
+1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
+
+```bash
+CREATE USER 'zbx_monitor' IDENTIFIED BY '<password>';
+```
+
+2\. Edit pg_hba.conf to allow connections from Zabbix agent:
+
+```bash
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+    host            all              zbx_monitor            127.0.0.1   	         md5
+```
+
+For more information please read the PostgreSQL documentation https://www.postgresql.org/docs/current/auth-pg-hba-conf.html.
+
+3\. Set in the {$PG.URI} macro the system data source name of the PostgreSQL instance such as <protocol(host:port)>.
+
+4\. Set the user name and password in host macros ({$PG.USER} and {$PG.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.
 
 
 
@@ -56,12 +76,14 @@ There are no template links in this template.
 |PostgreSQL |Checkpoint: Buffers checkpoints written |<p>Number of buffers written during checkpoints</p> |DEPENDENT |pgsql.bgwriter.buffers_checkpoint.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.buffers_checkpoint`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Checkpoint: By timeout |<p>Number of scheduled checkpoints that have been performed</p> |DEPENDENT |pgsql.bgwriter.checkpoints_timed.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checkpoints_timed`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Checkpoint: Requested |<p>Number of requested checkpoints that have been performed</p> |DEPENDENT |pgsql.bgwriter.checkpoints_req.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checkpoints_req`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |Checkpoint: Checkpoint write time |<p>Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds</p> |DEPENDENT |pgsql.bgwriter.checkpoint_write_time.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checkpoint_write_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |Checkpoint: Checkpoint sync time |<p>Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk</p> |DEPENDENT |pgsql.bgwriter.sync_time.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.sync_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Archive: Count of archive files |<p>Collect all metrics from pg_stat_activity\nhttps://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW</p> |DEPENDENT |pgsql.archive.count_archived_files<p>**Preprocessing**:</p><p>- JSONPATH: `$.archived_count`</p> |
 |PostgreSQL |Archive: Count of attempts to archive files |<p>Collect all metrics from pg_stat_activity\nhttps://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW</p> |DEPENDENT |pgsql.archive.failed_trying_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.failed_count`</p> |
 |PostgreSQL |Archive: Count of files in archive_status need to archive |<p>-</p> |DEPENDENT |pgsql.archive.count_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.count_files`</p> |
-|PostgreSQL |Archive: Count of files need to archive |<p>Collect all metrics from pg_stat_activity</p> |DEPENDENT |pgsql.archive.size_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.size_files`</p> |
-|PostgreSQL |Dbstat: Blocks read time |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_read_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p> |
-|PostgreSQL |Dbstat: Blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_write_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p> |
+|PostgreSQL |Archive: Count of files need to archive |<p>Size of files to archive</p> |DEPENDENT |pgsql.archive.size_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.size_files`</p> |
+|PostgreSQL |Dbstat: Blocks read time |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_read_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p><p>- MULTIPLIER: `0.001`</p> |
+|PostgreSQL |Dbstat: Blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_write_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p><p>- MULTIPLIER: `0.001`</p> |
 |PostgreSQL |Dbstat: Checksum failures |<p>Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12</p> |DEPENDENT |pgsql.dbstat.sum.checksum_failures.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checksum_failures`</p><p>- MATCHES_REGEX: `^\d*$`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Dbstat: Committed transactions |<p>Number of transactions that have been committed</p> |DEPENDENT |pgsql.dbstat.sum.xact_commit.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.xact_commit`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Dbstat: Conflicts |<p>Number of queries canceled due to conflicts with recovery.  (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)</p> |DEPENDENT |pgsql.dbstat.sum.conflicts.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.conflicts`</p><p>- CHANGE_PER_SECOND |
@@ -78,7 +100,7 @@ There are no template links in this template.
 |PostgreSQL |Dbstat: Rows updated |<p>Number of rows updated by queries</p> |DEPENDENT |pgsql.dbstat.sum.tup_updated.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.tup_updated`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |Dbstat: Backends connected |<p>Number of connected backends</p> |DEPENDENT |pgsql.dbstat.sum.numbackends<p>**Preprocessing**:</p><p>- JSONPATH: `$.numbackends`</p> |
 |PostgreSQL |Connections sum: Active |<p>Total number of connections executing a query</p> |DEPENDENT |pgsql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.active`</p> |
-|PostgreSQL |Connections sum: Fastpath function call |<p>Total number of connections in a transaction state, but not executing a query</p> |DEPENDENT |pgsql.connections.fastpath_function_call<p>**Preprocessing**:</p><p>- JSONPATH: `$.idle_in_transaction`</p> |
+|PostgreSQL |Connections sum: Fastpath function call |<p>Total number of connections executing a fast-path function</p> |DEPENDENT |pgsql.connections.fastpath_function_call<p>**Preprocessing**:</p><p>- JSONPATH: `$.idle_in_transaction`</p> |
 |PostgreSQL |Connections sum: Idle |<p>Total number of connections waiting for a new client command</p> |DEPENDENT |pgsql.connections.idle<p>**Preprocessing**:</p><p>- JSONPATH: `$.idle`</p> |
 |PostgreSQL |Connections sum: Idle in transaction |<p>Total number of connections in a transaction state, but not executing a query</p> |DEPENDENT |pgsql.connections.idle_in_transaction<p>**Preprocessing**:</p><p>- JSONPATH: `$.idle_in_transaction`</p> |
 |PostgreSQL |Connections sum: Prepared |<p>Total number of prepared transactions\nhttps://www.postgresql.org/docs/current/sql-prepare-transaction.html</p> |DEPENDENT |pgsql.connections.prepared<p>**Preprocessing**:</p><p>- JSONPATH: `$.prepared`</p> |
@@ -98,7 +120,7 @@ There are no template links in this template.
 |PostgreSQL |Replication: Status |<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</p> |ZABBIX_PASSIVE |pgsql.replication.status |
 |PostgreSQL |PostgreSQL: Ping |<p>-</p> |ZABBIX_PASSIVE |pgsql.ping<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |PostgreSQL |DB {#DBNAME}: Database age |<p>Database age</p> |ZABBIX_PASSIVE |pgsql.db.age[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"] |
-|PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number of scans done for table/index in the database</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"] |
+|PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number оf bloating tables</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Database size |<p>Database size</p> |ZABBIX_PASSIVE |pgsql.db.size[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Blocks hit per second |<p>Total number of times disk blocks were found already in the buffer cache, so that a read was not necessary</p> |DEPENDENT |pgsql.dbstat.blks_hit.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blks_hit`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Total number of disk blocks read in this database</p> |DEPENDENT |pgsql.dbstat.blks_read.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blks_read`</p><p>- CHANGE_PER_SECOND |
@@ -109,12 +131,14 @@ There are no template links in this template.
 |PostgreSQL |DB {#DBNAME}: Tuples deleted per second |<p>Total number of rows deleted by queries in this database</p> |DEPENDENT |pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tup_deleted`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Tuples fetched per second |<p>Total number of rows fetched by queries in this database</p> |DEPENDENT |pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tup_fetched`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Tuples inserted per second |<p>Total number of rows inserted by queries in this database</p> |DEPENDENT |pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tup_inserted`</p><p>- CHANGE_PER_SECOND |
-|PostgreSQL |DB {#DBNAME}: Tuples returned per second |<p>Total number of rows updated by queries in this database</p> |DEPENDENT |pgsql.dbstat.tup_returned.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tup_returned`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |DB {#DBNAME}: Tuples returned per second |<p>Number of rows returned by queries in this database</p> |DEPENDENT |pgsql.dbstat.tup_returned.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tup_returned`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Tuples updated per second |<p>Total number of rows updated by queries in this database</p> |DEPENDENT |pgsql.dbstat.tup_updated.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].tup_updated`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Commits per second |<p>Number of transactions in this database that have been committed</p> |DEPENDENT |pgsql.dbstat.xact_commit.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].xact_commit`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Rollbacks per second |<p>Total number of transactions in this database that have been rolled back</p> |DEPENDENT |pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].xact_rollback`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Backends connected |<p>Number of backends currently connected to this database</p> |DEPENDENT |pgsql.dbstat.numbackends["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].numbackends`</p> |
 |PostgreSQL |DB {#DBNAME}: Checksum failures |<p>Number of data page checksum failures detected in this database</p> |DEPENDENT |pgsql.dbstat.checksum_failures.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].checksum_failures`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_read_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_write_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Num of accessexclusive locks |<p>Number of accessexclusive locks for each database</p> |DEPENDENT |pgsql.locks.accessexclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].accessexclusive`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of accessshare locks |<p>Number of accessshare locks for each database</p> |DEPENDENT |pgsql.locks.accessshare["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].accessshare`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of exclusive locks |<p>Number of exclusive locks for each database</p> |DEPENDENT |pgsql.locks.exclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].exclusive`</p> |
