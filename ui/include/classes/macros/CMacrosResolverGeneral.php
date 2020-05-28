@@ -1012,7 +1012,7 @@ class CMacrosResolverGeneral {
 					}
 
 					if (!array_key_exists($macro, $host_macros[$hostid])) {
-						$host_macros[$hostid][$macro] = ['value' => null, 'contexts' => []];
+						$host_macros[$hostid][$macro] = ['value' => null, 'contexts' => [], 'regex' => []];
 					}
 
 					if ($context === null && $regex === null) {
@@ -1106,7 +1106,7 @@ class CMacrosResolverGeneral {
 					$value = self::getMacroValue($db_global_macro);
 
 					if (!array_key_exists($macro, $global_macros)) {
-						$global_macros[$macro] = ['value' => null, 'contexts' => []];
+						$global_macros[$macro] = ['value' => null, 'contexts' => [], 'regex' => []];
 					}
 
 					if ($context === null && $regex === null) {
@@ -1131,7 +1131,7 @@ class CMacrosResolverGeneral {
 							if ($context !== null && array_key_exists($context, $global_macros[$macro]['contexts'])) {
 								$value['value'] = $global_macros[$macro]['contexts'][$context];
 							}
-							elseif ($context !== null && array_key_exists('regex', $global_macros[$macro])) {
+							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
 								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
 									if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
 										$value['value'] = $val;
@@ -1200,13 +1200,15 @@ class CMacrosResolverGeneral {
 			$value_default = null) {
 		foreach ($hostids as $hostid) {
 			if (array_key_exists($hostid, $host_macros) && array_key_exists($macro, $host_macros[$hostid])) {
+				// Searching context coincidence with macro contexts.
 				if ($context !== null && array_key_exists($context, $host_macros[$hostid][$macro]['contexts'])) {
 					return [
 						'value' => $host_macros[$hostid][$macro]['contexts'][$context],
 						'value_default' => $value_default
 					];
 				}
-				elseif ($context !== null && array_key_exists('regex', $host_macros[$hostid][$macro])) {
+				// Searching context coincidence, if regex array not empty.
+				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
 						if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
 							return [
