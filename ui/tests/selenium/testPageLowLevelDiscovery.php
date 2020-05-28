@@ -23,13 +23,14 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testPageLowLevelDiscovery extends CWebTest {
 
 
+	const HOST_ID = 90001;
 	private $type_selection = ['Zabbix agent', 'Zabbix agent (active)', 'Simple check', 'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check',
 								'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'all'];
 	private $state_selection = ['Normal', 'Not supported', 'all'];
 	private $status_selection = ['all', 'Enabled', 'Disabled'];
 
 	public function testPageLowLevelDiscovery_CheckFilterForms() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check all field names.
@@ -99,7 +100,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getForResetButtonCheck
 	 */
 	public function testPageLowLevelDiscovery_ResetButton($data) {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Filling fields with neede discovery rule info.
@@ -122,7 +123,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	public function testPageLowLevelDiscovery_HostCheck() {
 
 		// Check that Hosts field and host names displayed are similar.
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$hosts = $form->getField('Hosts')->asMultiselect();
 		$hosts_name = 'Host for host prototype tests';
