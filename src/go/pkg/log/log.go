@@ -48,8 +48,11 @@ const Console = 3
 
 const MB = 1048576
 
+const noTimeStamp = 0
+
 var logLevel int
 var logger *log.Logger
+var syslogWriter *syslog.Writer
 
 type LogStat struct {
 	logType  int
@@ -114,15 +117,12 @@ func Open(logType int, level int, filename string, filesize int) error {
 
 	switch logType {
 	case System:
-		priority, err := getSyslogPriority(level)
+		syslogWriter, err = syslog.New(syslog.LOG_WARNING|syslog.LOG_DAEMON, "zabbix_agent2")
 		if err != nil {
 			return err
 		}
-		logwriter, err := syslog.New(priority, "zabbix_agent2")
-		if err != nil {
-			return err
-		}
-		logger = log.New(logwriter, "", log.Lmicroseconds|log.Ldate)
+		//we use this logger only if there is an error with specific log writing
+		logger = log.New(syslogWriter, "", noTimeStamp)
 	case Console:
 		logger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
 	case File:
@@ -139,38 +139,62 @@ func Open(logType int, level int, filename string, filesize int) error {
 	return nil
 }
 
-func Infof(format string, args ...interface{}) {
-	if CheckLogLevel(Info) {
-		procLog(format, args)
-	}
-}
-
 func Critf(format string, args ...interface{}) {
 	if CheckLogLevel(Crit) {
+		if logStat.logType == System {
+			procSyslog(syslogWriter.Crit, format, args)
+			return
+		}
 		procLog(format, args)
 	}
 }
 
-func Errf(format string, args ...interface{}) {
-	if CheckLogLevel(Err) {
+func Infof(format string, args ...interface{}) {
+	if CheckLogLevel(Info) {
+		if logStat.logType == System {
+			procSyslog(syslogWriter.Info, format, args)
+			return
+		}
 		procLog(format, args)
 	}
 }
 
 func Warningf(format string, args ...interface{}) {
 	if CheckLogLevel(Warning) {
+		if logStat.logType == System {
+			procSyslog(syslogWriter.Warning, format, args)
+			return
+		}
 		procLog(format, args)
 	}
 }
 
 func Tracef(format string, args ...interface{}) {
 	if CheckLogLevel(Trace) {
+		if logStat.logType == System {
+			procSyslog(syslogWriter.Debug, format, args)
+			return
+		}
 		procLog(format, args)
 	}
 }
 
 func Debugf(format string, args ...interface{}) {
 	if CheckLogLevel(Debug) {
+		if logStat.logType == System {
+			procSyslog(syslogWriter.Debug, format, args)
+			return
+		}
+		procLog(format, args)
+	}
+}
+
+func Errf(format string, args ...interface{}) {
+	if CheckLogLevel(Err) {
+		if logStat.logType == System {
+			procSyslog(syslogWriter.Err, format, args)
+			return
+		}
 		procLog(format, args)
 	}
 }
@@ -180,6 +204,16 @@ func procLog(format string, args []interface{}) {
 	defer logAccess.Unlock()
 	rotateLog()
 	logger.Printf(format, args...)
+}
+
+func procSyslog(log func(string) error, format string, args []interface{}) {
+	logAccess.Lock()
+	defer logAccess.Unlock()
+	msg := fmt.Sprintf(format, args...)
+	err := log(msg)
+	if err != nil {
+		logger.Printf("Failed to log to specific system log: %s", err)
+	}
 }
 
 func rotateLog() {
@@ -251,23 +285,4 @@ func Caller() (name string) {
 		return filepath.Base(frame.Func.Name())
 	}
 	return ""
-}
-
-func getSyslogPriority(level int) (syslog.Priority, error) {
-	switch level {
-	case Info:
-		return syslog.LOG_INFO, nil
-	case Crit:
-		return syslog.LOG_CRIT, nil
-	case Err:
-		return syslog.LOG_ERR, nil
-	case Warning:
-		return syslog.LOG_WARNING, nil
-	case Debug:
-		return syslog.LOG_DEBUG, nil
-	case Trace:
-		return syslog.LOG_DEBUG, nil
-	default:
-		return 0, errors.New("unknown system log priority level")
-	}
 }
