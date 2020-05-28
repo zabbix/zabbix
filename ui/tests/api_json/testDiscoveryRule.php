@@ -2873,5 +2873,386 @@ class testDiscoveryRule extends CAPITest {
 		// TODO: add templated discovery rules and check on errors.
 	}
 
+	public static function discoveryrule_overrides_create_data_invalid() {
+		$num = 0;
+		$new_lld_overrides = function(array $overrides) use (&$num) {
+			return [
+				'name' => 'Overrides (invalid)',
+				'key_' => 'invalid.lld.with.overrides.'.($num ++),
+				'hostid' => '50009',
+				'type' => '2',
+				'overrides' => $overrides
+			];
+		};
+
+		return [
+			// LLD rule overrides
+			'Test /1/overrides/2/name is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 2
+						],
+						[
+							'step' => 1
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2": the parameter "name" is missing.'
+			],
+			'Test /1/overrides/2/step must be numeric.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 'A'
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/step": an integer is expected.'
+			],
+			'Test /1/overrides/2/step is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 2
+						],
+						[
+							'name' => 'override 2'
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2": the parameter "step" is missing.'
+			],
+			'Test /1/overrides/2/step must be unique.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 2
+						],
+						[
+							'name' => 'override 2',
+							'step' => 2
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2": value (step)=(2) already exists.'
+			],
+			'Test /1/overrides/2/name must be unique.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 4
+						],
+						[
+							'name' => 'override',
+							'step' => 2
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2": value (name)=(override) already exists.'
+			],
+			'Test /1/overrides/1/stop field is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'stop' => 2
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/stop": value must be one of 0, 1.'
+			],
+			// LLD rule override filter
+			'Test /1/overrides/1/filter/evaltype is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => []
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter": the parameter "evaltype" is missing.'
+			],
+			'Test /1/overrides/1/filter/evaltype is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 4
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/evaltype": value must be one of 0, 1, 2, 3.'
+			],
+			'Test /1/overrides/1/filter/formula is required if /1/overrides/1/filter/evaltype == 3 (custom expression).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 9,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Formula missing for override "override".'
+			],
+			'Test /1/overrides/1/filter/formula cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'formula' => '',
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 9,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect custom expression "" for override "override": expression is empty.'
+			],
+			'Test /1/overrides/1/filter/formula cannot be incorrect.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'formula' => 'x',
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 9,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect custom expression "x" for override "override": check expression starting from "x".'
+			],
+			'Test /1/overrides/1/filter/formula refers to undefined condition (missing formulaid field).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'formula' => 'B or A',
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 9,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Condition "B" used in formula "B or A" for override "override" is not defined.'
+			],
+			'Test /1/overrides/1/filter/formula refers to undefined condition (missing another condition).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'formula' => 'B or A',
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 9,
+										'value' => '',
+										'formulaid' => 'B'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Condition "A" used in formula "B or A" for override "override" is not defined.'
+			],
+			'Test /1/overrides/1/filter/eval_formula is read_only.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'eval_formula' => 'A',
+								'formula' => 'A',
+								'conditions' => [
+									[
+										'macro' => '{#CORRECT}',
+										'operator' => 9,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter": unexpected parameter "eval_formula".'
+			],
+			// LLD rule override filter conditions
+			'Test /1/overrides/1/filter/conditions/1/macro is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'formula' => 'A',
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 9,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect filter condition macro for override "override".'
+			],
+			'Test /1/overrides/1/filter/conditions field is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter": the parameter "conditions" is missing.'
+			],
+			'Test /1/overrides/1/filter/conditions object cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'conditions' => []
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions": cannot be empty.'
+			],
+			'Test /1/overrides/1/filter/conditions/1/macro field is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'conditions' => [
+									[]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1": the parameter "macro" is missing.'
+			],
+			'Test /1/overrides/1/filter/conditions/1/value is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 9
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1": the parameter "value" is missing.'
+			],
+			'Test /1/overrides/1/filter/conditions/1/operator type is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 10
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of 8, 9.'
+			]
+		];
+	}
+
+	public static function discoveryrule_overrides_create_data_valid() {
+		return [];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_create_data_invalid
+	 * @dataProvider discoveryrule_overrides_create_data_valid
+	 */
+	public function testDiscoveryRuleOverrides_Create(array $discoveryrules, $expected_error) {
+		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
+	}
+
 	// TODO: add more tests to check other related discovery rule properties and perform more tests on templates and templated objects.
 }
