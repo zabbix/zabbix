@@ -810,17 +810,103 @@ static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: check_condition_event_tag                                        *
+ * Function: check_application_condition                                      *
  *                                                                            *
- * Purpose: check event tag condition                                         *
+ * Purpose: check application condition                                       *
  *                                                                            *
- * Parameters: event     - the event                                          *
- *             condition - condition for matching                             *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
  *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_condition_event_tag(const DB_EVENT *event, const zbx_condition_t *condition)
+static int	check_application_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids;
+	zbx_uint64_t		objectid;
+
+	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_LIKE != condition->op &&
+			CONDITION_OPERATOR_NOT_LIKE != condition->op)
+	{
+		return NOTSUPPORTED;
+	}
+
+	zbx_vector_uint64_create(&objectids);
+
+	get_object_ids(esc_events, &objectids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct t.triggerid,a.name"
+			" from applications a,items_applications i,functions f,triggers t"
+			" where a.applicationid=i.applicationid"
+			" and i.itemid=f.itemid"
+			" and f.triggerid=t.triggerid"
+			" and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", objectids.values, objectids.values_num);
+
+	result = DBselect("%s", sql);
+
+	switch (condition->op)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (0 == strcmp(row[1], condition->value))
+				{
+					ZBX_STR2UINT64(objectid, row[0]);
+					add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
+				}
+			}
+			break;
+		case CONDITION_OPERATOR_LIKE:
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (NULL != strstr(row[1], condition->value))
+				{
+					ZBX_STR2UINT64(objectid, row[0]);
+					add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
+				}
+			}
+			break;
+		case CONDITION_OPERATOR_NOT_LIKE:
+			while (NULL != (row = DBfetch(result)))
+			{
+				if (NULL == strstr(row[1], condition->value))
+				{
+					ZBX_STR2UINT64(objectid, row[0]);
+					add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
+				}
+			}
+			break;
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_condition_event_tag                                        *
+ *                                                                            *
+ * Purpose: check condition event tag                                         *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ ******************************************************************************/
+static void	check_condition_event_tag(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
 	int	i, ret, ret_continue;
 
@@ -829,31 +915,37 @@ static int	check_condition_event_tag(const DB_EVENT *event, const zbx_condition_
 	else
 		ret_continue = FAIL;
 
-	ret = ret_continue;
-
-	for (i = 0; i < event->tags.values_num && ret == ret_continue; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+		const DB_EVENT	*event = esc_events->values[i];
+		int		j;
 
-		ret = zbx_strmatch_condition(tag->tag, condition->value, condition->op);
+		ret = ret_continue;
+
+		for (j = 0; j < event->tags.values_num && ret == ret_continue; j++)
+		{
+			const zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[j];
+
+			ret = zbx_strmatch_condition(tag->tag, condition->value, condition->op);
+		}
+
+		if (SUCCEED == ret)
+			zbx_vector_uint64_append(&condition->eventids, event->eventid);
 	}
-
-	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: check_condition_event_tag_value                                  *
  *                                                                            *
- * Purpose: check event tag value condition                                   *
+ * Purpose: check condition event tag value                                   *
  *                                                                            *
- * Parameters: event     - the event                                          *
- *             condition - condition for matching                             *
- *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
  *                                                                            *
  ******************************************************************************/
-static int	check_condition_event_tag_value(const DB_EVENT *event, zbx_condition_t *condition)
+static void	check_condition_event_tag_value(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
 	int	i, ret, ret_continue;
 
@@ -862,17 +954,24 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, zbx_condition_
 	else
 		ret_continue = FAIL;
 
-	ret = ret_continue;
-
-	for (i = 0; i < event->tags.values_num && ret == ret_continue; i++)
+	for (i = 0; i < esc_events->values_num; i++)
 	{
-		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+		const DB_EVENT	*event = esc_events->values[i];
+		int		j;
 
-		if (0 == strcmp(condition->value2, tag->tag))
-			ret = zbx_strmatch_condition(tag->value, condition->value, condition->op);
+		ret = ret_continue;
+
+		for (j = 0; j < event->tags.values_num && ret == ret_continue; j++)
+		{
+			zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[j];
+
+			if (0 == strcmp(condition->value2, tag->tag))
+				ret = zbx_strmatch_condition(tag->value, condition->value, condition->op);
+		}
+
+		if (SUCCEED == ret)
+			zbx_vector_uint64_append(&condition->eventids, event->eventid);
 	}
-
-	return ret;
 }
 
 /******************************************************************************
@@ -892,9 +991,7 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, zbx_condition_
  ******************************************************************************/
 static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL, i;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -904,104 +1001,50 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 			ret = check_host_group_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			check_host_template_condition(esc_events, condition);
+			ret = check_host_template_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_HOST:
-			check_host_condition(esc_events, condition);
+			ret = check_host_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_TRIGGER:
-			check_trigger_id_condition(esc_events, condition);
+			ret = check_trigger_id_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
-			check_trigger_name_condition(esc_events, condition);
+			ret = check_trigger_name_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
-			check_trigger_severity_condition(esc_events, condition);
+			ret = check_trigger_severity_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_TIME_PERIOD:
-			check_time_period_condition(esc_events, condition);
+			ret = check_time_period_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_SUPPRESSED:
-			check_suppressed_condition(esc_events, condition);
+			ret = check_suppressed_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-			check_acknowledged_condition(esc_events, condition);
+			ret = check_acknowledged_condition(esc_events, condition);
 			break;
-	}
-
-	for (i = 0; i < esc_events->values_num; i++)
-	{
-		const DB_EVENT	*event = esc_events->values[i];
-
-		if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
-		{
-			result = DBselect(
-					"select distinct a.name"
-					" from applications a,items_applications i,functions f,triggers t"
-					" where a.applicationid=i.applicationid"
-						" and i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and t.triggerid=" ZBX_FS_UI64,
-					event->objectid);
-
-			switch (condition->op)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (0 == strcmp(row[0], condition->value))
-						{
-							ret = SUCCEED;
-							break;
-						}
-					}
-					break;
-				case CONDITION_OPERATOR_LIKE:
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (NULL != strstr(row[0], condition->value))
-						{
-							ret = SUCCEED;
-							break;
-						}
-					}
-					break;
-				case CONDITION_OPERATOR_NOT_LIKE:
-					ret = SUCCEED;
-					while (NULL != (row = DBfetch(result)))
-					{
-						if (NULL != strstr(row[0], condition->value))
-						{
-							ret = FAIL;
-							break;
-						}
-					}
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-			DBfree_result(result);
-		}
-		else if (CONDITION_TYPE_EVENT_TAG == condition->conditiontype)
-		{
-			ret = check_condition_event_tag(event, condition);
-		}
-		else if (CONDITION_TYPE_EVENT_TAG_VALUE == condition->conditiontype)
-		{
-			ret = check_condition_event_tag_value(event, condition);
-		}
-		else
-		{
+		case CONDITION_TYPE_APPLICATION:
+			ret = check_application_condition(esc_events, condition);
+			break;
+		case CONDITION_TYPE_EVENT_TAG:
+			check_condition_event_tag(esc_events, condition);
+			ret = SUCCEED;
+			break;
+		case CONDITION_TYPE_EVENT_TAG_VALUE:
+			check_condition_event_tag_value(esc_events,condition);
+			ret = SUCCEED;
+			break;
+		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
 					(int)condition->conditiontype, condition->conditionid);
-		}
+			ret = NOTSUPPORTED;
+	}
 
-		if (NOTSUPPORTED == ret)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					(int)condition->op, condition->conditionid);
-			ret = FAIL;
-		}
+	if (NOTSUPPORTED == ret)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				(int)condition->op, condition->conditionid);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
