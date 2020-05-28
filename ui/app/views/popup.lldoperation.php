@@ -155,6 +155,7 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')
 	->setEnabled(!$options['templated'])
+	->removeId()
 ]);
 
 $update_interval->addRow(
