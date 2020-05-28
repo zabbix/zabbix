@@ -622,6 +622,114 @@ static int	check_trigger_name_condition(const zbx_vector_ptr_t *esc_events, zbx_
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_trigger_severity_condition                                 *
+ *                                                                            *
+ * Purpose: check trigger severity condition                                  *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_trigger_severity_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	zbx_uint64_t	condition_value;
+	int		i;
+
+	condition_value = atoi(condition->value);
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = esc_events->values[i];
+
+		switch (condition->op)
+		{
+			case CONDITION_OPERATOR_EQUAL:
+				if (event->trigger.priority == condition_value)
+					zbx_vector_uint64_append(&condition->eventids, event->eventid);
+				break;
+			case CONDITION_OPERATOR_NOT_EQUAL:
+				if (event->trigger.priority != condition_value)
+					zbx_vector_uint64_append(&condition->eventids, event->eventid);
+				break;
+			case CONDITION_OPERATOR_MORE_EQUAL:
+				if (event->trigger.priority >= condition_value)
+					zbx_vector_uint64_append(&condition->eventids, event->eventid);
+				break;
+			case CONDITION_OPERATOR_LESS_EQUAL:
+				if (event->trigger.priority <= condition_value)
+					zbx_vector_uint64_append(&condition->eventids, event->eventid);
+				break;
+			default:
+				return NOTSUPPORTED;
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_time_period_condition                                      *
+ *                                                                            *
+ * Purpose: check time period condition                                       *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_time_period_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	char	*period;
+	int	i;
+
+	if (CONDITION_OPERATOR_IN != condition->op && CONDITION_OPERATOR_NOT_IN != condition->op)
+		return NOTSUPPORTED;
+
+	period = zbx_strdup(NULL, condition->value);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
+			MACRO_TYPE_COMMON, NULL, 0);
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = esc_events->values[i];
+		int		res;
+
+		if (SUCCEED == zbx_check_time_period(period, (time_t)event->clock, &res))
+		{
+			switch (condition->op)
+			{
+				case CONDITION_OPERATOR_IN:
+					if (SUCCEED == res)
+						zbx_vector_uint64_append(&condition->eventids, event->eventid);
+					break;
+				case CONDITION_OPERATOR_NOT_IN:
+					if (FAIL == res)
+						zbx_vector_uint64_append(&condition->eventids, event->eventid);
+					break;
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid time period \"%s\" for condition id [" ZBX_FS_UI64 "]",
+					period, condition->conditionid);
+		}
+	}
+
+	zbx_free(period);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_condition_event_tag                                        *
  *                                                                            *
  * Purpose: check event tag condition                                         *
@@ -706,7 +814,6 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	condition_value;
 	int		ret = FAIL, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -728,72 +835,19 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 		case CONDITION_TYPE_TRIGGER_NAME:
 			check_trigger_name_condition(esc_events, condition);
 			break;
+		case CONDITION_TYPE_TRIGGER_SEVERITY:
+			check_trigger_severity_condition(esc_events, condition);
+			break;
+		case CONDITION_TYPE_TIME_PERIOD:
+			check_time_period_condition(esc_events, condition);
+			break;
 	}
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
 		const DB_EVENT	*event = esc_events->values[i];
 
-		if (CONDITION_TYPE_TRIGGER_SEVERITY == condition->conditiontype)
-		{
-			condition_value = atoi(condition->value);
-
-			switch (condition->op)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					if (event->trigger.priority == condition_value)
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (event->trigger.priority != condition_value)
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_MORE_EQUAL:
-					if (event->trigger.priority >= condition_value)
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_LESS_EQUAL:
-					if (event->trigger.priority <= condition_value)
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-		}
-		else if (CONDITION_TYPE_TIME_PERIOD == condition->conditiontype)
-		{
-			char	*period;
-			int	res;
-
-			period = zbx_strdup(NULL, condition->value);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
-					MACRO_TYPE_COMMON, NULL, 0);
-
-			if (SUCCEED == zbx_check_time_period(period, (time_t)event->clock, &res))
-			{
-				switch (condition->op)
-				{
-					case CONDITION_OPERATOR_IN:
-						if (SUCCEED == res)
-							ret = SUCCEED;
-						break;
-					case CONDITION_OPERATOR_NOT_IN:
-						if (FAIL == res)
-							ret = SUCCEED;
-						break;
-					default:
-						ret = NOTSUPPORTED;
-				}
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Invalid time period \"%s\" for condition id [" ZBX_FS_UI64 "]",
-						period, condition->conditionid);
-			}
-
-			zbx_free(period);
-		}
-		else if (CONDITION_TYPE_SUPPRESSED == condition->conditiontype)
+		if (CONDITION_TYPE_SUPPRESSED == condition->conditiontype)
 		{
 			switch (condition->op)
 			{
