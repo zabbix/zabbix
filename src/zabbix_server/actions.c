@@ -53,6 +53,151 @@ static int	compare_events(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
+ * Function: add_condition_match                                              *
+ *                                                                            *
+ * Purpose: save eventids that match condition                                *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *             objectid   - [IN] object id, for example trigger or item id    *
+ *             object     - [IN] object, for example EVENT_OBJECT_TRIGGER     *
+ ******************************************************************************/
+static void	add_condition_match(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition, zbx_uint64_t objectid,
+		int object)
+{
+	int		index;
+	const DB_EVENT	event_search = {.objectid = objectid, .object = object};
+
+	if (FAIL != (index = zbx_vector_ptr_bsearch(esc_events, &event_search, compare_events)))
+	{
+		const DB_EVENT	*event = esc_events->values[index];
+		int		i;
+
+		zbx_vector_uint64_append(&condition->eventids, event->eventid);
+
+		for (i = index - 1; 0 <= i; i--)
+		{
+			event = esc_events->values[i];
+
+			if (event->objectid != objectid || event->object != object)
+				break;
+
+			zbx_vector_uint64_append(&condition->eventids, event->eventid);
+		}
+
+		for (i = index + 1; i < esc_events->values_num; i++)
+		{
+			event = esc_events->values[i];
+
+			if (event->objectid != objectid || event->object != object)
+				break;
+
+			zbx_vector_uint64_append(&condition->eventids, event->eventid);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_object_ids                                                   *
+ *                                                                            *
+ * Purpose: get objectids of escalation events                                *
+ *                                                                            *
+ * Parameters: esc_events [IN]  - events to check                             *
+ *             objectids  [OUT] - event objectids to be used in condition     *
+ *                                allocation                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_object_ids(const zbx_vector_ptr_t *esc_events, zbx_vector_uint64_t *objectids)
+{
+	int	i;
+
+	zbx_vector_uint64_reserve(objectids, esc_events->values_num);
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = esc_events->values[i];
+
+		zbx_vector_uint64_append(objectids, event->objectid);
+	}
+
+	zbx_vector_uint64_uniq(objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_host_group_condition                                       *
+ *                                                                            *
+ * Purpose: check host group condition                                        *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	char			*sql = NULL, *operation;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	objectids, groupids;
+	zbx_uint64_t		condition_value;
+
+	if (CONDITION_OPERATOR_EQUAL == condition->op)
+		operation = " and";
+	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+		operation = " and not";
+	else
+		return NOTSUPPORTED;
+
+	ZBX_STR2UINT64(condition_value, condition->value);
+
+	zbx_vector_uint64_create(&objectids);
+	zbx_vector_uint64_create(&groupids);
+
+	get_object_ids(esc_events, &objectids);
+	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		"select distinct t.triggerid"
+		" from hosts_groups hg,hosts h,items i,functions f,triggers t"
+		" where hg.hostid=h.hostid"
+			" and h.hostid=i.hostid"
+			" and i.itemid=f.itemid"
+			" and f.triggerid=t.triggerid"
+			" and");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+			objectids.values, objectids.values_num);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, operation);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values, groupids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	objectid;
+
+		ZBX_STR2UINT64(objectid, row[0]);
+		add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&groupids);
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_condition_event_tag                                        *
  *                                                                            *
  * Purpose: check event tag condition                                         *
@@ -133,7 +278,7 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, zbx_condition_
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -143,55 +288,18 @@ static int	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	switch (condition->conditiontype)
+	{
+		case CONDITION_TYPE_HOST_GROUP:
+			ret = check_host_group_condition(esc_events, condition);
+			break;
+	}
+
 	for (i = 0; i < esc_events->values_num; i++)
 	{
 		const DB_EVENT	*event = esc_events->values[i];
 
-		if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
-		{
-			zbx_vector_uint64_t	groupids;
-			char			*sql = NULL;
-			size_t			sql_alloc = 0, sql_offset = 0;
-
-			ZBX_STR2UINT64(condition_value, condition->value);
-
-			zbx_vector_uint64_create(&groupids);
-			zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct hg.groupid"
-					" from hosts_groups hg,hosts h,items i,functions f,triggers t"
-					" where hg.hostid=h.hostid"
-						" and h.hostid=i.hostid"
-						" and i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
-						" and t.triggerid=" ZBX_FS_UI64
-						" and",
-					event->objectid);
-
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
-					groupids.values_num);
-
-			result = DBselect("%s", sql);
-			zbx_free(sql);
-			zbx_vector_uint64_destroy(&groupids);
-
-			switch (condition->op)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					if (NULL != DBfetch(result))
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (NULL == DBfetch(result))
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-			DBfree_result(result);
-		}
-		else if (CONDITION_TYPE_HOST_TEMPLATE == condition->conditiontype)
+		if (CONDITION_TYPE_HOST_TEMPLATE == condition->conditiontype)
 		{
 			zbx_uint64_t	hostid, triggerid;
 
@@ -518,8 +626,6 @@ static int	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 /******************************************************************************
@@ -1361,7 +1467,7 @@ static int	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
  ******************************************************************************/
 int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition)
 {
-	int			ret = FAIL;
+	int			ret;
 	zbx_vector_ptr_t	new_escalations;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
@@ -1375,7 +1481,7 @@ int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition)
 	switch (event->source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
-			ret = check_trigger_condition(&new_escalations, condition);
+			check_trigger_condition(&new_escalations, condition);
 			break;
 		case EVENT_SOURCE_DISCOVERY:
 			ret = check_discovery_condition(&new_escalations, condition);
@@ -1390,6 +1496,8 @@ int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition)
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
 					event->source, condition->conditionid);
 	}
+
+	ret = 0 != condition->eventids.values_num ? SUCCEED : FAIL;
 
 	zbx_vector_ptr_destroy(&new_escalations);
 
@@ -1420,16 +1528,16 @@ static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char s
 	switch (source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
-			check_trigger_condition(&esc_events[source], condition);
+			check_trigger_condition(esc_events, condition);
 			break;
 		case EVENT_SOURCE_DISCOVERY:
-			check_discovery_condition(&esc_events[source], condition);
+			check_discovery_condition(esc_events, condition);
 			break;
 		case EVENT_SOURCE_AUTOREGISTRATION:
-			check_autoregistration_condition(&esc_events[source], condition);
+			check_autoregistration_condition(esc_events, condition);
 			break;
 		case EVENT_SOURCE_INTERNAL:
-			check_internal_condition(&esc_events[source], condition);
+			check_internal_condition(esc_events, condition);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
