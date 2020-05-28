@@ -227,7 +227,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	}
 	zbx_free(sql);
 	DBfree_result(result);
-
+	zbx_vector_uint64_create(&condition.eventids);
 	if (0 < tag_filters.values_num)
 		condition.op = CONDITION_OPERATOR_EQUAL;
 	else
@@ -264,6 +264,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		else
 			ret = SUCCEED;
 	}
+	zbx_vector_uint64_destroy(&condition.eventids);
 	zbx_vector_ptr_clear_ext(&tag_filters, (zbx_clean_func_t)zbx_tag_filter_free);
 	zbx_vector_ptr_destroy(&tag_filters);
 
@@ -1412,6 +1413,7 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 		condition.conditiontype	= (unsigned char)atoi(row[0]);
 		condition.op = (unsigned char)atoi(row[1]);
 		condition.value = row[2];
+		zbx_vector_uint64_create(&condition.eventids);
 
 		switch (evaltype)
 		{
@@ -1458,6 +1460,8 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 				exit = 1;
 				break;
 		}
+
+		zbx_vector_uint64_destroy(&condition.eventids);
 	}
 	DBfree_result(result);
 
