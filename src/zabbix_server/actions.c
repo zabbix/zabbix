@@ -728,6 +728,86 @@ static int	check_time_period_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 	return SUCCEED;
 }
 
+static int	check_suppressed_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	int	i;
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
+
+		switch (condition->op)
+		{
+			case CONDITION_OPERATOR_YES:
+				if (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed)
+					zbx_vector_uint64_append(&condition->eventids, event->eventid);
+				break;
+			case CONDITION_OPERATOR_NO:
+				if (ZBX_PROBLEM_SUPPRESSED_FALSE == event->suppressed)
+					zbx_vector_uint64_append(&condition->eventids, event->eventid);
+				break;
+			default:
+				return NOTSUPPORTED;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	int			i;
+	zbx_vector_uint64_t	eventids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = SUCCEED;
+
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_reserve(&eventids, esc_events->values_num);
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
+
+		zbx_vector_uint64_append(&eventids, event->eventid);
+	}
+
+	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select eventid"
+			" from events"
+			" where acknowledged=%d"
+				" and",
+			atoi(condition->value));
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
+
+	result = DBselect("%s", sql);
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	eventid;
+
+		ZBX_STR2UINT64(eventid, row[0]);
+		switch (condition->op)
+		{
+			case CONDITION_OPERATOR_EQUAL:
+				zbx_vector_uint64_append(&condition->eventids, eventid);
+				break;
+			default:
+				ret = NOTSUPPORTED;
+		}
+
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&eventids);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: check_condition_event_tag                                        *
@@ -841,50 +921,19 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 		case CONDITION_TYPE_TIME_PERIOD:
 			check_time_period_condition(esc_events, condition);
 			break;
+		case CONDITION_TYPE_SUPPRESSED:
+			check_suppressed_condition(esc_events, condition);
+			break;
+		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+			check_acknowledged_condition(esc_events, condition);
+			break;
 	}
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
 		const DB_EVENT	*event = esc_events->values[i];
 
-		if (CONDITION_TYPE_SUPPRESSED == condition->conditiontype)
-		{
-			switch (condition->op)
-			{
-				case CONDITION_OPERATOR_YES:
-					if (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed)
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NO:
-					if (ZBX_PROBLEM_SUPPRESSED_FALSE == event->suppressed)
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-		}
-		else if (CONDITION_TYPE_EVENT_ACKNOWLEDGED == condition->conditiontype)
-		{
-			result = DBselect(
-					"select acknowledged"
-					" from events"
-					" where acknowledged=%d"
-						" and eventid=" ZBX_FS_UI64,
-					atoi(condition->value),
-					event->eventid);
-
-			switch (condition->op)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					if (NULL != (row = DBfetch(result)))
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-			DBfree_result(result);
-		}
-		else if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
+		if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
 		{
 			result = DBselect(
 					"select distinct a.name"
