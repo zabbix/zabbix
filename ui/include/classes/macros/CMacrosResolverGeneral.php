@@ -1263,11 +1263,13 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get macro value refer by type.
 	 *
+	 * @static
+	 *
 	 * @param array $macro
 	 *
 	 * @return string
 	 */
-	static public function getMacroValue(array $macro): string {
+	public static function getMacroValue(array $macro): string {
 		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_SECRET_MASK : $macro['value'];
 	}
 
@@ -1278,12 +1280,14 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	static protected function sortRegexHostMacros(array $host_macros): array {
+	protected static function sortRegexHostMacros(array $host_macros): array {
 		foreach ($host_macros as &$macros) {
 			foreach ($macros as &$value) {
 				$value['regex'] = self::sortRegexMacros($value);
 			}
+			unset($value);
 		}
+		unset($macros);
 
 		return $host_macros;
 	}
@@ -1291,14 +1295,17 @@ class CMacrosResolverGeneral {
 	/**
 	 * Wrapper for sorting global macros.
 	 *
+	 * @static
+	 *
 	 * @param array $global_macros
 	 *
 	 * @return array
 	 */
-	static protected function sortRegexGlobalMacros(array $global_macros): array {
+	protected static function sortRegexGlobalMacros(array $global_macros): array {
 		foreach ($global_macros as &$value) {
 			$value['regex'] = self::sortRegexMacros($value);
 		}
+		unset($value);
 
 		return $global_macros;
 	}
@@ -1306,11 +1313,13 @@ class CMacrosResolverGeneral {
 	/**
 	 * Sort regex array by natural, case insensitive algorithm.
 	 *
+	 * @static
+	 *
 	 * @param array $macro
 	 *
 	 * @return array
 	 */
-	static private function sortRegexMacros(array $macro): array {
+	private static function sortRegexMacros(array $macro): array {
 		if (count($macro['regex']) > 1) {
 			// Create temp array.
 			$arr = [];
