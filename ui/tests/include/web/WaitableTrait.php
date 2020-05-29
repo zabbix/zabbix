@@ -18,6 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
+
 /**
  * Trait for objects implementing IWaitable interface.
  */

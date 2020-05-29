@@ -23,6 +23,13 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/CElementQuery.php';
 require_once dirname(__FILE__).'/CommandExecutor.php';
 
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\WebDriverDimension;
+use Facebook\WebDriver\Exception\NoSuchAlertException;
+use Facebook\WebDriver\WebDriverExpectedCondition;
+
 /**
  * Web page implementation.
  */
@@ -410,7 +417,7 @@ class CPage {
 		try {
 			return $this->driver->switchTo()->alert()->getText();
 		}
-		catch (NoAlertOpenException $exception) {
+		catch (NoSuchAlertException $exception) {
 			return null;
 		}
 	}
