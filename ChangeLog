@@ -40,6 +40,13 @@ A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed
 .......PS. [ZBX-15484] shadow global auto_increment variables for MySQL (arimdjonoks)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 5.0.1
 
 5.0.1rc1 was released as 5.0.1 without any changes
@@ -345,6 +352,13 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 ..F....... [ZBX-402] fixed latest data reloading to updating asynchronously (averza)
 .........T [ZBX-16695] changed default width of various screen elements in Zabbix templates from 500 to 750 pixels (Ivo, talbergs, vasilijs)
 ....I..... [ZBX-11764] fixed automake scripts; thanks to Tomasz Kłoczko for the patch (akozlovs)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.10rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.4.9
@@ -1515,6 +1529,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.22rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.21
