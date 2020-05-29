@@ -1,0 +1,1 @@
+..F....... [ZBX-17729] fixed user is always redirected back to login form when using SAML SSO if guest mode is enabled (agriscenko)
