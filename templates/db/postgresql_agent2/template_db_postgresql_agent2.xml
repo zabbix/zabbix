@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-29T09:35:13Z</date>
+   <date>2020-05-29T09:39:31Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -134,7 +134,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
             </item>
             <item>
                <name>Autovacuum: Count of autovacuum workers</name>
-               <key>pgsql.autovacuum.count</key>
+               <key>pgsql.autovacuum.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <description>Number of autovacuum workers.</description>
@@ -439,7 +439,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-V
             </item>
             <item>
                <name>PostgreSQL: Cache hit</name>
-               <key>pgsql.cache.hit</key>
+               <key>pgsql.cache.hit["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -1195,7 +1195,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>PostgreSQL: Age of oldest xid</name>
-               <key>pgsql.oldest.xid</key>
+               <key>pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <description>Age of oldest xid.</description>
@@ -1214,7 +1214,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>PostgreSQL: Ping</name>
-               <key>pgsql.ping</key>
+               <key>pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <applications>
                   <application>
@@ -1237,7 +1237,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: Standby count</name>
-               <key>pgsql.replication.count</key>
+               <key>pgsql.replication.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <description>Number of standby servers</description>
                <applications>
@@ -1248,7 +1248,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: Lag in bytes</name>
-               <key>pgsql.replication.lag.b</key>
+               <key>pgsql.replication.lag.b["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <units>B</units>
                <description>Replication lag with Master in byte.</description>
@@ -1260,7 +1260,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: Lag in seconds</name>
-               <key>pgsql.replication.lag.sec</key>
+               <key>pgsql.replication.lag.sec["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <units>s</units>
                <description>Replication lag with Master in seconds.</description>
@@ -1272,7 +1272,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: Recovery role</name>
-               <key>pgsql.replication.recovery_role</key>
+               <key>pgsql.replication.recovery_role["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <description>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</description>
                <applications>
@@ -1286,7 +1286,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>Replication: Status</name>
-               <key>pgsql.replication.status</key>
+               <key>pgsql.replication.status["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <description>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</description>
                <applications>
@@ -1300,7 +1300,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             </item>
             <item>
                <name>PostgreSQL: Uptime</name>
-               <key>pgsql.uptime</key>
+               <key>pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>s</units>
@@ -1385,7 +1385,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
             <discovery_rule>
                <name>Database discovery</name>
                <type>ZABBIX_PASSIVE</type>
-               <key>pgsql.db.discovery</key>
+               <key>pgsql.db.discovery["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <delay>1h</delay>
                <filter>
                   <evaltype>AND</evaltype>

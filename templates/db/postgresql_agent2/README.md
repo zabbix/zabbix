@@ -60,7 +60,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Database discovery |<p>-</p> |ZABBIX_PASSIVE |pgsql.db.discovery<p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$PG.LLD.FILTER.DBNAME}`</p> |
+|Database discovery |<p>-</p> |ZABBIX_PASSIVE |pgsql.db.discovery["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$PG.LLD.FILTER.DBNAME}`</p> |
 
 ## Items collected
 
@@ -109,16 +109,16 @@ There are no template links in this template.
 |PostgreSQL |Connections sum: Waiting |<p>Total number of waiting connections</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</p> |DEPENDENT |pgsql.connections.waiting<p>**Preprocessing**:</p><p>- JSONPATH: `$.waiting`</p> |
 |PostgreSQL |Connections sum: Idle in transaction (aborted) |<p>Total number of connections in a transaction state, but not executing a query and one of the statements in the transaction caused an error.</p> |DEPENDENT |pgsql.connections.idle_in_transaction_aborted<p>**Preprocessing**:</p><p>- JSONPATH: `$.idle_in_transaction_aborted`</p> |
 |PostgreSQL |Connections sum: Disabled |<p>Total number of disabled connections</p> |DEPENDENT |pgsql.connections.disabled<p>**Preprocessing**:</p><p>- JSONPATH: `$.disabled`</p> |
-|PostgreSQL |PostgreSQL: Age of oldest xid |<p>Age of oldest xid.</p> |ZABBIX_PASSIVE |pgsql.oldest.xid |
-|PostgreSQL |Autovacuum: Count of autovacuum workers |<p>Number of autovacuum workers.</p> |ZABBIX_PASSIVE |pgsql.autovacuum.count |
-|PostgreSQL |PostgreSQL: Cache hit |<p>-</p> |ZABBIX_PASSIVE |pgsql.cache.hit |
-|PostgreSQL |PostgreSQL: Uptime |<p>-</p> |ZABBIX_PASSIVE |pgsql.uptime |
-|PostgreSQL |Replication: Lag in bytes |<p>Replication lag with Master in byte.</p> |ZABBIX_PASSIVE |pgsql.replication.lag.b |
-|PostgreSQL |Replication: Lag in seconds |<p>Replication lag with Master in seconds.</p> |ZABBIX_PASSIVE |pgsql.replication.lag.sec |
-|PostgreSQL |Replication: Recovery role |<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p> |ZABBIX_PASSIVE |pgsql.replication.recovery_role |
-|PostgreSQL |Replication: Standby count |<p>Number of standby servers</p> |ZABBIX_PASSIVE |pgsql.replication.count |
-|PostgreSQL |Replication: Status |<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</p> |ZABBIX_PASSIVE |pgsql.replication.status |
-|PostgreSQL |PostgreSQL: Ping |<p>-</p> |ZABBIX_PASSIVE |pgsql.ping<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|PostgreSQL |PostgreSQL: Age of oldest xid |<p>Age of oldest xid.</p> |ZABBIX_PASSIVE |pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |Autovacuum: Count of autovacuum workers |<p>Number of autovacuum workers.</p> |ZABBIX_PASSIVE |pgsql.autovacuum.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |PostgreSQL: Cache hit |<p>-</p> |ZABBIX_PASSIVE |pgsql.cache.hit["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |PostgreSQL: Uptime |<p>-</p> |ZABBIX_PASSIVE |pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |Replication: Lag in bytes |<p>Replication lag with Master in byte.</p> |ZABBIX_PASSIVE |pgsql.replication.lag.b["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |Replication: Lag in seconds |<p>Replication lag with Master in seconds.</p> |ZABBIX_PASSIVE |pgsql.replication.lag.sec["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |Replication: Recovery role |<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p> |ZABBIX_PASSIVE |pgsql.replication.recovery_role["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |Replication: Standby count |<p>Number of standby servers</p> |ZABBIX_PASSIVE |pgsql.replication.count["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |Replication: Status |<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</p> |ZABBIX_PASSIVE |pgsql.replication.status["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|PostgreSQL |PostgreSQL: Ping |<p>-</p> |ZABBIX_PASSIVE |pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |PostgreSQL |DB {#DBNAME}: Database age |<p>Database age</p> |ZABBIX_PASSIVE |pgsql.db.age["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number оf bloating tables</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Database size |<p>Database size</p> |ZABBIX_PASSIVE |pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
@@ -161,9 +161,9 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:pgsql.connections.total_pct.min(5m)} > {$PG.CONN_TOTAL_PCT.MAX.WARN}` |AVERAGE | |
-|PostgreSQL: Oldest xid is too big |<p>-</p> |`{TEMPLATE_NAME:pgsql.oldest.xid.last()} > 18000000` |AVERAGE | |
-|PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE}) |<p>-</p> |`{TEMPLATE_NAME:pgsql.uptime.last()} < 600` |AVERAGE | |
-|PostgreSQL: Service is down |<p>-</p> |`{TEMPLATE_NAME:pgsql.ping.last()}=0` |HIGH | |
+|PostgreSQL: Oldest xid is too big |<p>-</p> |`{TEMPLATE_NAME:pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()} > 18000000` |AVERAGE | |
+|PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE}) |<p>-</p> |`{TEMPLATE_NAME:pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()} < 600` |AVERAGE | |
+|PostgreSQL: Service is down |<p>-</p> |`{TEMPLATE_NAME:pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"].last()}=0` |HIGH | |
 |DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.</p><p>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p> |`{TEMPLATE_NAME:pgsql.dbstat.conflicts.rate["{#DBNAME}"].min(5m)} > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}` |AVERAGE | |
 |DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>-</p> |`{TEMPLATE_NAME:pgsql.dbstat.deadlocks.rate["{#DBNAME}"].min(5m)} > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}` |HIGH | |
 
