@@ -3329,6 +3329,26 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opstatus/status": value must be one of 0, 1.'
 			],
+			'Test /1/overrides/1/operations/1/opstatus is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => 9,
+									'opstatus' => [
+										'status' => 0
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opstatus".'
+			],
 			// LLD rule override operation discover
 			'Test /1/overrides/1/operations/1/opdiscover/discover is mandatory.' => [
 				'discoveryrules' => [
@@ -3407,6 +3427,66 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "delay": invalid delay.'
 			],
+			'Test /1/overrides/1/operations/1/opperiod is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => 9,
+									'opperiod' => [
+										'delay' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opperiod".'
+			],
+			'Test /1/overrides/1/operations/1/opperiod is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => 9,
+									'opperiod' => [
+										'delay' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opperiod".'
+			],
+			'Test /1/overrides/1/operations/1/opperiod is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => 9,
+									'opperiod' => [
+										'delay' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opperiod".'
+			],
 			// LLD rule override operation history
 			'Test /1/overrides/1/operations/1/ophistory/history is mandatory.' => [
 				'discoveryrules' => [
@@ -3445,6 +3525,66 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": a time unit is expected.'
+			],
+			'Test /1/overrides/1/operations/1/ophistory is is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 1,
+									'operator' => 9,
+									'ophistory' => [
+										'history' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "ophistory".'
+			],
+			'Test /1/overrides/1/operations/1/ophistory is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 2,
+									'operator' => 9,
+									'ophistory' => [
+										'history' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "ophistory".'
+			],
+			'Test /1/overrides/1/operations/1/ophistory is is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 3,
+									'operator' => 9,
+									'ophistory' => [
+										'history' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "ophistory".'
 			],
 			// LLD rule override operation trends
 			'Test /1/overrides/1/operations/1/optrends/trends is mandatory.' => [
@@ -3485,6 +3625,66 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": a time unit is expected.'
 			],
+			'Test /1/overrides/1/operations/1/optrends is is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 1,
+									'operator' => 9,
+									'optrends' => [
+										'trends' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optrends".'
+			],
+			'Test /1/overrides/1/operations/1/optrends is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 2,
+									'operator' => 9,
+									'optrends' => [
+										'trends' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optrends".'
+			],
+			'Test /1/overrides/1/operations/1/optrends is is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 3,
+									'operator' => 9,
+									'optrends' => [
+										'trends' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optrends".'
+			],
 			// LLD rule override operation severity
 			'Test /1/overrides/1/operations/1/opseverity/severity is mandatory.' => [
 				'discoveryrules' => [
@@ -3523,6 +3723,66 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opseverity/severity": value must be one of 0, 1, 2, 3, 4, 5.'
+			],
+			'Test /1/overrides/1/operations/1/opseverity is is not supported for item prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => 9,
+									'opseverity' => [
+										'severity' => 5
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opseverity".'
+			],
+			'Test /1/overrides/1/operations/1/opseverity is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => 9,
+									'opseverity' => [
+										'severity' => 5
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opseverity".'
+			],
+			'Test /1/overrides/1/operations/1/opseverity is is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => 9,
+									'opseverity' => [
+										'severity' => 5
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opseverity".'
 			],
 			// LLD rule override operation tag
 			'Test /1/overrides/1/operations/1/optag cannot be empty.' => [
@@ -3563,6 +3823,88 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag/1": the parameter "tag" is missing.'
 			],
+			'Test /1/overrides/1/operations/1/optag/1/tag cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'optag' => [
+										[
+											'tag' => ''
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag/1/tag": cannot be empty.'
+			],
+			'Test /1/overrides/1/operations/1/optag is is not supported for item prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => 9,
+									'optag' => [
+										['tag' => 'www']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
+			],
+			'Test /1/overrides/1/operations/1/optag is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => 9,
+									'optag' => [
+										['tag' => 'www']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
+			],
+			'Test /1/overrides/1/operations/1/optag is is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => 9,
+									'optag' => [
+										['tag' => 'www']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
+			],
 			// LLD rule override operation template
 			'Test /1/overrides/1/operations/1/optemplate cannot be empty.' => [
 				'discoveryrules' => [
@@ -3602,6 +3944,88 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": the parameter "templateid" is missing.'
 			],
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid type is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 3,
+									'operator' => 9,
+									'optemplate' => [
+										[
+											'templateid' => ''
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1/templateid": a number is expected.'
+			],
+			'Test /1/overrides/1/operations/1/optemplate is is not supported for item prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => 9,
+									'optemplate' => [
+										['template' => '1']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": unexpected parameter "template".'
+			],
+			'Test /1/overrides/1/operations/1/optemplate is is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => 9,
+									'optemplate' => [
+										['template' => '1']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": unexpected parameter "template".'
+			],
+			'Test /1/overrides/1/operations/1/optemplate is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => 9,
+									'optemplate' => [
+										['template' => '1']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": unexpected parameter "template".'
+			],
 			// LLD rule override operation inventory
 			'Test /1/overrides/1/operations/1/opinventory/inventory_mode is mandatory.' => [
 				'discoveryrules' => [
@@ -3640,6 +4064,66 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opinventory/inventory_mode": value must be one of -1, 0, 1.'
+			],
+			'Test /1/overrides/1/operations/1/opinventory is is not supported for item prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => 9,
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_MANUAL
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
+			],
+			'Test /1/overrides/1/operations/1/opinventory is is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => 9,
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_MANUAL
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
+			],
+			'Test /1/overrides/1/operations/1/opinventory is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => 9,
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_MANUAL
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
 			],
 		];
 	}
