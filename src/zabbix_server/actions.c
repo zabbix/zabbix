@@ -1038,7 +1038,7 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
 					(int)condition->conditiontype, condition->conditionid);
-			ret = NOTSUPPORTED;
+			ret = FAIL;
 	}
 
 	if (NOTSUPPORTED == ret)
@@ -1656,6 +1656,218 @@ static int	check_dservice_type_condition(const zbx_vector_ptr_t *esc_events, zbx
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_dstatus_condition                                          *
+ *                                                                            *
+ * Purpose: check discovery status condition                                  *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_dstatus_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	int	i, condition_value_i = atoi(condition->value);
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
+
+		switch (condition->op)
+		{
+			case CONDITION_OPERATOR_EQUAL:
+				if (condition_value_i == event->value)
+					zbx_vector_uint64_append(&condition->eventids, event->eventid);
+				break;
+			case CONDITION_OPERATOR_NOT_EQUAL:
+				if (condition_value_i != event->value)
+					zbx_vector_uint64_append(&condition->eventids, event->eventid);
+				break;
+			default:
+				return NOTSUPPORTED;
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_duptime_condition                                          *
+ *                                                                            *
+ * Purpose: check uptime condition for discovery                              *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_duptime_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, i;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
+	zbx_vector_uint64_t	objectids[2];
+	int			condition_value_i;
+
+	if (CONDITION_OPERATOR_LESS_EQUAL != condition->op && CONDITION_OPERATOR_MORE_EQUAL != condition->op)
+		return NOTSUPPORTED;
+
+	condition_value_i = atoi(condition->value);
+
+	zbx_vector_uint64_create(&objectids[0]);
+	zbx_vector_uint64_create(&objectids[1]);
+
+	get_object_ids_discovery(esc_events, objectids);
+
+	for (i = 0; i < (int)ARRSIZE(objects); i++)
+	{
+		size_t	sql_offset = 0;
+
+		if (0 == objectids[i].values_num)
+			continue;
+
+		if (EVENT_OBJECT_DHOST == objects[i])
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select dhostid,status,lastup,lastdown"
+					" from dhosts"
+					" where");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+					objectids[i].values, objectids[i].values_num);
+		}
+		else	/* EVENT_OBJECT_DSERVICE */
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select dserviceid,status,lastup,lastdown"
+					" from dservices"
+					" where");
+
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+					objectids[i].values, objectids[i].values_num);
+		}
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t	objectid;
+			int		now, tmp_int;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+
+			now = time(NULL);
+			tmp_int = DOBJECT_STATUS_UP == atoi(row[1]) ? atoi(row[2]) : atoi(row[3]);
+
+			switch (condition->op)
+			{
+				case CONDITION_OPERATOR_LESS_EQUAL:
+					if (0 != tmp_int && (now - tmp_int) <= condition_value_i)
+						add_condition_match(esc_events, condition, objectid, objects[i]);
+					break;
+				case CONDITION_OPERATOR_MORE_EQUAL:
+					if (0 != tmp_int && (now - tmp_int) >= condition_value_i)
+						add_condition_match(esc_events, condition, objectid, objects[i]);
+					break;
+			}
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&objectids[0]);
+	zbx_vector_uint64_destroy(&objectids[1]);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_dservice_port_condition                                    *
+ *                                                                            *
+ * Purpose: check service port condition for discovery                        *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			object = EVENT_OBJECT_DSERVICE;
+	zbx_vector_uint64_t	objectids;
+	int			i;
+
+	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+		return NOTSUPPORTED;
+
+	zbx_vector_uint64_create(&objectids);
+
+	for (i = 0; i < esc_events->values_num; i++)
+	{
+		const DB_EVENT	*event = esc_events->values[i];
+
+		if (object == event->object)
+			zbx_vector_uint64_append(&objectids, event->objectid);
+	}
+
+	if (0 != objectids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select dserviceid,port"
+				" from dservices"
+				" where");
+
+		zbx_vector_uint64_uniq(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+					objectids.values, objectids.values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t	objectid;
+
+			ZBX_STR2UINT64(objectid, row[0]);
+			switch (condition->op)
+			{
+				case CONDITION_OPERATOR_EQUAL:
+					if (SUCCEED == int_in_list(condition->value, atoi(row[1])))
+						add_condition_match(esc_events, condition, objectid, object);
+					break;
+				case CONDITION_OPERATOR_NOT_EQUAL:
+					if (SUCCEED != int_in_list(condition->value, atoi(row[1])))
+						add_condition_match(esc_events, condition, objectid, object);
+					break;
+			}
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_discovery_condition                                        *
  *                                                                            *
  * Purpose: check if event matches single condition                           *
@@ -1680,136 +1892,48 @@ static int	check_discovery_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 	switch (condition->conditiontype)
 	{
 		case CONDITION_TYPE_DRULE:
-			check_drule_condition(esc_events, condition);
+			ret = check_drule_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_DCHECK:
-			check_dcheck_condition(esc_events, condition);
+			ret = check_dcheck_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_DOBJECT:
-			check_dobject_condition(esc_events, condition);
+			ret = check_dobject_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_PROXY:
-			check_proxy_condition(esc_events, condition);
+			ret = check_proxy_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_DVALUE:
-			check_dvalue_condition(esc_events, condition);
+			ret = check_dvalue_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_DHOST_IP:
-			check_dhost_ip_condition(esc_events, condition);
+			ret = check_dhost_ip_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_DSERVICE_TYPE:
-			check_dservice_type_condition(esc_events, condition);
+			ret = check_dservice_type_condition(esc_events, condition);
 			break;
-	}
-
-	for (i = 0; i < esc_events->values_num; i++)
-	{
-		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
-
-		if (CONDITION_TYPE_DSTATUS == condition->conditiontype)
-		{
-			int	condition_value_i = atoi(condition->value);
-
-			switch (condition->op)
-			{
-				case CONDITION_OPERATOR_EQUAL:
-					if (condition_value_i == event->value)
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (condition_value_i != event->value)
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
-			}
-		}
-		else if (CONDITION_TYPE_DUPTIME == condition->conditiontype)
-		{
-			int	condition_value_i = atoi(condition->value);
-
-			if (EVENT_OBJECT_DHOST == event->object)
-			{
-				result = DBselect(
-						"select status,lastup,lastdown"
-						" from dhosts"
-						" where dhostid=" ZBX_FS_UI64,
-						event->objectid);
-			}
-			else
-			{
-				result = DBselect(
-						"select status,lastup,lastdown"
-						" from dservices"
-						" where dserviceid=" ZBX_FS_UI64,
-						event->objectid);
-			}
-
-			if (NULL != (row = DBfetch(result)))
-			{
-				int	now;
-
-				now = time(NULL);
-				tmp_int = DOBJECT_STATUS_UP == atoi(row[0]) ? atoi(row[1]) : atoi(row[2]);
-
-				switch (condition->op)
-				{
-					case CONDITION_OPERATOR_LESS_EQUAL:
-						if (0 != tmp_int && (now - tmp_int) <= condition_value_i)
-							ret = SUCCEED;
-						break;
-					case CONDITION_OPERATOR_MORE_EQUAL:
-						if (0 != tmp_int && (now - tmp_int) >= condition_value_i)
-							ret = SUCCEED;
-						break;
-					default:
-						ret = NOTSUPPORTED;
-				}
-			}
-			DBfree_result(result);
-		}
-		else if (CONDITION_TYPE_DSERVICE_PORT == condition->conditiontype)
-		{
-			if (EVENT_OBJECT_DSERVICE == event->object)
-			{
-				result = DBselect(
-						"select port"
-						" from dservices"
-						" where dserviceid=" ZBX_FS_UI64,
-						event->objectid);
-
-				if (NULL != (row = DBfetch(result)))
-				{
-					switch (condition->op)
-					{
-						case CONDITION_OPERATOR_EQUAL:
-							if (SUCCEED == int_in_list(condition->value, atoi(row[0])))
-								ret = SUCCEED;
-							break;
-						case CONDITION_OPERATOR_NOT_EQUAL:
-							if (SUCCEED != int_in_list(condition->value, atoi(row[0])))
-								ret = SUCCEED;
-							break;
-						default:
-							ret = NOTSUPPORTED;
-					}
-				}
-				DBfree_result(result);
-			}
-		}
-		else
-		{
+		case CONDITION_TYPE_DSTATUS:
+			ret = check_dstatus_condition(esc_events, condition);
+			break;
+		case CONDITION_TYPE_DUPTIME:
+			ret = check_duptime_condition(esc_events, condition);
+			break;
+		case CONDITION_TYPE_DSERVICE_PORT:
+			ret = check_dservice_port_condition(esc_events, condition);
+			break;
+		default:
+			ret = FAIL;
 			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
 					(int)condition->conditiontype, condition->conditionid);
-		}
-
-		if (NOTSUPPORTED == ret)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					(int)condition->op, condition->conditionid);
-			ret = FAIL;
-		}
 	}
+
+	if (NOTSUPPORTED == ret)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				(int)condition->op, condition->conditionid);
+		ret = FAIL;
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
