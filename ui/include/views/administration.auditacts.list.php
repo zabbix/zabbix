@@ -27,11 +27,11 @@ $auditWidget = (new CWidget())->setTitle(_('Action log'));
 
 // create filter
 $filterColumn = new CFormList();
-$filterColumn->addRow(_('Recipient'), [
+$filterColumn->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
 	(new CMultiSelect([
-		'name' => 'userids[]',
+		'name' => 'filter_userids[]',
 		'object_name' => 'users',
-		'data' => $data['userids'],
+		'data' => $data['filter_userids'],
 		'placeholder' => '',
 		'popup' => [
 			'parameters' => [
@@ -39,7 +39,7 @@ $filterColumn->addRow(_('Recipient'), [
 				'srcfld1' => 'userid',
 				'srcfld2' => 'fullname',
 				'dstfrm' => 'zbx_filter',
-				'dstfld1' => 'userids_'
+				'dstfld1' => 'filter_userids_'
 			]
 		]
 	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

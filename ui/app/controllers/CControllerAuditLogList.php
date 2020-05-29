@@ -23,15 +23,15 @@ class CControllerAuditLogList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'page' =>				'ge 1',
-			'auditlog_action' =>	'in -1,'.implode(',', array_keys(self::getActionsList())),
-			'resourcetype' =>		'in -1,'.implode(',', array_keys(self::getResourcesList())),
-			'filter_rst' =>			'in 1',
-			'filter_set' =>			'in 1',
-			'userids' =>			'array_db users.userid',
-			'resourceid' =>			'string',
-			'from' =>				'range_time',
-			'to' =>					'range_time'
+			'page' =>					'ge 1',
+			'filter_action' =>			'in -1,'.implode(',', array_keys(self::getActionsList())),
+			'filter_resourcetype' =>	'in -1,'.implode(',', array_keys(self::getResourcesList())),
+			'filter_rst' =>				'in 1',
+			'filter_set' =>				'in 1',
+			'filter_userids' =>			'array_db users.userid',
+			'filter_resourceid' =>		'string',
+			'from' =>					'range_time',
+			'to' =>						'range_time'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -65,7 +65,7 @@ class CControllerAuditLogList extends CController {
 		updateTimeSelectorPeriod($timeselector_options);
 
 		$data = [
-			'page' => 1,
+			'page' => $this->getInput('page', 1),
 			'userids' => CProfile::getArray('web.auditlog.filter.userids', []),
 			'resourcetype' => CProfile::get('web.auditlog.filter.resourcetype', -1),
 			'auditlog_action' => CProfile::get('web.auditlog.filter.action', -1),
@@ -77,7 +77,6 @@ class CControllerAuditLogList extends CController {
 			'auditlogs' => [],
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
-		$this->getInputs($data, ['user_alias', 'resourcetype', 'auditlog_action', 'page']);
 		$users = [];
 		$filter = [];
 
@@ -224,12 +223,12 @@ class CControllerAuditLogList extends CController {
 	private function updateProfiles(): void {
 		$this->deleteProfiles();
 
-		CProfile::updateArray('web.auditlog.filter.userids', $this->getInput('userids', []), PROFILE_TYPE_ID);
-		CProfile::update('web.auditlog.filter.action', $this->getInput('auditlog_action', -1), PROFILE_TYPE_INT);
-		CProfile::update('web.auditlog.filter.resourcetype', $this->getInput('resourcetype', -1),
+		CProfile::updateArray('web.auditlog.filter.userids', $this->getInput('filter_userids', []), PROFILE_TYPE_ID);
+		CProfile::update('web.auditlog.filter.action', $this->getInput('filter_action', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.auditlog.filter.resourcetype', $this->getInput('filter_resourcetype', -1),
 			PROFILE_TYPE_INT
 		);
-		CProfile::update('web.auditlog.filter.resourceid', $this->getInput('resourceid', ''), PROFILE_TYPE_ID);
+		CProfile::update('web.auditlog.filter.resourceid', $this->getInput('filter_resourceid', ''), PROFILE_TYPE_ID);
 	}
 
 	private function deleteProfiles(): void {

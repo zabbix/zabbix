@@ -34,11 +34,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	// filter
-	'filter_rst' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'filter_set' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'userids' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
-	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null]
+	'filter_rst' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'filter_set' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'filter_userids' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
+	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null]
 ];
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -52,11 +52,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Filter
  */
 if (hasRequest('filter_set')) {
-	CProfile::updateArray('web.auditacts.filter.userids', getRequest('userids', []), PROFILE_TYPE_INT);
+	CProfile::updateArray('web.auditacts.filter.userids', getRequest('filter_userids', []), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
-	CProfile::delete('web.auditacts.filter.userids');
+	CProfile::deleteIdx('web.auditacts.filter.userids');
 	DBend();
 }
 
@@ -72,7 +72,7 @@ $timeselector_options = [
 updateTimeSelectorPeriod($timeselector_options);
 
 $data = [
-	'userids' => CProfile::getArray('web.auditacts.filter.userids', []),
+	'filter_userids' => CProfile::getArray('web.auditacts.filter.userids', []),
 	'users' => [],
 	'alerts' => [],
 	'paging' => null,
@@ -82,24 +82,24 @@ $data = [
 
 $userids = [];
 
-if ($data['userids']) {
+if ($data['filter_userids']) {
 	$data['users'] = API::User()->get([
 		'output' => ['userid', 'alias', 'name', 'surname'],
-		'userids' => $data['userids'],
+		'userids' => $data['filter_userids'],
 		'preservekeys' => true
 	]);
 
 	$userids = array_column($data['users'], 'userid');
 
 	// Sanitize userids for multiselect.
-	$data['userids'] = array_map(function (array $value): array {
+	$data['filter_userids'] = array_map(function (array $value): array {
 		return ['id' => $value['userid'], 'name' => getUserFullname($value)];
 	}, $data['users']);
 
-	CArrayHelper::sort($data['userids'], ['name']);
+	CArrayHelper::sort($data['filter_userids'], ['name']);
 }
 
-if (!$data['userids'] || $data['users']) {
+if (!$data['filter_userids'] || $data['users']) {
 	$config = select_config();
 
 	// Fetch alerts for different objects and sources and combine them in a single stream.
@@ -109,7 +109,7 @@ if (!$data['userids'] || $data['users']) {
 				'retries', 'error', 'alerttype'
 			],
 			'selectMediatypes' => ['mediatypeid', 'name', 'maxattempts'],
-			'userids' => $userids === [] ? null : $userids,
+			'userids' => $userids ? $userids : null,
 			// API::Alert operates with 'open' time interval therefore before call have to alter 'from' and 'to' values.
 			'time_from' => $data['timeline']['from_ts'] - 1,
 			'time_till' => $data['timeline']['to_ts'] + 1,
@@ -132,7 +132,7 @@ if (!$data['userids'] || $data['users']) {
 	);
 
 	// Get users.
-	if (!$data['userids']) {
+	if (!$data['filter_userids']) {
 		$data['users'] = API::User()->get([
 			'output' => ['userid', 'alias', 'name', 'surname'],
 			'userids' => array_column($data['alerts'], 'userid'),
