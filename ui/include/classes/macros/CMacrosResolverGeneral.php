@@ -1274,7 +1274,7 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Wrapper for sorting host macros.
+	 * Sorting host macros.
 	 *
 	 * @param array $host_macros
 	 *
@@ -1283,7 +1283,7 @@ class CMacrosResolverGeneral {
 	protected static function sortRegexHostMacros(array $host_macros): array {
 		foreach ($host_macros as &$macros) {
 			foreach ($macros as &$value) {
-				$value['regex'] = self::sortRegexMacros($value);
+				natksort($value['regex']);
 			}
 			unset($value);
 		}
@@ -1293,7 +1293,7 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Wrapper for sorting global macros.
+	 * Sorting global macros.
 	 *
 	 * @static
 	 *
@@ -1303,41 +1303,10 @@ class CMacrosResolverGeneral {
 	 */
 	protected static function sortRegexGlobalMacros(array $global_macros): array {
 		foreach ($global_macros as &$value) {
-			$value['regex'] = self::sortRegexMacros($value);
+			natksort($value['regex']);
 		}
 		unset($value);
 
 		return $global_macros;
-	}
-
-	/**
-	 * Sort regex array by natural, case insensitive algorithm.
-	 *
-	 * @static
-	 *
-	 * @param array $macro
-	 *
-	 * @return array
-	 */
-	private static function sortRegexMacros(array $macro): array {
-		if (count($macro['regex']) > 1) {
-			// Create temp array.
-			$arr = [];
-
-			// Get all regex for this macro.
-			$keys = array_keys($macro['regex']);
-
-			// Sorting array.
-			natcasesort($keys);
-
-			foreach ($keys as $key) {
-				$arr[$key] = $macro['regex'][$key];
-			}
-
-			// Replace regex array with sorted temporary array.
-			return $arr;
-		}
-
-		return $macro['regex'];
 	}
 }
