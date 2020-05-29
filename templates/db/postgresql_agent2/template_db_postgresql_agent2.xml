@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-29T07:35:18Z</date>
+   <date>2020-05-29T09:35:13Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -33,7 +33,8 @@
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Collect all metrics from pg_stat_activity\nhttps://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW</description>
+               <description>Collect all metrics from pg_stat_activity&#13;
+https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW</description>
                <applications>
                   <application>
                      <name>PostgreSQL</name>
@@ -78,7 +79,8 @@
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Collect all metrics from pg_stat_activity\nhttps://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW</description>
+               <description>Collect all metrics from pg_stat_activity&#13;
+https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW</description>
                <applications>
                   <application>
                      <name>PostgreSQL</name>
@@ -585,7 +587,8 @@
                <key>pgsql.connections.prepared</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of prepared transactions\nhttps://www.postgresql.org/docs/current/sql-prepare-transaction.html</description>
+               <description>Total number of prepared transactions&#13;
+https://www.postgresql.org/docs/current/sql-prepare-transaction.html</description>
                <applications>
                   <application>
                      <name>PostgreSQL</name>
@@ -659,7 +662,8 @@
                <key>pgsql.connections.waiting</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>Total number of waiting connections\nhttps://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</description>
+               <description>Total number of waiting connections&#13;
+https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</description>
                <applications>
                   <application>
                      <name>PostgreSQL</name>
@@ -1606,7 +1610,8 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                            <expression>{min(5m)} &gt; {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}</expression>
                            <name>DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)</name>
                            <priority>AVERAGE</priority>
-                           <description>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.\nhttps://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</description>
+                           <description>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.&#13;
+https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
