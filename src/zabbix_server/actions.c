@@ -2724,61 +2724,6 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 
 /******************************************************************************
  *                                                                            *
- * Function: check_action_condition                                           *
- *                                                                            *
- * Purpose: check if event matches single condition                           *
- *                                                                            *
- * Parameters: event - event to check                                         *
- *             condition - condition for matching                             *
- *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition)
-{
-	int			ret;
-	zbx_vector_ptr_t	new_escalations;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
-			" cond.value2:'%s'", __func__, condition->actionid, condition->conditionid,
-			ZBX_NULL2STR(condition->value), ZBX_NULL2STR(condition->value2));
-
-	zbx_vector_ptr_create(&new_escalations);
-
-	zbx_vector_ptr_append(&new_escalations, (DB_EVENT *)event);
-
-	switch (event->source)
-	{
-		case EVENT_SOURCE_TRIGGERS:
-			check_trigger_condition(&new_escalations, condition);
-			break;
-		case EVENT_SOURCE_DISCOVERY:
-			check_discovery_condition(&new_escalations, condition);
-			break;
-		case EVENT_SOURCE_AUTOREGISTRATION:
-			check_autoregistration_condition(&new_escalations, condition);
-			break;
-		case EVENT_SOURCE_INTERNAL:
-			check_internal_condition(&new_escalations, condition);
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
-					event->source, condition->conditionid);
-	}
-
-	ret = 0 != condition->eventids.values_num ? SUCCEED : FAIL;
-
-	zbx_vector_ptr_destroy(&new_escalations);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: check_events_condition                                           *
  *                                                                            *
  * Purpose: check if multiple events matches single condition                 *
@@ -2816,6 +2761,44 @@ static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char s
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_action_condition                                           *
+ *                                                                            *
+ * Purpose: check if event matches single condition                           *
+ *                                                                            *
+ * Parameters: event - event to check                                         *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition)
+{
+	int			ret;
+	zbx_vector_ptr_t	esc_events;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
+			" cond.value2:'%s'", __func__, condition->actionid, condition->conditionid,
+			ZBX_NULL2STR(condition->value), ZBX_NULL2STR(condition->value2));
+
+	zbx_vector_ptr_create(&esc_events);
+
+	zbx_vector_ptr_append(&esc_events, (DB_EVENT *)event);
+
+	check_events_condition(&esc_events, event->source, condition);
+
+	ret = 0 != condition->eventids.values_num ? SUCCEED : FAIL;
+
+	zbx_vector_ptr_destroy(&esc_events);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
