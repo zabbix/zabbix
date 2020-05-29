@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 define('PROXY_GOOD', 0);
 define('PROXY_BAD', 1);
 
+use Facebook\WebDriver\WebDriverBy;
+
 /**
  * @backup hosts
  */
