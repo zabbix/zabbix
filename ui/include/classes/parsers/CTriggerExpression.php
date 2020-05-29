@@ -498,7 +498,7 @@ class CTriggerExpression {
 
 		if ($level != 0 || isset($this->expression[$this->pos])
 				|| ($state != self::STATE_AFTER_CLOSE_BRACE && $state != self::STATE_AFTER_CONSTANT)) {
-			$exp_part = substr($this->expression, $this->pos == 0 ? 0 : $this->pos - 1);
+			$exp_part = substr($this->expression, ($this->pos == 0) ? 0 : $this->pos - 1);
 			$this->error = $this->options['calculated']
 				? _s('incorrect calculated item formula starting from "%1$s"', $exp_part)
 				: _('Incorrect trigger expression.').' '._s('Check expression part starting from "%1$s".', $exp_part);
@@ -573,7 +573,7 @@ class CTriggerExpression {
 				return true;
 			}
 		}
-		else if ($this->parseFunctionMacro()
+		elseif ($this->parseFunctionMacro()
 				|| $this->parseUsing($this->macro_parser, CTriggerExprParserResult::TOKEN_TYPE_MACRO)) {
 			return true;
 		}
