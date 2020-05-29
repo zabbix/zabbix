@@ -1881,11 +1881,9 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_discovery_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+static void	check_discovery_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		tmp_int, ret = FAIL, i;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1931,12 +1929,151 @@ static int	check_discovery_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 	{
 		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 				(int)condition->op, condition->conditionid);
-		ret = FAIL;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+}
 
-	return ret;
+/******************************************************************************
+ *                                                                            *
+ * Function: check_hostname_metadata_condition                                *
+ *                                                                            *
+ * Purpose: check metadata or host condition for auto registration            *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_hostname_metadata_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			object = EVENT_OBJECT_ZABBIX_ACTIVE;
+	zbx_vector_uint64_t	objectids;
+	const char		*condition_field;
+
+	if (CONDITION_OPERATOR_LIKE != condition->op && CONDITION_OPERATOR_NOT_LIKE != condition->op)
+		return NOTSUPPORTED;
+
+	if (CONDITION_TYPE_HOST_NAME == condition->conditiontype)
+		condition_field = "host";
+	else
+		condition_field = "host_metadata";
+
+	zbx_vector_uint64_create(&objectids);
+	get_object_ids(esc_events, &objectids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select autoreg_hostid,%s"
+			" from autoreg_host"
+			" where",
+			condition_field);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid",
+			objectids.values, objectids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	objectid;
+
+		ZBX_STR2UINT64(objectid, row[0]);
+
+		switch (condition->op)
+		{
+			case CONDITION_OPERATOR_LIKE:
+				if (NULL != strstr(row[1], condition->value))
+					add_condition_match(esc_events, condition, objectid, object);
+				break;
+			case CONDITION_OPERATOR_NOT_LIKE:
+				if (NULL == strstr(row[1], condition->value))
+					add_condition_match(esc_events, condition, objectid, object);
+				break;
+		}
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_areg_proxy_condition                                       *
+ *                                                                            *
+ * Purpose: check proxy condition for auto registration                       *
+ *                                                                            *
+ * Parameters: esc_events - [IN] events to check                              *
+ *             condition  - [IN/OUT] condition for matching, outputs          *
+ *                                   event ids that match condition           *
+ *                                                                            *
+ * Return value: SUCCEED - supported operator                                 *
+ *               NOTSUPPORTED - not supported operator                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_areg_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			object = EVENT_OBJECT_ZABBIX_ACTIVE;
+	zbx_vector_uint64_t	objectids;
+	zbx_uint64_t		condition_value;
+
+	ZBX_STR2UINT64(condition_value, condition->value);
+
+	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+		return NOTSUPPORTED;
+
+	zbx_vector_uint64_create(&objectids);
+	get_object_ids(esc_events, &objectids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select autoreg_hostid,proxy_hostid"
+			" from autoreg_host"
+			" where");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid",
+			objectids.values, objectids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	id;
+		zbx_uint64_t	objectid;
+
+		ZBX_STR2UINT64(objectid, row[0]);
+		ZBX_DBROW2UINT64(id, row[1]);
+
+		switch (condition->op)
+		{
+			case CONDITION_OPERATOR_EQUAL:
+				if (id == condition_value)
+					add_condition_match(esc_events, condition, objectid, object);
+				break;
+			case CONDITION_OPERATOR_NOT_EQUAL:
+				if (id != condition_value)
+					add_condition_match(esc_events, condition, objectid, object);
+				break;
+		}
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&objectids);
+	zbx_free(sql);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1954,108 +2091,35 @@ static int	check_discovery_condition(const zbx_vector_ptr_t *esc_events, zbx_con
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	check_autoregistration_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+static void	check_autoregistration_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	condition_value, id;
-	int		ret = FAIL, i;
-	const char	*condition_field;
+	const char	*__function_name = "check_auto_registration_condition";
+	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	for (i = 0; i < esc_events->values_num; i++)
+	switch (condition->conditiontype)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
-
-		switch (condition->conditiontype)
-		{
-			case CONDITION_TYPE_HOST_NAME:
-			case CONDITION_TYPE_HOST_METADATA:
-				if (CONDITION_TYPE_HOST_NAME == condition->conditiontype)
-					condition_field = "host";
-				else
-					condition_field = "host_metadata";
-
-				result = DBselect(
-						"select %s"
-						" from autoreg_host"
-						" where autoreg_hostid=" ZBX_FS_UI64,
-						condition_field, event->objectid);
-
-				if (NULL != (row = DBfetch(result)))
-				{
-					switch (condition->op)
-					{
-						case CONDITION_OPERATOR_LIKE:
-							if (NULL != strstr(row[0], condition->value))
-								ret = SUCCEED;
-							break;
-						case CONDITION_OPERATOR_NOT_LIKE:
-							if (NULL == strstr(row[0], condition->value))
-								ret = SUCCEED;
-							break;
-						case CONDITION_OPERATOR_REGEXP:
-							if (NULL != zbx_regexp_match(row[0], condition->value, NULL))
-								ret = SUCCEED;
-							break;
-						case CONDITION_OPERATOR_NOT_REGEXP:
-							if (NULL == zbx_regexp_match(row[0], condition->value, NULL))
-								ret = SUCCEED;
-							break;
-						default:
-							ret = NOTSUPPORTED;
-					}
-				}
-				DBfree_result(result);
-
-				break;
-			case CONDITION_TYPE_PROXY:
-				ZBX_STR2UINT64(condition_value, condition->value);
-
-				result = DBselect(
-						"select proxy_hostid"
-						" from autoreg_host"
-						" where autoreg_hostid=" ZBX_FS_UI64,
-						event->objectid);
-
-				if (NULL != (row = DBfetch(result)))
-				{
-					ZBX_DBROW2UINT64(id, row[0]);
-
-					switch (condition->op)
-					{
-						case CONDITION_OPERATOR_EQUAL:
-							if (id == condition_value)
-								ret = SUCCEED;
-							break;
-						case CONDITION_OPERATOR_NOT_EQUAL:
-							if (id != condition_value)
-								ret = SUCCEED;
-							break;
-						default:
-							ret = NOTSUPPORTED;
-					}
-				}
-				DBfree_result(result);
-
-				break;
-			default:
-				zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
-						(int)condition->conditiontype, condition->conditionid);
-		}
-
-		if (NOTSUPPORTED == ret)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					(int)condition->op, condition->conditionid);
+		case CONDITION_TYPE_HOST_NAME:
+		case CONDITION_TYPE_HOST_METADATA:
+			ret = check_hostname_metadata_condition(esc_events, condition);
+			break;
+		case CONDITION_TYPE_PROXY:
+			ret = check_areg_proxy_condition(esc_events, condition);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
+					(int)condition->conditiontype, condition->conditionid);
 			ret = FAIL;
-		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	if (NOTSUPPORTED == ret)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				(int)condition->op, condition->conditionid);
+	}
 
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2414,10 +2478,10 @@ int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition)
 			check_trigger_condition(&new_escalations, condition);
 			break;
 		case EVENT_SOURCE_DISCOVERY:
-			ret = check_discovery_condition(&new_escalations, condition);
+			check_discovery_condition(&new_escalations, condition);
 			break;
 		case EVENT_SOURCE_AUTOREGISTRATION:
-			ret = check_autoregistration_condition(&new_escalations, condition);
+			check_autoregistration_condition(&new_escalations, condition);
 			break;
 		case EVENT_SOURCE_INTERNAL:
 			ret = check_internal_condition(&new_escalations, condition);
