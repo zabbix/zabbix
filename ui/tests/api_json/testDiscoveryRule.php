@@ -3130,29 +3130,6 @@ class testDiscoveryRule extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/overrides/1/filter": unexpected parameter "eval_formula".'
 			],
 			// LLD rule override filter conditions
-			'Test /1/overrides/1/filter/conditions/1/macro is validated.' => [
-				'discoveryrules' => [
-					$new_lld_overrides([
-						[
-							'name' => 'override',
-							'step' => 1,
-							'filter' => [
-								'evaltype' => 3,
-								'formula' => 'A',
-								'conditions' => [
-									[
-										'macro' => '{##INCORRECT}',
-										'operator' => 9,
-										'value' => '',
-										'formulaid' => 'A'
-									]
-								]
-							]
-						]
-					])
-				],
-				'expected_error' => 'Incorrect filter condition macro for override "override".'
-			],
 			'Test /1/overrides/1/filter/conditions field is mandatory.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
@@ -3199,6 +3176,29 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1": the parameter "macro" is missing.'
 			],
+			'Test /1/overrides/1/filter/conditions/1/macro is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 3,
+								'formula' => 'A',
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => 9,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect filter condition macro for override "override".'
+			],
 			'Test /1/overrides/1/filter/conditions/1/value is mandatory.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
@@ -3238,7 +3238,409 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of 8, 9.'
-			]
+			],
+			// LLD rule override operation
+			'Test /1/overrides/1/operations/1/operationobject type is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 4
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operationobject": value must be one of 0, 1, 2, 3.'
+			],
+			'Test /1/overrides/1/operations/1/operator type is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 10,
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operator": value must be one of 0, 1, 2, 3, 8, 9.'
+			],
+			'Test /1/overrides/1/operations/1 at least one action is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": value must be one of opstatus, opdiscover, opperiod, ophistory, optrends.'
+			],
+			// LLD rule override operation status
+			'Test /1/overrides/1/operations/1/opstatus/status is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'opstatus' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opstatus": the parameter "status" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opstatus/status is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'opstatus' => [
+										'status' => 2
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opstatus/status": value must be one of 0, 1.'
+			],
+			// LLD rule override operation discover
+			'Test /1/overrides/1/operations/1/opdiscover/discover is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'opdiscover' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opdiscover": the parameter "discover" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opdiscover/discover is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'opdiscover' => [
+										'discover' => 2
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opdiscover/discover": value must be one of 0, 1.'
+			],
+			// LLD rule override operation period
+			'Test /1/overrides/1/operations/1/opperiod/delay is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'opperiod' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opperiod": the parameter "delay" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opperiod/delay is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'opperiod' => [
+										'delay' => 'www'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect value for field "delay": invalid delay.'
+			],
+			// LLD rule override operation history
+			'Test /1/overrides/1/operations/1/ophistory/history is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'ophistory' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory": the parameter "history" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/ophistory/history is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'ophistory' => [
+										'history' => 'www'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": a time unit is expected.'
+			],
+			// LLD rule override operation trends
+			'Test /1/overrides/1/operations/1/optrends/trends is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'optrends' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends": the parameter "trends" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/optrends/trends is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'optrends' => [
+										'trends' => 'www'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": a time unit is expected.'
+			],
+			// LLD rule override operation severity
+			'Test /1/overrides/1/operations/1/opseverity/severity is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'opseverity' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opseverity": the parameter "severity" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opseverity/severity is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'opseverity' => [
+										'severity' => 6
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opseverity/severity": value must be one of 0, 1, 2, 3, 4, 5.'
+			],
+			// LLD rule override operation tag
+			'Test /1/overrides/1/operations/1/optag cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'optag' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag": cannot be empty.'
+			],
+			'Test /1/overrides/1/operations/1/optag/1/tag is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 0,
+									'operator' => 9,
+									'optag' => [
+										[]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag/1": the parameter "tag" is missing.'
+			],
+			// LLD rule override operation template
+			'Test /1/overrides/1/operations/1/optemplate cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 3,
+									'operator' => 9,
+									'optemplate' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate": cannot be empty.'
+			],
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 3,
+									'operator' => 9,
+									'optemplate' => [
+										[]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": the parameter "templateid" is missing.'
+			],
+			// LLD rule override operation inventory
+			'Test /1/overrides/1/operations/1/opinventory/inventory_mode is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 3,
+									'operator' => 9,
+									'opinventory' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opinventory": the parameter "inventory_mode" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opinventory/inventory_mode is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 3,
+									'operator' => 9,
+									'opinventory' => [
+										'inventory_mode' => -2
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opinventory/inventory_mode": value must be one of -1, 0, 1.'
+			],
 		];
 	}
 
