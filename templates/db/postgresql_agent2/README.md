@@ -119,9 +119,9 @@ There are no template links in this template.
 |PostgreSQL |Replication: Standby count |<p>Number of standby servers</p> |ZABBIX_PASSIVE |pgsql.replication.count |
 |PostgreSQL |Replication: Status |<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</p> |ZABBIX_PASSIVE |pgsql.replication.status |
 |PostgreSQL |PostgreSQL: Ping |<p>-</p> |ZABBIX_PASSIVE |pgsql.ping<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|PostgreSQL |DB {#DBNAME}: Database age |<p>Database age</p> |ZABBIX_PASSIVE |pgsql.db.age[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"] |
-|PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number оf bloating tables</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"] |
-|PostgreSQL |DB {#DBNAME}: Database size |<p>Database size</p> |ZABBIX_PASSIVE |pgsql.db.size[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"] |
+|PostgreSQL |DB {#DBNAME}: Database age |<p>Database age</p> |ZABBIX_PASSIVE |pgsql.db.age["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
+|PostgreSQL |DB {#DBNAME}: Get bloating tables |<p>Number оf bloating tables</p> |ZABBIX_PASSIVE |pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
+|PostgreSQL |DB {#DBNAME}: Database size |<p>Database size</p> |ZABBIX_PASSIVE |pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"] |
 |PostgreSQL |DB {#DBNAME}: Blocks hit per second |<p>Total number of times disk blocks were found already in the buffer cache, so that a read was not necessary</p> |DEPENDENT |pgsql.dbstat.blks_hit.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blks_hit`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Total number of disk blocks read in this database</p> |DEPENDENT |pgsql.dbstat.blks_read.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blks_read`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Detected conflicts per second |<p>Total number of queries canceled due to conflicts with recovery in this database</p> |DEPENDENT |pgsql.dbstat.conflicts.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].conflicts`</p><p>- CHANGE_PER_SECOND |
@@ -148,13 +148,13 @@ There are no template links in this template.
 |PostgreSQL |DB {#DBNAME}: Num of shareupdateexclusive locks |<p>Number of shareupdateexclusive locks for each database</p> |DEPENDENT |pgsql.locks.shareupdateexclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].shareupdateexclusive`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of share locks |<p>Number of share locks for each database</p> |DEPENDENT |pgsql.locks.share["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].share`</p> |
 |PostgreSQL |DB {#DBNAME}: Num of total locks |<p>Number of total locks for each database</p> |DEPENDENT |pgsql.locks.total["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].total`</p> |
-|Zabbix_raw_items |PostgreSQL: Get bgwriter |<p>https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p> |ZABBIX_PASSIVE |pgsql.bgwriter |
-|Zabbix_raw_items |PostgreSQL: Get archive |<p>Collect archive status metrics</p> |ZABBIX_PASSIVE |pgsql.archive |
-|Zabbix_raw_items |PostgreSQL: Get dbstat |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat |
-|Zabbix_raw_items |PostgreSQL: Get dbstat sum |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat.sum |
-|Zabbix_raw_items |PostgreSQL: Get connections |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p> |ZABBIX_PASSIVE |pgsql.connections |
-|Zabbix_raw_items |PostgreSQL: Get WAL |<p>Collect WAL metrics</p> |ZABBIX_PASSIVE |pgsql.wal.stat |
-|Zabbix_raw_items |PostgreSQL: Get locks |<p>Collect all metrics from pg_locks per database</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p> |ZABBIX_PASSIVE |pgsql.locks |
+|Zabbix_raw_items |PostgreSQL: Get bgwriter |<p>https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p> |ZABBIX_PASSIVE |pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix_raw_items |PostgreSQL: Get archive |<p>Collect archive status metrics</p> |ZABBIX_PASSIVE |pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix_raw_items |PostgreSQL: Get dbstat |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix_raw_items |PostgreSQL: Get dbstat sum |<p>Collect all metrics from pg_stat_database per database</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p> |ZABBIX_PASSIVE |pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix_raw_items |PostgreSQL: Get connections |<p>Collect all metrics from pg_stat_activity</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p> |ZABBIX_PASSIVE |pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix_raw_items |PostgreSQL: Get WAL |<p>Collect WAL metrics</p> |ZABBIX_PASSIVE |pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
+|Zabbix_raw_items |PostgreSQL: Get locks |<p>Collect all metrics from pg_locks per database</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p> |ZABBIX_PASSIVE |pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"] |
 
 ## Triggers
 

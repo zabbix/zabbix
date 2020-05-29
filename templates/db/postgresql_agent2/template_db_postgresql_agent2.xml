@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-28T22:25:10Z</date>
+   <date>2020-05-29T07:35:18Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -27,19 +27,6 @@
          </applications>
          <items>
             <item>
-               <name>PostgreSQL: Get archive</name>
-               <key>pgsql.archive</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Collect archive status metrics</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>Archive: Count of archive files</name>
                <type>DEPENDENT</type>
                <key>pgsql.archive.count_archived_files</key>
@@ -59,7 +46,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.archive</key>
+                  <key>pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -81,7 +68,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.archive</key>
+                  <key>pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -104,7 +91,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.archive</key>
+                  <key>pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -127,8 +114,21 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.archive</key>
+                  <key>pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
+            </item>
+            <item>
+               <name>PostgreSQL: Get archive</name>
+               <key>pgsql.archive["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>Collect archive status metrics</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
             </item>
             <item>
                <name>Autovacuum: Count of autovacuum workers</name>
@@ -139,19 +139,6 @@
                <applications>
                   <application>
                      <name>PostgreSQL</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
-               <name>PostgreSQL: Get bgwriter</name>
-               <key>pgsql.bgwriter</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
                   </application>
                </applications>
             </item>
@@ -179,7 +166,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -206,7 +193,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -233,7 +220,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -260,7 +247,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -287,7 +274,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -319,7 +306,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -346,7 +333,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -373,7 +360,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -400,7 +387,7 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -432,8 +419,21 @@
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.bgwriter</key>
+                  <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
+            </item>
+            <item>
+               <name>PostgreSQL: Get bgwriter</name>
+               <key>pgsql.bgwriter["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>https://www.postgresql.org/docs/12/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
             </item>
             <item>
                <name>PostgreSQL: Cache hit</name>
@@ -444,20 +444,6 @@
                <applications>
                   <application>
                      <name>PostgreSQL</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
-               <name>PostgreSQL: Get connections</name>
-               <key>pgsql.connections</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Collect all metrics from pg_stat_activity&#13;
-https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
                   </application>
                </applications>
             </item>
@@ -480,7 +466,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -502,7 +488,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -524,7 +510,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -546,7 +532,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -568,7 +554,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -590,7 +576,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -612,7 +598,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -634,7 +620,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -657,7 +643,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -686,31 +672,17 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.connections</key>
+                  <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
-               <name>PostgreSQL: Get dbstat</name>
-               <key>pgsql.dbstat</key>
+               <name>PostgreSQL: Get connections</name>
+               <key>pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <description>Collect all metrics from pg_stat_database per database&#13;
-https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
-               <name>PostgreSQL: Get dbstat sum</name>
-               <key>pgsql.dbstat.sum</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Collect all metrics from pg_stat_database per database&#13;
-https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</description>
+               <description>Collect all metrics from pg_stat_activity&#13;
+https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -742,7 +714,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -770,7 +742,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -797,7 +769,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -824,7 +796,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -857,7 +829,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -884,7 +856,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -911,7 +883,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -928,7 +900,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -956,7 +928,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -983,7 +955,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -1010,7 +982,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -1037,7 +1009,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -1064,7 +1036,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -1091,7 +1063,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -1118,7 +1090,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -1145,7 +1117,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
@@ -1172,12 +1144,40 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-V
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.dbstat.sum</key>
+                  <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
+               <name>PostgreSQL: Get dbstat sum</name>
+               <key>pgsql.dbstat.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>Collect all metrics from pg_stat_database per database&#13;
+https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>PostgreSQL: Get dbstat</name>
+               <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <description>Collect all metrics from pg_stat_database per database&#13;
+https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
                <name>PostgreSQL: Get locks</name>
-               <key>pgsql.locks</key>
+               <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -1332,12 +1332,12 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.wal.stat</key>
+                  <key>pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
             <item>
                <name>PostgreSQL: Get WAL</name>
-               <key>pgsql.wal.stat</key>
+               <key>pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                <delay>5m</delay>
                <history>0</history>
                <trends>0</trends>
@@ -1373,7 +1373,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </step>
                </preprocessing>
                <master_item>
-                  <key>pgsql.wal.stat</key>
+                  <key>pgsql.wal.stat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                </master_item>
             </item>
          </items>
@@ -1396,7 +1396,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                <item_prototypes>
                   <item_prototype>
                      <name>DB {#DBNAME}: Database age</name>
-                     <key>pgsql.db.age[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"]</key>
+                     <key>pgsql.db.age["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      <delay>15m</delay>
                      <history>7d</history>
                      <description>Database age</description>
@@ -1408,7 +1408,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </item_prototype>
                   <item_prototype>
                      <name>DB {#DBNAME}: Get bloating tables</name>
-                     <key>pgsql.db.bloating_tables[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"]</key>
+                     <key>pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      <history>7d</history>
                      <description>Number оf bloating tables</description>
                      <application_prototypes>
@@ -1419,7 +1419,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                   </item_prototype>
                   <item_prototype>
                      <name>DB {#DBNAME}: Database size</name>
-                     <key>pgsql.db.size[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"]</key>
+                     <key>pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      <delay>5m</delay>
                      <history>7d</history>
                      <units>B</units>
@@ -1459,7 +1459,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1491,7 +1491,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1518,7 +1518,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1545,7 +1545,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1572,7 +1572,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1599,7 +1599,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1634,7 +1634,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1663,7 +1663,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1690,7 +1690,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1716,7 +1716,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1743,7 +1743,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1770,7 +1770,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1797,7 +1797,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1824,7 +1824,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1851,7 +1851,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1878,7 +1878,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1905,7 +1905,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.dbstat</key>
+                        <key>pgsql.dbstat["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1927,7 +1927,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1949,7 +1949,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1971,7 +1971,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1993,7 +1993,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2015,7 +2015,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2037,7 +2037,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2059,7 +2059,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2081,7 +2081,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2103,7 +2103,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>pgsql.locks</key>
+                        <key>pgsql.locks["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
@@ -2201,7 +2201,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                            <color>1A7C11</color>
                            <item>
                               <host>Template DB PostgreSQL Agent 2</host>
-                              <key>pgsql.db.bloating_tables[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"]</key>
+                              <key>pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2322,7 +2322,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                            <color>1A7C11</color>
                            <item>
                               <host>Template DB PostgreSQL Agent 2</host>
-                              <key>pgsql.db.size[{$PG.URI},{$PG.USER},{$PG.PASSWORD},"{#DBNAME}"]</key>
+                              <key>pgsql.db.size["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
