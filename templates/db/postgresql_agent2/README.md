@@ -19,6 +19,8 @@ This template was tested on:
 
 ```bash
 CREATE USER 'zbx_monitor' IDENTIFIED BY '<password>';
+GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_dir(text) TO zbx_monitor;
+GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
 ```
 
 2\. Edit pg_hba.conf to allow connections from Zabbix agent:
