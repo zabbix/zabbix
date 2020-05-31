@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-21T07:01:57Z</date>
+   <date>2020-05-31T18:06:56Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -14,12 +14,14 @@
          <description>1. Create an MSSQL user for monitoring.&#13;
 For more information read the MSSQL documentation, please. &#13;
 2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).&#13;
+View Server State permission should grant to the user.&#13;
 Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy. &#13;
 Use Microsoft documentation https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.&#13;
 Note! Credentials into odbc.ini do not work in case MSSQL.&#13;
+The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MS SQL instance.&#13;
 &#13;
 &#13;
-You can discuss this template or leave feedback on our forum &#13;
+You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
 Template tooling version used: 0.36</description>
          <groups>
@@ -40,20 +42,53 @@ Template tooling version used: 0.36</description>
                <name>MSSQL: Get performance counters</name>
                <type>ODBC</type>
                <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               <delay>0;m0-59</delay>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT object_name, counter_name, instance_name, cntr_value 
+               <params>SELECT object_name, counter_name, instance_name, cntr_value
 FROM sys.dm_os_performance_counters 
 UNION 
 SELECT 'SQLServer' as object_name, 'Version' as counter_name, @@version as instance_name, 0 as cntr_value
 UNION 
 SELECT 'SQLServer' as object_name, 'Uptime' as counter_name, '' as instance_name, 
-DATEDIFF(second, sqlserver_start_time, GETDATE()) as cntr_value 
+DATEDIFF(second, sqlserver_start_time, GETDATE()) as cntr_value
 FROM sys.dm_os_sys_info
 UNION
 SELECT 'SQLServer:Databases' as object_name, 'State' as counter_name, name as instance_name, state as cntr_value
-FROM sys.databases</params>
+FROM sys.databases
+UNION
+SELECT a.object_name, 'BufferCacheHitRatio' as counter_name, '' as instance_name, 
+cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters  a
+JOIN  (SELECT cntr_value,OBJECT_NAME 
+  FROM sys.dm_os_performance_counters  
+    WHERE counter_name = 'Buffer cache hit ratio base'
+        AND OBJECT_NAME = 'SQLServer:Buffer Manager') b ON  a.OBJECT_NAME = b.OBJECT_NAME
+WHERE a.counter_name = 'Buffer cache hit ratio'
+AND a.OBJECT_NAME = 'SQLServer:Buffer Manager'
+UNION
+SELECT a.object_name, 'WorktablesFromCacheRatio' as counter_name, '' as instance_name, 
+cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters  a
+JOIN  (SELECT cntr_value,OBJECT_NAME 
+  FROM sys.dm_os_performance_counters  
+    WHERE counter_name = 'Worktables From Cache Base'
+        AND OBJECT_NAME = 'SQLServer:Access Methods') b ON  a.OBJECT_NAME = b.OBJECT_NAME
+WHERE a.counter_name = 'Worktables From Cache Ratio'
+AND a.OBJECT_NAME = 'SQLServer:Access Methods'
+UNION
+SELECT a.object_name, 'CacheHitRatio' as counter_name, '_Total' as instance_name, 
+cast(a.cntr_value*100.0 / b.cntr_value as dec(3,0)) as cntr_value
+FROM sys.dm_os_performance_counters  a
+JOIN  (SELECT cntr_value,OBJECT_NAME 
+  FROM sys.dm_os_performance_counters  
+    WHERE counter_name = 'Cache Hit Ratio base'
+        AND OBJECT_NAME = 'SQLServer:Plan Cache'
+        AND instance_name = '_Total') b ON  a.OBJECT_NAME = b.OBJECT_NAME
+WHERE a.counter_name = 'Cache Hit Ratio'
+  AND a.OBJECT_NAME = 'SQLServer:Plan Cache'
+  AND instance_name = '_Total'</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
                <description>The item gets server global status information.</description>
@@ -92,15 +127,55 @@ FROM sys.databases</params>
             </item>
             <item>
                <name>MSSQL: Average latch wait time</name>
-               <type>DEPENDENT</type>
+               <type>CALCULATED</type>
                <key>mssql.average_latch_wait_time</key>
+               <delay>0;m0-59s2</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>ms</units>
+               <params>(last(mssql.average_latch_wait_time_raw) - prev(mssql.average_latch_wait_time_raw)) /
+(last(mssql.average_latch_wait_time_base) - prev(mssql.average_latch_wait_time_base) + 
+(last(mssql.average_latch_wait_time_base) - prev(mssql.average_latch_wait_time_base)=0))</params>
+               <description>Average latch wait time (in milliseconds) for latch requests that had to wait.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>MSSQL: Average latch wait time base</name>
+               <type>DEPENDENT</type>
+               <key>mssql.average_latch_wait_time_base</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>For internal use only.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Average Latch Wait Time Base')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Average latch wait time raw</name>
+               <type>DEPENDENT</type>
+               <key>mssql.average_latch_wait_time_raw</key>
                <delay>0</delay>
                <history>7d</history>
                <units>ms</units>
                <description>Average latch wait time (in milliseconds) for latch requests that had to wait.</description>
                <applications>
                   <application>
-                     <name>MSSQL</name>
+                     <name>Zabbix raw items</name>
                   </application>
                </applications>
                <preprocessing>
@@ -115,15 +190,63 @@ FROM sys.databases</params>
             </item>
             <item>
                <name>MSSQL: Total average wait time</name>
-               <type>DEPENDENT</type>
+               <type>CALCULATED</type>
                <key>mssql.average_wait_time</key>
-               <delay>0</delay>
+               <delay>0;m0-59s2</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Total wait time (in milliseconds) for locks in the last second.</description>
+               <params>(last(mssql.average_wait_time_raw) - prev(mssql.average_wait_time_raw)) /
+(last(mssql.average_wait_time_base) - prev(mssql.average_wait_time_base) + 
+(last(mssql.average_wait_time_base) - prev(mssql.average_wait_time_base)=0))</params>
+               <description>The average wait time, in milliseconds, for each lock request that had to wait.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$MSSQL.AVERAGE_WAIT_TIME.MAX}</expression>
+                     <name>MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>An average wait time longer than 500ms may indicate excessive blocking. This value should generally correlate to 'Lock Waits/sec' and move up or down with it accordingly.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>MSSQL: Total average wait time base</name>
+               <type>DEPENDENT</type>
+               <key>mssql.average_wait_time_base</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>For internal use only.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Average Wait Time Base' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>MSSQL: Total average wait time raw</name>
+               <type>DEPENDENT</type>
+               <key>mssql.average_wait_time_raw</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>ms</units>
+               <description>Average amount of wait time (in milliseconds) for each lock request that resulted in a wait. Information for all locks.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
                   </application>
                </applications>
                <preprocessing>
@@ -131,22 +254,10 @@ FROM sys.databases</params>
                      <type>JSONPATH</type>
                      <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Average Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
-                  <step>
-                     <type>SIMPLE_CHANGE</type>
-                     <params/>
-                  </step>
                </preprocessing>
                <master_item>
                   <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                </master_item>
-               <triggers>
-                  <trigger>
-                     <expression>{min(5m)}&gt;{$MSSQL.AVERAGE_WAIT_TIME.MAX}</expression>
-                     <name>MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)</name>
-                     <priority>WARNING</priority>
-                     <description>The wait time for locks in the last second is too long.</description>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>MSSQL: Batch requests per second</name>
@@ -193,7 +304,7 @@ FROM sys.databases</params>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Buffer cache hit ratio')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='BufferCacheHitRatio')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -227,6 +338,7 @@ FROM sys.databases</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
+               <units>%</units>
                <description>Ratio between cache hits and lookups.</description>
                <applications>
                   <application>
@@ -236,7 +348,7 @@ FROM sys.databases</params>
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='Cache Hit Ratio' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                     <params>$[?(@.object_name=='SQLServer:Plan Cache' &amp;&amp; @.counter_name=='CacheHitRatio' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -509,7 +621,7 @@ FROM sys.databases</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Number of unrestricted full scans per second. These can be either base-table or full-index scans.</description>
+               <description>Number of unrestricted full scans per second. These can be either base-table or full-index scans. Values greater than 1 or 2 indicate that we are having table / Index page scans. If we see high CPU then we need to investigate this counter, otherwise if the full scans are on small tables we can ignore this counter.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -644,7 +756,8 @@ FROM sys.databases</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Number of latch requests that could not be granted immediately.</description>
+               <units>rps</units>
+               <description>The number of latch requests that could not be granted immediately. Latches are lightweight means of holding a very transient server resource, such as an address in memory.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -772,13 +885,14 @@ FROM sys.databases</params>
                </triggers>
             </item>
             <item>
-               <name>MSSQL: Total lock wait time</name>
+               <name>MSSQL: Lock wait time</name>
                <type>DEPENDENT</type>
                <key>mssql.lock_wait_time</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Average amount of wait time (in milliseconds) for each lock request that resulted in a wait.</description>
+               <description>Average of total wait time (in milliseconds) for locks in the last second.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -788,6 +902,10 @@ FROM sys.databases</params>
                   <step>
                      <type>JSONPATH</type>
                      <params>$[?(@.object_name=='SQLServer:Locks' &amp;&amp; @.counter_name=='Lock Wait Time (ms)' &amp;&amp; @.instance_name=='_Total')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
                   </step>
                </preprocessing>
                <master_item>
@@ -821,6 +939,14 @@ FROM sys.databases</params>
                <master_item>
                   <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;0</expression>
+                     <name>MSSQL: Some blocking is occurring for 5m</name>
+                     <priority>AVERAGE</priority>
+                     <description>Values greater than zero indicate at least some blocking is occurring, while a value of zero can quickly eliminate blocking as a potential root-cause problem.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>MSSQL: Total log file size</name>
@@ -883,7 +1009,7 @@ FROM sys.databases</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Total number of logins started per second. This does not include pooled connections.</description>
+               <description>Total number of logins started per second. This does not include pooled connections. Any value over 2 may indicate insufcient connection pooling.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -910,7 +1036,7 @@ FROM sys.databases</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Total number of logout operations started per second.</description>
+               <description>Total number of logout operations started per second. Any value over 2 may indicate insufcient connection pooling.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -1071,8 +1197,8 @@ FROM sys.databases</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <units>min</units>
-               <description>Indicates the number of minutes a page will stay in the buffer pool without references.</description>
+               <units>s</units>
+               <description>Indicates the number of seconds a page will stay in the buffer pool without references.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -1083,18 +1209,14 @@ FROM sys.databases</params>
                      <type>JSONPATH</type>
                      <params>$[?(@.object_name=='SQLServer:Buffer Manager' &amp;&amp; @.counter_name=='Page life expectancy')].cntr_value.first()</params>
                   </step>
-                  <step>
-                     <type>MULTIPLIER</type>
-                     <params>0.01667</params>
-                  </step>
                </preprocessing>
                <master_item>
                   <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{max(5m)}&lt;{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</expression>
-                     <name>MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 5m)</name>
+                     <expression>{max(15m)}&lt;{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</expression>
+                     <name>MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)</name>
                      <priority>HIGH</priority>
                      <description>The page stays in the buffer pool without references of less time than the threshold value.</description>
                   </trigger>
@@ -1356,6 +1478,33 @@ FROM sys.databases</params>
                </master_item>
             </item>
             <item>
+               <name>MSSQL: Table lock escalations per second</name>
+               <type>DEPENDENT</type>
+               <key>mssql.table_lock_escalations.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of times locks on a table were escalated to the TABLE or HoBT granularity.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='Table Lock Escalations/sec')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
                <name>MSSQL: Target pages</name>
                <type>DEPENDENT</type>
                <key>mssql.target_pages</key>
@@ -1410,8 +1559,9 @@ FROM sys.databases</params>
                <key>mssql.total_latch_wait_time</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <units>ms</units>
-               <description>Total latch wait time (in milliseconds) for latch requests in the last second.</description>
+               <description>Total latch wait time (in milliseconds) for latch requests in the last second. This value should stay stable compared to the number of latch waits per second.</description>
                <applications>
                   <application>
                      <name>MSSQL</name>
@@ -1421,6 +1571,10 @@ FROM sys.databases</params>
                   <step>
                      <type>JSONPATH</type>
                      <params>$[?(@.object_name=='SQLServer:Latches' &amp;&amp; @.counter_name=='Total Latch Wait Time (ms)')].cntr_value.first()</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1569,7 +1723,7 @@ FROM sys.databases</params>
                      <dependencies>
                         <dependency>
                            <name>MSSQL: Service is unavailable</name>
-                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}].max(#3)}=0</expression>
+                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].max(#3)}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1732,9 +1886,41 @@ FROM sys.databases</params>
                </triggers>
             </item>
             <item>
+               <name>MSSQL: % Worktables from cache ratio</name>
+               <type>DEPENDENT</type>
+               <key>mssql.worktables_from_cache_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Percentage of work tables created where the initial two pages of the work table were not allocated but were immediately available from the work table cache.</description>
+               <applications>
+                  <application>
+                     <name>MSSQL</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.object_name=='SQLServer:Access Methods' &amp;&amp; @.counter_name=='WorktablesFromCacheRatio')].cntr_value.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{max(5m)}&lt;{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}</expression>
+                     <name>MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)</name>
+                     <priority>HIGH</priority>
+                     <description>A value less than 90% may indicate insufcient memory, since execution plans are being dropped, or may indicate, on 32-bit systems, the need for an upgrade to a 64-bit system</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
                <name>MSSQL: Service's TCP port state</name>
                <type>SIMPLE</type>
-               <key>net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}]</key>
+               <key>net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]</key>
                <delay>30s</delay>
                <history>7d</history>
                <description>Test the availability of MS SQL Server on TCP port.</description>
@@ -1776,13 +1962,13 @@ FROM sys.availability_groups</params>
                <description>Discovery the existed availability groups.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>Availability group '{#GROUP_NAME}': Get replica states</name>
+                     <name>MSSQL AG '{#GROUP_NAME}': Get replica states</name>
                      <type>ODBC</type>
-                     <key>db.odbc.get[replica_states,"{$MSSQL.DSN}"]</key>
+                     <key>db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
-                     <params>SELECT ag.name as group_name
+                     <params>SELECT ag.name as group_name,
 ISNULL(ags.primary_recovery_health, 2) as primary_recovery_health,
 ISNULL(ags.primary_replica, 'Unknown') as primary_replica,
 ISNULL(ags.secondary_recovery_health, 2) as secondary_recovery_health,
@@ -1791,16 +1977,16 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <username>{$MSSQL.USER}</username>
                      <password>{$MSSQL.PASSWORD}</password>
                      <description>Getting replica states - name, primary and secondary health, synchronization health.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Availability group '{#GROUP_NAME}' DB {#DBNAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                   </item_prototype>
                   <item_prototype>
-                     <name>Availability group '{#GROUP_NAME}': Primary replica recovery health</name>
+                     <name>MSSQL AG '{#GROUP_NAME}': Primary replica recovery health</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.primary_recovery_health[{#GROUP_NAME}]</key>
+                     <key>mssql.primary_recovery_health["{#GROUP_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Indicates the recovery health of the primary replica:&#13;
@@ -1809,7 +1995,7 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
 2 = Unavailable</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Availability group '{#GROUP_NAME}' DB {#DBNAME}</name>
+                           <name>MSSQL Availability Group '{#GROUP_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -1826,21 +2012,21 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica_states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>Availability group '{#GROUP_NAME}': Primary replica recovery health in progress</name>
+                           <name>MSSQL AG '{#GROUP_NAME}': Primary replica recovery health in progress</name>
                            <priority>WARNING</priority>
                            <description>The primary replica is in the synchronization process.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Availability group '{#GROUP_NAME}': Primary replica name</name>
+                     <name>MSSQL AG '{#GROUP_NAME}': Primary replica name</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.primary_replica[{#GROUP_NAME}]</key>
+                     <key>mssql.primary_replica["{#GROUP_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
@@ -1848,7 +2034,7 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                      <description>Name of the server instance that is hosting the current primary replica.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Availability group '{#GROUP_NAME}' DB {#DBNAME}</name>
+                           <name>MSSQL Availability Group '{#GROUP_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -1862,13 +2048,13 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica_states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Availability group '{#GROUP_NAME}': Secondary replica recovery health</name>
+                     <name>MSSQL AG '{#GROUP_NAME}': Secondary replica recovery health</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.secondary_recovery_health[{#GROUP_NAME}]</key>
+                     <key>mssql.secondary_recovery_health["{#GROUP_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Indicates the recovery health of a secondary replica replica:&#13;
@@ -1877,7 +2063,7 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
 2 = Unavailable</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Availability group '{#GROUP_NAME}' DB {#DBNAME}</name>
+                           <name>MSSQL Availability Group '{#GROUP_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -1894,21 +2080,21 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica_states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>Availability group '{#GROUP_NAME}': Secondary replica recovery health in progress</name>
+                           <name>MSSQL AG '{#GROUP_NAME}': Secondary replica recovery health in progress</name>
                            <priority>WARNING</priority>
                            <description>The secondary replica is in the synchronization process.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Availability group '{#GROUP_NAME}': Synchronization health</name>
+                     <name>MSSQL AG '{#GROUP_NAME}': Synchronization health</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.synchronization_health[{#GROUP_NAME}]</key>
+                     <key>mssql.synchronization_health["{#GROUP_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Reflects a rollup of the synchronization_health of all availability replicas in the availability group:&#13;
@@ -1917,7 +2103,7 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
 2: Healthy. The synchronization health of every availability replica is healthy.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Availability group '{#GROUP_NAME}' DB {#DBNAME}</name>
+                           <name>MSSQL Availability Group '{#GROUP_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -1934,18 +2120,18 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica_states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get[{#GROUP_NAME}_replica_states,"{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>Availability group '{#GROUP_NAME}': All replicas unhealthy</name>
+                           <name>MSSQL AG '{#GROUP_NAME}': All replicas unhealthy</name>
                            <priority>DISASTER</priority>
                            <description>None of the availability replicas have a healthy.</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=1</expression>
-                           <name>Availability group '{#GROUP_NAME}': Some replicas unhealthy</name>
+                           <name>MSSQL AG '{#GROUP_NAME}': Some replicas unhealthy</name>
                            <priority>HIGH</priority>
                            <description>The synchronization health of some, but not all, availability replicas is healthy.</description>
                         </trigger_prototype>
@@ -1988,15 +2174,15 @@ FROM sys.databases</params>
                <description>Scanning databases in DBMS.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Active transactions</name>
+                     <name>MSSQL DB '{#DBNAME}': Active transactions</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.active_transactions[{#DBNAME}]</key>
+                     <key>mssql.db.active_transactions["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Number of active transactions for the database.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2010,16 +2196,16 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Data file size</name>
+                     <name>MSSQL DB '{#DBNAME}': Data file size</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.data_files_size[{#DBNAME}]</key>
+                     <key>mssql.db.data_files_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
                      <description>Cumulative size of all the data files in the database including any automatic growth. Monitoring this counter is useful, for example, for determining the correct size of tempdb.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2037,9 +2223,9 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log bytes flushed per second</name>
+                     <name>MSSQL DB '{#DBNAME}': Log bytes flushed per second</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_bytes_flushed_sec.rate[{#DBNAME}]</key>
+                     <key>mssql.db.log_bytes_flushed_sec.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -2047,7 +2233,7 @@ FROM sys.databases</params>
                      <description>Total number of log bytes flushed per second. Useful for determining trends and utilization of the transaction log.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2065,16 +2251,16 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log file size</name>
+                     <name>MSSQL DB '{#DBNAME}': Log file size</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_files_size[{#DBNAME}]</key>
+                     <key>mssql.db.log_files_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
                      <description>Cumulative size of all the transaction log files in the database.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2092,16 +2278,16 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log file used size</name>
+                     <name>MSSQL DB '{#DBNAME}': Log file used size</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_files_used_size[{#DBNAME}]</key>
+                     <key>mssql.db.log_files_used_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
                      <description>The cumulative used size of all the log files in the database.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2119,16 +2305,17 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log flush wait time</name>
+                     <name>MSSQL DB '{#DBNAME}': Log flush wait time</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_flush_wait_time[{#DBNAME}]</key>
+                     <key>mssql.db.log_flush_wait_time["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>ms</units>
                      <description>Total wait time (in milliseconds) to flush the log. On an AlwaysOn secondary database, this value indicates the wait time for log records to be hardened to disk.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2137,7 +2324,7 @@ FROM sys.databases</params>
                            <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Flush Wait Time' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
                         </step>
                         <step>
-                           <type>SIMPLE_CHANGE</type>
+                           <type>CHANGE_PER_SECOND</type>
                            <params/>
                         </step>
                      </preprocessing>
@@ -2147,23 +2334,23 @@ FROM sys.databases</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB {#DBNAME}: Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m)</name>
+                           <name>MSSQL DB '{#DBNAME}': Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m)</name>
                            <priority>WARNING</priority>
                            <description>The wait time to flush the log is too long.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log flush waits per second</name>
+                     <name>MSSQL DB '{#DBNAME}': Log flush waits per second</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_flush_waits_sec.rate[{#DBNAME}]</key>
+                     <key>mssql.db.log_flush_waits_sec.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <description>Number of commits per second waiting for the log flush.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2182,23 +2369,23 @@ FROM sys.databases</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB {#DBNAME}: Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m)</name>
+                           <name>MSSQL DB '{#DBNAME}': Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m)</name>
                            <priority>WARNING</priority>
                            <description>Too many commits are waiting for the log flush.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log flushes per second</name>
+                     <name>MSSQL DB '{#DBNAME}': Log flushes per second</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_flushes_sec.rate[{#DBNAME}]</key>
+                     <key>mssql.db.log_flushes_sec.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <description>Number of log flushes per second.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2216,25 +2403,21 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log growths</name>
+                     <name>MSSQL DB '{#DBNAME}': Log growths</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_growths[{#DBNAME}]</key>
+                     <key>mssql.db.log_growths["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Total number of times the transaction log for the database has been expanded.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
                            <params>$[?(@.object_name=='SQLServer:Databases' &amp;&amp; @.counter_name=='Log Growths' &amp;&amp; @.instance_name=='{#DBNAME}')].cntr_value.first()</params>
-                        </step>
-                        <step>
-                           <type>SIMPLE_CHANGE</type>
-                           <params/>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2243,22 +2426,22 @@ FROM sys.databases</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB {#DBNAME}: Rate of log growths is high (over {$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
+                           <name>MSSQL DB '{#DBNAME}': Rate of log growths is high (over {$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
                            <priority>WARNING</priority>
                            <description>The transaction log for the database has grown too frequently.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log shrinks</name>
+                     <name>MSSQL DB '{#DBNAME}': Log shrinks</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_shrinks[{#DBNAME}]</key>
+                     <key>mssql.db.log_shrinks["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Total number of times the transaction log for the database has been shrunk.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2273,22 +2456,22 @@ FROM sys.databases</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB {#DBNAME}: Rate of log shrinks is (over {$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
+                           <name>MSSQL DB '{#DBNAME}': Rate of log shrinks is (over {$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
                            <priority>WARNING</priority>
                            <description>The transaction log for the database has shrunken too frequently.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Log truncations</name>
+                     <name>MSSQL DB '{#DBNAME}': Log truncations</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.log_truncations[{#DBNAME}]</key>
+                     <key>mssql.db.log_truncations["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>The number of times the transaction log has been shrunk.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2302,9 +2485,9 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Percent log used</name>
+                     <name>MSSQL DB '{#DBNAME}': Percent log used</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.percent_log_used[{#DBNAME}]</key>
+                     <key>mssql.db.percent_log_used["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
@@ -2312,7 +2495,7 @@ FROM sys.databases</params>
                      <description>Percentage of space in the log that is in use.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2327,16 +2510,16 @@ FROM sys.databases</params>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB {#DBNAME}: Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m)</name>
+                           <name>MSSQL DB '{#DBNAME}': Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m)</name>
                            <priority>WARNING</priority>
                            <description>There's not enough space left in the log.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: State</name>
+                     <name>MSSQL DB '{#DBNAME}': State</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.state[{#DBNAME}]</key>
+                     <key>mssql.db.state["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>0 = ONLINE&#13;
@@ -2350,7 +2533,7 @@ FROM sys.databases</params>
 10 = OFFLINE_SECONDARY | Azure SQL Database Active Geo-Replication</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2371,24 +2554,24 @@ FROM sys.databases</params>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}&gt;0</expression>
-                           <name>MSSQL DB {#DBNAME}: State is {ITEM.VALUE}</name>
+                           <expression>{last()}&gt;1</expression>
+                           <name>MSSQL DB '{#DBNAME}': State is {ITEM.VALUE}</name>
                            <priority>HIGH</priority>
                            <description>The DB has a non-working state.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL DB {#DBNAME}: Transactions per second</name>
+                     <name>MSSQL DB '{#DBNAME}': Transactions per second</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.db.transactions_sec.rate[{#DBNAME}]</key>
+                     <key>mssql.db.transactions_sec.rate["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <description>Number of transactions started for the database per second.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL DB {#DBNAME}</name>
+                           <name>MSSQL Database '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2406,6 +2589,40 @@ FROM sys.databases</params>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>MSSQL DB '{#DBNAME}': Log size</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_files_size["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_files_used_size["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>MSSQL DB '{#DBNAME}': Size</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.data_files_size["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2431,9 +2648,9 @@ WHERE drs.is_local = 1</params>
                <description>Discovery of the local availability databases.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Local DB: Get local DB states</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': Get local DB states</name>
                      <type>ODBC</type>
-                     <key>db.odbc.get[local_db.states,"{$MSSQL.DSN}"]</key>
+                     <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -2457,9 +2674,9 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      </applications>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Local DB: {#DBNAME} Suspended</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': Suspended</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.local_db.is_suspended[{#DBNAME}]</key>
+                     <key>mssql.local_db.is_suspended["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Database state:&#13;
@@ -2467,13 +2684,13 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
 1 = Suspended</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Local DB DB {#DBNAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Local DB '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].is_suspended.first()</params>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].is_suspended.first()</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2481,13 +2698,13 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[local_db.states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Local DB: {#DBNAME} State</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': State</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.local_db.state[{#DBNAME}]</key>
+                     <key>mssql.local_db.state["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>0 = Online&#13;
@@ -2499,7 +2716,7 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
 6 = Offline</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Local DB DB {#DBNAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Local DB '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2508,7 +2725,7 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].database_state.first()</params>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].database_state.first()</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2516,21 +2733,21 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[local_db.states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&gt;0</expression>
-                           <name>AG '{#GROUP_NAME}' Local DB: "{#DBNAME}" is {ITEM.VALUE}</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}</name>
                            <priority>WARNING</priority>
                            <description>The local availability database has a non-working state.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Local DB: {#DBNAME} Synchronization health</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': Synchronization health</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.local_db.synchronization_health[{#DBNAME}]</key>
+                     <key>mssql.local_db.synchronization_health["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Reflects the intersection of the synchronization state of a database that is joined to the availability group on the availability replica and the availability mode of the availability replica (synchronous-commit or asynchronous-commit mode):&#13;
@@ -2540,7 +2757,7 @@ partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
 2 = Healthy. A database on an synchronous-commit availability replica is considered healthy if synchronization_state is 2 (SYNCHRONIZED), and a database on an asynchronous-commit availability replica is considered healthy if synchronization_state is 1 (SYNCHRONIZING).</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Local DB DB {#DBNAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Local DB '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2549,7 +2766,7 @@ partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].synchronization_health.first()</params>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].synchronization_health.first()</params>
                         </step>
                         <step>
                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
@@ -2557,18 +2774,18 @@ partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[local_db.states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_local_db.states","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>AG '{#GROUP_NAME}' Local DB: "{#DBNAME}" is Not healthy</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Not healthy</name>
                            <priority>HIGH</priority>
                            <description>The synchronization state of the local availability database is NOT SYNCHRONIZING.</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=1</expression>
-                           <name>AG '{#GROUP_NAME}' Local DB: "{#DBNAME}" is Partially healthy</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Local DB '{#DBNAME}': "{#DBNAME}" is Partially healthy</name>
                            <priority>AVERAGE</priority>
                            <description>A database on a synchronous-commit availability replica is considered partially healthy if synchronization state is SYNCHRONIZING.</description>
                         </trigger_prototype>
@@ -2600,9 +2817,9 @@ database. To see non-NULL values on a mirror database, you must be a member&#13;
 of the sysadmin fixed server role.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>Mirroring DB {#DBNAME}: Get the mirror state</name>
+                     <name>MSSQL Mirroring '{#DBNAME}': Get the mirror state</name>
                      <type>ODBC</type>
-                     <key>db.odbc.get[{#DBNAME}_mirroring_state,"{$MSSQL.DSN}"]</key>
+                     <key>db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -2624,15 +2841,15 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      </applications>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL Mirroring DB: {#DBNAME} Role sequence</name>
+                     <name>MSSQL Mirroring '{#DBNAME}': Role sequence</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.mirroring.role_sequence[{#DBNAME}]</key>
+                     <key>mssql.mirroring.role_sequence["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>The number of times that mirroring partners have switched the principal and mirror roles due to a failover or forced service.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL Mirroring DB {#DBNAME}</name>
+                           <name>MSSQL Mirroring '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
@@ -2646,13 +2863,13 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[{#DBNAME}_mirroring_state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL Mirroring DB: {#DBNAME} Role</name>
+                     <name>MSSQL Mirroring '{#DBNAME}': Role</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.mirroring.role[{#DBNAME}]</key>
+                     <key>mssql.mirroring.role["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Current role of the local database plays in the database mirroring session.&#13;
@@ -2660,7 +2877,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
 2 = Mirror</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL Mirroring DB {#DBNAME}</name>
+                           <name>MSSQL Mirroring '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2677,13 +2894,13 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[{#DBNAME}_mirroring_state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL Mirroring DB: {#DBNAME} Safety level</name>
+                     <name>MSSQL Mirroring '{#DBNAME}': Safety level</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.mirroring.safety_level[{#DBNAME}]</key>
+                     <key>mssql.mirroring.safety_level["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Safety setting for updates on the mirror database:&#13;
@@ -2692,7 +2909,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
 2 = Full [synchronous]</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL Mirroring DB {#DBNAME}</name>
+                           <name>MSSQL Mirroring '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2709,13 +2926,13 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[{#DBNAME}_mirroring_state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL Mirroring DB: {#DBNAME} State</name>
+                     <name>MSSQL Mirroring '{#DBNAME}': State</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.mirroring.state[{#DBNAME}]</key>
+                     <key>mssql.mirroring.state["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>State of the mirror database and of the database mirroring session.&#13;
@@ -2728,7 +2945,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
 6 = The partners are synchronized. Failover is potentially possible. For information about the requirements for failover see, Database Mirroring Operating Modes.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL Mirroring DB {#DBNAME}</name>
+                           <name>MSSQL Mirroring '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2745,33 +2962,33 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[{#DBNAME}_mirroring_state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}&gt;=0 and {last()}&lt;=2</expression>
-                           <name>MSSQL Mirroring DB: "{#DBNAME}" is {ITEM.VALUE}</name>
+                           <name>MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}</name>
                            <priority>INFO</priority>
                            <description>The state of the mirror database and of the database mirroring session is "Suspended", "Disconnected from the other partner", or "Synchronizing".</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=3</expression>
-                           <name>MSSQL Mirroring DB: "{#DBNAME}" is {ITEM.VALUE}</name>
+                           <name>MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}</name>
                            <priority>WARNING</priority>
                            <description>The state of the mirror database and of the database mirroring session is "Pending Failover".</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=5</expression>
-                           <name>MSSQL Mirroring DB: "{#DBNAME}" is {ITEM.VALUE}</name>
+                           <name>MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" is {ITEM.VALUE}</name>
                            <priority>HIGH</priority>
                            <description>The state of the mirror database and of the database mirroring session is "Not synchronized". The partners are not synchronized. A failover is not possible now.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>MSSQL Mirroring DB: {#DBNAME} Witness state</name>
+                     <name>MSSQL Mirroring '{#DBNAME}': Witness state</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.mirroring.witness_state[{#DBNAME}]</key>
+                     <key>mssql.mirroring.witness_state["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>State of the witness in the database mirroring session of the database:&#13;
@@ -2780,7 +2997,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
 2 = Disconnected</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>MSSQL Mirroring DB {#DBNAME}</name>
+                           <name>MSSQL Mirroring '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -2797,12 +3014,12 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[{#DBNAME}_mirroring_state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#DBNAME}_mirroring_state","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=2</expression>
-                           <name>MSSQL Mirroring DB: "{#DBNAME}" Witness is disconnected</name>
+                           <name>MSSQL Mirroring '{#DBNAME}': "{#DBNAME}" Witness is disconnected</name>
                            <priority>WARNING</priority>
                            <description>The state of the witness in the database mirroring session of the database is "Disconnected".</description>
                         </trigger_prototype>
@@ -2811,13 +3028,13 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                </item_prototypes>
                <graph_prototypes>
                   <graph_prototype>
-                     <name>MSSQL Mirroring DB: {#DBNAME} States</name>
+                     <name>MSSQL Mirroring '{#DBNAME}': States</name>
                      <graph_items>
                         <graph_item>
                            <color>1A7C11</color>
                            <item>
                               <host>Template DB MSSQL by ODBC</host>
-                              <key>mssql.mirroring.state[{#DBNAME}]</key>
+                              <key>mssql.mirroring.state["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -2825,7 +3042,7 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                            <color>2774A4</color>
                            <item>
                               <host>Template DB MSSQL by ODBC</host>
-                              <key>mssql.mirroring.witness_state[{#DBNAME}]</key>
+                              <key>mssql.mirroring.witness_state["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -2850,9 +3067,9 @@ WHERE drs.is_local = 0</params>
                <description>Discovery of the non-local (not local to the SQL Server instance) availability databases.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Non-Local DB: Get non-local DB states</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Get non-local DB states</name>
                      <type>ODBC</type>
-                     <key>db.odbc.get[non-local_db.states,"{$MSSQL.DSN}"]</key>
+                     <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -2875,22 +3092,22 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                      </applications>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Non-Local DB: {#DBNAME} Log queue size</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Log queue size</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.non-local_db.log_send_queue_size[{#DBNAME}]</key>
+                     <key>mssql.non-local_db.log_send_queue_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
                      <description>Amount of log records of the primary database that has not been sent to the secondary databases.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Non-Local DB {#DBNAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Non-Local DB '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].log_send_queue_size.first()</params>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].log_send_queue_size.first()</params>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
@@ -2902,34 +3119,34 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[non-local_db.states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last(#1)}&gt;{last(#2)} and {last(#2)}&gt;{last(#3)}</expression>
-                           <name>AG '{#GROUP_NAME}' Non-Local DB: {#DBNAME} Log queue size is growing</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Log queue size is growing</name>
                            <priority>HIGH</priority>
                            <description>The log records of the primary database do not send to the secondary databases.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Non-Local DB: {#DBNAME} Redo log queue size</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Redo log queue size</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.non-local_db.redo_queue_size[{#DBNAME}]</key>
+                     <key>mssql.non-local_db.redo_queue_size["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
                      <description>Amount of log records in the log files of the secondary replica that has not yet been redone.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Non-Local DB {#DBNAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Non-Local DB '{#DBNAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME} &amp;&amp; @.dbname=='{#DBNAME}')].redo_queue_size.first()</params>
+                           <params>$[?(@.group_name=='{#GROUP_NAME}' &amp;&amp; @.replica_name=='{#REPLICA_NAME}' &amp;&amp; @.dbname=='{#DBNAME}')].redo_queue_size.first()</params>
                         </step>
                         <step>
                            <type>MULTIPLIER</type>
@@ -2941,12 +3158,12 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[non-local_db.states,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#DBNAME}_non-local_db.states","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last(#1)}&gt;{last(#2)} and {last(#2)}&gt;{last(#3)}</expression>
-                           <name>AG '{#GROUP_NAME}' Non-Local DB: {#DBNAME} Redo log queue size is growing</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Non-Local DB '{#DBNAME}': Redo log queue size is growing</name>
                            <priority>HIGH</priority>
                            <description>The log records in the log files of the secondary replica have not yet been redone.</description>
                         </trigger_prototype>
@@ -2975,9 +3192,9 @@ JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id</params>
                <description>Discovery of the database replicas.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Replica: Get the replica state</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': Get the replica state</name>
                      <type>ODBC</type>
-                     <key>db.odbc.get[replica.state,"{$MSSQL.DSN}"]</key>
+                     <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      <history>0h</history>
                      <trends>0</trends>
                      <value_type>TEXT</value_type>
@@ -3004,9 +3221,9 @@ WHERE ag.name = '{#GROUP_NAME}' AND arcs.replica_server_name = '{#REPLICA_NAME}'
                      </applications>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} Connected state</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': Connected state</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.replica.connected_state[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <key>mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Whether a secondary replica is currently connected to the primary replica:&#13;
@@ -3016,7 +3233,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
 1 : Connected. Each primary replica tracks the connection state for every secondary replica in the same availability group. Secondary replicas track the connection state of only the primary replica.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Replica '{#REPLICA_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -3033,13 +3250,13 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica.state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} Is local</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': Is local</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.replica.is_local[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <key>mssql.replica.is_local["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Whether the replica is local:&#13;
@@ -3047,7 +3264,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
 1 = Indicates a local replica. On secondary replicas, this is the only available value for the availability group to which the replica belongs.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Replica '{#REPLICA_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -3064,13 +3281,13 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica.state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} Join state</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': Join state</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.replica.join_state[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <key>mssql.replica.join_state["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>0 = Not joined&#13;
@@ -3078,7 +3295,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
 2 = Joined, failover cluster instance</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Replica '{#REPLICA_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -3095,13 +3312,13 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica.state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} Operational state</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': Operational state</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.replica.operational_state[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <key>mssql.replica.operational_state["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Current operational state of the replica:&#13;
@@ -3114,7 +3331,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
 6 = Not local</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Replica '{#REPLICA_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -3131,33 +3348,33 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica.state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0 or {last()}=1 or {last()}=3</expression>
-                           <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} is {ITEM.VALUE}</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}</name>
                            <priority>WARNING</priority>
                            <description>The operational state of the replica in a given availability group is "Pending" or "Offline".</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=4</expression>
-                           <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} is {ITEM.VALUE}</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}</name>
                            <priority>AVERAGE</priority>
                            <description>The operational state of the replica in a given availability group is "Failed".</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=5</expression>
-                           <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} is {ITEM.VALUE}</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is {ITEM.VALUE}</name>
                            <priority>HIGH</priority>
                            <description>The operational state of the replica in a given availability group is "Failed, no quorum".</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} Recovery health</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': Recovery health</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.replica.recovery_health[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <key>mssql.replica.recovery_health["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Rollup of the database_state column of the sys.dm_hadr_database_replica_states dynamic management view:&#13;
@@ -3166,7 +3383,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
 1 : Online. All the joined databases have a database state of ONLINE (database_state is 0).</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Replica '{#REPLICA_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -3183,21 +3400,21 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica.state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} Recovery in progress</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} Recovery in progress</name>
                            <priority>INFO</priority>
                            <description>At least one joined database has a database state other than ONLINE.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} Role</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': Role</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.replica.role[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <key>mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Current Always On availability groups role of a local replica or a connected remote replica:&#13;
@@ -3206,7 +3423,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
 2 = Secondary</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Replica '{#REPLICA_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -3223,13 +3440,13 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica.state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} Sync health</name>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': Sync health</name>
                      <type>DEPENDENT</type>
-                     <key>mssql.replica.synchronization_health[{#GROUP_NAME}_{#REPLICA_NAME}]</key>
+                     <key>mssql.replica.synchronization_health["{#GROUP_NAME}_{#REPLICA_NAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <description>Reflects a rollup of the database synchronization state (synchronization_state)of all joined availability databases (also known as replicas) and the availability mode of the replica (synchronous-commit or asynchronous-commit mode). The rollup will reflect the least healthy accumulated state the databases on the replica:&#13;
@@ -3238,7 +3455,7 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
 2 : Healthy. All replicas are in the target synchronization state: synchronous-commit replicas are synchronized, and asynchronous-commit replicas are synchronizing.</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>AG '{#GROUP_NAME}' Replica {#REPLICA_NAME}</name>
+                           <name>MSSQL Available Group '{#GROUP_NAME}' Replica '{#REPLICA_NAME}'</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
@@ -3255,18 +3472,18 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[replica.state,"{$MSSQL.DSN}"]</key>
+                        <key>db.odbc.get["{#GROUP_NAME}_{#REPLICA_NAME}_replica.state","{$MSSQL.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=0</expression>
-                           <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} is Not healthy</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is Not healthy</name>
                            <priority>AVERAGE</priority>
                            <description>At least one joined database is in the NOT SYNCHRONIZING state.</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{last()}=1</expression>
-                           <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} is Partially healthy</name>
+                           <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is Partially healthy</name>
                            <priority>WARNING</priority>
                            <description>Some replicas are not in the target synchronization state: synchronous-commit replicas should be synchronized, and asynchronous-commit replicas should be synchronizing.</description>
                         </trigger_prototype>
@@ -3275,8 +3492,8 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template DB MSSQL by ODBC:mssql.replica.connected_state[{#GROUP_NAME}_{#REPLICA_NAME}].last()}=0 and {Template DB MSSQL by ODBC:mssql.replica.role[{#GROUP_NAME}_{#REPLICA_NAME}].last()}=2</expression>
-                     <name>AG '{#GROUP_NAME}' Replica: {#REPLICA_NAME} is disconnected</name>
+                     <expression>{Template DB MSSQL by ODBC:mssql.replica.connected_state["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=0 and {Template DB MSSQL by ODBC:mssql.replica.role["{#GROUP_NAME}_{#REPLICA_NAME}"].last()}=2</expression>
+                     <name>MSSQL AG '{#GROUP_NAME}' Replica '{#REPLICA_NAME}': {#REPLICA_NAME} is disconnected</name>
                      <priority>WARNING</priority>
                      <description>The response of an availability replica to the DISCONNECTED state depends on its role: &#13;
 On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect; On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.</description>
@@ -3312,7 +3529,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             </macro>
             <macro>
                <macro>{$MSSQL.DEADLOCKS.MAX}</macro>
-               <value>0</value>
+               <value>1</value>
                <description>The maximum deadlocks per second for trigger expression.</description>
             </macro>
             <macro>
@@ -3326,18 +3543,13 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <description>The maximum free list stalls per second for trigger expression.</description>
             </macro>
             <macro>
-               <macro>{$MSSQL.HOST}</macro>
-               <value>localhost</value>
-               <description>MSSQL host IP address or FQDN.</description>
-            </macro>
-            <macro>
                <macro>{$MSSQL.LAZY_WRITES.MAX}</macro>
                <value>20</value>
                <description>The maximum lazy writes per second for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.LOCK_REQUESTS.MAX}</macro>
-               <value>3000</value>
+               <value>1000</value>
                <description>The maximum lock requests per second for trigger expression.</description>
             </macro>
             <macro>
@@ -3347,7 +3559,7 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             </macro>
             <macro>
                <macro>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX}</macro>
-               <value>5</value>
+               <value>1</value>
                <description>The maximum log flush wait time in ms for trigger expression.</description>
             </macro>
             <macro>
@@ -3362,12 +3574,12 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             </macro>
             <macro>
                <macro>{$MSSQL.LOG_SHRINKS.MAX}</macro>
-               <value>15</value>
+               <value>1</value>
                <description>The maximum log shrinks for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</macro>
-               <value>5</value>
+               <value>300</value>
                <description>The minimum page life expectancy for trigger expression.</description>
             </macro>
             <macro>
@@ -3386,9 +3598,24 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <description>MSSQL user password.</description>
             </macro>
             <macro>
+               <macro>{$MSSQL.PERCENT_COMPILATIONS.MAX}</macro>
+               <value>10</value>
+               <description>The maximum percent of Transact-SQL compilations for trigger expression.</description>
+            </macro>
+            <macro>
                <macro>{$MSSQL.PERCENT_LOG_USED.MAX}</macro>
                <value>80</value>
                <description>The maximum percent log used for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.PERCENT_READAHEAD.MAX}</macro>
+               <value>20</value>
+               <description>The maximum percent of pages read/sec in anticipation of use for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.PERCENT_RECOMPILATIONS.MAX}</macro>
+               <value>10</value>
+               <description>The maximum percent of Transact-SQL recompilations for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PORT}</macro>
@@ -3402,17 +3629,54 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
             </macro>
             <macro>
                <macro>{$MSSQL.WORK_FILES.MAX}</macro>
-               <value>300</value>
+               <value>20</value>
                <description>The maximum number of work files created per second for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.WORK_TABLES.MAX}</macro>
-               <value>50</value>
+               <value>20</value>
                <description>The maximum number of work tables created per second for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}</macro>
+               <value>90</value>
+               <description>The minimum % worktables from cache ratio for high trigger expression.</description>
             </macro>
          </macros>
       </template>
    </templates>
+   <triggers>
+      <trigger>
+         <expression>{Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()} * 1000 &gt; {Template DB MSSQL by ODBC:mssql.index_searches_sec.rate.last()}</expression>
+         <name>MSSQL: Index and table scans are often than index searches</name>
+         <priority>WARNING</priority>
+         <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
+      </trigger>
+      <trigger>
+         <expression>({Template DB MSSQL by ODBC:mssql.sql_compilations_sec.rate.last()}/{Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()} * 100) &gt; {$MSSQL.PERCENT_COMPILATIONS.MAX}</expression>
+         <name>MSSQL: Percent of adhoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}%</name>
+         <priority>WARNING</priority>
+         <description>The lower this value is the better. High values often indicate excessive adhoc querying and should be as low as possible. If excessive adhoc querying is happening, try rewriting the queries as procedures or invoke the queries using sp_executeSQL. When rewriting isn’t possible, consider using a plan guide or setting the database to parameterization forced mode.</description>
+      </trigger>
+      <trigger>
+         <expression>({Template DB MSSQL by ODBC:mssql.sql_recompilations_sec.rate.last()}/{Template DB MSSQL by ODBC:mssql.sql_compilations_sec.rate.last()} * 100) &gt; {$MSSQL.PERCENT_RECOMPILATIONS.MAX}</expression>
+         <name>MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}%</name>
+         <priority>WARNING</priority>
+         <description>This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter’s value should follow in proportion to “Batch Requests/sec” and “SQL Compilations/sec”. This needs to be nil in your system as much as possible.</description>
+      </trigger>
+      <trigger>
+         <expression>{Template DB MSSQL by ODBC:mssql.forwarded_records_sec.rate.last()} * 100 &gt; 10 * {Template DB MSSQL by ODBC:mssql.batch_requests_sec.rate.last()}</expression>
+         <name>MSSQL: Too frequently pointers using</name>
+         <priority>WARNING</priority>
+         <description>Rows with varchar columns can experience expansion when varchar values are updated with a longer string.  In the case where the row cannot fit in the existing page, the row migrates and access to the row will traverse a pointer.  This only happens on heaps (tables without clustered indexes). Evaluate clustered index for heap tables.  In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.</description>
+      </trigger>
+      <trigger>
+         <expression>{Template DB MSSQL by ODBC:mssql.readahead_pages_sec.rate.last()} / {Template DB MSSQL by ODBC:mssql.page_reads_sec.rate.last()} &gt; {$MSSQL.PERCENT_READAHEAD.MAX}</expression>
+         <name>MSSQL: Too many physical reads occurring</name>
+         <priority>WARNING</priority>
+         <description>If this value is makes up even a sizeable minority of total Page Reads/sec (say, greater than 20% of total page reads), you may have too many physical reads occurring.</description>
+      </trigger>
+   </triggers>
    <graphs>
       <graph>
          <name>MSSQL: Access methods</name>
@@ -3630,6 +3894,22 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <item>
                   <host>Template DB MSSQL by ODBC</host>
                   <key>mssql.number_deadlocks_sec.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.lock_waits_sec.rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template DB MSSQL by ODBC</host>
+                  <key>mssql.average_wait_time</key>
                </item>
             </graph_item>
          </graph_items>
