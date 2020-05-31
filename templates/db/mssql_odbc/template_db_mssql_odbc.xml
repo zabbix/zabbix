@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-31T18:06:56Z</date>
+   <date>2020-05-31T18:44:57Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -14,7 +14,7 @@
          <description>1. Create an MSSQL user for monitoring.&#13;
 For more information read the MSSQL documentation, please. &#13;
 2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).&#13;
-View Server State permission should grant to the user.&#13;
+View Server State and View Any Definition permissions should grant to the user.&#13;
 Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy. &#13;
 Use Microsoft documentation https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.&#13;
 Note! Credentials into odbc.ini do not work in case MSSQL.&#13;

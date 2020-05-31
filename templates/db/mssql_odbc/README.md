@@ -16,7 +16,7 @@ This template was tested on:
 1. Create an MSSQL user for monitoring.
 For more information read the MSSQL documentation, please. 
 2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).
-View Server State permission should grant to the user.
+View Server State and View Any Definition permissions should grant to the user.
 Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy. 
 Use Microsoft documentation https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.
 Note! Credentials into odbc.ini do not work in case MSSQL.
@@ -251,6 +251,6 @@ You can also provide a feedback, discuss the template or ask for help with it at
 
 ## References
 
-http://www.grumpyolddba.co.uk/monitoring/Performance%20Counter%20Guidance%20-%20SQL%20Server.htm
+http://www.grumpyolddba.co.uk/monitoring/Performance%20Counter%20Guidance%20-%20SQL%20Server.htm  
 https://docs.microsoft.com/en-us/sql/relational-databases/performance-monitor/sql-server-access-methods-object?view=sql-server-ver15
 
