@@ -1,6 +1,8 @@
 Changes for 5.2.0alpha1
 
 New features:
+.........T [ZBXNEXT-5955] added support of custom fields and custom buttons in message card (tuskov)
+.........T [ZBXNEXT-5905] added "Template App Etcd by HTTPP" (ychukina)
 .........T [ZBXNEXT-5902] added Spiceworks integration guide (tuskov)
 .......PS. [ZBXNEXT-5922] increased max configuration cache size limit to 64GB (viktors)
 ...G...... [ZBXNEXT-1839] added LLD for perf_counter; thanks to Ryan Armstrong for the patch (asestakovs)
