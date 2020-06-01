@@ -117,7 +117,7 @@ static void	get_object_ids(const zbx_vector_ptr_t *esc_events, zbx_vector_uint64
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		zbx_vector_uint64_append(objectids, event->objectid);
 	}
@@ -289,13 +289,11 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 		DB_ROW		row;
 		size_t		sql_offset = 0;
 
+		/* objectids that need parents to be determined */
 		for (i = 0; i < objectids_pair->values_num; i++)
-		{
 			zbx_vector_uint64_append(&objectids_tmp, objectids_pair->values[i].second);
-		}
 
 		zbx_vector_uint64_sort(&objectids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 		/* multiple hosts can share trigger from same template, don't allocate duplicate ids */
 		zbx_vector_uint64_uniq(&objectids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -304,14 +302,16 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, sql_field, objectids_tmp.values,
 				objectids_tmp.values_num);
 
+		zbx_vector_uint64_clear(&objectids_tmp);
+
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_uint64_t	objectid, templateid, value;
+			zbx_uint64_t	objectid, parent_objectid, value;
 
 			ZBX_STR2UINT64(objectid, row[0]);
-			ZBX_STR2UINT64(templateid, row[1]);
+			ZBX_STR2UINT64(parent_objectid, row[1]);
 			ZBX_STR2UINT64(value, row[2]);
 
 			/* find all templates or trigger ids that match our condition and get original id */
@@ -346,7 +346,7 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 				{
 					/* update template id to next level, to compare to condition in next select */
 
-					objectids_pair->values[i].second = templateid;
+					objectids_pair->values[i].second = parent_objectid;
 					zbx_vector_uint64_pair_append(&objectids_pair_tmp, objectids_pair->values[i]);
 				}
 
@@ -365,7 +365,6 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 		}
 
 		zbx_vector_uint64_pair_clear(&objectids_pair_tmp);
-		zbx_vector_uint64_clear(&objectids_tmp);
 	}
 
 	/* equals are deleted so copy to result those that are left (not equals)  */
