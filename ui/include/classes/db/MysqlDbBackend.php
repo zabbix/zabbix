@@ -29,10 +29,13 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDbVersionTable() {
-		$tableExists = DBfetch(DBselect("SHOW TABLES LIKE 'dbversion'"));
+		$table_exists = DBfetch(DBselect("SHOW TABLES LIKE 'dbversion'"));
 
-		if (!$tableExists) {
-			$this->setError(_('The frontend does not match Zabbix database.'));
+		if (!$table_exists) {
+			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
+				_s('the table "%1$s" was not found', 'dbversion')
+			));
+
 			return false;
 		}
 
