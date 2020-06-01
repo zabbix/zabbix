@@ -366,28 +366,27 @@ static zbx_key_access_rule_t	*zbx_key_access_rule_create(char *pattern, zbx_key_
  ******************************************************************************/
 void	finalize_key_access_rules_configuration(void)
 {
-	int			i, j, rules_num;
+	int			i, j, rules_num, sysrun_index = ZBX_MAX_UINT31_1;
 	zbx_key_access_rule_t	*rule, *sysrun_deny;
 	char			sysrun_pattern[] = "system.run[*]";
 
+
 	rules_num = key_access_rules.values_num;
 
-	/* prepare system.run[*] deny rule to be added at the end */
-	/* if no other system.run[*] rules are defined            */
-
+	/* prepare default system.run[*] deny rule to be added at the end */
 	if (NULL == (sysrun_deny = zbx_key_access_rule_create(sysrun_pattern, ZBX_KEY_ACCESS_DENY)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL != zbx_vector_ptr_search(&key_access_rules, sysrun_deny, compare_key_access_rules))
+	if (FAIL != (i = zbx_vector_ptr_search(&key_access_rules, sysrun_deny, compare_key_access_rules)))
 	{
 		/* exclude system.run[*] from total number of rules */
 		rules_num--;
 
-		zbx_key_access_rule_free(sysrun_deny);
-		sysrun_deny = NULL;
+		/* sysrun_index points at the first rule matching system.run[*] */
+		sysrun_index = i;
 	}
 
 	if (0 != rules_num)
@@ -397,7 +396,13 @@ void	finalize_key_access_rules_configuration(void)
 		{
 			rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
 			if (1 == rule->elements.values_num && 0 == strcmp(rule->elements.values[0], "*"))
+			{
+				/* 'match all' rule also matches system.run[*] */
+				if (i < sysrun_index)
+					sysrun_index = i;
+
 				break;
+			}
 		}
 
 		if (i != key_access_rules.values_num)
@@ -421,7 +426,11 @@ void	finalize_key_access_rules_configuration(void)
 			if (ZBX_KEY_ACCESS_ALLOW != rule->type)
 				break;
 
-			zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing AllowKey \"%s\" rule",  rule->pattern);
+			if (i != sysrun_index)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing AllowKey \"%s\" rule",
+						rule->pattern);
+			}
 
 			zbx_key_access_rule_free(rule);
 			zbx_vector_ptr_remove(&key_access_rules, i);
@@ -436,8 +445,10 @@ void	finalize_key_access_rules_configuration(void)
 		}
 	}
 
-	if (NULL != sysrun_deny)
+	if (ZBX_MAX_UINT31_1 == sysrun_index)
 		zbx_vector_ptr_append(&key_access_rules, sysrun_deny);
+	else
+		zbx_key_access_rule_free(sysrun_deny);
 }
 
 /******************************************************************************
