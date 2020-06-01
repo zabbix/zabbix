@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-01T16:44:32Z</date>
+   <date>2020-06-01T18:53:11Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -129,7 +129,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <name>MSSQL: Average latch wait time</name>
                <type>CALCULATED</type>
                <key>mssql.average_latch_wait_time</key>
-               <delay>0;m0-59s2</delay>
+               <delay>0;m0-59s3</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
@@ -192,7 +192,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <name>MSSQL: Total average wait time</name>
                <type>CALCULATED</type>
                <key>mssql.average_wait_time</key>
-               <delay>0;m0-59s2</delay>
+               <delay>0;m0-59s3</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>ms</units>
@@ -3654,7 +3654,8 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()} * 1000 &gt; {Template DB MSSQL by ODBC:mssql.index_searches_sec.rate.last()}</expression>
+         <expression>({Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()} + ({Template DB MSSQL by ODBC:mssql.full_scans_sec.rate.last()}=0)) *&#13;
+1000 &lt; {Template DB MSSQL by ODBC:mssql.index_searches_sec.rate.last()}</expression>
          <name>MSSQL: Index and table scans are often than index searches</name>
          <priority>WARNING</priority>
          <description>Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.</description>
