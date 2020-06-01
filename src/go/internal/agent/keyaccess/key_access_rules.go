@@ -22,6 +22,7 @@ package keyaccess
 import (
 	"errors"
 	"fmt"
+	"math"
 	"sort"
 
 	"zabbix.com/pkg/conf"
@@ -96,20 +97,20 @@ func parse(rec Record) (r *Rule, err error) {
 	return r, nil
 }
 
-func findRule(rule *Rule) *Rule {
-	for _, r := range rules {
-		if rule.Key != r.Key || len(rule.Params) != len(r.Params) {
+func findRule(proto *Rule) (rule *Rule, index int) {
+	for j, r := range rules {
+		if proto.Key != r.Key || len(proto.Params) != len(r.Params) {
 			continue
 		}
-		for i, p := range rule.Params {
+		for i, p := range proto.Params {
 			if p != r.Params[i] {
 				goto noMatch
 			}
 		}
-		return r
+		return r, j
 	noMatch:
 	}
-	return nil
+	return
 }
 
 func addRule(rec Record) (err error) {
@@ -118,7 +119,7 @@ func addRule(rec Record) (err error) {
 	if rule, err = parse(rec); err != nil {
 		return
 	}
-	if r := findRule(rule); r != nil {
+	if r, _ := findRule(rule); r != nil {
 		var desc string
 		if r.Permission == rule.Permission {
 			desc = "duplicates"
@@ -142,6 +143,7 @@ func GetNumberOfRules() int {
 func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	rules = rules[:0]
 	var records []Record
+	sysrunIndex := math.MaxInt32
 
 	// load AllowKey/DenyKey parameters
 	if node, ok := allowRecords.(*conf.Node); ok {
@@ -177,40 +179,47 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	if err != nil {
 		return
 	}
-	if r := findRule(sysrunRule); r != nil {
-		sysrunRule = nil
+	if r, i := findRule(sysrunRule); r != nil {
+		sysrunIndex = i
 		rulesNum--
 	}
 
-	// remove rules after 'full match' rule
-	for i, r := range rules {
-		if len(r.Params) == 0 && r.Key == "*" {
-			for j := i + 1; j < len(rules); j++ {
-				log.Warningf(`removed unreachable %s "%s" rule`, rules[j].Permission, rules[j].Pattern)
+	if rulesNum != 0 {
+		// remove rules after 'full match' rule
+		for i, r := range rules {
+			if len(r.Params) == 0 && r.Key == "*" {
+				if i < sysrunIndex {
+					sysrunIndex = i
+				}
+				for j := i + 1; j < len(rules); j++ {
+					log.Warningf(`removed unreachable %s "%s" rule`, rules[j].Permission, rules[j].Pattern)
+				}
+				rules = rules[:i+1]
+				break
 			}
-			rules = rules[:i+1]
-			break
+		}
+
+		// remove trailing 'allow' rules
+		cutoff := len(rules)
+		for i := len(rules) - 1; i >= 0; i-- {
+			if rules[i].Permission != ALLOW {
+				break
+			}
+			if i != sysrunIndex {
+				log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
+			}
+			cutoff = i
+		}
+		rules = rules[:cutoff]
+
+		if len(rules) == 0 {
+			return errors.New("Item key access rules are configured to match all keys," +
+				" indicating possible configuration problem. " +
+				" Please remove the rules if that was the purpose.")
 		}
 	}
 
-	// remove trailing 'allow' rules
-	cutoff := len(rules)
-	for i := len(rules) - 1; i >= 0; i-- {
-		if rules[i].Permission != ALLOW {
-			break
-		}
-		log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
-		cutoff = i
-	}
-	rules = rules[:cutoff]
-
-	if rulesNum != 0 && len(rules) == 0 {
-		return errors.New("Item key access rules are configured to match all keys," +
-			" indicating possible configuration problem. " +
-			" Please remove the rules if that was the purpose.")
-	}
-
-	if sysrunRule != nil {
+	if sysrunIndex == math.MaxInt32 {
 		rules = append(rules, sysrunRule)
 	}
 
