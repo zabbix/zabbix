@@ -690,7 +690,7 @@ static int	check_time_period_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 		int		res;
 
 		if (SUCCEED == zbx_check_time_period(period, (time_t)event->clock, &res))
@@ -793,6 +793,7 @@ static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_
 
 	}
 	DBfree_result(result);
+	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&eventids);
 
@@ -3602,6 +3603,13 @@ int	process_actions_by_acknowledgements(const zbx_vector_ptr_t *ack_tasks)
 	zbx_vector_ptr_create(&events);
 
 	zbx_db_get_events_by_eventids(&eventids, &events);
+
+	for (i = 0; i < events.values_num; i++)
+	{
+		DB_EVENT	*event = (DB_EVENT *)events.values[i];
+
+		zbx_vector_ptr_append(&esc_events[event->source], (void*)event);
+	}
 
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
