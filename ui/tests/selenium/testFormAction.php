@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 define('ACTION_GOOD', 0);
 define('ACTION_BAD', 1);
 
+use Facebook\WebDriver\WebDriverBy;
+
 /**
  * @backup actions
  */
