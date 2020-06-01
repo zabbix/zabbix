@@ -63,15 +63,15 @@ static int	compare_events(const void *d1, const void *d2)
  *             objectid   - [IN] object id, for example trigger or item id    *
  *             object     - [IN] object, for example EVENT_OBJECT_TRIGGER     *
  ******************************************************************************/
-static void	add_condition_match(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition, zbx_uint64_t objectid,
-		int object)
+static void	add_condition_match(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition,
+		zbx_uint64_t objectid, int object)
 {
 	int		index;
 	const DB_EVENT	event_search = {.objectid = objectid, .object = object};
 
 	if (FAIL != (index = zbx_vector_ptr_bsearch(esc_events, &event_search, compare_events)))
 	{
-		const DB_EVENT	*event = esc_events->values[index];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[index];
 		int		i;
 
 		zbx_vector_uint64_append(&condition->eventids, event->eventid);
@@ -88,7 +88,7 @@ static void	add_condition_match(const zbx_vector_ptr_t *esc_events, zbx_conditio
 
 		for (i = index + 1; i < esc_events->values_num; i++)
 		{
-			event = esc_events->values[i];
+			event = (DB_EVENT *)esc_events->values[i];
 
 			if (event->objectid != objectid || event->object != object)
 				break;
