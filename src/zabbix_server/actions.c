@@ -3407,7 +3407,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 				zbx_escalation_new_t	*new_escalation;
 
 				/* command and message operations handled by escalators even for    */
-				/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTOREGISTRATION events */
+				/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTOREGISTRATION events  */
 				new_escalation = (zbx_escalation_new_t *)zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
 				new_escalation->actionid = action->actionid;
 				new_escalation->event = event;
