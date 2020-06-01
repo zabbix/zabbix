@@ -105,7 +105,7 @@ class CMenu extends CTag {
 	/**
 	 * Insert new menu item after the one with specified label, or insert as the last item, if not found.
 	 *
-	 * @param string $label         Visual label to insert item after.
+	 * @param string    $label      Visual label to insert item after.
 	 * @param CMenuItem $menu_item  Menu item object.
 	 *
 	 * @return CMenu
@@ -117,7 +117,7 @@ class CMenu extends CTag {
 	/**
 	 * Insert new menu item before the one with specified label, or insert as the first item, if not found.
 	 *
-	 * @param string $label         Visual label to insert item before.
+	 * @param string    $label      Visual label to insert item before.
 	 * @param CMenuItem $menu_item  Menu item object.
 	 *
 	 * @return CMenu
@@ -147,14 +147,15 @@ class CMenu extends CTag {
 	/**
 	 * Deep find menu item by action name and mark the whole chain as selected.
 	 *
-	 * @param string $action_name  Action name to search for.
-	 * @param bool $expand         Add 'is-expanded' class for selected submenus.
+	 * @param string $action_name     Action name to search for.
+	 * @param array  $request_params  Parameters of current HTTP request to compare in search process.
+	 * @param bool   $expand          Add 'is-expanded' class for selected submenus.
 	 *
 	 * @return bool  True, if menu item was selected.
 	 */
-	public function setSelectedByAction(string $action_name, bool $expand = true): bool {
+	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = true): bool {
 		foreach ($this->menu_items as $item) {
-			if ($item->setSelectedByAction($action_name, $expand)) {
+			if ($item->setSelectedByAction($action_name, $request_params, $expand)) {
 				if ($expand && $item->hasSubMenu()) {
 					$item->addClass('is-expanded');
 				}

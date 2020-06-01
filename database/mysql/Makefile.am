@@ -11,4 +11,5 @@ endif
 EXTRA_DIST = \
 	data.sql \
 	images.sql \
-	schema.sql
+	schema.sql \
+	double.sql

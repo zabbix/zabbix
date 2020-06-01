@@ -731,10 +731,10 @@ else {
 	if (!hasRequest('parent_discoveryid')) {
 		$items = API::Item()->get([
 			'output' => ['itemid'],
-			'graphids' => array_keys($data['graphs']),
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
 			'selectGraphs' => ['graphid'],
-			'selectItemDiscovery' => ['ts_delete']
+			'selectItemDiscovery' => ['ts_delete'],
+			'graphids' => array_keys($data['graphs']),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 		]);
 
 		foreach ($items as $item) {

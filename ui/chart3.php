@@ -92,8 +92,7 @@ if ($httptestid = getRequest('httptestid', false)) {
 		$graph_items[] = $item + [
 			'color' => ($color === false) ? reset($colors) : $color,
 			'host' => $hosts[$item['hostid']]['host'],
-			'hostname' => $hosts[$item['hostid']]['name'],
-			'preprocessing' => []
+			'hostname' => $hosts[$item['hostid']]['name']
 		];
 		$color = next($colors);
 	}
@@ -108,7 +107,6 @@ elseif ($items = getRequest('items', [])) {
 		'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
 			'value_type', 'key_'
 		],
-		'selectPreprocessing' => ['type', 'params'],
 		'selectHosts' => ['hostid', 'name', 'host'],
 		'filter' => [
 			'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]

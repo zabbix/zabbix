@@ -85,30 +85,27 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Add single item object to graph. If invalid 'delay' interval passed method will interrupt current request with
 	 * error message.
 	 *
-	 * @param array  $graph_item                              Array of graph item properties.
-	 * @param string $graph_item['itemid']                    Item id.
-	 * @param string $graph_item['type']                      Item type.
-	 * @param string $graph_item['name']                      Item host display name.
-	 * @param string $graph_item['hostname']                  Item hostname.
-	 * @param string $graph_item['key_']                      Item key_ field value.
-	 * @param string $graph_item['value_type']                Item value type.
-	 * @param string $graph_item['history']                   Item history field value.
-	 * @param string $graph_item['trends']                    Item trends field value.
-	 * @param string $graph_item['delay']                     Item delay.
-	 * @param string $graph_item['master_itemid']             Master item id for item of type ITEM_TYPE_DEPENDENT.
-	 * @param string $graph_item['units']                     Item units value.
-	 * @param string $graph_item['hostid']                    Item host id.
-	 * @param string $graph_item['hostname']                  Item host name.
-	 * @param string $graph_item['color']                     Item presentation color.
-	 * @param int    $graph_item['drawtype']                  Item presentation draw type, could be one of
-	 *                                                        GRAPH_ITEM_DRAWTYPE_* constants.
-	 * @param int    $graph_item['yaxisside']                 Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
-	 * @param int    $graph_item['calc_fnc']                  Item calculation function, could be one of CALC_FNC_* constants.
-	 * @param int    $graph_item['calc_type']                 Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or
-	 *                                                        GRAPH_ITEM_SUM.
-	 * @param array  $graph_item['preprocessing']             Item preprocessing steps.
-	 * @param string $graph_item['preprocessing'][]['type']   Item preprocessing step type.
-	 * @param string $graph_item['preprocessing'][]['params'] Item preprocessing step parameters.
+	 * @param array  $graph_item                   Array of graph item properties.
+	 * @param string $graph_item['itemid']         Item id.
+	 * @param string $graph_item['type']           Item type.
+	 * @param string $graph_item['name']           Item host display name.
+	 * @param string $graph_item['hostname']       Item hostname.
+	 * @param string $graph_item['key_']           Item key_ field value.
+	 * @param string $graph_item['value_type']     Item value type.
+	 * @param string $graph_item['history']        Item history field value.
+	 * @param string $graph_item['trends']         Item trends field value.
+	 * @param string $graph_item['delay']          Item delay.
+	 * @param string $graph_item['master_itemid']  Master item id for item of type ITEM_TYPE_DEPENDENT.
+	 * @param string $graph_item['units']          Item units value.
+	 * @param string $graph_item['hostid']         Item host id.
+	 * @param string $graph_item['hostname']       Item host name.
+	 * @param string $graph_item['color']          Item presentation color.
+	 * @param int    $graph_item['drawtype']       Item presentation draw type, could be one of
+	 *                                             GRAPH_ITEM_DRAWTYPE_* constants.
+	 * @param int    $graph_item['yaxisside']      Item axis side, could be one of GRAPH_YAXIS_SIDE_* constants.
+	 * @param int    $graph_item['calc_fnc']       Item calculation function, could be one of CALC_FNC_* constants.
+	 * @param int    $graph_item['calc_type']      Item graph presentation calculation type, GRAPH_ITEM_SIMPLE or
+	 *                                             GRAPH_ITEM_SUM.
 	 */
 	public function addItem(array $graph_item) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
@@ -282,8 +279,7 @@ class CLineGraphDraw extends CGraphDraw {
 				'min' => [],
 				'max' => [],
 				'avg' => [],
-				'clock' => [],
-				'missing_data_interval' => 0
+				'clock' => []
 			];
 
 			if (array_key_exists($item['itemid'], $results)) {
@@ -310,13 +306,6 @@ class CLineGraphDraw extends CGraphDraw {
 					$data['shift_min'][$idx] = 0;
 					$data['shift_max'][$idx] = 0;
 					$data['shift_avg'][$idx] = 0;
-				}
-
-				if ($item['source'] !== 'trends') {
-					$data['missing_data_interval'] = self::getDataFrequency($result['data'], $item) * 3;
-				}
-				else {
-					$data['missing_data_interval'] = self::getAverageDistance($result['data'], $item) * 3;
 				}
 			}
 
@@ -1624,7 +1613,7 @@ class CLineGraphDraw extends CGraphDraw {
 		return true;
 	}
 
-	protected function drawElement(&$data, $from, $to, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $yaxisside) {
+	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $yaxisside) {
 		if (!isset($data['max'][$from]) || !isset($data['max'][$to])) {
 			return;
 		}
@@ -1847,46 +1836,6 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
-	/**
-	 * Computes data frequency based on item configuration or data. If there is throttle preprocessing without heartbeat
-	 * frequency is zero, else max value between "item delay" or "preprocessing heartbeat" is chosen. If item does not
-	 * have any throttling steps and it's delay is zero, then frequency is determined from data.
-	 *
-	 * @param array $points                             Data points that is collected by this item.
-	 * @param array $points[]['clock']                  Point timestamp.
-	 * @param array $item                               Item that collected points.
-	 * @param array $item['delay']                      Item delay.
-	 * @param array $item['preprocessing']              Item preprocessing.
-	 * @param array $item['preprocessing'][]['type']    Preprocessing type. Only throttle preprocessing looked at.
-	 * @param array $item['preprocessing'][]['params']  Preprocessing parameters.
-	 *
-	 * @return int                                      Determined frequency in seconds or 0 if cannot be determined.
-	 */
-	protected static function getDataFrequency(array $points, array $item) {
-		$frequency = (int) timeUnitToSeconds($item['delay']);
-
-		foreach ($item['preprocessing'] as $preprocessing) {
-			// Only one of throttling steps is allowed.
-			if ($preprocessing['type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE) {
-				$throttle = (int) timeUnitToSeconds($preprocessing['params']);
-				if ($throttle > $frequency) {
-					return (int) $throttle;
-				}
-
-				break;
-			}
-			elseif ($preprocessing['type'] == ZBX_PREPROC_THROTTLE_VALUE) {
-				return 0;
-			}
-		}
-
-		if ($frequency == 0) {
-			return self::getAverageDistance($points);
-		}
-
-		return (int) $frequency;
-	}
-
 	private function calcVerticalScale() {
 		$calc_min = $this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED;
 		$calc_max = $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED;
@@ -1937,27 +1886,6 @@ class CLineGraphDraw extends CGraphDraw {
 				$rows_min = $rows_max = $result['rows'];
 			}
 		}
-	}
-
-	/**
-	 * Computes the average interval between given points.
-	 *
-	 * @param array $points             Data set points.
-	 * @param array $points[]['clock']  Point timestamp.
-	 *
-	 * @return int
-	 */
-	protected static function getAverageDistance(array $points = []) {
-		$distances = [];
-		$prev_clock = null;
-		foreach ($points as $point) {
-			if ($prev_clock !== null) {
-				$distances[] = $point['clock'] - $prev_clock;
-			}
-			$prev_clock = $point['clock'];
-		}
-
-		return $distances ? array_sum($distances) / count($distances) : 0;
 	}
 
 	private function calcDimentions() {
@@ -2174,6 +2102,9 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// for each metric
 		for ($item = 0; $item < $this->num; $item++) {
+			$minY = $this->m_minY[$this->items[$item]['yaxisside']];
+			$maxY = $this->m_maxY[$this->items[$item]['yaxisside']];
+
 			if (!array_key_exists($this->items[$item]['itemid'], $this->data)) {
 				continue;
 			}
@@ -2199,36 +2130,68 @@ class CLineGraphDraw extends CGraphDraw {
 				$calc_fnc = $this->items[$item]['calc_fnc'];
 			}
 
-			$stacked_data = ($this->type == GRAPH_TYPE_STACKED);
-			$elements = ($drawtype == GRAPH_ITEM_DRAWTYPE_DOT)
-				? $this->fmtPoints($data, $this->sizeX)
-				: $this->fmtLines($data, $this->sizeX, $data['missing_data_interval'], $stacked_data);
-
-			foreach ($elements as $element) {
-				list($j, $i) = $element;
-
-				if ($drawtype == GRAPH_ITEM_DRAWTYPE_DOT) {
-					$metric_drawtype = GRAPH_ITEM_DRAWTYPE_DOT;
+			// for each X
+			$prevDraw = true;
+			for ($i = 1, $j = 0; $i < $this->sizeX; $i++) { // new point
+				if ($data['count'][$i] == 0 && $i != $this->sizeX - 1) {
+					continue;
 				}
-				elseif ($j == $i) {
-					$metric_drawtype = GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
+
+				$delay = $this->items[$item]['delay'];
+
+				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
+						|| ($this->items[$item]['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+							&& preg_match('/^(event)?log(rt)?\[/', $this->items[$item]['key_']))
+						|| ($this->items[$item]['has_scheduling_intervals'] && $delay == 0)) {
+					$draw = true;
 				}
 				else {
-					$metric_drawtype = $drawtype;
+					if (!$data['clock']) {
+						$diff = 0;
+					}
+					else {
+						$diff = abs($data['clock'][$i] - $data['clock'][$j]);
+					}
+
+					$cell = ($this->to_time - $this->from_time) / $this->sizeX;
+
+					if ($cell > $delay) {
+						$draw = ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
+					}
+					else {
+						$draw = ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
+					}
 				}
 
-				$this->drawElement(
-					$data,
-					$i,
-					$j,
-					$metric_drawtype,
-					$max_color,
-					$avg_color,
-					$min_color,
-					$minmax_color,
-					$calc_fnc,
-					$this->items[$item]['yaxisside']
-				);
+				if (!$draw && !$prevDraw) {
+					$draw = true;
+					$valueDrawType = GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
+				}
+				else {
+					$valueDrawType = $drawtype;
+					$prevDraw = $draw;
+				}
+
+				if ($draw) {
+					$this->drawElement(
+						$data,
+						$i,
+						$j,
+						0,
+						$this->sizeX,
+						$minY,
+						$maxY,
+						$valueDrawType,
+						$max_color,
+						$avg_color,
+						$min_color,
+						$minmax_color,
+						$calc_fnc,
+						$this->items[$item]['yaxisside']
+					);
+				}
+
+				$j = $i;
 			}
 		}
 
@@ -2254,134 +2217,5 @@ class CLineGraphDraw extends CGraphDraw {
 		unset($this->items, $this->data);
 
 		imageOut($this->im);
-	}
-
-	/**
-	 * Produces points or zero length lines from data set.
-	 *
-	 * @param array $data   Data set.
-	 * @param int   $max_x  Number of pixels in graph.
-	 *
-	 * @return array
-	 */
-	public function fmtPoints(&$data, $max_x) {
-		$points = [];
-
-		$pt = -1;
-		$point = -1;
-
-		while (++ $pt < $max_x) {
-			if (!$data['count'][$pt]) {
-				continue;
-			}
-
-			$points[++ $point] = [$pt, $pt];
-		}
-
-		return $points;
-	}
-
-	/**
-	 * Produces lines according with expected data frequency. Points are connected only when they are no further apart
-	 * as given frequency.
-	 *
-	 * @param array $data          Data set.
-	 * @param int   $max_x         Number of pixels in graph.
-	 * @param int   $frequency     Expected metric frequency in seconds. If frequency is zero, lines are always connected.
-	 * @param int   $stacked_data  If $data passed is stacked graph type data.
-	 *
-	 * @return array
-	 */
-	public function fmtLines(&$data, $max_x, $frequency, $stacked_data = false) {
-		$lines = [];
-
-		$pt = -1;
-		$prev_pt = 0;
-		$line = -1;
-
-		// Construct lines, of data points no less time apart in x axis as given in $frequency.
-		while (++ $pt < $max_x) {
-			if (!$data['count'][$pt]) {
-				continue;
-			}
-
-			if (!$lines) {
-				$lines[++ $line] = [$pt, $pt];
-			}
-			elseif ($data['clock'][$pt] - $data['clock'][$prev_pt] > $frequency) {
-				$lines[++ $line] = [$pt, $pt];
-			}
-			elseif ($data['avg'][$pt] != $data['avg'][$prev_pt]) {
-				$lines[++ $line] = [$prev_pt, $pt];
-				$lines[++ $line] = [$pt, $pt];
-			}
-			elseif (!$frequency || $pt - $prev_pt < ZBX_GRAPH_MAX_SKIP_CELL) {
-				if ($stacked_data) {
-					$lines[++ $line] = [$prev_pt, $pt];
-				}
-				else {
-					$lines[$line][1] = $pt;
-				}
-			}
-			else {
-				$lines[$line][1] = $pt;
-			}
-
-			$prev_pt = $pt;
-		}
-
-		/*
-		 * Metric lines are connected to image edges when it is not certain that this gap exists because of missing data
-		 * or when first point is closer to image edge than max allowed graph cell. When frequency is zero, will always
-		 * connect lines to graph edges, or up till current time for the right graph edge.
-		 */
-		if ($lines) {
-			$pt_first = $lines[0][0];
-			if ($pt_first != 0) {
-				if ($pt_first < ZBX_GRAPH_MAX_SKIP_CELL
-						|| (!$frequency || $data['clock'][$pt_first] - $data['clock'][0] < $frequency)) {
-					array_unshift($lines, [0, $pt_first]);
-				}
-			}
-
-			$last_line = end($lines);
-			$pt_last = $last_line[1];
-			$px_last = $max_x - 1;
-			if ($pt_last != $px_last) {
-				// If graph image contains a region in "future", extending happens up till "now" instead of image edge.
-				$now = time();
-				if ($data['clock'][$px_last] > $now) {
-					while ($data['clock'][-- $px_last] > $now);
-				}
-
-				if ($px_last - $pt_last < ZBX_GRAPH_MAX_SKIP_CELL
-						|| (!$frequency || $data['clock'][$px_last] - $data['clock'][$pt_last] < $frequency)) {
-
-					// If last segment is "dot", extend that into a line.
-					if ($last_line[0] == $last_line[1]) {
-						$lines[count($lines) - 1][1] = $px_last;
-					}
-					else {
-						$lines[] = [$pt_last, $px_last];
-					}
-				}
-			}
-		}
-
-		// Removing any points that are adjacent to line.
-		if ($lines) {
-			foreach ($lines as $index => $line) {
-				if ($line[0] == $line[1]) {
-					if (array_key_exists($index - 1, $lines) && $lines[$index - 1][1] == $line[0]) {
-						unset($lines[$index]);
-					}
-					elseif (array_key_exists($index + 1, $lines) && $lines[$index + 1][0] == $line[0]) {
-						unset($lines[$index]);
-					}
-				}
-			}
-		}
-
-		return $lines;
 	}
 }

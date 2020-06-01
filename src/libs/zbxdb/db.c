@@ -72,6 +72,8 @@ static char	*last_db_strerror = NULL;	/* last database error message */
 
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
+static int	db_auto_increment;
+
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
@@ -334,6 +336,18 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_db_init_autoincrement_options                                *
+ *                                                                            *
+ * Purpose: specify the autoincrement options during db connect               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_init_autoincrement_options(void)
+{
+	db_auto_increment = 1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_db_connect                                                   *
  *                                                                            *
  * Purpose: connect to the database                                           *
@@ -393,20 +407,24 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(EXIT_FAILURE);
 	}
 
-	/* shadow global auto_increment variables */
-
-	if (0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
-			"set @@session.auto_increment_increment=1"))
+	if (1 == db_auto_increment)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_increment option.");
-		ret = ZBX_DB_FAIL;
-	}
+		/* Shadow global auto_increment variables. */
+		/* Setting session variables requires special permissions in MySQL 8.0.14-8.0.17. */
 
-	if (ZBX_DB_OK == ret && 0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
-			"set @@session.auto_increment_offset=1"))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_offset option.");
-		ret = ZBX_DB_FAIL;
+		if (0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
+				"set @@session.auto_increment_increment=1"))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_increment option.");
+			ret = ZBX_DB_FAIL;
+		}
+
+		if (ZBX_DB_OK == ret && 0 != MYSQL_OPTIONS(conn, MYSQL_INIT_COMMAND, MYSQL_OPTIONS_ARGS_VOID_CAST
+				"set @@session.auto_increment_offset=1"))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot set auto_increment_offset option.");
+			ret = ZBX_DB_FAIL;
+		}
 	}
 
 #if defined(HAVE_MYSQL_TLS)

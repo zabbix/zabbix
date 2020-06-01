@@ -45,14 +45,14 @@ foreach ($options['sendto_emails'] as $i => $email) {
 			(new CButton('sendto_emails['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
-	], 'form_row');
+	], 'form_row dynamic-row');
 }
 
 $email_send_to_table->setFooter(new CCol(
 	(new CButton('email_send_to_add', _('Add')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
-));
+), 'dynamic-row-control');
 
 // Create media form.
 $media_form = (new CFormList(_('Media')))
@@ -101,7 +101,8 @@ $form = (new CForm())
 					->addClass('element-table-remove')
 				)),
 			]))
-				->addClass('form_row'))
+				->addClass('form_row')
+				->addClass('dynamic-row'))
 				->setAttribute('type', 'text/x-jquery-tmpl')
 				->setAttribute('id', 'email_send_to_table_row')
 	]);
