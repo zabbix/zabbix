@@ -491,8 +491,7 @@ static int	check_host_condition(const zbx_vector_ptr_t *esc_events, zbx_conditio
 			operation,
 			condition_value);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
-				objectids.values, objectids.values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", objectids.values, objectids.values_num);
 
 	result = DBselect("%s", sql);
 
@@ -542,7 +541,7 @@ static int	check_trigger_id_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		if (event->objectid == condition_value)
 		{
@@ -594,27 +593,19 @@ static int	check_trigger_name_condition(const zbx_vector_ptr_t *esc_events, zbx_
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
-		char		*tmp_str;
-
-		tmp_str = zbx_strdup(NULL, event->trigger.description);
-
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_LIKE:
-				if (NULL != strstr(tmp_str, condition->value))
+				if (NULL != strstr(event->name, condition->value))
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
 			case CONDITION_OPERATOR_NOT_LIKE:
-				if (NULL == strstr(tmp_str, condition->value))
+				if (NULL == strstr(event->name, condition->value))
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
 		}
-
-		zbx_free(tmp_str);
 	}
 
 	return SUCCEED;
@@ -636,14 +627,14 @@ static int	check_trigger_name_condition(const zbx_vector_ptr_t *esc_events, zbx_
  ******************************************************************************/
 static int	check_trigger_severity_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	zbx_uint64_t	condition_value;
+	unsigned char	condition_value;
 	int		i;
 
-	condition_value = atoi(condition->value);
+	condition_value = (unsigned char)atoi(condition->value);
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		switch (condition->op)
 		{
