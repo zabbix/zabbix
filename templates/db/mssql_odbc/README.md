@@ -13,13 +13,14 @@ This template was tested on:
 
 ## Setup
 
-1. Create an MSSQL user for monitoring.
-  View Server State and View Any Definition permissions should be granted to the user.
-  For more information please see the MSSQL documentation. 
-2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).
-  Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy. 
-  See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.
-  Note! Credentials in the odbc.ini do not work for MSSQL.
+1. Create an MSSQL user for monitoring.  
+  View Server State and View Any Definition permissions should be granted to the user.  
+  For more information please see the MSSQL documentation.  
+2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).  
+  Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.  
+  See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.  
+  Note! Credentials in the odbc.ini do not work for MSSQL.  
+
 The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.
 
 

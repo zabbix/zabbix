@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-01T07:52:10Z</date>
+   <date>2020-06-01T08:31:40Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -13,9 +13,9 @@
          <name>Template DB MSSQL by ODBC</name>
          <description>1. Create an MSSQL user for monitoring.&#13;
   View Server State and View Any Definition permissions should be granted to the user.&#13;
-  For more information please see the MSSQL documentation. &#13;
+  For more information please see the MSSQL documentation.&#13;
 2. Set the user name and password in host macros ({$MSSQL.USER} and {$MSSQL.PASSWORD}).&#13;
-  Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy. &#13;
+  Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.&#13;
   See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15.&#13;
   Note! Credentials in the odbc.ini do not work for MSSQL.&#13;
 The "Service's TCP port state" item uses {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.&#13;
