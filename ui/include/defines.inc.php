@@ -1329,6 +1329,7 @@ define('API_NUMERIC',			28);
 define('API_LLD_MACRO',			29);
 define('API_PSK',				30);
 define('API_SORTORDER',			31);
+define('API_CALC_FORMULA',		32);
 
 // flags
 define('API_REQUIRED',					0x0001);
