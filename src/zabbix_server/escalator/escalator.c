@@ -266,7 +266,6 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 		else
 			ret = SUCCEED;
 	}
-
 	zbx_vector_ptr_clear_ext(&tag_filters, (zbx_clean_func_t)zbx_tag_filter_free);
 	zbx_vector_ptr_destroy(&tag_filters);
 
