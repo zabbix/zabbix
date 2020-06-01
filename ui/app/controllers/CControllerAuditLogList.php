@@ -88,7 +88,7 @@ class CControllerAuditLogList extends CController {
 			$filter['resourcetype'] = $data['resourcetype'];
 		}
 
-		if ($data['resourceid'] !== '' && CNewValidator::is_uint64($data['resourceid'])) {
+		if ($data['resourceid'] !== '' && CNewValidator::is_id($data['resourceid'])) {
 			$filter['resourceid'] = $data['resourceid'];
 		}
 
