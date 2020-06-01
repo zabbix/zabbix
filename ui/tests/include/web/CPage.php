@@ -479,4 +479,41 @@ class CPage {
 			// Code is not missing here.
 		}
 	}
+
+	/**
+	 * Refresh page.
+	 *
+	 * @return $this
+	 */
+	public function refresh() {
+		$this->driver->navigate()->refresh();
+
+		return $this;
+	}
+
+	/**
+	 * Switching to frame or iframe.
+	 *
+	 * @param CElement|null $element    iframe element
+	 *
+	 * @return $this
+	 */
+	public function switchTo($element = null) {
+		if ($element) {
+			if (is_string($element)) {
+				$element = $this->query($element)->one();
+			}
+
+			if (is_array($element)) {
+				$element = $this->query($element[0], $element[1])->one();
+			}
+
+			$this->driver->switchTo()->frame($element);
+		}
+		else {
+			$this->driver->switchTo()->defaultContent();
+		}
+
+		return $this;
+	}
 }

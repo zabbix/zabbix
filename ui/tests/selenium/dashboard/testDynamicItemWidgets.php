@@ -292,32 +292,32 @@ class testDynamicItemWidgets extends CWebTest {
 			}
 			$this->page->waitUntilReady();
 			// TODO: remove after fix ZBX-17821
-			CElementQuery::getDriver()->navigate()->refresh();
+			$this->page->refresh();
 			$this->page->waitUntilReady();
 		}
 
-		$this->checkWidgetContent($data['widgets']);
+		$this->assertWidgetContent($data['widgets']);
 		// Check that after page refresh widgets remain the same.
-		CElementQuery::getDriver()->navigate()->refresh();
+		$this->page->refresh();
 		$this->page->waitUntilReady();
-		$this->checkWidgetContent($data['widgets']);
+		$this->assertWidgetContent($data['widgets']);
 	}
 
-	private function checkWidgetContent($data) {
+	private function assertWidgetContent($data) {
 		$dashboard = CDashboardElement::find()->one();
-		$all_widgets = $dashboard->getWidgets();
-		$this->assertEquals(count($data), $all_widgets->count());
+		$widgets = $dashboard->getWidgets();
+		$this->assertEquals(count($data), $widgets->count());
 
-		foreach ($data as $key => $widget) {
-			$get_widget = $all_widgets->get($key);
-			$widget_content = $get_widget->getContent();
-			$this->assertEquals($widget['header'], $get_widget->getHeaderText());
+		foreach ($data as $key => $expected) {
+			$widget = $widgets->get($key);
+			$widget_content = $widget->getContent();
+			$this->assertEquals($expected['header'], $widget->getHeaderText());
 
 			// Check widget empty content, because the host doesn't match dynamic option criteria.
-			if ($widget['header'] === '' || $widget['header'] === $widget['type']
-					|| CTestArrayHelper::get($widget, 'empty', false)) {
+			if ($expected['header'] === '' || $expected['header'] === $expected['type']
+					|| CTestArrayHelper::get($expected, 'empty', false)) {
 				$content = $widget_content->query('class:nothing-to-show')->one()->getText();
-				$message = ($widget['type'] === 'URL')
+				$message = ($expected['type'] === 'URL')
 						? 'No host selected.'
 						: 'No permissions to referred object or it does not exist!';
 				$this->assertEquals($message, $content);
@@ -326,20 +326,20 @@ class testDynamicItemWidgets extends CWebTest {
 
 			// Check widget content when the host match dynamic option criteria.
 			$this->assertFalse($widget_content->query('class:nothing-to-show')->one(false)->isValid());
-			switch ($widget['type']) {
+			switch ($expected['type']) {
 				case 'Plain text':
 					$data = $widget_content->asTable()->index('Name');
-					foreach ($widget['expected'] as $item => $value) {
+					foreach ($expected['expected'] as $item => $value) {
 						$row = $data[$item];
 						$this->assertEquals($value, $row['Value']);
 					}
 					break;
 
 				case 'URL':
-					CElementQuery::getDriver()->switchTo()->frame($widget_content->query('id:iframe')->one());
+					$this->page->switchTo($widget_content->query('id:iframe')->one());
 					$form = $this->query('xpath://form[@action="hostinventories.php"]')->asForm()->one();
-					$this->assertEquals($widget['host'], $form->getFieldContainer('Host name')->getText());
-					CElementQuery::getDriver()->switchTo()->defaultContent();
+					$this->assertEquals($expected['host'], $form->getFieldContainer('Host name')->getText());
+					$this->page->switchTo();
 					break;
 			}
 		}
