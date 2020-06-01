@@ -69,12 +69,12 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Database discovery |<p>Scanning databases in DBMS.</p> |ODBC |db.odbc.discovery[dbname,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1m`</p><p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$MSSQL.DBNAME.MATCHES}`</p><p>- B: {#DBNAME} NOT_MATCHES_REGEX `{$MSSQL.DBNAME.NOT_MATCHES}`</p> |
-|Availability groups discovery |<p>Discovery the existed availability groups.</p> |ODBC |db.odbc.discovery[availability_groups,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1m`</p> |
-|Local database discovery |<p>Discovery of the local availability databases.</p> |ODBC |db.odbc.discovery[local_db,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1m`</p> |
-|Non-local database discovery |<p>Discovery of the non-local (not local to the SQL Server instance) availability databases.</p> |ODBC |db.odbc.discovery[non-local_db,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1m`</p> |
-|Replication discovery |<p>Discovery of the database replicas.</p> |ODBC |db.odbc.discovery[replicas,"{$MSSQL.DSN}"] |
-|Mirroring discovery |<p>To see the row for a database other than master or tempdb, you must</p><p>either be the database owner or have at least ALTER ANY DATABASE or VIEW ANY</p><p>DATABASE server-level permission or CREATE DATABASE permission in the master</p><p>database. To see non-NULL values on a mirror database, you must be a member</p><p>of the sysadmin fixed server role.</p> |ODBC |db.odbc.discovery[mirrors,"{$MSSQL.DSN}"] |
+|Database discovery |<p>Scanning databases in DBMS.</p> |ODBC |db.odbc.discovery[dbname,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p><p>**Filter**:</p>AND <p>- A: {#DBNAME} MATCHES_REGEX `{$MSSQL.DBNAME.MATCHES}`</p><p>- B: {#DBNAME} NOT_MATCHES_REGEX `{$MSSQL.DBNAME.NOT_MATCHES}`</p> |
+|Availability groups discovery |<p>Discovery the existed availability groups.</p> |ODBC |db.odbc.discovery[availability_groups,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Local database discovery |<p>Discovery of the local availability databases.</p> |ODBC |db.odbc.discovery[local_db,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Non-local database discovery |<p>Discovery of the non-local (not local to the SQL Server instance) availability databases.</p> |ODBC |db.odbc.discovery[non-local_db,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Replication discovery |<p>Discovery of the database replicas.</p> |ODBC |db.odbc.discovery[replicas,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Mirroring discovery |<p>To see the row for a database other than master or tempdb, you must</p><p>either be the database owner or have at least ALTER ANY DATABASE or VIEW ANY</p><p>DATABASE server-level permission or CREATE DATABASE permission in the master</p><p>database. To see non-NULL values on a mirror database, you must be a member</p><p>of the sysadmin fixed server role.</p> |ODBC |db.odbc.discovery[mirrors,"{$MSSQL.DSN}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
 ## Items collected
 

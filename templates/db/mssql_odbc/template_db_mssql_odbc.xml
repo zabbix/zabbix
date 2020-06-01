@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-01T08:31:40Z</date>
+   <date>2020-06-01T09:56:44Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1958,7 +1958,6 @@ WHERE a.counter_name = 'Cache Hit Ratio'
 FROM sys.availability_groups</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
-               <lifetime>0</lifetime>
                <description>Discovery the existed availability groups.</description>
                <item_prototypes>
                   <item_prototype>
@@ -2141,7 +2140,7 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1m</params>
+                     <params>1d</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2170,7 +2169,6 @@ FROM sys.databases</params>
                      </condition>
                   </conditions>
                </filter>
-               <lifetime>0</lifetime>
                <description>Scanning databases in DBMS.</description>
                <item_prototypes>
                   <item_prototype>
@@ -2626,7 +2624,7 @@ FROM sys.databases</params>
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1m</params>
+                     <params>1d</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2644,7 +2642,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
 WHERE drs.is_local = 1</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
-               <lifetime>0</lifetime>
                <description>Discovery of the local availability databases.</description>
                <item_prototypes>
                   <item_prototype>
@@ -2795,7 +2792,7 @@ partially healthy if synchronization_state is 1 (SYNCHRONIZING).&#13;
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1m</params>
+                     <params>1d</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -2809,7 +2806,6 @@ FROM sys.database_mirroring
 WHERE mirroring_state_desc IS NOT NULL</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
-               <lifetime>0</lifetime>
                <description>To see the row for a database other than master or tempdb, you must&#13;
 either be the database owner or have at least ALTER ANY DATABASE or VIEW ANY&#13;
 DATABASE server-level permission or CREATE DATABASE permission in the master&#13;
@@ -3048,6 +3044,12 @@ WHERE m.mirroring_state_desc IS NOT NULL</params>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
             </discovery_rule>
             <discovery_rule>
                <name>Non-local database discovery</name>
@@ -3063,7 +3065,6 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
 WHERE drs.is_local = 0</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
-               <lifetime>0</lifetime>
                <description>Discovery of the non-local (not local to the SQL Server instance) availability databases.</description>
                <item_prototypes>
                   <item_prototype>
@@ -3173,7 +3174,7 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                <preprocessing>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1m</params>
+                     <params>1d</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -3188,7 +3189,6 @@ FROM sys.dm_hadr_availability_replica_cluster_states as arcs
 JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
-               <lifetime>0</lifetime>
                <description>Discovery of the database replicas.</description>
                <item_prototypes>
                   <item_prototype>
@@ -3499,6 +3499,12 @@ On a secondary replica, upon detecting that it is disconnected, the secondary re
 On the primary replica, if a secondary replica is disconnected, its secondary databases are marked as NOT SYNCHRONIZED on the primary replica, which waits for the secondary to reconnect; On a secondary replica, upon detecting that it is disconnected, the secondary replica attempts to reconnect to the primary replica.</description>
                   </trigger_prototype>
                </trigger_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
             </discovery_rule>
          </discovery_rules>
          <macros>
