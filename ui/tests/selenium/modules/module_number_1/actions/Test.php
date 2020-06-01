@@ -1,6 +1,5 @@
 <?php declare(strict_types = 1);
 
-
 namespace Modules\Example_A\Actions;
 
 use CController as CAction;
@@ -31,7 +30,6 @@ class Test extends CAction {
 	 * @inheritDoc
 	 */
 	protected function doAction() {
-
 		$response = new \CControllerResponseData([]);
 		$response->setTitle('1st Module');
 

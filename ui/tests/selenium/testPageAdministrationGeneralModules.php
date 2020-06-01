@@ -37,9 +37,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			[
-				'class' => CMessageBehavior::class
-			]
+			'class' => CMessageBehavior::class
 		];
 	}
 
@@ -76,7 +74,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			[
 				'Name' => 'шестой модуль',
 				'Version' => 'бета 2',
-				'Author' => 'Иосиф Кобзон',
+				'Author' => 'Работник Заббикса',
 				'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Scripts" из секции "Administration".',
 				'Status' => 'Disabled'
 			]
@@ -173,7 +171,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				[
 					'Name' => 'шестой модуль',
 					'Version' => 'бета 2',
-					'Author' => 'Иосиф Кобзон',
+					'Author' => 'Работник Заббикса',
 					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Scripts" из секции "Administration".',
 					'Directory' => 'module_number_6',
 					'Namespace' => 'Example_F',
@@ -538,7 +536,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 */
 	private function assertModuleEnabled($module) {
 		$xpath = 'xpath://ul[@class="menu-main"]//a[text()="';
-		// If module removes a menu entry or top level menu entry, check that such antries are not present.
+		// If module removes a menu entry or top level menu entry, check that such entries are not present.
 		if (CTestArrayHelper::get($module, 'remove', false)) {
 			$this->assertTrue($this->query($xpath.$module['menu_entry'].'"]')->count() === 0);
 			if (array_key_exists('top_menu_entry', $module)) {
@@ -587,10 +585,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				$message = CMessageElement::find()->one();
 				$this->assertContains('Class not found for action '.$entry['action'], $message->getText());
 				$this->page->open('zabbix.php?action=module.list');
-			}
-			else {
-
-				continue;
 			}
 		}
 	}

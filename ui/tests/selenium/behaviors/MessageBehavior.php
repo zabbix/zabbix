@@ -37,14 +37,14 @@ class CMessageBehavior extends CBehavior {
 
 		($expected === TEST_GOOD) ? $this->test->assertTrue($message->isGood()) : $this->test->assertTrue($message->isBad());
 
-		$this->test->assertEquals($title, $message->getTitle());
+		$this->test->assertEquals($title, $message->getTitle(), 'Message title and the expected title do not match.');
 
 		if ($details !== null) {
 			if (!is_array($details)) {
 				$details = [$details];
 			}
 			foreach ($details as $detail) {
-				$this->test->assertTrue($message->hasLine($detail));
+				$this->test->assertTrue($message->hasLine($detail), 'Line "'.$detail.'" was not found in message details');
 			}
 		}
 	}
