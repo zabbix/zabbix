@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-01T09:56:44Z</date>
+   <date>2020-06-01T16:44:32Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -3186,7 +3186,8 @@ JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replic
                <params>SELECT ag.name as group_name, 
 arcs.replica_server_name as replica_name
 FROM sys.dm_hadr_availability_replica_cluster_states as arcs 
-JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id</params>
+JOIN sys.availability_groups ag ON ag.group_id = arcs.group_id
+JOIN sys.dm_hadr_availability_replica_states ars ON ars.replica_id = arcs.replica_id</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
                <description>Discovery of the database replicas.</description>
