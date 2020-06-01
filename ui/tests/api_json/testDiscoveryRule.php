@@ -20,9 +20,15 @@
 
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../../include/classes/parsers/CConditionFormula.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CConditionHelper.php';
 
 /**
+ * @backup ids
  * @backup items
+ * @backup lld_override
+ * @backup lld_override_condition
+ * @backup lld_override_operation
  */
 class testDiscoveryRule extends CAPITest {
 	public static function discoveryrule_create_data_invalid() {
@@ -3002,7 +3008,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
@@ -3023,7 +3029,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'formula' => '',
 								'conditions' => [
 									[
@@ -3045,7 +3051,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'formula' => 'x',
 								'conditions' => [
 									[
@@ -3067,7 +3073,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'formula' => 'B or A',
 								'conditions' => [
 									[
@@ -3089,7 +3095,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'formula' => 'B or A',
 								'conditions' => [
 									[
@@ -3112,7 +3118,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'eval_formula' => 'A',
 								'formula' => 'A',
 								'conditions' => [
@@ -3137,7 +3143,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 							]
 						]
 					])
@@ -3151,7 +3157,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'conditions' => []
 							]
 						]
@@ -3166,7 +3172,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'conditions' => [
 									[]
 								]
@@ -3183,7 +3189,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'formula' => 'A',
 								'conditions' => [
 									[
@@ -3206,7 +3212,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
@@ -3226,7 +3232,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => 3,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
@@ -4129,15 +4135,218 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	public static function discoveryrule_overrides_create_data_valid() {
-		return [];
+		$num = 0;
+		$new_lld_overrides = function(array $overrides) use (&$num) {
+			return [
+				'name' => 'Overrides (valid)',
+				'key_' => 'valid.lld.with.overrides.'.($num ++),
+				'hostid' => '50009',
+				'type' => '2',
+				'overrides' => $overrides
+			];
+		};
+
+		$data = [
+			// LLD rule overrides
+			'Test /1/overrides/1/filter and /1/overrides/1/operations are not mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override 1',
+							'step' => 2
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/stop default value is set correctly.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override 1',
+							'step' => 2
+						],
+						[
+							'name' => 'override 2',
+							'step' => 3,
+							'stop' => ZBX_LLD_OVERRIDE_STOP_NO
+						],
+						[
+							'name' => 'override 3',
+							'step' => 1,
+							'stop' => ZBX_LLD_OVERRIDE_STOP_YES
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			// LLD rule override filter
+			'Test /1/overrides/1/filter/conditions/3/operator default value is set correctly.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or A or C',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			]
+		];
+		/* return [end($data)]; */
+		return $data;
+	}
+
+	/**
+	 * @param array $db_lld_override                     Table "lld_override" row (all fields).
+	 * @param array $db_lld_override['lld_overrideid']
+	 * @param array $db_lld_override['itemid']
+	 * @param array $db_lld_override['name']
+	 * @param array $db_lld_override['step']
+	 * @param array $db_lld_override['evaltype']
+	 * @param array $db_lld_override['formula']
+	 * @param array $db_lld_override['stop']
+	 * @param array $request_lld_override
+	 * @param array $request_lld_override['name']
+	 * @param array $request_lld_override['step']
+	 * @param array $request_lld_override['stop']        (optional)
+	 * @param array $request_lld_override['filter']      (optional)
+	 * @param array $request_lld_override['operations']  (optional)
+	 */
+	protected function assertLLDOverride(array $db_lld_override, array $request_lld_override) {
+		$this->assertEquals($db_lld_override['name'], $request_lld_override['name']);
+		$this->assertEquals($db_lld_override['step'], $request_lld_override['step']);
+
+		$stop = array_key_exists('stop', $request_lld_override)
+			? $request_lld_override['stop']
+			: ZBX_LLD_OVERRIDE_STOP_NO;
+		$this->assertEquals($db_lld_override['stop'], $stop);
+
+		if (array_key_exists('filter', $request_lld_override)) {
+			$this->assertLLDOverrideFilter($db_lld_override, $request_lld_override['filter']);
+		}
+		else {
+			$this->assertEmpty($db_lld_override['formula']);
+			$this->assertEquals($db_lld_override['evaltype'], CONDITION_EVAL_TYPE_AND_OR);
+		}
+
+		if (array_key_exists('operations', $request_lld_override)) {
+			foreach ($request_lld_override['operations'] as $operation) {
+				$this->assertLLDOverrideOperation($db_lld_override, $operation);
+			}
+		}
+	}
+
+	/**
+	 * @param array $db_lld_override                            Table "lld_override" row (all fields).
+	 * @param array $filter                                     LLD rule override filter request object.
+	 * @param array $filter['evaltype']
+	 * @param array $filter['eval_formula']                     (optional)
+	 * @param array $filter['formula']                          (optional)
+	 * @param array $filter['conditions']
+	 * @param array $filter['conditions'][]                     LLD rule override filter condition object.
+	 * @param array $filter['conditions'][]['macro']
+	 * @param array $filter['conditions'][]['value']
+	 * @param array $filter['conditions'][]['formulaid']        (optional)
+	 * @param array $filter['conditions'][]['operator']         (optional)
+	 */
+	protected function assertLLDOverrideFilter(array $db_lld_override, array $filter) {
+		$db_lld_conditions = CDBHelper::getAll('SELECT * from lld_override_condition WHERE '.
+			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
+		);
+
+		$conditionid_by_formulaid = array_combine(
+			array_column($filter['conditions'], 'formulaid'),
+			array_column($db_lld_conditions, 'lld_override_conditionid')
+		);
+		$formula = CConditionHelper::replaceLetterIds($filter['formula'], $conditionid_by_formulaid);
+		$this->assertEquals($db_lld_override['formula'], $formula);
+
+		$this->assertEquals($db_lld_override['evaltype'], $filter['evaltype']);
+
+		foreach ($filter['conditions'] as $num => $condition) {
+			$this->assertEquals($db_lld_conditions[$num]['macro'], $condition['macro']);
+			$this->assertEquals($db_lld_conditions[$num]['value'], $condition['value']);
+
+			$operator = array_key_exists('operator', $condition)
+				? $condition['operator']
+				: CONDITION_OPERATOR_REGEXP;
+
+			$this->assertEquals($db_lld_conditions[$num]['operator'], $operator);
+		}
+	}
+
+	/**
+	 * @param array $db_lld_override                            Table "lld_override" row (all fields).
+	 * @param array $operation                                  LLD rule override operation object.
+	 * @param array $operation['operationobject']
+	 * @param array $operation['operator'] (optional)
+	 * @param array $operation['value']
+	 * @param array $operation['opstatus']
+	 * @param array $operation['opdiscover']
+	 * @param array $operation['opperiod']
+	 * @param array $operation['ophistory']
+	 * @param array $operation['optrends']
+	 * @param array $operation['opseverity']
+	 * @param array $operation['optag']
+	 * @param array $operation['optemplate']
+	 * @param array $operation['opinventory']
+	 */
+	protected function assertLLDOverrideOperation(array $db_lld_override, array $operation) {
+		$db_lld_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
+			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid']));
+		/* 'lld_override_operation' */
+		/* 'lld_override_opdiscover' */
+		/* 'lld_override_ophistory' */
+		/* 'lld_override_opinventory' */
+		/* 'lld_override_opperiod' */
+		/* 'lld_override_opseverity' */
+		/* 'lld_override_opstatus' */
+		/* 'lld_override_optag' */
+		/* 'lld_override_optemplate' */
+		/* 'lld_override_optrends' */
 	}
 
 	/**
 	 * @dataProvider discoveryrule_overrides_create_data_invalid
 	 * @dataProvider discoveryrule_overrides_create_data_valid
 	 */
-	public function testDiscoveryRuleOverrides_Create(array $discoveryrules, $expected_error) {
-		$result = $this->call('discoveryrule.create', $discoveryrules, $expected_error);
+	public function testDiscoveryRuleOverrides_Create(array $request, $expected_error) {
+		$result = $this->call('discoveryrule.create', $request, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['itemids'] as $num => $itemid) {
+				$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.dbConditionId('itemid', (array) $itemid));
+
+				$request_lld_overrides = $request[$num]['overrides'];
+				foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+					$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+				}
+			}
+		}
 	}
 
 	// TODO: add more tests to check other related discovery rule properties and perform more tests on templates and templated objects.
