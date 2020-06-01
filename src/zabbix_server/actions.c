@@ -359,9 +359,10 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 		/* resolve in next select only those triggerids that have template id and not equal to condition */
 		zbx_vector_uint64_pair_clear(objectids_pair);
 
-		for (i = 0; i < objectids_pair_tmp.values_num; i++)
+		if (0 != objectids_pair_tmp.values_num)
 		{
-			zbx_vector_uint64_pair_append(objectids_pair, objectids_pair_tmp.values[i]);
+			zbx_vector_uint64_pair_append_array(objectids_pair, objectids_pair_tmp.values,
+					objectids_pair_tmp.values_num);
 		}
 
 		zbx_vector_uint64_pair_clear(&objectids_pair_tmp);
