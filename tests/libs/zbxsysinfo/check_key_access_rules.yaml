@@ -16,7 +16,7 @@ in:
     - pattern: '*'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 2
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_DENY
@@ -286,7 +286,7 @@ in:
     - pattern: '*'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 4
+  number_of_rules: 3
   metrics:
     - metric: 'vfs.file.size[/var/log/zabbix_server.log]'
       result: ZBX_KEY_ACCESS_ALLOW
@@ -389,7 +389,7 @@ in:
     - pattern: '*'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 12
+  number_of_rules: 11
   metrics:
     - metric: 'vfs.file.size'
       result: ZBX_KEY_ACCESS_DENY
