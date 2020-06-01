@@ -324,9 +324,13 @@ class CUserMacro extends CApiService {
 
 		$macro = $user_macro_parser->getMacro();
 		$context = $user_macro_parser->getContext();
+		$regex = $user_macro_parser->getRegex();
 
 		if ($context !== null) {
 			$macro .= ':'.$context;
+		}
+		elseif ($regex !== null) {
+			$macro .= ':'.CUserMacroParser::REGEX_PREFIX.$regex;
 		}
 
 		return $macro;

@@ -26,7 +26,7 @@ class CUserMacroParser extends CParser {
 	const STATE_UNQUOTED = 2;
 	const STATE_QUOTED = 3;
 	const STATE_END_OF_MACRO = 4;
-	private const REGEX_PREFIX = 'regex:';
+	public const REGEX_PREFIX = 'regex:';
 
 	private $macro = '';
 	private $context = null;
