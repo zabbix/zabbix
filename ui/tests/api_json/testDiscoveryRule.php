@@ -3270,7 +3270,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => 10,
 								]
 							]
@@ -3287,7 +3287,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP
 								]
 							]
@@ -3305,7 +3305,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opstatus' => []
 								]
@@ -3323,7 +3323,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opstatus' => [
 										'status' => 2
@@ -3364,7 +3364,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opdiscover' => []
 								]
@@ -3382,7 +3382,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opdiscover' => [
 										'discover' => 2
@@ -3403,7 +3403,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opperiod' => []
 								]
@@ -3421,7 +3421,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opperiod' => [
 										'delay' => 'www'
@@ -3502,7 +3502,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => []
 								]
@@ -3520,7 +3520,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => [
 										'history' => 'www'
@@ -3540,7 +3540,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 1,
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => [
 										'history' => '1d'
@@ -3560,7 +3560,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 2,
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => [
 										'history' => '1d'
@@ -3580,7 +3580,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 3,
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => [
 										'history' => '1d'
@@ -3601,7 +3601,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => []
 								]
@@ -3619,7 +3619,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => [
 										'trends' => 'www'
@@ -3639,7 +3639,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 1,
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => [
 										'trends' => '1d'
@@ -3659,7 +3659,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 2,
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => [
 										'trends' => '1d'
@@ -3679,7 +3679,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 3,
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => [
 										'trends' => '1d'
@@ -3700,7 +3700,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => []
 								]
@@ -3718,7 +3718,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
 										'severity' => 6
@@ -3799,7 +3799,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => []
 								]
@@ -3817,7 +3817,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => [
 										[]
@@ -3837,7 +3837,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 0,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => [
 										[
@@ -3920,7 +3920,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 3,
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => []
 								]
@@ -3938,7 +3938,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 3,
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => [
 										[]
@@ -3958,7 +3958,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 3,
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => [
 										[
@@ -4041,7 +4041,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 3,
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opinventory' => []
 								]
@@ -4059,7 +4059,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operationobject' => 3,
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opinventory' => [
 										'inventory_mode' => -2
@@ -4159,6 +4159,18 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
+			'Test /1/overrides/1/operations can be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override 1',
+							'step' => 2,
+							'operations' => []
+						]
+					])
+				],
+				'expected_error' => null
+			],
 			'Test /1/overrides/1/stop default value is set correctly.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
@@ -4181,6 +4193,38 @@ class testDiscoveryRule extends CAPITest {
 				'expected_error' => null
 			],
 			// LLD rule override filter
+			'Test /1/overrides/1/filter/evaltype and_or with three conditions.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => ''
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => ''
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			// LLD rule override filter condition
 			'Test /1/overrides/1/filter/conditions/3/operator default value is set correctly.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
@@ -4265,12 +4309,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array $filter                                     LLD rule override filter request object.
 	 * @param array $filter['evaltype']
 	 * @param array $filter['eval_formula']                     (optional)
-	 * @param array $filter['formula']                          (optional)
+	 * @param array $filter['formula']                          (optional) if evaltype is CONDITION_EVAL_TYPE_EXPRESSION
 	 * @param array $filter['conditions']
 	 * @param array $filter['conditions'][]                     LLD rule override filter condition object.
 	 * @param array $filter['conditions'][]['macro']
 	 * @param array $filter['conditions'][]['value']
-	 * @param array $filter['conditions'][]['formulaid']        (optional)
+	 * @param array $filter['conditions'][]['formulaid']        (optional) if evaltype is CONDITION_EVAL_TYPE_EXPRESSION
 	 * @param array $filter['conditions'][]['operator']         (optional)
 	 */
 	protected function assertLLDOverrideFilter(array $db_lld_override, array $filter) {
@@ -4278,14 +4322,16 @@ class testDiscoveryRule extends CAPITest {
 			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
 		);
 
-		$conditionid_by_formulaid = array_combine(
-			array_column($filter['conditions'], 'formulaid'),
-			array_column($db_lld_conditions, 'lld_override_conditionid')
-		);
-		$formula = CConditionHelper::replaceLetterIds($filter['formula'], $conditionid_by_formulaid);
-		$this->assertEquals($db_lld_override['formula'], $formula);
-
 		$this->assertEquals($db_lld_override['evaltype'], $filter['evaltype']);
+
+		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$conditionid_by_formulaid = array_combine(
+				array_column($filter['conditions'], 'formulaid'),
+				array_column($db_lld_conditions, 'lld_override_conditionid')
+			);
+			$formula = CConditionHelper::replaceLetterIds($filter['formula'], $conditionid_by_formulaid);
+			$this->assertEquals($db_lld_override['formula'], $formula);
+		}
 
 		foreach ($filter['conditions'] as $num => $condition) {
 			$this->assertEquals($db_lld_conditions[$num]['macro'], $condition['macro']);
