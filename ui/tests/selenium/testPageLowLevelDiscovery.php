@@ -22,8 +22,9 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testPageLowLevelDiscovery extends CWebTest {
 
+	const HOST_ID = 90001;
 	public function testPageLowLevelDiscovery_CheckLayout() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check all field names.
@@ -31,6 +32,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 			'Keep lost resources period', 'SNMP OID', 'State', 'Status'];
 		$labels = $form->getLabels()->asText();
 		$this->assertEquals($fields, $labels);
+
+		// Check that filter expanded.
+		$this->assertTrue($this->query('xpath://li[@aria-expanded="true"]')->one()->isPresent());
 
 		// Check all dropdowns.
 		$dropdowns = [
@@ -49,7 +53,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			}
 		}
 
-		// Check that all buttons.
+		// Check all buttons.
 		$buttons_name = ['Apply', 'Reset'];
 		foreach ($buttons_name as $button){
 			$this->assertTrue($form->query('button:'.$button)->one()->isPresent());
@@ -61,41 +65,26 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->assertSame($headers, $table->getHeadersText());
 	}
 
-	public static function getForResetButtonCheck() {
-		return [
-			[
-				[
-					'fields' => [
-						'Name' => 'Discovery rule 3',
+	public function testPageLowLevelDiscovery_ResetButton() {
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$rows_amount = $table->getRows()->count();
+		// Filling fields with neede discovery rule info.
+		$form->fill(['Name' => 'Discovery rule 3',
 						'Key' => 'key3',
 						'Type' => 'Zabbix agent',
 						'Update interval' => '30s',
-						'Status' => 'Enabled'
-					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider getForResetButtonCheck
-	 */
-	public function testPageLowLevelDiscovery_ResetButton($data) {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=90001');
-		$form = $this->query('name:zbx_filter')->one()->asForm();
-
-		// Filling fields with neede discovery rule info.
-		$form->fill($data['fields']);
+						'Status' => 'Enabled']);
 		$form->submit();
 
-		// Checking that needed discovery displayed and he is only one.
-		$table = $this->query('class:list-table')->asTable()->one();
+		// Checking that needed discovery rule displayed.
 		$this->assertTrue($table->findRow('Name', 'Discovery rule 3')->isPresent());
 		$this->assertEquals(1, $table->getRows()->count());
 
 		// After pressing reset button, check that there is 3 discovery rules displayed again.
 		$form->query('button:Reset')->one()->click();
-		$this->assertEquals(3, $table->getRows()->count());
+		$this->assertEquals($table->getRows()->count(), $rows_amount);
 	}
 
 	public static function getFilterData() {
@@ -176,6 +165,130 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'expected' => [
 						'count' => 1,
 						'names' => ['delete Discovery Rule']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host groups' => [
+							'values' => 'Inheritance test'
+						],
+						'Hosts' => [
+							'values' => ['Inheritance test template with host prototype'],
+							'context' => 'Inheritance test'
+						],
+					],
+					'expected' => [
+						'count' => 1,
+						'names' => ['Discovery rule for host prototype test']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host groups' => [
+							'values' => 'Zabbix servers'
+						],
+						'Name' => 'DiscoveryRule ZBX6663'
+					],
+					'expected' => [
+						'count' => 2
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Key' => 'array.cache.discovery'
+					],
+					'expected' => [
+						'count' => 3,
+						'names' => ['Array Controller Cache Discovery',
+							'Array Controller Cache Discovery',
+							'Array Controller Cache Discovery']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'State' => 'Normal'
+					],
+					'expected' => [
+						'count' => 3,
+						'names' => ['Template Module Linux block devices by Zabbix agent: Get /proc/diskstats: Block devices discovery',
+							'Template Module Linux filesystems by Zabbix agent: Mounted filesystem discovery',
+							'Template Module Linux network interfaces by Zabbix agent: Network interface discovery']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'Block',
+						'State' => 'Normal'
+					],
+					'expected' => [
+						'count' => 1,
+						'names' => ['Template Module Linux block devices by Zabbix agent: Get /proc/diskstats: Block devices discovery']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host groups' => 'Templates/Operating systems',
+						'Type' => 'Dependent item'
+					],
+					'expected' => [
+						'count' => 10
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Type' => 'Dependent item'
+					],
+					'expected' => [
+						'count' => 47
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Type' => 'Database monitor',
+						'Update interval' => '1h'
+					],
+					'expected' => [
+						'count' => 2,
+						'names' => ['Databases discovery', 'Replication discovery']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Status' => 'Disabled'
+					],
+					'expected' => [
+						'count' => 1,
+						'names' => ['Discovery-rule-layout-test-001']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+					'Status' => 'Enabled',
+					'Name' => 'Discovery-rule'
+					],
+					'expected' => [
+						'count' => 1,
+						'names' => ['Discovery-rule-layout-test-002']
 					]
 				]
 			]
