@@ -3012,7 +3012,7 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
-										'operator' => 9,
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => ''
 									]
 								]
@@ -3034,7 +3034,7 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
-										'operator' => 9,
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => ''
 									]
 								]
@@ -3056,7 +3056,7 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
-										'operator' => 9,
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => ''
 									]
 								]
@@ -3078,7 +3078,7 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
-										'operator' => 9,
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => ''
 									]
 								]
@@ -3100,7 +3100,7 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
-										'operator' => 9,
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => '',
 										'formulaid' => 'B'
 									]
@@ -3124,7 +3124,7 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{#CORRECT}',
-										'operator' => 9,
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => '',
 										'formulaid' => 'A'
 									]
@@ -3194,7 +3194,7 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
-										'operator' => 9,
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => '',
 										'formulaid' => 'A'
 									]
@@ -3216,7 +3216,7 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{##INCORRECT}',
-										'operator' => 9
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP
 									]
 								]
 							]
@@ -3288,7 +3288,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP
 								]
 							]
 						]
@@ -3306,7 +3306,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opstatus' => []
 								]
 							]
@@ -3324,7 +3324,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opstatus' => [
 										'status' => 2
 									]
@@ -3344,7 +3344,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opstatus' => [
 										'status' => 0
 									]
@@ -3365,7 +3365,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opdiscover' => []
 								]
 							]
@@ -3383,7 +3383,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opdiscover' => [
 										'discover' => 2
 									]
@@ -3404,7 +3404,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opperiod' => []
 								]
 							]
@@ -3422,7 +3422,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opperiod' => [
 										'delay' => 'www'
 									]
@@ -3442,7 +3442,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opperiod' => [
 										'delay' => '1d'
 									]
@@ -3462,7 +3462,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opperiod' => [
 										'delay' => '1d'
 									]
@@ -3482,7 +3482,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opperiod' => [
 										'delay' => '1d'
 									]
@@ -3503,7 +3503,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => []
 								]
 							]
@@ -3521,7 +3521,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => [
 										'history' => 'www'
 									]
@@ -3541,7 +3541,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 1,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => [
 										'history' => '1d'
 									]
@@ -3561,7 +3561,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 2,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => [
 										'history' => '1d'
 									]
@@ -3581,7 +3581,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 3,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'ophistory' => [
 										'history' => '1d'
 									]
@@ -3602,7 +3602,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => []
 								]
 							]
@@ -3620,7 +3620,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => [
 										'trends' => 'www'
 									]
@@ -3640,7 +3640,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 1,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => [
 										'trends' => '1d'
 									]
@@ -3660,7 +3660,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 2,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => [
 										'trends' => '1d'
 									]
@@ -3680,7 +3680,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 3,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optrends' => [
 										'trends' => '1d'
 									]
@@ -3701,7 +3701,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => []
 								]
 							]
@@ -3719,7 +3719,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
 										'severity' => 6
 									]
@@ -3739,7 +3739,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
 										'severity' => 5
 									]
@@ -3759,7 +3759,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
 										'severity' => 5
 									]
@@ -3779,7 +3779,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
 										'severity' => 5
 									]
@@ -3800,7 +3800,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => []
 								]
 							]
@@ -3818,7 +3818,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => [
 										[]
 									]
@@ -3838,7 +3838,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 0,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => [
 										[
 											'tag' => ''
@@ -3860,7 +3860,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => [
 										['tag' => 'www']
 									]
@@ -3880,7 +3880,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => [
 										['tag' => 'www']
 									]
@@ -3900,7 +3900,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optag' => [
 										['tag' => 'www']
 									]
@@ -3921,7 +3921,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 3,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => []
 								]
 							]
@@ -3939,7 +3939,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 3,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => [
 										[]
 									]
@@ -3959,7 +3959,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 3,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => [
 										[
 											'templateid' => ''
@@ -3981,7 +3981,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => [
 										['template' => '1']
 									]
@@ -4001,7 +4001,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => [
 										['template' => '1']
 									]
@@ -4021,7 +4021,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'optemplate' => [
 										['template' => '1']
 									]
@@ -4042,7 +4042,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 3,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opinventory' => []
 								]
 							]
@@ -4060,7 +4060,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => 3,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opinventory' => [
 										'inventory_mode' => -2
 									]
@@ -4080,7 +4080,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opinventory' => [
 										'inventory_mode' => HOST_INVENTORY_MANUAL
 									]
@@ -4100,7 +4100,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opinventory' => [
 										'inventory_mode' => HOST_INVENTORY_MANUAL
 									]
@@ -4120,7 +4120,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
-									'operator' => 9,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opinventory' => [
 										'inventory_mode' => HOST_INVENTORY_MANUAL
 									]
