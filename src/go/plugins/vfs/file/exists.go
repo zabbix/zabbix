@@ -125,8 +125,9 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 			(f.Mode().IsDir() && typesIncl.HasType(zbxFtDir)) ||
 			(f.Mode()&os.ModeSymlink != 0 && typesIncl.HasType(zbxFtSym)) ||
 			(f.Mode()&os.ModeSocket != 0 && typesIncl.HasType(zbxFtSock)) ||
-			(f.Mode()&os.ModeDevice != 0 && typesIncl.HasType(zbxFtBdev)) ||
-			(f.Mode()&os.ModeCharDevice != 0 && typesIncl.HasType(zbxFtCdev)) ||
+			(f.Mode()&os.ModeDevice != 0 &&
+				((f.Mode()&os.ModeCharDevice == 0 && typesIncl.HasType(zbxFtBdev)) ||
+					(f.Mode()&os.ModeCharDevice != 0 && typesIncl.HasType(zbxFtCdev)))) ||
 			(f.Mode()&os.ModeNamedPipe != 0 && typesIncl.HasType(zbxFtFifo)) {
 			return 1, nil
 		}
