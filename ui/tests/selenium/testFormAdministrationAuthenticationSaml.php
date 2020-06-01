@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 /**
  * @backup config
  */
-
 class testFormAdministrationAuthenticationSaml extends CWebTest {
 
 	public function getSamlData() {
@@ -127,6 +126,24 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'Sign' => ['Messages', 'Assertions', 'AuthN requests', 'Logout requests', 'Logout responses'],
 						'Encrypt' => ['Name ID', 'Assertions'],
 						'Case sensitive login' => true
+					],
+					'check_disabled' => true,
+					'db_check' => [
+						'saml_auth_enabled' => '1',
+						'saml_idp_entityid' => 'IdP_saml_zabbix.com',
+						'saml_sso_url' => 'SSO_saml_zabbix.com',
+						'saml_slo_url' => 'SLO_saml_zabbix.com',
+						'saml_username_attribute' => 'Username attribute',
+						'saml_sp_entityid' => 'SP entity ID',
+						'saml_nameid_format' => 'SP name ID format',
+						'saml_sign_messages' => '1',
+						'saml_sign_assertions' => '1',
+						'saml_sign_authn_requests' => '1',
+						'saml_sign_logout_requests' => '1',
+						'saml_sign_logout_responses' => '1',
+						'saml_encrypt_nameid' => '1',
+						'saml_encrypt_assertions' => '1',
+						'saml_case_sensitive' => '1'
 					]
 				]
 			]
@@ -144,6 +161,14 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		// Enable SAML authentication and then fill and submit SAML settings form.
 		$form = $this->query('name:form_auth')->asForm()->one();
 		$form->selectTab('SAML settings');
+
+		// Check that SAML authentication fields are disabled if "Enable SAML authentication" checkbox is not set.
+		if (CTestArrayHelper::get($data, 'check_disabled', false)) {
+			foreach($data['fields'] as $name => $value){
+				$this->assertTrue($form->getField($name)->isEnabled(false));
+			}
+		}
+
 		$form->getField('Enable SAML authentication')->check();
 		$form->fill($data['fields']);
 		$form->submit();
@@ -168,6 +193,15 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 				$data['fields'] = array_map('trim', $data['fields']);
 			}
 			$form->checkValue($data['fields']);
+			if (array_key_exists('db_check', $data)) {
+				$sql = 'SELECT saml_auth_enabled, saml_idp_entityid, saml_sso_url, saml_slo_url, saml_username_attribute,'.
+						' saml_sp_entityid, saml_nameid_format, saml_sign_messages, saml_sign_assertions,'.
+						' saml_sign_authn_requests, saml_sign_logout_requests, saml_sign_logout_responses,'.
+						' saml_encrypt_nameid, saml_encrypt_assertions, saml_case_sensitive'.
+						' FROM config';
+				$result = CDBHelper::getRow($sql);
+				$this->assertEquals($data['db_check'], $result);
+			}
 		}
 	}
 
