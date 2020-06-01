@@ -221,14 +221,12 @@ class CControllerAuditLogList extends CController {
 	}
 
 	private function updateProfiles(): void {
-		$this->deleteProfiles();
-
 		CProfile::updateArray('web.auditlog.filter.userids', $this->getInput('filter_userids', []), PROFILE_TYPE_ID);
 		CProfile::update('web.auditlog.filter.action', $this->getInput('filter_action', -1), PROFILE_TYPE_INT);
 		CProfile::update('web.auditlog.filter.resourcetype', $this->getInput('filter_resourcetype', -1),
 			PROFILE_TYPE_INT
 		);
-		CProfile::update('web.auditlog.filter.resourceid', $this->getInput('filter_resourceid', ''), PROFILE_TYPE_ID);
+		CProfile::update('web.auditlog.filter.resourceid', $this->getInput('filter_resourceid', ''), PROFILE_TYPE_STR);
 	}
 
 	private function deleteProfiles(): void {
