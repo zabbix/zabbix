@@ -1568,7 +1568,7 @@ class CDiscoveryRule extends CItemGeneral {
 					'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_optag', 'tag')],
 					'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_optag', 'value'), 'default' => DB::getDefault('lld_override_optag', 'value')]
 				]],
-				'optemplate' =>			['type' => API_OBJECTS, 'fields' => [
+				'optemplate' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 					'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
 				'opinventory' =>		['type' => API_OBJECT, 'fields' => [
