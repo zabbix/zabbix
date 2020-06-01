@@ -2760,6 +2760,7 @@ static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char s
 					source, condition->conditionid);
 	}
 
+	zbx_vector_uint64_sort(condition->eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -2838,7 +2839,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 			continue;	/* short-circuit true OR condition block to the next AND condition */
 		}
 
-		condition_result = FAIL == zbx_vector_uint64_search(&condition->eventids, eventid,
+		condition_result = FAIL == zbx_vector_uint64_bsearch(&condition->eventids, eventid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC) ? FAIL : SUCCEED;
 
 		zabbix_log(LOG_LEVEL_DEBUG, " conditionid:" ZBX_FS_UI64 " conditiontype:%d cond.value:'%s' "
