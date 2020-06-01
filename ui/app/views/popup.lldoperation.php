@@ -245,7 +245,7 @@ $operations_popup_form_list
 	)
 	->addRow(
 		(new CVisibilityBox('visible[optemplate]', 'optemplate_div', _('Original')))
-			->setLabel(_('Link new templates'))
+			->setLabel(_('Link templates'))
 			->setChecked(array_key_exists('optemplate', $options))
 			->setReadonly($options['templated']),
 		(new CDiv([

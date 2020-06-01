@@ -140,7 +140,7 @@ class CControllerPopupLldOperation extends CController {
 			}
 
 			if (array_key_exists('optemplate', $page_options) && !$page_options['optemplate']) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Link new templates'), _('cannot be empty')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Link templates'), _('cannot be empty')));
 			}
 
 			/*
