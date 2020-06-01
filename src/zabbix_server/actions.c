@@ -2760,7 +2760,7 @@ static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char s
 					source, condition->conditionid);
 	}
 
-	zbx_vector_uint64_sort(condition->eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&condition->eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
