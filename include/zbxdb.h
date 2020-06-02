@@ -96,7 +96,9 @@ int	zbx_db_txn_error(void);
 int	zbx_db_txn_end_error(void);
 const char	*zbx_db_last_strerr(void);
 
+#ifdef HAVE_POSTGRESQL
 int	zbx_dbms_get_version(void);
+#endif
 
 #ifdef HAVE_ORACLE
 

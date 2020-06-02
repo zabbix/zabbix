@@ -2439,6 +2439,7 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
 	return zbx_strlen_utf8_nchars(text, maxlen);
 }
 
+#ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbms_get_version                                             *
@@ -2455,8 +2456,6 @@ int	zbx_db_strlen_n(const char *text, size_t maxlen)
  ******************************************************************************/
 int	zbx_dbms_get_version(void)
 {
-#ifdef HAVE_POSTGRESQL
 	return ZBX_PG_SVERSION;
-#endif
-	return 0;
 }
+#endif
