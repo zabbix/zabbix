@@ -93,7 +93,7 @@ func TestDenyAll(t *testing.T) {
 		{metric: "system.localtime[utc]", result: false},
 	}
 
-	RunScenarios(t, scenarios, records, 2)
+	RunScenarios(t, scenarios, records, 1)
 }
 
 func TestNoParameters(t *testing.T) {
@@ -346,7 +346,7 @@ func TestWhitelist(t *testing.T) {
 		{metric: "system.localtime", result: false},
 	}
 
-	RunScenarios(t, scenarios, records, 4)
+	RunScenarios(t, scenarios, records, 3)
 }
 
 func TestBlacklist(t *testing.T) {
@@ -427,7 +427,7 @@ func TestDuplicateRules(t *testing.T) {
 		{metric: "system.run[echo 1]", result: false},
 	}
 
-	RunScenarios(t, scenarios, records, 12)
+	RunScenarios(t, scenarios, records, 11)
 }
 
 func TestNoRulesAfterAllowAll(t *testing.T) {
