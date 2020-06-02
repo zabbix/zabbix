@@ -1278,7 +1278,7 @@ int	cmp_key_id(const char *key_1, const char *key_2)
  *                                                                            *
  * Purpose: Returns process name                                              *
  *                                                                            *
- * Parameters: process_type - [IN] process type; ZBX_PROCESS_TYPE_*           *
+ * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -4627,7 +4627,7 @@ char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc)
  * Purpose: find number of parameters in parameter list                       *
  *                                                                            *
  * Parameters:                                                                *
- *      param  - parameter list                                               *
+ *      p - [IN] parameter list                                               *
  *                                                                            *
  * Return value: number of parameters (starting from 1) or                    *
  *               0 if syntax error                                            *

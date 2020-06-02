@@ -110,7 +110,7 @@ typedef struct
 zbx_preprocessing_manager_t;
 
 static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
-		zbx_preproc_item_value_t *value, zbx_list_item_t *master);
+		zbx_preproc_item_value_t *source_value, zbx_list_item_t *master);
 
 /* cleanup functions */
 
