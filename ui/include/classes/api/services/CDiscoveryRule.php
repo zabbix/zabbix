@@ -1040,8 +1040,15 @@ class CDiscoveryRule extends CItemGeneral {
 
 						if (array_key_exists('filter', $override)) {
 							foreach ($override['filter']['conditions'] as $condition) {
-								$condition['lld_overrideid'] = $override['lld_overrideid'];
-								$ovrd_conditions[] = $condition;
+								$ovrd_conditions[] = [
+									'macro' => $condition['macro'],
+									'value' => $condition['value'],
+									'formulaid' => $condition['formulaid'],
+									'operator' => array_key_exists('operator', $condition)
+										? $condition['operator']
+										: DB::getDefault('lld_override_condition', 'operator'),
+									'lld_overrideid' => $override['lld_overrideid']
+								];
 							}
 						}
 					}
@@ -1099,7 +1106,7 @@ class CDiscoveryRule extends CItemGeneral {
 									'operationobject' => $operation['operationobject'],
 									'operator' => array_key_exists('operator', $operation)
 										? $operation['operator']
-										: CONDITION_OPERATOR_EQUAL,
+										: DB::getDefault('lld_override_operation', 'operator'),
 									'value' => array_key_exists('value', $operation) ? $operation['value'] : ''
 								];
 							}
@@ -1537,14 +1544,14 @@ class CDiscoveryRule extends CItemGeneral {
 				'formula' =>		['type' => API_STRING_UTF8],
 				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 					'macro' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_condition', 'macro')],
-					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_REGEXP],
+					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => DB::getDefault('lld_override_condition', 'operator')],
 					'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_condition', 'value')],
 					'formulaid' =>		['type' => API_STRING_UTF8]
 				]]
 			]],
 			'operations' =>	['type' => API_OBJECTS, 'fields' => [
 				'operationobject' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE])],
-				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_EQUAL],
+				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => DB::getDefault('lld_override_operation', 'operator')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_operation', 'value')],
 				'opstatus' =>			['type' => API_OBJECT, 'fields' => [
 					'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED])],
