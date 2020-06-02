@@ -51,6 +51,12 @@ foreach ($data['inputs'] as $name => $value) {
 	elseif ($name === 'proxy_hostid') {
 		continue;
 	}
+	elseif ($name === 'query_fields' || $name === 'headers') {
+		foreach (['name', 'value'] as $key) {
+			$form->addVar($name.'['.$key.']', $value[$key]);
+		}
+		continue;
+	}
 
 	$form->addItem((new CInput('hidden', $name, $value))->removeId());
 }
