@@ -34,7 +34,7 @@ OBJS = \
 	$(TARGETDIR)\resource.syso
 
 CFLAGS := $(CFLAGS) -O2 -g -DUNICODE -DHAVE_STDINT_H=1 -I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
-RFLAGS := --input-format=rc -O coff
+RFLAGS := $(RFLAGS) --input-format=rc -O coff
 GOPATH := $(GOPATH);$(TOPDIR)\go
 TAGS :=
 
