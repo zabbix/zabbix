@@ -1280,10 +1280,10 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	protected static function sortRegexHostMacros(array $host_macros): array {
+	private static function sortRegexHostMacros(array $host_macros): array {
 		foreach ($host_macros as &$macros) {
 			foreach ($macros as &$value) {
-				natksort($value['regex']);
+				$value['regex'] = self::sortRegex($value['regex']);
 			}
 			unset($value);
 		}
@@ -1301,12 +1301,37 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	protected static function sortRegexGlobalMacros(array $global_macros): array {
+	private static function sortRegexGlobalMacros(array $global_macros): array {
 		foreach ($global_macros as &$value) {
-			natksort($value['regex']);
+			$value['regex'] = self::sortRegex($value['regex']);
 		}
 		unset($value);
 
 		return $global_macros;
+	}
+
+	/**
+	 * Sort regex
+	 *
+	 * @static
+	 *
+	 * @param array $macros
+	 *
+	 * @return array
+	 */
+	private static function sortRegex(array $macros): array {
+		$keys = array_keys($macros);
+
+		usort($keys, function (string $a, string $b): int {
+			return strcmp($a, $b);
+		});
+
+		$new_array = [];
+
+		foreach($keys as $key) {
+			$new_array[$key] = $macros[$key];
+		}
+
+		return $new_array;
 	}
 }
