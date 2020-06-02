@@ -24,6 +24,21 @@ require_once __DIR__.'/include/config.inc.php';
 $config = select_config();
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
+if (hasRequest('request')) {
+	$request = getRequest('request', '');
+	preg_match('/^\/?(?<filename>[a-z0-9_.]+\.php)(\?.*)?$/i', $request, $test_request);
+
+	if (!array_key_exists('filename', $test_request) || !file_exists('./' . $test_request['filename'])
+			|| $test_request['filename'] == basename(__FILE__)) {
+		$request = '';
+	}
+
+	if ($request !== '') {
+		$redirect_to->setArgument('request', $request);
+		CSession::setValue('request', $request);
+	}
+}
+
 if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
 	redirect($redirect_to->toString());
 }
@@ -212,7 +227,7 @@ try {
 
 		CWebUser::setSessionCookie($user['sessionid']);
 
-		$redirect = array_filter([$user['url'], ZBX_DEFAULT_URL]);
+		$redirect = array_filter([CSession::getValue('request'), $user['url'], ZBX_DEFAULT_URL]);
 		redirect(reset($redirect));
 	}
 
@@ -226,7 +241,13 @@ echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => array_column(clear_messages(), 'message'),
 	'buttons' => [
-		(new CButton('login', _('Login')))->onClick('document.location = '.json_encode($redirect_to->getUrl()).';')
+		(new CButton('login', _('Login')))->onClick(
+			'document.location = '.json_encode(
+				$redirect_to
+					->setArgument('request', CSession::getValue('request'))
+					->getUrl()
+			).';'
+		)
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();
