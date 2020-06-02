@@ -680,7 +680,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartSNMPTrapper",		&CONFIG_SNMPTRAPPER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(8) * ZBX_GIBIBYTE},
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HistoryIndexCacheSize",	&CONFIG_HISTORY_INDEX_CACHE_SIZE,	TYPE_UINT64,
@@ -1101,6 +1101,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	DBinit_autoincrement_options();
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{

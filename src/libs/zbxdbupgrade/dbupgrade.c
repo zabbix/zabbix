@@ -537,12 +537,14 @@ int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZB
 	ZBX_UNUSED(old_field);
 #else
 	/* Oracle cannot change column type in a general case if column contents are not null. Conversions like   */
-	/* number -> nvarchar2 need special processing. New column is created with desired datatype and data from */
-	/* old column is copied there. Then old column is dropped. This method does not preserve column order.    */
+	/* number -> nvarchar2 or nvarchar2 -> nclob need special processing. New column is created with desired  */
+	/* datatype and data from old column is copied there. Then old column is dropped. This method does not    */
+	/* preserve column order.                                                                                 */
 	/* NOTE: Existing column indexes and constraints are not respected by the current implementation!         */
 
 	if (NULL != old_field && (zbx_oracle_column_type(old_field->type) != zbx_oracle_column_type(field->type) ||
-			ZBX_ORACLE_COLUMN_TYPE_DOUBLE == zbx_oracle_column_type(field->type)))
+			ZBX_ORACLE_COLUMN_TYPE_DOUBLE == zbx_oracle_column_type(field->type) ||
+			(ZBX_TYPE_TEXT == field->type && ZBX_TYPE_SHORTTEXT == old_field->type)))
 		return DBmodify_field_type_with_copy(table_name, field);
 #endif
 	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
@@ -777,6 +779,8 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(4020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(4030)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(4040)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(4050)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(5000)[];
+/*extern zbx_dbpatch_t	DBPATCH_VERSION(5010)[];*/
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -796,6 +800,8 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(4030), "4.4 development"},
 	{DBPATCH_VERSION(4040), "4.4 maintenance"},
 	{DBPATCH_VERSION(4050), "5.0 development"},
+	{DBPATCH_VERSION(5000), "5.0 maintenance"},
+/*	{DBPATCH_VERSION(5010), "5.2 development"},*/
 	{NULL}
 };
 

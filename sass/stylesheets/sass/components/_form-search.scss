@@ -66,7 +66,7 @@ $form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !defa
 		// Reset global button style.
 		background-color: transparent !important;
 
-		background: url(../img/icon-sprite.svg) no-repeat $form-search-icon-bg-position;
+		background: url($sprite-path) no-repeat $form-search-icon-bg-position;
 		image-rendering: pixelated;
 		border: 0;
 		opacity: $form-search-icon-opacity;

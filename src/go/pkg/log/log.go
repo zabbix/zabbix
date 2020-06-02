@@ -31,14 +31,14 @@ import (
 	"sync"
 )
 
-const Empty = 0
+const Info = 0
 const Crit = 1
 const Err = 2
 const Warning = 3
 const Debug = 4
 const Trace = 5
 
-const Info = 127
+const None = -1
 
 const Undefined = 0
 const System = 1
@@ -61,7 +61,7 @@ var logStat LogStat
 var logAccess sync.Mutex
 
 func CheckLogLevel(level int) bool {
-	if level != Info && level > logLevel || Empty == logLevel {
+	if level > logLevel {
 		return false
 	}
 	return true
@@ -69,8 +69,10 @@ func CheckLogLevel(level int) bool {
 
 func Level() string {
 	switch logLevel {
-	case Empty:
-		return "empty"
+	case None:
+		return "none"
+	case Info:
+		return "info"
 	case Crit:
 		return "critical"
 	case Err:
@@ -95,7 +97,7 @@ func IncreaseLogLevel() (success bool) {
 }
 
 func DecreaseLogLevel() (success bool) {
-	if logLevel != Empty {
+	if logLevel != Info {
 		logLevel--
 		return true
 	}
@@ -125,14 +127,20 @@ func Open(logType int, level int, filename string, filesize int) error {
 	return nil
 }
 
+func Infof(format string, args ...interface{}) {
+	if CheckLogLevel(Info) {
+		procLog(format, args)
+	}
+}
+
 func Critf(format string, args ...interface{}) {
 	if CheckLogLevel(Crit) {
 		procLog(format, args)
 	}
 }
 
-func Infof(format string, args ...interface{}) {
-	if CheckLogLevel(Info) {
+func Errf(format string, args ...interface{}) {
+	if CheckLogLevel(Err) {
 		procLog(format, args)
 	}
 }
@@ -151,12 +159,6 @@ func Tracef(format string, args ...interface{}) {
 
 func Debugf(format string, args ...interface{}) {
 	if CheckLogLevel(Debug) {
-		procLog(format, args)
-	}
-}
-
-func Errf(format string, args ...interface{}) {
-	if CheckLogLevel(Err) {
 		procLog(format, args)
 	}
 }

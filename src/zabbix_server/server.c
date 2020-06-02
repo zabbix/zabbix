@@ -666,7 +666,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartSNMPTrapper",		&CONFIG_SNMPTRAPPER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_UINT64,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(8) * ZBX_GIBIBYTE},
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HistoryIndexCacheSize",	&CONFIG_HISTORY_INDEX_CACHE_SIZE,	TYPE_UINT64,
@@ -1134,6 +1134,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
 
 	DBcheck_capabilities();
+
+	if (SUCCEED != zbx_db_check_instanceid())
+		exit(EXIT_FAILURE);
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS

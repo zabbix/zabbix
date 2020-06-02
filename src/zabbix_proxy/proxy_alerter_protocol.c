@@ -60,12 +60,14 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 	return 0;
 }
 
-void	zbx_alerter_deserialize_result(const unsigned char *data, char **value, int *errcode, char **errmsg)
+void	zbx_alerter_deserialize_result(const unsigned char *data, char **value, int *errcode, char **error,
+		char **debug)
 {
 	ZBX_UNUSED(value);
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(errcode);
-	ZBX_UNUSED(errmsg);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(debug);
 
 	THIS_SHOULD_NEVER_HAPPEN;
 }

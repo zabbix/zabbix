@@ -707,12 +707,15 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 	zbx_free(port);
 }
 
-void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results)
+void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,
+		unsigned char poller_type)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
 #ifndef HAVE_NETSNMP
 		int	i;
+
+		ZBX_UNUSED(poller_type);
 
 		for (i = 0; i < num; i++)
 		{
@@ -724,7 +727,7 @@ void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *resul
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num);
+		get_values_snmp(items, results, errcodes, num, poller_type);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
@@ -835,7 +838,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_vector_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
-	zbx_check_items(items, errcodes, num, results, &add_results);
+	zbx_check_items(items, errcodes, num, results, &add_results, poller_type);
 
 	zbx_timespec(&timespec);
 

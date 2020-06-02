@@ -171,6 +171,9 @@
 #define ZBX_PROTO_TAG_IPMI_PASSWORD		"ipmi_password"
 #define ZBX_PROTO_TAG_JMX_AVAILABLE		"jmx_available"
 #define ZBX_PROTO_TAG_DATA_TYPE			"datatype"
+#define ZBX_PROTO_TAG_PROXY_DELAY		"proxy_delay"
+#define ZBX_PROTO_TAG_EXPRESSIONS		"expressions"
+#define ZBX_PROTO_TAG_EXPRESSION		"expression"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -201,6 +204,7 @@
 #define ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND	"alert.send"
 #define ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST	"item.test"
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
+#define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
 
 typedef enum
 {

@@ -355,4 +355,18 @@ in:
   key: 'zabbix[host,,items]'
 out:
   return: 'FAIL'
+---
+test case: valid item key syntax (52)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[proxy,proxy1,delay]'
+out:
+  return: 'SUCCEED'
+---
+test case: valid item key syntax (53)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[proxy,,delay]'
+out:
+  return: 'SUCCEED'
 ...

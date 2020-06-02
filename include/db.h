@@ -479,6 +479,8 @@ DB_ACKNOWLEDGE;
 int	DBinit(char **error);
 void	DBdeinit(void);
 
+void	DBinit_autoincrement_options(void);
+
 int	DBconnect(int flag);
 void	DBclose(void);
 
@@ -586,6 +588,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
+void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
@@ -605,6 +608,7 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
+int	DBget_user_names(zbx_uint64_t userid, char **alias, char **name, char **surname);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
@@ -738,7 +742,6 @@ typedef struct
 }
 zbx_host_availability_t;
 
-
 int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_host_availability_t *ha);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
@@ -774,23 +777,29 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
 
-
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	unsigned char	compress;
-	int		version;
-	int		lastaccess;
-	int		last_version_error_time;
+	zbx_uint64_t		hostid;
+	unsigned char		compress;
+	int			version;
+	int			lastaccess;
+	int			last_version_error_time;
+	int			proxy_delay;
+	int			more_data;
+	zbx_proxy_suppress_t	nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT			__UINT64_C(0x0040)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
-		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION | 	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
 	zbx_uint64_t	flags;
 }
@@ -813,4 +822,5 @@ zbx_db_mock_field_t;
 void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len);
 int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
+int	zbx_db_check_instanceid(void);
 #endif
