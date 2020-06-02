@@ -4258,7 +4258,168 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => null
-			]
+			],
+			'Test /1/overrides/1/filter/conditions/3/operator default value is set correctly (field ordering issue #2).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or A or C',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/filter/conditions/3/operator default value is set correctly (field ordering issue #3).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'step' => 1,
+							'name' => 'override',
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or A or C',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'formulaid' => 'B',
+										'operator' => CONDITION_OPERATOR_REGEXP
+									],
+									[
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/filter/formula is set correctly if /evaltype is custom_expression.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or (A or C)',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/filter/formula and /formulaid are silently ignored if /evaltype is not custom_expression.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_OR,
+								'formula' => 'X or Y or Z',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			// LLD rule override operation
+			'Test /1/overrides/1/operations.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'value' => '',
+									'opstatus' => [
+										'status' => 0
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
 		];
 		/* return [end($data)]; */
 		return $data;
