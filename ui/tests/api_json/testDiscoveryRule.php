@@ -3972,6 +3972,53 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1/templateid": a number is expected.'
 			],
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid must exist.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										[
+											'templateid' => '1'
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid cannot exis twice.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										[
+											'templateid' => '50010'
+										],
+										[
+											'templateid' => '50010'
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
 			'Test /1/overrides/1/operations/1/optemplate is is not supported for item prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
@@ -4399,7 +4446,26 @@ class testDiscoveryRule extends CAPITest {
 				'expected_error' => null
 			],
 			// LLD rule override operation
-			'Test /1/overrides/1/operations.' => [
+			'Test /1/overrides/1/operations ./operator and ./value defaults are set.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations two similar operations can be set.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4409,9 +4475,251 @@ class testDiscoveryRule extends CAPITest {
 								[
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
-									'value' => '',
 									'opstatus' => [
-										'status' => 0
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_LIKE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations (ordering issue #2).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operator' => CONDITION_OPERATOR_NOT_LIKE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								],
+								[
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									],
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_LIKE
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/ all operation objects are set correctly for item_prototype.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'opperiod' => [
+										'delay' => '1d'
+									],
+									'ophistory' => [
+										'history' => '1d'
+									],
+									'optrends' => [
+										'trends' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/ all operation objects are set correctly for item_prototype.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_WARNING
+									],
+									'optag' => [
+										[
+											'value' => 'tag value',
+											'tag' => 'tag'
+										],
+										[
+											'tag' => 'tag 2'
+										],
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/ all operation objects are set correctly for graph_prototype.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/ all operation objects are set correctly for host_prototype.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'optemplate' => [
+										[
+											'templateid' => '50010'
+										]
+									],
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/ multiple operations are set correctly.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'opperiod' => [
+										'delay' => '1d'
+									],
+									'ophistory' => [
+										'history' => '1d'
+									],
+									'optrends' => [
+										'trends' => '1d'
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_WARNING
+									],
+									'optag' => [
+										[
+											'value' => 'tag value',
+											'tag' => 'tag'
+										],
+										[
+											'tag' => 'tag 2'
+										],
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'optemplate' => [
+										[
+											'templateid' => '50010'
+										]
+									],
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/optemplate duplicate templateids.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'optemplate' => [
+										[
+											'templateid' => '50010'
+										],
 									]
 								]
 							]
@@ -4421,7 +4729,8 @@ class testDiscoveryRule extends CAPITest {
 				'expected_error' => null
 			],
 		];
-		/* return [end($data)]; */
+
+		return [end($data)];
 		return $data;
 	}
 
@@ -4459,8 +4768,10 @@ class testDiscoveryRule extends CAPITest {
 		}
 
 		if (array_key_exists('operations', $request_lld_override)) {
-			foreach ($request_lld_override['operations'] as $operation) {
-				$this->assertLLDOverrideOperation($db_lld_override, $operation);
+			foreach ($request_lld_override['operations'] as $num => $operation) {
+				$db_lld_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
+					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid']));
+				$this->assertLLDOverrideOperation($db_lld_operations[$num], $operation);
 			}
 		}
 	}
@@ -4507,34 +4818,211 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	/**
-	 * @param array $db_lld_override                            Table "lld_override" row (all fields).
-	 * @param array $operation                                  LLD rule override operation object.
-	 * @param array $operation['operationobject']
-	 * @param array $operation['operator'] (optional)
-	 * @param array $operation['value']
-	 * @param array $operation['opstatus']
-	 * @param array $operation['opdiscover']
-	 * @param array $operation['opperiod']
-	 * @param array $operation['ophistory']
-	 * @param array $operation['optrends']
-	 * @param array $operation['opseverity']
-	 * @param array $operation['optag']
-	 * @param array $operation['optemplate']
-	 * @param array $operation['opinventory']
+	 * @param array  $db_lld_override_op                              Table "lld_override_operation" row (all fields).
+	 * @param string $db_lld_override_op['lld_override_operationid']
+	 * @param string $db_lld_override_op['lld_overrideid']
+	 * @param string $db_lld_override_op['operationobject']
+	 * @param string $db_lld_override_op['operator']
+	 * @param array  $operation                                        LLD rule override operation object.
+	 * @param string $operation['operationobject']
+	 * @param string $operation['operator']                            (optional)
+	 * @param string $operation['value']                               (optional)
+	 * @param string $operation['opstatus']                            (optional)
+	 * @param string $operation['opdiscover']                          (optional)
+	 * @param string $operation['opperiod']                            (optional)
+	 * @param string $operation['ophistory']                           (optional)
+	 * @param string $operation['optrends']                            (optional)
+	 * @param string $operation['opseverity']                          (optional)
+	 * @param string $operation['optag']                               (optional)
+	 * @param string $operation['optemplate']                          (optional)
+	 * @param string $operation['opinventory']                         (optional)
 	 */
-	protected function assertLLDOverrideOperation(array $db_lld_override, array $operation) {
-		$db_lld_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
-			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid']));
-		/* 'lld_override_operation' */
-		/* 'lld_override_opdiscover' */
-		/* 'lld_override_ophistory' */
-		/* 'lld_override_opinventory' */
-		/* 'lld_override_opperiod' */
-		/* 'lld_override_opseverity' */
-		/* 'lld_override_opstatus' */
-		/* 'lld_override_optag' */
-		/* 'lld_override_optemplate' */
-		/* 'lld_override_optrends' */
+	protected function assertLLDOverrideOperation(array $db_lld_override_op, array $operation) {
+		$this->assertEquals($db_lld_override_op['operationobject'], $operation['operationobject']);
+
+		$condition_operator = array_key_exists('operator', $operation)
+			? $operation['operator']
+			: CONDITION_OPERATOR_EQUAL;
+		$this->assertEquals($db_lld_override_op['operator'], $condition_operator);
+
+		$condition_value = array_key_exists('value', $operation)
+			? $operation['value']
+			: '';
+		$this->assertEquals($db_lld_override_op['value'], $condition_value);
+
+		$this->assertLLDOverrideOperationStatus($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationDiscover($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationHistory($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationPeriod($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationSeverity($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationTags($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationTemplates($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationTrends($db_lld_override_op, $operation);
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationStatus(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opstatus = CDBHelper::getRow('SELECT * from lld_override_opstatus WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('opstatus', $operation)) {
+			$this->assertEquals($db_opstatus['status'], $operation['opstatus']['status']);
+		}
+		else {
+			$this->assertEmpty($db_opstatus);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationDiscover(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opdiscover = CDBHelper::getRow('SELECT * from lld_override_opdiscover WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('opdiscover', $operation)) {
+			$this->assertEquals($db_opdiscover['discover'], $operation['opdiscover']['discover']);
+		}
+		else {
+			$this->assertEmpty($db_opdiscover);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationHistory(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_ophistory = CDBHelper::getRow('SELECT * from lld_override_ophistory WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('ophistory', $operation)) {
+			$this->assertEquals($db_ophistory['history'], $operation['ophistory']['history']);
+		}
+		else {
+			$this->assertEmpty($db_ophistory);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationPeriod(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opperiod = CDBHelper::getRow('SELECT * from lld_override_opperiod WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('ophistory', $operation)) {
+			$this->assertEquals($db_opperiod['delay'], $operation['opperiod']['delay']);
+		}
+		else {
+			$this->assertEmpty($db_opperiod);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationSeverity(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opseverity = CDBHelper::getRow('SELECT * from lld_override_opseverity WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('opseverity', $operation)) {
+			$this->assertEquals($db_opseverity['severity'], $operation['opseverity']['severity']);
+		}
+		else {
+			$this->assertEmpty($db_opseverity);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationTags(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_optags = CDBHelper::getAll('SELECT * from lld_override_optag WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('optag', $operation)) {
+			$this->assertEquals(count($db_optags), count($operation['optag']));
+
+			foreach ($db_optags as $num => $db_optag) {
+				$optag_value = array_key_exists('value', $operation['optag'][$num])
+					? $operation['optag'][$num]['value']
+					: '';
+
+				$this->assertEquals($db_optag['value'], $optag_value);
+				$this->assertEquals($db_optag['tag'], $operation['optag'][$num]['tag']);
+			}
+		}
+		else {
+			$this->assertEmpty($db_optag);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationTemplates(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_optemplates = CDBHelper::getAll('SELECT * from lld_override_optemplate WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('optemplate', $operation)) {
+			$this->assertEquals(count($db_optemplates), count($operation['optemplate']));
+			foreach ($db_optemplates as $num => $db_optemplate) {
+				$this->assertEquals($operation['optemplate'][$num]['templateid'], $db_optemplate['templateid']);
+			}
+		}
+		else {
+			$this->assertEmpty($db_optemplate);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationTrends(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_optrends = CDBHelper::getRow('SELECT * from lld_override_optrends WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('optrends', $operation)) {
+			$this->assertEquals($db_optrends['trends'], $operation['optrends']['trends']);
+		}
+		else {
+			$this->assertEmpty($db_optrends);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	protected function assertLLDOverrideOperationInventory(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opinventory = CDBHelper::getRow('SELECT * from lld_override_opinventory WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid));
+		if (array_key_exists('opinventory', $operation)) {
+			$this->assertEquals($db_opinventory['inventory_mode'], $operation['opinventory']['inventory_mode']);
+		}
+		else {
+			$this->assertEmpty($db_opinventory);
+		}
 	}
 
 	/**
