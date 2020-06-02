@@ -1,0 +1,1 @@
+.........T [ZBX-17790] fixed preprocessing of mysql.created_tmp_files, mysql.created_tmp_disk_tables, mysql.created_tmp_tables, mysql.threads_created items in Template DB MySQL, added triggers (mchudinov)
