@@ -58,8 +58,8 @@ class CDashboardElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getWidgets() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget" or contains(@class, "dashbrd-grid-widget ") or '.
-			'@class="dashbrd-grid-iterator" or contains(@class, "dashbrd-grid-iterator ")]')->asWidget()->all();
+		return $this->query('xpath:.//div[@class="dashbrd-grid-widget" or contains(@class, "dashbrd-grid-widget ") or'.
+				' @class="dashbrd-grid-iterator" or contains(@class, "dashbrd-grid-iterator ")]')->asWidget()->all();
 	}
 
 	/**
@@ -71,9 +71,9 @@ class CDashboardElement extends CElement {
 	 * @return CWidgetElement|CNullElement
 	 */
 	public function getWidget($name, $should_exist = true) {
-		$query = $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or '.
-			'contains(@class, "dashbrd-grid-iterator-head")]/h4[text()='.
-			CXPathHelper::escapeQuotes($name).']/../../..');
+		$query = $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
+				' contains(@class, "dashbrd-grid-iterator-head")]/h4[text()='.
+				CXPathHelper::escapeQuotes($name).']/../../..');
 
 		if ($should_exist) {
 			$query->waitUntilPresent();
