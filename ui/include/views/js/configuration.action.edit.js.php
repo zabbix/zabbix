@@ -330,9 +330,8 @@
 
 		this.$subject = $obj.siblings('#operation-message-subject');
 		this.$body = $obj.siblings('#operation-message-body');
-		this.$mediatype_only = $obj.siblings('#operation-message-mediatype-default');
-		this.$mediatype_default = $obj.siblings('#operation-message-mediatype-only');
-
+		this.$mediatype_only = $obj.siblings('#operation-message-mediatype-only');
+		this.$mediatype_default = $obj.siblings('#operation-message-mediatype-default');
 
 		this.$usergroups = $obj.siblings('#operation-message-user-groups');
 		this.$usergroups.find('#operation-message-user-groups-footer button')
@@ -375,10 +374,10 @@
 	};
 
 	/**
-	 * @param {bool} yes  If true, show custom message form, else hide it.
+	 * @param {bool} show_message  If true, show custom message form, else hide it.
 	 */
-	OperationViewMessage.prototype.showCustomMessage = function(yes) {
-		if (yes) {
+	OperationViewMessage.prototype.showCustomMessage = function(show_message) {
+		if (show_message) {
 			this.$custom.find('input[type="checkbox"]').prop('checked', true);
 			this.$subject.show();
 			this.$body.show();
@@ -661,6 +660,9 @@
 		this.$passphrase_input.val(conf.password);
 	};
 
+	/**
+	 * @param {jQuery} $wrapper
+	 */
 	OperationViewCommandTypeSSH.prototype.attach = function($wrapper) {
 		this.$authtype.appendTo($wrapper);
 		this.$username.appendTo($wrapper);
@@ -711,6 +713,9 @@
 		this.$cmd_input.val(conf.command);
 	};
 
+	/**
+	 * @param {jQuery} $wrapper
+	 */
 	OperationViewCommandTypeTelnet.prototype.attach = function($wrapper) {
 		this.$username.appendTo($wrapper);
 		this.$password.appendTo($wrapper);
@@ -1093,7 +1098,6 @@
 	 */
 	OperationViewCondition.prototype.validateNewCondition = function(condition_form) {
 		const url = new Curl('zabbix.php');
-
 		url.setArgument('action', 'popup.condition.actions');
 		url.setArgument('validate', 1);
 
@@ -1128,7 +1132,7 @@
 			condition.num = num;
 			const $condition = $(this.tmpl_condition_row.evaluate(condition));
 
-			$condition.find('[data-action="remove"]').on('click', ({target}) => {
+			$condition.find('[data-action="remove"]').on('click', () => {
 				this.conditions.splice(num, 1);
 				this.renderConditions();
 			});
@@ -1243,7 +1247,6 @@
 	 */
 	function OperationPopup(return_focus, eventsource, recovery_phase) {
 		this.return_focus = return_focus;
-
 		this.eventsource = eventsource;
 		this.recovery_phase = recovery_phase;
 
@@ -1255,7 +1258,7 @@
 		const props = {
 			recovery_phase,
 			operation_type: operation_details.OPERATION_TYPE_MESSAGE,
-			command_type: operation_details.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+			command_type: operation_details.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 		};
 
 		this.view = new OperationView(props);
@@ -1354,7 +1357,7 @@
 
 		this.view.setConfig(res.popup_config);
 		this.view.render();
-		this.overlay.setProperties({content: this.view.$obj, debug: res.debug_data, buttons});
+		this.overlay.setProperties({content: this.view.$obj, debug: res.debug, buttons});
 		this.overlay.containFocus();
 		this.view.$obj.find(':focusable:first').focus();
 	};

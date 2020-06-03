@@ -37,7 +37,7 @@ class CControllerActionOperationGet extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;
@@ -58,7 +58,19 @@ class CControllerActionOperationGet extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
+			if (!$this->getInput('actionid', '0')) {
+				return true;
+			}
+
+			return (bool) API::Action()->get([
+				'output' => [],
+				'actionids' => $this->getInput('actionid'),
+				'editable' => true
+			]);
+		}
+
+		return false;
 	}
 
 	protected function doAction() {
@@ -69,16 +81,15 @@ class CControllerActionOperationGet extends CController {
 
 		$data = [
 			'popup_config' => $this->popupConfig($operation, $eventsource, $recovery),
-			'debug_data' => null
+			'debug' => null
 		];
 
-		if (CWebUser::getDebugMode()) {
+		if ($this->getDebugMode() == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();
-			$data['debug_data'] = CProfiler::getInstance()->make()->toString();
+			$data['debug'] = CProfiler::getInstance()->make()->toString();
 		}
 
-		$response = (new CControllerResponseData(['main_block' => json_encode($data)]))->disableView();
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 
 	/**
@@ -98,7 +109,7 @@ class CControllerActionOperationGet extends CController {
 			],
 			'operationtype' => '0',
 			'esc_step_from' => '1',
-			'esc_step_to' => '1',
+			'esc_step_to' => '0',
 			'esc_period' => '0',
 			'opcommand_hst' => [],
 			'opcommand_grp' => [],
@@ -125,7 +136,7 @@ class CControllerActionOperationGet extends CController {
 	}
 
 	/**
-	 * Transpiles operation object into operation config object. Needed meta data is queried.
+	 * Transforms operation object into operation config object. Needed meta data is queried.
 	 *
 	 * @param array $operation  Operation object.
 	 * @param int $eventsource  Action event source.
@@ -158,9 +169,9 @@ class CControllerActionOperationGet extends CController {
 	 * @param int $eventsource  Action event source.
 	 * @param int $recovery     Action event phase.
 	 *
-	 * @return array|null
+	 * @return array
 	 */
-	private function popupConfigOperationType(array $operation, int $eventsource, int $recovery): ?array {
+	private function popupConfigOperationType(array $operation, int $eventsource, int $recovery): array {
 		$operation_type_options = [];
 
 		foreach (getAllowedOperations($eventsource)[$recovery] as $operation_type) {

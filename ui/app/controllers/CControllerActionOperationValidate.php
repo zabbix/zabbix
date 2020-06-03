@@ -34,9 +34,7 @@ class CControllerActionOperationValidate extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 
 		return $ret;
@@ -47,12 +45,22 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
+			if (!$this->getInput('actionid', '0')) {
+				return true;
+			}
+
+			return (bool) API::Action()->get([
+				'output' => [],
+				'actionids' => $this->getInput('actionid'),
+				'editable' => true
+			]);
+		}
+
+		return false;
 	}
 
 	protected function doAction() {
-		return $this->setResponse(
-			(new CControllerResponseData(['main_block' => json_encode([])]))->disableView()
-		);
+		return $this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
 	}
 }

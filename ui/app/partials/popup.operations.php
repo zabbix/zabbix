@@ -39,12 +39,13 @@ $form_list->addRow(_('Operation type'), new CComboBox('operationtype'), 'operati
 /*
  * Operation escalation steps row.
  */
-$step_from = (new CNumericBox('operation[esc_step_from]', 0, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+$step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 $step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
 $form_list->addRow(_('Steps'), [
 		$step_from,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-', (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CNumericBox('operation[esc_step_to]', 0, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+		(new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), _('(0 - infinitely)')
 	],
 	'operation-step-range'
@@ -73,7 +74,7 @@ $form_list->addRow('', (new CLabel(_('At least one user or user group must be se
  */
 $form_list->addRow(_('Send to User groups'), (new CDiv(
 	(new CTable())
-		->setAttribute('style', 'width: 100%;')
+		->addStyle('width: 100%;')
 		->setHeader([_('User group'), _('Action')])
 		->addRow(
 			(new CRow(
@@ -84,7 +85,7 @@ $form_list->addRow(_('Send to User groups'), (new CDiv(
 		)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	'operation-message-user-groups'
 );
 
@@ -93,7 +94,7 @@ $form_list->addRow(_('Send to User groups'), (new CDiv(
  */
 $form_list->addRow(_('Send to Users'), (new CDiv(
 	(new CTable())
-		->setAttribute('style', 'width: 100%;')
+		->addStyle('width: 100%;')
 		->setHeader([_('User'), _('Action')])
 		->addRow(
 			(new CRow(
@@ -104,7 +105,7 @@ $form_list->addRow(_('Send to Users'), (new CDiv(
 		)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	'operation-message-users'
 );
 
@@ -150,41 +151,39 @@ $form_list->addRow(_('Message'),
 /*
  * Command execution targets row.
  */
-$form_list->addRow((new CLabel(_('Target list'), 'opCmdList'))->setAsteriskMark(), // TODO: opCmdList <- another ID to fix.
+$form_list->addRow((new CLabel(_('Target list')))->setAsteriskMark(),
 	(new CDiv(
 		(new CFormList())
 			->cleanItems()
-			->addRow(_('Current host'), (new CCheckBox('operation[opcommand_hst][][hostid]', '0'))
-				->setId('operation-command-chst')
+			->addRow(_('Current host'),
+				(new CCheckBox('operation[opcommand_hst][][hostid]', '0'))->setId('operation-command-chst')
 			)
 			->addRow(new CLabel(_('Host')),
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_hst][][hostid]',
 					'object_name' => 'hosts',
-					'add_post_js' => ''
-				]))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					'add_post_js' => false
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(
 				(new CLabel(_('Host group'))),
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_grp][][groupid]',
 					'object_name' => 'hostGroup',
-					'add_post_js' => ''
+					'add_post_js' => false
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('opCmdList'),
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	'operation-command-targets'
 );
 
 /*
  * Command type row.
  */
-$form_list->addRow((new CLabel(_('Type'), 'operation[opcommand][type]')),
-	(new CComboBox('operation[opcommand][type]', 0, '', [
+$form_list->addRow(_('Type'),
+	(new CComboBox('operation[opcommand][type]', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, null, [
 		ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 		ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
 		ZBX_SCRIPT_TYPE_SSH => _('SSH'),
@@ -209,10 +208,10 @@ $form_list->addRow((new CLabel(_('Script name'), 'operation_opcommand_script'))-
 );
 
 /*
- * Command execute target (global script) row.
+ * Command execute target row.
  */
-$form_list->addRow((new CLabel(_('Execute on'), 'operation[opcommand][execute_on]')),
-	(new CRadioButtonList('operation[opcommand][execute_on]', 0))
+$form_list->addRow((new CLabel(_('Execute on'), 'operation_opcommand_execute_on')),
+	(new CRadioButtonList('operation[opcommand][execute_on]', ZBX_SCRIPT_EXECUTE_ON_AGENT))
 		->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 		->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 		->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
@@ -233,7 +232,7 @@ $form_list->addRow(_('Authentication method'), (new CComboBox('operation[opcomma
 /*
  * Command user name row.
  */
-$form_list->addRow((new CLabel(_('User name'), 'operation[opcommand][username]'))->setAsteriskMark(),
+$form_list->addRow((new CLabel(_('User name'), 'operation_opcommand_username'))->setAsteriskMark(),
 	(new CTextBox('operation[opcommand][username]'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->setAriaRequired(),
@@ -243,7 +242,7 @@ $form_list->addRow((new CLabel(_('User name'), 'operation[opcommand][username]')
 /*
  * Command public key row.
  */
-$form_list->addRow((new CLabel(_('Public key file'), 'operation[opcommand][publickey]'))->setAsteriskMark(),
+$form_list->addRow((new CLabel(_('Public key file'), 'operation_opcommand_publickey'))->setAsteriskMark(),
 	(new CTextBox('operation[opcommand][publickey]'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->setAriaRequired(),
@@ -253,7 +252,7 @@ $form_list->addRow((new CLabel(_('Public key file'), 'operation[opcommand][publi
 /*
  * Command private key row.
  */
-$form_list->addRow((new CLabel(_('Private key file'), 'operation[opcommand][privatekey]'))->setAsteriskMark(),
+$form_list->addRow((new CLabel(_('Private key file'), 'operation_opcommand_privatekey'))->setAsteriskMark(),
 	(new CTextBox('operation[opcommand][privatekey]'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->setAriaRequired(),
@@ -287,7 +286,7 @@ $form_list->addRow(_('Port'), (new CTextBox('operation[opcommand][port]'))->setW
 /*
  * Command input row.
  */
-$form_list->addRow((new CLabel(_('Commands'), 'operation[opcommand][command]'))->setAsteriskMark(),
+$form_list->addRow((new CLabel(_('Commands'), 'operation_opcommand_command'))->setAsteriskMark(),
 	(new CTextArea('operation[opcommand][command]'))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -313,7 +312,7 @@ $form_list->addRow((new CLabel(_('Commands'), 'operation_opcommand_command_ipmi'
 $form_list->addRow((new CLabel(_('Host groups')))->setAsteriskMark(), (new CMultiSelect([
 		'name' => 'operation[opgroup][][groupid]',
 		'object_name' => 'hostGroup',
-		'add_post_js' => ''
+		'add_post_js' => false
 	]))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
@@ -326,7 +325,7 @@ $form_list->addRow((new CLabel(_('Host groups')))->setAsteriskMark(), (new CMult
 $form_list->addRow((new CLabel(_('Templates')))->setAsteriskMark(), (new CMultiSelect([
 		'name' => 'operation[optemplate][][templateid]',
 		'object_name' => 'templates',
-		'add_post_js' => ''
+		'add_post_js' => false
 	]))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
@@ -336,7 +335,7 @@ $form_list->addRow((new CLabel(_('Templates')))->setAsteriskMark(), (new CMultiS
 /*
  * Host inventory mode attribute row.
  */
-$form_list->addRow(new CLabel(_('Inventory mode'), 'operation[opinventory][inventory_mode]'),
+$form_list->addRow(new CLabel(_('Inventory mode'), 'operation_opinventory_inventory_mode'),
 	(new CRadioButtonList('operation[opinventory][inventory_mode]', HOST_INVENTORY_MANUAL))
 		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
@@ -348,11 +347,11 @@ $form_list->addRow(new CLabel(_('Inventory mode'), 'operation[opinventory][inven
  * Conditions type of calculation row.
  */
 $form_list->addRow(_('Type of calculation'), [
-		(new CComboBox( 'operation[evaltype]', 0, '', [
+		new CComboBox( 'operation[evaltype]', CONDITION_EVAL_TYPE_AND_OR, '', [
 			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
 			CONDITION_EVAL_TYPE_AND => _('And'),
 			CONDITION_EVAL_TYPE_OR => _('Or')
-		]))->setId('operationEvaltype'), // TODO: operationEvaltype make kebab-case id
+		]),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan())->setId('operation-condition-evaltype-formula')
 	],
@@ -364,7 +363,7 @@ $form_list->addRow(_('Type of calculation'), [
  */
 $form_list->addRow(_('Conditions'), (new CDiv(
 	(new CTable())
-		->setAttribute('style', 'width: 100%;')
+		->addStyle('width: 100%;')
 		->setHeader([_('Label'), _('Name'), _('Action')])
 		->addRow(
 			(new CRow(
@@ -375,7 +374,7 @@ $form_list->addRow(_('Conditions'), (new CDiv(
 		)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	'operation-condition-list'
 );
 
