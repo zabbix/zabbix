@@ -31,6 +31,7 @@ require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
+require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralValuemap.php';
 require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
@@ -162,6 +163,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
 		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
+		$suite->addTestSuite('testPageAdministrationGeneralModules');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationGeneralValuemap');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
