@@ -822,6 +822,7 @@ static int	check_application_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 	DB_ROW			row;
 	zbx_vector_uint64_t	objectids;
 	zbx_uint64_t		objectid;
+	int			i;
 
 	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_LIKE != condition->op &&
 			CONDITION_OPERATOR_NOT_LIKE != condition->op)
@@ -870,12 +871,20 @@ static int	check_application_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 		case CONDITION_OPERATOR_NOT_LIKE:
 			while (NULL != (row = DBfetch(result)))
 			{
-				if (NULL == strstr(row[1], condition->value))
+				if (NULL != strstr(row[1], condition->value))
 				{
 					ZBX_STR2UINT64(objectid, row[0]);
-					add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
+
+					if (FAIL != (i = zbx_vector_uint64_search(&objectids, objectid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						zbx_vector_uint64_remove_noorder(&objectids, i);
+					}
 				}
 			}
+
+			for (i = 0; i < objectids.values_num; i++)
+				add_condition_match(esc_events, condition, objectids.values[i], EVENT_OBJECT_TRIGGER);
 			break;
 	}
 	DBfree_result(result);
@@ -885,7 +894,6 @@ static int	check_application_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 
 	return SUCCEED;
 }
-
 
 /******************************************************************************
  *                                                                            *
