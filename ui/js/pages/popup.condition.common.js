@@ -55,16 +55,9 @@ function submitConditionPopup(response, overlay) {
 		}
 	}
 
-	if (form_param === 'add_opcondition') {
-		overlayDialogueDestroy(cond_dialogueid);
-
-		PopUp('popup.action.operation', jQuery(document.forms['popup.operation']).serialize(), opr_dialogueid);
-	}
-	else {
-		// XHR has finished, but the state is still considered as loading at form submission.
-		overlay.setLoading();
-		submitFormWithParam(form_name, form_param, '1');
-	}
+	// XHR has finished, but the state is still considered as loading at form submission.
+	overlay.setLoading();
+	submitFormWithParam(form_name, form_param, '1');
 }
 
 /**

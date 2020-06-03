@@ -51,7 +51,7 @@ class CControllerPopupConditionOperations extends CControllerPopupConditionCommo
 		return [
 			'form' => [
 				'name' => 'popup.operation',
-				'param' => 'add_opcondition',
+				'param' => '',
 				'input_name' => 'opcondition'
 			],
 			'inputs' => [
