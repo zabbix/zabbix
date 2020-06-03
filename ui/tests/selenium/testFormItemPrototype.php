@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../include/classes/api/services/CItemGeneral.php';
 require_once dirname(__FILE__).'/../../include/classes/api/services/CItemPrototype.php';
 
+use Facebook\WebDriver\WebDriverBy;
+
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
