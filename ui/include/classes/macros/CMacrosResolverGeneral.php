@@ -1311,7 +1311,7 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Sort regex
+	 * Sort regex.
 	 *
 	 * @static
 	 *
@@ -1322,9 +1322,7 @@ class CMacrosResolverGeneral {
 	private static function sortRegex(array $macros): array {
 		$keys = array_keys($macros);
 
-		usort($keys, function (string $a, string $b): int {
-			return strcmp($a, $b);
-		});
+		usort($keys, 'strcmp');
 
 		$new_array = [];
 
