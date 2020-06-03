@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-18 12:33+0300\n"
-"PO-Revision-Date: 2020-05-25 08:05+0300\n"
-"Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2020-05-26 11:52+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1590386740.000000\n"
+"X-POOTLE-MTIME: 1590486771.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:67
 #: include/classes/db/OracleDbBackend.php:136
@@ -16669,7 +16669,7 @@ msgstr "WebインターフェースがZabbixデータベースと互換性があ
 #: include/html.inc.php:739
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "グラフがディスカバリされなくなったため%1$sに削除されます。(日時 %2$s at %3$s)"
 
 #: include/html.inc.php:734
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
@@ -16735,7 +16735,7 @@ msgstr "受信したリモートプロシージャーは存在しないか利用
 #: include/html.inc.php:766
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "トリガーがディスカバリされなくなったため%1$sに削除されます。(日時 %2$s at %3$s)"
 
 #: include/html.inc.php:761
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."

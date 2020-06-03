@@ -22,6 +22,6 @@
 
 #include "threads.h"
 
-ZBX_THREAD_ENTRY(listener_thread, pSock);
+ZBX_THREAD_ENTRY(listener_thread, args);
 
 #endif

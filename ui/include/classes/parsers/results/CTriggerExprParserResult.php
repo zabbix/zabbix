@@ -33,6 +33,7 @@ class CTriggerExprParserResult extends CParserResult {
 	const TOKEN_TYPE_LLD_MACRO = 7;
 	const TOKEN_TYPE_STRING = 8;
 	const TOKEN_TYPE_FUNCTIONID_MACRO = 9;
+	const TOKEN_TYPE_FUNCTION = 10;
 
 	/**
 	 * Array of expression tokens.
