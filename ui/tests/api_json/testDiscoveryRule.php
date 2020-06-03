@@ -4861,12 +4861,12 @@ class testDiscoveryRule extends CAPITest {
 	 */
 	protected function assertLLDOverride(array $db_lld_override, array $request_lld_override) {
 		$this->assertEquals($db_lld_override['name'], $request_lld_override['name']);
-		$this->assertEquals($db_lld_override['step'], $request_lld_override['step']);
+		$this->assertEquals($db_lld_override['step'], $request_lld_override['step'], 'Override step value.');
 
 		$stop = array_key_exists('stop', $request_lld_override)
 			? $request_lld_override['stop']
 			: ZBX_LLD_OVERRIDE_STOP_NO;
-		$this->assertEquals($db_lld_override['stop'], $stop);
+		$this->assertEquals($db_lld_override['stop'], $stop, 'Override stop value.');
 
 		if (array_key_exists('filter', $request_lld_override)) {
 			$this->assertLLDOverrideFilter($db_lld_override, $request_lld_override['filter']);
@@ -4882,6 +4882,12 @@ class testDiscoveryRule extends CAPITest {
 					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid']));
 				$this->assertLLDOverrideOperation($db_lld_operations[$num], $operation);
 			}
+
+			$db_lld_operations_count = CDBHelper::getCount('SELECT * from lld_override_operation WHERE '.
+					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid']));
+
+			$this->assertEquals(count($request_lld_override['operations']), $db_lld_operations_count,
+					'Expected count of operations.');
 		}
 	}
 
@@ -4903,7 +4909,7 @@ class testDiscoveryRule extends CAPITest {
 			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
 		);
 
-		$this->assertEquals($db_lld_override['evaltype'], $filter['evaltype']);
+		$this->assertEquals($db_lld_override['evaltype'], $filter['evaltype'], 'Override evaltype value.');
 
 		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			$conditionid_by_formulaid = array_combine(
@@ -4947,12 +4953,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param string $operation['opinventory']                         (optional)
 	 */
 	protected function assertLLDOverrideOperation(array $db_lld_override_op, array $operation) {
-		$this->assertEquals($db_lld_override_op['operationobject'], $operation['operationobject']);
+		$this->assertEquals($db_lld_override_op['operationobject'], $operation['operationobject'], 'Operation object.');
 
 		$condition_operator = array_key_exists('operator', $operation)
 			? $operation['operator']
 			: CONDITION_OPERATOR_EQUAL;
-		$this->assertEquals($db_lld_override_op['operator'], $condition_operator);
+		$this->assertEquals($db_lld_override_op['operator'], $condition_operator, 'Operation operator.');
 
 		$condition_value = array_key_exists('value', $operation)
 			? $operation['value']
@@ -4979,10 +4985,10 @@ class testDiscoveryRule extends CAPITest {
 		$db_opstatus = CDBHelper::getRow('SELECT * from lld_override_opstatus WHERE '.
 			dbConditionId('lld_override_operationid', (array) $operationid));
 		if (array_key_exists('opstatus', $operation)) {
-			$this->assertEquals($db_opstatus['status'], $operation['opstatus']['status']);
+			$this->assertEquals($db_opstatus['status'], $operation['opstatus']['status'], 'Operation opstatus.');
 		}
 		else {
-			$this->assertEmpty($db_opstatus);
+			$this->assertEmpty($db_opstatus, 'Expected opstatus.');
 		}
 	}
 
@@ -5131,6 +5137,87 @@ class testDiscoveryRule extends CAPITest {
 		}
 		else {
 			$this->assertEmpty($db_opinventory);
+		}
+	}
+
+	public function testDiscoveryRuleOverrides_Copy() {
+		$itemid = '133763';
+		$hostids = ['90020', '90021'];
+
+		$result = $this->call('discoveryrule.copy', [
+			'discoveryids' => [$itemid],
+			'hostids' => $hostids
+		]);
+
+		$this->assertTrue($result['result']);
+
+		$request_lld_overrides = [
+			[
+				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+				'name' => 'override',
+				'step' => 1,
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+					'formula' => 'A or B or C',
+					'conditions' => [
+						[
+							'macro' => '{#MACRO1}',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'value' => '\d{3}$',
+							'formulaid' => 'A'
+						],
+						[
+							'macro' => '{#MACRO2}',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'value' => '\d{2}$',
+							'formulaid' => 'B'
+						],
+						[
+							'macro' => '{#MACRO3}',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'value' => '\d{1}$',
+							'formulaid' => 'C'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_NOT_LIKE,
+						'value' => '8',
+						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED]
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+						'value' => '\w\W',
+						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED]
+					],
+				]
+			],
+			[
+				'name' => 'override 2',
+				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+				'step' => 2,
+				'operations' => []
+			],
+		];
+
+		$db_lld_ruleids = array_column(CDBHelper::getAll('SELECT itemid from items WHERE '.
+				dbConditionId('hostid', (array) $hostids)), 'itemid');
+		sort($db_lld_ruleids);
+
+		foreach ($db_lld_ruleids as $db_lld_ruleid) {
+			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+					dbConditionId('itemid', (array) $db_lld_ruleid));
+
+			usort($db_lld_overrides, function ($a, $b) {
+				return $b['lld_overrideid'] <=> $a['lld_overrideid'];
+			});
+
+			foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+				$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+			}
 		}
 	}
 

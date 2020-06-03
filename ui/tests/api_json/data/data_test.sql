@@ -969,7 +969,7 @@ INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop)
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1,133763,'override',1,3,'{1} or {2} or {3}',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1,1,8,'{#MACRO1}','\d{3}$');
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (2,1,8,'{#MACRO2}','\d{2}$');
-INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (3,1,8,'{#MACRO2}','\d{1}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (3,1,8,'{#MACRO3}','\d{1}$');
 INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1,1,0,3,'8');
 INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (2,1,0,1,'\w\W');
 INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (3,1,1,8,'^c+$');
