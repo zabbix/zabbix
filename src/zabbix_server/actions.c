@@ -917,7 +917,7 @@ static void	check_condition_event_tag(const zbx_vector_ptr_t *esc_events, zbx_co
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 		int		j;
 
 		ret = ret_continue;
@@ -956,7 +956,7 @@ static void	check_condition_event_tag_value(const zbx_vector_ptr_t *esc_events, 
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 		int		j;
 
 		ret = ret_continue;
