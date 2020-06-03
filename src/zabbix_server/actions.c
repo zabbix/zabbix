@@ -2178,7 +2178,7 @@ static int	check_intern_event_type_condition(const zbx_vector_ptr_t *esc_events,
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		if (FAIL == is_supported_event_object(event))
 		{
@@ -2230,7 +2230,7 @@ static void	get_object_ids_internal(const zbx_vector_ptr_t *esc_events, zbx_vect
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		for (j = 0; j < objects_num; j++)
 		{
@@ -2327,7 +2327,7 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, operation);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
-					groupids.values_num);
+				groupids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -2592,10 +2592,10 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 static int	check_intern_application_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
 	char			*sql = NULL;
-	size_t			sql_alloc = 0, i;
+	size_t			sql_alloc = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			objects[3] = {EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE};
+	int			objects[3] = {EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE}, i, j;
 	zbx_vector_uint64_t	objectids[3];
 	zbx_uint64_t		objectid;
 
@@ -2667,12 +2667,19 @@ static int	check_intern_application_condition(const zbx_vector_ptr_t *esc_events
 			case CONDITION_OPERATOR_NOT_LIKE:
 				while (NULL != (row = DBfetch(result)))
 				{
-					if (NULL == strstr(row[1], condition->value))
+					if (NULL != strstr(row[1], condition->value))
 					{
 						ZBX_STR2UINT64(objectid, row[0]);
-						add_condition_match(esc_events, condition, objectid, objects[i]);
+						if (FAIL != (j = zbx_vector_uint64_search(&objectids[i], objectid,
+								ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+						{
+							zbx_vector_uint64_remove_noorder(&objectids[i], j);
+						}
 					}
 				}
+
+				for (j = 0; j < objectids[i].values_num; j++)
+					add_condition_match(esc_events, condition, objectids[i].values[j], objects[i]);
 				break;
 		}
 		DBfree_result(result);
