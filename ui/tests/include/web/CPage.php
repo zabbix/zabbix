@@ -486,4 +486,46 @@ class CPage {
 			// Code is not missing here.
 		}
 	}
+
+	/**
+	 * Refresh page.
+	 *
+	 * @return $this
+	 */
+	public function refresh() {
+		$this->driver->navigate()->refresh();
+
+		return $this;
+	}
+
+	/**
+	 * Switching to frame or iframe.
+	 *
+	 * @param CElement|string|array|null $element    iframe element
+	 *
+	 * @return $this
+	 */
+	public function switchTo($element = null) {
+		if ($element === null) {
+			$this->driver->switchTo()->defaultContent();
+
+			return $this;
+		}
+
+		if (is_string($element)) {
+			$element = $this->query($element)->one(false);
+		}
+		elseif (is_array($element)) {
+			$element = $this->query($element[0], $element[1])->one(false);
+		}
+
+		if ($element instanceof RemoteWebElement) {
+			$this->driver->switchTo()->frame($element);
+		}
+		else {
+			throw new \Exception('Cannot switch to frame that is not an element.');
+		}
+
+		return $this;
+	}
 }
