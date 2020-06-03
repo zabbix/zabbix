@@ -963,4 +963,35 @@ INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, re
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, note, ip, resourceid, resourcename) VALUES (9005, 1, 1582269240, 1, 14, '', '192.168.3.32', 6, 'HG1 updated');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (9005, 9005, 'groups', 'name', 'HG1', 'HG1 updated');
 
-
+-- LLD with overrides to delete
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133763,2,'',50009,'Overrides (delete)','overrides.delete','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (2,133763,'override 2',2,0,'',1);
+INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (1,133763,'override',1,3,'{1} or {2} or {3}',1);
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (1,1,8,'{#MACRO1}','\d{3}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (2,1,8,'{#MACRO2}','\d{2}$');
+INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (3,1,8,'{#MACRO2}','\d{1}$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (1,1,0,3,'8');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (2,1,0,1,'\w\W');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (3,1,1,8,'^c+$');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (4,1,2,2,'123');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (5,1,3,0,'');
+INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (6,2,0,0,'');
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (2,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (3,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (4,1);
+INSERT INTO lld_override_opdiscover (lld_override_operationid,discover) VALUES (5,1);
+INSERT INTO lld_override_ophistory (lld_override_operationid,history) VALUES (2,'92d');
+INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) VALUES (5,1);
+INSERT INTO lld_override_opperiod (lld_override_operationid,delay) VALUES (2,'1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00');
+INSERT INTO lld_override_opseverity (lld_override_operationid,severity) VALUES (3,3);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (1,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (2,0);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (3,1);
+INSERT INTO lld_override_opstatus (lld_override_operationid,status) VALUES (5,1);
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (1,3,'tag1','value1');
+INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (2,3,'tag2','value2');
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (1,5,10264);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (2,5,10265);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (3,5,50010);
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (2,'36d');
+INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (6,'5d');

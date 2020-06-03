@@ -29,6 +29,15 @@ require_once dirname(__FILE__).'/../../include/classes/helpers/CConditionHelper.
  * @backup lld_override
  * @backup lld_override_condition
  * @backup lld_override_operation
+ * @backup lld_override_opdiscover
+ * @backup lld_override_opstatus
+ * @backup lld_override_ophistory
+ * @backup lld_override_opinventory
+ * @backup lld_override_opperiod
+ * @backup lld_override_opseverity
+ * @backup lld_override_optag
+ * @backup lld_override_optemplate
+ * @backup lld_override_optrends
  */
 class testDiscoveryRule extends CAPITest {
 	public static function discoveryrule_create_data_invalid() {
@@ -2879,6 +2888,88 @@ class testDiscoveryRule extends CAPITest {
 		// TODO: add templated discovery rules and check on errors.
 	}
 
+	public static function discoveryrule_overrides_delete_data() {
+		return [
+			'Test cannot delete nothing.' => [
+				[],
+				[],
+				[],
+				'Empty input parameter.'
+			],
+			'Test cannot delete that does not exists.' => [
+				['9999999999'],
+				[],
+				[],
+				'No permissions to referred object or it does not exist!'
+			],
+			'Test overrides and override operations are deleted.' => [
+				['133763'],
+				['1', '2'],
+				['1', '2', '3', '4', '5', '6'],
+				null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_delete_data
+	 */
+	public function testDiscoveryRuleOverrides_Delete(array $itemids, array $overrideids, array $operationids, $error) {
+		$result = $this->call('discoveryrule.delete', $itemids, $error);
+
+		if ($error === null) {
+			$this->assertEquals($result['result']['ruleids'], $itemids);
+
+			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+				dbConditionId('lld_overrideid', $overrideids));
+			$this->assertEmpty($db_lld_overrides);
+
+			$lld_override_conditions = CDBHelper::getAll('SELECT * from lld_override_condition WHERE '.
+				dbConditionId('lld_overrideid', $overrideids));
+			$this->assertEmpty($lld_override_conditions);
+
+			$lld_override_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
+				dbConditionId('lld_overrideid', $overrideids));
+			$this->assertEmpty($lld_override_operations);
+
+			$lld_override_opdiscover = CDBHelper::getAll('SELECT * from lld_override_opdiscover WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_opdiscover);
+
+			$lld_override_opstatus = CDBHelper::getAll('SELECT * from lld_override_opstatus WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_opstatus);
+
+			$lld_override_ophistory = CDBHelper::getAll('SELECT * from lld_override_ophistory WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_ophistory);
+
+			$lld_override_opinventory = CDBHelper::getAll('SELECT * from lld_override_opinventory WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_opinventory);
+
+			$lld_override_opperiod = CDBHelper::getAll('SELECT * from lld_override_opperiod WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_opperiod);
+
+			$lld_override_opseverity = CDBHelper::getAll('SELECT * from lld_override_opseverity WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_opseverity);
+
+			$lld_override_optag = CDBHelper::getAll('SELECT * from lld_override_optag WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_optag);
+
+			$lld_override_optemplate = CDBHelper::getAll('SELECT * from lld_override_optemplate WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_optemplate);
+
+			$lld_override_optrends = CDBHelper::getAll('SELECT * from lld_override_optrends WHERE '.
+				dbConditionId('lld_override_operationid', $operationids));
+			$this->assertEmpty($lld_override_optrends);
+		}
+	}
+
 	public static function discoveryrule_overrides_create_data_invalid() {
 		$num = 0;
 		$new_lld_overrides = function(array $overrides) use (&$num) {
@@ -4500,7 +4591,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => 1,
 							'operations' => [
 								[
-									'operator' => CONDITION_OPERATOR_NOT_LIKE,
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'opstatus' => [
 										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 									]
@@ -4730,8 +4821,26 @@ class testDiscoveryRule extends CAPITest {
 			],
 		];
 
-		return [end($data)];
 		return $data;
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_create_data_invalid
+	 * @dataProvider discoveryrule_overrides_create_data_valid
+	 */
+	public function testDiscoveryRuleOverrides_Create(array $request, $expected_error) {
+		$result = $this->call('discoveryrule.create', $request, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['itemids'] as $num => $itemid) {
+				$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.dbConditionId('itemid', (array) $itemid));
+
+				$request_lld_overrides = $request[$num]['overrides'];
+				foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+					$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+				}
+			}
+		}
 	}
 
 	/**
@@ -5022,25 +5131,6 @@ class testDiscoveryRule extends CAPITest {
 		}
 		else {
 			$this->assertEmpty($db_opinventory);
-		}
-	}
-
-	/**
-	 * @dataProvider discoveryrule_overrides_create_data_invalid
-	 * @dataProvider discoveryrule_overrides_create_data_valid
-	 */
-	public function testDiscoveryRuleOverrides_Create(array $request, $expected_error) {
-		$result = $this->call('discoveryrule.create', $request, $expected_error);
-
-		if ($expected_error === null) {
-			foreach ($result['result']['itemids'] as $num => $itemid) {
-				$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.dbConditionId('itemid', (array) $itemid));
-
-				$request_lld_overrides = $request[$num]['overrides'];
-				foreach ($request_lld_overrides as $override_num => $request_lld_override) {
-					$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
-				}
-			}
 		}
 	}
 
