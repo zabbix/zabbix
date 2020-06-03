@@ -152,6 +152,13 @@ define('ORACLE_MAX_STRING_SIZE', 4000);
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
+/**
+ * The sandbox attribute enables an extra set of restrictions for the content in the iframe. Default is set to empty
+ * string, which means all restrictions are applied. To disable, set to FALSE. To set a specific set of restrictions,
+ * write a custom string.
+ */
+define('ZBX_IFRAME_SANDBOX', '');
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript
