@@ -1,0 +1,1 @@
+.........T [ZBX-17654] fixed "Memory utilization" item in template_os_linux and template_os_linux_active by splitting it into master and depended relation (tuskov)

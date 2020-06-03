@@ -10,6 +10,7 @@ TARGETDIR = $(TOPDIR)\src\go\cmd\zabbix_agent2
 TARGETPKG=zabbix.com/cmd/zabbix_agent2
 
 CC = gcc
+WINDRES = windres.exe
 
 OBJS = \
 	$(OUTPUTDIR)\threads.o \
@@ -29,9 +30,11 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_system.o \
 	$(OUTPUTDIR)\sysinfo_dns.o \
 	$(OUTPUTDIR)\sysinfo_dir.o \
-	$(OUTPUTDIR)\eventlog.o
+	$(OUTPUTDIR)\eventlog.o \
+	$(TARGETDIR)\resource.syso
 
 CFLAGS := $(CFLAGS) -O2 -g -DUNICODE -DHAVE_STDINT_H=1 -I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
+RFLAGS := $(RFLAGS) --input-format=rc -O coff
 GOPATH := $(GOPATH);$(TOPDIR)\go
 TAGS :=
 
@@ -44,10 +47,12 @@ ifeq ("$(ARCH)", "x86")
 	CGO_CFLAGS := $(CGO_CFLAGS) -m32
 	GOARCH := 386
 	TARGETBIN=$(TOPDIR)\bin\win32\zabbix_agent2.exe
+	RFLAGS := $(RFLAGS) --target=pe-i386
 
 else
 	TARGETBIN=$(TOPDIR)\bin\win64\zabbix_agent2.exe
 	GOARCH := amd64
+	RFLAGS := $(RFLAGS) --target=pe-x86-64
 endif
 
 ifneq ("$(OPENSSL)", "")
@@ -134,6 +139,9 @@ $(OUTPUTDIR)\logfiles.o: $(TOPDIR)\src\zabbix_agent\logfiles\logfiles.c
 $(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog.c
 	$(CC) $(CFLAGS) -c $^ -I$(TOPDIR)\go\win64 -o $@
 
+$(TARGETDIR)\resource.syso: $(TOPDIR)\build\win32\project\resource.rc
+	$(WINDRES) $^ $(RFLAGS) -D _WINDOWS -D ZABBIX_AGENT2 -o $@
+
 .FORCE:
 $(TARGETBIN): $(OBJS) .FORCE
 	set CGO_CFLAGS=$(CGO_CFLAGS)
@@ -153,4 +161,4 @@ $(TARGETBIN): $(OBJS) .FORCE
 
 clean:
 	go clean -cache
-	del $(TOPDIR)\include\config.h "$(TARGETBIN)" $(OUTPUTDIR)\*.o 2>NUL
+	del $(TOPDIR)\include\config.h "$(TARGETBIN)" $(OUTPUTDIR)\*.o $(TARGETDIR)\*.syso 2>NUL

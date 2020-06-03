@@ -20,6 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+use Facebook\WebDriver\WebDriverBy;
+
 class testZBX6663 extends CLegacyWebTest {
 
 

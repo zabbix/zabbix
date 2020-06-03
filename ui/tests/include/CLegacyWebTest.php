@@ -22,6 +22,9 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CWebTest.php';
 
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
+
 /**
  * Base class for legacy Selenium tests.
  */

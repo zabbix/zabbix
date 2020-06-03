@@ -154,7 +154,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 	zbx_uint64_t	scriptid, hostid;
 	struct zbx_json	j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): data:%s ", __func__, data);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -202,6 +202,8 @@ finish:
 
 	zbx_json_free(&j);
 	zbx_free(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

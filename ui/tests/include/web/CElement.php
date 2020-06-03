@@ -27,6 +27,10 @@ require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
 require_once dirname(__FILE__).'/CastableTrait.php';
 
+use Facebook\WebDriver\WebDriverExpectedCondition;
+use Facebook\WebDriver\Remote\RemoteWebElement;
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * Generic web page element.
  */
@@ -70,16 +74,19 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @param RemoteWebElement $element
 	 * @param type $options
 	 */
-	public function __construct(RemoteWebElement $element, $options = []) {
-		$this->setElement($element);
+	public static function createInstance(RemoteWebElement $element, $options = []) {
+		$instance = new static($element->executor, $element->id, $element->isW3cCompliant);
+		$instance->setElement($element);
 
 		foreach ($options as $key => $value) {
-			$this->$key = $value;
+			$instance->$key = $value;
 		}
 
-		if (!$this->normalized) {
-			$this->normalize();
+		if (!$instance->normalized) {
+			$instance->normalize();
 		}
+
+		return $instance;
 	}
 
 	/**
@@ -138,6 +145,7 @@ class CElement extends CBaseElement implements IWaitable {
 		$this->executor = $element->executor;
 		$this->id = $element->id;
 		$this->fileDetector = $element->fileDetector;
+		$this->isW3cCompliant = $element->isW3cCompliant;
 	}
 
 	/**
@@ -245,7 +253,10 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return CElement
 	 */
 	public function cast($class, $options = []) {
-		return new $class($this, array_merge($options, ['parent' => $this->parent, 'by' => $this->by]));
+		return call_user_func([$class, 'createInstance'], $this, array_merge($options, [
+			'parent' => $this->parent,
+			'by' => $this->by
+		]));
 	}
 
 	/**
@@ -500,6 +511,8 @@ class CElement extends CBaseElement implements IWaitable {
 
 			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 		}
+
+		return $this;
 	}
 
 	/**

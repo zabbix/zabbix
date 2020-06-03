@@ -320,6 +320,18 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			if ($fullItem['type'] == ITEM_TYPE_CALCULATED) {
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'params' => ['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0],
+				]];
+
+				$data = array_intersect_key($item, $api_input_rules['fields']);
+
+				if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($inum + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+
 			$host = $dbHosts[$fullItem['hostid']];
 
 			// Validate update interval.

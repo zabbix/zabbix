@@ -21,6 +21,8 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
+use Facebook\WebDriver\WebDriverBy;
+
 /**
  * @backup httptest
  */

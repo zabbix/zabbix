@@ -320,7 +320,7 @@ function getTeamByID(teamID) {&#13;
 }&#13;
 &#13;
 function createProblemURL(zabbix_url, triggerid, eventid) {&#13;
-    var problem_url = '{0}/tr_events.php?triggeriid{1}&amp;eventid={2}'&#13;
+    var problem_url = '{0}/tr_events.php?triggerid{1}&amp;eventid={2}'&#13;
         .format(&#13;
             zabbix_url,&#13;
             triggerid,&#13;
