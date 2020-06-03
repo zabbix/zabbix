@@ -2750,7 +2750,7 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	check_events_condition(zbx_vector_ptr_t *esc_events, unsigned char source, zbx_condition_t *condition)
+static void	check_events_condition(const zbx_vector_ptr_t *esc_events, unsigned char source, zbx_condition_t *condition)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
 			" cond.value2:'%s'", __func__, condition->actionid, condition->conditionid,
