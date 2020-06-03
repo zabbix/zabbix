@@ -597,8 +597,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	private function enableAndCheckModules($data, $from_form = false) {
 		foreach ($data as $module) {
 			// Change module status from Disabled to Enabled.
-			($from_form) ? $this->changeModuleStatusFromForm($module['module_name'], true) :
-					$this->changeModuleStatusFromPage($module['module_name'], 'Disabled');
+			if ($from_form) {
+				$this->changeModuleStatusFromForm($module['module_name'], true);
+			}
+			else {
+				$this->changeModuleStatusFromPage($module['module_name'], 'Disabled');
+			}
 			// In case of negative test check error message and confirm that module wasn't applied.
 			if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
 				$this->assertMessage($module['expected'], $module['error_title'], $module['error_details']);
@@ -623,8 +627,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				continue;
 			}
 			// Change module status from Enabled to Disabled.
-			($from_form) ? $this->changeModuleStatusFromForm($module['module_name'], false) :
-					$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
+			if ($from_form) {
+				$this->changeModuleStatusFromForm($module['module_name'], false);
+			}
+			else {
+				$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
+			}
 			// Check message and confirm that changes, made by the module, were revered.
 			$this->assertMessage(TEST_GOOD, 'Module disabled: '.$module['module_name'].'.');
 			$this->assertModuleDisabled($module);

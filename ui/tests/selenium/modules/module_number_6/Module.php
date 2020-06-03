@@ -12,8 +12,6 @@ class Module extends CModule {
 	 * Initialize module.
 	 */
 	public function init(): void {
-
-		/** @var CMenu $menu */
 		$menu = APP::Component()->get('menu.main');
 
 		$menu->remove(_('Reports'));

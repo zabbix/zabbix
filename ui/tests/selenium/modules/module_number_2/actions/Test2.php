@@ -14,7 +14,6 @@ class Test2 extends CAction {
 	 * @inheritDoc
 	 */
 	protected function checkPermissions() {
-
 		return true;
 	}
 
@@ -22,7 +21,6 @@ class Test2 extends CAction {
 	 * @inheritDoc
 	 */
 	protected function checkInput() {
-
 		return true;
 	}
 
