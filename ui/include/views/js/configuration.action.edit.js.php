@@ -1244,11 +1244,13 @@
 	 * @param {Node}   return_focus  The node a popup returns focus to when it closes.
 	 * @param {number} eventsource
 	 * @param {number} recovery_phase
+	 * @param {number} actionid
 	 */
-	function OperationPopup(return_focus, eventsource, recovery_phase) {
+	function OperationPopup(return_focus, eventsource, recovery_phase, actionid) {
 		this.return_focus = return_focus;
 		this.eventsource = eventsource;
 		this.recovery_phase = recovery_phase;
+		this.actionid = actionid;
 
 		this.overlay = overlayDialogue({
 			class: 'modal-popup modal-popup-medium',
@@ -1275,6 +1277,7 @@
 	OperationPopup.prototype.validate = function(operation_form) {
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'action.operation.validate');
+		url.setArgument('actionid', this.actionid);
 
 		return $.ajax({
 			url: url.getUrl(),
@@ -1428,9 +1431,11 @@
 		 * @param {string} recovery_phase  One of: ACTION_OPERATION, ACTION_RECOVERY_OPERATION,
 		 *                                 ACTION_ACKNOWLEDGE_OPERATION.
 		 * @param {object} operation       (optional) Current operation object.
+		 * @param {number} actionid        Current operation actionid.
 		 */
-		open(target, eventsource, recovery_phase, operation) {
-			const operation_popup = new OperationPopup(target, eventsource, recovery_phase);
+		open(target, eventsource, recovery_phase, operation, actionid) {
+			console.log(operation);
+			const operation_popup = new OperationPopup(target, eventsource, recovery_phase, actionid);
 			operation_popup.load(operation);
 
 			/*

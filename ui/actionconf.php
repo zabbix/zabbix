@@ -419,7 +419,7 @@ $config = select_config();
 if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
-		'actionid' => getRequest('actionid'),
+		'actionid' => getRequest('actionid', '0'),
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
 		'new_recovery_operation' => getRequest('new_recovery_operation'),

@@ -23,7 +23,8 @@ class CControllerActionOperationValidate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'operation' => 'array'
+			'operation' => 'array',
+			'actionid'	=> 'db actions.actionid',
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateOperationsIntegrity();
