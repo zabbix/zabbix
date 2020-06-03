@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-02T09:02:58Z</date>
+   <date>2020-06-03T10:08:35Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -539,7 +539,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{max(5m)}&gt;{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}</expression>
+                     <expression>{min(5m)}&gt;{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}</expression>
                      <name>MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)</name>
                      <priority>WARNING</priority>
                      <description>Possibly the application using the database is in need of query optimization.</description>
@@ -574,7 +574,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{max(5m)}&gt;{$MYSQL.CREATED_TMP_FILES.MAX.WARN}</expression>
+                     <expression>{min(5m)}&gt;{$MYSQL.CREATED_TMP_FILES.MAX.WARN}</expression>
                      <name>MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)</name>
                      <priority>WARNING</priority>
                      <description>Possibly the application using the database is in need of query optimization.</description>
@@ -609,7 +609,7 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{max(5m)}&gt;{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}</expression>
+                     <expression>{min(5m)}&gt;{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}</expression>
                      <name>MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)</name>
                      <priority>WARNING</priority>
                      <description>Possibly the application using the database is in need of query optimization.</description>
@@ -1450,7 +1450,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Operations</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1472,7 +1472,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Queries</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1494,7 +1494,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Connections</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1516,7 +1516,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Bandwidth</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1538,7 +1538,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: InnoDB buffer pool</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1560,7 +1560,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Threads</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>2</y>
