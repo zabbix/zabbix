@@ -1419,7 +1419,7 @@ static int	check_dvalue_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		if (object == event->object)
 			zbx_vector_uint64_append(&objectids, event->objectid);
@@ -1433,8 +1433,8 @@ static int	check_dvalue_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 					" where");
 
 		zbx_vector_uint64_uniq(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
-					objectids.values, objectids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid", objectids.values,
+				objectids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -1529,8 +1529,8 @@ static int	check_dhost_ip_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 					" from dservices"
 					" where");
 
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
-					objectids[i].values, objectids[i].values_num);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid", objectids[i].values,
+					objectids[i].values_num);
 		}
 		else	/* EVENT_OBJECT_DSERVICE */
 		{
@@ -1605,7 +1605,7 @@ static int	check_dservice_type_condition(const zbx_vector_ptr_t *esc_events, zbx
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		if (object == event->object)
 			zbx_vector_uint64_append(&objectids, event->objectid);
@@ -1620,8 +1620,8 @@ static int	check_dservice_type_condition(const zbx_vector_ptr_t *esc_events, zbx
 					" and");
 
 		zbx_vector_uint64_uniq(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ds.dserviceid",
-					objectids.values, objectids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ds.dserviceid", objectids.values,
+				objectids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -1821,7 +1821,7 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		if (object == event->object)
 			zbx_vector_uint64_append(&objectids, event->objectid);
@@ -1835,8 +1835,8 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
 				" where");
 
 		zbx_vector_uint64_uniq(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
-					objectids.values, objectids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid", objectids.values,
+				objectids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -1958,8 +1958,16 @@ static int	check_hostname_metadata_condition(const zbx_vector_ptr_t *esc_events,
 	zbx_vector_uint64_t	objectids;
 	const char		*condition_field;
 
-	if (CONDITION_OPERATOR_LIKE != condition->op && CONDITION_OPERATOR_NOT_LIKE != condition->op)
-		return NOTSUPPORTED;
+	switch(condition->op)
+	{
+		case CONDITION_OPERATOR_LIKE:
+		case CONDITION_OPERATOR_NOT_LIKE:
+		case CONDITION_OPERATOR_REGEXP:
+		case CONDITION_OPERATOR_NOT_REGEXP:
+			break;
+		default:
+			return NOTSUPPORTED;
+	}
 
 	if (CONDITION_TYPE_HOST_NAME == condition->conditiontype)
 		condition_field = "host";
@@ -1975,8 +1983,7 @@ static int	check_hostname_metadata_condition(const zbx_vector_ptr_t *esc_events,
 			" where",
 			condition_field);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid",
-			objectids.values, objectids.values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid", objectids.values, objectids.values_num);
 
 	result = DBselect("%s", sql);
 
@@ -1994,6 +2001,14 @@ static int	check_hostname_metadata_condition(const zbx_vector_ptr_t *esc_events,
 				break;
 			case CONDITION_OPERATOR_NOT_LIKE:
 				if (NULL == strstr(row[1], condition->value))
+					add_condition_match(esc_events, condition, objectid, object);
+				break;
+			case CONDITION_OPERATOR_REGEXP:
+				if (NULL != zbx_regexp_match(row[1], condition->value, NULL))
+					add_condition_match(esc_events, condition, objectid, object);
+				break;
+			case CONDITION_OPERATOR_NOT_REGEXP:
+				if (NULL == zbx_regexp_match(row[1], condition->value, NULL))
 					add_condition_match(esc_events, condition, objectid, object);
 				break;
 		}
