@@ -991,7 +991,7 @@ static void	check_condition_event_tag_value(const zbx_vector_ptr_t *esc_events, 
  ******************************************************************************/
 static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1068,7 +1068,7 @@ static void	get_object_ids_discovery(const zbx_vector_ptr_t *esc_events, zbx_vec
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		if (event->object == EVENT_OBJECT_DHOST)
 			zbx_vector_uint64_append(&objectids[0], event->objectid);
@@ -1214,7 +1214,7 @@ static int	check_dcheck_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		if (object == event->object)
 			zbx_vector_uint64_append(&objectids, event->objectid);
@@ -1231,8 +1231,8 @@ static int	check_dcheck_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 				condition_value);
 
 		zbx_vector_uint64_uniq(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
-					objectids.values, objectids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid", objectids.values,
+				objectids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -1275,7 +1275,7 @@ static int	check_dobject_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
-		const DB_EVENT	*event = esc_events->values[i];
+		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 
 		if (event->object == condition_value_i)
 			zbx_vector_uint64_append(&condition->eventids, event->eventid);
@@ -1332,7 +1332,7 @@ static int	check_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
 		if (EVENT_OBJECT_DHOST == objects[i])
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select dhostid"
+					"select h.dhostid"
 					" from drules r,dhosts h"
 					" where r.druleid=h.druleid"
 						"%s r.proxy_hostid=" ZBX_FS_UI64
@@ -1340,8 +1340,8 @@ static int	check_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
 					operation_and,
 					condition_value);
 
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
-					objectids[i].values, objectids[i].values_num);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.dhostid", objectids[i].values,
+					objectids[i].values_num);
 		}
 		else	/* EVENT_OBJECT_DSERVICE */
 		{
