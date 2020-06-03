@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/CommandExecutor.php';
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverDimension;
 use Facebook\WebDriver\Exception\NoSuchAlertException;
 use Facebook\WebDriver\WebDriverExpectedCondition;
