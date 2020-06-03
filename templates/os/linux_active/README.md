@@ -209,7 +209,7 @@ There are no template links in this template.
 |Storage |{#DEVNAME}: Disk write request avg waiting time (w_await) |<p>This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.</p> |CALCULATED |vfs.dev.write.await[{#DEVNAME}]<p>**Expression**:</p>`(last("vfs.dev.write.time.rate[{#DEVNAME}]")/(last("vfs.dev.write.rate[{#DEVNAME}]")+(last("vfs.dev.write.rate[{#DEVNAME}]")=0)))*1000*(last("vfs.dev.write.rate[{#DEVNAME}]") > 0)` |
 |Storage |{#DEVNAME}: Disk average queue size (avgqu-sz) |<p>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |DEPENDENT |vfs.dev.queue_size[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[10]`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `0.001`</p> |
 |Storage |{#DEVNAME}: Disk utilization |<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</p> |DEPENDENT |vfs.dev.util[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[9]`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `0.1`</p> |
-|Zabbix_raw_items |{#DEVNAME}: Get /sys/block/{#DEVNAME}/stat |<p>Get contents of /sys/block/{#DEVNAME}/stat for disk stats.</p> |ZABBIX_ACTIVE |vfs.file.contents[/sys/block/{#DEVNAME}/stat]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.trim().split(/ +/));`</p> |
+|Zabbix_raw_items |{#DEVNAME}: Get stats |<p>Get contents of /sys/block/{#DEVNAME}/stat for disk stats.</p> |ZABBIX_ACTIVE |vfs.file.contents[/sys/block/{#DEVNAME}/stat]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.trim().split(/ +/));`</p> |
 |Zabbix_raw_items |{#DEVNAME}: Disk read time (rate) |<p>Rate of total read time counter. Used in r_await calculation</p> |DEPENDENT |vfs.dev.read.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[3]`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `0.001`</p> |
 |Zabbix_raw_items |{#DEVNAME}: Disk write time (rate) |<p>Rate of total write time counter. Used in w_await calculation</p> |DEPENDENT |vfs.dev.write.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[7]`</p><p>- CHANGE_PER_SECOND<p>- MULTIPLIER: `0.001`</p> |
 
@@ -393,8 +393,7 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide feedback, discuss the template or ask for help with it at
-[ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux).
+You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux).
 
 ## Known Issues
 
