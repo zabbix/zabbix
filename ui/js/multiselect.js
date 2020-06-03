@@ -387,10 +387,15 @@ jQuery(function($) {
 			}
 
 			$obj
-				.on('mousedown', function() {
+				.on('mousedown', function(event) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
+
+						// Focus input only when not clicked on selected item.
+						if (!$(event.target).parents('.multiselect-list').length) {
+							$('input[type="text"]', $obj).focus();
+						}
 					}
 				})
 				.on('remove', function() {
@@ -787,6 +792,9 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
+
+						// preventScroll not work in IE.
+						$('input[type="text"]', $obj)[0].focus({preventScroll: true});
 					}
 				});
 

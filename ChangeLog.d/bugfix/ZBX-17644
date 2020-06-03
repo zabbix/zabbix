@@ -1,0 +1,1 @@
+..F....... [ZBX-17644] fixed host address field not being editable and macros not showing for username and password fields in item test popup form for SSH and TELNET item types (Ivo)
