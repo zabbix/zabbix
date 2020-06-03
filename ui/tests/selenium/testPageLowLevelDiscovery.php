@@ -70,7 +70,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$rows_amount = $table->getRows()->count();
-		// Filling fields with neede discovery rule info.
+		
+		// Filling fields with needed discovery rule info.
 		$form->fill(['Name' => 'Discovery rule 3',
 						'Key' => 'key3',
 						'Type' => 'Zabbix agent',
