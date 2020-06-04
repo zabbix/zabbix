@@ -275,7 +275,7 @@ Template tooling version used: 0.34</description>
                         <name>CPU utilization</name>
                         <host>Template Module HOST-RESOURCES-MIB SNMPv1</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -297,7 +297,7 @@ Template tooling version used: 0.34</description>
                         <name>{#MEMNAME}: Memory utilization</name>
                         <host>Template Module HOST-RESOURCES-MIB SNMPv1</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -319,7 +319,7 @@ Template tooling version used: 0.34</description>
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template Module HOST-RESOURCES-MIB SNMPv1</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
