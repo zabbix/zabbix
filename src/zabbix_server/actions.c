@@ -481,16 +481,15 @@ static int	check_host_condition(const zbx_vector_ptr_t *esc_events, zbx_conditio
 	get_object_ids(esc_events, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct t.triggerid"
-			" from items i,functions f,triggers t"
+			"select distinct f.triggerid"
+			" from items i,functions f"
 			" where i.itemid=f.itemid"
-				" and f.triggerid=t.triggerid"
 				"%s i.hostid=" ZBX_FS_UI64
 				" and",
 			operation,
 			condition_value);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", objectids.values, objectids.values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "f.triggerid", objectids.values, objectids.values_num);
 
 	result = DBselect("%s", sql);
 
@@ -2527,16 +2526,15 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 		if (EVENT_OBJECT_TRIGGER == objects[i])
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct t.triggerid"
-					" from items i,functions f,triggers t"
+					"select distinct f.triggerid"
+					" from items i,functions f"
 					" where i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
 						"%s i.hostid=" ZBX_FS_UI64
 						" and",
 					operation,
 					condition_value);
 
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "f.triggerid",
 					objectids[i].values, objectids[i].values_num);
 		}
 		else	/* EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE */
