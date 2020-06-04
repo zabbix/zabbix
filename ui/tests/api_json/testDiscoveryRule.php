@@ -5141,7 +5141,7 @@ class testDiscoveryRule extends CAPITest {
 	}
 
 	public function testDiscoveryRuleOverrides_Copy() {
-		$itemid = '133763';
+		$itemid = '133764';
 		$hostids = ['90020', '90021'];
 
 		$result = $this->call('discoveryrule.copy', [
