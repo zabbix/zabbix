@@ -158,7 +158,7 @@ class CControllerActionOperationGet extends CController {
 			'operation_message' => $operation_message,
 			'operation_command' => $operation_command,
 			'operation_attr' => $operation_attr,
-			'operation_condition' => $operation_condition,
+			'operation_condition' => $operation_condition
 		];
 	}
 
@@ -256,7 +256,7 @@ class CControllerActionOperationGet extends CController {
 				'mediatypeid' => $operation['opmessage']['mediatypeid'],
 				'mediatypes' => $mediatypes,
 				'usergroups' => $usergroups,
-				'users' => $users,
+				'users' => $users
 			];
 		}
 
@@ -386,7 +386,7 @@ class CControllerActionOperationGet extends CController {
 			if ($recovery == ACTION_OPERATION) {
 				$operation_condition = [
 					'conditions' => [],
-					'evaltype' => $operation['evaltype'],
+					'evaltype' => $operation['evaltype']
 				];
 
 				foreach ($operation['opconditions'] as $index => $opcondition) {
@@ -399,7 +399,7 @@ class CControllerActionOperationGet extends CController {
 						'name' => $name,
 						'conditiontype' => $opcondition['conditiontype'],
 						'operator' => $opcondition['operator'],
-						'value' => $opcondition['value'],
+						'value' => $opcondition['value']
 					];
 				}
 
