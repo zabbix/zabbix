@@ -106,7 +106,7 @@ func DecreaseLogLevel() (success bool) {
 	return false
 }
 
-//Open sets a new logger based on the log type and a new log output level
+// Open sets a new logger based on the log type and a new log output level
 func Open(logType int, level int, filename string, filesize int) error {
 	logStat.logType = logType
 	logStat.filename = filename
