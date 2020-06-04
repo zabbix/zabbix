@@ -5263,5 +5263,300 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
+	public static function discoveryrule_overrides_get_data_valid() {
+		$itemid = '133763';
+
+		return [
+			'Test getting lld_overrides extended output.' => [
+				'discoveryrule' => [
+					'output' => ['itemid'],
+					'itemids' => [$itemid],
+					'selectOverrides' => API_OUTPUT_EXTEND
+				],
+				'get_result' => [
+					'itemid' => $itemid,
+					'overrides' => [
+						[
+							'name' => 'override',
+							'step' => '1',
+							'stop' => '1',
+							'filter' => [
+								'evaltype' => '3',
+								'formula' => 'A or B or C',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO1}',
+										'value' => '\\d{3}$',
+										'operator' => '8',
+										'formulaid' => 'A'
+									],
+									[
+										'macro' => '{#MACRO2}',
+										'value' => '\\d{2}$',
+										'operator' => '8',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO3}',
+										'value' => '\\d{1}$',
+										'operator' => '8',
+										'formulaid' => 'C'
+									]
+								],
+								'eval_formula' => 'A or B or C'
+							],
+							'operations' => [
+								[
+									'operationobject' => '0',
+									'operator' => '3',
+									'value' => '8',
+									'opstatus' => [
+										'status' => '1'
+									]
+								],
+								[
+									'operationobject' => '0',
+									'operator' => '1',
+									'value' => '\\w\\W',
+									'opstatus' => [
+										'status' => '0'
+									],
+									'opdiscover' => [
+										'discover' => '1'
+									],
+									'ophistory' => [
+										'history' => '92d'
+									],
+									'optrends' => [
+										'trends' => '36d'
+									],
+									'opperiod' => [
+										'delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'
+									]
+								],
+								[
+									'operationobject' => '1',
+									'operator' => '8',
+									'value' => '^c+$',
+									'opstatus' => [
+										'status' => '1'
+									],
+									'opdiscover' => [
+										'discover' => '1'
+									],
+									'opseverity' => [
+										'severity' => '3'
+									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									]
+								],
+								[
+									'operationobject' => '2',
+									'operator' => '2',
+									'value' => '123',
+									'opdiscover' => [
+										'discover' => '1'
+									]
+								],
+								[
+									'operationobject' => '3',
+									'operator' => '0',
+									'value' => '',
+									'opstatus' => [
+										'status' => '1'
+									],
+									'opdiscover' => [
+										'discover' => '1'
+									],
+									'optemplate' => [
+										[
+											'templateid' => '10264'
+										],
+										[
+											'templateid' => '10265'
+										],
+										[
+											'templateid' => '50010'
+										]
+									],
+									'opinventory' => [
+										'inventory_mode' => '1'
+									]
+								]
+							]
+						],
+						[
+							'name' => 'override 2',
+							'step' => '2',
+							'stop' => '1',
+							'filter' => [
+								'evaltype' => '0',
+								'formula' => '',
+								'conditions' => [],
+								'eval_formula' => ''
+							],
+							'operations' => [
+								[
+									'operationobject' => '0',
+									'operator' => '0',
+									'value' => '',
+									'optrends' => [
+										'trends' => '5d'
+									]
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test getting lld_overrides queried output.' => [
+				'discoveryrule' => [
+					'output' => ['itemid'],
+					'itemids' => [$itemid],
+					'selectOverrides' => ['step', 'operations']
+				],
+				'get_result' => [
+					'itemid' => $itemid,
+					'overrides' => [
+						[
+							'step' => '1',
+							'operations' => [
+								[
+									'operationobject' => '0',
+									'operator' => '3',
+									'value' => '8',
+									'opstatus' => [
+										'status' => '1'
+									]
+								],
+								[
+									'operationobject' => '0',
+									'operator' => '1',
+									'value' => '\\w\\W',
+									'opstatus' => [
+										'status' => '0'
+									],
+									'opdiscover' => [
+										'discover' => '1'
+									],
+									'ophistory' => [
+										'history' => '92d'
+									],
+									'optrends' => [
+										'trends' => '36d'
+									],
+									'opperiod' => [
+										'delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'
+									]
+								],
+								[
+									'operationobject' => '1',
+									'operator' => '8',
+									'value' => '^c+$',
+									'opstatus' => [
+										'status' => '1'
+									],
+									'opdiscover' => [
+										'discover' => '1'
+									],
+									'opseverity' => [
+										'severity' => '3'
+									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									]
+								],
+								[
+									'operationobject' => '2',
+									'operator' => '2',
+									'value' => '123',
+									'opdiscover' => [
+										'discover' => '1'
+									]
+								],
+								[
+									'operationobject' => '3',
+									'operator' => '0',
+									'value' => '',
+									'opstatus' => [
+										'status' => '1'
+									],
+									'opdiscover' => [
+										'discover' => '1'
+									],
+									'optemplate' => [
+										[
+											'templateid' => '10264'
+										],
+										[
+											'templateid' => '10265'
+										],
+										[
+											'templateid' => '50010'
+										]
+									],
+									'opinventory' => [
+										'inventory_mode' => '1'
+									]
+								]
+							]
+						],
+						[
+							'step' => '2',
+							'operations' => [
+								[
+									'operationobject' => '0',
+									'operator' => '0',
+									'value' => '',
+									'optrends' => [
+										'trends' => '5d'
+									]
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_get_data_valid
+	 */
+	public function testDiscoveryRuleOverrides_Get($discoveryrule, $get_result, $expected_error) {
+		$result = $this->call('discoveryrule.get', $discoveryrule);
+
+		if ($expected_error === null) {
+			foreach ($result['result'] as $entry) {
+				$this->assertSame($entry['itemid'], $get_result['itemid']);
+
+				if (array_key_exists('selectOverrides', $discoveryrule)) {
+					$this->assertArrayHasKey('overrides', $get_result);
+					$this->assertSame($entry['overrides'], $get_result['overrides']);
+				}
+				else {
+					$this->assertArrayNotHasKey('overrides', $get_result);
+				}
+			}
+		}
+	}
+
 	// TODO: add more tests to check other related discovery rule properties and perform more tests on templates and templated objects.
 }
