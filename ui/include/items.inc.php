@@ -1971,3 +1971,60 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_SNMP
 	];
 }
+
+/**
+ * Validates update interval for items, item prototypes and low-level discovery rules and their overrides.
+ *
+ * @param CUpdateIntervalParser $parser [IN]      Parser used for delay validation.
+ * @param string                $value  [IN]      Update interval to parse and validate.
+ * @param string                $field_name [IN]  Frontend or API field name in the error
+ * @param string                $error  [OUT]     Returned error string if delay validation fails.
+ *
+ * @return bool
+ */
+function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$error) {
+	if ($parser->parse($value) != CParser::PARSE_SUCCESS) {
+		$error = _s('Incorrect value for field "%1$s": %2$s.', $field_name, _('invalid delay'));
+
+		return false;
+	}
+
+	$delay = $parser->getDelay();
+
+	if ($delay[0] !== '{') {
+		$delay_sec = timeUnitToSeconds($delay);
+		$intervals = $parser->getIntervals();
+		$flexible_intervals = $parser->getIntervals(ITEM_DELAY_FLEXIBLE);
+		$has_scheduling_intervals = (bool) $parser->getIntervals(ITEM_DELAY_SCHEDULING);
+		$has_macros = false;
+
+		foreach ($intervals as $interval) {
+			if (strpos($interval['interval'], '{') !== false) {
+				$has_macros = true;
+				break;
+			}
+		}
+
+		// If delay is 0, there must be at least one either flexible or scheduling interval.
+		if ($delay_sec == 0 && !$intervals) {
+			$error = _('Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.');
+
+			return false;
+		}
+		elseif ($delay_sec < 0 || $delay_sec > SEC_PER_DAY) {
+			$error = _('Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.');
+
+			return false;
+		}
+
+		// If there are scheduling intervals or intervals with macros, skip the next check calculation.
+		if (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
+				&& calculateItemNextCheck(0, $delay_sec, $flexible_intervals, time()) == ZBX_JAN_2038) {
+			$error = _('Item will not be refreshed. Please enter a correct update interval.');
+
+			return false;
+		}
+	}
+
+	return true;
+}
