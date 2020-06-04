@@ -164,15 +164,14 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-		"select distinct t.triggerid"
-		" from hosts_groups hg,hosts h,items i,functions f,triggers t"
+		"select distinct f.triggerid"
+		" from hosts_groups hg,hosts h,items i,functions f"
 		" where hg.hostid=h.hostid"
 			" and h.hostid=i.hostid"
 			" and i.itemid=f.itemid"
-			" and f.triggerid=t.triggerid"
 			" and");
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "f.triggerid",
 			objectids.values, objectids.values_num);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, operation);
@@ -2301,16 +2300,15 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 		if (EVENT_OBJECT_TRIGGER == objects[i])
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select distinct t.triggerid"
-					" from hosts_groups hg,hosts h,items i,functions f,triggers t"
+					"select distinct f.triggerid"
+					" from hosts_groups hg,hosts h,items i,functions f"
 					" where hg.hostid=h.hostid"
 						" and h.hostid=i.hostid"
 						" and i.itemid=f.itemid"
-						" and f.triggerid=t.triggerid"
 						" and");
 
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
-					objectids[i].values, objectids[i].values_num);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "f.triggerid", objectids[i].values,
+					objectids[i].values_num);
 		}
 		else	/* EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE */
 		{
