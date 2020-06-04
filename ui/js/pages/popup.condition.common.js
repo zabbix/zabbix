@@ -31,9 +31,6 @@ function submitConditionPopup(response, overlay) {
 		inputs = response.inputs,
 		cond_dialogueid = jQuery(document.forms['popup.condition'])
 			.closest('[data-dialogueid]')
-			.data('dialogueid'),
-		opr_dialogueid = jQuery(document.forms['popup.operation'])
-			.closest('[data-dialogueid]')
 			.data('dialogueid');
 
 	if (!cond_dialogueid) {
