@@ -420,7 +420,7 @@ class testDiscoveryRule extends CAPITest {
 				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '999999',
+							'lld_macro_pathid' => '999999'
 						]
 					]
 				],
@@ -430,7 +430,7 @@ class testDiscoveryRule extends CAPITest {
 				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '992',
+							'lld_macro_pathid' => '992'
 						],
 						[
 							'lld_macro' => '{#B}',
@@ -1791,7 +1791,7 @@ class testDiscoveryRule extends CAPITest {
 					'lld_macro_paths' => [
 						[
 							'lld_macro_pathid' => '991',
-							'lld_macro' => '{#V}',
+							'lld_macro' => '{#V}'
 						],
 						[
 							'lld_macro_pathid' => '992',
@@ -1821,7 +1821,7 @@ class testDiscoveryRule extends CAPITest {
 					'lld_macro_paths' => [
 						[
 							'lld_macro_pathid' => '991',
-							'lld_macro' => '{#V}',
+							'lld_macro' => '{#V}'
 						],
 						[
 							'lld_macro_pathid' => '992',
@@ -3234,7 +3234,7 @@ class testDiscoveryRule extends CAPITest {
 							'name' => 'override',
 							'step' => 1,
 							'filter' => [
-								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION
 							]
 						]
 					])
@@ -3362,7 +3362,7 @@ class testDiscoveryRule extends CAPITest {
 							'operations' => [
 								[
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-									'operator' => 10,
+									'operator' => 10
 								]
 							]
 						]
@@ -3832,7 +3832,7 @@ class testDiscoveryRule extends CAPITest {
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
-										'severity' => 5
+										'severity' => TRIGGER_SEVERITY_INFORMATION
 									]
 								]
 							]
@@ -3852,7 +3852,7 @@ class testDiscoveryRule extends CAPITest {
 									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
-										'severity' => 5
+										'severity' => TRIGGER_SEVERITY_WARNING
 									]
 								]
 							]
@@ -3872,7 +3872,7 @@ class testDiscoveryRule extends CAPITest {
 									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
-										'severity' => 5
+										'severity' => TRIGGER_SEVERITY_WARNING
 									]
 								]
 							]
@@ -4268,7 +4268,7 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
-			],
+			]
 		];
 	}
 
@@ -4665,7 +4665,7 @@ class testDiscoveryRule extends CAPITest {
 										],
 										[
 											'tag' => 'tag 2'
-										],
+										]
 									]
 								]
 							]
@@ -4766,7 +4766,7 @@ class testDiscoveryRule extends CAPITest {
 										],
 										[
 											'tag' => 'tag 2'
-										],
+										]
 									]
 								],
 								[
@@ -4810,7 +4810,7 @@ class testDiscoveryRule extends CAPITest {
 									'optemplate' => [
 										[
 											'templateid' => '50010'
-										],
+										]
 									]
 								]
 							]
@@ -4818,7 +4818,7 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => null
-			],
+			]
 		];
 
 		return $data;
