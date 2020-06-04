@@ -19,11 +19,23 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/behaviors/MessageBehavior.php';
 
 /**
  * @backup config
  */
 class testFormAdministrationAuthenticationSaml extends CWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
 
 	public function getSamlData() {
 		return [
@@ -165,7 +177,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		// Check that SAML authentication fields are disabled if "Enable SAML authentication" checkbox is not set.
 		if (CTestArrayHelper::get($data, 'check_disabled', false)) {
 			foreach($data['fields'] as $name => $value){
-				$this->assertTrue($form->getField($name)->isEnabled(false));
+				$this->assertFalse($form->getField($name)->isEnabled());
 			}
 		}
 
@@ -176,15 +188,13 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
 		$message = CMessageElement::find()->one();
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertTrue($message->isBad());
-			$this->assertEquals($data['error'], $message->getTitle());
+			$this->assertMessage(TEST_BAD, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
 		}
 		else {
-			$this->assertTrue($message->isGood());
-			$this->assertEquals('Authentication settings updated', $message->getTitle());
-
+			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 			$form->invalidate();
 			$form->selectTab('SAML settings');
 			$this->assertTrue($form->getField('Enable SAML authentication')->isChecked());
@@ -205,7 +215,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		}
 	}
 
-	public function testFormAdministrationAuthenticationSaml_EnableDisable() {
+	public function testFormAdministrationAuthenticationSaml_CheckStatusChange() {
 		$settings = [
 			'IdP entity ID' => 'IdP',
 			'SSO service URL' => 'SSO',
