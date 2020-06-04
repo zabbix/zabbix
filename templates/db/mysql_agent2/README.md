@@ -37,9 +37,9 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$MYSQL.ABORTED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`3` |
 |{$MYSQL.BUFF_UTIL.MIN.WARN} |<p>The minimum buffer pool utilization percentage for trigger expression.</p> |`50` |
-|{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} |<p>The maximum create tmp tables on disk per second for trigger expression.</p> |`10` |
-|{$MYSQL.CREATED_TMP_FILES.MAX.WARN} |<p>The maximum create tmp files on disk per second for trigger expression.</p> |`10` |
-|{$MYSQL.CREATED_TMP_TABLES.MAX.WARN} |<p>The maximum create tmp tables on memory per second for trigger expression.</p> |`30` |
+|{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables on a disk per second for trigger expressions.</p> |`10` |
+|{$MYSQL.CREATED_TMP_FILES.MAX.WARN} |<p>The maximum number of created tmp files on a disk per second for trigger expressions.</p> |`10` |
+|{$MYSQL.CREATED_TMP_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables in memory per second for trigger expressions.</p> |`30` |
 |{$MYSQL.DSN} |<p>System data source name such as <protocol(host:port or /path/to/socket)/>.</p> |`<Put your DSN>` |
 |{$MYSQL.PASSWORD} |<p>MySQL user password.</p> |`` |
 |{$MYSQL.REPL_LAG.MAX.WARN} |<p>The lag of slave from master for trigger expression.</p> |`30m` |

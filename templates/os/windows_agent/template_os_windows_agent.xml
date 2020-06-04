@@ -1765,7 +1765,7 @@ Template tooling version used: 0.34</description>
                         <name>CPU usage</name>
                         <host>Template OS Windows by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1787,7 +1787,7 @@ Template tooling version used: 0.34</description>
                         <key>perf_counter_en["\System\Processor Queue Length"]</key>
                         <host>Template OS Windows by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1809,7 +1809,7 @@ Template tooling version used: 0.34</description>
                         <name>Memory utilization</name>
                         <host>Template OS Windows by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1831,7 +1831,7 @@ Template tooling version used: 0.34</description>
                         <name>Swap usage</name>
                         <host>Template OS Windows by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1853,7 +1853,7 @@ Template tooling version used: 0.34</description>
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template OS Windows by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1875,7 +1875,7 @@ Template tooling version used: 0.34</description>
                         <name>{#DEVNAME}: Disk read/write rates</name>
                         <host>Template OS Windows by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>3</y>
@@ -1897,7 +1897,7 @@ Template tooling version used: 0.34</description>
                         <name>{#DEVNAME}: Disk utilization and queue</name>
                         <host>Template OS Windows by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>4</y>
@@ -1919,7 +1919,7 @@ Template tooling version used: 0.34</description>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Windows by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>5</y>

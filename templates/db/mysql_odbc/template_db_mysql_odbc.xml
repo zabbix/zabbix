@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-03T10:08:35Z</date>
+   <date>2020-06-04T06:27:43Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1414,17 +1414,17 @@ As with the I/O thread, this should normally be Yes.</description>
             <macro>
                <macro>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}</macro>
                <value>10</value>
-               <description>The maximum create tmp tables on disk per second for trigger expression.</description>
+               <description>The maximum number of created tmp tables on a disk per second for trigger expressions.</description>
             </macro>
             <macro>
                <macro>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}</macro>
                <value>10</value>
-               <description>The maximum create tmp files on disk per second for trigger expression.</description>
+               <description>The maximum number of created tmp files on a disk per second for trigger expressions.</description>
             </macro>
             <macro>
                <macro>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}</macro>
                <value>30</value>
-               <description>The maximum create tmp tables on memory per second for trigger expression.</description>
+               <description>The maximum number of created tmp tables in memory per second for trigger expressions.</description>
             </macro>
             <macro>
                <macro>{$MYSQL.DSN}</macro>
