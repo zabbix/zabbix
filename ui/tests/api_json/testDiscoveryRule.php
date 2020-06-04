@@ -5558,5 +5558,237 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
+	public static function discoveryrule_overrides_update_data() {
+		$itemid = '133765';
+		$initial_overrides = [
+			[
+				'name' => 'override',
+				'step' => '1',
+				'stop' => '1',
+				'filter' => [
+					'evaltype' => '3',
+					'formula' => 'A or B or C',
+					'conditions' => [
+						[
+							'macro' => '{#MACRO1}',
+							'value' => '\\d{3}$',
+							'operator' => '8',
+							'formulaid' => 'A'
+						],
+						[
+							'macro' => '{#MACRO2}',
+							'value' => '\\d{2}$',
+							'operator' => '8',
+							'formulaid' => 'B'
+						],
+						[
+							'macro' => '{#MACRO3}',
+							'value' => '\\d{1}$',
+							'operator' => '8',
+							'formulaid' => 'C'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationobject' => '0',
+						'operator' => '3',
+						'value' => '8',
+						'opstatus' => [
+							'status' => '1'
+						]
+					],
+					[
+						'operationobject' => '0',
+						'operator' => '1',
+						'value' => '\\w\\W',
+						'opstatus' => [
+							'status' => '0'
+						],
+						'opdiscover' => [
+							'discover' => '1'
+						],
+						'ophistory' => [
+							'history' => '92d'
+						],
+						'optrends' => [
+							'trends' => '36d'
+						],
+						'opperiod' => [
+							'delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'
+						]
+					],
+					[
+						'operationobject' => '1',
+						'operator' => '8',
+						'value' => '^c+$',
+						'opstatus' => [
+							'status' => '1'
+						],
+						'opdiscover' => [
+							'discover' => '1'
+						],
+						'opseverity' => [
+							'severity' => '3'
+						],
+						'optag' => [
+							[
+								'tag' => 'tag1',
+								'value' => 'value1'
+							],
+							[
+								'tag' => 'tag2',
+								'value' => 'value2'
+							]
+						]
+					],
+					[
+						'operationobject' => '2',
+						'operator' => '2',
+						'value' => '123',
+						'opdiscover' => [
+							'discover' => '1'
+						]
+					],
+					[
+						'operationobject' => '3',
+						'operator' => '0',
+						'value' => '',
+						'opstatus' => [
+							'status' => '1'
+						],
+						'opdiscover' => [
+							'discover' => '1'
+						],
+						'optemplate' => [
+							[
+								'templateid' => '10264'
+							],
+							[
+								'templateid' => '10265'
+							],
+							[
+								'templateid' => '50010'
+							]
+						],
+						'opinventory' => [
+							'inventory_mode' => '1'
+						]
+					]
+				]
+			],
+			[
+				'name' => 'override 2',
+				'step' => '2',
+				'stop' => '1',
+				'operations' => [
+					[
+						'operationobject' => '0',
+						'operator' => '0',
+						'value' => '',
+						'optrends' => [
+							'trends' => '5d'
+						]
+					]
+				]
+			]
+		];
+
+		$edited_overrides = $initial_overrides;
+		unset($edited_overrides[1]);
+		$edited_overrides[0]['name'] = 'edited override';
+
+		$edited_invalid_overrides = $initial_overrides;
+		$edited_invalid_overrides[1]['operations'][0]['optrends']['trends'] = 'incorrect date value';
+
+		return [
+			'Test update override expects array.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => [
+						'incorrect' => '123'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1": an array is expected.',
+				'current_overrides' => null
+			],
+			'Test override object is validated.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => [
+						[]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1": the parameter "step" is missing.',
+				'current_overrides' => null
+			],
+			'Test that overrides remain untouched if update request omits overrides field.' => [
+				'request' => [
+					'itemid' => $itemid
+				],
+				'expected_error' => null,
+				'current_overrides' => $initial_overrides
+			],
+			'Test all overrides array can only be completely rewritten.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => $edited_overrides
+				],
+				'expected_error' => null,
+				'current_overrides' => $edited_overrides
+			],
+			'Test overrides/2/operations/1/optrends/trends is validated.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => $edited_invalid_overrides
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2/operations/1/optrends/trends": a time unit is expected.',
+				'current_overrides' => null
+			],
+			'Test all overrides can deleted.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => []
+				],
+				'expected_error' => null,
+				'current_overrides' => []
+			],
+			'Test all overrides can be recreated.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => $initial_overrides
+				],
+				'expected_error' => null,
+				'current_overrides' => $initial_overrides
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_update_data
+	 */
+	public function testDiscoveryRuleOverrides_Update($request, $expected_error, $current_overrides) {
+		$this->call('discoveryrule.update', $request, $expected_error);
+
+		if ($expected_error === null) {
+			$itemid = $request['itemid'];
+
+			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+					dbConditionId('itemid', (array) $itemid));
+
+			if (array_key_exists('overrides', $request)) {
+				$this->assertEquals(count($current_overrides), count($request['overrides']));
+			}
+
+			usort($db_lld_overrides, function ($a, $b) {
+				return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+			});
+
+			foreach ($current_overrides as $override_num => $override) {
+				$this->assertLLDOverride($db_lld_overrides[$override_num], $override);
+			}
+		}
+	}
+
 	// TODO: add more tests to check other related discovery rule properties and perform more tests on templates and templated objects.
 }
