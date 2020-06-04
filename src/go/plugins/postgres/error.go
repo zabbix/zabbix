@@ -35,6 +35,7 @@ const (
 	errorCannotConvertPostgresVersionInt = zabbixError("Cannot convert Postgres version to integer.")
 	errorFourthParamEmpty                = zabbixError("The key requires database name as fourth parameter")
 	errorFourthParamLen                  = zabbixError("Expected database name as fourth parameter for the key, got empty string")
+	errorEmptyParam                      = zabbixError("Expected session name or uri, username, password as parameters")
 )
 
 // formatZabbixError formats a given error text. It capitalizes the first letter and adds a dot to the end.

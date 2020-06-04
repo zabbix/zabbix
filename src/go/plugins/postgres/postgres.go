@@ -35,7 +35,6 @@ const pluginName = "Postgres"
 var maxParams = map[string]int{
 
 	keyPostgresPing:                                      4,
-	keyPostgresTransactions:                              4,
 	keyPostgresConnections:                               4,
 	keyPostgresWal:                                       4,
 	keyPostgresStat:                                      4,
@@ -83,18 +82,28 @@ func (p *Plugin) Stop() {
 	p.connMgr = nil
 }
 
-// Export implements the Exporter interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	var (
-		connString    string
-		handler       requestHandler
-		session       *Session
-		handlerParams []string
-	)
+// whereToConnect builds a session based on key's parameters and a configuration file.
+func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (res *url.URL, err error) {
+	var session *Session
+	user := ""
+	if len(params) > 1 {
+		user = params[1]
+	}
+
+	password := ""
+	if len(params) > 2 {
+		password = params[2]
+	}
+
+	database := defaultPluginOptions.Database
+	if len(params) > 3 {
+		database = params[3]
+	}
+
 	// The first param can be either a port & host or a session identifier.
 	if len(params) > 0 && len(params[0]) > 0 {
 		var ok bool
-		if session, ok = p.options.Sessions[params[0]]; !ok {
+		if session, ok = defaultPluginOptions.Sessions[params[0]]; !ok {
 			// get host & port from first parameter, username from second parameter,
 			// password from the third parameter, database name from the fourth  parameter
 			var port uint64
@@ -104,7 +113,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				return nil, fmt.Errorf("Invalid connection parameters: %s", err)
 			}
 			if u.Host == "" {
-				u.Host = p.options.Host
+				u.Host = defaultPluginOptions.Host
 			}
 
 			session = &Session{
@@ -115,38 +124,40 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 					return nil, fmt.Errorf("Invalid connection port: %s", err)
 				}
 				session.Port = uint16(port)
+			} else {
+				session.Port = defaultPluginOptions.Port
 			}
-			if len(params) > 1 {
-				session.User = params[1]
-			}
-			if len(params) > 2 {
-				session.Password = params[2]
-			}
-			if len(params) > 3 {
-				session.Database = params[3]
-			}
+			session.User = user
+			session.Password = password
+			session.Database = database
 		}
 	} else {
-		session = &Session{
-			Host:     p.options.Host,
-			Port:     p.options.Port,
-			Database: p.options.Database,
-			User:     p.options.User,
-			Password: p.options.Password,
-		}
+		return nil, errorEmptyParam
 	}
 
-	u := url.URL{
+	res = &url.URL{
 		Scheme: "postgresql",
 		Host:   session.Host,
 		Path:   session.Database,
 		User:   url.UserPassword(session.User, session.Password),
 	}
 	if session.Port != 0 {
-		u.Host += fmt.Sprintf(":%d", session.Port)
+		res.Host += fmt.Sprintf(":%d", session.Port)
 	}
-	connString = u.String()
+	return res, nil
+}
 
+// Export implements the Exporter interface.
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	var (
+		handler       requestHandler
+		handlerParams []string
+	)
+	u, err := whereToConnect(params, &p.options)
+	if err != nil {
+		return nil, err
+	}
+	connString := u.String()
 	switch key {
 	case keyPostgresDiscoveryDatabases:
 		handler = p.databasesDiscoveryHandler // postgres.databasesdiscovery[[connString][,section]]
@@ -159,9 +170,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	case keyPostgresDatabasesAge:
 		handler = p.databasesAgeHandler // postgres.databases[[connString][,section]]
-
-	case keyPostgresTransactions:
-		handler = p.transactionsHandler // postgres.transactions[[connString]]
 
 	case keyPostgresSizeArchive:
 		handler = p.archiveHandler // postgres.archive[[connString]]
@@ -237,7 +245,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	plugin.RegisterMetrics(&impl, pluginName,
 		keyPostgresPing, "Test if connection is alive or not.",
-		keyPostgresTransactions, "Returns JSON for active,idle, waiting and prepared transactions.",
 		keyPostgresConnections, "Returns JSON for sum of each type of connection.",
 		keyPostgresWal, "Returns JSON wal by type.",
 		keyPostgresStat, "Returns JSON for sum of each type of statistic.",

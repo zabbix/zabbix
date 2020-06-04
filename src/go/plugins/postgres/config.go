@@ -33,7 +33,7 @@ type Session struct {
 	Host string `conf:"optional"`
 
 	// Port of  Postgres server. Default 5432.
-	Port uint16 `conf:"optional"`
+	Port uint16 `conf:"optional,range=1024:65535"`
 
 	//  Database of  Postgres server.
 	Database string `conf:"optional"`
@@ -56,12 +56,6 @@ type PluginOptions struct {
 
 	// Database is the default DB name.
 	Database string `conf:"default=postgres"`
-
-	// User is the default user for postgres.
-	User string `conf:"default=postgres"`
-
-	// Password is the default password.
-	Password string `conf:"default=postgres"`
 
 	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout which is 3.
 	Timeout int `conf:"optional,range=1:30"`
@@ -98,14 +92,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		if session.Port == 0 {
 			session.Port = p.options.Port
 		}
-		if session.User == "" {
-			session.User = p.options.User
-		}
 		if session.Database == "" {
 			session.Database = p.options.Database
-		}
-		if session.Password == "" {
-			session.Password = p.options.Password
 		}
 	}
 }
@@ -113,8 +101,10 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
 func (p *Plugin) Validate(options interface{}) error {
-	var opts PluginOptions
-	var err error
+	var (
+		opts PluginOptions
+		err  error
+	)
 
 	err = conf.Unmarshal(options, &opts)
 	if err != nil {
@@ -132,46 +122,19 @@ func (p *Plugin) Validate(options interface{}) error {
 	if err != nil {
 		return err
 	}
-	// validate user name for Postgres
-	err = validateUser(opts.User)
-	if err != nil {
-		return err
-	}
-
-	if len(opts.Password) > MaxAuthPassLen {
-		return fmt.Errorf("password cannot be longer than %d characters", MaxAuthPassLen)
-	}
-
-	user := opts.User
-	database := opts.Database
-	host := opts.Host
 
 	for name, session := range opts.Sessions {
 
-		if session.Host != "" {
-			host = session.Host
+		if session.Host == "" {
+			session.Host = opts.Host
 		}
-		if session.Database != "" {
-			database = session.Database
-		}
-		if session.User != "" {
-			user = session.User
-		}
-		// validate each parameter of PostgreSQL connection
-		// check if localhost or addr
-		err = validateHost(host)
-		if err != nil {
-			return fmt.Errorf("invalid host parameters for session '%s': %s", host, err.Error())
+		if session.Database == "" {
+			session.Database = opts.Database
 		}
 		// validate Database name
-		err = validateDatabase(database)
+		err = validateDatabase(session.Database)
 		if err != nil {
 			return fmt.Errorf("invalid database parameters for session '%s': %s", name, err.Error())
-		}
-		// validate user name for Postgres
-		err = validateUser(user)
-		if err != nil {
-			return fmt.Errorf("invalid user parameters for session '%s': %s", name, err.Error())
 		}
 		// validate Password length
 		if len(session.Password) > MaxAuthPassLen {
