@@ -208,7 +208,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (3 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		goto err;
+		return ret;
 	}
 
 	filename = get_rparam(request, 0);
@@ -216,13 +216,13 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == filename || '\0' == *filename)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		goto err;
+		return ret;
 	}
 
 	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
 			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
 	{
-		goto err;
+		return ret;
 	}
 
 	if (0 == types_incl)
@@ -260,13 +260,12 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
-		goto err;
+		return ret;
 	}
 
 	SET_UI64_RESULT(result, file_exists);
-	ret = SYSINFO_RET_OK;
-err:
-	return ret;
+
+	return SYSINFO_RET_OK;
 }
 #endif
 
