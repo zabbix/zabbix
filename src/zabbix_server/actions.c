@@ -251,19 +251,24 @@ static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_
  * Purpose: there can be multiple levels of templates, that need              *
  *          resolving in order to compare to condition                        *
  *                                                                            *
- * Parameters: object          - [IN] object that generated event             *
- * Parameters: esc_events      - [IN] to find eventid by object and objectid  *
- *             objectids       - [IN] event ids to check in case of not equal *
- *                                    condition will delete objectids that    *
- *                                    match condition for internal usage      *
- *             objectids_pair  - [IN] first is original trigger id, second is *
- *                                    parent trigger id and will be updated   *
- *                                    for internal usage                      *
- *             condition       - [IN/OUT] condition for matching, outputs     *
- *                                    event ids that match condition          *
+ * Parameters: object          - [IN] type of the object that generated event *
+ * Parameters: esc_events      - [IN] events being checked                    *
+ *             objectids       - [IN] object ids of the esc_events            *
+ *                                    (contents can be changed by processing  *
+ *                                    and should not be used by caller)       *
+ *             objectids_pair  - [IN] pairs of (objectid, source objectid)    *
+ *                                    where objectid are ids of the esc_events*
+ *                                    and source objectid is object id for    *
+ *                                    normal objects and prototype id for     *
+ *                                    discovered objects                      *
+ *                                    (contents can be changed by processing  *
+ *                                    and should not be used by caller)       *
+ *             condition       - [IN/OUT] condition to evaluate, matched      *
+ *                                    events will be added to condition       *
+ *                                    eventids vector                         *
  *             condition_value - [IN] condition value for matching            *
  *             sql_str         - [IN] custom sql query, must obtain object,   *
- *                                    template id and value                   *
+ *                                    template object id and value            *
  *             sql_field       - [IN] field name that is added to the sql     *
  *                                    query condition                         *
  *                                                                            *
