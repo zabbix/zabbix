@@ -1,0 +1,1 @@
+..F....... [ZBX-17226] fixed confusing error message being displayed if dbversion table cannot be found (agriscenko)

@@ -291,7 +291,7 @@ close_query:
  * Purpose: get performance object index by reference value described by      *
  *          zbx_builtin_counter_ref_t enum                                    *
  *                                                                            *
- * Parameters: object_ref - [IN] built-in performance object                  *
+ * Parameters: counter_ref - [IN] built-in performance object                 *
  *                                                                            *
  * Comments: Performance object index values can differ across Windows        *
  *           installations for the same names                                 *

@@ -1,0 +1,16 @@
+{
+	"manifest_version": 1.01,
+	"id": "3",
+	"name": "This module should not be loaded",
+	"author": "module author",
+	"description": "Manifest version is higher than allowed",
+	"version": "1",
+	"namespace": "Example_C",
+	"url": "",
+	"actions": {
+		"third.module": {
+			"class": "Test3",
+			"view": "third.module"
+		}
+	}
+}

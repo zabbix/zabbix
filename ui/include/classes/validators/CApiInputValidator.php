@@ -70,6 +70,9 @@ class CApiInputValidator {
 	 */
 	private static function validateData($rule, &$data, $path, &$error, array $parent_data = null) {
 		switch ($rule['type']) {
+			case API_CALC_FORMULA:
+				return self::validateCalcFormula($rule, $data, $path, $error);
+
 			case API_COLOR:
 				return self::validateColor($rule, $data, $path, $error);
 
@@ -188,6 +191,7 @@ class CApiInputValidator {
 	 */
 	private static function validateDataUniqueness($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
+			case API_CALC_FORMULA:
 			case API_COLOR:
 			case API_MULTIPLE:
 			case API_STRING_UTF8:
@@ -266,6 +270,33 @@ class CApiInputValidator {
 
 		if (($flags & API_NOT_EMPTY) && $data === '') {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Calculated item formula validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateCalcFormula($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$expression_data = new CTriggerExpression(['calculated' => true, 'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
+		if (!$expression_data->parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $expression_data->error);
 			return false;
 		}
 

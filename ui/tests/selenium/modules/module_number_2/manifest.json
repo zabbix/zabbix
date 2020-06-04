@@ -1,0 +1,16 @@
+{
+	"manifest_version": 0.99,
+	"id": "two",
+	"name": "2nd Module name !@#$%^&*()_+",
+	"author": "2nd Module author !@#$%^&*()_+",
+	"description": "Module description !@#$%^&*()_+",
+	"version": "two !@#$%^&*()_+",
+	"namespace": "Example_B",
+	"url": "!@#$%^&*()_+",
+	"actions": {
+		"second.module": {
+			"class": "Test2",
+			"view": "second.module"
+		}
+	}
+}
