@@ -135,50 +135,20 @@ func Open(logType int, level int, filename string, filesize int) error {
 	return nil
 }
 
-func Critf(format string, args ...interface{}) {
-	if CheckLogLevel(Crit) {
-		if logStat.logType == System {
-			procSyslog(syslogWriter.Crit, format, args)
-			return
-		}
-		procLog(format, args)
-	}
-}
-
 func Infof(format string, args ...interface{}) {
 	if CheckLogLevel(Info) {
 		if logStat.logType == System {
-			procSyslog(syslogWriter.Info, format, args)
+			syslogWriter.Info(fmt.Sprintf(format, args...))
 			return
 		}
 		procLog(format, args)
 	}
 }
 
-func Warningf(format string, args ...interface{}) {
-	if CheckLogLevel(Warning) {
+func Critf(format string, args ...interface{}) {
+	if CheckLogLevel(Crit) {
 		if logStat.logType == System {
-			procSyslog(syslogWriter.Warning, format, args)
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Tracef(format string, args ...interface{}) {
-	if CheckLogLevel(Trace) {
-		if logStat.logType == System {
-			procSyslog(syslogWriter.Debug, format, args)
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Debugf(format string, args ...interface{}) {
-	if CheckLogLevel(Debug) {
-		if logStat.logType == System {
-			procSyslog(syslogWriter.Debug, format, args)
+			syslogWriter.Crit(fmt.Sprintf(format, args...))
 			return
 		}
 		procLog(format, args)
@@ -188,7 +158,37 @@ func Debugf(format string, args ...interface{}) {
 func Errf(format string, args ...interface{}) {
 	if CheckLogLevel(Err) {
 		if logStat.logType == System {
-			procSyslog(syslogWriter.Err, format, args)
+			syslogWriter.Err(fmt.Sprintf(format, args...))
+			return
+		}
+		procLog(format, args)
+	}
+}
+
+func Warningf(format string, args ...interface{}) {
+	if CheckLogLevel(Warning) {
+		if logStat.logType == System {
+			syslogWriter.Warning(fmt.Sprintf(format, args...))
+			return
+		}
+		procLog(format, args)
+	}
+}
+
+func Tracef(format string, args ...interface{}) {
+	if CheckLogLevel(Trace) {
+		if logStat.logType == System {
+			syslogWriter.Debug(fmt.Sprintf(format, args...))
+			return
+		}
+		procLog(format, args)
+	}
+}
+
+func Debugf(format string, args ...interface{}) {
+	if CheckLogLevel(Debug) {
+		if logStat.logType == System {
+			syslogWriter.Debug(fmt.Sprintf(format, args...))
 			return
 		}
 		procLog(format, args)
@@ -200,12 +200,6 @@ func procLog(format string, args []interface{}) {
 	defer logAccess.Unlock()
 	rotateLog()
 	logger.Printf(format, args...)
-}
-
-func procSyslog(log func(string) error, format string, args []interface{}) {
-	logAccess.Lock()
-	defer logAccess.Unlock()
-	log(fmt.Sprintf(format, args...))
 }
 
 func rotateLog() {
