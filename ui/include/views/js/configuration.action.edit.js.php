@@ -1434,7 +1434,6 @@
 		 * @param {number} actionid        Current operation actionid.
 		 */
 		open(target, eventsource, recovery_phase, operation, actionid) {
-			console.log(operation);
 			const operation_popup = new OperationPopup(target, eventsource, recovery_phase, actionid);
 			operation_popup.load(operation);
 
