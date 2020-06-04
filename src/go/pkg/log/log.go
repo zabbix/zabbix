@@ -48,8 +48,6 @@ const Console = 3
 
 const MB = 1048576
 
-const noTimeStamp = 0
-
 var logLevel int
 var logger *log.Logger
 var syslogWriter *syslog.Writer
@@ -121,8 +119,6 @@ func Open(logType int, level int, filename string, filesize int) error {
 		if err != nil {
 			return err
 		}
-		//we use this logger only if there is an error with specific log writing
-		logger = log.New(syslogWriter, "", noTimeStamp)
 	case Console:
 		logger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
 	case File:
@@ -209,11 +205,7 @@ func procLog(format string, args []interface{}) {
 func procSyslog(log func(string) error, format string, args []interface{}) {
 	logAccess.Lock()
 	defer logAccess.Unlock()
-	msg := fmt.Sprintf(format, args...)
-	err := log(msg)
-	if err != nil {
-		logger.Printf("Failed to log to specific system log: %s", err)
-	}
+	log(fmt.Sprintf(format, args...))
 }
 
 func rotateLog() {
