@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-03-24T19:11:47Z</date>
+   <date>2020-06-04T06:27:42Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -22,7 +22,7 @@ For more information read the MYSQL documentation https://dev.mysql.com/doc/refm
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -512,11 +512,12 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
-               <name>MySQL: Created tmp tables on disk</name>
+               <name>MySQL: Created tmp tables on disk per second</name>
                <type>DEPENDENT</type>
-               <key>mysql.created_tmp_disk_tables</key>
+               <key>mysql.created_tmp_disk_tables.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <description>The number of internal on-disk temporary tables created by the server while executing statements.</description>
                <applications>
                   <application>
@@ -528,17 +529,30 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <type>JSONPATH</type>
                      <params>$.Created_tmp_disk_tables</params>
                   </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}</expression>
+                     <name>MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>Possibly the application using the database is in need of query optimization.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
-               <name>MySQL: Created tmp files on disk</name>
+               <name>MySQL: Created tmp files on disk per second</name>
                <type>DEPENDENT</type>
-               <key>mysql.created_tmp_files</key>
+               <key>mysql.created_tmp_files.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <description>How many temporary files mysqld has created.</description>
                <applications>
                   <application>
@@ -550,17 +564,30 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <type>JSONPATH</type>
                      <params>$.Created_tmp_files</params>
                   </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$MYSQL.CREATED_TMP_FILES.MAX.WARN}</expression>
+                     <name>MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>Possibly the application using the database is in need of query optimization.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
-               <name>MySQL: Created tmp tables on memory</name>
+               <name>MySQL: Created tmp tables on memory per second</name>
                <type>DEPENDENT</type>
-               <key>mysql.created_tmp_tables</key>
+               <key>mysql.created_tmp_tables.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <description>The number of internal temporary tables created by the server while executing statements.</description>
                <applications>
                   <application>
@@ -572,10 +599,22 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <type>JSONPATH</type>
                      <params>$.Created_tmp_tables</params>
                   </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
                </preprocessing>
                <master_item>
                   <key>mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]</key>
                </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}</expression>
+                     <name>MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)</name>
+                     <priority>WARNING</priority>
+                     <description>Possibly the application using the database is in need of query optimization.</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>MySQL: Get status variables</name>
@@ -1008,11 +1047,12 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
             </item>
             <item>
-               <name>MySQL: Threads created</name>
+               <name>MySQL: Threads created per second</name>
                <type>DEPENDENT</type>
-               <key>mysql.threads_created</key>
+               <key>mysql.threads_created.rate</key>
                <delay>0</delay>
                <history>7d</history>
+               <value_type>FLOAT</value_type>
                <description>The number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.</description>
                <applications>
                   <application>
@@ -1023,6 +1063,10 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                   <step>
                      <type>JSONPATH</type>
                      <params>$.Threads_created</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
                   </step>
                </preprocessing>
                <master_item>
@@ -1079,6 +1123,18 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <name>MySQL: Service has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
                      <description>MySQL uptime is less than 10 minutes.</description>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>MySQL: Failed to fetch info data (or no data for 30m)</name>
+                     <priority>INFO</priority>
+                     <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>MySQL: Service is down</name>
+                           <expression>{Template DB MySQL by Zabbix agent 2:mysql.ping["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
                   </trigger>
                </triggers>
             </item>
@@ -1343,6 +1399,21 @@ As with the I/O thread, this should normally be Yes.</description>
                <description>The minimum buffer pool utilization percentage for trigger expression.</description>
             </macro>
             <macro>
+               <macro>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}</macro>
+               <value>10</value>
+               <description>The maximum number of created tmp tables on a disk per second for trigger expressions.</description>
+            </macro>
+            <macro>
+               <macro>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}</macro>
+               <value>10</value>
+               <description>The maximum number of created tmp files on a disk per second for trigger expressions.</description>
+            </macro>
+            <macro>
+               <macro>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}</macro>
+               <value>30</value>
+               <description>The maximum number of created tmp tables in memory per second for trigger expressions.</description>
+            </macro>
+            <macro>
                <macro>{$MYSQL.DSN}</macro>
                <value>&lt;Put your DSN&gt;</value>
                <description>System data source name such as &lt;protocol(host:port or /path/to/socket)/&gt;.</description>
@@ -1379,7 +1450,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Operations</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1401,7 +1472,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Queries</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1423,7 +1494,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Connections</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1445,7 +1516,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Bandwidth</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1467,7 +1538,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: InnoDB buffer pool</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1489,7 +1560,7 @@ As with the I/O thread, this should normally be Yes.</description>
                         <name>MySQL: Threads</name>
                         <host>Template DB MySQL by Zabbix agent 2</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>2</y>
@@ -1691,7 +1762,7 @@ As with the I/O thread, this should normally be Yes.</description>
                <color>F63100</color>
                <item>
                   <host>Template DB MySQL by Zabbix agent 2</host>
-                  <key>mysql.threads_created</key>
+                  <key>mysql.threads_created.rate</key>
                </item>
             </graph_item>
             <graph_item>

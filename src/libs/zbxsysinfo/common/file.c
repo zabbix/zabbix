@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 #include "md5.h"
 #include "file.h"
+#include "dir.h"
 #include "zbxregexp.h"
 #include "log.h"
 
@@ -105,13 +106,15 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+#if defined(_WINDOWS) || defined(__MINGW32__)
+static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	zbx_stat_t	buf;
-	char		*filename;
-	int		ret = SYSINFO_RET_FAIL, file_exists;
+	const char	*filename;
+	int		ret = SYSINFO_RET_FAIL, file_exists = 0, types, types_incl, types_excl;
+	DWORD		file_attributes;
+	wchar_t		*wpath;
 
-	if (1 < request->nparam)
+	if (3 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto err;
@@ -125,9 +128,130 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 == zbx_stat(filename, &buf))
+	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
+			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
 	{
-		file_exists = S_ISREG(buf.st_mode) ? 1 : 0;
+		goto err;
+	}
+
+	if (0 == types_incl)
+	{
+		if (0 == types_excl)
+			types_incl = ZBX_FT_FILE;
+		else
+			types_incl = ZBX_FT_ALLMASK;
+	}
+
+	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
+
+	if (NULL == (wpath = zbx_utf8_to_unicode(filename)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot convert file name to UTF-16."));
+		goto err;
+	}
+
+	file_attributes = GetFileAttributesW(wpath);
+	zbx_free(wpath);
+
+	if (INVALID_FILE_ATTRIBUTES == file_attributes)
+	{
+		DWORD	error;
+
+		switch (error = GetLastError())
+		{
+			case ERROR_FILE_NOT_FOUND:
+				goto exit;
+			case ERROR_BAD_NETPATH:	/* special case from GetFileAttributesW() documentation */
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "The specified file is a network share."
+						" Use a path to a subfolder on that share."));
+				goto err;
+			default:
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
+						strerror_from_system(error)));
+				goto err;
+		}
+	}
+
+	switch (file_attributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
+	{
+		case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
+			if (0 != (types & ZBX_FT_SYM))
+				file_exists = 1;
+			break;
+		case FILE_ATTRIBUTE_REPARSE_POINT:
+						/* not a symlink directory => symlink regular file*/
+						/* counting symlink files as MS explorer */
+			if (0 != (types & ZBX_FT_FILE))
+				file_exists = 1;
+			break;
+		case FILE_ATTRIBUTE_DIRECTORY:
+			if (0 != (types & ZBX_FT_DIR))
+				file_exists = 1;
+			break;
+		default:	/* not a directory => regular file */
+			if (0 != (types & ZBX_FT_FILE))
+				file_exists = 1;
+	}
+exit:
+	SET_UI64_RESULT(result, file_exists);
+	ret = SYSINFO_RET_OK;
+err:
+	return ret;
+}
+#else /* not _WINDOWS or __MINGW32__ */
+static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	zbx_stat_t	buf;
+	const char	*filename;
+	int		ret = SYSINFO_RET_FAIL, file_exists, types, types_incl, types_excl;
+
+	if (3 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		goto err;
+	}
+
+	filename = get_rparam(request, 0);
+
+	if (NULL == filename || '\0' == *filename)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		goto err;
+	}
+
+	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
+			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
+	{
+		goto err;
+	}
+
+	if (0 == types_incl)
+	{
+		if (0 == types_excl)
+			types_incl = ZBX_FT_FILE;
+		else
+			types_incl = ZBX_FT_ALLMASK;
+	}
+
+	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
+
+	if(0 != (types & ZBX_FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+	{
+		file_exists = 1;
+	}
+	else if (0 != (types_excl & ZBX_FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+	{
+		file_exists = 0;
+	}
+	else if (0 == zbx_stat(filename, &buf) && (
+			(S_ISREG(buf.st_mode)  && 0 != (types & ZBX_FT_FILE)) ||
+			(S_ISDIR(buf.st_mode)  && 0 != (types & ZBX_FT_DIR)) ||
+			(S_ISSOCK(buf.st_mode) && 0 != (types & ZBX_FT_SOCK)) ||
+			(S_ISBLK(buf.st_mode)  && 0 != (types & ZBX_FT_BDEV)) ||
+			(S_ISCHR(buf.st_mode)  && 0 != (types & ZBX_FT_CDEV)) ||
+			(S_ISFIFO(buf.st_mode) && 0 != (types & ZBX_FT_FIFO))))
+	{
+		file_exists = 1;
 	}
 	else if (errno == ENOENT)
 	{
@@ -143,6 +267,12 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ret = SYSINFO_RET_OK;
 err:
 	return ret;
+}
+#endif
+
+int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return vfs_file_exists(request, result);
 }
 
 int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
