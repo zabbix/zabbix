@@ -226,7 +226,7 @@ try {&#13;
         // Resolved message.&#13;
         else {&#13;
             facts.push({&#13;
-                name: 'Revovery time',&#13;
+                name: 'Recovery time',&#13;
                 value: params.event_recovery_time + ' ' + params.event_recovery_date&#13;
             });&#13;
         }&#13;
