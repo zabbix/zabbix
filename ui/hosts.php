@@ -1038,7 +1038,9 @@ if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || ha
 		'mass_action_tpls' => getRequest('mass_action_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
+		'mass_update_groups' => getRequest('mass_update_groups', ZBX_ACTION_ADD),
 		'tags' => $tags,
+		'mass_update_tags' => getRequest('mass_update_tags', ZBX_ACTION_ADD),
 		'macros' => $macros,
 		'macros_checkbox' => [
 			ZBX_ACTION_ADD => getRequest('macros_add', '0'),

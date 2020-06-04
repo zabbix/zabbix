@@ -1516,6 +1516,7 @@ function getTriggerMassupdateFormData() {
 		'visible' => getRequest('visible', []),
 		'dependencies' => getRequest('dependencies', []),
 		'tags' => getRequest('tags', []),
+		'mass_update_tags' => getRequest('mass_update_tags', ZBX_ACTION_ADD),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'massupdate' => getRequest('massupdate', 1),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
