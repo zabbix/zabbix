@@ -19,7 +19,7 @@
 **/
 
 
-class CUserMacroParserTest extends PHPUnit\Framework\TestCase {
+class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * An array of user macros and parsed results.
