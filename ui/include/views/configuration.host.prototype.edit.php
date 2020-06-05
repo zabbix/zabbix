@@ -253,7 +253,8 @@ else {
 				'srcfld2' => 'host',
 				'dstfrm' => $frmHost->getName(),
 				'dstfld1' => 'add_templates_',
-				'disableids' => $disableids
+				'disableids' => $disableids,
+				'enrich_parent_groups' => true
 			]
 		]
 	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);

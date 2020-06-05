@@ -89,7 +89,8 @@ $filter
 							'dstfrm' => $filter->getName(),
 							'dstfld1' => 'filter_groups_',
 							'templated_hosts' => 1,
-							'editable' => 1
+							'editable' => 1,
+							'enrich_parent_groups' => true
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -106,7 +107,8 @@ $filter
 							'srcfld1' => 'hostid',
 							'srcfld2' => 'host',
 							'dstfrm' => $filter->getName(),
-							'dstfld1' => 'filter_templates_'
+							'dstfld1' => 'filter_templates_',
+							'enrich_parent_groups' => true
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)

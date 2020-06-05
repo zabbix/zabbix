@@ -260,7 +260,8 @@ $operations_popup_form_list
 						'srcfld1' => 'hostid',
 						'srcfld2' => 'host',
 						'dstfrm' => 'lldoperation_form',
-						'dstfld1' => 'optemplate_'
+						'dstfld1' => 'optemplate_',
+						'enrich_parent_groups' => true
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
