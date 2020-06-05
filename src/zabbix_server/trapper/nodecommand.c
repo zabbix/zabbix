@@ -256,10 +256,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
-	{
-		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_CLIENTIP);
-		goto finish;
-	}
+		*clientip = '\0';
 
 	if (SUCCEED == (ret = execute_script(scriptid, hostid, sessionid, clientip, &result)))
 	{
