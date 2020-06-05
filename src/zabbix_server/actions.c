@@ -148,11 +148,7 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 	zbx_vector_uint64_t	objectids, groupids;
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL == condition->op)
-		operation = " and";
-	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
-		operation = " and not";
-	else
+	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
@@ -174,7 +170,7 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "f.triggerid",
 			objectids.values, objectids.values_num);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, operation);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values, groupids.values_num);
 
 	result = DBselect("%s", sql);
@@ -184,9 +180,29 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 		zbx_uint64_t	objectid;
 
 		ZBX_STR2UINT64(objectid, row[0]);
-		add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
+		if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+		{
+			int	index;
+
+			if (FAIL != (index = zbx_vector_uint64_search(&objectids, objectid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				zbx_vector_uint64_remove_noorder(&objectids, index);
+			}
+		}
+		else
+			add_condition_match(esc_events, condition, objectid, EVENT_OBJECT_TRIGGER);
+
 	}
 	DBfree_result(result);
+
+	if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+	{
+		int	i;
+
+		for (i = 0; i < objectids.values_num; i++)
+			add_condition_match(esc_events, condition, objectids.values[i], EVENT_OBJECT_TRIGGER);
+	}
 
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_vector_uint64_destroy(&objectids);
