@@ -347,7 +347,7 @@ $form_list->addRow(new CLabel(_('Inventory mode'), 'operation_opinventory_invent
  * Conditions type of calculation row.
  */
 $form_list->addRow(_('Type of calculation'), [
-		new CComboBox( 'operation[evaltype]', CONDITION_EVAL_TYPE_AND_OR, '', [
+		new CComboBox('operation[evaltype]', CONDITION_EVAL_TYPE_AND_OR, '', [
 			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
 			CONDITION_EVAL_TYPE_AND => _('And'),
 			CONDITION_EVAL_TYPE_OR => _('Or')
