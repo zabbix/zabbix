@@ -149,13 +149,15 @@ switch ($data['method']) {
 					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
 					'templated_hosts' => array_key_exists('templated_hosts', $data) ? $data['templated_hosts'] : null,
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
-					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
+					'preservekeys' => true
 				];
 				$hostGroups = API::HostGroup()->get($options);
 
 				if ($hostGroups) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
 						$hostGroups = enrichParentGroups($hostGroups, [
+							'templated_hosts' => null,
 							'real_hosts' => null
 						] + $options);
 					}
