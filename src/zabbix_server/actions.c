@@ -141,7 +141,7 @@ static void	get_object_ids(const zbx_vector_ptr_t *esc_events, zbx_vector_uint64
  ******************************************************************************/
 static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	char			*sql = NULL, *operation;
+	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2284,7 +2284,7 @@ static void	get_object_ids_internal(const zbx_vector_ptr_t *esc_events, zbx_vect
  ******************************************************************************/
 static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
-	char			*sql = NULL, *operation;
+	char			*sql = NULL;
 	size_t			sql_alloc = 0, i;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2292,11 +2292,7 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 	zbx_vector_uint64_t	objectids[3], groupids;
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL == condition->op)
-		operation = " and";
-	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
-		operation = " and not";
-	else
+	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
@@ -2343,7 +2339,7 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 					objectids[i].values, objectids[i].values_num);
 		}
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, operation);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
 				groupids.values_num);
 
@@ -2354,13 +2350,34 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 			zbx_uint64_t	objectid;
 
 			ZBX_STR2UINT64(objectid, row[0]);
-			add_condition_match(esc_events, condition, objectid, objects[i]);
+			if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+			{
+				int	index;
+
+				if (FAIL != (index = zbx_vector_uint64_search(&objectids[i], objectid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+				{
+					zbx_vector_uint64_remove_noorder(&objectids[i], index);
+				}
+			}
+			else
+				add_condition_match(esc_events, condition, objectid, objects[i]);
 		}
 		DBfree_result(result);
 	}
 
 	for (i = 0; i < (int)ARRSIZE(objects); i++)
+	{
+		if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+		{
+			int	j;
+
+			for (j = 0; j < objectids[i].values_num; j++)
+				add_condition_match(esc_events, condition, objectids[i].values[j], objects[i]);
+		}
+
 		zbx_vector_uint64_destroy(&objectids[i]);
+	}
 
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_free(sql);
