@@ -22,10 +22,15 @@ CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
 ```
 
-For more information please read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
+For more information please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
 
-2. Set in the {$MYSQL.DSN} macro the system data source name of the MySQL instance such as <protocol(host:port or /path/to/socket)/>.
-3. Set the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.
+2. Set in the {$MYSQL.DSN} macro the data source name of the MySQL instance either session name from Zabbix agent 2 configuration file or URI <protocol(host:port or /path/to/socket)/>.  
+**Examples:** MySQL1, tcp://localhost:3306, tcp://172.16.0.10, unix:/var/run/mysql.sock  
+For more information about MySQL Unix socket file please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/problems-with-mysql-sock.html.
+
+3. If you had set URI in the {$MYSQL.DSN}, please define the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}).  
+Leave macros {$MYSQL.USER} and {$MYSQL.PASSWORD} empty if you use a session name. Set the user name and password in the Plugins.Mysql.<...> section of your Zabbix agent 2 configuration file.  
+For more information about configuring the Zabbix MySQL plugin please read the documentation https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/mysql/README.md.
 
 ## Zabbix configuration
 
