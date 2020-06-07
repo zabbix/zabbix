@@ -1,1 +1,0 @@
-A.F....... [ZBXNEXT-3035] removed identical HTML IDs in low-level discovery form, fixed Type of Calculation field not hiding in override popup, fixed incorrect field order during override create in API causing SQL errors, fixed validation of delay, history and trends fields in override popup (Ivo, miks)
