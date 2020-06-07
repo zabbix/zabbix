@@ -317,6 +317,7 @@ Changes for 4.4.10rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.9
