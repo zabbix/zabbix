@@ -1538,6 +1538,12 @@ Changes for 4.0.22rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-17480] fixed context of {$TEMP_CRIT} macro in Temperature trigger prototype (tuskov)
+.......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
+...G...... [ZBX-17780] fixed memory leak (viktors)
+..F....... [ZBX-17577] fixed remove of selected items in multiselect (rlataria)
+..F....... [ZBX-17226] fixed confusing error message being displayed if dbversion table cannot be found (agriscenko)
+.......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.21
