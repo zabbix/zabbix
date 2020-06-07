@@ -38,15 +38,6 @@ type Session struct {
 
 // PluginOptions option from config file
 type PluginOptions struct {
-	// URI is the default connection string.
-	Uri string `conf:"default=tcp://localhost:3306"`
-
-	// User is the default user.
-	User string `conf:"default=root"`
-
-	// Password is the default password.
-	Password string `conf:"default="`
-
 	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
 
@@ -54,7 +45,6 @@ type PluginOptions struct {
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	// Sessions map[string]*Session `conf:"optional"`
 	Sessions map[string]*Session `conf:"optional"`
 }
 
@@ -74,11 +64,11 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 	for _, session := range p.options.Sessions {
 		if session.Uri == "" {
-			session.Uri = p.options.Uri
+			session.Uri = "tcp://localhost:3306"
 		}
 		if session.User == "" {
-			session.User = p.options.User
-			session.Password = p.options.Password
+			session.User = "root"
+			session.Password = ""
 		}
 	}
 
@@ -94,11 +84,6 @@ func (p *Plugin) Validate(options interface{}) error {
 	p.Debugf("Start config validation...")
 
 	err = conf.Unmarshal(options, &opts)
-	if err != nil {
-		return err
-	}
-
-	_, err = checkURI(&Session{Uri: opts.Uri, User: opts.User, Password: opts.Password})
 	if err != nil {
 		return err
 	}
