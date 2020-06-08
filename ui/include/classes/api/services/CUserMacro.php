@@ -847,8 +847,9 @@ class CUserMacro extends CApiService {
 				$regex_exists = ($regex !== null && in_array($regex,
 					array_column($existing_macros[$hostid][$macro_name], 'regex'), true
 				));
+				$is_macro_without_context = ($context === null && $regex === null);
 
-				if ($context_exists || $regex_exists) {
+				if ($is_macro_without_context || $context_exists || $regex_exists) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
 				}
 			}
