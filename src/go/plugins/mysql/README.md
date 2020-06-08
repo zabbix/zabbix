@@ -28,22 +28,21 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 
 ### Connection and authentication
 The plugin uses URI, username and password from item key parameters or from Plugins.Mysql.Sessions options of the Zabbix agent 2 configuration file.
-The first three parameters in all plugin keys are connection string (connString next), username, and password.
-As connString could be used URI or session name. 
+The first three parameters in all plugin keys are connection string (connString), username, and password.
+A URI or a session name can be used as a connString.  
 If passing a URI it must match the short URI format. Supported sockets are TCP and Unix.
 For example:
 - tcp://myhost:3306
 - tcp://172.16.0.10
 - unix:/var/run/mysql.sock
-**Note!** Credentials in connString are ignored. For authentication are taken the username and password from plugin key parameters.
-By default, URI is tcp://localhost:3306, username root, password  empty. 
+**Note!** Credentials passed via a connString will be ignored. 
+If the username and password for authentication are not provided, default values will be used: URI *tcp://localhost:3306*, username *root*, password  empty. 
 
-It is possible to monitor several MySQL instances by creating named sessions in the configuration file and providing 
-different usernames, passwords and URIs for each session.
+It is possible to monitor several MySQL instances by creating a named session with separate URI, username and/or password parameters for each instance. 
 
 #### Named sessions
 Named sessions allow you to define specific parameters for each MySQL instance. Currently, only three parameters are supported: 
-URI, username, and password.
+URI, username, and password (if certain parameter is not specified for a named session, a hardcoded default value will be used). 
 
 *Example:*  
 If you have two instances: "MySQL1" and "MySQL2", the following options have to be added to the agent configuration:
@@ -61,11 +60,11 @@ Now, these names can be used as connStrings in keys instead of URIs:
     mysql.ping[MySQL2]
 
 ### Parameters priority
-There are 4 levels of parameters overwriting:
-1. Hardcoded default values →
-2. Named sessions (Plugins.Mysql.Sessions.\<sessionName\>.\<parameter\>) →
-3. Item key parameters.
-
+  There are 4 levels of parameter overwriting:
+  1. Hardcoded default values →
+  2. Named sessions (Plugins.Mysql.Sessions.\<sessionName\>.\<parameter\>) →
+  3. Item key parameters.
+  
 ## Supported keys
 
 **mysql.ping[connString,username,password]** — tests whether a connection is alive or not.  
