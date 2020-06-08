@@ -426,14 +426,18 @@ void	finalize_key_access_rules_configuration(void)
 			if (ZBX_KEY_ACCESS_ALLOW != rule->type)
 				break;
 
-			if (i != sysrun_index)
+			/* system.run allow rules are not redundant because of default system.run[*] deny rule */
+			if (0 == rule->elements.values_num || 0 != strcmp(rule->elements.values[0], "system.run"))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing AllowKey \"%s\" rule",
-						rule->pattern);
-			}
+				if (i != sysrun_index)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "removed redundant trailing AllowKey \"%s\" rule",
+							rule->pattern);
+				}
 
-			zbx_key_access_rule_free(rule);
-			zbx_vector_ptr_remove(&key_access_rules, i);
+				zbx_key_access_rule_free(rule);
+				zbx_vector_ptr_remove(&key_access_rules, i);
+			}
 		}
 
 		if (0 == key_access_rules.values_num)

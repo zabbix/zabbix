@@ -491,7 +491,7 @@ func TestNoTrailingAllowRules(t *testing.T) {
 		{metric: "system.localtime", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestEmptyParametersMatch(t *testing.T) {

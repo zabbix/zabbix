@@ -475,7 +475,7 @@ in:
     - pattern: '*'
       type: ZBX_KEY_ACCESS_ALLOW
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_DENY

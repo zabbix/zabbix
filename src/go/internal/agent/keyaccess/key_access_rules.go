@@ -205,10 +205,16 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 			if rules[i].Permission != ALLOW {
 				break
 			}
-			if i != sysrunIndex {
-				log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
+			// system.run allow rules are not redundant because of default system.run[*] deny rule
+			if rules[i].Key != "system.run" {
+				if i != sysrunIndex {
+					log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
+				}
+				for j := i; j < len(rules)-1; j++ {
+					rules[j] = rules[j+1]
+				}
+				cutoff--
 			}
-			cutoff = i
 		}
 		rules = rules[:cutoff]
 
