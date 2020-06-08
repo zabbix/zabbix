@@ -24,41 +24,9 @@ import (
 )
 
 func createSyslog() error {
-	return errors.New("syslog is not supported on Windows")
+	return errors.New("system log is not supported on Windows")
 }
 
-func Infof(format string, args ...interface{}) {
-	if CheckLogLevel(Info) {
-		procLog(format, args)
-	}
-}
-
-func Critf(format string, args ...interface{}) {
-	if CheckLogLevel(Crit) {
-		procLog(format, args)
-	}
-}
-
-func Errf(format string, args ...interface{}) {
-	if CheckLogLevel(Err) {
-		procLog(format, args)
-	}
-}
-
-func Warningf(format string, args ...interface{}) {
-	if CheckLogLevel(Warning) {
-		procLog(format, args)
-	}
-}
-
-func Tracef(format string, args ...interface{}) {
-	if CheckLogLevel(Trace) {
-		procLog(format, args)
-	}
-}
-
-func Debugf(format string, args ...interface{}) {
-	if CheckLogLevel(Debug) {
-		procLog(format, args)
-	}
+func procLog(format string, args []interface{}, level int) {
+	procStandartLog(format, args)
 }

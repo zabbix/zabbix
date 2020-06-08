@@ -133,7 +133,43 @@ func Open(logType int, level int, filename string, filesize int) error {
 	return nil
 }
 
-func procLog(format string, args []interface{}) {
+func Infof(format string, args ...interface{}) {
+	if CheckLogLevel(Info) {
+		procLog(format, args, Info)
+	}
+}
+
+func Critf(format string, args ...interface{}) {
+	if CheckLogLevel(Crit) {
+		procLog(format, args, Crit)
+	}
+}
+
+func Errf(format string, args ...interface{}) {
+	if CheckLogLevel(Err) {
+		procLog(format, args, Err)
+	}
+}
+
+func Warningf(format string, args ...interface{}) {
+	if CheckLogLevel(Warning) {
+		procLog(format, args, Warning)
+	}
+}
+
+func Tracef(format string, args ...interface{}) {
+	if CheckLogLevel(Trace) {
+		procLog(format, args, Trace)
+	}
+}
+
+func Debugf(format string, args ...interface{}) {
+	if CheckLogLevel(Debug) {
+		procLog(format, args, Debug)
+	}
+}
+
+func procStandartLog(format string, args []interface{}) {
 	logAccess.Lock()
 	defer logAccess.Unlock()
 	rotateLog()

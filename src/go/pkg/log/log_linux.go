@@ -31,62 +31,26 @@ func createSyslog() (err error) {
 	return
 }
 
-func Infof(format string, args ...interface{}) {
-	if CheckLogLevel(Info) {
-		if logStat.logType == System {
-			syslogWriter.Info(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
+func procLog(format string, args []interface{}, level int) {
+	if logStat.logType == System {
+		procSysLog(format, args)
+		return
 	}
+	procStandartLog()
 }
 
-func Critf(format string, args ...interface{}) {
-	if CheckLogLevel(Crit) {
-		if logStat.logType == System {
-			syslogWriter.Crit(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
+func procSysLog() {
+	switch level {
+	case Info:
+		syslogWriter.Info(fmt.Sprintf(format, args...))
+	case Crit:
+		syslogWriter.Crit(fmt.Sprintf(format, args...))
+	case Err:
+		syslogWriter.Err(fmt.Sprintf(format, args...))
+	case Warning:
+		syslogWriter.Warning(fmt.Sprintf(format, args...))
+	case Debug, Trace:
+		syslogWriter.Debug(fmt.Sprintf(format, args...))
 	}
-}
-
-func Errf(format string, args ...interface{}) {
-	if CheckLogLevel(Err) {
-		if logStat.logType == System {
-			syslogWriter.Err(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Warningf(format string, args ...interface{}) {
-	if CheckLogLevel(Warning) {
-		if logStat.logType == System {
-			syslogWriter.Warning(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Tracef(format string, args ...interface{}) {
-	if CheckLogLevel(Trace) {
-		if logStat.logType == System {
-			syslogWriter.Debug(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Debugf(format string, args ...interface{}) {
-	if CheckLogLevel(Debug) {
-		if logStat.logType == System {
-			syslogWriter.Debug(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
+	return
 }
