@@ -235,23 +235,46 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
 
-	if(0 != (types & ZBX_FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+	if (0 != (types & ZBX_FT_SYM) || 0 != (types_excl & ZBX_FT_SYM))
 	{
-		file_exists = 1;
+		int rc;
+
+		if (0 != (rc = lstat(filename, &buf)) && ENOENT != errno)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
+					zbx_strerror(errno)));
+			return ret;
+		}
+
+		if (0 == rc && S_ISLNK(buf.st_mode))
+		{
+			if (0 != (types & ZBX_FT_SYM))
+			{
+				file_exists = 1;
+				goto done;
+			}
+
+			if (0 != (types_excl & ZBX_FT_SYM))
+			{
+				file_exists = 0;
+				goto done;
+			}
+		}
 	}
-	else if (0 != (types_excl & ZBX_FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+
+	if (0 == zbx_stat(filename, &buf))
 	{
-		file_exists = 0;
-	}
-	else if (0 == zbx_stat(filename, &buf) && (
-			(S_ISREG(buf.st_mode)  && 0 != (types & ZBX_FT_FILE)) ||
-			(S_ISDIR(buf.st_mode)  && 0 != (types & ZBX_FT_DIR)) ||
-			(S_ISSOCK(buf.st_mode) && 0 != (types & ZBX_FT_SOCK)) ||
-			(S_ISBLK(buf.st_mode)  && 0 != (types & ZBX_FT_BDEV)) ||
-			(S_ISCHR(buf.st_mode)  && 0 != (types & ZBX_FT_CDEV)) ||
-			(S_ISFIFO(buf.st_mode) && 0 != (types & ZBX_FT_FIFO))))
-	{
-		file_exists = 1;
+		if ((S_ISREG(buf.st_mode) && 0 != (types & ZBX_FT_FILE)) ||
+				(S_ISDIR(buf.st_mode)  && 0 != (types & ZBX_FT_DIR)) ||
+				(S_ISSOCK(buf.st_mode) && 0 != (types & ZBX_FT_SOCK)) ||
+				(S_ISBLK(buf.st_mode)  && 0 != (types & ZBX_FT_BDEV)) ||
+				(S_ISCHR(buf.st_mode)  && 0 != (types & ZBX_FT_CDEV)) ||
+				(S_ISFIFO(buf.st_mode) && 0 != (types & ZBX_FT_FIFO)))
+		{
+			file_exists = 1;
+		}
+		else
+			file_exists = 0;
 	}
 	else if (errno == ENOENT)
 	{
@@ -262,9 +285,8 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		return ret;
 	}
-
+done:
 	SET_UI64_RESULT(result, file_exists);
-
 	return SYSINFO_RET_OK;
 }
 #endif
