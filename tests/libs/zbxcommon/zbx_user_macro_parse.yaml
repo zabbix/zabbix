@@ -187,4 +187,52 @@ out:
   macro_r: 12
   context_l: 5
   context_r: 10
+---
+test case: "empty context"
+in:
+  macro: '{$A:}'
+out:
+  return: 'SUCCEED'
+  macro_r: 4
+  context_l: 4
+  context_r: 3
+---
+test case: "ignore regex prefix for nonregex match"
+in:
+  macro: '{$A:regex:}'
+out:
+  return: 'SUCCEED'
+  macro_r: 10
+  context_l: 4
+  context_r: 9
+---
+test case: "unterminated regex prefix"
+in:
+  macro: '{$A:regex}'
+  match: true
+out:
+  return: 'SUCCEED'
+  macro_r: 9
+  context_l: 4
+  context_r: 8
+---
+test case: "empty regex match"
+in:
+  macro: '{$A:regex:}'
+  match: true
+out:
+  return: 'SUCCEED'
+  macro_r: 10
+  context_l: 10
+  context_r: 9
+---
+test case: "simple regex match"
+in:
+  macro: '{$A:regex:(A|B):}'
+  match: true
+out:
+  return: 'SUCCEED'
+  macro_r: 16
+  context_l: 10
+  context_r: 15
 ...

@@ -50,6 +50,25 @@ void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 	return NULL;
 }
 
+static int	config_gmacro_context_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_GMACRO	*m1 = *(const ZBX_DC_GMACRO **)d1;
+	const ZBX_DC_GMACRO	*m2 = *(const ZBX_DC_GMACRO **)d2;
+
+	/* macros without context have higher priority than macros with */
+	if (NULL == m1->context)
+		return NULL == m2->context ? 0 : -1;
+
+	if (NULL == m2->context)
+		return 1;
+
+	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
+
+	return strcmp(m1->context, m2->context);
+}
+
+
 static void	init_macros(const char *path)
 {
 	zbx_mock_handle_t	hmacros, handle;
@@ -75,7 +94,7 @@ static void	init_macros(const char *path)
 		macro_name = zbx_mock_get_object_member_string(handle, "name");
 		macro_value = zbx_mock_get_object_member_string(handle, "value");
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(macro_name, &name, &context, NULL))
+		if (SUCCEED != zbx_user_macro_parse_dyn(macro_name, &name, &context, NULL, NULL))
 			fail_msg("invalid user macro: %s", macro_name);
 
 		for (i = 0; i < macros.values_num; i++)
@@ -99,7 +118,12 @@ static void	init_macros(const char *path)
 		macro->context = context;
 		macro->value = macro_value;
 		zbx_vector_ptr_append(&gm->gmacros, macro);
+	}
 
+	for (i = 0; i < macros.values_num; i++)
+	{
+		gm = (ZBX_DC_GMACRO_M *)macros.values[i];
+		zbx_vector_ptr_sort(&gm->gmacros, config_gmacro_context_compare);
 	}
 }
 
