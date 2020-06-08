@@ -20,9 +20,13 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
+/**
+ * @backup items
+ */
 class testPageLowLevelDiscovery extends CWebTest {
 
 	const HOST_ID = 90001;
+	private $discovery_rule_names = ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'];
 
 	public function testPageLowLevelDiscovery_CheckLayout() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
@@ -111,6 +115,117 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count));
 	}
 
+	public function testPageLowLevelDiscovery_EnableDisableSingle() {
+		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
+		$table = $this->query('class:list-table')->asTable()->one();
+		$name = 'Discovery rule 2';
+		$row = $table->findRow('Name', $name);
+		$row->select();
+		// Clicking Enabled/Disabled link
+		$discovery_status = ['Enabled', 'Disabled'];
+		foreach ($discovery_status as $action) {
+			$row->query('link:'.$action)->one()->click();
+			$expected_status = $action === 'Enabled' ? 1 : 0;
+			$status = CDBHelper::getValue('SELECT status FROM items WHERE name ='.zbx_dbstr($name));
+			$this->assertEquals($expected_status, $status);
+			$message_action = $action === 'Enabled' ? 'disabled' : 'enabled';
+			$this->assertEquals('Discovery rule '.$message_action, CMessageElement::find()->one()->getTitle());
+			$link_color = $action === 'Enabled' ? 'red' : 'green';
+			$this->assertTrue($row->query('xpath://td/a[@class="link-action '.$link_color.'"]')->one()->isPresent());
+		}
+	}
+
+	public function testPageLowLevelDiscovery_EnableDisableAll() {
+		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
+		// Press Enable or Disable buttons and check the result.
+		$actions = ['Disable', 'Enable'];
+		foreach ($actions as $action) {
+			$this->massChangeStatus($action);
+			$expected_status = $action === 'Disable' ? 1 : 0;
+			foreach ($this->discovery_rule_names as $name) {
+				$status = CDBHelper::getValue('SELECT status FROM items WHERE name ='.zbx_dbstr($name));
+				$this->assertEquals($expected_status, $status);
+			}
+		}
+	}
+
+	public static function getCheckNowData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'names' => ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'],
+					'message' => 'Request sent successfully'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'names' => ['Discovery rule 2'],
+					'message' => 'Request sent successfully'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names' => ['Discovery rule 2'],
+					'disabled' => true,
+					'message' => 'Cannot send request',
+					'error_details' => 'Cannot send request: discovery rule is disabled.'
+				]
+			]
+		];
+	}
+
+	/**
+	* @dataProvider getCheckNowData
+	*/
+	public function testPageLowLevelDiscovery_CheckNow($data) {
+		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
+		// Enabe all LLDs, so Check now can be send successfully.
+		$this->massChangeStatus('Enable');
+
+		$table = $this->query('class:list-table')->asTable()->one();
+		foreach($data['names'] as $name){
+			$row = $table->findRow('Name', $name);
+			$row->select();
+			if (CTestArrayHelper::get($data, 'disabled')) {
+				$this->query('button:Disable')->one()->click();
+				$this->page->acceptAlert();
+				$row->select();
+			}
+		}
+		$this->query('button:Execute now')->one()->click();
+
+		$message = CMessageElement::find()->one();
+		$this->assertEquals($data['message'], $message->getTitle());
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->assertTrue($message->isGood());
+				break;
+			case TEST_BAD:
+				$this->assertTrue($message->isBad());
+				$this->assertTrue($message->hasLine($data['error_details']));
+				break;
+		}
+	}
+
+	public function testPageLowLevelDiscovery_DeleteAllButton() {
+		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
+		// Delete all discovery rules.
+		$table = $this->query('class:list-table')->asTable()->one();
+		foreach ($this->discovery_rule_names as $rule_name) {
+			$table->findRow('Name', $rule_name)->select();
+		}
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertEquals('Discovery rules deleted', CMessageElement::find()->one()->getTitle());
+		foreach ($this->discovery_rule_names as $rule_name) {
+			$count = CDBHelper::getCount('SELECT null FROM items WHERE name ='.zbx_dbstr($rule_name));
+			$this->assertEquals(0, $count);
+		}
+	}
+
 	private function getTableResult($rows_count){
 		$table = $this->query('class:list-table')->asTable()->one();
 		$result = [];
@@ -131,10 +246,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Zabbix servers',
+						'Host groups' => 'Templates/Virtualization',
 					],
 					'expected' => [
-						'count' => 23
+						'count' => 8
 					]
 				]
 			],
@@ -364,4 +479,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 			}
 		}
 	}
+
+	private function massChangeStatus($action) {
+		$this->query('id:all_items')->asCheckbox()->one()->check();
+		$this->query('button:'.$action)->one()->click();
+		$this->page->acceptAlert();
+		$this->assertEquals('Discovery rules '.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
+	}
 }
+
