@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"log/syslog"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -50,7 +49,6 @@ const MB = 1048576
 
 var logLevel int
 var logger *log.Logger
-var syslogWriter *syslog.Writer
 
 type LogStat struct {
 	logType  int
@@ -115,7 +113,7 @@ func Open(logType int, level int, filename string, filesize int) error {
 
 	switch logType {
 	case System:
-		syslogWriter, err = syslog.New(syslog.LOG_WARNING|syslog.LOG_DAEMON, "zabbix_agent2")
+		err = createSyslog()
 		if err != nil {
 			return err
 		}
@@ -133,66 +131,6 @@ func Open(logType int, level int, filename string, filesize int) error {
 
 	logLevel = level
 	return nil
-}
-
-func Infof(format string, args ...interface{}) {
-	if CheckLogLevel(Info) {
-		if logStat.logType == System {
-			syslogWriter.Info(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Critf(format string, args ...interface{}) {
-	if CheckLogLevel(Crit) {
-		if logStat.logType == System {
-			syslogWriter.Crit(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Errf(format string, args ...interface{}) {
-	if CheckLogLevel(Err) {
-		if logStat.logType == System {
-			syslogWriter.Err(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Warningf(format string, args ...interface{}) {
-	if CheckLogLevel(Warning) {
-		if logStat.logType == System {
-			syslogWriter.Warning(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Tracef(format string, args ...interface{}) {
-	if CheckLogLevel(Trace) {
-		if logStat.logType == System {
-			syslogWriter.Debug(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
-}
-
-func Debugf(format string, args ...interface{}) {
-	if CheckLogLevel(Debug) {
-		if logStat.logType == System {
-			syslogWriter.Debug(fmt.Sprintf(format, args...))
-			return
-		}
-		procLog(format, args)
-	}
 }
 
 func procLog(format string, args []interface{}) {
