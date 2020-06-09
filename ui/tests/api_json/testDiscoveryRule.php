@@ -4991,6 +4991,10 @@ class testDiscoveryRule extends CAPITest {
 			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
 		);
 
+		usort($db_lld_conditions, function ($a, $b) {
+			return $a['lld_override_conditionid'] <=> $b['lld_override_conditionid'];
+		});
+
 		$this->assertEquals($db_lld_override['evaltype'], $filter['evaltype'], 'Override evaltype value.');
 
 		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
