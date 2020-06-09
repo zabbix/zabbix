@@ -5082,7 +5082,7 @@ class testDiscoveryRule extends CAPITest {
 			}
 		}
 		else {
-			$this->assertEmpty($db_optag);
+			$this->assertEmpty($db_optags);
 		}
 	}
 
@@ -5102,7 +5102,7 @@ class testDiscoveryRule extends CAPITest {
 			}
 		}
 		else {
-			$this->assertEmpty($db_optemplate);
+			$this->assertEmpty($db_optemplates);
 		}
 	}
 
