@@ -24,12 +24,15 @@ require_once __DIR__.'/include/config.inc.php';
 $config = select_config();
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
+$request = CSession::getValue('request');
+CSession::unsetValue(['request']);
+
 if (hasRequest('request')) {
-	$request = getRequest('request', '');
+	$request = getRequest('request');
 	preg_match('/^\/?(?<filename>[a-z0-9_.]+\.php)(\?.*)?$/i', $request, $test_request);
 
-	if (!array_key_exists('filename', $test_request) || !file_exists('./' . $test_request['filename'])
-			|| $test_request['filename'] == basename(__FILE__)) {
+	if (!array_key_exists('filename', $test_request) || !file_exists('./'.$test_request['filename'])
+			|| $test_request['filename'] === basename(__FILE__)) {
 		$request = '';
 	}
 
@@ -40,6 +43,8 @@ if (hasRequest('request')) {
 }
 
 if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
+	CSession::unsetValue(['request']);
+
 	redirect($redirect_to->toString());
 }
 
@@ -50,6 +55,7 @@ use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Utils;
 
 $baseurl = Utils::getSelfURLNoQuery();
+$relay_state = null;
 
 $sp_key = '';
 $sp_cert = '';
@@ -186,8 +192,8 @@ try {
 			'session_index' => $auth->getSessionIndex()
 		]);
 
-		if (hasRequest('RelayState') && Utils::getSelfURL() != getRequest('RelayState')) {
-			$auth->redirectTo(getRequest('RelayState'));
+		if (hasRequest('RelayState') && strpos(getRequest('RelayState'), $baseurl) === false) {
+			$relay_state = getRequest('RelayState');
 		}
 	}
 
@@ -227,7 +233,7 @@ try {
 
 		CWebUser::setSessionCookie($user['sessionid']);
 
-		$redirect = array_filter([CSession::getValue('request'), $user['url'], ZBX_DEFAULT_URL]);
+		$redirect = array_filter([$request, $user['url'], $relay_state, ZBX_DEFAULT_URL]);
 		redirect(reset($redirect));
 	}
 
@@ -244,7 +250,7 @@ echo (new CView('general.warning', [
 		(new CButton('login', _('Login')))->onClick(
 			'document.location = '.json_encode(
 				$redirect_to
-					->setArgument('request', CSession::getValue('request'))
+					->setArgument('request', $request)
 					->getUrl()
 			).';'
 		)
