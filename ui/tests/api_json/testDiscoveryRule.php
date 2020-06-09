@@ -3536,6 +3536,26 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "delay": invalid delay.'
 			],
+			'Test /1/overrides/1/operations/1/opperiod/delay cannot be 0.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '0'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+			],
 			'Test /1/overrides/1/operations/1/opperiod is not supported for trigger prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
