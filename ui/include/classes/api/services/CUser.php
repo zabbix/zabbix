@@ -1385,9 +1385,7 @@ class CUser extends CApiService {
 	private function getUserGroupsData($userid) {
 		$usrgrps = [
 			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
-			'userip' => (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== '')
-				? $_SERVER['HTTP_X_FORWARDED_FOR']
-				: $_SERVER['REMOTE_ADDR'],
+			'userip' => CWebUser::getIp(),
 			'users_status' => GROUP_STATUS_ENABLED,
 			'gui_access' => GROUP_GUI_ACCESS_SYSTEM
 		];

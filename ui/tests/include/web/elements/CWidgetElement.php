@@ -45,7 +45,8 @@ class CWidgetElement extends CElement {
 	 * @return string
 	 */
 	public function getHeaderText() {
-		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4')->one()->getText();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
+				' contains(@class, "dashbrd-grid-iterator-head")]/h4')->one()->getText();
 	}
 
 	/**
@@ -54,7 +55,8 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content")]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content") or'.
+				' contains(@class, "dashbrd-grid-iterator-content")]')->one();
 	}
 
 	/**

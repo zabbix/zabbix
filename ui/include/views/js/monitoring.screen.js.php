@@ -64,7 +64,7 @@
 							}
 
 							clearMessages();
-							addMessage(makeMessageBox('good', response.message, null, true));
+							addMessage(makeMessageBox('good', [], response.message, true, false));
 							flickerfreeScreen.refresh(id);
 						}
 					}

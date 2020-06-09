@@ -120,9 +120,11 @@ static int	dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
  * Parameters: request - structure that contains item key and parameters      *
  *              request->key - item key without parameters                    *
  *              request->nparam - number of parameters                        *
- *              request->timeout - processing should not take longer than     *
- *                                 this number of seconds                     *
  *              request->params[N-1] - pointers to item key parameters        *
+ *              request->types[N-1] - item key parameters types:              *
+ *                  REQUEST_PARAMETER_TYPE_UNDEFINED (key parameter is empty) *
+ *                  REQUEST_PARAMETER_TYPE_ARRAY (array)                      *
+ *                  REQUEST_PARAMETER_TYPE_STRING (quoted or unquoted string) *
  *                                                                            *
  *             result - structure that will contain result                    *
  *                                                                            *
@@ -133,6 +135,8 @@ static int	dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
  * Comment: get_rparam(request, N-1) can be used to get a pointer to the Nth  *
  *          parameter starting from 0 (first parameter). Make sure it exists  *
  *          by checking value of request->nparam.                             *
+ *          In the same manner get_rparam_type(request, N-1) can be used to   *
+ *          get a parameter type.                                             *
  *                                                                            *
  ******************************************************************************/
 static int	dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -150,7 +154,7 @@ static int	dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 	param1 = get_rparam(request, 0);
 	param2 = get_rparam(request, 1);
 
-	/* there is no strict validation of parameters for simplicity sake */
+	/* there is no strict validation of parameters and types for simplicity sake */
 	from = atoi(param1);
 	to = atoi(param2);
 
