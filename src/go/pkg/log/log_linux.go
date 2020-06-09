@@ -33,13 +33,13 @@ func createSyslog() (err error) {
 
 func procLog(format string, args []interface{}, level int) {
 	if logStat.logType == System {
-		procSysLog(format, args)
+		procSysLog(format, args, level)
 		return
 	}
-	procStandartLog()
+	procStandartLog(format, args)
 }
 
-func procSysLog() {
+func procSysLog(format string, args []interface{}, level int) {
 	switch level {
 	case Info:
 		syslogWriter.Info(fmt.Sprintf(format, args...))
