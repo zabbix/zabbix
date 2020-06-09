@@ -5388,7 +5388,7 @@ class testDiscoveryRule extends CAPITest {
 										]
 									],
 									'opinventory' => [
-										'inventory_mode' => '1'
+										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 									]
 								]
 							]
@@ -5512,7 +5512,7 @@ class testDiscoveryRule extends CAPITest {
 										]
 									],
 									'opinventory' => [
-										'inventory_mode' => '1'
+										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 									]
 								]
 							]
@@ -5672,7 +5672,7 @@ class testDiscoveryRule extends CAPITest {
 							]
 						],
 						'opinventory' => [
-							'inventory_mode' => '1'
+							'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 						]
 					]
 				]
