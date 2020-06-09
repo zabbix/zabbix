@@ -161,6 +161,8 @@ class ZBase {
 	public function run($mode) {
 		$this->init();
 
+		new CMysqlSession();
+
 		$this->setMaintenanceMode();
 
 		ini_set('display_errors', 'Off');
@@ -419,7 +421,7 @@ class ZBase {
 	private function initMessages(): void {
 		foreach (['messageOk', 'messageError'] as $message_type) {
 			if (array_key_exists($message_type, $_COOKIE)) {
-				CSession::setValue($message_type, $_COOKIE[$message_type]);
+				CSessionHelper::set($message_type, $_COOKIE[$message_type]);
 				zbx_setcookie($message_type, null, 1);
 			}
 		}
@@ -429,14 +431,12 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		$sessionid = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
-
-		if (!$sessionid) {
+		if (!CWebUser::checkAuthentication(CSessionHelper::getId())) {
 			CWebUser::setDefault();
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->auth = $sessionid;
+		API::getWrapper()->auth = CSessionHelper::getId();
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();
@@ -509,17 +509,17 @@ class ZBase {
 		if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
 			if ($response->getMessageOk() !== null) {
-				CSession::setValue('messageOk', $response->getMessageOk());
+				CSessionHelper::set('messageOk', $response->getMessageOk());
 			}
 			if ($response->getMessageError() !== null) {
-				CSession::setValue('messageError', $response->getMessageError());
+				CSessionHelper::set('messageError', $response->getMessageError());
 			}
 			global $ZBX_MESSAGES;
 			if (isset($ZBX_MESSAGES)) {
-				CSession::setValue('messages', $ZBX_MESSAGES);
+				CSessionHelper::set('messages', $ZBX_MESSAGES);
 			}
 			if ($response->getFormData() !== null) {
-				CSession::setValue('formData', $response->getFormData());
+				CSessionHelper::set('formData', $response->getFormData());
 			}
 
 			redirect($response->getLocation());
@@ -541,7 +541,7 @@ class ZBase {
 					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
-			CSession::setValue('messages', $response->getMessages());
+			CSessionHelper::set('messages', $response->getMessages());
 
 			redirect('zabbix.php?action=system.warning');
 		}

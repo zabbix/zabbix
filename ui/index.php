@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
-CWebUser::disableSessionCookie();
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -45,7 +44,7 @@ $config = select_config();
 
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED && $config['saml_slo_url'] !== ''
-			&& CSession::keyExists('saml_data')) {
+			&& CSessionHelper::has('saml_data')) {
 		redirect('index_sso.php?slo');
 	}
 
@@ -104,3 +103,4 @@ echo (new CView('general.login', [
 	'autologin' => $autologin == 1,
 	'error' => (hasRequest('enter') && $messages) ? array_pop($messages) : null
 ]))->getOutput();
+exit('23');

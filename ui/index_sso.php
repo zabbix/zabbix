@@ -147,7 +147,7 @@ if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
 try {
 	$auth = new Auth($settings);
 
-	if (hasRequest('acs') && !CSession::keyExists('saml_data')) {
+	if (hasRequest('acs') && !CSessionHelper::has('saml_data')) {
 		$auth->processResponse();
 
 		if (!$auth->isAuthenticated()) {
@@ -162,7 +162,7 @@ try {
 			);
 		}
 
-		CSession::setValue('saml_data', [
+		CSessionHelper::set('saml_data', [
 			'username_attribute' => reset($user_attributes[$config['saml_username_attribute']]),
 			'nameid' => $auth->getNameId(),
 			'nameid_format' => $auth->getNameIdFormat(),
@@ -177,8 +177,8 @@ try {
 	}
 
 	if ($config['saml_slo_url'] !== '') {
-		if (hasRequest('slo') && CSession::keyExists('saml_data')) {
-			$saml_data = CSession::getValue('saml_data');
+		if (hasRequest('slo') && CSessionHelper::has('saml_data')) {
+			$saml_data = CSessionHelper::get('saml_data');
 
 			$auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], false,
 				$saml_data['nameid_format'], $saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
@@ -198,14 +198,14 @@ try {
 		redirect($redirect_to->toString());
 	}
 
-	if (CSession::keyExists('saml_data')) {
-		$saml_data = CSession::getValue('saml_data');
+	if (CSessionHelper::has('saml_data')) {
+		$saml_data = CSessionHelper::get('saml_data');
 		$user = API::getApiService('user')->loginByAlias($saml_data['username_attribute'],
 			($config['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE), $config['authentication_type']
 		);
 
 		if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-			CSession::unsetValue(['saml_data']);
+			CSessionHelper::unset(['saml_data']);
 
 			throw new Exception(_('GUI access disabled.'));
 		}

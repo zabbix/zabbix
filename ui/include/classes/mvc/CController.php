@@ -61,7 +61,12 @@ abstract class CController {
 	private $validateSID = true;
 
 	public function __construct() {
-		CSession::start();
+		// CSession::start();<q></q>
+		// new CMysqlSession();
+		// CSessionHelper::set('test', 'dsada');
+		// CSessionHelper::set('test2', 'cdsd');
+		// CSessionHelper::set('getttttttts', 'dasd');
+
 		$this->init();
 	}
 
@@ -131,7 +136,7 @@ abstract class CController {
 	 * @return string
 	 */
 	public function getUserSID() {
-		$sessionid = CWebUser::getSessionCookie();
+		$sessionid = CSessionHelper::getId();
 
 		if ($sessionid === null || strlen($sessionid) < 16) {
 			return null;
@@ -148,9 +153,9 @@ abstract class CController {
 	 * @return bool
 	 */
 	public function validateInput($validationRules) {
-		if (CSession::keyExists('formData')) {
-			$input = array_merge($_REQUEST, CSession::getValue('formData'));
-			CSession::unsetValue(['formData']);
+		if (CSessionHelper::has('formData')) {
+			$input = array_merge($_REQUEST, CSessionHelper::get('formData'));
+			CSessionHelper::unset(['formData']);
 		}
 		else {
 			$input = $_REQUEST;
@@ -306,7 +311,7 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function checkSID() {
-		$sessionid = CWebUser::getSessionCookie();
+		$sessionid = CSessionHelper::getId();
 
 		if ($sessionid === null || !isset($_REQUEST['sid'])) {
 			return false;

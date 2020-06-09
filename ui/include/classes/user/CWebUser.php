@@ -24,22 +24,9 @@ class CWebUser {
 	public static $data = null;
 
 	/**
-	 * Flag used to ignore setting authentication cookie performed checkAuthentication.
-	 */
-	static $set_cookie = true;
-
-	/**
 	 * Flag used to not to extend session lifetime in checkAuthentication.
 	 */
 	static $extend_session = true;
-
-	/**
-	 * Disable automatic cookie setting.
-	 * First checkAuthentication call (performed in initialization phase) will not be sending cookies.
-	 */
-	public static function disableSessionCookie() {
-		self::$set_cookie = false;
-	}
 
 	/**
 	 * Disable automatic session extension.
@@ -88,11 +75,11 @@ class CWebUser {
 			}
 
 			// remove guest session after successful login
-			$result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie(ZBX_SESSION_NAME)));
+			// $result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie(ZBX_SESSION_NAME)));
 
-			if ($result) {
-				self::setSessionCookie(self::$data['sessionid']);
-			}
+			// if ($result) {
+			// 	self::setSessionCookie(self::$data['sessionid']);
+			// }
 
 			return $result;
 		}
@@ -106,26 +93,25 @@ class CWebUser {
 	 * Log-out the current user.
 	 */
 	public static function logout() {
-		self::$data['sessionid'] = self::getSessionCookie();
+		self::$data['sessionid'] = CSessionHelper::getId();
 
 		if (API::User()->logout([])) {
 			self::$data = null;
-			CSession::destroy();
-			zbx_unsetcookie(ZBX_SESSION_NAME);
+			session_destroy();
+			// zbx_unsetcookie(ZBX_SESSION_NAME);
 		}
 	}
 
-	public static function checkAuthentication($sessionId) {
+	public static function checkAuthentication(string $sessionid): bool {
 		try {
-			if ($sessionId !== null) {
-				self::$data = API::User()->checkAuthentication([
-					'sessionid' => $sessionId,
-					'extend' => self::$extend_session
-				]);
-			}
+			self::$data = API::User()->checkAuthentication([
+				'sessionid' => $sessionid,
+				'extend' => self::$extend_session
+			]);
 
-			if ($sessionId === null || empty(self::$data)) {
+			if (empty(self::$data)) {
 				self::setDefault();
+
 				self::$data = API::User()->login([
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
@@ -136,21 +122,13 @@ class CWebUser {
 					clear_messages(1);
 					throw new Exception();
 				}
-				$sessionId = self::$data['sessionid'];
 			}
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				throw new Exception();
 			}
 
-			if (self::$set_cookie) {
-				self::setSessionCookie($sessionId);
-			}
-			else {
-				self::$set_cookie = true;
-			}
-
-			return $sessionId;
+			return true;
 		}
 		catch (Exception $e) {
 			self::setDefault();
@@ -163,20 +141,21 @@ class CWebUser {
 	 *
 	 * @param string $sessionId		Session ID string
 	 */
-	public static function setSessionCookie($sessionId) {
-		$autoLogin = self::isGuest() ? false : (bool) self::$data['autologin'];
+	// public static function setSessionCookie($sessionId) {
+	// 	$autoLogin = self::isGuest() ? false : (bool) self::$data['autologin'];
 
-		zbx_setcookie(ZBX_SESSION_NAME, $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
-	}
+	// 	// zbx_setcookie(ZBX_SESSION_NAME, $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
+	// }
 
 	/**
 	 * Retrieves current session ID from cookie named as defined in ZBX_SESSION_NAME.
 	 *
 	 * @return string
 	 */
-	public static function getSessionCookie() {
-		return get_cookie(ZBX_SESSION_NAME);
-	}
+	// public static function getSessionCookie() {
+	// 	return CSessionHelper::getId();
+	// 	// return get_cookie(ZBX_SESSION_NAME);
+	// }
 
 	public static function setDefault() {
 		self::$data = [

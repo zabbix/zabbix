@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
-CWebUser::disableSessionCookie();
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $config = select_config();

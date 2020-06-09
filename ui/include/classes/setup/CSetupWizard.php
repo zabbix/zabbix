@@ -61,11 +61,11 @@ class CSetupWizard extends CForm {
 	}
 
 	function getConfig($name, $default = null) {
-		return CSession::keyExists($name) ? CSession::getValue($name) : $default;
+		return CSessionHelper::has($name) ? CSessionHelper::get($name) : $default;
 	}
 
 	function setConfig($name, $value) {
-		CSession::setValue($name, $value);
+		CSessionHelper::set($name, $value);
 	}
 
 	function getStep() {

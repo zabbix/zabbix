@@ -38,7 +38,7 @@ class CSession {
 	 * @throw Exception if cannot start session
 	 */
 	public static function start() {
-		if (!self::$session_created) {
+		xif (!self::$session_created) {
 			ob_start();
 			session_set_cookie_params(0, self::getDefaultCookiePath(), null, HTTPS, true);
 
@@ -143,6 +143,8 @@ class CSession {
 		static $options = [];
 
 		session_start($options);
+
+		$_SESSION['a'] = 'asd';
 
 		if (!$options) {
 			$options = ['use_cookies' => 0];

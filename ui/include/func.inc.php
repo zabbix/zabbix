@@ -104,7 +104,10 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0, CSession::getDefaultCookiePath(), null, HTTPS, true);
+	$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+	$path = rtrim(substr($path, 0, strrpos($path, '/')), '/');
+
+	setcookie($name, $value, isset($time) ? $time : 0, $path, null, HTTPS, true);
 	$_COOKIE[$name] = $value;
 }
 
@@ -1867,19 +1870,19 @@ function get_prepared_messages(array $options = []): ?string {
 	// Process messages passed by the previous request.
 
 	if ($options['with_session_messages']
-			&& (CSession::keyExists('messageOk') || CSession::keyExists('messageError'))) {
-		if (CSession::keyExists('messages')) {
-			$ZBX_MESSAGES = CSession::getValue('messages');
+			&& (CSessionHelper::has('messageOk') || CSessionHelper::has('messageError'))) {
+		if (CSessionHelper::has('messages')) {
+			$ZBX_MESSAGES = CSessionHelper::get('messages');
 		}
 
-		if (CSession::keyExists('messageOk')) {
-			show_messages(true, CSession::getValue('messageOk'), null);
+		if (CSessionHelper::has('messageOk')) {
+			show_messages(true, CSessionHelper::get('messageOk'), null);
 		}
 		else {
-			show_messages(false, null, CSession::getValue('messageError'));
+			show_messages(false, null, CSessionHelper::get('messageError'));
 		}
 
-		CSession::unsetValue(['messages', 'messageOk', 'messageError']);
+		CSessionHelper::unset(['messages', 'messageOk', 'messageError']);
 	}
 
 	$messages_session = $ZBX_MESSAGES_PREPARED;
@@ -2020,14 +2023,14 @@ function get_status() {
 	];
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
+	$status['is_running'] = $server->isRunning(CSessionHelper::getId());
 
 	if ($status['is_running'] === false) {
 		return $status;
 	}
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
-	$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
+	$server_status = $server->getStatus(CSessionHelper::getId());
 	$status['has_status'] = (bool) $server_status;
 
 	if ($server_status === false) {
@@ -2199,7 +2202,7 @@ function imageOut(&$image, $format = null) {
 
 	if ($page['type'] != PAGE_TYPE_IMAGE) {
 		$imageId = md5(strlen($imageSource));
-		CSession::setValue('image_id', [$imageId => $imageSource]);
+		CSessionHelper::set('image_id', [$imageId => $imageSource]);
 	}
 
 	switch ($page['type']) {

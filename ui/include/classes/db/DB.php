@@ -1174,4 +1174,41 @@ class DB {
 
 		return $sql_parts;
 	}
+
+	public static function merge(string $table_name, array $data) {
+		global $DB;
+
+		$schema = self::getSchema($table_name);
+		$pk = self::getPk($table_name);
+
+		foreach ($data as $row) {
+			switch ($DB['TYPE']) {
+				case ZBX_DB_MYSQL:
+					$sql = 'INSERT INTO '.$table_name.' ('.implode(',', array_keys($row)).')'.
+						' VALUES ('.implode(',', array_map(function ($val) { return zbx_dbstr($val); }, array_values($row))).') ON DUPLICATE KEY UPDATE ';
+					$updates = [];
+
+					foreach ($row as $key => $val) {
+						if ($pk === $key) {
+							continue;
+						}
+
+						$updates[] = $key.'='.zbx_dbstr($val);
+					}
+
+					$sql .= implode(', ', $updates);
+					break;
+				case ZBX_DB_POSTGRESQL:
+					break;
+				case ZBX_DB_ORACLE:
+					break;
+			}
+
+			if (!DBexecute($sql)) {
+				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			}
+		}
+
+		return self::$dbBackend;
+	}
 }

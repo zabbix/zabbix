@@ -1303,7 +1303,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function checkAuthentication(array $session) {
+	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
 			'extend' =>	['type' => API_BOOLEAN, 'default' => true]
@@ -1327,7 +1327,9 @@ class CUser extends CApiService {
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
 
+		// If session not log in.
 		if (!$db_sessions) {
+			return []; // FIXME:
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
@@ -1340,7 +1342,9 @@ class CUser extends CApiService {
 			'userids' => $db_session['userid']
 		]);
 
+		// If user not exists.
 		if (!$db_users) {
+			return []; // FIXME:
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
@@ -1491,7 +1495,8 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private static function createSession($alias, $db_user) {
-		$db_user['sessionid'] = md5(microtime().$alias.mt_rand());
+		// $db_user['sessionid'] = md5(microtime().$alias.mt_rand());
+		$db_user['sessionid'] = CSessionHelper::getId();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
