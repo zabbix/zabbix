@@ -729,9 +729,7 @@ $lld_macro_paths_form_list->addRow(_('LLD macros'),
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-/*
- * Overrides tab.
- */
+// Overrides tab.
 $overrides_form_list = new CFormList();
 $overrides_list = (new CTable())
 	->addClass('lld-overrides-table')
@@ -749,6 +747,7 @@ $overrides_list = (new CTable())
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
 					->setEnabled(!$templated)
+					->removeId()
 			))
 		))
 	);

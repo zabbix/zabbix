@@ -2383,7 +2383,7 @@ false - Returns only running containers</description>
                         <name>Docker: Containers</name>
                         <host>Template App Docker</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -2405,7 +2405,7 @@ false - Returns only running containers</description>
                         <name>Docker: Size</name>
                         <host>Template App Docker</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -2427,7 +2427,7 @@ false - Returns only running containers</description>
                         <name>Docker: Memory total</name>
                         <host>Template App Docker</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -2449,7 +2449,7 @@ false - Returns only running containers</description>
                         <name>Docker: Goroutines</name>
                         <host>Template App Docker</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -2471,7 +2471,7 @@ false - Returns only running containers</description>
                         <name>Docker: Images</name>
                         <host>Template App Docker</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>

@@ -368,18 +368,6 @@ DB_MEDIATYPE;
 
 typedef struct
 {
-	zbx_uint64_t	conditionid;
-	zbx_uint64_t	actionid;
-	char		*value;
-	char		*value2;
-	int		condition_result;
-	unsigned char	conditiontype;
-	unsigned char	op;
-}
-DB_CONDITION;
-
-typedef struct
-{
 	zbx_uint64_t	alertid;
 	zbx_uint64_t 	actionid;
 	int		clock;
@@ -479,6 +467,8 @@ DB_ACKNOWLEDGE;
 int	DBinit(char **error);
 void	DBdeinit(void);
 
+void	DBinit_autoincrement_options(void);
+
 int	DBconnect(int flag);
 void	DBclose(void);
 
@@ -557,8 +547,8 @@ typedef struct
 }
 zbx_trigger_diff_t;
 
-void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
-void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *diffs);
+void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff);
+void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
@@ -606,6 +596,7 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
+int	DBget_user_names(zbx_uint64_t userid, char **alias, char **name, char **surname);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
@@ -634,7 +625,7 @@ zbx_conn_flags_t;
 
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
 		const char *dns, unsigned short port, zbx_conn_flags_t flags);
-void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char type, const unsigned char bulk,
+void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version, const unsigned char bulk,
 		const char *community, const char *securityname, const unsigned char securitylevel,
 		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
 		const unsigned char privprotocol, const char *contextname);
@@ -739,7 +730,6 @@ typedef struct
 }
 zbx_host_availability_t;
 
-
 int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_host_availability_t *ha);
 int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user);
@@ -774,7 +764,6 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 		zbx_vector_uint64_t *r_eventids);
 
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
-
 
 typedef struct
 {
