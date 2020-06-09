@@ -38,11 +38,13 @@ typedef struct
 }
 zbx_es_httprequest_t;
 
+/* note that the caller of ZBX_CURL_SETOPT() must define variable 'int err_index' and label 'out' */
 #define ZBX_CURL_SETOPT(ctx, handle, opt, value, err)							\
 	if (CURLE_OK != (err = curl_easy_setopt(handle, opt, value)))					\
 	{												\
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot set cURL option " #opt ": %s.",	\
-				curl_easy_strerror(err));						\
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,				\
+				"cannot set cURL option " #opt ": %s.", curl_easy_strerror(err));	\
+		goto out;										\
 	}
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
