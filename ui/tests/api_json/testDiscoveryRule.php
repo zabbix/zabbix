@@ -5345,7 +5345,7 @@ class testDiscoveryRule extends CAPITest {
 										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									],
 									'opseverity' => [
-										'severity' => '3'
+										'severity' => TRIGGER_SEVERITY_AVERAGE
 									],
 									'optag' => [
 										[
@@ -5469,7 +5469,7 @@ class testDiscoveryRule extends CAPITest {
 										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									],
 									'opseverity' => [
-										'severity' => '3'
+										'severity' => TRIGGER_SEVERITY_AVERAGE
 									],
 									'optag' => [
 										[
@@ -5629,7 +5629,7 @@ class testDiscoveryRule extends CAPITest {
 							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 						],
 						'opseverity' => [
-							'severity' => '3'
+							'severity' => TRIGGER_SEVERITY_AVERAGE
 						],
 						'optag' => [
 							[
