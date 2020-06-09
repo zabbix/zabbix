@@ -3063,7 +3063,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/stop": value must be one of 0, 1.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/stop": value must be one of '.implode(', ', [ZBX_LLD_OVERRIDE_STOP_NO, ZBX_LLD_OVERRIDE_STOP_YES]).'.'
 			],
 			// LLD rule override filter
 			'Test /1/overrides/1/filter/evaltype is mandatory.' => [
@@ -3090,7 +3090,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/evaltype": value must be one of 0, 1, 2, 3.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/evaltype": value must be one of '.implode(', ', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]).'.'
 			],
 			'Test /1/overrides/1/filter/formula is required if /1/overrides/1/filter/evaltype == 3 (custom expression).' => [
 				'discoveryrules' => [
@@ -3334,7 +3334,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of 8, 9.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]).'.'
 			],
 			// LLD rule override operation
 			'Test /1/overrides/1/operations/1/operationobject type is validated.' => [
@@ -3351,7 +3351,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operationobject": value must be one of 0, 1, 2, 3.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operationobject": value must be one of '.implode(', ', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE]).'.'
 			],
 			'Test /1/overrides/1/operations/1/operator type is validated.' => [
 				'discoveryrules' => [
@@ -3368,7 +3368,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operator": value must be one of 0, 1, 2, 3, 8, 9.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]).'.'
 			],
 			'Test /1/overrides/1/operations/1 at least one action is mandatory.' => [
 				'discoveryrules' => [
@@ -3424,7 +3424,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opstatus/status": value must be one of 0, 1.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opstatus/status": value must be one of '.implode(', ', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED]).'.'
 			],
 			'Test /1/overrides/1/operations/1/opstatus is not supported for graph prototype object.' => [
 				'discoveryrules' => [
@@ -3483,7 +3483,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opdiscover/discover": value must be one of 0, 1.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opdiscover/discover": value must be one of '.implode(', ', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]).'.'
 			],
 			// LLD rule override operation period
 			'Test /1/overrides/1/operations/1/opperiod/delay is mandatory.' => [
@@ -3812,14 +3812,14 @@ class testDiscoveryRule extends CAPITest {
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
-										'severity' => 6
+										'severity' => TRIGGER_SEVERITY_COUNT
 									]
 								]
 							]
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opseverity/severity": value must be one of 0, 1, 2, 3, 4, 5.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opseverity/severity": value must be one of '.implode(', ', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)).'.'
 			],
 			'Test /1/overrides/1/operations/1/opseverity is is not supported for item prototype object.' => [
 				'discoveryrules' => [
@@ -4207,7 +4207,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opinventory/inventory_mode": value must be one of -1, 0, 1.'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opinventory/inventory_mode": value must be one of '.implode(', ', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]).'.'
 			],
 			'Test /1/overrides/1/operations/1/opinventory is is not supported for item prototype object.' => [
 				'discoveryrules' => [
