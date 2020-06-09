@@ -131,9 +131,9 @@ class CTableElement extends CElement {
 	/**
 	 * Find row by column value.
 	 *
-	 * @param string $column    column name
-	 * @param string $value     column value
-	 * @param bool	 $contains  flag that determines if column value should contain the passed value or coincide with it
+	 * @param string	$column    column name
+	 * @param string	$value     column value
+	 * @param boolean	$contains  flag that determines if column value should contain the passed value or coincide with it
 	 *
 	 * @return CTableRow|CNullElement
 	 */
@@ -149,8 +149,8 @@ class CTableElement extends CElement {
 			$column = $index + 1;
 		}
 
-		($contains) ? $suffix = '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..' :
-				$suffix = '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
+		$suffix = $contains ? '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..'
+			: '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
 
 		$xpaths = ['.//tbody/tr/td'.$suffix, './/tbody/tr/th'.$suffix];
 

@@ -92,17 +92,16 @@ class testPageTriggerDescription extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Problem', $data['Trigger name'], true);
 
-		if (CTestArrayHelper::get($data,'description', false)) {
-			$row->query('xpath:.//span[contains(@class, "icon-description")]')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
+		if (CTestArrayHelper::get($data, 'description', false)) {
+			$row->query('xpath:.//span[contains(@class, "icon-description")]')->one()->click();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->one()->waitUntilReady();
 			$this->assertEquals($data['description'], $overlay->getText());
 
 			// Check urls in description.
 			$this->checkDescriptionUrls($data, $overlay);
 
 			// Close the tool-tip.
-			$overlay->query('xpath:./button[@title="Close"]')->one()->click();
-			$this->assertFalse($overlay->isDisplayed());
+			$overlay->close();
 		}
 		// Check that there is no description icon if such is not specified if trigger config.
 		else {
@@ -119,7 +118,7 @@ class testPageTriggerDescription extends CWebTest {
 		$description = $this->query('xpath://td[text()="Description"]/..')->one()->asTableRow()->getColumn(1);
 
 		// Check description value.
-		if (CTestArrayHelper::get($data,'description', false)) {
+		if (CTestArrayHelper::get($data, 'description', false)) {
 			$this->assertEquals($data['description'], $description->getText());
 			// Check URLs in description.
 			$this->checkDescriptionUrls($data, $description);
@@ -130,14 +129,14 @@ class testPageTriggerDescription extends CWebTest {
 		}
 	}
 
-	private function checkDescriptionUrls($data, $location){
+	private function checkDescriptionUrls($data, $element) {
 		// Take the urls out of description text to process them separatelly.
 		$urls = [];
 		preg_match_all('/https?:\/\/\S+/', $data['description'], $urls);
 
 		// Check that urls are clickable.
 		foreach ($urls[0] as $url) {
-			$this->assertTrue($location->query('xpath:./div/a[@href="'.$url.'"]')->one()->isClickable());
+			$this->assertTrue($element->query('xpath:./div/a[@href="'.$url.'"]')->one()->isClickable());
 		}
 	}
 }
