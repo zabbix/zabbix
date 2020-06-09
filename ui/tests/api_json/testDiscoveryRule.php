@@ -3437,7 +3437,7 @@ class testDiscoveryRule extends CAPITest {
 									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opstatus' => [
-										'status' => 0
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 									]
 								]
 							]
@@ -5311,7 +5311,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '3',
 									'value' => '8',
 									'opstatus' => [
-										'status' => '1'
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									]
 								],
 								[
@@ -5319,7 +5319,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '1',
 									'value' => '\\w\\W',
 									'opstatus' => [
-										'status' => '0'
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 									],
 									'opdiscover' => [
 										'discover' => '1'
@@ -5339,7 +5339,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '8',
 									'value' => '^c+$',
 									'opstatus' => [
-										'status' => '1'
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									],
 									'opdiscover' => [
 										'discover' => '1'
@@ -5371,7 +5371,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '0',
 									'value' => '',
 									'opstatus' => [
-										'status' => '1'
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									],
 									'opdiscover' => [
 										'discover' => '1'
@@ -5435,7 +5435,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '3',
 									'value' => '8',
 									'opstatus' => [
-										'status' => '1'
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									]
 								],
 								[
@@ -5443,7 +5443,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '1',
 									'value' => '\\w\\W',
 									'opstatus' => [
-										'status' => '0'
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 									],
 									'opdiscover' => [
 										'discover' => '1'
@@ -5463,7 +5463,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '8',
 									'value' => '^c+$',
 									'opstatus' => [
-										'status' => '1'
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									],
 									'opdiscover' => [
 										'discover' => '1'
@@ -5495,7 +5495,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '0',
 									'value' => '',
 									'opstatus' => [
-										'status' => '1'
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									],
 									'opdiscover' => [
 										'discover' => '1'
@@ -5595,7 +5595,7 @@ class testDiscoveryRule extends CAPITest {
 						'operator' => '3',
 						'value' => '8',
 						'opstatus' => [
-							'status' => '1'
+							'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 						]
 					],
 					[
@@ -5603,7 +5603,7 @@ class testDiscoveryRule extends CAPITest {
 						'operator' => '1',
 						'value' => '\\w\\W',
 						'opstatus' => [
-							'status' => '0'
+							'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 						],
 						'opdiscover' => [
 							'discover' => '1'
@@ -5623,7 +5623,7 @@ class testDiscoveryRule extends CAPITest {
 						'operator' => '8',
 						'value' => '^c+$',
 						'opstatus' => [
-							'status' => '1'
+							'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 						],
 						'opdiscover' => [
 							'discover' => '1'
@@ -5655,7 +5655,7 @@ class testDiscoveryRule extends CAPITest {
 						'operator' => '0',
 						'value' => '',
 						'opstatus' => [
-							'status' => '1'
+							'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 						],
 						'opdiscover' => [
 							'discover' => '1'
