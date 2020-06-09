@@ -5322,7 +5322,7 @@ class testDiscoveryRule extends CAPITest {
 										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 									],
 									'opdiscover' => [
-										'discover' => '1'
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									],
 									'ophistory' => [
 										'history' => '92d'
@@ -5342,7 +5342,7 @@ class testDiscoveryRule extends CAPITest {
 										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									],
 									'opdiscover' => [
-										'discover' => '1'
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									],
 									'opseverity' => [
 										'severity' => '3'
@@ -5363,7 +5363,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '2',
 									'value' => '123',
 									'opdiscover' => [
-										'discover' => '1'
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									]
 								],
 								[
@@ -5374,7 +5374,7 @@ class testDiscoveryRule extends CAPITest {
 										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									],
 									'opdiscover' => [
-										'discover' => '1'
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									],
 									'optemplate' => [
 										[
@@ -5446,7 +5446,7 @@ class testDiscoveryRule extends CAPITest {
 										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 									],
 									'opdiscover' => [
-										'discover' => '1'
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									],
 									'ophistory' => [
 										'history' => '92d'
@@ -5466,7 +5466,7 @@ class testDiscoveryRule extends CAPITest {
 										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									],
 									'opdiscover' => [
-										'discover' => '1'
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									],
 									'opseverity' => [
 										'severity' => '3'
@@ -5487,7 +5487,7 @@ class testDiscoveryRule extends CAPITest {
 									'operator' => '2',
 									'value' => '123',
 									'opdiscover' => [
-										'discover' => '1'
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									]
 								],
 								[
@@ -5498,7 +5498,7 @@ class testDiscoveryRule extends CAPITest {
 										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 									],
 									'opdiscover' => [
-										'discover' => '1'
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 									],
 									'optemplate' => [
 										[
@@ -5606,7 +5606,7 @@ class testDiscoveryRule extends CAPITest {
 							'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 						],
 						'opdiscover' => [
-							'discover' => '1'
+							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 						],
 						'ophistory' => [
 							'history' => '92d'
@@ -5626,7 +5626,7 @@ class testDiscoveryRule extends CAPITest {
 							'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 						],
 						'opdiscover' => [
-							'discover' => '1'
+							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 						],
 						'opseverity' => [
 							'severity' => '3'
@@ -5647,7 +5647,7 @@ class testDiscoveryRule extends CAPITest {
 						'operator' => '2',
 						'value' => '123',
 						'opdiscover' => [
-							'discover' => '1'
+							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 						]
 					],
 					[
@@ -5658,7 +5658,7 @@ class testDiscoveryRule extends CAPITest {
 							'status' => ZBX_PROTOTYPE_STATUS_DISABLED
 						],
 						'opdiscover' => [
-							'discover' => '1'
+							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
 						],
 						'optemplate' => [
 							[
