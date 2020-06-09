@@ -5082,7 +5082,7 @@ class testDiscoveryRule extends CAPITest {
 			}
 		}
 		else {
-			$this->assertEmpty($db_optags);
+			$this->assertEmpty($db_optags, 'Expected no operation tags.');
 		}
 	}
 
@@ -5204,7 +5204,7 @@ class testDiscoveryRule extends CAPITest {
 						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED],
 						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER],
 						'opseverity' => ['severity' => TRIGGER_SEVERITY_AVERAGE],
-						'optags' => [
+						'optag' => [
 							['tag' => 'tag1', 'value' => 'value1'],
 							['tag' => 'tag2', 'value' => 'value2']
 						]
