@@ -5174,6 +5174,10 @@ class testDiscoveryRule extends CAPITest {
 		if (array_key_exists('optag', $operation)) {
 			$this->assertEquals(count($db_optags), count($operation['optag']));
 
+			usort($db_optags, function ($a, $b) {
+				return $a['lld_override_optagid'] <=> $b['lld_override_optagid'];
+			});
+
 			foreach ($db_optags as $num => $db_optag) {
 				$optag_value = array_key_exists('value', $operation['optag'][$num])
 					? $operation['optag'][$num]['value']
