@@ -32,9 +32,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Action log');
 
 		$this->zbxTestTextPresent('Recipient');
-		$this->zbxTestAssertElementPresentId('alias');
-		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
-		$this->zbxTestAssertElementPresentId('btn1');
+		$this->zbxTestAssertElementPresentId('filter_userids__ms');
 		$this->zbxTestAssertElementPresentXpath("//button[@name='filter_set']");
 		$this->zbxTestAssertElementPresentXpath("//button[contains(text(),'Reset')]");
 		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient', 'Message', 'Status', 'Info']);
@@ -105,7 +103,9 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		);
 
 		$this->zbxTestExpandFilterTab();
-		$this->zbxTestInputTypeWait('alias', 'guest');
+		$this->zbxTestClickButtonMultiselect('filter_userids_');
+		$this->zbxTestLaunchOverlayDialog('Users');
+		$this->zbxTestClickLinkText('guest');
 		$this->zbxTestClickXpathWait("//button[@name='filter_set']");
 		$this->zbxTestTextPresent('No data found.');
 
