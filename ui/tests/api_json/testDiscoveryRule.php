@@ -5307,7 +5307,7 @@ class testDiscoveryRule extends CAPITest {
 							],
 							'operations' => [
 								[
-									'operationobject' => '0',
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_LIKE,
 									'value' => '8',
 									'opstatus' => [
@@ -5315,7 +5315,7 @@ class testDiscoveryRule extends CAPITest {
 									]
 								],
 								[
-									'operationobject' => '0',
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 									'value' => '\\w\\W',
 									'opstatus' => [
@@ -5335,7 +5335,7 @@ class testDiscoveryRule extends CAPITest {
 									]
 								],
 								[
-									'operationobject' => '1',
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_REGEXP,
 									'value' => '^c+$',
 									'opstatus' => [
@@ -5359,7 +5359,7 @@ class testDiscoveryRule extends CAPITest {
 									]
 								],
 								[
-									'operationobject' => '2',
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_LIKE,
 									'value' => '123',
 									'opdiscover' => [
@@ -5367,7 +5367,7 @@ class testDiscoveryRule extends CAPITest {
 									]
 								],
 								[
-									'operationobject' => '3',
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_EQUAL,
 									'value' => '',
 									'opstatus' => [
@@ -5405,7 +5405,7 @@ class testDiscoveryRule extends CAPITest {
 							],
 							'operations' => [
 								[
-									'operationobject' => '0',
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_EQUAL,
 									'value' => '',
 									'optrends' => [
@@ -5431,7 +5431,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => '1',
 							'operations' => [
 								[
-									'operationobject' => '0',
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_LIKE,
 									'value' => '8',
 									'opstatus' => [
@@ -5439,7 +5439,7 @@ class testDiscoveryRule extends CAPITest {
 									]
 								],
 								[
-									'operationobject' => '0',
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 									'value' => '\\w\\W',
 									'opstatus' => [
@@ -5459,7 +5459,7 @@ class testDiscoveryRule extends CAPITest {
 									]
 								],
 								[
-									'operationobject' => '1',
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_REGEXP,
 									'value' => '^c+$',
 									'opstatus' => [
@@ -5483,7 +5483,7 @@ class testDiscoveryRule extends CAPITest {
 									]
 								],
 								[
-									'operationobject' => '2',
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_LIKE,
 									'value' => '123',
 									'opdiscover' => [
@@ -5491,7 +5491,7 @@ class testDiscoveryRule extends CAPITest {
 									]
 								],
 								[
-									'operationobject' => '3',
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_EQUAL,
 									'value' => '',
 									'opstatus' => [
@@ -5521,7 +5521,7 @@ class testDiscoveryRule extends CAPITest {
 							'step' => '2',
 							'operations' => [
 								[
-									'operationobject' => '0',
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_EQUAL,
 									'value' => '',
 									'optrends' => [
@@ -5591,7 +5591,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'operations' => [
 					[
-						'operationobject' => '0',
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 						'operator' => CONDITION_OPERATOR_NOT_LIKE,
 						'value' => '8',
 						'opstatus' => [
@@ -5599,7 +5599,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					],
 					[
-						'operationobject' => '0',
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
 						'value' => '\\w\\W',
 						'opstatus' => [
@@ -5619,7 +5619,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					],
 					[
-						'operationobject' => '1',
+						'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
 						'operator' => CONDITION_OPERATOR_REGEXP,
 						'value' => '^c+$',
 						'opstatus' => [
@@ -5643,7 +5643,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					],
 					[
-						'operationobject' => '2',
+						'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
 						'operator' => CONDITION_OPERATOR_LIKE,
 						'value' => '123',
 						'opdiscover' => [
@@ -5651,7 +5651,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					],
 					[
-						'operationobject' => '3',
+						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => '',
 						'opstatus' => [
@@ -5683,7 +5683,7 @@ class testDiscoveryRule extends CAPITest {
 				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
 				'operations' => [
 					[
-						'operationobject' => '0',
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => '',
 						'optrends' => [
