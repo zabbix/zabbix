@@ -3635,6 +3635,46 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": a time unit is expected.'
 			],
+			'Test /1/overrides/1/operations/1/ophistory/history max value is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => [
+										'history' => 25 * SEC_PER_YEAR + 1
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
+			],
+			'Test /1/overrides/1/operations/1/ophistory/history min value is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => [
+										'history' => SEC_PER_HOUR - 1
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
+			],
 			'Test /1/overrides/1/operations/1/ophistory is is not supported for trigger prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
@@ -3733,6 +3773,46 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": a time unit is expected.'
+			],
+			'Test /1/overrides/1/operations/1/optrends/trends max value is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => [
+										'trends' => 25 * SEC_PER_YEAR + 1
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
+			],
+			'Test /1/overrides/1/operations/1/optrends/trends min value is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => [
+										'trends' => SEC_PER_HOUR - 1
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
 			],
 			'Test /1/overrides/1/operations/1/optrends is is not supported for trigger prototype object.' => [
 				'discoveryrules' => [
