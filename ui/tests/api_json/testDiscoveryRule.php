@@ -4968,6 +4968,7 @@ class testDiscoveryRule extends CAPITest {
 		$this->assertLLDOverrideOperationTags($db_lld_override_op, $operation);
 		$this->assertLLDOverrideOperationTemplates($db_lld_override_op, $operation);
 		$this->assertLLDOverrideOperationTrends($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationInventory($db_lld_override_op, $operation);
 	}
 
 	/**
