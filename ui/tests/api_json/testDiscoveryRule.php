@@ -24,20 +24,7 @@ require_once dirname(__FILE__).'/../../include/classes/parsers/CConditionFormula
 require_once dirname(__FILE__).'/../../include/classes/helpers/CConditionHelper.php';
 
 /**
- * @backup ids
  * @backup items
- * @backup lld_override
- * @backup lld_override_condition
- * @backup lld_override_operation
- * @backup lld_override_opdiscover
- * @backup lld_override_opstatus
- * @backup lld_override_ophistory
- * @backup lld_override_opinventory
- * @backup lld_override_opperiod
- * @backup lld_override_opseverity
- * @backup lld_override_optag
- * @backup lld_override_optemplate
- * @backup lld_override_optrends
  */
 class testDiscoveryRule extends CAPITest {
 	public static function discoveryrule_create_data_invalid() {
