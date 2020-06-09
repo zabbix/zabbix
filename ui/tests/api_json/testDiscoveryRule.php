@@ -5279,7 +5279,7 @@ class testDiscoveryRule extends CAPITest {
 						[
 							'name' => 'override',
 							'step' => '1',
-							'stop' => '1',
+							'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
 							'filter' => [
 								'evaltype' => '3',
 								'formula' => 'A or B or C',
@@ -5396,7 +5396,7 @@ class testDiscoveryRule extends CAPITest {
 						[
 							'name' => 'override 2',
 							'step' => '2',
-							'stop' => '1',
+							'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
 							'filter' => [
 								'evaltype' => '0',
 								'formula' => '',
@@ -5564,7 +5564,7 @@ class testDiscoveryRule extends CAPITest {
 			[
 				'name' => 'override',
 				'step' => '1',
-				'stop' => '1',
+				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
 				'filter' => [
 					'evaltype' => '3',
 					'formula' => 'A or B or C',
@@ -5680,7 +5680,7 @@ class testDiscoveryRule extends CAPITest {
 			[
 				'name' => 'override 2',
 				'step' => '2',
-				'stop' => '1',
+				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
 				'operations' => [
 					[
 						'operationobject' => '0',
