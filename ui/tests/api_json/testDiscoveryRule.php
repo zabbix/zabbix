@@ -2896,7 +2896,7 @@ class testDiscoveryRule extends CAPITest {
 				[],
 				'Empty input parameter.'
 			],
-			'Test cannot delete that does not exists.' => [
+			'Test cannot delete what does not exist.' => [
 				['9999999999'],
 				[],
 				[],
@@ -2921,51 +2921,63 @@ class testDiscoveryRule extends CAPITest {
 			$this->assertEquals($result['result']['ruleids'], $itemids);
 
 			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
-				dbConditionId('lld_overrideid', $overrideids));
+				dbConditionId('lld_overrideid', $overrideids)
+			);
 			$this->assertEmpty($db_lld_overrides);
 
 			$lld_override_conditions = CDBHelper::getAll('SELECT * from lld_override_condition WHERE '.
-				dbConditionId('lld_overrideid', $overrideids));
+				dbConditionId('lld_overrideid', $overrideids)
+			);
 			$this->assertEmpty($lld_override_conditions);
 
 			$lld_override_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
-				dbConditionId('lld_overrideid', $overrideids));
+				dbConditionId('lld_overrideid', $overrideids)
+			);
 			$this->assertEmpty($lld_override_operations);
 
 			$lld_override_opdiscover = CDBHelper::getAll('SELECT * from lld_override_opdiscover WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_opdiscover);
 
 			$lld_override_opstatus = CDBHelper::getAll('SELECT * from lld_override_opstatus WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_opstatus);
 
 			$lld_override_ophistory = CDBHelper::getAll('SELECT * from lld_override_ophistory WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_ophistory);
 
 			$lld_override_opinventory = CDBHelper::getAll('SELECT * from lld_override_opinventory WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_opinventory);
 
 			$lld_override_opperiod = CDBHelper::getAll('SELECT * from lld_override_opperiod WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_opperiod);
 
 			$lld_override_opseverity = CDBHelper::getAll('SELECT * from lld_override_opseverity WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_opseverity);
 
 			$lld_override_optag = CDBHelper::getAll('SELECT * from lld_override_optag WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_optag);
 
 			$lld_override_optemplate = CDBHelper::getAll('SELECT * from lld_override_optemplate WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_optemplate);
 
 			$lld_override_optrends = CDBHelper::getAll('SELECT * from lld_override_optrends WHERE '.
-				dbConditionId('lld_override_operationid', $operationids));
+				dbConditionId('lld_override_operationid', $operationids)
+			);
 			$this->assertEmpty($lld_override_optrends);
 		}
 	}
@@ -3102,7 +3114,7 @@ class testDiscoveryRule extends CAPITest {
 								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'conditions' => [
 									[
-										'macro' => '{##INCORRECT}',
+										'macro' => '{#MACRO}',
 										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => ''
 									]
@@ -3124,7 +3136,7 @@ class testDiscoveryRule extends CAPITest {
 								'formula' => '',
 								'conditions' => [
 									[
-										'macro' => '{##INCORRECT}',
+										'macro' => '{#MACRO}',
 										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => ''
 									]
@@ -3146,7 +3158,7 @@ class testDiscoveryRule extends CAPITest {
 								'formula' => 'x',
 								'conditions' => [
 									[
-										'macro' => '{##INCORRECT}',
+										'macro' => '{#MACRO}',
 										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => ''
 									]
@@ -3168,7 +3180,7 @@ class testDiscoveryRule extends CAPITest {
 								'formula' => 'B or A',
 								'conditions' => [
 									[
-										'macro' => '{##INCORRECT}',
+										'macro' => '{#MACRO}',
 										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => ''
 									]
@@ -3190,7 +3202,7 @@ class testDiscoveryRule extends CAPITest {
 								'formula' => 'B or A',
 								'conditions' => [
 									[
-										'macro' => '{##INCORRECT}',
+										'macro' => '{#MACRO}',
 										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 										'value' => '',
 										'formulaid' => 'B'
@@ -3306,7 +3318,7 @@ class testDiscoveryRule extends CAPITest {
 								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'conditions' => [
 									[
-										'macro' => '{##INCORRECT}',
+										'macro' => '{#MACRO}',
 										'operator' => CONDITION_OPERATOR_NOT_REGEXP
 									]
 								]
@@ -3326,7 +3338,7 @@ class testDiscoveryRule extends CAPITest {
 								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
 								'conditions' => [
 									[
-										'macro' => '{##INCORRECT}',
+										'macro' => '{#MACRO}',
 										'operator' => CONDITION_OPERATOR_YES
 									]
 								]
@@ -4085,7 +4097,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			'Test /1/overrides/1/operations/1/optemplate/1/templateid cannot exis twice.' => [
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid cannot exist twice.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4466,7 +4478,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test /1/overrides/1/filter/formula is set correctly if /evaltype is custom_expression.' => [
+			'Test /1/overrides/1/filter/formula is set correctly if ./evaltype is custom_expression.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4501,7 +4513,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test /1/overrides/1/filter/formula and /formulaid are silently ignored if /evaltype is not custom_expression.' => [
+			'Test /1/overrides/1/filter/formula and ./formulaid are silently ignored if ./evaltype is not custom_expression.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4833,7 +4845,9 @@ class testDiscoveryRule extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['itemids'] as $num => $itemid) {
-				$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.dbConditionId('itemid', (array) $itemid));
+				$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+					dbConditionId('itemid', (array) $itemid)
+				);
 
 				$request_lld_overrides = $request[$num]['overrides'];
 				foreach ($request_lld_overrides as $override_num => $request_lld_override) {
@@ -4859,7 +4873,7 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array $request_lld_override['filter']      (optional)
 	 * @param array $request_lld_override['operations']  (optional)
 	 */
-	protected function assertLLDOverride(array $db_lld_override, array $request_lld_override) {
+	private function assertLLDOverride(array $db_lld_override, array $request_lld_override) {
 		$this->assertEquals($db_lld_override['name'], $request_lld_override['name']);
 		$this->assertEquals($db_lld_override['step'], $request_lld_override['step'], 'Override step value.');
 
@@ -4879,12 +4893,14 @@ class testDiscoveryRule extends CAPITest {
 		if (array_key_exists('operations', $request_lld_override)) {
 			foreach ($request_lld_override['operations'] as $num => $operation) {
 				$db_lld_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
-					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid']));
+					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
+				);
 				$this->assertLLDOverrideOperation($db_lld_operations[$num], $operation);
 			}
 
 			$db_lld_operations_count = CDBHelper::getCount('SELECT * from lld_override_operation WHERE '.
-					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid']));
+				dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
+			);
 
 			$this->assertEquals(count($request_lld_override['operations']), $db_lld_operations_count,
 					'Expected count of operations.');
@@ -4904,7 +4920,7 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array $filter['conditions'][]['formulaid']        (optional) if evaltype is CONDITION_EVAL_TYPE_EXPRESSION
 	 * @param array $filter['conditions'][]['operator']         (optional)
 	 */
-	protected function assertLLDOverrideFilter(array $db_lld_override, array $filter) {
+	private function assertLLDOverrideFilter(array $db_lld_override, array $filter) {
 		$db_lld_conditions = CDBHelper::getAll('SELECT * from lld_override_condition WHERE '.
 			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
 		);
@@ -4952,7 +4968,7 @@ class testDiscoveryRule extends CAPITest {
 	 * @param string $operation['optemplate']                          (optional)
 	 * @param string $operation['opinventory']                         (optional)
 	 */
-	protected function assertLLDOverrideOperation(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperation(array $db_lld_override_op, array $operation) {
 		$this->assertEquals($db_lld_override_op['operationobject'], $operation['operationobject'], 'Operation object.');
 
 		$condition_operator = array_key_exists('operator', $operation)
@@ -4979,13 +4995,14 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationStatus(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationStatus(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_opstatus = CDBHelper::getRow('SELECT * from lld_override_opstatus WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('opstatus', $operation)) {
-			$this->assertEquals($db_opstatus['status'], $operation['opstatus']['status'], 'Operation status.'.json_encode($operation));
+			$this->assertEquals($db_opstatus['status'], $operation['opstatus']['status'], 'Operation status.');
 		}
 		else {
 			$this->assertEmpty($db_opstatus, 'Expected opstatus.');
@@ -4996,11 +5013,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationDiscover(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationDiscover(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_opdiscover = CDBHelper::getRow('SELECT * from lld_override_opdiscover WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('opdiscover', $operation)) {
 			$this->assertEquals($db_opdiscover['discover'], $operation['opdiscover']['discover']);
 		}
@@ -5013,11 +5031,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationHistory(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationHistory(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_ophistory = CDBHelper::getRow('SELECT * from lld_override_ophistory WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('ophistory', $operation)) {
 			$this->assertEquals($db_ophistory['history'], $operation['ophistory']['history']);
 		}
@@ -5030,11 +5049,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationPeriod(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationPeriod(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_opperiod = CDBHelper::getRow('SELECT * from lld_override_opperiod WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('opperiod', $operation)) {
 			$this->assertEquals($db_opperiod['delay'], $operation['opperiod']['delay']);
 		}
@@ -5047,11 +5067,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationSeverity(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationSeverity(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_opseverity = CDBHelper::getRow('SELECT * from lld_override_opseverity WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('opseverity', $operation)) {
 			$this->assertEquals($db_opseverity['severity'], $operation['opseverity']['severity']);
 		}
@@ -5064,11 +5085,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationTags(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationTags(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_optags = CDBHelper::getAll('SELECT * from lld_override_optag WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('optag', $operation)) {
 			$this->assertEquals(count($db_optags), count($operation['optag']));
 
@@ -5090,11 +5112,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationTemplates(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationTemplates(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_optemplates = CDBHelper::getAll('SELECT * from lld_override_optemplate WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('optemplate', $operation)) {
 			$this->assertEquals(count($db_optemplates), count($operation['optemplate']));
 			foreach ($db_optemplates as $num => $db_optemplate) {
@@ -5110,11 +5133,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationTrends(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationTrends(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_optrends = CDBHelper::getRow('SELECT * from lld_override_optrends WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('optrends', $operation)) {
 			$this->assertEquals($db_optrends['trends'], $operation['optrends']['trends']);
 		}
@@ -5127,11 +5151,12 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array  $db_lld_override_op
 	 * @param array  $operation
 	 */
-	protected function assertLLDOverrideOperationInventory(array $db_lld_override_op, array $operation) {
+	private function assertLLDOverrideOperationInventory(array $db_lld_override_op, array $operation) {
 		$operationid = $db_lld_override_op['lld_override_operationid'];
 
 		$db_opinventory = CDBHelper::getRow('SELECT * from lld_override_opinventory WHERE '.
-			dbConditionId('lld_override_operationid', (array) $operationid));
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
 		if (array_key_exists('opinventory', $operation)) {
 			$this->assertEquals($db_opinventory['inventory_mode'], $operation['opinventory']['inventory_mode']);
 		}
@@ -5251,7 +5276,8 @@ class testDiscoveryRule extends CAPITest {
 
 		foreach ($db_lld_ruleids as $db_lld_ruleid) {
 			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
-					dbConditionId('itemid', (array) $db_lld_ruleid));
+				dbConditionId('itemid', (array) $db_lld_ruleid)
+			);
 
 			usort($db_lld_overrides, function ($a, $b) {
 				return $a['lld_overrideid'] <=> $b['lld_overrideid'];
@@ -5271,7 +5297,7 @@ class testDiscoveryRule extends CAPITest {
 				'discoveryrule' => [
 					'output' => ['itemid'],
 					'itemids' => [$itemid],
-					'selectOverrides' => API_OUTPUT_EXTEND
+					'selectOverrides' => ['name', 'step', 'stop', 'operations']
 				],
 				'get_result' => [
 					'itemid' => $itemid,
@@ -5774,7 +5800,8 @@ class testDiscoveryRule extends CAPITest {
 			$itemid = $request['itemid'];
 
 			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
-					dbConditionId('itemid', (array) $itemid));
+				dbConditionId('itemid', (array) $itemid)
+			);
 
 			if (array_key_exists('overrides', $request)) {
 				$this->assertEquals(count($current_overrides), count($request['overrides']));
