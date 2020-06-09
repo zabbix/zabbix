@@ -20,7 +20,9 @@
 package keyaccess
 
 import (
+	"errors"
 	"fmt"
+	"math"
 	"sort"
 
 	"zabbix.com/pkg/conf"
@@ -38,6 +40,17 @@ const (
 	DENY
 )
 
+func (t RuleType) String() string {
+	switch t {
+	case ALLOW:
+		return "AllowKey"
+	case DENY:
+		return "DenyKey"
+	default:
+		return "unknown"
+	}
+}
+
 // Record key access record
 type Record struct {
 	Pattern    string
@@ -47,17 +60,19 @@ type Record struct {
 
 // Rule key access rule definition
 type Rule struct {
+	Pattern    string
 	Permission RuleType
 	Key        string
 	Params     []string
 }
 
 var rules []*Rule
-var noMoreRules bool = false
 
 func parse(rec Record) (r *Rule, err error) {
-	r = &Rule{}
-	r.Permission = rec.Permission
+	r = &Rule{
+		Permission: rec.Permission,
+		Pattern:    rec.Pattern,
+	}
 
 	if r.Key, r.Params, err = itemutil.ParseWildcardKey(rec.Pattern); err != nil {
 		return nil, err
@@ -82,20 +97,20 @@ func parse(rec Record) (r *Rule, err error) {
 	return r, nil
 }
 
-func findRule(rule *Rule) *Rule {
-	for _, r := range rules {
-		if rule.Key != r.Key || len(rule.Params) != len(r.Params) {
+func findRule(proto *Rule) (rule *Rule, index int) {
+	for j, r := range rules {
+		if proto.Key != r.Key || len(proto.Params) != len(r.Params) {
 			continue
 		}
-		for i, p := range rule.Params {
+		for i, p := range proto.Params {
 			if p != r.Params[i] {
 				goto noMatch
 			}
 		}
-		return r
+		return r, j
 	noMatch:
 	}
-	return nil
+	return
 }
 
 func addRule(rec Record) (err error) {
@@ -103,29 +118,20 @@ func addRule(rec Record) (err error) {
 
 	if rule, err = parse(rec); err != nil {
 		return
-	} else if !noMoreRules {
-		if r := findRule(rule); r != nil {
-			var ruleType string
-			if rule.Permission == ALLOW {
-				ruleType = "AllowKey"
-			} else {
-				ruleType = "DenyKey"
-			}
-			if r.Permission == rule.Permission {
-				log.Warningf("key access rule \"%s=%s\" duplicates another rule defined above", ruleType, rec.Pattern)
-			} else {
-				log.Warningf("key access rule \"%s=%s\" conflicts with another rule defined above", ruleType, rec.Pattern)
-			}
-		} else if len(rule.Params) == 0 && rule.Key == "*" {
-			if rule.Permission == DENY {
-				rules = append(rules, rule)
-			}
-			noMoreRules = true // any rules after "allow/deny all" are meaningless
-		} else {
-			rules = append(rules, rule)
-		}
 	}
-	return nil
+	if r, _ := findRule(rule); r != nil {
+		var desc string
+		if r.Permission == rule.Permission {
+			desc = "duplicates"
+		} else {
+			desc = "conflicts"
+		}
+		log.Warningf(`%s access rule "%s" was not added because it %s with another rule defined above`,
+			rec.Permission, rec.Pattern, desc)
+		return
+	}
+	rules = append(rules, rule)
+	return
 }
 
 // GetNumberOfRules returns a number of access rules configured
@@ -136,10 +142,10 @@ func GetNumberOfRules() int {
 // LoadRules adds key access records to access rule list
 func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	rules = rules[:0]
-	noMoreRules = false
-
 	var records []Record
+	sysrunIndex := math.MaxInt32
 
+	// load AllowKey/DenyKey parameters
 	if node, ok := allowRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {
 			if value, ok := v.(*conf.Value); ok {
@@ -166,28 +172,61 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 		}
 	}
 
-	var allowRules, denyRules int = 0, 0
-	for _, r := range rules {
-		switch r.Permission {
-		case ALLOW:
-			allowRules++
-		case DENY:
-			denyRules++
+	rulesNum := len(rules)
+	// create system.run[*] deny rule to be appended at the end of rule list unless other
+	// system.run[*] rules are present
+	sysrunRule, err := parse(Record{Pattern: "system.run[*]", Permission: DENY, Line: 0})
+	if err != nil {
+		return
+	}
+	if r, i := findRule(sysrunRule); r != nil {
+		sysrunIndex = i
+		rulesNum--
+	}
+
+	if rulesNum != 0 {
+		// remove rules after 'full match' rule
+		for i, r := range rules {
+			if len(r.Params) == 0 && r.Key == "*" {
+				if i < sysrunIndex {
+					sysrunIndex = i
+				}
+				for j := i + 1; j < len(rules); j++ {
+					log.Warningf(`removed unreachable %s "%s" rule`, rules[j].Permission, rules[j].Pattern)
+				}
+				rules = rules[:i+1]
+				break
+			}
+		}
+
+		// remove trailing 'allow' rules
+		cutoff := len(rules)
+		for i := len(rules) - 1; i >= 0; i-- {
+			if rules[i].Permission != ALLOW {
+				break
+			}
+			// system.run allow rules are not redundant because of default system.run[*] deny rule
+			if rules[i].Key != "system.run" {
+				if i != sysrunIndex {
+					log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
+				}
+				for j := i; j < len(rules)-1; j++ {
+					rules[j] = rules[j+1]
+				}
+				cutoff--
+			}
+		}
+		rules = rules[:cutoff]
+
+		if len(rules) == 0 {
+			return errors.New("Item key access rules are configured to match all keys," +
+				" indicating possible configuration problem. " +
+				" Please remove the rules if that was the purpose.")
 		}
 	}
 
-	if allowRules > 0 && denyRules == 0 {
-		err = fmt.Errorf("\"AllowKey\" without \"DenyKey\" rules are meaningless")
-		return
-	} else {
-		// trailing AllowKey rules are meaningless, because AllowKey=* is default behavior
-		for i := len(rules) - 1; i >= 0; i-- {
-			r := rules[i]
-			if r.Permission == DENY {
-				break
-			}
-			rules = rules[:len(rules)-1]
-		}
+	if sysrunIndex == math.MaxInt32 {
+		rules = append(rules, sysrunRule)
 	}
 
 	return nil
