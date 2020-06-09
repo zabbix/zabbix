@@ -31,14 +31,6 @@ func createSyslog() (err error) {
 	return
 }
 
-func procLog(format string, args []interface{}, level int) {
-	if logStat.logType == System {
-		procSysLog(format, args, level)
-		return
-	}
-	procStandartLog(format, args)
-}
-
 func procSysLog(format string, args []interface{}, level int) {
 	switch level {
 	case Info:

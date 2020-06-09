@@ -27,6 +27,6 @@ func createSyslog() error {
 	return errors.New("system log is not supported on Windows")
 }
 
-func procLog(format string, args []interface{}, level int) {
-	procStandartLog(format, args)
+func procSysLog(format string, args []interface{}, level int) {
+	return
 }

@@ -169,7 +169,12 @@ func Debugf(format string, args ...interface{}) {
 	}
 }
 
-func procStandartLog(format string, args []interface{}) {
+func procLog(format string, args []interface{}, level int) {
+	if logStat.logType == System {
+		procSysLog(format, args, level)
+		return
+	}
+
 	logAccess.Lock()
 	defer logAccess.Unlock()
 	rotateLog()
