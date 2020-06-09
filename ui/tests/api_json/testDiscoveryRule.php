@@ -4809,27 +4809,6 @@ class testDiscoveryRule extends CAPITest {
 					])
 				],
 				'expected_error' => null
-			],
-			'Test /1/overrides/1/operations/1/optemplate duplicate templateids.' => [
-				'discoveryrules' => [
-					$new_lld_overrides([
-						[
-							'name' => 'override',
-							'step' => 1,
-							'operations' => [
-								[
-									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
-									'optemplate' => [
-										[
-											'templateid' => '50010'
-										]
-									]
-								]
-							]
-						]
-					])
-				],
-				'expected_error' => null
 			]
 		];
 
