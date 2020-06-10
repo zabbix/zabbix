@@ -4961,6 +4961,9 @@ class testDiscoveryRule extends CAPITest {
 				$db_lld_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
 					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
 				);
+				usort($db_lld_operations, function ($a, $b) {
+					return $a['lld_override_operationid'] <=> $b['lld_override_operationid'];
+				});
 				$this->assertLLDOverrideOperation($db_lld_operations[$num], $operation);
 			}
 
