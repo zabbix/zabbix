@@ -4430,7 +4430,7 @@ class testDiscoveryRule extends CAPITest {
 				'expected_error' => null
 			],
 			// LLD rule override filter
-			'Test /1/overrides/1/filter/evaltype and_or with three conditions.' => [
+			'Test /1/overrides/1/filter/evaltype with three conditions where two are unique.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4956,7 +4956,15 @@ class testDiscoveryRule extends CAPITest {
 			$this->assertEquals($db_lld_override['evaltype'], CONDITION_EVAL_TYPE_AND_OR);
 		}
 
+		$db_lld_operations_count = CDBHelper::getCount('SELECT * from lld_override_operation WHERE '.
+			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
+		);
+
 		if (array_key_exists('operations', $request_lld_override)) {
+			$this->assertEquals(count($request_lld_override['operations']), $db_lld_operations_count,
+				'Expected count of operations.'
+			);
+
 			foreach ($request_lld_override['operations'] as $num => $operation) {
 				$db_lld_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
 					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
@@ -4966,13 +4974,9 @@ class testDiscoveryRule extends CAPITest {
 				});
 				$this->assertLLDOverrideOperation($db_lld_operations[$num], $operation);
 			}
-
-			$db_lld_operations_count = CDBHelper::getCount('SELECT * from lld_override_operation WHERE '.
-				dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
-			);
-
-			$this->assertEquals(count($request_lld_override['operations']), $db_lld_operations_count,
-					'Expected count of operations.');
+		}
+		else {
+			$this->assertEquals(0, $db_lld_operations_count, 'Expected no operations.');
 		}
 	}
 
@@ -5203,7 +5207,7 @@ class testDiscoveryRule extends CAPITest {
 			dbConditionId('lld_override_operationid', (array) $operationid)
 		);
 		if (array_key_exists('optemplate', $operation)) {
-			$this->assertEquals(count($db_optemplates), count($operation['optemplate']));
+			$this->assertEquals(count($db_optemplates), count($operation['optemplate']), 'optemplate count');
 			foreach ($db_optemplates as $num => $db_optemplate) {
 				$this->assertEquals($operation['optemplate'][$num]['templateid'], $db_optemplate['templateid']);
 			}
@@ -5246,6 +5250,74 @@ class testDiscoveryRule extends CAPITest {
 		}
 		else {
 			$this->assertEmpty($db_opinventory);
+		}
+	}
+
+	public function testDiscoveryRuleOverrides_TemplateConstaint() {
+		$templateid = 131001;
+		$itemid = 133766;
+		$request_lld_overrides = [
+			[
+				'stop' => ZBX_LLD_OVERRIDE_STOP_NO,
+				'name' => 'Only template operation',
+				'step' => 1,
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+						'optemplate' => [
+							['templateid' => $templateid]
+						]
+					]
+				]
+			],
+			[
+				'stop' => ZBX_LLD_OVERRIDE_STOP_NO,
+				'name' => 'Not only template operation',
+				'step' => 2,
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+						'opinventory' => [
+							'inventory_mode' => HOST_INVENTORY_MANUAL
+						],
+						'optemplate' => [
+							['templateid' => $templateid]
+						]
+					]
+				]
+			],
+		];
+
+		$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+			dbConditionId('itemid', (array) $itemid)
+		);
+
+		usort($db_lld_overrides, function ($a, $b) {
+			return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+		});
+
+		// Assertion confirms existing request.
+		foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+			$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+		}
+
+		$result = $this->call('template.delete', [131001]);
+		$this->assertEquals($result['result'], ['templateids' => [$templateid]]);
+
+		$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+			dbConditionId('itemid', (array) $itemid)
+		);
+
+		usort($db_lld_overrides, function ($a, $b) {
+			return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+		});
+
+		// Operation that had only optamplate is deleted.
+		unset($request_lld_overrides[0]['operations']);
+		// Operation that had not only optamplate is not deleted.
+		unset($request_lld_overrides[1]['operations'][0]['optemplate']);
+		foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+			$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
 		}
 	}
 
