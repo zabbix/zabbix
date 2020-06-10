@@ -47,6 +47,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'types' => ['user'],
 			'method' => 'resolveTexts'
 		],
+		'hostInterfaceDetails' => [
+			'types' => ['user'],
+			'method' => 'resolveTexts'
+		],
 		'graphName' => [
 			'types' => ['graphFunctionalItem'],
 			'source' => 'name',

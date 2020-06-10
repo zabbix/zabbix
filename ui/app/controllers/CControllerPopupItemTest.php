@@ -479,7 +479,23 @@ abstract class CControllerPopupItemTest extends CController {
 					'interface' => $this->getHostInterface($interface_input)
 				];
 
-				unset($data['interface']['ip'], $data['interface']['dns']);
+				if ($data['interface']['details']) {
+					if ($data['interface']['details']['version'] == SNMP_V1
+							|| $data['interface']['details']['version'] == SNMP_V2C) {
+						$data['snmp_community'] = $data['interface']['details']['community'];
+					}
+					else {
+						$data['snmpv3_securityname'] = $data['interface']['details']['securityname'];
+						$data['snmpv3_contextname'] = $data['interface']['details']['contextname'];
+						$data['snmpv3_securitylevel'] = $data['interface']['details']['securitylevel'];
+						$data['snmpv3_authprotocol'] = $data['interface']['details']['authprotocol'];
+						$data['snmpv3_authpassphrase'] = $data['interface']['details']['authpassphrase'];
+						$data['snmpv3_privprotocol'] = $data['interface']['details']['privprotocol'];
+						$data['snmpv3_privpassphrase'] = $data['interface']['details']['privpassphrase'];
+					}
+				}
+
+				unset($data['interface']['ip'], $data['interface']['dns'], $data['interface']['details']);
 				break;
 
 			case ITEM_TYPE_INTERNAL:
