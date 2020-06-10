@@ -21,10 +21,6 @@ package postgres
 
 import (
 	"errors"
-	"fmt"
-	"net/url"
-	"strconv"
-	"strings"
 	"time"
 
 	"zabbix.com/pkg/plugin"
@@ -83,8 +79,8 @@ func (p *Plugin) Stop() {
 }
 
 // whereToConnect builds a session based on key's parameters and a configuration file.
-func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (res *url.URL, err error) {
-	var session *Session
+func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (u *URI, err error) {
+	var uri string
 	user := ""
 	if len(params) > 1 {
 		user = params[1]
@@ -100,51 +96,29 @@ func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (res *
 		database = params[3]
 	}
 
-	// The first param can be either a port & host or a session identifier.
+	// The first param can be either a URI or a session identifier
 	if len(params) > 0 && len(params[0]) > 0 {
-		var ok bool
-		if session, ok = defaultPluginOptions.Sessions[params[0]]; !ok {
-			// get host & port from first parameter, username from second parameter,
-			// password from the third parameter, database name from the fourth  parameter
-			var port uint64
-
-			u, err := url.Parse(params[0])
-			if err != nil {
-				return nil, fmt.Errorf("Invalid connection parameters: %s", err)
-			}
-			if u.Host == "" {
-				u.Host = defaultPluginOptions.Host
+		if isLooksLikeURI(params[0]) {
+			// Use the URI defined as key's parameter
+			uri = params[0]
+		} else {
+			if _, ok := defaultPluginOptions.Sessions[params[0]]; !ok {
+				return nil, errorUnknownSession
 			}
 
-			session = &Session{
-				Host: u.Hostname(),
-			}
-			if u.Port() != "" {
-				if port, err = strconv.ParseUint(u.Port(), 10, 16); err != nil {
-					return nil, fmt.Errorf("Invalid connection port: %s", err)
-				}
-				session.Port = uint16(port)
-			} else {
-				session.Port = defaultPluginOptions.Port
-			}
-			session.User = user
-			session.Password = password
-			session.Database = database
+			// Use a pre-defined session
+			uri = defaultPluginOptions.Sessions[params[0]].URI
+			user = defaultPluginOptions.Sessions[params[0]].User
+			password = defaultPluginOptions.Sessions[params[0]].Password
+			database = defaultPluginOptions.Sessions[params[0]].Database
 		}
-	} else {
-		return nil, errorEmptyParam
 	}
 
-	res = &url.URL{
-		Scheme: "postgresql",
-		Host:   session.Host,
-		Path:   session.Database,
-		User:   url.UserPassword(session.User, session.Password),
+	if len(user) > 0 || len(password) > 0 || len(database) > 0 {
+		return newURIWithCreds(uri, user, password, database)
 	}
-	if session.Port != 0 {
-		res.Host += fmt.Sprintf(":%d", session.Port)
-	}
-	return res, nil
+
+	return parseURI(uri)
 }
 
 // Export implements the Exporter interface.
@@ -153,11 +127,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		handler       requestHandler
 		handlerParams []string
 	)
+
 	u, err := whereToConnect(params, &p.options)
 	if err != nil {
 		return nil, err
 	}
-	connString := u.String()
+	// get connection string for PostgreSQL
+	connString := u.URI()
 	switch key {
 	case keyPostgresDiscoveryDatabases:
 		handler = p.databasesDiscoveryHandler // postgres.databasesdiscovery[[connString][,section]]
@@ -211,7 +187,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		handler = p.locksHandler // postgres.locks[[connString]]
 
 	case keyPostgresOldestXid:
-		handler = p.oldestHandler // postgres.locks[[connString]
+		handler = p.oldestHandler // postgres.oldestXid[[connString]
 
 	default:
 		return nil, errorUnsupportedMetric
@@ -233,8 +209,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if key == keyPostgresDatabasesSize || key == keyPostgresDatabasesAge {
-		path := strings.TrimLeft(u.Path, "/")
-		handlerParams = []string{path}
+		handlerParams = []string{u.Database()}
 	} else {
 		handlerParams = make([]string, 0)
 	}

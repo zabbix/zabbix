@@ -54,7 +54,7 @@ func TestPlugin_Export(t *testing.T) {
 		{
 			"Check PG Ping",
 			&impl,
-			args{keyPostgresPing, []string{"postgresql://localhost:5432", "postgres", "postgres"}, nil},
+			args{keyPostgresPing, []string{"tcp://localhost:5432", "postgres", "postgres"}, nil},
 			pingOK,
 			false,
 		},
@@ -75,7 +75,7 @@ func TestPlugin_Export(t *testing.T) {
 		{
 			"Check PG Wal",
 			&impl,
-			args{keyPostgresWal, []string{"postgresql://localhost:5432", "postgres", "postgres"}, nil},
+			args{keyPostgresWal, []string{"tcp://localhost:5432", "postgres", "postgres"}, nil},
 			nil,
 			false,
 		},

@@ -29,11 +29,8 @@ import (
 // Session struct holds individual options for postgres connection for each session
 type Session struct {
 
-	// Path of  Postgres server. Default is localhost.
-	Host string `conf:"optional"`
-
-	// Port of  Postgres server. Default 5432.
-	Port uint16 `conf:"optional,range=1024:65535"`
+	// URI is a connection string consisting of a network scheme, a host address and a port or a path to a Unix-socket.
+	URI string `conf:"name=Uri,optional"`
 
 	//  Database of  Postgres server.
 	Database string `conf:"optional"`
@@ -48,12 +45,6 @@ type Session struct {
 // PluginOptions are options for Postgres connection
 type PluginOptions struct {
 
-	// Host is the default host.
-	Host string `conf:"default=localhost"`
-
-	// Port is the default PORT	.
-	Port uint16 `conf:"range=1024:65535,default=5432"`
-
 	// Database is the default DB name.
 	Database string `conf:"default=postgres"`
 
@@ -67,10 +58,7 @@ type PluginOptions struct {
 	Sessions map[string]*Session `conf:"optional"`
 }
 
-const (
-	DefaultPort    = 5432
-	MaxAuthPassLen = 512
-)
+const MaxAuthPassLen = 512
 
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
@@ -86,12 +74,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	}
 
 	for _, session := range p.options.Sessions {
-		if session.Host == "" {
-			session.Host = p.options.Host
-		}
-		if session.Port == 0 {
-			session.Port = p.options.Port
-		}
 		if session.Database == "" {
 			session.Database = p.options.Database
 		}
@@ -102,17 +84,12 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 // Returns an error if validation of a plugin's configuration is failed.
 func (p *Plugin) Validate(options interface{}) error {
 	var (
-		opts PluginOptions
-		err  error
+		opts     PluginOptions
+		err      error
+		database string
 	)
 
 	err = conf.Unmarshal(options, &opts)
-	if err != nil {
-		return err
-	}
-	// validate each parameter of PostgreSQL connection
-	// check if localhost or addr
-	err = validateHost(opts.Host)
 	if err != nil {
 		return err
 	}
@@ -124,22 +101,27 @@ func (p *Plugin) Validate(options interface{}) error {
 	}
 
 	for name, session := range opts.Sessions {
-
-		if session.Host == "" {
-			session.Host = opts.Host
-		}
-		if session.Database == "" {
-			session.Database = opts.Database
-		}
-		// validate Database name
-		err = validateDatabase(session.Database)
-		if err != nil {
-			return fmt.Errorf("invalid database parameters for session '%s': %s", name, err.Error())
-		}
-		// validate Password length
-		if len(session.Password) > MaxAuthPassLen {
-			return fmt.Errorf("invalid parameters for session '%s': password cannot be longer than %d characters",
-				name, MaxAuthPassLen)
+		if session.URI != "" {
+			err = validateURI(session.URI)
+			if err != nil {
+				return fmt.Errorf("invalid parameters for session '%s': %s", name, err.Error())
+			}
+			// if session database is empty use global database
+			if session.Database == "" {
+				database = opts.Database
+			} else {
+				database = session.Database
+			}
+			// validate Database name
+			err = validateDatabase(database)
+			if err != nil {
+				return fmt.Errorf("invalid database parameters for session '%s': %s", name, err.Error())
+			}
+			// validate Password length
+			if len(session.Password) > MaxAuthPassLen {
+				return fmt.Errorf("invalid parameters for session '%s': password cannot be longer than %d characters",
+					name, MaxAuthPassLen)
+			}
 		}
 
 	}
