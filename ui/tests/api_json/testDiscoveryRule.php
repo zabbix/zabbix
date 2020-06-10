@@ -5169,7 +5169,13 @@ class testDiscoveryRule extends CAPITest {
 			$this->assertEquals(count($db_optags), count($operation['optag']));
 
 			usort($db_optags, function ($a, $b) {
-				return $a['lld_override_optagid'] <=> $b['lld_override_optagid'];
+				return $a['value'].$a['tag'] <=> $b['value'].$b['tag'];
+			});
+
+			usort($operation['optag'], function ($a, $b) {
+				$a_value = array_key_exists('value', $a) ? $a['value'] : '';
+				$b_value = array_key_exists('value', $b) ? $b['value'] : '';
+				return $a_value.$a['tag'] <=> $b_value.$b['tag'];
 			});
 
 			foreach ($db_optags as $num => $db_optag) {
