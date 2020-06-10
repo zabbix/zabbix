@@ -7,9 +7,11 @@ For Zabbix version: 5.0
 
 ## Setup
 
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
+No specific Zabbix configuration is required.
 
 ### Macros used
 
@@ -66,9 +68,11 @@ For Zabbix version: 5.0
 
 ## Setup
 
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
+No specific Zabbix configuration is required.
 
 ### Macros used
 
@@ -123,9 +127,11 @@ For Zabbix version: 5.0
 
 ## Setup
 
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
+No specific Zabbix configuration is required.
 
 ### Macros used
 
@@ -293,9 +299,11 @@ For Zabbix version: 5.0
 
 ## Setup
 
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
+No specific Zabbix configuration is required.
 
 ### Macros used
 

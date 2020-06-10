@@ -1,6 +1,10 @@
 Changes for 5.2.0alpha1
 
 New features:
+...G...... [ZBXNEXT-1867] added file type include and exclude parameters to item 'vfs.file.exist' (Andris, viktors)
+.........T [ZBXNEXT-5921] added IIS template (tuskov)
+.........T [ZBXNEXT-5895] added Template DB MSSQL by ODBC (mchudinov)
+..F.....S. [ZBXNEXT-3209,ZBXNEXT-5932] added support of user related macros {USER.ALIAS}, {USER.FULLNAME}, {USER.NAME} and {USER.SURNAME} for global scripts (agriscenko, Andris)
 .........T [ZBXNEXT-5955] added support of custom fields and custom buttons in message card (tuskov)
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 .........T [ZBXNEXT-5902] added Spiceworks integration guide (tuskov)
@@ -13,6 +17,27 @@ New features:
 .........T [ZBXNEXT-5880] added component version item to server and proxy remote monitoring templates (vjaceslavs)
 
 Bug fixes:
+.........T [ZBX-17741] changed setup description for Template DB MySQL by Zabbix agent 2 (mchudinov)
+..F....... [ZBX-17644] fixed host address field not being editable and macros not showing for username and password fields in item test popup form for SSH and TELNET item types (Ivo)
+A.F....... [ZBX-14539] added validation of the calculated item formula in item.create, item.update, itemprototype.create and itemprototype.update methods (Sasha)
+.........T [ZBX-17776] fixed typo in "Recovery time" field for Discord and MS Teams media (tuskov)
+..F....... [ZBX-17374] fixed radio button state if mass update fails (vmaksimovs)
+.........T [ZBX-17744] changed width of graphs in screens from 750x100 to 500x100 (mchudinov)
+A.F....... [ZBXNEXT-3035] removed identical HTML IDs in low-level discovery form, fixed Type of Calculation field not hiding in override popup, fixed incorrect field order during override create in API causing SQL errors, fixed validation of delay, history and trends fields in override popup (Ivo, miks)
+.........T [ZBX-17790] fixed preprocessing of mysql.created_tmp_files, mysql.created_tmp_disk_tables, mysql.created_tmp_tables, mysql.threads_created items in Template DB MySQL, added triggers (mchudinov)
+........S. [ZBX-17792] fixed zabbix sending invalid delete elastic search scroll request (arimdjonoks)
+.........T [ZBX-17654] fixed "Memory utilization" item in template_os_linux and template_os_linux_active by splitting it into master and depended relation (tuskov)
+...G...... [ZBX-17780] fixed memory leak (viktors)
+.......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
+..F....... [ZBX-17577] fixed remove of selected items in multiselect (rlataria)
+..F....... [ZBX-17561] fixed inherited macro becoming editable after remove (vmaksimovs)
+..F....... [ZBX-17226] fixed confusing error message being displayed if dbversion table cannot be found (agriscenko)
+........S. [ZBX-17737] fixed value mappings not working for text based simple macros (arimdjonoks)
+..F....... [ZBX-17625] fixed javascript message box formatting (vasilijs)
+.........T [ZBX-17599] fixed "ServerVersion" metric for older versions of Apache (afayantsev)
+.......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+.........T [ZBXCTR-7] fixed typo in method usage for Telegram media type (ableev)
+.......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
 .........T [ZBX-17771] fixed Zabbix event url in mattermost (afayantsev)
 A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed discover control in prototype edit forms (Ivo, Sasha, vmurzins)
 ....I..... [ZBX-17711] added double.sql file to source distribution tarball (yurii)
@@ -45,8 +70,35 @@ A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed
 Changes for 5.0.2rc1
 
 New features:
+...G...... [ZBXNEXT-1867] added file type include and exclude parameters to item 'vfs.file.exist' (Andris, viktors)
+.........T [ZBXNEXT-5955] added support of custom fields and custom buttons in message card (tuskov)
+.........T [ZBXNEXT-5921] added IIS template (tuskov)
+.........T [ZBXNEXT-5895] added Template DB MSSQL by ODBC (mchudinov)
+..F.....S. [ZBXNEXT-3209,ZBXNEXT-5932] added support of user related macros {USER.ALIAS}, {USER.FULLNAME}, {USER.NAME} and {USER.SURNAME} for global scripts (agriscenko, Andris)
+.........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+.........T [ZBX-17741] changed setup description for Template DB MySQL by Zabbix agent 2 (mchudinov)
+..F....... [ZBX-17644] fixed host address field not being editable and macros not showing for username and password fields in item test popup form for SSH and TELNET item types (Ivo)
+A.F....... [ZBX-14539] added validation of the calculated item formula in item.create, item.update, itemprototype.create and itemprototype.update methods (Sasha)
+.........T [ZBX-17776] fixed typo in "Recovery time" field for Discord and MS Teams media (tuskov)
+..F....... [ZBX-17374] fixed radio button state if mass update fails (vmaksimovs)
+.........T [ZBX-17744] changed width of graphs in screens from 750x100 to 500x100 (mchudinov)
+A.F....... [ZBXNEXT-3035] removed identical HTML IDs in low-level discovery form, fixed Type of Calculation field not hiding in override popup, fixed incorrect field order during override create in API causing SQL errors, fixed validation of delay, history and trends fields in override popup (Ivo, miks)
+.........T [ZBX-17790] fixed preprocessing of mysql.created_tmp_files, mysql.created_tmp_disk_tables, mysql.created_tmp_tables, mysql.threads_created items in Template DB MySQL, added triggers (mchudinov)
+........S. [ZBX-17792] fixed zabbix sending invalid delete elastic search scroll request (arimdjonoks)
+.........T [ZBX-17654] fixed "Memory utilization" item in template_os_linux and template_os_linux_active by splitting it into master and depended relation (tuskov)
+...G...... [ZBX-17780] fixed memory leak (viktors)
+.......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
+..F....... [ZBX-17577] fixed remove of selected items in multiselect (rlataria)
+..F....... [ZBX-17561] fixed inherited macro becoming editable after remove (vmaksimovs)
+..F....... [ZBX-17226] fixed confusing error message being displayed if dbversion table cannot be found (agriscenko)
+........S. [ZBX-17737] fixed value mappings not working for text based simple macros (arimdjonoks)
+..F....... [ZBX-17625] fixed javascript message box formatting (vasilijs)
+.........T [ZBX-17599] fixed "ServerVersion" metric for older versions of Apache (afayantsev)
+.........T [ZBX-17771] fixed Zabbix event url in mattermost (afayantsev)
+.......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
+.........T [ZBXCTR-7] fixed typo in method usage for Telegram media type (ableev)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.1
@@ -361,6 +413,7 @@ Changes for 4.4.10rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.9
@@ -1538,6 +1591,12 @@ Changes for 4.0.22rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-17480] fixed context of {$TEMP_CRIT} macro in Temperature trigger prototype (tuskov)
+.......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
+...G...... [ZBX-17780] fixed memory leak (viktors)
+..F....... [ZBX-17577] fixed remove of selected items in multiselect (rlataria)
+..F....... [ZBX-17226] fixed confusing error message being displayed if dbversion table cannot be found (agriscenko)
+.......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.21

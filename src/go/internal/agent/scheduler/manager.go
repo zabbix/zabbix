@@ -140,7 +140,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 
 	// immediately fail direct checks and ignore bulk requests when shutting down
 	if m.shutdownSeconds != shutdownInactive {
-		if update.clientID == 0 {
+		if update.clientID <= agent.MaxBuiltinClientID {
 			if len(update.requests) == 1 {
 				update.sink.Write(&plugin.Result{
 					Itemid: update.requests[0].Itemid,
@@ -179,7 +179,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		r.Key = m.aliases.Get(r.Key)
 		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
 			p, ok = m.plugins[key]
-			if ok {
+			if ok && update.clientID != agent.LocalChecksClientID {
 				ok = keyaccess.CheckRules(key, params)
 			}
 			if !ok {

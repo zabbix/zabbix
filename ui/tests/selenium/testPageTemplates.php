@@ -125,9 +125,8 @@ class testPageTemplates extends CLegacyWebTest {
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv1']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv2']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMP']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 
 	public function testPageTemplates_FilterNone() {
