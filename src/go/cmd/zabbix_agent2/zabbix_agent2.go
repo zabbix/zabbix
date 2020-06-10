@@ -307,6 +307,8 @@ func main() {
 
 	var logType, logLevel int
 	switch agent.Options.LogType {
+	case "system":
+		logType = log.System
 	case "console":
 		logType = log.Console
 	case "file":
