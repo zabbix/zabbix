@@ -3,12 +3,12 @@ test case: No rules (all allowed)
 in:
   rules: []
 out:
-  number_of_rules: 0
+  number_of_rules: 1
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_ALLOW
     - metric: 'system.run[echo 1]'
-      result: ZBX_KEY_ACCESS_ALLOW
+      result: ZBX_KEY_ACCESS_DENY
 ---
 test case: No allowed keys
 in:
@@ -31,7 +31,7 @@ in:
     - pattern: 'vfs.file.contents'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents'
       result: ZBX_KEY_ACCESS_DENY
@@ -46,7 +46,7 @@ in:
     - pattern: 'vfs.file.contents[]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[]'
       result: ZBX_KEY_ACCESS_DENY
@@ -63,7 +63,7 @@ in:
     - pattern: 'vfs.file.contents[*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[]'
       result: ZBX_KEY_ACCESS_DENY
@@ -78,7 +78,7 @@ in:
     - pattern: 'vfs.file.contents[**]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[]'
       result: ZBX_KEY_ACCESS_DENY
@@ -95,7 +95,7 @@ in:
     - pattern: 'vfs.file.contents[/etc/passwd,*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd,]'
       result: ZBX_KEY_ACCESS_DENY
@@ -114,7 +114,7 @@ in:
     - pattern: 'vfs.file.contents[*passwd*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_DENY
@@ -129,7 +129,7 @@ in:
     - pattern: 'test[a,*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'test[a]'
       result: ZBX_KEY_ACCESS_DENY
@@ -146,7 +146,7 @@ in:
     - pattern: 'vfs.file.contents[*passwd*,*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd,]'
       result: ZBX_KEY_ACCESS_DENY
@@ -163,7 +163,7 @@ in:
     - pattern: 'test[*,b]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'test[anything,c]'
       result: ZBX_KEY_ACCESS_ALLOW
@@ -180,7 +180,7 @@ in:
     - pattern: 'test[a,,c]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'test[a,,c]'
       result: ZBX_KEY_ACCESS_DENY
@@ -193,7 +193,7 @@ in:
     - pattern: 'vfs.file.contents[/var/log/zabbix_server.log,*,abc]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/var/log/zabbix_server.log,,abc]'
       result: ZBX_KEY_ACCESS_DENY
@@ -208,7 +208,7 @@ in:
     - pattern: 'vfs.file.contents[/etc/passwd,utf8]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd,utf8]'
       result: ZBX_KEY_ACCESS_DENY
@@ -242,7 +242,7 @@ in:
     - pattern: 'vfs.file.*'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents'
       result: ZBX_KEY_ACCESS_DENY
@@ -261,7 +261,7 @@ in:
     - pattern: 'vfs.*.contents'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 2
+  number_of_rules: 3
   metrics:
     - metric: 'vfs.file.size.bytes[]'
       result: ZBX_KEY_ACCESS_DENY
@@ -328,7 +328,7 @@ in:
     - pattern: 't*t*[a]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'test1[a]'
       result: ZBX_KEY_ACCESS_DENY
@@ -475,7 +475,7 @@ in:
     - pattern: '*'
       type: ZBX_KEY_ACCESS_ALLOW
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'vfs.file.contents[/etc/passwd]'
       result: ZBX_KEY_ACCESS_DENY
@@ -492,7 +492,7 @@ in:
     - pattern: 'web.page.get[localhost,*,*]'
       type: ZBX_KEY_ACCESS_DENY
 out:
-  number_of_rules: 1
+  number_of_rules: 2
   metrics:
     - metric: 'web.page.get[localhost]'
       result: ZBX_KEY_ACCESS_DENY

@@ -798,10 +798,7 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
 void	DCupdate_hosts_availability(void);
 
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions, unsigned char opflags);
-void	zbx_action_eval_free(zbx_action_eval_t *action);
-void	zbx_db_condition_clean(DB_CONDITION *condition);
-void	zbx_conditions_eval_clean(zbx_hashset_t *uniq_conditions);
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
 void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids);

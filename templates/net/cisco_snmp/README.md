@@ -7,9 +7,17 @@ For Zabbix version: 5.0
 
 ## Setup
 
+<<<<<<< HEAD
 
 ## Zabbix configuration
 
+=======
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+>>>>>>> e1abf351285e1c3010930b5a3adebad5a4f01d2a
 
 ### Macros used
 
@@ -53,9 +61,17 @@ For Zabbix version: 5.0
 
 ## Setup
 
+<<<<<<< HEAD
 
 ## Zabbix configuration
 
+=======
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+>>>>>>> e1abf351285e1c3010930b5a3adebad5a4f01d2a
 
 ### Macros used
 
@@ -97,9 +113,17 @@ For Zabbix version: 5.0
 
 ## Setup
 
+<<<<<<< HEAD
 
 ## Zabbix configuration
 
+=======
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+>>>>>>> e1abf351285e1c3010930b5a3adebad5a4f01d2a
 
 ### Macros used
 
@@ -141,9 +165,17 @@ For Zabbix version: 5.0
 
 ## Setup
 
+<<<<<<< HEAD
 
 ## Zabbix configuration
 
+=======
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+>>>>>>> e1abf351285e1c3010930b5a3adebad5a4f01d2a
 
 ### Macros used
 
@@ -182,9 +214,17 @@ For Zabbix version: 5.0
 
 ## Setup
 
+<<<<<<< HEAD
 
 ## Zabbix configuration
 
+=======
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+>>>>>>> e1abf351285e1c3010930b5a3adebad5a4f01d2a
 
 
 ## Template links
@@ -226,9 +266,17 @@ For Zabbix version: 5.0
 
 ## Setup
 
+<<<<<<< HEAD
 
 ## Zabbix configuration
 
+=======
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+>>>>>>> e1abf351285e1c3010930b5a3adebad5a4f01d2a
 
 ### Macros used
 
@@ -346,9 +394,17 @@ For Zabbix version: 5.0
 
 ## Setup
 
+<<<<<<< HEAD
 
 ## Zabbix configuration
 
+=======
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+>>>>>>> e1abf351285e1c3010930b5a3adebad5a4f01d2a
 
 
 ## Template links
@@ -387,9 +443,17 @@ For Zabbix version: 5.0
 
 ## Setup
 
+<<<<<<< HEAD
 
 ## Zabbix configuration
 
+=======
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+>>>>>>> e1abf351285e1c3010930b5a3adebad5a4f01d2a
 
 
 ## Template links

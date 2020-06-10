@@ -1,0 +1,1 @@
+...G...... [ZBX-17759] aliased EnableRemoteCommands to Allow/DenyKey=system.run[*], added default DenyKey=system.run[*] rule for backwards compatibility (wiper)
