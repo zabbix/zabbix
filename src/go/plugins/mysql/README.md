@@ -35,6 +35,7 @@ For example:
 - tcp://myhost:3306
 - tcp://172.16.0.10
 - unix:/var/run/mysql.sock
+
 **Note!** Credentials passed via a connString will be ignored. 
 If the username and password for authentication are not provided, default values will be used: URI *tcp://localhost:3306*, username *root*, password  empty. 
 
@@ -60,10 +61,10 @@ Now, these names can be used as connStrings in keys instead of URIs:
     mysql.ping[MySQL2]
 
 ### Parameters priority
-  There are 4 levels of parameter overwriting:
-  1. Hardcoded default values →
-  2. Named sessions (Plugins.Mysql.Sessions.\<sessionName\>.\<parameter\>) →
-  3. Item key parameters.
+Zabbix checks parameters in the following order:
+1. Item key parameters (checked first). If a connString with session name is present, username and password key parameters should be empty. →
+2. Named session parameters in configuration file (Plugins.Mysql.Sessions.\<sessionName\>.\<parameter\>). Checked only if connString is provided in key parameters. →
+3. Hardcoded default values. Used to replace missing URI, username or password parameters either in item key or named session parameters.
   
 ## Supported keys
 
