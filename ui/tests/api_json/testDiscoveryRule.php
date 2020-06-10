@@ -5344,19 +5344,19 @@ class testDiscoveryRule extends CAPITest {
 						[
 							'macro' => '{#MACRO1}',
 							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => '\d{3}$',
+							'value' => 'd{3}$',
 							'formulaid' => 'A'
 						],
 						[
 							'macro' => '{#MACRO2}',
 							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => '\d{2}$',
+							'value' => 'd{2}$',
 							'formulaid' => 'B'
 						],
 						[
 							'macro' => '{#MACRO3}',
 							'operator' => CONDITION_OPERATOR_REGEXP,
-							'value' => '\d{1}$',
+							'value' => 'd{1}$',
 							'formulaid' => 'C'
 						]
 					]
@@ -5371,7 +5371,7 @@ class testDiscoveryRule extends CAPITest {
 					[
 						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-						'value' => '\w\W',
+						'value' => 'wW',
 						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_ENABLED],
 						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER],
 						'ophistory' => ['history' => '92d'],
@@ -5468,19 +5468,19 @@ class testDiscoveryRule extends CAPITest {
 								'conditions' => [
 									[
 										'macro' => '{#MACRO1}',
-										'value' => '\\d{3}$',
+										'value' => 'd{3}$',
 										'operator' => CONDITION_OPERATOR_REGEXP,
 										'formulaid' => 'A'
 									],
 									[
 										'macro' => '{#MACRO2}',
-										'value' => '\\d{2}$',
+										'value' => 'd{2}$',
 										'operator' => CONDITION_OPERATOR_REGEXP,
 										'formulaid' => 'B'
 									],
 									[
 										'macro' => '{#MACRO3}',
-										'value' => '\\d{1}$',
+										'value' => 'd{1}$',
 										'operator' => CONDITION_OPERATOR_REGEXP,
 										'formulaid' => 'C'
 									]
@@ -5499,7 +5499,7 @@ class testDiscoveryRule extends CAPITest {
 								[
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-									'value' => '\\w\\W',
+									'value' => 'wW',
 									'opstatus' => [
 										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 									],
@@ -5623,7 +5623,7 @@ class testDiscoveryRule extends CAPITest {
 								[
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-									'value' => '\\w\\W',
+									'value' => 'wW',
 									'opstatus' => [
 										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 									],
@@ -5753,19 +5753,19 @@ class testDiscoveryRule extends CAPITest {
 					'conditions' => [
 						[
 							'macro' => '{#MACRO1}',
-							'value' => '\\d{3}$',
+							'value' => 'd{3}$',
 							'operator' => CONDITION_OPERATOR_REGEXP,
 							'formulaid' => 'A'
 						],
 						[
 							'macro' => '{#MACRO2}',
-							'value' => '\\d{2}$',
+							'value' => 'd{2}$',
 							'operator' => CONDITION_OPERATOR_REGEXP,
 							'formulaid' => 'B'
 						],
 						[
 							'macro' => '{#MACRO3}',
-							'value' => '\\d{1}$',
+							'value' => 'd{1}$',
 							'operator' => CONDITION_OPERATOR_REGEXP,
 							'formulaid' => 'C'
 						]
@@ -5783,7 +5783,7 @@ class testDiscoveryRule extends CAPITest {
 					[
 						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-						'value' => '\\w\\W',
+						'value' => 'wW',
 						'opstatus' => [
 							'status' => ZBX_PROTOTYPE_STATUS_ENABLED
 						],
