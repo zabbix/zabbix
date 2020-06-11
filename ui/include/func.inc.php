@@ -2068,8 +2068,7 @@ function get_status() {
 			}
 		}
 	}
-	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored']
-			+ $status['hosts_count_template'];
+	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored'];
 
 	// items
 	foreach ($server_status['item stats'] as $stats) {
