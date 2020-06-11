@@ -176,7 +176,7 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	}
 	defer conn.Close()
 
-	if service == "http" || service == "tcp" {
+	if service == "http" || service == "tcp" || service == "ldap" {
 		return 1
 	}
 
@@ -299,7 +299,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				err = errors.New(errorInvalidThirdParam)
 				return
 			}
-		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http":
+		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "ldap":
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return
