@@ -2976,7 +2976,7 @@ class testDiscoveryRule extends CAPITest {
 				'name' => 'Overrides (invalid)',
 				'key_' => 'invalid.lld.with.overrides.'.($num ++),
 				'hostid' => '50009',
-				'type' => '2',
+				'type' => ITEM_TYPE_TRAPPER,
 				'overrides' => $overrides
 			];
 		};
@@ -3951,7 +3951,7 @@ class testDiscoveryRule extends CAPITest {
 									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
 									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
 									'opseverity' => [
-										'severity' => TRIGGER_SEVERITY_COUNT
+										'severity' => 999
 									]
 								]
 							]
@@ -4418,7 +4418,7 @@ class testDiscoveryRule extends CAPITest {
 				'name' => 'Overrides (valid)',
 				'key_' => 'valid.lld.with.overrides.'.($num ++),
 				'hostid' => '50009',
-				'type' => '2',
+				'type' => ITEM_TYPE_TRAPPER,
 				'overrides' => $overrides
 			];
 		};
@@ -5219,6 +5219,7 @@ class testDiscoveryRule extends CAPITest {
 			usort($operation['optag'], function ($a, $b) {
 				$a_value = array_key_exists('value', $a) ? $a['value'] : '';
 				$b_value = array_key_exists('value', $b) ? $b['value'] : '';
+
 				return $a_value.$a['tag'] <=> $b_value.$b['tag'];
 			});
 
@@ -5293,7 +5294,7 @@ class testDiscoveryRule extends CAPITest {
 		}
 	}
 
-	public function testDiscoveryRuleOverrides_TemplateConstaint() {
+	public function testDiscoveryRuleOverrides_TemplateConstraint() {
 		$templateid = 131001;
 		$itemid = 133766;
 		$request_lld_overrides = [
@@ -5354,8 +5355,10 @@ class testDiscoveryRule extends CAPITest {
 
 		// Operation that had only optamplate is deleted.
 		unset($request_lld_overrides[0]['operations']);
+
 		// Operation that had not only optamplate is not deleted.
 		unset($request_lld_overrides[1]['operations'][0]['optemplate']);
+
 		foreach ($request_lld_overrides as $override_num => $request_lld_override) {
 			$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
 		}
@@ -5492,8 +5495,8 @@ class testDiscoveryRule extends CAPITest {
 			'Test getting lld_overrides extended output.' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => [$itemid],
-					'selectOverrides' => ['name', 'step', 'stop', 'operations']
+					'selectOverrides' => ['name', 'step', 'stop', 'operations'],
+					'itemids' => [$itemid]
 				],
 				'get_result' => [
 					'itemid' => $itemid,
@@ -5643,8 +5646,8 @@ class testDiscoveryRule extends CAPITest {
 			'Test getting lld_overrides queried output.' => [
 				'discoveryrule' => [
 					'output' => ['itemid'],
-					'itemids' => [$itemid],
-					'selectOverrides' => ['step', 'operations']
+					'selectOverrides' => ['step', 'operations'],
+					'itemids' => [$itemid]
 				],
 				'get_result' => [
 					'itemid' => $itemid,
