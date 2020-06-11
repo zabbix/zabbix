@@ -3543,6 +3543,46 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 			],
+			'Test /1/overrides/1/operations/1/opperiod/delay has to be correct update interval.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '2w'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+			],
+			'Test /1/overrides/1/operations/1/opperiod/delay has to be correct flexible interval.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '0;0/1,00:00-23:00'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Item will not be refreshed. Please enter a correct update interval.'
+			],
 			'Test /1/overrides/1/operations/1/opperiod is not supported for trigger prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
