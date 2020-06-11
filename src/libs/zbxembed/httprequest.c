@@ -45,7 +45,7 @@ zbx_es_httprequest_t;
 #define ZBX_CURL_SETOPT(ctx, handle, opt, value, err)							\
 	if (CURLE_OK != (err = curl_easy_setopt(handle, opt, value)))					\
 	{												\
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,				\
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,					\
 				"cannot set cURL option " #opt ": %s.", curl_easy_strerror(err));	\
 		goto out;										\
 	}
@@ -140,7 +140,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 
 	if (NULL == (request->handle = curl_easy_init()))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot initialize cURL library");
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot initialize cURL library");
 		goto out;
 	}
 
@@ -159,10 +159,16 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	duk_push_c_function(ctx, es_httprequest_dtor, 1);
 	duk_set_finalizer(ctx, -2);
 out:
-	zbx_free(request);
-
 	if (-1 != err_index)
-		duk_throw(ctx);
+	{
+		if (NULL != request)
+		{
+			if (NULL != request->handle)
+				curl_easy_cleanup(request->handle);
+			zbx_free(request);
+		}
+		return duk_throw(ctx);
+	}
 
 	return 0;
 }
@@ -182,7 +188,7 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 	int			err_index = -1;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &utf8))
 	{
@@ -197,7 +203,7 @@ out:
 	zbx_free(utf8);
 
 	if (-1 != err_index)
-		duk_throw(ctx);
+		return duk_throw(ctx);
 
 	return 0;
 }
@@ -214,7 +220,7 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	curl_slist_free_all(request->headers);
 	request->headers = NULL;
@@ -258,7 +264,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (NULL == (request = es_httprequest(ctx)))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 		goto out;
 	}
 
@@ -291,8 +297,8 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (CURLE_OK != (err = curl_easy_perform(request->handle)))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
-				"cannot get URL: %s.", curl_easy_strerror(err));
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot get URL: %s.",
+				curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -302,7 +308,7 @@ out:
 	zbx_free(contents);
 
 	if (-1 != err_index)
-		duk_throw(ctx);
+		return duk_throw(ctx);
 
 	return 1;
 }
@@ -369,12 +375,12 @@ static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
 	int			err_index = -1;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_to_string(ctx, 0), err);
 out:
 	if (-1 != err_index)
-		duk_throw(ctx);
+		return duk_throw(ctx);
 
 	return 1;
 }
@@ -393,10 +399,10 @@ static duk_ret_t	es_httprequest_status(duk_context *ctx)
 	CURLcode		err;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
 	if (CURLE_OK != (err = curl_easy_getinfo(request->handle, CURLINFO_RESPONSE_CODE, &response_code)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain request status: %s", curl_easy_strerror(err));
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot obtain request status: %s", curl_easy_strerror(err));
 
 	duk_push_number(ctx, (duk_double_t)response_code);
 
@@ -420,9 +426,9 @@ static const duk_function_list_entry	httprequest_methods[] = {
 static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 {
 	if (!duk_is_constructor_call(ctx))
-		return DUK_RET_TYPE_ERROR;
+		return DUK_RET_EVAL_ERROR;
 
-	return duk_error(ctx, DUK_RET_TYPE_ERROR, "missing cURL library");
+	return duk_error(ctx, DUK_RET_EVAL_ERROR, "missing cURL library");
 }
 
 static const duk_function_list_entry	httprequest_methods[] = {
