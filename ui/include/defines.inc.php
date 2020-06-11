@@ -1930,6 +1930,14 @@ define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
 
+/**
+ * The sandbox attribute enables an extra set of restrictions for the content in the iframe. Default is set to empty
+ * string, which means all restrictions are applied. To disable, set to FALSE. To set a specific set of restrictions,
+ * write a custom string.
+ * https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html#attr-iframe-sandbox
+ */
+define('ZBX_IFRAME_SANDBOX', '');
+
 // HTTP headers
 /*
  * Value of HTTP X-Frame-options header.
