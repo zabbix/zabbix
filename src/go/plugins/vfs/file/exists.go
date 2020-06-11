@@ -90,6 +90,7 @@ func typesToMask(types []string) (fileType, error) {
 func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 	var typesIncl fileType
 	var typesExcl fileType
+	var f os.FileInfo
 
 	if len(params) > 3 {
 		return nil, errors.New("Too many parameters.")
@@ -120,17 +121,31 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 
 	typesIncl.ClearType(typesExcl)
 
-	if f, err := os.Lstat(params[0]); err == nil {
-		if (f.Mode().IsRegular() && typesIncl.HasType(zbxFtFile)) ||
-			(f.Mode().IsDir() && typesIncl.HasType(zbxFtDir)) ||
-			(f.Mode()&os.ModeSymlink != 0 && typesIncl.HasType(zbxFtSym)) ||
-			(f.Mode()&os.ModeSocket != 0 && typesIncl.HasType(zbxFtSock)) ||
-			(f.Mode()&os.ModeDevice != 0 &&
-				((f.Mode()&os.ModeCharDevice == 0 && typesIncl.HasType(zbxFtBdev)) ||
-					(f.Mode()&os.ModeCharDevice != 0 && typesIncl.HasType(zbxFtCdev)))) ||
-			(f.Mode()&os.ModeNamedPipe != 0 && typesIncl.HasType(zbxFtFifo)) {
-			return 1, nil
+	if f, err = os.Lstat(params[0]); err != nil {
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
+
+		switch err := err.(type) {
+		case *os.PathError:
+			return nil, errors.New(err.Op + ": " + err.Err.Error())
+		case *os.LinkError:
+			return nil, errors.New(err.Op + ": " + err.Err.Error())
+		case *os.SyscallError:
+			return nil, errors.New(err.Syscall + ": " + err.Err.Error())
 		}
 	}
+
+	if (f.Mode().IsRegular() && typesIncl.HasType(zbxFtFile)) ||
+		(f.Mode().IsDir() && typesIncl.HasType(zbxFtDir)) ||
+		(f.Mode()&os.ModeSymlink != 0 && typesIncl.HasType(zbxFtSym)) ||
+		(f.Mode()&os.ModeSocket != 0 && typesIncl.HasType(zbxFtSock)) ||
+		(f.Mode()&os.ModeDevice != 0 &&
+			((f.Mode()&os.ModeCharDevice == 0 && typesIncl.HasType(zbxFtBdev)) ||
+				(f.Mode()&os.ModeCharDevice != 0 && typesIncl.HasType(zbxFtCdev)))) ||
+		(f.Mode()&os.ModeNamedPipe != 0 && typesIncl.HasType(zbxFtFifo)) {
+		return 1, nil
+	}
+
 	return 0, nil
 }
