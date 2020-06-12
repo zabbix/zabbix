@@ -3989,6 +3989,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				zbx_strlcpy(service->dns, row[5], INTERFACE_DNS_LEN_MAX);
 				zbx_vector_ptr_append(&services_old, service);
 				zbx_vector_uint64_append(dcheckids, service->dcheckid);
+				dchecks++;
 			}
 		}
 		DBfree_result(result);
