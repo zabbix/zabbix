@@ -170,32 +170,17 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		$old_hash = CDBHelper::getHash('SELECT * FROM config');
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
-		// Enable SAML authentication and then fill and submit SAML settings form.
-		$form = $this->query('name:form_auth')->asForm()->one();
-		$form->selectTab('SAML settings');
-
-		// Check that SAML authentication fields are disabled if "Enable SAML authentication" checkbox is not set.
-		if (CTestArrayHelper::get($data, 'check_disabled', false)) {
-			foreach($data['fields'] as $name => $value){
-				$this->assertFalse($form->getField($name)->isEnabled());
-			}
-		}
-
-		$form->getField('Enable SAML authentication')->check();
-		$form->fill($data['fields']);
-		$form->submit();
-		$this->page->waitUntilReady();
+		// Check that SAML settings are disabled by default and configure SAML authentication.
+		$this->configureSamlAuthentication($data['fields'], true);
 
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
-		$message = CMessageElement::find()->one();
-
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-			$form->invalidate();
+			$form = $this->query('name:form_auth')->asForm()->one();
 			$form->selectTab('SAML settings');
 			$this->assertTrue($form->getField('Enable SAML authentication')->isChecked());
 			// Trim trailing and leading spaces in expected values before comparison.
@@ -224,12 +209,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		];
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
-		// Enable SAML authentication.
-		$form = $this->query('name:form_auth')->asForm()->one();
-		$form->selectTab('SAML settings');
-		$form->getField('Enable SAML authentication')->check();
-		$form->fill($settings);
-		$form->submit();
+		$this->configureSamlAuthentication($settings);
 		// Logout and check that SAML authentication was enabled.
 		$this->page->logout();
 		$this->page->open('index.php')->waitUntilReady();
@@ -237,7 +217,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		$this->assertContains('index_sso.php', $link->getAttribute('href'));
 		// Login and disable SAML authentication.
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form->invalidate();
+		$form = $this->query('name:form_auth')->asForm()->one();
 		$form->selectTab('SAML settings');
 		$form->getField('Enable SAML authentication')->uncheck();
 		$form->submit();
@@ -245,5 +225,169 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		$this->page->logout();
 		$this->page->open('index.php')->waitUntilReady();
 		$this->assertTrue($this->query('link:Sign in with Single Sign-On (SAML)')->count() === 0, 'Link must not exist.');
+	}
+
+	public function getAuthenticationDetails() {
+		return [
+			// Login as zabbix super admin - case insensitive login
+			[
+				[
+					'username' => 'admin'
+				]
+			],
+			// Login as zabbix super admin - case sensitive login
+			[
+				[
+					'username' => 'Admin',
+					'custom_settings' => [
+						'Case sensitive login' => true
+					],
+				]
+			],
+			// Login as zabbix user
+			[
+				[
+					'username' => 'user-zabbix'
+				]
+			],
+			// Login as zabbix admin with custom url after login
+			[
+				[
+					'username' => 'admin-zabbix',
+					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
+					'regular_login' => true,
+					'header' => '100 busiest triggers'
+				]
+			],
+			// Login as zabbix admin with pre-defined login url (has higher priority then the configured url after login).
+			[
+				[
+					'username' => 'admin-zabbix',
+					'url' => 'services.php',
+					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
+					'regular_login' => true,
+					'header' => 'Services'
+				]
+			],
+			// Regular login
+			[
+				[
+					'username' => 'Admin',
+					'regular_login' => true
+				]
+			],
+			// Incorrect IDP
+			[
+				[
+					'expected' => TEST_BAD,
+					'username' => 'admin',
+					'custom_settings' => [
+						'IdP entity ID' => 'metadata'
+					],
+					'error_title' => 'You are not logged in',
+					'error_details' => 'Invalid issuer in the Assertion/Response'
+				]
+			],
+			// UID exists only on IDP side.
+			[
+				[
+					'expected' => TEST_BAD,
+					'username' => 'Admin2',
+					'error_title' => 'You are not logged in',
+					'error_details' => 'Login name or password is incorrect.'
+				]
+			],
+			// Login as Admin - case sensitive login - negative test.
+			[
+				[
+					'expected' => TEST_BAD,
+					'username' => 'admin',
+					'custom_settings' => [
+						'Case sensitive login' => true
+					],
+					'error_title' => 'You are not logged in',
+					'error_details' => 'Login name or password is incorrect.'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @ignore-browser-errors
+	 * @backup config
+	 * @dataProvider getAuthenticationDetails
+	 */
+	public function testFormAdministrationAuthenticationSaml_Authenticate($data) {
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$settings = [
+			'IdP entity ID' => 'http://192.168.3.37:8081/simplesaml/saml2/idp/metadata.php',
+			'SSO service URL' => 'http://192.168.3.37:8081/simplesaml/saml2/idp/SSOService.php',
+			'SLO service URL' => 'http://192.168.3.37:8081/simplesaml/saml2/idp/SingleLogoutService.php',
+			'Username attribute' => 'uid',
+			'SP entity ID' => 'dev-1560-5.0',
+			'Case sensitive login' => false
+		];
+		// Override particcular SAMl settings with values from data provider.
+		if (array_key_exists('custom_settings', $data)) {
+			foreach ($data['custom_settings'] as $key => $value) {
+				$settings[$key] = $value;
+			}
+		}
+
+		$this->configureSamlAuthentication($settings);
+
+		// Logout and check that SAML authentication was enabled.
+		$this->page->logout();
+		// Login to a particcular url, if such is defined in data provider.
+		if (array_key_exists('url', $data)) {
+			$this->page->open($data['url'])->waitUntilReady();
+			$this->query('button:Login')->one()->click();
+			$this->page->waitUntilReady();
+		}
+		else {
+			$this->page->open('index.php')->waitUntilReady();
+		}
+		// Login via regular Sing-in form or via SAML.
+		if (CTestArrayHelper::get($data, 'regular_login', false)) {
+			$this->query('id:name')->waitUntilVisible()->one()->fill($data['username']);
+			$this->query('id:password')->one()->fill('zabbix');
+			$this->query('button:Sign in')->one()->click();
+		}
+		else {
+			$link = $this->query('link:Sign in with Single Sign-On (SAML)')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+			$this->query('id:username')->one()->waitUntilVisible()->fill($data['username']);
+			$this->query('id:password')->one()->waitUntilVisible()->fill('zabbix');
+			$this->query('button:Login')-> one()->click();
+		}
+		$this->page->waitUntilReady();
+		// Check error message in case of negative test.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
+			return;
+		}
+		// Check the header of the page that was displayed to the user after login.
+		$header = CTestArrayHelper::get($data, 'header', 'Global view');
+		$this->assertEquals($header, $this->query('tag:h1')->one()->getText());
+
+		// MAke sure that it is possible to log out.
+		$this->query('link:Sign out')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertContains('index.php', $this->page->getCurrentUrl());
+	}
+
+	private function configureSamlAuthentication($fields, $check_enabled = false) {
+		$form = $this->query('name:form_auth')->asForm()->one();
+		$form->selectTab('SAML settings');
+		// Check that SAML settings are disabled by default.
+		if ($check_enabled === true) {
+			foreach($fields as $name => $value){
+				$this->assertFalse($form->getField($name)->isEnabled());
+			}
+		}
+		$form->getField('Enable SAML authentication')->check();
+		$form->fill($fields);
+		$form->submit();
+		$this->page->waitUntilReady();
 	}
 }

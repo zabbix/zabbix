@@ -36,7 +36,8 @@ class CMessageElement extends CElement {
 	 * @return boolean
 	 */
 	public function isGood() {
-		return ($this->getAttribute('class') === 'msg-good');
+		$classes = ['msg-good', 'msg-good msg-global'];
+		return (in_array($this->getAttribute('class'), $classes));
 	}
 
 	/**
@@ -45,7 +46,8 @@ class CMessageElement extends CElement {
 	 * @return boolean
 	 */
 	public function isBad() {
-		return ($this->getAttribute('class') === 'msg-bad');
+		$classes = ['msg-bad', 'msg-bad msg-global'];
+		return (in_array($this->getAttribute('class'), $classes));
 	}
 
 	/**
@@ -54,7 +56,12 @@ class CMessageElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		return $this->query('xpath:./span')->one()->getText();
+		if ($this->getAttribute('class') === 'msg-bad msg-global'){
+			return strtok($this->getText(), "\n");
+		}
+		else {
+			return $this->query('xpath:./span')->one()->getText();
+		}
 	}
 
 	/**
