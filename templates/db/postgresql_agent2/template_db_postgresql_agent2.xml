@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-12T14:11:59Z</date>
+   <date>2020-06-12T14:34:29Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -829,7 +829,7 @@ https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-V
                      <type>CHANGE_PER_SECOND</type>
                      <params/>
                      <error_handler>CUSTOM_VALUE</error_handler>
-                     <error_handler_params>-1</error_handler_params>
+                     <error_handler_params>ZBX_NOTSUPPORTED: Checksum failures metric is supported only in PostgreSQL 12 or higher.</error_handler_params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1571,8 +1571,14 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                            <params>$['{#DBNAME}'].checksum_failures</params>
                         </step>
                         <step>
+                           <type>MATCHES_REGEX</type>
+                           <params>^\d*$</params>
+                        </step>
+                        <step>
                            <type>CHANGE_PER_SECOND</type>
                            <params/>
+                           <error_handler>CUSTOM_VALUE</error_handler>
+                           <error_handler_params>ZBX_NOTSUPPORTED: Checksum failures metric is supported only in PostgreSQL 12 or higher.</error_handler_params>
                         </step>
                      </preprocessing>
                      <master_item>
