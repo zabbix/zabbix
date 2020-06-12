@@ -32,6 +32,7 @@
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 #include "zbxcrypto.h"
+#include "../events.h"
 
 extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, program_type;
