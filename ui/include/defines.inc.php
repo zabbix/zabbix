@@ -32,7 +32,7 @@ define('ZBX_LOGIN_BLOCK',		30); // sec
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
 
-define('ZBX_SESSION_NAME', 'zbx_sessionid'); // Session cookie name for Zabbix front-end.
+define('ZBX_SESSION_NAME', 'zbx_session'); // Session cookie name for Zabbix front-end.
 
 define('ZBX_KIBIBYTE',	'1024');
 define('ZBX_MEBIBYTE',	'1048576');

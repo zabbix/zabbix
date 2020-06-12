@@ -61,12 +61,6 @@ abstract class CController {
 	private $validateSID = true;
 
 	public function __construct() {
-		// CSession::start();<q></q>
-		// new CMysqlSession();
-		// CSessionHelper::set('test', 'dsada');
-		// CSessionHelper::set('test2', 'cdsd');
-		// CSessionHelper::set('getttttttts', 'dasd');
-
 		$this->init();
 	}
 
@@ -153,15 +147,7 @@ abstract class CController {
 	 * @return bool
 	 */
 	public function validateInput($validationRules) {
-		if (CSessionHelper::has('formData')) {
-			$input = array_merge($_REQUEST, CSessionHelper::get('formData'));
-			CSessionHelper::unset(['formData']);
-		}
-		else {
-			$input = $_REQUEST;
-		}
-
-		$validator = new CNewValidator($input, $validationRules);
+		$validator = new CNewValidator($_REQUEST, $validationRules);
 
 		foreach ($validator->getAllErrors() as $error) {
 			info($error);

@@ -82,8 +82,6 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 
 	$redirect = array_filter([CWebUser::isGuest() ? '' : $request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
 	redirect(reset($redirect));
-
-	exit;
 }
 
 if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
@@ -103,4 +101,5 @@ echo (new CView('general.login', [
 	'autologin' => $autologin == 1,
 	'error' => (hasRequest('enter') && $messages) ? array_pop($messages) : null
 ]))->getOutput();
-exit('23');
+
+session_write_close();

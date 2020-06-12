@@ -38,17 +38,15 @@ class CWebUser {
 	/**
 	 * Tries to login a user and populates self::$data on success.
 	 *
-	 * @param string $login			user login
-	 * @param string $password		user password
+	 * @param string $login     user login
+	 * @param string $password  user password
 	 *
 	 * @throws Exception if user cannot be logged in
 	 *
 	 * @return bool
 	 */
-	public static function login($login, $password) {
+	public static function login(string $login, string $password): bool {
 		try {
-			self::setDefault();
-
 			self::$data = API::User()->login([
 				'user' => $login,
 				'password' => $password,
@@ -59,7 +57,7 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
+			if (self::$data['userid'] == GROUP_GUI_ACCESS_DISABLED) {
 				error(_('GUI access disabled.'));
 				throw new Exception();
 			}
@@ -73,13 +71,6 @@ class CWebUser {
 				CProfile::update('web.login.attempt.clock', self::$data['attempt_clock'], PROFILE_TYPE_INT);
 				$result &= CProfile::flush();
 			}
-
-			// remove guest session after successful login
-			// $result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie(ZBX_SESSION_NAME)));
-
-			// if ($result) {
-			// 	self::setSessionCookie(self::$data['sessionid']);
-			// }
 
 			return $result;
 		}
@@ -98,7 +89,6 @@ class CWebUser {
 		if (API::User()->logout([])) {
 			self::$data = null;
 			session_destroy();
-			// zbx_unsetcookie(ZBX_SESSION_NAME);
 		}
 	}
 
@@ -110,18 +100,8 @@ class CWebUser {
 			]);
 
 			if (empty(self::$data)) {
-				self::setDefault();
-
-				self::$data = API::User()->login([
-					'user' => ZBX_GUEST_USER,
-					'password' => '',
-					'userData' => true
-				]);
-
-				if (empty(self::$data)) {
-					clear_messages(1);
-					throw new Exception();
-				}
+				clear_messages(1);
+				throw new Exception();
 			}
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
@@ -131,31 +111,9 @@ class CWebUser {
 			return true;
 		}
 		catch (Exception $e) {
-			self::setDefault();
 			return false;
 		}
 	}
-
-	/**
-	 * Shorthand method for setting current session ID in cookies.
-	 *
-	 * @param string $sessionId		Session ID string
-	 */
-	// public static function setSessionCookie($sessionId) {
-	// 	$autoLogin = self::isGuest() ? false : (bool) self::$data['autologin'];
-
-	// 	// zbx_setcookie(ZBX_SESSION_NAME, $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
-	// }
-
-	/**
-	 * Retrieves current session ID from cookie named as defined in ZBX_SESSION_NAME.
-	 *
-	 * @return string
-	 */
-	// public static function getSessionCookie() {
-	// 	return CSessionHelper::getId();
-	// 	// return get_cookie(ZBX_SESSION_NAME);
-	// }
 
 	public static function setDefault() {
 		self::$data = [

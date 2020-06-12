@@ -107,8 +107,8 @@ function zbx_setcookie($name, $value, $time = null) {
 	$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 	$path = rtrim(substr($path, 0, strrpos($path, '/')), '/');
 
-	setcookie($name, $value, isset($time) ? $time : 0, $path, null, HTTPS, true);
-	$_COOKIE[$name] = $value;
+	// setcookie($name, $value, isset($time) ? $time : 0, $path, null, HTTPS, true);
+	// $_COOKIE[$name] = $value;
 }
 
 function zbx_unsetcookie($name) {

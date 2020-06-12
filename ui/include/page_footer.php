@@ -70,4 +70,5 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	echo '</div></body></html>';
 }
 
+session_write_close();
 exit;

@@ -161,8 +161,6 @@ class ZBase {
 	public function run($mode) {
 		$this->init();
 
-		new CMysqlSession();
-
 		$this->setMaintenanceMode();
 
 		ini_set('display_errors', 'Off');
@@ -170,6 +168,8 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
+				new CCookieSession();
+
 				$this->loadConfigFile();
 				$this->initDB();
 				$this->authenticateUser();
@@ -194,7 +194,6 @@ class ZBase {
 				CProfiler::getInstance()->start();
 
 				$this->processRequest($router);
-
 				break;
 
 			case self::EXEC_MODE_API:
@@ -518,11 +517,11 @@ class ZBase {
 			if (isset($ZBX_MESSAGES)) {
 				CSessionHelper::set('messages', $ZBX_MESSAGES);
 			}
-			if ($response->getFormData() !== null) {
-				CSessionHelper::set('formData', $response->getFormData());
-			}
 
 			redirect($response->getLocation());
+		}
+		elseif ($response instanceof CControllerFormDataResponseRedirect) {
+			$response->redirect();
 		}
 		// Controller returned fatal error?
 		elseif ($response instanceof CControllerResponseFatal) {
@@ -584,6 +583,7 @@ class ZBase {
 			echo (new CView($router->getLayout(), $layout_data))->getOutput();
 		}
 
+		session_write_close();
 		exit;
 	}
 

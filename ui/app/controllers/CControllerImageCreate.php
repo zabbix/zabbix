@@ -28,15 +28,16 @@ class CControllerImageCreate extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+		$ret = false;
 
 		if (!$ret) {
-			switch ($this->getValidationError()) {
+			switch (self::VALIDATION_ERROR) {
 				case self::VALIDATION_ERROR:
 					$url = (new CUrl('zabbix.php'))
 						->setArgument('action', 'image.edit')
 						->setArgument('imagetype', $this->getInput('imagetype'));
 
-					$response = new CControllerResponseRedirect($url);
+					$response = new CControllerFormDataResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot add image'));
 					$this->setResponse($response);
@@ -136,4 +137,3 @@ class CControllerImageCreate extends CController {
 		$this->setResponse($response);
 	}
 }
-

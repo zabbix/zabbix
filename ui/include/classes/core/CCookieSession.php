@@ -20,22 +20,32 @@
 
 
 /**
- * Session wrapper uses MySQL for session store.
+ * Session wrapper uses cookie for session store.
  */
-class CMysqlSession implements SessionHandlerInterface {
+final class CCookieSession implements \SessionHandlerInterface {
+
+	private const COOKIE_NAME = ZBX_SESSION_NAME;
+
+	private const COOKIE_MAX_SIZE = 4096;
 
 	/**
 	 * Class consturctor. Set session handlers and start session.
 	 */
 	public function __construct() {
 		if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
-			ini_set("session.use_cookies", 0);
+			// Set use_cookie to 0 because we manually set session id
+			ini_set('session.use_cookies', 0);
+			// Set serialize method because we need have abillity to encode / decode session data.
+			ini_set('session.serialize_handler', 'php_serialize');
 
 			session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'],
 				[$this, 'write'], [$this, 'destroy'], [$this, 'gc']
 			);
 
-			session_start();
+			$this->session_start();
+
+			CSessionHelper::set('sessionid', CSessionHelper::getId());
+			CSessionHelper::set('last_access', time());
 		}
 	}
 
@@ -45,6 +55,8 @@ class CMysqlSession implements SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function close() {
+		echo ob_get_clean();
+
 		return true;
 	}
 
@@ -56,9 +68,8 @@ class CMysqlSession implements SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function destroy($session_id) {
-		// if (!headers_sent()) {
-			CCookieHelper::unset('ZBX_'.$session_id);
-		// }
+		CCookieHelper::unset(self::COOKIE_NAME);
+
 		return true;
 	}
 
@@ -82,6 +93,8 @@ class CMysqlSession implements SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function open($save_path, $session_name) {
+		ob_start();
+
 		return session_status() === PHP_SESSION_ACTIVE;
 	}
 
@@ -93,9 +106,9 @@ class CMysqlSession implements SessionHandlerInterface {
 	 * @return string
 	 */
 	public function read($session_id) {
-		$data = CCookieHelper::get('ZBX_'.$session_id);
+		$data = CCookieHelper::get(self::COOKIE_NAME);
 
-		return $data ? $data : '';
+		return $data ? $this->decode($data) : '';
 	}
 
 	/**
@@ -107,10 +120,39 @@ class CMysqlSession implements SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function write($session_id, $session_data) {
-		// if (!headers_sent()) {
-			CCookieHelper::set('ZBX_'.$session_id, $session_data);
-		// }
+		$session_data = $this->encode($session_data);
+
+		if (strlen($session_data) > self::COOKIE_MAX_SIZE) {
+			throw new \Exception("Session too big.");
+		}
+
+		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, 0)) {
+			throw new \Exception('Session cookie not set.');
+		}
 
 		return true;
+	}
+
+	private function session_start(): bool {
+		if (!CCookieHelper::has(self::COOKIE_NAME)) {
+			return session_start();
+		}
+
+		$cookie = $this->decode(CCookieHelper::get(self::COOKIE_NAME));
+		$data = unserialize($cookie);
+
+		if (array_key_exists('sessionid', $data)) {
+			session_id($data['sessionid']);
+		}
+
+		return session_start();
+	}
+
+	private function encode(string $data): string {
+		return base64_encode($data);
+	}
+
+	private function decode(string $data): string {
+		return base64_decode($data);
 	}
 }

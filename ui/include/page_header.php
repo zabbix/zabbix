@@ -19,9 +19,6 @@
 **/
 
 
-// CSession::start();
-// new CMysqlSession();
-
 if (!isset($page['type'])) {
 	$page['type'] = PAGE_TYPE_HTML;
 }

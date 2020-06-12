@@ -1329,7 +1329,6 @@ class CUser extends CApiService {
 
 		// If session not log in.
 		if (!$db_sessions) {
-			return []; // FIXME:
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
@@ -1344,7 +1343,6 @@ class CUser extends CApiService {
 
 		// If user not exists.
 		if (!$db_users) {
-			return []; // FIXME:
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
