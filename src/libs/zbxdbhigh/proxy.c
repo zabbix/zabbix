@@ -31,6 +31,7 @@
 #include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "zbxlld.h"
+#include "events.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -4233,6 +4234,9 @@ json_parse_error:
 				}
 			}
 		}
+
+		zbx_process_events(NULL, NULL);
+		zbx_clean_events();
 		DBcommit();
 	}
 json_parse_return:
