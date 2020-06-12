@@ -166,28 +166,27 @@ func (p *Plugin) validateImap(buf []byte) int {
 	}
 	return tcpExpectFail
 }
-func (p *Plugin) ldapExpect(scheme string, address string) (result int) {
-	url := fmt.Sprintf("%s://%s", scheme, address)
-	conn, err := ldap.DialURL(url)
+func (p *Plugin) ldapExpect(address string) (result int) {
+	conn, err := ldap.Dial("tcp", address)
 	if err != nil {
-		log.Debugf("LDAP TCP expect network error: cannot connect to [%s]: %s", url, err.Error())
+		log.Debugf("LDAP TCP expect network error: cannot connect to [%s]: %s", address, err.Error())
 		return
 	}
 	defer conn.Close()
 	res, err := conn.Search(&ldap.SearchRequest{Scope: ldap.ScopeBaseObject, Filter: "(objectClass=*)",
 		Attributes: []string{"namingContexts"}})
 	if err != nil {
-		log.Debugf("LDAP TCP expect search error: searching failed for [%s]: %s", url, err.Error())
+		log.Debugf("LDAP TCP expect search error: searching failed for [%s]: %s", address, err.Error())
 		return
 	}
 
 	if len(res.Entries) < 1 {
-		log.Debugf("LDAP TCP expect response error: empty search result for [%s]", url)
+		log.Debugf("LDAP TCP expect response error: empty search result for [%s]", address)
 		return
 	}
 
 	if len(res.Entries[0].Attributes) < 1 {
-		log.Debugf("LDAP TCP expect response error: no attributes in first entry for [%s]", url)
+		log.Debugf("LDAP TCP expect response error: no attributes in first entry for [%s]", address)
 		return
 	}
 
@@ -280,7 +279,7 @@ func (p *Plugin) exportNetService(params []string) int {
 		}
 	}
 	if service == "ldap" {
-		return p.ldapExpect(service, net.JoinHostPort(ip, port))
+		return p.ldapExpect(net.JoinHostPort(ip, port))
 	}
 
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
