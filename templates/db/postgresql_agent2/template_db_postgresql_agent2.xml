@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-29T09:39:31Z</date>
+   <date>2020-06-12T14:11:59Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template DB PostgreSQL Agent 2</template>
          <name>Template DB PostgreSQL Agent 2</name>
-         <description>Template tooling version used: 0.35</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -2358,7 +2358,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
             </macro>
             <macro>
                <macro>{$PG.URI}</macro>
-               <value>postgresql://localhost:5432</value>
+               <value>tcp://localhost:5432</value>
             </macro>
             <macro>
                <macro>{$PG.USER}</macro>
