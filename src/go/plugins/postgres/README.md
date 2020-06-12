@@ -155,8 +155,7 @@ dbName — Database name. Optional.
     AND (n_live_tup+n_dead_tup) > 50;
     ```
 
-    SQL query. Result of this query differs depending on the database to which agent is now
-connected.
+    SQL query. Result of this query differs depending on the database to which agent is now connected.
 
 **pgsql.replication_lag.sec[uri,username,password]** — replication lag in seconds.
 *Params:*
@@ -205,17 +204,19 @@ dbName — Database name. Optional.
 dbName — Database name. Optional.
 
 *Returns:*
-    - 0 — streaming is down
-    - 1 — streaming is up
-    - 2 — mastermode
+
+- 0 — streaming is down
+- 1 — streaming is up
+- 2 — mastermode
 
 **pgsql.replication.recovery_role[uri,username,password]** — recovery status.
 (Params:)
 dbName — Database name. Optional.
 
 *Returns:*
-    - 1 — recovery is still in progress (standby mode)
-    - 0 — master mode.
+
+- 1 — recovery is still in progress (standby mode)
+- 0 — master mode.
 
 **pgsql.cache.hit[uri,username,password,dbName]** — cache hit rate.
 *Params:*
@@ -256,15 +257,16 @@ dbName — Database name. Optional.
     SQL query JSON format.
 
 Then JSON is proceeded by dependent items of pgsql.connections:
-    - **pgsql.connections.active** - the backend is executing a query.
-    - **pgsql.connections.fastpath_function_call** -the backend is executing a fast-path function.
-    - **pgsql.connections.idle** - The backend is waiting for a new client command.
-    - **pgsql.connections.idle_in_transaction** - the backend is in a transaction, but is not currently executing a query.
-    - **pgsql.connections.prepared** - number of prepared connections
-    - **pgsql.connections.total** - total numer of connection
-    - **pgsql.connections.total_pct** - percantange of total connections in respect to ‘max_connections’ setting of PostgreSQL server.
-    - **pgsql.connections.waiting** - number of waiting connections.
-    - **pgsql.connections.idle_in_transaction_aborted** - This state is similar to idle in transaction, except one of the statements in the transaction caused an error.
+
+- pgsql.connections.active - the backend is executing a query.
+- pgsql.connections.fastpath_function_call** -the backend is executing a fast-path function.
+- pgsql.connections.idle - The backend is waiting for a new client command.
+- pgsql.connections.idle_in_transaction - the backend is in a transaction, but is not currently executing a query.
+- pgsql.connections.prepared - number of prepared connections
+- pgsql.connections.total - total numer of connection
+- pgsql.connections.total_pct - percantange of total connections in respect to ‘max_connections’ setting of PostgreSQL server.
+- pgsql.connections.waiting - number of waiting connections.
+- pgsql.connections.idle_in_transaction_aborted - This state is similar to idle in transaction, except one of the statements in the transaction caused an error.
 
 **pgsql.archive[uri,username,password,dbName]** — returns info about archive files.
 *Params:*
@@ -284,11 +286,12 @@ dbName — Database name. Optional.
 
     SQL query JSON format.
 
-Then JSON is proceeded by dependent items of :
-    - pgsql.archive.count_archived_files - number of WAL files that have been successfully archived.
-    - pgsql.archive.failed_trying_to_archive - number of failed attempts for archiving WAL files.
-    - pgsql.archive.count_files_to_archive - number of files to archive.
-    - pgsql.archive.size_files_to_archive - size of files to archive.
+Then JSON is proceeded by dependent items of:
+
+- pgsql.archive.count_archived_files - number of WAL files that have been successfully archived.
+- pgsql.archive.failed_trying_to_archive - number of failed attempts for archiving WAL files.
+- pgsql.archive.count_files_to_archive - number of files to archive.
+- pgsql.archive.size_files_to_archive - size of files to archive.
 
 **pgsql.bgwriter[uri,username,password,dbName]** — statistics about the background writer process's activity.
 *Params:*
@@ -316,17 +319,18 @@ dbName — Database name. Optional.
 
     SQL query JSON format.
 
-Then JSON is proceeded by dependent items of :
-    - *pgsql.bgwriter.buffers_alloc* - number of buffers allocated.
-    - pgsql.bgwriter.buffers_backend - number of buffers written directly by a backend.
-    - pgsql.bgwriter.maxwritten_clean - number of times the background writer stopped a cleaning scan because it had written too many buffers.
-    - pgsql.bgwriter.buffers_backend_fsync - number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write).
-    - pgsql.bgwriter.buffers_clean - number of buffers written by the background writer.
-    - pgsql.bgwriter.buffers_checkpoint - number of buffers written during checkpoints.
-    - pgsql.bgwriter.checkpoints_timed - number of scheduled checkpoints that have been performed.
-    - pgsql.bgwriter.checkpoints_req - number of requested checkpoints that have been performed.
-    - pgsql.bgwriter.checkpoint_write_time - total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds.
-    - pgsql.bgwriter.sync_time - total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk.
+Then JSON is proceeded by dependent items of:
+
+- *pgsql.bgwriter.buffers_alloc* - number of buffers allocated.
+- pgsql.bgwriter.buffers_backend - number of buffers written directly by a backend.
+- pgsql.bgwriter.maxwritten_clean - number of times the background writer stopped a cleaning scan because it had written too many buffers.
+- pgsql.bgwriter.buffers_backend_fsync - number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write).
+- pgsql.bgwriter.buffers_clean - number of buffers written by the background writer.
+- pgsql.bgwriter.buffers_checkpoint - number of buffers written during checkpoints.
+- pgsql.bgwriter.checkpoints_timed - number of scheduled checkpoints that have been performed.
+- pgsql.bgwriter.checkpoints_req - number of requested checkpoints that have been performed.
+- pgsql.bgwriter.checkpoint_write_time - total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds.
+- pgsql.bgwriter.sync_time - total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk.
 
 **pgsql.autovacum.count[uri,username,password,dbName]** — number of autovacuum workers.
 *Params:*
@@ -370,24 +374,25 @@ dbName — Database name. Optional.
 
     SQL query JSON format.
 
-Then JSON is proceeded by dependent items of :
-    - pgsql.dbstat.numbackends - Number of backends currently connected to this database.
-    - pgsql.dbstat.sum.blk_read_time - Time spent reading data file blocks by backends in this database, in milliseconds.
-    - pgsql.dbstat.sum.blk_write_time - Time spent writing data file blocks by backends in this database, in milliseconds.
-    - pgsql.dbstat.sum.checksum_failures - Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled.(PostgreSQL version 12 only).
-    - pgsql.dbstat.sum.xact_commit - Number of transactions in this database that have been committed.
-    - pgsql.dbstat.sum.conflicts - Number of queries canceled due to conflicts with recovery in this database. (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)
-    - pgsql.dbstat.sum.deadlocks - Number of deadlocks detected in this database.
-    - pgsql.dbstat.sum.blks_read - Number of disk blocks read in this database.
-    - pgsql.dbstat.sum.blks_hit - Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL Pro buffer cache, not the operating system's file system cache).
-    - pgsql.dbstat.sum.temp_bytes - Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
-    - pgsql.dbstat.sum.temp_files - Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
-    - pgsql.dbstat.sum.xact_rollback - Number of transactions in this database that have been rolled back.
-    - pgsql.dbstat.sum.tup_deleted - Number of rows deleted by queries in this database.
-    - pgsql.dbstat.sum.tup_fetched - Number of rows fetched by queries in this database.
-    - pgsql.dbstat.sum.tup_inserted - Number of rows inserted by queries in this database.
-    - pgsql.dbstat.sum.tup_returned - Number of rows returned by queries in this database.
-     pgsql.dbstat.sum.tup_updated - Number of rows updated by queries in this database.
+Then JSON is proceeded by dependent items of:
+
+- pgsql.dbstat.numbackends - Number of backends currently connected to this database.
+- pgsql.dbstat.sum.blk_read_time - Time spent reading data file blocks by backends in this database, in milliseconds.
+- pgsql.dbstat.sum.blk_write_time - Time spent writing data file blocks by backends in this database, in milliseconds.
+- pgsql.dbstat.sum.checksum_failures - Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled.(PostgreSQL version 12 only).
+- pgsql.dbstat.sum.xact_commit - Number of transactions in this database that have been committed.
+- pgsql.dbstat.sum.conflicts - Number of queries canceled due to conflicts with recovery in this database. (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)
+- pgsql.dbstat.sum.deadlocks - Number of deadlocks detected in this database.
+- pgsql.dbstat.sum.blks_read - Number of disk blocks read in this database.
+- pgsql.dbstat.sum.blks_hit - Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL Pro buffer cache, not the operating system's file system cache).
+- pgsql.dbstat.sum.temp_bytes - Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
+- pgsql.dbstat.sum.temp_files - Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
+- pgsql.dbstat.sum.xact_rollback - Number of transactions in this database that have been rolled back.
+- pgsql.dbstat.sum.tup_deleted - Number of rows deleted by queries in this database.
+- pgsql.dbstat.sum.tup_fetched - Number of rows fetched by queries in this database.
+- pgsql.dbstat.sum.tup_inserted - Number of rows inserted by queries in this database.
+- pgsql.dbstat.sum.tup_returned - Number of rows returned by queries in this database.
+    pgsql.dbstat.sum.tup_updated - Number of rows updated by queries in this database.
 
 **pgsql.dbstat[uri,username,password,dbName]** - statistics per database . Used in databases discovery.
 *Params:*
@@ -425,23 +430,24 @@ dbName — Database name. Optional.
     SQL query JSON format.
 
 Then JSON is proceeded by dependent items of :
-    - pgsql.dbstat.numbackends["{#DBNAME}"] - Number of backends currently connected to this database.
-    - pgsql.dbstat.sum.blk_read_time["{#DBNAME}"] - Time spent reading data file blocks by backends in this database, in milliseconds.  
-    - pgsql.dbstat.sum.blk_write_time["{#DBNAME}"] - Time spent writing data file blocks by backends in this database, in milliseconds.  
-    - pgsql.dbstat.sum.checksum_failures["{#DBNAME}"] - Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled.(PostgreSQL version 12 only)  
-    - pgsql.dbstat.blks_read.rate["{#DBNAME}"] - Number of disk blocks read in this database.  
-    - pgsql.dbstat.deadlocks.rate["{#DBNAME}"] - Number of deadlocks detected in this database.  
-    - pgsql.dbstat.blks_hit.rate["{#DBNAME}"] - Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL Pro buffer cache, not the operating system's file system cache).
-    - pgsql.dbstat.xact_rollback.rate["{#DBNAME}"] - Number of transactions in this database that have been rolled back.  
-    - pgsql.dbstat.xact_commit.rate["{#DBNAME}"] - Number of transactions in this database that have been committed.  
-    - pgsql.dbstat.tup_updated.rate["{#DBNAME}"] - Number of rows updated by queries in this database.  
-    - pgsql.dbstat.tup_returned.rate["{#DBNAME}"] - Number of rows returned by queries in this database.  
-    - pgsql.dbstat.tup_inserted.rate["{#DBNAME}"] - Number of rows inserted by queries in this database.  
-    - pgsql.dbstat.tup_fetched.rate["{#DBNAME}"] - Number of rows fetched by queries in this database.  
-    - pgsql.dbstat.tup_deleted.rate["{#DBNAME}"] - Number of rows deleted by queries in this database.  
-    - pgsql.dbstat.conflicts.rate["{#DBNAME}"] - Number of queries canceled due to conflicts with recovery in this database. (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)
-    - pgsql.dbstat.temp_files.rate["{#DBNAME}"] - Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
-    - pgsql.dbstat.temp_bytes.rate["{#DBNAME}"] - Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
+
+- pgsql.dbstat.numbackends["{#DBNAME}"] - Number of backends currently connected to this database.
+- pgsql.dbstat.sum.blk_read_time["{#DBNAME}"] - Time spent reading data file blocks by backends in this database, in milliseconds.  
+- pgsql.dbstat.sum.blk_write_time["{#DBNAME}"] - Time spent writing data file blocks by backends in this database, in milliseconds.  
+- pgsql.dbstat.sum.checksum_failures["{#DBNAME}"] - Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled.(PostgreSQL version 12 only)  
+- pgsql.dbstat.blks_read.rate["{#DBNAME}"] - Number of disk blocks read in this database.  
+- pgsql.dbstat.deadlocks.rate["{#DBNAME}"] - Number of deadlocks detected in this database.  
+- pgsql.dbstat.blks_hit.rate["{#DBNAME}"] - Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL Pro buffer cache, not the operating system's file system cache).
+- pgsql.dbstat.xact_rollback.rate["{#DBNAME}"] - Number of transactions in this database that have been rolled back.  
+- pgsql.dbstat.xact_commit.rate["{#DBNAME}"] - Number of transactions in this database that have been committed.  
+- pgsql.dbstat.tup_updated.rate["{#DBNAME}"] - Number of rows updated by queries in this database.  
+- pgsql.dbstat.tup_returned.rate["{#DBNAME}"] - Number of rows returned by queries in this database.  
+- pgsql.dbstat.tup_inserted.rate["{#DBNAME}"] - Number of rows inserted by queries in this database.  
+- pgsql.dbstat.tup_fetched.rate["{#DBNAME}"] - Number of rows fetched by queries in this database.  
+- pgsql.dbstat.tup_deleted.rate["{#DBNAME}"] - Number of rows deleted by queries in this database.  
+- pgsql.dbstat.conflicts.rate["{#DBNAME}"] - Number of queries canceled due to conflicts with recovery in this database. (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)
+- pgsql.dbstat.temp_files.rate["{#DBNAME}"] - Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
+- pgsql.dbstat.temp_bytes.rate["{#DBNAME}"] - Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
 
 **pgsql.wal.stat[uri,username,password,dbName]** — returns WAL statistics.
 *Params:*
@@ -524,14 +530,15 @@ dbName — Database name. Optional.
     SQL query JSON format.
 
 Then JSON is proceeded by dependent items of:
-    - pgsql.locks.shareupdateexclusive["{#DBNAME}"]  - number of share update exclusive locks.
-    - pgsql.locks.accessexclusive["{#DBNAME}"]  - number of access exclusive locks.
-    - pgsql.locks.accessshare["{#DBNAME}"] - number of access share locks.
-    - pgsql.locks.exclusive["{#DBNAME}"]  - number of exclusive locks.
-    - pgsql.locks.rowexclusive["{#DBNAME}"]  - number of row exclusive locks.
-    - pgsql.locks.rowshare["{#DBNAME}"]  - number of row share locks.
-    - pgsql.locks.share["{#DBNAME}"]  - number of share locks.
-    - pgsql.locks.sharerowexclusive["{#DBNAME}"]  - number of share row exclusive locks.
+
+- pgsql.locks.shareupdateexclusive["{#DBNAME}"]  - number of share update exclusive locks.
+- pgsql.locks.accessexclusive["{#DBNAME}"]  - number of access exclusive locks.
+- pgsql.locks.accessshare["{#DBNAME}"] - number of access share locks.
+- pgsql.locks.exclusive["{#DBNAME}"]  - number of exclusive locks.
+- pgsql.locks.rowexclusive["{#DBNAME}"]  - number of row exclusive locks.
+- pgsql.locks.rowshare["{#DBNAME}"]  - number of row share locks.
+- pgsql.locks.share["{#DBNAME}"]  - number of share locks.
+- pgsql.locks.sharerowexclusive["{#DBNAME}"]  - number of share row exclusive locks.
 
 **pgsql.pgsql.oldest.xid[uri,username,password,dbName]** — PostgreSQL age of the oldest XID.
 *Params:*
