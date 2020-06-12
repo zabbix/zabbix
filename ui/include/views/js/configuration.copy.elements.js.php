@@ -68,7 +68,6 @@
 					helper_options.popup.parameters.srctbl = 'templates';
 					helper_options.popup.parameters.srcfld1 = 'hostid';
 					helper_options.popup.parameters.srcfld2 = 'host';
-					helper_options.popup.parameters.enrich_parent_groups = 1;
 					break;
 			}
 
