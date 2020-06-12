@@ -2508,3 +2508,257 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,10,'test@jabber.com',0,16,'1-7,00:00-24:00');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (5,1,12,'test_account',0,63,'6-7,09:00-18:00');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (6,3,1,'zabbix@zabbix.com',0,60,'1-5,09:00-18:00');
+
+-- Dashboards and widgets for Copy widget tests
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (130, 'Dashboard for Copying widgets', 1, 1);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (131, 'Dashboard for Paste widgets', 1, 1);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (175, 131, 'navtree', 'Test copy Map navigation tree', 0, 0, 6, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90479, 175, 1, 'reference', 0, 'FYKXG');
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (174, 131, 'clock', 'Test widget for replace', 6, 0, 13, 8);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (150, 130, 'actionlog', 'Test copy Action log', 0, 0, 7, 6);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90250, 150, 0, 'rf_rate', 10);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90251, 150, 0, 'show_lines', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90252, 150, 0, 'sort_triggers', 7);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (151, 130, 'clock', 'Test copy Clock', 7, 0, 2, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90253, 151, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90254, 151, 0, 'time_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90412, 151, 4, 'itemid', 0, 29172);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (152, 130, 'dataover', 'Test copy Data overview', 9, 0, 4, 2);
+-- change rf_rate to 0 after ZBX-17804 is fixed:
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90255, 152, 0, 'rf_rate', 10);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90256, 152, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90257, 152, 0, 'style', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90258, 152, 1, 'application', 0, '3 application');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90259, 152, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90260, 152, 3, 'hostids', 0, 50012);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (153, 130, 'graph', 'Test copy classic Graph', 13, 0, 11, 6);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90261, 153, 0, 'dynamic', 10);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90262, 153, 0, 'rf_rate', 30);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90263, 153, 0, 'show_legend', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90264, 153, 0, 'source_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90265, 153, 4, 'itemid', 0, 99088);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (154, 130, 'favgraphs', 'Test copy Favourite graphs', 7, 2, 2, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90413, 154, 0, 'rf_rate', 30);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (155, 130, 'favmaps', 'Test copy Favourite maps', 9, 2, 4, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90266, 155, 0, 'rf_rate', 600);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (156, 130, 'discovery', 'Test copy Discovery status', 9, 4, 4, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90267, 156, 0, 'rf_rate', 900);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (157, 130, 'favscreens', 'Test copy Favourite screens', 7, 4, 2, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90268, 157, 0, 'rf_rate', 30);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (158, 130, 'graphprototype', 'Test copy Graph prototype', 0, 6, 13, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90269, 158, 0, 'columns', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90270, 158, 0, 'rows', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90271, 158, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90272, 158, 0, 'rf_rate', 30);
+-- change show_legend to 0 after ZBX-17813 is fixed:
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90273, 158, 0, 'show_legend', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90273, 158, 0, 'show_legend', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90274, 158, 7, 'graphid', 0, 892);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (159, 130, 'hostavail', 'Test copy Host availability', 13, 6, 5, 4);
+-- add following lines after ZBX-17813 is fixed:
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90275, 159, 0, 'interface_type', 1);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90276, 159, 0, 'interface_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90278, 159, 0, 'interface_type', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90279, 159, 0, 'layout', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90280, 159, 0, 'maintenance', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90281, 159, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90282, 159, 2, 'groupids', 0, 50013);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (160, 130, 'map', 'Test copy Map', 18, 6, 6, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90283, 160, 1, 'reference', 0, 'OYKZW');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_sysmapid) VALUES (90284, 160, 8, 'sysmapid', 0, 3);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (161, 130, 'navtree', 'Test copy Map navigation tree', 0, 10, 6, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90414, 161, 0, 'navtree.order.2', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90285, 161, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90286, 161, 0, 'show_unavailable', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90287, 161, 1, 'navtree.name.1', 0, 'Map with icon mapping');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90288, 161, 1, 'navtree.name.2', 0, 'Public map with image');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90289, 161, 1, 'reference', 0, 'STZDI');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90290, 161, 8, 'navtree.sysmapid.1', 0, 6);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90291, 161, 8, 'navtree.sysmapid.2', 0, 10);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (162, 130, 'map', 'Test copy Map from tree', 6, 10, 7, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90292, 162, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90293, 162, 0, 'source_type', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90294, 162, 1, 'filter_widget_reference', 0, 'STZDI');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90295, 162, 1, 'reference', 0, 'PVEYR');
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (163, 130, 'plaintext', 'Test copy plain text', 13, 10, 5, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90296, 163, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90297, 163, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90298, 163, 0, 'show_as_html', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90299, 163, 0, 'show_lines', 12);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90300, 163, 0, 'style', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90301, 163, 4, 'itemids', 0, 29171);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (164, 130, 'problemhosts', 'Test copy Problem hosts', 18, 10, 6, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90302, 164, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90303, 164, 0, 'ext_ack', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90304, 164, 0, 'hide_empty_groups', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90305, 164, 0, 'rf_rate', 30);
+-- delete this line and add three following after ZBX-17812 is fixed:
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90308, 164, 0, 'severities', 4);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90308, 164, 0, 'severities', 1);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90417, 164, 0, 'severities', 3);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90418, 164, 0, 'severities', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90309, 164, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90310, 164, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90311, 164, 1, 'problem', 0, 'Test');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90312, 164, 1, 'tags.tag.0', 0, 'Tag1');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90313, 164, 1, 'tags.value.0', 0, 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90314, 164, 2, 'exclude_groupids', 0, 50014);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90315, 164, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90316, 164, 4, 'itemids', 0, 29171);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (165, 130, 'problems', 'Test copy Problems', 0, 12, 8, 6);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90317, 165, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90318, 165, 0, 'rf_rate', 900);
+-- delete this line and add three following after ZBX-17812 is fixed:
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90321, 165, 0, 'severities', 5);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90321, 165, 0, 'severities', 0);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90415, 165, 0, 'severities', 4);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90416, 165, 0, 'severities', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90322, 165, 0, 'show', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90323, 165, 0, 'show_lines', 12);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90324, 165, 0, 'show_opdata', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90325, 165, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90326, 165, 0, 'show_tags', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90328, 165, 0, 'sort_triggers', 15);
+-- change show_timeline to 0 after ZBX-17813 is fixed:
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90327, 165, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90329, 165, 0, 'tag_name_format', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90330, 165, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90426, 165, 0, 'tags.operator.1', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90331, 165, 0, 'unacknowledged', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90332, 165, 1, 'problem', 0, 'test2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90333, 165, 1, 'tags.value.0', 0, '2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90428, 165, 1, 'tags.value.1', 0, '33');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90334, 165, 1, 'tag_priority', 0, '1,2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90335, 165, 1, 'tags.tag.0', 0, 'tag2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90427, 165, 1, 'tags.tag.1', 0, 'tagg33');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90336, 165, 2, 'exclude_groupids', 0, 50014);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90337, 165, 2, 'groupids', 0, 50005);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90338, 165, 3, 'hostids', 0, 99026);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (166, 130, 'problems', 'Test copy Problems 2', 8, 12, 16, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90340, 166, 0, 'rf_rate', 60);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90344, 166, 0, 'show', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90345, 166, 0, 'show_lines', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90346, 166, 0, 'show_opdata', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90347, 166, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90348, 166, 0, 'show_tags', 3);
+-- change show_timeline to 0 after ZBX-17813 is fixed:
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90349, 166, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90350, 166, 0, 'sort_triggers', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90351, 166, 0, 'tag_name_format', 2);
+-- change tags.operators to 0 after ZBX-17813 is fixed:
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90352, 166, 0, 'tags.operator.0', 0);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90429, 166, 0, 'tags.operator.1', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90352, 166, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90429, 166, 0, 'tags.operator.1', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90353, 166, 0, 'unacknowledged', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90354, 166, 1, 'problem', 0, 'test4');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90355, 166, 1, 'tags.value.0', 0, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90431, 166, 1, 'tags.value.1', 0, 44);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90356, 166, 1, 'tag_priority', 0, 'test5, test6');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90357, 166, 1, 'tags.tag.0', 0, 'tag3');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90430, 166, 1, 'tags.tag.1', 0, 'tag44');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90358, 166, 2, 'exclude_groupids', 0, 50014);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90359, 166, 2, 'groupids', 0, 50006);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90360, 166, 3, 'hostids', 0, 99015);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (167, 130, 'problemsbysv', 'Test copy Problems by severity', 8, 14, 16, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90361, 167, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90362, 167, 0, 'ext_ack', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90363, 167, 0, 'layout', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90364, 167, 0, 'rf_rate', 30);
+-- delete this line and add following after ZBX-17812 is fixed:
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90366, 167, 0, 'severities', 5);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90424, 167, 0, 'severities', 2);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90425, 167, 0, 'severities', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90367, 167, 0, 'show_opdata', 2);
+-- change show_timeline to 0 after ZBX-17813 is fixed:
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90368, 167, 0, 'show_timeline', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90369, 167, 0, 'show_type', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90370, 167, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90371, 167, 1, 'problem', 0, 'test problem');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90372, 167, 1, 'tags.tag.0', 0, 'tag5');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90373, 167, 1, 'tags.value.0', 0, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90374, 167, 2, 'exclude_groupids', 0, 50008);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90375, 167, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90376, 167, 3, 'hostids', 0, 99012);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (168, 130, 'systeminfo', 'Test copy System information', 0, 18, 7, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90377, 168, 0, 'rf_rate', 30);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (169, 130, 'trigover', 'Test copy Trigger overview', 7, 18, 17, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90378, 169, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90379, 169, 0, 'show', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90380, 169, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90381, 169, 0, 'style', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90382, 169, 1, 'application', 0, 'Inventory');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90383, 169, 2, 'groupids', 0, 50011);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90384, 169, 3, 'hostids', 0, 99012);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (170, 130, 'url', 'Test copy URL', 0, 21, 7, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90385, 170, 0, 'dynamic', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90386, 170, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90387, 170, 1, 'url', 0, 'https://www.zabbix.com/integrations');
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (171, 130, 'web', 'Test copy Web monitoring', 7, 21, 3, 3);
+-- change maintenance to 0 after ZBX-17813 is fixed:
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90388, 171, 0, 'maintenance', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90389, 171, 0, 'rf_rate', 120);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90390, 171, 2, 'exclude_groupids', 0, 50008);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90391, 171, 2, 'groupids', 0, 50016);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90392, 171, 3, 'hostids', 0, 99133);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (172, 130, 'problems', 'Test copy Problems 3', 10, 21, 14, 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90393, 172, 0, 'evaltype', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90394, 172, 0, 'rf_rate', 60);
+-- add following lines after ZBX-17812 is fixed:
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90419, 172, 0, 'severities', 0);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90420, 172, 0, 'severities', 1);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90421, 172, 0, 'severities', 2);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90422, 172, 0, 'severities', 3);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90423, 172, 0, 'severities', 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90395, 172, 0, 'severities', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90396, 172, 0, 'show', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90397, 172, 0, 'show_lines', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90398, 172, 0, 'show_opdata', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90399, 172, 0, 'show_suppressed', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90400, 172, 0, 'show_tags', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90401, 172, 0, 'sort_triggers', 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90402, 172, 0, 'tags.operator.0', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90403, 172, 0, 'tag_name_format', 2);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90404, 172, 0, 'unacknowledged', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90405, 172, 1, 'problem', 0, 'test5');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90406, 172, 1, 'tag_priority', 0, 'test7, test8');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90407, 172, 1, 'tags.tag.0', 0, 'tag9');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90408, 172, 1, 'tags.value.0', 0, '9');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90409, 172, 2, 'exclude_groupids', 0, 50014);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90410, 172, 2, 'groupids', 0, 50006);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90411, 172, 3, 'hostids', 0, 99015);
+
+-- add following lines after ZBX-17809 is fixed:
+-- INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (173, 130, 'graphprototype', 'Test copy Graph prototype 2', 10, 23, 14, 5);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90440, 173, 0, 'columns', 20);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90441, 173, 0, 'rows', 5);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90442, 173, 0, 'dynamic', 0);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90443, 173, 0, 'rf_rate', 600);
+-- -- change show_legend to 0 after ZBX-17813 is fixed:
+-- -- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 173, 0, 'show_legend', 0);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 173, 0, 'show_legend', 1);
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90445, 173, 7, 'graphid', 0, 892);
