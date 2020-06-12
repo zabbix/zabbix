@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-04T08:05:41Z</date>
+   <date>2020-06-11T17:03:35Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Windows CPU by Zabbix agent active</template>
          <name>Template Module Windows CPU by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -222,7 +222,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows filesystems by Zabbix agent active</template>
          <name>Template Module Windows filesystems by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -430,7 +430,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows generic by Zabbix agent active</template>
          <name>Template Module Windows generic by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -603,7 +603,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows memory by Zabbix agent active</template>
          <name>Template Module Windows memory by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -720,11 +720,26 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                </applications>
             </item>
             <item>
-               <name>Free swap space</name>
+               <name>Used swap space in %</name>
                <type>ZABBIX_ACTIVE</type>
-               <key>system.swap.size[,free]</key>
+               <key>perf_counter_en["\Paging file(_Total)\% Usage"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The used space of swap volume/file in percent.</description>
+               <applications>
+                  <application>
+                     <name>Memory</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Free swap space</name>
+               <type>CALCULATED</type>
+               <key>system.swap.free</key>
                <history>7d</history>
                <units>B</units>
+               <params>last("system.swap.size[,total]") - last("system.swap.size[,total]") / 100 * last("perf_counter_en[\"\Paging file(_Total)\% Usage\"]")</params>
                <description>The free space of swap volume/file in bytes.</description>
                <applications>
                   <application>
@@ -734,8 +749,9 @@ A typical Event ID 2019 is recorded in the system event log.</description>
             </item>
             <item>
                <name>Free swap space in %</name>
-               <type>ZABBIX_ACTIVE</type>
-               <key>system.swap.size[,pfree]</key>
+               <type>DEPENDENT</type>
+               <key>system.swap.pfree</key>
+               <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -745,6 +761,15 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                      <name>Memory</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return (100 - value)</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>perf_counter_en["\Paging file(_Total)\% Usage"]</key>
+               </master_item>
             </item>
             <item>
                <name>Total swap space</name>
@@ -835,7 +860,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
       <template>
          <template>Template Module Windows network by Zabbix agent active</template>
          <name>Template Module Windows network by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1406,7 +1431,7 @@ return JSON.stringify({"data": output})</params>
       <template>
          <template>Template Module Windows physical disks by Zabbix agent active</template>
          <name>Template Module Windows physical disks by Zabbix agent active</name>
-         <description>Template tooling version used: 0.36</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1654,7 +1679,7 @@ return JSON.stringify({"data": output})</params>
          <name>Template Module Windows services by Zabbix agent active</name>
          <description>Template Services OS Windows&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1756,7 +1781,7 @@ Template tooling version used: 0.36</description>
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.37</description>
          <templates>
             <template>
                <name>Template Module Windows CPU by Zabbix agent active</name>
@@ -1801,7 +1826,7 @@ Template tooling version used: 0.36</description>
                         <name>CPU usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1823,7 +1848,7 @@ Template tooling version used: 0.36</description>
                         <key>perf_counter_en["\System\Processor Queue Length"]</key>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1845,7 +1870,7 @@ Template tooling version used: 0.36</description>
                         <name>Memory utilization</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1867,7 +1892,7 @@ Template tooling version used: 0.36</description>
                         <name>Swap usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1889,7 +1914,7 @@ Template tooling version used: 0.36</description>
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1911,7 +1936,7 @@ Template tooling version used: 0.36</description>
                         <name>{#DEVNAME}: Disk read/write rates</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>3</y>
@@ -1933,7 +1958,7 @@ Template tooling version used: 0.36</description>
                         <name>{#DEVNAME}: Disk utilization and queue</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>4</y>
@@ -1955,7 +1980,7 @@ Template tooling version used: 0.36</description>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>5</y>
@@ -1977,7 +2002,7 @@ Template tooling version used: 0.36</description>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template Module Windows memory by Zabbix agent active:system.swap.size[,pfree].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
+         <expression>{Template Module Windows memory by Zabbix agent active:system.swap.pfree.min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
@@ -2071,7 +2096,7 @@ Template tooling version used: 0.36</description>
                <color>1A7C11</color>
                <item>
                   <host>Template Module Windows memory by Zabbix agent active</host>
-                  <key>system.swap.size[,free]</key>
+                  <key>system.swap.free</key>
                </item>
             </graph_item>
             <graph_item>
