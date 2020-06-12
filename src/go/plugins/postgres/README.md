@@ -102,14 +102,14 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT json_build_object('data',json_agg(json_build_object('{#DBNAME}',d.datname)))
-    FROM pg_database
-    WHERE NOT datistemplate
-    AND datallowconn;
-    ```
+```sql
+SELECT json_build_object('data',json_agg(json_build_object('{#DBNAME}',d.datname)))
+FROM pg_database
+WHERE NOT datistemplate
+AND datallowconn;
+```
 
-    SQL query in LLD JSON format
+> SQL query in LLD JSON format.
 
 **pgsql.db.size[uri,username,password,dbName]** — database size in bytes. Used in databases discovery.
 *Params:*
@@ -117,14 +117,14 @@ dbName — Database name. Mandatory.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT pg_database_size(datname::text)
-    FROM pg_catalog.pg_database
-    WHERE datistemplate = false
-    AND datname = <dbName>;
-    ```
+```sql
+SELECT pg_database_size(datname::text)
+FROM pg_catalog.pg_database
+WHERE datistemplate = false
+AND datname = <dbName>;
+```
 
-    SQL query for specific database in bytes.
+> SQL query for specific database in bytes.
 
 **pgsql.db.age[uri,username,password,dbName]** — age of the oldest xid for each database. Used in databases discovery.
 *Params:*
@@ -132,14 +132,14 @@ dbName — Database name. Mandatory.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT age(datfrozenxid)
-    FROM pg_catalog.pg_database
-    WHERE datistemplate = false
-    AND datname = <dbName>
-    ```
+```sql
+SELECT age(datfrozenxid)
+FROM pg_catalog.pg_database
+WHERE datistemplate = false
+AND datname = <dbName>
+```
 
-    SQL query for specific database in transactions.
+> SQL query for specific database in transactions.
 
 **pgsql.db.bloating_tables[uri,username,password,dbName]** — number of bloating tables
 per database. Used in databases discovery.
@@ -148,14 +148,16 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT count(*)
-    FROM pg_catalog.pg_stat_all_tables
-    WHERE (n_dead_tup/(n_live_tup+n_dead_tup)::float8) > 0.2
-    AND (n_live_tup+n_dead_tup) > 50;
-    ```
+```sql
+SELECT count(*)
+FROM pg_catalog.pg_stat_all_tables
+WHERE (n_dead_tup/(n_live_tup+n_dead_tup)::float8) > 0.2
+AND (n_live_tup+n_dead_tup) > 50;
+```
 
-    SQL query. Result of this query differs depending on the database to which agent is now connected.
+> SQL query.
+
+Result of this query differs depending on the database to which agent is now connected.
 
 **pgsql.replication_lag.sec[uri,username,password]** — replication lag in seconds.
 *Params:*
@@ -163,16 +165,16 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT
-    CASE
-    WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
-    ELSE
-    COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
-    END as lag
-    ```
+```sql
+SELECT
+CASE
+WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
+ELSE
+COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
+END as lag
+```
 
-    SQL query in seconds.
+> SQL query in seconds.
 
 **pgsql.replication_lag.b[uri,username,password]** — replication lag in bytes.
 *Params:*
@@ -180,12 +182,12 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
-    FROM pg_stat_wal_receiver;
-    ```
+```sql
+SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
+FROM pg_stat_wal_receiver;
+```
 
-    SQL query in bytes
+> SQL query in bytes
 
 **pgsql.replication.count[uri,username,password]** — number of standby servers.
 *Params:*
@@ -193,11 +195,11 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT count(*) FROM pg_stat_replication
-    ```
+```sql
+SELECT count(*) FROM pg_stat_replication
+```
 
-    SQL query.
+> SQL query.
 
 **pgsql.replication.status[uri,username,password]** — status of replication.
 *Params:*
@@ -224,12 +226,12 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2)
-    FROM pg_catalog.pg_stat_database;
-    ```
-    
-    SQL query in percentage.
+```sql
+SELECT round(sum(blks_hit)*100/sum(blks_hit+blks_read), 2)
+FROM pg_catalog.pg_stat_database;
+```
+
+> SQL query in percentage.
 
 **pgsql.connections[uri,username,password,dbName]** — connections by types.
 *Params:*
@@ -237,24 +239,24 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT row_to_json(T)
-    FROM (
-    SELECT
-    sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active,
-    sum(CASE WHEN state = 'idle' THEN 1 ELSE 0 END) AS idle,
-    sum(CASE WHEN state = 'idle in transaction' THEN 1 ELSE 0 END) AS idle_in_transaction,
-    sum(CASE WHEN state = 'idle in transaction (aborted)' THEN 1 ELSE 0 END) AS idle_in_transaction_aborted,
-    sum(CASE WHEN state = 'fastpath function call' THEN 1 ELSE 0 END) AS fastpath_function_call,
-    count(*) AS total,
-    count(*)*100/(SELECT current_setting('max_connections')::int) AS total_pct,
-    sum(CASE WHEN wait_event IS NOT NULL THEN 1 ELSE 0 END) AS waiting,
-    (SELECT count(*) FROM pg_prepared_xacts) AS prepared
-    FROM pg_stat_activity
-    WHERE datid is not NULL) T;
-    ```
-    
-    SQL query JSON format.
+```sql
+SELECT row_to_json(T)
+FROM (
+SELECT
+sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active,
+sum(CASE WHEN state = 'idle' THEN 1 ELSE 0 END) AS idle,
+sum(CASE WHEN state = 'idle in transaction' THEN 1 ELSE 0 END) AS idle_in_transaction,
+sum(CASE WHEN state = 'idle in transaction (aborted)' THEN 1 ELSE 0 END) AS idle_in_transaction_aborted,
+sum(CASE WHEN state = 'fastpath function call' THEN 1 ELSE 0 END) AS fastpath_function_call,
+count(*) AS total,
+count(*)*100/(SELECT current_setting('max_connections')::int) AS total_pct,
+sum(CASE WHEN wait_event IS NOT NULL THEN 1 ELSE 0 END) AS waiting,
+(SELECT count(*) FROM pg_prepared_xacts) AS prepared
+FROM pg_stat_activity
+WHERE datid is not NULL) T;
+```
+
+> SQL query JSON format.
 
 Then JSON is proceeded by dependent items of pgsql.connections:
 
@@ -274,17 +276,17 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT row_to_json(T)
-    FROM (SELECT archived_count, failed_count from pg_stat_archiver) T
-    SELECT row_to_json(T)
-    FROM ( SELECT count(name) AS count_files ,
-    coalesce(sum((pg_stat_file('./pg_wal/' || rtrim(ready.name,'.ready'))).size),0) AS size_files
-    FROM ( SELECT name
-    FROM pg_ls_dir('./pg_wal/archive_status') name WHERE right( name,6)= '.ready' ) ready) T;
-    ```
+```sql
+SELECT row_to_json(T)
+FROM (SELECT archived_count, failed_count from pg_stat_archiver) T
+SELECT row_to_json(T)
+FROM ( SELECT count(name) AS count_files ,
+coalesce(sum((pg_stat_file('./pg_wal/' || rtrim(ready.name,'.ready'))).size),0) AS size_files
+FROM ( SELECT name
+FROM pg_ls_dir('./pg_wal/archive_status') name WHERE right( name,6)= '.ready' ) ready) T;
+```
 
-    SQL query JSON format.
+> SQL query JSON format.
 
 Then JSON is proceeded by dependent items of:
 
@@ -299,25 +301,25 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT row_to_json (T)
-    FROM (
-    SELECT
-    checkpoints_timed
-    , checkpoints_req
-    , checkpoint_write_time
-    , checkpoint_sync_time
-    , buffers_checkpoint
-    , buffers_clean
-    , maxwritten_clean
-    , buffers_backend
-    , buffers_backend_fsync
-    , buffers_alloc
-    FROM pg_catalog.pg_stat_bgwriter
-    ) T
-    ```
+```sql
+SELECT row_to_json (T)
+FROM (
+SELECT
+checkpoints_timed
+, checkpoints_req
+, checkpoint_write_time
+, checkpoint_sync_time
+, buffers_checkpoint
+, buffers_clean
+, maxwritten_clean
+, buffers_backend
+, buffers_backend_fsync
+, buffers_alloc
+FROM pg_catalog.pg_stat_bgwriter
+) T
+```
 
-    SQL query JSON format.
+> SQL query JSON format.
 
 Then JSON is proceeded by dependent items of:
 
@@ -338,41 +340,41 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT count(*)
-    FROM pg_catalog.pg_stat_activity
-    WHERE query like '%%autovacuum%%'
-    AND state <> 'idle'
-    AND pid <> pg_catalog.pg_backend_pid()" SQL query .
-    pgsql.dbstat.sum[uri,username,password,dbName] - statistics for all databases combined
-    Params:
-    dbName — Database name. Optional.
-    Returns: Result of the
-    “SELECT row_to_json (T)
-    FROM (
-    SELECT
-    sum(numbackends) as numbackends
-    , sum(xact_commit) as xact_commit
-    , sum(xact_rollback) as xact_rollback
-    , sum(blks_read) as blks_read
-    , sum(blks_hit) as blks_hit
-    , sum(tup_returned) as tup_returned
-    , sum(tup_fetched) as tup_fetched
-    , sum(tup_inserted) as tup_inserted
-    , sum(tup_updated) as tup_updated
-    , sum(tup_deleted) as tup_deleted
-    , sum(conflicts) as conflicts
-    , sum(temp_files) as temp_files
-    , sum(temp_bytes) as temp_bytes
-    , sum(deadlocks) as deadlocks
-    , sum(checksum_failures) as checksum_failures
-    , sum(blk_read_time) as blk_read_time
-    , sum(blk_write_time) as blk_write_time
-    FROM pg_catalog.pg_stat_database
-    ) T
-    ```
+```sql
+SELECT count(*)
+FROM pg_catalog.pg_stat_activity
+WHERE query like '%%autovacuum%%'
+AND state <> 'idle'
+AND pid <> pg_catalog.pg_backend_pid()" SQL query .
+pgsql.dbstat.sum[uri,username,password,dbName] - statistics for all databases combined
+Params:
+dbName — Database name. Optional.
+Returns: Result of the
+“SELECT row_to_json (T)
+FROM (
+SELECT
+sum(numbackends) as numbackends
+, sum(xact_commit) as xact_commit
+, sum(xact_rollback) as xact_rollback
+, sum(blks_read) as blks_read
+, sum(blks_hit) as blks_hit
+, sum(tup_returned) as tup_returned
+, sum(tup_fetched) as tup_fetched
+, sum(tup_inserted) as tup_inserted
+, sum(tup_updated) as tup_updated
+, sum(tup_deleted) as tup_deleted
+, sum(conflicts) as conflicts
+, sum(temp_files) as temp_files
+, sum(temp_bytes) as temp_bytes
+, sum(deadlocks) as deadlocks
+, sum(checksum_failures) as checksum_failures
+, sum(blk_read_time) as blk_read_time
+, sum(blk_write_time) as blk_write_time
+FROM pg_catalog.pg_stat_database
+) T
+```
 
-    SQL query JSON format.
+> SQL query JSON format.
 
 Then JSON is proceeded by dependent items of:
 
@@ -400,34 +402,34 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT
-    json_object_agg(coalesce (datname,'null'), row_to_json(T))
-    FROM (
-    SELECT
-    datname
-    , numbackends as numbackends
-    , xact_commit as xact_commit
-    , xact_rollback as xact_rollback
-    , blks_read as blks_read
-    , blks_hit as blks_hit
-    , tup_returned as tup_returned
-    , tup_fetched as tup_fetched
-    , tup_inserted as tup_inserted
-    , tup_updated as tup_updated
-    , tup_deleted as tup_deleted
-    , conflicts as conflicts
-    , temp_files as temp_files
-    , temp_bytes as temp_bytes
-    , deadlocks as deadlocks
-    , %s as checksum_failures
-    , blk_read_time as blk_read_time
-    , blk_write_time as blk_write_time
-    FROM pg_catalog.pg_stat_database
-    ) T;
-    ```
+```sql
+SELECT
+json_object_agg(coalesce (datname,'null'), row_to_json(T))
+FROM (
+SELECT
+datname
+, numbackends as numbackends
+, xact_commit as xact_commit
+, xact_rollback as xact_rollback
+, blks_read as blks_read
+, blks_hit as blks_hit
+, tup_returned as tup_returned
+, tup_fetched as tup_fetched
+, tup_inserted as tup_inserted
+, tup_updated as tup_updated
+, tup_deleted as tup_deleted
+, conflicts as conflicts
+, temp_files as temp_files
+, temp_bytes as temp_bytes
+, deadlocks as deadlocks
+, %s as checksum_failures
+, blk_read_time as blk_read_time
+, blk_write_time as blk_write_time
+FROM pg_catalog.pg_stat_database
+) T;
+```
 
-    SQL query JSON format.
+> SQL query JSON format.
 
 Then JSON is proceeded by dependent items of :
 
@@ -455,17 +457,17 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT row_to_json(T)
-    FROM (
-    SELECT
-    pg_wal_lsn_diff(pg_current_wal_lsn(),'0/00000000') AS WRITE,
-    count(*)
-    FROM pg_ls_waldir() AS COUNT
-    ) T;
-    ```
+```sql
+SELECT row_to_json(T)
+FROM (
+SELECT
+pg_wal_lsn_diff(pg_current_wal_lsn(),'0/00000000') AS WRITE,
+count(*)
+FROM pg_ls_waldir() AS COUNT
+) T;
+```
 
-    SQL query JSON format.
+> SQL query JSON format.
 
 Then JSON is proceeded by dependent items of :
     - pgsql.wal.count — number of wal files.
@@ -477,57 +479,57 @@ dbName — Database name. Optional.
 
 *Returns:* Result of the
 
-    ```sql
-    WITH T AS
-    (SELECT
-    db.datname dbname,
-    lower(replace(Q.mode, 'Lock', '')) AS MODE,
-    coalesce(T.qty, 0) val
-    FROM pg_database db
-    JOIN (
-    VALUES ('AccessShareLock') ,('RowShareLock') ,('RowExclusiveLock') ,('ShareUpdateExclusiveLock') ,('ShareLock') ,('ShareRowExclusiveLock') ,('ExclusiveLock') ,('AccessExclusiveLock')) Q(MODE) ON TRUE NATURAL
-    LEFT JOIN
-    (SELECT datname,
-    MODE,
-    count(MODE) qty
-    FROM pg_locks lc
-    RIGHT JOIN pg_database db ON db.oid = lc.database
-    GROUP BY 1, 2) T
-    WHERE NOT db.datistemplate
-    ORDER BY 1, 2)
-    SELECT json_object_agg(dbname, row_to_json(T2))
-    FROM
-    (SELECT dbname,
-    sum(val) AS total,
-    sum(CASE
-    WHEN MODE = 'accessexclusive' THEN val
-    END) AS accessexclusive,
-    sum (CASE
-    WHEN MODE = 'accessshare' THEN val
-    END) AS accessshare,
-    sum(CASE
-    WHEN MODE = 'exclusive' THEN val
-    END) AS EXCLUSIVE,
-    sum(CASE
-    WHEN MODE = 'rowexclusive' THEN val
-    END) AS rowexclusive,
-    sum(CASE
-    WHEN MODE = 'rowshare' THEN val
-    END) AS rowshare,
-    sum(CASE
-    WHEN MODE = 'share' THEN val
-    END) AS SHARE,
-    sum(CASE
-    WHEN MODE = 'sharerowexclusive' THEN val
-    END) AS sharerowexclusive,
-    sum(CASE
-    WHEN MODE = 'shareupdateexclusive' THEN val
-    END) AS shareupdateexclusive
-    FROM T
-    GROUP BY dbname) T2;
-    ```
+```sql
+WITH T AS
+(SELECT
+db.datname dbname,
+lower(replace(Q.mode, 'Lock', '')) AS MODE,
+coalesce(T.qty, 0) val
+FROM pg_database db
+JOIN (
+VALUES ('AccessShareLock') ,('RowShareLock') ,('RowExclusiveLock') ,('ShareUpdateExclusiveLock') ,('ShareLock') ,('ShareRowExclusiveLock') ,('ExclusiveLock') ,('AccessExclusiveLock')) Q(MODE) ON TRUE NATURAL
+LEFT JOIN
+(SELECT datname,
+MODE,
+count(MODE) qty
+FROM pg_locks lc
+RIGHT JOIN pg_database db ON db.oid = lc.database
+GROUP BY 1, 2) T
+WHERE NOT db.datistemplate
+ORDER BY 1, 2)
+SELECT json_object_agg(dbname, row_to_json(T2))
+FROM
+(SELECT dbname,
+sum(val) AS total,
+sum(CASE
+WHEN MODE = 'accessexclusive' THEN val
+END) AS accessexclusive,
+sum (CASE
+WHEN MODE = 'accessshare' THEN val
+END) AS accessshare,
+sum(CASE
+WHEN MODE = 'exclusive' THEN val
+END) AS EXCLUSIVE,
+sum(CASE
+WHEN MODE = 'rowexclusive' THEN val
+END) AS rowexclusive,
+sum(CASE
+WHEN MODE = 'rowshare' THEN val
+END) AS rowshare,
+sum(CASE
+WHEN MODE = 'share' THEN val
+END) AS SHARE,
+sum(CASE
+WHEN MODE = 'sharerowexclusive' THEN val
+END) AS sharerowexclusive,
+sum(CASE
+WHEN MODE = 'shareupdateexclusive' THEN val
+END) AS shareupdateexclusive
+FROM T
+GROUP BY dbname) T2;
+```
 
-    SQL query JSON format.
+> SQL query JSON format.
 
 Then JSON is proceeded by dependent items of:
 
@@ -546,10 +548,10 @@ dbName — Database name. Non-mandatory
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
-    FROM pg_catalog.pg_stat_activity" SQL query.
-    ```
+```sql
+SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
+FROM pg_catalog.pg_stat_activity" SQL query.
+```
 
 **pgsql.uptime[uri,username,password,dbName]** — PostgreSQL uptime in ms.
 *Params:*
@@ -557,11 +559,11 @@ dbName — Database name. Non-mandatory
 
 *Returns:* Result of the
 
-    ```sql
-    SELECT date_part('epoch', now() - pg_postmaster_start_time());
-    ```
+```sql
+SELECT date_part('epoch', now() - pg_postmaster_start_time());
+```
 
-    SQL query in ms.
+> SQL query in ms.
 
 ## Troubleshooting
 
