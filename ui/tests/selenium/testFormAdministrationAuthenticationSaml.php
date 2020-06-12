@@ -376,6 +376,10 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		$this->assertContains('index.php', $this->page->getCurrentUrl());
 	}
 
+	/**
+	 * Function checks that SAML settings are disabled by default, if the corresponding flag is specified, enables and
+	 * fills SAML settings, and submits the form.
+	 */
 	private function configureSamlAuthentication($fields, $check_enabled = false) {
 		$form = $this->query('name:form_auth')->asForm()->one();
 		$form->selectTab('SAML settings');
