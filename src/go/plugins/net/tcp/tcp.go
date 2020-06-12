@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-ldap/ldap"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
@@ -165,6 +166,33 @@ func (p *Plugin) validateImap(buf []byte) int {
 	}
 	return tcpExpectFail
 }
+func (p *Plugin) ldapExpect(scheme string, address string) (result int) {
+	url := fmt.Sprintf("%s://%s", scheme, address)
+	conn, err := ldap.DialURL(url)
+	if err != nil {
+		log.Debugf("LDAP TCP expect network error: cannot connect to [%s]: %s", url, err.Error())
+		return
+	}
+	defer conn.Close()
+	res, err := conn.Search(&ldap.SearchRequest{Scope: ldap.ScopeBaseObject, Filter: "(objectClass=*)",
+		Attributes: []string{"namingContexts"}})
+	if err != nil {
+		log.Debugf("LDAP TCP expect search error: searching failed for [%s]: %s", url, err.Error())
+		return
+	}
+
+	if len(res.Entries) < 1 {
+		log.Debugf("LDAP TCP expect response error: empty search result for [%s]: %s", url, err.Error())
+		return
+	}
+
+	if len(res.Entries[0].Attributes) < 1 {
+		log.Debugf("LDAP TCP expect response error: no attributes in first entry for [%s]: %s", url, err.Error())
+		return
+	}
+
+	return 1
+}
 
 func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var conn net.Conn
@@ -176,7 +204,7 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	}
 	defer conn.Close()
 
-	if service == "http" || service == "tcp" || service == "ldap" {
+	if service == "http" || service == "tcp" {
 		return 1
 	}
 
@@ -251,6 +279,10 @@ func (p *Plugin) exportNetService(params []string) int {
 			port = "pop3"
 		}
 	}
+	if service == "ldap" {
+		return p.ldapExpect(service, net.JoinHostPort(ip, port))
+	}
+
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
 }
 
