@@ -1,0 +1,1 @@
+.........T [ZBX-16945] changed type of items "Free swap space" to calculated, "Free swap space in %" to dependent, added item "Used swap space in %" (mchudinov)
