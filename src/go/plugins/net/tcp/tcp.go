@@ -182,12 +182,12 @@ func (p *Plugin) ldapExpect(scheme string, address string) (result int) {
 	}
 
 	if len(res.Entries) < 1 {
-		log.Debugf("LDAP TCP expect response error: empty search result for [%s]: %s", url, err.Error())
+		log.Debugf("LDAP TCP expect response error: empty search result for [%s]", url)
 		return
 	}
 
 	if len(res.Entries[0].Attributes) < 1 {
-		log.Debugf("LDAP TCP expect response error: no attributes in first entry for [%s]: %s", url, err.Error())
+		log.Debugf("LDAP TCP expect response error: no attributes in first entry for [%s]", url)
 		return
 	}
 
