@@ -323,7 +323,7 @@ FROM pg_catalog.pg_stat_bgwriter
 
 Then JSON is proceeded by dependent items of:
 
-- *pgsql.bgwriter.buffers_alloc* - number of buffers allocated.
+- pgsql.bgwriter.buffers_alloc - number of buffers allocated.
 - pgsql.bgwriter.buffers_backend - number of buffers written directly by a backend.
 - pgsql.bgwriter.maxwritten_clean - number of times the background writer stopped a cleaning scan because it had written too many buffers.
 - pgsql.bgwriter.buffers_backend_fsync - number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write).
