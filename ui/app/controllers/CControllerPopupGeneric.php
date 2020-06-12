@@ -599,7 +599,8 @@ class CControllerPopupGeneric extends CController {
 			$group_options['groupid'] = $this->getInput('groupid');
 		}
 
-		if ($this->hasInput('enrich_parent_groups')) {
+		if ($this->hasInput('enrich_parent_groups')
+				|| in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER)) {
 			$group_options['enrich_parent_groups'] = 1;
 		}
 
@@ -1028,12 +1029,7 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::HostGroup()->get($options);
 				if ($this->hasInput('enrich_parent_groups')) {
-					$parent_options = [
-						'templated_hosts' => null,
-						'real_hosts' => null
-					] + $options;
-
-					$records = enrichParentGroups($records, $parent_options);
+					$records = enrichParentGroups($records);
 				}
 
 				CArrayHelper::sort($records, ['name']);

@@ -628,8 +628,7 @@ switch ($data['operationtype']) {
 					'srcfld2' => 'host',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'operation_templateids_',
-					'editable' => true,
-					'enrich_parent_groups' => true
+					'editable' => true
 				]
 			]
 		]))

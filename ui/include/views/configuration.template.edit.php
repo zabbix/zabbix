@@ -392,8 +392,7 @@ $add_templates_ms = (new CMultiSelect([
 			'dstfrm' => $frmHost->getName(),
 			'dstfld1' => 'add_templates_',
 			'excludeids' => ($data['templateid'] == 0) ? [] : [$data['templateid']],
-			'disableids' => $disableids,
-			'enrich_parent_groups' => true
+			'disableids' => $disableids
 		]
 	]
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);

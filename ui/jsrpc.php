@@ -156,10 +156,7 @@ switch ($data['method']) {
 
 				if ($hostGroups) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
-						$hostGroups = enrichParentGroups($hostGroups, [
-							'templated_hosts' => null,
-							'real_hosts' => null
-						] + $options);
+						$hostGroups = enrichParentGroups($hostGroups);
 					}
 
 					CArrayHelper::sort($hostGroups, [

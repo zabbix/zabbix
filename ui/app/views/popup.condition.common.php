@@ -330,8 +330,7 @@ switch ($data['type']) {
 							'srcfld2' => 'host',
 							'dstfrm' => $form->getName(),
 							'dstfld1' => 'template_new_condition',
-							'editable' => true,
-							'enrich_parent_groups' => true
+							'editable' => true
 						]
 					]
 				]))

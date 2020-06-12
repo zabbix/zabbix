@@ -322,11 +322,10 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
  * @param array  $groups
  * @param string $groups[<groupid>]['groupid']
  * @param string $groups[<groupid>]['name']
- * @param array  $options                        HostGroup API call parameters.
  *
  * @return array
  */
-function enrichParentGroups(array $groups, array $options = []) {
+function enrichParentGroups(array $groups) {
 	$parents = [];
 	foreach ($groups as $group) {
 		$parent = explode('/', $group['name']);
@@ -344,18 +343,13 @@ function enrichParentGroups(array $groups, array $options = []) {
 	}
 
 	if ($parents) {
-		if (!array_key_exists('output', $options)) {
-			$options['output'] = ['groupid', 'name'];
-		}
-
-		if (!array_key_exists('filter', $options)) {
-			$options['filter'] = [];
-		}
-
-		$options['filter']['name'] = array_keys($parents);
-
-		$options['preservekeys'] = true;
-		$groups += API::HostGroup()->get($options);
+		$groups += API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'filter' => [
+				'name' => array_keys($parents)
+			],
+			'preservekeys' => true
+		]);
 	}
 
 	return $groups;

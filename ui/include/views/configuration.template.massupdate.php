@@ -107,8 +107,7 @@ $new_template_table = (new CTable())
 					'srcfld1' => 'hostid',
 					'srcfld2' => 'host',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'linked_templates_',
-					'enrich_parent_groups' => true
+					'dstfld1' => 'linked_templates_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
