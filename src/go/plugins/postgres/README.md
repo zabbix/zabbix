@@ -345,12 +345,18 @@ SELECT count(*)
 FROM pg_catalog.pg_stat_activity
 WHERE query like '%%autovacuum%%'
 AND state <> 'idle'
-AND pid <> pg_catalog.pg_backend_pid()" SQL query .
-pgsql.dbstat.sum[uri,username,password,dbName] - statistics for all databases combined
-Params:
+AND pid <> pg_catalog.pg_backend_pid()
+```
+> SQL query .
+
+**pgsql.dbstat.sum[uri,username,password,dbName]** - statistics for all databases combined
+*Params:*
 dbName — Database name. Optional.
-Returns: Result of the
-“SELECT row_to_json (T)
+
+*Returns:* Result of the
+
+```sql
+SELECT row_to_json (T)
 FROM (
 SELECT
 sum(numbackends) as numbackends
