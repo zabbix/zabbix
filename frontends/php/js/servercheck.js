@@ -106,4 +106,7 @@ jQuery(function($) {
 			$(document).off('mousemove.messagehide');
 		});
 	});
+	jQuery(document).ready(function(){
+		jQuery("#ackTab table tbody tr td").each(function(){jQuery(this).html(jQuery(this).html().replace(/(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim, '<a href="$1" target="_blank">$1</a>'))});
+	})
 });
