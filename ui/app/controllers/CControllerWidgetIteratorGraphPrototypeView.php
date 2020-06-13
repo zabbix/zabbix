@@ -274,7 +274,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	 */
 	protected function inaccessibleError() {
 		return [
-			'header' =>$this->getDefaultHeader(),
+			'header' => $this->getDefaultHeader(),
 			'body' => (new CTableInfo())
 				->setNoDataMessage(_('No permissions to referred object or it does not exist!'))
 				->toString()
