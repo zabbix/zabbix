@@ -421,7 +421,7 @@ class ZBase {
 		foreach (['messageOk', 'messageError'] as $message_type) {
 			if (array_key_exists($message_type, $_COOKIE)) {
 				CSessionHelper::set($message_type, $_COOKIE[$message_type]);
-				zbx_setcookie($message_type, null, 1);
+				CCookieHelper::unset($message_type);
 			}
 		}
 	}

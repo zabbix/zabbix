@@ -42,10 +42,11 @@ final class CCookieSession implements \SessionHandlerInterface {
 				[$this, 'write'], [$this, 'destroy'], [$this, 'gc']
 			);
 
-			$this->session_start();
+			if (!$this->session_start()) {
+				throw new Exception('Cannot start session.');
+			}
 
 			CSessionHelper::set('sessionid', CSessionHelper::getId());
-			CSessionHelper::set('last_access', time());
 		}
 	}
 

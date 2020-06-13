@@ -60,7 +60,7 @@ class CTabView extends CDiv {
 
 	public function setSelected($selected) {
 		if ($selected == 0) {
-			zbx_unsetcookie('tab');
+			CCookieHelper::unset('tab');
 		}
 
 		$this->selectedTab = $selected;
@@ -110,7 +110,7 @@ class CTabView extends CDiv {
 			$this->addItem($tab);
 		}
 		else {
-			$visible_tab = (int) get_cookie('tab', (int) $this->selectedTab);
+			$visible_tab = CCookieHelper::has('tab') ? (int) CCookieHelper::get('tab') : (int) $this->selectedTab;
 			foreach (array_values($this->tabs) as $index => $tab) {
 				if ($visible_tab == $index) {
 					$tab->setAttribute('aria-hidden', 'false');

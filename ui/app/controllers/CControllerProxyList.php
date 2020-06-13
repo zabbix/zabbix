@@ -127,7 +127,7 @@ class CControllerProxyList extends CController {
 			global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-			$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
+			$server_status = $server->getStatus(CSessionHelper::getId());
 
 			if ($server_status !== false) {
 				$defaults = [

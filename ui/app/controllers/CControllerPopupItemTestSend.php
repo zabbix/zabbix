@@ -292,7 +292,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			// Send test to be executed on Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-			$result = $server->testItem($item_test_data, get_cookie('zbx_sessionid'));
+			$result = $server->testItem($item_test_data, CSessionHelper::getId());
 
 			// Handle the response.
 			if ($result === false) {
@@ -335,7 +335,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			// Send test details to Zabbix server.
 			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-			$result = $server->testPreprocessingSteps($preproc_test_data, get_cookie('zbx_sessionid'));
+			$result = $server->testPreprocessingSteps($preproc_test_data, CSessionHelper::getId());
 
 			if ($result === false) {
 				error($server->getError());
