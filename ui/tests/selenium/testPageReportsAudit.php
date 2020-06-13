@@ -75,12 +75,12 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Audit log');
 		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details']);
 		$this->zbxTestExpandFilterTab();
-		$this->zbxTestAssertElementPresentId('alias');
-		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
-		$this->zbxTestAssertElementPresentId('select_user');
+		$this->zbxTestAssertElementPresentId('filter_userids__ms');
+		$this->zbxTestAssertElementPresentId('filter_resourceid');
+		$this->zbxTestAssertElementPresentXpath("//input[@id='filter_resourceid' and @maxlength='255']");
 
-		$this->zbxTestDropdownHasOptions('auditlog_action', $this->actions);
-		$this->zbxTestDropdownHasOptions('resourcetype', $this->resourcetypes);
+		$this->zbxTestDropdownHasOptions('filter_action', $this->actions);
+		$this->zbxTestDropdownHasOptions('filter_resourcetype', $this->resourcetypes);
 	}
 
 	public static function auditActions() {
@@ -175,9 +175,9 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentId('config');
 
 		$this->zbxTestExpandFilterTab();
-		$this->zbxTestInputType('alias', '');
-		$this->zbxTestDropdownSelect('auditlog_action', $this->actions[$action]);
-		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);
+		$this->zbxTestMultiselectClear('filter_userids_');
+		$this->zbxTestDropdownSelect('filter_action', $this->actions[$action]);
+		$this->zbxTestDropdownSelect('filter_resourcetype', $this->resourcetypes[$resourcetype]);
 
 		$this->zbxTestClickXpathWait("//form[@name='zbx_filter']//button[@name='filter_set']");
 		$this->zbxTestCheckHeader('Audit log');

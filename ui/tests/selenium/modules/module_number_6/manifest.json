@@ -1,0 +1,10 @@
+{
+	"manifest_version": 0.01,
+	"id": "6",
+	"name": "шестой модуль",
+	"author": "Работник Заббикса",
+	"description": "Удалить \"Reports\" из меню верхнего уровня, а так же удалить \"Scripts\" из секции \"Administration\".",
+	"version": "бета 2",
+	"namespace": "Example_F",
+	"url": ""
+}

@@ -511,6 +511,8 @@ class CElement extends CBaseElement implements IWaitable {
 
 			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 		}
+
+		return $this;
 	}
 
 	/**

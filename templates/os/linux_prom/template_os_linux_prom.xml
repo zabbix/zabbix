@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2020-06-04T17:53:48Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -24,7 +24,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Operating systems</name>
@@ -1458,7 +1458,7 @@ return newvalue;</params>
                         <trigger_prototype>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
@@ -1525,7 +1525,7 @@ and&#13;
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2 and {Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1548,7 +1548,7 @@ and&#13;
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2 and {Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1568,7 +1568,7 @@ and&#13;
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2 and {Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1587,7 +1587,7 @@ and {Template OS Linux by Prom:net.if.out.errors[node_exporter"{#IFNAME}"].max(5
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}=2 and {Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template OS Linux by Prom:net.if.status[node_exporter,"{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -2433,7 +2433,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -2462,7 +2462,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>System load</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -2484,7 +2484,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>CPU usage</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -2506,7 +2506,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>Memory usage</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -2528,7 +2528,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>Swap usage</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -2550,7 +2550,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -2572,7 +2572,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>{#DEVNAME}: Disk read/write rates</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>3</y>
@@ -2594,7 +2594,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>{#DEVNAME}: Disk average waiting time</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>4</y>
@@ -2616,7 +2616,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>{#DEVNAME}: Disk utilization and queue</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>5</y>
@@ -2638,7 +2638,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>6</y>

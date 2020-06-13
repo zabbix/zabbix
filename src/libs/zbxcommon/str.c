@@ -1278,7 +1278,7 @@ int	cmp_key_id(const char *key_1, const char *key_2)
  *                                                                            *
  * Purpose: Returns process name                                              *
  *                                                                            *
- * Parameters: process_type - [IN] process type; ZBX_PROCESS_TYPE_*           *
+ * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -2751,6 +2751,9 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *                       ending '"' for quoted context values or the last     *
  *                       character before the ending '}' character)           *
  *                       0 if macro does not have context specified.          *
+ *     context_op - [OUT] the context matching operator (optional):           *
+ *                          CONDITION_OPERATOR_EQUAL                          *
+ *                          CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully.                           *
@@ -2758,7 +2761,7 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *               is not defined.                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r)
+int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r, unsigned char *context_op)
 {
 	int	i;
 
@@ -2777,6 +2780,10 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 		*macro_r = i;
 		*context_l = 0;
 		*context_r = 0;
+
+		if (NULL != context_op)
+			*context_op = CONDITION_OPERATOR_EQUAL;
+
 		return SUCCEED;
 	}
 
@@ -2784,9 +2791,21 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
 	if  (':' != macro[i])
 		return FAIL;
 
+	i++;
+	if (NULL != context_op)
+	{
+		if (0 == strncmp(macro + i, ZBX_MACRO_REGEX_PREFIX, ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX)))
+		{
+			*context_op = CONDITION_OPERATOR_REGEXP;
+			i += ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX);
+		}
+		else
+			*context_op = CONDITION_OPERATOR_EQUAL;
+	}
+
 	/* skip the whitespace after macro context separator */
-	while (' ' == macro[++i])
-		;
+	while (' ' == macro[i])
+		i++;
 
 	*context_l = i;
 
@@ -2843,19 +2862,22 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
  *     context - [OUT] the unquoted macro context, NULL for macros without    *
  *                     context                                                *
  *     length  - [OUT] the length of parsed macro (optional)                  *
+ *     context_op - [OUT] the context matching operator (optional):           *
+ *                          CONDITION_OPERATOR_EQUAL                          *
+ *                          CONDITION_OPERATOR_REGEXP                         *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully                            *
  *     FAIL    - the macro parsing failed, invalid parameter syntax           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length)
+int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length, unsigned char *context_op)
 {
 	const char	*ptr;
 	int		macro_r, context_l, context_r;
 	size_t		len;
 
-	if (SUCCEED != zbx_user_macro_parse(macro, &macro_r, &context_l, &context_r))
+	if (SUCCEED != zbx_user_macro_parse(macro, &macro_r, &context_l, &context_r, context_op))
 		return FAIL;
 
 	zbx_free(*context);
@@ -2867,6 +2889,10 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 		/* find the context separator ':' by stripping spaces before context */
 		while (' ' == *(--ptr))
 			;
+
+		/* remove regex: prefix from macro name for regex contexts */
+		if (NULL != context_op && CONDITION_OPERATOR_REGEXP == *context_op)
+			ptr -= ZBX_CONST_STRLEN(ZBX_MACRO_REGEX_PREFIX);
 
 		/* extract the macro name and close with '}' character */
 		len = ptr - macro + 1;
@@ -3509,7 +3535,7 @@ static int	zbx_token_parse_user_macro(const char *expression, const char *macro,
 	int			macro_r, context_l, context_r;
 	zbx_token_user_macro_t	*data;
 
-	if (SUCCEED != zbx_user_macro_parse(macro, &macro_r, &context_l, &context_r))
+	if (SUCCEED != zbx_user_macro_parse(macro, &macro_r, &context_l, &context_r, NULL))
 		return FAIL;
 
 	offset = macro - expression;
@@ -4261,7 +4287,7 @@ static size_t	zbx_no_function(const char *expr)
 			continue;
 		}
 
-		if ('{' == *ptr && '$' == *(ptr + 1) && SUCCEED == zbx_user_macro_parse(ptr, &len, &c_l, &c_r))
+		if ('{' == *ptr && '$' == *(ptr + 1) && SUCCEED == zbx_user_macro_parse(ptr, &len, &c_l, &c_r, NULL))
 		{
 			ptr += len + 1;	/* skip to the position after user macro */
 		}
@@ -4627,7 +4653,7 @@ char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc)
  * Purpose: find number of parameters in parameter list                       *
  *                                                                            *
  * Parameters:                                                                *
- *      param  - parameter list                                               *
+ *      p - [IN] parameter list                                               *
  *                                                                            *
  * Return value: number of parameters (starting from 1) or                    *
  *               0 if syntax error                                            *
@@ -5146,7 +5172,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 		while ('\0' != (*data)[i])
 		{
 			if ('{' == (*data)[i] && '$' == (*data)[i + 1] &&
-					SUCCEED == zbx_user_macro_parse(&(*data)[i], &len, &c_l, &c_r))
+					SUCCEED == zbx_user_macro_parse(&(*data)[i], &len, &c_l, &c_r, NULL))
 			{
 				i += len + 1;	/* skip to the position after user macro */
 			}

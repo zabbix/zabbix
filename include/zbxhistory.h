@@ -50,7 +50,7 @@ void	zbx_history_value_print(char *buffer, size_t size, const history_value_t *v
 int	zbx_history_init(char **error);
 void	zbx_history_destroy(void);
 
-int	zbx_history_add_values(const zbx_vector_ptr_t *values);
+int	zbx_history_add_values(const zbx_vector_ptr_t *history);
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 

@@ -976,7 +976,7 @@ static int	dbsync_compare_global_macro(const ZBX_DC_GMACRO *gmacro, const DB_ROW
 	if (FAIL == dbsync_compare_str(dbrow[2], gmacro->value))
 		return FAIL;
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[1], &macro, &context, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[1], &macro, &context, NULL, NULL))
 		return FAIL;
 
 	if (0 != strcmp(gmacro->macro, macro))
@@ -1098,7 +1098,7 @@ static int	dbsync_compare_host_macro(const ZBX_DC_HMACRO *hmacro, const DB_ROW d
 	if (FAIL == dbsync_compare_uint64(dbrow[1], hmacro->hostid))
 		return FAIL;
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[2], &macro, &context, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[2], &macro, &context, NULL, NULL))
 		return FAIL;
 
 	if (0 != strcmp(hmacro->macro, macro))

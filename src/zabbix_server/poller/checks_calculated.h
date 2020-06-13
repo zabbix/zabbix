@@ -24,6 +24,6 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
-int	get_value_calculated(DC_ITEM *item, AGENT_RESULT *result);
+int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result);
 
 #endif
