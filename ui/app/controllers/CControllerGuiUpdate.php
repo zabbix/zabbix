@@ -24,10 +24,11 @@ class CControllerGuiUpdate extends CController {
 	protected function checkInput() {
 		$themes = array_keys(APP::getThemes());
 		$fields = [
-			'default_theme'           => 'required|in '.implode(',', $themes).'|db config.default_theme',
-			'search_limit'            => 'required|db config.search_limit|ge 1|le 999999',
-			'max_in_table'            => 'required|db config.max_in_table|ge 1|le 99999',
-			'server_check_interval'   => 'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL
+			'default_lang'          => 'required|in '.implode(',', array_keys(getLocales())).'|db config.default_lang',
+			'default_theme'         => 'required|in '.implode(',', $themes).'|db config.default_theme',
+			'search_limit'          => 'required|db config.search_limit|ge 1|le 999999',
+			'max_in_table'          => 'required|db config.max_in_table|ge 1|le 99999',
+			'server_check_interval' => 'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,10 +61,11 @@ class CControllerGuiUpdate extends CController {
 	protected function doAction() {
 		DBstart();
 		$result = update_config([
-			'default_theme'           => $this->getInput('default_theme'),
-			'search_limit'            => $this->getInput('search_limit'),
-			'max_in_table'            => $this->getInput('max_in_table'),
-			'server_check_interval'   => $this->getInput('server_check_interval')
+			'default_lang'          => $this->getInput('default_lang'),
+			'default_theme'         => $this->getInput('default_theme'),
+			'search_limit'          => $this->getInput('search_limit'),
+			'max_in_table'          => $this->getInput('max_in_table'),
+			'server_check_interval' => $this->getInput('server_check_interval')
 		]);
 		$result = DBend($result);
 

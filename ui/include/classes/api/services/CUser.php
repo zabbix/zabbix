@@ -260,7 +260,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permissions to create users.'));
 		}
 
-		$locales = array_keys(getLocales());
+		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
@@ -271,7 +271,7 @@ class CUser extends CApiService {
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', $locales)],
+			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
@@ -368,7 +368,7 @@ class CUser extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
-		$locales = array_keys(getLocales());
+		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
@@ -380,7 +380,7 @@ class CUser extends CApiService {
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
-			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', $locales)],
+			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
@@ -547,7 +547,7 @@ class CUser extends CApiService {
 	 */
 	private function checkLanguages(array $languages) {
 		foreach ($languages as $lang) {
-			if ($lang !== 'en_GB' && !setlocale(LC_MONETARY, zbx_locale_variants($lang))) {
+			if ($lang != LANG_DEFAULT && !setlocale(LC_MONETARY, zbx_locale_variants($lang))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Language "%1$s" is not supported.', $lang));
 			}
 		}
@@ -1353,6 +1353,9 @@ class CUser extends CApiService {
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
 
+		$config = select_config();
+		$db_user['lang'] = ($db_user['lang'] == LANG_DEFAULT) ? $config['default_lang'] : $db_user['lang'];
+
 		$autologout = timeUnitToSeconds($db_user['autologout']);
 
 		// Check system permissions.
@@ -1580,6 +1583,9 @@ class CUser extends CApiService {
 		$db_user['debug_mode'] = $usrgrps['debug_mode'];
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
+
+		$config = select_config();
+		$db_user['lang'] = ($db_user['lang'] == LANG_DEFAULT) ? $config['default_lang'] : $db_user['lang'];
 
 		return $db_user;
 	}

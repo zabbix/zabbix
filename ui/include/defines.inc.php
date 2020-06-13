@@ -1506,6 +1506,12 @@ define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
 
+// user default language
+define('LANG_DEFAULT', 'default');
+
+// the default language
+define('ZBX_DEFAULT_LANG', 'en_GB');
+
 // user default theme
 define('THEME_DEFAULT', 'default');
 
