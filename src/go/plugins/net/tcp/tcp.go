@@ -207,11 +207,11 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	}
 
 	if service == "ldap" {
-		lconn := ldap.NewConn(conn, false)
-		lconn.Debug = false
-		lconn.Start()
-		defer lconn.Close()
-		return p.validateLdap(lconn, address)
+		l := ldap.NewConn(conn, false)
+		l.Debug = false
+		l.Start()
+		defer l.Close()
+		return p.validateLdap(l, address)
 	}
 
 	var sendToClose string
@@ -281,7 +281,6 @@ func (p *Plugin) exportNetService(params []string) int {
 			port = "pop3"
 		}
 	}
-
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
 }
 
