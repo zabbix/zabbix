@@ -482,6 +482,7 @@ var hintBox = {
 			box.prepend(close_link);
 		}
 
+		jQuery(box).find("td").each(function(){jQuery(this).html(jQuery(this).html().replace(/(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim, '<a href="$1" target="_blank">$1</a>'))});
 		jQuery(appendTo).append(box);
 
 		var removeHandler = function() {
