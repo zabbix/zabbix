@@ -978,8 +978,10 @@ class CMacrosResolverGeneral {
 		 * @var array  $host_macros
 		 * @var array  $host_macros[<hostid>]
 		 * @var array  $host_macros[<hostid>][<macro>]				macro base without curly braces
-		 * @var string $host_macros[<hostid>][<macro>]['value']		base macro value (without context); can be null
-		 * @var array  $host_macros[<hostid>][<macro>]['contexts']	context values; ['<context>' => '<value>', ...]
+		 * @var string $host_macros[<hostid>][<macro>]['value']		base macro value (without context and regex);
+		 * 															can be null
+		 * @var array  $host_macros[<hostid>][<macro>]['contexts']	context values; ['<context1>' => '<value1>', ...]
+		 * @var array  $host_macros[<hostid>][<macro>]['regex']		regex values; ['<regex1>' => '<value1>', ...]
 		 */
 		$host_macros = [];
 
@@ -1000,6 +1002,7 @@ class CMacrosResolverGeneral {
 					$hostid = $db_host_macro['hostid'];
 					$macro = $user_macro_parser->getMacro();
 					$context = $user_macro_parser->getContext();
+					$regex = $user_macro_parser->getRegex();
 					$value = self::getMacroValue($db_host_macro);
 
 					if (!array_key_exists($hostid, $host_macros)) {
@@ -1007,11 +1010,14 @@ class CMacrosResolverGeneral {
 					}
 
 					if (!array_key_exists($macro, $host_macros[$hostid])) {
-						$host_macros[$hostid][$macro] = ['value' => null, 'contexts' => []];
+						$host_macros[$hostid][$macro] = ['value' => null, 'contexts' => [], 'regex' => []];
 					}
 
-					if ($context === null) {
+					if ($context === null && $regex === null) {
 						$host_macros[$hostid][$macro]['value'] = $value;
+					}
+					elseif ($regex !== null) {
+						$host_macros[$hostid][$macro]['regex'][$regex] = $value;
 					}
 					else {
 						$host_macros[$hostid][$macro]['contexts'][$context] = $value;
@@ -1042,6 +1048,9 @@ class CMacrosResolverGeneral {
 				}
 			} while ($hostids);
 		}
+
+		// Reordering only regex array.
+		$host_macros = self::sortRegexHostMacros($host_macros);
 
 		$all_macros_resolved = true;
 
@@ -1083,8 +1092,10 @@ class CMacrosResolverGeneral {
 			/*
 			 * @var array  $global_macros
 			 * @var array  $global_macros[<macro>]				macro base without curly braces
-			 * @var string $global_macros[<macro>]['value']		base macro value (without context); can be null
+			 * @var string $global_macros[<macro>]['value']		base macro value (without context and regex);
+			 * 													can be null
 			 * @var array  $global_macros[<macro>]['contexts']	context values; ['<context1>' => '<value1>', ...]
+			 * @var array  $global_macros[<macro>]['regex']		regex values; ['<regex1>' => '<value1>', ...]
 			 */
 			$global_macros = [];
 
@@ -1092,19 +1103,27 @@ class CMacrosResolverGeneral {
 				if ($user_macro_parser->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
 					$macro = $user_macro_parser->getMacro();
 					$context = $user_macro_parser->getContext();
+					$regex = $user_macro_parser->getRegex();
+					$value = self::getMacroValue($db_global_macro);
 
 					if (!array_key_exists($macro, $global_macros)) {
-						$global_macros[$macro] = ['value' => null, 'contexts' => []];
+						$global_macros[$macro] = ['value' => null, 'contexts' => [], 'regex' => []];
 					}
 
-					if ($context === null) {
-						$global_macros[$macro]['value'] = self::getMacroValue($db_global_macro);
+					if ($context === null && $regex === null) {
+						$global_macros[$macro]['value'] = $value;
+					}
+					elseif ($regex !== null) {
+						$global_macros[$macro]['regex'][$regex] = $value;
 					}
 					else {
-						$global_macros[$macro]['contexts'][$context] = $db_global_macro['value'];
+						$global_macros[$macro]['contexts'][$context] = $value;
 					}
 				}
 			}
+
+			// Reordering only regex array.
+			$global_macros = self::sortRegexGlobalMacros($global_macros);
 
 			foreach ($data as &$element) {
 				foreach ($element['macros'] as $usermacro => &$value) {
@@ -1116,7 +1135,16 @@ class CMacrosResolverGeneral {
 							if ($context !== null && array_key_exists($context, $global_macros[$macro]['contexts'])) {
 								$value['value'] = $global_macros[$macro]['contexts'][$context];
 							}
-							elseif ($global_macros[$macro]['value'] !== null) {
+							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
+								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
+									if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+										$value['value'] = $val;
+										break;
+									}
+								}
+							}
+
+							if ($value['value'] === null && $global_macros[$macro]['value'] !== null) {
 								if ($context === null) {
 									$value['value'] = $global_macros[$macro]['value'];
 								}
@@ -1176,11 +1204,23 @@ class CMacrosResolverGeneral {
 			$value_default = null) {
 		foreach ($hostids as $hostid) {
 			if (array_key_exists($hostid, $host_macros) && array_key_exists($macro, $host_macros[$hostid])) {
+				// Searching context coincidence with macro contexts.
 				if ($context !== null && array_key_exists($context, $host_macros[$hostid][$macro]['contexts'])) {
 					return [
 						'value' => $host_macros[$hostid][$macro]['contexts'][$context],
 						'value_default' => $value_default
 					];
+				}
+				// Searching context coincidence, if regex array not empty.
+				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
+					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
+						if (preg_match('/'.trim($regex, '/').'/', $context) === 1) {
+							return [
+								'value' => $val,
+								'value_default' => $value_default
+							];
+						}
+					}
 				}
 
 				if ($host_macros[$hostid][$macro]['value'] !== null) {
@@ -1223,11 +1263,73 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get macro value refer by type.
 	 *
+	 * @static
+	 *
 	 * @param array $macro
 	 *
 	 * @return string
 	 */
-	static public function getMacroValue(array $macro): string {
+	public static function getMacroValue(array $macro): string {
 		return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_SECRET_MASK : $macro['value'];
+	}
+
+	/**
+	 * Sorting host macros.
+	 *
+	 * @param array $host_macros
+	 *
+	 * @return array
+	 */
+	private static function sortRegexHostMacros(array $host_macros): array {
+		foreach ($host_macros as &$macros) {
+			foreach ($macros as &$value) {
+				$value['regex'] = self::sortRegex($value['regex']);
+			}
+			unset($value);
+		}
+		unset($macros);
+
+		return $host_macros;
+	}
+
+	/**
+	 * Sorting global macros.
+	 *
+	 * @static
+	 *
+	 * @param array $global_macros
+	 *
+	 * @return array
+	 */
+	private static function sortRegexGlobalMacros(array $global_macros): array {
+		foreach ($global_macros as &$value) {
+			$value['regex'] = self::sortRegex($value['regex']);
+		}
+		unset($value);
+
+		return $global_macros;
+	}
+
+	/**
+	 * Sort regex.
+	 *
+	 * @static
+	 *
+	 * @param array $macros
+	 *
+	 * @return array
+	 */
+	private static function sortRegex(array $macros): array {
+		$keys = array_keys($macros);
+
+		usort($keys, 'strcmp');
+
+		$new_array = [];
+
+		foreach($keys as $key) {
+			$new_array[$key] = $macros[$key];
+		}
+
+		return $new_array;
 	}
 }

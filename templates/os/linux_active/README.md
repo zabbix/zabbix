@@ -7,9 +7,11 @@ For Zabbix version: 5.0
 
 ## Setup
 
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
+No specific Zabbix configuration is required.
 
 ### Macros used
 
@@ -66,9 +68,11 @@ For Zabbix version: 5.0
 
 ## Setup
 
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
+No specific Zabbix configuration is required.
 
 ### Macros used
 
@@ -123,9 +127,11 @@ For Zabbix version: 5.0
 
 ## Setup
 
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
+No specific Zabbix configuration is required.
 
 ### Macros used
 
@@ -274,7 +280,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Interface {#IFNAME}: High error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m) |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"} or {Template Module Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:net.if.in["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and {Template Module Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}: Link down</p> |
-|Interface {#IFNAME}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p><p>3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and ({TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)`<p>Recovery expression:</p>`{TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}<>2` |AVERAGE |<p>Manual close: YES</p> |
+|Interface {#IFNAME}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p><p>3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and ({TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)`<p>Recovery expression:</p>`{TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}<>2 or {$IFCONTROL:"{#IFNAME}"}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Interface {#IFNAME}: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`{TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}<0 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}>0 and ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=6 or {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].last()}=1) and ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}<>2)`<p>Recovery expression:</p>`({TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}>0 and {TEMPLATE_NAME:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].prev()}>0) or ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}: Link down</p> |
 
 ## Feedback
@@ -293,9 +299,11 @@ For Zabbix version: 5.0
 
 ## Setup
 
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
+No specific Zabbix configuration is required.
 
 ### Macros used
 

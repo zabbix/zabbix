@@ -310,6 +310,7 @@ class testDynamicItemWidgets extends CWebTest {
 
 		foreach ($data as $key => $expected) {
 			$widget = $widgets->get($key);
+			$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 			$widget_content = $widget->getContent();
 			$this->assertEquals($expected['header'], $widget->getHeaderText());
 
