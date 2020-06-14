@@ -413,6 +413,8 @@ Changes for 4.4.10rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
+...G...... [ZBX-17891] changed log, log.count monitoring to ignore file modification time (wiper)
 .......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
 
 --------------------------------------------------------------------------------
