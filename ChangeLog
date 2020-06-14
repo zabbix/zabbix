@@ -1520,8 +1520,16 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.22rc1
 
 New features:
+........S. [ZBXNEXT-3588] improved Zabbix server performance when evaluating trigger, discovery, autoregistration and internal actions (vso)
 
 Bug fixes:
+.......PS. [ZBX-17720] exclude disabled items from preprocessing configuration sync (wiper)
+........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
+.....J.... [ZBX-17406] fixed null value for a field of CompositeData in JMX discovery (arimdjonoks)
+...G...... [ZBX-17891] changed log, log.count monitoring to ignore file modification time (wiper)
+..F....... [ZBX-17697] fixed strict DFSG compliance issue in using minified jQuery sources (talbergs)
+.........T [ZBX-16461] fixed recovery expression for "link down" trigger and updated for following zabbix template guidelines (tuskov)
+........S. [ZBX-17702] fixed escalation cancellation message not being sent when action is disabled (wiper)
 .........T [ZBX-17480] fixed context of {$TEMP_CRIT} macro in Temperature trigger prototype (tuskov)
 .......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
 ...G...... [ZBX-17780] fixed memory leak (viktors)
