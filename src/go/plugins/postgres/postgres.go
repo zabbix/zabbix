@@ -35,7 +35,6 @@ const pluginName = "Postgres"
 var maxParams = map[string]int{
 
 	keyPostgresPing:                                      4,
-	keyPostgresTransactions:                              4,
 	keyPostgresConnections:                               4,
 	keyPostgresWal:                                       4,
 	keyPostgresStat:                                      4,
@@ -160,9 +159,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case keyPostgresDatabasesAge:
 		handler = p.databasesAgeHandler // postgres.databases[[connString][,section]]
 
-	case keyPostgresTransactions:
-		handler = p.transactionsHandler // postgres.transactions[[connString]]
-
 	case keyPostgresSizeArchive:
 		handler = p.archiveHandler // postgres.archive[[connString]]
 
@@ -237,7 +233,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	plugin.RegisterMetrics(&impl, pluginName,
 		keyPostgresPing, "Test if connection is alive or not.",
-		keyPostgresTransactions, "Returns JSON for active,idle, waiting and prepared transactions.",
 		keyPostgresConnections, "Returns JSON for sum of each type of connection.",
 		keyPostgresWal, "Returns JSON wal by type.",
 		keyPostgresStat, "Returns JSON for sum of each type of statistic.",
