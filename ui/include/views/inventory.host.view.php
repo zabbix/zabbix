@@ -152,6 +152,7 @@ $overviewFormList->addRow(_('Monitoring'),
 		),
 		new CLink(_('Graphs'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
+				->setArgument('filter_set', '1')
 				->setArgument('view_as', HISTORY_GRAPH)
 				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 				->setArgument('filter_hostids', [$data['host']['hostid']])

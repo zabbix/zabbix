@@ -108,7 +108,7 @@ int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *fun
 			{
 				int	macro_r, context_l, context_r;
 
-				if (SUCCEED == zbx_user_macro_parse(c, &macro_r, &context_l, &context_r))
+				if (SUCCEED == zbx_user_macro_parse(c, &macro_r, &context_l, &context_r, NULL))
 					c += macro_r;
 				else
 					c++;
@@ -296,7 +296,7 @@ static void	DCexpand_trigger_expression(char **expression)
 		{
 			int	macro_r, context_l, context_r;
 
-			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r, NULL))
 			{
 				zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, *expression + l, macro_r + 1);
 				l += macro_r;
@@ -503,7 +503,8 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 	while (NULL != (m = strchr(p, '$')))
 	{
-		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r))
+		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r,
+				NULL))
 		{
 			/* user macros */
 
@@ -1535,6 +1536,50 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 /******************************************************************************
  *                                                                            *
+ * Function: format_user_fullname                                             *
+ *                                                                            *
+ * Purpose: formats full user name from name, surname and alias               *
+ *                                                                            *
+ * Parameters: name    - [IN] the user name, can be empty string              *
+ *             surname - [IN] the user surname, can be empty string           *
+ *             alias   - [IN] the user alias                                  *
+ *                                                                            *
+ * Return value: the formatted user fullname                                  *
+ *                                                                            *
+ ******************************************************************************/
+static char	*format_user_fullname(const char *name, const char *surname, const char *alias)
+{
+	char	*buf = NULL;
+	size_t	buf_alloc = 0, buf_offset = 0;
+
+	zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, name);
+
+	if ('\0' != *surname)
+	{
+		if (0 != buf_offset)
+			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ' ');
+
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, surname);
+	}
+
+	if ('\0' != *alias)
+	{
+		size_t	offset = buf_offset;
+
+		if (0 != buf_offset)
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " (");
+
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, alias);
+
+		if (0 != offset)
+			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ')');
+	}
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_escalation_history                                           *
  *                                                                            *
  * Purpose: retrieve escalation history                                       *
@@ -1966,10 +2011,13 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ALERT_SUBJECT		"{ALERT.SUBJECT}"
 #define MVAR_ALERT_MESSAGE		"{ALERT.MESSAGE}"
 
-#define MVAR_ACK_MESSAGE                "{ACK.MESSAGE}"			/* deprecated */
-#define MVAR_ACK_TIME	                "{ACK.TIME}"			/* deprecated */
-#define MVAR_ACK_DATE	                "{ACK.DATE}"			/* deprecated */
-#define MVAR_USER_FULLNAME          	"{USER.FULLNAME}"
+#define MVAR_ACK_MESSAGE		"{ACK.MESSAGE}"			/* deprecated */
+#define MVAR_ACK_TIME			"{ACK.TIME}"			/* deprecated */
+#define MVAR_ACK_DATE			"{ACK.DATE}"			/* deprecated */
+#define MVAR_USER_ALIAS			"{USER.ALIAS}"
+#define MVAR_USER_NAME			"{USER.NAME}"
+#define MVAR_USER_SURNAME		"{USER.SURNAME}"
+#define MVAR_USER_FULLNAME		"{USER.FULLNAME}"
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
@@ -2831,14 +2879,13 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 	char			c, *replace_to = NULL, sql[64];
 	const char		*m;
 	int			N_functionid, indexed_macro, require_address, ret, res = SUCCEED,
-				pos = 0, found,
-				raw_value;
+				pos = 0, found, user_names_found = 0, raw_value;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
 	zbx_token_t		token;
 	zbx_token_search_t	token_search;
-	char			*expression = NULL;
+	char			*expression = NULL, *user_alias = NULL, *user_name = NULL, *user_surname = NULL;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -3252,14 +3299,14 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
 					{
-						const char	*user_name;
+						const char	*user_name1;
 
 						if (SUCCEED == zbx_check_user_permissions(&ack->userid, userid))
-							user_name = zbx_user_string(ack->userid);
+							user_name1 = zbx_user_string(ack->userid);
 						else
-							user_name = "Inaccessible user";
+							user_name1 = "Inaccessible user";
 
-						replace_to = zbx_strdup(replace_to, user_name);
+						replace_to = zbx_strdup(replace_to, user_name1);
 					}
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
@@ -4269,6 +4316,41 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					replace_to = zbx_strdup(replace_to, interface.addr);
 				require_address = 1;
 			}
+			else if (NULL != userid)
+			{
+				/* use only one DB request for all occurrences of 4 macros */
+				if (0 == user_names_found && (0 == strcmp(m, MVAR_USER_ALIAS) ||
+						0 == strcmp(m, MVAR_USER_NAME) || 0 == strcmp(m, MVAR_USER_SURNAME) ||
+						0 == strcmp(m, MVAR_USER_FULLNAME)))
+				{
+					if (SUCCEED == DBget_user_names(*userid, &user_alias, &user_name,
+							&user_surname))
+					{
+						user_names_found = 1;
+					}
+				}
+
+				if (0 != user_names_found)
+				{
+					if (0 == strcmp(m, MVAR_USER_ALIAS))
+					{
+						replace_to = zbx_strdup(replace_to, user_alias);
+					}
+					else if (0 == strcmp(m, MVAR_USER_NAME))
+					{
+						replace_to = zbx_strdup(replace_to, user_name);
+					}
+					else if (0 == strcmp(m, MVAR_USER_SURNAME))
+					{
+						replace_to = zbx_strdup(replace_to, user_surname);
+					}
+					else if (0 == strcmp(m, MVAR_USER_FULLNAME))
+					{
+						zbx_free(replace_to);
+						replace_to = format_user_fullname(user_name, user_surname, user_alias);
+					}
+				}
+			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_HTTPTEST_FIELD))
 		{
@@ -4582,6 +4664,9 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		pos++;
 	}
 
+	zbx_free(user_alias);
+	zbx_free(user_name);
+	zbx_free(user_surname);
 	zbx_free(expression);
 	zbx_vector_uint64_destroy(&hostids);
 

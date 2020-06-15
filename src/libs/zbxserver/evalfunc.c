@@ -2745,8 +2745,8 @@ out:
  *                                                                            *
  * Purpose: evaluate function                                                 *
  *                                                                            *
- * Parameters: item - item to calculate function for                          *
- *             function - function (for example, 'max')                       *
+ * Parameters: item      - item to calculate function for                     *
+ *             function  - function (for example, 'max')                      *
  *             parameter - parameter of the function                          *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
@@ -3360,6 +3360,22 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
+			/* last, prev functions can return quoted and escaped string values */
+			/* which must be unquoted and unescaped before further processing   */
+			if ('"' == *value)
+			{
+				char	*src, *dst;
+
+				for (dst = value, src = dst + 1; '"' != *src; )
+				{
+					if ('\\' == *src)
+						src++;
+					if ('\0' == *src)
+						break;
+					*dst++ = *src++;
+				}
+				*dst = '\0';
+			}
 			zbx_format_value(value, len, item.valuemapid, item.units, item.value_type);
 		}
 		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function,

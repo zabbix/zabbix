@@ -149,7 +149,7 @@ out:
  *                                                                            *
  * Purpose: save the trigger changes to database                              *
  *                                                                            *
- * Parameters:trigger_diff - [IN] the trigger changeset                       *
+ * Parameters: trigger_diff - [IN] the trigger changeset                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)

@@ -517,7 +517,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                         <name>Nginx: Connections by state</name>
                         <host>Template App Nginx by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -539,7 +539,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                         <name>Nginx: Requests per second</name>
                         <host>Template App Nginx by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -561,7 +561,7 @@ https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                         <name>Nginx: Connections per second</name>
                         <host>Template App Nginx by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>

@@ -3736,7 +3736,7 @@
 						$.subscribe('widget.update.dimensions', warning_msg_remove);
 						$wrapper.siblings('.msg-good, .msg-bad').remove();
 						$wrapper.before(makeMessageBox(
-							'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, true
+							'warning', [], t('Cannot add widget: not enough free space on the dashboard.'), true, false
 						));
 						return;
 					}

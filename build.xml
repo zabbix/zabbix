@@ -61,6 +61,11 @@
 		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
 	</target>
 
+	<target name="init-frontend-modules">
+		<!-- Copy modules directory for selenium tests -->
+		<copydir forceoverwrite="true" src="ui/tests/selenium/modules" dest="ui/modules"/>
+	</target>
+
 	<target name="make-dbschema">
 		<!-- Create database schema -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
@@ -174,7 +179,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
+	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql,init-frontend-modules">
 		<exec executable="psql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -290,7 +295,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,init-server-mysql">
+	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,init-server-mysql,init-frontend-modules">
 		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>

@@ -60,6 +60,11 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'description' => '!@#$%^&*()_+/*'
 						],
 						[
+							'macro' => '{$M:regex:^[0-9a-z]}',
+							'value' => 'regex',
+							'description' => 'context macro with regex'
+						],
+						[
 							'macro' => '{$MACRO1}',
 							'value' => 'Value_1',
 							'description' => 'Test macro Description 1'
@@ -88,6 +93,11 @@ class testFormHostPrototypeMacros extends testFormMacros {
 							'macro' => '{$MACRO:A}',
 							'value' => '{$MACRO:A}',
 							'description' => '{$MACRO:A}'
+						],
+						[
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => '',
+							'description' => ''
 						]
 					],
 					'success_message' => 'Host prototype added'
@@ -145,6 +155,28 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					],
 					'error_message' => 'Cannot add host prototype',
 					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'Host prototype With repeated regex {#MACROS}',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_message' => 'Cannot add host prototype',
+					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
 				]
 			]
 		];
@@ -239,6 +271,35 @@ class testFormHostPrototypeMacros extends testFormMacros {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[a-z]"}',
+							'value' => 'regex',
+							'description' => ''
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$MACRO:regex:^[0-9a-z]}',
+							'value' => '',
+							'description' => 'DESCRIPTION'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'macro' => '{$UPDATED_MACRO_2}',
+							'value' => 'Значение',
+							'description' => 'Описание'
+						]
+					],
+					'success_message' => 'Host prototype updated'
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'Name' => 'Without dollar in Macros',
 					'macros' => [
@@ -291,6 +352,54 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					],
 					'error_message' => 'Cannot update host prototype',
 					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated regex {#MACROS}',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$M:regex:"[a-z]"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$M:regex:"[a-z]"}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_message' => 'Cannot update host prototype',
+					'error_details' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated regex {#MACROS} and quotes',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$MACRO:regex:^[0-9].*$}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_message' => 'Cannot update host prototype',
+					'error_details' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.'
 				]
 			]
 		];

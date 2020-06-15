@@ -291,6 +291,21 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
+	 * Get values of elements as array.
+	 *
+	 * @return array
+	 */
+	public function asValues() {
+		$values = [];
+
+		foreach ($this->elements as $key => $element) {
+			$values[$key] = $element->getValue();
+		}
+
+		return $values;
+	}
+
+	/**
 	 * Get elements as array.
 	 *
 	 * @return array

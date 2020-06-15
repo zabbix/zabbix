@@ -58,7 +58,8 @@ else {
 	foreach ($data['macros'] as $i => $macro) {
 		$readonly = ($data['readonly'] || !($macro['inherited_type'] & ZBX_PROPERTY_OWN));
 		$macro_cell = [
-			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro'], ['readonly' => $readonly]))
+			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
+				->setReadonly($data['readonly'] || $macro['inherited_type'] & ZBX_PROPERTY_INHERITED)
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}'),

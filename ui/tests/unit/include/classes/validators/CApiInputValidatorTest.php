@@ -24,6 +24,55 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 	public function dataProviderInput() {
 		return [
 			[
+				['type' => API_CALC_FORMULA],
+				'last(agent.ping) = 1 or "text" = {$MACRO}',
+				'/1/formula',
+				'last(agent.ping) = 1 or "text" = {$MACRO}'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'last(agent.ping) = 1 or "text" = {#LLD}',
+				'/1/formula',
+				'Invalid parameter "/1/formula": incorrect calculated item formula starting from " {#LLD}".'
+			],
+			[
+				['type' => API_CALC_FORMULA, 'flags' => API_ALLOW_LLD_MACRO],
+				'last(agent.ping) = 1 or "text" = {#LLD}',
+				'/1/formula',
+				'last(agent.ping) = 1 or "text" = {#LLD}'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				'',
+				'/1/formula',
+				'Invalid parameter "/1/formula": cannot be empty.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				[],
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				true,
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				null,
+				'/1/formula',
+				'Invalid parameter "/1/formula": a character string is expected.'
+			],
+			[
+				['type' => API_CALC_FORMULA],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/formula',
+				'Invalid parameter "/1/formula": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_COLOR],
 				'ffffff',
 				'/1/color',
