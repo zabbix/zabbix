@@ -25,11 +25,13 @@ import (
 	"math"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/web"
 )
 
 const (
@@ -166,6 +168,24 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
+func (p *Plugin) httpsExpect(ip string, port string) int {
+	url := ip
+	if port != "" {
+		url = net.JoinHostPort(ip, port)
+	}
+
+	if !strings.HasPrefix(ip, "https://") {
+		url = fmt.Sprintf("https://%s", url)
+	}
+
+	if _, err := web.Get(url, time.Second*p.options.Timeout, true); err != nil {
+		log.Debugf("https network error: cannot connect to [%s]: %s", url, err.Error())
+		return 0
+	}
+
+	return 1
+}
+
 func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
@@ -245,12 +265,19 @@ func (p *Plugin) exportNetService(params []string) int {
 	if len(params) == 3 && params[2] != "" {
 		port = params[2]
 	} else {
-		if service != "pop" {
-			port = service
-		} else {
+		switch service {
+		case "pop":
 			port = "pop3"
+		case "https":
+			port = ""
+		default:
+			port = service
 		}
 	}
+	if service == "https" {
+		return p.httpsExpect(ip, port)
+	}
+
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
 }
 
@@ -299,7 +326,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				err = errors.New(errorInvalidThirdParam)
 				return
 			}
-		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http":
+		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "https":
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return
