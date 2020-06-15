@@ -203,12 +203,12 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	const char	*filename;
-	int		ret = SYSINFO_RET_FAIL, file_exists, types, types_incl, types_excl;
+	int		file_exists, types, types_incl, types_excl;
 
 	if (3 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return ret;
+		return SYSINFO_RET_FAIL;
 	}
 
 	filename = get_rparam(request, 0);
@@ -216,13 +216,13 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == filename || '\0' == *filename)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return ret;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
 			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
 	{
-		return ret;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 == types_incl)
@@ -243,7 +243,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
 					zbx_strerror(errno)));
-			return ret;
+			return SYSINFO_RET_FAIL;
 		}
 
 		if (0 == rc && S_ISLNK(buf.st_mode))
@@ -283,7 +283,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
-		return ret;
+		return SYSINFO_RET_FAIL;
 	}
 done:
 	SET_UI64_RESULT(result, file_exists);
