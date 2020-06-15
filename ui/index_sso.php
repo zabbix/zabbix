@@ -201,6 +201,8 @@ try {
 		if (hasRequest('slo') && CSession::keyExists('saml_data')) {
 			$saml_data = CSession::getValue('saml_data');
 
+			CWebUser::logout();
+
 			$auth->logout(null, [], $saml_data['nameid'], $saml_data['session_index'], false,
 				$saml_data['nameid_format'], $saml_data['nameid_name_qualifier'], $saml_data['nameid_sp_name_qualifier']
 			);
@@ -208,8 +210,6 @@ try {
 
 		if (hasRequest('sls')) {
 			$auth->processSLO();
-
-			CWebUser::logout();
 
 			redirect('index.php');
 		}
