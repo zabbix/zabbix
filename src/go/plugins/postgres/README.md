@@ -1,4 +1,4 @@
-# MySQL plugin
+# PostgreSQL plugin
 
 This plugin provides a native solution for monitoring PostgreSQL servers by Zabbix (in-memory data structure store).
 The plugin can monitor several remote or local PostgreSQL instances simultaneously via Zabbix agent 2. The plugin keeps connections in the open state to reduce network congestion, latency, CPU, and memory usage. It can be used in conjunction with the official "Template DB PostgreSQL Agent 2" monitoring template (it is also possible to edit or extend the default template as needed or create a new one for your specific needs).
@@ -440,19 +440,19 @@ FROM pg_catalog.pg_stat_database
 Then JSON is proceeded by dependent items of :
 
 - pgsql.dbstat.numbackends["{#DBNAME}"] - Number of backends currently connected to this database.
-- pgsql.dbstat.sum.blk_read_time["{#DBNAME}"] - Time spent reading data file blocks by backends in this database, in milliseconds.  
-- pgsql.dbstat.sum.blk_write_time["{#DBNAME}"] - Time spent writing data file blocks by backends in this database, in milliseconds.  
-- pgsql.dbstat.sum.checksum_failures["{#DBNAME}"] - Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled.(PostgreSQL version 12 only)  
-- pgsql.dbstat.blks_read.rate["{#DBNAME}"] - Number of disk blocks read in this database.  
-- pgsql.dbstat.deadlocks.rate["{#DBNAME}"] - Number of deadlocks detected in this database.  
+- pgsql.dbstat.sum.blk_read_time["{#DBNAME}"] - Time spent reading data file blocks by backends in this database, in milliseconds. 
+- pgsql.dbstat.sum.blk_write_time["{#DBNAME}"] - Time spent writing data file blocks by backends in this database, in milliseconds. 
+- pgsql.dbstat.sum.checksum_failures["{#DBNAME}"] - Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled.(PostgreSQL version 12 only) 
+- pgsql.dbstat.blks_read.rate["{#DBNAME}"] - Number of disk blocks read in this database. 
+- pgsql.dbstat.deadlocks.rate["{#DBNAME}"] - Number of deadlocks detected in this database. 
 - pgsql.dbstat.blks_hit.rate["{#DBNAME}"] - Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL Pro buffer cache, not the operating system's file system cache).
-- pgsql.dbstat.xact_rollback.rate["{#DBNAME}"] - Number of transactions in this database that have been rolled back.  
-- pgsql.dbstat.xact_commit.rate["{#DBNAME}"] - Number of transactions in this database that have been committed.  
-- pgsql.dbstat.tup_updated.rate["{#DBNAME}"] - Number of rows updated by queries in this database.  
-- pgsql.dbstat.tup_returned.rate["{#DBNAME}"] - Number of rows returned by queries in this database.  
-- pgsql.dbstat.tup_inserted.rate["{#DBNAME}"] - Number of rows inserted by queries in this database.  
-- pgsql.dbstat.tup_fetched.rate["{#DBNAME}"] - Number of rows fetched by queries in this database.  
-- pgsql.dbstat.tup_deleted.rate["{#DBNAME}"] - Number of rows deleted by queries in this database.  
+- pgsql.dbstat.xact_rollback.rate["{#DBNAME}"] - Number of transactions in this database that have been rolled back. 
+- pgsql.dbstat.xact_commit.rate["{#DBNAME}"] - Number of transactions in this database that have been committed. 
+- pgsql.dbstat.tup_updated.rate["{#DBNAME}"] - Number of rows updated by queries in this database. 
+- pgsql.dbstat.tup_returned.rate["{#DBNAME}"] - Number of rows returned by queries in this database. 
+- pgsql.dbstat.tup_inserted.rate["{#DBNAME}"] - Number of rows inserted by queries in this database. 
+- pgsql.dbstat.tup_fetched.rate["{#DBNAME}"] - Number of rows fetched by queries in this database. 
+- pgsql.dbstat.tup_deleted.rate["{#DBNAME}"] - Number of rows deleted by queries in this database. 
 - pgsql.dbstat.conflicts.rate["{#DBNAME}"] - Number of queries canceled due to conflicts with recovery in this database. (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)
 - pgsql.dbstat.temp_files.rate["{#DBNAME}"] - Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
 - pgsql.dbstat.temp_bytes.rate["{#DBNAME}"] - Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
