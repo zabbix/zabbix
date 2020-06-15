@@ -28,11 +28,21 @@ final class CCookieSession implements \SessionHandlerInterface {
 
 	private const COOKIE_MAX_SIZE = 4096;
 
+	private $key;
+
 	/**
 	 * Class consturctor. Set session handlers and start session.
 	 */
 	public function __construct() {
 		if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
+
+			$config = select_config();
+			$this->key = $config['session_key'];
+
+			if (!$this->key) {
+				throw new \Exception('Please define session secret key');
+			}
+
 			// Set use_cookie to 0 because we manually set session id
 			ini_set('session.use_cookies', 0);
 			// Set serialize method because we need have abillity to encode / decode session data.
@@ -43,7 +53,7 @@ final class CCookieSession implements \SessionHandlerInterface {
 			);
 
 			if (!$this->session_start()) {
-				throw new Exception('Cannot start session.');
+				throw new \Exception('Cannot start session.');
 			}
 
 			CSessionHelper::set('sessionid', CSessionHelper::getId());
@@ -109,7 +119,7 @@ final class CCookieSession implements \SessionHandlerInterface {
 	public function read($session_id) {
 		$data = CCookieHelper::get(self::COOKIE_NAME);
 
-		return $data ? $this->decode($data) : '';
+		return $data ? base64_decode($data) : '';
 	}
 
 	/**
@@ -140,6 +150,11 @@ final class CCookieSession implements \SessionHandlerInterface {
 		}
 
 		$cookie = $this->decode(CCookieHelper::get(self::COOKIE_NAME));
+
+		if (!$this->checkSign($cookie)) {
+			return session_start();
+		}
+
 		$data = unserialize($cookie);
 
 		if (array_key_exists('sessionid', $data)) {
@@ -150,10 +165,27 @@ final class CCookieSession implements \SessionHandlerInterface {
 	}
 
 	private function encode(string $data): string {
+		$sign = $this->sign($data);
+		$data = unserialize($data);
+		$data['sign'] = $sign;
+		$data = serialize($data);
 		return base64_encode($data);
 	}
 
 	private function decode(string $data): string {
 		return base64_decode($data);
+	}
+
+	private function checkSign(string $data) {
+		$data = unserialize($data);
+		$session_sign = $data['sign'];
+		unset($data['sign']);
+		$sign = $this->sign(serialize($data));
+
+		return hash_equals($session_sign, $sign);
+	}
+
+	private function sign(string $data): string {
+		return openssl_encrypt($data, 'aes-256-ecb', $this->key);
 	}
 }

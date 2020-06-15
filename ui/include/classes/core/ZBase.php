@@ -168,10 +168,13 @@ class ZBase {
 
 		switch ($mode) {
 			case self::EXEC_MODE_DEFAULT:
-				new CCookieSession();
 
 				$this->loadConfigFile();
 				$this->initDB();
+
+				// Start sesion only after DB initilized.
+				new CCookieSession();
+
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
 				$this->initMessages();
