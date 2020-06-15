@@ -203,7 +203,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	const char	*filename;
-	int		file_exists, types, types_incl, types_excl;
+	int		types = 0, types_incl, types_excl;
 
 	if (3 < request->nparam)
 	{
@@ -233,60 +233,47 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 			types_incl = ZBX_FT_ALLMASK;
 	}
 
-	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
-
-	if (0 != (types & ZBX_FT_SYM) || 0 != (types_excl & ZBX_FT_SYM))
+	if (0 != (types_incl & ZBX_FT_SYM) || 0 != (types_excl & ZBX_FT_SYM))
 	{
-		int rc;
-
-		if (0 != (rc = lstat(filename, &buf)) && ENOENT != errno)
+		if (0 == lstat(filename, &buf))
+		{
+			if (0 != S_ISLNK(buf.st_mode))
+				types |= ZBX_FT_SYM;
+		}
+		else if (ENOENT != errno)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
 					zbx_strerror(errno)));
 			return SYSINFO_RET_FAIL;
 		}
-
-		if (0 == rc && S_ISLNK(buf.st_mode))
-		{
-			if (0 != (types & ZBX_FT_SYM))
-			{
-				file_exists = 1;
-				goto done;
-			}
-
-			if (0 != (types_excl & ZBX_FT_SYM))
-			{
-				file_exists = 0;
-				goto done;
-			}
-		}
 	}
 
 	if (0 == zbx_stat(filename, &buf))
 	{
-		if ((S_ISREG(buf.st_mode) && 0 != (types & ZBX_FT_FILE)) ||
-				(S_ISDIR(buf.st_mode)  && 0 != (types & ZBX_FT_DIR)) ||
-				(S_ISSOCK(buf.st_mode) && 0 != (types & ZBX_FT_SOCK)) ||
-				(S_ISBLK(buf.st_mode)  && 0 != (types & ZBX_FT_BDEV)) ||
-				(S_ISCHR(buf.st_mode)  && 0 != (types & ZBX_FT_CDEV)) ||
-				(S_ISFIFO(buf.st_mode) && 0 != (types & ZBX_FT_FIFO)))
-		{
-			file_exists = 1;
-		}
-		else
-			file_exists = 0;
+		if (0 != S_ISREG(buf.st_mode))
+			types |= ZBX_FT_FILE;
+		else if (0 != S_ISDIR(buf.st_mode))
+			types |= ZBX_FT_DIR;
+		else if (0 != S_ISSOCK(buf.st_mode))
+			types |= ZBX_FT_SOCK;
+		else if (0 != S_ISBLK(buf.st_mode))
+			types |= ZBX_FT_BDEV;
+		else if (0 != S_ISCHR(buf.st_mode))
+			types |= ZBX_FT_CDEV;
+		else if (0 != S_ISFIFO(buf.st_mode))
+			types |= ZBX_FT_FIFO;
 	}
-	else if (errno == ENOENT)
-	{
-		file_exists = 0;
-	}
-	else
+	else if (ENOENT != errno)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
-done:
-	SET_UI64_RESULT(result, file_exists);
+
+	if (0 == (types & types_excl) && 0 != (types & types_incl))
+		SET_UI64_RESULT(result, 1);
+	else
+		SET_UI64_RESULT(result, 0);
+
 	return SYSINFO_RET_OK;
 }
 #endif
