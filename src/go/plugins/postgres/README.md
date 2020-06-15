@@ -16,23 +16,6 @@ The plugin is supplied as part of the Zabbix Agent 2 and does not require any sp
 
 Open the Zabbix Agent configuration file (zabbix_agent2.conf or zabbix_agent2.win.conf) and set the required parameters.
 
-**Plugins.Postgres.User** — a username to be used for PostgreSQL authentication.  
-*Default value:* postgres.
-
-**Plugins.Postgres.Password** — a password to be used for PostgreSQL authentication.  
-*Default value:* postgres.
-
-**Plugins.Postgres.Port** — port to be used for PostgreSQL.
-*Default value:* 5432
-
-**Plugins.Postgres.Host** — host to be used for PostgreSQL.
-*Default value:* localhost
-
-Examples:
-
-- localhost
-- 192.168.1.1
-
 **Plugins.Postgres.Database** — a database name to be used for PostgreSQL.
 *Default value:* postgres
 
