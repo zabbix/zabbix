@@ -49,7 +49,7 @@ foreach (getLocales() as $localeid => $locale) {
 }
 
 // Restoring original locale.
-setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
+setlocale(LC_MONETARY, zbx_locale_variants($data['default_lang']));
 
 $language_error = '';
 if (!function_exists('bindtextdomain')) {

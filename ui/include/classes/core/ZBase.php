@@ -207,7 +207,6 @@ class ZBase {
 					$this->loadConfigFile();
 					$this->initDB();
 					$this->authenticateUser();
-					$this->initLocales(CWebUser::$data);
 				}
 				catch (ConfigFileException $e) {}
 				break;
@@ -370,7 +369,7 @@ class ZBase {
 	 * @param array  $user_data          Array of user data.
 	 * @param string $user_data['lang']  Language.
 	 */
-	protected function initLocales(array $user_data) {
+	public function initLocales(array $user_data): void {
 		init_mbstrings();
 
 		$defaultLocales = [

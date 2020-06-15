@@ -188,7 +188,7 @@ class CWebUser {
 		self::$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
-			'lang' => $config['default_lang'],
+			'lang' => $config ? $config['default_lang'] : ZBX_DEFAULT_LANG,
 			'type' => 0,
 			'debug_mode' => false
 		];
