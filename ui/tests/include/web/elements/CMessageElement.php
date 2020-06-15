@@ -36,8 +36,7 @@ class CMessageElement extends CElement {
 	 * @return boolean
 	 */
 	public function isGood() {
-		$classes = ['msg-good', 'msg-good msg-global'];
-		return (in_array($this->getAttribute('class'), $classes));
+		return in_array('msg-good', explode(' ', $this->getAttribute('class')));
 	}
 
 	/**
@@ -46,8 +45,7 @@ class CMessageElement extends CElement {
 	 * @return boolean
 	 */
 	public function isBad() {
-		$classes = ['msg-bad', 'msg-bad msg-global'];
-		return (in_array($this->getAttribute('class'), $classes));
+		return in_array('msg-bad', explode(' ', $this->getAttribute('class')));
 	}
 
 	/**

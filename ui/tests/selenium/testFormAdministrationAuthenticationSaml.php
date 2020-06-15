@@ -324,7 +324,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 			'SSO service URL' => 'http://192.168.3.37:8081/simplesaml/saml2/idp/SSOService.php',
 			'SLO service URL' => 'http://192.168.3.37:8081/simplesaml/saml2/idp/SingleLogoutService.php',
 			'Username attribute' => 'uid',
-			'SP entity ID' => 'dev-1560-5.0',
+			'SP entity ID' => 'saml_entity_id',
 			'Case sensitive login' => false
 		];
 		// Override particcular SAMl settings with values from data provider.
