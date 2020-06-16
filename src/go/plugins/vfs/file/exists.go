@@ -139,7 +139,6 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 		return 0, err
 	}
 
-	fmt.Println(types, typesExcl, typesIncl)
 	if !typesExcl.HasType(types) && typesIncl.HasType(types) {
 		return 1, nil
 	}
