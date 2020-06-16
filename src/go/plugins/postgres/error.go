@@ -19,7 +19,10 @@
 
 package postgres
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type zabbixError string
 
@@ -46,4 +49,30 @@ func formatZabbixError(errText string) string {
 	}
 
 	return strings.Title(errText)
+}
+
+func sanitizeError(errText, connString string) (err error) {
+	// default error string shows user credentials used to establish connection
+	// this can be potentialy dangerous
+	// create error message string without sensitive info
+	var (
+		originSchema, sanitizedErrorString string
+		startingIndexOfError               int
+	)
+	if strings.Contains(connString, "host=") {
+		originSchema = "unix://"
+	} else {
+		originSchema = "tcp://"
+	}
+	// want to get only uri from conn string for the error message
+	splitted := strings.Split(connString, "@")
+	if len(splitted) > 1 {
+		// create error message without username and password and with the right schemaname
+		startingIndexOfError = strings.Index(errText, connString) + len(connString) + 2
+		sanitizedErrorString = fmt.Sprintf("%s%s  %s ", originSchema, splitted[1], errText[startingIndexOfError:])
+	} else {
+		// should never happen
+		sanitizedErrorString = errText[len(connString):]
+	}
+	return fmt.Errorf("invalid connection string: %s:", sanitizedErrorString)
 }

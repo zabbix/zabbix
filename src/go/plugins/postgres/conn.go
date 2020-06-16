@@ -56,7 +56,7 @@ func (p *postgresConn) finalize() (err error) {
 	// get conn pool using url created in postgres.go
 	config, err := pgxpool.ParseConfig(p.connString)
 	if err != nil {
-		return fmt.Errorf("invalid connection string: %s:", err)
+		return sanitizeError(err.Error(), p.connString)
 	}
 	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		d := net.Dialer{}
