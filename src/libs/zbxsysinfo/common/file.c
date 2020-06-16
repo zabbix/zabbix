@@ -203,12 +203,12 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	const char	*filename;
-	int		ret = SYSINFO_RET_FAIL, file_exists, types, types_incl, types_excl;
+	int		types = 0, types_incl, types_excl;
 
 	if (3 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		goto err;
+		return SYSINFO_RET_FAIL;
 	}
 
 	filename = get_rparam(request, 0);
@@ -216,13 +216,13 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == filename || '\0' == *filename)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		goto err;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (FAIL == (types_incl = zbx_etypes_to_mask(get_rparam(request, 1), result)) ||
 			FAIL == (types_excl = zbx_etypes_to_mask(get_rparam(request, 2), result)))
 	{
-		goto err;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 == types_incl)
@@ -233,40 +233,48 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 			types_incl = ZBX_FT_ALLMASK;
 	}
 
-	types = types_incl & (~types_excl) & ZBX_FT_ALLMASK;
+	if (0 != (types_incl & ZBX_FT_SYM) || 0 != (types_excl & ZBX_FT_SYM))
+	{
+		if (0 == lstat(filename, &buf))
+		{
+			if (0 != S_ISLNK(buf.st_mode))
+				types |= ZBX_FT_SYM;
+		}
+		else if (ENOENT != errno)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
+					zbx_strerror(errno)));
+			return SYSINFO_RET_FAIL;
+		}
+	}
 
-	if(0 != (types & ZBX_FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
+	if (0 == zbx_stat(filename, &buf))
 	{
-		file_exists = 1;
+		if (0 != S_ISREG(buf.st_mode))
+			types |= ZBX_FT_FILE;
+		else if (0 != S_ISDIR(buf.st_mode))
+			types |= ZBX_FT_DIR;
+		else if (0 != S_ISSOCK(buf.st_mode))
+			types |= ZBX_FT_SOCK;
+		else if (0 != S_ISBLK(buf.st_mode))
+			types |= ZBX_FT_BDEV;
+		else if (0 != S_ISCHR(buf.st_mode))
+			types |= ZBX_FT_CDEV;
+		else if (0 != S_ISFIFO(buf.st_mode))
+			types |= ZBX_FT_FIFO;
 	}
-	else if (0 != (types_excl & ZBX_FT_SYM) && 0 == lstat(filename, &buf) && S_ISLNK(buf.st_mode))
-	{
-		file_exists = 0;
-	}
-	else if (0 == zbx_stat(filename, &buf) && (
-			(S_ISREG(buf.st_mode)  && 0 != (types & ZBX_FT_FILE)) ||
-			(S_ISDIR(buf.st_mode)  && 0 != (types & ZBX_FT_DIR)) ||
-			(S_ISSOCK(buf.st_mode) && 0 != (types & ZBX_FT_SOCK)) ||
-			(S_ISBLK(buf.st_mode)  && 0 != (types & ZBX_FT_BDEV)) ||
-			(S_ISCHR(buf.st_mode)  && 0 != (types & ZBX_FT_CDEV)) ||
-			(S_ISFIFO(buf.st_mode) && 0 != (types & ZBX_FT_FIFO))))
-	{
-		file_exists = 1;
-	}
-	else if (errno == ENOENT)
-	{
-		file_exists = 0;
-	}
-	else
+	else if (ENOENT != errno)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
-		goto err;
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_UI64_RESULT(result, file_exists);
-	ret = SYSINFO_RET_OK;
-err:
-	return ret;
+	if (0 == (types & types_excl) && 0 != (types & types_incl))
+		SET_UI64_RESULT(result, 1);
+	else
+		SET_UI64_RESULT(result, 0);
+
+	return SYSINFO_RET_OK;
 }
 #endif
 
