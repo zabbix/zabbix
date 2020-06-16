@@ -168,17 +168,32 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
+func buildURL(scheme string, ip string, port string) (out string) {
+	if ip == "" || port == "" {
+		return ip
+	}
+
+	parts := strings.Split(ip, "/")
+	for i, p := range parts {
+		if i == 0 {
+			out = fmt.Sprintf("%s:%s", p, port)
+			continue
+		}
+		out = fmt.Sprintf("%s/%s", out, p)
+	}
+
+	if scheme != "" {
+		out = fmt.Sprintf("%s://%s", scheme, out)
+	}
+
+	return
+}
+
 func (p *Plugin) httpsExpect(ip string, port string) int {
-	url := ip
-	if port != "" {
-		url = net.JoinHostPort(ip, port)
-	}
-
-	if !strings.HasPrefix(ip, "https://") {
-		url = fmt.Sprintf("https://%s", url)
-	}
-
-	if _, err := web.Get(url, time.Second*p.options.Timeout, true); err != nil {
+	url := buildURL("https", ip, port)
+	// does NOT return an error on >=400 status codes same as C agent
+	_, err := web.Get(url, time.Second*p.options.Timeout, false)
+	if err != nil {
 		log.Debugf("https network error: cannot connect to [%s]: %s", url, err.Error())
 		return 0
 	}
