@@ -1,6 +1,11 @@
 Changes for 5.0.2rc1
 
 New features:
+........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
+A.F....PS. [ZBXNEXT-3205] added regex context matching support to user macros (rlataria, wiper)
+.........T [ZBXNEXT-5966] updated SNMP templates for version 5.0 (afayantsev)
+A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit log (rlataria, wiper)
+........S. [ZBXNEXT-3588] improved Zabbix server performance when evaluating trigger, discovery, autoregistration and internal actions (vso)
 ...G...... [ZBXNEXT-1867] added file type include and exclude parameters to item 'vfs.file.exist' (Andris, viktors)
 .........T [ZBXNEXT-5955] added support of custom fields and custom buttons in message card (tuskov)
 .........T [ZBXNEXT-5921] added IIS template (tuskov)
@@ -9,6 +14,26 @@ New features:
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+.......PS. [ZBX-17720] exclude disabled items from preprocessing configuration sync (wiper)
+.........T [ZBX-16940] added "Number of cores" item and changed trigger for "CPU queue length" item (mchudinov)
+........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
+.........T [ZBX-16945] changed type of items "Free swap space" to calculated, "Free swap space in %" to dependent, added item "Used swap space in %" (mchudinov)
+..F....... [ZBX-17853] fixed graph filter to be reset when linked from graph screen and host inventory page (talbergs)
+...G...... [ZBX-17673] removed redundant shared memory destruction (viktors)
+..F....... [ZBX-17735] made changes in System information widget to show number of templates on a separate line and number of hosts show only enabled and disabled hosts (Ivo)
+.....J.... [ZBX-17406] fixed null value for a field of CompositeData in JMX discovery (arimdjonoks)
+..F....... [ZBX-17823] fixed displaying zero for history values less than one millisecond (averza)
+..F....... [ZBXNEXT-5763] fixed resolving of macros in the item test form for formulas of the calculated items (Sasha)
+...G...... [ZBX-17245] fixed agent2 not logging to system log code (esneiders)
+...G...... [ZBX-17759] aliased EnableRemoteCommands to Allow/DenyKey=system.run[*], added default DenyKey=system.run[*] rule for backwards compatibility (wiper)
+...G...... [ZBX-17891] changed log, log.count monitoring to ignore file modification time (wiper)
+..F....... [ZBX-17697] fixed strict DFSG compliance issue in using minified jQuery sources (talbergs)
+..F....... [ZBX-17729] fixed user is always redirected back to login form when using SAML SSO if guest mode is enabled (agriscenko)
+.........T [ZBX-16461] fixed recovery expression for "link down" trigger (tuskov)
+.........T [ZBX-17480] fixed context of {$TEMP_CRIT} macro in Temperature trigger prototype (tuskov)
+........S. [ZBX-17702] fixed escalation cancellation message not being sent when action is disabled (wiper)
+..F....... [ZBX-17751] fixed host group multiselect in popups remembering selected groups when it should not (Ivo)
+........S. [ZBX-17816] fixed wrong query fields when linking template with host prototype (MVekslers)
 .........T [ZBX-17741] changed setup description for Template DB MySQL by Zabbix agent 2 (mchudinov)
 ..F....... [ZBX-17644] fixed host address field not being editable and macros not showing for username and password fields in item test popup form for SSH and TELNET item types (Ivo)
 A.F....... [ZBX-14539] added validation of the calculated item formula in item.create, item.update, itemprototype.create and itemprototype.update methods (Sasha)
@@ -344,6 +369,8 @@ Changes for 4.4.10rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
+...G...... [ZBX-17891] changed log, log.count monitoring to ignore file modification time (wiper)
 .......PS. [ZBX-17801] shadow global auto_increment MySQL variables only for proxy (arimdjonoks)
 
 --------------------------------------------------------------------------------
@@ -1520,8 +1547,16 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.22rc1
 
 New features:
+........S. [ZBXNEXT-3588] improved Zabbix server performance when evaluating trigger, discovery, autoregistration and internal actions (vso)
 
 Bug fixes:
+.......PS. [ZBX-17720] exclude disabled items from preprocessing configuration sync (wiper)
+........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
+.....J.... [ZBX-17406] fixed null value for a field of CompositeData in JMX discovery (arimdjonoks)
+...G...... [ZBX-17891] changed log, log.count monitoring to ignore file modification time (wiper)
+..F....... [ZBX-17697] fixed strict DFSG compliance issue in using minified jQuery sources (talbergs)
+.........T [ZBX-16461] fixed recovery expression for "link down" trigger and updated for following zabbix template guidelines (tuskov)
+........S. [ZBX-17702] fixed escalation cancellation message not being sent when action is disabled (wiper)
 .........T [ZBX-17480] fixed context of {$TEMP_CRIT} macro in Temperature trigger prototype (tuskov)
 .......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
 ...G...... [ZBX-17780] fixed memory leak (viktors)
