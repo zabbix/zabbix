@@ -95,6 +95,9 @@ func (c *DiskCache) getOldestWriteClock(table string) (clock int64, err error) {
 	if err != nil {
 		return
 	}
+
+	defer rows.Close()
+
 	var u interface{}
 	ok, err := fetchRowAndClose(rows, &u)
 	if err != nil {
@@ -116,6 +119,9 @@ func (c *DiskCache) getLastID(table string) (id uint64, err error) {
 	if err != nil {
 		return
 	}
+
+	defer rows.Close()
+
 	var u interface{}
 	ok, err := fetchRowAndClose(rows, &u)
 	if err != nil {
@@ -165,6 +171,9 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		c.Errf("cannot select from data table: %s", err.Error())
 		return
 	}
+
+	defer rows.Close()
+
 	defer func() {
 		if err != nil && (c.lastError == nil || err.Error() != c.lastError.Error()) {
 			c.Warningf("cannot upload history data: %s", err)
@@ -197,6 +206,9 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 			c.Errf("cannot select from log table: %s", err.Error())
 			return
 		}
+
+		defer rows.Close()
+
 		for rows.Next() {
 			if result, err = c.resultFetch(rows); err != nil {
 				rows.Close()
@@ -340,9 +352,13 @@ func (c *DiskCache) write(r *plugin.Result) {
 			atomic.StoreUint32(&c.persistFlag, 1)
 		}
 		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("log_%d", c.serverID)))
+
 		if err != nil {
 			c.Errf("cannot prepare SQL query to insert history in log_%d : %s", c.serverID, err)
+		} else {
+			defer stmt.Close()
 		}
+
 	} else {
 		if c.oldestData == 0 {
 			c.oldestData = clock
@@ -361,6 +377,8 @@ func (c *DiskCache) write(r *plugin.Result) {
 		stmt, err = c.database.Prepare(c.insertResultTable(fmt.Sprintf("data_%d", c.serverID)))
 		if err != nil {
 			c.Errf("cannot prepare SQL query to insert history in data_%d : %s", c.serverID, err)
+		} else {
+			defer stmt.Close()
 		}
 	}
 	if stmt != nil {
@@ -423,6 +441,9 @@ func (c *DiskCache) init(options *agent.AgentOptions) {
 	}
 
 	rows, err := c.database.Query(fmt.Sprintf("SELECT id FROM registry WHERE address = '%s'", c.uploader.Addr()))
+
+	defer rows.Close()
+
 	if err == nil {
 		for rows.Next() {
 			if err = rows.Scan(&c.serverID); err != nil {
