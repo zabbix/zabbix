@@ -31,15 +31,21 @@ http://zabbix/<br>
 4\. You can also choose between two notification formats. Set *"use_default_message"* parameter:
 - **false** (default)
     - Use preformatted message with predefined set of fields for trigger-based notifications.<br>
-In internal, autoregistration and discovery notifications *{ALERT.MESSAGE}* as text a body of the message will be used.
+    In internal, autoregistration and discovery notifications *{ALERT.MESSAGE}* as a body of the message will be used.
+    In this case you can customize the message template for trigger-based notifications by adding additional fields and up to four buttons with URLs.
+        - To add an additional field to message card, put a parameter with prefix **fact_** and field name. For example, *"fact_Data center"* as key and *{EVENT.TAGS.dc}* as value.
+        - To create a new button with a link to an external resource, add a parameter with prefix **openUri_** and button name. The value should be a valid URL. For example, *"openUri_Link to Zabbix.com"* as key and *https://www.zabbix.com/* as value.<br>
+        If any of the parameters with prefix **openUri_** has invalid URL it will be ignored by Teams.<br>
+        Also, since Microsoft only supports five buttons in a message card, one of which is reserved for the "*Event info*" link, the fifth and subsequent parameters with prefix **openUri_** and valid URL will be ignored too.
+
 - **true**
-    - Use {ALERT.MESSAGE} as text a body of the message in all types of notifications.
+    - Use {ALERT.MESSAGE} as a body of the message in all types of notifications.
 
 [![](images/thumb.2.png?raw=true)](images/2.png)
 
 5\. To receive Zabbix notifications in MS Teams, you need to create a **Zabbix user** and add **Media** with the **MS Teams media type**.<br>
 In the *Administration → Users section*, click *Create user* button in the top right corner. In the *User* tab, fill in all required fields (marked with red asterisks). In the *Media* tab, add a new media and select **"MS Teams"** type from the drop-down list. Though a "*Send to*" field is not used in MS Teams media, it cannot be empty. To comply with the frontend requirements, you can put any symbol there.<br>
-Don’t forget that in order to send notifications, this user must have access to hosts that generated such problems
+Make sure this user has access to all hosts for which you would like problem notifications to be sent to MS Teams.<br>
 [![](images/thumb.3.png?raw=true)](images/3.png)
 
 6\. Great! You can now start receiving alerts!

@@ -1,1 +1,0 @@
-..F.....S. [ZBXNEXT-3209,ZBXNEXT-5932] added support of user related macros {USER.ALIAS}, {USER.FULLNAME}, {USER.NAME} and {USER.SURNAME} for global scripts (agriscenko, Andris)

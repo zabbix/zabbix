@@ -174,6 +174,7 @@
 #define ZBX_PROTO_TAG_PROXY_DELAY		"proxy_delay"
 #define ZBX_PROTO_TAG_EXPRESSIONS		"expressions"
 #define ZBX_PROTO_TAG_EXPRESSION		"expression"
+#define ZBX_PROTO_TAG_CLIENTIP			"clientip"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -272,7 +273,7 @@ int		zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, c
 		zbx_json_type_t *type);
 int		zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string,
 		size_t *string_alloc, zbx_json_type_t *type);
-int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *out);
+int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp);
 int		zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(const struct zbx_json_parse *jp);
 int		zbx_json_count(const struct zbx_json_parse *jp);

@@ -13,6 +13,8 @@
 #	include "zabbix_get_desc.h"
 #elif defined(ZABBIX_SENDER)
 #	include "zabbix_sender_desc.h"
+#elif defined(ZABBIX_AGENT2)
+#	include "zabbix_agent2_desc.h"
 #endif
 
 #define VER_FILEVERSION		ZABBIX_VERSION_MAJOR,ZABBIX_VERSION_MINOR,ZABBIX_VERSION_PATCH,ZABBIX_VERSION_RC_NUM
