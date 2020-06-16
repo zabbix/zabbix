@@ -154,7 +154,7 @@ class CControllerModuleUpdate extends CController {
 		}
 		else {
 			if ($this->getAction() === 'module.update') {
-				$response->setMessageOk(_s('Cannot update module: %1$s.', $db_modules_update_names[0]));
+				$response->setMessageError(_s('Cannot update module: %1$s.', $db_modules_update_names[0]));
 			}
 			elseif ($set_status == MODULE_STATUS_ENABLED) {
 				$response->setMessageError(_n('Cannot enable module: %1$s.', 'Cannot enable modules: %1$s.',
