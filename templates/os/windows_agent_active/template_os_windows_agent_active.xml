@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-11T17:03:35Z</date>
+   <date>2020-06-13T03:32:53Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -157,20 +157,6 @@ and are waiting to be executed.</description>
                      <name>CPU</name>
                   </application>
                </applications>
-               <triggers>
-                  <trigger>
-                     <expression>{min(5m)}&gt;{$CPU.QUEUE.CRIT.MAX}</expression>
-                     <name>CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)</name>
-                     <priority>WARNING</priority>
-                     <description>The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}.</description>
-                     <dependencies>
-                        <dependency>
-                           <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                           <expression>{Template Module Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>CPU utilization</name>
@@ -194,6 +180,18 @@ and are waiting to be executed.</description>
                      <description>CPU utilization is too high. The system might be slow to respond.</description>
                   </trigger>
                </triggers>
+            </item>
+            <item>
+               <name>Number of cores</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]</key>
+               <history>7d</history>
+               <description>The number of logical processors available on the computer.</description>
+               <applications>
+                  <application>
+                     <name>CPU</name>
+                  </application>
+               </applications>
             </item>
          </items>
          <macros>
@@ -2001,6 +1999,18 @@ Template tooling version used: 0.37</description>
       </template>
    </templates>
    <triggers>
+      <trigger>
+         <expression>{Template Module Windows CPU by Zabbix agent active:perf_counter_en["\System\Processor Queue Length"].min(5m)} - {Template Module Windows CPU by Zabbix agent active:wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"].last()} * 2 &gt; {$CPU.QUEUE.CRIT.MAX}</expression>
+         <name>CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)</name>
+         <priority>WARNING</priority>
+         <description>The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro {$CPU.QUEUE.CRIT.MAX }.</description>
+         <dependencies>
+            <dependency>
+               <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
+               <expression>{Template Module Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
+            </dependency>
+         </dependencies>
+      </trigger>
       <trigger>
          <expression>{Template Module Windows memory by Zabbix agent active:system.swap.pfree.min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
