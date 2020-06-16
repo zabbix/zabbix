@@ -19,12 +19,14 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
  * @backup items
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
+	use TableTrait;
 	const HOST_ID = 90001;
 	private $discovery_rule_names = ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'];
 
@@ -47,8 +49,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check all dropdowns.
 		$dropdowns = [
-			'Type' => ['all','Zabbix agent', 'Zabbix agent (active)', 'Simple check', 'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check',
-					'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item'],
+			'Type' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check', 'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check',
+					'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'all'],
 			'State' => ['Normal', 'Not supported', 'all'],
 			'Status' => ['all', 'Enabled', 'Disabled']
 		];
@@ -56,9 +58,19 @@ class testPageLowLevelDiscovery extends CWebTest {
 		foreach ($dropdowns as $name => $values) {
 			foreach ($values as $value) {
 				$form->fill([$name => $value]);
-				$form->submit();
-				$form->invalidate();
 				$this->assertEquals($form->getField($name)->getValue(), $value);
+				switch ($value):
+					case 'SNMP agent':
+						$this->assertTrue($form->query('xpath://li[@id="filter_snmp_oid_row" and @style=""]')->one()->isPresent());
+						break;
+					case 'Zabbix trapper':
+						$this->assertTrue($form->query('xpath://li[@id="filter_delay_row" and @style="display: none;"]')->one()->isPresent());
+						break;
+					case 'Normal':
+					case 'Not supported':
+						$this->assertTrue($form->query('xpath://div/select[@id="filter_status" and @disabled]')->one()->isPresent());
+						break;
+				endswitch;
 			}
 		}
 
@@ -70,8 +82,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Checking Title, Header and Column names.
 		$this->assertPageTitle('Configuration of discovery rules');
-		$title = $this->query('xpath://h1[@id="page-title-general"]')->one()->getText();
-		$this->assertEquals('Discovery rules', $title);
+		$this->assertPageHeader('Discovery rules');
 
 		$table = $this->query('class:list-table')->asTable()->one();
 		$headers = ['', 'Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts', 'Key', 'Interval', 'Type', 'Status', 'Info'];
@@ -116,16 +127,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	public function testPageLowLevelDiscovery_EnableDisableSingle() {
-		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$table = $this->query('class:list-table')->asTable()->one();
 		$name = 'Discovery rule 2';
 		$row = $table->findRow('Name', $name);
 		$row->select();
 		// Clicking Enabled/Disabled link
-		$discovery_status = ['Enabled', 'Disabled'];
-		foreach ($discovery_status as $action) {
+		$discovery_status = ['Enabled' => 1, 'Disabled' => 0];
+		foreach ($discovery_status as $action=>$expected_status) {
 			$row->query('link:'.$action)->one()->click();
-			$expected_status = $action === 'Enabled' ? 1 : 0;
 			$status = CDBHelper::getValue('SELECT status FROM items WHERE name ='.zbx_dbstr($name));
 			$this->assertEquals($expected_status, $status);
 			$message_action = $action === 'Enabled' ? 'disabled' : 'enabled';
@@ -136,7 +146,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	public function testPageLowLevelDiscovery_EnableDisableAll() {
-		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		// Press Enable or Disable buttons and check the result.
 		$actions = ['Disable', 'Enable'];
 		foreach ($actions as $action) {
@@ -154,24 +164,57 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'names' => ['Discovery rule 1', 'Discovery rule 2', 'Discovery rule 3'],
-					'message' => 'Request sent successfully'
+					'names' => [
+						['Name' => 'Discovery rule 1'],
+						['Name' => 'Discovery rule 2'],
+						['Name' => 'Discovery rule 3']
+					],
+					'message' => 'Request sent successfully',
+					'host_count' => 1
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'names' => ['Discovery rule 2'],
-					'message' => 'Request sent successfully'
+					'names' => [
+						'Name' => 'Discovery rule 2'
+					],
+					'message' => 'Request sent successfully',
+					'host_count' => 1
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'names' => ['Discovery rule 2'],
+					'names' => [
+						'Name' => 'Discovery rule 2'
+					],
 					'disabled' => true,
 					'message' => 'Cannot send request',
-					'error_details' => 'Cannot send request: discovery rule is disabled.'
+					'error_details' => 'Cannot send request: discovery rule is disabled.',
+					'host_count' => 1
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'Name' => 'Discovery rule for triggers filtering'
+					],
+					'message' => 'Cannot send request',
+					'error_details' => 'Cannot send request: wrong discovery rule type.',
+					'host_count' => 2
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'Name' => 'Temp Status Discovery'
+					],
+					'message' => 'Cannot send request',
+					'error_details' => 'Cannot send request: host is not monitored.',
+					'host_count' => 3
 				]
 			]
 		];
@@ -181,22 +224,28 @@ class testPageLowLevelDiscovery extends CWebTest {
 	* @dataProvider getCheckNowData
 	*/
 	public function testPageLowLevelDiscovery_CheckNow($data) {
-		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
+		switch ($data['host_count']):
+			case 1:
+				$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+				break;
+			case 2:
+				$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=99062');
+				break;
+			case 3:
+				$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=10250');
+		endswitch;
+
 		// Enabe all LLDs, so Check now can be send successfully.
 		$this->massChangeStatus('Enable');
-
-		$table = $this->query('class:list-table')->asTable()->one();
-		foreach($data['names'] as $name){
-			$row = $table->findRow('Name', $name);
-			$row->select();
-			if (CTestArrayHelper::get($data, 'disabled')) {
-				$this->query('button:Disable')->one()->click();
-				$this->page->acceptAlert();
-				$row->select();
-			}
+//		$table = $this->query('class:list-table')->asTable()->one();
+		$this->selectTableRows($data['names']);
+		if (CTestArrayHelper::get($data, 'disabled')) {
+			$this->query('button:Disable')->one()->click();
+			$this->page->acceptAlert();
+			$this->selectTableRows($data['names']);
 		}
-		$this->query('button:Execute now')->one()->click();
 
+		$this->query('button:Execute now')->one()->click();
 		$message = CMessageElement::find()->one();
 		$this->assertEquals($data['message'], $message->getTitle());
 		switch ($data['expected']) {
@@ -207,24 +256,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->assertTrue($message->isBad());
 				$this->assertTrue($message->hasLine($data['error_details']));
 				break;
+			}
 		}
-	}
-
-	public function testPageLowLevelDiscovery_DeleteAllButton() {
-		$this->page->login()->open('host_discovery.php?&hostid='.self::HOST_ID);
-		// Delete all discovery rules.
-		$table = $this->query('class:list-table')->asTable()->one();
-		foreach ($this->discovery_rule_names as $rule_name) {
-			$table->findRow('Name', $rule_name)->select();
-		}
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->assertEquals('Discovery rules deleted', CMessageElement::find()->one()->getTitle());
-		foreach ($this->discovery_rule_names as $rule_name) {
-			$count = CDBHelper::getCount('SELECT null FROM items WHERE name ='.zbx_dbstr($rule_name));
-			$this->assertEquals(0, $count);
-		}
-	}
+//	}
 
 	private function getTableResult($rows_count){
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -429,8 +463,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Status' => 'Disabled'
 					],
 					'expected' => [
-						'count' => 1,
-						'names' => ['Discovery-rule-layout-test-001']
+						'count' => 2,
+						'names' => ['Discovery-rule-layout-test-001', 'Discovery rule 2']
 					]
 				]
 			],
@@ -456,6 +490,35 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'names' => ['Discovery-rule-layout-test-001']
 					]
 				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'try'
+					],
+					'expected' => [
+						'count' => 0
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => 'Test item host',
+						'Name' => 'Test discovery rule',
+						'Key' => 'test',
+						'Type' => 'Zabbix agent',
+						'Update interval' => '0',
+						'Keep lost resources period' => '30d',
+						'State' => 'all',
+						'Status' => 'Enabled'
+					],
+					'expected' => [
+						'count' => 1,
+//						'names' => ['Test discovery rule']
+					]
+				]
 			]
 		];
 	}
@@ -470,9 +533,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
 		$form->submit();
+		$this->page->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals($data['expected']['count'], $table->getRows()->count());
-
 		if (array_key_exists('names', $data['expected'])) {
 			foreach ($data['expected']['names'] as $i => $name){
 				$this->assertEquals($name, $table->getRow($i)->getColumn('Name')->getText());
@@ -481,10 +544,47 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	private function massChangeStatus($action) {
+		$table = $this->query('class:list-table')->asTable()->one();
+		$row_count = $table->getRows()->count();
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button:'.$action)->one()->click();
 		$this->page->acceptAlert();
-		$this->assertEquals('Discovery rules '.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
+		if ($row_count == 1) {
+			$this->assertEquals('Discovery rule '.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
+		}
+		else {
+			$this->assertEquals('Discovery rules '.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
+		}
+	}
+
+	public function testPageLowLevelDiscovery_DeleteAllButton() {
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		// Delete all discovery rules.
+		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$form->fill(['Hosts'=>'Host for host prototype tests', 'Keep lost resources period'=> '']);
+		$form->submit();
+		$table = $this->query('class:list-table')->asTable()->one();
+		foreach ($this->discovery_rule_names as $rule_name) {
+			$table->findRow('Name', $rule_name)->select();
+		}
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertEquals('Discovery rules deleted', CMessageElement::find()->one()->getTitle());
+		foreach ($this->discovery_rule_names as $rule_name) {
+			$count = CDBHelper::getCount('SELECT null FROM items WHERE name ='.zbx_dbstr($rule_name));
+			$this->assertEquals(0, $count);
+		}
+
+		// Delete template discovery rule.
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$form->fill(['Hosts'=>'Host ZBX6663', 'Name'=>'DiscoveryRule ZBX6663 Second']);
+		$form->submit();
+		$this->page->waitUntilReady();
+		$table->findRow('Name', 'Template ZBX6663 Second: DiscoveryRule ZBX6663 Second')->select();
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertEquals('Cannot delete discovery rules', CMessageElement::find()->one()->getTitle());
 	}
 }
 
