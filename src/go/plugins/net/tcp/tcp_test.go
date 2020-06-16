@@ -21,7 +21,7 @@ package tcpudp
 
 import "testing"
 
-func Test_setPort(t *testing.T) {
+func Test_buildURL(t *testing.T) {
 	type args struct {
 		scheme string
 		ip     string
