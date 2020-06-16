@@ -26,7 +26,6 @@ class CControllerPopupLldOverride extends CController {
 	}
 
 	protected function checkInput() {
-
 		$fields = [
 			'no' =>					'int32',
 			'templated' =>			'in 0,1',

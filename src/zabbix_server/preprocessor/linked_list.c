@@ -27,7 +27,7 @@
  *                                                                            *
  * Purpose: create singly linked list                                         *
  *                                                                            *
- * Parameters: list - [IN] the list                                           *
+ * Parameters: queue - [IN] the list                                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_list_create(zbx_list_t *queue)

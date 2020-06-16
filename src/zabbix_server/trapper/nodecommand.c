@@ -81,6 +81,72 @@ static int	execute_remote_script(zbx_script_t *script, DC_HOST *host, char **inf
 
 /******************************************************************************
  *                                                                            *
+ * Function: auditlog_global_script                                           *
+ *                                                                            *
+ * Purpose: record global script execution results into audit log             *
+ *                                                                            *
+ ******************************************************************************/
+static void	auditlog_global_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
+		zbx_uint64_t userid, const char *clientip, const char *command, unsigned char execute_on,
+		const char *output, const char *error)
+{
+	int		now;
+	zbx_uint64_t	auditid;
+	char		execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
+
+	now = time(NULL);
+	auditid = DBget_maxid("auditlog");
+	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%d", execute_on);
+	zbx_snprintf(hostid_s, sizeof(hostid_s), ZBX_FS_UI64, hostid);
+	if (0 != proxy_hostid)
+		zbx_snprintf(proxy_hostid_s, sizeof(proxy_hostid_s), ZBX_FS_UI64, proxy_hostid);
+
+	do
+	{
+		zbx_db_insert_t	db_audit, db_details;
+
+		zbx_db_insert_prepare(&db_audit, "auditlog", "auditid", "userid", "clock", "action", "resourcetype",
+				"ip", "resourceid", NULL);
+
+		zbx_db_insert_prepare(&db_details, "auditlog_details", "auditdetailid", "auditid", "table_name",
+				"field_name", "newvalue", NULL);
+
+		DBbegin();
+
+		zbx_db_insert_add_values(&db_audit, auditid, userid, now, AUDIT_ACTION_EXECUTE, AUDIT_RESOURCE_SCRIPT,
+				clientip, scriptid);
+
+
+		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "execute_on", execute_on_s);
+		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "hostid", hostid_s);
+
+		if (0 != proxy_hostid)
+		{
+			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "proxy_hostid",
+					proxy_hostid_s);
+		}
+
+		zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "command", command);
+
+		if (NULL != output)
+			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "output", output);
+
+		if (NULL != error)
+			zbx_db_insert_add_values(&db_details, __UINT64_C(0), auditid, "script", "error", error);
+
+		zbx_db_insert_execute(&db_audit);
+		zbx_db_insert_clean(&db_audit);
+
+		zbx_db_insert_autoincrement(&db_details, "auditdetailid");
+		zbx_db_insert_execute(&db_details);
+		zbx_db_insert_clean(&db_details);
+
+	}
+	while (ZBX_DB_DOWN == DBcommit());
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: execute_script                                                   *
  *                                                                            *
  * Purpose: executing command                                                 *
@@ -89,7 +155,8 @@ static int	execute_remote_script(zbx_script_t *script, DC_HOST *host, char **inf
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char *sessionid, char **result)
+static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char *sessionid, const char *clientip,
+		char **result)
 {
 	char		error[MAX_STRING_LEN];
 	int		ret = FAIL, rc;
@@ -121,10 +188,20 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, const char
 
 	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, &user, error, sizeof(error))))
 	{
+		const char	*poutput = NULL, *perror = NULL;
+
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on)
 			ret = zbx_script_execute(&script, &host, result, error, sizeof(error));
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
+
+		if (SUCCEED == ret)
+			poutput = *result;
+		else
+			perror = error;
+
+		auditlog_global_script(scriptid, hostid, host.proxy_hostid, user.userid, clientip, script.command_orig,
+				script.execute_on, poutput, perror);
 	}
 
 	zbx_script_clean(&script);
@@ -149,12 +226,12 @@ fail:
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_parse *jp)
 {
-	char		*result = NULL, *send = NULL, tmp[64], sessionid[MAX_STRING_LEN];
+	char		*result = NULL, *send = NULL, tmp[64], sessionid[MAX_STRING_LEN], clientip[MAX_STRING_LEN];
 	int		ret = FAIL;
 	zbx_uint64_t	scriptid, hostid;
 	struct zbx_json	j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): data:%s ", __func__, data);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -178,7 +255,10 @@ int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_p
 		goto finish;
 	}
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, sessionid, &result)))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
+		*clientip = '\0';
+
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, sessionid, clientip, &result)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
@@ -202,6 +282,8 @@ finish:
 
 	zbx_json_free(&j);
 	zbx_free(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

@@ -57,7 +57,7 @@ $hostFormList->addRow(
 		->setChecked(array_key_exists('groups', $data['visible']))
 		->setAttribute('autofocus', 'autofocus'),
 	(new CDiv([
-		(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
+		(new CRadioButtonList('mass_update_groups', (int) $data['mass_update_groups']))
 			->addValue(_('Add'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Remove'), ZBX_ACTION_REMOVE)
@@ -216,7 +216,7 @@ $tags_form_list->addRow(
 		->setLabel(_('Tags'))
 		->setChecked(array_key_exists('tags', $data['visible'])),
 	(new CDiv([
-		(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
+		(new CRadioButtonList('mass_update_tags', (int) $data['mass_update_tags']))
 			->addValue(_('Add'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Remove'), ZBX_ACTION_REMOVE)

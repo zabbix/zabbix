@@ -786,7 +786,9 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		});
 
 	if (title !== null) {
-		$msg_box.prepend($link_details);
+		if (Array.isArray(messages) && messages.length > 0) {
+			$msg_box.prepend($link_details);
+		}
 		jQuery('<span>')
 			.text(title)
 			.appendTo($msg_box);
@@ -819,6 +821,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 	if (show_close_box) {
 		var $button = jQuery('<button>')
 				.addClass('overlay-close-btn')
+				.attr('type', 'button')
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)

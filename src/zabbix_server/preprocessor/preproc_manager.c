@@ -110,7 +110,7 @@ typedef struct
 zbx_preprocessing_manager_t;
 
 static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
-		zbx_preproc_item_value_t *value, zbx_list_item_t *master);
+		zbx_preproc_item_value_t *source_value, zbx_list_item_t *master);
 
 /* cleanup functions */
 
@@ -216,16 +216,16 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	zbx_preproc_history_t	*vault;
 	zbx_vector_ptr_t	*phistory;
 
-	if (ISSET_LOG(request->value.result))
-		zbx_variant_set_str(&value, request->value.result->log->value);
-	else if (ISSET_UI64(request->value.result))
-		zbx_variant_set_ui64(&value, request->value.result->ui64);
-	else if (ISSET_DBL(request->value.result))
-		zbx_variant_set_dbl(&value, request->value.result->dbl);
-	else if (ISSET_STR(request->value.result))
-		zbx_variant_set_str(&value, request->value.result->str);
-	else if (ISSET_TEXT(request->value.result))
-		zbx_variant_set_str(&value, request->value.result->text);
+	if (ISSET_LOG(request->value.result_ptr->result))
+		zbx_variant_set_str(&value, request->value.result_ptr->result->log->value);
+	else if (ISSET_UI64(request->value.result_ptr->result))
+		zbx_variant_set_ui64(&value, request->value.result_ptr->result->ui64);
+	else if (ISSET_DBL(request->value.result_ptr->result))
+		zbx_variant_set_dbl(&value, request->value.result_ptr->result->dbl);
+	else if (ISSET_STR(request->value.result_ptr->result))
+		zbx_variant_set_str(&value, request->value.result_ptr->result->str);
+	else if (ISSET_TEXT(request->value.result_ptr->result))
+		zbx_variant_set_str(&value, request->value.result_ptr->result->text);
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
@@ -338,6 +338,21 @@ out:
 	return task;
 }
 
+static void	preproc_item_result_free(zbx_preproc_item_value_t *value)
+{
+	if (0 == --(value->result_ptr->refcount))
+	{
+		if (NULL != value->result_ptr->result)
+		{
+			free_result(value->result_ptr->result);
+			zbx_free(value->result_ptr->result);
+		}
+		zbx_free(value->result_ptr);
+	}
+	else
+		value->result_ptr = NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: preprocessor_get_worker_by_client                                *
@@ -443,11 +458,7 @@ static void	preprocessor_assign_tasks(zbx_preprocessing_manager_t *manager)
 static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
 {
 	zbx_free(value->error);
-	if (NULL != value->result)
-	{
-		free_result(value->result);
-		zbx_free(value->result);
-	}
+	preproc_item_result_free(value);
 	zbx_free(value->ts);
 }
 
@@ -496,11 +507,11 @@ static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 {
 	if (0 == (value->item_flags & ZBX_FLAG_DISCOVERY_RULE) || 0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result, value->ts,
-				value->state, value->error);
+		dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result_ptr->result,
+				value->ts, value->state, value->error);
 	}
 	else
-		zbx_lld_process_agent_result(value->itemid, value->result, value->ts, value->error);
+		zbx_lld_process_agent_result(value->itemid, value->result_ptr->result, value->ts, value->error);
 }
 
 /******************************************************************************
@@ -617,33 +628,6 @@ static void	preprocessor_copy_value(zbx_preproc_item_value_t *target, zbx_prepro
 		target->ts = (zbx_timespec_t *)zbx_malloc(NULL, sizeof(zbx_timespec_t));
 		memcpy(target->ts, source->ts, sizeof(zbx_timespec_t));
 	}
-
-	if (NULL != source->result)
-	{
-		target->result = (AGENT_RESULT *)zbx_malloc(NULL, sizeof(AGENT_RESULT));
-		memcpy(target->result, source->result, sizeof(AGENT_RESULT));
-
-		if (NULL != source->result->str)
-			target->result->str = zbx_strdup(NULL, source->result->str);
-
-		if (NULL != source->result->text)
-			target->result->text = zbx_strdup(NULL, source->result->text);
-
-		if (NULL != source->result->msg)
-			target->result->msg = zbx_strdup(NULL, source->result->msg);
-
-		if (NULL != source->result->log)
-		{
-			target->result->log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
-			memcpy(target->result->log, source->result->log, sizeof(zbx_log_t));
-
-			if (NULL != source->result->log->value)
-				target->result->log->value = zbx_strdup(NULL, source->result->log->value);
-
-			if (NULL != source->result->log->source)
-				target->result->log->source = zbx_strdup(NULL, source->result->log->source);
-		}
-	}
 }
 
 /******************************************************************************
@@ -678,7 +662,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 		priority = ZBX_PREPROC_PRIORITY_FIRST;
 
 	if (NULL == item || 0 == item->preproc_ops_num || (ITEM_STATE_NOTSUPPORTED != value->state &&
-			(NULL == value->result || 0 == ISSET_VALUE(value->result))))
+			(NULL == value->result_ptr->result || 0 == ISSET_VALUE(value->result_ptr->result))))
 	{
 		state = REQUEST_STATE_DONE;
 
@@ -780,12 +764,15 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __func__, source_value->itemid);
 
-	if (NULL != source_value->result && ISSET_VALUE(source_value->result))
+	if (NULL != source_value->result_ptr->result && ISSET_VALUE(source_value->result_ptr->result))
 	{
 		item_local.itemid = source_value->itemid;
 		if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local)) &&
 				0 != item->dep_itemids_num)
 		{
+			/* result is shared between all dependent items, new result will be created after preprocessing */
+			source_value->result_ptr->refcount += item->dep_itemids_num;
+
 			for (i = item->dep_itemids_num - 1; i >= 0; i--)
 			{
 				preprocessor_copy_value(&value, source_value);
@@ -873,7 +860,8 @@ static void	preprocessor_add_test_request(zbx_preprocessing_manager_t *manager, 
  *             error   - [IN] error message (if any)                          *
  *                                                                            *
  ******************************************************************************/
-static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request, zbx_variant_t *value, char *error)
+static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
+		zbx_variant_t *value, char *error)
 {
 	int		type, ret = FAIL;
 	zbx_log_t	*log;
@@ -890,12 +878,11 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 	if (ZBX_VARIANT_NONE == value->type)
 	{
-		UNSET_UI64_RESULT(request->value.result);
-		UNSET_DBL_RESULT(request->value.result);
-		UNSET_STR_RESULT(request->value.result);
-		UNSET_TEXT_RESULT(request->value.result);
-		UNSET_LOG_RESULT(request->value.result);
-		UNSET_MSG_RESULT(request->value.result);
+		preproc_item_result_free(&request->value);
+		request->value.result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
+		request->value.result_ptr->refcount = 1;
+		request->value.result_ptr->result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+		init_result(request->value.result_ptr->result);
 		ret = FAIL;
 
 		goto out;
@@ -916,42 +903,46 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 
 	if (FAIL != (ret = zbx_variant_convert(value, type)))
 	{
+		/* old result is shared between dependent and master items, it cannot be modified, create new result */
+		AGENT_RESULT	*result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+
+		init_result(result);
+
 		switch (request->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				UNSET_RESULT_EXCLUDING(request->value.result, AR_DOUBLE);
-				SET_DBL_RESULT(request->value.result, value->data.dbl);
+				SET_DBL_RESULT(result, value->data.dbl);
 				break;
 			case ITEM_VALUE_TYPE_STR:
-				UNSET_RESULT_EXCLUDING(request->value.result, AR_STRING);
-				UNSET_STR_RESULT(request->value.result);
-				SET_STR_RESULT(request->value.result, value->data.str);
+				SET_STR_RESULT(result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				UNSET_RESULT_EXCLUDING(request->value.result, AR_LOG);
-				if (ISSET_LOG(request->value.result))
+				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
+
+				if (ISSET_LOG(request->value.result_ptr->result))
 				{
-					log = GET_LOG_RESULT(request->value.result);
-					zbx_free(log->value);
+					*log = *request->value.result_ptr->result->log;
+					if (NULL != log->source)
+						log->source = zbx_strdup(NULL, log->source);
 				}
 				else
-				{
-					log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
 					memset(log, 0, sizeof(zbx_log_t));
-					SET_LOG_RESULT(request->value.result, log);
-				}
+
 				log->value = value->data.str;
+				SET_LOG_RESULT(result, log);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				UNSET_RESULT_EXCLUDING(request->value.result, AR_UINT64);
-				SET_UI64_RESULT(request->value.result, value->data.ui64);
+				SET_UI64_RESULT(result, value->data.ui64);
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				UNSET_RESULT_EXCLUDING(request->value.result, AR_TEXT);
-				UNSET_TEXT_RESULT(request->value.result);
-				SET_TEXT_RESULT(request->value.result, value->data.str);
+				SET_TEXT_RESULT(result, value->data.str);
 				break;
 		}
+
+		preproc_item_result_free(&request->value);
+		request->value.result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
+		request->value.result_ptr->refcount = 1;
+		request->value.result_ptr->result = result;
 
 		zbx_variant_set_none(value);
 	}
