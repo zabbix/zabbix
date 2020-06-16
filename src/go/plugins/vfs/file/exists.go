@@ -35,10 +35,8 @@ const (
 	zbxFtBdev
 	zbxFtCdev
 	zbxFtFifo
-	zbxFtAll
-	zbxFtDev
-	zbxFtAllMask = (zbxFtFile | zbxFtDir | zbxFtSym | zbxFtSock | zbxFtBdev | zbxFtCdev | zbxFtFifo)
-	zbxFtDev2    = (zbxFtBdev | zbxFtCdev)
+	zbxFtAll = (zbxFtFile | zbxFtDir | zbxFtSym | zbxFtSock | zbxFtBdev | zbxFtCdev | zbxFtFifo)
+	zbxFtDev = (zbxFtBdev | zbxFtCdev)
 )
 
 type fileType uint16
@@ -47,40 +45,33 @@ func (f fileType) HasType(t fileType) bool { return f&t != 0 }
 func (f *fileType) AddType(t fileType)     { *f |= t }
 func (f *fileType) ClearType(t fileType)   { *f &= ^t }
 
-func typesToMask(types []string) (fileType, error) {
+func typesToMask(param string) (fileType, error) {
 	var mask fileType = 0
-	var fType fileType
-	template := [9]string{"file", "dir", "sym", "sock", "bdev", "cdev", "fifo", "all", "dev"}
+	template := map[string]fileType{
+		"file": zbxFtFile,
+		"dir":  zbxFtDir,
+		"sym":  zbxFtSym,
+		"sock": zbxFtSock,
+		"bdev": zbxFtBdev,
+		"cdev": zbxFtCdev,
+		"fifo": zbxFtFifo,
+		"all":  zbxFtAll,
+		"dev":  zbxFtDev,
+	}
 
-	if len(types) == 0 || types[0] == "" {
+	if strings.TrimSpace(param) == "" {
 		return 0, nil
 	}
 
-	for i := 0; i < len(types); i++ {
-		fType = 1
+	types := strings.Split(param, ",")
 
-		for j := 0; j <= len(template); j++ {
-
-			if j == len(template) {
-				return 0, fmt.Errorf("Invalid type \"%s\".", types[i])
-			}
-
-			if template[j] == types[i] {
-				break
-			}
-
-			fType <<= 1
+	for _, name := range types {
+		name = strings.TrimSpace(name)
+		if t, ok := template[name]; ok {
+			mask.AddType(t)
+		} else {
+			return 0, fmt.Errorf(`Invalid type "%s".`, name)
 		}
-
-		mask.AddType(fType)
-	}
-
-	if mask.HasType(zbxFtAll) {
-		mask.AddType(zbxFtAllMask)
-	}
-
-	if mask.HasType(zbxFtDev) {
-		mask.AddType(zbxFtDev2)
 	}
 
 	return mask, nil
@@ -90,6 +81,7 @@ func typesToMask(types []string) (fileType, error) {
 func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 	var typesIncl fileType
 	var typesExcl fileType
+	var types fileType
 	var f os.FileInfo
 
 	if len(params) > 3 {
@@ -100,13 +92,13 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 	}
 
 	if len(params) > 1 && params[1] != "" {
-		if typesIncl, err = typesToMask(strings.Split(params[1], ",")); err != nil {
+		if typesIncl, err = typesToMask(params[1]); err != nil {
 			return nil, err
 		}
 	}
 
 	if len(params) > 2 && params[2] != "" {
-		if typesExcl, err = typesToMask(strings.Split(params[2], ",")); err != nil {
+		if typesExcl, err = typesToMask(params[2]); err != nil {
 			return nil, err
 		}
 	}
@@ -115,37 +107,41 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 		if typesExcl == 0 {
 			typesIncl.AddType(zbxFtFile)
 		} else {
-			typesIncl.AddType(zbxFtAllMask)
+			typesIncl.AddType(zbxFtAll)
 		}
 	}
 
-	typesIncl.ClearType(typesExcl)
-
-	if f, err = os.Lstat(params[0]); err != nil {
-		if os.IsNotExist(err) {
-			return 0, nil
-		}
-
-		switch err := err.(type) {
-		case *os.PathError:
-			return nil, errors.New(err.Op + ": " + err.Err.Error())
-		case *os.LinkError:
-			return nil, errors.New(err.Op + ": " + err.Err.Error())
-		case *os.SyscallError:
-			return nil, errors.New(err.Syscall + ": " + err.Err.Error())
+	if typesIncl.HasType(zbxFtSym) || typesExcl.HasType(zbxFtSym) {
+		if f, err = os.Lstat(params[0]); err == nil {
+			if f.Mode()&os.ModeSymlink != 0 {
+				types.AddType(zbxFtSym)
+			}
+		} else if !os.IsNotExist(err) {
+			return 0, err
 		}
 	}
 
-	if (f.Mode().IsRegular() && typesIncl.HasType(zbxFtFile)) ||
-		(f.Mode().IsDir() && typesIncl.HasType(zbxFtDir)) ||
-		(f.Mode()&os.ModeSymlink != 0 && typesIncl.HasType(zbxFtSym)) ||
-		(f.Mode()&os.ModeSocket != 0 && typesIncl.HasType(zbxFtSock)) ||
-		(f.Mode()&os.ModeDevice != 0 &&
-			((f.Mode()&os.ModeCharDevice == 0 && typesIncl.HasType(zbxFtBdev)) ||
-				(f.Mode()&os.ModeCharDevice != 0 && typesIncl.HasType(zbxFtCdev)))) ||
-		(f.Mode()&os.ModeNamedPipe != 0 && typesIncl.HasType(zbxFtFifo)) {
+	if f, err = os.Stat(params[0]); err == nil {
+		if f.Mode().IsRegular() {
+			types.AddType(zbxFtFile)
+		} else if f.Mode().IsDir() {
+			types.AddType(zbxFtDir)
+		} else if f.Mode()&os.ModeSocket != 0 {
+			types.AddType(zbxFtSock)
+		} else if f.Mode()&os.ModeCharDevice != 0 {
+			types.AddType(zbxFtCdev)
+		} else if f.Mode()&os.ModeDevice != 0 {
+			types.AddType(zbxFtBdev)
+		} else if f.Mode()&os.ModeNamedPipe != 0 {
+			types.AddType(zbxFtFifo)
+		}
+	} else if !os.IsNotExist(err) {
+		return 0, err
+	}
+
+	fmt.Println(types, typesExcl, typesIncl)
+	if !typesExcl.HasType(types) && typesIncl.HasType(types) {
 		return 1, nil
 	}
-
 	return 0, nil
 }
