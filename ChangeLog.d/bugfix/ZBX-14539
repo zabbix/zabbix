@@ -1,1 +1,0 @@
-A.F....... [ZBX-14539] added validation of the calculated item formula in item.create, item.update, itemprototype.create and itemprototype.update methods (Sasha)

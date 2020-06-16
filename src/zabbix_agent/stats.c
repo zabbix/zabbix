@@ -232,9 +232,6 @@ void	free_collector_data(void)
 		collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 	}
 
-	if (-1 == shmctl(shm_id, IPC_RMID, 0))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector: %s", zbx_strerror(errno));
-
 	zbx_mutex_destroy(&diskstats_lock);
 #endif
 	collector = NULL;

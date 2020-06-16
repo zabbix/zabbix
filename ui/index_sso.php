@@ -194,7 +194,7 @@ try {
 		}
 	}
 
-	if (CWebUser::isLoggedIn()) {
+	if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 		redirect($redirect_to->toString());
 	}
 

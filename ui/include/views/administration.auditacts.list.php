@@ -27,21 +27,22 @@ $auditWidget = (new CWidget())->setTitle(_('Action log'));
 
 // create filter
 $filterColumn = new CFormList();
-$filterColumn->addRow(_('Recipient'), [
-	(new CTextBox('alias', $this->data['alias']))
-		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus'),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('btn1', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			json_encode([
+$filterColumn->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
+	(new CMultiSelect([
+		'name' => 'filter_userids[]',
+		'object_name' => 'users',
+		'data' => $data['filter_userids'],
+		'placeholder' => '',
+		'popup' => [
+			'parameters' => [
 				'srctbl' => 'users',
-				'srcfld1' => 'alias',
+				'srcfld1' => 'userid',
+				'srcfld2' => 'fullname',
 				'dstfrm' => 'zbx_filter',
-				'dstfld1' => 'alias'
-			]).', null, this);'
-		)
+				'dstfld1' => 'filter_userids_'
+			]
+		]
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 ]);
 
 $auditWidget->addItem(

@@ -28,11 +28,19 @@ void	zbx_mock_test_entry(void **state)
 	int			exp_result, act_result;
 	int			exp_macro_r, exp_context_l, exp_context_r;
 	int			act_macro_r, act_context_l, act_context_r;
+	unsigned char		*match, context_op;
 	const char		*macro;
+	zbx_mock_handle_t	hmatch;
 
 	ZBX_UNUSED(state);
 
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.match", &hmatch))
+		match = &context_op;
+	else
+		match = NULL;
+
 	macro = zbx_mock_get_parameter_string("in.macro");
+
 
 	exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
@@ -43,7 +51,7 @@ void	zbx_mock_test_entry(void **state)
 		exp_context_r	= (int)zbx_mock_get_parameter_uint64("out.context_r");
 	}
 
-	act_result = zbx_user_macro_parse(macro, &act_macro_r, &act_context_l, &act_context_r);
+	act_result = zbx_user_macro_parse(macro, &act_macro_r, &act_context_l, &act_context_r, match);
 
 	zbx_mock_assert_int_eq("return value", exp_result, act_result);
 

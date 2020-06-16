@@ -59,9 +59,7 @@ class CControllerDashboardWidgetSanitize extends CControllerDashboardAbstract {
 		];
 
 		foreach ($widget_fields[0]['fields'] as $field) {
-			if ($field['value']) {
-				$output['fields'][$field['name']] = $field['value'];
-			}
+			$output['fields'][$field['name']] = $field['value'];
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

@@ -413,19 +413,21 @@ class JMXItemChecker extends ItemChecker
 
 				try
 				{
-					String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
+					String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null :
+							attrInfo.getDescription());
 
 					if (attribute instanceof TabularData)
 					{
 						logger.trace("looking for attributes of tabular types");
 
 						formatPrimitiveTypeResult(counters, name, descr, attrInfo.getName(), attribute,
-							propertiesAsMacros, getTabularData((TabularData)attribute).toString());
+							propertiesAsMacros, getTabularData((TabularData)attribute));
 					}
 					else
 					{
 						logger.trace("looking for attributes of primitive types");
-						getAttributeFields(counters, name, descr, attrInfo.getName(), attribute, propertiesAsMacros);
+						getAttributeFields(counters, name, descr, attrInfo.getName(), attribute,
+								propertiesAsMacros);
 					}
 				}
 				catch (Exception e)
@@ -545,10 +547,11 @@ class JMXItemChecker extends ItemChecker
 	private void getAttributeFields(JSONArray counters, ObjectName name, String descr, String attrPath,
 			Object attribute, boolean propertiesAsMacros) throws NoSuchMethodException, JSONException
 	{
-		if (isPrimitiveAttributeType(attribute))
+		if (null == attribute || isPrimitiveAttributeType(attribute))
 		{
-			logger.trace("found attribute of a primitive type: {}", attribute.getClass());
-			formatPrimitiveTypeResult(counters, name, descr, attrPath, attribute, propertiesAsMacros, attribute.toString());
+			logger.trace("found attribute of a primitive type: {}", null == attribute ? "null" :
+					attribute.getClass());
+			formatPrimitiveTypeResult(counters, name, descr, attrPath, attribute, propertiesAsMacros, attribute);
 		}
 		else if (attribute instanceof CompositeData)
 		{
@@ -572,25 +575,29 @@ class JMXItemChecker extends ItemChecker
 	}
 
 	private void formatPrimitiveTypeResult(JSONArray counters, ObjectName name, String descr, String attrPath,
-			Object attribute, boolean propertiesAsMacros, String value) throws JSONException
+			Object attribute, boolean propertiesAsMacros, Object value) throws JSONException
 	{
 		JSONObject counter = new JSONObject();
 
+		String checkedDescription = null == descr ? name + "," + attrPath : descr;
+		Object checkedType = null == attribute ? JSONObject.NULL : attribute.getClass().getName();
+		Object checkedValue = null == value ? JSONObject.NULL : value.toString();
+
 		if (propertiesAsMacros)
 		{
-			counter.put("{#JMXDESC}", null == descr ? name + "," + attrPath : descr);
+			counter.put("{#JMXDESC}", checkedDescription);
 			counter.put("{#JMXOBJ}", name);
 			counter.put("{#JMXATTR}", attrPath);
-			counter.put("{#JMXTYPE}", attribute.getClass().getName());
-			counter.put("{#JMXVALUE}", value);
+			counter.put("{#JMXTYPE}", checkedType);
+			counter.put("{#JMXVALUE}", checkedValue);
 		}
 		else
 		{
 			counter.put("name", attrPath);
 			counter.put("object", name);
-			counter.put("description", null == descr ? name + "," + attrPath : descr);
-			counter.put("type", attribute.getClass().getName());
-			counter.put("value", value);
+			counter.put("description", checkedDescription);
+			counter.put("type", checkedType);
+			counter.put("value", checkedValue);
 		}
 
 		counters.put(counter);
