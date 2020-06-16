@@ -547,7 +547,7 @@ class CUser extends CApiService {
 	 */
 	private function checkLanguages(array $languages) {
 		foreach ($languages as $lang) {
-			if ($lang != LANG_DEFAULT && !setlocale(LC_MONETARY, zbx_locale_variants($lang))) {
+			if ($lang !== LANG_DEFAULT && !setlocale(LC_MONETARY, zbx_locale_variants($lang))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Language "%1$s" is not supported.', $lang));
 			}
 		}
