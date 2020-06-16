@@ -211,7 +211,7 @@ class CMultiselectElement extends CElement {
 		$this->getControls()->first()->click();
 
 		return COverlayDialogElement::find()->waitUntilPresent()
-				->all()->last()->waitUntilReady()->setDataContext($context);
+				->all()->last()->waitUntilReady()->setDataContext($context, $this->mode);
 	}
 
 	/**
