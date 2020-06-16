@@ -50,7 +50,7 @@ func Test_buildURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotOut := buildURL(tt.args.scheme, tt.args.ip, tt.args.port); gotOut != tt.wantOut {
-				t.Errorf("setPort() = %v, want %v", gotOut, tt.wantOut)
+				t.Errorf("buildURL() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
 	}
