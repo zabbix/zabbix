@@ -12,14 +12,14 @@ final class CCookieHelper {
 
 	public static function set(string $name, $value, int $time = 0): bool {
 		if (headers_sent()) {
-			throw new \Exception('Headers already sent.');
+			throw new \Exception('Headers already sent.'); // FIXME:
 		}
 
 		$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 		$path = rtrim(substr($path, 0, strrpos($path, '/')), '/');
 
 		if (strlen($value) === 0) {
-			throw new \Exception("Value cannot be empty. To delete cookie use ".self::class."::unset()");
+			throw new \Exception("Value cannot be empty. To delete cookie use ".self::class."::unset()"); // FIXME:
 		}
 
 		if (!setcookie($name, $value, $time, $path, null, HTTPS, true)) {
@@ -37,12 +37,12 @@ final class CCookieHelper {
 		}
 
 		if (headers_sent()) {
-			throw new \Exception('Headers already sent.');
+			throw new \Exception('Headers already sent.'); // FIXME:
 		}
 
 		unset($_COOKIE[$name]);
 
-		return setcookie($name, '', -99999);
+		return setcookie($name, '', 0);
 	}
 
 	public static function getAll(): array {

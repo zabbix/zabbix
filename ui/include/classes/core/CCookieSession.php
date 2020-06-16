@@ -22,11 +22,13 @@
 /**
  * Session wrapper uses cookie for session store.
  */
-final class CCookieSession implements \SessionHandlerInterface {
+class CCookieSession implements \SessionHandlerInterface {
 
 	private const COOKIE_NAME = ZBX_SESSION_NAME;
 
-	private const COOKIE_MAX_SIZE = 4096;
+	private const COOKIE_MAX_SIZE = 4000;
+
+	private const SIGN_ALGO = 'aes-256-ecb';
 
 	private $key;
 
@@ -40,12 +42,12 @@ final class CCookieSession implements \SessionHandlerInterface {
 			$this->key = $config['session_key'];
 
 			if (!$this->key) {
-				throw new \Exception('Please define session secret key');
+				throw new \Exception('Please define session secret key'); // FIXME:
 			}
 
-			// Set use_cookie to 0 because we manually set session id
+			// Set use standard cookie PHPSESSID to false.
 			ini_set('session.use_cookies', 0);
-			// Set serialize method because we need have abillity to encode / decode session data.
+			// Set serialize method to standard serialize / unserialize.
 			ini_set('session.serialize_handler', 'php_serialize');
 
 			session_set_save_handler([$this, 'open'], [$this, 'close'], [$this, 'read'],
@@ -53,7 +55,7 @@ final class CCookieSession implements \SessionHandlerInterface {
 			);
 
 			if (!$this->session_start()) {
-				throw new \Exception('Cannot start session.');
+				throw new \Exception('Cannot start session.'); // FIXME:
 			}
 
 			CSessionHelper::set('sessionid', CSessionHelper::getId());
@@ -117,9 +119,7 @@ final class CCookieSession implements \SessionHandlerInterface {
 	 * @return string
 	 */
 	public function read($session_id) {
-		$data = CCookieHelper::get(self::COOKIE_NAME);
-
-		return $data ? base64_decode($data) : '';
+		return $this->parseData();
 	}
 
 	/**
@@ -131,52 +131,34 @@ final class CCookieSession implements \SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function write($session_id, $session_data) {
-		$session_data = $this->encode($session_data);
+		$cookies = $this->prepareData(unserialize($session_data));
 
-		if (strlen($session_data) > self::COOKIE_MAX_SIZE) {
-			throw new \Exception("Session too big.");
-		}
-
-		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, 0)) {
-			throw new \Exception('Session cookie not set.');
+		foreach ($cookies as $name => $cookie) {
+			if (!CCookieHelper::set($name, $cookie, 0)) {
+				throw new \Exception('Session cookie not set.'); // FIXME:
+			}
 		}
 
 		return true;
 	}
 
 	private function session_start(): bool {
-		if (!CCookieHelper::has(self::COOKIE_NAME)) {
+		$session_data = $this->parseData();
+
+		if (mb_strlen($session_data) === 0 || !$this->checkSign($session_data)) {
 			return session_start();
 		}
 
-		$cookie = $this->decode(CCookieHelper::get(self::COOKIE_NAME));
+		$session_data = unserialize($session_data);
 
-		if (!$this->checkSign($cookie)) {
-			return session_start();
-		}
-
-		$data = unserialize($cookie);
-
-		if (array_key_exists('sessionid', $data)) {
-			session_id($data['sessionid']);
+		if (array_key_exists('sessionid', $session_data)) {
+			session_id($session_data['sessionid']);
 		}
 
 		return session_start();
 	}
 
-	private function encode(string $data): string {
-		$sign = $this->sign($data);
-		$data = unserialize($data);
-		$data['sign'] = $sign;
-		$data = serialize($data);
-		return base64_encode($data);
-	}
-
-	private function decode(string $data): string {
-		return base64_decode($data);
-	}
-
-	private function checkSign(string $data) {
+	private function checkSign(string $data): bool {
 		$data = unserialize($data);
 		$session_sign = $data['sign'];
 		unset($data['sign']);
@@ -186,6 +168,46 @@ final class CCookieSession implements \SessionHandlerInterface {
 	}
 
 	private function sign(string $data): string {
-		return openssl_encrypt($data, 'aes-256-ecb', $this->key);
+		return openssl_encrypt($data, self::SIGN_ALGO, $this->key);
+	}
+
+	private function prepareData(array $data): array {
+		if (array_key_exists('sign', $data)) {
+			unset($data['sign']);
+		}
+
+		$data['sign'] = $this->sign(serialize($data));
+
+		return $this->splitData($data);
+	}
+
+	private function splitData(array $data): array {
+		$cookies = [];
+		$offset = 0;
+		$raw = base64_encode(serialize($data));
+		$block = mb_substr($raw, self::COOKIE_MAX_SIZE * $offset, self::COOKIE_MAX_SIZE);
+
+		while ($block !== false) {
+			$cookies[self::COOKIE_NAME.'_'.$offset] = $block;
+			$offset++;
+			$block = substr($raw, self::COOKIE_MAX_SIZE * $offset, self::COOKIE_MAX_SIZE);
+		}
+
+		return $cookies;
+	}
+
+	private function parseData(): string {
+		$session_data = '';
+		$cookies = CCookieHelper::getAll();
+
+		foreach ($cookies as $name => $value) {
+			if (strpos($name, self::COOKIE_NAME) === 0) {
+				$session_data .= $value;
+
+				// CCookieHelper::unset($name);
+			}
+		}
+
+		return base64_decode($session_data);
 	}
 }

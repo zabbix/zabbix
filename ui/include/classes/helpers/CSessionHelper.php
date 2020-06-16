@@ -27,4 +27,8 @@ final class CSessionHelper {
 	public static function getId(): string {
 		return session_id();
 	}
+
+	public function getAll(): array {
+		return $_SESSION;
+	}
 }

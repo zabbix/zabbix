@@ -174,6 +174,12 @@ class ZBase {
 
 				// Start sesion only after DB initilized.
 				new CCookieSession();
+				$longText = 'SSased ante sit Maecenas sed ante sit amet arcu rutrum efficitur. Nulla eleifend et tellus ut iaculis. Sed vehicula ut massa sit amet facilisis. Nullam quis vulputate diam, non tempor mi. Sed ut dolor pulvinar, mattis magna vitae, dictum turpis. Nulla suscipit placerat mauris. Cras rutrum dignissim lectus a ultricies. Phasellus et sapien purus.
+
+				Duis elementum tristique metus non porta. Integer iaculis massa eget diam euismod bibendum. Proin vestibulum, felis convallis ullamcorper aliquet, eros dui lacinia arcu, dapibus consectetur arcu mauris non nunc. Mauris ullamcorper erat ut ultricies porttitor. Nulla mollis faucibus erat, convallis porta massa tincidunt ac. Aenean leo dui, interdum sed ante vel, feugiat ullamcorper sem. Nulla facilisis facilisis odio, mollis luctus purus hendrerit et. Fusce congue tempor gravida.
+
+				In dictum efficitur pharetra. Sed suscipit rutrum felis sit amet consectetur. Vivamus id libero dapibus, dictum ante non, feugiat sapien. Sed maximus, ipsum vitae pharetra rutrum, ligula quam viverra mi, sit amet porta ipsum metus at magna. Proin semper a enim nec semper. Morbi a turpis mattis, semper sem et, blandit elit. In sagittis dapibus consequat. Quisque ornare quam non lacus cursus, quis tincidunt erat aliquam. Aenean condimentum odio mattis leo semper, lobortis vestibulum felis tempor. In quam orci, suscipit rutrum feugiat sed, mattis vitae lectus. Aenean viverra, magna in volutpat gravida, dui magna eleifend orci, ac elementum ligula tortor eu sem.';
+				// CSessionHelper::set('longtext', $longText.$longText);
 
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
