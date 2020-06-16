@@ -277,7 +277,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'action' => 'forth.module'
 							]
 						],
-						'error_title' => 'Cannot enable module: 4th Module.',
+//						'error_title' => 'Cannot update module: 4th Module.',
 						'error_details' => 'Identical namespace (Example_A) is used by modules located at '.
 								'module_number_1, module_number_4.'
 					]
@@ -483,8 +483,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('button:Update')->one()->click();
 
-		// Please chenge the message below to "Module updated: 1st Module name" after ZBX-17721 is merged.
-		$this->assertMessage(TEST_GOOD, 'Module disabled: 1st Module name.');
+		$this->assertMessage(TEST_GOOD, 'Module updated: 1st Module name.');
 		// Check that Module has been updated and that there are no changes took place.
 		$this->assertEquals($initial_hash, CDBHelper::getHash($sql));
 	}
@@ -605,12 +604,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			}
 			// In case of negative test check error message and confirm that module wasn't applied.
 			if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
-				$this->assertMessage($module['expected'], $module['error_title'], $module['error_details']);
+				$title = $from_form ? 'Cannot update module: ' : 'Cannot enable module: ';
+				$this->assertMessage($module['expected'], $title.$module['module_name'].'.', $module['error_details']);
 				$this->assertModuleDisabled($module);
 				continue;
 			}
 			// Check message and confirm that changes, made by the enabled module, took place.
-			$this->assertMessage(CTestArrayHelper::get($module, 'expected', TEST_GOOD), 'Module enabled: '.$module['module_name'].'.');
+			$message = $from_form ? 'Module updated: ' : 'Module enabled: ';
+			$this->assertMessage(CTestArrayHelper::get($module, 'expected', TEST_GOOD), $message.$module['module_name'].'.');
 			$this->assertModuleEnabled($module);
 		}
 	}
@@ -634,7 +635,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
 			}
 			// Check message and confirm that changes, made by the module, were revered.
-			$this->assertMessage(TEST_GOOD, 'Module disabled: '.$module['module_name'].'.');
+			$message = $from_form ? 'Module updated: ' : 'Module disabled: ';
+			$this->assertMessage(TEST_GOOD, $message.$module['module_name'].'.');
 			$this->assertModuleDisabled($module);
 		}
 	}
