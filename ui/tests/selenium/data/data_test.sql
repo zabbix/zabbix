@@ -2751,13 +2751,13 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90410, 172, 2, 'groupids', 0, 50006);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90411, 172, 3, 'hostids', 0, 99015);
 
--- add following lines after ZBX-17809 is fixed:
--- INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (173, 130, 'graphprototype', 'Test copy Graph prototype 2', 10, 23, 14, 5);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90440, 173, 0, 'columns', 20);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90441, 173, 0, 'rows', 5);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90442, 173, 0, 'dynamic', 0);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90443, 173, 0, 'rf_rate', 600);
--- -- change show_legend to 0 after ZBX-17813 is fixed:
--- -- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 173, 0, 'show_legend', 0);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 173, 0, 'show_legend', 1);
--- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90445, 173, 7, 'graphid', 0, 892);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (173, 130, 'graphprototype', 'Test copy Graph prototype 2', 10, 23, 14, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90440, 173, 0, 'columns', 20);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90441, 173, 0, 'rows', 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90442, 173, 0, 'dynamic', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90443, 173, 0, 'rf_rate', 600);
+-- change show_legend to 0 after ZBX-17813 is fixed:
+-- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 173, 0, 'show_legend', 0);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 173, 0, 'show_legend', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90445, 173, 7, 'graphid', 0, 892);
