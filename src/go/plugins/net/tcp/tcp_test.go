@@ -36,9 +36,15 @@ func Test_buildURL(t *testing.T) {
 		{"+longPath", args{"", "localHost/path1/path2/path3", "443"}, "localHost:443/path1/path2/path3"},
 		{"+http", args{"http", "www.localHost.com/path1/path2", "443"}, "http://www.localHost.com:443/path1/path2"},
 		{"+https", args{"https", "localHost/path1/path2/path3", "443"}, "https://localHost:443/path1/path2/path3"},
+		{"+ip", args{"https", "127.0.0.0/path1", "443"}, "https://127.0.0.0:443/path1"},
+		{"+trailingSlash", args{"https", "localHost/path1/", "443"}, "https://localHost:443/path1/"},
 		{"-emptyScheme", args{"", "www.localHost.com/path1", "443"}, "www.localHost.com:443/path1"},
 		{"-emptyUrl", args{"https", "", "443"}, ""},
-		{"-emptyPort", args{"https", "localHost/path1", ""}, "localHost/path1"},
+		{"-emptyUrlAndPort", args{"https", "", ""}, ""},
+		{"-emptyPort", args{"https", "localHost/path1", ""}, "https://localHost/path1"},
+		{"-emptyPortAndScheme", args{"", "localHost/path1", ""}, "localHost/path1"},
+		{"-emptyScheme", args{"", "localHost/path1", ""}, "localHost/path1"},
+		{"-emptySchemeAndUrl", args{"", "", "443"}, ""},
 		{"-emptyAll", args{"", "", ""}, ""},
 	}
 	for _, tt := range tests {

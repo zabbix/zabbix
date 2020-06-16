@@ -168,17 +168,18 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
-func buildURL(scheme string, ip string, port string) (out string) {
-	if ip == "" || port == "" {
-		return ip
+func buildURL(scheme string, path string, port string) (out string) {
+	if path == "" {
+		return
 	}
 
-	parts := strings.Split(ip, "/")
-	for i, p := range parts {
-		if i == 0 {
-			out = fmt.Sprintf("%s:%s", p, port)
-			continue
-		}
+	parts := strings.Split(path, "/")
+	out = parts[0]
+	if port != "" {
+		out = fmt.Sprintf("%s:%s", out, port)
+	}
+
+	for _, p := range parts[1:] {
 		out = fmt.Sprintf("%s/%s", out, p)
 	}
 
