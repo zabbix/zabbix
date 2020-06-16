@@ -53,7 +53,9 @@ foreach ($data['inputs'] as $name => $value) {
 	}
 	elseif ($name === 'query_fields' || $name === 'headers') {
 		foreach (['name', 'value'] as $key) {
-			$form->addVar($name.'['.$key.']', $value[$key]);
+			if (array_key_exists($key, $value)) {
+				$form->addVar($name.'['.$key.']', $value[$key]);
+			}
 		}
 		continue;
 	}
