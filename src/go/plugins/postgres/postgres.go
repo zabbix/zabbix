@@ -21,10 +21,6 @@ package postgres
 
 import (
 	"errors"
-	"fmt"
-	"net/url"
-	"strconv"
-	"strings"
 	"time"
 
 	"zabbix.com/pkg/plugin"
@@ -82,70 +78,62 @@ func (p *Plugin) Stop() {
 	p.connMgr = nil
 }
 
+// whereToConnect builds a session based on key's parameters and a configuration file.
+func whereToConnect(params []string, defaultPluginOptions *PluginOptions) (u *URI, err error) {
+	var uri string
+	user := ""
+	if len(params) > 1 {
+		user = params[1]
+	}
+
+	password := ""
+	if len(params) > 2 {
+		password = params[2]
+	}
+
+	database := defaultPluginOptions.Database
+	if len(params) > 3 {
+		database = params[3]
+	}
+
+	// The first param can be either a URI or a session identifier
+	if len(params) > 0 && len(params[0]) > 0 {
+		if isLooksLikeURI(params[0]) {
+			// Use the URI defined as key's parameter
+			uri = params[0]
+		} else {
+			if _, ok := defaultPluginOptions.Sessions[params[0]]; !ok {
+				return nil, errorUnknownSession
+			}
+
+			// Use a pre-defined session
+			uri = defaultPluginOptions.Sessions[params[0]].URI
+			user = defaultPluginOptions.Sessions[params[0]].User
+			password = defaultPluginOptions.Sessions[params[0]].Password
+			database = defaultPluginOptions.Sessions[params[0]].Database
+		}
+	}
+
+	if len(user) > 0 || len(password) > 0 || len(database) > 0 {
+		return newURIWithCreds(uri, user, password, database)
+	}
+
+	return parseURI(uri)
+}
+
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var (
-		connString    string
 		handler       requestHandler
-		session       *Session
 		handlerParams []string
 	)
-	// The first param can be either a port & host or a session identifier.
-	if len(params) > 0 && len(params[0]) > 0 {
-		var ok bool
-		if session, ok = p.options.Sessions[params[0]]; !ok {
-			// get host & port from first parameter, username from second parameter,
-			// password from the third parameter, database name from the fourth  parameter
-			var port uint64
 
-			u, err := url.Parse(params[0])
-			if err != nil {
-				return nil, fmt.Errorf("Invalid connection parameters: %s", err)
-			}
-			if u.Host == "" {
-				u.Host = p.options.Host
-			}
-
-			session = &Session{
-				Host: u.Hostname(),
-			}
-			if u.Port() != "" {
-				if port, err = strconv.ParseUint(u.Port(), 10, 16); err != nil {
-					return nil, fmt.Errorf("Invalid connection port: %s", err)
-				}
-				session.Port = uint16(port)
-			}
-			if len(params) > 1 {
-				session.User = params[1]
-			}
-			if len(params) > 2 {
-				session.Password = params[2]
-			}
-			if len(params) > 3 {
-				session.Database = params[3]
-			}
-		}
-	} else {
-		session = &Session{
-			Host:     p.options.Host,
-			Port:     p.options.Port,
-			Database: p.options.Database,
-			User:     p.options.User,
-			Password: p.options.Password,
-		}
+	u, err := whereToConnect(params, &p.options)
+	if err != nil {
+		return nil, err
 	}
-
-	u := url.URL{
-		Scheme: "postgresql",
-		Host:   session.Host,
-		Path:   session.Database,
-		User:   url.UserPassword(session.User, session.Password),
-	}
-	if session.Port != 0 {
-		u.Host += fmt.Sprintf(":%d", session.Port)
-	}
-	connString = u.String()
-
+	// get connection string for PostgreSQL
+	connString := u.URI()
 	switch key {
 	case keyPostgresDiscoveryDatabases:
 		handler = p.databasesDiscoveryHandler // postgres.databasesdiscovery[[connString][,section]]
@@ -199,7 +187,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		handler = p.locksHandler // postgres.locks[[connString]]
 
 	case keyPostgresOldestXid:
-		handler = p.oldestHandler // postgres.locks[[connString]
+		handler = p.oldestHandler // postgres.oldestXid[[connString]
 
 	default:
 		return nil, errorUnsupportedMetric
@@ -221,8 +209,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if key == keyPostgresDatabasesSize || key == keyPostgresDatabasesAge {
-		path := strings.TrimLeft(u.Path, "/")
-		handlerParams = []string{path}
+		handlerParams = []string{u.Database()}
 	} else {
 		handlerParams = make([]string, 0)
 	}
