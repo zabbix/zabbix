@@ -154,6 +154,7 @@ require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
 require_once dirname(__FILE__).'/dashboard/testGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testCopyWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testGraphPrototypeWidget.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -295,6 +296,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6663');
 		$suite->addTestSuite('testGraphWidget');
 		$suite->addTestSuite('testCopyWidgets');
+		$suite->addTestSuite('testGraphPrototypeWidget');
 
 		return $suite;
 	}
