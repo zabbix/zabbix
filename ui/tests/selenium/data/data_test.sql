@@ -2477,7 +2477,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90059, 121, 0, 'dynamic', 1);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (122, 105, 'url', 'Dynamic URL', 0, 13, 11, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90060, 122, 0, 'dynamic', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 122, 1, 'url', 'hostinventories.php?hostid={HOST.ID}');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 122, 1, 'url', 'iframe.php?name={HOST.NAME}');
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (123, 105, 'graphprototype', '', 0, 17, 9, 2);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (124, 105, 'graphprototype', '', 9, 17, 8, 2);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (125, 105, 'graphprototype', '', 17, 17, 7, 2);
