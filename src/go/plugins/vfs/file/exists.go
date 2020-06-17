@@ -123,6 +123,8 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 
 	if f, err = os.Stat(params[0]); err == nil {
 		if f.Mode().IsRegular() {
+			// don't recognize linked files as symlinks to match C agent behavior
+			types.ClearType(zbxFtSym)
 			types.AddType(zbxFtFile)
 		} else if f.Mode().IsDir() {
 			types.AddType(zbxFtDir)
