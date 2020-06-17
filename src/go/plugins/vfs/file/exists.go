@@ -117,7 +117,7 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 				types.AddType(zbxFtSym)
 			}
 		} else if !os.IsNotExist(err) {
-			return 0, err
+			return 0, fmt.Errorf("Cannot obtain file information: %s", err)
 		}
 	}
 
@@ -136,7 +136,7 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 			types.AddType(zbxFtFifo)
 		}
 	} else if !os.IsNotExist(err) {
-		return 0, err
+		return 0, fmt.Errorf("Cannot obtain file information: %s", err)
 	}
 
 	if !typesExcl.HasType(types) && typesIncl.HasType(types) {
