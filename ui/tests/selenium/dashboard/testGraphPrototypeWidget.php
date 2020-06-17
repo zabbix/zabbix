@@ -347,6 +347,8 @@ class testGraphPrototypeWidget extends CWebTest {
 		$form->submit();
 		$dashboard->getWidget($widget['Name']);
 		$dashboard->save();
+		$this->page->removeFocus();
+		sleep(1);
 		$screenshot_area = $this->query('class:dashbrd-grid-container')->one();
 		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
 	}
