@@ -201,23 +201,22 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Physical disks discovery |<p>Discovery of installed physical disks.</p> |DEPENDENT |vfs.dev.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `output = JSON.parse(value).map(function(dev){     return {         "{#DEVNAME}": dev.Name,         "{#DEVQUEUE}": dev.CurrentDiskQueueLength,         "{#DEVREADS}": dev.DiskReadsPersec,         "{#DEVTIME}": dev.PercentDiskTime,         "{#DEVWRITES}": dev.DiskWritesPersec     }}) return JSON.stringify({"data": output})`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- A: {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- B: {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
+|Physical disks discovery |<p>Discovery of installed physical disks.</p> |ZABBIX_ACTIVE |perf_instance_en.discovery[PhysicalDisk]<p>**Preprocessing**:</p><p>- STR_REPLACE: `{#INSTANCE} {#DEVNAME}`</p><p>**Filter**:</p>AND <p>- A: {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- B: {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Storage |{#DEVNAME}: Disk read rate |<p>Rate of read operations on the disk.</p> |DEPENDENT |vfs.dev.read.rate[DiskReadsPersec.{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#DEVNAME}")].DiskReadsPersec.first()`</p> |
-|Storage |{#DEVNAME}: Disk write rate |<p>Rate of write operations on the disk.</p> |DEPENDENT |vfs.dev.write.rate[DiskWritesPersec.{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#DEVNAME}")].DiskWritesPersec.first()`</p> |
-|Storage |{#DEVNAME}: Disk average queue size (avgqu-sz) |<p>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |DEPENDENT |vfs.dev.queue_size[CurrentDiskQueueLength.{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#DEVNAME}")].CurrentDiskQueueLength.first()`</p> |
-|Storage |{#DEVNAME}: Disk utilization |<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</p> |DEPENDENT |vfs.dev.util[PercentDiskTime.{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.Name == "{#DEVNAME}")].PercentDiskTime.first()`</p> |
-|Zabbix_raw_items |Physical disks WMI get |<p>Raw data of win32_perfformatteddata_perfdisk_physicaldisk.</p> |ZABBIX_ACTIVE |wmi.getall[root\cimv2,"select * from win32_perfformatteddata_perfdisk_physicaldisk"] |
+|Storage |{#DEVNAME}: Disk read rate |<p>Rate of read operations on the disk.</p> |ZABBIX_ACTIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Reads/sec",60] |
+|Storage |{#DEVNAME}: Disk write rate |<p>Rate of write operations on the disk.</p> |ZABBIX_ACTIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Writes/sec",60] |
+|Storage |{#DEVNAME}: Disk average queue size (avgqu-sz) |<p>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |ZABBIX_ACTIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Current Disk Queue Length",60] |
+|Storage |{#DEVNAME}: Disk utilization |<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests.</p> |ZABBIX_ACTIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m) |<p>The disk appears to be under heavy load</p> |`{TEMPLATE_NAME:vfs.dev.util[PercentDiskTime.{#DEVNAME}].min(15m)}>{$VFS.DEV.UTIL.MAX.WARN}` |WARNING |<p>Manual close: YES</p> |
+|{#DEVNAME}: Disk is overloaded (util > {$VFS.DEV.UTIL.MAX.WARN}% for 15m) |<p>The disk appears to be under heavy load</p> |`{TEMPLATE_NAME:perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60].min(15m)}>{$VFS.DEV.UTIL.MAX.WARN}` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
