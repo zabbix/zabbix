@@ -169,7 +169,7 @@ class MysqlDbBackend extends DbBackend {
 			$tls_mode = MYSQLI_CLIENT_SSL;
 		}
 
-		$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
+		@$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
 
 		if ($resource->error) {
 			$this->setError($resource->error);
