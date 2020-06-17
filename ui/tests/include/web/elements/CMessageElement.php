@@ -28,7 +28,7 @@ class CMessageElement extends CElement {
 	 */
 	public static function find() {
 		return (new CElementQuery('xpath:.//output[@role="contentinfo" or'.
-				' contains(@class, "msg-global")]'))->waitUntilVisible()->asMessage();
+				' contains(@class, "msg-global ")]'))->waitUntilVisible()->asMessage();
 	}
 
 	/**
