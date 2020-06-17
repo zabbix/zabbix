@@ -177,6 +177,8 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 		case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
 			if (0 != (types & ZBX_FT_SYM))
 				file_exists = 1;
+			else if (0 != (types & ZBX_FT_DIR))
+				file_exists = 1;
 			break;
 		case FILE_ATTRIBUTE_REPARSE_POINT:
 						/* not a symlink directory => symlink regular file*/
