@@ -21,10 +21,11 @@
 
 class CControllerResponseRedirect extends CControllerResponse {
 
-	private $location;
-	private $messageOk = null;
-	private $messageError = null;
-	private $formData = null;
+	protected $messageOk;
+
+	protected $messageError;
+
+	protected $formData;
 
 	public function __construct($location) {
 		if ($location instanceof CUrl) {
@@ -34,31 +35,27 @@ class CControllerResponseRedirect extends CControllerResponse {
 		$this->location = $location;
 	}
 
-	public function getLocation() {
-		return $this->location;
-	}
-
-	public function getFormData() {
-		return $this->formData;
-	}
-
-	public function setFormData($formData) {
+	public function setFormData(array $formData): void {
 		$this->formData = $formData;
 	}
 
-	public function setMessageOk($messageOk) {
+	public function setMessageOk(string $messageOk): void {
 		$this->messageOk = $messageOk;
 	}
 
-	public function getMessageOk() {
-		return $this->messageOk;
-	}
-
-	public function setMessageError($messageError) {
+	public function setMessageError(string $messageError): void {
 		$this->messageError = $messageError;
 	}
 
-	public function getMessageError() {
+	public function getFormData(): ?array {
+		return $this->formData;
+	}
+
+	public function getMessageOk(): ?string {
+		return $this->messageOk;
+	}
+
+	public function getMessageError(): ?string {
 		return $this->messageError;
 	}
 }

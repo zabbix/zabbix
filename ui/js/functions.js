@@ -294,7 +294,7 @@ function clearMessages() {
  * @param {String} message
  */
 function postMessageOk(message) {
-	cookie.create('messageOk', message);
+	cookie.create('system-message-ok', message);
 }
 
 /**
@@ -303,7 +303,7 @@ function postMessageOk(message) {
  * @param {String} message
  */
 function postMessageError(message) {
-	cookie.create('messageError', message);
+	cookie.create('system-message-error', message);
 }
 
 /**

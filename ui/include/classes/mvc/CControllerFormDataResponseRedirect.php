@@ -21,7 +21,7 @@
 
 class CControllerFormDataResponseRedirect extends CControllerResponse {
 
-	private $location;
+	private $location = '';
 	private $messageOk = null;
 	private $messageError = null;
 	private $formData = null;
@@ -63,28 +63,34 @@ class CControllerFormDataResponseRedirect extends CControllerResponse {
 	}
 
 	public function redirect(): void {
-		if ($this->getMessageOk() !== null) {
-			CSessionHelper::set('messageOk', $this->getMessageOk());
-		}
-		if ($this->getMessageError() !== null) {
-			CSessionHelper::set('messageError', $this->getMessageError());
-		}
 		global $ZBX_MESSAGES;
-		if (isset($ZBX_MESSAGES)) {
-			CSessionHelper::set('messages', $ZBX_MESSAGES);
-		}
+
+		// if ($this->getMessageOk() !== null) {
+		// 	CSessionHelper::set('messageOk', $this->getMessageOk());
+		// }
+		// if ($this->getMessageError() !== null) {
+		// 	CSessionHelper::set('messageError', $this->getMessageError());
+		// }
+		// if (isset($ZBX_MESSAGES)) {
+		// 	CSessionHelper::set('messages', $ZBX_MESSAGES);
+		// }
 
 		// Redirect as simple request.
-		if ($this->getFormData() === null) {
+		if ($this->getFormData() === null && $this->getMessageOk() === null && $this->getMessageError() === null
+				&& !isset($ZBX_MESSAGES)) {
 			redirect($this->getLocation());
 		}
 
 		(new CPageHeader(_('Loading...')))->display();
 		echo '<body>';
 
-		echo ($this->getForm())->toString();
+		echo $this
+			->getForm()
+			->toString();
 
-		echo ($this->getScript())->toString();
+		echo $this
+			->getScript()
+			->toString();
 
 		echo '</body></html>';
 		session_write_close();
@@ -114,9 +120,7 @@ class CControllerFormDataResponseRedirect extends CControllerResponse {
 	private function getScript() {
 		$js = '
 			<script>
-				document.addEventListener("DOMContentLoaded", function() {
-					document.getElementById(\'form-data\').submit();
-				});
+				document.addEventListener("DOMContentLoaded", () => document.getElementById("form-data").submit(););
 			</script>
 		';
 

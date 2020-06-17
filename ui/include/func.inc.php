@@ -1847,20 +1847,22 @@ function get_prepared_messages(array $options = []): ?string {
 
 	// Process messages passed by the previous request.
 
-	if ($options['with_session_messages']
-			&& (CSessionHelper::has('messageOk') || CSessionHelper::has('messageError'))) {
-		if (CSessionHelper::has('messages')) {
-			$ZBX_MESSAGES = CSessionHelper::get('messages');
+	if ($options['with_session_messages']) {
+		if (hasRequest('system-messages')) {
+			$ZBX_MESSAGES = getRequest('system-messages');
 		}
 
-		if (CSessionHelper::has('messageOk')) {
-			show_messages(true, CSessionHelper::get('messageOk'), null);
-		}
-		else {
-			show_messages(false, null, CSessionHelper::get('messageError'));
+		if (hasRequest('system-message-ok')) {
+			show_messages(true, getRequest('system-message-ok'), null);
 		}
 
-		CSessionHelper::unset(['messages', 'messageOk', 'messageError']);
+		if (hasRequest('system-message-error')) {
+			show_messages(false, null, getRequest('system-message-error'));
+		}
+
+		unset_request('system-messages');
+		unset_request('system-message-ok');
+		unset_request('system-message-error');
 	}
 
 	$messages_session = $ZBX_MESSAGES_PREPARED;

@@ -427,9 +427,9 @@ class ZBase {
 	 * Set messages received in cookies.
 	 */
 	private function initMessages(): void {
-		foreach (['messageOk', 'messageError'] as $message_type) {
+		foreach (['system-message-ok', 'system-message-error'] as $message_type) {
 			if (array_key_exists($message_type, $_COOKIE)) {
-				CSessionHelper::set($message_type, $_COOKIE[$message_type]);
+				$_REQUEST[$message_type] = $_COOKIE[$message_type];
 				CCookieHelper::unset($message_type);
 			}
 		}
@@ -516,20 +516,13 @@ class ZBase {
 		// Controller returned redirect to another page?
 		if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
-			if ($response->getMessageOk() !== null) {
-				CSessionHelper::set('messageOk', $response->getMessageOk());
-			}
-			if ($response->getMessageError() !== null) {
-				CSessionHelper::set('messageError', $response->getMessageError());
-			}
+
 			global $ZBX_MESSAGES;
-			if (isset($ZBX_MESSAGES)) {
-				CSessionHelper::set('messages', $ZBX_MESSAGES);
+			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+			foreach ($messages as $message) {
+				$response->addMessage($message['message']);
 			}
 
-			redirect($response->getLocation());
-		}
-		elseif ($response instanceof CControllerFormDataResponseRedirect) {
 			$response->redirect();
 		}
 		// Controller returned fatal error?
@@ -549,9 +542,8 @@ class ZBase {
 					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
-			CSessionHelper::set('messages', $response->getMessages());
 
-			redirect('zabbix.php?action=system.warning');
+			$response->redirect();
 		}
 		// Action has layout?
 		if ($router->getLayout() !== null) {

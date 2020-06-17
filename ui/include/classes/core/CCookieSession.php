@@ -26,7 +26,7 @@ class CCookieSession implements \SessionHandlerInterface {
 
 	private const COOKIE_NAME = ZBX_SESSION_NAME;
 
-	private const COOKIE_MAX_SIZE = 4000;
+	private const COOKIE_MAX_SIZE = 4096;
 
 	private const SIGN_ALGO = 'aes-256-ecb';
 
@@ -203,8 +203,6 @@ class CCookieSession implements \SessionHandlerInterface {
 		foreach ($cookies as $name => $value) {
 			if (strpos($name, self::COOKIE_NAME) === 0) {
 				$session_data .= $value;
-
-				// CCookieHelper::unset($name);
 			}
 		}
 
