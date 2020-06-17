@@ -223,7 +223,7 @@ class PostgresqlDbBackend extends DbBackend {
 			$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
 		}
 
-		$resource = pg_connect($conn_string);
+		$resource = @pg_connect($conn_string);
 
 		if (!$resource) {
 			$this->setError('Error connecting to database.');

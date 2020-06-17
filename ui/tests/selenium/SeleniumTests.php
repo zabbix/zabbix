@@ -69,9 +69,6 @@ require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testPageUsers.php';
-require_once dirname(__FILE__).'/dashboard/testDynamicItemWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testProblemsBySeverityWidget.php';
-require_once dirname(__FILE__).'/dashboard/testHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/testFormAction.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
@@ -152,9 +149,12 @@ require_once dirname(__FILE__).'/testUrlUserPermissions.php';
 require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
-require_once dirname(__FILE__).'/dashboard/testGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testGraphPrototypeWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDynamicItemWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testGraphWidget.php';
+require_once dirname(__FILE__).'/dashboard/testHostAvailabilityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testProblemsBySeverityWidget.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -211,9 +211,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
-		$suite->addTestSuite('testDynamicItemWidgets');
-		$suite->addTestSuite('testProblemsBySeverityWidget');
-		$suite->addTestSuite('testHostAvailabilityWidget');
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
 		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
@@ -294,9 +291,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testGraphWidget');
 		$suite->addTestSuite('testCopyWidgets');
 		$suite->addTestSuite('testGraphPrototypeWidget');
+		$suite->addTestSuite('testDynamicItemWidgets');
+		$suite->addTestSuite('testGraphWidget');
+		$suite->addTestSuite('testHostAvailabilityWidget');
+		$suite->addTestSuite('testProblemsBySeverityWidget');
 
 		return $suite;
 	}
