@@ -275,6 +275,9 @@ class testDynamicItemWidgets extends CWebTest {
 	}
 
 	/**
+	 * @on-before createTestFile
+	 * @on-after removeTestFile
+	 *
 	 * @dataProvider getWidgetsData
 	 */
 	public function testDynamicItemWidgets_Layout($data) {
@@ -338,11 +341,21 @@ class testDynamicItemWidgets extends CWebTest {
 
 				case 'URL':
 					$this->page->switchTo($widget_content->query('id:iframe')->one());
-					$form = $this->query('xpath://form[@action="hostinventories.php"]')->asForm()->one();
-					$this->assertEquals($expected['host'], $form->getFieldContainer('Host name')->getText());
+					$params = json_decode($this->query('xpath://body')->one()->getText(), true);
+					$this->assertEquals($expected['host'], $params['name']);
 					$this->page->switchTo();
 					break;
 			}
 		}
+	}
+
+	public function createTestFile() {
+		if (file_put_contents(PHPUNIT_BASEDIR.'/ui/iframe.php', '<?php echo json_encode($_GET);') === false) {
+			throw new Exception('Failed to create iframe test file.');
+		}
+	}
+
+	public function removeTestFile() {
+		@unlink(PHPUNIT_BASEDIR.'/frontends/php/iframe.php');
 	}
 }
