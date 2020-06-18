@@ -266,13 +266,13 @@ abstract class CControllerLatest extends CController {
 				}
 			}
 
-			// Resolve macros (items stored by references).
+			// Resolve macros.
 
 			$items = CMacrosResolverHelper::resolveItemKeys($items);
 			$items = CMacrosResolverHelper::resolveItemNames($items);
 			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
-			// Choossing max history period for already filtered items with data.
+			// Choossing max history period for already filtered items having data.
 			$history_period = $filter['show_without_data'] ? ZBX_HISTORY_PERIOD : null;
 
 			$history = Manager::History()->getLastValues($items, 2, $history_period);
