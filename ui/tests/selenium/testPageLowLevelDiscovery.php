@@ -77,17 +77,14 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->assertEquals($form->getField($name)->getValue(), $value);
 				switch ($value):
 					case 'SNMP agent':
-						$this->assertTrue($form->query('xpath://li[@id="filter_snmp_oid_row" and @style=""]')
-							->one()->isPresent());
+						$this->assertTrue($form->query('id:filter_snmp_oid')->one()->isVisible());
 						break;
 					case 'Zabbix trapper':
-						$this->assertTrue($form->query('xpath://li[@id="filter_delay_row" and @style="display: none;"]')
-							->one()->isPresent());
+						$this->assertTrue($form->query('id:filter_delay_row')->one()->isVisible());
 						break;
 					case 'Normal':
 					case 'Not supported':
-						$this->assertTrue($form->query('xpath://div/select[@id="filter_status" and @disabled]')
-							->one()->isPresent());
+						$this->assertTrue($form->query('id:filter_status')->one()->isEnabled());
 						break;
 				endswitch;
 			}
@@ -262,8 +259,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 		}
 
 		$this->query('button:Execute now')->one()->click();
-//		$message = CMessageElement::find()->one();
-//		$this->assertEquals($data['message'], $message->getTitle());
 		if ($data['expected'] == TEST_GOOD) {
 			$this->assertMessage($data['expected'], $data['message']);
 		}
