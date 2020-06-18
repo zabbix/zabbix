@@ -1320,6 +1320,8 @@ class CUser extends CApiService {
 		}
 
 		$time = time();
+		CWebUser::setDefault();
+		APP::getInstance()->initLocales(CWebUser::$data);
 
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess'],
@@ -1354,7 +1356,7 @@ class CUser extends CApiService {
 		$db_user['gui_access'] = $usrgrps['gui_access'];
 
 		$config = select_config();
-		$db_user['lang'] = ($db_user['lang'] == LANG_DEFAULT) ? $config['default_lang'] : $db_user['lang'];
+		$db_user['lang'] = ($db_user['lang'] === LANG_DEFAULT) ? $config['default_lang'] : $db_user['lang'];
 
 		$autologout = timeUnitToSeconds($db_user['autologout']);
 
@@ -1585,7 +1587,7 @@ class CUser extends CApiService {
 		$db_user['gui_access'] = $usrgrps['gui_access'];
 
 		$config = select_config();
-		$db_user['lang'] = ($db_user['lang'] == LANG_DEFAULT) ? $config['default_lang'] : $db_user['lang'];
+		$db_user['lang'] = ($db_user['lang'] === LANG_DEFAULT) ? $config['default_lang'] : $db_user['lang'];
 
 		return $db_user;
 	}

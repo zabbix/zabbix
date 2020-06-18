@@ -125,7 +125,6 @@ class CWebUser {
 			}
 
 			if ($sessionId === null || empty(self::$data)) {
-				self::setDefault();
 				self::$data = API::User()->login([
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
@@ -153,7 +152,6 @@ class CWebUser {
 			return $sessionId;
 		}
 		catch (Exception $e) {
-			self::setDefault();
 			return false;
 		}
 	}
@@ -184,14 +182,32 @@ class CWebUser {
 	 * @static
 	 */
 	public static function setDefault(): void {
-		$config = select_config();
-		self::$data = [
+		$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
-			'lang' => $config ? $config['default_lang'] : ZBX_DEFAULT_LANG,
+			'lang' => ZBX_DEFAULT_LANG,
 			'type' => 0,
 			'debug_mode' => false
 		];
+
+		$config = select_config();
+		if ($config) {
+			$data['lang'] = $config['default_lang'];
+		}
+
+		if (CWebUser::isGuestAllowed()) {
+			$db_users = DB::select('users', [
+				'output' => ['lang'],
+				'filter' => ['alias' => ZBX_GUEST_USER]
+			]);
+			$guest_data = $db_users[0];
+
+			if ($guest_data['lang'] !== LANG_DEFAULT) {
+				$data['lang'] = $guest_data['lang'];
+			}
+		}
+
+		self::$data = $data;
 	}
 
 	/**

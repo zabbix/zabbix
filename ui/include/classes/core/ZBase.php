@@ -207,6 +207,7 @@ class ZBase {
 					$this->loadConfigFile();
 					$this->initDB();
 					$this->authenticateUser();
+					$this->initLocales(CWebUser::$data);
 				}
 				catch (ConfigFileException $e) {}
 				break;
