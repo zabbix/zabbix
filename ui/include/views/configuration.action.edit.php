@@ -257,8 +257,8 @@ if ($data['action']['operations']) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('operation_details.open(this,'.$data['eventsource'].','.
-								ACTION_OPERATION.','.json_encode($operation_for_popup).','.$data['actionid'].')'
+							->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
+								ACTION_OPERATION.','.json_encode($operation_for_popup).')'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK),
 						[
@@ -278,8 +278,8 @@ if ($data['action']['operations']) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('operation_details.open(this,'.$data['eventsource'].','.
-								ACTION_OPERATION.','.json_encode($operation_for_popup).', '.$data['actionid'].')'
+							->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
+								ACTION_OPERATION.','.json_encode($operation_for_popup).')'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK),
 						[
@@ -299,8 +299,7 @@ if ($data['action']['operations']) {
 
 $operations_table->addRow(
 	(new CSimpleButton(_('Add')))
-		->onClick('operation_details.open(this,'.$data['eventsource'].','.ACTION_OPERATION.', '.json_encode([]).','.
-			$data['actionid'].')')
+		->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.ACTION_OPERATION.')')
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
 
@@ -358,9 +357,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('operation_details.open(this,'.$data['eventsource'].','.
-								ACTION_RECOVERY_OPERATION.','.json_encode($operation_for_popup).','.
-								$data['actionid'].')'
+							->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
+								ACTION_RECOVERY_OPERATION.','.json_encode($operation_for_popup).')'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK),
 						[
@@ -380,8 +378,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 	$operations_table->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('operation_details.open(this,'.$data['eventsource'].','.ACTION_RECOVERY_OPERATION.','.
-				json_encode([]).','.$data['actionid'].')')
+			->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
+				ACTION_RECOVERY_OPERATION.')'
+			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
@@ -431,9 +430,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				(new CCol(
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
-							->onClick('operation_details.open(this,'.$data['eventsource'].','.
-								ACTION_ACKNOWLEDGE_OPERATION.','.json_encode($operation_for_popup).','.
-								$data['actionid'].')'
+							->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
+								ACTION_ACKNOWLEDGE_OPERATION.','.json_encode($operation_for_popup).')'
 							)
 							->addClass(ZBX_STYLE_BTN_LINK),
 						[
@@ -453,8 +451,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 
 	$operations_table->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('operation_details.open(this,'.$data['eventsource'].','.ACTION_ACKNOWLEDGE_OPERATION.','.
-				json_encode([]).','.$data['actionid'].')')
+			->onClick('operation_details.open(this,'.$data['actionid'].','.$data['eventsource'].','.
+				ACTION_ACKNOWLEDGE_OPERATION.')'
+			)
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
