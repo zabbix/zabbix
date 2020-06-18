@@ -54,7 +54,7 @@ class COverlayDialogElement extends CElement {
 	 * This code should be different from older versions of Zabbix (< 5.0).
 	 *
 	 * @param array    $context
-	 * @param integer  $mode    MODE_SELECT or MODE_TYPE
+	 * @param integer  $mode    multiselect fill mode, or null if default
 	 */
 	public function setDataContext($context, $mode = null) {
 		if (!$context) {
@@ -66,7 +66,7 @@ class COverlayDialogElement extends CElement {
 				->asMultiselect()->one();
 
 		if ($mode !== null) {
-			$element->setFillMode();
+			$element->setFillMode($mode);
 		}
 
 		$element->fill($context);
