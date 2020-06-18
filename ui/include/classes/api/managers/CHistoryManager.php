@@ -25,6 +25,66 @@
 class CHistoryManager {
 
 	/**
+	 * Returns a subset of $items having history data within the $period of time.
+	 *
+	 * @param array $items     an array of items with the 'itemid' and 'value_type' properties
+	 * @param int   $period    the maximum period of time to search for history values within.
+	 *
+	 * @return array    an array with items IDs as keys and the original item data as values
+	 */
+	public function getItemsHavingValues(array $items, $period = null) {
+		$items = zbx_toHash($items, 'itemid');
+
+		$results = [];
+		$grouped_items = self::getItemsGroupedByStorage($items);
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
+			$results += $this->getLastValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC], 1, $period);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
+			$results += $this->getItemsHavingValuesFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL], $period);
+		}
+
+		return array_intersect_key($items, $results);
+	}
+
+	/**
+	 * SQL specific implementation of getItemsHavingValues.
+	 *
+	 * @see CHistoryManager::getItemsHavingValues
+	 */
+	private function getItemsHavingValuesFromSql(array $items, $period = null) {
+		$results = [];
+
+		if ($period) {
+			$period = time() - $period;
+		}
+
+		$items = zbx_toHash($items, 'itemid');
+
+		$itemids_by_type = [];
+
+		foreach ($items as $itemid => $item) {
+			$itemids_by_type[$item['value_type']][] = $itemid;
+		}
+
+		foreach ($itemids_by_type as $type => $type_itemids) {
+			$type_results = DBfetchColumn(DBselect(
+				'SELECT itemid'.
+				' FROM '.self::getTableName($type).
+				' WHERE '.dbConditionInt('itemid', $type_itemids).
+				' GROUP BY itemid'.
+					($period ? ' HAVING MAX(clock)>'.$period : '')
+			), 'itemid');
+
+			$results += array_intersect_key($items, array_flip($type_results));
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Returns the last $limit history objects for the given items.
 	 *
 	 * @param array $items     an array of items with the 'itemid' and 'value_type' properties
