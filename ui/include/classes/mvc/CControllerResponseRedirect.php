@@ -25,7 +25,7 @@ class CControllerResponseRedirect extends CControllerResponse {
 
 	protected $messageError;
 
-	protected $formData;
+	protected $formData = [];
 
 	public function __construct($location) {
 		if ($location instanceof CUrl) {
@@ -47,7 +47,7 @@ class CControllerResponseRedirect extends CControllerResponse {
 		$this->messageError = $messageError;
 	}
 
-	public function getFormData(): ?array {
+	public function getFormData(): array {
 		return $this->formData;
 	}
 

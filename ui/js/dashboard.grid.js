@@ -3024,6 +3024,11 @@
 				if ('redirect' in response) {
 					// There are no more unsaved changes.
 					data['options']['updated'] = false;
+
+					if ('system-message-ok' in response) {
+						postMessageOk(response['system-message-ok']);
+					}
+
 					/*
 					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
 					 * It allows to use back browser button more user-friendly.

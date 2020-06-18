@@ -25,7 +25,6 @@ abstract class CControllerResponse {
 
 	protected $messages = [];
 
-
 	public function getLocation(): string {
 		return $this->location;
 	}
@@ -70,8 +69,8 @@ abstract class CControllerResponse {
 				->setEnctype('multipart/form-data')
 				->setId('form-data');
 
-		foreach ($this->getMessages() as $value) {
-			$form->addItem(new CInput('hidden', 'system-messages[]', $value));
+		foreach ($this->getMessages() as $key => $value) {
+			$form->addItem(new CInput('hidden', '"system-messages['.$key.'][message]', $value));
 		}
 
 		if ($this instanceof CControllerResponseRedirect) {
@@ -83,7 +82,7 @@ abstract class CControllerResponse {
 				$form->addItem(new CInput('hidden', 'system-message-error', $this->getMessageError()));
 			}
 
-			foreach ($this->formData as $key => $value) {
+			foreach ($this->getFormData() as $key => $value) {
 				if (is_array($value)) {
 					foreach ($value as $k => $val) {
 						$form->addItem(new CInput('hidden', $key.'['.$k.']', $val));
@@ -98,7 +97,7 @@ abstract class CControllerResponse {
 		return $form;
 	}
 
-	protected function getScript() {
+	protected function getScript(): CJsScript {
 		$js = '
 			<script>
 				document.addEventListener("DOMContentLoaded", () => document.getElementById("form-data").submit());
@@ -106,5 +105,11 @@ abstract class CControllerResponse {
 		';
 
 		return new CJsScript($js);
+	}
+
+	private function prepareData(): array {
+		$arr = [];
+
+
 	}
 }

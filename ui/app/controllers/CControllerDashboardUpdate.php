@@ -246,13 +246,15 @@ class CControllerDashboardUpdate extends CController {
 			$message = _('Dashboard created');
 			$error_msg = _('Failed to create dashboard');
 		}
-
 		if ($result) {
 			$data['redirect'] = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.view')
 				->setArgument('dashboardid', $result['dashboardids'][0])
 				->getUrl();
-			// CSessionHelper::set('messageOk', $message);
+
+			$data['system-message-ok'] = $message;
+
+			// FIXME: add success message. $message
 		}
 		else {
 			if (!hasErrorMesssages()) {

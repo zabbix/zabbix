@@ -131,12 +131,10 @@ class CCookieSession implements \SessionHandlerInterface {
 	 * @return boolean
 	 */
 	public function write($session_id, $session_data) {
-		$cookies = $this->prepareData(unserialize($session_data));
+		$session_data = $this->prepareData($session_data);
 
-		foreach ($cookies as $name => $cookie) {
-			if (!CCookieHelper::set($name, $cookie, 0)) {
-				throw new \Exception('Session cookie not set.'); // FIXME:
-			}
+		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, 0)) {
+			throw new \Exception('Session cookie not set.'); // FIXME:
 		}
 
 		return true;
@@ -171,41 +169,19 @@ class CCookieSession implements \SessionHandlerInterface {
 		return openssl_encrypt($data, self::SIGN_ALGO, $this->key);
 	}
 
-	private function prepareData(array $data): array {
+	private function prepareData(string $data): string {
+		$data = unserialize($data);
+
 		if (array_key_exists('sign', $data)) {
 			unset($data['sign']);
 		}
 
 		$data['sign'] = $this->sign(serialize($data));
 
-		return $this->splitData($data);
-	}
-
-	private function splitData(array $data): array {
-		$cookies = [];
-		$offset = 0;
-		$raw = base64_encode(serialize($data));
-		$block = mb_substr($raw, self::COOKIE_MAX_SIZE * $offset, self::COOKIE_MAX_SIZE);
-
-		while ($block !== false) {
-			$cookies[self::COOKIE_NAME.'_'.$offset] = $block;
-			$offset++;
-			$block = substr($raw, self::COOKIE_MAX_SIZE * $offset, self::COOKIE_MAX_SIZE);
-		}
-
-		return $cookies;
+		return base64_encode(serialize($data));
 	}
 
 	private function parseData(): string {
-		$session_data = '';
-		$cookies = CCookieHelper::getAll();
-
-		foreach ($cookies as $name => $value) {
-			if (strpos($name, self::COOKIE_NAME) === 0) {
-				$session_data .= $value;
-			}
-		}
-
-		return base64_decode($session_data);
+		return base64_decode(CCookieHelper::get(self::COOKIE_NAME));
 	}
 }

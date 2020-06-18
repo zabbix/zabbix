@@ -1604,12 +1604,16 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 				$list->setAttribute('style', 'display: none;');
 			}
 		}
+
 		foreach ($messages as $message) {
 			foreach (explode("\n", $message['message']) as $message_part) {
 				$list->addItem($message_part);
 			}
 		}
-		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
+
+		$msg_details = (new CDiv())
+			->addClass(ZBX_STYLE_MSG_DETAILS)
+			->addItem($list);
 	}
 
 	if ($title !== null) {
@@ -1847,7 +1851,7 @@ function get_prepared_messages(array $options = []): ?string {
 
 	// Process messages passed by the previous request.
 
-	if ($options['with_session_messages']) {
+	if ($options['with_session_messages'] && (hasRequest('system-message-ok') || hasRequest('system-message-error'))) {
 		if (hasRequest('system-messages')) {
 			$ZBX_MESSAGES = getRequest('system-messages');
 		}

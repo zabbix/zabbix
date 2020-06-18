@@ -63,7 +63,8 @@ $fields = [
 	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 ];
 
-CSession::start();
+new CCookieSession;
+
 CSessionHelper::set('check_fields_result', check_fields($fields, false));
 if (!CSessionHelper::has('step')) {
 	CSessionHelper::set('step', 0);
