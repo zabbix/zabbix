@@ -286,19 +286,25 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Name' => 'Containers discovery'
 					],
-					'expected' => ['Containers discovery']
+					'expected' => [
+						'Containers discovery'
+					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Hosts' => ['Simple form test host']
+						'Hosts' => [
+							'Simple form test host'
+						]
 					],
-					'expected' => ['testFormDiscoveryRule',
-							'testFormDiscoveryRule1',
-							'testFormDiscoveryRule2',
-							'testFormDiscoveryRule3',
-							'testFormDiscoveryRule4']
+					'expected' => [
+						'testFormDiscoveryRule',
+						'testFormDiscoveryRule1',
+						'testFormDiscoveryRule2',
+						'testFormDiscoveryRule3',
+						'testFormDiscoveryRule4'
+					]
 				]
 			],
 			[
@@ -306,7 +312,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Name' => 'testFormDiscoveryRule2',
 					],
-					'expected' => ['testFormDiscoveryRule2']
+					'expected' => [
+						'testFormDiscoveryRule2'
+					]
 				]
 			],
 			[
@@ -314,42 +322,67 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Update interval' => '0',
 					],
-					'expected' => ['Test discovery rule', 'Test discovery rule']
+					'expected' => [
+						'Test discovery rule',
+						'Test discovery rule'
+					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Hosts' => ['Visible host for template linkage', 'Test item host']
+						'Hosts' => [
+							'Visible host for template linkage',
+							'Test item host'
+						]
 					],
-					'expected' => ['delete Discovery Rule', 'Test discovery rule']
+					'expected' => [
+						'delete Discovery Rule',
+						'Test discovery rule'
+					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Hosts' => ['Visible host for template linkage', 'Test item host'],
+						'Hosts' => [
+							'Visible host for template linkage',
+							'Test item host'
+						],
 						'Key' => 'key'
 					],
-					'expected' => ['delete Discovery Rule']
+					'expected' => [
+						'delete Discovery Rule'
+					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Host groups' => ['Inheritance test'],
-						'Hosts' => ['Inheritance test template with host prototype']
+						'Host groups' => [
+							'Inheritance test'
+						],
+						'Hosts' => [
+							'Inheritance test template with host prototype'
+						]
 					],
-					'expected' => ['Discovery rule for host prototype test']
+					'expected' => [
+						'Discovery rule for host prototype test'
+					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Host groups' => ['Zabbix servers'],
+						'Host groups' => [
+							'Zabbix servers'
+						],
 						'Name' => 'DiscoveryRule ZBX6663'
 					],
-					'expected' => ['DiscoveryRule ZBX6663', 'Template ZBX6663 Second: DiscoveryRule ZBX6663 Second']
+					'expected' => [
+						'DiscoveryRule ZBX6663',
+						'Template ZBX6663 Second: DiscoveryRule ZBX6663 Second'
+					]
 				]
 			],
 			[
@@ -357,9 +390,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Key' => 'array.cache.discovery'
 					],
-					'expected' => ['Array Controller Cache Discovery',
-							'Array Controller Cache Discovery',
-							'Array Controller Cache Discovery']
+					'expected' => [
+						'Array Controller Cache Discovery',
+						'Array Controller Cache Discovery',
+						'Array Controller Cache Discovery'
+					]
 				]
 			],
 			[
@@ -367,10 +402,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'State' => 'Normal'
 					],
-					'expected' => ['Template Module Linux block devices by Zabbix agent: Get /proc/diskstats:'
-							. ' Block devices discovery',
-							'Template Module Linux filesystems by Zabbix agent: Mounted filesystem discovery',
-							'Template Module Linux network interfaces by Zabbix agent: Network interface discovery']
+					'expected' => [
+						'Template Module Linux block devices by Zabbix agent: Get /proc/diskstats:'
+						. ' Block devices discovery',
+						'Template Module Linux filesystems by Zabbix agent: Mounted filesystem discovery',
+						'Template Module Linux network interfaces by Zabbix agent: Network interface discovery'
+					]
 				]
 			],
 			[
@@ -379,8 +416,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Name' => 'Block',
 						'State' => 'Normal'
 					],
-					'expected' => ['Template Module Linux block devices by Zabbix agent: Get /proc/diskstats:'
-							. ' Block devices discovery']
+					'expected' => [
+						'Template Module Linux block devices by Zabbix agent: Get /proc/diskstats:'
+						. ' Block devices discovery'
+					]
 				]
 			],
 			[
@@ -398,7 +437,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Database monitor',
 						'Update interval' => '1h'
 					],
-					'expected' => ['Databases discovery', 'Replication discovery']
+					'expected' => [
+						'Databases discovery',
+						'Replication discovery'
+					]
 				]
 			],
 			[
@@ -406,7 +448,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Status' => 'Disabled'
 					],
-					'expected' => ['Discovery-rule-layout-test-001']
+					'expected' => [
+						'Discovery-rule-layout-test-001'
+					]
 				]
 			],
 			[
@@ -415,7 +459,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Status' => 'Enabled',
 						'Name' => 'Discovery-rule'
 					],
-					'expected' => ['Discovery-rule-layout-test-002']
+					'expected' => [
+						'Discovery-rule-layout-test-002'
+					]
 				]
 			],
 			[
@@ -423,7 +469,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Keep lost resources period' => '50d'
 					],
-					'expected' => ['Discovery-rule-layout-test-001']
+					'expected' => [
+						'Discovery-rule-layout-test-001'
+					]
 				]
 			],
 			[
@@ -431,7 +479,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Name' => 'try'
 					],
-					'rows' => 0
+					'expected' => []
 				]
 			],
 			[
@@ -447,7 +495,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'all',
 						'Status' => 'Enabled'
 					],
-					'expected' => ['Test discovery rule']
+					'expected' => [
+						'Test discovery rule'
+					]
 				]
 			]
 		];
@@ -469,12 +519,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			$this->assertTableDataColumn($data['expected']);
 		}
 		if (array_key_exists('rows', $data)) {
-			if ($data['rows'] == 0) {
-				$this->assertTableData($data['rows']);
-			}
-			else {
-				$this->assertEquals($data['rows'], $table->getRows()->count());
-			}
+			$this->assertEquals($data['rows'], $table->getRows()->count());
 		}
 	}
 
