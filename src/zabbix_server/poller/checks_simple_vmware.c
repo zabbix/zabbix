@@ -2154,6 +2154,16 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		{
 			zbx_uint64_t	mi = datastore->hv_uuids_access.values[i].value;
 
+			if (0 == count && (i + 1) == datastore->hv_uuids_access.values_num)
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore is not available for hypervisor: %s",
+						0 == (ZBX_VMWARE_DS_MOUNTED & mi) ? "unmounted" : (
+						0 == (ZBX_VMWARE_DS_ACCESSIBLE & mi) ? "inaccessible" : (
+						ZBX_VMWARE_DS_READ == (ZBX_VMWARE_DS_READWRITE & mi)? "readOnly" :
+						"unknown"))));
+				goto unlock;
+			}
+
 			zabbix_log(LOG_LEVEL_DEBUG, "Datastore %s is not available for hypervisor %s: %s",
 					datastore->name, datastore->hv_uuids_access.values[i].name,
 					0 == (ZBX_VMWARE_DS_MOUNTED & mi) ? "unmounted" : (
