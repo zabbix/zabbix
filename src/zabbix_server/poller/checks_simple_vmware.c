@@ -2193,7 +2193,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 
 	if (0 == ds_count)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No available datastores."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastores available."));
 		goto unlock;
 	}
 
