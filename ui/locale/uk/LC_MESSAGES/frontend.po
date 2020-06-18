@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-14 11:17+0300\n"
+"POT-Creation-Date: 2020-06-18 10:58+0300\n"
 "PO-Revision-Date: 2019-10-10 13:52+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2329,7 +2329,7 @@ msgstr[0] "Не вдалося дезактивувати метод повід�
 msgstr[1] "Не вдалося дезактивувати методи повідомлень"
 msgstr[2] "Не вдалося дезактивувати методи повідомлень"
 
-#: app/controllers/CControllerModuleUpdate.php:159
+#: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
@@ -2402,7 +2402,7 @@ msgstr[0] "Не вдалося активувати метод повідомл�
 msgstr[1] "Не вдалося активувати методи повідомлень"
 msgstr[2] "Не вдалося активувати методи повідомлень"
 
-#: app/controllers/CControllerModuleUpdate.php:154
+#: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
@@ -3016,6 +3016,11 @@ msgstr "Не вдалося оновити період сервісу"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "Не вдалося оновити метод повідомлень"
+
+#: app/controllers/CControllerModuleUpdate.php:157
+#, c-format
+msgid "Cannot update module: %1$s."
+msgstr ""
 
 #: sysmaps.php:180
 msgid "Cannot update network map"
@@ -6691,7 +6696,7 @@ msgstr "GSM модем"
 msgid "GUI"
 msgstr "Веб інтерфейс"
 
-#: include/classes/user/CWebUser.php:76 index_sso.php:210
+#: include/classes/user/CWebUser.php:76 index_sso.php:231
 msgid "GUI access disabled."
 msgstr "Доступ до GUI відключено."
 
@@ -10711,7 +10716,7 @@ msgstr "Записувати не співпадаючі SNMP трапи"
 #: app/controllers/CControllerAuditLogList.php:167
 #: app/views/administration.authentication.edit.php:127
 #: app/views/administration.user.list.php:97 include/func.inc.php:1540
-#: include/func.inc.php:1555 index_http.php:93 index_sso.php:229
+#: include/func.inc.php:1555 index_http.php:93 index_sso.php:250
 msgid "Login"
 msgstr "Вхід в систему"
 
@@ -10869,7 +10874,7 @@ msgstr "Період сервісу додано"
 msgid "Maintenance deleted"
 msgstr "Сервіс видалено"
 
-#: app/controllers/CControllerPopupMaintenancePeriod.php:212
+#: app/controllers/CControllerPopupMaintenancePeriod.php:218
 msgid "Maintenance period"
 msgstr "Період сервісу"
 
@@ -11439,7 +11444,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/controllers/CControllerModuleUpdate.php:147
+#: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
@@ -11447,13 +11452,18 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/controllers/CControllerModuleUpdate.php:142
+#: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/controllers/CControllerModuleUpdate.php:142
+#, c-format
+msgid "Module updated: %1$s."
+msgstr ""
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -16951,7 +16961,7 @@ msgstr "Елемент даних більше не виявляється та 
 msgid "The number of processes. Returns integer"
 msgstr "Кількість процесів. Повертає ціле число"
 
-#: index_sso.php:161
+#: index_sso.php:182
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
@@ -19287,7 +19297,7 @@ msgstr "Ви увійшли під іменем \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Ви не можете вибрати деякі з мов, тому що їх локалі не встановлено на веб-сервері."
 
-#: include/func.inc.php:1549 index_http.php:90 index_sso.php:226
+#: include/func.inc.php:1549 index_http.php:90 index_sso.php:247
 msgid "You are not logged in"
 msgstr "Ви не увійшли в систему"
 
