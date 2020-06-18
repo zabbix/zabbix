@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-14 11:14+0300\n"
+"POT-Creation-Date: 2020-06-18 10:53+0300\n"
 "PO-Revision-Date: 2020-06-04 05:05+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2237,7 +2237,7 @@ msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "미디어 타입을 비활성화 할 수 없습니다."
 
-#: app/controllers/CControllerModuleUpdate.php:159
+#: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
@@ -2292,7 +2292,7 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "미디어 타입을 활성화 할 수 없습니다."
 
-#: app/controllers/CControllerModuleUpdate.php:154
+#: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
@@ -2888,6 +2888,11 @@ msgstr "메인터넌스를 갱신할 수 없습니다"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "연락 방법을 갱신할 수 없습니다"
+
+#: app/controllers/CControllerModuleUpdate.php:157
+#, c-format
+msgid "Cannot update module: %1$s."
+msgstr ""
 
 #: sysmaps.php:180
 msgid "Cannot update network map"
@@ -6546,7 +6551,7 @@ msgstr "GSM 모뎀"
 msgid "GUI"
 msgstr "표시 설정"
 
-#: include/classes/user/CWebUser.php:76 index_sso.php:210
+#: include/classes/user/CWebUser.php:76 index_sso.php:231
 msgid "GUI access disabled."
 msgstr "GUI 액세스를 비활성 하였습니다"
 
@@ -10534,7 +10539,7 @@ msgstr "매치하지 않은 SNMP트랩을 로그에 기록"
 #: app/controllers/CControllerAuditLogList.php:167
 #: app/views/administration.authentication.edit.php:127
 #: app/views/administration.user.list.php:97 include/func.inc.php:1540
-#: include/func.inc.php:1555 index_http.php:93 index_sso.php:229
+#: include/func.inc.php:1555 index_http.php:93 index_sso.php:250
 msgid "Login"
 msgstr "로그인"
 
@@ -10692,7 +10697,7 @@ msgstr "메인터넌스를 추가하였습니다"
 msgid "Maintenance deleted"
 msgstr "메인터넌스를 삭제하였습니다"
 
-#: app/controllers/CControllerPopupMaintenancePeriod.php:212
+#: app/controllers/CControllerPopupMaintenancePeriod.php:218
 msgid "Maintenance period"
 msgstr "메인터넌스 기간"
 
@@ -11248,17 +11253,22 @@ msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] ""
 
-#: app/controllers/CControllerModuleUpdate.php:147
+#: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
 msgstr[0] ""
 
-#: app/controllers/CControllerModuleUpdate.php:142
+#: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] ""
+
+#: app/controllers/CControllerModuleUpdate.php:142
+#, c-format
+msgid "Module updated: %1$s."
+msgstr ""
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -16744,7 +16754,7 @@ msgstr "디스커버리된 아이템을 찾을 수 없었습니다. 다음 디�
 msgid "The number of processes. Returns integer"
 msgstr "프로세스 수. integer를 리턴."
 
-#: index_sso.php:161
+#: index_sso.php:182
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
@@ -19056,7 +19066,7 @@ msgstr "\"%1$s\"로 로그인 하였습니다."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Web서버의 언어가 인스톨되어있지 않기 때문에 몇 언어를 이용할 수 없습니다."
 
-#: include/func.inc.php:1549 index_http.php:90 index_sso.php:226
+#: include/func.inc.php:1549 index_http.php:90 index_sso.php:247
 msgid "You are not logged in"
 msgstr "당신은 로그인 되지 않았습니다"
 

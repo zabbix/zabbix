@@ -175,7 +175,7 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 	switch (file_attributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY))
 	{
 		case FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY:
-			if (0 != (types & ZBX_FT_SYM))
+			if (0 != (types & ZBX_FT_SYM) || 0 != (types & ZBX_FT_DIR))
 				file_exists = 1;
 			break;
 		case FILE_ATTRIBUTE_REPARSE_POINT:
