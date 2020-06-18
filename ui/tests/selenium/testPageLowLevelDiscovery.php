@@ -145,7 +145,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Clicking Enabled/Disabled link
 		$discovery_status = ['Enabled' => 1, 'Disabled' => 0];
-		foreach ($discovery_status as $action=>$expected_status) {
+		foreach ($discovery_status as $action => $expected_status) {
 			$row->query('link', $action)->one()->click();
 			$status = CDBHelper::getValue('SELECT status FROM items WHERE name ='.zbx_dbstr($name).' and hostid ='
 				.self::HOST_ID);
@@ -508,7 +508,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$form->fill(['Hosts'=>'Host for host prototype tests', 'Keep lost resources period'=> '']);
+		$form->fill(['Hosts' => 'Host for host prototype tests', 'Keep lost resources period' => '']);
 		$form->submit();
 		$table = $this->query('class:list-table')->asTable()->one();
 		foreach ($this->discovery_rule_names as $rule_name) {
@@ -527,7 +527,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Delete template discovery rule.
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$form->fill(['Hosts'=>'Host ZBX6663', 'Name'=>'DiscoveryRule ZBX6663 Second']);
+		$form->fill(['Hosts' => 'Host ZBX6663', 'Name' => 'DiscoveryRule ZBX6663 Second']);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$table->findRow('Name', 'Template ZBX6663 Second: DiscoveryRule ZBX6663 Second')->select();
