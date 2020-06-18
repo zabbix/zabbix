@@ -174,9 +174,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 		}
 	}
 
-	/**
-	 * @backup items
-	 */
 	public static function getCheckNowData() {
 		return [
 			[
@@ -188,7 +185,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						['Name' => 'Discovery rule 3']
 					],
 					'message' => 'Request sent successfully',
-					'hostid' => 90001
+					'hostid' => self::HOST_ID
 				]
 			],
 			[
@@ -198,7 +195,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Name' => 'Discovery rule 2'
 					],
 					'message' => 'Request sent successfully',
-					'hostid' => 90001
+					'hostid' => self::HOST_ID
 				]
 			],
 			[
@@ -210,7 +207,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'disabled' => true,
 					'message' => 'Cannot send request',
 					'error_details' => 'Cannot send request: discovery rule is disabled.',
-					'hostid' => 90001
+					'hostid' => self::HOST_ID
 				]
 			],
 			[
@@ -239,6 +236,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
+	 * @backup items
+	 *
 	 * @dataProvider getCheckNowData
 	 */
 	public function testPageLowLevelDiscovery_CheckNow($data) {
@@ -407,7 +406,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Status' => 'Disabled'
 					],
-					'expected' => ['Discovery-rule-layout-test-001', 'Discovery rule 2']
+					'expected' => ['Discovery-rule-layout-test-001']
 				]
 			],
 			[
@@ -489,36 +488,57 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
 	}
 
-	public function testPageLowLevelDiscovery_DeleteAllButton() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+	public static function getDeleteAllButtonData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'hostid' => self::HOST_ID,
+					'filter' => ['Hosts' => 'Host for host prototype tests', 'Keep lost resources period' => ''],
+					'names' => [
+						['Name' => 'Discovery rule 1'],
+						['Name' => 'Discovery rule 2'],
+						['Name' => 'Discovery rule 3']
+					],
+					'message' => 'Discovery rules deleted',
+					'details' => null,
+					'count_expected' => 0
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'hostid' => 50001,
+					'filter' => ['Hosts' => 'Host ZBX6663', 'Key' => 'drule-ZBX6663-second'],
+					'names' => [
+						['Name' => 'Template ZBX6663 Second: DiscoveryRule ZBX6663 Second']
+					],
+					'message' => 'Cannot delete discovery rules',
+					'details' => 'Cannot delete templated items',
+					'count_expected' => 1
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getDeleteAllButtonData
+	 */
+	public function testPageLowLevelDiscovery_DeleteAllButton($data) {
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid']);
 
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$form->fill(['Hosts' => 'Host for host prototype tests', 'Keep lost resources period' => '']);
+		$form->fill($data['filter']);
 		$form->submit();
-		$table = $this->query('class:list-table')->asTable()->one();
-		foreach ($this->discovery_rule_names as $rule_name) {
-			$table->findRow('Name', $rule_name)->select();
-		}
-
+		$this->selectTableRows($data['names']);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
-		$this->assertEquals('Discovery rules deleted', CMessageElement::find()->one()->getTitle());
+		$this->assertMessage($data['expected'], $data['message'], $data['details']);
 		foreach ($this->discovery_rule_names as $rule_name) {
 			$count = CDBHelper::getCount('SELECT null FROM items WHERE name ='
 				.zbx_dbstr($rule_name).' and hostid ='.self::HOST_ID);
 			$this->assertEquals(0, $count);
 		}
-
-		// Delete template discovery rule.
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
-		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$form->fill(['Hosts' => 'Host ZBX6663', 'Name' => 'DiscoveryRule ZBX6663 Second']);
-		$form->submit();
-		$this->page->waitUntilReady();
-		$table->findRow('Name', 'Template ZBX6663 Second: DiscoveryRule ZBX6663 Second')->select();
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->assertEquals('Cannot delete discovery rules', CMessageElement::find()->one()->getTitle());
 	}
 }
