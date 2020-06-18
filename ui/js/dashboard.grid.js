@@ -2612,7 +2612,7 @@
 	function setModeEditDashboard($obj, data) {
 		$obj.addClass('dashbrd-mode-edit');
 
-		// Recaltulate minimal height and expand dashboard to the whole screen.
+		// Recalculate minimal height and expand dashboard to the whole screen.
 		data.minimalHeight = calculateGridMinHeight($obj);
 		resizeDashboardGrid($obj, data);
 
