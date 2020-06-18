@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/reiver/go-telnet"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
@@ -166,6 +167,16 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
+func (p *Plugin) telnetExpect(address string) (result int) {
+	var caller telnet.Caller = telnet.StandardCaller
+	if err := telnet.DialToAndCall(address, caller); err != nil {
+		log.Debugf("TELNET TCP expect network error: cannot connect to [%s]: %s", address, err.Error())
+		return
+	}
+
+	return 1
+}
+
 func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
@@ -251,6 +262,11 @@ func (p *Plugin) exportNetService(params []string) int {
 			port = "pop3"
 		}
 	}
+
+	if service == "telnet" {
+		return p.telnetExpect(net.JoinHostPort(ip, port))
+	}
+
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
 }
 
@@ -299,7 +315,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				err = errors.New(errorInvalidThirdParam)
 				return
 			}
-		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http":
+		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "telnet":
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return
