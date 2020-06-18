@@ -1,1 +1,0 @@
-.........T [ZBX-17905] changed type of physical disk performance items from wmi to perf_counter_en and perf_instance_en in Template Module Windows physical disks by Zabbix agent (mchudinov)
