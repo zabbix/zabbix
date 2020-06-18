@@ -1197,11 +1197,11 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 
 	for (i = 0; i < src->hv_uuids_access.values_num; i++)
 	{
-		zbx_str_uint64_pair_t	pval;
+		zbx_str_uint64_pair_t	val;
 
-		pval.name = vmware_shared_strdup(src->hv_uuids_access.values[i].name);
-		pval.value = src->hv_uuids_access.values[i].value;
-		zbx_vector_str_uint64_pair_append_ptr(&datastore->hv_uuids_access, &pval);
+		val.name = vmware_shared_strdup(src->hv_uuids_access.values[i].name);
+		val.value = src->hv_uuids_access.values[i].value;
+		zbx_vector_str_uint64_pair_append_ptr(&datastore->hv_uuids_access, &val);
 	}
 
 	return datastore;
