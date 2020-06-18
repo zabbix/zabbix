@@ -80,11 +80,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 						$this->assertTrue($form->query('id:filter_snmp_oid')->one()->isVisible());
 						break;
 					case 'Zabbix trapper':
-						$this->assertTrue($form->query('id:filter_delay_row')->one()->isVisible());
+						$this->assertFalse($form->query('id:filter_delay_row')->one()->isVisible());
 						break;
 					case 'Normal':
 					case 'Not supported':
-						$this->assertTrue($form->query('id:filter_status')->one()->isEnabled());
+						$this->assertFalse($form->query('id:filter_status')->one()->isEnabled());
 						break;
 				endswitch;
 			}
