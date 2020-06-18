@@ -938,6 +938,10 @@ $(function() {
 		pos_side = 10,
 		side = 'right';
 
+	if (main === null) {
+		return;
+	}
+
 	main.appendChild(ntf_node);
 
 	if (ntf_pos !== null && 'top' in ntf_pos) {
