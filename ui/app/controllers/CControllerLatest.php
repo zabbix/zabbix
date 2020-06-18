@@ -44,9 +44,18 @@ abstract class CControllerLatest extends CController {
 
 		// Sorting options for hosts, applications and items.
 
-		$host_sort_options = ['field' => 'name', 'order' => ($sort_field === 'host') ? $sort_order : 'ASC'];
-		$application_sort_options = ['field' => 'name', 'order' => ($sort_field === 'name') ? $sort_order : 'ASC'];
-		$item_sort_options = ['field' => 'name', 'order' => ($sort_field === 'name') ? $sort_order : 'ASC'];
+		$host_sort_options = [
+			'field' => 'name',
+			'order' => ($sort_field === 'host') ? $sort_order : 'ASC'
+		];
+		$application_sort_options = [
+			'field' => 'name',
+			'order' => ($sort_field === 'name') ? $sort_order : 'ASC'
+		];
+		$item_sort_options = [
+			'field' => 'name',
+			'order' => ($sort_field === 'name') ? $sort_order : 'ASC'
+		];
 
 		// Select groups for subsequent selection of hosts, applications and items.
 
@@ -272,7 +281,7 @@ abstract class CControllerLatest extends CController {
 			$items = CMacrosResolverHelper::resolveItemNames($items);
 			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
-			// Choossing max history period for already filtered items having data.
+			// Choosing max history period for already filtered items having data.
 			$history_period = $filter['show_without_data'] ? ZBX_HISTORY_PERIOD : null;
 
 			$history = Manager::History()->getLastValues($items, 2, $history_period);
