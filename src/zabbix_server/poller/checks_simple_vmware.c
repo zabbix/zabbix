@@ -2098,7 +2098,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
-	int			i, ret = SYSINFO_RET_FAIL, count = 0;
+	int			i, ret = SYSINFO_RET_FAIL, count = 0, ds_count = 0;
 	zbx_uint64_t		latency = 0, counterid;
 	unsigned char		is_maxlatency = 0;
 
@@ -2154,16 +2154,6 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		{
 			zbx_uint64_t	mi = datastore->hv_uuids_access.values[i].value;
 
-			if (0 == count && (i + 1) == datastore->hv_uuids_access.values_num)
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore is not available for hypervisor: %s",
-						0 == (ZBX_VMWARE_DS_MOUNTED & mi) ? "unmounted" : (
-						0 == (ZBX_VMWARE_DS_ACCESSIBLE & mi) ? "inaccessible" : (
-						ZBX_VMWARE_DS_READ == (ZBX_VMWARE_DS_READWRITE & mi)? "readOnly" :
-						"unknown"))));
-				goto unlock;
-			}
-
 			zabbix_log(LOG_LEVEL_DEBUG, "Datastore %s is not available for hypervisor %s: %s",
 					datastore->name, datastore->hv_uuids_access.values[i].name,
 					0 == (ZBX_VMWARE_DS_MOUNTED & mi) ? "unmounted" : (
@@ -2185,6 +2175,8 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			goto unlock;
 		}
 
+		ds_count++;
+
 		if (0 == ISSET_VALUE(result))
 			continue;
 
@@ -2197,6 +2189,12 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			latency = *GET_UI64_RESULT(result);
 
 		UNSET_UI64_RESULT(result);
+	}
+
+	if (0 == ds_count)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "No available datastores."));
+		goto unlock;
 	}
 
 	if (0 == is_maxlatency && 0 != count)
