@@ -41,9 +41,8 @@ const (
 
 type fileType uint16
 
-func (f fileType) HasType(t fileType) bool { return f&t != 0 }
-func (f *fileType) AddType(t fileType)     { *f |= t }
-func (f *fileType) ClearType(t fileType)   { *f &= ^t }
+func (f fileType) hasType(t fileType) bool { return f&t != 0 }
+func (f *fileType) addType(t fileType)     { *f |= t }
 
 func typesToMask(param string) (fileType, error) {
 	var mask fileType = 0
@@ -68,7 +67,7 @@ func typesToMask(param string) (fileType, error) {
 	for _, name := range types {
 		name = strings.TrimSpace(name)
 		if t, ok := template[name]; ok {
-			mask.AddType(t)
+			mask.addType(t)
 		} else {
 			return 0, fmt.Errorf(`Invalid type "%s".`, name)
 		}
@@ -105,16 +104,16 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 
 	if typesIncl == 0 {
 		if typesExcl == 0 {
-			typesIncl.AddType(zbxFtFile)
+			typesIncl.addType(zbxFtFile)
 		} else {
-			typesIncl.AddType(zbxFtAll)
+			typesIncl.addType(zbxFtAll)
 		}
 	}
 
-	if typesIncl.HasType(zbxFtSym) || typesExcl.HasType(zbxFtSym) {
+	if typesIncl.hasType(zbxFtSym) || typesExcl.hasType(zbxFtSym) {
 		if f, err = os.Lstat(params[0]); err == nil {
 			if f.Mode()&os.ModeSymlink != 0 {
-				types.AddType(zbxFtSym)
+				types.addType(zbxFtSym)
 			}
 		} else if !os.IsNotExist(err) {
 			return 0, fmt.Errorf("Cannot obtain file information: %s", err)
@@ -123,23 +122,23 @@ func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
 
 	if f, err = os.Stat(params[0]); err == nil {
 		if f.Mode().IsRegular() {
-			types.AddType(zbxFtFile)
+			types.addType(zbxFtFile)
 		} else if f.Mode().IsDir() {
-			types.AddType(zbxFtDir)
+			types.addType(zbxFtDir)
 		} else if f.Mode()&os.ModeSocket != 0 {
-			types.AddType(zbxFtSock)
+			types.addType(zbxFtSock)
 		} else if f.Mode()&os.ModeCharDevice != 0 {
-			types.AddType(zbxFtCdev)
+			types.addType(zbxFtCdev)
 		} else if f.Mode()&os.ModeDevice != 0 {
-			types.AddType(zbxFtBdev)
+			types.addType(zbxFtBdev)
 		} else if f.Mode()&os.ModeNamedPipe != 0 {
-			types.AddType(zbxFtFifo)
+			types.addType(zbxFtFifo)
 		}
 	} else if !os.IsNotExist(err) {
 		return 0, fmt.Errorf("Cannot obtain file information: %s", err)
 	}
 
-	if !typesExcl.HasType(types) && typesIncl.HasType(types) {
+	if !typesExcl.hasType(types) && typesIncl.hasType(types) {
 		return 1, nil
 	}
 	return 0, nil
