@@ -126,6 +126,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Check that filtered count mathces expected.
 		$this->assertEquals($filtered_count, $table->getRows()->count());
 		$this->assertDisplayingText($filtered_count);
+
 		// Checking that filtered discovery rule matches expected.
 		$this->assertEquals($filtered_contents, $this->getTableResult($filtered_count));
 
@@ -173,6 +174,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 		}
 	}
 
+	/**
+	 * @backup items
+	 */
 	public static function getCheckNowData() {
 		return [
 			[
@@ -184,7 +188,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						['Name' => 'Discovery rule 3']
 					],
 					'message' => 'Request sent successfully',
-					'host_count' => 1
+					'hostid' => 90001
 				]
 			],
 			[
@@ -194,7 +198,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Name' => 'Discovery rule 2'
 					],
 					'message' => 'Request sent successfully',
-					'host_count' => 1
+					'hostid' => 90001
 				]
 			],
 			[
@@ -206,7 +210,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'disabled' => true,
 					'message' => 'Cannot send request',
 					'error_details' => 'Cannot send request: discovery rule is disabled.',
-					'host_count' => 1
+					'hostid' => 90001
 				]
 			],
 			[
@@ -217,7 +221,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'message' => 'Cannot send request',
 					'error_details' => 'Cannot send request: wrong discovery rule type.',
-					'host_count' => 2
+					'hostid' => 99062
 				]
 			],
 			[
@@ -228,7 +232,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'message' => 'Cannot send request',
 					'error_details' => 'Cannot send request: host is not monitored.',
-					'host_count' => 3
+					'hostid' => 10250
 				]
 			]
 		];
@@ -238,16 +242,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @dataProvider getCheckNowData
 	 */
 	public function testPageLowLevelDiscovery_CheckNow($data) {
-		switch ($data['host_count']):
-			case 1:
-				$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
-				break;
-			case 2:
-				$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=99062');
-				break;
-			case 3:
-				$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D=10250');
-		endswitch;
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid']);
 
 		// Enabe all LLDs, so Check now can be send successfully.
 		$this->massChangeStatus('Enable');
@@ -257,14 +252,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 			$this->page->acceptAlert();
 			$this->selectTableRows($data['names']);
 		}
-
 		$this->query('button:Execute now')->one()->click();
-		if ($data['expected'] == TEST_GOOD) {
-			$this->assertMessage($data['expected'], $data['message']);
-		}
-		else {
-			$this->assertMessage($data['expected'], $data['message'], $data['error_details']);
-		}
+		$this->assertMessage($data['expected'], $data['message']);
 	}
 
 	private function getTableResult($rows_count){
@@ -496,16 +485,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
-		if ($row_count == 1) {
-			$this->assertEquals('Discovery rule '.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
-		}
-		else {
-			$this->assertEquals('Discovery rules '.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
-		}
+		$string = ($table->getRows()->count() == 1) ? 'Discovery rule ' : 'Discovery rules ';
+		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
 	}
 
 	public function testPageLowLevelDiscovery_DeleteAllButton() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
+
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill(['Hosts' => 'Host for host prototype tests', 'Keep lost resources period' => '']);
