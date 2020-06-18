@@ -65,7 +65,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check filter collapse/expand.
 		$filter_expanded = ['true', 'false'];
-		foreach ($filter_expanded as $status){
+		foreach ($filter_expanded as $status) {
 			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
 			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
 		}
@@ -91,7 +91,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		}
 
 		// Check filter buttons.
-		foreach ($buttons as $button){
+		foreach ($buttons as $button) {
 			$this->assertTrue($form->query('button', $button)->one()->isPresent());
 		}
 
@@ -112,7 +112,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$filtered_contents = ['Discovery rule 3'];
-		$filtered_count = count($filtered_contents);
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
@@ -124,11 +123,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form->submit();
 
 		// Check that filtered count mathces expected.
-		$this->assertEquals($filtered_count, $table->getRows()->count());
-		$this->assertDisplayingText($filtered_count);
+		$this->assertEquals(count($filtered_contents), $table->getRows()->count());
+		$this->assertDisplayingText(count($filtered_contents));
 
 		// Checking that filtered discovery rule matches expected.
-		$this->assertEquals($filtered_contents, $this->getTableResult($filtered_count));
+		$this->assertEquals($filtered_contents, $this->getTableResult(count($filtered_contents)));
 
 		// After pressing reset button, check that previous discovery rules are displayed again.
 		$form->query('button:Reset')->one()->click();
@@ -255,17 +254,16 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->assertMessage($data['expected'], $data['message']);
 	}
 
-	private function getTableResult($rows_count){
+	private function getTableResult($rows_count) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$result = [];
 		for ($i = 0; $i < $rows_count; $i ++) {
 			$result[] = $table->getRow($i)->getColumn('Name')->getText();
 		}
-
 		return $result;
 	}
 
-	private function assertDisplayingText($count){
+	private function assertDisplayingText($count) {
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
 			$this->query('xpath://div[@class="table-stats"]')->one()->getText());
 	}
@@ -506,7 +504,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	/**
 	 * @dataProvider getFilterData
 	 */
-	public function testPageLowLevelDiscovery_Filter($data){
+	public function testPageLowLevelDiscovery_Filter($data) {
 		$this->page->login()->open('host_discovery.php?filter_name=&filter_key='
 			. '&filter_type=-1&filter_delay=&filter_lifetime=&filter_snmp_oid='
 			. '&filter_state=-1&filter_status=-1&filter_set=1');
@@ -525,7 +523,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	private function massChangeStatus($action) {
 		$table = $this->query('class:list-table')->asTable()->one();
-		$row_count = $table->getRows()->count();
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
@@ -539,7 +536,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'hostid' => self::HOST_ID,
-					'filter' => ['Hosts' => 'Host for host prototype tests', 'Keep lost resources period' => ''],
+					'filter' => [
+						'Hosts' => 'Host for host prototype tests',
+						'Keep lost resources period' => ''
+					],
 					'names' => [
 						['Name' => 'Discovery rule 1'],
 						['Name' => 'Discovery rule 2'],
@@ -554,7 +554,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'hostid' => 50001,
-					'filter' => ['Hosts' => 'Host ZBX6663', 'Key' => 'drule-ZBX6663-second'],
+					'filter' => [
+						'Hosts' => 'Host ZBX6663',
+						'Key' => 'drule-ZBX6663-second'
+					],
 					'names' => [
 						['Name' => 'Template ZBX6663 Second: DiscoveryRule ZBX6663 Second']
 					],
