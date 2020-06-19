@@ -18,6 +18,8 @@ This template was tested on:
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+
 1. Import template into Zabbix
 2. After importing template make sure that etcd allows for metric collection.
   Test by running: `curl -L http://localhost:2379/metrics`
