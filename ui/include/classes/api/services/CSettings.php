@@ -49,7 +49,7 @@ class CSettings extends CApiService {
 
 	/**
 	 * Get settings parameters.
-	 * 
+	 *
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -85,7 +85,7 @@ class CSettings extends CApiService {
 
 	/**
 	 * Update settings parameters.
-	 * 
+	 *
 	 * @param array $settings
 	 *
 	 * @return array
@@ -136,7 +136,7 @@ class CSettings extends CApiService {
 
 	/**
 	 * Validate updated settings parameters.
-	 * 
+	 *
 	 * @param array  $settings
 	 * @param array  $db_settings
 	 *

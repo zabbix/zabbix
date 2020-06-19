@@ -43,7 +43,7 @@ class CHousekeeping extends CApiService {
 
 	/**
 	 * Get housekeeping parameters.
-	 * 
+	 *
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -79,7 +79,7 @@ class CHousekeeping extends CApiService {
 
 	/**
 	 * Update housekeeping parameters.
-	 * 
+	 *
 	 * @param array  $hk
 	 *
 	 * @return array
@@ -123,7 +123,7 @@ class CHousekeeping extends CApiService {
 
 	/**
 	 * Validate updated housekeeping parameters.
-	 * 
+	 *
 	 * @param array  $hk
 	 * @param array  $db_hk
 	 *

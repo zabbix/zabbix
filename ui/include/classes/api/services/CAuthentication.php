@@ -45,7 +45,7 @@ class CAuthentication extends CApiService {
 
 	/**
 	 * Get authentication parameters.
-	 * 
+	 *
 	 * @param array $options
 	 *
 	 * @throws APIException if the input is invalid.
@@ -82,7 +82,7 @@ class CAuthentication extends CApiService {
 
 	/**
 	 * Update authentication parameters.
-	 * 
+	 *
 	 * @param array  $auth
 	 *
 	 * @return array
@@ -129,7 +129,7 @@ class CAuthentication extends CApiService {
 
 	/**
 	 * Validate updated authentication parameters.
-	 * 
+	 *
 	 * @param array  $auth
 	 * @param array  $db_auth
 	 *
