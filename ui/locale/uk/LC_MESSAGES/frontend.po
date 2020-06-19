@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-07 11:15+0300\n"
+"POT-Creation-Date: 2020-06-18 10:53+0300\n"
 "PO-Revision-Date: 2019-10-10 13:52+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -212,7 +212,7 @@ msgstr[2] "%1$s проблем всього"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2171 include/classes/screens/CScreenActions.php:129
-#: include/views/administration.auditacts.list.php:82
+#: include/views/administration.auditacts.list.php:83
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
@@ -270,7 +270,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, обрано"
 
-#: include/func.inc.php:1850
+#: include/func.inc.php:1851
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -407,7 +407,7 @@ msgstr "ТА"
 msgid "Acceptable SLA"
 msgstr "Допустимий рівень SLA"
 
-#: include/func.inc.php:1529
+#: include/func.inc.php:1530
 msgid "Access denied"
 msgstr "Доступ заборонено"
 
@@ -425,7 +425,7 @@ msgstr[1] "Обліковий запис заблокоровано на %1$s с
 msgstr[2] "Обліковий запис заблокоровано на %1$s секунд."
 
 #: app/views/monitoring.widget.problems.view.php:64
-#: include/actions.inc.php:157 include/blocks.inc.php:765
+#: include/actions.inc.php:157 include/blocks.inc.php:768
 #: include/classes/screens/CScreenHostTriggers.php:220
 #: include/classes/screens/CScreenProblem.php:897
 #: include/classes/screens/CScreenProblem.php:922
@@ -451,7 +451,7 @@ msgstr "Підтверджені події ПРОБЛЕМА"
 msgid "Acknowledged RESOLVED events"
 msgstr "Підтверджені ВИРІШЕНІ події"
 
-#: app/controllers/CControllerAuditLogList.php:188
+#: app/controllers/CControllerAuditLogList.php:190
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.tags.tab.php:41
 #: app/views/administration.iconmap.edit.php:58
@@ -469,10 +469,10 @@ msgstr "Підтверджені ВИРІШЕНІ події"
 #: app/views/popup.operation.common.php:182
 #: app/views/popup.operation.common.php:671
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:117
-#: app/views/reports.auditlog.list.php:46
-#: app/views/reports.auditlog.list.php:65 include/actions.inc.php:1838
+#: app/views/reports.auditlog.list.php:56
+#: app/views/reports.auditlog.list.php:74 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/classes/screens/CScreenActions.php:112
-#: include/views/administration.auditacts.list.php:62
+#: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.action.edit.php:56
 #: include/views/configuration.action.edit.php:170
 #: include/views/configuration.action.edit.php:174
@@ -541,7 +541,7 @@ msgstr "В дії \"%1$s\" не вказано операцій."
 msgid "Action added"
 msgstr "Дію додано"
 
-#: include/classes/core/ZBase.php:462
+#: include/classes/core/ZBase.php:459
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
@@ -577,7 +577,7 @@ msgstr "Дію оновлено"
 
 #: app/views/administration.mediatype.edit.php:276
 #: app/views/monitoring.dashboard.view.php:97
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:766
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:769
 #: include/classes/screens/CScreenHostTriggers.php:220
 #: include/classes/screens/CScreenProblem.php:898
 #: include/classes/screens/CScreenProblem.php:923
@@ -617,7 +617,7 @@ msgstr "Активно із"
 msgid "Active till"
 msgstr "Активно до"
 
-#: app/controllers/CControllerAuditLogList.php:168
+#: app/controllers/CControllerAuditLogList.php:169
 #: app/partials/common.filter.trigger.php:154
 #: app/partials/configuration.tags.tab.php:116
 #: app/partials/hostmacros.inherited.list.html.php:179
@@ -922,8 +922,8 @@ msgstr "Аліас"
 msgid "Align map elements"
 msgstr "Вирівняти елементи карти"
 
-#: app/controllers/CControllerAuditLogList.php:147
 #: app/controllers/CControllerAuditLogList.php:148
+#: app/controllers/CControllerAuditLogList.php:149
 #: app/controllers/CControllerUserList.php:110
 #: app/views/administration.script.edit.php:77
 #: app/views/administration.script.edit.php:86
@@ -1055,7 +1055,7 @@ msgstr "Будь-який"
 msgid "Any character string included"
 msgstr "Містить будь-який рядок символів"
 
-#: app/controllers/CControllerAuditLogList.php:193
+#: app/controllers/CControllerAuditLogList.php:195
 #: app/partials/common.filter.trigger.php:92
 #: app/views/monitoring.latest.view.php:84
 #: app/views/monitoring.problem.view.php:138 httpconf.php:39
@@ -1068,7 +1068,7 @@ msgstr "Містить будь-який рядок символів"
 #: include/views/configuration.httpconf.edit.php:68
 #: include/views/configuration.httpconf.edit.php:73
 #: include/views/configuration.httpconf.list.php:118
-#: include/views/inventory.host.view.php:202
+#: include/views/inventory.host.view.php:203
 #: include/views/js/monitoring.sysmaps.js.php:227
 #: include/views/monitoring.overview.items.php:133
 #: include/views/monitoring.screen.constructor.edit.php:634
@@ -1133,7 +1133,7 @@ msgstr "Група елементів даних з applicationid \"%1$s\" не 
 #: include/views/configuration.template.edit.php:134
 #: include/views/configuration.template.list.php:149
 #: include/views/configuration.template.list.php:252
-#: include/views/conf.import.php:37 include/views/inventory.host.view.php:169
+#: include/views/conf.import.php:37 include/views/inventory.host.view.php:170
 msgid "Applications"
 msgstr "Групи елементів даних"
 
@@ -1304,8 +1304,8 @@ msgstr "Аудит"
 msgid "Audit data storage period \"%1$s\"."
 msgstr "Період зберігання даних аудиту \"%1$s\"."
 
-#: app/controllers/CControllerAuditLogList.php:151
-#: app/views/reports.auditlog.list.php:50
+#: app/controllers/CControllerAuditLogList.php:152
+#: app/views/reports.auditlog.list.php:59
 msgid "Audit log"
 msgstr "Журнал аудиту"
 
@@ -1335,7 +1335,7 @@ msgstr "Аутентифікація"
 msgid "Authentication algorithm"
 msgstr "Алгоритм аутентифікації"
 
-#: include/classes/api/services/CUser.php:1571
+#: include/classes/api/services/CUser.php:1569
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "Невдала аутентийікація: %1$s."
@@ -1409,7 +1409,7 @@ msgstr "Автоматичне призначення іконок"
 msgid "Automatic icon selection"
 msgstr "Автоматичний вибір іконок"
 
-#: app/controllers/CControllerAuditLogList.php:216
+#: app/controllers/CControllerAuditLogList.php:218
 #: app/controllers/CControllerAutoregEdit.php:67
 #: app/views/administration.autoreg.edit.php:29
 #: app/views/administration.autoreg.edit.php:89
@@ -2329,7 +2329,7 @@ msgstr[0] "Не вдалося дезактивувати метод повід�
 msgstr[1] "Не вдалося дезактивувати методи повідомлень"
 msgstr[2] "Не вдалося дезактивувати методи повідомлень"
 
-#: app/controllers/CControllerModuleUpdate.php:159
+#: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
@@ -2402,7 +2402,7 @@ msgstr[0] "Не вдалося активувати метод повідомл�
 msgstr[1] "Не вдалося активувати методи повідомлень"
 msgstr[2] "Не вдалося активувати методи повідомлень"
 
-#: app/controllers/CControllerModuleUpdate.php:154
+#: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
@@ -2594,7 +2594,7 @@ msgid "Cannot link template."
 msgstr "Не вдалося приєднати шаблон."
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:636
+#: include/classes/core/ZBase.php:633
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2657,7 +2657,7 @@ msgstr "Не вдалося прочитати JSON: %1$s."
 msgid "Cannot read XML: %1$s."
 msgstr "Не вдалося прочитати XML: %1$s."
 
-#: include/classes/server/CZabbixServer.php:479
+#: include/classes/server/CZabbixServer.php:480
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Не вдалося прочитати відповідь, перевірте з'єднання з Zabbix сервером \"%1$s\"."
@@ -2676,7 +2676,7 @@ msgstr "Не вдалось зберегти правило виявлення �
 msgid "Cannot save widget \"%1$s\"."
 msgstr "Не вдалося зберегти віджет \"%1$s\"."
 
-#: include/classes/server/CZabbixServer.php:420
+#: include/classes/server/CZabbixServer.php:421
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Не вдалося відправити команду, перевірте з'єднання з Zabbix сервером \"%1$s\"."
@@ -3017,6 +3017,11 @@ msgstr "Не вдалося оновити період сервісу"
 msgid "Cannot update media type"
 msgstr "Не вдалося оновити метод повідомлень"
 
+#: app/controllers/CControllerModuleUpdate.php:157
+#, c-format
+msgid "Cannot update module: %1$s."
+msgstr ""
+
 #: sysmaps.php:180
 msgid "Cannot update network map"
 msgstr "Не вдалося оновити карту мережі"
@@ -3349,7 +3354,7 @@ msgstr "Посилання, утворююче кільце, в шаблонах
 msgid "Circular template linkage is not allowed."
 msgstr "Приєднання шаблону, утворююче кільце, не дозволено."
 
-#: include/classes/core/ZBase.php:456
+#: include/classes/core/ZBase.php:453
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
@@ -3410,7 +3415,7 @@ msgstr "Годинник"
 msgid "Clone"
 msgstr "Клонувати"
 
-#: include/func.inc.php:1648 include/views/js/monitoring.sysmaps.js.php:297
+#: include/func.inc.php:1649 include/views/js/monitoring.sysmaps.js.php:297
 #: include/views/js/monitoring.sysmaps.js.php:449
 #: include/views/js/monitoring.sysmaps.js.php:569
 #: include/views/js/monitoring.sysmaps.js.php:664
@@ -3490,7 +3495,7 @@ msgid "Combined result"
 msgstr "Комбінований результат"
 
 #: app/views/administration.script.edit.php:67
-#: include/views/administration.auditacts.list.php:101
+#: include/views/administration.auditacts.list.php:102
 msgid "Command"
 msgstr "Команда"
 
@@ -3596,7 +3601,7 @@ msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Дублікати умов для кореляції \"%1$s\"."
 
 #: include/menu.inc.php:97 include/menu.inc.php:142
-#: include/views/inventory.host.view.php:210 jsLoader.php:272
+#: include/views/inventory.host.view.php:211 jsLoader.php:272
 msgid "Configuration"
 msgstr "Налаштування"
 
@@ -3617,7 +3622,7 @@ msgstr "Імпорт конфігурації"
 msgid "Configuration of GUI"
 msgstr "Налаштування веб-інтерфейсу"
 
-#: app/controllers/CControllerAuditLogList.php:184
+#: app/controllers/CControllerAuditLogList.php:186
 msgid "Configuration of Zabbix"
 msgstr "Налаштування Zabbix"
 
@@ -3806,12 +3811,12 @@ msgstr "З'єднано"
 msgid "Connection security"
 msgstr "Безпека з'єднання"
 
-#: include/classes/server/CZabbixServer.php:433
+#: include/classes/server/CZabbixServer.php:434
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Перевищено час очікування %1$s секунд при під'єднанні до Zabbix сервера \"%2$s\"."
 
-#: include/classes/server/CZabbixServer.php:544
+#: include/classes/server/CZabbixServer.php:545
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3819,7 +3824,7 @@ msgid ""
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:532
+#: include/classes/server/CZabbixServer.php:533
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3829,7 +3834,7 @@ msgid ""
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:540
+#: include/classes/server/CZabbixServer.php:541
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -4375,7 +4380,7 @@ msgstr "Щодня"
 msgid "Dark"
 msgstr "Темна"
 
-#: app/controllers/CControllerAuditLogList.php:215
+#: app/controllers/CControllerAuditLogList.php:217
 #: app/controllers/CControllerDashboardView.php:141 include/menu.inc.php:31
 msgid "Dashboard"
 msgstr "ПАНЕЛЬ"
@@ -4464,7 +4469,7 @@ msgstr "Набір даних"
 msgid "Data storage period"
 msgstr "Період зберігання даних"
 
-#: include/blocks.inc.php:698
+#: include/blocks.inc.php:701
 msgid "Database history tables upgraded"
 msgstr ""
 
@@ -4625,7 +4630,7 @@ msgstr "Затримка"
 msgid "Delayed by"
 msgstr "Затримується на"
 
-#: app/controllers/CControllerAuditLogList.php:170
+#: app/controllers/CControllerAuditLogList.php:171
 #: app/views/administration.iconmap.edit.php:135
 #: app/views/administration.image.edit.php:79
 #: app/views/administration.mediatype.edit.php:357
@@ -5016,7 +5021,7 @@ msgstr "Статус розгортання"
 #: app/views/administration.proxy.edit.php:82
 #: app/views/administration.script.edit.php:73
 #: app/views/popup.triggerwizard.php:129
-#: app/views/reports.auditlog.list.php:67
+#: app/views/reports.auditlog.list.php:76
 #: include/classes/screens/CScreenEvents.php:32 include/events.inc.php:235
 #: include/views/configuration.correlation.edit.php:128
 #: include/views/configuration.host.discovery.edit.php:555
@@ -5037,12 +5042,12 @@ msgid "Description"
 msgstr "Опис"
 
 #: app/views/administration.mediatype.list.php:77
-#: app/views/reports.auditlog.list.php:68 include/blocks.inc.php:617
-#: include/func.inc.php:1603 include/views/configuration.action.edit.php:170
+#: app/views/reports.auditlog.list.php:77 include/blocks.inc.php:617
+#: include/func.inc.php:1604 include/views/configuration.action.edit.php:170
 #: include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:313
 #: include/views/configuration.action.edit.php:395
-#: include/views/inventory.host.view.php:246
+#: include/views/inventory.host.view.php:247
 msgid "Details"
 msgstr "Деталі"
 
@@ -5076,7 +5081,7 @@ msgstr ""
 msgid "Directory size (in bytes). Returns integer"
 msgstr "Розмір папки (в байтах). Повертає ціле"
 
-#: app/controllers/CControllerAuditLogList.php:172
+#: app/controllers/CControllerAuditLogList.php:173
 #: app/views/administration.mediatype.list.php:163
 #: app/views/administration.module.list.php:124
 #: app/views/administration.usergroup.list.php:210
@@ -5258,8 +5263,8 @@ msgstr "Оновленні елементи даних"
 #: include/views/configuration.host.list.php:431
 #: include/views/configuration.template.list.php:154
 #: include/views/configuration.template.list.php:288
-#: include/views/inventory.host.view.php:190
-#: include/views/inventory.host.view.php:206
+#: include/views/inventory.host.view.php:191
+#: include/views/inventory.host.view.php:207
 msgid "Discovery"
 msgstr "Виявлення"
 
@@ -5288,7 +5293,7 @@ msgstr "Список виявлення"
 msgid "Discovery object"
 msgstr "Об'єкт виявлення"
 
-#: app/controllers/CControllerAuditLogList.php:205
+#: app/controllers/CControllerAuditLogList.php:207
 #: app/views/monitoring.discovery.view.php:49
 #: app/views/monitoring.widget.discovery.view.php:32
 #: include/actions.inc.php:52 include/forms.inc.php:933
@@ -5586,7 +5591,7 @@ msgstr "Дублікат usrgrpid \"%1$s\" у групах користувач�
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Дублікат usrgrpid \"%1$s\" у групах користувачів для комплексного екрану \"%2$s\"."
 
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:764
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:767
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:921
 #: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:249
@@ -5779,7 +5784,7 @@ msgstr "Пустий тип умови фільтру для дії \"%1$s\"."
 #: include/classes/api/services/CTemplate.php:588
 #: include/classes/api/services/CTrigger.php:678
 #: include/classes/api/services/CTrigger.php:802
-#: include/classes/api/services/CUserMacro.php:609
+#: include/classes/api/services/CUserMacro.php:613
 msgid "Empty input parameter."
 msgstr "Вхідний параметр пустий."
 
@@ -5815,7 +5820,7 @@ msgstr "Пустий screen ID для шаблонного комплексно�
 msgid "Empty screen ID."
 msgstr "Пустий ID комплексного екрану."
 
-#: app/controllers/CControllerAuditLogList.php:171
+#: app/controllers/CControllerAuditLogList.php:172
 #: app/views/administration.mediatype.list.php:162
 #: app/views/administration.module.list.php:123
 #: app/views/administration.usergroup.list.php:204
@@ -6038,7 +6043,7 @@ msgstr "Помилка"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Помилка в запиті пошуку в таблиці \"%1$s\"."
 
-#: include/func.inc.php:1642 jsLoader.php:159
+#: include/func.inc.php:1643 jsLoader.php:159
 msgid "Error message"
 msgstr "Повідомлення про помилку"
 
@@ -6060,7 +6065,7 @@ msgstr "ID події"
 msgid "Event acknowledged"
 msgstr "Подію підтвержено"
 
-#: app/controllers/CControllerAuditLogList.php:214 include/menu.inc.php:145
+#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:145
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr "Кореляція подій"
@@ -6135,7 +6140,7 @@ msgstr "Виключено"
 msgid "Exclude host groups"
 msgstr "Виключити групи вузлів мережі"
 
-#: jsLoader.php:150
+#: app/controllers/CControllerAuditLogList.php:174 jsLoader.php:150
 msgid "Execute"
 msgstr "Виконати"
 
@@ -6168,7 +6173,7 @@ msgid "Execute on"
 msgstr "Виконати на"
 
 #: include/actions.inc.php:2126
-#: include/views/administration.auditacts.list.php:76
+#: include/views/administration.auditacts.list.php:77
 msgid "Executed"
 msgstr "Виконано"
 
@@ -6307,7 +6312,7 @@ msgid "Fail"
 msgstr "Помилка"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2138
-#: include/views/administration.auditacts.list.php:86
+#: include/views/administration.auditacts.list.php:87
 msgid "Failed"
 msgstr "Помилковий"
 
@@ -6491,11 +6496,11 @@ msgstr "Заповнений регіон"
 #: app/views/monitoring.host.view.php:101
 #: app/views/monitoring.latest.view.php:47
 #: app/views/monitoring.problem.view.php:354
-#: app/views/monitoring.web.view.php:46 app/views/reports.auditlog.list.php:56
+#: app/views/monitoring.web.view.php:46 app/views/reports.auditlog.list.php:65
 #: hostinventoriesoverview.php:148 include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/forms.inc.php:703
-#: include/views/administration.auditacts.list.php:52
+#: include/views/administration.auditacts.list.php:53
 #: include/views/configuration.action.list.php:62
 #: include/views/configuration.application.list.php:28
 #: include/views/configuration.correlation.list.php:40
@@ -6691,7 +6696,7 @@ msgstr "GSM модем"
 msgid "GUI"
 msgstr "Веб інтерфейс"
 
-#: include/classes/user/CWebUser.php:76 index_sso.php:210
+#: include/classes/user/CWebUser.php:76 index_sso.php:231
 msgid "GUI access disabled."
 msgstr "Доступ до GUI відключено."
 
@@ -6761,7 +6766,7 @@ msgstr "Повернутись до %1$s"
 msgid "Go to"
 msgstr "Перейти до"
 
-#: app/views/system.warning.php:31 include/func.inc.php:1542
+#: app/views/system.warning.php:31 include/func.inc.php:1543
 msgid "Go to dashboard"
 msgstr "Перейти на ПАНЕЛЬ"
 
@@ -6802,7 +6807,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Градієнтна лінія"
 
-#: app/controllers/CControllerAuditLogList.php:189
+#: app/controllers/CControllerAuditLogList.php:191
 #: app/partials/monitoring.latest.view.html.php:203
 #: app/partials/monitoring.latest.view.html.php:377
 #: app/views/monitoring.charts.view.php:52
@@ -6885,11 +6890,11 @@ msgstr[2] "Графіки скопійовано"
 msgid "Graph deleted"
 msgstr "Графік видалено"
 
-#: app/controllers/CControllerAuditLogList.php:191
+#: app/controllers/CControllerAuditLogList.php:193
 msgid "Graph element"
 msgstr "Елемент графіка"
 
-#: app/controllers/CControllerAuditLogList.php:190
+#: app/controllers/CControllerAuditLogList.php:192
 #: app/views/popup.lldoperation.php:50
 #: include/classes/widgets/CWidgetConfig.php:41
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:32
@@ -7002,8 +7007,8 @@ msgstr "Графік з таким же іменем, але іншого тип
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:276
 #: include/views/conf.import.php:41 include/views/inventory.host.view.php:153
-#: include/views/inventory.host.view.php:185
-#: include/views/inventory.host.view.php:205 jsLoader.php:287
+#: include/views/inventory.host.view.php:186
+#: include/views/inventory.host.view.php:206 jsLoader.php:287
 msgid "Graphs"
 msgstr "Графіки"
 
@@ -7330,7 +7335,7 @@ msgstr "Горизонтальний"
 msgid "Horizontal align"
 msgstr "Вирівнювання по горизонталі"
 
-#: app/controllers/CControllerAuditLogList.php:186
+#: app/controllers/CControllerAuditLogList.php:188
 #: app/partials/monitoring.latest.view.html.php:50
 #: app/partials/monitoring.latest.view.html.php:70
 #: app/views/monitoring.charts.view.php:82
@@ -7338,7 +7343,7 @@ msgstr "Вирівнювання по горизонталі"
 #: app/views/monitoring.widget.problems.view.php:56
 #: app/views/popup.generic.php:93 app/views/popup.operation.common.php:396
 #: app/views/search.php:30 httpconf.php:183 httpconf.php:491
-#: include/actions.inc.php:50 include/blocks.inc.php:761
+#: include/actions.inc.php:50 include/blocks.inc.php:764
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
@@ -7363,8 +7368,8 @@ msgstr "Вирівнювання по горизонталі"
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.triggers.list.php:198
 #: include/views/inventory.host.list.php:77
-#: include/views/inventory.host.view.php:165
-#: include/views/inventory.host.view.php:201
+#: include/views/inventory.host.view.php:166
+#: include/views/inventory.host.view.php:202
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/monitoring.screen.constructor.edit.php:511
@@ -7452,7 +7457,7 @@ msgstr[0] "Вузел мережі активовано"
 msgstr[1] "Вузли мережі активовано"
 msgstr[2] "Вузли мережі активовано"
 
-#: app/controllers/CControllerAuditLogList.php:196
+#: app/controllers/CControllerAuditLogList.php:198
 #: app/partials/administration.usergroup.grouprights.html.php:29
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/views/administration.script.edit.php:84
@@ -7565,7 +7570,7 @@ msgstr "Інтерфейс вузла мережі"
 #: app/views/monitoring.problem.view.php:295
 #: app/views/popup.lldoperation.php:272 hostinventories.php:26
 #: include/views/inventory.host.list.php:26
-#: include/views/inventory.host.view.php:254
+#: include/views/inventory.host.view.php:255
 msgid "Host inventory"
 msgstr "Інвентарні дані вузла мережі"
 
@@ -7604,7 +7609,7 @@ msgstr "Ім'я вузла мережі"
 msgid "Host networks"
 msgstr "Мережі вузла мережі"
 
-#: app/controllers/CControllerAuditLogList.php:187
+#: app/controllers/CControllerAuditLogList.php:189
 #: app/views/popup.lldoperation.php:51
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:160
 msgid "Host prototype"
@@ -7785,7 +7790,7 @@ msgstr ""
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
-#: app/views/reports.auditlog.list.php:66
+#: app/views/reports.auditlog.list.php:75
 msgid "ID"
 msgstr "ID"
 
@@ -7795,7 +7800,7 @@ msgstr "IMAP"
 
 #: app/views/administration.proxy.edit.php:53
 #: app/views/monitoring.host.view.php:123
-#: app/views/reports.auditlog.list.php:63 app/views/search.php:31
+#: app/views/reports.auditlog.list.php:72 app/views/search.php:31
 #: include/views/configuration.host.list.php:137
 #: include/views/inventory.host.view.php:92
 #: include/views/js/configuration.host.edit.js.php:54
@@ -7914,7 +7919,7 @@ msgstr "Призначення іконок видалено"
 msgid "Icon map updated"
 msgstr "Призначення іконок оновлено"
 
-#: app/controllers/CControllerAuditLogList.php:213
+#: app/controllers/CControllerAuditLogList.php:215
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27 include/html.inc.php:911
 msgid "Icon mapping"
@@ -7957,11 +7962,11 @@ msgstr "Ідентифікатор системи. Повертає рядок"
 msgid "If filter matches"
 msgstr ""
 
-#: include/func.inc.php:1532 include/func.inc.php:1551
+#: include/func.inc.php:1533 include/func.inc.php:1552
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Якщо Ви вважаєте це повідомлення помилковим, то зверніться до вашого адміністратора для отримання необхідних прав доступу."
 
-#: app/controllers/CControllerAuditLogList.php:199
+#: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.image.edit.php:60
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:224 include/maps.inc.php:28
@@ -8052,7 +8057,7 @@ msgid "In maintenance"
 msgstr "В періоді сервісу"
 
 #: include/actions.inc.php:2133
-#: include/views/administration.auditacts.list.php:80
+#: include/views/administration.auditacts.list.php:81
 msgid "In progress"
 msgstr "В роботі"
 
@@ -8760,9 +8765,9 @@ msgstr "Некоректний регулярний вираз \"%1$s\": \"%2$s\
 msgid "Incorrect resource type provided for screen item."
 msgstr "Вказано некоректний тип ресурсу для елементу комплексного екрану."
 
-#: include/classes/server/CZabbixServer.php:445
-#: include/classes/server/CZabbixServer.php:487
-#: include/classes/server/CZabbixServer.php:494
+#: include/classes/server/CZabbixServer.php:446
+#: include/classes/server/CZabbixServer.php:488
+#: include/classes/server/CZabbixServer.php:495
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Некоректну відповідь отримано від Zabbix сервера \"%1$s\"."
@@ -9278,7 +9283,7 @@ msgstr "Некоректне значення використано для ст
 msgid "Indonesian (id_ID)"
 msgstr "Індонезійська (id_ID)"
 
-#: include/func.inc.php:1355 include/func.inc.php:1359
+#: include/func.inc.php:1356 include/func.inc.php:1360
 msgid "Infinity"
 msgstr ""
 
@@ -9287,11 +9292,11 @@ msgstr ""
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
-#: include/blocks.inc.php:760 include/classes/screens/CScreenActions.php:117
+#: include/blocks.inc.php:763 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:220
 #: include/classes/screens/CScreenProblem.php:891
 #: include/classes/screens/CScreenProblem.php:915
-#: include/views/administration.auditacts.list.php:67
+#: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.application.list.php:85
 #: include/views/configuration.graph.list.php:126
 #: include/views/configuration.host.discovery.list.php:181
@@ -9548,7 +9553,7 @@ msgstr "Неправильний четвертий параметр."
 msgid "Invalid history data storage period: %1$s."
 msgstr "Неправильний період зберігання даних історії: %1$s."
 
-#: include/classes/api/services/CUserMacro.php:754
+#: include/classes/api/services/CUserMacro.php:758
 #, c-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Неправильний hostid для макросу \"%1$s\"."
@@ -9591,7 +9596,7 @@ msgstr "Неправильний ключ \"%1$s\" для прототипу е�
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Неправильний ключ \"%1$s\": %2$s."
 
-#: include/classes/api/services/CUserMacro.php:724
+#: include/classes/api/services/CUserMacro.php:728
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
 msgstr "Неправильний макрос \"%1$s\": %2$s."
@@ -9813,7 +9818,7 @@ msgstr "Неправильний період зберігання даних т
 msgid "Invalid trigger data storage period: %1$s."
 msgstr "Неправильний період зберігання даних тригерів: %1$s."
 
-#: include/classes/api/services/CUserMacro.php:737
+#: include/classes/api/services/CUserMacro.php:741
 #, c-format
 msgid "Invalid type for macro \"%1$s\"."
 msgstr ""
@@ -9870,7 +9875,7 @@ msgstr "Неможливо виконувати пошук по паролю к�
 msgid "Italian (it_IT)"
 msgstr "Італійська (it_IT)"
 
-#: app/controllers/CControllerAuditLogList.php:197
+#: app/controllers/CControllerAuditLogList.php:199
 #: app/views/popup.triggerexpr.php:96 app/views/popup.triggerwizard.php:86
 #: include/classes/screens/CScreenHistory.php:269
 #: include/classes/screens/CScreenPlainText.php:42
@@ -9969,7 +9974,7 @@ msgstr "Елемент даних не вибрано"
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "Відсутні параметри в попередній обробці елемента даних: %1$s"
 
-#: app/controllers/CControllerAuditLogList.php:198
+#: app/controllers/CControllerAuditLogList.php:200
 #: app/views/popup.lldoperation.php:48
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:48
 #: include/forms.inc.php:936
@@ -10114,8 +10119,8 @@ msgstr "Елемент даних з ключем \"%1$s\" вже існує в 
 #: include/views/configuration.template.edit.php:158
 #: include/views/configuration.template.list.php:150
 #: include/views/configuration.template.list.php:260
-#: include/views/conf.import.php:38 include/views/inventory.host.view.php:175
-#: include/views/inventory.host.view.php:203 items.php:1683 queue.php:110
+#: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
+#: include/views/inventory.host.view.php:204 items.php:1683 queue.php:110
 msgid "Items"
 msgstr "Елементи даних"
 
@@ -10708,10 +10713,10 @@ msgstr "Формат часу в журналі"
 msgid "Log unmatched SNMP traps"
 msgstr "Записувати не співпадаючі SNMP трапи"
 
-#: app/controllers/CControllerAuditLogList.php:166
+#: app/controllers/CControllerAuditLogList.php:167
 #: app/views/administration.authentication.edit.php:127
-#: app/views/administration.user.list.php:97 include/func.inc.php:1539
-#: include/func.inc.php:1554 index_http.php:93 index_sso.php:229
+#: app/views/administration.user.list.php:97 include/func.inc.php:1540
+#: include/func.inc.php:1555 index_http.php:93 index_sso.php:250
 msgid "Login"
 msgstr "Вхід в систему"
 
@@ -10720,12 +10725,12 @@ msgid "Login failed."
 msgstr "Невдала спроба входу."
 
 #: include/classes/api/services/CUser.php:1196
-#: include/classes/api/services/CUser.php:1567
+#: include/classes/api/services/CUser.php:1565
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:86
 msgid "Login name or password is incorrect."
 msgstr "Некоректне ім'я користувача або пароль."
 
-#: app/controllers/CControllerAuditLogList.php:167
+#: app/controllers/CControllerAuditLogList.php:168
 msgid "Logout"
 msgstr "Вихід із системи"
 
@@ -10776,7 +10781,7 @@ msgstr "MD5"
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "MD5 контрольна сума файлу. Повертає рядок символів (MD5 хеш файлу)"
 
-#: app/controllers/CControllerAuditLogList.php:211
+#: app/controllers/CControllerAuditLogList.php:213
 #: app/partials/hostmacros.inherited.list.html.php:47
 #: app/partials/hostmacros.list.html.php:34
 #: app/partials/massupdate.macros.tab.php:29
@@ -10786,22 +10791,22 @@ msgstr "MD5 контрольна сума файлу. Повертає рядо�
 msgid "Macro"
 msgstr "Макро"
 
-#: include/classes/api/services/CUserMacro.php:923
+#: include/classes/api/services/CUserMacro.php:953
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "Макрос \"%1$s\" вже існує в \"%2$s\"."
 
-#: include/classes/api/services/CUserMacro.php:410
+#: include/classes/api/services/CUserMacro.php:414
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "Макрос \"%1$s\" вже існує."
 
-#: include/classes/api/services/CUserMacro.php:839
+#: include/classes/api/services/CUserMacro.php:855
 #, c-format
 msgid "Macro \"%1$s\" is not unique."
 msgstr "Макрос \"%1$s\" не унікальний."
 
-#: include/classes/api/services/CUserMacro.php:946
+#: include/classes/api/services/CUserMacro.php:977
 #, c-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "Макросу з hostmacroid \"%1$s\" не існує."
@@ -10838,7 +10843,7 @@ msgstr "Головний фільтр"
 msgid "Main navigation"
 msgstr "Головна навігація"
 
-#: app/controllers/CControllerAuditLogList.php:209 include/menu.inc.php:112
+#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:112
 #: include/views/configuration.maintenance.edit.php:248
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -10869,7 +10874,7 @@ msgstr "Період сервісу додано"
 msgid "Maintenance deleted"
 msgstr "Сервіс видалено"
 
-#: app/controllers/CControllerPopupMaintenancePeriod.php:212
+#: app/controllers/CControllerPopupMaintenancePeriod.php:218
 msgid "Maintenance period"
 msgstr "Період сервісу"
 
@@ -10920,7 +10925,7 @@ msgstr "Вручну"
 msgid "Manually closed"
 msgstr "Закритий вручну"
 
-#: app/controllers/CControllerAuditLogList.php:202
+#: app/controllers/CControllerAuditLogList.php:204
 #: include/classes/widgets/CWidgetConfig.php:43
 #: include/classes/widgets/forms/CWidgetFormMap.php:41
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
@@ -11136,7 +11141,7 @@ msgstr "Травень"
 msgid "Media"
 msgstr "Метод повідомлення"
 
-#: app/controllers/CControllerAuditLogList.php:185
+#: app/controllers/CControllerAuditLogList.php:187
 #: app/views/administration.mediatype.edit.php:265 report4.php:103
 msgid "Media type"
 msgstr "Тип засобу передачі"
@@ -11247,8 +11252,8 @@ msgstr ""
 #: app/views/popup.operation.common.php:267 include/actions.inc.php:1703
 #: include/actions.inc.php:1974 include/actions.inc.php:2082
 #: include/classes/screens/CScreenActions.php:115
-#: include/views/administration.auditacts.list.php:65
-#: include/views/administration.auditacts.list.php:96
+#: include/views/administration.auditacts.list.php:66
+#: include/views/administration.auditacts.list.php:97
 msgid "Message"
 msgstr "Повідомлення"
 
@@ -11413,7 +11418,7 @@ msgstr "Режим"
 msgid "Model"
 msgstr "Модель"
 
-#: app/controllers/CControllerAuditLogList.php:217
+#: app/controllers/CControllerAuditLogList.php:219
 #: app/views/administration.module.edit.php:52
 msgid "Module"
 msgstr ""
@@ -11439,7 +11444,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/controllers/CControllerModuleUpdate.php:147
+#: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
@@ -11447,13 +11452,18 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/controllers/CControllerModuleUpdate.php:142
+#: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/controllers/CControllerModuleUpdate.php:142
+#, c-format
+msgid "Module updated: %1$s."
+msgstr ""
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -11844,7 +11854,7 @@ msgstr "Наступний крок"
 #: app/views/popup.condition.common.php:647
 #: app/views/popup.lldoperation.php:79 app/views/popup.lldoperation.php:91
 #: include/actions.inc.php:33 include/blocks.inc.php:624
-#: include/blocks.inc.php:699 include/blocks.inc.php:866
+#: include/blocks.inc.php:702 include/blocks.inc.php:869
 #: include/classes/screens/CScreenHostTriggers.php:261
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/screens/CScreenProblem.php:1253 include/events.inc.php:173
@@ -12065,7 +12075,7 @@ msgstr "Графіків не додано."
 msgid "No host IDs given."
 msgstr "Не вказано ID вузлів мережі."
 
-#: include/classes/api/services/CUserMacro.php:750
+#: include/classes/api/services/CUserMacro.php:754
 #, c-format
 msgid "No host given for macro \"%1$s\"."
 msgstr "Не вказано вузел мережі для макросу \"%1$s\"."
@@ -12172,7 +12182,7 @@ msgid "No operation type given for correlation \"%1$s\"."
 msgstr "Тип операції не задано для кореляції \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:1201
-#: include/classes/api/services/CUser.php:1579
+#: include/classes/api/services/CUser.php:1577
 msgid "No permissions for system access."
 msgstr "Немає прав доступу до системи."
 
@@ -12327,9 +12337,9 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CTriggerPrototype.php:729
 #: include/classes/api/services/CUserGroup.php:329
 #: include/classes/api/services/CUserGroup.php:876
-#: include/classes/api/services/CUserMacro.php:368
-#: include/classes/api/services/CUserMacro.php:455
-#: include/classes/api/services/CUserMacro.php:803
+#: include/classes/api/services/CUserMacro.php:372
+#: include/classes/api/services/CUserMacro.php:459
+#: include/classes/api/services/CUserMacro.php:807
 #: include/classes/api/services/CUser.php:424
 #: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
@@ -12337,7 +12347,7 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1507 items.php:1436 items.php:1640 services.php:84
+#: include/func.inc.php:1508 items.php:1436 items.php:1640 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Немає прав доступу до запитуваного об'єкту або він не існує!"
 
@@ -12548,10 +12558,10 @@ msgid "Number of enabled items on the host."
 msgstr "Кількість активованих елементів даних у вузла мережі."
 
 #: include/blocks.inc.php:628
-msgid "Number of hosts (enabled/disabled/templates)"
-msgstr "Кількість вузлів мережі (активовані/дезактивовані/шаблони)"
+msgid "Number of hosts (enabled/disabled)"
+msgstr ""
 
-#: include/blocks.inc.php:638
+#: include/blocks.inc.php:641
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Кількість елементів даних (активовані/дезактивовані/не підтримуються)"
 
@@ -12619,7 +12629,11 @@ msgstr "Кількість змін стану"
 msgid "Number of steps"
 msgstr "Кількість кроків"
 
-#: include/blocks.inc.php:649
+#: include/blocks.inc.php:637
+msgid "Number of templates"
+msgstr ""
+
+#: include/blocks.inc.php:652
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Кількість тригерів (активовані/дезактивовані [проблема/ок])"
 
@@ -12635,7 +12649,7 @@ msgstr "Кількість елементів даних в базі даних 
 msgid "Number of unsupported items on the host."
 msgstr "Кількість елементів даних у вузла мережі, які не підтримуються."
 
-#: include/blocks.inc.php:661
+#: include/blocks.inc.php:664
 msgid "Number of users (online)"
 msgstr "Кількість користувачів (підключених в даний момент)"
 
@@ -12883,7 +12897,7 @@ msgstr "Тільки адміністратори можуть задавати 
 msgid "Only administrators can set slide show owner."
 msgstr "Тільки адміністратори можуть задавати власника слайд шоу."
 
-#: include/blocks.inc.php:639
+#: include/blocks.inc.php:642
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Підраховуються елементи даних тільки у вузлів мережі під спостереженням"
 
@@ -12940,7 +12954,7 @@ msgstr "Тільки супер адміністратори можуть оно
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Індикатор відображує тільки останні 20%%."
 
-#: include/blocks.inc.php:650
+#: include/blocks.inc.php:653
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Підраховуються тригери тільки у вузлів мережі під спостереженням та які залежать від активних елементів даних"
 
@@ -12979,7 +12993,7 @@ msgstr "Операція не має шаблону для функціонув�
 msgid "Operation type"
 msgstr "Тип операції"
 
-#: app/views/monitoring.widget.problems.view.php:62 include/blocks.inc.php:763
+#: app/views/monitoring.widget.problems.view.php:62 include/blocks.inc.php:766
 #: include/classes/screens/CScreenProblem.php:919
 #: include/classes/screens/CScreenProblem.php:1168 include/events.inc.php:160
 #: include/views/configuration.trigger.prototype.edit.php:72
@@ -13196,7 +13210,7 @@ msgid "Overrides"
 msgstr "Заміщення"
 
 #: include/menu.inc.php:42 include/menu.inc.php:63
-#: include/views/inventory.host.view.php:224 overview.php:27
+#: include/views/inventory.host.view.php:225 overview.php:27
 msgid "Overview"
 msgstr "Огляд"
 
@@ -13859,7 +13873,7 @@ msgstr "Рівень привілеїв"
 #: app/views/monitoring.problem.view.php:176
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:46 include/blocks.inc.php:762
+#: app/views/popup.mediatype.message.php:46 include/blocks.inc.php:765
 #: include/classes/helpers/CMediatypeHelper.php:45
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
@@ -14003,7 +14017,7 @@ msgstr "Наданий URL \"%1$s\" є некоректним."
 msgid "Proxies"
 msgstr "Проксі"
 
-#: app/controllers/CControllerAuditLogList.php:207
+#: app/controllers/CControllerAuditLogList.php:209
 #: app/views/administration.proxy.edit.php:87
 #: app/views/administration.proxy.edit.php:122
 #: app/views/popup.condition.common.php:507
@@ -14199,8 +14213,7 @@ msgstr "Останні проблеми"
 #: include/classes/screens/CScreenActions.php:114
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:37
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:38
-#: include/views/administration.auditacts.list.php:30
-#: include/views/administration.auditacts.list.php:64
+#: include/views/administration.auditacts.list.php:65
 msgid "Recipient"
 msgstr "Отримувач"
 
@@ -14211,6 +14224,10 @@ msgstr "Отримувач (у порядку зростання)"
 #: include/views/monitoring.screen.constructor.edit.php:572
 msgid "Recipient (descending)"
 msgstr "Отримувач (в порядку спадання)"
+
+#: include/views/administration.auditacts.list.php:30
+msgid "Recipients"
+msgstr ""
 
 #: app/views/administration.user.edit.php:388
 #: include/classes/screens/CScreenProblem.php:1083
@@ -14278,7 +14295,7 @@ msgstr "Оновлювати непідтримувані елементи да�
 msgid "Regular"
 msgstr "Звичайні"
 
-#: app/controllers/CControllerAuditLogList.php:208
+#: app/controllers/CControllerAuditLogList.php:210
 #: app/views/popup.lldoverride.php:93 include/items.inc.php:1720
 #: include/views/configuration.host.discovery.edit.php:591
 msgid "Regular expression"
@@ -14581,7 +14598,7 @@ msgstr "Необхідна продуктивність (знач/сек)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Необхідна швидкодія Zabbix сервера, в одиницях очікуваної кількості нових значень в секунду."
 
-#: include/blocks.inc.php:665
+#: include/blocks.inc.php:668
 msgid "Required server performance, new values per second"
 msgstr "Необхідна потужність сервера, нових значень в секунду"
 
@@ -14657,11 +14674,15 @@ msgstr ""
 msgid "Resolved by user \"%1$s\"."
 msgstr "Вирішено користувачем \"%1$s\"."
 
-#: app/views/reports.auditlog.list.php:47
-#: app/views/reports.auditlog.list.php:64
+#: app/views/reports.auditlog.list.php:52
+#: app/views/reports.auditlog.list.php:73
 #: include/views/monitoring.screen.constructor.edit.php:100
 msgid "Resource"
 msgstr "Ресурс"
+
+#: app/views/reports.auditlog.list.php:53
+msgid "Resource ID"
+msgstr ""
 
 #: app/views/popup.mediatypetest.edit.php:46
 msgid "Response"
@@ -15150,7 +15171,7 @@ msgctxt "selected problems"
 msgid "Scope"
 msgstr "Межі"
 
-#: app/controllers/CControllerAuditLogList.php:203
+#: app/controllers/CControllerAuditLogList.php:205
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.slideconf.edit.php:117
 msgid "Screen"
@@ -15230,7 +15251,7 @@ msgstr "Комплексний екран оновлено"
 #: include/views/configuration.template.edit.php:310
 #: include/views/configuration.template.list.php:153
 #: include/views/configuration.template.list.php:284
-#: include/views/conf.import.php:43 include/views/inventory.host.view.php:159
+#: include/views/conf.import.php:43 include/views/inventory.host.view.php:160
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.constructor.list.php:28
 #: include/views/monitoring.screen.edit.php:28
@@ -15244,7 +15265,7 @@ msgstr "Комплексний екран оновлено"
 msgid "Screens"
 msgstr "Комплексні екрани"
 
-#: app/controllers/CControllerAuditLogList.php:210
+#: app/controllers/CControllerAuditLogList.php:212
 #: app/views/administration.mediatype.edit.php:212
 #: app/views/administration.script.edit.php:50
 #: app/views/administration.script.edit.php:120
@@ -15374,11 +15395,9 @@ msgstr "Ім'я безпеки"
 #: app/views/monitoring.widget.navtreeitem.edit.php:48
 #: app/views/popup.condition.common.php:390 app/views/popup.generic.php:638
 #: app/views/popup.operation.common.php:446 app/views/popup.services.php:132
-#: app/views/popup.triggerexpr.php:73 app/views/reports.auditlog.list.php:35
-#: include/classes/html/CMultiSelect.php:86
+#: app/views/popup.triggerexpr.php:73 include/classes/html/CMultiSelect.php:86
 #: include/classes/widgets/CWidgetHelper.php:340
 #: include/classes/widgets/CWidgetHelper.php:554 include/forms.inc.php:244
-#: include/views/administration.auditacts.list.php:35
 #: include/views/configuration.graph.edit.php:192
 #: include/views/configuration.graph.edit.php:274
 #: include/views/configuration.item.edit.php:99
@@ -15483,7 +15502,7 @@ msgid "Send to back"
 msgstr "Перемістити на самий зад"
 
 #: include/actions.inc.php:2127
-#: include/views/administration.auditacts.list.php:75
+#: include/views/administration.auditacts.list.php:76
 msgid "Sent"
 msgstr "Надіслано"
 
@@ -15535,7 +15554,7 @@ msgstr "Сервер (проксі)"
 msgid "Server time"
 msgstr "Час на сервері"
 
-#: app/controllers/CControllerAuditLogList.php:201
+#: app/controllers/CControllerAuditLogList.php:203
 #: app/views/popup.services.php:46 include/actions.inc.php:76
 #: include/views/configuration.services.edit.php:344 services.php:352
 #: srv_status.php:144
@@ -15979,7 +15998,7 @@ msgstr "Область / район"
 msgid "Size"
 msgstr "Розмір"
 
-#: include/classes/server/CZabbixServer.php:466
+#: include/classes/server/CZabbixServer.php:467
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Розмір отриманої відповіді від Zabbix сервера \"%1$s\" перевищує допустимий розмір в %2$s байт. Це значення може бути збільшене за допомогою константи ZBX_SOCKET_BYTES_LIMIT в include/defines.inc.php."
@@ -15993,7 +16012,7 @@ msgstr "Пропущено копіювання графіку \"%1$s\" у ву�
 msgid "Slide"
 msgstr "Слайд"
 
-#: app/controllers/CControllerAuditLogList.php:206
+#: app/controllers/CControllerAuditLogList.php:208
 msgid "Slide show"
 msgstr "Слайдшоу"
 
@@ -16206,7 +16225,7 @@ msgstr "Статично"
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:247 include/events.inc.php:456
 #: include/forms.inc.php:231 include/forms.inc.php:664
-#: include/views/administration.auditacts.list.php:66
+#: include/views/administration.auditacts.list.php:67
 #: include/views/configuration.action.list.php:68
 #: include/views/configuration.action.list.php:91
 #: include/views/configuration.correlation.list.php:46
@@ -16353,7 +16372,7 @@ msgstr "Субфільтр"
 #: app/views/popup.mediatype.message.php:70
 #: app/views/popup.mediatypetest.edit.php:69
 #: app/views/popup.operation.common.php:263
-#: include/views/administration.auditacts.list.php:91
+#: include/views/administration.auditacts.list.php:92
 msgid "Subject"
 msgstr "Тема"
 
@@ -16373,7 +16392,7 @@ msgstr "Суб-карта"
 msgid "Success Audit"
 msgstr "Аудит успіхів"
 
-#: include/func.inc.php:1642 jsLoader.php:158
+#: include/func.inc.php:1643 jsLoader.php:158
 msgid "Success message"
 msgstr "Повідомлення про успіх"
 
@@ -16438,7 +16457,7 @@ msgstr "Час завантаження системи. Повертає ціл�
 msgid "System default"
 msgstr "Системна по замовчуванню"
 
-#: include/func.inc.php:1669
+#: include/func.inc.php:1670
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "Трапилась системна помилка. Зв'яжіться з адміністратором Zabbix."
 
@@ -16585,7 +16604,7 @@ msgstr "Значення тегу"
 #: app/views/monitoring.host.view.php:149
 #: app/views/monitoring.problem.view.php:296
 #: app/views/monitoring.widget.problems.view.php:66
-#: app/views/popup.lldoperation.php:234 include/blocks.inc.php:767
+#: app/views/popup.lldoperation.php:234 include/blocks.inc.php:770
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:924
 #: include/classes/screens/CScreenProblem.php:1172
@@ -16638,7 +16657,7 @@ msgstr "Тип цілі"
 msgid "Telnet"
 msgstr "Telnet"
 
-#: app/controllers/CControllerAuditLogList.php:212
+#: app/controllers/CControllerAuditLogList.php:214
 #: app/views/administration.mediatype.edit.php:275 app/views/search.php:228
 #: include/actions.inc.php:49 include/forms.inc.php:281
 #: include/forms.inc.php:674 include/views/configuration.template.edit.php:46
@@ -16807,7 +16826,7 @@ msgstr "Тестові дані"
 msgid "Test expressions"
 msgstr "Тест виразів"
 
-#: app/controllers/CControllerPopupItemTestEdit.php:249
+#: app/controllers/CControllerPopupItemTestEdit.php:274
 msgid "Test item"
 msgstr ""
 
@@ -16942,7 +16961,7 @@ msgstr "Елемент даних більше не виявляється та 
 msgid "The number of processes. Returns integer"
 msgstr "Кількість процесів. Повертає ціле число"
 
-#: index_sso.php:161
+#: index_sso.php:182
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
@@ -17046,10 +17065,10 @@ msgstr "До"
 #: app/views/monitoring.widget.problems.view.php:36
 #: app/views/popup.itemtestedit.view.php:162
 #: app/views/popup.triggerexpr.php:136 app/views/popup.triggerexpr.php:140
-#: app/views/reports.auditlog.list.php:61 include/actions.inc.php:1703
+#: app/views/reports.auditlog.list.php:70 include/actions.inc.php:1703
 #: include/actions.inc.php:1757 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/actions.inc.php:1974
-#: include/blocks.inc.php:742 include/classes/screens/CScreenActions.php:111
+#: include/blocks.inc.php:745 include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:845
 #: include/classes/screens/CScreenProblem.php:1163
@@ -17059,7 +17078,7 @@ msgstr "До"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/events.inc.php:168 include/events.inc.php:245
 #: include/events.inc.php:443 include/events.inc.php:449
-#: include/views/administration.auditacts.list.php:61
+#: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.services.edit.php:299
 #: include/views/configuration.services.edit.php:313
 #: include/views/configuration.services.edit.php:346
@@ -17257,7 +17276,7 @@ msgstr "Період зберігання трендів"
 msgid "Trends"
 msgstr "Динаміка"
 
-#: app/controllers/CControllerAuditLogList.php:194
+#: app/controllers/CControllerAuditLogList.php:196
 #: app/controllers/CControllerPopupTriggerWizard.php:221
 #: app/controllers/CControllerPopupTriggerWizard.php:293
 #: app/views/popup.services.php:48 include/actions.inc.php:46
@@ -17386,7 +17405,7 @@ msgstr "Ім'я тригера"
 msgid "Trigger overview"
 msgstr "Огляд тригерів"
 
-#: app/controllers/CControllerAuditLogList.php:195
+#: app/controllers/CControllerAuditLogList.php:197
 #: app/views/popup.lldoperation.php:49
 #: include/views/configuration.trigger.prototype.edit.php:536
 #: include/views/configuration.trigger.prototype.massupdate.php:183
@@ -17504,8 +17523,8 @@ msgstr "Тригер оновлено"
 #: include/views/configuration.triggers.edit.php:28
 #: include/views/configuration.triggers.list.php:165
 #: include/views/configuration.triggers.massupdate.php:28
-#: include/views/conf.import.php:40 include/views/inventory.host.view.php:180
-#: include/views/inventory.host.view.php:204
+#: include/views/conf.import.php:40 include/views/inventory.host.view.php:181
+#: include/views/inventory.host.view.php:205
 #: include/views/js/monitoring.sysmaps.js.php:167 triggers.php:670
 msgid "Triggers"
 msgstr "Тригери"
@@ -17566,7 +17585,7 @@ msgstr "Необхідно вибрати два елемента карти м�
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
 #: include/forms.inc.php:178 include/hosts.inc.php:99
 #: include/hosts.inc.php:1451
-#: include/views/administration.auditacts.list.php:63
+#: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/configuration.graph.edit.php:341
 #: include/views/configuration.host.discovery.edit.php:58
@@ -17768,7 +17787,7 @@ msgstr "Разблокувати"
 msgid "Unblock selected users?"
 msgstr "Розблокувати вибраних користувачів?"
 
-#: include/classes/core/ZBase.php:551
+#: include/classes/core/ZBase.php:548
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr ""
@@ -17807,7 +17826,7 @@ msgstr "Одиниця виміру"
 msgid "Unknown"
 msgstr "Невідомо"
 
-#: app/views/reports.auditlog.list.php:89
+#: app/views/reports.auditlog.list.php:98
 msgid "Unknown action"
 msgstr "Невідома дія"
 
@@ -17838,7 +17857,7 @@ msgstr "Невідомий вузел мережі, його не предста
 msgid "Unknown interface type."
 msgstr "Невідомий тип інтерфейсу."
 
-#: app/views/reports.auditlog.list.php:86
+#: app/views/reports.auditlog.list.php:95
 msgid "Unknown resource"
 msgstr "Невідомий ресурс"
 
@@ -17960,7 +17979,7 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Доступний"
 
-#: app/controllers/CControllerAuditLogList.php:169
+#: app/controllers/CControllerAuditLogList.php:170
 #: app/partials/massupdate.macros.tab.php:123
 #: app/views/administration.authentication.edit.php:264
 #: app/views/administration.autoreg.edit.php:90
@@ -18111,11 +18130,10 @@ msgstr "Використовується в діях"
 msgid "Used in items"
 msgstr "Використовується в елементах даних"
 
-#: app/controllers/CControllerAuditLogList.php:183
+#: app/controllers/CControllerAuditLogList.php:185
 #: app/views/administration.user.edit.php:217
 #: app/views/popup.operation.common.php:182
-#: app/views/reports.auditlog.list.php:30
-#: app/views/reports.auditlog.list.php:62 httpconf.php:58
+#: app/views/reports.auditlog.list.php:71 httpconf.php:58
 #: include/actions.inc.php:1703 include/actions.inc.php:1757
 #: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:245
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:167
@@ -18184,7 +18202,7 @@ msgstr[0] "Користувача видалено"
 msgstr[1] ""
 msgstr[2] ""
 
-#: app/controllers/CControllerAuditLogList.php:192
+#: app/controllers/CControllerAuditLogList.php:194
 #: app/views/administration.script.edit.php:82
 #: app/views/administration.script.list.php:69
 #: app/views/administration.usergroup.edit.php:203
@@ -18274,8 +18292,8 @@ msgstr "Групи користувачів"
 msgid "User is not allowed to delete himself."
 msgstr "Користувачу не дозволено видалити самого себе."
 
-#: include/classes/api/services/CUserMacro.php:519
-#: include/classes/api/services/CUserMacro.php:716
+#: include/classes/api/services/CUserMacro.php:523
+#: include/classes/api/services/CUserMacro.php:720
 #, c-format
 msgid "User macro missing parameters: %1$s"
 msgstr "У макросу користувача відсутні параметри: %1$s"
@@ -18387,7 +18405,8 @@ msgstr ""
 #: app/views/administration.usergroup.edit.php:48
 #: app/views/administration.usergroup.list.php:188
 #: app/views/administration.user.list.php:31
-#: app/views/dashboard.sharing.edit.php:50 include/menu.inc.php:171
+#: app/views/dashboard.sharing.edit.php:50
+#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:171
 #: include/views/monitoring.screen.edit.php:164
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:334
@@ -18686,7 +18705,7 @@ msgstr "Ефективність кешу значень. Допустимі п�
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика кешу значень. Допустимі режими: total, free, pfree, used та pused."
 
-#: app/controllers/CControllerAuditLogList.php:200
+#: app/controllers/CControllerAuditLogList.php:202
 #: app/views/administration.valuemap.list.php:62
 msgid "Value map"
 msgstr "Перетворення значення"
@@ -18865,8 +18884,8 @@ msgstr "Вибачте, але досягнуто максимум для зап
 #: include/views/configuration.template.list.php:155
 #: include/views/configuration.template.list.php:296
 #: include/views/inventory.host.view.php:135
-#: include/views/inventory.host.view.php:195
-#: include/views/inventory.host.view.php:207 jsLoader.php:305
+#: include/views/inventory.host.view.php:196
+#: include/views/inventory.host.view.php:208 jsLoader.php:305
 msgid "Web"
 msgstr "Веб"
 
@@ -18878,7 +18897,7 @@ msgstr "Веб"
 msgid "Web monitoring"
 msgstr "Веб моніторинг"
 
-#: app/controllers/CControllerAuditLogList.php:204 httpconf.php:182
+#: app/controllers/CControllerAuditLogList.php:206 httpconf.php:182
 #: httpconf.php:490
 msgid "Web scenario"
 msgstr "Веб сценарій"
@@ -19071,8 +19090,8 @@ msgstr "Помилкові поля для залежності послуги \
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Помилкові поля для вузла мережі \"%1$s\"."
 
-#: include/classes/api/services/CUserMacro.php:479
-#: include/classes/api/services/CUserMacro.php:550
+#: include/classes/api/services/CUserMacro.php:483
+#: include/classes/api/services/CUserMacro.php:554
 #, c-format
 msgid "Wrong fields for macro \"%1$s\"."
 msgstr "Помилкові поля для макросу \"%1$s\"."
@@ -19241,7 +19260,7 @@ msgstr "Щороку"
 #: app/views/popup.condition.common.php:648
 #: app/views/popup.lldoperation.php:78 app/views/popup.lldoperation.php:90
 #: include/actions.inc.php:32 include/blocks.inc.php:624
-#: include/blocks.inc.php:866
+#: include/blocks.inc.php:869
 #: include/classes/screens/CScreenHostTriggers.php:261
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/screens/CScreenProblem.php:1253 include/events.inc.php:173
@@ -19269,7 +19288,7 @@ msgstr "Так"
 msgid "Yesterday"
 msgstr "Вчора"
 
-#: include/func.inc.php:1531
+#: include/func.inc.php:1532
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Ви увійшли під іменем \"%1$s\"."
@@ -19278,7 +19297,7 @@ msgstr "Ви увійшли під іменем \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Ви не можете вибрати деякі з мов, тому що їх локалі не встановлено на веб-сервері."
 
-#: include/func.inc.php:1548 index_http.php:90 index_sso.php:226
+#: include/func.inc.php:1549 index_http.php:90 index_sso.php:247
 msgid "You are not logged in"
 msgstr "Ви не увійшли в систему"
 
@@ -19319,8 +19338,8 @@ msgstr ""
 #: include/classes/api/services/CTemplate.php:1076
 #: include/classes/api/services/CTemplate.php:1182
 #: include/classes/api/services/CUserMacro.php:252
-#: include/classes/api/services/CUserMacro.php:343
-#: include/classes/api/services/CUserMacro.php:438
+#: include/classes/api/services/CUserMacro.php:347
+#: include/classes/api/services/CUserMacro.php:442
 msgid "You do not have permission to perform this operation."
 msgstr "У вас немає повноважень для виконання цієї операції."
 
@@ -19332,7 +19351,7 @@ msgstr "У вас немає повноважень для створення к
 msgid "You do not have permissions to edit dashboard"
 msgstr ""
 
-#: include/func.inc.php:1531
+#: include/func.inc.php:1532
 msgid "You have no permissions to access this page."
 msgstr "У вас недостатньо прав для доступу до цієї сторінки."
 
@@ -19340,7 +19359,7 @@ msgstr "У вас недостатньо прав для доступу до ц�
 msgid "You have unsaved changes."
 msgstr "У вас є незбережені зміни."
 
-#: include/func.inc.php:1550
+#: include/func.inc.php:1551
 msgid "You must login to view this page."
 msgstr "Ви маєте увійти в систему для перегляду цієї сторінки."
 
@@ -19414,7 +19433,7 @@ msgstr "Форма входу в систему Zabbix"
 msgid "Zabbix server"
 msgstr "Zabbix сервер"
 
-#: include/classes/server/CZabbixServer.php:536
+#: include/classes/server/CZabbixServer.php:537
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" can not be reached. Possible reasons:\n"
@@ -19888,7 +19907,7 @@ msgstr ""
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "count() - Кількість успішно отриманих значень V (які задовільняють оператор О) за період Т"
 
-#: include/func.inc.php:597 jsLoader.php:154
+#: include/func.inc.php:598 jsLoader.php:154
 msgctxt "day short"
 msgid "d"
 msgstr "д"
@@ -20049,7 +20068,7 @@ msgstr "глобальних налаштуваннях очистки істо�
 msgid "graph pattern"
 msgstr ""
 
-#: include/func.inc.php:598 jsLoader.php:155
+#: include/func.inc.php:599 jsLoader.php:155
 msgctxt "hour short"
 msgid "h"
 msgstr "г"
@@ -20125,7 +20144,7 @@ msgid "incorrect element count"
 msgstr "некоректна кількість елементів"
 
 #: include/classes/parsers/CItemKey.php:80
-#: include/classes/parsers/CUserMacroParser.php:59
+#: include/classes/parsers/CUserMacroParser.php:61
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
 msgstr "некоректний синтаксис біля \"%1$s\""
@@ -20250,12 +20269,12 @@ msgstr "logsource() - Джерело в останньому записі лог
 msgid "low-level discovery rule"
 msgstr "правило низькорівневого виявлення"
 
-#: include/func.inc.php:599 jsLoader.php:120 jsLoader.php:156 jsLoader.php:340
+#: include/func.inc.php:600 jsLoader.php:120 jsLoader.php:156 jsLoader.php:340
 msgctxt "minute short"
 msgid "m"
 msgstr "хв"
 
-#: include/func.inc.php:596 jsLoader.php:153
+#: include/func.inc.php:597 jsLoader.php:153
 msgctxt "month short"
 msgid "m"
 msgstr "м"
@@ -20270,7 +20289,7 @@ msgstr "m-d"
 msgid "m-d H:i"
 msgstr "m-d H:i"
 
-#: include/classes/parsers/CUserMacroParser.php:45
+#: include/classes/parsers/CUserMacroParser.php:47
 msgid "macro is empty"
 msgstr "макрос пустий"
 
@@ -20343,7 +20362,7 @@ msgstr "мінімальна довжина %1$s символів"
 msgid "mm"
 msgstr "мм"
 
-#: include/func.inc.php:601
+#: include/func.inc.php:602
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "мс"
@@ -20542,7 +20561,7 @@ msgstr "корінь"
 msgid "ruleid of dependent item and master item should match"
 msgstr "ruleid залежного елементу даних та головного елементу даних мають співпадати"
 
-#: include/func.inc.php:600
+#: include/func.inc.php:601
 msgctxt "second short"
 msgid "s"
 msgstr "с"
@@ -20636,7 +20655,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - Сума значень за період Т"
 
-#: include/classes/api/services/CUser.php:1571
+#: include/classes/api/services/CUser.php:1569
 msgid "supplied credentials are not unique"
 msgstr "наданий обліковий запис не унікальний"
 
@@ -20769,7 +20788,7 @@ msgstr ""
 msgid "unexpected end of key"
 msgstr "неочікуваний кінець ключа"
 
-#: include/classes/parsers/CUserMacroParser.php:45
+#: include/classes/parsers/CUserMacroParser.php:47
 msgid "unexpected end of macro"
 msgstr "неочікуваний кінець макросу"
 
@@ -20954,7 +20973,7 @@ msgstr "помилковий тип правила виявлення"
 msgid "wrong item type"
 msgstr "помилковий тип елементу даних"
 
-#: include/func.inc.php:595 jsLoader.php:152
+#: include/func.inc.php:596 jsLoader.php:152
 msgctxt "year short"
 msgid "y"
 msgstr "р"

@@ -67,19 +67,11 @@ func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []str
 		return strconv.Itoa(status), nil
 
 	case keyPostgresReplicationLagSec:
-		if conn.version >= 100000 {
-			query = `SELECT
-  						CASE
-    						WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
-							ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
-  						END as lag`
-		} else {
-			query = `SELECT
-  						CASE
-    						WHEN pg_last_xlog_receive_location() = pg_last_xlog_replay_location() THEN 0
-							ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
-  						END as lag`
-		}
+		query = `SELECT
+  					CASE
+    					WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
+						ELSE COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())::integer, 0)
+  					END as lag`
 	case keyPostgresReplicationLagB:
 		err = conn.postgresPool.QueryRow(context.Background(), `SELECT pg_is_in_recovery()`).Scan(&inRecovery)
 		if err != nil {
@@ -91,14 +83,8 @@ func (p *Plugin) replicationHandler(conn *postgresConn, key string, params []str
 			return nil, errorCannotFetchData
 		}
 		if inRecovery {
-			if conn.version >= 100000 {
-				query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
+			query = `SELECT pg_catalog.pg_wal_lsn_diff (received_lsn, pg_last_wal_replay_lsn())
 						   FROM pg_stat_wal_receiver;`
-			} else {
-				query = `SELECT pg_catalog.pg_xlog_location_diff (received_lsn, pg_last_xlog_replay_location())
-						   FROM pg_stat_wal_receiver;`
-			}
-
 			err = conn.postgresPool.QueryRow(context.Background(), query).Scan(&replicationResult)
 			if err != nil {
 				if err == pgx.ErrNoRows {

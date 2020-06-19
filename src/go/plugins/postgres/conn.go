@@ -56,7 +56,7 @@ func (p *postgresConn) finalize() (err error) {
 	// get conn pool using url created in postgres.go
 	config, err := pgxpool.ParseConfig(p.connString)
 	if err != nil {
-		return fmt.Errorf("invalid connection string: %s:", err)
+		return sanitizeError(err.Error(), p.connString)
 	}
 	config.ConnConfig.DialFunc = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		d := net.Dialer{}
@@ -79,7 +79,7 @@ func (p *postgresConn) finalize() (err error) {
 
 	versionPG, err := GetPostgresVersion(newConn)
 	if err != nil {
-		return fmt.Errorf("cannot otain version information: %s", err)
+		return fmt.Errorf("cannot obtain version information: %s", err)
 	}
 
 	version, err := strconv.Atoi(versionPG)
@@ -192,7 +192,7 @@ func (c *connManager) GetPostgresConnection(connString string) (conn *postgresCo
 		defer c.Unlock()
 		delete(c.connections, connString)
 		c.log.Debugf("removed failed connection %s: %s", connString, err)
-		return nil, fmt.Errorf("Cannoe etabilish connection to Postgres server: %s", err)
+		return nil, fmt.Errorf("Cannot estabilish connection to Postgres server: %s", err)
 	}
 	return
 }
