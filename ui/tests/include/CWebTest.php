@@ -298,7 +298,7 @@ class CWebTest extends CTest {
 	/**
 	 * Check page header
 	 *
-	 * @param string $header
+	 * @param string $header	page header to be compared
 	 */
 	public function assertPageHeader($header) {
 		$this->assertEquals($header, $this->query('xpath://h1[@id="page-title-general"]')->one()->getText());
