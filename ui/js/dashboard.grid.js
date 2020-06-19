@@ -600,7 +600,7 @@
 	 * @returns {integer}
 	 */
 	function calculateGridMinHeight($obj) {
-		return $(window).height() - $obj.offset().top - $('.wrapper').scrollTop() - parseInt($(document.body).css('margin-bottom'), 10);
+		return $(window).height() - $obj.offset().top - $('.wrapper').scrollTop();
 	}
 
 	function getWidgetByTarget(widgets, $div) {
