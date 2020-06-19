@@ -48,7 +48,7 @@ class CSettings extends CApiService {
 		'script_timeout', 'item_test_timeout'];
 
 	/**
-	 * Get settings paramters
+	 * Get settings parameters.
 	 * 
 	 * @param array $options
 	 *
@@ -84,11 +84,11 @@ class CSettings extends CApiService {
 	}
 
 	/**
-	 * Update settings paramters
+	 * Update settings parameters.
 	 * 
-	 * @param array  $settings
+	 * @param array $settings
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function update(array $settings): array {
 		$this->validateUpdate($settings, $db_settings);
@@ -135,7 +135,7 @@ class CSettings extends CApiService {
 	}
 
 	/**
-	 * Validate updated settings parameters
+	 * Validate updated settings parameters.
 	 * 
 	 * @param array  $settings
 	 * @param array  $db_settings

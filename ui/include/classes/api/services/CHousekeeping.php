@@ -42,7 +42,7 @@ class CHousekeeping extends CApiService {
 		'hk_trends', 'db_extension', 'compression_status', 'compress_older', 'compression_availability'];
 
 	/**
-	 * Get housekeeping paramters
+	 * Get housekeeping parameters.
 	 * 
 	 * @param array $options
 	 *
@@ -78,11 +78,11 @@ class CHousekeeping extends CApiService {
 	}
 
 	/**
-	 * Update housekeeping paramters
+	 * Update housekeeping parameters.
 	 * 
 	 * @param array  $hk
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function update(array $hk): array {
 		$this->validateUpdate($hk, $db_hk);
@@ -122,7 +122,7 @@ class CHousekeeping extends CApiService {
 	}
 
 	/**
-	 * Validate updated housekeeping parameters
+	 * Validate updated housekeeping parameters.
 	 * 
 	 * @param array  $hk
 	 * @param array  $db_hk

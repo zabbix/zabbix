@@ -44,7 +44,7 @@ class CAuthentication extends CApiService {
 		'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'];
 
 	/**
-	 * Get authentication paramters
+	 * Get authentication parameters.
 	 * 
 	 * @param array $options
 	 *
@@ -81,11 +81,11 @@ class CAuthentication extends CApiService {
 	}
 
 	/**
-	 * Update authentication paramters
+	 * Update authentication parameters.
 	 * 
 	 * @param array  $auth
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function update(array $auth): array {
 		$this->validateUpdate($auth, $db_auth);
@@ -128,7 +128,7 @@ class CAuthentication extends CApiService {
 	}
 
 	/**
-	 * Validate updated authentication parameters
+	 * Validate updated authentication parameters.
 	 * 
 	 * @param array  $auth
 	 * @param array  $db_auth
