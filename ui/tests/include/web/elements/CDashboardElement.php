@@ -58,10 +58,8 @@ class CDashboardElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getWidgets() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget" or'.
-				' @class="dashbrd-grid-iterator" or'.
-				' contains(@class, "dashbrd-grid-widget ") or'.
-				' contains(@class, "dashbrd-grid-iterator ")]')->asWidget()->all();
+		return $this->query("xpath:.//div[".CXPathHelper::fromClass("dashbrd-grid-widget").
+				" or ".CXPathHelper::fromClass("dashbrd-grid-iterator")."]")->asWidget()->all();
 	}
 
 	/**
