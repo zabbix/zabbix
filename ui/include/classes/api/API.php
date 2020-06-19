@@ -130,6 +130,13 @@ class API {
 	}
 
 	/**
+	 * @return CAuthentication
+	 */
+	public static function Authentication() {
+		return self::getApi('authentication');
+	}
+
+	/**
 	 * @return CAutoregistration
 	 */
 	public static function Autoregistration() {
@@ -256,6 +263,13 @@ class API {
 	}
 
 	/**
+	 * @return CHousekeeping
+	 */
+	public static function Housekeeping() {
+		return self::getApi('housekeeping');
+	}
+
+	/**
 	 * @return CImage
 	 */
 	public static function Image() {
@@ -351,6 +365,13 @@ class API {
 	 */
 	public static function Script() {
 		return self::getApi('script');
+	}
+
+	/**
+	 * @return CSettings
+	 */
+	public static function Settings() {
+		return self::getApi('settings');
 	}
 
 	/**

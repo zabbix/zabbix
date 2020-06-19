@@ -216,7 +216,10 @@ class CControllerAuditLogList extends CController {
 			AUDIT_RESOURCE_CORRELATION => _('Event correlation'),
 			AUDIT_RESOURCE_DASHBOARD => _('Dashboard'),
 			AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
-			AUDIT_RESOURCE_MODULE => _('Module')
+			AUDIT_RESOURCE_MODULE => _('Module'),
+			AUDIT_RESOURCE_SETTINGS => _('Settings'),
+			AUDIT_RESOURCE_AUTHENTICATION => _('Authentication'),
+			AUDIT_RESOURCE_HOUSEKEEPING => _('Housekeeping')
 		];
 	}
 
