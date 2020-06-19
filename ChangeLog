@@ -15,6 +15,7 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-17878] fixed low-level discovery rule override operation object label not selecting the related field when clicked on (Ivo)
 ..F....... [ZBX-17663] fixed user not being redirected back to an URL he was coming from before signing in using SAML SSO (agriscenko)
 .........T [ZBX-17900] fixed the template description - the config file naming is in lowercase (mchudinov)
 .........T [ZBX-17905] changed type of physical disk performance items from wmi to perf_counter_en and perf_instance_en in Template Module Windows physical disks by Zabbix agent (mchudinov)
