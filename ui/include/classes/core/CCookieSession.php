@@ -26,24 +26,11 @@ class CCookieSession implements \SessionHandlerInterface {
 
 	private const COOKIE_NAME = ZBX_SESSION_NAME;
 
-	private const COOKIE_MAX_SIZE = 4096;
-
-	private const SIGN_ALGO = 'aes-256-ecb';
-
-	private $key;
-
 	/**
 	 * Class consturctor. Set session handlers and start session.
 	 */
 	public function __construct() {
 		if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
-
-			$config = select_config();
-			$this->key = $config['session_key'];
-
-			if (!$this->key) {
-				throw new \Exception('Please define session secret key'); // FIXME:
-			}
 
 			// Set use standard cookie PHPSESSID to false.
 			ini_set('session.use_cookies', 0);
@@ -160,13 +147,9 @@ class CCookieSession implements \SessionHandlerInterface {
 		$data = unserialize($data);
 		$session_sign = $data['sign'];
 		unset($data['sign']);
-		$sign = $this->sign(serialize($data));
+		$sign = CEncryptHelper::sign(serialize($data));
 
-		return hash_equals($session_sign, $sign);
-	}
-
-	private function sign(string $data): string {
-		return openssl_encrypt($data, self::SIGN_ALGO, $this->key);
+		return CEncryptHelper::checkSign($session_sign, $sign);
 	}
 
 	private function prepareData(string $data): string {
@@ -176,7 +159,7 @@ class CCookieSession implements \SessionHandlerInterface {
 			unset($data['sign']);
 		}
 
-		$data['sign'] = $this->sign(serialize($data));
+		$data['sign'] = CEncryptHelper::sign(serialize($data));
 
 		return base64_encode(serialize($data));
 	}

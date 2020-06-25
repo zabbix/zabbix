@@ -73,8 +73,9 @@ abstract class CControllerResponse {
 		$data = json_encode($data);
 		$sign = CEncryptHelper::sign($data);
 
-		$form->addItem(new CInput('hidden', 'sign', $sign));
-		$form->addItem(new CInput('hidden', 'data', $data));
+		$form->addItem(new CInput('hidden', 'formdata', ''));
+		$form->addItem(new CInput('hidden', 'sign', base64_encode($sign)));
+		$form->addItem(new CInput('hidden', 'data', base64_encode($data)));
 
 		return $form;
 	}
@@ -94,7 +95,7 @@ abstract class CControllerResponse {
 		$messages = [];
 
 		foreach ($this->getMessages() as $value) {
-			$messages['messages'][] = $value;
+			$messages['messages'][] = ['message' => $value];
 		}
 
 		if ($this instanceof CControllerResponseRedirect) {
@@ -109,6 +110,6 @@ abstract class CControllerResponse {
 			$data = $this->getFormData();
 		}
 
-		return [$data, $messages];
+		return ['form' => $data, 'messages' => $messages];
 	}
 }

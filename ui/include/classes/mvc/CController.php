@@ -139,6 +139,35 @@ abstract class CController {
 		return substr($sessionid, 16, 16);
 	}
 
+	protected function parseFormData(): bool {
+		$data = base64_decode(getRequest('data'));
+		$sign = base64_decode(getRequest('sign'));
+		$request_sign = CEncryptHelper::sign($data);
+
+		if (!CEncryptHelper::checkSign($sign, $request_sign)) {
+			info(_('Operation cannot be performed due to unauthorized request.'));
+			return false;
+		}
+
+		$data = json_decode($data, true);
+		if ($data['messages']) {
+			if (array_key_exists('success', $data['messages'])) {
+				$_REQUEST['system-message-ok'] = $data['messages']['success'];
+			}
+			if (array_key_exists('error', $data['messages'])) {
+				$_REQUEST['system-message-error'] = $data['messages']['error'];
+			}
+
+			if (array_key_exists('messages', $data['messages'])) {
+				$_REQUEST['system-messages'] = $data['messages']['messages'];
+			}
+		}
+
+		array_merge($_REQUEST, $data['form']);
+
+		return true;
+	}
+
 	/**
 	 * Validate input parameters.
 	 *
@@ -147,6 +176,10 @@ abstract class CController {
 	 * @return bool
 	 */
 	public function validateInput($validationRules) {
+		if (hasRequest('formdata')) {
+			$this->parseFormData();
+		}
+
 		$validator = new CNewValidator($_REQUEST, $validationRules);
 
 		foreach ($validator->getAllErrors() as $error) {
