@@ -69,30 +69,12 @@ abstract class CControllerResponse {
 				->setEnctype('multipart/form-data')
 				->setId('form-data');
 
-		foreach ($this->getMessages() as $key => $value) {
-			$form->addItem(new CInput('hidden', '"system-messages['.$key.'][message]', $value));
-		}
+		$data = $this->getData();
+		$data = json_encode($data);
+		$sign = CEncryptHelper::sign($data);
 
-		if ($this instanceof CControllerResponseRedirect) {
-			if ($this->getMessageOk() !== null) {
-				$form->addItem(new CInput('hidden', 'system-message-ok', $this->getMessageOk()));
-			}
-
-			if ($this->getMessageError() !== null) {
-				$form->addItem(new CInput('hidden', 'system-message-error', $this->getMessageError()));
-			}
-
-			foreach ($this->getFormData() as $key => $value) {
-				if (is_array($value)) {
-					foreach ($value as $k => $val) {
-						$form->addItem(new CInput('hidden', $key.'['.$k.']', $val));
-					}
-				}
-				else {
-					$form->addItem(new CInput('hidden', $key, $value));
-				}
-			}
-		}
+		$form->addItem(new CInput('hidden', 'sign', $sign));
+		$form->addItem(new CInput('hidden', 'data', $data));
 
 		return $form;
 	}
@@ -107,9 +89,26 @@ abstract class CControllerResponse {
 		return new CJsScript($js);
 	}
 
-	private function prepareData(): array {
-		$arr = [];
+	private function getData(): array {
+		$data = [];
+		$messages = [];
 
+		foreach ($this->getMessages() as $value) {
+			$messages['messages'][] = $value;
+		}
 
+		if ($this instanceof CControllerResponseRedirect) {
+			if ($this->getMessageOk() !== null) {
+				$messages['success'] = $this->getMessageOk();
+			}
+
+			if ($this->getMessageError() !== null) {
+				$messages['error'] = $this->getMessageError();
+			}
+
+			$data = $this->getFormData();
+		}
+
+		return [$data, $messages];
 	}
 }
