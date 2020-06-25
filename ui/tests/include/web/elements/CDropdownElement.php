@@ -93,4 +93,15 @@ class CDropdownElement extends CElement {
 	public function getValue() {
 		return $this->getText();
 	}
+
+	/**
+	 * Check if dropdown option is enabled.
+	 *
+	 * @param string	$option    element text to be checked
+	 *
+	 * @return boolean
+	 */
+	public function checkOptionEnabled($option) {
+		return $this->query('xpath:.//option[text()='.CXPathHelper::escapeQuotes($option).']')->one()->isEnabled();
+	}
 }
