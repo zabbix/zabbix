@@ -84,6 +84,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 			// Analog graph prototype for the selected dynamic host.
 			$options['hostids'] = [$dynamic_hostid];
+			$dynamic_host_discoveries = API::DiscoveryRule()->get([
+					'output' => ['itemid'],
+					'hostids' => $options['hostids']
+			]);
+			// Graphs has to be selected by items, as graph dynamically relates to host via items it represents.
+			$options['discoveryids'] = array_column($dynamic_host_discoveries, 'itemid');
 			$options['filter'] = ['name' => $graph_prototype['name']];
 		}
 		else {
