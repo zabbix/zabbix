@@ -32,6 +32,7 @@
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
 #include "zbxcrypto.h"
+#include "../events.h"
 
 extern int		CONFIG_DISCOVERER_FORKS;
 extern unsigned char	process_type, program_type;
@@ -280,7 +281,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 								MACRO_TYPE_COMMON, NULL, 0);
 					}
 
-					if (SUCCEED == get_value_snmp(&item, &result) &&
+					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER) &&
 							NULL != (pvalue = GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -611,7 +612,11 @@ static void	process_rule(DB_DRULE *drule)
 			zbx_vector_ptr_clear_ext(&services, zbx_ptr_free);
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			{
 				discovery_update_host(&dhost, host_status, now);
+				zbx_process_events(NULL, NULL);
+				zbx_clean_events();
+			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule->druleid, ip, dns, host_status, now);
 

@@ -255,17 +255,18 @@ func main() {
 	}
 
 	if argTest || argPrint {
-		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
-			fatalExit("failed to load key access rules", err)
-		}
 		var level int
 		if argVerbose {
 			level = log.Trace
 		} else {
-			level = log.Empty
+			level = log.None
 		}
 		if err := log.Open(log.Console, level, "", 0); err != nil {
 			fatalExit("cannot initialize logger", err)
+		}
+
+		if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+			fatalExit("failed to load key access rules", err)
 		}
 
 		var m *scheduler.Manager
@@ -306,6 +307,8 @@ func main() {
 
 	var logType, logLevel int
 	switch agent.Options.LogType {
+	case "system":
+		logType = log.System
 	case "console":
 		logType = log.Console
 	case "file":

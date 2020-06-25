@@ -339,7 +339,7 @@ void	zbx_str_free(char *data);
 
 void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
 void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
-void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
+void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value);
 void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 unsigned int	zbx_isqrt32(unsigned int value);

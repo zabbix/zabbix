@@ -20,6 +20,6 @@
 #ifndef ZABBIX_MOCK_HELPER_H
 #define ZABBIX_MOCK_HELPER_H
 
-char		*zbx_yaml_assemble_binary_sequence(const char *in, size_t expected);
+char		*zbx_yaml_assemble_binary_sequence(const char *path, size_t expected);
 
 #endif

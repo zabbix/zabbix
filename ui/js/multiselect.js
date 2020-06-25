@@ -32,6 +32,9 @@ jQuery(function($) {
 			TAB: 9
 		};
 
+	const MS_ACTION_POPUP = 0;
+	const MS_ACTION_AUTOSUGGEST = 1;
+
 	/**
 	 * Multi select helper.
 	 *
@@ -281,6 +284,9 @@ jQuery(function($) {
 	 * @param string options['popup']['filter_preselect_fields']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
+	 * @param object options['autosuggest']         autosuggest options (optional)
+	 * @param object options['autosuggest']['filter_preselect_fields'] autosuggest preselect fields (optional)
+	 * @param string options['autosuggest']['filter_preselect_fields']['hosts'] autosuggest host preselect field (optional)
 	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
 	 * @param string options['styles']['property']
 	 * @param string options['styles']['value']
@@ -381,10 +387,15 @@ jQuery(function($) {
 			}
 
 			$obj
-				.on('mousedown', function() {
+				.on('mousedown', function(event) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
+
+						// Focus input only when not clicked on selected item.
+						if (!$(event.target).parents('.multiselect-list').length) {
+							$('input[type="text"]', $obj).focus();
+						}
 					}
 				})
 				.on('remove', function() {
@@ -419,7 +430,7 @@ jQuery(function($) {
 					var popup_options = ms.options.popup.parameters;
 
 					if (ms.options.popup.filter_preselect_fields) {
-						popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj));
+						popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj, MS_ACTION_POPUP));
 					}
 
 					// Click used instead focus because in patternselect listen only click.
@@ -435,23 +446,29 @@ jQuery(function($) {
 	/**
 	 * Get current value from preselect filter field.
 	 *
-	 * @param {jQuery} $obj
+	 * @param {jQuery} $obj    Multiselect instance.
+	 * @param {int}    action  User action that caused preselection.
 	 *
 	 * @return {object}
 	 */
-	function getFilterPreselectField($obj) {
+	function getFilterPreselectField($obj, action) {
 		var ms = $obj.data('multiSelect'),
+			preselect_options = ms.options[(action == MS_ACTION_AUTOSUGGEST) ? 'autosuggest' : 'popup'] || null,
 			ret = {};
 
-		if (typeof ms.options.popup.filter_preselect_fields.hosts !== 'undefined') {
-			var hosts = $('#' + ms.options.popup.filter_preselect_fields.hosts).multiSelect('getData');
+		if (!preselect_options) {
+			return ret;
+		}
+
+		if (typeof preselect_options.filter_preselect_fields.hosts !== 'undefined') {
+			var hosts = $('#' + preselect_options.filter_preselect_fields.hosts).multiSelect('getData');
 			if (hosts.length != 0) {
 				ret.hostid = hosts[0].id;
 			}
 		}
 
-		if (typeof ms.options.popup.filter_preselect_fields.hostgroups !== 'undefined') {
-			var host_groups = $('#' + ms.options.popup.filter_preselect_fields.hostgroups).multiSelect('getData');
+		if (typeof preselect_options.filter_preselect_fields.hostgroups !== 'undefined') {
+			var host_groups = $('#' + preselect_options.filter_preselect_fields.hostgroups).multiSelect('getData');
 			if (host_groups.length != 0) {
 				ret.groupid = host_groups[0].id;
 			}
@@ -499,6 +516,9 @@ jQuery(function($) {
 					}
 
 					if (search !== '') {
+						var preselect_values = getFilterPreselectField($obj, MS_ACTION_AUTOSUGGEST),
+							cache_key = search + JSON.stringify(preselect_values);
+
 						/*
 						 * Strategy:
 						 * 1. Load the cached result set if such exists for the given term and show the list.
@@ -506,36 +526,38 @@ jQuery(function($) {
 						 * 3. Schedule result set retrieval for the given term otherwise.
 						 */
 
-						if (search in ms.values.searches) {
+						if (cache_key in ms.values.searches) {
 							ms.values.search = search;
+							ms.values.cache_key = cache_key;
 							loadAvailable($obj);
 							showAvailable($obj);
 						}
-						else if (!(search in ms.values.searching)) {
+						else if (!(cache_key in ms.values.searching)) {
 							ms.values.searchTimeout = setTimeout(function() {
-								ms.values.searching[search] = true;
+								ms.values.searching[cache_key] = true;
 
 								$.ajax({
 									url: ms.options.url + '&curtime=' + new CDate().getTime(),
 									type: 'GET',
 									dataType: 'json',
 									cache: false,
-									data: {
+									data: jQuery.extend({
 										search: search,
-										limit: getLimit($obj)
-									}
+										limit: getLimit($obj),
+									}, preselect_values)
 								})
 									.then(function(response) {
-										ms.values.searches[search] = response.result;
+										ms.values.searches[cache_key] = response.result;
 
 										if (search === $input.val().trim()) {
 											ms.values.search = search;
+											ms.values.cache_key = cache_key;
 											loadAvailable($obj);
 											showAvailable($obj);
 										}
 									})
 									.done(function() {
-										delete ms.values.searching[search];
+										delete ms.values.searching[cache_key];
 									});
 
 								delete ms.values.searchTimeout;
@@ -770,6 +792,9 @@ jQuery(function($) {
 					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
+
+						// preventScroll not work in IE.
+						$('input[type="text"]', $obj)[0].focus({preventScroll: true});
 					}
 				});
 
@@ -842,7 +867,7 @@ jQuery(function($) {
 
 	function loadAvailable($obj) {
 		var ms = $obj.data('multiSelect'),
-			data = ms.values.searches[ms.values.search];
+			data = ms.values.searches[ms.values.cache_key];
 
 		cleanAvailable($obj);
 
@@ -1112,6 +1137,7 @@ jQuery(function($) {
 	function cleanSearchHistory($obj) {
 		var ms = $obj.data('multiSelect');
 
+		ms.values.cache_key = '';
 		ms.values.search = '';
 		ms.values.searches = {};
 		ms.values.searching = {};

@@ -89,8 +89,9 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 wchar_t		*get_counter_name(DWORD pdhIndex);
 int		check_counter_path(char *counterPath, int convert_from_numeric);
 int		init_builtin_counter_indexes(void);
-DWORD 		get_builtin_object_index(zbx_builtin_counter_ref_t ref);
-DWORD 		get_builtin_counter_index(zbx_builtin_counter_ref_t ref);
+DWORD 		get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
+DWORD 		get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
+wchar_t		*get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
 #define	get_builtin_object_name(ctr)	get_counter_name(get_builtin_object_index(ctr))
 #define	get_builtin_counter_name(ctr)	get_counter_name(get_builtin_counter_index(ctr))

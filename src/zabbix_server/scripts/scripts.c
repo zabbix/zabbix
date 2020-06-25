@@ -318,7 +318,7 @@ void	zbx_script_clean(zbx_script_t *script)
  *                                                                            *
  * Parameters: host          - [IN] the host the script will be executed on   *
  *             script        - [IN/OUT] the script to prepare                 *
- *             user          - [IN] the user executing script                 *
+ *             user          - [IN] the user executing script (can be NULL)   *
  *             error         - [OUT] the error message output buffer          *
  *             mas_error_len - [IN] the size of error message output buffer   *
  *                                                                            *
@@ -335,7 +335,8 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 		size_t max_error_len)
 {
 	int		ret = FAIL;
-	zbx_uint64_t	groupid;
+	zbx_uint64_t	groupid, userid;
+	zbx_uint64_t	*p_userid = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -385,13 +386,23 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 				goto out;
 			}
 
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
-					NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
+			if (user != NULL)
+			{
+				/* zbx_script_prepare() receives 'user' as const-pointer but */
+				/* substitute_simple_macros() takes 'userid' as non-const pointer. */
+				/* Make a copy to preserve const-correctness. */
+				userid = user->userid;
+				p_userid = &userid;
+			}
+
+			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host, NULL,
+					NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
 			{
 				goto out;
 			}
+
 			/* expand macros in command_orig used for non-secure logging */
-			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
+			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, p_userid, NULL, host, NULL, NULL,
 					NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error, max_error_len))
 			{
 				/* script command_orig is a copy of script command - if the script command  */

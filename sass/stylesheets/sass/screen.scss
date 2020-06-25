@@ -1481,6 +1481,15 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 			display: inline-block;
 		}
 	}
+
+	.dynamic-row > td {
+		padding-top: 0;
+	}
+
+	.dynamic-row-control > td {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
 }
 
 .table-forms-separator {
@@ -4024,8 +4033,21 @@ $form-icon-btn: (
 			padding: 0 10px;
 			@extend %webkit-scrollbar;
 
-			.table-forms .table-forms-td-right {
-				padding-right: 8px;
+			.table-forms {
+				.table-forms-td-right {
+					padding-right: 8px;
+				}
+
+				.table-forms-row-with-second-field {
+					position: relative;
+					transform: scale(1);
+
+					.table-forms-second-column {
+						position: absolute;
+						top: 5px;
+						right: 8px;
+					}
+				}
 			}
 
 			.columns-wrapper {
@@ -5237,7 +5259,7 @@ a.link-action {
 		}
 		@else {
 			a.link-action,
-			input[type="radio"]:checked + label {
+			input[type="radio"]:enabled:checked + label {
 				color: darken($color, 45%);
 			}
 		}
@@ -5871,6 +5893,11 @@ svg {
 	svg {
 		flex-grow: 1;
 	}
+}
+
+.lld-overrides-operations-table {
+	white-space: normal;
+	word-break: break-word;
 }
 
 .overrides-list {

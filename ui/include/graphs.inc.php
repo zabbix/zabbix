@@ -916,7 +916,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		$rows[] = $value;
 	}
 
-	$ignore_milliseconds = $min <= 1 || $max >= 1;
+	$ignore_milliseconds = ($min <= -1 || $max >= 1);
 
 	$options = [
 		'units' => $units,

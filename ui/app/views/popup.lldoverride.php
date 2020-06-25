@@ -24,7 +24,7 @@
  */
 
 $output = [
-	'header' => $data['title'],
+	'header' => $data['title']
 ];
 
 $options = $data['options'];
@@ -32,49 +32,62 @@ $options = $data['options'];
 $overrides_popup_form = (new CForm())
 	->cleanItems()
 	->setId('lldoverride_form')
-	->addVar('no', $options['no'])
+	->addItem((new CVar('no', $options['no']))->removeId())
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('overrides_names', $options['overrides_names'])
-	->addVar('action', 'popup.lldoverride')
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->addItem((new CVar('action', 'popup.lldoverride'))->removeId())
+	->addItem((new CInput('submit', 'submit'))
+		->addStyle('display: none;')
+		->removeId()
+	);
 
 $overrides_popup_form_list = (new CFormList())
 	->addRow(
 		(new CLabel(_('Name'), 'override_name'))->setAsteriskMark(),
-		(new CTextBox('name', $options['old_name'], (bool) $options['templated'], DB::getFieldLength('lld_override', 'name')))
+		(new CTextBox('name', $options['old_name'], $options['templated'], DB::getFieldLength('lld_override', 'name')))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('override_name')
-	);
-
-$overrides_popup_form_list
-	->addRow(_('Stop processing next overrides if matches'),
-		(new CCheckBox('stop'))
-			->setChecked($options['stop'] == ZBX_LLD_OVERRIDE_STOP_YES)
+	)
+	->addRow(
+		_('If filter matches'),
+		(new CRadioButtonList('stop', (int) $options['stop']))
+			->addValue(_('Continue overrides'), ZBX_LLD_OVERRIDE_STOP_NO)
+			->addValue(_('Stop processing'), ZBX_LLD_OVERRIDE_STOP_YES)
+			->setModern(true)
+			->setReadonly($options['templated'])
 	);
 
 // filters
 $override_evaltype = (new CDiv([
-	_('Type of calculation'),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	new CComboBox('overrides_evaltype', $options['overrides_evaltype'], null, [
-		CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-		CONDITION_EVAL_TYPE_AND => _('And'),
-		CONDITION_EVAL_TYPE_OR => _('Or'),
-		CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-	]),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CSpan(''))
-		->setId('overrides_expression'),
-	(new CTextBox('overrides_formula', $options['overrides_formula']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('overrides_formula')
-		->setAttribute('placeholder', 'A or (B and C) &hellip;')
+	(new CDiv([
+		_('Type of calculation'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CComboBox('overrides_evaltype', $options['overrides_evaltype'], null, [
+			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+			CONDITION_EVAL_TYPE_AND => _('And'),
+			CONDITION_EVAL_TYPE_OR => _('Or'),
+			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+		]))
+			->setReadonly($options['templated']),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+	]))->addClass(ZBX_STYLE_CELL),
+	(new CDiv([
+		(new CSpan(''))
+			->addStyle('white-space: normal;')
+			->setId('overrides_expression'),
+		(new CTextBox('overrides_formula', $options['overrides_formula'], $options['templated'],
+				DB::getFieldLength('lld_override', 'formula')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('overrides_formula')
+			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+	]))->addClass(ZBX_STYLE_CELL)
 ]))
-	->addClass('overrideRow');
+	->addClass(ZBX_STYLE_ROW)
+	->setId('overrideRow');
 
-$filterTable = (new CTable())
+$filter_table = (new CTable())
 	->setId('overrides_filters')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
@@ -98,44 +111,51 @@ $operators = [
 ];
 
 foreach ($overrides_filters as $i => $overrides_filter) {
-	$formulaId = [
+	$formulaid = [
 		new CSpan($overrides_filter['formulaid']),
 		new CVar('overrides_filters['.$i.'][formulaid]', $overrides_filter['formulaid'])
 	];
 
-	$macro = (new CTextBox('overrides_filters['.$i.'][macro]', $overrides_filter['macro'], false, DB::getFieldLength('lld_override_condition', 'macro')))
+	$macro = (new CTextBox('overrides_filters['.$i.'][macro]', $overrides_filter['macro'], $options['templated'],
+			DB::getFieldLength('lld_override_condition', 'macro')))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass(ZBX_STYLE_UPPERCASE)
 		->addClass('macro')
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $overrides_filter['formulaid']);
 
-	$value = (new CTextBox('overrides_filters['.$i.'][value]', $overrides_filter['value'], false, DB::getFieldLength('lld_override_condition', 'value')))
+	$value = (new CTextBox('overrides_filters['.$i.'][value]', $overrides_filter['value'],$options['templated'],
+			DB::getFieldLength('lld_override_condition', 'value')))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('regular expression'));
 
-	$deleteButtonCell = [
+	$delete_button_cell = [
 		(new CButton('overrides_filters_'.$i.'_remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
+			->setEnabled(!$options['templated'])
 	];
 
-	$row = [$formulaId, $macro,
-		(new CComboBox('overrides_filters['.$i.'][operator]', $overrides_filter['operator'], null, $operators))->addClass('operator'),
+	$row = [$formulaid, $macro,
+		(new CComboBox('overrides_filters['.$i.'][operator]', $overrides_filter['operator'], null, $operators))
+			->addClass('operator')
+			->setReadonly($options['templated']),
 		$value,
-		(new CCol($deleteButtonCell))->addClass(ZBX_STYLE_NOWRAP)
+		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	];
-	$filterTable->addRow($row, 'form_row');
+	$filter_table->addRow($row, 'form_row');
 }
 
-$filterTable->setFooter(new CCol(
+$filter_table->setFooter(new CCol(
 	(new CButton('macro_add', _('Add')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
+		->setEnabled(!$options['templated'])
+		->removeId()
 ));
 
 $overrides_popup_form_list->addRow(_('Filters'),
-	(new CDiv([$override_evaltype, $filterTable]))
+	(new CDiv([$override_evaltype, $filter_table]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
@@ -143,9 +163,9 @@ $overrides_popup_form_list->addRow(_('Filters'),
 // operations
 $operations_list = (new CTable())
 	->addClass('lld-overrides-operations-table')
-	->addStyle('white-space:normal;')
+	->addStyle('width: 100%;')
 	->setHeader([
-		(new CColHeader(_('Condition')))->setWidth('350'),
+		_('Condition'),
 		(new CColHeader(''))->setWidth('50')
 	])
 	->addRow(
@@ -154,14 +174,17 @@ $operations_list = (new CTable())
 				(new CButton('param_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
+					->setEnabled(!$options['templated'])
+					->removeId()
 			))->addClass('step-action')
 		))
-			->addClass('lld-overrides-operations-table-foot')
 	);
 
 $overrides_popup_form_list->addRow(_('Operations'),
 	(new CDiv($operations_list))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('width: 100%;')
 );
 
 $output['buttons'] = [
@@ -170,6 +193,7 @@ $output['buttons'] = [
 		'class' => '',
 		'keepOpen' => true,
 		'isSubmit' => true,
+		'enabled' => !$options['templated'],
 		'action' => 'return lldoverrides.overrides.edit_form.validate(overlay);'
 	]
 ];

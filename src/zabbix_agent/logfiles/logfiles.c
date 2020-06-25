@@ -1672,6 +1672,9 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 			goto clean;
 		}
 
+		/* mtime is not used for log, log.count items, reset to ignore */
+		file_buf.st_mtime = 0;
+
 		add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 		if (SUCCEED != (ret = set_use_ino_by_fs_type(filename, use_ino, err_msg)))

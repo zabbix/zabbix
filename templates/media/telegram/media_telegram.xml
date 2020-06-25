@@ -52,7 +52,7 @@
         }&#13;
 &#13;
         if (Telegram.proxy) {&#13;
-            request.setProxy(Telegram.proxy);&#13;
+            request.SetProxy(Telegram.proxy);&#13;
         }&#13;
 &#13;
         request.AddHeader('Content-Type: application/json');&#13;

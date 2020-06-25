@@ -225,7 +225,7 @@ $tranStrings = [
 		'S_MUTE' => _('Mute'),
 		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
 		'S_UNMUTE' => _('Unmute'),
-		'S_CLEAR' => _('Clear'),
+		'S_CLOSE' => _('Close'),
 		'S_SNOOZE' => _('Snooze')
 	],
 	'class.cookie.js' => [

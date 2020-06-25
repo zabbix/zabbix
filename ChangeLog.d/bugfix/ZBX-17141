@@ -1,0 +1,1 @@
+.........T [ZBX-17141] fixed discovery of block devices by using vfs.dev.discovery key instead of reading /proc/diskstats (tuskov)

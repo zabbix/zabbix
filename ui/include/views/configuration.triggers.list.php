@@ -270,7 +270,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 		if (array_key_exists('ts_delete', $trigger['triggerDiscovery'])
 				&& $trigger['triggerDiscovery']['ts_delete'] > 0) {
-			$info_icons[] = getItemLifetimeIndicator(time(), $trigger['triggerDiscovery']['ts_delete']);
+			$info_icons[] = getTriggerLifetimeIndicator(time(), $trigger['triggerDiscovery']['ts_delete']);
 		}
 	}
 

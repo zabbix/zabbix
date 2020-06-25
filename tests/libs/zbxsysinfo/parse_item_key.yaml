@@ -5,6 +5,7 @@ in:
 out:
   key: 'key'
   parameters: []
+  types: []
 ---
 test case: valid key with empty brackets
 in:
@@ -12,6 +13,7 @@ in:
 out:
   key: 'key'
   parameters: ['']
+  types: ['undefined']
 ---
 test case: valid key with quoted empty string in brackets
 in:
@@ -19,6 +21,7 @@ in:
 out:
   key: 'key'
   parameters: ['']
+  types: ['string']
 ---
 test case: valid key with space in brackets
 in:
@@ -26,6 +29,7 @@ in:
 out:
   key: 'key'
   parameters: ['']
+  types: ['undefined']
 ---
 test case: valid key with leading space before quoted empty string in brackets
 in:
@@ -33,6 +37,7 @@ in:
 out:
   key: 'key'
   parameters: ['']
+  types: ['string']
 ---
 test case: valid key with leading and trailing spaces around quoted empty string in brackets
 in:
@@ -40,6 +45,7 @@ in:
 out:
   key: 'key'
   parameters: ['']
+  types: ['string']
 ---
 test case: valid key with 'a' in brackets
 in:
@@ -47,6 +53,7 @@ in:
 out:
   key: 'key'
   parameters: ['a']
+  types: ['string']
 ---
 test case: valid key with leading space before 'a' in brackets
 in:
@@ -54,6 +61,7 @@ in:
 out:
   key: 'key'
   parameters: ['a']
+  types: ['string']
 ---
 test case: valid key with leading and trailing spaces around 'a' in brackets
 in:
@@ -61,6 +69,7 @@ in:
 out:
   key: 'key'
   parameters: ['a ']
+  types: ['string']
 ---
 test case: valid key with quoted 'a' in brackets
 in:
@@ -68,6 +77,7 @@ in:
 out:
   key: 'key'
   parameters: ['a']
+  types: ['string']
 ---
 test case: valid key with quoted 'a' followed by comma in brackets
 in:
@@ -75,6 +85,7 @@ in:
 out:
   key: 'key'
   parameters: ['a', '']
+  types: ['string', 'undefined']
 ---
 test case: valid key with unquoted 'a' followed by comma in brackets
 in:
@@ -82,6 +93,7 @@ in:
 out:
   key: 'key'
   parameters: ['a', '']
+  types: ['string', 'undefined']
 ---
 test case: valid key with multiple unquoted parameters in brackets
 in:
@@ -89,6 +101,7 @@ in:
 out:
   key: 'key'
   parameters: ['a', 'b', 'c']
+  types: ['string', 'string', 'string']
 ---
 test case: valid key with multiple quoted parameters in brackets
 in:
@@ -96,6 +109,7 @@ in:
 out:
   key: 'key'
   parameters: ['a', 'b', 'c']
+  types: ['string', 'string', 'string']
 ---
 test case: valid key with first unquoted parameter and second array parameter containing two unquoted parameters
 in:
@@ -103,6 +117,7 @@ in:
 out:
   key: 'key'
   parameters: ['a','b,c']
+  types: ['string', 'array']
 ---
 test case: valid key with first unquoted parameter and second array parameter containing unquoted and empty parameter
 in:
@@ -110,6 +125,7 @@ in:
 out:
   key: 'key'
   parameters: ['a', 'b,']
+  types: ['string', 'array']
 ---
 test case: valid key with two unquoted parameters where second parameter contains opening square bracket
 in:
@@ -117,6 +133,7 @@ in:
 out:
   key: 'key'
   parameters: ['a', 'b[c']
+  types: ['string', 'string']
 ---
 test case: valid key with multiple quoted parameters and array  # array contains multiple quoted parameters which containing escaping and characters that are not allowed in unquoted parameters
 in:
@@ -124,6 +141,7 @@ in:
 out:
   key: 'key'
   parameters: ['a',"b",'"c","d\",]"']
+  types: ['string', 'string', 'array']
 ---
 test case: valid key with multiple quoted parameters and multiple arrays        # arrays contains multiple unquoted and quoted parameters which containing escaping and characters that are not allowed in unquoted parameters
 in:
@@ -131,6 +149,7 @@ in:
 out:
   key: 'key'
   parameters: ['a','b','"c","d\",]"','e,f']
+  types: ['string', 'string', 'array', 'array']
 ---
 test case: valid key, single parameter with unquoted string containing double quote characters
 in:
@@ -138,6 +157,7 @@ in:
 out:
   key: 'key'
   parameters: ['a"b"']
+  types: ['string']
 ---
 test case: valid key, multiple different type parameters where one is unquoted string containing double quote characters
 in:
@@ -145,6 +165,7 @@ in:
 out:
   key: 'key'
   parameters: ['a','b"c"','d']
+  types: ['string', 'string', 'string']
 ---
 test case: valid key with many quoted/unquoted parameters with/without trailing/leading spaces also featuring escaping
 in:
@@ -152,6 +173,15 @@ in:
 out:
   key: 'key'
   parameters: ['"aaa"', 'bbb', 'ccc', 'ddd', '', '', '', '', '', '', '', 'eee', 'fff', 'ggg ', 'hhh" ']
+  types: ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'undefined', 'undefined', 'undefined', 'string', 'string', 'string', 'string']
+---
+test case: valid key with quoted and unquoted arrays
+in:
+  key: 'key[[],"[]",[a,b],"z,[c,d]"]'
+out:
+  key: 'key'
+  parameters: ['','[]','a,b','z,[c,d]']
+  types: ['array', 'string', 'array', 'string']
 ---
 test case: invalid key, unmatched opening bracket (1)   # array missing closing bracket after second parameter
 in:

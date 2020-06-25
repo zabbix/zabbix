@@ -747,14 +747,14 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 
 #define ZBX_MACRO_SECRET_MASK	"******"
 
-void	DCget_user_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
+void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to);
 char	*DCexpression_expand_user_macros(const char *expression);
 
 int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
 		zbx_agent_availability_t *in, zbx_agent_availability_t *out);
 
-int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timespec_t *ts,
-		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error);
+int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
@@ -798,16 +798,13 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
 void	DCupdate_hosts_availability(void);
 
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions, unsigned char opflags);
-void	zbx_action_eval_free(zbx_action_eval_t *action);
-void	zbx_db_condition_clean(DB_CONDITION *condition);
-void	zbx_conditions_eval_clean(zbx_hashset_t *uniq_conditions);
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
 void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids);
 
 void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint64_t hostid);
-void	zbx_host_availability_clean(zbx_host_availability_t *availability);
+void	zbx_host_availability_clean(zbx_host_availability_t *ha);
 void	zbx_host_availability_free(zbx_host_availability_t *availability);
 int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
 
@@ -819,8 +816,7 @@ void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules);
 void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
-void	zbx_dc_get_nested_hostgroupids_by_names(char **names, int names_num,
-		zbx_vector_uint64_t *nested_groupids);
+void	zbx_dc_get_nested_hostgroupids_by_names(zbx_vector_str_t *groups, zbx_vector_uint64_t *nested_groupids);
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
@@ -857,7 +853,7 @@ typedef struct
 zbx_hc_item_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
-void	zbx_free_item_tag(zbx_item_tag_t *host_tag);
+void	zbx_free_item_tag(zbx_item_tag_t *item_tag);
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
 void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version);
@@ -895,7 +891,7 @@ zbx_trigger_dep_t;
 
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
-void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_uint64_t *proxy_hostids);
+void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids);
 
 void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit);
 void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -976,7 +972,8 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 		const char *macro, char **value);
 int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 
-void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);
+void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num,
+		zbx_vector_ptr_t *item_tags);
 
 unsigned char	zbx_dc_set_macro_env(unsigned char env);
 

@@ -1,0 +1,16 @@
+{
+	"manifest_version": 1,
+	"id": "1st module id",
+	"name": "1st Module name",
+	"author": "1st Module author",
+	"description": "1st Module description",
+	"version": "1",
+	"namespace": "Example_A",
+	"url": "1st module URL",
+	"actions": {
+		"first.module": {
+			"class": "Test",
+			"view": "first.module"
+		}
+	}
+}

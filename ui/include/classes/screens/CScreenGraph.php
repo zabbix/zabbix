@@ -205,6 +205,7 @@ class CScreenGraph extends CScreenBase {
 			$item = new CLink(null, (new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
 				->setArgument('view_as', HISTORY_GRAPH)
+				->setArgument('filter_set', '1')
 				->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
 				->setArgument('filter_graphids', [$resourceId])
 				->setArgument('from', $this->timeline['from'])

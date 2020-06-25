@@ -1,0 +1,16 @@
+{
+	"manifest_version": 0.01,
+	"id": "4",
+	"name": "4th Module",
+	"author": "",
+	"description": "",
+	"version": "",
+	"namespace": "Example_A",
+	"url": "",
+	"actions": {
+		"forth.module": {
+			"class": "Test4",
+			"view": "forth.module"
+		}
+	}
+}

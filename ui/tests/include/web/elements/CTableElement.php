@@ -131,12 +131,13 @@ class CTableElement extends CElement {
 	/**
 	 * Find row by column value.
 	 *
-	 * @param string $column    column name
-	 * @param string $value     column value
+	 * @param string	$column    column name
+	 * @param string	$value     column value
+	 * @param boolean	$contains  flag that determines if column value should contain the passed value or coincide with it
 	 *
 	 * @return CTableRow|CNullElement
 	 */
-	public function findRow($column, $value) {
+	public function findRow($column, $value, $contains = false) {
 		$headers = $this->getHeadersText();
 
 		if (is_string($column)) {
@@ -148,7 +149,9 @@ class CTableElement extends CElement {
 			$column = $index + 1;
 		}
 
-		$suffix = '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
+		$suffix = $contains ? '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..'
+			: '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
+
 		$xpaths = ['.//tbody/tr/td'.$suffix, './/tbody/tr/th'.$suffix];
 
 		return $this->query('xpath', implode('|', $xpaths))->asTableRow(['parent' => $this])->one(false);

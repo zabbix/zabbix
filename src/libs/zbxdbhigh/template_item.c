@@ -286,7 +286,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 
 		item->timeout = zbx_strdup(NULL, row[30]);
 		item->url = zbx_strdup(NULL, row[31]);
-		item->query_fields = zbx_strdup(NULL, row[31]);
+		item->query_fields = zbx_strdup(NULL, row[32]);
 		item->posts = zbx_strdup(NULL, row[33]);
 		item->status_codes = zbx_strdup(NULL, row[34]);
 		ZBX_STR2UCHAR(item->follow_redirects, row[35]);

@@ -291,7 +291,7 @@ close_query:
  * Purpose: get performance object index by reference value described by      *
  *          zbx_builtin_counter_ref_t enum                                    *
  *                                                                            *
- * Parameters: object_ref - [IN] built-in performance object                  *
+ * Parameters: counter_ref - [IN] built-in performance object                 *
  *                                                                            *
  * Comments: Performance object index values can differ across Windows        *
  *           installations for the same names                                 *
@@ -322,28 +322,30 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_all_counter_eng_names                                        *
+ * Function: get_all_counter_names                                            *
  *                                                                            *
- * Purpose: helper function for init_builtin_counter_indexes()                *
+ * Purpose: function to read counter names/help from registry                 *
  *                                                                            *
- * Parameters: reg_value_name    - [IN] name of the registry value            *
+ * Parameters: reg_key           - [IN] registry key                          *
+ *             reg_value_name    - [IN] name of the registry value            *
  *                                                                            *
  * Return value: wchar_t* buffer with list of strings on success,             *
  *               NULL on failure                                              *
  *                                                                            *
- * Comments: This function should be normally called with L"Counter"          *
- *           parameter. It returns a list of null-terminated string pairs.    *
- *           Last string is followed by an additional null-terminator.        *
- *           The return buffer must be freed by the caller.                   *
+ * Comments: This function should be normally called with reg_key parameter   *
+ *           set to HKEY_PERFORMANCE_NLSTEXT (localized names) or             *
+ *           HKEY_PERFORMANCE_TEXT (English names); and reg_value_name        *
+ *           parameter set to L"Counter" parameter. It returns a list of      *
+ *           null-terminated string pairs. Last string is followed by         *
+ *           an additional null-terminator. The return buffer must be freed   *
+ *           by the caller.                                                   *
  *                                                                            *
  ******************************************************************************/
-static wchar_t	*get_all_counter_eng_names(wchar_t *reg_value_name)
+wchar_t	*get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name)
 {
 	wchar_t		*buffer = NULL;
 	DWORD		buffer_size = 0;
 	LSTATUS		status = ERROR_SUCCESS;
-	/* this registry key guaranteed to hold english counter texts even in localized Win versions */
-	static HKEY	reg_key = HKEY_PERFORMANCE_TEXT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -504,9 +506,9 @@ out:
  *                                                                            *
  * Function: init_builtin_counter_indexes                                     *
  *                                                                            *
- * Purpose: scans registry key with all performance counter English names     *
+ * Purpose: Scans registry key with all performance counter English names     *
  *          and obtains system-dependent PDH counter indexes for further      *
- *          use by corresponding items                                        *
+ *          use by corresponding items.                                       *
  *                                                                            *
  * Return value: SUCCEED/FAIL                                                 *
  *                                                                            *
@@ -524,7 +526,7 @@ int	init_builtin_counter_indexes(void)
 
 	/* Get buffer holding a list of performance counter indexes and English counter names. */
 	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used).          */
-	if (NULL == (counter_base = eng_names = get_all_counter_eng_names(L"Counter")))
+	if (NULL == (counter_base = eng_names = get_all_counter_names(HKEY_PERFORMANCE_TEXT, L"Counter")))
 	{
 		ret = FAIL;
 		goto out;

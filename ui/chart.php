@@ -56,7 +56,6 @@ $items = API::Item()->get([
 	'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
 		'value_type', 'key_'
 	],
-	'selectPreprocessing' => ['type', 'params'],
 	'selectHosts' => ['name', 'host'],
 	'itemids' => $itemIds,
 	'webitems' => true,

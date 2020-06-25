@@ -21,6 +21,7 @@ package web
 import (
 	"bufio"
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -79,6 +80,7 @@ func (p *Plugin) webPageGet(params []string, dump bool) (string, error) {
 
 	client := &http.Client{
 		Transport: &http.Transport{
+			TLSClientConfig:   &tls.Config{InsecureSkipVerify: true},
 			Proxy:             http.ProxyFromEnvironment,
 			DisableKeepAlives: true,
 			DialContext: (&net.Dialer{

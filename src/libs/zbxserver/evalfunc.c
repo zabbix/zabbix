@@ -2745,8 +2745,8 @@ out:
  *                                                                            *
  * Purpose: evaluate function                                                 *
  *                                                                            *
- * Parameters: item - item to calculate function for                          *
- *             function - function (for example, 'max')                       *
+ * Parameters: item      - item to calculate function for                     *
+ *             function  - function (for example, 'max')                      *
  *             parameter - parameter of the function                          *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
@@ -3353,9 +3353,30 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	}
 	else
 	{
+		size_t	len;
+
+		len = strlen(value) + 1 + MAX_BUFFER_LEN;
+		value = (char *)zbx_realloc(value, len);
+
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
-			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
+			/* last, prev functions can return quoted and escaped string values */
+			/* which must be unquoted and unescaped before further processing   */
+			if ('"' == *value)
+			{
+				char	*src, *dst;
+
+				for (dst = value, src = dst + 1; '"' != *src; )
+				{
+					if ('\\' == *src)
+						src++;
+					if ('\0' == *src)
+						break;
+					*dst++ = *src++;
+				}
+				*dst = '\0';
+			}
+			zbx_format_value(value, len, item.valuemapid, item.units, item.value_type);
 		}
 		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function,
 				','))
@@ -3364,7 +3385,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
-					add_value_suffix(value, MAX_BUFFER_LEN, item.units, item.value_type);
+					add_value_suffix(value, len, item.units, item.value_type);
 					break;
 				default:
 					;
@@ -3372,7 +3393,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 		}
 		else if (SUCCEED == str_in_list("timeleft", function, ','))
 		{
-			add_value_suffix(value, MAX_BUFFER_LEN, "s", ITEM_VALUE_TYPE_FLOAT);
+			add_value_suffix(value, len, "s", ITEM_VALUE_TYPE_FLOAT);
 		}
 
 		*result = zbx_strdup(NULL, value);
