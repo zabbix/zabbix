@@ -253,8 +253,6 @@ class CControllerDashboardUpdate extends CController {
 				->getUrl();
 
 			$data['system-message-ok'] = $message;
-
-			// FIXME: add success message. $message
 		}
 		else {
 			if (!hasErrorMesssages()) {

@@ -27,12 +27,10 @@ class CControllerImageCreate extends CController {
 			'imagetype' => 'required | fatal | db images.imagetype'
 		];
 
-		// $ret = $this->validateInput($fields);
-		$ret = false;
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			// switch ($this->getValidationError()) {
-			switch (self::VALIDATION_ERROR) {
+			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
 					$url = (new CUrl('zabbix.php'))
 						->setArgument('action', 'image.edit')

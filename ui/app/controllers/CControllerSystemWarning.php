@@ -26,7 +26,7 @@ class CControllerSystemWarning extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		return $this->validateInput([]);
 	}
 
 	protected function checkPermissions() {
@@ -39,9 +39,8 @@ class CControllerSystemWarning extends CController {
 			'messages' => []
 		];
 
-		if (CSessionHelper::has('messages')) {
-			$data['messages'] = CSessionHelper::get('messages');
-			CSessionHelper::unset(['messages']);
+		if (hasRequest('system-messages')) {
+			$data['messages'] = getRequest('system-messages');
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

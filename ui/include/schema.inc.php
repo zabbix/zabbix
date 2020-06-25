@@ -8370,27 +8370,5 @@ return [
 				'default' => '0',
 			],
 		],
-	],
-	'user_sessions' => [
-		'key' => 'sessionid',
-		'fields' => [
-			'sessionid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
-				'default' => '',
-			],
-			'data' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '',
-			],
-			'lastaccess' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 11,
-				'default' => '0',
-			]
-		]
 	]
 ];

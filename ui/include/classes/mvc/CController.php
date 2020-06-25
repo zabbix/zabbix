@@ -150,6 +150,9 @@ abstract class CController {
 		}
 
 		$data = json_decode($data, true);
+
+		$_REQUEST = array_merge($_REQUEST, $data['form']);
+
 		if ($data['messages']) {
 			if (array_key_exists('success', $data['messages'])) {
 				$_REQUEST['system-message-ok'] = $data['messages']['success'];
@@ -162,8 +165,6 @@ abstract class CController {
 				$_REQUEST['system-messages'] = $data['messages']['messages'];
 			}
 		}
-
-		array_merge($_REQUEST, $data['form']);
 
 		return true;
 	}

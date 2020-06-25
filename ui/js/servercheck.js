@@ -114,5 +114,5 @@ jQuery(function($) {
 		}
 	};
 
-	// ServerChecker.start($('#msg-global-footer'), 5000);
+	ServerChecker.start($('#msg-global-footer'), 5000);
 });
