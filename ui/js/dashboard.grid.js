@@ -572,10 +572,6 @@
 			}
 		});
 
-		if (data['options']['rows'] == 0) {
-			data.new_widget_placeholder.container.show();
-		}
-
 		if (typeof min_rows !== 'undefined' && data['options']['rows'] < min_rows) {
 			data['options']['rows'] = min_rows;
 		}
@@ -2590,6 +2586,7 @@
 				}));
 
 				$placeholder.click(callback);
+				this.clearPosition();
 			},
 			setPositioning: function() {
 				$placeholder.off('click');
@@ -2605,7 +2602,19 @@
 					.addClass('dashbrd-grid-widget-set-size');
 				updateLabelVisibility();
 			},
-			updateLabelVisibility: updateLabelVisibility
+			updateLabelVisibility: updateLabelVisibility,
+			setPosition: function(pos) {
+				$placeholder.css({
+					position: 'absolute',
+					top: pos.top,
+					left: pos.left,
+					height: pos.height,
+					width: pos.width
+				});
+			},
+			clearPosition: function() {
+				$placeholder.removeAttr('style');
+			}
 		};
 	}
 
@@ -2675,7 +2684,7 @@
 								placeholder.setPositioning();
 							}
 							else {
-								placeholder.container.removeAttr('style');
+								placeholder.clearPosition();
 								placeholder.setPositioning();
 							}
 						}
@@ -2728,17 +2737,16 @@
 				}
 
 				data.add_widget_dimension = {};
-				data.new_widget_placeholder.setDefault(function(e) {
-					methods.addNewWidget.call($obj, this);
-					return cancelEvent(e);
-				});
 
 				if (data.widgets.length) {
 					data.new_widget_placeholder.container.hide();
 					data.new_widget_placeholder.setPositioning();
 				}
 				else {
-					data.new_widget_placeholder.container.removeAttr('style');
+					data.new_widget_placeholder.setDefault(function(e) {
+						methods.addNewWidget.call($obj, this);
+						return cancelEvent(e);
+					});
 				}
 			})
 			.on('mouseenter mousemove', function(event) {
@@ -2891,16 +2899,15 @@
 				// Hide widget headers, not to interfere with the new widget placeholder.
 				doLeaveWidgetsExcept($obj, data);
 
-				data.new_widget_placeholder.container
-					.css({
-						position: 'absolute',
-						top: (data.add_widget_dimension.y * data.options['widget-height']) + 'px',
-						left: (data.add_widget_dimension.x * data.options['widget-width']) + '%',
-						height: (data.add_widget_dimension.height * data.options['widget-height']) + 'px',
-						width: (data.add_widget_dimension.width * data.options['widget-width']) + '%'
-					})
-					.show();
+				var css_pos = {
+					top: (data.add_widget_dimension.y * data.options['widget-height']) + 'px',
+					left: (data.add_widget_dimension.x * data.options['widget-width']) + '%',
+					height: (data.add_widget_dimension.height * data.options['widget-height']) + 'px',
+					width: (data.add_widget_dimension.width * data.options['widget-width']) + '%'
+				}
 
+				data.new_widget_placeholder.setPosition(css_pos);
+				data.new_widget_placeholder.container.show();
 				data.new_widget_placeholder.updateLabelVisibility();
 			});
 	}
@@ -2972,6 +2979,14 @@
 			data['options']['updated'] = true;
 
 			resizeDashboardGrid($obj, data);
+
+			if (!data.widgets.length && !$obj.is(':hover')) {
+				data.add_widget_dimension = {};
+				data.new_widget_placeholder.setDefault(function(e) {
+					methods.addNewWidget.call($obj, this);
+					return cancelEvent(e);
+				});
+			}
 		}
 	}
 
