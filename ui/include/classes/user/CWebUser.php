@@ -182,7 +182,7 @@ class CWebUser {
 	 * @static
 	 */
 	public static function setDefault(): void {
-		$data = [
+		self::$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => ZBX_DEFAULT_LANG,
@@ -192,7 +192,7 @@ class CWebUser {
 
 		$config = select_config();
 		if ($config) {
-			$data['lang'] = $config['default_lang'];
+			self::$data['lang'] = $config['default_lang'];
 		}
 
 		if (CWebUser::isGuestAllowed()) {
@@ -203,11 +203,11 @@ class CWebUser {
 			$guest_data = $db_users[0];
 
 			if ($guest_data['lang'] !== LANG_DEFAULT) {
-				$data['lang'] = $guest_data['lang'];
+				self::$data['lang'] = $guest_data['lang'];
 			}
 		}
 
-		self::$data = $data;
+		APP::getInstance()->initLocales(CWebUser::$data);
 	}
 
 	/**

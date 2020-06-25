@@ -1319,9 +1319,9 @@ class CUser extends CApiService {
 			return self::$userData;
 		}
 
-		$time = time();
 		CWebUser::setDefault();
-		APP::getInstance()->initLocales(CWebUser::$data);
+
+		$time = time();
 
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess'],
