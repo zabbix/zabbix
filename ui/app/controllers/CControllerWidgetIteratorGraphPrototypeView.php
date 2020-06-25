@@ -157,9 +157,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			];
 		}
 
+		$widget_header = $this->hasInput('name')
+			? $this->getInput('name')
+			: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
+
 		return [
-			'header' =>
-				$this->getInput('name', $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name']),
+			'header' => $widget_header,
 			'children' => $children,
 			'page' => $page,
 			'page_count' => $page_count
@@ -262,10 +265,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			];
 		}
 
-		return [
-			'header' =>
-				$this->getInput('name', $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name']),
+		$widget_header = $this->hasInput('name')
+			? $this->getInput('name')
+			: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name'];
 
+		return [
+			'header' => $widget_header,
 			'children' => $children,
 			'page' => $page,
 			'page_count' => $page_count
