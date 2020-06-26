@@ -64,10 +64,10 @@ class CControllerValuemapDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Value map deleted', 'Value maps deleted', count($valuemapids)));
+			CMessages::addSuccess(_n('Value map deleted', 'Value maps deleted', count($valuemapids)));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete value map', 'Cannot delete value maps', count($valuemapids)));
+			CMessages::addError(_n('Cannot delete value map', 'Cannot delete value maps', count($valuemapids)));
 		}
 
 		$this->setResponse($response);

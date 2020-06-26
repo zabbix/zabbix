@@ -62,7 +62,7 @@ class CControllerIconMapUpdate extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'iconmap.list')
 			);
-			$response->setMessageOk(_('Icon map updated'));
+			CMessages::addSuccess(_('Icon map updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -74,7 +74,7 @@ class CControllerIconMapUpdate extends CController {
 				$form_data['iconmap']['mappings'] = [];
 			}
 			$response->setFormData($form_data);
-			$response->setMessageError(_('Cannot update icon map'));
+			CMessages::addError(_('Cannot update icon map'));
 		}
 
 		$this->setResponse($response);

@@ -39,9 +39,7 @@ class CControllerSystemWarning extends CController {
 			'messages' => []
 		];
 
-		if (hasRequest('system-messages')) {
-			$data['messages'] = getRequest('system-messages');
-		}
+		$data['messages'] = CMessages::get();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

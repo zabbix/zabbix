@@ -33,7 +33,7 @@ catch (Exception $e) {
 		'theme' => ZBX_DEFAULT_THEME
 	]))->getOutput();
 
-	exit;
+	exit();
 }
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -62,8 +62,6 @@ $fields = [
 	'next' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 ];
-
-new CCookieSession;
 
 CSessionHelper::set('check_fields_result', check_fields($fields, false));
 if (!CSessionHelper::has('step')) {

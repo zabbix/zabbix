@@ -53,10 +53,10 @@ class CControllerUsergroupDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('User group deleted', 'User groups deleted', $deleted));
+			CMessages::addSuccess(_n('User group deleted', 'User groups deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete user group', 'Cannot delete user groups', $deleted));
+			CMessages::addError(_n('Cannot delete user group', 'Cannot delete user groups', $deleted));
 		}
 
 		$this->setResponse($response);

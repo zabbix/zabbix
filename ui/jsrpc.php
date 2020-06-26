@@ -65,8 +65,6 @@ switch ($data['method']) {
 		break;
 
 	case 'zabbix.status':
-		new CCookieSession;
-
 		if (!CSessionHelper::has('serverCheckResult')
 				|| (CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
 			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);

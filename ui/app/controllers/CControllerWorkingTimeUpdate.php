@@ -34,7 +34,7 @@ class CControllerWorkingTimeUpdate extends CController {
 				->getUrl()
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update configuration'));
+			CMessages::addError(_('Cannot update configuration'));
 			$this->setResponse($response);
 		}
 
@@ -55,11 +55,11 @@ class CControllerWorkingTimeUpdate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response->setMessageOk(_('Configuration updated'));
+			CMessages::addSuccess(_('Configuration updated'));
 		}
 		else {
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update configuration'));
+			CMessages::addError(_('Cannot update configuration'));
 		}
 
 		$this->setResponse($response);

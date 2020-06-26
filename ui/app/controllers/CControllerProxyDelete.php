@@ -63,10 +63,10 @@ class CControllerProxyDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Proxy deleted', 'Proxies deleted', $deleted));
+			CMessages::addSuccess(_n('Proxy deleted', 'Proxies deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete proxy', 'Cannot delete proxies', $deleted));
+			CMessages::addError(_n('Cannot delete proxy', 'Cannot delete proxies', $deleted));
 		}
 		$this->setResponse($response);
 	}

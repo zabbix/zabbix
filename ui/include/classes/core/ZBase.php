@@ -202,6 +202,9 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
+
+				new CCookieSession();
+
 				$this->initLocales(['lang' => 'en_gb']);
 				break;
 
@@ -210,8 +213,12 @@ class ZBase {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
+
+					new CCookieSession();
+
 					$this->authenticateUser();
 					$this->initLocales(CWebUser::$data);
+					$this->initComponents();
 				}
 				catch (ConfigFileException $e) {}
 				break;
@@ -421,11 +428,13 @@ class ZBase {
 	 * Set messages received in cookies.
 	 */
 	private function initMessages(): void {
-		foreach (['system-message-ok', 'system-message-error'] as $message_type) {
-			if (array_key_exists($message_type, $_COOKIE)) {
-				$_REQUEST[$message_type] = $_COOKIE[$message_type];
-				CCookieHelper::unset($message_type);
-			}
+		if (CCookieHelper::has('system-message-ok')) {
+			CMessages::addSuccess(CCookieHelper::get('system-message-ok'));
+			CCookieHelper::unset('system-message-ok');
+		}
+		if (CCookieHelper::has('system-message-error')) {
+			CMessages::addError(CCookieHelper::get('system-message-error'));
+			CCookieHelper::unset('system-message-error');
 		}
 	}
 
@@ -514,7 +523,7 @@ class ZBase {
 			global $ZBX_MESSAGES;
 			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
 			foreach ($messages as $message) {
-				$response->addMessage($message['message']);
+				CMessages::add($message);
 			}
 
 			$response->redirect();
@@ -526,14 +535,14 @@ class ZBase {
 			global $ZBX_MESSAGES;
 			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
 			foreach ($messages as $message) {
-				$response->addMessage($message['message']);
+				CMessages::add($message);
 			}
 
-			$response->addMessage('Controller: '.$router->getAction());
+			CMessages::add(['message' => 'Controller: '.$router->getAction()]);
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
 				if ($key !== 'sid') {
-					$response->addMessage(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
+					CMessages::add(['message' => is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value)]);
 				}
 			}
 

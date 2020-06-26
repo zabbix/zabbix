@@ -210,8 +210,6 @@ try {
 			throw new Exception(_('GUI access disabled.'));
 		}
 
-		CWebUser::setSessionCookie($user['sessionid']);
-
 		$redirect = array_filter([$user['url'], ZBX_DEFAULT_URL]);
 		redirect(reset($redirect));
 	}
@@ -230,3 +228,6 @@ echo (new CView('general.warning', [
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();
+
+
+session_write_close();

@@ -72,10 +72,10 @@ class CControllerUserUnblock extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('User unblocked', 'Users unblocked', $unblocked));
+			CMessages::addSuccess(_n('User unblocked', 'Users unblocked', $unblocked));
 		}
 		else {
-			$response->setMessageError(_n('Cannot unblock user', 'Cannot unblock users', $unblocked));
+			CMessages::addError(_n('Cannot unblock user', 'Cannot unblock users', $unblocked));
 		}
 
 		$this->setResponse($response);

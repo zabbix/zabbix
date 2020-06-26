@@ -139,6 +139,11 @@ abstract class CController {
 		return substr($sessionid, 16, 16);
 	}
 
+	/**
+	 * Parse form data.
+	 *
+	 * @return boolean
+	 */
 	protected function parseFormData(): bool {
 		$data = base64_decode(getRequest('data'));
 		$sign = base64_decode(getRequest('sign'));
@@ -155,14 +160,16 @@ abstract class CController {
 
 		if ($data['messages']) {
 			if (array_key_exists('success', $data['messages'])) {
-				$_REQUEST['system-message-ok'] = $data['messages']['success'];
+				CMessages::addSuccess($data['messages']['success']);
 			}
 			if (array_key_exists('error', $data['messages'])) {
-				$_REQUEST['system-message-error'] = $data['messages']['error'];
+				CMessages::addError($data['messages']['error']);
 			}
 
 			if (array_key_exists('messages', $data['messages'])) {
-				$_REQUEST['system-messages'] = $data['messages']['messages'];
+				foreach ($data['messages']['messages'] as $message) {
+					CMessages::add($message);
+				}
 			}
 		}
 

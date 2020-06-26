@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -24,7 +24,10 @@
  */
 class CCookieSession implements \SessionHandlerInterface {
 
-	private const COOKIE_NAME = ZBX_SESSION_NAME;
+	/**
+	 * Cookie name.
+	 */
+	public const COOKIE_NAME = ZBX_SESSION_NAME;
 
 	/**
 	 * Class consturctor. Set session handlers and start session.
@@ -33,7 +36,7 @@ class CCookieSession implements \SessionHandlerInterface {
 		if (!headers_sent() && session_status() === PHP_SESSION_NONE) {
 
 			// Set use standard cookie PHPSESSID to false.
-			ini_set('session.use_cookies', 0);
+			ini_set('session.use_cookies', '0');
 			// Set serialize method to standard serialize / unserialize.
 			ini_set('session.serialize_handler', 'php_serialize');
 
@@ -42,15 +45,16 @@ class CCookieSession implements \SessionHandlerInterface {
 			);
 
 			if (!$this->session_start()) {
-				throw new \Exception('Cannot start session.'); // FIXME:
+				throw new \Exception(_('Session initialization error.'));
 			}
 
 			CSessionHelper::set('sessionid', CSessionHelper::getId());
+			CSessionHelper::set('lastacsess', time());
 		}
 	}
 
 	/**
-	 * Undocumented function
+	 * @inheritDoc
 	 *
 	 * @return boolean
 	 */
@@ -61,7 +65,7 @@ class CCookieSession implements \SessionHandlerInterface {
 	}
 
 	/**
-	 * Undocumented function
+	 * @inheritDoc
 	 *
 	 * @param string $session_id
 	 *
@@ -74,7 +78,7 @@ class CCookieSession implements \SessionHandlerInterface {
 	}
 
 	/**
-	 * Undocumented function
+	 * @inheritDoc
 	 *
 	 * @param integer $maxlifetime
 	 *
@@ -85,7 +89,7 @@ class CCookieSession implements \SessionHandlerInterface {
 	}
 
 	/**
-	 * Undocumented function
+	 * @inheritDoc
 	 *
 	 * @param string $save_path
 	 * @param string $session_name
@@ -99,7 +103,7 @@ class CCookieSession implements \SessionHandlerInterface {
 	}
 
 	/**
-	 * Undocumented function
+	 * @inheritDoc
 	 *
 	 * @param string $session_id
 	 *
@@ -110,7 +114,7 @@ class CCookieSession implements \SessionHandlerInterface {
 	}
 
 	/**
-	 * Undocumented function
+	 * @inheritDoc
 	 *
 	 * @param string $session_id
 	 * @param string $session_data
@@ -121,12 +125,17 @@ class CCookieSession implements \SessionHandlerInterface {
 		$session_data = $this->prepareData($session_data);
 
 		if (!CCookieHelper::set(self::COOKIE_NAME, $session_data, 0)) {
-			throw new \Exception('Session cookie not set.'); // FIXME:
+			throw new \Exception(_('Cannot set session cookie.'));
 		}
 
 		return true;
 	}
 
+	/**
+	 * Run session_start.
+	 *
+	 * @return boolean
+	 */
 	private function session_start(): bool {
 		$session_data = $this->parseData();
 
@@ -143,6 +152,13 @@ class CCookieSession implements \SessionHandlerInterface {
 		return session_start();
 	}
 
+	/**
+	 * Prepare data and check sign.
+	 *
+	 * @param string $data
+	 *
+	 * @return boolean
+	 */
 	private function checkSign(string $data): bool {
 		$data = unserialize($data);
 		$session_sign = $data['sign'];
@@ -152,6 +168,13 @@ class CCookieSession implements \SessionHandlerInterface {
 		return CEncryptHelper::checkSign($session_sign, $sign);
 	}
 
+	/**
+	 * Prepare session data.
+	 *
+	 * @param string $data
+	 *
+	 * @return string
+	 */
 	private function prepareData(string $data): string {
 		$data = unserialize($data);
 
@@ -164,7 +187,16 @@ class CCookieSession implements \SessionHandlerInterface {
 		return base64_encode(serialize($data));
 	}
 
+	/**
+	 * Parse session data.
+	 *
+	 * @return string
+	 */
 	private function parseData(): string {
-		return base64_decode(CCookieHelper::get(self::COOKIE_NAME));
+		if (CCookieHelper::has(self::COOKIE_NAME)) {
+			return base64_decode(CCookieHelper::get(self::COOKIE_NAME));
+		}
+
+		return '';
 	}
 }

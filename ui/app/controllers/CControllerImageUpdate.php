@@ -40,7 +40,7 @@ class CControllerImageUpdate extends CController {
 
 					$response = new CControllerResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update image'));
+					CMessages::addError(_('Cannot update image'));
 					$this->setResponse($response);
 					break;
 
@@ -107,7 +107,7 @@ class CControllerImageUpdate extends CController {
 			);
 			error($error);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update image'));
+			CMessages::addError(_('Cannot update image'));
 
 			return $this->setResponse($response);
 		}
@@ -134,7 +134,7 @@ class CControllerImageUpdate extends CController {
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $this->getInput('imagetype'))
 			);
-			$response->setMessageOk(_('Image updated'));
+			CMessages::addSuccess(_('Image updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -143,7 +143,7 @@ class CControllerImageUpdate extends CController {
 				->setArgument('imageid', $this->getInput('imageid'))
 			);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update image'));
+			CMessages::addError(_('Cannot update image'));
 		}
 
 		$this->setResponse($response);

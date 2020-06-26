@@ -39,23 +39,7 @@ class CControllerResponseRedirect extends CControllerResponse {
 		$this->formData = $formData;
 	}
 
-	public function setMessageOk(string $messageOk): void {
-		$this->messageOk = $messageOk;
-	}
-
-	public function setMessageError(string $messageError): void {
-		$this->messageError = $messageError;
-	}
-
 	public function getFormData(): array {
 		return $this->formData;
-	}
-
-	public function getMessageOk(): ?string {
-		return $this->messageOk;
-	}
-
-	public function getMessageError(): ?string {
-		return $this->messageError;
 	}
 }

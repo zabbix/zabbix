@@ -29,18 +29,10 @@ abstract class CControllerResponse {
 		return $this->location;
 	}
 
-	public function getMessages(): array {
-		return $this->messages;
-	}
-
-	public function addMessage(string $msg): void {
-		$this->messages[] = $msg;
-	}
-
 	public function redirect(): void {
 		// Redirect as simple request.
 		if ($this instanceof CControllerResponseRedirect) {
-			if ($this->getFormData() === null && $this->getMessageOk() === null && $this->getMessageError() === null) {
+			if ($this->getFormData() === null && CMessages::getSuccess() === null && CMessages::getError() === null) {
 				redirect($this->getLocation());
 			}
 		}
@@ -94,17 +86,21 @@ abstract class CControllerResponse {
 		$data = [];
 		$messages = [];
 
-		foreach ($this->getMessages() as $value) {
-			$messages['messages'][] = ['message' => $value];
+		foreach (CMessages::get() as $value) {
+			if (!is_array($value)) {
+				$value = ['message' => $value];
+			}
+
+			$messages['messages'][] = $value;
 		}
 
 		if ($this instanceof CControllerResponseRedirect) {
-			if ($this->getMessageOk() !== null) {
-				$messages['success'] = $this->getMessageOk();
+			if (CMessages::getSuccess() !== null) {
+				$messages['success'] = CMessages::getSuccess();
 			}
 
-			if ($this->getMessageError() !== null) {
-				$messages['error'] = $this->getMessageError();
+			if (CMessages::getError() !== null) {
+				$messages['error'] = CMessages::getError();
 			}
 
 			$data = $this->getFormData();

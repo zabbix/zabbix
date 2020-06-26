@@ -40,8 +40,6 @@ if ($request !== '') {
 
 if ($config['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED) {
 	redirect($redirect_to->toString());
-
-	exit;
 }
 
 $http_user = '';
@@ -70,11 +68,8 @@ if ($http_user) {
 		);
 
 		if ($user) {
-			CWebUser::setSessionCookie($user['sessionid']);
 			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
 			redirect(reset($redirect));
-
-			exit;
 		}
 	}
 	catch (APIException $e) {
@@ -94,3 +89,5 @@ echo (new CView('general.warning', [
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();
+
+session_write_close();

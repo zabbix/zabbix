@@ -40,7 +40,7 @@ class CControllerMiscConfigUpdate extends CController {
 					);
 
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update configuration'));
+					CMessages::addError(_('Cannot update configuration'));
 
 					$this->setResponse($response);
 					break;
@@ -74,10 +74,10 @@ class CControllerMiscConfigUpdate extends CController {
 		$result = DBend($result);
 
 		if ($result) {
-			$response->setMessageOk(_('Configuration updated'));
+			CMessages::addSuccess(_('Configuration updated'));
 		}
 		else {
-			$response->setMessageError(_('Cannot update configuration'));
+			CMessages::addError(_('Cannot update configuration'));
 			$response->setFormData($this->getInputAll());
 		}
 

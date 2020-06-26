@@ -107,10 +107,10 @@ class CControllerMacrosUpdate extends CController {
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'macros.edit'));
 		if ($result) {
-			$response->setMessageOk(_('Macros updated'));
+			CMessages::addSuccess(_('Macros updated'));
 		}
 		else {
-			$response->setMessageError(_('Cannot update macros'));
+			CMessages::addError(_('Cannot update macros'));
 			$form_data = $this->getInputAll();
 			$form_data['macros'] = array_values($form_data['macros']);
 			$response->setFormData($form_data);

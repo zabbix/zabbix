@@ -1851,22 +1851,18 @@ function get_prepared_messages(array $options = []): ?string {
 
 	// Process messages passed by the previous request.
 
-	if ($options['with_session_messages'] && (hasRequest('system-message-ok') || hasRequest('system-message-error'))) {
-		if (hasRequest('system-messages')) {
-			$ZBX_MESSAGES = getRequest('system-messages');
+	if ($options['with_session_messages']) {
+		if (CMessages::get()) {
+			$ZBX_MESSAGES = CMessages::get();
 		}
 
-		if (hasRequest('system-message-ok')) {
-			show_messages(true, getRequest('system-message-ok'), null);
+		if (CMessages::getSuccess()) {
+			show_messages(true, CMessages::getSuccess(), null);
 		}
 
-		if (hasRequest('system-message-error')) {
-			show_messages(false, null, getRequest('system-message-error'));
+		if (CMessages::getError()) {
+			show_messages(false, null, CMessages::getError());
 		}
-
-		unset_request('system-messages');
-		unset_request('system-message-ok');
-		unset_request('system-message-error');
 	}
 
 	$messages_session = $ZBX_MESSAGES_PREPARED;

@@ -38,7 +38,7 @@ class CControllerValuemapCreate extends CController {
 
 					$response = new CControllerResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot add value map'));
+					CMessages::addError(_('Cannot add value map'));
 
 					$this->setResponse($response);
 					break;
@@ -68,13 +68,13 @@ class CControllerValuemapCreate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('valuemap.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Value map added'));
+			CMessages::addSuccess(_('Value map added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.edit')
 			);
-			$response->setMessageError(_('Cannot add value map'));
+			CMessages::addError(_('Cannot add value map'));
 			$response->setFormData($this->getInputAll());
 		}
 

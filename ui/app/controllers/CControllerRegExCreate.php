@@ -40,7 +40,7 @@ class CControllerRegExCreate extends CController {
 
 					$response = new CControllerResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot add regular expression'));
+					CMessages::addError(_('Cannot add regular expression'));
 					$this->setResponse($response);
 					break;
 
@@ -82,12 +82,12 @@ class CControllerRegExCreate extends CController {
 
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
-			$response->setMessageOk(_('Regular expression added'));
+			CMessages::addSuccess(_('Regular expression added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.edit'));
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot add regular expression'));
+			CMessages::addError(_('Cannot add regular expression'));
 		}
 
 		$this->setResponse($response);

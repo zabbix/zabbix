@@ -132,10 +132,10 @@ class CControllerModuleScan extends CController {
 			: _('No new modules discovered');
 
 		if (hasErrorMesssages()) {
-			$response->setMessageError($message);
+			CMessages::addError($message);
 		}
 		else {
-			$response->setMessageOk($message);
+			CMessages::addSuccess($message);
 		}
 
 		$this->setResponse($response);

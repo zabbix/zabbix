@@ -103,7 +103,7 @@ class CControllerModuleEdit extends CController {
 				->setArgument('action', 'module.list')
 				->setArgument('page', CPagerHelper::loadPage('module.list', null))
 			);
-			$response->setMessageError(_s('Cannot load module at: %1$s.', $this->module['relative_path']));
+			CMessages::addError(_s('Cannot load module at: %1$s.', $this->module['relative_path']));
 			$this->setResponse($response);
 		}
 	}

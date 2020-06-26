@@ -63,10 +63,10 @@ class CControllerScriptDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Script deleted', 'Scripts deleted', $deleted));
+			CMessages::addSuccess(_n('Script deleted', 'Scripts deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete script', 'Cannot delete scripts', $deleted));
+			CMessages::addError(_n('Cannot delete script', 'Cannot delete scripts', $deleted));
 		}
 
 		$this->setResponse($response);

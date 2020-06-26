@@ -64,14 +64,14 @@ class CControllerImageDelete extends CController {
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $this->getInput('imagetype'))
 			);
-			$response->setMessageOk(_('Image deleted'));
+			CMessages::addSuccess(_('Image deleted'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'image.edit')
 				->setArgument('imageid', $this->getInput('imageid'))
 			);
-			$response->setMessageError(_('Cannot delete image'));
+			CMessages::addError(_('Cannot delete image'));
 		}
 
 		$this->setResponse($response);

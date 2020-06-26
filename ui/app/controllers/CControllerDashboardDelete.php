@@ -56,10 +56,10 @@ class CControllerDashboardDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Dashboard deleted', 'Dashboards deleted', $deleted));
+			CMessages::addSuccess(_n('Dashboard deleted', 'Dashboards deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete dashboard', 'Cannot delete dashboards', $deleted));
+			CMessages::addError(_n('Cannot delete dashboard', 'Cannot delete dashboards', $deleted));
 		}
 
 		$this->setResponse($response);
