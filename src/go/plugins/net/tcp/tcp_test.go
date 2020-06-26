@@ -23,99 +23,60 @@ import (
 	"testing"
 )
 
-func Test_isValidPort(t *testing.T) {
-	type args struct {
-		port string
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{"+basic", args{"443"}, true},
-		{"+empty", args{""}, true},
-		{"-negative", args{"-1"}, false},
-		{"-zero", args{"0"}, false},
-		{"-out_of_range", args{"65536"}, false},
-		{"-malformed", args{"44ava3"}, false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := isValidPort(tt.args.port); got != tt.want {
-				t.Errorf("isValidPort() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_splitAndRemovePort(t *testing.T) {
+func Test_removeScheme(t *testing.T) {
 	type args struct {
 		in string
 	}
 	tests := []struct {
-		name         string
-		args         args
-		wantScheme   string
-		wantHostname string
-		wantErr      bool
+		name       string
+		args       args
+		wantScheme string
+		wantHost   string
+		wantErr    bool
 	}{
-		{"+set_scheme", args{"https://example.com"}, "https", "example.com", false},
-		{"+set_port", args{"example.com:443"}, "", "example.com", false},
-		{"+full", args{"https://example.com:443/path1/path2"}, "https", "example.com/path1/path2", false},
-		{"-no_scheme", args{"example.com"}, "", "example.com", false},
-		{"-malformed_scheme", args{"https://https://example.com"}, "", "https://https://example.com", true},
-		{"-malformed_port", args{"https://example.com:443:12121"}, "", "https://example.com:443:12121", true},
-		{"-incorrect_port", args{"https://example.com:444ad"}, "", "https://example.com:444ad", true},
-		{"-malformed_all", args{"https://https://example.com:443:12121"}, "", "https://https://example.com:443:12121", true},
-		{"-empty", args{""}, "", "", false},
+		{"+base", args{"https://localhost"}, "https", "localhost", false},
+		{"+full", args{"https://www.google.com:443/path1/path2"}, "https", "www.google.com:443/path1/path2", false},
+		{"+no_scheme", args{"localhost"}, "", "localhost", false},
+		{"+no_input", args{""}, "", "", false},
+		{"-malformed", args{"https://https://localhost"}, "", "https://https://localhost", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			scheme, hostname, err := splitAndRemovePort(tt.args.in)
+			gotScheme, gotHost, err := removeScheme(tt.args.in)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("splitAndRemovePort() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("removeScheme() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if scheme != tt.wantScheme {
-				t.Errorf("splitAndRemovePort() scheme = %v, want %v", scheme, tt.wantScheme)
+			if gotScheme != tt.wantScheme {
+				t.Errorf("removeScheme() gotScheme = %v, want %v", gotScheme, tt.wantScheme)
 			}
-			if hostname != tt.wantHostname {
-				t.Errorf("splitAndRemovePort() hostname = %v, want %v", hostname, tt.wantHostname)
+			if gotHost != tt.wantHost {
+				t.Errorf("removeScheme() gotHost = %v, want %v", gotHost, tt.wantHost)
 			}
 		})
 	}
 }
-
-func Test_buildURL(t *testing.T) {
+func Test_encloseIPv6(t *testing.T) {
 	type args struct {
-		scheme string
-		ip     string
-		port   string
+		in string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantOut string
+		name string
+		args args
+		want string
 	}{
-		{"+basic", args{"", "localHost", "443"}, "localHost:443"},
-		{"+longPath", args{"", "localHost/path1/path2/path3", "443"}, "localHost:443/path1/path2/path3"},
-		{"+http", args{"http", "www.localHost.com/path1/path2", "443"}, "http://www.localHost.com:443/path1/path2"},
-		{"+https", args{"https", "localHost/path1/path2/path3", "443"}, "https://localHost:443/path1/path2/path3"},
-		{"+ip", args{"https", "127.0.0.0/path1", "443"}, "https://127.0.0.0:443/path1"},
-		{"+trailingSlash", args{"https", "localHost/path1/", "443"}, "https://localHost:443/path1/"},
-		{"-emptyScheme", args{"", "www.localHost.com/path1", "443"}, "www.localHost.com:443/path1"},
-		{"-emptyUrl", args{"https", "", "443"}, ""},
-		{"-emptyUrlAndPort", args{"https", "", ""}, ""},
-		{"-emptyPort", args{"https", "localHost/path1", ""}, "https://localHost/path1"},
-		{"-emptyPortAndScheme", args{"", "localHost/path1", ""}, "localHost/path1"},
-		{"-emptyScheme", args{"", "localHost/path1", ""}, "localHost/path1"},
-		{"-emptySchemeAndUrl", args{"", "", "443"}, ""},
-		{"-emptyAll", args{"", "", ""}, ""},
+		{"+basic", args{"::1"}, "[::1]"},
+		{"+not_ip", args{"localhost:443"}, "localhost:443"},
+		{"+already_enclosed", args{"[::1]"}, "[::1]"},
+		{"-empty", args{""}, ""},
+		//unsupport cases for this function
+		{"-with_port", args{"::1:443"}, "[::1:443]"},
+		{"-with_scheme", args{"https://::1"}, "https://::1"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := buildURL(tt.args.scheme, tt.args.ip, tt.args.port); gotOut != tt.wantOut {
-				t.Errorf("buildURL() = %v, want %v", gotOut, tt.wantOut)
+			if got := encloseIPv6(tt.args.in); got != tt.want {
+				t.Errorf("encloseIPv6() = %v, want %v", got, tt.want)
 			}
 		})
 	}

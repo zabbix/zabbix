@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"math"
 	"net"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -168,92 +169,52 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
-func isValidPort(port string) bool {
-	if port == "" {
-		return true
-	}
-	i, err := strconv.Atoi(port)
-	if err != nil {
-		return false
-	}
-	if i < 1 || i > 65535 {
-		return false
-	}
-
-	return true
-}
-
-func splitAndRemovePort(in string) (scheme string, host string, err error) {
+func removeScheme(in string) (scheme string, host string, err error) {
 	parts := strings.Split(in, "://")
 	switch len(parts) {
 	case 1:
-		host = in
+		return "", in, nil
 	case 2:
-		scheme = parts[0]
-		host = parts[1]
+		return parts[0], parts[1], nil
 	default:
 		return "", in, errors.New("malformed url")
 	}
-
-	parts = strings.Split(host, ":")
-	switch len(parts) {
-	case 1:
-	case 2:
-		host = parts[0]
-		paths := strings.Split(parts[1], "/")
-		// we need this validation because C agent validates port in url but does not use it.
-		valid := isValidPort(paths[0])
-		if !valid {
-			return "", in, errors.New("malformed url")
-		}
-		if len(paths) > 1 {
-			for _, path := range paths[1:] {
-				host = fmt.Sprintf("%s/%s", host, path)
-			}
-		}
-	default:
-		return "", in, errors.New("malformed url")
-	}
-
-	return
 }
 
-func buildURL(scheme string, hostname string, port string) (out string) {
-	if hostname == "" {
-		return
+func encloseIPv6(in string) string {
+	parsedIP := net.ParseIP(in)
+	if parsedIP != nil {
+		ipv6 := parsedIP.To16()
+		if ipv6 != nil {
+			out := ipv6.String()
+			return fmt.Sprintf("[%s]", out)
+		}
 	}
 
-	parts := strings.Split(hostname, "/")
-	out = parts[0]
-	if port != "" {
-		out = fmt.Sprintf("%s:%s", out, port)
-	}
-
-	for _, p := range parts[1:] {
-		out = fmt.Sprintf("%s/%s", out, p)
-	}
-
-	if scheme != "" {
-		out = fmt.Sprintf("%s://%s", scheme, out)
-	}
-
-	return
+	return in
 }
 
 func (p *Plugin) httpsExpect(ip string, port string) int {
-	scheme, hostname, err := splitAndRemovePort(ip)
+	scheme, host, err := removeScheme(ip)
 	if err != nil {
-		log.Debugf("https error: cannot parse the url [%s]: %s", hostname, err.Error())
+		log.Debugf("https error: cannot parse the url [%s]: %s", ip, err.Error())
 		return 0
 	}
-	if scheme == "" {
-		scheme = "https"
+	if scheme != "" && scheme != "https" {
+		return 0
 	}
-	url := buildURL(scheme, hostname, port)
-	// does NOT return an error on >=400 status codes same as C agent
-	_, err = web.Get(url, time.Second*p.options.Timeout, false)
+
+	u, err := url.Parse(fmt.Sprintf("%s://%s", "https", encloseIPv6(host)))
 	if err != nil {
-		log.Debugf("https network error: cannot connect to [%s]: %s", url, err.Error())
+		log.Debugf("https error: cannot parse the url [%s]: %s", ip, err.Error())
+		return 0
+	}
+
+	// does NOT return an error on >=400 status codes same as C agent
+	_, err = web.Get(fmt.Sprintf("%s://%s:%s%s", u.Scheme, u.Hostname(), port, u.Path),
+		time.Second*p.options.Timeout, false)
+	if err != nil {
+		log.Debugf("https network error: cannot connect to [%s]: %s", u, err.Error())
 		return 0
 	}
 
