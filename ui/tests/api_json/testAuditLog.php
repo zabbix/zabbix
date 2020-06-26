@@ -732,7 +732,7 @@ class testAuditLog extends CAPITest {
 					]
 				],
 				'$expected_result' => null,
-				'expected_error' => 'Invalid parameter "/filter/action/1": value must be one of 0, 1, 2, 3, 4, 5, 6.'
+				'expected_error' => 'Invalid parameter "/filter/action/1": value must be one of 0, 1, 2, 3, 4, 5, 6, 7.'
 			],
 			// Filter validation - resourcetype.
 			[

@@ -1938,7 +1938,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'type' => 'Calculated',
 					'name' => 'Calculated',
 					'key' => 'item-calculated',
-					'params_f' => 'formula',
+					'params_f' => '"formula"',
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true

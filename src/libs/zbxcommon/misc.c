@@ -1884,8 +1884,11 @@ static int	parse_user_macro(const char *str, int *len)
 {
 	int	macro_r, context_l, context_r;
 
-	if ('{' != *str || '$' != *(str + 1) || SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r))
+	if ('{' != *str || '$' != *(str + 1) || SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r,
+			NULL))
+	{
 		return FAIL;
+	}
 
 	*len = macro_r + 1;
 

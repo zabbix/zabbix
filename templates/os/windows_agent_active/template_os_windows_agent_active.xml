@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2020-06-17T08:32:23Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Windows CPU by Zabbix agent active</template>
          <name>Template Module Windows CPU by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -157,20 +157,6 @@ and are waiting to be executed.</description>
                      <name>CPU</name>
                   </application>
                </applications>
-               <triggers>
-                  <trigger>
-                     <expression>{min(5m)}&gt;{$CPU.QUEUE.CRIT.MAX}</expression>
-                     <name>CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)</name>
-                     <priority>WARNING</priority>
-                     <description>The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}.</description>
-                     <dependencies>
-                        <dependency>
-                           <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                           <expression>{Template Module Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
-                        </dependency>
-                     </dependencies>
-                  </trigger>
-               </triggers>
             </item>
             <item>
                <name>CPU utilization</name>
@@ -194,6 +180,18 @@ and are waiting to be executed.</description>
                      <description>CPU utilization is too high. The system might be slow to respond.</description>
                   </trigger>
                </triggers>
+            </item>
+            <item>
+               <name>Number of cores</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]</key>
+               <history>7d</history>
+               <description>The number of logical processors available on the computer.</description>
+               <applications>
+                  <application>
+                     <name>CPU</name>
+                  </application>
+               </applications>
             </item>
          </items>
          <macros>
@@ -222,7 +220,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows filesystems by Zabbix agent active</template>
          <name>Template Module Windows filesystems by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -430,7 +428,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows generic by Zabbix agent active</template>
          <name>Template Module Windows generic by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -603,7 +601,7 @@ and are waiting to be executed.</description>
       <template>
          <template>Template Module Windows memory by Zabbix agent active</template>
          <name>Template Module Windows memory by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -720,11 +718,26 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                </applications>
             </item>
             <item>
-               <name>Free swap space</name>
+               <name>Used swap space in %</name>
                <type>ZABBIX_ACTIVE</type>
-               <key>system.swap.size[,free]</key>
+               <key>perf_counter_en["\Paging file(_Total)\% Usage"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The used space of swap volume/file in percent.</description>
+               <applications>
+                  <application>
+                     <name>Memory</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Free swap space</name>
+               <type>CALCULATED</type>
+               <key>system.swap.free</key>
                <history>7d</history>
                <units>B</units>
+               <params>last("system.swap.size[,total]") - last("system.swap.size[,total]") / 100 * last("perf_counter_en[\"\Paging file(_Total)\% Usage\"]")</params>
                <description>The free space of swap volume/file in bytes.</description>
                <applications>
                   <application>
@@ -734,8 +747,9 @@ A typical Event ID 2019 is recorded in the system event log.</description>
             </item>
             <item>
                <name>Free swap space in %</name>
-               <type>ZABBIX_ACTIVE</type>
-               <key>system.swap.size[,pfree]</key>
+               <type>DEPENDENT</type>
+               <key>system.swap.pfree</key>
+               <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -745,6 +759,15 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                      <name>Memory</name>
                   </application>
                </applications>
+               <preprocessing>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return (100 - value)</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>perf_counter_en["\Paging file(_Total)\% Usage"]</key>
+               </master_item>
             </item>
             <item>
                <name>Total swap space</name>
@@ -835,7 +858,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
       <template>
          <template>Template Module Windows network by Zabbix agent active</template>
          <name>Template Module Windows network by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1112,7 +1135,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                         <trigger_prototype>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
@@ -1178,7 +1201,7 @@ and&#13;
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1198,7 +1221,7 @@ and&#13;
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1217,7 +1240,7 @@ and {Template Module Windows network by Zabbix agent active:net.if.out["{#IFNAME
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}=2 and {Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template Module Windows network by Zabbix agent active:net.if.status["{#IFNAME}"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1406,7 +1429,7 @@ return JSON.stringify({"data": output})</params>
       <template>
          <template>Template Module Windows physical disks by Zabbix agent active</template>
          <name>Template Module Windows physical disks by Zabbix agent active</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1416,32 +1439,13 @@ return JSON.stringify({"data": output})</params>
             <application>
                <name>Storage</name>
             </application>
-            <application>
-               <name>Zabbix raw items</name>
-            </application>
          </applications>
-         <items>
-            <item>
-               <name>Physical disks WMI get</name>
-               <type>ZABBIX_ACTIVE</type>
-               <key>wmi.getall[root\cimv2,"select * from win32_perfformatteddata_perfdisk_physicaldisk"]</key>
-               <history>1h</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Raw data of win32_perfformatteddata_perfdisk_physicaldisk.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-         </items>
          <discovery_rules>
             <discovery_rule>
                <name>Physical disks discovery</name>
-               <type>DEPENDENT</type>
-               <key>vfs.dev.discovery</key>
-               <delay>0</delay>
+               <type>ZABBIX_ACTIVE</type>
+               <key>perf_instance_en.discovery[PhysicalDisk]</key>
+               <delay>1h</delay>
                <filter>
                   <evaltype>AND</evaltype>
                   <conditions>
@@ -1461,56 +1465,9 @@ return JSON.stringify({"data": output})</params>
                <description>Discovery of installed physical disks.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>{#DEVNAME}: Disk average queue size (avgqu-sz)</name>
-                     <type>DEPENDENT</type>
-                     <key>vfs.dev.queue_size[CurrentDiskQueueLength.{#DEVNAME}]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <value_type>FLOAT</value_type>
-                     <description>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Disk {#DEVNAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#DEVNAME}")].CurrentDiskQueueLength.first()</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>wmi.getall[root\cimv2,"select * from win32_perfformatteddata_perfdisk_physicaldisk"]</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#DEVNAME}: Disk read rate</name>
-                     <type>DEPENDENT</type>
-                     <key>vfs.dev.read.rate[DiskReadsPersec.{#DEVNAME}]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <units>!r/s</units>
-                     <description>Rate of read operations on the disk.</description>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Disk {#DEVNAME}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#DEVNAME}")].DiskReadsPersec.first()</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>wmi.getall[root\cimv2,"select * from win32_perfformatteddata_perfdisk_physicaldisk"]</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
                      <name>{#DEVNAME}: Disk utilization</name>
-                     <type>DEPENDENT</type>
-                     <key>vfs.dev.util[PercentDiskTime.{#DEVNAME}]</key>
-                     <delay>0</delay>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]</key>
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
@@ -1520,15 +1477,6 @@ return JSON.stringify({"data": output})</params>
                            <name>Disk {#DEVNAME}</name>
                         </application_prototype>
                      </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#DEVNAME}")].PercentDiskTime.first()</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>wmi.getall[root\cimv2,"select * from win32_perfformatteddata_perfdisk_physicaldisk"]</key>
-                     </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{min(15m)}&gt;{$VFS.DEV.UTIL.MAX.WARN}</expression>
@@ -1540,11 +1488,38 @@ return JSON.stringify({"data": output})</params>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>{#DEVNAME}: Disk write rate</name>
-                     <type>DEPENDENT</type>
-                     <key>vfs.dev.write.rate[DiskWritesPersec.{#DEVNAME}]</key>
-                     <delay>0</delay>
+                     <name>{#DEVNAME}: Disk average queue size (avgqu-sz)</name>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Current Disk Queue Length",60]</key>
                      <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <description>Current average disk queue, the number of requests outstanding on the disk at the time the performance data is collected.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Disk {#DEVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DEVNAME}: Disk read rate</name>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Reads/sec",60]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>!r/s</units>
+                     <description>Rate of read operations on the disk.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Disk {#DEVNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DEVNAME}: Disk write rate</name>
+                     <type>ZABBIX_ACTIVE</type>
+                     <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Writes/sec",60]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>!w/s</units>
                      <description>Rate of write operations on the disk.</description>
                      <application_prototypes>
@@ -1552,15 +1527,6 @@ return JSON.stringify({"data": output})</params>
                            <name>Disk {#DEVNAME}</name>
                         </application_prototype>
                      </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$[?(@.Name == "{#DEVNAME}")].DiskWritesPersec.first()</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>wmi.getall[root\cimv2,"select * from win32_perfformatteddata_perfdisk_physicaldisk"]</key>
-                     </master_item>
                   </item_prototype>
                </item_prototypes>
                <graph_prototypes>
@@ -1571,7 +1537,7 @@ return JSON.stringify({"data": output})</params>
                            <color>1A7C11</color>
                            <item>
                               <host>Template Module Windows physical disks by Zabbix agent active</host>
-                              <key>vfs.dev.read.rate[DiskReadsPersec.{#DEVNAME}]</key>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Reads/sec",60]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1580,7 +1546,7 @@ return JSON.stringify({"data": output})</params>
                            <color>2774A4</color>
                            <item>
                               <host>Template Module Windows physical disks by Zabbix agent active</host>
-                              <key>vfs.dev.write.rate[DiskWritesPersec.{#DEVNAME}]</key>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Writes/sec",60]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -1593,7 +1559,7 @@ return JSON.stringify({"data": output})</params>
                            <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Windows physical disks by Zabbix agent active</host>
-                              <key>vfs.dev.queue_size[CurrentDiskQueueLength.{#DEVNAME}]</key>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\Current Disk Queue Length",60]</key>
                            </item>
                         </graph_item>
                         <graph_item>
@@ -1602,31 +1568,17 @@ return JSON.stringify({"data": output})</params>
                            <color>2774A4</color>
                            <item>
                               <host>Template Module Windows physical disks by Zabbix agent active</host>
-                              <key>vfs.dev.util[PercentDiskTime.{#DEVNAME}]</key>
+                              <key>perf_counter_en["\PhysicalDisk({#DEVNAME})\% Disk Time",60]</key>
                            </item>
                         </graph_item>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
-               <master_item>
-                  <key>wmi.getall[root\cimv2,"select * from win32_perfformatteddata_perfdisk_physicaldisk"]</key>
-               </master_item>
                <preprocessing>
                   <step>
-                     <type>JAVASCRIPT</type>
-                     <params>output = JSON.parse(value).map(function(dev){
-    return {
-        "{#DEVNAME}": dev.Name,
-        "{#DEVQUEUE}": dev.CurrentDiskQueueLength,
-        "{#DEVREADS}": dev.DiskReadsPersec,
-        "{#DEVTIME}": dev.PercentDiskTime,
-        "{#DEVWRITES}": dev.DiskWritesPersec
-    }})
-return JSON.stringify({"data": output})</params>
-                  </step>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>1h</params>
+                     <type>STR_REPLACE</type>
+                     <params>{#INSTANCE}
+{#DEVNAME}</params>
                   </step>
                </preprocessing>
             </discovery_rule>
@@ -1654,7 +1606,7 @@ return JSON.stringify({"data": output})</params>
          <name>Template Module Windows services by Zabbix agent active</name>
          <description>Template Services OS Windows&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1756,7 +1708,7 @@ Template tooling version used: 0.34</description>
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.37</description>
          <templates>
             <template>
                <name>Template Module Windows CPU by Zabbix agent active</name>
@@ -1801,7 +1753,7 @@ Template tooling version used: 0.34</description>
                         <name>CPU usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1823,7 +1775,7 @@ Template tooling version used: 0.34</description>
                         <key>perf_counter_en["\System\Processor Queue Length"]</key>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1845,7 +1797,7 @@ Template tooling version used: 0.34</description>
                         <name>Memory utilization</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1867,7 +1819,7 @@ Template tooling version used: 0.34</description>
                         <name>Swap usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1889,7 +1841,7 @@ Template tooling version used: 0.34</description>
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1911,7 +1863,7 @@ Template tooling version used: 0.34</description>
                         <name>{#DEVNAME}: Disk read/write rates</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>3</y>
@@ -1933,7 +1885,7 @@ Template tooling version used: 0.34</description>
                         <name>{#DEVNAME}: Disk utilization and queue</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>4</y>
@@ -1955,7 +1907,7 @@ Template tooling version used: 0.34</description>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>5</y>
@@ -1977,7 +1929,19 @@ Template tooling version used: 0.34</description>
    </templates>
    <triggers>
       <trigger>
-         <expression>{Template Module Windows memory by Zabbix agent active:system.swap.size[,pfree].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
+         <expression>{Template Module Windows CPU by Zabbix agent active:perf_counter_en["\System\Processor Queue Length"].min(5m)} - {Template Module Windows CPU by Zabbix agent active:wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"].last()} * 2 &gt; {$CPU.QUEUE.CRIT.MAX}</expression>
+         <name>CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)</name>
+         <priority>WARNING</priority>
+         <description>The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro {$CPU.QUEUE.CRIT.MAX }.</description>
+         <dependencies>
+            <dependency>
+               <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
+               <expression>{Template Module Windows CPU by Zabbix agent active:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
+            </dependency>
+         </dependencies>
+      </trigger>
+      <trigger>
+         <expression>{Template Module Windows memory by Zabbix agent active:system.swap.pfree.min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
@@ -2071,7 +2035,7 @@ Template tooling version used: 0.34</description>
                <color>1A7C11</color>
                <item>
                   <host>Template Module Windows memory by Zabbix agent active</host>
-                  <key>system.swap.size[,free]</key>
+                  <key>system.swap.free</key>
                </item>
             </graph_item>
             <graph_item>

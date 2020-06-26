@@ -92,9 +92,7 @@ class testPageLatestData extends CLegacyWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
-		$xpath = './/div[@class="action-container"]/span[text()='.
-				CXPathHelper::escapeQuotes($data['Item name']).']/../..';
-		$row = $table->query('xpath', $xpath)->asTableRow(['parent' => $table])->one();
+		$row = $table->findRow('Name', $data['Item name'], true);
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:icon-description')->one()->click()->waitUntilReady();

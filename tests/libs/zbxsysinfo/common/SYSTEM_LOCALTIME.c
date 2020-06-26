@@ -30,7 +30,7 @@
 static zbx_timespec_t	timespec;
 
 time_t	__wrap_time(time_t *seconds);
-int	__wrap_gettimeofday(struct timeval *__restrict tv, __timezone_ptr_t tz);
+int	__wrap_gettimeofday(struct timeval *__restrict tv, void *tz);
 
 static void	zbx_mock_time(void)
 {
@@ -180,7 +180,7 @@ time_t	__wrap_time(time_t *seconds)
 	return timespec.sec;
 }
 
-int	__wrap_gettimeofday(struct timeval *__restrict tv, __timezone_ptr_t tz)
+int	__wrap_gettimeofday(struct timeval *__restrict tv, void *tz)
 {
 	if (NULL != tv)
 	{

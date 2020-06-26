@@ -2745,8 +2745,8 @@ out:
  *                                                                            *
  * Purpose: evaluate function                                                 *
  *                                                                            *
- * Parameters: item - item to calculate function for                          *
- *             function - function (for example, 'max')                       *
+ * Parameters: item      - item to calculate function for                     *
+ *             function  - function (for example, 'max')                      *
  *             parameter - parameter of the function                          *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains its value   *

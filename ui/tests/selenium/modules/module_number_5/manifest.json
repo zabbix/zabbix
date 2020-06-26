@@ -1,0 +1,16 @@
+{
+	"manifest_version": 0.01,
+	"id": "5",
+	"name": "5th Module",
+	"author": "",
+	"description": "Adding top-level and sub-level menu",
+	"version": "",
+	"namespace": "Example_E",
+	"url": "",
+	"actions": {
+		"fifth.module": {
+			"class": "Test5",
+			"view": "fifth.module"
+		}
+	}
+}

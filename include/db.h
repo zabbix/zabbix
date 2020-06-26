@@ -368,18 +368,6 @@ DB_MEDIATYPE;
 
 typedef struct
 {
-	zbx_uint64_t	conditionid;
-	zbx_uint64_t	actionid;
-	char		*value;
-	char		*value2;
-	int		condition_result;
-	unsigned char	conditiontype;
-	unsigned char	op;
-}
-DB_CONDITION;
-
-typedef struct
-{
 	zbx_uint64_t	alertid;
 	zbx_uint64_t 	actionid;
 	int		clock;
@@ -559,8 +547,8 @@ typedef struct
 }
 zbx_trigger_diff_t;
 
-void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
-void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *diffs);
+void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff);
+void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
 		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
@@ -637,7 +625,7 @@ zbx_conn_flags_t;
 
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
 		const char *dns, unsigned short port, zbx_conn_flags_t flags);
-void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char type, const unsigned char bulk,
+void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version, const unsigned char bulk,
 		const char *community, const char *securityname, const unsigned char securitylevel,
 		const char *authpassphrase, const char *privpassphrase, const unsigned char authprotocol,
 		const unsigned char privprotocol, const char *contextname);

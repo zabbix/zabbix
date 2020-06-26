@@ -62,7 +62,7 @@ class testFormItemTest extends CWebTest {
 		return array_merge($this->getCommonTestButtonStateData(), [
 				['Type' => 'SNMP trap', 'Key' => 'snmptrap.fallback'],
 				['Type' => 'Zabbix aggregate', 'Key' => 'grpmax["Zabbix",key,last]'],
-				['Type' => 'Calculated', 'Formula' => 'A+B']
+				['Type' => 'Calculated', 'Formula' => '"formula"']
 		]);
 	}
 
@@ -608,6 +608,8 @@ class testFormItemTest extends CWebTest {
 						$fields_state = ['address' => true, 'port' => true, 'proxy' => true];
 						break;
 
+					case 'SSH agent':
+					case 'TELNET agent':
 					case 'Simple check':
 						$fields_value = [
 							'address' => $is_host ? $host_interface[0] : '',
@@ -620,8 +622,6 @@ class testFormItemTest extends CWebTest {
 					case 'Zabbix internal':
 					case 'External check':
 					case 'Database monitor':
-					case 'SSH agent':
-					case 'TELNET agent':
 					case 'HTTP agent':
 					case 'JMX agent':
 						$fields_value = [

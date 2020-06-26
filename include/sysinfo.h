@@ -206,14 +206,14 @@ void	free_metrics(void);
 
 void	init_key_access_rules(void);
 void	finalize_key_access_rules_configuration(void);
-int	add_key_access_rule(const char *pattern, zbx_key_access_rule_type_t type);
+int	add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
 int	check_key_access_rules(const char *metric);
 int	check_request_access_rules(AGENT_REQUEST *request);
 void	free_key_access_rules(void);
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
-int	add_user_parameter(const char *key, char *command, char *error, size_t max_error_len);
+int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
 int	add_user_module(const char *key, int (*function)(void));
 void	test_parameters(void);
 void	test_parameter(const char *key);
