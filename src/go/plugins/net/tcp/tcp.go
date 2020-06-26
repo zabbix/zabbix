@@ -168,12 +168,62 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
-func buildURL(scheme string, path string, port string) (out string) {
-	if path == "" {
+func isValidPort(port string) bool {
+	if port == "" {
+		return true
+	}
+	i, err := strconv.Atoi(port)
+	if err != nil {
+		return false
+	}
+	if i < 1 || i > 65535 {
+		return false
+	}
+
+	return true
+}
+
+func splitAndRemovePort(in string) (scheme string, host string, err error) {
+	parts := strings.Split(in, "://")
+	switch len(parts) {
+	case 1:
+		host = in
+	case 2:
+		scheme = parts[0]
+		host = parts[1]
+	default:
+		return "", in, errors.New("malformed url")
+	}
+
+	parts = strings.Split(host, ":")
+	switch len(parts) {
+	case 1:
+	case 2:
+		host = parts[0]
+		paths := strings.Split(parts[1], "/")
+		// we need this validation because C agent validates port in url but does not use it.
+		valid := isValidPort(paths[0])
+		if !valid {
+			return "", in, errors.New("malformed url")
+		}
+		if len(paths) > 1 {
+			for _, path := range paths[1:] {
+				host = fmt.Sprintf("%s/%s", host, path)
+			}
+		}
+	default:
+		return "", in, errors.New("malformed url")
+	}
+
+	return
+}
+
+func buildURL(scheme string, hostname string, port string) (out string) {
+	if hostname == "" {
 		return
 	}
 
-	parts := strings.Split(path, "/")
+	parts := strings.Split(hostname, "/")
 	out = parts[0]
 	if port != "" {
 		out = fmt.Sprintf("%s:%s", out, port)
@@ -191,9 +241,17 @@ func buildURL(scheme string, path string, port string) (out string) {
 }
 
 func (p *Plugin) httpsExpect(ip string, port string) int {
-	url := buildURL("https", ip, port)
+	scheme, hostname, err := splitAndRemovePort(ip)
+	if err != nil {
+		log.Debugf("https error: cannot parse the url [%s]: %s", hostname, err.Error())
+		return 0
+	}
+	if scheme == "" {
+		scheme = "https"
+	}
+	url := buildURL(scheme, hostname, port)
 	// does NOT return an error on >=400 status codes same as C agent
-	_, err := web.Get(url, time.Second*p.options.Timeout, false)
+	_, err = web.Get(url, time.Second*p.options.Timeout, false)
 	if err != nil {
 		log.Debugf("https network error: cannot connect to [%s]: %s", url, err.Error())
 		return 0
@@ -285,7 +343,7 @@ func (p *Plugin) exportNetService(params []string) int {
 		case "pop":
 			port = "pop3"
 		case "https":
-			port = ""
+			port = "443"
 		default:
 			port = service
 		}
