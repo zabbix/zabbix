@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-18 10:58+0300\n"
+"POT-Creation-Date: 2020-06-26 19:55+0300\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -243,7 +243,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr ""
 
-#: include/func.inc.php:1851
+#: include/func.inc.php:1853
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -273,8 +273,8 @@ msgstr ""
 msgid "(Only super admins can create groups)"
 msgstr "(只有超級管理員可以新增群組)"
 
-#: app/views/popup.itemtestedit.view.php:104
-#: app/views/popup.itemtestedit.view.php:106
+#: app/views/popup.itemtestedit.view.php:112
+#: app/views/popup.itemtestedit.view.php:114
 #: include/views/configuration.host.edit.php:200
 #: include/views/configuration.host.edit.php:205
 #: include/views/configuration.host.massupdate.php:96
@@ -376,7 +376,7 @@ msgstr "且"
 msgid "Acceptable SLA"
 msgstr "可接受的SLA"
 
-#: include/func.inc.php:1530
+#: include/func.inc.php:1532
 msgid "Access denied"
 msgstr ""
 
@@ -1574,7 +1574,7 @@ msgstr ""
 msgid "CPU utilisation percentage. Returns float"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:156
+#: app/views/popup.itemtestedit.view.php:164
 msgid "CRLF"
 msgstr ""
 
@@ -3291,7 +3291,7 @@ msgstr "Clock"
 msgid "Clone"
 msgstr "克隆"
 
-#: include/func.inc.php:1649 include/views/js/monitoring.sysmaps.js.php:297
+#: include/func.inc.php:1651 include/views/js/monitoring.sysmaps.js.php:297
 #: include/views/js/monitoring.sysmaps.js.php:449
 #: include/views/js/monitoring.sysmaps.js.php:569
 #: include/views/js/monitoring.sysmaps.js.php:664
@@ -4408,7 +4408,7 @@ msgstr "硬體購買日期"
 msgid "Day"
 msgstr "日"
 
-#: include/func.inc.php:2519
+#: include/func.inc.php:2521
 msgid "Day before yesterday"
 msgstr ""
 
@@ -4911,7 +4911,7 @@ msgstr "描述"
 
 #: app/views/administration.mediatype.list.php:77
 #: app/views/reports.auditlog.list.php:77 include/blocks.inc.php:617
-#: include/func.inc.php:1604 include/views/configuration.action.edit.php:170
+#: include/func.inc.php:1606 include/views/configuration.action.edit.php:170
 #: include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:313
 #: include/views/configuration.action.edit.php:395
@@ -5865,7 +5865,7 @@ msgstr ""
 msgid "Encryption level"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:153
+#: app/views/popup.itemtestedit.view.php:161
 msgid "End of line sequence"
 msgstr ""
 
@@ -5907,7 +5907,7 @@ msgstr "錯誤"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "資料表搜尋請求 \"%1$s\"的錯誤."
 
-#: include/func.inc.php:1643 jsLoader.php:159
+#: include/func.inc.php:1645 jsLoader.php:159
 msgid "Error message"
 msgstr ""
 
@@ -6584,16 +6584,16 @@ msgstr "德語 (de_DE)"
 msgid "Get content of web page. Returns web page source as text"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:128
+#: app/views/popup.itemtestedit.view.php:136
 msgid "Get value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:483
-#: app/views/popup.itemtestedit.view.php:296
+#: app/views/popup.itemtestedit.view.php:304
 msgid "Get value and test"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:86
+#: app/views/popup.itemtestedit.view.php:94
 msgid "Get value from host"
 msgstr ""
 
@@ -6628,7 +6628,7 @@ msgstr ""
 msgid "Go to"
 msgstr "到"
 
-#: app/views/system.warning.php:31 include/func.inc.php:1543
+#: app/views/system.warning.php:31 include/func.inc.php:1545
 msgid "Go to dashboard"
 msgstr ""
 
@@ -7279,7 +7279,7 @@ msgstr "已新增主機"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:114
 #: app/controllers/CControllerPopupItemTestSend.php:154
-#: app/views/popup.itemtestedit.view.php:90
+#: app/views/popup.itemtestedit.view.php:98
 msgid "Host address"
 msgstr ""
 
@@ -7814,7 +7814,7 @@ msgstr ""
 msgid "If filter matches"
 msgstr ""
 
-#: include/func.inc.php:1533 include/func.inc.php:1552
+#: include/func.inc.php:1535 include/func.inc.php:1554
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "假如您認為這個訊息是錯的, 請諮詢您的管理者關於如何取得需要的許可權."
 
@@ -10154,7 +10154,7 @@ msgstr "LDAP登入成功"
 msgid "LDAP settings"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:155
+#: app/views/popup.itemtestedit.view.php:163
 msgid "LF"
 msgstr ""
 
@@ -10196,37 +10196,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
 
-#: include/func.inc.php:2572
+#: include/func.inc.php:2574
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2568
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2561
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 
-#: include/func.inc.php:2575
+#: include/func.inc.php:2577
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2554
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 
-#: include/func.inc.php:2578
+#: include/func.inc.php:2580
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10547,8 +10547,8 @@ msgstr "日誌與SNMP捉捕器不符"
 
 #: app/controllers/CControllerAuditLogList.php:167
 #: app/views/administration.authentication.edit.php:127
-#: app/views/administration.user.list.php:97 include/func.inc.php:1540
-#: include/func.inc.php:1555 index_http.php:93 index_sso.php:250
+#: app/views/administration.user.list.php:97 include/func.inc.php:1542
+#: include/func.inc.php:1557 index_http.php:93 index_sso.php:250
 msgid "Login"
 msgstr "登入"
 
@@ -10646,7 +10646,7 @@ msgstr "有主機巨集識別碼\"%1$s\"的巨集不存在."
 #: app/partials/massupdate.macros.tab.php:118
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
-#: app/views/popup.itemtestedit.view.php:178 include/html.inc.php:913
+#: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:913
 #: include/views/configuration.host.edit.php:621
 #: include/views/configuration.host.massupdate.php:308
 #: include/views/configuration.host.prototype.edit.php:303
@@ -11450,7 +11450,7 @@ msgstr ""
 #: app/views/monitoring.widget.plaintext.view.php:48
 #: app/views/popup.httpstep.php:45 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:193
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:201
 #: app/views/popup.lldoperation.php:240 app/views/popup.lldoverride.php:47
 #: app/views/popup.operation.common.php:671
 #: app/views/popup.triggerwizard.php:81 correlation.php:35
@@ -12163,7 +12163,7 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1508 items.php:1436 items.php:1640 services.php:84
+#: include/func.inc.php:1507 items.php:1436 items.php:1640 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "沒有所說的物件的許可權或其不存在!"
 
@@ -13534,7 +13534,7 @@ msgstr "填入主機資產紀錄欄位"
 #: app/views/administration.authentication.edit.php:96
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
-#: app/views/popup.itemtestedit.view.php:116
+#: app/views/popup.itemtestedit.view.php:124
 #: app/views/popup.operation.common.php:517
 #: include/classes/setup/CSetupWizard.php:332 include/hosts.inc.php:1471
 #: include/views/configuration.host.list.php:140
@@ -13579,7 +13579,7 @@ msgstr ""
 msgid "Preprocessing"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:221
+#: app/views/popup.itemtestedit.view.php:229
 #: include/views/configuration.host.discovery.edit.php:765
 #: include/views/configuration.item.edit.php:864
 #: include/views/configuration.item.massupdate.php:248
@@ -13593,7 +13593,7 @@ msgstr ""
 #: app/controllers/CControllerPopupItemTestSend.php:191
 #: app/controllers/CControllerPopupItemTestSend.php:196
 #: app/controllers/CControllerPopupItemTestSend.php:201
-#: app/views/popup.itemtestedit.view.php:168
+#: app/views/popup.itemtestedit.view.php:176
 msgid "Prev. time"
 msgstr ""
 
@@ -13604,7 +13604,7 @@ msgstr ""
 msgid "Preview"
 msgstr "預覽"
 
-#: include/func.inc.php:2522
+#: include/func.inc.php:2524
 msgid "Previous month"
 msgstr ""
 
@@ -13612,15 +13612,15 @@ msgstr ""
 msgid "Previous page"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:146
+#: app/views/popup.itemtestedit.view.php:154
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2521
+#: include/func.inc.php:2523
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2523
+#: include/func.inc.php:2525
 msgid "Previous year"
 msgstr ""
 
@@ -13835,7 +13835,7 @@ msgstr "系統代理程式"
 #: app/views/administration.proxy.edit.php:87
 #: app/views/administration.proxy.edit.php:122
 #: app/views/popup.condition.common.php:507
-#: app/views/popup.itemtestedit.view.php:100 include/actions.inc.php:63
+#: app/views/popup.itemtestedit.view.php:108 include/actions.inc.php:63
 #: include/views/configuration.discovery.list.php:67
 #: include/views/configuration.host.list.php:148
 #: include/views/configuration.host.list.php:152
@@ -14516,8 +14516,8 @@ msgstr ""
 
 #: app/views/administration.regex.edit.php:119
 #: app/views/administration.regex.edit.php:124
-#: app/views/popup.itemtestedit.view.php:194
-#: app/views/popup.itemtestedit.view.php:229
+#: app/views/popup.itemtestedit.view.php:202
+#: app/views/popup.itemtestedit.view.php:237
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:168
 #: include/classes/debug/CProfiler.php:183
@@ -16200,7 +16200,7 @@ msgstr "子拓墣圖"
 msgid "Success Audit"
 msgstr "成功審計"
 
-#: include/func.inc.php:1643 jsLoader.php:158
+#: include/func.inc.php:1645 jsLoader.php:158
 msgid "Success message"
 msgstr ""
 
@@ -16265,7 +16265,7 @@ msgstr ""
 msgid "System default"
 msgstr "系統預設"
 
-#: include/func.inc.php:1670
+#: include/func.inc.php:1672
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr ""
 
@@ -16597,7 +16597,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
 #: app/views/js/popup.itemtestedit.view.js.php:506
-#: app/views/popup.itemtestedit.view.php:296
+#: app/views/popup.itemtestedit.view.php:304
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1420
 #: include/views/configuration.host.discovery.edit.php:789
@@ -16795,7 +16795,7 @@ msgstr ""
 msgid "Theme"
 msgstr "背景主題"
 
-#: include/func.inc.php:2520
+#: include/func.inc.php:2522
 msgid "This day last week"
 msgstr ""
 
@@ -16808,11 +16808,11 @@ msgstr ""
 msgid "This is the test message from Zabbix"
 msgstr ""
 
-#: include/func.inc.php:2528 srv_status.php:40
+#: include/func.inc.php:2530 srv_status.php:40
 msgid "This month"
 msgstr "本月"
 
-#: include/func.inc.php:2529
+#: include/func.inc.php:2531
 msgid "This month so far"
 msgstr ""
 
@@ -16824,19 +16824,19 @@ msgstr "這篩選-列不是空白. 刪除它?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "這篩選-行不是空白. 刪除它?"
 
-#: include/func.inc.php:2526 srv_status.php:39
+#: include/func.inc.php:2528 srv_status.php:39
 msgid "This week"
 msgstr "本周"
 
-#: include/func.inc.php:2527
+#: include/func.inc.php:2529
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2530 srv_status.php:41
+#: include/func.inc.php:2532 srv_status.php:41
 msgid "This year"
 msgstr "本年"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2533
 msgid "This year so far"
 msgstr ""
 
@@ -16867,7 +16867,7 @@ msgstr "直到"
 #: app/controllers/CControllerPopupTriggerExpr.php:188
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:36
-#: app/views/popup.itemtestedit.view.php:162
+#: app/views/popup.itemtestedit.view.php:170
 #: app/views/popup.triggerexpr.php:136 app/views/popup.triggerexpr.php:140
 #: app/views/reports.auditlog.list.php:70 include/actions.inc.php:1703
 #: include/actions.inc.php:1757 include/actions.inc.php:1838
@@ -16964,12 +16964,12 @@ msgstr "到"
 msgid "To set a host interface select a single item type for all items"
 msgstr "要設定一個主機介面, 選擇一個單一的項目類型給所有的項目"
 
-#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2524
+#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2526
 #: srv_status.php:38
 msgid "Today"
 msgstr "今天"
 
-#: include/func.inc.php:2525
+#: include/func.inc.php:2527
 msgid "Today so far"
 msgstr ""
 
@@ -18431,7 +18431,7 @@ msgstr ""
 #: app/views/popup.condition.common.php:581
 #: app/views/popup.condition.common.php:600 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:138
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:146
 #: app/views/popup.lldoperation.php:240 app/views/popup.testtriggerexpr.php:31
 #: include/blocks.inc.php:617 include/classes/graphdraw/CPieGraphDraw.php:310
 #: include/classes/screens/CScreenEvents.php:32
@@ -19064,11 +19064,11 @@ msgstr "每年"
 msgid "Yes"
 msgstr "是"
 
-#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2518
+#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2520
 msgid "Yesterday"
 msgstr ""
 
-#: include/func.inc.php:1532
+#: include/func.inc.php:1534
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr ""
@@ -19077,7 +19077,7 @@ msgstr ""
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您無法選擇某些語言, 因為這些語系並未安裝於web伺服器上."
 
-#: include/func.inc.php:1549 index_http.php:90 index_sso.php:247
+#: include/func.inc.php:1551 index_http.php:90 index_sso.php:247
 msgid "You are not logged in"
 msgstr ""
 
@@ -19131,7 +19131,7 @@ msgstr "您沒有許可權來創建用戶."
 msgid "You do not have permissions to edit dashboard"
 msgstr ""
 
-#: include/func.inc.php:1532
+#: include/func.inc.php:1534
 msgid "You have no permissions to access this page."
 msgstr "您沒有許可權來操作本頁。"
 
@@ -19139,7 +19139,7 @@ msgstr "您沒有許可權來操作本頁。"
 msgid "You have unsaved changes."
 msgstr ""
 
-#: include/func.inc.php:1551
+#: include/func.inc.php:1553
 msgid "You must login to view this page."
 msgstr "您必需登入才能瀏覽此頁面."
 
@@ -20637,7 +20637,7 @@ msgstr ""
 #: app/views/js/popup.itemtestedit.view.js.php:446
 #: app/views/monitoring.host.view.php:69
 #: app/views/monitoring.problem.view.php:257
-#: app/views/popup.itemtestedit.view.php:74
+#: app/views/popup.itemtestedit.view.php:82
 #: include/classes/html/CMacroValue.php:121
 #: include/classes/html/CMacroValue.php:129
 #: include/classes/widgets/CWidgetHelper.php:466

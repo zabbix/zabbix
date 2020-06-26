@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-18 10:58+0300\n"
+"POT-Creation-Date: 2020-06-26 19:55+0300\n"
 "PO-Revision-Date: 2020-04-28 01:24+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -240,7 +240,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s件選択済"
 
-#: include/func.inc.php:1851
+#: include/func.inc.php:1853
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -270,8 +270,8 @@ msgstr "(0 - アクションのデフォルトを使用)"
 msgid "(Only super admins can create groups)"
 msgstr "(特権管理者のみがグループを作成できます)"
 
-#: app/views/popup.itemtestedit.view.php:104
-#: app/views/popup.itemtestedit.view.php:106
+#: app/views/popup.itemtestedit.view.php:112
+#: app/views/popup.itemtestedit.view.php:114
 #: include/views/configuration.host.edit.php:200
 #: include/views/configuration.host.edit.php:205
 #: include/views/configuration.host.massupdate.php:96
@@ -373,7 +373,7 @@ msgstr "AND"
 msgid "Acceptable SLA"
 msgstr "SLAの許容値"
 
-#: include/func.inc.php:1530
+#: include/func.inc.php:1532
 msgid "Access denied"
 msgstr "アクセスは拒否されました"
 
@@ -1570,7 +1570,7 @@ msgstr "CPUの負荷。浮動小数点値を返す。"
 msgid "CPU utilisation percentage. Returns float"
 msgstr "CPU使用率。浮動小数点値を返す。"
 
-#: app/views/popup.itemtestedit.view.php:156
+#: app/views/popup.itemtestedit.view.php:164
 msgid "CRLF"
 msgstr "CRLF"
 
@@ -3283,7 +3283,7 @@ msgstr "時刻"
 msgid "Clone"
 msgstr "複製"
 
-#: include/func.inc.php:1649 include/views/js/monitoring.sysmaps.js.php:297
+#: include/func.inc.php:1651 include/views/js/monitoring.sysmaps.js.php:297
 #: include/views/js/monitoring.sysmaps.js.php:449
 #: include/views/js/monitoring.sysmaps.js.php:569
 #: include/views/js/monitoring.sysmaps.js.php:664
@@ -4411,7 +4411,7 @@ msgstr "ハードウェア購入日"
 msgid "Day"
 msgstr "日"
 
-#: include/func.inc.php:2519
+#: include/func.inc.php:2521
 msgid "Day before yesterday"
 msgstr "一昨日"
 
@@ -4914,7 +4914,7 @@ msgstr "説明"
 
 #: app/views/administration.mediatype.list.php:77
 #: app/views/reports.auditlog.list.php:77 include/blocks.inc.php:617
-#: include/func.inc.php:1604 include/views/configuration.action.edit.php:170
+#: include/func.inc.php:1606 include/views/configuration.action.edit.php:170
 #: include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:313
 #: include/views/configuration.action.edit.php:395
@@ -5868,7 +5868,7 @@ msgstr "暗号化"
 msgid "Encryption level"
 msgstr "暗号化レベル"
 
-#: app/views/popup.itemtestedit.view.php:153
+#: app/views/popup.itemtestedit.view.php:161
 msgid "End of line sequence"
 msgstr "行末文字列"
 
@@ -5910,7 +5910,7 @@ msgstr "エラー"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 
-#: include/func.inc.php:1643 jsLoader.php:159
+#: include/func.inc.php:1645 jsLoader.php:159
 msgid "Error message"
 msgstr "エラーメッセージ"
 
@@ -6587,16 +6587,16 @@ msgstr "ドイツ語 (de_DE)"
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Webページコンテンツ取得。テキストとしてWebページのソースを返す。"
 
-#: app/views/popup.itemtestedit.view.php:128
+#: app/views/popup.itemtestedit.view.php:136
 msgid "Get value"
 msgstr "値の取得"
 
 #: app/views/js/popup.itemtestedit.view.js.php:483
-#: app/views/popup.itemtestedit.view.php:296
+#: app/views/popup.itemtestedit.view.php:304
 msgid "Get value and test"
 msgstr "値の取得とテスト"
 
-#: app/views/popup.itemtestedit.view.php:86
+#: app/views/popup.itemtestedit.view.php:94
 msgid "Get value from host"
 msgstr "ホストから値を取得"
 
@@ -6631,7 +6631,7 @@ msgstr "%1$sに戻る"
 msgid "Go to"
 msgstr "次のページへ移動"
 
-#: app/views/system.warning.php:31 include/func.inc.php:1543
+#: app/views/system.warning.php:31 include/func.inc.php:1545
 msgid "Go to dashboard"
 msgstr "ダッシュボードへ移動"
 
@@ -7280,7 +7280,7 @@ msgstr "ホストを追加しました"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:114
 #: app/controllers/CControllerPopupItemTestSend.php:154
-#: app/views/popup.itemtestedit.view.php:90
+#: app/views/popup.itemtestedit.view.php:98
 msgid "Host address"
 msgstr "ホストのアドレス"
 
@@ -7815,7 +7815,7 @@ msgstr "システムの識別文字列。文字列値を返す。"
 msgid "If filter matches"
 msgstr ""
 
-#: include/func.inc.php:1533 include/func.inc.php:1552
+#: include/func.inc.php:1535 include/func.inc.php:1554
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "このメッセージが間違っている場合は、必要な権限を得るために管理者に問い合わせてください"
 
@@ -10155,7 +10155,7 @@ msgstr "LDAPによるログインが成功しました"
 msgid "LDAP settings"
 msgstr "LDAP認証の設定"
 
-#: app/views/popup.itemtestedit.view.php:155
+#: app/views/popup.itemtestedit.view.php:163
 msgid "LF"
 msgstr "LF"
 
@@ -10197,37 +10197,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "最後"
 
-#: include/func.inc.php:2572
+#: include/func.inc.php:2574
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "最新の%1$d日間"
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2568
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] "最新の%1$d時間"
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2561
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] "最新の%1$d分間"
 
-#: include/func.inc.php:2575
+#: include/func.inc.php:2577
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] "最新の%1$dヶ月間"
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2554
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] "最新の%1$d秒間"
 
-#: include/func.inc.php:2578
+#: include/func.inc.php:2580
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10548,8 +10548,8 @@ msgstr "マッチしないSNMPトラップをログに記録"
 
 #: app/controllers/CControllerAuditLogList.php:167
 #: app/views/administration.authentication.edit.php:127
-#: app/views/administration.user.list.php:97 include/func.inc.php:1540
-#: include/func.inc.php:1555 index_http.php:93 index_sso.php:250
+#: app/views/administration.user.list.php:97 include/func.inc.php:1542
+#: include/func.inc.php:1557 index_http.php:93 index_sso.php:250
 msgid "Login"
 msgstr "ログイン"
 
@@ -10647,7 +10647,7 @@ msgstr "hostmacroid \"%1$s\"を持つマクロは存在しません。"
 #: app/partials/massupdate.macros.tab.php:118
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
-#: app/views/popup.itemtestedit.view.php:178 include/html.inc.php:913
+#: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:913
 #: include/views/configuration.host.edit.php:621
 #: include/views/configuration.host.massupdate.php:308
 #: include/views/configuration.host.prototype.edit.php:303
@@ -11449,7 +11449,7 @@ msgstr "NTLM"
 #: app/views/monitoring.widget.plaintext.view.php:48
 #: app/views/popup.httpstep.php:45 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:193
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:201
 #: app/views/popup.lldoperation.php:240 app/views/popup.lldoverride.php:47
 #: app/views/popup.operation.common.php:671
 #: app/views/popup.triggerwizard.php:81 correlation.php:35
@@ -12162,7 +12162,7 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1508 items.php:1436 items.php:1640 services.php:84
+#: include/func.inc.php:1507 items.php:1436 items.php:1640 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "対象が存在しないか、アクセス権がありません！"
 
@@ -13533,7 +13533,7 @@ msgstr "ホストインベントリフィールドの自動設定"
 #: app/views/administration.authentication.edit.php:96
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
-#: app/views/popup.itemtestedit.view.php:116
+#: app/views/popup.itemtestedit.view.php:124
 #: app/views/popup.operation.common.php:517
 #: include/classes/setup/CSetupWizard.php:332 include/hosts.inc.php:1471
 #: include/views/configuration.host.list.php:140
@@ -13578,7 +13578,7 @@ msgstr "インストール事前準備概要"
 msgid "Preprocessing"
 msgstr "保存前処理"
 
-#: app/views/popup.itemtestedit.view.php:221
+#: app/views/popup.itemtestedit.view.php:229
 #: include/views/configuration.host.discovery.edit.php:765
 #: include/views/configuration.item.edit.php:864
 #: include/views/configuration.item.massupdate.php:248
@@ -13592,7 +13592,7 @@ msgstr "保存前処理の設定"
 #: app/controllers/CControllerPopupItemTestSend.php:191
 #: app/controllers/CControllerPopupItemTestSend.php:196
 #: app/controllers/CControllerPopupItemTestSend.php:201
-#: app/views/popup.itemtestedit.view.php:168
+#: app/views/popup.itemtestedit.view.php:176
 msgid "Prev. time"
 msgstr "前の時間"
 
@@ -13603,7 +13603,7 @@ msgstr "前の時間"
 msgid "Preview"
 msgstr "プレビュー"
 
-#: include/func.inc.php:2522
+#: include/func.inc.php:2524
 msgid "Previous month"
 msgstr "先月"
 
@@ -13611,15 +13611,15 @@ msgstr "先月"
 msgid "Previous page"
 msgstr "前のページ"
 
-#: app/views/popup.itemtestedit.view.php:146
+#: app/views/popup.itemtestedit.view.php:154
 msgid "Previous value"
 msgstr "前の値"
 
-#: include/func.inc.php:2521
+#: include/func.inc.php:2523
 msgid "Previous week"
 msgstr "先週"
 
-#: include/func.inc.php:2523
+#: include/func.inc.php:2525
 msgid "Previous year"
 msgstr "去年"
 
@@ -13834,7 +13834,7 @@ msgstr "プロキシ"
 #: app/views/administration.proxy.edit.php:87
 #: app/views/administration.proxy.edit.php:122
 #: app/views/popup.condition.common.php:507
-#: app/views/popup.itemtestedit.view.php:100 include/actions.inc.php:63
+#: app/views/popup.itemtestedit.view.php:108 include/actions.inc.php:63
 #: include/views/configuration.discovery.list.php:67
 #: include/views/configuration.host.list.php:148
 #: include/views/configuration.host.list.php:152
@@ -14515,8 +14515,8 @@ msgstr "レスポンスタイプ: 文字列"
 
 #: app/views/administration.regex.edit.php:119
 #: app/views/administration.regex.edit.php:124
-#: app/views/popup.itemtestedit.view.php:194
-#: app/views/popup.itemtestedit.view.php:229
+#: app/views/popup.itemtestedit.view.php:202
+#: app/views/popup.itemtestedit.view.php:237
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:168
 #: include/classes/debug/CProfiler.php:183
@@ -16199,7 +16199,7 @@ msgstr "サブマップ"
 msgid "Success Audit"
 msgstr "成功の監査"
 
-#: include/func.inc.php:1643 jsLoader.php:158
+#: include/func.inc.php:1645 jsLoader.php:158
 msgid "Success message"
 msgstr "成功メッセージ"
 
@@ -16264,7 +16264,7 @@ msgstr "システムのブート時刻。UNIXのタイムスタンプで整数�
 msgid "System default"
 msgstr "システムデフォルト"
 
-#: include/func.inc.php:1670
+#: include/func.inc.php:1672
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "システムエラーが発生しました。Zabbix管理者に連絡してください。"
 
@@ -16596,7 +16596,7 @@ msgstr "テンプレートを更新しました"
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
 #: app/views/js/popup.itemtestedit.view.js.php:506
-#: app/views/popup.itemtestedit.view.php:296
+#: app/views/popup.itemtestedit.view.php:304
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1420
 #: include/views/configuration.host.discovery.edit.php:789
@@ -16794,7 +16794,7 @@ msgstr "Webシナリオが設定されているホストと異なるホストに
 msgid "Theme"
 msgstr "テーマ"
 
-#: include/func.inc.php:2520
+#: include/func.inc.php:2522
 msgid "This day last week"
 msgstr "先週の今日"
 
@@ -16807,11 +16807,11 @@ msgstr "このフィールドはアイテム\"%1$s\"によって自動的に設�
 msgid "This is the test message from Zabbix"
 msgstr "これはZabbixからのテストメッセージです"
 
-#: include/func.inc.php:2528 srv_status.php:40
+#: include/func.inc.php:2530 srv_status.php:40
 msgid "This month"
 msgstr "今月"
 
-#: include/func.inc.php:2529
+#: include/func.inc.php:2531
 msgid "This month so far"
 msgstr "今月(現在まで)"
 
@@ -16823,19 +16823,19 @@ msgstr "スクリーンの列は空ではありません。削除しますか？
 msgid "This screen row is not empty. Delete it?"
 msgstr "スクリーンの行は空ではありません。削除しますか？"
 
-#: include/func.inc.php:2526 srv_status.php:39
+#: include/func.inc.php:2528 srv_status.php:39
 msgid "This week"
 msgstr "今週"
 
-#: include/func.inc.php:2527
+#: include/func.inc.php:2529
 msgid "This week so far"
 msgstr "今週(現在まで)"
 
-#: include/func.inc.php:2530 srv_status.php:41
+#: include/func.inc.php:2532 srv_status.php:41
 msgid "This year"
 msgstr "今年"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2533
 msgid "This year so far"
 msgstr "今年(現在まで)"
 
@@ -16866,7 +16866,7 @@ msgstr "終了"
 #: app/controllers/CControllerPopupTriggerExpr.php:188
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:36
-#: app/views/popup.itemtestedit.view.php:162
+#: app/views/popup.itemtestedit.view.php:170
 #: app/views/popup.triggerexpr.php:136 app/views/popup.triggerexpr.php:140
 #: app/views/reports.auditlog.list.php:70 include/actions.inc.php:1703
 #: include/actions.inc.php:1757 include/actions.inc.php:1838
@@ -16963,12 +16963,12 @@ msgstr "終了"
 msgid "To set a host interface select a single item type for all items"
 msgstr "すべてのアイテムのため1つのホストインターフェースを選択する必要があります"
 
-#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2524
+#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2526
 #: srv_status.php:38
 msgid "Today"
 msgstr "今日"
 
-#: include/func.inc.php:2525
+#: include/func.inc.php:2527
 msgid "Today so far"
 msgstr "今日(現在まで)"
 
@@ -18430,7 +18430,7 @@ msgstr "バリデーション"
 #: app/views/popup.condition.common.php:581
 #: app/views/popup.condition.common.php:600 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:138
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:146
 #: app/views/popup.lldoperation.php:240 app/views/popup.testtriggerexpr.php:31
 #: include/blocks.inc.php:617 include/classes/graphdraw/CPieGraphDraw.php:310
 #: include/classes/screens/CScreenEvents.php:32
@@ -19063,11 +19063,11 @@ msgstr "毎年"
 msgid "Yes"
 msgstr "はい"
 
-#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2518
+#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2520
 msgid "Yesterday"
 msgstr "昨日"
 
-#: include/func.inc.php:1532
+#: include/func.inc.php:1534
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\"としてログインしています。"
@@ -19076,7 +19076,7 @@ msgstr "\"%1$s\"としてログインしています。"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Webサーバーにロケールがインストールされていないため、いくつかの言語は利用できません。"
 
-#: include/func.inc.php:1549 index_http.php:90 index_sso.php:247
+#: include/func.inc.php:1551 index_http.php:90 index_sso.php:247
 msgid "You are not logged in"
 msgstr "あなたはログインしていません"
 
@@ -19130,7 +19130,7 @@ msgstr "ユーザーを作成する権限がありません。"
 msgid "You do not have permissions to edit dashboard"
 msgstr "ダッシュボードを編集する権限がありません"
 
-#: include/func.inc.php:1532
+#: include/func.inc.php:1534
 msgid "You have no permissions to access this page."
 msgstr "このページを表示する権限がありません。"
 
@@ -19138,7 +19138,7 @@ msgstr "このページを表示する権限がありません。"
 msgid "You have unsaved changes."
 msgstr "保存していない変更があります。"
 
-#: include/func.inc.php:1551
+#: include/func.inc.php:1553
 msgid "You must login to view this page."
 msgstr "このページを表示するためにはログインする必要があります"
 
@@ -20639,7 +20639,7 @@ msgstr "サポートされていないバージョン番号です"
 #: app/views/js/popup.itemtestedit.view.js.php:446
 #: app/views/monitoring.host.view.php:69
 #: app/views/monitoring.problem.view.php:257
-#: app/views/popup.itemtestedit.view.php:74
+#: app/views/popup.itemtestedit.view.php:82
 #: include/classes/html/CMacroValue.php:121
 #: include/classes/html/CMacroValue.php:129
 #: include/classes/widgets/CWidgetHelper.php:466
