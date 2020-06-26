@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include <openssl/rand.h>
 
 /*
  * 5.2 development database patches
@@ -29,10 +30,30 @@
 
 extern unsigned char	program_type;
 
-/*static int	DBpatch_5010000(void)
+static int	DBpatch_5010000(void)
 {
-	*** put the first upgrade patch here ***
-}*/
+	const ZBX_FIELD	field = {"session_key", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5010001(void)
+{
+	char		buffer[16], string[33];
+	unsigned int	i;
+
+	if (1 != RAND_bytes(buffer, sizeof(buffer))
+		return FAIL;
+
+	/* convert hex to text */
+	for (i = 0; i < ARRSIZE(buffer); i++)
+		zbx_snprintf(string[i * 2], ARRSIZE(buffer), "%02x", buffer[i]);
+
+	if (ZBX_DB_OK > DBexecute("update config set session_key='%s' where configid=1", string))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 #endif
 
@@ -40,6 +61,7 @@ DBPATCH_START(5010)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(5010000, 0, 1)*/
+DBPATCH_ADD(5010000, 0, 1)
+DBPATCH_ADD(5010001, 0, 1)
 
 DBPATCH_END()
