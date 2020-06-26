@@ -2981,6 +2981,8 @@
 					methods.addNewWidget.call($obj, this);
 					return cancelEvent(e);
 				});
+
+				data.new_widget_placeholder.container.show();
 			}
 		}
 	}
@@ -3361,6 +3363,7 @@
 						data.minimalHeight = calculateGridMinHeight($this);
 						data['cell-width'] = getCurrentCellWidth(data);
 						data.new_widget_placeholder.updateLabelVisibility();
+						resizeDashboardGrid($this, data);
 					});
 			});
 		},
