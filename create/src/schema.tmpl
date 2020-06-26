@@ -302,7 +302,7 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|key_		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|delay		|t_varchar(1024)|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|history	|t_varchar(255)	|'90d'	|NOT NULL	|0
+FIELD		|history	|t_varchar(255)	|'90d'	|NOT NULL	|ZBX_PROXY
 FIELD		|trends		|t_varchar(255)	|'365d'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -322,7 +322,7 @@ FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_PROXY		|4|interface	|		|RESTRICT
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
-FIELD		|inventory_link	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|inventory_link	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|lifetime	|t_varchar(255)	|'30d'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
@@ -602,8 +602,8 @@ FIELD		|hk_audit	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_sessions_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_sessions	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_history_mode|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_history_global|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|hk_history	|t_varchar(32)	|'90d'	|NOT NULL	|ZBX_NODATA
+FIELD		|hk_history_global|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|hk_history	|t_varchar(32)	|'90d'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|hk_trends_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA

@@ -50,14 +50,18 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDbVersionTable() {
-		$tableExists = DBfetch(DBselect('SELECT 1 FROM information_schema.tables'.
+		$table_exists = DBfetch(DBselect(
+			'SELECT 1 FROM information_schema.tables'.
 			' WHERE table_catalog='.zbx_dbstr($this->dbname).
 				' AND table_schema='.zbx_dbstr($this->schema).
 				' AND table_name='.zbx_dbstr('dbversion')
 		));
 
-		if (!$tableExists) {
-			$this->setError(_('The frontend does not match Zabbix database.'));
+		if (!$table_exists) {
+			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
+				_s('the table "%1$s" was not found', 'dbversion')
+			));
+
 			return false;
 		}
 
@@ -219,7 +223,7 @@ class PostgresqlDbBackend extends DbBackend {
 			$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
 		}
 
-		$resource = pg_connect($conn_string);
+		$resource = @pg_connect($conn_string);
 
 		if (!$resource) {
 			$this->setError('Error connecting to database.');

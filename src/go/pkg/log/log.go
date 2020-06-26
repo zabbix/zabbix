@@ -104,22 +104,28 @@ func DecreaseLogLevel() (success bool) {
 	return false
 }
 
+// Open sets a new logger based on the log type and a new log output level
 func Open(logType int, level int, filename string, filesize int) error {
-
 	logStat.logType = logType
 	logStat.filename = filename
 	logStat.filesize = int64(filesize) * MB
 	var err error
 
-	if logType == Console {
+	switch logType {
+	case System:
+		err = createSyslog()
+		if err != nil {
+			return err
+		}
+	case Console:
 		logger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
-	} else if logType == File {
+	case File:
 		logStat.f, err = os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return err
 		}
 		logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
-	} else {
+	default:
 		return errors.New("invalid argument")
 	}
 
@@ -129,41 +135,46 @@ func Open(logType int, level int, filename string, filesize int) error {
 
 func Infof(format string, args ...interface{}) {
 	if CheckLogLevel(Info) {
-		procLog(format, args)
+		procLog(format, args, Info)
 	}
 }
 
 func Critf(format string, args ...interface{}) {
 	if CheckLogLevel(Crit) {
-		procLog(format, args)
+		procLog(format, args, Crit)
 	}
 }
 
 func Errf(format string, args ...interface{}) {
 	if CheckLogLevel(Err) {
-		procLog(format, args)
+		procLog(format, args, Err)
 	}
 }
 
 func Warningf(format string, args ...interface{}) {
 	if CheckLogLevel(Warning) {
-		procLog(format, args)
+		procLog(format, args, Warning)
 	}
 }
 
 func Tracef(format string, args ...interface{}) {
 	if CheckLogLevel(Trace) {
-		procLog(format, args)
+		procLog(format, args, Trace)
 	}
 }
 
 func Debugf(format string, args ...interface{}) {
 	if CheckLogLevel(Debug) {
-		procLog(format, args)
+		procLog(format, args, Debug)
 	}
 }
 
-func procLog(format string, args []interface{}) {
+func procLog(format string, args []interface{}, level int) {
+	if logStat.logType == System {
+		procSysLog(format, args, level)
+		return
+	}
+
 	logAccess.Lock()
 	defer logAccess.Unlock()
 	rotateLog()

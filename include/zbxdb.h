@@ -79,11 +79,13 @@ zbx_db_value_t;
 #	define ZBX_ROW_DL	";\n"
 #endif
 
-int	zbx_db_init(const char *dbname, const char *const db_schema, char **error);
+int	zbx_db_init(const char *dbname, const char *const dbschema, char **error);
 void	zbx_db_deinit(void);
 
+void	zbx_db_init_autoincrement_options(void);
+
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tlsmode, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
 void	zbx_db_close(void);
 
 int	zbx_db_begin(void);
@@ -94,7 +96,9 @@ int	zbx_db_txn_error(void);
 int	zbx_db_txn_end_error(void);
 const char	*zbx_db_last_strerr(void);
 
+#ifdef HAVE_POSTGRESQL
 int	zbx_dbms_get_version(void);
+#endif
 
 #ifdef HAVE_ORACLE
 

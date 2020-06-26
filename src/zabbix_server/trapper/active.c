@@ -532,14 +532,12 @@ out:
  * Purpose: send list of active checks to the host                            *
  *                                                                            *
  * Parameters: sock - open socket of server-agent connection                  *
- *             json - request buffer                                          *
+ *             jp   - request buffer                                          *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)

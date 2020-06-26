@@ -79,7 +79,7 @@ func TestNoRules(t *testing.T) {
 		{metric: "vfs.file.contents[]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 0)
+	RunScenarios(t, scenarios, records, 1)
 }
 
 func TestDenyAll(t *testing.T) {
@@ -108,7 +108,7 @@ func TestNoParameters(t *testing.T) {
 		{metric: "vfs.file.contents.ext", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestEmptyParameters(t *testing.T) {
@@ -125,7 +125,7 @@ func TestEmptyParameters(t *testing.T) {
 		{metric: "vfs.file.contents[/etc/passwd]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestAnyParameters(t *testing.T) {
@@ -139,7 +139,7 @@ func TestAnyParameters(t *testing.T) {
 		{metric: "vfs.file.contents", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestAnyParametersDoubleAsterisk(t *testing.T) {
@@ -154,7 +154,7 @@ func TestAnyParametersDoubleAsterisk(t *testing.T) {
 		{metric: "vfs.file.contents", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestSpecificFirstParameter(t *testing.T) {
@@ -172,7 +172,7 @@ func TestSpecificFirstParameter(t *testing.T) {
 		{metric: "vfs.file.contents[]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestFirstParameterPattern(t *testing.T) {
@@ -188,7 +188,7 @@ func TestFirstParameterPattern(t *testing.T) {
 		{metric: "vfs.file.contents[/etc/passwd,utf8]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestAnySecondParameter(t *testing.T) {
@@ -203,7 +203,7 @@ func TestAnySecondParameter(t *testing.T) {
 		{metric: "test[]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestFirstParameterPatternAndAnyFollowing(t *testing.T) {
@@ -218,7 +218,7 @@ func TestFirstParameterPatternAndAnyFollowing(t *testing.T) {
 		{metric: "vfs.file.contents[/tmp/test]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestAnyFirstParameter(t *testing.T) {
@@ -233,7 +233,7 @@ func TestAnyFirstParameter(t *testing.T) {
 		{metric: "test[anything,b,]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestEmptySecondParameterValue(t *testing.T) {
@@ -247,7 +247,7 @@ func TestEmptySecondParameterValue(t *testing.T) {
 		{metric: "test[a,b,c]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestAnySecondParameterValue(t *testing.T) {
@@ -261,7 +261,7 @@ func TestAnySecondParameterValue(t *testing.T) {
 		{metric: "vfs.file.contents[/var/log/zabbix_server.log,,abc,def]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestSpecificParameters(t *testing.T) {
@@ -276,7 +276,7 @@ func TestSpecificParameters(t *testing.T) {
 		{metric: "vfs.file.contents[/etc/passwd,utf16]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestQuotedParameters(t *testing.T) {
@@ -308,7 +308,7 @@ func TestKeyPatternWithoutParameters(t *testing.T) {
 		{metric: "vfs.dev.list", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestKeyPatternWithAnyParameters(t *testing.T) {
@@ -326,7 +326,7 @@ func TestKeyPatternWithAnyParameters(t *testing.T) {
 		{metric: "vfs.contents", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 2)
+	RunScenarios(t, scenarios, records, 3)
 }
 
 func TestWhitelist(t *testing.T) {
@@ -383,7 +383,7 @@ func TestCombinedWildcardInKey(t *testing.T) {
 		{metric: "best[a]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestDuplicateRules(t *testing.T) {
@@ -470,9 +470,9 @@ func TestIncompleteWhitelist(t *testing.T) {
 	records.addRule("system.localtime[*]", ALLOW)
 	// Trailing DenyKey=* is missing
 
-	var err error = LoadRules(&records.allowRecords, &records.denyRecords);
+	var err error = LoadRules(&records.allowRecords, &records.denyRecords)
 
-	if err == nil || err.Error() != "\"AllowKey\" without \"DenyKey\" rules are meaningless" {
+	if err == nil {
 		t.Errorf("Failure expected while loading incomplete whitelist")
 	}
 }
@@ -491,7 +491,7 @@ func TestNoTrailingAllowRules(t *testing.T) {
 		{metric: "system.localtime", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }
 
 func TestEmptyParametersMatch(t *testing.T) {
@@ -508,5 +508,5 @@ func TestEmptyParametersMatch(t *testing.T) {
 		{metric: "web.page.get[127.0.0.1]", result: true},
 	}
 
-	RunScenarios(t, scenarios, records, 1)
+	RunScenarios(t, scenarios, records, 2)
 }

@@ -59,7 +59,7 @@ char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *ho
 int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end);
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);
 
-int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameters,
+int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error);
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
@@ -91,10 +91,10 @@ void	get_trigger_expression_constant(const char *expression, const zbx_token_ref
 int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
 		int flags, char *error, size_t max_error_len);
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, int macro_type, char *error, size_t mexerrlen);
+		const zbx_vector_ptr_t *lld_macro_paths, int macro_type, char *error, size_t maxerrlen);
 int	substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
-		char *error, size_t mexerrlen);
+		char *error, size_t maxerrlen);
 int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len);

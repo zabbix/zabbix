@@ -41,6 +41,7 @@ extern int	CONFIG_ESCALATOR_FORKS;
 #define ZBX_ESCALATION_SOURCE_ITEM	1
 #define ZBX_ESCALATION_SOURCE_TRIGGER	2
 
+#define ZBX_ESCALATION_UNSET		-1
 #define ZBX_ESCALATION_CANCEL		0
 #define ZBX_ESCALATION_DELETE		1
 #define ZBX_ESCALATION_SKIP		2
@@ -205,7 +206,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	int			ret = FAIL, i;
 	zbx_vector_ptr_t	tag_filters;
 	zbx_tag_filter_t	*tag_filter;
-	DB_CONDITION		condition;
+	zbx_condition_t		condition;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -259,7 +260,9 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 				condition.value = tag_filter->tag;
 			}
 
+			zbx_vector_uint64_create(&condition.eventids);
 			ret = check_action_condition(event, &condition);
+			zbx_vector_uint64_destroy(&condition.eventids);
 		}
 		else
 			ret = SUCCEED;
@@ -1392,7 +1395,7 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_CONDITION	condition;
+	zbx_condition_t	condition;
 
 	int		ret = SUCCEED; /* SUCCEED required for CONDITION_EVAL_TYPE_AND_OR */
 	int		cond, exit = 0;
@@ -1412,6 +1415,7 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 		condition.conditiontype	= (unsigned char)atoi(row[0]);
 		condition.op = (unsigned char)atoi(row[1]);
 		condition.value = row[2];
+		zbx_vector_uint64_create(&condition.eventids);
 
 		switch (evaltype)
 		{
@@ -1458,6 +1462,8 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 				exit = 1;
 				break;
 		}
+
+		zbx_vector_uint64_destroy(&condition.eventids);
 	}
 	DBfree_result(result);
 
@@ -1992,7 +1998,8 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	if (0 != escalation->esc_step)
+	/* the cancellation notification can be sent if no objects are deleted */
+	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step)
 	{
 		add_sentusers_msg(&user_msg, action->actionid, 0, event, NULL, NULL, action->eventsource,
 				ZBX_OPERATION_MODE_NORMAL, ZBX_NULL2EMPTY_STR(error));
@@ -2224,10 +2231,10 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 	for (i = 0; i < escalations->values_num; i++)
 	{
-		int		index;
+		int		index, state = ZBX_ESCALATION_UNSET;
 		char		*error = NULL;
-		DB_ACTION	*action;
-		DB_EVENT	*event, *r_event;
+		DB_ACTION	*action = NULL;
+		DB_EVENT	*event = NULL, *r_event;
 		DB_ESCALATION	*escalation;
 
 		escalation = (DB_ESCALATION *)escalations->values[i];
@@ -2236,31 +2243,35 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			error = zbx_dsprintf(error, "action id:" ZBX_FS_UI64 " deleted", escalation->actionid);
-			goto cancel_warning;
+			state = ZBX_ESCALATION_CANCEL;
 		}
-
-		action = (DB_ACTION *)actions.values[index];
-
-		if (ACTION_STATUS_ACTIVE != action->status)
+		else
 		{
-			error = zbx_dsprintf(error, "action '%s' disabled.", action->name);
-			goto cancel_warning;
+			action = (DB_ACTION *)actions.values[index];
+
+			if (ACTION_STATUS_ACTIVE != action->status)
+			{
+				error = zbx_dsprintf(error, "action '%s' disabled.", action->name);
+				state = ZBX_ESCALATION_CANCEL;
+			}
 		}
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(&events, &escalation->eventid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			error = zbx_dsprintf(error, "event id:" ZBX_FS_UI64 " deleted.", escalation->eventid);
-			goto cancel_warning;
+			state = ZBX_ESCALATION_CANCEL;
 		}
-
-		event = (DB_EVENT *)events.values[index];
-
-		if ((EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source) &&
-				EVENT_OBJECT_TRIGGER == event->object && 0 == event->trigger.triggerid)
+		else
 		{
-			error = zbx_dsprintf(error, "trigger id:" ZBX_FS_UI64 " deleted.", event->objectid);
-			goto cancel_warning;
+			event = (DB_EVENT *)events.values[index];
+
+			if ((EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source) &&
+					EVENT_OBJECT_TRIGGER == event->object && 0 == event->trigger.triggerid)
+			{
+				error = zbx_dsprintf(error, "trigger id:" ZBX_FS_UI64 " deleted.", event->objectid);
+				state = ZBX_ESCALATION_CANCEL;
+			}
 		}
 
 		if (0 != escalation->r_eventid)
@@ -2269,33 +2280,40 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				error = zbx_dsprintf(error, "event id:" ZBX_FS_UI64 " deleted.", escalation->r_eventid);
-				goto cancel_warning;
+				state = ZBX_ESCALATION_CANCEL;
 			}
-
-			r_event = (DB_EVENT *)events.values[index];
-
-			if (EVENT_SOURCE_TRIGGERS == event->source && 0 == r_event->trigger.triggerid)
+			else
 			{
-				error = zbx_dsprintf(error, "trigger id:" ZBX_FS_UI64 " deleted.", r_event->objectid);
-				goto cancel_warning;
+				r_event = (DB_EVENT *)events.values[index];
+
+				if (EVENT_SOURCE_TRIGGERS == r_event->source && 0 == r_event->trigger.triggerid)
+				{
+					error = zbx_dsprintf(error, "trigger id:" ZBX_FS_UI64 " deleted.", r_event->objectid);
+					state = ZBX_ESCALATION_CANCEL;
+				}
 			}
 		}
 		else
 			r_event = NULL;
 
+
 		/* Handle escalation taking into account status of items, triggers, hosts, */
 		/* maintenance and trigger dependencies.                                   */
-		switch (check_escalation(escalation, action, event, &error))
+		if (ZBX_ESCALATION_UNSET == state)
+			state = check_escalation(escalation, action, event, &error);
+
+		switch (state)
 		{
 			case ZBX_ESCALATION_CANCEL:
 				escalation_cancel(escalation, action, event, error);
 				zbx_free(error);
-				ZBX_FALLTHROUGH;
+				zbx_vector_uint64_append(&escalationids, escalation->escalationid);
+				continue;
 			case ZBX_ESCALATION_DELETE:
 				zbx_vector_uint64_append(&escalationids, escalation->escalationid);
-				ZBX_FALLTHROUGH;
+				continue;
 			case ZBX_ESCALATION_SKIP:
-				goto cancel_warning;	/* error is NULL on skip */
+				continue;
 			case ZBX_ESCALATION_SUPPRESS:
 				diff = escalation_create_diff(escalation);
 				escalation->nextcheck = now + SEC_PER_MIN;
@@ -2365,13 +2383,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 		escalation_update_diff(escalation, diff);
 		zbx_vector_ptr_append(&diffs, diff);
-cancel_warning:
-		if (NULL != error)
-		{
-			escalation_log_cancel_warning(escalation, error);
-			zbx_vector_uint64_append(&escalationids, escalation->escalationid);
-			zbx_free(error);
-		}
 	}
 
 	if (0 == diffs.values_num && 0 == escalationids.values_num)
@@ -2450,7 +2461,10 @@ cancel_warning:
 
 	/* 3. Delete cancelled, completed escalations. */
 	if (0 != escalationids.values_num)
+	{
+		zbx_vector_uint64_sort(&escalationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		DBexecute_multiple_query("delete from escalations where", "escalationid", &escalationids);
+	}
 
 	DBcommit();
 out:

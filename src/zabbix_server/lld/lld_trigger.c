@@ -904,7 +904,7 @@ static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functio
 		{
 			int	macro_r, context_l, context_r;
 
-			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r, NULL))
 				l += macro_r;
 			else
 				l++;
@@ -982,7 +982,7 @@ static char	*lld_expression_expand(const char *expression, const zbx_vector_ptr_
 		{
 			int	macro_r, context_l, context_r;
 
-			if (SUCCEED == zbx_user_macro_parse(expression + l, &macro_r, &context_l, &context_r))
+			if (SUCCEED == zbx_user_macro_parse(expression + l, &macro_r, &context_l, &context_r, NULL))
 				l += macro_r;
 			else
 				l++;
@@ -2308,7 +2308,7 @@ static void	lld_expression_create(char **expression, const zbx_vector_ptr_t *fun
 		{
 			int	macro_r, context_l, context_r;
 
-			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r, NULL))
 				l += macro_r;
 			else
 				l++;

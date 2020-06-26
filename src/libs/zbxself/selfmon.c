@@ -128,7 +128,7 @@ extern int		process_num;
  *                                                                            *
  * Purpose: Returns number of processes depending on process type             *
  *                                                                            *
- * Parameters: process_type - [IN] process type; ZBX_PROCESS_TYPE_*           *
+ * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
  *                                                                            *
  * Return value: number of processes                                          *
  *                                                                            *
@@ -483,8 +483,8 @@ out:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num,
-		unsigned char state, double *value)
+void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
+		double *value)
 {
 	unsigned int	total = 0, counter = 0;
 	unsigned char	s;

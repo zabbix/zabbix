@@ -151,6 +151,7 @@ static char	*execute_script(const char *script, const char *param, int timeout, 
 	if (FAIL == zbx_es_init_env(&es, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot initialize scripting environment: %s", errmsg);
+		zbx_free(errmsg);
 		return NULL;
 	}
 
@@ -160,12 +161,14 @@ static char	*execute_script(const char *script, const char *param, int timeout, 
 	if (FAIL == zbx_es_compile(&es, script, &code, &size, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot compile script: %s", errmsg);
+		zbx_free(errmsg);
 		goto out;
 	}
 
 	if (FAIL == zbx_es_execute(&es, script, code, size, param, &result, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot execute script: %s", errmsg);
+		zbx_free(errmsg);
 		goto out;
 	}
 out:

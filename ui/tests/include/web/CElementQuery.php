@@ -46,6 +46,9 @@ require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
 require_once dirname(__FILE__).'/CastableTrait.php';
 
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+
 /**
  * Element selection query.
  */
@@ -172,7 +175,7 @@ class CElementQuery implements IWaitable {
 			}
 		}
 
-		return call_user_func(['WebDriverBy', $type], $locator);
+		return call_user_func([WebDriverBy::class, $type], $locator);
 	}
 
 	/**
@@ -317,7 +320,10 @@ class CElementQuery implements IWaitable {
 			throw $exception;
 		}
 
-		return new $class($element, array_merge($this->options, ['parent' => $parent, 'by' => $this->by]));
+		return call_user_func([$class, 'createInstance'], $element, array_merge($this->options, [
+			'parent' => $parent,
+			'by' => $this->by
+		]));
 	}
 
 	/**
@@ -332,7 +338,7 @@ class CElementQuery implements IWaitable {
 
 		if ($this->class !== 'RemoteWebElement') {
 			foreach ($elements as &$element) {
-				$element = new $class($element, $this->options);
+				$element = call_user_func([$class, 'createInstance'], $element, $this->options);
 			}
 			unset($element);
 		}

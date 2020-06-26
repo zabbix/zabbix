@@ -148,13 +148,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				error(_s('Test of "%1$s" items is not supported.', item_type2str($this->item_type)));
 				$ret = false;
 			}
-			elseif ($this->get_value_from_host && in_array($this->item_type, $this->items_require_interface)) {
-				if (!array_key_exists('address', $interface) || $interface['address'] === '') {
+			elseif ($this->get_value_from_host && array_key_exists($this->item_type, $this->items_require_interface)) {
+				if ($this->items_require_interface[$this->item_type]['address']
+						&& (!array_key_exists('address', $interface) || $interface['address'] === '')) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host address'), _('cannot be empty')));
 					$ret = false;
 				}
 
-				if ($this->item_type != ITEM_TYPE_SIMPLE
+				if ($this->items_require_interface[$this->item_type]['port']
 						&& (!array_key_exists('port', $interface) || $interface['port'] === '')) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
 					$ret = false;
