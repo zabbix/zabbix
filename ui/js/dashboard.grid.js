@@ -2586,7 +2586,7 @@
 				}));
 
 				$placeholder.click(callback);
-				this.clearPosition();
+				this.setDefaultPositionAndSize();
 			},
 			setPositioning: function() {
 				$placeholder.off('click');
@@ -2603,7 +2603,7 @@
 				updateLabelVisibility();
 			},
 			updateLabelVisibility: updateLabelVisibility,
-			setPosition: function(pos) {
+			setPositionAndSize: function(pos) {
 				$placeholder.css({
 					position: 'absolute',
 					top: pos.top,
@@ -2612,8 +2612,14 @@
 					width: pos.width
 				});
 			},
-			clearPosition: function() {
-				$placeholder.removeAttr('style');
+			setDefaultPositionAndSize: function() {
+				$placeholder.css({
+					position: '',
+					top: '',
+					left: '',
+					height: '',
+					width: ''
+				});
 			}
 		};
 	}
@@ -2678,15 +2684,6 @@
 						closeCallback: function() {
 							data['pos-action'] = '';
 							data.add_widget_dimension = {};
-
-							if (data.widgets.length) {
-								placeholder.container.hide();
-								placeholder.setPositioning();
-							}
-							else {
-								placeholder.clearPosition();
-								placeholder.setPositioning();
-							}
 						}
 					};
 
@@ -2899,14 +2896,12 @@
 				// Hide widget headers, not to interfere with the new widget placeholder.
 				doLeaveWidgetsExcept($obj, data);
 
-				var css_pos = {
+				data.new_widget_placeholder.setPositionAndSize({
 					top: (data.add_widget_dimension.y * data.options['widget-height']) + 'px',
 					left: (data.add_widget_dimension.x * data.options['widget-width']) + '%',
 					height: (data.add_widget_dimension.height * data.options['widget-height']) + 'px',
 					width: (data.add_widget_dimension.width * data.options['widget-width']) + '%'
-				}
-
-				data.new_widget_placeholder.setPosition(css_pos);
+				});
 				data.new_widget_placeholder.container.show();
 				data.new_widget_placeholder.updateLabelVisibility();
 			});
