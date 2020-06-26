@@ -208,7 +208,6 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 
 	if service == "ldap" {
 		l := ldap.NewConn(conn, false)
-		l.Debug = false
 		l.Start()
 		defer l.Close()
 		return p.validateLdap(l, address)
