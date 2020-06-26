@@ -428,7 +428,9 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'script_inline':
 				this.unsetProperty(key);
-				this.$dialogue.$script.html(obj[key]);
+				// See: jQuery.html() rnoInnerhtml = /<script|<style|<link/i
+				// If content matches this regex it will be parsed in jQuery.buildFragment as HTML, but here we have JS.
+				this.$dialogue.$script.get(0).innerHTML = obj[key];
 				this.$dialogue.$footer.prepend(this.$dialogue.$script);
 				break;
 
