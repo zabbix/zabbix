@@ -61,14 +61,13 @@ class CScreenUrl extends CScreenBase {
 			if (ZBX_IFRAME_SANDBOX !== false) {
 				$item->setAttribute('sandbox', ZBX_IFRAME_SANDBOX);
 			}
-		}
-		else {
-			$item = makeMessageBox(false, [[
-				'type' => 'error',
-				'message' => _s('Provided URL "%1$s" is invalid.', $this->screenitem['url'])
-			]]);
+
+			return $item;
 		}
 
-		return $item;
+		return makeMessageBox(false, [[
+			'type' => 'error',
+			'message' => _s('Provided URL "%1$s" is invalid.', $this->screenitem['url'])
+		]]);
 	}
 }
