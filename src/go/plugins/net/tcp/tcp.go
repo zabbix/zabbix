@@ -202,12 +202,14 @@ func (p *Plugin) httpsExpect(ip string, port string) int {
 		return 0
 	}
 	if scheme != "" && scheme != "https" {
+		log.Debugf("https error: incorrect scheme '%s' in url [%s]", scheme, ip)
 		return 0
 	}
 
-	u, err := url.Parse(fmt.Sprintf("%s://%s", "https", encloseIPv6(host)))
+	rawURL := fmt.Sprintf("%s://%s", "https", encloseIPv6(host))
+	u, err := url.Parse(rawURL)
 	if err != nil {
-		log.Debugf("https error: cannot parse the url [%s]: %s", ip, err.Error())
+		log.Debugf("https error: cannot parse the combined url [%s]: %s", rawURL, err.Error())
 		return 0
 	}
 

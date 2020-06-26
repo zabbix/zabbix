@@ -56,6 +56,7 @@ func Test_removeScheme(t *testing.T) {
 		})
 	}
 }
+
 func Test_encloseIPv6(t *testing.T) {
 	type args struct {
 		in string
