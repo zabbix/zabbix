@@ -36,39 +36,19 @@ static int	DBpatch_5000000(void)
 
 static int	DBpatch_5000001(void)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
-	int		ret = SUCCEED;
-	int		i;
-	const char	*values[] = {
-			"web.latest.toggle", "web.latest.toggle_other"
-		};
-
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (i = 0; i < (int)ARRSIZE(values); i++)
-	{
-		if (ZBX_DB_OK > DBexecute("delete from profiles where idx='%s'", values[i]))
-			return FAIL;
-	}
+    if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.latest.toggle' or idx='web.latest.toggle_other'"))
+        return FAIL;
 
-	result = DBselect("select userid from profiles where idx='web.latest.sort' and value_str='lastclock'");
+    if (ZBX_DB_OK > DBexecute(
+            "delete from profiles"
+            " where (idx='web.latest.sort' or idx='web.latest.sortorder')"
+            " and userid in (select userid from profiles where idx='web.latest.sort' and value_str='lastclock')"))
+        return FAIL;
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (ZBX_DB_OK > DBexecute(
-			"delete from profiles where userid='%s' and (idx='web.latest.sort' or idx='web.latest.sortorder')", row[0]
-		))
-		{
-			ret = FAIL;
-			goto out;
-		}
-	}
-out:
-	DBfree_result(result);
-
-	return ret;
+    return SUCCEED;
 }
 
 #endif
