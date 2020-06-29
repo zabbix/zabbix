@@ -1,1 +1,1 @@
-A......... [ZBX-17952] fixed compression_availability config not being checked when deleting history (talbergs)
+A......... [ZBX-17952] fixed compression availability not being checked when deleting history (talbergs)
