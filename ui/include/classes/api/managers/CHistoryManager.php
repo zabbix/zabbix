@@ -1061,7 +1061,7 @@ class CHistoryManager {
 		}
 
 		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] == ZBX_DB_EXTENSION_TIMESCALEDB
-				&& PostgresqlDbBackend::isCompressed($item_tables)) {
+				&& $config['compression_availability'] == 1 && PostgresqlDbBackend::isCompressed($item_tables)) {
 			error(_('Some of the history for this item may be compressed, deletion is not available.'));
 
 			return false;
