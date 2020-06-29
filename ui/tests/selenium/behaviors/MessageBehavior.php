@@ -32,11 +32,13 @@ class CMessageBehavior extends CBehavior {
 	 * @param string			$title		reference title
 	 * @param string, array		$details	reference array or string values of which should be present in message details
 	 */
-	public function assertMessage($expected, $title, $details = null) {
+	public function assertMessage($expected, $title = null, $details = null) {
 		$message = CMessageElement::find()->one();
 
 		$this->test->assertTrue(($expected === TEST_GOOD) ? $message->isGood() : $message->isBad());
-		$this->test->assertEquals($title, $message->getTitle(), 'Message title and the expected title do not match.');
+		if ($title !== null) {
+			$this->test->assertEquals($title, $message->getTitle(), 'Message title and the expected title do not match.');
+		}
 
 		if ($details !== null) {
 			if (!is_array($details)) {
