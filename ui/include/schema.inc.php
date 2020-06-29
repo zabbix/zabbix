@@ -2981,6 +2981,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'session_key' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
+			],
 		],
 	],
 	'triggers' => [
@@ -8370,5 +8376,5 @@ return [
 				'default' => '0',
 			],
 		],
-	]
+	],
 ];
