@@ -491,6 +491,11 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 ....I..... [ZBX-11764] fixed automake scripts; thanks to Tomasz Kłoczko for the patch (akozlovs)
 
 --------------------------------------------------------------------------------
+Changes for 4.4.10
+
+4.4.10rc1 was released as 4.4.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.4.10rc1
 
 Bug fixes:
@@ -1667,6 +1672,11 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.22
+
+4.0.22rc1 was released as 4.0.22 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.22rc1
