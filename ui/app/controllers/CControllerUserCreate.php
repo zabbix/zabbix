@@ -34,7 +34,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'password2' =>		'required|string',
 			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>	'required|array_id|not_empty',
-			'user_medias' =>	'array',
+			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
@@ -89,7 +89,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 
 		$user['medias'] = [];
 
-		foreach ($this->getInput('user_medias', []) as $media) {
+		foreach ($this->getInput('medias', []) as $media) {
 			$user['medias'][] = [
 				'mediatypeid' => $media['mediatypeid'],
 				'sendto' => $media['sendto'],

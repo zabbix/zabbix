@@ -656,7 +656,7 @@ function addSelectedValues(object, parentid) {
  */
 function add_media(formname, media, mediatypeid, sendto, period, active, severity) {
 	var form = window.document.forms[formname];
-	var media_name = (media > -1) ? 'user_medias[' + media + ']' : 'new_media';
+	var media_name = (media > -1) ? 'medias[' + media + ']' : 'new_media';
 
 	window.create_var(form, media_name + '[mediatypeid]', mediatypeid);
 	if (typeof sendto === "object") {

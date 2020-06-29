@@ -33,7 +33,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			'userid' =>			'fatal|required|db users.userid',
 			'password1' =>		'string',
 			'password2' =>		'string',
-			'user_medias' =>	'array',
+			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
@@ -93,7 +93,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$user['medias'] = [];
 
-			foreach ($this->getInput('user_medias', []) as $media) {
+			foreach ($this->getInput('medias', []) as $media) {
 				$user['medias'][] = [
 					'mediatypeid' => $media['mediatypeid'],
 					'sendto' => $media['sendto'],
