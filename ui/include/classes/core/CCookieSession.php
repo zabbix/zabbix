@@ -49,7 +49,6 @@ class CCookieSession implements \SessionHandlerInterface {
 			}
 
 			CSessionHelper::set('sessionid', CSessionHelper::getId());
-			CSessionHelper::set('lastacsess', time());
 		}
 	}
 
@@ -136,7 +135,7 @@ class CCookieSession implements \SessionHandlerInterface {
 	 *
 	 * @return boolean
 	 */
-	private function session_start(): bool {
+	protected function session_start(): bool {
 		$session_data = $this->parseData();
 
 		if (mb_strlen($session_data) === 0 || !$this->checkSign($session_data)) {
@@ -159,13 +158,8 @@ class CCookieSession implements \SessionHandlerInterface {
 	 *
 	 * @return boolean
 	 */
-	private function checkSign(string $data): bool {
-		$data = unserialize($data);
-		$session_sign = $data['sign'];
-		unset($data['sign']);
-		$sign = CEncryptHelper::sign(serialize($data));
-
-		return CEncryptHelper::checkSign($session_sign, $sign);
+	protected function checkSign(string $data): bool {
+		return true;
 	}
 
 	/**
@@ -175,14 +169,8 @@ class CCookieSession implements \SessionHandlerInterface {
 	 *
 	 * @return string
 	 */
-	private function prepareData(string $data): string {
+	protected function prepareData(string $data): string {
 		$data = unserialize($data);
-
-		if (array_key_exists('sign', $data)) {
-			unset($data['sign']);
-		}
-
-		$data['sign'] = CEncryptHelper::sign(serialize($data));
 
 		return base64_encode(serialize($data));
 	}
@@ -192,7 +180,7 @@ class CCookieSession implements \SessionHandlerInterface {
 	 *
 	 * @return string
 	 */
-	private function parseData(): string {
+	protected function parseData(): string {
 		if (CCookieHelper::has(self::COOKIE_NAME)) {
 			return base64_decode(CCookieHelper::get(self::COOKIE_NAME));
 		}

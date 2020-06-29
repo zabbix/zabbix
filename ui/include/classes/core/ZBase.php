@@ -173,7 +173,7 @@ class ZBase {
 				$this->initDB();
 
 				// Start sesion only after DB initilized.
-				new CCookieSession();
+				new CEncryptedCookieSession();
 
 				$this->authenticateUser();
 				$this->initLocales(CWebUser::$data);
@@ -203,18 +203,18 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initDB();
 
-				new CCookieSession();
+				new CEncryptedCookieSession();
 
 				$this->initLocales(['lang' => 'en_gb']);
 				break;
 
 			case self::EXEC_MODE_SETUP:
+				new CCookieSession();
+
 				try {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
-
-					new CCookieSession();
 
 					$this->authenticateUser();
 					$this->initLocales(CWebUser::$data);
@@ -585,7 +585,7 @@ class ZBase {
 		}
 
 		session_write_close();
-		exit;
+		exit();
 	}
 
 	/**

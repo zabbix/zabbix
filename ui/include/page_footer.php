@@ -71,4 +71,4 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 }
 
 session_write_close();
-exit;
+exit();
