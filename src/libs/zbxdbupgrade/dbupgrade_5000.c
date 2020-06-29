@@ -39,16 +39,16 @@ static int	DBpatch_5000001(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-    if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.latest.toggle' or idx='web.latest.toggle_other'"))
-        return FAIL;
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.latest.toggle' or idx='web.latest.toggle_other'"))
+		return FAIL;
 
-    if (ZBX_DB_OK > DBexecute(
-            "delete from profiles"
-            " where (idx='web.latest.sort' or idx='web.latest.sortorder')"
-            " and userid in (select userid from profiles where idx='web.latest.sort' and value_str='lastclock')"))
-        return FAIL;
+	if (ZBX_DB_OK > DBexecute(
+			"delete from profiles"
+			" where (idx='web.latest.sort' or idx='web.latest.sortorder')"
+			" and userid in (select userid from profiles where idx='web.latest.sort' and value_str='lastclock')"))
+		return FAIL;
 
-    return SUCCEED;
+	return SUCCEED;
 }
 
 #endif
