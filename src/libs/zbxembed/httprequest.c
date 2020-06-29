@@ -161,12 +161,10 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 out:
 	if (-1 != err_index)
 	{
-		if (NULL != request)
-		{
-			if (NULL != request->handle)
-				curl_easy_cleanup(request->handle);
-			zbx_free(request);
-		}
+		if (NULL != request->handle)
+			curl_easy_cleanup(request->handle);
+		zbx_free(request);
+
 		return duk_throw(ctx);
 	}
 
