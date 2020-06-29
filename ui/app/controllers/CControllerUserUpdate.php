@@ -99,10 +99,10 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['user_medias'] = [];
+		$user['medias'] = [];
 
 		foreach ($this->getInput('user_medias', []) as $media) {
-			$user['user_medias'][] = [
+			$user['medias'][] = [
 				'mediatypeid' => $media['mediatypeid'],
 				'sendto' => $media['sendto'],
 				'active' => $media['active'],
