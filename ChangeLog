@@ -1,6 +1,8 @@
 Changes for 5.0.2rc1
 
 New features:
+...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
+...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
 ...G...... [ZBXCTR-9] Added agent2 PostgreSQL plugin and template (Daria_V)
 ........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
 A.F....PS. [ZBXNEXT-3205] added regex context matching support to user macros (rlataria, wiper)
@@ -15,6 +17,11 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-17920] fixed browser error when user tries to access properties without permissions (kustalovs)
+.......PS. [ZBX-17252] fixed building of Zabbix daemons with link time optimization (vso)
+..F....... [ZBX-17693] fixed headers and query fields in HTTP item test form; thanks to Mikhail Okhotin for the patch (Ivo, talbergs)
+.......PS. [ZBX-17837] fixed memory leaks when handling CurlHttpRequest errors (Andris, wiper)
+..F....... [ZBX-17878] fixed low-level discovery rule override operation object label not selecting the related field when clicked on (Ivo)
 ..F....... [ZBX-17663] fixed user not being redirected back to an URL he was coming from before signing in using SAML SSO (agriscenko)
 .........T [ZBX-17900] fixed the template description - the config file naming is in lowercase (mchudinov)
 .........T [ZBX-17905] changed type of physical disk performance items from wmi to perf_counter_en and perf_instance_en in Template Module Windows physical disks by Zabbix agent (mchudinov)
@@ -372,6 +379,11 @@ A.F....... [ZBX-17049] fixed non well formed numeric value in maintenance.create
 ..F....... [ZBX-402] fixed latest data reloading to updating asynchronously (averza)
 .........T [ZBX-16695] changed default width of various screen elements in Zabbix templates from 500 to 750 pixels (Ivo, talbergs, vasilijs)
 ....I..... [ZBX-11764] fixed automake scripts; thanks to Tomasz Kłoczko for the patch (akozlovs)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.10
+
+4.4.10rc1 was released as 4.4.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.4.10rc1
@@ -1550,6 +1562,11 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.22
+
+4.0.22rc1 was released as 4.0.22 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.22rc1

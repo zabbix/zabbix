@@ -27,7 +27,8 @@ class CMessageElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://output'))->asMessage();
+		return (new CElementQuery('xpath:.//output[@role="contentinfo" or '.
+				CXPathHelper::fromClass('msg-global').']'))->waitUntilVisible()->asMessage();
 	}
 
 	/**
