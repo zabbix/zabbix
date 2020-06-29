@@ -1707,7 +1707,7 @@ else {
 		'sortorder' => $sortOrder,
 		'config' => select_config(),
 		'hostid' => $hostid,
-		'is_template' => !isset($host['hostid'])
+		'is_template' => !array_key_exists('hostid', $host)
 	];
 
 	// items
