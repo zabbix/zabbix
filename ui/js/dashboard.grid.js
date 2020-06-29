@@ -2684,6 +2684,17 @@
 						closeCallback: function() {
 							data['pos-action'] = '';
 							data.add_widget_dimension = {};
+
+							if (data.widgets.length || (!data.widgets.length && $obj.is(':hover'))) {
+								data.new_widget_placeholder.container.hide();
+								data.new_widget_placeholder.setPositioning();
+							}
+							else if (!data.widgets.length && !$obj.is(':hover')) {
+								data.new_widget_placeholder.setDefault(function(e) {
+									methods.addNewWidget.call($obj, this);
+									return cancelEvent(e);
+								});
+							}
 						}
 					};
 
