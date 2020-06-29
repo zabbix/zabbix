@@ -93,12 +93,12 @@ class CSetupWizard extends CForm {
 	}
 
 	protected function bodyToString($destroy = true) {
+		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
+
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
 			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
 			->addItem($this->getList());
-
-		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
 
 		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$cancel_button = (new CSubmit('cancel', _('Cancel')))
@@ -428,6 +428,15 @@ class CSetupWizard extends CForm {
 		];
 
 		$error = false;
+
+		// Create session secret key.
+		$sql = sprintf("update config set session_key='%s' where configid=1", bin2hex(openssl_random_pseudo_bytes(16)));
+		if (!$this->dbConnect() || !DBexecute($sql)) {
+			$this->STEP_FAILED = true;
+			$this->setConfig('step', 2);
+			return $this->stage2();
+		}
+		$this->dbClose();
 
 		if (!$config->save()) {
 			$error = true;
