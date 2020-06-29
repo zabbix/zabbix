@@ -188,6 +188,26 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
+		'snmp_community' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmpv3_securityname' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmpv3_contextname' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmpv3_authpassphrase'	=> [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'snmpv3_privpassphrase'	=> [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
 		'username' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -695,6 +715,7 @@ abstract class CControllerPopupItemTest extends CController {
 				: [];
 
 			if (count($interfaces) > 0) {
+				// Macros in interface details are not resolved.
 				$interfaces = CMacrosResolverHelper::resolveHostInterfaces($interfaces);
 
 				$interface_data = [

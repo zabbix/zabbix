@@ -175,54 +175,6 @@ class CMacrosResolverHelper {
 			unset($interface);
 		}
 
-		// Resolve macros in interface details.
-		$resolve_details = false;
-		$data = [];
-
-		foreach ($interfaces as $interface) {
-			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
-				$resolve_details = true;
-
-				if ($interface['details']['version'] == SNMP_V1 || $interface['details']['version'] == SNMP_V2C) {
-					$data[$interface['hostid']][] = $interface['details']['community'];
-				}
-				else {
-					$data[$interface['hostid']][] = $interface['details']['securityname'];
-					$data[$interface['hostid']][] = $interface['details']['contextname'];
-					$data[$interface['hostid']][] = $interface['details']['authpassphrase'];
-					$data[$interface['hostid']][] = $interface['details']['privpassphrase'];
-				}
-			}
-		}
-
-		if ($resolve_details) {
-			$resolvedData = self::$macrosResolver->resolve([
-				'config' => 'hostInterfaceDetails',
-				'data' => $data
-			]);
-
-			foreach ($resolvedData as $hostId => $texts) {
-				$n = 0;
-
-				foreach ($interfaces as &$interface) {
-					if ($interface['hostid'] == $hostId) {
-						if ($interface['details']['version'] == SNMP_V1
-								|| $interface['details']['version'] == SNMP_V2C) {
-							$interface['details']['community'] = $texts[$n];
-							$n++;
-						}
-						else {
-							foreach (['securityname', 'contextname', 'authpassphrase', 'privpassphrase'] as $field) {
-								$interface['details'][$field] = $texts[$n];
-								$n++;
-							}
-						}
-					}
-				}
-				unset($interface);
-			}
-		}
-
 		return $interfaces;
 	}
 
