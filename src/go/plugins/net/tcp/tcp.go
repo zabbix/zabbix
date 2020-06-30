@@ -20,6 +20,7 @@
 package tcpudp
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"math"
@@ -27,7 +28,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/reiver/go-telnet"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
@@ -45,6 +45,15 @@ const (
 	tcpExpectFail   = -1
 	tcpExpectOk     = 0
 	tcpExpectIgnore = 1
+)
+
+const (
+	cmdIAC  = 255
+	cmdWILL = 251
+	cmdWONT = 252
+	cmdDO   = 253
+	cmdDONT = 254
+	optSGA  = 3
 )
 
 type Options struct {
@@ -167,14 +176,117 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
-func (p *Plugin) telnetExpect(address string) (result int) {
-	var caller telnet.Caller = telnet.StandardCaller
-	if err := telnet.DialToAndCall(address, caller); err != nil {
-		log.Debugf("TELNET TCP expect network error: cannot connect to [%s]: %s", address, err.Error())
-		return
+func telnetRead(rw *bufio.ReadWriter) (byte, error) {
+	for {
+		b, err := rw.ReadByte()
+		if err != nil {
+			<-time.After(time.Second / 10)
+			b, err = rw.ReadByte()
+			if err != nil {
+				return b, err
+			}
+		}
+
+		return b, nil
 	}
 
-	return 1
+}
+
+func telnetWrite(b byte, rw *bufio.ReadWriter) error {
+	err := rw.WriteByte(b)
+	if err != nil {
+		<-time.After(time.Second / 10)
+		err = rw.WriteByte(b)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func telnet(rw *bufio.ReadWriter, buf []byte) error {
+	var err error
+	for {
+		var c, c1, c2, c3 byte
+
+		c1, err = telnetRead(rw)
+		if err != nil {
+			return err
+		}
+
+		if string(c1) == ":" {
+			return nil
+		}
+
+		if cmdIAC == c1 {
+			c2, err = telnetRead(rw)
+			if nil != err {
+				return err
+			}
+
+			switch c2 {
+			case cmdWILL, cmdWONT, cmdDO, cmdDONT:
+				c3, err = telnetRead(rw)
+				if nil != err {
+					return err
+				}
+
+				c = cmdIAC
+				err := telnetWrite(c, rw)
+				if err != nil {
+					return err
+				}
+
+				if c2 == cmdWONT {
+					c = cmdDONT
+				} else if c2 == cmdDONT {
+					c = cmdWONT
+				} else if c3 == optSGA {
+					c = cmdDO
+					if c2 == cmdDO {
+						c = cmdWILL
+					}
+				} else {
+					c = cmdDONT
+					if c2 == cmdDO {
+						c = cmdWONT
+					}
+				}
+
+				err = telnetWrite(c, rw)
+				if err != nil {
+					return err
+				}
+				err = telnetWrite(c3, rw)
+				if err != nil {
+					return err
+				}
+				err = rw.Flush()
+				if err != nil {
+					return err
+				}
+			case cmdIAC:
+				buf[0] = cmdIAC
+				buf = buf[1:]
+			default:
+				return fmt.Errorf("incorrect telnet protocol")
+			}
+		} else {
+			buf[0] = c1
+			buf = buf[1:]
+		}
+	}
+}
+
+func (p *Plugin) validateTelnet(buf []byte, conn net.Conn) int {
+	err := telnet(bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn)), buf)
+	if err != nil {
+		log.Debugf("TCP telnet network error: %s", err.Error())
+		return tcpExpectFail
+	}
+
+	return tcpExpectOk
 }
 
 func (p *Plugin) tcpExpect(service string, address string) (result int) {
@@ -198,35 +310,38 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var sendToClose string
 	var checkResult int
 	buf := make([]byte, 2048)
+	if service == "telnet" {
+		checkResult = p.validateTelnet(buf, conn)
+	} else {
+		for {
+			if _, err = conn.Read(buf); err == nil {
+				switch service {
+				case "ssh":
+					checkResult = p.validateSsh(buf, conn)
+				case "smtp":
+					checkResult = p.validateSmtp(buf)
+					sendToClose = fmt.Sprintf("%s", "QUIT\r\n")
+				case "ftp":
+					checkResult = p.validateFtp(buf)
+					sendToClose = fmt.Sprintf("%s", "QUIT\r\n")
+				case "pop":
+					checkResult = p.validatePop(buf)
+					sendToClose = fmt.Sprintf("%s", "QUIT\r\n")
+				case "nntp":
+					checkResult = p.validateNntp(buf)
+					sendToClose = fmt.Sprintf("%s", "QUIT\r\n")
+				case "imap":
+					checkResult = p.validateImap(buf)
+					sendToClose = fmt.Sprintf("%s", "a1 LOGOUT\r\n")
+				}
 
-	for {
-		if _, err = conn.Read(buf); err == nil {
-			switch service {
-			case "ssh":
-				checkResult = p.validateSsh(buf, conn)
-			case "smtp":
-				checkResult = p.validateSmtp(buf)
-				sendToClose = fmt.Sprintf("%s", "QUIT\r\n")
-			case "ftp":
-				checkResult = p.validateFtp(buf)
-				sendToClose = fmt.Sprintf("%s", "QUIT\r\n")
-			case "pop":
-				checkResult = p.validatePop(buf)
-				sendToClose = fmt.Sprintf("%s", "QUIT\r\n")
-			case "nntp":
-				checkResult = p.validateNntp(buf)
-				sendToClose = fmt.Sprintf("%s", "QUIT\r\n")
-			case "imap":
-				checkResult = p.validateImap(buf)
-				sendToClose = fmt.Sprintf("%s", "a1 LOGOUT\r\n")
+				if checkResult == tcpExpectOk {
+					break
+				}
+			} else {
+				log.Debugf("TCP expect network error: cannot read from [%s]: %s", address, err.Error())
+				return 0
 			}
-
-			if checkResult == tcpExpectOk {
-				break
-			}
-		} else {
-			log.Debugf("TCP expect network error: cannot read from [%s]: %s", address, err.Error())
-			return 0
 		}
 	}
 
@@ -263,9 +378,9 @@ func (p *Plugin) exportNetService(params []string) int {
 		}
 	}
 
-	if service == "telnet" {
-		return p.telnetExpect(net.JoinHostPort(ip, port))
-	}
+	// if service == "telnet" {
+	// 	return p.telnetExpect(net.JoinHostPort(ip, port))
+	// }
 
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
 }
