@@ -20,7 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
-#include <openssl/rand.h>
+#include "log.h"
 
 /*
  * 5.2 development database patches
@@ -34,22 +34,42 @@ static int	DBpatch_5010000(void)
 {
 	const ZBX_FIELD	field = {"session_key", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5010001(void)
 {
-	char		buffer[16], string[33];
+	const char	rnd_dev[] = "/dev/urandom";
+	char		buff[16], str[33];
+	int		fd, n;
 	unsigned int	i;
 
-	if (1 != RAND_bytes(buffer, sizeof(buffer))
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (-1 == (fd = open(rnd_dev, O_RDONLY)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open \"%s\": %s", rnd_dev, zbx_strerror(errno));
 		return FAIL;
+	}
+
+	n = read(fd, buff, sizeof(buff));
+	close(fd);
+
+	if (-1 == n)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot read \"%s\": %s", rnd_dev, zbx_strerror(errno));
+		return FAIL;
+	}
 
 	/* convert hex to text */
-	for (i = 0; i < ARRSIZE(buffer); i++)
-		zbx_snprintf(string[i * 2], ARRSIZE(buffer), "%02x", buffer[i]);
+	for (i = 0; i < ARRSIZE(buff); i++)
+		zbx_snprintf(str + i * 2, sizeof(str) - i * 2, "%02x", buff[i]);
 
-	if (ZBX_DB_OK > DBexecute("update config set session_key='%s' where configid=1", string))
+	if (ZBX_DB_OK > DBexecute("update config set session_key='%s' where configid=1", str))
 		return FAIL;
 
 	return SUCCEED;
