@@ -1043,7 +1043,9 @@ class CDiscoveryRule extends CItemGeneral {
 								$ovrd_conditions[] = [
 									'macro' => $condition['macro'],
 									'value' => $condition['value'],
-									'formulaid' => $condition['formulaid'],
+									'formulaid' => array_key_exists('formulaid', $condition)
+										? $condition['formulaid']
+										: '',
 									'operator' => array_key_exists('operator', $condition)
 										? $condition['operator']
 										: DB::getDefault('lld_override_condition', 'operator'),
