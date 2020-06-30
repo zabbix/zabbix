@@ -91,10 +91,16 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
 }
 
 // Set default language.
-$default_lang = getRequest('default_lang', CSession::keyExists('default_lang')
-	? CSession::getValue('default_lang')
-	: ZBX_DEFAULT_LANG
-);
+$default_lang = ZBX_DEFAULT_LANG;
+if (hasRequest('default_lang')) {
+	$default_lang = getRequest('default_lang');
+}
+elseif (CSession::keyExists('default_lang')) {
+	$default_lang = CSession::getValue('default_lang');
+}
+elseif (CWebUser::$data) {
+	$default_lang = CWebUser::$data['lang'];
+}
 CSession::setValue('default_lang', $default_lang);
 APP::getInstance()->initLocales(['lang' => $default_lang]);
 
@@ -106,11 +112,6 @@ DBclose();
  * Setup wizard
  */
 $ZBX_SETUP_WIZARD = new CSetupWizard();
-
-// if init fails due to missing configuration, set user as guest with default en_GB language
-if (!CWebUser::$data) {
-	CWebUser::setDefault();
-}
 
 // page title
 (new CPageHeader(_('Installation')))
