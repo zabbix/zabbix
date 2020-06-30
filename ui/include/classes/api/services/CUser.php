@@ -300,7 +300,6 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as &$user) {
-
 			if (array_key_exists('user_medias', $user)) {
 				$user['medias'] = $user['user_medias'];
 				unset($user['user_medias']);
@@ -440,7 +439,6 @@ class CUser extends CApiService {
 		$aliases = [];
 
 		foreach ($users as &$user) {
-
 			if (array_key_exists('user_medias', $user)) {
 				$user['medias'] = $user['user_medias'];
 				unset($user['user_medias']);
