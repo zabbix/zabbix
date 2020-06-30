@@ -517,10 +517,11 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	public function delete(array $ruleids, $nopermissions = false) {
 		// TODO VM: calls with nopermissions should use CDiscoveryRuleMakager::delete();
-		// TODO VM: rename $delRules to $db_rules;
-		$this->validateDelete($ruleids, $delRules, $nopermissions);
+		$this->validateDelete($ruleids, $db_rules, $nopermissions);
 
-		CDiscoveryRuleManager::delete($ruleids, $delRules);
+		CDiscoveryRuleManager::delete($ruleids);
+
+		// TODO: $db_rules should be used for creating audit entry.
 
 		return ['ruleids' => $ruleids];
 	}

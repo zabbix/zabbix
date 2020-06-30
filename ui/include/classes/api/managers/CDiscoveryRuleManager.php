@@ -29,56 +29,49 @@ class CDiscoveryRuleManager {
 	 *
 	 * @param array $ruleids
 	 */
-	public static function delete(array &$ruleids, array $delRules) {
-		// get child discovery rules
-		$parentItemids = $ruleids;
-		$childTuleids = [];
+	public static function delete(array $ruleids) {
+		// Get child discovery rules.
+		$parent_itemids = $ruleids;
+		$child_ruleids = [];
 		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
-			$parentItemids = [];
-			while ($dbItem = DBfetch($dbItems)) {
-				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
-				$childTuleids[$dbItem['itemid']] = $dbItem['itemid'];
+			$db_items = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parent_itemids));
+			$parent_itemids = [];
+			while ($db_item = DBfetch($db_items)) {
+				$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
+				$child_ruleids[$db_item['itemid']] = $db_item['itemid'];
 			}
-		} while (!empty($parentItemids));
+		} while ($parent_itemids);
 
-		$delRulesChildren = API::DiscoveryRule()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'itemids' => $childTuleids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
+		$ruleids = array_merge($ruleids, $child_ruleids);
 
-		$delRules = array_merge($delRules, $delRulesChildren);
-		$ruleids = array_merge($ruleids, $childTuleids);
-
+		// Delete item prototypes.
 		$iprototypeids = [];
-		$dbItems = DBselect(
+		$db_items = DBselect(
 			'SELECT i.itemid'.
 			' FROM item_discovery id,items i'.
 			' WHERE i.itemid=id.itemid'.
 				' AND '.dbConditionInt('parent_itemid', $ruleids)
 		);
-		while ($item = DBfetch($dbItems)) {
+		while ($item = DBfetch($db_items)) {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
 		}
 		if ($iprototypeids) {
 			CItemPrototypeManager::delete($iprototypeids);
 		}
 
-		// delete host prototypes
-		$hostPrototypeIds = DBfetchColumn(DBselect(
+		// Delete host prototypes.
+		$host_prototypeids = DBfetchColumn(DBselect(
 			'SELECT hd.hostid'.
 			' FROM host_discovery hd'.
 			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
 		), 'hostid');
-		if ($hostPrototypeIds) {
-			if (!API::HostPrototype()->delete($hostPrototypeIds, true)) {
+		if ($host_prototypeids) {
+			if (!API::HostPrototype()->delete($host_prototypeids, true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
 			}
 		}
 
-		// delete LLD rules
+		// Delete LLD rules.
 		DB::delete('items', ['itemid' => $ruleids]);
 
 		$insert = [];
