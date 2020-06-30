@@ -190,24 +190,26 @@ class CWebUser {
 			'debug_mode' => false
 		];
 
-		$config = select_config();
-		if ($config) {
-			self::$data['lang'] = $config['default_lang'];
-		}
+		if (APP::getExecMode() === APP::EXEC_MODE_DEFAULT) {
+			$config = select_config();
+			if ($config) {
+				self::$data['lang'] = $config['default_lang'];
+			}
 
-		if (CWebUser::isGuestAllowed()) {
-			$db_users = DB::select('users', [
-				'output' => ['lang'],
-				'filter' => ['alias' => ZBX_GUEST_USER]
-			]);
-			$guest_data = $db_users[0];
+			if (CWebUser::isGuestAllowed()) {
+				$db_users = DB::select('users', [
+					'output' => ['lang'],
+					'filter' => ['alias' => ZBX_GUEST_USER]
+				]);
+				$guest_data = $db_users[0];
 
-			if ($guest_data['lang'] !== LANG_DEFAULT) {
-				self::$data['lang'] = $guest_data['lang'];
+				if ($guest_data['lang'] !== LANG_DEFAULT) {
+					self::$data['lang'] = $guest_data['lang'];
+				}
 			}
 		}
 
-		APP::getInstance()->initLocales(CWebUser::$data);
+		APP::getInstance()->initLocales(self::$data);
 	}
 
 	/**
