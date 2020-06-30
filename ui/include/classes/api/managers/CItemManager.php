@@ -31,6 +31,7 @@ class CItemManager {
 	 */
 	public static function delete(array $itemids) {
 		$del_itemids = [];
+		$del_ruleids = [];
 		$del_item_prototypeids = [];
 
 		// Selecting all inherited items.
@@ -54,6 +55,7 @@ class CItemManager {
 		// Note: We are not separating normal from discovered items at this point.
 		$dep_itemids = [
 			ZBX_FLAG_DISCOVERY_NORMAL => $del_itemids,
+			ZBX_FLAG_DISCOVERY_RULE => [],
 			ZBX_FLAG_DISCOVERY_CREATED => [],
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
@@ -74,9 +76,11 @@ class CItemManager {
 
 			$del_itemids += $dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL];
 			$del_itemids += $dep_itemids[ZBX_FLAG_DISCOVERY_CREATED];
+			$del_ruleids += $dep_itemids[ZBX_FLAG_DISCOVERY_RULE];
 			$del_item_prototypeids += $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE];
 			$dep_itemids = [
 				ZBX_FLAG_DISCOVERY_NORMAL => [],
+				ZBX_FLAG_DISCOVERY_RULE => [],
 				ZBX_FLAG_DISCOVERY_CREATED => [],
 				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 			];
@@ -87,6 +91,10 @@ class CItemManager {
 						if (!array_key_exists($db_item['itemid'], $del_itemids)) {
 							$dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL][$db_item['itemid']] = true;
 						}
+						break;
+
+					case ZBX_FLAG_DISCOVERY_RULE:
+						$dep_itemids[ZBX_FLAG_DISCOVERY_RULE][$db_item['itemid']] = true;
 						break;
 
 					case ZBX_FLAG_DISCOVERY_CREATED:
@@ -106,6 +114,10 @@ class CItemManager {
 		);
 
 		$del_itemids = array_keys($del_itemids);
+
+		if ($del_ruleids) {
+			CDiscoveryRuleManager::delete(array_keys($del_ruleids));
+		}
 
 		if ($del_item_prototypeids) {
 			CItemPrototypeManager::delete(array_keys($del_item_prototypeids));
