@@ -124,7 +124,7 @@ class CAuthentication extends CApiService {
 			[['configid' => $db_auth['configid']] + $auth], [$db_auth['configid'] => $db_auth]
 		);
 
-		return array_keys($upd_config);
+		return array_keys($auth);
 	}
 
 	/**
@@ -181,6 +181,8 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_auth = DB::select('config', ['output' => ['configid'] + $this->output_fields])[0];
+		$output_fields = $this->output_fields;
+		array_unshift($output_fields, 'configid');
+		$db_auth = DB::select('config', ['output' => $output_fields])[0];
 	}
 }

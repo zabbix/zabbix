@@ -118,7 +118,7 @@ class CHousekeeping extends CApiService {
 			[['configid' => $db_hk['configid']] + $hk], [$db_hk['configid'] => $db_hk]
 		);
 
-		return array_keys($upd_config);
+		return array_keys($hk);
 	}
 
 	/**
@@ -170,6 +170,7 @@ class CHousekeeping extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 		$output_fields = array_diff($this->output_fields, ['db_extension', 'compression_availability']);
-		$db_hk = DB::select('config', ['output' => ['configid'] + $output_fields])[0];
+		array_unshift($output_fields, 'configid');
+		$db_hk = DB::select('config', ['output' => $output_fields])[0];
 	}
 }

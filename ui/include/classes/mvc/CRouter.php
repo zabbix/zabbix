@@ -229,8 +229,6 @@ class CRouter {
 		'widget.trigover.view'			=> ['CControllerWidgetTrigOverView',				'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'				=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
 		'widget.web.view'				=> ['CControllerWidgetWebView',						'layout.widget',		'monitoring.widget.web.view'],
-		'workingtime.edit'				=> ['CControllerWorkingTimeEdit',					'layout.htmlpage',		'administration.workingtime.edit'],
-		'workingtime.update'			=> ['CControllerWorkingTimeUpdate',					null,					null],
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],

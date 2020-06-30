@@ -881,10 +881,6 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'valuemap.list')
 		->getUrl();
 
-	$workingtime_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'workingtime.edit')
-		->getUrl();
-
 	$trigseverity_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'trigseverity.edit')
 		->getUrl();
@@ -912,7 +908,6 @@ function getAdministrationGeneralSubmenu() {
 				$regex_url        => _('Regular expressions'),
 				$macros_url       => _('Macros'),
 				$valuemap_url     => _('Value mapping'),
-				$workingtime_url  => _('Working time'),
 				$trigseverity_url => _('Trigger severities'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),

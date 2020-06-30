@@ -131,7 +131,7 @@ class CSettings extends CApiService {
 			[['configid' => $db_settings['configid']] + $settings], [$db_settings['configid'] => $db_settings]
 		);
 
-		return array_keys($upd_config);
+		return array_keys($settings);
 	}
 
 	/**
@@ -231,7 +231,8 @@ class CSettings extends CApiService {
 					$settings['alert_usrgrpid']));
 			}
 		}
-
-		$db_settings = DB::select('config', ['output' => ['configid'] + $this->output_fields])[0];
+		$output_fields = $this->output_fields;
+		array_unshift($output_fields, 'configid');
+		$db_settings = DB::select('config', ['output' => $output_fields])[0];
 	}
 }

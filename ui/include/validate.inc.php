@@ -567,7 +567,7 @@ function validateTimeUnit($value, $min, $max, $allow_zero, &$error, array $optio
 
 	if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
 		if ($value[0] !== '{') {
-			$value = timeUnitToSeconds($value);
+			$value = timeUnitToSeconds($value, array_key_exists('with_year', $options) ? $options['with_year'] : false);
 
 			if ($allow_zero && $value == 0) {
 				return true;

@@ -46,6 +46,34 @@ $gui_tab = (new CFormList())
 		(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))
 			->setUncheckedValue('0')
 			->setChecked($data['server_check_interval'] == SERVER_CHECK_INTERVAL)
+	)
+	->addRow((new CLabel(_('Working time'), 'work_period'))->setAsteriskMark(),
+	(new CTextBox('work_period', $data['work_period']))
+		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		->setAriaRequired()
+	)
+	->addRow(_('Show technical errors'),
+		(new CCheckBox('show_technical_errors'))
+			->setUncheckedValue('0')
+			->setChecked($data['show_technical_errors'] == 1)
+	)
+	->addRow(
+		(new CLabel(_('Max history display period'), 'history_period'))->setAsteriskMark(),
+		(new CTextBox('history_period', $data['history_period']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Time filter default period'), 'period_default'))->setAsteriskMark(),
+		(new CTextBox('period_default', $data['period_default']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Max period'), 'max_period'))->setAsteriskMark(),
+		(new CTextBox('max_period', $data['max_period']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	);
 
 $gui_view = (new CTabView())

@@ -340,13 +340,6 @@ class API {
 	}
 
 	/**
-	 * @return CService
-	 */
-	public static function Service() {
-		return self::getApi('service');
-	}
-
-	/**
 	 * @return CScreen
 	 */
 	public static function Screen() {
@@ -365,6 +358,13 @@ class API {
 	 */
 	public static function Script() {
 		return self::getApi('script');
+	}
+
+	/**
+	 * @return CService
+	 */
+	public static function Service() {
+		return self::getApi('service');
 	}
 
 	/**
