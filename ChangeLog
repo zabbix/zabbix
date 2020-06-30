@@ -3,7 +3,6 @@ Changes for 5.2.0alpha1
 New features:
 ...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
 ...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
-...G...... [ZBXCTR-9] Added agent2 PostgreSQL plugin and template (Daria_V)
 ........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
 A.F....PS. [ZBXNEXT-3205] added regex context matching support to user macros (rlataria, wiper)
 .........T [ZBXNEXT-5966] updated SNMP templates for version 5.0 (afayantsev)
@@ -32,7 +31,7 @@ Bug fixes:
 ..F....... [ZBX-17663] fixed user not being redirected back to an URL he was coming from before signing in using SAML SSO (agriscenko)
 .........T [ZBX-17900] fixed the template description - the config file naming is in lowercase (mchudinov)
 .........T [ZBX-17905] changed type of physical disk performance items from wmi to perf_counter_en and perf_instance_en in Template Module Windows physical disks by Zabbix agent (mchudinov)
-...G...... [ZBXCTR-9] Removed username and password from 1st level configuration parameters and change connection; removed unused tests and handler (Daria_V)
+...G...... [ZBXCTR-9] removed username and password from 1st level configuration parameters and change connection; removed unused tests and handler (Daria_V)
 ..F....... [ZBX-17811] fixed runtime error messages on database connection error (kustalovs)
 ..F....... [ZBX-17721] fixed message on updating module (kustalovs)
 ..F....... [ZBX-17809] fixed dashboard save button becomes disabled after widget paste (vmaksimovs)
@@ -113,7 +112,6 @@ Changes for 5.0.2rc1
 New features:
 ...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
 ...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
-...G...... [ZBXCTR-9] Added agent2 PostgreSQL plugin and template (Daria_V)
 ........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
 A.F....PS. [ZBXNEXT-3205] added regex context matching support to user macros (rlataria, wiper)
 .........T [ZBXNEXT-5966] updated SNMP templates for version 5.0 (afayantsev)
@@ -135,7 +133,7 @@ Bug fixes:
 ..F....... [ZBX-17663] fixed user not being redirected back to an URL he was coming from before signing in using SAML SSO (agriscenko)
 .........T [ZBX-17900] fixed the template description - the config file naming is in lowercase (mchudinov)
 .........T [ZBX-17905] changed type of physical disk performance items from wmi to perf_counter_en and perf_instance_en in Template Module Windows physical disks by Zabbix agent (mchudinov)
-...G...... [ZBXCTR-9] Removed username and password from 1st level configuration parameters and change connection; removed unused tests and handler (Daria_V)
+...G...... [ZBXCTR-9] removed username and password from 1st level configuration parameters and change connection; removed unused tests and handler (Daria_V)
 ..F....... [ZBX-17811] fixed runtime error messages on database connection error (kustalovs)
 ..F....... [ZBX-17721] fixed message on updating module (kustalovs)
 ..F....... [ZBX-17809] fixed dashboard save button becomes disabled after widget paste (vmaksimovs)
