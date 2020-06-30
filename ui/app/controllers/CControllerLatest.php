@@ -281,11 +281,13 @@ abstract class CControllerLatest extends CController {
 
 			CArrayHelper::sort($items, [$item_sort_options]);
 
+			$sorted_itemids = array_keys($items);
+
 			$rows = [];
 
 			foreach ($application_itemids as $applicationid => $itemids) {
-				usort($itemids, function($itemid_1, $itemid_2) use ($items) {
-					return (array_search($itemid_1, $items) <=> array_search($itemid_2, $items));
+				usort($itemids, function($itemid_1, $itemid_2) use ($sorted_itemids) {
+					return (array_search($itemid_1, $sorted_itemids) <=> array_search($itemid_2, $sorted_itemids));
 				});
 
 				foreach ($itemids as $itemid) {
