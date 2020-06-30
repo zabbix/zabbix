@@ -28,7 +28,7 @@ class testGraphPrototype extends CAPITest {
 			[
 				[
 					'output' => ['graphid'],
-					'hostids' => [131002]
+					'hostids' => [131003]
 				],
 				[
 					[
@@ -40,7 +40,7 @@ class testGraphPrototype extends CAPITest {
 			[
 				[
 					'output' => ['graphid'],
-					'hostids' => [131001]
+					'hostids' => [131002]
 				],
 				[
 					// Should be no matches.
