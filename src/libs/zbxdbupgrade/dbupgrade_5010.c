@@ -64,13 +64,13 @@ static int	linux_read_uint64(const char *path, zbx_uint64_t *value)
 static int	DBpatch_5010001(void)
 {
 	const char	rnd_dev[] = "/dev/urandom";
-	char		buff[16], str[33];
+	unsigned char	buff[16];
+	char		str[33];
 	int		fd, n;
 	unsigned int	i;
 #if defined(__linux__)
 	zbx_uint64_t	value;
 #endif
-
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 #if defined(__linux__)
