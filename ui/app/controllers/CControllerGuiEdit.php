@@ -63,7 +63,7 @@ class CControllerGuiEdit extends CController {
 				$this->getInput('server_check_interval', CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL)),
 			'work_period'           =>
 				$this->getInput('work_period', CSettingsHelper::get(CSettingsHelper::WORK_PERIOD)),
-			'show_technical_errors' => 
+			'show_technical_errors' =>
 				$this->getInput('show_technical_errors', CSettingsHelper::get(CSettingsHelper::SHOW_TECHNICAL_ERRORS)),
 			'history_period'        =>
 				$this->getInput('history_period', CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)),
