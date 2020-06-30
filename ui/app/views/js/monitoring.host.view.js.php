@@ -78,10 +78,10 @@
 				return this.bindDataEvents(deferred);
 			},
 			setLoading: function() {
-				this.getCurrentForm().addClass('in-progress delayed-15s');
+				this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
 			},
 			clearLoading: function() {
-				this.getCurrentForm().removeClass('in-progress delayed-15s');
+				this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
 			},
 			doRefresh: function(body) {
 				this.getCurrentForm().replaceWith(body);
@@ -147,7 +147,7 @@
 			start: function() {
 				if (this.refresh_interval != 0) {
 					this.running = true;
-					this.scheduleRefresh();
+					this.refresh();
 				}
 			},
 			stop: function() {
@@ -157,5 +157,18 @@
 		};
 
 		window.host_page = new hostPage();
+
+		// TODO: create generic wrapper for 'pagination and sorting' via ajax.
+		host_page.getCurrentForm().parent().on('click', '.list-table th a[href*="sort="],.paging-btn-container a', function(ev) {
+			var location_url = new Curl(),
+				action_url = new Curl($(ev.target).attr('href'));
+
+			host_page.refresh_url = action_url.getUrl();
+			action_url.setArgument('action', location_url.getArgument('action'));
+			history.replaceState(history.state, '', action_url.getUrl());
+			host_page.refresh();
+
+			return cancelEvent(ev);
+		});
 	});
 </script>

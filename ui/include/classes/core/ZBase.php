@@ -349,6 +349,7 @@ class ZBase {
 		$autoloader = new CAutoloader;
 		$autoloader->addNamespace('', $this->getIncludePaths());
 		$autoloader->addNamespace('Core', [$this->rootDir.'/include/classes/core']);
+		$autoloader->addNamespace('Services', [$this->rootDir.'/include/classes/services']);
 		$autoloader->register();
 		$this->autoloader = $autoloader;
 	}
