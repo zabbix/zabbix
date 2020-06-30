@@ -83,7 +83,7 @@ class CWebUser {
 	/**
 	 * Log-out the current user.
 	 */
-	public static function logout() {
+	public static function logout(): void {
 		self::$data['sessionid'] = CSessionHelper::getId();
 
 		if (API::User()->logout([])) {

@@ -1489,7 +1489,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function createSession($db_user) {
+	private static function createSession($db_user): array {
 		$db_user['sessionid'] = CSessionHelper::getId();
 
 		DB::insert('sessions', [[

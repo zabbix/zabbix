@@ -256,5 +256,4 @@ echo (new CView('general.warning', [
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();
 
-
 session_write_close();

@@ -134,4 +134,3 @@ $sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_
 
 <?php
 session_write_close();
-exit();

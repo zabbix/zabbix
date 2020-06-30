@@ -215,7 +215,6 @@ class ZBase {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
-
 					$this->authenticateUser();
 					$this->initLocales(CWebUser::$data);
 					$this->initComponents();
@@ -438,7 +437,7 @@ class ZBase {
 	/**
 	 * Authenticate user.
 	 */
-	protected function authenticateUser() {
+	protected function authenticateUser(): void {
 		if (!CWebUser::checkAuthentication(CSessionHelper::getId())) {
 			CWebUser::setDefault();
 		}
@@ -455,7 +454,7 @@ class ZBase {
 	 *
 	 * @param CRouter $router  CRouter class instance.
 	 */
-	private function processRequest(CRouter $router) {
+	private function processRequest(CRouter $router): void {
 		$action_name = $router->getAction();
 		$action_class = $router->getController();
 
@@ -506,11 +505,11 @@ class ZBase {
 				'theme' => ZBX_DEFAULT_THEME
 			]))->getOutput();
 
-			exit;
+			exit();
 		}
 	}
 
-	private function processResponseFinal(CRouter $router, CAction $action) {
+	private function processResponseFinal(CRouter $router, CAction $action): void {
 		$response = $action->getResponse();
 
 		// Controller returned redirect to another page?

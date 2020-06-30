@@ -304,7 +304,7 @@ function check_field(&$fields, &$field, $checks) {
 			return ZBX_VALID_OK;
 		}
 		elseif ($flags & P_ACT) {
-			if (!isset($_REQUEST['sid']) || $_REQUEST['sid'] != substr(CSessionHelper::getId(), 16, 16)) {
+			if (!hasRequest('sid') || getRequest('sid') != substr(CSessionHelper::getId(), 16, 16)) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}
