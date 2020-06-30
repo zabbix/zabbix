@@ -511,13 +511,11 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Delete DiscoveryRules.
 	 *
 	 * @param array $ruleids
-	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $ruleids, $nopermissions = false) {
-		// TODO VM: calls with nopermissions should use CDiscoveryRuleMakager::delete();
-		$this->validateDelete($ruleids, $db_rules, $nopermissions);
+	public function delete(array $ruleids) {
+		$this->validateDelete($ruleids, $db_rules);
 
 		CDiscoveryRuleManager::delete($ruleids);
 
@@ -534,7 +532,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$ruleids, array &$db_rules = null, $nopermissions = false) {
+	private function validateDelete(array &$ruleids, array &$db_rules = null) {
 		// TODO VM: remove $nopermissions
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $ruleids, '/', $error)) {
@@ -548,19 +546,17 @@ class CDiscoveryRule extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		if (!$nopermissions) {
-			foreach ($ruleids as $ruleid) {
-				if (!array_key_exists($ruleid, $db_rules)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
+		foreach ($ruleids as $ruleid) {
+			if (!array_key_exists($ruleid, $db_rules)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 
-				$db_rule = $db_rules[$ruleid];
+			$db_rule = $db_rules[$ruleid];
 
-				if ($db_rule['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
-				}
+			if ($db_rule['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
 			}
 		}
 	}
