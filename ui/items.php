@@ -1707,7 +1707,7 @@ else {
 		'sortorder' => $sortOrder,
 		'config' => select_config(),
 		'hostid' => $hostid,
-		'is_template' => !array_key_exists('hostid', $host)
+		'is_template' => true
 	];
 
 	// items
@@ -2019,6 +2019,15 @@ else {
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
+
+	// Set is_template false, when one of hosts is not template.
+	$hosts_status = array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status');
+	foreach ($hosts_status as $value) {
+		if ($value != HOST_STATUS_TEMPLATE) {
+			$data['is_template'] = false;
+			break;
+		}
+	}
 
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();
