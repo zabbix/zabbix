@@ -148,6 +148,29 @@ $footer[] = (new CDiv())
 			->addClass(ZBX_STYLE_BTN_ALT)
 	);
 
+(new CScriptTemplate('filter-tag-row-tmpl'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('filter_tags[#{rowNum}][tag]'))
+				->setAttribute('placeholder', _('tag'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('filter_tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
+			(new CTextBox('filter_tags[#{rowNum}][value]'))
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('filter_tags[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row'))
+	->show();
+
+// TODO: remove
 (new CFilter($data['view_curl']))
 	->hideFilterButtons()
 	->setProfile('web.hostsmon.filter')
@@ -156,3 +179,18 @@ $footer[] = (new CDiv())
 	->addFilterTab(_('Filter'), $columns, $footer)
 	->addTimeSelector('now-1h', 'now')
 	->show();
+// TODO end
+
+// (new CScriptTemplate('web_monitoring_hosts_tmpl'))
+// 	->addItem([$columns, $footer])
+// 	->show();
+?>
+<script type="text/javascript">
+jQuery(function($) {
+	$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
+
+	$('#filter_maintenance_status').on('change', function() {
+		$('#filter_show_suppressed').prop('disabled', !this.checked);
+	});
+});
+</script>
