@@ -257,7 +257,7 @@ abstract class CControllerLatest extends CController {
 				});
 
 				foreach ($host_items_grouped as $applicationid => $application_items) {
-					CArrayHelper::sort($application_items, $item_sort_options);
+					CArrayHelper::sort($application_items, [$item_sort_options]);
 
 					foreach ($application_items as $itemid => $item) {
 						unset($item['applications']);
@@ -268,7 +268,7 @@ abstract class CControllerLatest extends CController {
 							'applicationid' => $applicationid
 						];
 
-						if (count($items) > $config['search_limit']) {
+						if (count($rows) > $config['search_limit']) {
 							break 3;
 						}
 					}
