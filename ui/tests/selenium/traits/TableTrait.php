@@ -116,10 +116,14 @@ trait TableTrait {
 	/**
 	 * Counts displayed rows in table
 	 *
-	 * @param integer $count	rows count
+	 * @param integer $count	rows count per page
+	 * @param integer $total	total rows count
 	 */
-	public function assertRowCount($count) {
+	public function assertRowCount($count, $total = null) {
+		if ($total === null) {
+			$total = $count;
+		}
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
-		$this->query('xpath://div[@class="table-stats"]')->one()->getText());
+				$this->query('xpath://div[@class="table-stats"]')->one()->getText());
 	}
 }

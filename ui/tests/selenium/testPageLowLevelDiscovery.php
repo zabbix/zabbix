@@ -117,8 +117,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form->submit();
 
 		// Check that filtered count mathces expected.
-		$this->assertEquals(count(['Discovery rule 3']), $table->getRows()->count());
-		$this->assertRowCount(count(['Discovery rule 3']));
+		$this->assertEquals(1, $table->getRows()->count());
+		$this->assertRowCount(1);
 
 		// Checking that filtered discovery rule matches expected.
 		$this->assertEquals(['Discovery rule 3'], $this->getTableData());
@@ -251,7 +251,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
-	 * Remove table data by Name
+	 * Return table data by Name
 	 *
 	 * @return array
 	 */
