@@ -38,10 +38,9 @@ catch (Exception $e) {
 
 $available_locales = [];
 foreach (getLocales() as $localeid => $locale) {
-	if (!$locale['display'] || !setlocale(LC_MONETARY, zbx_locale_variants($localeid))) {
-		continue;
+	if ($locale['display'] && setlocale(LC_MONETARY, zbx_locale_variants($localeid)) !== false) {
+		$available_locales[] = $localeid;
 	}
-	$available_locales[] = $localeid;
 }
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
