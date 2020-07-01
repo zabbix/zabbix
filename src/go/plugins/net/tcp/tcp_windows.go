@@ -21,11 +21,14 @@ package tcpudp
 
 import (
 	"encoding/binary"
+	"syscall"
 	"unsafe"
 
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
+
+const telnetErr = syscall.EAGAIN
 
 func exportSystemTcpListen(port uint16) (result interface{}, err error) {
 	var tcpTable *win32.MIB_TCPTABLE

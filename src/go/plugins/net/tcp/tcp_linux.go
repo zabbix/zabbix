@@ -21,9 +21,12 @@ package tcpudp
 
 import (
 	"errors"
+	"syscall"
 
 	"zabbix.com/pkg/plugin"
 )
+
+const telnetErr = syscall.EAGAIN
 
 func exportSystemTcpListen(port uint16) (result interface{}, err error) {
 	return nil, errors.New("Not supported.")

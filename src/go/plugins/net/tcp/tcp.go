@@ -47,15 +47,6 @@ const (
 	tcpExpectIgnore = 1
 )
 
-const (
-	cmdIAC  = 255
-	cmdWILL = 251
-	cmdWONT = 252
-	cmdDO   = 253
-	cmdDONT = 254
-	optSGA  = 3
-)
-
 type Options struct {
 	Timeout  time.Duration `conf:"optional,range=1:30"`
 	Capacity int           `conf:"optional,range=1:100"`
@@ -180,39 +171,51 @@ func telnetRead(rw *bufio.ReadWriter) (byte, error) {
 	for {
 		b, err := rw.ReadByte()
 		if err != nil {
-			<-time.After(time.Second / 10)
-			b, err = rw.ReadByte()
-			if err != nil {
-				return b, err
-			}
-		}
+			if err == telnetErr {
+				<-time.After(time.Second / 10)
+				_, err := rw.Peek(1)
+				if err != nil {
+					return b, err
+				}
 
+				continue
+			}
+			return b, err
+		}
 		return b, nil
 	}
-
 }
 
 func telnetWrite(b byte, rw *bufio.ReadWriter) error {
-	err := rw.WriteByte(b)
-	if err != nil {
-		<-time.After(time.Second / 10)
-		err = rw.WriteByte(b)
+	for {
+		err := rw.WriteByte(b)
 		if err != nil {
-			return err
+			if err == telnetErr {
+				<-time.After(time.Second / 10)
+				continue
+			}
+			return fmt.Errorf("buffer write [%x] error: %s", b, err.Error())
 		}
+		return nil
 	}
-
-	return nil
 }
 
 func telnet(rw *bufio.ReadWriter, buf []byte) error {
 	var err error
+
+	cmdIAC := byte(255)
+	cmdWILL := byte(251)
+	cmdWONT := byte(252)
+	cmdDO := byte(253)
+	cmdDONT := byte(254)
+	optSGA := byte(3)
+
 	for {
 		var c, c1, c2, c3 byte
-
 		c1, err = telnetRead(rw)
 		if err != nil {
-			return err
+			return fmt.Errorf("c1 network read error: %s", err.Error())
+
 		}
 
 		if string(c1) == ":" {
@@ -222,14 +225,14 @@ func telnet(rw *bufio.ReadWriter, buf []byte) error {
 		if cmdIAC == c1 {
 			c2, err = telnetRead(rw)
 			if nil != err {
-				return err
+				return fmt.Errorf("c2 read error: %s", err.Error())
 			}
 
 			switch c2 {
 			case cmdWILL, cmdWONT, cmdDO, cmdDONT:
 				c3, err = telnetRead(rw)
 				if nil != err {
-					return err
+					return fmt.Errorf("c3 read error: %s", err.Error())
 				}
 
 				c = cmdIAC
@@ -264,13 +267,13 @@ func telnet(rw *bufio.ReadWriter, buf []byte) error {
 				}
 				err = rw.Flush()
 				if err != nil {
-					return err
+					return fmt.Errorf("buffer flush error: %s", err.Error())
 				}
 			case cmdIAC:
 				buf[0] = cmdIAC
 				buf = buf[1:]
 			default:
-				return fmt.Errorf("incorrect telnet protocol")
+				return fmt.Errorf("malformed telnet response")
 			}
 		} else {
 			buf[0] = c1
