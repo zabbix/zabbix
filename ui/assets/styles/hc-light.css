@@ -3287,6 +3287,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: absolute;
   z-index: 1000;
   padding: 15px 10px 10px;
+  word-break: break-word;
   background-color: #ffffff;
   border: 1px solid #383838;
   border-bottom-color: #353535;

@@ -426,6 +426,8 @@ var hintBox = {
 			// Hint box width and height.
 			hint_width = target.hintBoxItem.outerWidth(),
 			hint_height = target.hintBoxItem.outerHeight(),
+			// Hint box max-width.
+			hint_max_width = $host.width() - (target.hintBoxItem.innerWidth() - target.hintBoxItem.width()),
 			/*
 				Fix popup width and height since browsers will tend to reduce the size of the popup, if positioned further
 				than the width of window when horizontal scolling is active.
@@ -434,6 +436,8 @@ var hintBox = {
 				width: target.hintBoxItem.width(),
 				height: target.hintBoxItem.height()
 			};
+
+		css['max-width'] = hint_max_width;
 
 		if (event_x + event_offset + hint_width <= host_x_max) {
 			css.left = event_x + event_offset;
