@@ -37,9 +37,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
+		return [CMessageBehavior::class];
 	}
 
 	public function testPageLowLevelDiscovery_CheckLayout() {
