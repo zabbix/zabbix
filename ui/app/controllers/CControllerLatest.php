@@ -240,7 +240,7 @@ abstract class CControllerLatest extends CController {
 			}
 
 			$items = [];
-			$application_itemids = [];
+			$rows = [];
 
 			uksort($items_grouped, function($hostid_1, $hostid_2) use ($hostids) {
 				return (array_search($hostid_1, $hostids) <=> array_search($hostid_2, $hostids));
@@ -252,17 +252,21 @@ abstract class CControllerLatest extends CController {
 						return bccomp($id_1, $id_2) * (($application_sort_options['order'] === 'ASC') ? -1 : 1);
 					}
 
-					return (array_search($id_1, $applicationids) <=> array_search($id_2, $applicationids));
+					return (array_search($id_1, $applicationids)
+						<=> array_search($id_2, $applicationids));
 				});
 
 				foreach ($host_items_grouped as $applicationid => $application_items) {
-					CArrayHelper::sort($application_items, [$item_sort_options]);
+					CArrayHelper::sort($application_items, $item_sort_options);
 
 					foreach ($application_items as $itemid => $item) {
 						unset($item['applications']);
 
 						$items[$itemid] = $item;
-						$application_itemids[$applicationid][] = $itemid;
+						$rows[] = [
+							'itemid' => $itemid,
+							'applicationid' => $applicationid
+						];
 
 						if (count($items) > $config['search_limit']) {
 							break 3;
@@ -276,27 +280,6 @@ abstract class CControllerLatest extends CController {
 			$items = CMacrosResolverHelper::resolveItemKeys($items);
 			$items = CMacrosResolverHelper::resolveItemNames($items);
 			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
-
-			// Finally, sort limited set of items with resolved macros.
-
-			CArrayHelper::sort($items, [$item_sort_options]);
-
-			$sorted_itemids = array_keys($items);
-
-			$rows = [];
-
-			foreach ($application_itemids as $applicationid => $itemids) {
-				usort($itemids, function($itemid_1, $itemid_2) use ($sorted_itemids) {
-					return (array_search($itemid_1, $sorted_itemids) <=> array_search($itemid_2, $sorted_itemids));
-				});
-
-				foreach ($itemids as $itemid) {
-					$rows[] = [
-						'itemid' => $itemid,
-						'applicationid' => $applicationid
-					];
-				}
-			}
 
 			// Choosing max history period for already filtered items having data.
 			$history_period = $filter['show_without_data'] ? ZBX_HISTORY_PERIOD : null;
