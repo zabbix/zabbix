@@ -252,8 +252,7 @@ abstract class CControllerLatest extends CController {
 						return bccomp($id_1, $id_2) * (($application_sort_options['order'] === 'ASC') ? -1 : 1);
 					}
 
-					return (array_search($id_1, $applicationids)
-						<=> array_search($id_2, $applicationids));
+					return (array_search($id_1, $applicationids) <=> array_search($id_2, $applicationids));
 				});
 
 				foreach ($host_items_grouped as $applicationid => $application_items) {
