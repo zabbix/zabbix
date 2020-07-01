@@ -112,4 +112,14 @@ trait TableTrait {
 
 		$table->findRows($data)->select();
 	}
+
+	/**
+	 * Counts displayed rows in table
+	 *
+	 * @param integer $count	rows count
+	 */
+	public function assertRowCount($count) {
+		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
+		$this->query('xpath://div[@class="table-stats"]')->one()->getText());
+	}
 }

@@ -43,10 +43,19 @@ class testPageLowLevelDiscovery extends CWebTest {
 	public function testPageLowLevelDiscovery_CheckLayout() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$headers = ['', 'Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts',
-				'Key', 'Interval', 'Type', 'Status', 'Info'];
+
+		// Check all field names.
 		$fields = ['Host groups', 'Hosts', 'Name', 'Key', 'Type', 'Update interval',
 				'Keep lost resources period', 'SNMP OID', 'State', 'Status'];
+		$this->assertEquals($fields, $form->getLabels()->asText());
+
+		// Check filter collapse/expand.
+		foreach (['true', 'false'] as $status) {
+			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
+			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
+		}
+
+		// Check all dropdowns.
 		$dropdowns = [
 				'Type' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
 						'SNMP agent', 'Zabbix internal','Zabbix trapper', 'External check',
@@ -55,21 +64,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'State' => ['Normal', 'Not supported', 'all'],
 				'Status' => ['all', 'Enabled', 'Disabled']
 		];
-		$buttons = ['Apply', 'Reset'];
-		$buttons_name = ['Enable', 'Disable', 'Execute now', 'Delete'];
-
-		// Check all field names.
-		$labels = $form->getLabels()->asText();
-		$this->assertEquals($fields, $labels);
-
-		// Check filter collapse/expand.
-		$filter_expanded = ['true', 'false'];
-		foreach ($filter_expanded as $status) {
-			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
-		}
-
-		// Check all dropdowns.
 		foreach ($dropdowns as $name => $values) {
 			foreach ($values as $value) {
 				$form->fill([$name => $value]);
@@ -90,18 +84,20 @@ class testPageLowLevelDiscovery extends CWebTest {
 		}
 
 		// Check filter buttons.
-		foreach ($buttons as $button) {
+		foreach (['Apply', 'Reset'] as $button) {
 			$this->assertTrue($form->query('button', $button)->one()->isPresent());
 		}
 
 		// Checking Title, Header and Column names.
+		$headers = ['', 'Host', 'Name', 'Items', 'Triggers', 'Graphs', 'Hosts',
+				'Key', 'Interval', 'Type', 'Status', 'Info'];
 		$this->assertPageTitle('Configuration of discovery rules');
 		$this->assertPageHeader('Discovery rules');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertSame($headers, $table->getHeadersText());
 
 		// Check table buttons.
-		foreach ($buttons_name as $button) {
+		foreach (['Enable', 'Disable', 'Execute now', 'Delete'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isPresent());
 		}
 	}
@@ -110,30 +106,28 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$filtered_contents = ['Discovery rule 3'];
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
-		$this->assertDisplayingText($start_rows_count);
-		$start_contents = $this->getTableResult($start_rows_count);
+		$this->assertRowCount($start_rows_count);
+		$start_contents = $this->getTableData();
 
 		// Filling fields with needed discovery rule info.
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
 
 		// Check that filtered count mathces expected.
-		$this->assertEquals(count($filtered_contents), $table->getRows()->count());
-		$this->assertDisplayingText(count($filtered_contents));
+		$this->assertEquals(count(['Discovery rule 3']), $table->getRows()->count());
+		$this->assertRowCount(count(['Discovery rule 3']));
 
 		// Checking that filtered discovery rule matches expected.
-		$this->assertEquals($filtered_contents, $this->getTableResult(count($filtered_contents)));
+		$this->assertEquals(['Discovery rule 3'], $this->getTableData());
 
 		// After pressing reset button, check that previous discovery rules are displayed again.
 		$form->query('button:Reset')->one()->click();
-		$reset_rows_count = $table->getRows()->count();
-		$this->assertEquals($start_rows_count, $reset_rows_count);
-		$this->assertDisplayingText($reset_rows_count);
-		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count));
+		$this->assertEquals($start_rows_count, $table->getRows()->count());
+		$this->assertRowCount($table->getRows()->count());
+		$this->assertEquals($start_contents, $this->getTableData());
 	}
 
 	/**
@@ -142,14 +136,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 	public function testPageLowLevelDiscovery_EnableDisableSingle() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 		$table = $this->query('class:list-table')->asTable()->one();
-		$name = 'Discovery rule 2';
-		$row = $table->findRow('Name', $name);
+		$row = $table->findRow('Name', 'Discovery rule 2');
 
 		// Clicking Enabled/Disabled link
 		$discovery_status = ['Enabled' => 1, 'Disabled' => 0];
 		foreach ($discovery_status as $action => $expected_status) {
 			$row->query('link', $action)->one()->click();
-			$status = CDBHelper::getValue('SELECT status FROM items WHERE name ='.zbx_dbstr($name).' and hostid ='
+			$status = CDBHelper::getValue('SELECT status FROM items WHERE name='.zbx_dbstr('Discovery rule 2').' and hostid='
 				.self::HOST_ID);
 			$this->assertEquals($expected_status, $status);
 			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
@@ -164,13 +157,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);
 
 		// Press Enable or Disable buttons and check the result.
-		$actions = ['Disable', 'Enable'];
-		foreach ($actions as $action) {
+		foreach (['Disable', 'Enable'] as $action) {
 			$this->massChangeStatus($action);
 			$expected_status = ($action === 'Disable') ? 1 : 0;
 			foreach ($lld_names as $name) {
-				$status = CDBHelper::getValue('SELECT status FROM items WHERE name ='.zbx_dbstr($name).
-					' and hostid ='.self::HOST_ID);
+				$status = CDBHelper::getValue('SELECT status FROM items WHERE name='.zbx_dbstr($name).
+					' and hostid='.self::HOST_ID);
 				$this->assertEquals($expected_status, $status);
 			}
 		}
@@ -258,20 +250,19 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
 	}
 
-	private function getTableResult($rows_count) {
-		$table = $this->query('class:list-table')->asTable()->one();
+	/**
+	 * Remove table data by Name
+	 *
+	 * @return array
+	 */
+	private function getTableData() {
 		$result = [];
 
-		for ($i = 0; $i < $rows_count; $i ++) {
-			$result[] = $table->getRow($i)->getColumn('Name')->getText();
+		foreach ($this->query('class:list-table')->asTable()->one()->getRows() as $row) {
+			$result[] = $row->getColumn('Name')->getText();
 		}
 
 		return $result;
-	}
-
-	private function assertDisplayingText($count) {
-		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
-				$this->query('xpath://div[@class="table-stats"]')->one()->getText());
 	}
 
 	public static function getFilterData() {
@@ -591,8 +582,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
 
 		foreach ($data['keys'] as $key) {
-			$count = CDBHelper::getCount('SELECT status FROM items WHERE key_ ='
-					.zbx_dbstr($key['Key']).' and hostid ='.zbx_dbstr($data['hostid']));
+			$count = CDBHelper::getCount('SELECT status FROM items WHERE key_='
+					.zbx_dbstr($key['Key']).' and hostid='.zbx_dbstr($data['hostid']));
 			$this->assertEquals($data['db_count'], $count);
 		}
 	}
