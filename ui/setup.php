@@ -36,9 +36,17 @@ catch (Exception $e) {
 	exit;
 }
 
+$available_locales = [];
+foreach (getLocales() as $localeid => $locale) {
+	if (!$locale['display'] || !setlocale(LC_MONETARY, zbx_locale_variants($localeid))) {
+		continue;
+	}
+	$available_locales[] = $localeid;
+}
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'default_lang' =>		[T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', array_keys(getLocales())).'"'), null],
+	'default_lang' =>		[T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', $available_locales).'"'), null],
 	'type' =>				[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'"'), null],
 	'server' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
 	'port' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
@@ -92,6 +100,7 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
 
 // Set default language.
 $default_lang = ZBX_DEFAULT_LANG;
+
 if (hasRequest('default_lang')) {
 	$default_lang = getRequest('default_lang');
 }
@@ -101,6 +110,11 @@ elseif (CSession::keyExists('default_lang')) {
 elseif (CWebUser::$data) {
 	$default_lang = CWebUser::$data['lang'];
 }
+
+if (!in_array($default_lang, $available_locales)) {
+	$default_lang = ZBX_DEFAULT_LANG;
+}
+
 CSession::setValue('default_lang', $default_lang);
 APP::getInstance()->initLocales(['lang' => $default_lang]);
 
