@@ -114,7 +114,7 @@ trait TableTrait {
 	}
 
 	/**
-	 * Counts displayed rows in table
+	 * Displayed text of rows amount.
 	 *
 	 * @param integer $count	rows count per page
 	 * @param integer $total	total rows count
@@ -124,6 +124,7 @@ trait TableTrait {
 			$total = $count;
 		}
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
-				$this->query('xpath://div[@class="table-stats"]')->one()->getText());
+				$this->query('xpath://div[@class="table-stats"]')->one()->getText()
+		);
 	}
 }
