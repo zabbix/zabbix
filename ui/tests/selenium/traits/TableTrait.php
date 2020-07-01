@@ -114,7 +114,7 @@ trait TableTrait {
 	}
 
 	/**
-	 * Displayed text of rows amount.
+	 * Assert text of displayed rows amount.
 	 *
 	 * @param integer $count	rows count per page
 	 * @param integer $total	total rows count
