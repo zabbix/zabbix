@@ -21,14 +21,14 @@ package tcpudp
 
 import (
 	"encoding/binary"
-	"syscall"
 	"unsafe"
 
+	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
 
-const telnetErr = syscall.EAGAIN
+const telnetErr = windows.WSAEWOULDBLOCK
 
 func exportSystemTcpListen(port uint16) (result interface{}, err error) {
 	var tcpTable *win32.MIB_TCPTABLE
