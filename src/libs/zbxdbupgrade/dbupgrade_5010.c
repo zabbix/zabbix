@@ -29,10 +29,19 @@
 
 extern unsigned char	program_type;
 
-/*static int	DBpatch_5010000(void)
+static int	DBpatch_5010000(void)
 {
-	*** put the first upgrade patch here ***
-}*/
+	const ZBX_FIELD	field = {"default_timezone", "", NULL, NULL, 30, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5010001(void)
+{
+	const ZBX_FIELD	field = {"timezone", "default", NULL, NULL, 30, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("users", &field);
+}
 
 #endif
 
@@ -40,6 +49,7 @@ DBPATCH_START(5010)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(5010000, 0, 1)*/
+DBPATCH_ADD(5010000, 0, 1)
+DBPATCH_ADD(5010001, 0, 1)
 
 DBPATCH_END()
