@@ -92,7 +92,7 @@ class CControllerTrigDisplayUpdate extends CController {
 			$names = [];
 			for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 				$severity_name = 'severity_name_'.$i;
-	
+
 				if (isset($names[$this->getInput($severity_name)])) {
 					error(_s('Duplicate severity name "%1$s".', $this->getInput($severity_name)));
 					$ret = false;
