@@ -23,17 +23,29 @@ class CControllerTrigDisplayUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'custom_color'        => 'required | int32 | in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
-			'problem_unack_style' => 'required | int32 | in 0,1',
-			'problem_ack_style'   => 'required | int32 | in 0,1',
-			'ok_unack_style'      => 'required | int32 | in 0,1',
-			'ok_ack_style'        => 'required | int32 | in 0,1',
-			'ok_period'           => 'required | string | not_empty',
-			'blink_period'        => 'required | string | not_empty',
-			'problem_unack_color' => 'rgb',
-			'problem_ack_color'   => 'rgb',
-			'ok_unack_color'      => 'rgb',
-			'ok_ack_color'        => 'rgb'
+			'custom_color'        => 'required|db config.custom_color|in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
+			'problem_unack_color' => 'db config.problem_unack_color|rgb',
+			'problem_ack_color'   => 'db config.problem_ack_color|rgb',
+			'ok_unack_color'      => 'db config.ok_unack_color|rgb',
+			'ok_ack_color'        => 'db config.ok_ack_color|rgb',
+			'problem_unack_style' => 'required|db config.problem_unack_style|in 0,1',
+			'problem_ack_style'   => 'required|db config.problem_ack_style|in 0,1',
+			'ok_unack_style'      => 'required|db config.ok_unack_style|in 0,1',
+			'ok_ack_style'        => 'required|db config.ok_ack_style|in 0,1',
+			'ok_period'           => 'required|db config.ok_period|not_empty',
+			'blink_period'        => 'required|db config.blink_period|not_empty',
+			'severity_name_0'     => 'required|db config.severity_name_0|not_empty',
+			'severity_color_0'    => 'required|db config.severity_color_0|rgb',
+			'severity_name_1'     => 'required|db config.severity_name_1|not_empty',
+			'severity_color_1'    => 'required|db config.severity_color_1|rgb',
+			'severity_name_2'     => 'required|db config.severity_name_2|not_empty',
+			'severity_color_2'    => 'required|db config.severity_color_2|rgb',
+			'severity_name_3'     => 'required|db config.severity_name_3|not_empty',
+			'severity_color_3'    => 'required|db config.severity_color_3|rgb',
+			'severity_name_4'     => 'required|db config.severity_name_4|not_empty',
+			'severity_color_4'    => 'required|db config.severity_color_4|rgb',
+			'severity_name_5'     => 'required|db config.severity_name_5|not_empty',
+			'severity_color_5'    => 'required|db config.severity_color_5|rgb'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -48,6 +60,59 @@ class CControllerTrigDisplayUpdate extends CController {
 
 			$this->setResponse($response);
 		}
+		else {
+			$fields = [
+				'ok_period' => [
+					'min' => 0,
+					'max' => SEC_PER_DAY,
+					'allow_zero' => false,
+					'message' => _('Invalid displaying of OK triggers: %1$s.')
+				],
+				'blink_period' => [
+					'min' => 0,
+					'max' => SEC_PER_DAY,
+					'allow_zero' => false,
+					'message' => _('Invalid blinking on trigger status change: %1$s.')
+				],
+			];
+
+			foreach ($fields as $field => $args) {
+				if ($this->hasInput($field)
+						&& !validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],
+							$error
+						)) {
+					error(sprintf($args['message'], $error));
+
+					$ret = false;
+					break;
+				}
+			}
+
+			// check duplicate severity names and if name is empty.
+			$names = [];
+			for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
+				$severity_name = 'severity_name_'.$i;
+	
+				if (isset($names[$this->getInput($severity_name)])) {
+					error(_s('Duplicate severity name "%1$s".', $this->getInput($severity_name)));
+					$ret = false;
+					break;
+				}
+				else {
+					$names[$this->getInput($severity_name)] = true;
+				}
+			}
+
+			if (!$ret) {
+				$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+					->setArgument('action', 'trigdisplay.edit')
+					->getUrl()
+				);
+				$response->setFormData($this->getInputAll());
+				$response->setMessageError(_('Cannot update configuration'));
+				$this->setResponse($response);
+			}
+		}
 
 		return $ret;
 	}
@@ -57,30 +122,40 @@ class CControllerTrigDisplayUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$update_values = [
-			'custom_color'        => $this->getInput('custom_color', EVENT_CUSTOM_COLOR_DISABLED),
-			'problem_unack_style' => $this->getInput('problem_unack_style'),
-			'problem_ack_style'   => $this->getInput('problem_ack_style'),
-			'ok_unack_style'      => $this->getInput('ok_unack_style'),
-			'ok_ack_style'        => $this->getInput('ok_ack_style'),
-			'ok_period'           => trim($this->getInput('ok_period')),
-			'blink_period'        => trim($this->getInput('blink_period'))
+		$settings = [
+			CSettingsHelper::CUSTOM_COLOR        => $this->getInput('custom_color', EVENT_CUSTOM_COLOR_DISABLED),
+			CSettingsHelper::PROBLEM_UNACK_STYLE => $this->getInput('problem_unack_style'),
+			CSettingsHelper::PROBLEM_ACK_STYLE   => $this->getInput('problem_ack_style'),
+			CSettingsHelper::OK_UNACK_STYLE      => $this->getInput('ok_unack_style'),
+			CSettingsHelper::OK_ACK_STYLE        => $this->getInput('ok_ack_style'),
+			CSettingsHelper::OK_PERIOD           => trim($this->getInput('ok_period')),
+			CSettingsHelper::BLINK_PERIOD        => trim($this->getInput('blink_period')),
+			CSettingsHelper::SEVERITY_NAME_0     => $this->getInput('severity_name_0'),
+			CSettingsHelper::SEVERITY_COLOR_0    => $this->getInput('severity_color_0'),
+			CSettingsHelper::SEVERITY_NAME_1     => $this->getInput('severity_name_1'),
+			CSettingsHelper::SEVERITY_COLOR_1    => $this->getInput('severity_color_1'),
+			CSettingsHelper::SEVERITY_NAME_2     => $this->getInput('severity_name_2'),
+			CSettingsHelper::SEVERITY_COLOR_2    => $this->getInput('severity_color_2'),
+			CSettingsHelper::SEVERITY_NAME_3     => $this->getInput('severity_name_3'),
+			CSettingsHelper::SEVERITY_COLOR_3    => $this->getInput('severity_color_3'),
+			CSettingsHelper::SEVERITY_NAME_4     => $this->getInput('severity_name_4'),
+			CSettingsHelper::SEVERITY_COLOR_4    => $this->getInput('severity_color_4'),
+			CSettingsHelper::SEVERITY_NAME_5     => $this->getInput('severity_name_5'),
+			CSettingsHelper::SEVERITY_COLOR_5    => $this->getInput('severity_color_5')
 		];
+
+		if ($settings[CSettingsHelper::CUSTOM_COLOR] == EVENT_CUSTOM_COLOR_ENABLED) {
+			$settings[CSettingsHelper::PROBLEM_UNACK_COLOR] = $this->getInput('problem_unack_color');
+			$settings[CSettingsHelper::PROBLEM_ACK_COLOR]   = $this->getInput('problem_ack_color');
+			$settings[CSettingsHelper::OK_UNACK_COLOR]      = $this->getInput('ok_unack_color');
+			$settings[CSettingsHelper::OK_ACK_COLOR]        = $this->getInput('ok_ack_color');
+		}
+
+		$result = API::Settings()->update($settings);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'trigdisplay.edit')
 		);
-
-		if ($update_values['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED) {
-			$update_values['problem_unack_color'] = $this->getInput('problem_unack_color');
-			$update_values['problem_ack_color']   = $this->getInput('problem_ack_color');
-			$update_values['ok_unack_color']      = $this->getInput('ok_unack_color');
-			$update_values['ok_ack_color']        = $this->getInput('ok_ack_color');
-		}
-
-		DBstart();
-		$result = update_config($update_values);
-		$result = DBend($result);
 
 		if ($result) {
 			$response->setMessageOk(_('Configuration updated'));

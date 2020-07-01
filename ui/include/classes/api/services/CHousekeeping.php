@@ -157,7 +157,7 @@ class CHousekeeping extends CApiService {
 			'hk_trends_global' =>			['type' => API_INT32, 'in' => '0,1'],
 			'hk_trends' =>					['type' => API_TIME_UNIT,
 												'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'compression_status' =>			[],
+			'compression_status' =>			['type' => API_INT32, 'in' => '0,1'],
 			'compress_older' =>				['type' => API_TIME_UNIT,
 												'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])]
 		]];

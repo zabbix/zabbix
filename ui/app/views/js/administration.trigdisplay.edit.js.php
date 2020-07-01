@@ -30,7 +30,7 @@ $schema = DB::getSchema('config');
 	jQuery(document).ready(function() {
 		jQuery("input[name=custom_color]").on('change', function() {
 			var checked = jQuery(this).is(':checked');
-			jQuery(".input-color-picker").each(function() {
+			jQuery(".js-event-color-picker").each(function() {
 				var $field = jQuery(this);
 				$field.toggleClass('<?= ZBX_STYLE_DISABLED ?>', !checked);
 				jQuery("input", $field).prop('disabled', !checked);
@@ -99,10 +99,42 @@ $schema = DB::getSchema('config');
 
 							jQuery('#ok_period').val("<?= $schema['fields']['ok_period']['default'] ?>");
 							jQuery('#blink_period').val("<?= $schema['fields']['blink_period']['default'] ?>");
+
+							$('#severity_name_0').val("<?= $schema['fields']['severity_name_0']['default'] ?>");
+							$('#severity_name_1').val("<?= $schema['fields']['severity_name_1']['default'] ?>");
+							$('#severity_name_2').val("<?= $schema['fields']['severity_name_2']['default'] ?>");
+							$('#severity_name_3').val("<?= $schema['fields']['severity_name_3']['default'] ?>");
+							$('#severity_name_4').val("<?= $schema['fields']['severity_name_4']['default'] ?>");
+							$('#severity_name_5').val("<?= $schema['fields']['severity_name_5']['default'] ?>");
+							$('#severity_color_0')
+								.val("<?= $schema['fields']['severity_color_0']['default'] ?>")
+								.change();
+							$('#severity_color_1')
+								.val("<?= $schema['fields']['severity_color_1']['default'] ?>")
+								.change();
+							$('#severity_color_2')
+								.val("<?= $schema['fields']['severity_color_2']['default'] ?>")
+								.change();
+							$('#severity_color_3')
+								.val("<?= $schema['fields']['severity_color_3']['default'] ?>")
+								.change();
+							$('#severity_color_4')
+								.val("<?= $schema['fields']['severity_color_4']['default'] ?>")
+								.change();
+							$('#severity_color_5')
+								.val("<?= $schema['fields']['severity_color_5']['default'] ?>")
+								.change();
 						}
 					}
 				]
 			}, this);
+		});
+
+		var $form = $('form');
+		$form.on('submit', function() {
+			$form.trimValues(['#severity_name_0', '#severity_name_1', '#severity_name_2', '#severity_name_3',
+				'#severity_name_4', '#severity_name_5'
+			]);
 		});
 	});
 </script>

@@ -27,17 +27,29 @@ class CControllerTrigDisplayEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'custom_color'        => 'int32',
-			'problem_unack_color' => 'string',
-			'problem_ack_color'   => 'string',
-			'ok_unack_color'      => 'string',
-			'ok_ack_color'        => 'string',
-			'problem_unack_style' => 'int32',
-			'problem_ack_style'   => 'int32',
-			'ok_unack_style'      => 'int32',
-			'ok_ack_style'        => 'int32',
-			'ok_period'           => 'string',
-			'blink_period'        => 'string'
+			'custom_color'        => 'db config.custom_color',
+			'problem_unack_color' => 'db config.problem_unack_color',
+			'problem_ack_color'   => 'db config.problem_ack_color',
+			'ok_unack_color'      => 'db config.ok_unack_color',
+			'ok_ack_color'        => 'db config.ok_ack_color',
+			'problem_unack_style' => 'db config.problem_unack_style',
+			'problem_ack_style'   => 'db config.problem_ack_style',
+			'ok_unack_style'      => 'db config.ok_unack_style',
+			'ok_ack_style'        => 'db config.ok_ack_style',
+			'ok_period'           => 'db config.ok_period',
+			'blink_period'        => 'db config.blink_period',
+			'severity_name_0'     => 'db config.severity_name_0',
+			'severity_color_0'    => 'db config.severity_color_0',
+			'severity_name_1'     => 'db config.severity_name_1',
+			'severity_color_1'    => 'db config.severity_color_1',
+			'severity_name_2'     => 'db config.severity_name_2',
+			'severity_color_2'    => 'db config.severity_color_2',
+			'severity_name_3'     => 'db config.severity_name_3',
+			'severity_color_3'    => 'db config.severity_color_3',
+			'severity_name_4'     => 'db config.severity_name_4',
+			'severity_color_4'    => 'db config.severity_color_4',
+			'severity_name_5'     => 'db config.severity_name_5',
+			'severity_color_5'    => 'db config.severity_color_5'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,17 +69,52 @@ class CControllerTrigDisplayEdit extends CController {
 		$config = select_config();
 
 		$data = [
-			'custom_color'        => $this->getInput('custom_color',        $config['custom_color']),
-			'problem_unack_color' => $this->getInput('problem_unack_color', $config['problem_unack_color']),
-			'problem_ack_color'   => $this->getInput('problem_ack_color',   $config['problem_ack_color']),
-			'ok_unack_color'      => $this->getInput('ok_unack_color',      $config['ok_unack_color']),
-			'ok_ack_color'        => $this->getInput('ok_ack_color',        $config['ok_ack_color']),
-			'problem_unack_style' => $this->getInput('problem_unack_style', $config['problem_unack_style']),
-			'problem_ack_style'   => $this->getInput('problem_ack_style',   $config['problem_ack_style']),
-			'ok_unack_style'      => $this->getInput('ok_unack_style',      $config['ok_unack_style']),
-			'ok_ack_style'        => $this->getInput('ok_ack_style',        $config['ok_ack_style']),
-			'ok_period'           => $this->getInput('ok_period',           $config['ok_period']),
-			'blink_period'        => $this->getInput('blink_period',        $config['blink_period'])
+			'custom_color' =>
+				$this->getInput('custom_color',        CSettingsHelper::get(CSettingsHelper::CUSTOM_COLOR)),
+			'problem_unack_color' =>
+				$this->getInput('problem_unack_color', CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_COLOR)),
+			'problem_ack_color' =>
+				$this->getInput('problem_ack_color',   CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_COLOR)),
+			'ok_unack_color' =>
+				$this->getInput('ok_unack_color',      CSettingsHelper::get(CSettingsHelper::OK_UNACK_COLOR)),
+			'ok_ack_color' =>
+				$this->getInput('ok_ack_color',        CSettingsHelper::get(CSettingsHelper::OK_ACK_COLOR)),
+			'problem_unack_style' =>
+				$this->getInput('problem_unack_style', CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE)),
+			'problem_ack_style' =>
+				$this->getInput('problem_ack_style',   CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE)),
+			'ok_unack_style' =>
+				$this->getInput('ok_unack_style',      CSettingsHelper::get(CSettingsHelper::OK_UNACK_STYLE)),
+			'ok_ack_style' =>
+				$this->getInput('ok_ack_style',        CSettingsHelper::get(CSettingsHelper::OK_ACK_STYLE)),
+			'ok_period' =>
+				$this->getInput('ok_period',           CSettingsHelper::get(CSettingsHelper::OK_PERIOD)),
+			'blink_period' =>
+				$this->getInput('blink_period',        CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)),
+			'severity_name_0'  =>
+				$this->getInput('severity_name_0',     CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0)),
+			'severity_color_0' =>
+				$this->getInput('severity_color_0',    CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_0)),
+			'severity_name_1'  =>
+				$this->getInput('severity_name_1',     CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_1)),
+			'severity_color_1' =>
+				$this->getInput('severity_color_1',    CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_1)),
+			'severity_name_2'  =>
+				$this->getInput('severity_name_2',     CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_2)),
+			'severity_color_2' =>
+				$this->getInput('severity_color_2',    CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_2)),
+			'severity_name_3'  =>
+				$this->getInput('severity_name_3',     CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_3)),
+			'severity_color_3' =>
+				$this->getInput('severity_color_3',    CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_3)),
+			'severity_name_4'  =>
+				$this->getInput('severity_name_4',     CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_4)),
+			'severity_color_4' =>
+				$this->getInput('severity_color_4',    CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_4)),
+			'severity_name_5'  =>
+				$this->getInput('severity_name_5',     CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_5)),
+			'severity_color_5' =>
+				$this->getInput('severity_color_5',    CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_5))
 		];
 
 		$response = new CControllerResponseData($data);

@@ -62,6 +62,93 @@ class CControllerHousekeepingUpdate extends CController {
 					break;
 			}
 		}
+		else {
+			$fields = [
+				'hk_events_trigger' => [
+					'min' => SEC_PER_DAY,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => false,
+					'message' => _('Invalid trigger data storage period: %1$s.')
+				],
+				'hk_events_internal' => [
+					'min' => SEC_PER_DAY,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => false,
+					'message' => _('Invalid internal data storage period: %1$s.')
+				],
+				'hk_events_discovery' => [
+					'min' => SEC_PER_DAY,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => false,
+					'message' => _('Invalid network discovery data storage period: %1$s.')
+				],
+				'hk_events_autoreg' => [
+					'min' => SEC_PER_DAY,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => false,
+					'message' => _('Invalid autoregistration data storage period: %1$s.')
+				],
+				'hk_services' => [
+					'min' => SEC_PER_DAY,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => false,
+					'message' => _('Invalid data storage period for services: %1$s.')
+				],
+				'hk_audit' => [
+					'min' => SEC_PER_DAY,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => false,
+					'message' => _('Invalid audit data storage period: %1$s.')
+				],
+				'hk_sessions' => [
+					'min' => SEC_PER_DAY,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => false,
+					'message' => _('Invalid user sessions data storage period: %1$s.')
+				],
+				'hk_history' => [
+					'min' => SEC_PER_HOUR,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => true,
+					'message' => _('Invalid history data storage period: %1$s.')
+				],
+				'hk_trends' => [
+					'min' => SEC_PER_DAY,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => true,
+					'message' => _('Invalid trends data storage period: %1$s.')
+				],
+				'compress_older' => [
+					'min' => SEC_PER_DAY * 7,
+					'max' => 25 * SEC_PER_YEAR,
+					'allow_zero' => false,
+					'message' => _s('Invalid parameter "%1$s": %2$s.', _('Compress records older than'), '%1$s')
+				],
+			];
+
+			if ($this->hasInput('compression_status') && $this->getInput('compression_status') === 0) {
+				unset($fields['compress_older']);
+			}
+
+			foreach ($fields as $field => $args) {
+				if ($this->hasInput($field)
+						&& !validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],
+							$error
+						)) {
+					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+						->setArgument('action', 'housekeeping.edit')
+						->getUrl()
+					);
+					$response->setFormData($this->getInputAll());
+					$response->setMessageError(_('Cannot update configuration'));
+					$this->setResponse($response);
+					error(sprintf($args['message'], $error));
+
+					$ret = false;
+					break;
+				}
+			}
+		}
 
 		return $ret;
 	}
@@ -71,48 +158,52 @@ class CControllerHousekeepingUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$config = [
-			'hk_events_mode'		=> $this->getInput('hk_events_mode', 0),
-			'hk_services_mode'		=> $this->getInput('hk_services_mode', 0),
-			'hk_audit_mode'			=> $this->getInput('hk_audit_mode', 0),
-			'hk_sessions_mode'		=> $this->getInput('hk_sessions_mode', 0),
-			'hk_history_mode'		=> $this->getInput('hk_history_mode', 0),
-			'hk_history_global'		=> $this->getInput('hk_history_global', 0),
-			'hk_trends_mode'		=> $this->getInput('hk_trends_mode', 0),
-			'hk_trends_global'		=> $this->getInput('hk_trends_global', 0),
-			'compression_status'	=> $this->getInput('compression_status', 0),
-			'compress_older'		=> $this->getInput('compress_older', DB::getDefault('config', 'compress_older'))
+		$hk = [
+			CHousekeepingHelper::HK_EVENTS_MODE => $this->getInput('hk_events_mode', 0),
+			CHousekeepingHelper::HK_SERVICES_MODE => $this->getInput('hk_services_mode', 0),
+			CHousekeepingHelper::HK_AUDIT_MODE => $this->getInput('hk_audit_mode', 0),
+			CHousekeepingHelper::HK_SESSIONS_MODE => $this->getInput('hk_sessions_mode', 0),
+			CHousekeepingHelper::HK_HISTORY_MODE => $this->getInput('hk_history_mode', 0),
+			CHousekeepingHelper::HK_HISTORY_GLOBAL => $this->getInput('hk_history_global', 0),
+			CHousekeepingHelper::HK_TRENDS_MODE => $this->getInput('hk_trends_mode', 0),
+			CHousekeepingHelper::HK_TRENDS_GLOBAL => $this->getInput('hk_trends_global', 0),
+			CHousekeepingHelper::COMPRESSION_STATUS => $this->getInput('compression_status', 0),
+			CHousekeepingHelper::COMPRESS_OLDER => $this->getInput('compress_older', DB::getDefault('config',
+				'compress_older'
+			))
 		];
 
-		if ($config['hk_events_mode'] == 1) {
-			$this->getInputs($config,
-				['hk_events_trigger', 'hk_events_internal', 'hk_events_discovery', 'hk_events_autoreg']
-			);
+		if ($hk[CHousekeepingHelper::COMPRESSION_STATUS] === 0) {
+			unset($hk[CHousekeepingHelper::COMPRESS_OLDER]);
 		}
 
-		if ($config['hk_services_mode'] == 1) {
-			$config['hk_services'] = $this->getInput('hk_services');
+		if ($hk[CHousekeepingHelper::HK_EVENTS_MODE] == 1) {
+			$this->getInputs($hk, [CHousekeepingHelper::HK_EVENTS_TRIGGER, CHousekeepingHelper::HK_EVENTS_INTERNAL,
+				CHousekeepingHelper::HK_EVENTS_DISCOVERY, CHousekeepingHelper::HK_EVENTS_AUTOREG
+			]);
 		}
 
-		if ($config['hk_audit_mode'] == 1) {
-			$config['hk_audit'] = $this->getInput('hk_audit');
+		if ($hk[CHousekeepingHelper::HK_SERVICES_MODE] == 1) {
+			$hk[CHousekeepingHelper::HK_SERVICES] = $this->getInput('hk_services');
 		}
 
-		if ($config['hk_sessions_mode'] == 1) {
-			$config['hk_sessions'] = $this->getInput('hk_sessions');
+		if ($hk[CHousekeepingHelper::HK_AUDIT_MODE] == 1) {
+			$hk[CHousekeepingHelper::HK_AUDIT] = $this->getInput('hk_audit');
 		}
 
-		if ($config['hk_history_global'] == 1) {
-			$config['hk_history'] = $this->getInput('hk_history');
+		if ($hk[CHousekeepingHelper::HK_SESSIONS_MODE] == 1) {
+			$hk[CHousekeepingHelper::HK_SESSIONS] = $this->getInput('hk_sessions');
 		}
 
-		if ($config['hk_trends_global'] == 1) {
-			$config['hk_trends'] = $this->getInput('hk_trends');
+		if ($hk[CHousekeepingHelper::HK_HISTORY_GLOBAL] == 1) {
+			$hk[CHousekeepingHelper::HK_HISTORY] = $this->getInput('hk_history');
 		}
 
-		DBstart();
-		$result = update_config($config);
-		$result = DBend($result);
+		if ($hk[CHousekeepingHelper::HK_TRENDS_GLOBAL] == 1) {
+			$hk[CHousekeepingHelper::HK_TRENDS] = $this->getInput('hk_trends');
+		}
+
+		$result = API::Housekeeping()->update($hk);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'housekeeping.edit')

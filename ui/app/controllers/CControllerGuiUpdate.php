@@ -88,7 +88,7 @@ class CControllerGuiUpdate extends CController {
 						->getUrl()
 					);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update configurationnn'));
+					$response->setMessageError(_('Cannot update configuration'));
 					$this->setResponse($response);
 					error(sprintf($args['message'], $error));
 
@@ -107,15 +107,15 @@ class CControllerGuiUpdate extends CController {
 
 	protected function doAction() {
 		$result = API::Settings()->update([
-			'default_theme'           => $this->getInput('default_theme'),
-			'search_limit'            => $this->getInput('search_limit'),
-			'max_in_table'            => $this->getInput('max_in_table'),
-			'server_check_interval'   => $this->getInput('server_check_interval'),
-			'work_period'             => $this->getInput('work_period'),
-			'show_technical_errors'   => $this->getInput('show_technical_errors'),
-			'history_period'          => $this->getInput('history_period'),
-			'period_default'          => $this->getInput('period_default'),
-			'max_period'              => $this->getInput('max_period')
+			CSettingsHelper::DEFAULT_THEME         => $this->getInput('default_theme'),
+			CSettingsHelper::SEARCH_LIMIT          => $this->getInput('search_limit'),
+			CSettingsHelper::MAX_IN_TABLE          => $this->getInput('max_in_table'),
+			CSettingsHelper::SERVER_CHECK_INTERVAL => $this->getInput('server_check_interval'),
+			CSettingsHelper::WORK_PERIOD           => $this->getInput('work_period'),
+			CSettingsHelper::SHOW_TECHNICAL_ERRORS => $this->getInput('show_technical_errors'),
+			CSettingsHelper::HISTORY_PERIOD        => $this->getInput('history_period'),
+			CSettingsHelper::PERIOD_DEFAULT        => $this->getInput('period_default'),
+			CSettingsHelper::MAX_PERIOD            => $this->getInput('max_period')
 		]);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))

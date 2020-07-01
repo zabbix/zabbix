@@ -881,10 +881,6 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'valuemap.list')
 		->getUrl();
 
-	$trigseverity_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'trigseverity.edit')
-		->getUrl();
-
 	$trigdisplay_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.edit')
 		->getUrl();
@@ -908,7 +904,6 @@ function getAdministrationGeneralSubmenu() {
 				$regex_url        => _('Regular expressions'),
 				$macros_url       => _('Macros'),
 				$valuemap_url     => _('Value mapping'),
-				$trigseverity_url => _('Trigger severities'),
 				$trigdisplay_url  => _('Trigger displaying options'),
 				$modules_url      => _('Modules'),
 				$miscconfig_url   => _('Other')
