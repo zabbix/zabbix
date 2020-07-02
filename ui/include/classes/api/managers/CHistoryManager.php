@@ -1065,7 +1065,7 @@ class CHistoryManager {
 			error(_('Some of the history for this item may be compressed, deletion is not available.'));
 
 			return false;
-		};
+		}
 
 		foreach ($item_tables as $table_name) {
 			$itemids = array_keys(array_intersect($items, [(string) $table_names[$table_name]]));
