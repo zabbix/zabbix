@@ -59,7 +59,6 @@ class CItemManager {
 			ZBX_FLAG_DISCOVERY_CREATED => [],
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
-		$del_itemids = [];
 
 		do {
 			$db_items = DBselect(
@@ -74,10 +73,6 @@ class CItemManager {
 					)
 			);
 
-			$del_itemids += $dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL];
-			$del_itemids += $dep_itemids[ZBX_FLAG_DISCOVERY_CREATED];
-			$del_ruleids += $dep_itemids[ZBX_FLAG_DISCOVERY_RULE];
-			$del_item_prototypeids += $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE];
 			$dep_itemids = [
 				ZBX_FLAG_DISCOVERY_NORMAL => [],
 				ZBX_FLAG_DISCOVERY_RULE => [],
@@ -108,6 +103,12 @@ class CItemManager {
 						break;
 				}
 			}
+
+			$del_itemids += $dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL];
+			$del_itemids += $dep_itemids[ZBX_FLAG_DISCOVERY_CREATED];
+			$del_ruleids += $dep_itemids[ZBX_FLAG_DISCOVERY_RULE];
+			$del_item_prototypeids += $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE];
+
 		} while ($dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL]
 			|| $dep_itemids[ZBX_FLAG_DISCOVERY_CREATED]
 			|| $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE]
