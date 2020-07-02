@@ -2090,9 +2090,9 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50014, 4)
 INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40067, 2, 50014, 'Item A', 'A', '', '', '', '');
 INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40068, 2, 50014, 'Item B', 'B', '', '', '', '');
 INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40069, 2, 50014, 'Item C', 'C', '', '', '', '');
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100001, '{100001}=0', 'A trigger', '');
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100002, '{100002}=0', 'B trigger', '');
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100003, '{100003}=0', 'C trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100001, '{16028}=0', 'A trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100002, '{16029}=0', 'B trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (100003, '{16030}=0', 'C trigger', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16028, 40067, 100001,'last','0');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16029, 40068, 100002,'last','0');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 40069, 100003,'last','0');
@@ -2477,7 +2477,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90059, 121, 0, 'dynamic', 1);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (122, 105, 'url', 'Dynamic URL', 0, 13, 11, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90060, 122, 0, 'dynamic', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 122, 1, 'url', 'hostinventories.php?hostid={HOST.ID}');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 122, 1, 'url', 'iframe.php?name={HOST.NAME}');
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (123, 105, 'graphprototype', '', 0, 17, 9, 2);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (124, 105, 'graphprototype', '', 9, 17, 8, 2);
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (125, 105, 'graphprototype', '', 17, 17, 7, 2);
@@ -2751,7 +2751,6 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (90410, 172, 2, 'groupids', 0, 50006);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_hostid) VALUES (90411, 172, 3, 'hostids', 0, 99015);
 
-
 INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (173, 130, 'graphprototype', 'Test copy Graph prototype 2', 10, 23, 14, 5);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90440, 173, 0, 'columns', 20);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90441, 173, 0, 'rows', 5);
@@ -2761,3 +2760,13 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 -- INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 173, 0, 'show_legend', 0);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90444, 173, 0, 'show_legend', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90445, 173, 7, 'graphid', 0, 892);
+
+-- Dashboard for Graph Prototype widget
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (140, 'Dashboard for Graph Prototype widget', 1, 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (199, 140, 'graphprototype', 'Graph prototype widget for update', 0, 0, 16, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (90500, 199, 7, 'graphid', 600003);
+
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (200, 140, 'graphprototype', 'Graph prototype widget for delete', 0, 5, 16, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (90501, 200, 7, 'graphid', 600002);
+
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (141, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);

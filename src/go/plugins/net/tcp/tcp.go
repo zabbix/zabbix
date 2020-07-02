@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-ldap/ldap"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
@@ -292,6 +293,27 @@ func (p *Plugin) validateTelnet(buf []byte, conn net.Conn) int {
 	return tcpExpectOk
 }
 
+func (p *Plugin) validateLdap(conn *ldap.Conn, address string) (result int) {
+	res, err := conn.Search(&ldap.SearchRequest{Scope: ldap.ScopeBaseObject, Filter: "(objectClass=*)",
+		Attributes: []string{"namingContexts"}})
+	if err != nil {
+		log.Debugf("TCP expect search error: searching failed for [%s]: %s", address, err.Error())
+		return
+	}
+
+	if len(res.Entries) < 1 {
+		log.Debugf("TCP expect response error: empty search result for [%s]", address)
+		return
+	}
+
+	if len(res.Entries[0].Attributes) < 1 {
+		log.Debugf("TCP expect response error: no attributes in first entry for [%s]", address)
+		return
+	}
+
+	return 1
+}
+
 func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
@@ -308,6 +330,13 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 
 	if err = conn.SetReadDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
 		return
+	}
+
+	if service == "ldap" {
+		l := ldap.NewConn(conn, false)
+		l.Start()
+		defer l.Close()
+		return p.validateLdap(l, address)
 	}
 
 	var sendToClose string
@@ -429,7 +458,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				err = errors.New(errorInvalidThirdParam)
 				return
 			}
-		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "telnet":
+		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "ldap", "telnet":
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return

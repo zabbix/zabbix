@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-14 11:14+0300\n"
+"POT-Creation-Date: 2020-06-26 19:54+0300\n"
 "PO-Revision-Date: 2020-05-25 09:44+0300\n"
 "Last-Translator: Yurii <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -240,7 +240,7 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, chọn"
 
-#: include/func.inc.php:1851
+#: include/func.inc.php:1853
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -270,8 +270,8 @@ msgstr "(0 - hoạt động mặc định)"
 msgid "(Only super admins can create groups)"
 msgstr "(Chỉ có nhóm super admins mới có thể tạo nhóm)"
 
-#: app/views/popup.itemtestedit.view.php:104
-#: app/views/popup.itemtestedit.view.php:106
+#: app/views/popup.itemtestedit.view.php:112
+#: app/views/popup.itemtestedit.view.php:114
 #: include/views/configuration.host.edit.php:200
 #: include/views/configuration.host.edit.php:205
 #: include/views/configuration.host.massupdate.php:96
@@ -373,7 +373,7 @@ msgstr "VÀ"
 msgid "Acceptable SLA"
 msgstr "SLA chấp nhận được"
 
-#: include/func.inc.php:1530
+#: include/func.inc.php:1532
 msgid "Access denied"
 msgstr "Truy cập bị từ chối"
 
@@ -1570,7 +1570,7 @@ msgstr "CPU load. Trả về kiều float"
 msgid "CPU utilisation percentage. Returns float"
 msgstr "Tỉ lệ sử dụng CPU. Trả về kiểu float"
 
-#: app/views/popup.itemtestedit.view.php:156
+#: app/views/popup.itemtestedit.view.php:164
 msgid "CRLF"
 msgstr "CRLF"
 
@@ -2237,7 +2237,7 @@ msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] ""
 
-#: app/controllers/CControllerModuleUpdate.php:159
+#: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
@@ -2292,7 +2292,7 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] ""
 
-#: app/controllers/CControllerModuleUpdate.php:154
+#: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
@@ -2889,6 +2889,11 @@ msgstr "Không thể cập nhật bảo trì"
 msgid "Cannot update media type"
 msgstr "Không thể cập nhật kiểu media"
 
+#: app/controllers/CControllerModuleUpdate.php:157
+#, c-format
+msgid "Cannot update module: %1$s."
+msgstr ""
+
 #: sysmaps.php:180
 msgid "Cannot update network map"
 msgstr "Không thể cập nhật sơ đồ mạng"
@@ -3278,7 +3283,7 @@ msgstr "Đồng hồ"
 msgid "Clone"
 msgstr "Tạo bản sao"
 
-#: include/func.inc.php:1649 include/views/js/monitoring.sysmaps.js.php:297
+#: include/func.inc.php:1651 include/views/js/monitoring.sysmaps.js.php:297
 #: include/views/js/monitoring.sysmaps.js.php:449
 #: include/views/js/monitoring.sysmaps.js.php:569
 #: include/views/js/monitoring.sysmaps.js.php:664
@@ -4406,7 +4411,7 @@ msgstr "Ngày đã mua HW"
 msgid "Day"
 msgstr "Ngày"
 
-#: include/func.inc.php:2519
+#: include/func.inc.php:2521
 msgid "Day before yesterday"
 msgstr "Ngày trước hôm qua"
 
@@ -4909,7 +4914,7 @@ msgstr "Mô tả"
 
 #: app/views/administration.mediatype.list.php:77
 #: app/views/reports.auditlog.list.php:77 include/blocks.inc.php:617
-#: include/func.inc.php:1604 include/views/configuration.action.edit.php:170
+#: include/func.inc.php:1606 include/views/configuration.action.edit.php:170
 #: include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:313
 #: include/views/configuration.action.edit.php:395
@@ -5863,7 +5868,7 @@ msgstr "Mã hóa"
 msgid "Encryption level"
 msgstr "Cấp độ mã hóa"
 
-#: app/views/popup.itemtestedit.view.php:153
+#: app/views/popup.itemtestedit.view.php:161
 msgid "End of line sequence"
 msgstr "Kết thúc chuỗi"
 
@@ -5905,7 +5910,7 @@ msgstr "Lỗi"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Lỗi trong yêu cầu tìm kiếm cho bảng \"%1$s\"."
 
-#: include/func.inc.php:1643 jsLoader.php:159
+#: include/func.inc.php:1645 jsLoader.php:159
 msgid "Error message"
 msgstr "Tin nhắn lỗi"
 
@@ -6556,7 +6561,7 @@ msgstr "Bộ điều giải GSM"
 msgid "GUI"
 msgstr "GUI"
 
-#: include/classes/user/CWebUser.php:76 index_sso.php:210
+#: include/classes/user/CWebUser.php:76 index_sso.php:231
 msgid "GUI access disabled."
 msgstr "Truy cập GUI bị vô hiệu hóa."
 
@@ -6582,16 +6587,16 @@ msgstr "German (de_DE)"
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Nội dung của trang web. Trả về nguồn trang web dưới dạng văn bản"
 
-#: app/views/popup.itemtestedit.view.php:128
+#: app/views/popup.itemtestedit.view.php:136
 msgid "Get value"
 msgstr "Lấy giá trị"
 
 #: app/views/js/popup.itemtestedit.view.js.php:483
-#: app/views/popup.itemtestedit.view.php:296
+#: app/views/popup.itemtestedit.view.php:304
 msgid "Get value and test"
 msgstr "Nhận giá trị và kiểm tra"
 
-#: app/views/popup.itemtestedit.view.php:86
+#: app/views/popup.itemtestedit.view.php:94
 msgid "Get value from host"
 msgstr "Nhận giá trị từ máy chủ"
 
@@ -6626,7 +6631,7 @@ msgstr "Quay trở về %1$s"
 msgid "Go to"
 msgstr "Đi tới"
 
-#: app/views/system.warning.php:31 include/func.inc.php:1543
+#: app/views/system.warning.php:31 include/func.inc.php:1545
 msgid "Go to dashboard"
 msgstr "Đi tới bảng điều khiển"
 
@@ -7275,7 +7280,7 @@ msgstr "Host được thêm vào"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:114
 #: app/controllers/CControllerPopupItemTestSend.php:154
-#: app/views/popup.itemtestedit.view.php:90
+#: app/views/popup.itemtestedit.view.php:98
 msgid "Host address"
 msgstr "Địa chỉ máy chủ"
 
@@ -7810,7 +7815,7 @@ msgstr "Nhận dạng hệ thống. Trả về kiểu string"
 msgid "If filter matches"
 msgstr "Nếu khớp với bộ lọc"
 
-#: include/func.inc.php:1533 include/func.inc.php:1552
+#: include/func.inc.php:1535 include/func.inc.php:1554
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Nếu bạn nghĩ rằng tin nhắn này là sai, xin vui lòng tham khảo ý kiến các quản trị viên của bạn về việc nhận các điều khoản cần thiết."
 
@@ -10150,7 +10155,7 @@ msgstr "Đăng nhập LDAP thành công"
 msgid "LDAP settings"
 msgstr "Cài đặt LDAP"
 
-#: app/views/popup.itemtestedit.view.php:155
+#: app/views/popup.itemtestedit.view.php:163
 msgid "LF"
 msgstr "LF"
 
@@ -10192,37 +10197,37 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Giá trị cuối cùng"
 
-#: include/func.inc.php:2572
+#: include/func.inc.php:2574
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2568
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2561
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 
-#: include/func.inc.php:2575
+#: include/func.inc.php:2577
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2554
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 
-#: include/func.inc.php:2578
+#: include/func.inc.php:2580
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10543,8 +10548,8 @@ msgstr "Log không khớp với SNMP traps"
 
 #: app/controllers/CControllerAuditLogList.php:167
 #: app/views/administration.authentication.edit.php:127
-#: app/views/administration.user.list.php:97 include/func.inc.php:1540
-#: include/func.inc.php:1555 index_http.php:93 index_sso.php:229
+#: app/views/administration.user.list.php:97 include/func.inc.php:1542
+#: include/func.inc.php:1557 index_http.php:93 index_sso.php:250
 msgid "Login"
 msgstr "Đăng nhập"
 
@@ -10642,7 +10647,7 @@ msgstr "Macro với hostmacroid \"%1$s\" không tồn tại."
 #: app/partials/massupdate.macros.tab.php:118
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
-#: app/views/popup.itemtestedit.view.php:178 include/html.inc.php:913
+#: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:913
 #: include/views/configuration.host.edit.php:621
 #: include/views/configuration.host.massupdate.php:308
 #: include/views/configuration.host.prototype.edit.php:303
@@ -10702,7 +10707,7 @@ msgstr "Bảo trì đã được thêm vào"
 msgid "Maintenance deleted"
 msgstr "Bảo trì đã bị xóa"
 
-#: app/controllers/CControllerPopupMaintenancePeriod.php:212
+#: app/controllers/CControllerPopupMaintenancePeriod.php:218
 msgid "Maintenance period"
 msgstr "Chu kỳ bảo trì"
 
@@ -11258,17 +11263,22 @@ msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] ""
 
-#: app/controllers/CControllerModuleUpdate.php:147
+#: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
 msgstr[0] ""
 
-#: app/controllers/CControllerModuleUpdate.php:142
+#: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] ""
+
+#: app/controllers/CControllerModuleUpdate.php:142
+#, c-format
+msgid "Module updated: %1$s."
+msgstr ""
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -11439,7 +11449,7 @@ msgstr "NTLM"
 #: app/views/monitoring.widget.plaintext.view.php:48
 #: app/views/popup.httpstep.php:45 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:193
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:201
 #: app/views/popup.lldoperation.php:240 app/views/popup.lldoverride.php:47
 #: app/views/popup.operation.common.php:671
 #: app/views/popup.triggerwizard.php:81 correlation.php:35
@@ -12152,7 +12162,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/helpers/CMapHelper.php:82
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1508 items.php:1436 items.php:1640 services.php:84
+#: include/func.inc.php:1507 items.php:1436 items.php:1640 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Không có quyền truy cập vào đối tượng được gọi hoặc nó không tồn tại!"
 
@@ -13523,7 +13533,7 @@ msgstr "Gắn linh kiện vào trường host còn lại"
 #: app/views/administration.authentication.edit.php:96
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
-#: app/views/popup.itemtestedit.view.php:116
+#: app/views/popup.itemtestedit.view.php:124
 #: app/views/popup.operation.common.php:517
 #: include/classes/setup/CSetupWizard.php:332 include/hosts.inc.php:1471
 #: include/views/configuration.host.list.php:140
@@ -13568,7 +13578,7 @@ msgstr "Tóm tắt chuẩn bị cài đặt"
 msgid "Preprocessing"
 msgstr "Tiền xử lý"
 
-#: app/views/popup.itemtestedit.view.php:221
+#: app/views/popup.itemtestedit.view.php:229
 #: include/views/configuration.host.discovery.edit.php:765
 #: include/views/configuration.item.edit.php:864
 #: include/views/configuration.item.massupdate.php:248
@@ -13582,7 +13592,7 @@ msgstr "Bước tiền xử lý"
 #: app/controllers/CControllerPopupItemTestSend.php:191
 #: app/controllers/CControllerPopupItemTestSend.php:196
 #: app/controllers/CControllerPopupItemTestSend.php:201
-#: app/views/popup.itemtestedit.view.php:168
+#: app/views/popup.itemtestedit.view.php:176
 msgid "Prev. time"
 msgstr "Thời điểm trước"
 
@@ -13593,7 +13603,7 @@ msgstr "Thời điểm trước"
 msgid "Preview"
 msgstr "Xem trước"
 
-#: include/func.inc.php:2522
+#: include/func.inc.php:2524
 msgid "Previous month"
 msgstr "Tháng trước"
 
@@ -13601,15 +13611,15 @@ msgstr "Tháng trước"
 msgid "Previous page"
 msgstr "Trang trước"
 
-#: app/views/popup.itemtestedit.view.php:146
+#: app/views/popup.itemtestedit.view.php:154
 msgid "Previous value"
 msgstr "Giá trị trước"
 
-#: include/func.inc.php:2521
+#: include/func.inc.php:2523
 msgid "Previous week"
 msgstr "Quay lại tuần trước"
 
-#: include/func.inc.php:2523
+#: include/func.inc.php:2525
 msgid "Previous year"
 msgstr "Quay lại năm trước"
 
@@ -13824,7 +13834,7 @@ msgstr "Proxies"
 #: app/views/administration.proxy.edit.php:87
 #: app/views/administration.proxy.edit.php:122
 #: app/views/popup.condition.common.php:507
-#: app/views/popup.itemtestedit.view.php:100 include/actions.inc.php:63
+#: app/views/popup.itemtestedit.view.php:108 include/actions.inc.php:63
 #: include/views/configuration.discovery.list.php:67
 #: include/views/configuration.host.list.php:148
 #: include/views/configuration.host.list.php:152
@@ -14505,8 +14515,8 @@ msgstr "Kiểu phản hồi: chuỗi"
 
 #: app/views/administration.regex.edit.php:119
 #: app/views/administration.regex.edit.php:124
-#: app/views/popup.itemtestedit.view.php:194
-#: app/views/popup.itemtestedit.view.php:229
+#: app/views/popup.itemtestedit.view.php:202
+#: app/views/popup.itemtestedit.view.php:237
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:168
 #: include/classes/debug/CProfiler.php:183
@@ -16189,7 +16199,7 @@ msgstr "Submap"
 msgid "Success Audit"
 msgstr "Kiểm nghiệm thành công"
 
-#: include/func.inc.php:1643 jsLoader.php:158
+#: include/func.inc.php:1645 jsLoader.php:158
 msgid "Success message"
 msgstr "Tin chắn thành công"
 
@@ -16254,7 +16264,7 @@ msgstr "Thời gian khởi động hệ thống. Trả về kiểu integer (đơ
 msgid "System default"
 msgstr "Mặc định hệ thống"
 
-#: include/func.inc.php:1670
+#: include/func.inc.php:1672
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "Xảy ra lỗi hệ thống. Vui lòng liên hệ với quản trị viên Zabbix."
 
@@ -16586,7 +16596,7 @@ msgstr "Các mẫu đã được cập nhật"
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
 #: app/views/js/popup.itemtestedit.view.js.php:506
-#: app/views/popup.itemtestedit.view.php:296
+#: app/views/popup.itemtestedit.view.php:304
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1420
 #: include/views/configuration.host.discovery.edit.php:789
@@ -16754,7 +16764,7 @@ msgstr "Item này không được dò tìm nữa và sẽ bị xóa trong lần 
 msgid "The number of processes. Returns integer"
 msgstr "Số lượng các tiến trình. Trả về kiểu integer"
 
-#: index_sso.php:161
+#: index_sso.php:182
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Tham số \"%1$s\" bị thiếu trong các thuộc tính người dùng."
@@ -16784,7 +16794,7 @@ msgstr "Ứng dụng web scenario thuộc về một host khác hơn so vơ
 msgid "Theme"
 msgstr "Giao diện"
 
-#: include/func.inc.php:2520
+#: include/func.inc.php:2522
 msgid "This day last week"
 msgstr "Ngày cuối tuần"
 
@@ -16797,11 +16807,11 @@ msgstr "Trường này được tự động điền theo mục \"%1$s\"."
 msgid "This is the test message from Zabbix"
 msgstr "Đây là thông báo thử nghiệm từ Zabbix"
 
-#: include/func.inc.php:2528 srv_status.php:40
+#: include/func.inc.php:2530 srv_status.php:40
 msgid "This month"
 msgstr "Tháng này"
 
-#: include/func.inc.php:2529
+#: include/func.inc.php:2531
 msgid "This month so far"
 msgstr "Tháng này đến nay"
 
@@ -16813,19 +16823,19 @@ msgstr "Cột screen này không được để trống. Xóa nó?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Hàng screen này không được để trống. Xóa chúng?"
 
-#: include/func.inc.php:2526 srv_status.php:39
+#: include/func.inc.php:2528 srv_status.php:39
 msgid "This week"
 msgstr "Tuần này"
 
-#: include/func.inc.php:2527
+#: include/func.inc.php:2529
 msgid "This week so far"
 msgstr "Tuần này cho đến nay"
 
-#: include/func.inc.php:2530 srv_status.php:41
+#: include/func.inc.php:2532 srv_status.php:41
 msgid "This year"
 msgstr "Năm này"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2533
 msgid "This year so far"
 msgstr "Năm này cho đến nay"
 
@@ -16856,7 +16866,7 @@ msgstr "Cho tới"
 #: app/controllers/CControllerPopupTriggerExpr.php:188
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:36
-#: app/views/popup.itemtestedit.view.php:162
+#: app/views/popup.itemtestedit.view.php:170
 #: app/views/popup.triggerexpr.php:136 app/views/popup.triggerexpr.php:140
 #: app/views/reports.auditlog.list.php:70 include/actions.inc.php:1703
 #: include/actions.inc.php:1757 include/actions.inc.php:1838
@@ -16953,12 +16963,12 @@ msgstr "Đến"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Để thiết lập một host interface chọn một kiểu item duy nhất cho tất cả các item"
 
-#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2524
+#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2526
 #: srv_status.php:38
 msgid "Today"
 msgstr "Hôm nay"
 
-#: include/func.inc.php:2525
+#: include/func.inc.php:2527
 msgid "Today so far"
 msgstr "Hôm nay"
 
@@ -18420,7 +18430,7 @@ msgstr "Thẩm định"
 #: app/views/popup.condition.common.php:581
 #: app/views/popup.condition.common.php:600 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:138
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:146
 #: app/views/popup.lldoperation.php:240 app/views/popup.testtriggerexpr.php:31
 #: include/blocks.inc.php:617 include/classes/graphdraw/CPieGraphDraw.php:310
 #: include/classes/screens/CScreenEvents.php:32
@@ -19053,11 +19063,11 @@ msgstr "Hàng năm"
 msgid "Yes"
 msgstr "Có"
 
-#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2518
+#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2520
 msgid "Yesterday"
 msgstr "Hôm qua"
 
-#: include/func.inc.php:1532
+#: include/func.inc.php:1534
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Bạn vừa đăng nhập vào \"%1$s\"."
@@ -19066,7 +19076,7 @@ msgstr "Bạn vừa đăng nhập vào \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Bạn không thể chọn một số trong các ngôn ngữ, bởi vì địa chỉ của chúng không được cài đặt trên web máy chủ."
 
-#: include/func.inc.php:1549 index_http.php:90 index_sso.php:226
+#: include/func.inc.php:1551 index_http.php:90 index_sso.php:247
 msgid "You are not logged in"
 msgstr "Bạn không đăng nhập"
 
@@ -19120,7 +19130,7 @@ msgstr "Bạn không có quyền để tạo các người dùng."
 msgid "You do not have permissions to edit dashboard"
 msgstr "Bạn không có quyền chỉnh sửa bảng điều khiển"
 
-#: include/func.inc.php:1532
+#: include/func.inc.php:1534
 msgid "You have no permissions to access this page."
 msgstr "Bạn không có quyền truy cập trang này."
 
@@ -19128,7 +19138,7 @@ msgstr "Bạn không có quyền truy cập trang này."
 msgid "You have unsaved changes."
 msgstr "Bạn có các thay đổi chưa lưu."
 
-#: include/func.inc.php:1551
+#: include/func.inc.php:1553
 msgid "You must login to view this page."
 msgstr "Bạn phải đăng nhập để xem trang này."
 
@@ -20629,7 +20639,7 @@ msgstr "số phiên bản không được hỗ trợ"
 #: app/views/js/popup.itemtestedit.view.js.php:446
 #: app/views/monitoring.host.view.php:69
 #: app/views/monitoring.problem.view.php:257
-#: app/views/popup.itemtestedit.view.php:74
+#: app/views/popup.itemtestedit.view.php:82
 #: include/classes/html/CMacroValue.php:121
 #: include/classes/html/CMacroValue.php:129
 #: include/classes/widgets/CWidgetHelper.php:466
