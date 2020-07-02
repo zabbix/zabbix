@@ -385,7 +385,8 @@ out:
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg, const char *subj,
 		const char *msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACKNOWLEDGE *ack, int macro_type, const char *cancel_error, int err_type)
+		const DB_ACKNOWLEDGE *ack, int macro_type, const char *cancel_error, int err_type,
+		const char *default_timezone)
 {
 	ZBX_USER_MSG	*p, **pnext;
 	char		*subject, *message;
@@ -454,7 +455,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		const DB_ACKNOWLEDGE *ack, int macro_t, unsigned char evt_src, unsigned char op_mode,
-		const char *cancel_err)
+		const char *cancel_err, const char *default_timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -478,7 +479,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 			if (atoi(row[1]) != 1)
 			{
 				add_user_msg(userid, mediatypeid, user_msg, row[2], row[3], actionid, event, r_event,
-						ack, macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE);
+						ack, macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, default_timezone);
 				goto out;
 			}
 
@@ -520,19 +521,19 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 		if (0 != mtmid)
 		{
 			add_user_msg(userid, mediatypeid, user_msg, row[1], row[2], actionid, event, r_event, ack,
-					macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE);
+					macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, default_timezone);
 		}
 		else
 		{
 			add_user_msg(userid, mediatypeid, user_msg, "", "", actionid, event, r_event, ack, macro_t,
-					cancel_err, ZBX_ALERT_MESSAGE_ERR_MSG);
+					cancel_err, ZBX_ALERT_MESSAGE_ERR_MSG, default_timezone);
 		}
 	}
 
 	if (0 == mediatypeid)
 	{
 		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, macro_t, cancel_err,
-				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG);
+				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG, default_timezone);
 	}
 
 out:
@@ -543,7 +544,7 @@ out:
 
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_USER_MSG **user_msg,
 		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, int macro_type,
-		unsigned char evt_src, unsigned char op_mode)
+		unsigned char evt_src, unsigned char op_mode, const char *default_timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -588,7 +589,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 		}
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, macro_type, evt_src,
-				op_mode, NULL);
+				op_mode, NULL, default_timezone);
 	}
 	DBfree_result(result);
 
@@ -616,7 +617,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
  ******************************************************************************/
 static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zbx_uint64_t operationid,
 		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, unsigned char evt_src,
-		unsigned char op_mode, const char *cancel_err)
+		unsigned char op_mode, const char *cancel_err, const char *default_timezone)
 {
 	char		*sql = NULL;
 	DB_RESULT	result;
@@ -679,7 +680,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 		}
 
 		add_user_msgs(userid, operationid, mediatypeid, user_msg, actionid, event, r_event, ack, message_type,
-				evt_src, op_mode, cancel_err);
+				evt_src, op_mode, cancel_err, default_timezone);
 	}
 	DBfree_result(result);
 
@@ -704,7 +705,8 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
  *                                                                            *
  ******************************************************************************/
 static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zbx_uint64_t operationid,
-		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, unsigned char evt_src)
+		const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, unsigned char evt_src,
+		const char *default_timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -730,7 +732,7 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 			continue;
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, MACRO_TYPE_MESSAGE_ACK,
-				evt_src, ZBX_OPERATION_MODE_ACK, NULL);
+				evt_src, ZBX_OPERATION_MODE_ACK, NULL, default_timezone);
 	}
 	DBfree_result(result);
 
@@ -955,7 +957,8 @@ static void	get_operation_groupids(zbx_uint64_t operationid, zbx_vector_uint64_t
 }
 
 static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
-		zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step, int macro_type)
+		zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step, int macro_type,
+		const char *default_timezone)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1179,7 +1182,7 @@ skip:
 
 static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto, const char *subject,
-		const char *message, const DB_ACKNOWLEDGE *ack, char **params)
+		const char *message, const DB_ACKNOWLEDGE *ack, char **params, const char *timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1322,7 +1325,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		}
 
 		get_mediatype_params(event, r_event, actionid, userid, mediatypeid, row[1], subject, message, ack,
-				&params);
+				&params, NULL);
 
 		if (NULL != r_event)
 		{
@@ -1472,7 +1475,8 @@ static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operat
 	return ret;
 }
 
-static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EVENT *event, const DB_ACTION *action)
+static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EVENT *event, const DB_ACTION *action,
+		const char *default_timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1531,11 +1535,12 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 				case OPERATION_TYPE_MESSAGE:
 					add_object_msg(action->actionid, operationid, &user_msg, event, NULL, NULL,
 							MACRO_TYPE_MESSAGE_NORMAL, action->eventsource,
-							ZBX_OPERATION_MODE_NORMAL);
+							ZBX_OPERATION_MODE_NORMAL, default_timezone);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, NULL, NULL, action->actionid, operationid,
-							escalation->esc_step, MACRO_TYPE_MESSAGE_NORMAL);
+							escalation->esc_step, MACRO_TYPE_MESSAGE_NORMAL,
+							default_timezone);
 					break;
 			}
 		}
@@ -1597,7 +1602,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute_recovery_operations(const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACTION *action)
+		const DB_ACTION *action, const char *default_timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1627,15 +1632,15 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
 			case OPERATION_TYPE_MESSAGE:
 				add_object_msg(action->actionid, operationid, &user_msg, event, r_event, NULL,
 						MACRO_TYPE_MESSAGE_RECOVERY, action->eventsource,
-						ZBX_OPERATION_MODE_RECOVERY);
+						ZBX_OPERATION_MODE_RECOVERY, default_timezone);
 				break;
 			case OPERATION_TYPE_RECOVERY_MESSAGE:
 				add_sentusers_msg(&user_msg, action->actionid, operationid, event, r_event, NULL,
-						action->eventsource, ZBX_OPERATION_MODE_RECOVERY, NULL);
+						action->eventsource, ZBX_OPERATION_MODE_RECOVERY, NULL, default_timezone);
 				break;
 			case OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, NULL, action->actionid, operationid, 1,
-						MACRO_TYPE_MESSAGE_RECOVERY);
+						MACRO_TYPE_MESSAGE_RECOVERY, default_timezone);
 				break;
 		}
 	}
@@ -1662,7 +1667,7 @@ static void	escalation_execute_recovery_operations(const DB_EVENT *event, const 
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, const DB_EVENT *r_event,
-		const DB_ACTION *action, const DB_ACKNOWLEDGE *ack)
+		const DB_ACTION *action, const DB_ACKNOWLEDGE *ack, const char *default_timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1691,17 +1696,18 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
 		{
 			case OPERATION_TYPE_MESSAGE:
 				add_object_msg(action->actionid, operationid, &user_msg, event, r_event, ack,
-						MACRO_TYPE_MESSAGE_ACK, action->eventsource, ZBX_OPERATION_MODE_ACK);
+						MACRO_TYPE_MESSAGE_ACK, action->eventsource, ZBX_OPERATION_MODE_ACK,
+						default_timezone);
 				break;
 			case OPERATION_TYPE_ACK_MESSAGE:
 				add_sentusers_msg(&user_msg, action->actionid, operationid, event, r_event, ack,
-						action->eventsource, ZBX_OPERATION_MODE_ACK, NULL);
+						action->eventsource, ZBX_OPERATION_MODE_ACK, NULL, default_timezone);
 				add_sentusers_ack_msg(&user_msg, action->actionid, operationid, event, r_event, ack,
-						action->eventsource);
+						action->eventsource, default_timezone);
 				break;
 			case OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, ack, action->actionid, operationid, 1,
-						MACRO_TYPE_MESSAGE_ACK);
+						MACRO_TYPE_MESSAGE_ACK, default_timezone);
 				break;
 		}
 	}
@@ -1991,7 +1997,7 @@ static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const
  *                                                                            *
  ******************************************************************************/
 static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const char *error)
+		const char *error, const char *default_timezone)
 {
 	ZBX_USER_MSG	*user_msg = NULL;
 
@@ -2002,7 +2008,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step)
 	{
 		add_sentusers_msg(&user_msg, action->actionid, 0, event, NULL, NULL, action->eventsource,
-				ZBX_OPERATION_MODE_NORMAL, ZBX_NULL2EMPTY_STR(error));
+				ZBX_OPERATION_MODE_NORMAL, ZBX_NULL2EMPTY_STR(error), default_timezone);
 		flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid, NULL);
 	}
 
@@ -2023,12 +2029,13 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
  *             event      - [IN]     the event                                *
  *                                                                            *
  ******************************************************************************/
-static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event)
+static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
+		const char *default_timezone)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	escalation_execute_operations(escalation, event, action);
+	escalation_execute_operations(escalation, event, action, default_timezone);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2046,12 +2053,12 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  ******************************************************************************/
 static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const DB_EVENT *r_event)
+		const DB_EVENT *r_event, const char *default_timezone)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	escalation_execute_recovery_operations(event, r_event, action);
+	escalation_execute_recovery_operations(event, r_event, action, default_timezone);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2071,7 +2078,7 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  ******************************************************************************/
 static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
-		const DB_EVENT *r_event)
+		const DB_EVENT *r_event, const char *default_timezone)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -2097,7 +2104,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 		ack.old_severity = atoi(row[4]);
 		ack.new_severity = atoi(row[5]);
 
-		escalation_execute_acknowledge_operations(event, r_event, action, &ack);
+		escalation_execute_acknowledge_operations(event, r_event, action, &ack, default_timezone);
 	}
 
 	DBfree_result(result);
@@ -2210,7 +2217,7 @@ static void	add_ack_escalation_r_eventids(zbx_vector_ptr_t *escalations, zbx_vec
 }
 
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *escalations,
-		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *actionids)
+		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *actionids, const char *default_timezone)
 {
 	int				i, ret;
 	zbx_vector_uint64_t		escalationids;
@@ -2305,7 +2312,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		switch (state)
 		{
 			case ZBX_ESCALATION_CANCEL:
-				escalation_cancel(escalation, action, event, error);
+				escalation_cancel(escalation, action, event, error, default_timezone);
 				zbx_free(error);
 				zbx_vector_uint64_append(&escalationids, escalation->escalationid);
 				continue;
@@ -2351,20 +2358,20 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 			}
 
-			escalation_acknowledge(escalation, action, event, r_event);
+			escalation_acknowledge(escalation, action, event, r_event, default_timezone);
 		}
 		else if (NULL != r_event)
 		{
 			if (0 == escalation->esc_step)
-				escalation_execute(escalation, action, event);
+				escalation_execute(escalation, action, event, default_timezone);
 
-			escalation_recover(escalation, action, event, r_event);
+			escalation_recover(escalation, action, event, r_event, default_timezone);
 		}
 		else if (escalation->nextcheck <= now)
 		{
 			if (ESCALATION_STATUS_ACTIVE == escalation->status)
 			{
-				escalation_execute(escalation, action, event);
+				escalation_execute(escalation, action, event, default_timezone);
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
@@ -2508,7 +2515,8 @@ out:
  *           in process_actions().                                            *
  *                                                                            *
  ******************************************************************************/
-static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source)
+static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source,
+		const char *default_timezone)
 {
 	int			ret = 0;
 	DB_RESULT		result;
@@ -2616,7 +2624,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 		if (escalations.values_num >= ZBX_ESCALATIONS_PER_STEP)
 		{
-			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids);
+			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids,
+					default_timezone);
 			zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 			zbx_vector_uint64_clear(&actionids);
 			zbx_vector_uint64_clear(&eventids);
@@ -2626,7 +2635,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 	if (0 < escalations.values_num)
 	{
-		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids);
+		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids, default_timezone);
 		zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 	}
 
@@ -2696,9 +2705,12 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE);
 
 		nextcheck = time(NULL) + CONFIG_ESCALATOR_FREQUENCY;
-		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER);
-		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM);
-		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT);
+		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER,
+				cfg.default_timezone);
+		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
+				cfg.default_timezone);
+		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
+				cfg.default_timezone);
 
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;
