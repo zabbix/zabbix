@@ -486,6 +486,7 @@ class CElementQuery implements IWaitable {
 			],
 			'CTableElement'				=> [
 				'/table',
+				'/div/table', // TODO: remove when extra containers are removed
 				'/*[contains(@class, "table-forms-separator")]/table'
 			],
 			'CCompositeInputElement'	=> [

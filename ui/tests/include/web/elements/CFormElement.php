@@ -117,6 +117,20 @@ class CFormElement extends CElement {
 		if (($element = CElementQuery::getInputElement($label, './../../'.self::TABLE_FORM_RIGHT))->isValid()) {
 			return $element;
 		}
+		else {
+			$for = $label->getAttribute('for');
+			if (substr($for, 0, 8) === 'visible_') {
+				try {
+					$this->query('id', $for)->asCheckbox()->one()->check();
+					if (($element = CElementQuery::getInputElement($label, './../../'.self::TABLE_FORM_RIGHT))->isValid()) {
+						return $element;
+					}
+				}
+				catch (\Exception $e) {
+					// Code is not missing here.
+				}
+			}
+		}
 
 		// Nested table forms.
 		return $label->query('xpath', './../../'.self::TABLE_FORM_RIGHT.'//'.self::TABLE_FORM.'/..')
@@ -192,8 +206,9 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getFieldById($id) {
-		$prefix = 'xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
-		$label = $this->query($prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).']')->one(false);
+		$prefix = './/'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT;
+		$label = $this->query('xpath:'.$prefix.'/label[@for='.CXPathHelper::escapeQuotes($id).
+				' or @for='.CXPathHelper::escapeQuotes('visible_'.$id).']')->one(false);
 
 		if ($label->isValid() === false) {
 			$label = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_RIGHT.'//*[@id='.
@@ -288,6 +303,47 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Fill form fields with specific values.
+	 *
+	 * @param string $field   field name to filled in
+	 * @param string $values  value to be put in field
+	 *
+	 * @return
+	 */
+	private function setFieldValue($field, $values) {
+		$element = $this->getField($field);
+
+		if ($values === null) {
+			$label = $this->getLabel($field);
+			$for = $label->getAttribute('for');
+
+			if (substr($for, 0, 8) === 'visible_') {
+				try {
+					$this->query('id', $for)->asCheckbox()->one()->uncheck();
+
+					return;
+				}
+				catch (\Exception $e) {
+					// Code is not missing here.
+				}
+			}
+		}
+		elseif (is_array($values)) {
+			if ($values !== []) {
+				$container = $this->getFieldContainer($field);
+
+				foreach ($values as $name => $value) {
+					$container->query('id', $name)->one()->detect()->fill($value);
+				}
+			}
+
+			return;
+		}
+
+		$element->fill($values);
+	}
+
+	/**
 	 * Fill form with specified data.
 	 *
 	 * @param array $data    data array where keys are label text and values are values to be put in fields
@@ -296,16 +352,16 @@ class CFormElement extends CElement {
 	 */
 	public function fill($data) {
 		if ($data && is_array($data)) {
-			foreach ($data as $field => $value) {
+			foreach ($data as $field => $values) {
 				try {
-					$this->getField($field)->fill($value);
+					$this->setFieldValue($field, $values);
 				}
 				catch (\Exception $e1) {
 					sleep(1);
 
 					try {
 						$this->invalidate();
-						$this->getField($field)->fill($value);
+						$this->setFieldValue($field, $values);
 					} catch (\Exception $e2) {
 						throw $e1;
 					}
