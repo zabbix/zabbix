@@ -80,6 +80,7 @@ $config = select_config();
 $simple_interval_parser = new CSimpleIntervalParser();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
+$last_hostid = null;
 $last_applicationid = null;
 
 foreach ($data['rows'] as $row) {
@@ -87,7 +88,10 @@ foreach ($data['rows'] as $row) {
 
 	// Secondary header for the next host or application.
 
-	if ($row['applicationid'] !== $last_applicationid) {
+	$is_next_host = $item['hostid'] !== $last_hostid;
+	$is_next_application = $row['applicationid'] !== $last_applicationid;
+
+	if ($is_next_host || $is_next_application) {
 		$host = $data['hosts'][$item['hostid']];
 
 		$col_host = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
@@ -107,6 +111,7 @@ foreach ($data['rows'] as $row) {
 
 		$table->addRow(['', $col_host, $col_name]);
 
+		$last_hostid = $item['hostid'];
 		$last_applicationid = $row['applicationid'];
 	}
 
