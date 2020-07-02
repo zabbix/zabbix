@@ -152,7 +152,7 @@ abstract class CControllerLatest extends CController {
 				$hosts = API::Host()->get([
 					'output' => ['hostid', 'name', 'status'],
 					'groupids' => $groupids,
-					'hostids' => array_keys(array_flip(zbx_objectValues($items, 'hostid'))),
+					'hostids' => array_keys(array_flip(array_column($items, 'hostid'))),
 					'with_monitored_items' => true,
 					'preservekeys' => true
 				]);
@@ -168,7 +168,7 @@ abstract class CControllerLatest extends CController {
 			}
 
 			uksort($items_of_hosts, function($hostid_1, $hostid_2) use ($hostids) {
-				return (array_search($hostid_1, $hostids) <=> array_search($hostid_2, $hostids));
+				return (array_search($hostid_1, $hostids, true) <=> array_search($hostid_2, $hostids, true));
 			});
 
 			$select_items = [];
@@ -220,7 +220,7 @@ abstract class CControllerLatest extends CController {
 				}
 
 				$item_applicationids = $item['applications']
-					? zbx_objectValues($item['applications'], 'applicationid')
+					? array_column($item['applications'], 'applicationid')
 					: [0];
 
 				foreach ($item_applicationids as $applicationid) {
@@ -243,7 +243,7 @@ abstract class CControllerLatest extends CController {
 			$rows = [];
 
 			uksort($items_grouped, function($hostid_1, $hostid_2) use ($hostids) {
-				return (array_search($hostid_1, $hostids) <=> array_search($hostid_2, $hostids));
+				return (array_search($hostid_1, $hostids, true) <=> array_search($hostid_2, $hostids, true));
 			});
 
 			foreach ($items_grouped as $host_items_grouped) {
@@ -252,7 +252,7 @@ abstract class CControllerLatest extends CController {
 						return bccomp($id_1, $id_2) * (($application_sort_options['order'] === 'ASC') ? -1 : 1);
 					}
 
-					return (array_search($id_1, $applicationids) <=> array_search($id_2, $applicationids));
+					return (array_search($id_1, $applicationids, true) <=> array_search($id_2, $applicationids, true));
 				});
 
 				foreach ($host_items_grouped as $applicationid => $application_items) {

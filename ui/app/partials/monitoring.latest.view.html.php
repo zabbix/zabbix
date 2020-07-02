@@ -197,13 +197,10 @@ foreach ($data['rows'] as $row) {
 	]))->addClass('action-container');
 
 	if ($keep_history != 0 || $keep_trends != 0) {
-		$link_title = $is_graph ? _('Graph') : _('History');
-		$link_url = (new CUrl('history.php'))
+		$actions = new CLink($is_graph ? _('Graphff') : _('History'), (new CUrl('history.php'))
 			->setArgument('action', $is_graph ? HISTORY_GRAPH : HISTORY_VALUES)
 			->setArgument('itemids[]', $item['itemid'])
-			->getUrl();
-
-		$actions = new CLink($link_title, $link_url);
+		);
 	}
 	else {
 		$actions = '';
@@ -216,12 +213,10 @@ foreach ($data['rows'] as $row) {
 			$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 		}
 		else {
-			$link_url = (new CUrl('items.php'))
+			$item_key = (new CLink($item['key_expanded'], (new CUrl('items.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $item['itemid'])
-				->getUrl();
-
-			$item_key = (new CLink($item['key_expanded'], $link_url))
+			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREEN);
 		}
