@@ -26,6 +26,7 @@ import (
 	"math"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-ldap/ldap"
@@ -168,42 +169,28 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
-func telnetRead(rw *bufio.ReadWriter) (byte, error) {
-	for {
-		b, err := rw.ReadByte()
-		if err != nil {
-			log.Debugf("TCP telnet network read error: %s", err.Error())
-			if err == telnetErr {
-				<-time.After(time.Second / 10)
-				_, err := rw.Peek(1)
-				if err != nil {
-					return b, err
-				}
-
-				continue
-			}
-			return b, err
-		}
-		return b, nil
+func telnetRead(conn net.Conn, rw *bufio.ReadWriter) (byte, bool, error) {
+	conn.SetReadDeadline(time.Now().Add(time.Second / 10))
+	b, err := rw.ReadByte()
+	if e, ok := err.(interface{ Timeout() bool }); ok && e.Timeout() {
+		return 0, true, err
+	} else if err != nil {
+		return 0, false, err
 	}
+
+	return b, false, nil
 }
 
-func telnetWrite(b byte, rw *bufio.ReadWriter) error {
-	for {
-		err := rw.WriteByte(b)
-		if err != nil {
-			log.Debugf("TCP telnet network write error: %s", err.Error())
-			if err == telnetErr {
-				<-time.After(time.Second / 10)
-				continue
-			}
-			return fmt.Errorf("buffer write [%x] error: %s", b, err.Error())
-		}
-		return nil
+func telnetWrite(b byte, conn net.Conn, rw *bufio.ReadWriter) error {
+	conn.SetWriteDeadline(time.Now().Add(time.Second / 10))
+	err := rw.WriteByte(b)
+	if err != nil {
+		return fmt.Errorf("buffer write [%x] error: %s", b, err.Error())
 	}
+	return nil
 }
 
-func telnetTestLogin(rw *bufio.ReadWriter, buf []byte) error {
+func telnetTestLogin(conn net.Conn, buf []byte) (int, error) {
 	var err error
 	cmdIAC := byte(255)
 	cmdWILL := byte(251)
@@ -211,35 +198,37 @@ func telnetTestLogin(rw *bufio.ReadWriter, buf []byte) error {
 	cmdDO := byte(253)
 	cmdDONT := byte(254)
 	optSGA := byte(3)
+	var timeout bool
+	var n int
 
+	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for {
 		var c, c1, c2, c3 byte
-		c1, err = telnetRead(rw)
-		if err != nil {
-			return fmt.Errorf("c1 network read error: %s", err.Error())
+		c1, timeout, err = telnetRead(conn, rw)
+		if timeout {
+			return n, nil
 		}
-
-		if string(c1) == ":" {
-			return nil
+		if err != nil {
+			return n, fmt.Errorf("c1 network read error: %s", err.Error())
 		}
 
 		if cmdIAC == c1 {
-			c2, err = telnetRead(rw)
+			c2, _, err = telnetRead(conn, rw)
 			if nil != err {
-				return fmt.Errorf("c2 read error: %s", err.Error())
+				return n, fmt.Errorf("c2 read error: %s", err.Error())
 			}
 
 			switch c2 {
 			case cmdWILL, cmdWONT, cmdDO, cmdDONT:
-				c3, err = telnetRead(rw)
+				c3, _, err = telnetRead(conn, rw)
 				if nil != err {
-					return fmt.Errorf("c3 read error: %s", err.Error())
+					return n, fmt.Errorf("c3 read error: %s", err.Error())
 				}
 
 				c = cmdIAC
-				err := telnetWrite(c, rw)
+				err := telnetWrite(c, conn, rw)
 				if err != nil {
-					return err
+					return n, err
 				}
 
 				if c2 == cmdWONT {
@@ -258,39 +247,50 @@ func telnetTestLogin(rw *bufio.ReadWriter, buf []byte) error {
 					}
 				}
 
-				err = telnetWrite(c, rw)
+				err = telnetWrite(c, conn, rw)
 				if err != nil {
-					return err
+					return n, err
 				}
-				err = telnetWrite(c3, rw)
+				err = telnetWrite(c3, conn, rw)
 				if err != nil {
-					return err
+					return n, err
 				}
 				err = rw.Flush()
 				if err != nil {
-					return fmt.Errorf("buffer flush error: %s", err.Error())
+					return n, fmt.Errorf("buffer flush error: %s", err.Error())
 				}
 			case cmdIAC:
 				buf[0] = cmdIAC
+				n++
 				buf = buf[1:]
 			default:
-				return fmt.Errorf("malformed telnet response")
+				return n, fmt.Errorf("malformed telnet response")
 			}
 		} else {
 			buf[0] = c1
+			n++
 			buf = buf[1:]
 		}
 	}
 }
 
 func (p *Plugin) validateTelnet(buf []byte, conn net.Conn) int {
-	err := telnetTestLogin(bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn)), buf)
+	n, err := telnetTestLogin(conn, buf)
 	if err != nil {
 		log.Debugf("TCP telnet network error: %s", err.Error())
 		return tcpExpectFail
 	}
 
-	return tcpExpectOk
+	s := string(buf[:n])
+	for strings.HasSuffix(s, " ") {
+		s = strings.TrimSuffix(s, " ")
+	}
+
+	if strings.HasSuffix(s, ":") {
+		return tcpExpectOk
+	}
+
+	return tcpExpectFail
 }
 
 func (p *Plugin) validateLdap(conn *ldap.Conn, address string) (result int) {
