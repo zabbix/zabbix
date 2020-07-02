@@ -1182,7 +1182,7 @@ skip:
 
 static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event, zbx_uint64_t actionid,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto, const char *subject,
-		const char *message, const DB_ACKNOWLEDGE *ack, char **params, const char *timezone)
+		const char *message, const DB_ACKNOWLEDGE *ack, char **params, const char *tz)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
