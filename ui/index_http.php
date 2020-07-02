@@ -80,9 +80,11 @@ else {
 	error(_('Login name or password is incorrect.'));
 }
 
+$messages = clear_messages();
+
 echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
-	'messages' => zbx_objectValues(clear_messages(), 'message'),
+	'messages' => array_column($messages, 'message'),
 	'buttons' => [
 		(new CButton('login', _('Login')))->onClick('document.location = '.
 			json_encode($redirect_to->getUrl()).';')

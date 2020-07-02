@@ -126,4 +126,17 @@ class CMessages {
 	public static function getError(): ?string {
 		return self::$error;
 	}
+
+	/**
+	 * Clear messages.
+	 *
+	 * @static
+	 *
+	 * @return boolean
+	 */
+	public static function clear(): bool {
+		self::$msgs = [];
+
+		return true;
+	}
 }

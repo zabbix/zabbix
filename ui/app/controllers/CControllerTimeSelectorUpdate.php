@@ -61,10 +61,10 @@ class CControllerTimeSelectorUpdate extends CController {
 			 * throw a JS alert() with current message in timeSelectorEventHandler() in gtlc.js.
 			 */
 
-			global $ZBX_MESSAGES;
+			$messages = CMessages::get();
 
 			$this->setResponse(new CControllerResponseData([
-				'main_block' => json_encode(['error' => $ZBX_MESSAGES[0]['message']])
+				'main_block' => json_encode(['error' => $messages[0]['message']])
 			]));
 
 			return $ret;

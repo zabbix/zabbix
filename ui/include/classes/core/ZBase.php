@@ -516,8 +516,7 @@ class ZBase {
 		if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
 
-			global $ZBX_MESSAGES;
-			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+			$messages =  filter_messages(CMessages::get());
 			foreach ($messages as $message) {
 				CMessages::add($message);
 			}
@@ -528,8 +527,7 @@ class ZBase {
 		elseif ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
 
-			global $ZBX_MESSAGES;
-			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+			$messages =  filter_messages(CMessages::get());
 			foreach ($messages as $message) {
 				CMessages::add($message);
 			}

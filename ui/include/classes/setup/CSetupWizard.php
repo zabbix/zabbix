@@ -303,9 +303,7 @@ class CSetupWizard extends CForm {
 		}
 
 		if ($this->STEP_FAILED) {
-			global $ZBX_MESSAGES;
-
-			$message_box = makeMessageBox(false, $ZBX_MESSAGES, _('Cannot connect to the database.'), false, true);
+			$message_box = makeMessageBox(false, CMessages::get(), _('Cannot connect to the database.'), false, true);
 		}
 		else {
 			$message_box = null;

@@ -362,16 +362,18 @@ function invalid_url($msg = null) {
 	}
 
 	// required global parameters for correct including page_header.php
-	global $DB, $ZBX_MESSAGES;
+	global $DB;
 
 	// backup messages before including page_header.php
-	$temp = $ZBX_MESSAGES;
-	$ZBX_MESSAGES = [];
+	$temp = CMessages::get();
+	CMessages::clear();
 
 	require_once dirname(__FILE__).'/page_header.php';
 
 	// Rollback reset messages.
-	$ZBX_MESSAGES = $temp;
+	array_map(function ($value) {
+		return CMessages::add($value);
+	}, $temp);
 
 	unset_all();
 	show_error_message($msg);

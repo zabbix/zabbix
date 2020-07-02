@@ -1673,35 +1673,32 @@ function filter_messages(array $messages = []) {
  * @param  bool    $good            Parameter passed to makeMessageBox to specify message box style.
  * @param  string  $title           Message box title.
  * @param  bool    $show_close_box  Show or hide close button in error message box.
- * @global array   $ZBX_MESSAGES
  *
  * @return CDiv|null
  */
 function getMessages($good = false, $title = null, $show_close_box = true) {
-	global $ZBX_MESSAGES;
-
-	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+	$messages = filter_messages(CMessages::get());
 
 	$message_box = ($title || $messages)
 		? makeMessageBox($good, $messages, $title, $show_close_box)
 		: null;
 
-	$ZBX_MESSAGES = [];
+	CMessages::clear();
 
 	return $message_box;
 }
 
 function show_messages($good = false, $okmsg = null, $errmsg = null) {
-	global $page, $ZBX_MESSAGES, $ZBX_MESSAGES_PREPARED;
+	global $page, $ZBX_MESSAGES_PREPARED;
 
 	if (defined('ZBX_API_REQUEST')) {
 		return null;
 	}
 
 	$title = $good ? $okmsg : $errmsg;
-	$messages = isset($ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+	$messages = filter_messages(CMessages::get());
 
-	$ZBX_MESSAGES = [];
+	CMessages::clear();
 
 	if ($title === null && !$messages) {
 		return;
@@ -1766,7 +1763,6 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 
 			imageOut($canvas);
 			imagedestroy($canvas);
-
 			break;
 
 		default:
@@ -1797,7 +1793,7 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
  * @return string|null  One or several HTML message boxes.
  */
 function get_prepared_messages(array $options = []): ?string {
-	global $ZBX_MESSAGES, $ZBX_MESSAGES_PREPARED;
+	global $ZBX_MESSAGES_PREPARED;
 
 	if (!is_array($ZBX_MESSAGES_PREPARED)) {
 		$ZBX_MESSAGES_PREPARED = [];
@@ -1820,11 +1816,11 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 	else {
 		$messages_current = [];
-		$restore_messages = $ZBX_MESSAGES;
+		$restore_messages = CMessages::get();
 		$restore_messages_prepared = $ZBX_MESSAGES_PREPARED;
 	}
 
-	$ZBX_MESSAGES = [];
+	CMessages::clear();
 	$ZBX_MESSAGES_PREPARED = [];
 
 	// Process authentication warning if user had unsuccessful authentication attempts.
@@ -1847,16 +1843,12 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 
 	$messages_authentication = $ZBX_MESSAGES_PREPARED;
-	$ZBX_MESSAGES = [];
+	CMessages::clear();
 	$ZBX_MESSAGES_PREPARED = [];
 
 	// Process messages passed by the previous request.
 
 	if ($options['with_session_messages']) {
-		if (CMessages::get()) {
-			$ZBX_MESSAGES = CMessages::get();
-		}
-
 		if (CMessages::getSuccess()) {
 			show_messages(true, CMessages::getSuccess(), null);
 		}
@@ -1877,7 +1869,10 @@ function get_prepared_messages(array $options = []): ?string {
 		)->toString();
 	}
 
-	$ZBX_MESSAGES = $restore_messages;
+	array_map(function ($value) {
+		return CMessages::add($value);
+	}, $restore_messages);
+
 	$ZBX_MESSAGES_PREPARED = $restore_messages_prepared;
 
 	return ($html === '') ? null : $html;
@@ -1892,16 +1887,10 @@ function show_error_message($msg) {
 }
 
 function info($msgs) {
-	global $ZBX_MESSAGES;
-
-	if (!isset($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = [];
-	}
-
 	zbx_value2array($msgs);
 
 	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = ['type' => 'info', 'message' => $msg];
+		CMessages::add(['type' => 'info', 'message' => $msg]);
 	}
 }
 
@@ -1912,20 +1901,10 @@ function info($msgs) {
  * @param string		 $src	The source of error message.
  */
 function error($msgs, $src = '') {
-	global $ZBX_MESSAGES;
-
-	if (!isset($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = [];
-	}
-
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		$ZBX_MESSAGES[] = [
-			'type' => 'error',
-			'message' => $msg,
-			'src' => $src
-		];
+		CMessages::add(['type' => 'error', 'message' => $msg, 'src' => $src]);
 	}
 }
 
@@ -1942,22 +1921,11 @@ function error_group($data) {
 	}
 }
 
-function clear_messages($count = null) {
-	global $ZBX_MESSAGES;
+function clear_messages() {
+	$messages = CMessages::get();
+	CMessages::clear();
 
-	if ($count != null) {
-		$result = [];
-
-		while ($count-- > 0) {
-			array_unshift($result, array_pop($ZBX_MESSAGES));
-		}
-	}
-	else {
-		$result = $ZBX_MESSAGES;
-		$ZBX_MESSAGES = [];
-	}
-
-	return $result ? filter_messages($result) : $result;
+	return filter_messages($messages);
 }
 
 function fatal_error($msg) {
@@ -2201,18 +2169,12 @@ function imageOut(&$image, $format = null) {
 /**
  * Check if we have error messages to display.
  *
- * @global array $ZBX_MESSAGES
- *
  * @return bool
  */
 function hasErrorMesssages() {
-	global $ZBX_MESSAGES;
-
-	if (isset($ZBX_MESSAGES)) {
-		foreach ($ZBX_MESSAGES as $message) {
-			if ($message['type'] === 'error') {
-				return true;
-			}
+	foreach (CMessages::get() as $message) {
+		if (array_key_exists('type', $message) && $message['type'] === 'error') {
+			return true;
 		}
 	}
 
