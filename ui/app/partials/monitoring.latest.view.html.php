@@ -197,7 +197,7 @@ foreach ($data['rows'] as $row) {
 	]))->addClass('action-container');
 
 	if ($keep_history != 0 || $keep_trends != 0) {
-		$actions = new CLink($is_graph ? _('Graphff') : _('History'), (new CUrl('history.php'))
+		$actions = new CLink($is_graph ? _('Graph') : _('History'), (new CUrl('history.php'))
 			->setArgument('action', $is_graph ? HISTORY_GRAPH : HISTORY_VALUES)
 			->setArgument('itemids[]', $item['itemid'])
 		);
