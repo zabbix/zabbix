@@ -86,7 +86,8 @@ class CAudit {
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
 			'users' => ['passwd' => true],
-			'config' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			'config' => ['tls_psk_identity' => true, 'tls_psk' => true],
+			'media_type' => ['passwd' => true],
 		];
 
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
@@ -127,8 +128,8 @@ class CAudit {
 				foreach ($object_diff as $field_name => &$values) {
 					if (array_key_exists($table_name, $masked_fields)
 							&& array_key_exists($field_name, $masked_fields[$table_name])) {
-						$object_old[$field_name] = '********';
-						$object[$field_name] = '********';
+						$object_old[$field_name] = ZBX_SECRET_MASK;
+						$object[$field_name] = ZBX_SECRET_MASK;
 					}
 
 					$values = [
