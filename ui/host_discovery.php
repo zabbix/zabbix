@@ -906,6 +906,17 @@ else {
 
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
 
+	// Set is_template false, when one of hosts is not template.
+	if ($data['discoveries']) {
+		$hosts_status = array_column(array_column(array_column($data['discoveries'], 'hosts'), 0), 'status');
+		foreach ($hosts_status as $value) {
+			if ($value != HOST_STATUS_TEMPLATE) {
+				$data['is_template'] = false;
+				break;
+			}
+		}
+	}
+
 	// pager
 	if (hasRequest('page')) {
 		$page_num = getRequest('page');
@@ -924,17 +935,6 @@ else {
 	);
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
-
-	// Set is_template false, when one of hosts is not template.
-	if ($data['discoveries']) {
-		$hosts_status = array_column(array_column(array_column($data['discoveries'], 'hosts'), 0), 'status');
-		foreach ($hosts_status as $value) {
-			if ($value != HOST_STATUS_TEMPLATE) {
-				$data['is_template'] = false;
-				break;
-			}
-		}
-	}
 
 	// render view
 	echo (new CView('configuration.host.discovery.list', $data))->getOutput();
