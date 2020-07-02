@@ -29,18 +29,10 @@ class CScreenUrl extends CScreenBase {
 	public function get() {
 		// prevent from resolving macros in configuration page
 		if ($this->mode != SCREEN_MODE_PREVIEW && $this->mode != SCREEN_MODE_SLIDESHOW) {
-			return $this->getOutput(
-				CHtmlUrlValidator::validate($this->screenitem['url'], ['allow_user_macro' => false])
-					? new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'],
-							'auto')
-					: makeMessageBox(false, [[
-								'type' => 'error',
-								'message' => _s('Provided URL "%1$s" is invalid.', $this->screenitem['url'])
-							]]
-						)
-			);
+			return $this->getOutput($this->prepareElement());
 		}
-		elseif ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid == 0) {
+
+		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid == 0) {
 			return $this->getOutput((new CTableInfo())->setNoDataMessage(_('No host selected.')));
 		}
 
@@ -54,14 +46,28 @@ class CScreenUrl extends CScreenBase {
 
 		$this->screenitem['url'] = $url ? $url : $this->screenitem['url'];
 
-		return $this->getOutput(
-			CHtmlUrlValidator::validate($this->screenitem['url'], ['allow_user_macro' => false])
-				? new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto')
-				: makeMessageBox(false, [[
-							'type' => 'error',
-							'message' => _s('Provided URL "%1$s" is invalid.', $this->screenitem['url'])
-						]]
-					)
-		);
+		return $this->getOutput($this->prepareElement());
+	}
+
+	/**
+	 * @return CTag
+	 */
+	private function prepareElement() {
+		if (CHtmlUrlValidator::validate($this->screenitem['url'], ['allow_user_macro' => false])) {
+			$item = new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'],
+				'auto'
+			);
+
+			if (ZBX_IFRAME_SANDBOX !== false) {
+				$item->setAttribute('sandbox', ZBX_IFRAME_SANDBOX);
+			}
+
+			return $item;
+		}
+
+		return makeMessageBox(false, [[
+			'type' => 'error',
+			'message' => _s('Provided URL "%1$s" is invalid.', $this->screenitem['url'])
+		]]);
 	}
 }
