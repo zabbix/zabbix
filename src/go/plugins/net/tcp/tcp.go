@@ -171,6 +171,7 @@ func telnetRead(rw *bufio.ReadWriter) (byte, error) {
 	for {
 		b, err := rw.ReadByte()
 		if err != nil {
+			log.Debugf("TCP telnet network read error: %s", err.Error())
 			if err == telnetErr {
 				<-time.After(time.Second / 10)
 				_, err := rw.Peek(1)
@@ -190,6 +191,7 @@ func telnetWrite(b byte, rw *bufio.ReadWriter) error {
 	for {
 		err := rw.WriteByte(b)
 		if err != nil {
+			log.Debugf("TCP telnet network write error: %s", err.Error())
 			if err == telnetErr {
 				<-time.After(time.Second / 10)
 				continue
@@ -200,9 +202,8 @@ func telnetWrite(b byte, rw *bufio.ReadWriter) error {
 	}
 }
 
-func telnet(rw *bufio.ReadWriter, buf []byte) error {
+func telnetTestLogin(rw *bufio.ReadWriter, buf []byte) error {
 	var err error
-
 	cmdIAC := byte(255)
 	cmdWILL := byte(251)
 	cmdWONT := byte(252)
@@ -215,7 +216,6 @@ func telnet(rw *bufio.ReadWriter, buf []byte) error {
 		c1, err = telnetRead(rw)
 		if err != nil {
 			return fmt.Errorf("c1 network read error: %s", err.Error())
-
 		}
 
 		if string(c1) == ":" {
@@ -283,7 +283,7 @@ func telnet(rw *bufio.ReadWriter, buf []byte) error {
 }
 
 func (p *Plugin) validateTelnet(buf []byte, conn net.Conn) int {
-	err := telnet(bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn)), buf)
+	err := telnetTestLogin(bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn)), buf)
 	if err != nil {
 		log.Debugf("TCP telnet network error: %s", err.Error())
 		return tcpExpectFail
@@ -380,10 +380,6 @@ func (p *Plugin) exportNetService(params []string) int {
 			port = "pop3"
 		}
 	}
-
-	// if service == "telnet" {
-	// 	return p.telnetExpect(net.JoinHostPort(ip, port))
-	// }
 
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
 }
