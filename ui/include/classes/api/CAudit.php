@@ -87,7 +87,7 @@ class CAudit {
 		$masked_fields = [
 			'users' => ['passwd' => true],
 			'config' => ['tls_psk_identity' => true, 'tls_psk' => true],
-			'media_type' => ['passwd' => true],
+			'media_type' => ['passwd' => true]
 		];
 
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
