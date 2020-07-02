@@ -66,9 +66,7 @@ class CDiscoveryRuleManager {
 			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
 		), 'hostid');
 		if ($host_prototypeids) {
-			if (!API::HostPrototype()->delete($host_prototypeids, true)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
-			}
+			API::HostPrototype()->delete($host_prototypeids, true);
 		}
 
 		// Delete LLD rules.
