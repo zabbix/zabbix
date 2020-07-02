@@ -515,11 +515,9 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return array
 	 */
 	public function delete(array $ruleids) {
-		$this->validateDelete($ruleids, $db_rules);
+		$this->validateDelete($ruleids);
 
 		CDiscoveryRuleManager::delete($ruleids);
-
-		// TODO: $db_rules should be used for creating audit entry.
 
 		return ['ruleids' => $ruleids];
 	}
@@ -528,12 +526,10 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Validates the input parameters for the delete() method.
 	 *
 	 * @param array $ruleids   [IN/OUT]
-	 * @param array $db_rules  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$ruleids, array &$db_rules = null) {
-		// TODO VM: remove $nopermissions
+	private function validateDelete(array &$ruleids) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $ruleids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
