@@ -2021,11 +2021,13 @@ else {
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
 
 	// Set is_template false, when one of hosts is not template.
-	$hosts_status = array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status');
-	foreach ($hosts_status as $value) {
-		if ($value != HOST_STATUS_TEMPLATE) {
-			$data['is_template'] = false;
-			break;
+	if ($data['items']) {
+		$hosts_status = array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status');
+		foreach ($hosts_status as $value) {
+			if ($value != HOST_STATUS_TEMPLATE) {
+				$data['is_template'] = false;
+				break;
+			}
 		}
 	}
 
