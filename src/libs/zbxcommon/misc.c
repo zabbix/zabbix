@@ -430,6 +430,7 @@ struct tm	*zbx_localtime(time_t *time, const char *tz)
 	if (0 != setenv("TZ", tz, 1))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set time zone \"%s\": %s", tz, zbx_strerror(errno));
 
+	tzset();
 	tm = localtime(time);
 
 	if (NULL == old_tz)
