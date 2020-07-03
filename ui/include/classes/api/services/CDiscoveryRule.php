@@ -536,7 +536,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		$db_rules = $this->get([
-			'output' => ['itemid', 'name', 'templateid', 'flags'], // TODO VM: API_OUTPUT_EXTEND
+			'output' => ['templateid'],
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true
