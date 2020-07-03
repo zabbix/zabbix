@@ -1202,7 +1202,7 @@ char	*zbx_date2str(time_t date)
 	return buffer;
 }
 
-char	*zbx_time2str(time_t time)
+char	*zbx_time2str(time_t time, const char *tz)
 {
 	static char	buffer[9];
 	struct tm	*tm;

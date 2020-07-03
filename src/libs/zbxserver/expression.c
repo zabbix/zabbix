@@ -1360,7 +1360,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp));
 			goto success;
 		case ZBX_REQUEST_ITEM_LOG_TIME:
-			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp));
+			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp, NULL));
 			goto success;
 		case ZBX_REQUEST_ITEM_LOG_AGE:
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
@@ -1587,7 +1587,7 @@ static char	*format_user_fullname(const char *name, const char *surname, const c
  *                                                                            *
  ******************************************************************************/
 static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-			char **replace_to, const zbx_uint64_t *recipient_userid)
+			char **replace_to, const zbx_uint64_t *recipient_userid, const char *tz)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1601,7 +1601,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 
 	zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
-			zbx_date2str(event->clock), zbx_time2str(event->clock),
+			zbx_date2str(event->clock), zbx_time2str(event->clock, tz),
 			zbx_age2str(time(NULL) - event->clock));
 
 	result = DBselect("select a.clock,a.alerttype,a.status,mt.name,a.sendto,a.error,a.esc_step,a.userid,a.message"
@@ -1628,7 +1628,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%d. ", esc_step);
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s %s %-7s %-11s",
-				zbx_date2str(now), zbx_time2str(now),	/* date, time */
+				zbx_date2str(now), zbx_time2str(now, tz),	/* date, time */
 				zbx_alert_type_string(type),		/* alert type */
 				zbx_alert_status_string(type, status));	/* alert status */
 
@@ -1680,7 +1680,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 	if (NULL != r_event)
 	{
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem ended: %s %s\n",
-				zbx_date2str(r_event->clock), zbx_time2str(r_event->clock));
+				zbx_date2str(r_event->clock), zbx_time2str(r_event->clock, tz));
 	}
 
 	if (0 != buf_offset)
@@ -1702,7 +1702,8 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_update_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid)
+static void	get_event_update_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid,
+		const char *tz)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1739,7 +1740,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n",
 				zbx_date2str(ack.clock),
-				zbx_time2str(ack.clock),
+				zbx_time2str(ack.clock, tz),
 				user_name);
 
 		if (SUCCEED == get_problem_update_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
@@ -2386,7 +2387,7 @@ static void	get_event_tags_json(const DB_EVENT *event, char **replace_to)
  * Purpose: request recovery event value by macro                             *
  *                                                                            *
  ******************************************************************************/
-static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event, char **replace_to)
+static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event, char **replace_to, const char *tz)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_DATE))
 	{
@@ -2403,7 +2404,7 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TIME))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_time2str(r_event->clock));
+		*replace_to = zbx_strdup(*replace_to, zbx_time2str(r_event->clock, tz));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_VALUE))
 	{
@@ -2450,7 +2451,7 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
  *                                                                            *
  ******************************************************************************/
 static void	get_event_value(const char *macro, const DB_EVENT *event, char **replace_to,
-			const zbx_uint64_t *recipient_userid, const DB_EVENT *r_event)
+			const zbx_uint64_t *recipient_userid, const DB_EVENT *r_event, const char *tz)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_AGE))
 	{
@@ -2473,7 +2474,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_TIME))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_time2str(event->clock));
+		*replace_to = zbx_strdup(*replace_to, zbx_time2str(event->clock, tz));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_SOURCE))
 	{
@@ -2487,7 +2488,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	{
 		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY) || 0 == strcmp(macro, MVAR_EVENT_UPDATE_HISTORY))
 		{
-			get_event_update_history(event, replace_to, recipient_userid);
+			get_event_update_history(event, replace_to, recipient_userid, tz);
 		}
 		else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
 		{
@@ -3013,12 +3014,12 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(*actionid, event, r_event, &replace_to, userid);
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
 					if (NULL != r_event)
-						get_recovery_event_value(m, r_event, &replace_to);
+						get_recovery_event_value(m, r_event, &replace_to, tz);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
@@ -3040,7 +3041,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				else if (0 == strcmp(m, MVAR_ACK_TIME) || 0 == strcmp(m, MVAR_EVENT_UPDATE_TIME))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-						replace_to = zbx_strdup(replace_to, zbx_time2str(ack->clock));
+						replace_to = zbx_strdup(replace_to, zbx_time2str(ack->clock, tz));
 				}
 				else if (0 == strcmp(m, MVAR_ACK_DATE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_DATE))
 				{
@@ -3066,7 +3067,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event);
+					get_event_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -3208,7 +3209,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
@@ -3345,12 +3346,12 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(*actionid, event, r_event, &replace_to, userid);
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
 					if (NULL != r_event)
-						get_recovery_event_value(m, r_event, &replace_to);
+						get_recovery_event_value(m, r_event, &replace_to, tz);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
@@ -3362,7 +3363,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event);
+					get_event_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -3452,7 +3453,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
@@ -3553,7 +3554,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)) &&
 						0 != strcmp(m, MVAR_EVENT_DURATION))
 				{
-					get_event_value(m, event, &replace_to, userid, NULL);
+					get_event_value(m, event, &replace_to, userid, NULL, tz);
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 				{
@@ -3657,7 +3658,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
@@ -3693,7 +3694,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)) &&
 						0 != strcmp(m, MVAR_EVENT_DURATION))
 				{
-					get_event_value(m, event, &replace_to, userid, NULL);
+					get_event_value(m, event, &replace_to, userid, NULL, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_METADATA))
 				{
@@ -3748,7 +3749,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
@@ -3785,12 +3786,12 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(*actionid, event, r_event, &replace_to, userid);
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
 					if (NULL != r_event)
-						get_recovery_event_value(m, r_event, &replace_to);
+						get_recovery_event_value(m, r_event, &replace_to, tz);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
@@ -3802,7 +3803,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event);
+					get_event_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -3884,7 +3885,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
@@ -3921,12 +3922,12 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					get_escalation_history(*actionid, event, r_event, &replace_to, userid);
+					get_escalation_history(*actionid, event, r_event, &replace_to, userid, tz);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
 					if (NULL != r_event)
-						get_recovery_event_value(m, r_event, &replace_to);
+						get_recovery_event_value(m, r_event, &replace_to, tz);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
@@ -3934,7 +3935,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event);
+					get_event_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -4016,7 +4017,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
@@ -4186,7 +4187,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 				{
-					get_event_value(m, event, &replace_to, userid, NULL);
+					get_event_value(m, event, &replace_to, userid, NULL, NULL);
 				}
 			}
 		}
