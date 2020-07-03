@@ -55,9 +55,9 @@ $email_send_to_table->setFooter(new CCol(
 ), 'dynamic-row-control');
 
 $type_combobox = new CComboBox('mediatypeid', $options['mediatypeid']);
-foreach ($data['db_mediatypes'] as $value => $caption) {
-	$type_combobox->addItem($value, $caption, null, true,
-		($data['mediatypes_status'][$value] == MEDIA_TYPE_STATUS_DISABLED) ? ZBX_STYLE_RED : null
+foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
+	$type_combobox->addItem($mediatypeid, $value['name'], null, true,
+		($value['status'] == MEDIA_TYPE_STATUS_DISABLED) ? ZBX_STYLE_RED : null
 	);
 }
 
