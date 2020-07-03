@@ -1677,6 +1677,9 @@ Changes for 4.0.23rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
+A.F....... [ZBX-17860] fixed host prototype import (rlataria)
+...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.22
