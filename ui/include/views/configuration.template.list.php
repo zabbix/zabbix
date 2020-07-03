@@ -311,13 +311,12 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'templates',
 		[
-			'template.export' => ['name' => _('Export'), 'redirect' =>
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'export.templates.xml')
-					->setArgument('backurl', (new CUrl('templates.php'))
-						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
-						->getUrl())
-					->getUrl()
+			'template.export' => [
+				'content' => new CButtonExport('export.templates',
+					(new CUrl('templates.php'))
+						->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+						->getUrl()
+				)
 			],
 			'template.massupdateform' => ['name' => _('Mass update')],
 			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?')],

@@ -19,18 +19,19 @@
 **/
 
 
-class CControllerExportXml extends CController {
+class CControllerExport extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'action' => 'required|string',
-			'backurl' => 'required|string',
-			'valuemapids' => 'not_empty|array_db valuemaps.valuemapid',
-			'hosts' => 'not_empty|array_db hosts.hostid',
-			'mediatypeids' => 'not_empty|array_db media_type.mediatypeid',
-			'screens' => 'not_empty|array_db screens.screenid',
-			'maps' => 'not_empty|array_db sysmaps.sysmapid',
-			'templates' => 'not_empty|array_db hosts.hostid'
+			'action' =>			'required|string',
+			'backurl' =>		'required|string',
+			'valuemapids' =>	'not_empty|array_db valuemaps.valuemapid',
+			'hosts' =>			'not_empty|array_db hosts.hostid',
+			'mediatypeids' =>	'not_empty|array_db media_type.mediatypeid',
+			'screens' =>		'not_empty|array_db screens.screenid',
+			'maps' =>			'not_empty|array_db sysmaps.sysmapid',
+			'templates' =>		'not_empty|array_db hosts.hostid',
+			'format' =>			'in '.implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,16 +45,16 @@ class CControllerExportXml extends CController {
 
 	protected function checkPermissions() {
 		switch ($this->getInput('action')) {
-			case 'export.mediatypes.xml':
-			case 'export.valuemaps.xml':
+			case 'export.mediatypes':
+			case 'export.valuemaps':
 				return (CWebUser::$data['type'] >= USER_TYPE_SUPER_ADMIN);
 
-			case 'export.hosts.xml':
-			case 'export.templates.xml':
+			case 'export.hosts':
+			case 'export.templates':
 				return (CWebUser::$data['type'] >= USER_TYPE_ZABBIX_ADMIN);
 
-			case 'export.screens.xml':
-			case 'export.sysmaps.xml':
+			case 'export.screens':
+			case 'export.sysmaps':
 				return (CWebUser::$data['type'] >= USER_TYPE_ZABBIX_USER);
 
 			default:
@@ -63,29 +64,30 @@ class CControllerExportXml extends CController {
 
 	protected function doAction() {
 		$action = $this->getInput('action');
+		$format = $this->getInput('format', CExportWriterFactory::YAML);
 
 		switch ($action) {
-			case 'export.valuemaps.xml':
+			case 'export.valuemaps':
 				$export = new CConfigurationExport(['valueMaps' => $this->getInput('valuemapids', [])]);
 				break;
 
-			case 'export.hosts.xml':
+			case 'export.hosts':
 				$export = new CConfigurationExport(['hosts' => $this->getInput('hosts', [])]);
 				break;
 
-			case 'export.mediatypes.xml':
+			case 'export.mediatypes':
 				$export = new CConfigurationExport(['mediaTypes' => $this->getInput('mediatypeids', [])]);
 				break;
 
-			case 'export.screens.xml':
+			case 'export.screens':
 				$export = new CConfigurationExport(['screens' => $this->getInput('screens', [])]);
 				break;
 
-			case 'export.sysmaps.xml':
+			case 'export.sysmaps':
 				$export = new CConfigurationExport(['maps' => $this->getInput('maps', [])]);
 				break;
 
-			case 'export.templates.xml':
+			case 'export.templates':
 				$export = new CConfigurationExport(['templates' => $this->getInput('templates', [])]);
 				break;
 
@@ -96,7 +98,7 @@ class CControllerExportXml extends CController {
 		}
 
 		$export->setBuilder(new CConfigurationExportBuilder());
-		$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
+		$export->setWriter(CExportWriterFactory::getWriter($format));
 
 		$export_data = $export->export();
 
@@ -111,7 +113,8 @@ class CControllerExportXml extends CController {
 		else {
 			$response = new CControllerResponseData([
 				'main_block' => $export_data,
-				'page' => ['file' => 'zbx_export_' . substr($action, 7)]
+				'content_type' => CExportWriterFactory::getContentType($format),
+				'page' => ['file' => 'zbx_export_'.substr($action, 7).'.'.$format]
 			]);
 		}
 

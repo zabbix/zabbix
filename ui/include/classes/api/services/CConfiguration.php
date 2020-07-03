@@ -31,7 +31,7 @@ class CConfiguration extends CApiService {
 	 */
 	public function export(array $params) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::XML, CExportWriterFactory::JSON])],
+			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON])],
 			'options' =>	['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'groups' =>		['type' => API_IDS],
 				'hosts' =>		['type' => API_IDS],
@@ -69,7 +69,7 @@ class CConfiguration extends CApiService {
 	 */
 	public function import($params) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::XML, CImportReaderFactory::JSON])],
+			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
 			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'applications' =>		['type' => API_OBJECT, 'fields' => [
