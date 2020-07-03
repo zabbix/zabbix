@@ -1291,30 +1291,37 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		$items = API::Item()->get([
 			'output' => ['itemid', 'key_', 'value_type'],
 			'itemids' => $itemIds,
-			'selectHosts' => ['name'],
+			'selectHosts' => ['name', 'status'],
 			'editable' => true
 		]);
 
 		if ($items) {
-			DBstart();
-
-			$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
-
-			if ($result) {
-				foreach ($items as $item) {
-					$host = reset($item['hosts']);
-
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-						_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
-							_('History cleared')
-					);
-				}
+			// Check items belong only to hosts.
+			$hosts_status = array_column(array_column(array_column($items, 'hosts'), 0), 'status');
+			if (in_array(HOST_STATUS_TEMPLATE, $hosts_status)) {
+				$result = false;
 			}
+			else {
+				DBstart();
 
-			$result = DBend($result);
+				$result = Manager::History()->deleteHistory(array_column($items, 'value_type', 'itemid'));
 
-			if ($result) {
-				uncheckTableRows(getRequest('checkbox_hash'));
+				if ($result) {
+					foreach ($items as $item) {
+						$host = reset($item['hosts']);
+
+						add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+							_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '. _('Host').' ['.$host['name'].'] '.
+								_('History cleared')
+						);
+					}
+				}
+
+				$result = DBend($result);
+
+				if ($result) {
+					uncheckTableRows(getRequest('checkbox_hash'));
+				}
 			}
 		}
 	}
