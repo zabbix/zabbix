@@ -1,6 +1,7 @@
 Changes for 5.0.2rc1
 
 New features:
+...G...... [ZBXNEXT-6044] added native support in agent2 for https key for net.tcp.service/.perf (esneiders)
 ...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
 ...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
 ........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
@@ -16,6 +17,12 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
+.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
+A.F....... [ZBX-17715] fixed filtering and sorting of the Latest Data (averza)
+..F....... [ZBX-17802] fixed runtime errors in trigger list (talbergs)
+...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
+A.F....... [ZBX-17860] fixed host prototype import (rlataria)
 ..F....... [ZBX-17920] fixed browser error when user tries to access properties without permissions (kustalovs)
 .......PS. [ZBX-17252] fixed building of Zabbix daemons with link time optimization (vso)
 ..F....... [ZBX-17693] fixed headers and query fields in HTTP item test form; thanks to Mikhail Okhotin for the patch (Ivo, talbergs)
