@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-20T00:00:00Z</date>
+    <date>2020-07-03T09:57:01Z</date>
     <media_types>
         <media_type>
             <name>Pushover</name>
@@ -14,6 +14,10 @@
                 <parameter>
                     <name>eventid</name>
                     <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>event_source</name>
+                    <value>{EVENT.SOURCE}</value>
                 </parameter>
                 <parameter>
                     <name>expire</name>
@@ -67,11 +71,15 @@
         request.SetProxy(params.HTTPProxy);&#13;
     }&#13;
 &#13;
+    if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {&#13;
+        throw 'Incorrect &quot;event_source&quot; parameter given: &quot;' + params.event_source + '&quot;.\nMust be 0-3.';&#13;
+    }&#13;
+&#13;
     if (isNaN(params.priority) || params.priority &lt; -2 || params.priority &gt; 2) {&#13;
         throw 'field &quot;priority&quot; should be -2..2';&#13;
     }&#13;
 &#13;
-    if (isNaN(params.triggerid)) {&#13;
+    if (params.event_source === '0' &amp;&amp; isNaN(params.triggerid)) {&#13;
         throw 'field &quot;triggerid&quot; is not a number';&#13;
     }&#13;
 &#13;
@@ -88,7 +96,9 @@
         user: params.user,&#13;
         title: params.title,&#13;
         message: params.message,&#13;
-        url: params.url + '/tr_events.php?triggerid=' + params.triggerid + '&amp;eventid=' + params.eventid,&#13;
+        url: (params.event_source === '0') &#13;
+            ? params.url + '/tr_events.php?triggerid=' + params.triggerid + '&amp;eventid=' + params.eventid&#13;
+            : params.url,&#13;
         url_title: params.url_title,&#13;
         priority: params.priority&#13;
     };&#13;
@@ -144,6 +154,65 @@ catch (error) {&#13;
 &#13;
 Set token parameter with to your Pushover application key.&#13;
 When assigning Pushover media to the Zabbix user - add user key into send to field.</description>
+            <message_templates>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Problem: {EVENT.NAME}</subject>
+                    <message>Problem started at {EVENT.TIME} on {EVENT.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Operational data: {EVENT.OPDATA}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>RECOVERY</operation_mode>
+                    <subject>Resolved in {EVENT.DURATION}: {EVENT.NAME}</subject>
+                    <message>Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
+Problem name: {EVENT.NAME}&#13;
+Problem duration: {EVENT.DURATION}&#13;
+Host: {HOST.NAME}&#13;
+Severity: {EVENT.SEVERITY}&#13;
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
+                </message_template>
+                <message_template>
+                    <event_source>TRIGGERS</event_source>
+                    <operation_mode>UPDATE</operation_mode>
+                    <subject>Updated problem in {EVENT.AGE}: {EVENT.NAME}</subject>
+                    <message>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.&#13;
+{EVENT.UPDATE.MESSAGE}&#13;
+&#13;
+Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.</message>
+                </message_template>
+                <message_template>
+                    <event_source>DISCOVERY</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}</subject>
+                    <message>Discovery rule: {DISCOVERY.RULE.NAME}&#13;
+&#13;
+Device IP: {DISCOVERY.DEVICE.IPADDRESS}&#13;
+Device DNS: {DISCOVERY.DEVICE.DNS}&#13;
+Device status: {DISCOVERY.DEVICE.STATUS}&#13;
+Device uptime: {DISCOVERY.DEVICE.UPTIME}&#13;
+&#13;
+Device service name: {DISCOVERY.SERVICE.NAME}&#13;
+Device service port: {DISCOVERY.SERVICE.PORT}&#13;
+Device service status: {DISCOVERY.SERVICE.STATUS}&#13;
+Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
+                </message_template>
+                <message_template>
+                    <event_source>AUTOREGISTRATION</event_source>
+                    <operation_mode>PROBLEM</operation_mode>
+                    <subject>Autoregistration: {HOST.HOST}</subject>
+                    <message>Host name: {HOST.HOST}&#13;
+Host IP: {HOST.IP}&#13;
+Agent port: {HOST.PORT}</message>
+                </message_template>
+            </message_templates>
         </media_type>
     </media_types>
 </zabbix_export>
