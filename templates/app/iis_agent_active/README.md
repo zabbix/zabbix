@@ -19,7 +19,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/5.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 1\. [Import](https://www.zabbix.com/documentation/current/manual/xml_export_import/templates) the template ([template_app_iis_agent.xml](template_app_iis_agent.xml) or [template_app_iis_agent_active.xml](template_app_iis_agent_active.xml)) into Zabbix.
 
