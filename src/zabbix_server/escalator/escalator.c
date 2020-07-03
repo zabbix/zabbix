@@ -121,20 +121,43 @@ static int	check_perm2system(zbx_uint64_t userid)
 	return res;
 }
 
-static	int	get_user_type(zbx_uint64_t userid)
+static int	get_user_type_and_timezone(zbx_uint64_t userid, char **user_timezone)
 {
 	int		user_type = -1;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select type from users where userid=" ZBX_FS_UI64, userid);
+	*user_timezone = NULL;
+
+	result = DBselect("select type,timezone from users where userid=" ZBX_FS_UI64, userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+	{
 		user_type = atoi(row[0]);
+		*user_timezone = zbx_strdup(NULL, row[1]);
+	}
 
 	DBfree_result(result);
 
 	return user_type;
+}
+
+static char	*get_user_timezone(zbx_uint64_t userid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*user_timezone;
+
+	result = DBselect("select timezone from users where userid=" ZBX_FS_UI64, userid);
+
+	if (NULL != (row = DBfetch(result)))
+		user_timezone = zbx_strdup(NULL, row[0]);
+	else
+		user_timezone = NULL;
+
+	DBfree_result(result);
+
+	return user_timezone;
 }
 
 /******************************************************************************
@@ -286,7 +309,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
+static int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event, char **user_timezone)
 {
 	int			perm = PERM_DENY;
 	DB_RESULT		result;
@@ -296,7 +319,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (USER_TYPE_SUPER_ADMIN == get_user_type(userid))
+	if (USER_TYPE_SUPER_ADMIN == get_user_type_and_timezone(userid, user_timezone))
 	{
 		perm = PERM_READ_WRITE;
 		goto out;
@@ -343,7 +366,7 @@ out:
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
+static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -356,7 +379,7 @@ static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
 	zbx_vector_uint64_create(&hostgroupids);
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (USER_TYPE_SUPER_ADMIN == get_user_type(userid))
+	if (USER_TYPE_SUPER_ADMIN == get_user_type_and_timezone(userid, user_timezone))
 	{
 		perm = PERM_READ_WRITE;
 		goto out;
@@ -387,17 +410,17 @@ out:
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg, const char *subj,
 		const char *msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		const DB_ACKNOWLEDGE *ack, int macro_type, const char *cancel_error, int err_type,
-		const char *default_timezone)
+		const char *tz)
 {
 	ZBX_USER_MSG	*p, **pnext;
-	char		*subject, *message, *tz;
+	char		*subject, *message, *tz_tmp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	subject = zbx_strdup(NULL, subj);
 	message = (NULL == cancel_error ? zbx_strdup(NULL, msg) :
 			zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\n%s", cancel_error, msg));
-	tz = zbx_strdup(NULL, default_timezone);
+	tz_tmp = zbx_strdup(NULL, tz);
 
 	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, tz, &subject,
 			macro_type, NULL, 0);
@@ -442,7 +465,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 		p->err = err_type;
 		p->subject = subject;
 		p->message = message;
-		p->tz = tz;
+		p->tz = tz_tmp;
 		p->next = *user_msg;
 
 		*user_msg = p;
@@ -451,7 +474,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	{
 		zbx_free(subject);
 		zbx_free(message);
-		zbx_free(tz);
+		zbx_free(tz_tmp);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -460,13 +483,16 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		const DB_ACKNOWLEDGE *ack, int macro_t, unsigned char evt_src, unsigned char op_mode,
-		const char *cancel_err, const char *default_timezone)
+		const char *cancel_err, const char *default_timezone, const char *user_timezone)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	mtid;
+	const char	*tz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	tz = NULL == user_timezone || 0 == strcmp(user_timezone, "default") ? default_timezone : user_timezone;
 
 	if (0 != operationid)
 	{
@@ -484,7 +510,7 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 			if (atoi(row[1]) != 1)
 			{
 				add_user_msg(userid, mediatypeid, user_msg, row[2], row[3], actionid, event, r_event,
-						ack, macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, default_timezone);
+						ack, macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
 				goto out;
 			}
 
@@ -526,19 +552,19 @@ static void	add_user_msgs(zbx_uint64_t userid, zbx_uint64_t operationid, zbx_uin
 		if (0 != mtmid)
 		{
 			add_user_msg(userid, mediatypeid, user_msg, row[1], row[2], actionid, event, r_event, ack,
-					macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, default_timezone);
+					macro_t, cancel_err, ZBX_ALERT_MESSAGE_ERR_NONE, tz);
 		}
 		else
 		{
 			add_user_msg(userid, mediatypeid, user_msg, "", "", actionid, event, r_event, ack, macro_t,
-					cancel_err, ZBX_ALERT_MESSAGE_ERR_MSG, default_timezone);
+					cancel_err, ZBX_ALERT_MESSAGE_ERR_MSG, tz);
 		}
 	}
 
 	if (0 == mediatypeid)
 	{
 		add_user_msg(userid, mtid, user_msg, "", "", actionid, event, r_event, ack, macro_t, cancel_err,
-				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG, default_timezone);
+				0 == mtid ? ZBX_ALERT_MESSAGE_ERR_USR : ZBX_ALERT_MESSAGE_ERR_MSG, tz);
 	}
 
 out:
@@ -570,6 +596,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	userid;
+		char		*user_timezone = NULL;
 
 		ZBX_STR2UINT64(userid, row[0]);
 
@@ -583,18 +610,22 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event))
-					continue;
+				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+					goto clean;
 				break;
 			case EVENT_OBJECT_ITEM:
 			case EVENT_OBJECT_LLDRULE:
-				if (PERM_READ > get_item_permission(userid, event->objectid))
-					continue;
+				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
+					goto clean;
 				break;
+			default:
+				user_timezone = get_user_timezone(userid);
 		}
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, macro_type, evt_src,
-				op_mode, NULL, default_timezone);
+				op_mode, NULL, default_timezone, user_timezone);
+clean:
+		zbx_free(user_timezone);
 	}
 	DBfree_result(result);
 
@@ -660,6 +691,8 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		char	*user_timezone = NULL;
+
 		ZBX_DBROW2UINT64(userid, row[0]);
 
 		/* exclude acknowledgement author from the recipient list */
@@ -674,18 +707,22 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event))
-					continue;
+				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+					goto clean;
 				break;
 			case EVENT_OBJECT_ITEM:
 			case EVENT_OBJECT_LLDRULE:
-				if (PERM_READ > get_item_permission(userid, event->objectid))
-					continue;
+				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
+					goto clean;
 				break;
+			default:
+				user_timezone = get_user_timezone(userid);
 		}
 
 		add_user_msgs(userid, operationid, mediatypeid, user_msg, actionid, event, r_event, ack, message_type,
-				evt_src, op_mode, cancel_err, default_timezone);
+				evt_src, op_mode, cancel_err, default_timezone, user_timezone);
+clean:
+		zbx_free(user_timezone);
 	}
 	DBfree_result(result);
 
@@ -727,17 +764,24 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		char	*user_timezone = NULL;
+
 		ZBX_DBROW2UINT64(userid, row[0]);
 
 		/* exclude acknowledgement author from the recipient list */
 		if (ack->userid == userid)
 			continue;
 
-		if (SUCCEED != check_perm2system(userid) || PERM_READ > get_trigger_permission(userid, event))
+		if (SUCCEED != check_perm2system(userid))
 			continue;
 
+		if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+			goto clean;
+
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, MACRO_TYPE_MESSAGE_ACK,
-				evt_src, ZBX_OPERATION_MODE_ACK, NULL, default_timezone);
+				evt_src, ZBX_OPERATION_MODE_ACK, NULL, default_timezone, user_timezone);
+clean:
+		zbx_free(user_timezone);
 	}
 	DBfree_result(result);
 
