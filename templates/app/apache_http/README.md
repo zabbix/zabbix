@@ -57,6 +57,8 @@ This template was tested on:
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/http) for basic instructions.
+
 Setup [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html)
 
 Check module availability: `httpd -M 2>/dev/null | grep status_module`
