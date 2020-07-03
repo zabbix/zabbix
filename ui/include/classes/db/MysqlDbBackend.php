@@ -83,6 +83,7 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkTablesEncoding(array $DB) {
+		// Aliasing table_name to ensure field name is lowercase.
 		$tables = DBfetchColumn(DBSelect('SELECT table_name table_name FROM information_schema.columns'.
 			' WHERE table_schema='.zbx_dbstr($DB['DATABASE']).
 				' AND '.dbConditionString('table_name', array_keys(DB::getSchema())).
