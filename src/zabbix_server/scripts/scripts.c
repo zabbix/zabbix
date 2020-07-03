@@ -52,7 +52,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 	}
 
 	port = zbx_strdup(port, item.interface.port_orig);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL,
 			&port, MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
@@ -346,13 +346,13 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL,
 					&script->publickey, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL,
 					&script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
 			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL,
 					&script->port, MACRO_TYPE_COMMON, NULL, 0);
 
 			if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
@@ -362,9 +362,9 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			}
 
 			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
-					&script->username, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, &script->username, MACRO_TYPE_COMMON, NULL, 0);
 			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
-					&script->password, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, &script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 			if (SUCCEED != DBget_script_by_scriptid(script->scriptid, script, &groupid))
@@ -396,14 +396,14 @@ int	zbx_script_prepare(zbx_script_t *script, const DC_HOST *host, const zbx_user
 			}
 
 			if (SUCCEED != substitute_simple_macros_unmasked(NULL, NULL, NULL, p_userid, NULL, host, NULL,
-					NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
+					NULL, NULL, NULL, &script->command, MACRO_TYPE_SCRIPT, error, max_error_len))
 			{
 				goto out;
 			}
 
 			/* expand macros in command_orig used for non-secure logging */
 			if (SUCCEED != substitute_simple_macros(NULL, NULL, NULL, p_userid, NULL, host, NULL, NULL,
-					NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error, max_error_len))
+					NULL, NULL, &script->command_orig, MACRO_TYPE_SCRIPT, error, max_error_len))
 			{
 				/* script command_orig is a copy of script command - if the script command  */
 				/* macro substitution succeeded, then it will succeed also for command_orig */

@@ -397,9 +397,9 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	message = (NULL == cancel_error ? zbx_strdup(NULL, msg) :
 			zbx_dsprintf(NULL, "NOTE: Escalation cancelled: %s\n%s", cancel_error, msg));
 
-	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
+	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, default_timezone,
 			&subject, macro_type, NULL, 0);
-	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
+	substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, default_timezone,
 			&message, macro_type, NULL, 0);
 
 	if (0 == mediatypeid)
@@ -1070,9 +1070,9 @@ static void	execute_commands(const DB_EVENT *event, const DB_EVENT *r_event, con
 			script.command = zbx_strdup(script.command, row[12]);
 			script.command_orig = zbx_strdup(script.command_orig, row[12]);
 			substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, ack, &script.command, macro_type, NULL, 0);
+					NULL, NULL, NULL, ack, default_timezone, &script.command, macro_type, NULL, 0);
 			substitute_simple_macros(&actionid, event, r_event, NULL, NULL,
-					NULL, NULL, NULL, ack, &script.command_orig, macro_type, NULL, 0);
+					NULL, NULL, NULL, ack, default_timezone, &script.command_orig, macro_type, NULL, 0);
 		}
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
@@ -1205,9 +1205,9 @@ static void	get_mediatype_params(const DB_EVENT *event, const DB_EVENT *r_event,
 		value = zbx_strdup(NULL, row[1]);
 
 		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
-				ack, &name, message_type, NULL, 0);
+				ack, tz, &name, message_type, NULL, 0);
 		substitute_simple_macros_unmasked(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
-				ack, &value, message_type, NULL, 0);
+				ack, tz, &value, message_type, NULL, 0);
 
 		zbx_json_addstring(&json, name, value, ZBX_JSON_TYPE_STRING);
 		zbx_free(name);
@@ -1271,7 +1271,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity = atoi(row[2]);
 		period = zbx_strdup(period, row[3]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
 				MACRO_TYPE_COMMON, NULL, 0);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "severity:%d, media severity:%d, period:'%s', userid:" ZBX_FS_UI64,
@@ -1510,8 +1510,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		ZBX_STR2UINT64(operationid, row[0]);
 
 		tmp = zbx_strdup(NULL, row[2]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON,
-				NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
+				MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid step duration \"%s\" for operation of action \"%s\","
