@@ -83,7 +83,7 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkTablesEncoding(array $DB) {
-		$tables = DBfetchColumn(DBSelect('SELECT table_name FROM information_schema.columns'.
+		$tables = DBfetchColumn(DBSelect('SELECT table_name table_name FROM information_schema.columns'.
 			' WHERE table_schema='.zbx_dbstr($DB['DATABASE']).
 				' AND '.dbConditionString('table_name', array_keys(DB::getSchema())).
 				' AND '.dbConditionString('data_type', ['text', 'varchar', 'longtext']).
