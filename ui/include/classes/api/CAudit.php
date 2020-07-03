@@ -127,8 +127,17 @@ class CAudit {
 				foreach ($object_diff as $field_name => &$values) {
 					if (array_key_exists($table_name, $masked_fields)
 							&& array_key_exists($field_name, $masked_fields[$table_name])) {
-						$object_old[$field_name] = '********';
-						$object[$field_name] = '********';
+						$object_old[$field_name] = ZBX_SECRET_MASK;
+						$object[$field_name] = ZBX_SECRET_MASK;
+					}
+
+					if ($table_name === 'globalmacro') {
+						if ($object_old['type'] == ZBX_MACRO_TYPE_SECRET) {
+							$object_old[$field_name] = ZBX_SECRET_MASK;
+						}
+						if ($object['type'] == ZBX_MACRO_TYPE_SECRET) {
+							$object[$field_name] = ZBX_SECRET_MASK;
+						}
 					}
 
 					$values = [
