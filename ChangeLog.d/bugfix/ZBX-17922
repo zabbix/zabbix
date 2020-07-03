@@ -1,1 +1,0 @@
-...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
