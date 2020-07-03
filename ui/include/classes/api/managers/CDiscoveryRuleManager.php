@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -29,7 +29,7 @@ class CDiscoveryRuleManager {
 	 *
 	 * @param array $ruleids
 	 */
-	public static function delete(array $ruleids) {
+	public static function delete(array $ruleids): void {
 		// Get child discovery rules.
 		$parent_itemids = $ruleids;
 		$child_ruleids = [];
