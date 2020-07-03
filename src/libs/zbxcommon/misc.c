@@ -429,18 +429,21 @@ struct tm	*zbx_localtime(time_t *time, const char *tz)
 
 	if (0 != setenv("TZ", tz, 1))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set time zone \"%s\": %s", tz, zbx_strerror(errno));
+
 	tm = localtime(time);
 
 	if (NULL == old_tz)
 	{
 		if (0 != unsetenv("TZ"))
 			zabbix_log(LOG_LEVEL_WARNING, "cannot unset zone \"%s\": %s", tz, zbx_strerror(errno));
-
-		return tm;
+	}
+	else
+	{
+		if (0 != setenv("TZ", old_tz, 1))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot restore time zone \"%s\": %s", old_tz, zbx_strerror(errno));
 	}
 
-	if (0 != setenv("TZ", tz, 1))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot restore time zone \"%s\": %s", old_tz, zbx_strerror(errno));
+	tzset();
 
 	return tm;
 }
@@ -975,14 +978,14 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
  * Comments:   !!! Don't forget to sync code with PHP !!!                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_time_period(const char *period, time_t time, int *res)
+int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res)
 {
 	int			res_total = FAIL;
 	const char		*next;
 	struct tm		*tm;
 	zbx_time_period_t	tp;
 
-	tm = localtime(&time);
+	tm = zbx_localtime(&time, tz);
 
 	next = strchr(period, ';');
 	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : (int)(next - period))))

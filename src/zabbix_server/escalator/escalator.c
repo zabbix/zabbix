@@ -1339,7 +1339,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 			continue;
 		}
 
-		if (SUCCEED != zbx_check_time_period(period, time(NULL), &res))
+		if (SUCCEED != zbx_check_time_period(period, time(NULL), tz, &res))
 		{
 			status = ALERT_STATUS_FAILED;
 			perror = "Invalid media activity period";

@@ -712,7 +712,7 @@ static int	check_time_period_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 		const DB_EVENT	*event = (DB_EVENT *)esc_events->values[i];
 		int		res;
 
-		if (SUCCEED == zbx_check_time_period(period, (time_t)event->clock, &res))
+		if (SUCCEED == zbx_check_time_period(period, (time_t)event->clock, NULL, &res))
 		{
 			switch (condition->op)
 			{
