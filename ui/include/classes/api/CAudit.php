@@ -128,8 +128,8 @@ class CAudit {
 				foreach ($object_diff as $field_name => &$values) {
 					if (array_key_exists($table_name, $masked_fields)
 							&& array_key_exists($field_name, $masked_fields[$table_name])) {
-						$object_old[$field_name] = ZBX_SECRET_MASK;
-						$object[$field_name] = ZBX_SECRET_MASK;
+						$object_old[$field_name] = ZBX_MACRO_SECRET_MASK;
+						$object[$field_name] = ZBX_MACRO_SECRET_MASK;
 					}
 
 					$values = [
