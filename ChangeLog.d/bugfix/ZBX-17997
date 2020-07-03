@@ -1,1 +1,1 @@
-..F....... [ZBX-17997] password replaced with '*' letters for media type in audit log and changed global variable name to more understandable (kustalovs)
+..F....... [ZBX-17997] fixed user media passwords appearing in plain text in audit log (kustalovs)
