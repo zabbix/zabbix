@@ -417,6 +417,34 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 	return offset;
 }
 
+struct tm	*zbx_localtime(time_t *time, const char *tz)
+{
+	const char	*old_tz;
+	struct tm	*tm;
+
+	if (NULL == tz || '\0' == *tz)
+		return localtime(time);
+
+	old_tz = getenv("TZ");
+
+	if (0 != setenv("TZ", tz, 1))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set time zone \"%s\": %s", tz, zbx_strerror(errno));
+	tm = localtime(time);
+
+	if (NULL == old_tz)
+	{
+		if (0 != unsetenv("TZ"))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot unset zone \"%s\": %s", tz, zbx_strerror(errno));
+
+		return tm;
+	}
+
+	if (0 != setenv("TZ", tz, 1))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore time zone \"%s\": %s", old_tz, zbx_strerror(errno));
+
+	return tm;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_utc_time                                                     *

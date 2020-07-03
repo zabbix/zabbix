@@ -1207,7 +1207,7 @@ char	*zbx_time2str(time_t time, const char *tz)
 	static char	buffer[9];
 	struct tm	*tm;
 
-	tm = localtime(&time);
+	tm = zbx_localtime(&time, tz);
 	zbx_snprintf(buffer, sizeof(buffer), "%.2d:%.2d:%.2d",
 			tm->tm_hour,
 			tm->tm_min,
