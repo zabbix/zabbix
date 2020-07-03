@@ -1357,7 +1357,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	switch (request)
 	{
 		case ZBX_REQUEST_ITEM_LOG_DATE:
-			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp));
+			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp, NULL));
 			goto success;
 		case ZBX_REQUEST_ITEM_LOG_TIME:
 			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp, NULL));
@@ -1601,7 +1601,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 
 	zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem started: %s %s Age: %s\n",
-			zbx_date2str(event->clock), zbx_time2str(event->clock, tz),
+			zbx_date2str(event->clock, tz), zbx_time2str(event->clock, tz),
 			zbx_age2str(time(NULL) - event->clock));
 
 	result = DBselect("select a.clock,a.alerttype,a.status,mt.name,a.sendto,a.error,a.esc_step,a.userid,a.message"
@@ -1628,7 +1628,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%d. ", esc_step);
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s %s %-7s %-11s",
-				zbx_date2str(now), zbx_time2str(now, tz),	/* date, time */
+				zbx_date2str(now, tz), zbx_time2str(now, tz),	/* date, time */
 				zbx_alert_type_string(type),		/* alert type */
 				zbx_alert_status_string(type, status));	/* alert status */
 
@@ -1680,7 +1680,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 	if (NULL != r_event)
 	{
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Problem ended: %s %s\n",
-				zbx_date2str(r_event->clock), zbx_time2str(r_event->clock, tz));
+				zbx_date2str(r_event->clock, tz), zbx_time2str(r_event->clock, tz));
 	}
 
 	if (0 != buf_offset)
@@ -1739,7 +1739,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n",
-				zbx_date2str(ack.clock),
+				zbx_date2str(ack.clock, tz),
 				zbx_time2str(ack.clock, tz),
 				user_name);
 
@@ -2391,7 +2391,7 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 {
 	if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_DATE))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_date2str(r_event->clock));
+		*replace_to = zbx_strdup(*replace_to, zbx_date2str(r_event->clock, tz));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_ID))
 	{
@@ -2459,7 +2459,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_DATE))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_date2str(event->clock));
+		*replace_to = zbx_strdup(*replace_to, zbx_date2str(event->clock, tz));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_DURATION))
 	{
@@ -3010,7 +3010,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_DATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
@@ -3046,7 +3046,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				else if (0 == strcmp(m, MVAR_ACK_DATE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_DATE))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-						replace_to = zbx_strdup(replace_to, zbx_date2str(ack->clock));
+						replace_to = zbx_strdup(replace_to, zbx_date2str(ack->clock, tz));
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_ACTION))
 				{
@@ -3342,7 +3342,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_DATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
@@ -3549,7 +3549,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_DATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)) &&
 						0 != strcmp(m, MVAR_EVENT_DURATION))
@@ -3689,7 +3689,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_DATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)) &&
 						0 != strcmp(m, MVAR_EVENT_DURATION))
@@ -3782,7 +3782,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_DATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
@@ -3918,7 +3918,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_DATE))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
+					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL), tz));
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
