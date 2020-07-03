@@ -490,8 +490,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'resourceid',
-						'real_hosts' => true,
-						'enrich_parent_groups' => true
+						'real_hosts' => true
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -625,8 +624,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
-					'real_hosts' => true,
-					'enrich_parent_groups' => true
+					'real_hosts' => true
 				]
 			]
 		]))
@@ -689,8 +687,7 @@ elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RE
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
-					'real_hosts' => true,
-					'enrich_parent_groups' => true
+					'real_hosts' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
