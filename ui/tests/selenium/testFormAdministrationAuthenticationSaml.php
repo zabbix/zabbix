@@ -26,6 +26,12 @@ require_once dirname(__FILE__).'/behaviors/MessageBehavior.php';
  */
 class testFormAdministrationAuthenticationSaml extends CWebTest {
 
+	protected function onBeforeTestSuite() {
+		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
+			self::markTestSuiteSkipped();
+		}
+	}
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -320,11 +326,11 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 	public function testFormAdministrationAuthenticationSaml_Authenticate($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$settings = [
-			'IdP entity ID' => 'http://192.168.3.37:8081/simplesaml/saml2/idp/metadata.php',
-			'SSO service URL' => 'http://192.168.3.37:8081/simplesaml/saml2/idp/SSOService.php',
-			'SLO service URL' => 'http://192.168.3.37:8081/simplesaml/saml2/idp/SingleLogoutService.php',
-			'Username attribute' => 'uid',
-			'SP entity ID' => 'saml_entity_id',
+			'IdP entity ID' => PHPUNIT_IDP_ENTITY_ID,
+			'SSO service URL' => PHPUNIT_SSO_SERVICE_URL,
+			'SLO service URL' => PHPUNIT_SSO_SERVICE_URL,
+			'Username attribute' => PHPUNIT_USERNAME_ATTRIBUTE,
+			'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
 			'Case sensitive login' => false
 		];
 		// Override particcular SAMl settings with values from data provider.
