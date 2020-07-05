@@ -54,7 +54,7 @@
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SLO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SingleLogoutService.php"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SP_ENTITY_ID}" value="${phpunit_sp_entity_id}"/>
 		<!-- Download SAML X509 certificates -->
-		<get src="${phpunit_simplesaml_baseurl}/module.php/saml/idp/certs.php/idp.crt" dest="ui/conf/cert"/>
+		<get src="${phpunit_simplesaml_baseurl}/module.php/saml/idp/certs.php/idp.crt" dest="ui/conf/certs"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
