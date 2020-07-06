@@ -23,7 +23,6 @@ import (
 	"encoding/binary"
 	"unsafe"
 
-	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
