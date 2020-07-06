@@ -301,6 +301,10 @@ class CUser extends CApiService {
 
 		foreach ($users as &$user) {
 			if (array_key_exists('user_medias', $user)) {
+				if (array_key_exists('medias', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'user_medias'));
+				}
+
 				$user['medias'] = $user['user_medias'];
 				unset($user['user_medias']);
 			}
@@ -440,6 +444,10 @@ class CUser extends CApiService {
 
 		foreach ($users as &$user) {
 			if (array_key_exists('user_medias', $user)) {
+				if (array_key_exists('medias', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'user_medias'));
+				}
+
 				$user['medias'] = $user['user_medias'];
 				unset($user['user_medias']);
 			}
