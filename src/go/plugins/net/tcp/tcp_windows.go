@@ -28,8 +28,6 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
-const telnetErr = windows.WSAEWOULDBLOCK
-
 func exportSystemTcpListen(port uint16) (result interface{}, err error) {
 	var tcpTable *win32.MIB_TCPTABLE
 	var sizeIn, sizeOut uint32

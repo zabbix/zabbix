@@ -169,20 +169,16 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
-func telnetRead(conn net.Conn, rw *bufio.ReadWriter) (byte, bool, error) {
-	conn.SetReadDeadline(time.Now().Add(time.Second / 10))
+func telnetRead(rw *bufio.ReadWriter) (byte, error) {
 	b, err := rw.ReadByte()
-	if e, ok := err.(interface{ Timeout() bool }); ok && e.Timeout() {
-		return 0, true, err
-	} else if err != nil {
-		return 0, false, err
+	if err != nil {
+		return 0, err
 	}
 
-	return b, false, nil
+	return b, nil
 }
 
-func telnetWrite(b byte, conn net.Conn, rw *bufio.ReadWriter) error {
-	conn.SetWriteDeadline(time.Now().Add(time.Second / 10))
+func telnetWrite(b byte, rw *bufio.ReadWriter) error {
 	err := rw.WriteByte(b)
 	if err != nil {
 		return fmt.Errorf("buffer write [%x] error: %s", b, err.Error())
@@ -190,7 +186,20 @@ func telnetWrite(b byte, conn net.Conn, rw *bufio.ReadWriter) error {
 	return nil
 }
 
-func telnetTestLogin(conn net.Conn, buf []byte) (int, error) {
+func loginRecived(buf []byte) bool {
+	s := string(buf)
+	for strings.HasSuffix(s, " ") {
+		s = strings.TrimSuffix(s, " ")
+	}
+
+	if strings.HasSuffix(s, ":") {
+		return true
+	}
+
+	return false
+}
+
+func telnetTestLogin(conn net.Conn, buf []byte) ([]byte, error) {
 	var err error
 	cmdIAC := byte(255)
 	cmdWILL := byte(251)
@@ -198,37 +207,35 @@ func telnetTestLogin(conn net.Conn, buf []byte) (int, error) {
 	cmdDO := byte(253)
 	cmdDONT := byte(254)
 	optSGA := byte(3)
-	var timeout bool
-	var n int
-
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	for {
-		var c, c1, c2, c3 byte
-		c1, timeout, err = telnetRead(conn, rw)
-		if timeout {
-			return n, nil
+		if loginRecived(buf) {
+			return buf, nil
 		}
+
+		var c, c1, c2, c3 byte
+		c1, err = telnetRead(rw)
 		if err != nil {
-			return n, fmt.Errorf("c1 network read error: %s", err.Error())
+			return buf, fmt.Errorf("c1 network read error: %s", err.Error())
 		}
 
 		if cmdIAC == c1 {
-			c2, _, err = telnetRead(conn, rw)
+			c2, err = telnetRead(rw)
 			if nil != err {
-				return n, fmt.Errorf("c2 read error: %s", err.Error())
+				return buf, fmt.Errorf("c2 read error: %s", err.Error())
 			}
 
 			switch c2 {
 			case cmdWILL, cmdWONT, cmdDO, cmdDONT:
-				c3, _, err = telnetRead(conn, rw)
+				c3, err = telnetRead(rw)
 				if nil != err {
-					return n, fmt.Errorf("c3 read error: %s", err.Error())
+					return buf, fmt.Errorf("c3 read error: %s", err.Error())
 				}
 
 				c = cmdIAC
-				err := telnetWrite(c, conn, rw)
+				err := telnetWrite(c, rw)
 				if err != nil {
-					return n, err
+					return buf, err
 				}
 
 				if c2 == cmdWONT {
@@ -247,50 +254,37 @@ func telnetTestLogin(conn net.Conn, buf []byte) (int, error) {
 					}
 				}
 
-				err = telnetWrite(c, conn, rw)
+				err = telnetWrite(c, rw)
 				if err != nil {
-					return n, err
+					return buf, err
 				}
-				err = telnetWrite(c3, conn, rw)
+				err = telnetWrite(c3, rw)
 				if err != nil {
-					return n, err
+					return buf, err
 				}
 				err = rw.Flush()
 				if err != nil {
-					return n, fmt.Errorf("buffer flush error: %s", err.Error())
+					return buf, fmt.Errorf("buffer flush error: %s", err.Error())
 				}
 			case cmdIAC:
-				buf[0] = cmdIAC
-				n++
-				buf = buf[1:]
+				buf = append(buf, c1)
 			default:
-				return n, fmt.Errorf("malformed telnet response")
+				return buf, fmt.Errorf("malformed telnet response")
 			}
 		} else {
-			buf[0] = c1
-			n++
-			buf = buf[1:]
+			buf = append(buf, c1)
 		}
 	}
 }
 
-func (p *Plugin) validateTelnet(buf []byte, conn net.Conn) int {
-	n, err := telnetTestLogin(conn, buf)
+func (p *Plugin) validateTelnet(buf []byte, conn net.Conn) ([]byte, int) {
+	buf, err := telnetTestLogin(conn, buf)
 	if err != nil {
 		log.Debugf("TCP telnet network error: %s", err.Error())
-		return tcpExpectFail
+		return buf, tcpExpectFail
 	}
 
-	s := string(buf[:n])
-	for strings.HasSuffix(s, " ") {
-		s = strings.TrimSuffix(s, " ")
-	}
-
-	if strings.HasSuffix(s, ":") {
-		return tcpExpectOk
-	}
-
-	return tcpExpectFail
+	return buf, tcpExpectOk
 }
 
 func (p *Plugin) validateLdap(conn *ldap.Conn, address string) (result int) {
@@ -341,10 +335,11 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 
 	var sendToClose string
 	var checkResult int
-	buf := make([]byte, 2048)
+	var buf []byte
 	if service == "telnet" {
-		checkResult = p.validateTelnet(buf, conn)
+		buf, checkResult = p.validateTelnet(buf, conn)
 	} else {
+		buf = make([]byte, 2048)
 		for {
 			if _, err = conn.Read(buf); err == nil {
 				switch service {
