@@ -31,14 +31,14 @@ extern unsigned char	program_type;
 
 static int	DBpatch_5010000(void)
 {
-	const ZBX_FIELD	field = {"default_timezone", "", NULL, NULL, 30, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"default_timezone", "", NULL, NULL, 50, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5010001(void)
 {
-	const ZBX_FIELD	field = {"timezone", "default", NULL, NULL, 30, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"timezone", "default", NULL, NULL, 50, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("users", &field);
 }

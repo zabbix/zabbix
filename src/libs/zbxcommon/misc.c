@@ -419,6 +419,10 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	ZBX_UNUSED(tz);
+	return localtime(time);
+#else
 	const char	*old_tz;
 	struct tm	*tm;
 
@@ -447,6 +451,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	tzset();
 
 	return tm;
+#endif
 }
 
 /******************************************************************************
