@@ -85,8 +85,18 @@ class CAudit {
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
-			'users' => ['passwd' => true],
-			'config' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			'users' => [
+				'fields' => ['passwd' => true]
+			],
+			'config' => [
+				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			],
+			'globalmacro' => [
+				'fields' => [
+					'value' => true
+				],
+				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+			]
 		];
 
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
@@ -124,29 +134,39 @@ class CAudit {
 					continue;
 				}
 
-				foreach ($object_diff as $field_name => &$values) {
-					if (array_key_exists($table_name, $masked_fields)
-							&& array_key_exists($field_name, $masked_fields[$table_name])) {
-						$object_old[$field_name] = ZBX_SECRET_MASK;
-						$object[$field_name] = ZBX_SECRET_MASK;
-					}
+				if (array_key_exists($table_name, $masked_fields)) {
+					$object_old_conditions_accepted = true;
+					$object_conditions_accepted = true;
 
-					if ($table_name === 'globalmacro') {
-						if ($object_old['type'] == ZBX_MACRO_TYPE_SECRET) {
-							$object_old[$field_name] = ZBX_SECRET_MASK;
-						}
-						if ($object['type'] == ZBX_MACRO_TYPE_SECRET) {
-							$object[$field_name] = ZBX_SECRET_MASK;
+					if (array_key_exists('conditions', $masked_fields[$table_name])) {
+						foreach ($masked_fields[$table_name]['conditions'] as $condition_field_name => $condition_value) {
+							$object_old_conditions_accepted = $object_old_conditions_accepted
+								&& ($object_old[$condition_field_name] == $condition_value);
+
+							$object_conditions_accepted = $object_conditions_accepted
+								&& ($object[$condition_field_name] == $condition_value);
 						}
 					}
 
-					$values = [
-						'old' => $object_old[$field_name],
-						'new' => $object[$field_name]
-					];
+					foreach ($object_diff as $field_name => &$values) {
+						if (array_key_exists($field_name, $masked_fields[$table_name]['fields'])) {
+							if ($object_old_conditions_accepted) {
+								$object_old[$field_name] = ZBX_SECRET_MASK;
+							}
 
+							if ($object_conditions_accepted) {
+								$object[$field_name] = ZBX_SECRET_MASK;
+							}
+						}
+
+						$values = [
+							'old' => $object_old[$field_name],
+							'new' => $object[$field_name]
+						];
+
+					}
+					unset($values);
 				}
-				unset($values);
 
 				$objects_diff[] = $object_diff;
 
@@ -188,7 +208,6 @@ class CAudit {
 						];
 					}
 				}
-
 				DB::insertBatch('auditlog_details', $auditlog_details);
 			}
 		}
