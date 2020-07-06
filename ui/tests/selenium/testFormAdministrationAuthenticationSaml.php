@@ -328,7 +328,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		$settings = [
 			'IdP entity ID' => PHPUNIT_IDP_ENTITY_ID,
 			'SSO service URL' => PHPUNIT_SSO_SERVICE_URL,
-			'SLO service URL' => PHPUNIT_SSO_SERVICE_URL,
+			'SLO service URL' => PHPUNIT_SLO_SERVICE_URL,
 			'Username attribute' => PHPUNIT_USERNAME_ATTRIBUTE,
 			'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
 			'Case sensitive login' => false
@@ -376,7 +376,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		$header = CTestArrayHelper::get($data, 'header', 'Global view');
 		$this->assertEquals($header, $this->query('tag:h1')->one()->getText());
 
-		// MAke sure that it is possible to log out.
+		// Make sure that it is possible to log out.
 		$this->query('link:Sign out')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertContains('index.php', $this->page->getCurrentUrl());
