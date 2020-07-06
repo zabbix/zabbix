@@ -440,7 +440,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	if (NULL == old_tz)
 	{
 		if (0 != unsetenv("TZ"))
-			zabbix_log(LOG_LEVEL_WARNING, "cannot unset zone \"%s\": %s", tz, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "cannot unset time zone \"%s\": %s", tz, zbx_strerror(errno));
 	}
 	else
 	{
