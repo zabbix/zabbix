@@ -103,7 +103,7 @@ class CMultifieldTableElement extends CTableElement {
 	 *
 	 * @return array
 	 */
-	public function detectMapping($headers = null) {
+	public function detectFieldMapping($headers = null) {
 		$rows = $this->getRows();
 
 		if ($rows->count() === 0) {
@@ -193,7 +193,7 @@ class CMultifieldTableElement extends CTableElement {
 		}
 
 		if ($this->mapping === null) {
-			$this->mapping = $this->detectMapping();
+			$this->mapping = $this->detectFieldMapping();
 		}
 
 		foreach ($row->query('xpath:./td|./th')->all() as $i => $column) {
@@ -401,10 +401,29 @@ class CMultifieldTableElement extends CTableElement {
 
 		$rows = $this->getRows()->count();
 		if (CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
-			$values = $this->getRowValue($rows - 1);
+			if ($this->mapping === null) {
+				$this->mapping = $this->detectFieldMapping();
+			}
+
+			$fields = [];
+			foreach ($this->mapping as $mapping) {
+				if (!is_array($mapping) || !array_key_exists('name', $mapping) || !array_key_exists('class', $mapping)) {
+					continue;
+				}
+
+				$fields[$mapping['name']] = $mapping['class'];
+			}
 
 			$empty = true;
-			foreach ($values as $value) {
+			$values = $this->getRowValue($rows - 1);
+
+			foreach ($values as $key => $value) {
+				// Elements with predefined values are always ignored.
+				if (in_array(CTestArrayHelper::get($fields, $key), [CDropdownElement::class, CCheckboxElement::class,
+					CRadioButtonList::class, CSegmentedRadioElement::class])) {
+					continue;
+				}
+
 				if ($value !== '') {
 					$empty = false;
 					break;
