@@ -265,7 +265,7 @@ class PostgresqlDbBackend extends DbBackend {
 	 *
 	 * @return bool
 	 */
-	public static function isCompressed(array $tables) :bool {
+	public static function isCompressed(array $tables): bool {
 		// Compression is available for TimescaleDB 1.5 and greater.
 		$config = select_config();
 		if ($config['db_extension'] != ZBX_DB_EXTENSION_TIMESCALEDB || $config['compression_availability'] != 1) {
