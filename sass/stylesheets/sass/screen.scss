@@ -4013,7 +4013,6 @@ $form-icon-btn: (
 	position: absolute;
 	z-index: 1000;
 	padding: 15px 10px 10px;
-	word-break: break-word;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
@@ -4101,10 +4100,11 @@ $form-icon-btn: (
 		@extend %webkit-scrollbar;
 	}
 
-	.hintbox-description {
+	.hintbox-wrap {
 		overflow: auto;
 		max-height: 240px;
 		max-width: 800px;
+		overflow-wrap: break-word;
 		@extend %webkit-scrollbar;
 	}
 
