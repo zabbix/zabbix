@@ -611,7 +611,7 @@ class CTemplate extends CHostGeneral {
 			'preservekeys' => true
 		]);
 		if ($del_rules) {
-			API::DiscoveryRule()->delete(array_keys($del_rules), true);
+			CDiscoveryRuleManager::delete(array_keys($del_rules));
 		}
 
 		// delete the items

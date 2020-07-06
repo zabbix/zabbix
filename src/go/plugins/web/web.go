@@ -20,12 +20,7 @@ package web
 
 import (
 	"bufio"
-	"bytes"
-	"crypto/tls"
 	"fmt"
-	"net"
-	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -35,7 +30,7 @@ import (
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/version"
+	"zabbix.com/pkg/web"
 	"zabbix.com/pkg/zbxregexp"
 )
 
@@ -62,52 +57,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
 	return conf.Unmarshal(options, &o)
-}
-
-func disableRedirect(req *http.Request, via []*http.Request) error {
-	return http.ErrUseLastResponse
-}
-
-func (p *Plugin) webPageGet(params []string, dump bool) (string, error) {
-	req, err := http.NewRequest("GET", params[0], nil)
-	if err != nil {
-		return "", fmt.Errorf("Cannot create new request: %s", err)
-	}
-
-	req.Header = map[string][]string{
-		"User-Agent": {"Zabbix " + version.Long()},
-	}
-
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig:   &tls.Config{InsecureSkipVerify: true},
-			Proxy:             http.ProxyFromEnvironment,
-			DisableKeepAlives: true,
-			DialContext: (&net.Dialer{
-				LocalAddr: &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0},
-			}).DialContext,
-		},
-		Timeout:       time.Duration(p.options.Timeout) * time.Second,
-		CheckRedirect: disableRedirect,
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %s", err)
-	}
-
-	defer resp.Body.Close()
-
-	if !dump {
-		return "", nil
-	}
-
-	b, err := httputil.DumpResponse(resp, true)
-	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %s", err)
-	}
-
-	return string(bytes.TrimRight(b, "\r\n")), nil
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (interface{}, error) {
@@ -168,7 +117,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			output = "\\0"
 		}
 
-		s, err := p.webPageGet(params, true)
+		s, err := web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, true)
 		if err != nil {
 			return nil, err
 		}
@@ -191,7 +140,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		start := time.Now()
 
-		_, err := p.webPageGet(params, false)
+		_, err := web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, false)
 		if err != nil {
 			return nil, err
 		}
@@ -202,7 +151,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, fmt.Errorf("Too many parameters.")
 		}
 
-		return p.webPageGet(params, true)
+		return web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, true)
 	}
 
 }
