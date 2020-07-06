@@ -302,7 +302,7 @@ class CControllerAuthenticationUpdate extends CController {
 				}
 
 				$this->response->setMessageOk(_('Authentication settings updated'));
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed'));
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTHENTICATION, _('Authentication method changed'));
 			}
 			else {
 				$this->response->setFormData($this->getInputAll());

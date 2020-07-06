@@ -45,7 +45,8 @@ class CSettings extends CApiService {
 		'ok_ack_style', 'refresh_unsupported', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid',
 		'snmptrap_logging', 'login_attempts', 'login_block', 'session_name', 'validate_uri_schemes',
 		'uri_valid_schemes', 'x_frame_options', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout',
-		'script_timeout', 'item_test_timeout'];
+		'script_timeout', 'item_test_timeout'
+	];
 
 	/**
 	 * Get settings parameters.
@@ -62,10 +63,6 @@ class CSettings extends CApiService {
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return [];
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -102,7 +99,8 @@ class CSettings extends CApiService {
 			'severity_name_4', 'severity_name_5', 'ok_period', 'blink_period', 'problem_unack_color',
 			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'refresh_unsupported', 'login_block', 'session_name',
 			'uri_valid_schemes', 'x_frame_options', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout',
-			'script_timeout', 'item_test_timeout'];
+			'script_timeout', 'item_test_timeout'
+		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $settings) && $settings[$field_name] !== $db_settings[$field_name]) {
 				$upd_config[$field_name] = $settings[$field_name];
@@ -113,7 +111,8 @@ class CSettings extends CApiService {
 		$field_names = ['search_limit', 'max_in_table', 'server_check_interval', 'show_technical_errors',
 			'custom_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style',
 			'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging', 'login_attempts',
-			'validate_uri_schemes'];
+			'validate_uri_schemes'
+		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $settings) && $settings[$field_name] != $db_settings[$field_name]) {
 				$upd_config[$field_name] = $settings[$field_name];

@@ -39,7 +39,8 @@ class CHousekeeping extends CApiService {
 	private $output_fields = ['hk_events_mode', 'hk_events_trigger', 'hk_events_internal', 'hk_events_discovery',
 		'hk_events_autoreg', 'hk_services_mode', 'hk_services', 'hk_audit_mode', 'hk_audit', 'hk_sessions_mode',
 		'hk_sessions', 'hk_history_mode', 'hk_history_global', 'hk_history', 'hk_trends_mode', 'hk_trends_global',
-		'hk_trends', 'db_extension', 'compression_status', 'compress_older', 'compression_availability'];
+		'hk_trends', 'db_extension', 'compression_status', 'compress_older', 'compression_availability'
+	];
 
 	/**
 	 * Get housekeeping parameters.
@@ -56,10 +57,6 @@ class CHousekeeping extends CApiService {
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return [];
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -87,11 +84,16 @@ class CHousekeeping extends CApiService {
 	public function update(array $hk): array {
 		$this->validateUpdate($hk, $db_hk);
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			return [];
+		}
+
 		$upd_config = [];
 
 		// strings
 		$field_names = ['hk_events_trigger', 'hk_events_internal', 'hk_events_discovery', 'hk_events_autoreg',
-			'hk_services', 'hk_audit', 'hk_sessions', 'hk_history', 'hk_trends', 'compress_older'];
+			'hk_services', 'hk_audit', 'hk_sessions', 'hk_history', 'hk_trends', 'compress_older'
+		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $hk) && $hk[$field_name] !== $db_hk[$field_name]) {
 				$upd_config[$field_name] = $hk[$field_name];
@@ -100,7 +102,8 @@ class CHousekeeping extends CApiService {
 
 		// integers
 		$field_names = ['hk_events_mode', 'hk_services_mode', 'hk_audit_mode', 'hk_sessions_mode', 'hk_history_mode',
-			'hk_history_global', 'hk_trends_mode', 'hk_trends_global', 'compression_status'];
+			'hk_history_global', 'hk_trends_mode', 'hk_trends_global', 'compression_status'
+		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $hk) && $hk[$field_name] != $db_hk[$field_name]) {
 				$upd_config[$field_name] = $hk[$field_name];

@@ -41,7 +41,8 @@ class CAuthentication extends CApiService {
 		'ldap_bind_dn', 'ldap_case_sensitive', 'ldap_bind_password', 'saml_auth_enabled', 'saml_idp_entityid',
 		'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format',
 		'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
-		'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'];
+		'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'
+	];
 
 	/**
 	 * Get authentication parameters.
@@ -59,10 +60,6 @@ class CAuthentication extends CApiService {
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return [];
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -94,7 +91,8 @@ class CAuthentication extends CApiService {
 
 		// strings
 		$field_names = ['http_strip_domains', 'ldap_host', 'ldap_base_dn', 'ldap_search_attribute', 'ldap_bind_dn',
-			'ldap_bind_password'];
+			'ldap_bind_password'
+		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $auth) && $auth[$field_name] !== $db_auth[$field_name]) {
 				$upd_config[$field_name] = $auth[$field_name];
@@ -106,7 +104,8 @@ class CAuthentication extends CApiService {
 			'ldap_configured', 'ldap_port', 'ldap_case_sensitive', 'saml_auth_enabled', 'saml_idp_entityid',
 			'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format',
 			'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
-			'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'];
+			'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive'
+		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $auth) && $auth[$field_name] != $db_auth[$field_name]) {
 				$upd_config[$field_name] = $auth[$field_name];

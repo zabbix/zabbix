@@ -26,9 +26,6 @@ define('ZABBIX_DB_VERSION',		5010014);
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
 
-define('ZBX_LOGIN_ATTEMPTS',	5);
-define('ZBX_LOGIN_BLOCK',		30); // sec
-
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
 
@@ -223,7 +220,7 @@ define('AUDIT_ACTION_DISABLE',	6);
 define('AUDIT_ACTION_EXECUTE',	7);
 
 define('AUDIT_RESOURCE_USER',				0);
-define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2);
+define('AUDIT_RESOURCE_AUTHENTICATION',		2);
 define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
 define('AUDIT_RESOURCE_HOST',				4);
 define('AUDIT_RESOURCE_ACTION',				5);
@@ -258,8 +255,7 @@ define('AUDIT_RESOURCE_HOST_PROTOTYPE',		37);
 define('AUDIT_RESOURCE_AUTOREGISTRATION',	38);
 define('AUDIT_RESOURCE_MODULE',				39);
 define('AUDIT_RESOURCE_SETTINGS',			40);
-define('AUDIT_RESOURCE_AUTHENTICATION',		41);
-define('AUDIT_RESOURCE_HOUSEKEEPING',		42);
+define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -1262,7 +1258,6 @@ define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 define('ZBX_SOCKET_TIMEOUT',			3);		// Socket timeout limit.
 define('ZBX_CONNECT_TIMEOUT',			3);		// Zabbix server connect timeout limit.
 define('ZBX_MEDIA_TYPE_TEST_TIMEOUT',	65);	// Timeout limit set for media type test.
-define('ZBX_SCRIPT_TIMEOUT',			60);	// Timeout limit set for scripts.
 define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
 // value is also used in servercheck.js file

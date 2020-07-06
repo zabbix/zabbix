@@ -40,7 +40,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 		-1 => 'All',
 		AUDIT_RESOURCE_ACTION => 'Action',
 		AUDIT_RESOURCE_APPLICATION => 'Application',
-		AUDIT_RESOURCE_ZABBIX_CONFIG => 'Configuration of Zabbix',
+		AUDIT_RESOURCE_AUTHENTICATION => 'Authentication',
 		AUDIT_RESOURCE_DISCOVERY_RULE => 'Discovery rule',
 		AUDIT_RESOURCE_GRAPH => 'Graph',
 		AUDIT_RESOURCE_GRAPH_ELEMENT => 'Graph element',
@@ -162,7 +162,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
 			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
 			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
-			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ZABBIX_CONFIG]
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_AUTHENTICATION]
 		];
 	}
 
