@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-03 19:53+0300\n"
-"PO-Revision-Date: 2020-07-02 05:14+0300\n"
+"PO-Revision-Date: 2020-07-06 00:32+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1593659646.000000\n"
+"X-POOTLE-MTIME: 1593988349.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -14130,7 +14130,7 @@ msgstr "通常アイテム"
 
 #: jsLoader.php:141
 msgid "Release to create a widget."
-msgstr "作成したウィジェットを離す"
+msgstr "作成したウィジェットを離す。"
 
 #: include/views/general.login.php:79
 msgid "Remember me for 30 days"
@@ -17726,7 +17726,7 @@ msgstr "インポートフォーマット\"%1$s\"はサポートされていま�
 
 #: app/controllers/CControllerActionOperationGet.php:53
 msgid "Unsupported operation."
-msgstr ""
+msgstr "サポートされていない実行内容です。"
 
 #: include/classes/api/services/CAction.php:2770
 #, c-format
