@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-03 19:59+0300\n"
-"PO-Revision-Date: 2020-04-28 01:24+0300\n"
+"PO-Revision-Date: 2020-07-06 00:32+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1588029884.000000\n"
+"X-POOTLE-MTIME: 1593988376.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -92,7 +92,7 @@ msgstr[0] "%3$d%2$s件中%1$d件の障害が表示されています"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:115
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d件の障害が選択されています。"
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -1162,7 +1162,7 @@ msgstr "プレーンテキスト"
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:236
 msgid "Assertions"
-msgstr ""
+msgstr "アサーション"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1196,7 +1196,7 @@ msgstr "開始時刻 (時:分)"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "少なくとも1つのアクションが必要です。"
 
 #: include/classes/api/services/CMaintenance.php:279
 #: include/classes/api/services/CMaintenance.php:704
@@ -1270,7 +1270,7 @@ msgstr "8月"
 
 #: app/views/administration.authentication.edit.php:208
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthNリクエスト"
 
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
@@ -2419,7 +2419,7 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 #: include/classes/import/CConfigurationImport.php:1005
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"の\"%2$s\"を上書きするためのテンプレート\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:170
 #: include/classes/import/importers/CMapImporter.php:223
@@ -2881,7 +2881,7 @@ msgstr "メディアタイプを更新できません"
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
-msgstr ""
+msgstr "モジュールを更新できません： %1$s。"
 
 #: sysmaps.php:180
 msgid "Cannot update network map"
@@ -3421,7 +3421,7 @@ msgstr "ディスカバリルール\"%1$s\"の条件\"%2$s\"は式\"%3$s\"内で
 #: include/classes/api/services/CDiscoveryRule.php:1547
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\"を上書きするための条件\"%2$s\"が式\"%3$s\"内で使用されていません。"
 
 #: include/classes/api/services/CAction.php:2724
 #, c-format
@@ -3441,7 +3441,7 @@ msgstr "ディスカバリルール\"%1$s\"の式\"%3$s\"内で使用されて�
 #: include/classes/api/services/CDiscoveryRule.php:1546
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
-msgstr ""
+msgstr "\"%1$s\"を上書きするための式\"%3$s\"内の条件\"%2$s\"は定義されていません。"
 
 #: app/partials/popup.operations.php:364
 #: include/views/configuration.action.edit.php:139
@@ -3826,7 +3826,7 @@ msgstr "コンテキスト名"
 
 #: app/views/popup.lldoverride.php:56
 msgid "Continue overrides"
-msgstr ""
+msgstr "上書きを続行"
 
 #: include/hosts.inc.php:254
 msgid "Contract number"
@@ -3967,7 +3967,7 @@ msgstr "ディスカバリルールの作成"
 
 #: include/views/configuration.host.discovery.list.php:40
 msgid "Create discovery rule (select host first)"
-msgstr ""
+msgstr "ディスカバリルールの作成(先にホストを選択)"
 
 #: app/views/popup.lldoperation.php:74
 #: include/views/configuration.host.prototype.edit.php:120
@@ -5091,7 +5091,7 @@ msgstr "値を破棄"
 #: include/views/configuration.trigger.prototype.edit.php:525
 #: include/views/configuration.trigger.prototype.list.php:59
 msgid "Discover"
-msgstr ""
+msgstr "ディスカバリ"
 
 #: include/discovery.inc.php:138 include/forms.inc.php:515
 #: include/views/configuration.triggers.list.php:144
@@ -5506,7 +5506,7 @@ msgstr "マップの変更"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "Edit operation"
-msgstr ""
+msgstr "実行内容の変更"
 
 #: include/views/monitoring.screen.php:106
 msgid "Edit screen"
@@ -5700,7 +5700,7 @@ msgstr "LDAP認証の有効化"
 
 #: app/views/administration.authentication.edit.php:144
 msgid "Enable SAML authentication"
-msgstr ""
+msgstr "SAML認証の有効化"
 
 #: app/views/administration.housekeeping.edit.php:162
 msgid "Enable compression"
@@ -5841,7 +5841,7 @@ msgstr "有効"
 
 #: app/views/administration.authentication.edit.php:226
 msgid "Encrypt"
-msgstr ""
+msgstr "暗号化"
 
 #: app/views/administration.proxy.edit.php:123
 #: app/views/administration.proxy.list.php:74
@@ -6469,17 +6469,17 @@ msgstr "式"
 #: include/classes/api/services/CAction.php:2722
 #, c-format
 msgid "Formula missing for action \"%1$s\"."
-msgstr ""
+msgstr "アクション\"%1$s\"の式が設定されていません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1750
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリルール\"%1$s\"の式が設定されていません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1543
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
-msgstr ""
+msgstr "上書き\"%1$s\"の式が設定されていません。"
 
 #: include/locales.inc.php:55
 msgid "French (fr_FR)"
@@ -7774,7 +7774,7 @@ msgstr "アイコン"
 
 #: app/views/administration.authentication.edit.php:149
 msgid "IdP entity ID"
-msgstr ""
+msgstr "IdPエンティティID"
 
 #: include/classes/core/CModuleManager.php:155
 #, c-format
@@ -7798,7 +7798,7 @@ msgstr "システムの識別文字列。文字列値を返す。"
 
 #: app/views/popup.lldoverride.php:54
 msgid "If filter matches"
-msgstr ""
+msgstr "フィルターが一致した場合"
 
 #: include/func.inc.php:1535 include/func.inc.php:1554
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -8325,7 +8325,7 @@ msgstr "ディスカバリルール\"%1$s\"のカスタム条件式\"%2$s\"が�
 #: include/classes/api/services/CDiscoveryRule.php:1544
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
-msgstr ""
+msgstr "\"%1$s\"を上書きするためのカスタム条件式\"%2$s\"が正しくありません: %3$s。"
 
 #: app/controllers/CControllerWidgetClockView.php:72
 msgid "Incorrect data."
@@ -8391,7 +8391,7 @@ msgstr "ディスカバリルール\"%1$s\"のフィルター条件マクロが�
 #: include/classes/api/services/CDiscoveryRule.php:1579
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\"を上書きするためのフィルター条件マクロが正しくありません。"
 
 #: include/classes/api/services/CAction.php:1624
 #: include/classes/api/services/CAction.php:2762
@@ -10554,11 +10554,11 @@ msgstr "ログアウト"
 
 #: app/views/administration.authentication.edit.php:214
 msgid "Logout requests"
-msgstr ""
+msgstr "ログアウトリクエスト"
 
 #: app/views/administration.authentication.edit.php:220
 msgid "Logout responses"
-msgstr ""
+msgstr "ログアウトレスポンス"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -11001,7 +11001,7 @@ msgstr "メディアタイプのテストに失敗しました。"
 
 #: app/views/js/popup.mediatypetest.edit.js.php:110
 msgid "Media type test log"
-msgstr ""
+msgstr "メディアタイプのテストログ"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:139
 msgid "Media type test successful."
@@ -11263,7 +11263,7 @@ msgstr[0] "モジュールを有効にしました: %1$s。"
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
 msgid "Module updated: %1$s."
-msgstr ""
+msgstr "モジュールを更新しました： %1$s。"
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -11535,7 +11535,7 @@ msgstr "名"
 
 #: app/views/administration.authentication.edit.php:230
 msgid "Name ID"
-msgstr ""
+msgstr "NameID"
 
 #: include/views/js/configuration.httpconf.edit.js.php:100
 msgid "Name of the form field should not exceed 255 characters."
@@ -11619,7 +11619,7 @@ msgstr "新しいイベントタグの値"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
-msgstr ""
+msgstr "実行内容の作成"
 
 #: app/views/administration.regex.list.php:36
 msgid "New regular expression"
@@ -12358,7 +12358,7 @@ msgstr "ホスト上の有効アイテム数。"
 
 #: include/blocks.inc.php:628
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "ホスト数 (有効/無効)"
 
 #: include/blocks.inc.php:641
 msgid "Number of items (enabled/disabled/not supported)"
@@ -12430,7 +12430,7 @@ msgstr "ステップ数"
 
 #: include/blocks.inc.php:637
 msgid "Number of templates"
-msgstr ""
+msgstr "テンプレート数"
 
 #: include/blocks.inc.php:652
 msgid "Number of triggers (enabled/disabled [problem/ok])"
@@ -12573,7 +12573,7 @@ msgstr "OS (簡易説明)"
 
 #: app/views/popup.lldoperation.php:46
 msgid "Object"
-msgstr ""
+msgstr "オブジェクト"
 
 #: include/func.inc.php:248
 msgid "Oct"
@@ -12983,7 +12983,7 @@ msgstr "次で上書き"
 
 #: app/controllers/CControllerPopupLldOverride.php:130
 msgid "Override"
-msgstr ""
+msgstr "上書き"
 
 #: app/views/administration.housekeeping.edit.php:127
 msgid "Override item history period"
@@ -12996,7 +12996,7 @@ msgstr "アイテムのトレンドの保存期間設定を上書き"
 #: app/controllers/CControllerPopupLldOverride.php:91
 #, c-format
 msgid "Override with name \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\"という名前の上書きはすでに存在します。"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:415
 #: include/classes/widgets/views/widget.svggraph.form.view.php:294
@@ -13352,7 +13352,7 @@ msgstr "貼り付け"
 
 #: app/views/monitoring.dashboard.view.php:110 jsLoader.php:128
 msgid "Paste widget"
-msgstr ""
+msgstr "ウィジェットの貼り付け"
 
 #: jsLoader.php:217
 msgid "Paste without external links"
@@ -14019,7 +14019,7 @@ msgstr "受信者 (降順)"
 
 #: include/views/administration.auditacts.list.php:30
 msgid "Recipients"
-msgstr ""
+msgstr "受信者"
 
 #: app/views/administration.user.edit.php:388
 #: include/classes/screens/CScreenProblem.php:1083
@@ -14130,7 +14130,7 @@ msgstr "通常アイテム"
 
 #: jsLoader.php:141
 msgid "Release to create a widget."
-msgstr ""
+msgstr "作成したウィジェットを離す。"
 
 #: include/views/general.login.php:79
 msgid "Remember me for 30 days"
@@ -14472,7 +14472,7 @@ msgstr "リソース"
 
 #: app/views/reports.auditlog.list.php:53
 msgid "Resource ID"
-msgstr ""
+msgstr "リソースID"
 
 #: app/views/popup.mediatypetest.edit.php:46
 msgid "Response"
@@ -14704,7 +14704,7 @@ msgstr "S"
 
 #: app/views/administration.authentication.edit.php:262
 msgid "SAML settings"
-msgstr ""
+msgstr "SAML認証の設定"
 
 #: app/views/popup.discovery.check.php:91
 #: include/views/js/configuration.host.edit.js.php:108
@@ -14719,7 +14719,7 @@ msgstr "SLA"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "SLO service URL"
-msgstr ""
+msgstr "SLOサービスURL"
 
 #: include/media.inc.php:26
 msgid "SMS"
@@ -14816,11 +14816,11 @@ msgstr "SNMPv3エージェント"
 
 #: app/views/administration.authentication.edit.php:176
 msgid "SP entity ID"
-msgstr ""
+msgstr "SPのエンティティID"
 
 #: app/views/administration.authentication.edit.php:184
 msgid "SP name ID format"
-msgstr ""
+msgstr "SPのNameIDフォーマット"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -14896,7 +14896,7 @@ msgstr "SSL/TLS"
 
 #: app/views/administration.authentication.edit.php:157
 msgid "SSO service URL"
-msgstr ""
+msgstr "SSOサービスURL"
 
 #: app/views/administration.mediatype.edit.php:77
 msgid "STARTTLS"
@@ -15702,7 +15702,7 @@ msgstr "サイドバー制御"
 
 #: app/views/administration.authentication.edit.php:192
 msgid "Sign"
-msgstr ""
+msgstr "サイン"
 
 #: include/views/general.login.php:64 include/views/general.login.php:82
 msgid "Sign in"
@@ -15714,7 +15714,7 @@ msgstr "HTTPでサインイン"
 
 #: include/views/general.login.php:49
 msgid "Sign in with Single Sign-On (SAML)"
-msgstr ""
+msgstr "SSO(SAML)でサインイン"
 
 #: include/menu.inc.php:240 include/menu.inc.php:243
 msgid "Sign out"
@@ -16119,7 +16119,7 @@ msgstr "停止"
 #: app/views/popup.lldoverride.php:57
 #: include/views/configuration.host.discovery.edit.php:740
 msgid "Stop processing"
-msgstr ""
+msgstr "処理の停止"
 
 #: app/views/popup.lldoperation.php:185 app/views/popup.lldoperation.php:206
 #: include/views/configuration.item.edit.php:690
@@ -16670,7 +16670,7 @@ msgstr "スクリーン\"%3$s\"のX - %1$s Y - %2$sにあるスクリーンの�
 #: include/classes/db/DbBackend.php:130
 #, c-format
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
-msgstr ""
+msgstr "Zabbix用データベースのバージョンが必要なバージョンと一致しません。あなたのデータベースのバージョンは%1$sで、必要なデータベースのバージョンは%2$sです。システム管理者に連絡してください。"
 
 #: include/html.inc.php:712
 #, c-format
@@ -16696,11 +16696,11 @@ msgstr "クローンしたテンプレートは\"隠しテキスト\"タイプ�
 #: include/html.inc.php:739
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "グラフがディスカバリされなくなったため%1$sに削除されます。(日時 %2$s at %3$s)"
 
 #: include/html.inc.php:734
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "グラフはディスカバリされなかったので次のディスカバリルールの処理後に削除されます。"
 
 #: include/html.inc.php:658
 #, c-format
@@ -16749,7 +16749,7 @@ msgstr "プロセス数。整数値を返す。"
 #: index_sso.php:182
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
-msgstr ""
+msgstr "ユーザー属性にパラメータ\"%1$s\"がありません。"
 
 #: include/classes/core/CJsonRpc.php:194
 msgid "The received JSON is not a valid JSON-RPC Request."
@@ -16762,11 +16762,11 @@ msgstr "受信したリモートプロシージャーは存在しないか利用
 #: include/html.inc.php:766
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "トリガーがディスカバリされなくなったため%1$sに削除されます。(日時 %2$s at %3$s)"
 
 #: include/html.inc.php:761
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "トリガーはディスカバリされなかったので次のディスカバリルールの処理後に削除されます。"
 
 #: include/classes/api/services/CHttpTest.php:710
 msgid "The web scenario application belongs to a different host than the web scenario host."
@@ -16884,7 +16884,7 @@ msgstr "特定のZabbixのプロセスもしくはプロセスグループ(<type
 
 #: app/views/js/popup.mediatypetest.edit.js.php:104
 msgid "Time elapsed:"
-msgstr ""
+msgstr "経過時間："
 
 #: include/classes/items/CHelpItems.php:1011
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
@@ -16997,7 +16997,7 @@ msgstr "トータル"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:169
 msgid "Trace"
-msgstr ""
+msgstr "トレース"
 
 #: include/page_footer.php:40
 msgid "Transaction has not been closed. Aborting..."
@@ -17520,7 +17520,7 @@ msgstr "設定ファイルが作成できません。"
 #: include/classes/db/PostgresqlDbBackend.php:61
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
-msgstr ""
+msgstr "現在のZabbixデータベースのバージョン：%1$sを判断できません。"
 
 #: include/classes/core/CConfigFile.php:193
 msgid "Unable to overwrite the existing configuration file."
@@ -17536,11 +17536,11 @@ msgstr "\"file_uploads\"が無効のためファイルをアップロードで�
 
 #: app/views/popup.acknowledge.edit.php:89
 msgid "Unacknowledge"
-msgstr ""
+msgstr "障害未確認"
 
 #: include/actions.inc.php:2078
 msgid "Unacknowledged"
-msgstr ""
+msgstr "未確認状態"
 
 #: app/views/administration.trigdisplay.edit.php:40
 msgid "Unacknowledged PROBLEM events"
@@ -17726,7 +17726,7 @@ msgstr "インポートフォーマット\"%1$s\"はサポートされていま�
 
 #: app/controllers/CControllerActionOperationGet.php:53
 msgid "Unsupported operation."
-msgstr ""
+msgstr "サポートされていない実行内容です。"
 
 #: include/classes/api/services/CAction.php:2770
 #, c-format
@@ -18168,7 +18168,7 @@ msgstr "ユーザー名とパスワード"
 
 #: app/views/administration.authentication.edit.php:168
 msgid "Username attribute"
-msgstr ""
+msgstr "ユーザー名の属性"
 
 #: app/controllers/CControllerPopupGeneric.php:240
 #: app/views/administration.user.edit.php:34
@@ -18592,7 +18592,7 @@ msgstr "ベトナム語 (vi_VN)"
 
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:98
 msgid "View"
-msgstr ""
+msgstr "ビュー"
 
 #: app/views/monitoring.charts.view.php:49
 #: include/views/monitoring.history.php:89
@@ -19896,12 +19896,12 @@ msgstr "サブグループを含む"
 
 #: include/classes/parsers/CTriggerExpression.php:494
 msgid "incorrect calculated item formula"
-msgstr ""
+msgstr "計算アイテムの計算式が正しくありません"
 
 #: include/classes/parsers/CTriggerExpression.php:503
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
-msgstr ""
+msgstr "\"%1$s\"から始まる計算アイテムの計算式が正しくありません"
 
 #: include/classes/validators/CEventCorrCondValidator.php:47
 msgid "incorrect condition type"
@@ -20479,7 +20479,7 @@ msgstr "パラメータ \"%1$s\"が指定されていません"
 #: include/classes/db/PostgresqlDbBackend.php:62
 #, c-format
 msgid "the table \"%1$s\" was not found"
-msgstr ""
+msgstr "テーブル\"%1$s\"が存在しません"
 
 #: include/classes/export/CConfigurationExportBuilder.php:77
 #: include/classes/import/validators/C44XmlValidator.php:2039
