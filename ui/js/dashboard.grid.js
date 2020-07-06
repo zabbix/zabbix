@@ -2500,6 +2500,19 @@
 		var config_dialogue_close = function() {
 			delete data['options']['config_dialogue_active'];
 			$.unsubscribe('overlay.close', config_dialogue_close);
+
+			data.add_widget_dimension = {};
+
+			if (data.widgets.length) {
+				data.new_widget_placeholder.container.hide();
+				data.new_widget_placeholder.setPositioning();
+			}
+			else {
+				data.new_widget_placeholder.setDefault(function(e) {
+					methods.addNewWidget.call($obj, this);
+					return cancelEvent(e);
+				});
+			}
 		};
 		$.subscribe('overlay.close', config_dialogue_close);
 
@@ -2645,14 +2658,16 @@
 			if (data['pos-action'] === 'addmodal' && dialogue.dialogueid === 'widgetConfg') {
 				data['pos-action'] = '';
 				data.add_widget_dimension = {};
-				data.new_widget_placeholder.setDefault(function(e) {
-					methods.addNewWidget.call($obj, this);
-					return cancelEvent(e);
-				});
 
 				if (data.widgets.length) {
 					data.new_widget_placeholder.container.hide();
 					data.new_widget_placeholder.setPositioning();
+				}
+				else {
+					data.new_widget_placeholder.setDefault(function(e) {
+						methods.addNewWidget.call($obj, this);
+						return cancelEvent(e);
+					});
 				}
 
 				resizeDashboardGrid($obj, data);
@@ -2685,15 +2700,17 @@
 							data['pos-action'] = '';
 							data.add_widget_dimension = {};
 
-							if (data.widgets.length || (!data.widgets.length && $obj.is(':hover'))) {
-								data.new_widget_placeholder.container.hide();
-								data.new_widget_placeholder.setPositioning();
-							}
-							else if (!data.widgets.length && !$obj.is(':hover')) {
-								data.new_widget_placeholder.setDefault(function(e) {
-									methods.addNewWidget.call($obj, this);
-									return cancelEvent(e);
-								});
+							if (!data['options']['config_dialogue_active']) {
+								if (data.widgets.length || $obj.is(':hover')) {
+									data.new_widget_placeholder.container.hide();
+									data.new_widget_placeholder.setPositioning();
+								}
+								else if (!data.widgets.length && !$obj.is(':hover')) {
+									data.new_widget_placeholder.setDefault(function(e) {
+										methods.addNewWidget.call($obj, this);
+										return cancelEvent(e);
+									});
+								}
 							}
 						}
 					};
