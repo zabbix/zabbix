@@ -417,6 +417,18 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 	return offset;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_localtime                                                    *
+ *                                                                            *
+ * Purpose: get broken-down representation of the time in specified time zone *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
+ *             tz   - [IN] time zone                                          *
+ *                                                                            *
+ * Return value: broken-down representation of the time in specified time zone*
+ *                                                                            *
+ ******************************************************************************/
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && !defined(_WINDOWS) && !defined(__MINGW32__)
@@ -438,7 +450,6 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	{
 		setenv("TZ", old_tz, 1);
 		zbx_free(old_tz);
-
 	}
 	else
 		unsetenv("TZ");
