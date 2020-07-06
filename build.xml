@@ -20,9 +20,9 @@
 		<property name="dbhost" value="${DBHOST}"/>
 		<property name="dbname" value="${DBNAME}"/>
 		<property name="dbuser" value="${DBUSER}"/>
-	 	<property name="dbpassword" value="${DBPASSWORD}"/>
-	 	<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
-	 	<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
+		<property name="dbpassword" value="${DBPASSWORD}"/>
+		<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
+		<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
 		<property name="screenshot_references_dir" value="${SCREENSHOT_REFERENCES_DIR}"/>
 		<condition property="phpunit_driver_address" value="${PHPUNIT_DRIVER_ADDRESS}" else="localhost">
 			<and>
@@ -31,6 +31,8 @@
 			</and>
 		</condition>
 		<property environment="env"/>
+		<property name="phpunit_simplesaml_baseurl" value="${PHPUNIT_SIMPLESAML_BASEURL}"/>
+		<property name="phpunit_sp_entity_id" value="${PHPUNIT_SP_ENTITY_ID}"/>
 
 		<!-- Create bootstrap.php -->
 		<copy overwrite="true" file="ui/tests/bootstrap.php.template" tofile="ui/tests/bootstrap.php"/>
@@ -45,6 +47,14 @@
 		<replace file="ui/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
 		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
+		<!-- SAML settings -->
+		<replace file="ui/tests/bootstrap.php" token="'PHPUNIT_SAML_TESTS_ENABLED', false" value="'PHPUNIT_SAML_TESTS_ENABLED', true"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_IDP_ENTITY_ID}" value="${phpunit_simplesaml_baseurl}/saml2/idp/metadata.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SSO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SSOService.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SLO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SingleLogoutService.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SP_ENTITY_ID}" value="${phpunit_sp_entity_id}"/>
+		<!-- Download SAML X509 certificates -->
+		<get src="${phpunit_simplesaml_baseurl}/module.php/saml/idp/certs.php/idp.crt" dest="ui/conf/certs"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
