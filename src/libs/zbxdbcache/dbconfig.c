@@ -7281,13 +7281,20 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 			item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &item_local, sizeof(item_local));
 		}
 
-		item->dep_itemids_num = dc_masteritem->dep_itemids.values_num;
+		item->dep_itemids_num = 0;
+		item->dep_itemids = (zbx_uint64_pair_t *)zbx_malloc(NULL, sizeof(zbx_uint64_pair_t) *
+				dc_masteritem->dep_itemids.values_num);
 
-		item->dep_itemids = (zbx_uint64_pair_t *)zbx_malloc(NULL,
-				sizeof(zbx_uint64_pair_t) * item->dep_itemids_num);
-
-		memcpy(item->dep_itemids, dc_masteritem->dep_itemids.values,
-				sizeof(zbx_uint64_pair_t) * item->dep_itemids_num);
+		for (i = 0; i < dc_masteritem->dep_itemids.values_num; i++)
+		{
+			if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+					&dc_masteritem->dep_itemids.values[i].first)) ||
+					ITEM_STATUS_ACTIVE != dc_item->status)
+			{
+				continue;
+			}
+			item->dep_itemids[item->dep_itemids_num++] = dc_masteritem->dep_itemids.values[i];
+		}
 	}
 
 	zbx_hashset_iter_reset(&config->items, &iter);

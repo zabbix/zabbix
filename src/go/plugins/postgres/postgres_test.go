@@ -38,8 +38,10 @@ func TestPlugin_Export(t *testing.T) {
 		params []string
 		ctx    plugin.ContextProvider
 	}
+
 	var pingOK int64 = 1
-	impl.Configure(&plugin.GlobalOptions{}, nil)
+
+	impl.Configure(&plugin.GlobalOptions{Timeout: 30}, nil)
 	impl.Start()
 
 	tests := []struct {
@@ -52,7 +54,7 @@ func TestPlugin_Export(t *testing.T) {
 		{
 			"Check PG Ping",
 			&impl,
-			args{keyPostgresPing, nil, nil},
+			args{keyPostgresPing, []string{"tcp://localhost:5432", "postgres", "postgres"}, nil},
 			pingOK,
 			false,
 		},
@@ -71,9 +73,9 @@ func TestPlugin_Export(t *testing.T) {
 			true,
 		},
 		{
-			"Check PG Transactions",
+			"Check PG Wal",
 			&impl,
-			args{keyPostgresTransactions, nil, nil},
+			args{keyPostgresWal, []string{"tcp://localhost:5432", "postgres", "postgres"}, nil},
 			nil,
 			false,
 		},
@@ -85,11 +87,11 @@ func TestPlugin_Export(t *testing.T) {
 				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(gotResult, tt.wantResult) && tt.args.key != keyPostgresTransactions {
+			if !reflect.DeepEqual(gotResult, tt.wantResult) && tt.args.key != keyPostgresWal {
 				t.Errorf("Plugin.Export() = %v, want %v", gotResult, tt.wantResult)
 			}
-			if tt.args.key == keyPostgresTransactions && len(gotResult.(string)) == 0 {
-				t.Errorf("Plugin.Export() result for keyPostgrestransaction length is 0")
+			if tt.args.key == keyPostgresWal && len(gotResult.(string)) == 0 {
+				t.Errorf("Plugin.Export() result for keyPostgresWal length is 0")
 			}
 		})
 	}

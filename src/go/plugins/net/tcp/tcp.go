@@ -24,12 +24,16 @@ import (
 	"fmt"
 	"math"
 	"net"
+	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/go-ldap/ldap"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/web"
 )
 
 const (
@@ -166,6 +170,81 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
+func removeScheme(in string) (scheme string, host string, err error) {
+	parts := strings.Split(in, "://")
+	switch len(parts) {
+	case 1:
+		return "", in, nil
+	case 2:
+		return parts[0], parts[1], nil
+	default:
+		return "", in, errors.New("malformed url")
+	}
+}
+
+func encloseIPv6(in string) string {
+	parsedIP := net.ParseIP(in)
+	if parsedIP != nil {
+		ipv6 := parsedIP.To16()
+		if ipv6 != nil {
+			out := ipv6.String()
+			return fmt.Sprintf("[%s]", out)
+		}
+	}
+
+	return in
+}
+
+func (p *Plugin) httpsExpect(ip string, port string) int {
+	scheme, host, err := removeScheme(ip)
+	if err != nil {
+		log.Debugf("https error: cannot parse the url [%s]: %s", ip, err.Error())
+		return 0
+	}
+	if scheme != "" && scheme != "https" {
+		log.Debugf("https error: incorrect scheme '%s' in url [%s]", scheme, ip)
+		return 0
+	}
+
+	rawURL := fmt.Sprintf("%s://%s", "https", encloseIPv6(host))
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		log.Debugf("https error: cannot parse the combined url [%s]: %s", rawURL, err.Error())
+		return 0
+	}
+
+	// does NOT return an error on >=400 status codes same as C agent
+	_, err = web.Get(fmt.Sprintf("%s://%s:%s%s", u.Scheme, u.Hostname(), port, u.Path),
+		time.Second*p.options.Timeout, false)
+	if err != nil {
+		log.Debugf("https network error: cannot connect to [%s]: %s", u, err.Error())
+		return 0
+	}
+
+	return 1
+}
+
+func (p *Plugin) validateLdap(conn *ldap.Conn, address string) (result int) {
+	res, err := conn.Search(&ldap.SearchRequest{Scope: ldap.ScopeBaseObject, Filter: "(objectClass=*)",
+		Attributes: []string{"namingContexts"}})
+	if err != nil {
+		log.Debugf("TCP expect search error: searching failed for [%s]: %s", address, err.Error())
+		return
+	}
+
+	if len(res.Entries) < 1 {
+		log.Debugf("TCP expect response error: empty search result for [%s]", address)
+		return
+	}
+
+	if len(res.Entries[0].Attributes) < 1 {
+		log.Debugf("TCP expect response error: no attributes in first entry for [%s]", address)
+		return
+	}
+
+	return 1
+}
+
 func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
@@ -182,6 +261,13 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 
 	if err = conn.SetReadDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
 		return
+	}
+
+	if service == "ldap" {
+		l := ldap.NewConn(conn, false)
+		l.Start()
+		defer l.Close()
+		return p.validateLdap(l, address)
 	}
 
 	var sendToClose string
@@ -245,12 +331,19 @@ func (p *Plugin) exportNetService(params []string) int {
 	if len(params) == 3 && params[2] != "" {
 		port = params[2]
 	} else {
-		if service != "pop" {
-			port = service
-		} else {
+		switch service {
+		case "pop":
 			port = "pop3"
+		case "https":
+			port = "443"
+		default:
+			port = service
 		}
 	}
+	if service == "https" {
+		return p.httpsExpect(ip, port)
+	}
+
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
 }
 
@@ -299,7 +392,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				err = errors.New(errorInvalidThirdParam)
 				return
 			}
-		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http":
+		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "https", "ldap":
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return

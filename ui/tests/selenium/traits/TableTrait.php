@@ -112,4 +112,19 @@ trait TableTrait {
 
 		$table->findRows($data)->select();
 	}
+
+	/**
+	 * Assert text of displayed rows amount.
+	 *
+	 * @param integer $count	rows count per page
+	 * @param integer $total	total rows count
+	 */
+	public function assertRowCount($count, $total = null) {
+		if ($total === null) {
+			$total = $count;
+		}
+		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
+				$this->query('xpath://div[@class="table-stats"]')->one()->getText()
+		);
+	}
 }

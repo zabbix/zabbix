@@ -75,7 +75,7 @@ class CXPathHelper {
 	public static function fromWebDriverBy($by) {
 		switch ($by->getMechanism()) {
 			case 'class name':
-				return '*[@class='.static::escapeQuotes($by->getValue()).']';
+				return '*['.static::fromClass($by->getValue()).']';
 
 			case 'id':
 				return '*[@id='.static::escapeQuotes($by->getValue()).']';
@@ -97,5 +97,21 @@ class CXPathHelper {
 		}
 
 		throw new Exception('Not supported selector type "'.$by->getMechanism().'".');
+	}
+
+	/**
+	 * Get XPath selector from class.
+	 *
+	 * @param string  $class     class to be converted to XPath selector
+	 *
+	 * @return string
+	 */
+	public static function fromClass($class) {
+		$length = strlen(' '.$class);
+
+		return '@class="'.$class.'" or contains(@class,'.static::escapeQuotes(' '.$class.' ').
+				') or starts-with(@class, '.static::escapeQuotes($class.' ').') or'.
+				' substring(@class, string-length(@class)-'.($length - 1).')='.
+				static::escapeQuotes(' '.$class).'';
 	}
 }

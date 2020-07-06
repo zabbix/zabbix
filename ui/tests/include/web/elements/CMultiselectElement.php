@@ -55,7 +55,7 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Set default fill mode.
 	 *
-	 * @param integer $mode    MODE_SELECT or MODE_TYPE
+	 * @param integer $mode    MODE_SELECT, MODE_SELECT_MULTIPLE or MODE_TYPE
 	 */
 	public static function setDefaultFillMode($mode) {
 		self::$default_mode = $mode;
@@ -64,7 +64,7 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Set fill mode.
 	 *
-	 * @param integer $mode    MODE_SELECT or MODE_TYPE
+	 * @param integer $mode    MODE_SELECT, MODE_SELECT_MULTIPLE or MODE_TYPE
 	 *
 	 * @return $this
 	 */
@@ -211,7 +211,7 @@ class CMultiselectElement extends CElement {
 		$this->getControls()->first()->click();
 
 		return COverlayDialogElement::find()->waitUntilPresent()
-				->all()->last()->waitUntilReady()->setDataContext($context);
+				->all()->last()->waitUntilReady()->setDataContext($context, $this->mode);
 	}
 
 	/**
