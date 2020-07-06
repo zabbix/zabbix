@@ -31,8 +31,6 @@
 			</and>
 		</condition>
 		<property environment="env"/>
-		<property name="phpunit_simplesaml_baseurl" value="${PHPUNIT_SIMPLESAML_BASEURL}"/>
-		<property name="phpunit_sp_entity_id" value="${PHPUNIT_SP_ENTITY_ID}"/>
 
 		<!-- Create bootstrap.php -->
 		<copy overwrite="true" file="ui/tests/bootstrap.php.template" tofile="ui/tests/bootstrap.php"/>
@@ -47,14 +45,6 @@
 		<replace file="ui/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
 		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
-		<!-- SAML settings -->
-		<replace file="ui/tests/bootstrap.php" token="'PHPUNIT_SAML_TESTS_ENABLED', false" value="'PHPUNIT_SAML_TESTS_ENABLED', true"/>
-		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_IDP_ENTITY_ID}" value="${phpunit_simplesaml_baseurl}/saml2/idp/metadata.php"/>
-		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SSO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SSOService.php"/>
-		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SLO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SingleLogoutService.php"/>
-		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SP_ENTITY_ID}" value="${phpunit_sp_entity_id}"/>
-		<!-- Download SAML X509 certificates -->
-		<get src="${phpunit_simplesaml_baseurl}/module.php/saml/idp/certs.php/idp.crt" dest="ui/conf/certs"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
@@ -64,6 +54,20 @@
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
+	</target>
+
+	<target name="create-saml-configs">
+		<property name="phpunit_simplesaml_baseurl" value="${PHPUNIT_SIMPLESAML_BASEURL}"/>
+		<property name="phpunit_sp_entity_id" value="${PHPUNIT_SP_ENTITY_ID}"/>
+
+		<!-- SAML settings -->
+		<replace file="ui/tests/bootstrap.php" token="'PHPUNIT_SAML_TESTS_ENABLED', false" value="'PHPUNIT_SAML_TESTS_ENABLED', true"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_IDP_ENTITY_ID}" value="${phpunit_simplesaml_baseurl}/saml2/idp/metadata.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SSO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SSOService.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SLO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SingleLogoutService.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SP_ENTITY_ID}" value="${phpunit_sp_entity_id}"/>
+		<!-- Download SAML X509 certificates -->
+		<get src="${phpunit_simplesaml_baseurl}/module.php/saml/idp/certs.php/idp.crt" dest="ui/conf/certs"/>
 	</target>
 
 	<target name="init-integration">
@@ -189,7 +193,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql,init-frontend-modules">
+	<target name="init-frontend-postgresql" depends="create-configs,create-saml-configs,make-dbschema,init-server-postgresql,init-frontend-modules">
 		<exec executable="psql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -305,7 +309,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,init-server-mysql,init-frontend-modules">
+	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,make-dbschema,init-server-mysql,init-frontend-modules">
 		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>
