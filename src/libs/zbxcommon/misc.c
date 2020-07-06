@@ -419,38 +419,36 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
-#if defined(_WINDOWS) || defined(__MINGW32__)
-	ZBX_UNUSED(tz);
-	return localtime(time);
-#else
-	const char	*old_tz;
+#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && !defined(_WINDOWS) && !defined(__MINGW32__)
+	char		*old_tz;
 	struct tm	*tm;
 
 	if (NULL == tz || '\0' == *tz)
 		return localtime(time);
 
-	old_tz = getenv("TZ");
+	if (NULL != (old_tz = getenv("TZ")))
+		old_tz = zbx_strdup(NULL, old_tz);
 
-	if (0 != setenv("TZ", tz, 1))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set time zone \"%s\": %s", tz, zbx_strerror(errno));
+	setenv("TZ", tz, 1);
 
 	tzset();
 	tm = localtime(time);
 
-	if (NULL == old_tz)
+	if (NULL != old_tz)
 	{
-		if (0 != unsetenv("TZ"))
-			zabbix_log(LOG_LEVEL_WARNING, "cannot unset time zone \"%s\": %s", tz, zbx_strerror(errno));
+		setenv("TZ", old_tz, 1);
+		zbx_free(old_tz);
+
 	}
 	else
-	{
-		if (0 != setenv("TZ", old_tz, 1))
-			zabbix_log(LOG_LEVEL_WARNING, "cannot restore time zone \"%s\": %s", old_tz, zbx_strerror(errno));
-	}
+		unsetenv("TZ");
 
 	tzset();
 
 	return tm;
+#else
+	ZBX_UNUSED(tz);
+	return localtime(time);
 #endif
 }
 
