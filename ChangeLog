@@ -66,6 +66,7 @@ A.F....... [ZBX-14539] added validation of the calculated item formula in item.c
 A.F....... [ZBXNEXT-3035] removed identical HTML IDs in low-level discovery form, fixed Type of Calculation field not hiding in override popup, fixed incorrect field order during override create in API causing SQL errors, fixed validation of delay, history and trends fields in override popup (Ivo, miks)
 .........T [ZBX-17790] fixed preprocessing of mysql.created_tmp_files, mysql.created_tmp_disk_tables, mysql.created_tmp_tables, mysql.threads_created items in Template DB MySQL, added triggers (mchudinov)
 ........S. [ZBX-17792] fixed zabbix sending invalid delete elastic search scroll request (arimdjonoks)
+.........T [ZBX-17141] fixed discovery of block devices by using vfs.dev.discovery key instead of reading /proc/diskstats (tuskov)
 .........T [ZBX-17654] fixed "Memory utilization" item in template_os_linux and template_os_linux_active by splitting it into master and depended relation (tuskov)
 ...G...... [ZBX-17780] fixed memory leak (viktors)
 .......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
