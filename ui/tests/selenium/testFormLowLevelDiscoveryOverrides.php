@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	const HOST_ID = 40001;
+	const LLD_UPDATE = 33800;
+
 	public static $id;
 
 	/**
@@ -436,6 +438,63 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$this->checkSavedState($data);
 	}
 
+
+	/*
+	 * Overrides data for LLD creation.
+	 */
+	public static function getUpdateData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'fields' => [
+								'Name' => '',
+							],
+							'error' => 'Incorrect value for field "Name": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'fields' => [
+								'Name' => '',
+							],
+							'error' => 'Incorrect value for field "Name": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_REMOVE,
+							'name' => 'Override for update 2',
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateData
+	 */
+	public function testFormLowLevelDiscoveryOverrides_Update($data) {
+		$this->overridesUpdate($data);
+//		$this->checkSavedState($data);
+	}
+
 	private function overridesCreate($data) {
 		$this->page->login()->open('host_discovery.php?form=create&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
@@ -449,52 +508,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		// Add overrides from data to lld rule.
 		foreach($data['overrides'] as $i => $override){
 			$override_container->query('button:Add')->one()->click();
-			// Open Override overlay.
-			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->one()->asForm();
-			// Fill Overridae name and further processing strategy.
-			$override_overlay->fill($override['fields']);
-
-			// Add Filters to override.
-			if (array_key_exists('Filters', $override)) {
-				$this->fillParameters($override['Filters']['filter_conditions']);
-
-				// Add Type of calculation if there are more then 2 filters.
-				if (array_key_exists('Type of calculation', $override['Filters'])) {
-					$override_overlay->query('id:overrides_evaltype')->waitUntilPresent()->one()
-							->asDropdown()->fill($override['Filters']['Type of calculation']);
-
-					// Add formula if Type of calculation is Custom.
-					if (array_key_exists('formula', $override['Filters'])) {
-						$override_overlay->query('id:overrides_formula')->waitUntilPresent()->one()
-							->fill($override['Filters']['formula']);
-					}
-				}
-			}
-
-			$operation_container = $override_overlay->getField('Operations')->asTable();
-
-			if (array_key_exists('Operations', $override)) {
-
-				// Add Operations to override.
-				foreach($override['Operations'] as $j => $operation){
-					$operation_container->query('button:Add')->one()->click();
-					// Fill Operation form fields.
-					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->one()->asForm();
-					$operation_overlay->fill($operation);
-					// Submit Operation.
-					$operation_overlay->submit();
-					$this->checkSubmittedOverlay($data['expected'], $operation_overlay, CTestArrayHelper::get($override, 'error'));
-
-					if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
-						// Check that Operation was added to Operations table.
-						$condition_text = $operation['Object'].' '.$operation['Condition']['operator'].' '.$operation['Condition']['value'];
-						$this->assertEquals($condition_text, $operation_container->getRow($j)->getColumn('Condition')->getText());
-					}
-				}
-			}
-
-			// Submit Override.
-			$override_overlay->submit();
+			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+			$this->fillOverride($data, $override);
 			$this->checkSubmittedOverlay($data['expected'], $override_overlay, CTestArrayHelper::get($override, 'error'));
 
 			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
@@ -516,8 +531,67 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		}
 	}
 
+	private function overridesUpdate($data) {
+		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::LLD_UPDATE);
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Overrides');
+		$form->invalidate();
+		$override_container = $form->getField('Overrides')->asTable();
+
+//		$overrides_count = $override_container->getRows()->count();
+//		for ($k = 0; $k < $overrides_count - 1; $k++) {
+//			$override[] = $override_container->getRow($k)->getColumn('Name')->getText();
+//		}
+
+		foreach ($data['overrides'] as $i => $override) {
+			$action = CTestArrayHelper::get($override, 'action', USER_ACTION_ADD);
+
+			switch ($action) {
+				case USER_ACTION_ADD:
+					$override_container->query('button:Add')->one()->click();
+					break;
+
+				case USER_ACTION_UPDATE:
+					$override_container->query('link', $override['name'])->one()->click();
+					break;
+			}
+
+			switch ($action) {
+				case USER_ACTION_ADD:
+				case USER_ACTION_UPDATE:
+					$override_overlay = $this->fillOverride($data, $override);
+					$this->checkSubmittedOverlay($data['expected'], $override_overlay, CTestArrayHelper::get($override, 'error'));
+
+					if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
+						// Check that Override with correct name was added to Overrides table.
+						$this->assertEquals($override['fields']['Name'], $override_container->getRow($i)->getColumn('Name')->getText());
+						// Check that Override in table has correct processing status.
+						$stop_processing = (CTestArrayHelper::get($override['fields'],
+								'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
+						$this->assertEquals($stop_processing, $override_container->getRow($i)->getColumn('Stop processing')->getText());
+					}
+					break;
+
+				case USER_ACTION_REMOVE:
+					$row = $override_container->findRow('Name', $override['name']);
+					$row->query('button:Remove')->one()->click();
+					break;
+
+				default:
+					throw new Exception('Cannot perform action "'.$action.'".');
+			}
+		}
+
+		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
+			// Submit LLD update.
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
+//			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($key)));
+//			self::$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($key));
+		}
+	}
+
 	/**
-	 *
 	 * @depends overridesCreate
 	 */
 	private function checkSavedState($data) {
@@ -554,7 +628,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Open each override dialog.
 			$row = $override_container->findRow('Name', $override['fields']['Name']);
 			$row->query('link', $override['fields']['Name'])->one()->click();
-			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->one()->asForm();
+			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
 
 			// Check that Override fields filled with correct data.
 			foreach ($override['fields'] as $field => $value) {
@@ -606,9 +680,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	/**
 	 * Function for checking successful/failed overlay submitting.
 	 *
-	 * @param string	$expected	case GOOD or BAD
-	 * @param element	$overlay	COverlayDialogElement
-	 * @param string	$error		error message text
+	 * @param string		$expected	case GOOD or BAD
+	 * @param CFormElement	$overlay 	override or condition form in overlay
+	 * @param string	    $error		error message text
 	 */
 	private function checkSubmittedOverlay($expected, $overlay, $error) {
 		switch ($expected) {
@@ -619,5 +693,62 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				$this->assertMessage(TEST_BAD, null, $error);
 				break;
 		}
+	}
+
+	/**
+	 *
+	 * @param array         $data              data provider
+	 * @param array         $override          override fields from data
+	 *
+	 * @return CFormElement $override_overlay  override or condition form in overlay
+	 */
+	private function fillOverride($data, $override) {
+		$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+		// Fill Override name and further processing strategy.
+		$override_overlay->fill($override['fields']);
+
+		// Add Filters to override.
+		if (array_key_exists('Filters', $override)) {
+			$this->fillParameters($override['Filters']['filter_conditions']);
+
+			// Add Type of calculation if there are more then 2 filters.
+			if (array_key_exists('Type of calculation', $override['Filters'])) {
+				$override_overlay->query('id:overrides_evaltype')->waitUntilPresent()->one()
+						->asDropdown()->fill($override['Filters']['Type of calculation']);
+
+				// Add formula if Type of calculation is Custom.
+				if (array_key_exists('formula', $override['Filters'])) {
+					$override_overlay->query('id:overrides_formula')->waitUntilPresent()->one()
+						->fill($override['Filters']['formula']);
+				}
+			}
+		}
+
+		$operation_container = $override_overlay->getField('Operations')->asTable();
+
+		if (array_key_exists('Operations', $override)) {
+
+			// Add Operations to override.
+			foreach($override['Operations'] as $j => $operation){
+				$operation_container->query('button:Add')->one()->click();
+				// Fill Operation form fields.
+				$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
+				$operation_overlay->fill($operation);
+				// Submit Operation.
+				$operation_overlay->submit();
+				$this->checkSubmittedOverlay($data['expected'], $operation_overlay, CTestArrayHelper::get($override, 'error'));
+
+				if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
+					// Check that Operation was added to Operations table.
+					$condition_text = $operation['Object'].' '.$operation['Condition']['operator'].' '.$operation['Condition']['value'];
+					$this->assertEquals($condition_text, $operation_container->getRow($j)->getColumn('Condition')->getText());
+				}
+			}
+		}
+
+		// Submit Override.
+		$override_overlay->submit();
+
+		return $override_overlay;
 	}
 }
