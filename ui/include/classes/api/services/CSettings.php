@@ -149,19 +149,15 @@ class CSettings extends CApiService {
 	 */
 	protected function validateUpdate(array &$settings, array &$db_settings = null) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'default_theme' =>				['type' => API_STRING_UTF8,
-												'in' => implode(',', array_keys(APP::getThemes()))],
+			'default_theme' =>				['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(APP::getThemes()))],
 			'search_limit' =>				['type' => API_INT32, 'in' => '1:999999'],
 			'max_in_table' =>				['type' => API_INT32, 'in' => '1:99999'],
 			'server_check_interval' =>		['type' => API_INT32, 'in' => '0,'.SERVER_CHECK_INTERVAL],
 			'work_period' =>				['type' => API_TIME_PERIOD],
 			'show_technical_errors' =>		['type' => API_INT32, 'in' => '0,1'],
-			'history_period' =>				['type' => API_TIME_UNIT,
-												'in' => implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY])],
-			'period_default' =>				['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR,
-												'in' => implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR])],
-			'max_period' =>					['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR,
-												'in' => implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])],
+			'history_period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY])],
+			'period_default' =>				['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR])],
+			'max_period' =>					['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])],
 			'severity_color_0' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			'severity_color_1' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			'severity_color_2' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
@@ -174,8 +170,7 @@ class CSettings extends CApiService {
 			'severity_name_3' =>			['type' => API_STRING_UTF8, 'length' => 32],
 			'severity_name_4' =>			['type' => API_STRING_UTF8, 'length' => 32],
 			'severity_name_5' =>			['type' => API_STRING_UTF8, 'length' => 32],
-			'custom_color' =>				['type' => API_INT32, 'in' => EVENT_CUSTOM_COLOR_DISABLED.','.
-												EVENT_CUSTOM_COLOR_ENABLED],
+			'custom_color' =>				['type' => API_INT32, 'in' => EVENT_CUSTOM_COLOR_DISABLED.','. EVENT_CUSTOM_COLOR_ENABLED],
 			'ok_period' =>					['type' => API_TIME_UNIT],
 			'blink_period' =>				['type' => API_TIME_UNIT],
 			'problem_unack_color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
@@ -188,8 +183,7 @@ class CSettings extends CApiService {
 			'ok_ack_style' =>				['type' => API_INT32, 'in' => '0,1'],
 			'refresh_unsupported' =>		['type' => API_TIME_UNIT],
 			'discovery_groupid' =>			['type' => API_ID],
-			'default_inventory_mode' =>		['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.
-												HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
+			'default_inventory_mode' =>		['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','. HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
 			'alert_usrgrpid' =>				['type' => API_ID, 'flags' => API_ALLOW_NULL],
 			'snmptrap_logging' =>			['type' => API_INT32, 'in' => '0,1'],
 			'login_attempts' =>				['type' => API_INT32, 'in' => '1:32'],

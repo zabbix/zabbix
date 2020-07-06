@@ -22,11 +22,10 @@
 class CControllerMiscConfigUpdate extends CController {
 
 	protected function checkInput() {
-		$host_inventory_values = HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC;
 		$fields = [
 			'refresh_unsupported'     => 'required|db config.refresh_unsupported',
 			'discovery_groupid'       => 'required|db config.discovery_groupid',
-			'default_inventory_mode'  => 'required|db config.default_inventory_mode|in '.$host_inventory_values,
+			'default_inventory_mode'  => 'required|in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
 			'alert_usrgrpid'          => 'db config.alert_usrgrpid',
 			'snmptrap_logging'        => 'required|db config.snmptrap_logging|in 0,1',
 			'login_attempts'          => 'required|db config.login_attempts|ge 1|le 32',

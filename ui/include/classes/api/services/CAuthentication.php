@@ -137,24 +137,19 @@ class CAuthentication extends CApiService {
 	protected function validateUpdate(array &$auth, array &$db_auth = null) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
-			'http_auth_enabled' =>			['type' => API_INT32,
-												'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
+			'http_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 			'http_login_form' =>			['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
 			'http_strip_domains' =>			['type' => API_STRING_UTF8, 'length' => 255],
-			'http_case_sensitive' =>		['type' => API_INT32,
-												'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
-			'ldap_configured' =>			['type' => API_INT32,
-												'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
+			'http_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
+			'ldap_configured' =>			['type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
 			'ldap_host' =>					['type' => API_STRING_UTF8, 'length' => 255],
 			'ldap_port' =>					['type' => API_INT32],
 			'ldap_base_dn' =>				['type' => API_STRING_UTF8, 'length' => 255],
 			'ldap_search_attribute' =>		['type' => API_STRING_UTF8, 'length' => 128],
 			'ldap_bind_dn' =>				['type' => API_STRING_UTF8, 'length' => 255],
-			'ldap_case_sensitive' =>		['type' => API_INT32,
-												'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
+			'ldap_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_bind_password' =>			['type' => API_STRING_UTF8, 'length' => 128],
-			'saml_auth_enabled' =>			['type' => API_INT32,
-												'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
+			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 			'saml_idp_entityid' =>			['type' => API_STRING_UTF8, 'length' => 1024],
 			'saml_sso_url' =>				['type' => API_STRING_UTF8, 'length' => 2048],
 			'saml_slo_url' =>				['type' => API_STRING_UTF8, 'length' => 2048],
@@ -168,8 +163,7 @@ class CAuthentication extends CApiService {
 			'saml_sign_logout_responses' =>	['type' => API_INT32, 'in' => '0,1'],
 			'saml_encrypt_nameid' =>		['type' => API_INT32, 'in' => '0,1'],
 			'saml_encrypt_assertions' =>	['type' => API_INT32, 'in' => '0,1'],
-			'saml_case_sensitive' =>		['type' => API_INT32,
-												'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE]
+			'saml_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $auth, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
