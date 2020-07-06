@@ -1337,7 +1337,8 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns)
+static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
+		const char *tz)
 {
 	DC_ITEM			item;
 	int			ret = FAIL, errcode = FAIL;
@@ -1357,10 +1358,10 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	switch (request)
 	{
 		case ZBX_REQUEST_ITEM_LOG_DATE:
-			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp, NULL));
+			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp, tz));
 			goto success;
 		case ZBX_REQUEST_ITEM_LOG_TIME:
-			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp, NULL));
+			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp, tz));
 			goto success;
 		case ZBX_REQUEST_ITEM_LOG_AGE:
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
@@ -1411,7 +1412,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	get_history_log_value(const char *expression, char **replace_to, int N_functionid,
-		int request, int clock, int ns)
+		int request, int clock, int ns, const char *tz)
 {
 	zbx_uint64_t	itemid;
 	int		ret = FAIL;
@@ -1419,7 +1420,7 @@ static int	get_history_log_value(const char *expression, char **replace_to, int 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED == get_N_itemid(expression, N_functionid, &itemid))
-		ret = DBget_history_log_value(itemid, replace_to, request, clock, ns);
+		ret = DBget_history_log_value(itemid, replace_to, request, clock, ns, tz);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -3144,43 +3145,43 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_LOG_AGE, c_event->clock,
-							c_event->ns);
+							c_event->ns, NULL);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_DATE))
 				{
 					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_LOG_DATE, c_event->clock,
-							c_event->ns);
+							c_event->ns, tz);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_EVENTID))
 				{
 					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_LOG_EVENTID, c_event->clock,
-							c_event->ns);
+							c_event->ns, NULL);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
 				{
 					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_LOG_NSEVERITY, c_event->clock,
-							c_event->ns);
+							c_event->ns, NULL);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SEVERITY))
 				{
 					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_LOG_SEVERITY, c_event->clock,
-							c_event->ns);
+							c_event->ns, NULL);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_SOURCE))
 				{
 					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_LOG_SOURCE, c_event->clock,
-							c_event->ns);
+							c_event->ns, NULL);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
 				{
 					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_LOG_TIME, c_event->clock,
-							c_event->ns);
+							c_event->ns, tz);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
 				{

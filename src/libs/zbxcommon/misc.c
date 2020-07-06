@@ -417,7 +417,7 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 	return offset;
 }
 
-struct tm	*zbx_localtime(time_t *time, const char *tz)
+struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
 	const char	*old_tz;
 	struct tm	*tm;
