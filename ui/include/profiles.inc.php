@@ -45,60 +45,11 @@ function setHostGroupInternal($groupid, $internal) {
 }
 
 function update_config($config) {
-	$configOrig = select_config();
-
-	if (array_key_exists('discovery_groupid', $config)) {
-		$hostGroups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => $config['discovery_groupid']
-		]);
-		if (!$hostGroups) {
-			error(_('Incorrect host group.'));
-			return false;
-		}
-	}
-
-	if (array_key_exists('alert_usrgrpid', $config) && $config['alert_usrgrpid'] != 0) {
-		$userGroup = DBfetch(DBselect(
-			'SELECT u.name'.
-			' FROM usrgrp u'.
-			' WHERE u.usrgrpid='.zbx_dbstr($config['alert_usrgrpid'])
-		));
-		if (!$userGroup) {
-			error(_('Incorrect user group.'));
-
-			return false;
-		}
-	}
-
-	$fields = [
-		'refresh_unsupported' => [
-			'min' => 0,
-			'max' => SEC_PER_DAY,
-			'allow_zero' => false,
-			'message' => _('Invalid refresh of unsupported items: %1$s')
-		],
-	];
-
-	foreach ($fields as $field => $args) {
-		if (array_key_exists($field, $config)
-				&& !validateTimeUnit($config[$field], $args['min'], $args['max'], $args['allow_zero'], $error)) {
-			error(sprintf($args['message'], $error));
-
-			return false;
-		}
-	}
-
 	$update = [];
 
 	foreach ($config as $key => $value) {
 		if (!is_null($value)) {
-			if ($key == 'alert_usrgrpid') {
-				$update[] = $key.'='.(($value == '0') ? 'NULL' : $value);
-			}
-			else{
-				$update[] = $key.'='.zbx_dbstr($value);
-			}
+			$update[] = $key.'='.zbx_dbstr($value);
 		}
 	}
 
@@ -108,30 +59,6 @@ function update_config($config) {
 	}
 
 	$result = DBexecute('UPDATE config SET '.implode(',', $update));
-
-	if ($result) {
-		$msg = [];
-		if (array_key_exists('refresh_unsupported', $config)) {
-			$msg[] = _s('Refresh unsupported items "%1$s".', $config['refresh_unsupported']);
-		}
-		if (array_key_exists('discovery_groupid', $config)) {
-			$msg[] = _s('Group for discovered hosts "%1$s".', $hostGroups[0]['name']);
-
-			if (bccomp($config['discovery_groupid'], $configOrig['discovery_groupid']) != 0) {
-				setHostGroupInternal($configOrig['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-				setHostGroupInternal($config['discovery_groupid'], ZBX_INTERNAL_GROUP);
-			}
-		}
-		if (array_key_exists('alert_usrgrpid', $config)) {
-			$msg[] = _s('User group for database down message "%1$s".',
-				$config['alert_usrgrpid'] != 0 ? $userGroup['name'] : _('None')
-			);
-		}
-
-		if ($msg) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
-		}
-	}
 
 	return $result;
 }

@@ -23,7 +23,8 @@ class CControllerTrigDisplayUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'custom_color'        => 'required|db config.custom_color|in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
+			'custom_color'        => 'required|db config.custom_color|in '.EVENT_CUSTOM_COLOR_DISABLED.','.
+				EVENT_CUSTOM_COLOR_ENABLED,
 			'problem_unack_color' => 'db config.problem_unack_color|rgb',
 			'problem_ack_color'   => 'db config.problem_ack_color|rgb',
 			'ok_unack_color'      => 'db config.ok_unack_color|rgb',
@@ -77,10 +78,9 @@ class CControllerTrigDisplayUpdate extends CController {
 			];
 
 			foreach ($fields as $field => $args) {
-				if ($this->hasInput($field)
-						&& !validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],
-							$error
-						)) {
+				if (!validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],
+					$error
+				)) {
 					error(sprintf($args['message'], $error));
 
 					$ret = false;

@@ -23,31 +23,38 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.miscconfig.edit.js.php');
+$this->addJsFile('multiselect.js');
+
 $widget = (new CWidget())
 	->setTitle(_('Other configuration parameters'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
-$from_list = new CFormList();
-
-$discovery_group = new CComboBox('discovery_groupid', $data['discovery_groupid']);
-foreach ($data['discovery_groups'] as $group) {
-	$discovery_group->addItem($group['groupid'], $group['name']);
-}
-
-$alert_user_group = new CComboBox('alert_usrgrpid', $data['alert_usrgrpid']);
-$alert_user_group->addItem(0, _('None'));
-foreach ($data['alert_usrgrps'] as $usrgrp) {
-	$alert_user_group->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
-}
-
-$from_list
+$from_list = (new CFormList())
 	->addRow((new CLabel(_('Refresh unsupported items'), 'refresh_unsupported'))->setAsteriskMark(),
 		(new CTextBox('refresh_unsupported', $data['refresh_unsupported']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Group for discovered hosts'), $discovery_group)
+	->addRow((new CLabel(_('Group for discovered hosts'), 'discovery_groupid'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'discovery_groupid',
+			'object_name' => 'hostGroup',
+			'data' => $data['discovery_group_data'],
+			'multiple' => false,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'name',
+					'dstfrm' => 'otherForm',
+					'dstfld1' => 'discovery_groupid',
+					'normal_only' => '1',
+					'editable' => true,
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+	)
 	->addRow(_('Default host inventory mode'),
 		(new CRadioButtonList('default_inventory_mode', (int) $data['default_inventory_mode']))
 			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
@@ -55,11 +62,95 @@ $from_list
 			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
 			->setModern(true)
 	)
-	->addRow(_('User group for database down message'), $alert_user_group)
+	->addRow(_('User group for database down message'),
+		(new CMultiSelect([
+			'name' => 'alert_usrgrpid',
+			'object_name' => 'usersGroups',
+			'data' => $data['alert_usrgrp_data'],
+			'multiple' => false,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'usrgrp',
+					'srcfld1' => 'name',
+					'dstfrm' => 'otherForm',
+					'dstfld1' => 'alert_usrgrpid',
+					'editable' => true
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+	)
 	->addRow(_('Log unmatched SNMP traps'),
 		(new CCheckBox('snmptrap_logging'))
 			->setUncheckedValue('0')
 			->setChecked($data['snmptrap_logging'] == 1)
+	)
+	->addRow(null)
+	->addRow(new CTag('h4', true, _('Authorization')))
+	->addRow((new CLabel(_('Login attempts'), 'login_attempts'))->setAsteriskMark(),
+		(new CNumericBox('login_attempts', $data['login_attempts'], 2))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Login blocking interval'), 'login_block'))->setAsteriskMark(),
+		(new CTextBox('login_block', $data['login_block']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('Session name'), 'session_name'))->setAsteriskMark(),
+		(new CTextBox('session_name', $data['session_name']))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(null)
+	->addRow(new CTag('h4', true, _('Security')))
+	->addRow(_('Validate URI schemes'),
+		(new CCheckBox('validate_uri_schemes'))
+			->setUncheckedValue('0')
+			->setChecked($data['validate_uri_schemes'] == 1)
+	)
+	->addRow((new CLabel(_('Valid URI schemes'), 'uri_valid_schemes')),
+		(new CTextBox('uri_valid_schemes', $data['uri_valid_schemes']))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setEnabled($data['validate_uri_schemes'] == 1)
+			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('X-Frame-Options HTTP header'), 'x_frame_options'))->setAsteriskMark(),
+		(new CTextBox('x_frame_options', $data['x_frame_options']))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(null)
+	->addRow(new CTag('h4', true, _('Communication with Zabbix server')))
+	->addRow(
+		(new CLabel(_('Network timeout'), 'socket_timeout'))->setAsteriskMark(),
+		(new CTextBox('socket_timeout', $data['socket_timeout']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Connection timeout'), 'connect_timeout'))->setAsteriskMark(),
+		(new CTextBox('connect_timeout', $data['connect_timeout']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Network timeout for media type test'), 'media_type_test_timeout'))->setAsteriskMark(),
+		(new CTextBox('media_type_test_timeout', $data['media_type_test_timeout']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Network timeout for script execution'), 'script_timeout'))->setAsteriskMark(),
+		(new CTextBox('script_timeout', $data['script_timeout']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Network timeout for item test'), 'item_test_timeout'))->setAsteriskMark(),
+		(new CTextBox('item_test_timeout', $data['item_test_timeout']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	);
 
 $form = (new CForm())
@@ -72,7 +163,10 @@ $form = (new CForm())
 	->addItem(
 		(new CTabView())
 			->addTab('other', _('Other parameters'), $from_list)
-			->setFooter(makeFormFooter(new CSubmit('update', _('Update'))))
+			->setFooter(makeFormFooter(
+				new CSubmit('update', _('Update')),
+				[new CButton('resetDefaults', _('Reset defaults'))]
+			))
 	);
 
 $widget->addItem($form)->show();

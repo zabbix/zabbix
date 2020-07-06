@@ -125,6 +125,12 @@ class CSettings extends CApiService {
 				'values' => $upd_config,
 				'where' => ['configid' => $db_settings['configid']]
 			]);
+
+			if (array_key_exists('discovery_groupid', $upd_config)
+					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) != 0) {
+				setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
+				setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
+			}
 		}
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SETTINGS,
@@ -185,7 +191,7 @@ class CSettings extends CApiService {
 			'discovery_groupid' =>			['type' => API_ID],
 			'default_inventory_mode' =>		['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.
 												HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
-			'alert_usrgrpid' =>				['type' => API_ID],
+			'alert_usrgrpid' =>				['type' => API_ID, 'flags' => API_ALLOW_NULL],
 			'snmptrap_logging' =>			['type' => API_INT32, 'in' => '0,1'],
 			'login_attempts' =>				['type' => API_INT32, 'in' => '1:32'],
 			'login_block' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [30, SEC_PER_HOUR])],
@@ -221,12 +227,12 @@ class CSettings extends CApiService {
 			}
 		}
 
-		if (array_key_exists('alert_usrgrpid', $settings)) {
-			$db_usrgrp_exists = DB::select('usrgrp', [
+		if (array_key_exists('alert_usrgrpid', $settings) && $settings['alert_usrgrpid'] !== null) {
+			$db_usrgrp_exists = API::UserGroup()->get([
 				'countOutput' => true,
 				'usrgrpids' => $settings['alert_usrgrpid']
 			]);
-			if (!$db_usrgrp_exists[0]['rowscount']) {
+			if (!$db_usrgrp_exists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with ID "%1$s" is not available.',
 					$settings['alert_usrgrpid']));
 			}

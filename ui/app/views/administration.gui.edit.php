@@ -48,9 +48,9 @@ $gui_tab = (new CFormList())
 			->setChecked($data['server_check_interval'] == SERVER_CHECK_INTERVAL)
 	)
 	->addRow((new CLabel(_('Working time'), 'work_period'))->setAsteriskMark(),
-	(new CTextBox('work_period', $data['work_period']))
-		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		->setAriaRequired()
+		(new CTextBox('work_period', $data['work_period']))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(_('Show technical errors'),
 		(new CCheckBox('show_technical_errors'))

@@ -79,10 +79,9 @@ class CControllerGuiUpdate extends CController {
 
 			foreach ($fields as $field => $args) {
 				$options = array_key_exists('with_year', $args) ? ['with_year' => true] : [];
-				if ($this->hasInput($field)
-						&& !validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],
-							$error, $options
-						)) {
+				if (!validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],$error,
+					$options
+				)) {
 					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 						->setArgument('action', 'gui.edit')
 						->getUrl()
@@ -112,7 +111,7 @@ class CControllerGuiUpdate extends CController {
 			CSettingsHelper::MAX_IN_TABLE          => $this->getInput('max_in_table'),
 			CSettingsHelper::SERVER_CHECK_INTERVAL => $this->getInput('server_check_interval'),
 			CSettingsHelper::WORK_PERIOD           => $this->getInput('work_period'),
-			CSettingsHelper::SHOW_TECHNICAL_ERRORS => $this->getInput('show_technical_errors'),
+			CSettingsHelper::SHOW_TECHNICAL_ERRORS => $this->getInput('show_technical_errors', 0),
 			CSettingsHelper::HISTORY_PERIOD        => $this->getInput('history_period'),
 			CSettingsHelper::PERIOD_DEFAULT        => $this->getInput('period_default'),
 			CSettingsHelper::MAX_PERIOD            => $this->getInput('max_period')

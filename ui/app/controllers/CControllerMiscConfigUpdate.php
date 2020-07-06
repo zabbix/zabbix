@@ -22,12 +22,24 @@
 class CControllerMiscConfigUpdate extends CController {
 
 	protected function checkInput() {
+		$host_inventory_values = HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC;
 		$fields = [
-			'refresh_unsupported'    => 'string',
-			'discovery_groupid'      => 'db hstgrp.groupid',
-			'default_inventory_mode' => 'in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
-			'alert_usrgrpid'         => 'db usrgrp.usrgrpid',
-			'snmptrap_logging'       => 'in 0,1'
+			'refresh_unsupported'     => 'required|db config.refresh_unsupported',
+			'discovery_groupid'       => 'required|db config.discovery_groupid',
+			'default_inventory_mode'  => 'required|db config.default_inventory_mode|in '.$host_inventory_values,
+			'alert_usrgrpid'          => 'db config.alert_usrgrpid',
+			'snmptrap_logging'        => 'required|db config.snmptrap_logging|in 0,1',
+			'login_attempts'          => 'required|db config.login_attempts|ge 1|le 32',
+			'login_block'             => 'required|db config.login_block',
+			'session_name'            => 'required|db config.session_name',
+			'validate_uri_schemes'    => 'required|db config.validate_uri_schemes|in 0,1',
+			'uri_valid_schemes'       => 'db config.uri_valid_schemes',
+			'x_frame_options'         => 'required|db config.x_frame_options',
+			'socket_timeout'          => 'required|db config.socket_timeout',
+			'connect_timeout'         => 'required|db config.connect_timeout',
+			'media_type_test_timeout' => 'required|db config.media_type_test_timeout',
+			'script_timeout'          => 'required|db config.script_timeout',
+			'item_test_timeout'       => 'required|db config.item_test_timeout'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -39,7 +51,7 @@ class CControllerMiscConfigUpdate extends CController {
 						->setArgument('action', 'miscconfig.edit')
 					);
 
-					$response->setFormData($this->getInputAll());
+					$response->setFormData($this->getInputAll() + ['discovery_groupid' => '0']);
 					$response->setMessageError(_('Cannot update configuration'));
 
 					$this->setResponse($response);
@@ -48,6 +60,95 @@ class CControllerMiscConfigUpdate extends CController {
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
+			}
+		}
+		else {
+			$fields = [
+				'refresh_unsupported' => [
+					'min' => 0,
+					'max' => SEC_PER_DAY,
+					'allow_zero' => false,
+					'message' => _('Invalid refresh of unsupported items: %1$s')
+				],
+				'login_block' => [
+					'min' => 30,
+					'max' => SEC_PER_HOUR,
+					'allow_zero' => false,
+					'message' => _('Invalid login blocking interval: %1$s.')
+				],
+				'socket_timeout' => [
+					'min' => 1,
+					'max' => 300,
+					'allow_zero' => false,
+					'message' => _('Invalid network timeout: %1$s.')
+				],
+				'connect_timeout' => [
+					'min' => 1,
+					'max' => 30,
+					'allow_zero' => false,
+					'message' => _('Invalid connection timeout: %1$s.')
+				],
+				'media_type_test_timeout' => [
+					'min' => 1,
+					'max' => 300,
+					'allow_zero' => false,
+					'message' => _('Invalid network timeout for media type test: %1$s.')
+				],
+				'script_timeout' => [
+					'min' => 1,
+					'max' => 300,
+					'allow_zero' => false,
+					'message' => _('Invalid network timeout for script execution: %1$s.')
+				],
+				'item_test_timeout' => [
+					'min' => 1,
+					'max' => 300,
+					'allow_zero' => false,
+					'message' => _('Invalid network timeout for item test: %1$s.')
+				],
+			];
+
+			foreach ($fields as $field => $args) {
+				if (!validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],
+					$error
+				)) {
+					error(sprintf($args['message'], $error));
+
+					$ret = false;
+					break;
+				}
+			}
+
+			$discovery_group_exists = API::HostGroup()->get([
+				'countOutput' => true,
+				'groupids' => $this->getInput('discovery_groupid')
+			]);
+			if (!$discovery_group_exists) {
+				error(_('Incorrect host group.'));
+
+				$ret = false;
+			}
+
+			if ($this->hasInput('alert_usrgrpid')) {
+				$user_group_exists = API::UserGroup()->get([
+					'countOutput' => true,
+					'usrgrpids' => $this->getInput('alert_usrgrpid'),
+				]);
+				if (!$user_group_exists) {
+					error(_('Incorrect user group.'));
+
+					$ret = false;
+				}
+			}
+
+			if (!$ret) {
+				$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+					->setArgument('action', 'miscconfig.edit')
+					->getUrl()
+				);
+				$response->setFormData($this->getInputAll());
+				$response->setMessageError(_('Cannot update configuration'));
+				$this->setResponse($response);
 			}
 		}
 
@@ -59,19 +160,38 @@ class CControllerMiscConfigUpdate extends CController {
 	}
 
 	protected function doAction() {
+		$settings = [
+			CSettingsHelper::REFRESH_UNSUPPORTED     => $this->getInput('refresh_unsupported'),
+			CSettingsHelper::DISCOVERY_GROUPID       => $this->getInput('discovery_groupid'),
+			CSettingsHelper::DEFAULT_INVENTORY_MODE  => $this->getInput('default_inventory_mode'),
+			CSettingsHelper::SNMPTRAP_LOGGING        => $this->getInput('snmptrap_logging'),
+			CSettingsHelper::LOGIN_ATTEMPTS          => $this->getInput('login_attempts'),
+			CSettingsHelper::LOGIN_BLOCK             => $this->getInput('login_block'),
+			CSettingsHelper::SESSION_NAME            => $this->getInput('session_name'),
+			CSettingsHelper::VALIDATE_URI_SCHEMES    => $this->getInput('validate_uri_schemes'),
+			CSettingsHelper::X_FRAME_OPTIONS         => $this->getInput('x_frame_options'),
+			CSettingsHelper::SOCKET_TIMEOUT          => $this->getInput('socket_timeout'),
+			CSettingsHelper::CONNECT_TIMEOUT         => $this->getInput('connect_timeout'),
+			CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT => $this->getInput('media_type_test_timeout'),
+			CSettingsHelper::SCRIPT_TIMEOUT          => $this->getInput('script_timeout'),
+			CSettingsHelper::ITEM_TEST_TIMEOUT       => $this->getInput('item_test_timeout')
+		];
+
+		$settings[CSettingsHelper::ALERT_USRGRPID] = $this->hasInput('alert_usrgrpid')
+			? $this->getInput('alert_usrgrpid')
+			: null;
+
+		if ($settings[CSettingsHelper::VALIDATE_URI_SCHEMES] == 1) {
+			$settings[CSettingsHelper::URI_VALID_SCHEMES] = $this->getInput('uri_valid_schemes',
+				DB::getSchema('config')['fields']['uri_valid_schemes']['default']
+			);
+		}
+
+		$result = API::Settings()->update($settings);
+
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'miscconfig.edit')
 		);
-
-		DBstart();
-		$result = update_config([
-			'refresh_unsupported'    => trim($this->getInput('refresh_unsupported')),
-			'alert_usrgrpid'         => $this->getInput('alert_usrgrpid'),
-			'discovery_groupid'      => $this->getInput('discovery_groupid'),
-			'default_inventory_mode' => $this->getInput('default_inventory_mode'),
-			'snmptrap_logging'       => $this->getInput('snmptrap_logging')
-		]);
-		$result = DBend($result);
 
 		if ($result) {
 			$response->setMessageOk(_('Configuration updated'));
