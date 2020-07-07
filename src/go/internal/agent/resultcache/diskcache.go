@@ -95,9 +95,6 @@ func (c *DiskCache) getOldestWriteClock(table string) (clock int64, err error) {
 	if err != nil {
 		return
 	}
-
-	defer rows.Close()
-
 	var u interface{}
 	ok, err := fetchRowAndClose(rows, &u)
 	if err != nil {
@@ -119,9 +116,6 @@ func (c *DiskCache) getLastID(table string) (id uint64, err error) {
 	if err != nil {
 		return
 	}
-
-	defer rows.Close()
-
 	var u interface{}
 	ok, err := fetchRowAndClose(rows, &u)
 	if err != nil {
@@ -172,8 +166,6 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		return
 	}
 
-	defer rows.Close()
-
 	defer func() {
 		if err != nil && (c.lastError == nil || err.Error() != c.lastError.Error()) {
 			c.Warningf("cannot upload history data: %s", err)
@@ -206,8 +198,6 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 			c.Errf("cannot select from log table: %s", err.Error())
 			return
 		}
-
-		defer rows.Close()
 
 		for rows.Next() {
 			if result, err = c.resultFetch(rows); err != nil {

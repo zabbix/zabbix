@@ -226,8 +226,6 @@ func prepareDiskCache(options *agent.AgentOptions, addresses []string) (err erro
 		return err
 	}
 
-	defer rows.Close()
-
 	for rows.Next() {
 		if err = rows.Scan(&id, &address); err != nil {
 			rows.Close()
@@ -272,8 +270,6 @@ addressCheck:
 		if err != nil {
 			return err
 		}
-
-		defer rows.Close()
 
 		if ok, err := fetchRowAndClose(rows, &id); !ok {
 			if err == nil {
