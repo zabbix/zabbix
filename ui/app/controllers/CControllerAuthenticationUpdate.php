@@ -232,7 +232,41 @@ class CControllerAuthenticationUpdate extends CController {
 			return;
 		}
 
-		$config = select_config();
+		$auth_params = [
+			CAuthenticationHelper::AUTHENTICATION_TYPE,
+			CAuthenticationHelper::HTTP_AUTH_ENABLED,
+			CAuthenticationHelper::HTTP_LOGIN_FORM,
+			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
+			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_CONFIGURED,
+			CAuthenticationHelper::LDAP_HOST,
+			CAuthenticationHelper::LDAP_PORT,
+			CAuthenticationHelper::LDAP_BASE_DN,
+			CAuthenticationHelper::LDAP_BIND_DN,
+			CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE,
+			CAuthenticationHelper::LDAP_BIND_PASSWORD,
+			CAuthenticationHelper::SAML_AUTH_ENABLED,
+			CAuthenticationHelper::SAML_IDP_ENTITYID,
+			CAuthenticationHelper::SAML_SSO_URL,
+			CAuthenticationHelper::SAML_SLO_URL,
+			CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE,
+			CAuthenticationHelper::SAML_SP_ENTITYID,
+			CAuthenticationHelper::SAML_NAMEID_FORMAT,
+			CAuthenticationHelper::SAML_SIGN_MESSAGES,
+			CAuthenticationHelper::SAML_SIGN_ASSERTIONS,
+			CAuthenticationHelper::SAML_SIGN_AUTHN_REQUESTS,
+			CAuthenticationHelper::SAML_SIGN_LOGOUT_REQUESTS,
+			CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES,
+			CAuthenticationHelper::SAML_ENCRYPT_NAMEID,
+			CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS,
+			CAuthenticationHelper::SAML_CASE_SENSITIVE
+		];
+		$auth = [];
+		foreach ($auth_params as $param) {
+			$auth[$param] = CAuthenticationHelper::get($param);
+		}
+
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
@@ -262,7 +296,7 @@ class CControllerAuthenticationUpdate extends CController {
 				$fields['ldap_bind_password'] = '';
 			}
 			else {
-				unset($config['ldap_bind_password']);
+				unset($auth[CAuthenticationHelper::LDAP_BIND_PASSWORD]);
 			}
 		}
 
@@ -285,16 +319,16 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
-		$data = array_merge($config, $fields);
+		$data = $fields + $auth;
 		$this->getInputs($data, array_keys($fields));
-		$data = array_diff_assoc($data, $config);
+		$data = array_diff_assoc($data, $auth);
 
 		if (array_key_exists('ldap_bind_dn', $data) && trim($data['ldap_bind_dn']) === '') {
 			$data['ldap_bind_password'] = '';
 		}
 
 		if ($data) {
-			$result = update_config($data);
+			$result = API::Authentication()->update($data);
 
 			if ($result) {
 				if (array_key_exists('authentication_type', $data)) {
@@ -302,7 +336,6 @@ class CControllerAuthenticationUpdate extends CController {
 				}
 
 				$this->response->setMessageOk(_('Authentication settings updated'));
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTHENTICATION, _('Authentication method changed'));
 			}
 			else {
 				$this->response->setFormData($this->getInputAll());

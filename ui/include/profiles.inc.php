@@ -35,22 +35,3 @@ function select_config() {
 
 	return $config;
 }
-
-function update_config($config) {
-	$update = [];
-
-	foreach ($config as $key => $value) {
-		if (!is_null($value)) {
-			$update[] = $key.'='.zbx_dbstr($value);
-		}
-	}
-
-	if (count($update) == 0) {
-		error(_('Nothing to do.'));
-		return null;
-	}
-
-	$result = DBexecute('UPDATE config SET '.implode(',', $update));
-
-	return $result;
-}
