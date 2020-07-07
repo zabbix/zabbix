@@ -27,17 +27,23 @@ abstract class CConfigGeneralHelper {
 	/**
 	 * API object parameters array.
 	 *
+	 * @static
+	 *
 	 * @var array
 	 */
 	protected static $params = [];
 
 	/**
 	 * Load once all parameters of API object.
+	 *
+	 * @static
 	 */
 	abstract protected static function loadParams(): void;
 
 	/**
 	 * Get value by parameter name of API object (load parameters if need).
+	 *
+	 * @static
 	 *
 	 * @param string  $name  API object parameter name.
 	 *
@@ -52,6 +58,8 @@ abstract class CConfigGeneralHelper {
 	/**
 	 * Get values of all parameters of API object (load parameters if need).
 	 *
+	 * @static
+	 *
 	 * @return array String array with all values of API object parameters in format <parameter name> => <value>.
 	 */
 	public static function getAll(): array {
@@ -62,6 +70,8 @@ abstract class CConfigGeneralHelper {
 
 	/**
 	 * Set value by parameter name of API object into $params (load parameters if need).
+	 *
+	 * @static
 	 *
 	 * @param string $name   API object parameter name.
 	 * @param string $value  API object parameter value.
