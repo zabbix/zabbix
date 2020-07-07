@@ -311,4 +311,187 @@ abstract class testFormMacros extends CWebTest {
 		// Compare macros from DB with macros from Frontend.
 		$this->assertEquals($macros['database'], $macros['frontend']);
 	}
+
+	public function createSecretMacros($macros, $url, $source) {
+		$this->openMacrosTab($url, $source, true);
+		// Check that macro values have type plain text by default.
+		$this->assertEquals('Text', CInputGroupElement::find()->one()->getInputType());
+		$this->fillMacros($macros);
+
+		$row = 0;
+		foreach ($macros as $macro) {
+			$value_field = $this->query('xpath://textarea[@name="macros['.$row.'][macro]"]/../..//div['.
+					CXPathHelper::fromClass('macro-value').']')->asInputGroup()->waitUntilVisible()->one();
+			// Check that type of both macros is set to secret text.
+			$this->assertEquals('Secret text', $value_field->getInputType());
+
+			//Check that textarea input element is not available for secret text macros.
+			$this->assertFalse($value_field->query('xpath:.//textarea[contains(@class, "textarea-flexible")]')
+					->one(false)->isValid());
+
+			$this->assertEquals($macro['value']['value'], $value_field->getValue());
+			// Switch to tab with inherited and instance macros and verify that the value is secret but is still accessible.
+			$this->checkInheritedTab($macro, true);
+			// Check that macro value is hidden but is still accessible after swithing back to instance macros list.
+			$value_field->isSecret();
+
+			if ($macro['macro'] === '{$TEXT_MACRO}') {
+				$value_field->changeInputType('Text');
+			}
+			$row++;
+		}
+		$this->query('button:Update')->one()->click();
+
+		$this->openMacrosTab($url, $source, true);
+
+		foreach ($macros as $macro) {
+			$sql = 'SELECT value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($macro['macro']);
+			$type = ($macro['macro'] === '{$TEXT_MACRO}') ? 0 : 1;
+
+			$value_field = $this->getValueField($macro['macro']);
+
+			if ($macro['macro'] === '{$TEXT_MACRO}') {
+				$this->assertEquals($macro['value']['value'], $value_field->getValue());
+				$this->assertFalse($value_field->query('button:Set new value')->one(false)->isValid());
+				$this->assertFalse($value_field->query('xpath:.//button[@title="Revert changes"]')->one(false)->isValid());
+
+				// Switch to tab with inherited and instance macros and verify that the value is plain text.
+				$this->checkInheritedTab($macro, false);
+			}
+			else {
+				$this->assertEquals('******', $value_field->getValue());
+
+				// Switch to tab with inherited and instance macros and verify that the value is secret and is not accessible.
+				$this->checkInheritedTab($macro, true, false);
+
+				$change_button = $value_field->query('button:Set new value')->one();
+				$revert_button = $value_field->query('xpath:.//button[@title="Revert changes"]')->one();
+				//Check that "Set new value" button is perent and "Revert" button is hidden if secret value wasn't modified.
+				$this->assertTrue($change_button->isEnabled());
+				$this->assertFalse($revert_button->isClickable());
+				// Modify secret value and check that Revert button becomes clickable and "Set new value" button is Disabled.
+				$change_button->click();
+				$value_field->invalidate();
+				$this->assertFalse($change_button->isEnabled());
+				$this->assertTrue($revert_button->isClickable());
+				// Revert changes
+				$value_field->pressRevertButton();
+			}
+			$this->query('button:Update')->one()->click();
+			// Check macro value, type and description in DB.
+			$this->assertEquals([$macro['value']['value'], $macro['description'], $type], array_values(CDBHelper::getRow($sql)));
+			$this->openMacrosTab($url, $source, true);
+		}
+	}
+
+	public function updateSecretMacros($macros, $url, $source, $table) {
+		$this->openMacrosTab($url, $source, true);
+		$this->fillMacros($macros);
+
+		foreach ($macros as $macro) {
+			$value_field = $this->getValueField($macro['macro']);
+			$secret = (CTestArrayHelper::get($macro['value'], 'type', 'Secret text') === 'Secret text') ? true : false;
+			$this->checkInheritedTab($macro, $secret);
+		}
+
+		$this->query('button:Update')->one()->click();
+		$this->openMacrosTab($url, $source);
+
+		foreach ($macros as $macro) {
+			$value_field = $this->getValueField($macro['macro']);
+			if (CTestArrayHelper::get($macro['value'], 'type', 'Secret text') === 'Secret text') {
+				$this->assertTrue($value_field->isSecret());
+				$this->assertEquals('******', $value_field->getValue());
+				$this->checkInheritedTab($macro, true, false);
+			}
+			else {
+				$this->assertFalse($value_field->isSecret());
+				$this->assertEquals($macro['value']['value'], $value_field->getValue());
+				$this->checkInheritedTab($macro, false);
+			}
+			$sql = 'SELECT value FROM '.$table.'macro WHERE macro='.zbx_dbstr($macro['macro']);
+			$this->assertEquals($macro['value']['value'], CDBHelper::getValue($sql));
+		}
+	}
+
+	public function revertSecretMacroChanges($macros, $url, $source, $table) {
+		$this->openMacrosTab($url, $source, true);
+
+		$sql = 'SELECT * FROM '.$table.'macro WHERE macro in ('.CDBHelper::escape(array_column($macros, 'macro')).
+				') ORDER BY macro';
+		$old_hash = CDBHelper::getHash($sql);
+
+		foreach ($macros as $macro) {
+			$value_field = $this->getValueField($macro['macro']);
+			// Check that the existing macro value is hidden.
+			$this->assertEquals('******', $value_field->getValue());
+			// Change the value of the secret macro to a unique value (absolute time)
+			$value_field->fill([
+				'value' => time()
+			]);
+
+			if ($macro['macro'] === '{$SECRET_HOST_MACRO_2_TEXT_REVERT}') {
+				$value_field->changeInputType('Text');
+			}
+			// Press revert button amd save the changes acnd make sure that changes were reverted.
+			$value_field->pressRevertButton();
+		}
+		$this->query('button:Update')->one()->click();
+		// Check that no macro value changes took place.
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+	}
+
+	public function resolveSecretMacro($macro, $url, $source) {
+		$this->page->login()->open($url)->waitUntilReady();
+		$this->query('link:Items')->one()->click();
+		$this->page->waitUntilReady();
+
+		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->one(false)->isValid());
+
+		$this->openMacrosTab($url, $source);
+
+		$value_field = $this->getValueField($macro['macro']);
+		$value_field->changeInputType('Secret text');
+
+		$this->query('button:Update')->one()->click();
+		$this->openMacrosTab($url, $source);
+
+		$this->query('link:Items')->one()->click();
+		$this->page->waitUntilReady();
+
+		$this->assertTrue($this->query('link', 'Macro value: ******')->one(false)->isValid());
+	}
+
+
+	public function getValueField($macro) {
+		return $value_field = $this->query('xpath://textarea[text()="'.$macro.'"]/../..//div[contains(@class,"macro-value")]')
+					->asInputGroup()->waitUntilVisible()->one();
+	}
+
+	public function checkInheritedTab($macro, $secret, $displayed = true) {
+		// Switch to the list of inherited and instance macros.
+		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
+		$value_field = $this->getValueField($macro['macro']);
+
+		if ($secret) {
+			$this->assertTrue($value_field->isSecret());
+			$expected_value = ($displayed) ? $macro['value']['value'] : '******';
+			$this->assertEquals($expected_value, $value_field->getValue());
+		}
+		else {
+			$this->assertFalse($value_field->isSecret());
+			$this->assertEquals($macro['value']['value'], $value_field->getValue());
+		}
+		// Switch back to the list of instance macros.
+		$this->query('xpath://label[@for="show_inherited_macros_0"]')->waitUntilPresent()->one()->click();
+	}
+
+	private function openMacrosTab($url, $source, $login = false){
+		if ($login) {
+			$this->page->login();
+		}
+		$this->page->open($url)->waitUntilReady();
+		$this->query('id:'.$source.'Form')->asForm()->one()->selectTab('Macros');
+	}
+
 }

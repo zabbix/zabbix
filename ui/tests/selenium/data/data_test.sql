@@ -2770,3 +2770,23 @@ INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALU
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (90501, 200, 7, 'graphid', 600002);
 
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (141, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
+
+-- testFormHostMacros
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99504, 99135, '{$SECRET_HOST_MACRO_REVERT}', 'Secret host value', 'Secret host macro description', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99505, 99135, '{$SECRET_HOST_MACRO_2_TEXT_REVERT}', 'Secret host value 2 text', 'Secret host macro that will be changed to text', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99506, 99135, '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}', 'Secret host value 2 B updated', 'Secret host macro that is going to be updated', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99507, 99135, '{$TEXT_HOST_MACRO_2_SECRET}', 'Text host macro value', 'Text host macro that is going to become secret', 0);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99508, 99135, '{$SECRET_HOST_MACRO_UPDATE}', 'Secret host macro value', 'Secret host macro that is going to stay secret', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99509, 99135, '{$SECRET_HOST_MACRO_2_RESOLVE}', 'Value 2 B resolved', 'Host macro to be resolved', 0);
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid) VALUES (99112, 2, 99135, 'Macro value: {$SECRET_HOST_MACRO_2_RESOLVE}', 'trap', NULL);
+
+
+-- testFormTemplateMacros
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99510, 99137, '{$SECRET_TEMPLATE_MACRO_REVERT}', 'Secret template value', 'Secret template macro description', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99511, 99137, '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}', 'Secret template value 2 text', 'Secret template macro that will be changed to text', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99512, 99137, '{$SECRET_TEMPLATE_MACRO_UPDATE_2_TEXT}', 'Secret template value 2 B updated', 'Secret template macro that is going to be updated', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99513, 99137, '{$TEXT_TEMPLATE_MACRO_2_SECRET}', 'Text template macro value', 'Text template macro that is going to become secret', 0);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99514, 99137, '{$SECRET_TEMPLATE_MACRO_UPDATE}', 'Secret template macro value', 'Secret template macro that is going to stay secret', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99515, 99137, '{$SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'Value 2 B resolved', 'Template macro to be resolved', 0);
+INSERT INTO items (itemid, type, hostid, name, key_, interfaceid) VALUES (99113, 2, 99137, 'Macro value: {$SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'trap', NULL);
+

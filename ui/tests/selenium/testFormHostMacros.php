@@ -415,4 +415,82 @@ class testFormHostMacros extends testFormMacros {
 	public function testFormHostMacros_ChangeRemoveInheritedMacro() {
 		$this->checkChangeRemoveInheritedMacro('hosts', 'host');
 	}
+
+	public function testFormHostMacros_CreateSecretMacros() {
+		$macros = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'macro' => '{$SECRET_MACRO}',
+				'value' => [
+					'value' => 'secret value',
+					'type' => 'Secret text'
+				],
+				'description' => 'secret description'
+			],
+			[
+				'macro' => '{$TEXT_MACRO}',
+				'value' => [
+					'value' => 'plain text value',
+					'type' => 'Secret text'
+				],
+				'description' => 'plain text description'
+			]
+		];
+		$this->createSecretMacros($macros, 'hosts.php?form=update&hostid=99134', 'hosts');
+	}
+
+	public function testFormHostMacros_RevertSecretMacroChanges() {
+		$macro = [
+			[
+				'macro' => '{$SECRET_HOST_MACRO_REVERT}',
+				'value' => 'Secret host value'
+			],
+			[
+				'macro' => '{$SECRET_HOST_MACRO_2_TEXT_REVERT}',
+				'value' => 'Secret host value 2'
+			]
+		];
+		$this->revertSecretMacroChanges($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+	}
+
+	public function testFormHostMacros_UpdateSecretMacros() {
+		$macro = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 2,
+				'macro' => '{$SECRET_HOST_MACRO_UPDATE}',
+				'value' => [
+					'value' => 'Updated secret value'
+				]
+			],
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 3,
+				'macro' => '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}',
+				'value' => [
+					'value' => 'New text value',
+					'type' => 'Text'
+				]
+			],
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 4,
+				'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
+				'value' => [
+					'value' => 'New secret value',
+					'type' => 'Secret text'
+				]
+			]
+		];
+		$this->updateSecretMacros($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+	}
+
+	public function testFormHostMacros_SecretMacroResolution() {
+		$macro = [
+			'macro' => '{$SECRET_HOST_MACRO_2_RESOLVE}',
+			'value' => 'Value 2 B resolved'
+		];
+		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+	}
 }

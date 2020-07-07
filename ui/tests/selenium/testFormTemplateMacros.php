@@ -415,4 +415,72 @@ class testFormTemplateMacros extends testFormMacros {
 	public function testFormTemplateMacros_ChangeRemoveInheritedMacro() {
 		$this->checkChangeRemoveInheritedMacro('templates', 'template');
 	}
+
+	public function testFormTemplateMacros_SecretMacrosCreate() {
+		$macros = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'macro' => '{$SECRET_MACRO}',
+				'value' => [
+					'value' => 'secret value'
+				],
+				'description' => 'secret description'
+			],
+			[
+				'macro' => '{$TEXT_MACRO}',
+				'value' => [
+					'value' => 'plain text value'
+				],
+				'description' => 'plain text description'
+			]
+		];
+		$this->createSecretMacros($macros, 'templates.php?form=update&templateid=99022', 'templates');
+	}
+
+	public function testFormTemplateMacros_RevertSecretMacroChanges() {
+		$macro = [
+			[
+				'macro' => '{$SECRET_TEMPLATE_MACRO}',
+				'value' => 'Secret template value'
+			],
+			[
+				'macro' => '{$SECRET_TEMPLATE_MACRO_2_TEXT}',
+				'value' => 'Secret template value 2'
+			]
+		];
+		$this->revertSecretMacroChanges($macro, 'templates.php?form=update&templateid=99137', 'templates', 'host');
+	}
+
+	public function testFormTemplateMacros_UpdateSecretMacros() {
+		$macro = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 2,
+				'macro' => '{$SECRET_TEMPLATE_MACRO_UPDATE}',
+				'value' => [
+					'value' => 'Updated secret value'
+				]
+			],
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 3,
+				'macro' => '{$SECRET_TEMPLATE_MACRO_UPDATE_2_TEXT}',
+				'value' => [
+					'value' => 'New text value',
+					'type' => 'Text'
+				]
+			],
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 4,
+				'macro' => '{$TEXT_TEMPLATE_MACRO_2_SECRET}',
+				'value' => [
+					'value' => 'New secret value',
+					'type' => 'Secret text'
+				]
+			]
+		];
+		$this->updateSecretMacros($macro, 'templates.php?form=update&templateid=99137', 'templates', 'host');
+	}
 }
