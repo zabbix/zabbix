@@ -858,7 +858,7 @@ class testFormAction extends CLegacyWebTest {
 					COverlayDialogElement::find()->one()->waitUntilReady();
 					break;
 				case 'Internal':
-					$this->zbxTestTextPresent ('Send message');
+					$this->zbxTestTextPresent('Send message');
 					break;
 			}
 		}
@@ -916,19 +916,19 @@ class testFormAction extends CLegacyWebTest {
 			switch ($new_operation_operationtype) {
 				case 'Send message':
 				case 'Remote command':
-					$this->zbxTestTextPresent ('Steps');
+					$this->zbxTestTextPresent('Steps');
 					$this->zbxTestAssertVisibleId('operation_esc_step_from');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'maxlength', 5);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'value', 1);
 
-					$this->zbxTestTextPresent ('(0 - infinitely)');
+					$this->zbxTestTextPresent('(0 - infinitely)');
 					$this->zbxTestAssertVisibleId('operation_esc_step_to');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'maxlength', 5);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'value', 1);
 
-					$this->zbxTestTextPresent (['Step duration', '(0 - use action default)']);
+					$this->zbxTestTextPresent(['Step duration', '(0 - use action default)']);
 					$this->zbxTestAssertVisibleId('operation_esc_period');
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'maxlength', 255);
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'size', 20);
@@ -943,7 +943,7 @@ class testFormAction extends CLegacyWebTest {
 			}
 
 		if (isset($data['new_operation_operationtype']) && $eventsource != 'Internal') {
-			$this->zbxTestTextPresent ('Operation type');
+			$this->zbxTestTextPresent('Operation type');
 			$this->zbxTestAssertVisibleXpath('//select[@id=\'operationtype\']');
 		}
 		else {
@@ -1008,7 +1008,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if ($new_operation_operationtype == 'Send message') {
-			$this->zbxTestTextPresent ([
+			$this->zbxTestTextPresent([
 				'Send to User groups', 'User group', 'Action',
 				'Send to Users'
 			]);
@@ -1017,7 +1017,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleXpath('//tr[@id=\'operation-message-users-footer\']//button[@class=\'btn-link\']');
 			$this->zbxTestAssertElementText('//tr[@id=\'operation-message-users-footer\']//button[@class=\'btn-link\']', 'Add');
 
-			$this->zbxTestTextPresent ('Send only to');
+			$this->zbxTestTextPresent('Send only to');
 			$this->zbxTestAssertVisibleId('operation_opmessage_mediatypeid');
 			$this->zbxTestDropdownAssertSelected('operation[opmessage][mediatypeid]', '- All -');
 			$this->zbxTestDropdownHasOptions('operation_opmessage_mediatypeid', [
@@ -1065,7 +1065,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if ($eventsource == 'Triggers' && $new_operation_operationtype != null) {
-			$this->zbxTestTextPresent ([
+			$this->zbxTestTextPresent([
 				'Conditions', 'Label', 'Name', 'Action'
 			]);
 
@@ -1073,7 +1073,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleXpath('//div[@id="operationTab"]//button[text()="Add"]');
 			}
 			else {
-				$this->zbxTestTextPresent ('New condition');
+				$this->zbxTestTextPresent('New condition');
 				$this->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]'.
 						'//button[text()="Cancel"]')->one()->waitUntilVisible();
 
@@ -1104,7 +1104,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if ($new_operation_opcommand_type != null) {
-			$this->zbxTestTextPresent ('Type');
+			$this->zbxTestTextPresent('Type');
 			$this->query('xpath://select[@id="operation_opcommand_type"]')->waitUntilVisible();
 			$this->zbxTestDropdownAssertSelected('operation[opcommand][type]', $new_operation_opcommand_type);
 			$this->zbxTestDropdownHasOptions('operation_opcommand_type', [
@@ -1120,7 +1120,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if ($new_operation_opcommand_type == 'Custom script') {
-			$this->zbxTestTextPresent ([
+			$this->zbxTestTextPresent([
 				'Execute on', 'Zabbix agent', 'Zabbix server']
 			);
 			$this->zbxTestAssertElementPresentXpath('//input[@id=\'operation_opcommand_execute_on_0\']');
@@ -1136,20 +1136,21 @@ class testFormAction extends CLegacyWebTest {
 			case 'Custom script':
 			case 'SSH':
 			case 'Telnet':
-				$this->zbxTestTextPresent ('Commands');
+				$this->zbxTestTextPresent('Commands');
 				$this->zbxTestAssertVisibleXpath('//textarea[@id=\'operation_opcommand_command\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_command\']', 'rows', 7);
 				break;
 			case 'IPMI':
-				$this->zbxTestTextPresent ('Commands');
+				$this->zbxTestTextPresent('Commands');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_command_ipmi\']');
+				break;
 			default:
 				$this->zbxTestAssertElementNotPresentXpath('//textarea[@id=\'operation_opcommand_command\']');
 				break;
 		}
 
 		if ($new_operation_opcommand_type == 'IPMI') {
-			$this->zbxTestTextPresent ('Commands');
+			$this->zbxTestTextPresent('Commands');
 			$this->zbxTestAssertVisibleXpath('//input[@id="operation_opcommand_command_ipmi"]');
 			$this->zbxTestAssertAttribute('//*[@id="operation_opcommand_command_ipmi"]', 'maxlength', 255);
 			$this->zbxTestAssertAttribute('//*[@id="operation_opcommand_command_ipmi"]', 'size', 20);
@@ -1161,7 +1162,7 @@ class testFormAction extends CLegacyWebTest {
 
 		switch ($new_operation_opcommand_type) {
 			case 'SSH':
-				$this->zbxTestTextPresent ('Authentication method');
+				$this->zbxTestTextPresent('Authentication method');
 				$this->zbxTestAssertVisibleXpath('//select[@id=\'operation_opcommand_authtype\']');
 				$this->zbxTestDropdownHasOptions('operation_opcommand_authtype', [
 						'Password',
@@ -1185,7 +1186,7 @@ class testFormAction extends CLegacyWebTest {
 		switch ($new_operation_opcommand_type) {
 			case 'SSH':
 			case 'Telnet':
-				$this->zbxTestTextPresent ('User name');
+				$this->zbxTestTextPresent('User name');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_username\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_username\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_username\']', 'size', 20);
@@ -1203,7 +1204,7 @@ class testFormAction extends CLegacyWebTest {
 
 		switch ($new_operation_opcommand_authtype) {
 			case 'Password':
-				$this->zbxTestTextPresent ('Password');
+				$this->zbxTestTextPresent('Password');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_password\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_password\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_password\']', 'size', 20);
@@ -1215,7 +1216,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertNotVisibleId('operation_opcommand_privatekey');
 				break;
 			case 'Public key':
-				$this->zbxTestTextPresent ('Key passphrase');
+				$this->zbxTestTextPresent('Key passphrase');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'opcommand_passphrase\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'opcommand_passphrase\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//*[@id=\'opcommand_passphrase\']', 'size', 20);
@@ -1223,13 +1224,13 @@ class testFormAction extends CLegacyWebTest {
 
 				$this->zbxTestAssertNotVisibleXpath('//input[@id=\'operation_opcommand_password\']');
 
-				$this->zbxTestTextPresent ('Public key file');
+				$this->zbxTestTextPresent('Public key file');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_publickey\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_publickey\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_publickey\']', 'size', 20);
 				$this->zbxTestAssertElementValue('operation_opcommand_publickey', '');
 
-				$this->zbxTestTextPresent ('Private key file');
+				$this->zbxTestTextPresent('Private key file');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_privatekey\']');
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_privatekey\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//*[@id=\'operation_opcommand_privatekey\']', 'size', 20);
@@ -1246,14 +1247,13 @@ class testFormAction extends CLegacyWebTest {
 					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'opcommand_passphrase\']');
 					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'operation_opcommand_publickey\']');
 					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'operation_opcommand_privatekey\']');
-				break;
 				}
 		}
 
 		switch ($new_operation_opcommand_type) {
 			case 'SSH':
 			case 'Telnet':
-				$this->zbxTestTextPresent ('Port');
+				$this->zbxTestTextPresent('Port');
 				$this->zbxTestAssertVisibleXpath('//input[@id=\'operation_opcommand_port\']');
 				$this->zbxTestAssertAttribute('//input[@id=\'operation_opcommand_port\']', 'maxlength', 255);
 				$this->zbxTestAssertAttribute('//input[@id=\'operation_opcommand_port\']', 'size', 20);
