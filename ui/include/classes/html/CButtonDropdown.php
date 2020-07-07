@@ -73,7 +73,10 @@ class CButtonDropdown extends CButton {
 				->setId(zbx_formatDomId($name.'[btn]'))
 				->setMenuPopup([
 					'type' => 'dropdown',
-					'data' => ['items' => $this->dropdown_items]
+					'data' => [
+						'items' => $this->dropdown_items,
+						'toggle_class' => ZBX_STYLE_BTN_TOGGLE
+					]
 				]))
 			->addItem((new CInput('hidden', $name, $this->getAttribute('value')))
 				->addClass(self::ZBX_STYLE_BTN_VALUE)

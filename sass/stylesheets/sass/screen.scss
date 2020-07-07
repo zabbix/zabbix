@@ -7057,13 +7057,13 @@ table.preprocessing-test-results {
 }
 
 .btn-split {
-	display: inline-flex;
+	display: inline-block;
 	position: relative;
-
-	// Fix for buttons that have no content.
-	vertical-align: top;
+	margin-right: 10px;
 
 	li {
+		display: inline-block;
+
 		button {
 			margin: 0 -1px 0 0;
 			border-radius: 0;
@@ -7075,12 +7075,10 @@ table.preprocessing-test-results {
 
 		&:last-child button {
 			border-radius: 0 2px 2px 0;
-			margin-right: 10px;
 		}
 
 		&:only-child button {
 			border-radius: 2px;
-			margin-right: 10px;
 		}
 	}
 }
@@ -7112,7 +7110,7 @@ table.preprocessing-test-results {
 	&::after {
 		position: absolute;
 		top: 7px;
-		right: 17px;
+		right: 6px;
 		width: 10px;
 		height: 10px;
 		content: '';

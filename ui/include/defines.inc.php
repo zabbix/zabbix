@@ -1267,16 +1267,6 @@ define('SERVER_CHECK_INTERVAL', 10);
 
 define('DATE_TIME_FORMAT_SECONDS_XML', 'Y-m-d\TH:i:s\Z');
 
-// XML export|import tags
-define('XML_TAG_MACRO',				'macro');
-define('XML_TAG_HOST',				'host');
-define('XML_TAG_HOSTINVENTORY',		'host_inventory');
-define('XML_TAG_ITEM',				'item');
-define('XML_TAG_TRIGGER',			'trigger');
-define('XML_TAG_GRAPH',				'graph');
-define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
-define('XML_TAG_DEPENDENCY',		'dependency');
-
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
 // XML import flags

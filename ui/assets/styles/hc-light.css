@@ -5398,20 +5398,20 @@ table.preprocessing-test-results .rel-container {
   background-position: -399px -510px; }
 
 .btn-split {
-  display: inline-flex;
+  display: inline-block;
   position: relative;
-  vertical-align: top; }
-  .btn-split li button {
-    margin: 0 -1px 0 0;
-    border-radius: 0; }
-  .btn-split li:first-child button {
-    border-radius: 2px 0 0 2px; }
-  .btn-split li:last-child button {
-    border-radius: 0 2px 2px 0;
-    margin-right: 10px; }
-  .btn-split li:only-child button {
-    border-radius: 2px;
-    margin-right: 10px; }
+  margin-right: 10px; }
+  .btn-split li {
+    display: inline-block; }
+    .btn-split li button {
+      margin: 0 -1px 0 0;
+      border-radius: 0; }
+    .btn-split li:first-child button {
+      border-radius: 2px 0 0 2px; }
+    .btn-split li:last-child button {
+      border-radius: 0 2px 2px 0; }
+    .btn-split li:only-child button {
+      border-radius: 2px; }
 
 .btn-dropdown-toggle {
   white-space: nowrap;
@@ -5433,7 +5433,7 @@ table.preprocessing-test-results .rel-container {
   .btn-dropdown-toggle::after {
     position: absolute;
     top: 7px;
-    right: 17px;
+    right: 6px;
     width: 10px;
     height: 10px;
     content: '';
