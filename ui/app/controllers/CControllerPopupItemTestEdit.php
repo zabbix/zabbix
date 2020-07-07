@@ -57,14 +57,6 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
 			'show_final_result'		=> 'in 0,1',
 			'snmp_oid'				=> 'string',
-			'snmp_community'		=> 'string',
-			'snmpv3_securityname'	=> 'string',
-			'snmpv3_contextname'	=> 'string',
-			'snmpv3_securitylevel'	=> 'in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
-			'snmpv3_authprotocol'	=> 'in '.implode(',', [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA]),
-			'snmpv3_authpassphrase'	=> 'string',
-			'snmpv3_privprotocol'	=> 'in '.implode(',', [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]),
-			'snmpv3_privpassphrase'	=> 'string',
 			'step_obj'				=> 'required|int32',
 			'steps'					=> 'array',
 			'ssl_cert_file'			=> 'string',
@@ -192,6 +184,15 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				// Check if user macros are supported in field.
 				if ($this->macros_by_item_props[$field]['support_user_macros']) {
 					$texts_support_user_macros[] = $inputs[$field];
+				}
+			}
+		}
+
+		// Check if Interface details (SNMP) have macros and add them to list of macros.
+		if (array_key_exists('details', $inputs['interface'])) {
+			foreach ($inputs['interface']['details'] as $field) {
+				if (strstr($field, '{') !== false) {
+					$texts_support_user_macros[] = $field;
 				}
 			}
 		}
