@@ -36,12 +36,23 @@ catch (Exception $e) {
 	exit;
 }
 
+$default_lang = ZBX_DEFAULT_LANG;
+if (CSession::keyExists('default_lang')) {
+	$default_lang = CSession::getValue('default_lang');
+}
+elseif (CWebUser::$data) {
+	$default_lang = CWebUser::$data['lang'];
+}
+
 $available_locales = [];
 foreach (getLocales() as $localeid => $locale) {
 	if ($locale['display'] && setlocale(LC_MONETARY, zbx_locale_variants($localeid)) !== false) {
 		$available_locales[] = $localeid;
 	}
 }
+
+// Restoring original locale.
+setlocale(LC_MONETARY, zbx_locale_variants($default_lang));
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
@@ -98,17 +109,7 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
 }
 
 // Set default language.
-$default_lang = ZBX_DEFAULT_LANG;
-
-if (hasRequest('default_lang')) {
-	$default_lang = getRequest('default_lang');
-}
-elseif (CSession::keyExists('default_lang')) {
-	$default_lang = CSession::getValue('default_lang');
-}
-elseif (CWebUser::$data) {
-	$default_lang = CWebUser::$data['lang'];
-}
+$default_lang = getRequest('default_lang', $default_lang);
 
 if (!in_array($default_lang, $available_locales)) {
 	$default_lang = ZBX_DEFAULT_LANG;
