@@ -9755,7 +9755,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros                                        *
+ * Function: dc_expand_user_macros                                            *
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
  * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
@@ -9771,7 +9771,7 @@ out:
  *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
+char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, len, last_pos = 0;
@@ -9818,7 +9818,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros_in_expression                          *
+ * Function: dc_expand_user_macros_in_expression                              *
  *                                                                            *
  * Purpose: expand user macros for triggers and calculated items in the       *
  *          specified text value and autoquote macros that are not already    *
@@ -9834,7 +9834,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  * Comments: The returned value must be freed by the caller.                  *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
+char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
@@ -9954,9 +9954,9 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	zbx_vector_uint64_create(&hostids);
 
 	get_functionids(&functionids, expression);
-	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
+	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	out = zbx_dc_expand_user_macros_in_expression(expression, hostids.values, hostids.values_num);
+	out = dc_expand_user_macros_in_expression(expression, hostids.values, hostids.values_num);
 
 	if (NULL != strstr(out, "{$"))
 	{
@@ -10721,7 +10721,7 @@ unlock:
  * Comments: this function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
+void	dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids)
 {
 	const ZBX_DC_FUNCTION	*function;
@@ -10757,7 +10757,7 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 
 	RDLOCK_CACHE;
 
-	zbx_dc_get_hostids_by_functionids(functionids->values, functionids->values_num, hostids);
+	dc_get_hostids_by_functionids(functionids->values, functionids->values_num, hostids);
 
 	UNLOCK_CACHE;
 
@@ -12708,7 +12708,7 @@ const char	*zbx_dc_get_instanceid(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_func_params_user_macros                            *
+ * Function: dc_expand_user_macros_in_func_params                             *
  *                                                                            *
  * Purpose: expand user macros in trigger function parameters                 *
  *                                                                            *
@@ -12718,7 +12718,7 @@ const char	*zbx_dc_get_instanceid(void)
  * Return value: The function parameters with expanded user macros.           *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *params)
+char	*dc_expand_user_macros_in_func_params(zbx_uint64_t hostid, const char *params)
 {
 	const char	*ptr;
 	size_t		params_len;
@@ -12739,7 +12739,7 @@ char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *par
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-		resolved_param = zbx_dc_expand_user_macros(param, &hostid, 1);
+		resolved_param = dc_expand_user_macros(param, &hostid, 1);
 
 		if (SUCCEED == zbx_function_param_quote(&resolved_param, quoted))
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, resolved_param);
@@ -12751,6 +12751,28 @@ char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *par
 	}
 
 	return buf;
+}
+
+char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
+{
+	char	*expression;
+
+	RDLOCK_CACHE;
+	expression = dc_expand_user_macros_in_expression(text, hostids, hostids_num);
+	UNLOCK_CACHE;
+
+	return expression;
+}
+
+char	*zbx_dc_expand_user_macros_in_func_params(zbx_uint64_t hostid, const char *params)
+{
+	char	*resolved_params;
+
+	RDLOCK_CACHE;
+	resolved_params = dc_expand_user_macros_in_func_params(hostid, params);
+	UNLOCK_CACHE;
+
+	return resolved_params;
 }
 
 #ifdef HAVE_TESTS

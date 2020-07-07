@@ -3298,7 +3298,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 
 	/* User macros in trigger and calculated function parameters are resolved during configuration sync. */
 	/* However simple macro user parameters are not expanded, do it now.                                 */
-	resolved_params = zbx_dc_expand_func_params_user_macros(item.host.hostid, parameter);
+	resolved_params = zbx_dc_expand_user_macros_in_func_params(item.host.hostid, parameter);
 
 	if (SUCCEED != errcode || SUCCEED != evaluate_function(&value, &item, function, resolved_params, &ts, &error))
 	{

@@ -1759,13 +1759,13 @@ static char	**dbsync_item_preproc_row(char **row)
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_DELAY))
-		row[8] = zbx_dc_expand_user_macros(row[8], &hostid, 1);
+		row[8] = dc_expand_user_macros(row[8], &hostid, 1);
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_HISTORY))
-		row[22] = zbx_dc_expand_user_macros(row[22], &hostid, 1);
+		row[22] = dc_expand_user_macros(row[22], &hostid, 1);
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_TRENDS))
-		row[23] = zbx_dc_expand_user_macros(row[23], &hostid, 1);
+		row[23] = dc_expand_user_macros(row[23], &hostid, 1);
 
 	return row;
 
@@ -2111,15 +2111,15 @@ static char	**dbsync_trigger_preproc_row(char **row)
 	get_functionids(&functionids, row[2]);
 	get_functionids(&functionids, row[11]);
 
-	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
+	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
 	/* expand user macros */
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_EXPRESSION))
-		row[2] = zbx_dc_expand_user_macros_in_expression(row[2], hostids.values, hostids.values_num);
+		row[2] = dc_expand_user_macros_in_expression(row[2], hostids.values, hostids.values_num);
 
 	if (0 != (flags & ZBX_DBSYNC_TRIGGER_COLUMN_RECOVERY_EXPRESSION))
-		row[11] = zbx_dc_expand_user_macros_in_expression(row[11], hostids.values, hostids.values_num);
+		row[11] = dc_expand_user_macros_in_expression(row[11], hostids.values, hostids.values_num);
 
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_vector_uint64_destroy(&hostids);
@@ -2350,7 +2350,7 @@ static char	**dbsync_function_preproc_row(char **row)
 		/* get associated host identifier */
 		ZBX_STR2UINT64(hostid, row[5]);
 
-		row[3] = zbx_dc_expand_func_params_user_macros(hostid, row[3]);
+		row[3] = dc_expand_user_macros_in_func_params(hostid, row[3]);
 	}
 
 	return row;
@@ -3506,10 +3506,10 @@ static char	**dbsync_item_pp_preproc_row(char **row)
 		ZBX_STR2UINT64(hostid, row[5]);
 
 		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM))
-			row[3] = zbx_dc_expand_user_macros(row[3], &hostid, 1);
+			row[3] = dc_expand_user_macros(row[3], &hostid, 1);
 
 		if (0 != (flags & ZBX_DBSYNC_ITEM_PP_COLUMN_ERR_PARAM))
-			row[7] = zbx_dc_expand_user_macros(row[7], &hostid, 1);
+			row[7] = dc_expand_user_macros(row[7], &hostid, 1);
 	}
 
 	return row;

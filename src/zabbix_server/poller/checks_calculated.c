@@ -150,9 +150,9 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	/* copy the remaining part */
 	zbx_strcpy_alloc(&tmp_exp, &exp_alloc, &exp_offset, e);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __func__, exp->exp);
-
 	exp->exp = zbx_dc_expand_user_macros_in_expression(tmp_exp, &dc_item->host.hostid, 1);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __func__, exp->exp);
 
 	ret = SUCCEED;
 out:
