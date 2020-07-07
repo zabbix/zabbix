@@ -167,15 +167,22 @@ elseif ($all_locales_available == 0) {
 	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 }
 
+$theme_combobox = new CComboBox('theme', $data['theme'], null,
+	[THEME_DEFAULT => _('System default')] + APP::getThemes()
+);
+
+if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
+	$lang_combobox->setEnabled(false);
+	$theme_combobox->setEnabled(false);
+}
+
 $user_form_list
 	->addRow(_('Language'),
 		($language_error !== '')
 			? [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
 			: $lang_combobox
 	)
-	->addRow(_('Theme'),
-		new CComboBox('theme', $data['theme'], null, [THEME_DEFAULT => _('System default')] + APP::getThemes())
-	);
+	->addRow(_('Theme'), $theme_combobox);
 
 // Append auto-login & auto-logout to form list.
 if ($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER) {

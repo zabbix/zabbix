@@ -444,6 +444,15 @@ class CUser extends CApiService {
 
 				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
 			}
+
+			if ($db_user['alias'] == ZBX_GUEST_USER) {
+				if (array_key_exists('lang', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set language for user "guest".'));
+				}
+				if (array_key_exists('theme', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set theme for user "guest".'));
+				}
+			}
 		}
 		unset($user);
 
@@ -1318,8 +1327,6 @@ class CUser extends CApiService {
 		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
 			return self::$userData;
 		}
-
-		CWebUser::setDefault();
 
 		$time = time();
 
