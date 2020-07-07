@@ -12725,6 +12725,9 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 	char		*buf;
 	size_t		buf_alloc, buf_offset = 0, sep_pos;
 
+	if ('\0' == *params)
+		return zbx_strdup(NULL, params);
+
 	buf_alloc = params_len = strlen(params);
 	buf = zbx_malloc(NULL, buf_alloc);
 
@@ -12734,10 +12737,11 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 		int	quoted;
 		char	*param = NULL, *resolved_param;
 
-		if (0 != buf_offset)
+		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+
+		if (',' == ptr[sep_pos])
 			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
 
-		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
 		resolved_param = dc_expand_user_macros(param, &hostid, 1);
 

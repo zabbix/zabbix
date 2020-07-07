@@ -1,0 +1,49 @@
+---
+test case: Expand '{$A}' with {$A}=1
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: 1
+  params: '{$A}'
+out:
+  params: '1'
+---
+test case: Expand '{$A}' with {$A}=(1)
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: (1)
+  params: '{$A}'
+out:
+  params: '"(1)"'
+---
+test case: Expand '' 
+in:
+  macros: []
+  params: ''
+out:
+  params: ''
+---
+test case: Expand ' '
+in:
+  macros: []
+  params: ' '
+out:
+  params: ''
+---
+test case: Expand '{$A}'
+in:
+  macros: []
+  params: '{$A}'
+out:
+  params: '{$A}'
+---
+test case: Expand ',' 
+in:
+  macros: []
+  params: ','
+out:
+  params: ','
+...
