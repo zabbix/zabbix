@@ -133,7 +133,7 @@ class CHousekeeping extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function validateUpdate(array $hk) {
+	protected function validateUpdate(array $hk): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'hk_events_mode' =>			['type' => API_INT32, 'in' => '0,1'],
 			'hk_events_trigger' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],

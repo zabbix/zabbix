@@ -148,7 +148,7 @@ class CSettings extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function validateUpdate(array $settings) {
+	protected function validateUpdate(array $settings): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'default_theme' =>				['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(APP::getThemes()))],
 			'search_limit' =>				['type' => API_INT32, 'in' => '1:999999'],
