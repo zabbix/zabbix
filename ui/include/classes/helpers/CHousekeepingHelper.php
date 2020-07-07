@@ -22,7 +22,7 @@
 /**
  * A class for accessing once loaded parameters of Housekeeping API object.
  */
-class CHousekeepingHelper {
+class CHousekeepingHelper extends CConfigGeneralHelper {
 
 	public const COMPRESS_OLDER = 'compress_older';
 	public const COMPRESSION_AVAILABILITY = 'compression_availability';
@@ -47,56 +47,11 @@ class CHousekeepingHelper {
 	public const HK_TRENDS_MODE = 'hk_trends_mode';
 
 	/**
-	 * Housekeeping parameters array.
-	 *
-	 * @var array
+	 * @inheritdoc
 	 */
-	private static $params = [];
-
-	/**
-	 * Load once all parameters of Housekeeping API object.
-	 */
-	private static function loadParams() {
+	protected static function loadParams(): void {
 		if (!self::$params) {
 			self::$params = API::Housekeeping()->get(['output' => 'extend']);
-		}
-	}
-
-	/**
-	 * Get value by parameter name of Housekeeping (load parameters if need).
-	 *
-	 * @param string  $name  Housekeeping parameter name.
-	 *
-	 * @return string|null Parameter value. If parameter not exists, return null.
-	 */
-	public static function get(string $name): ?string {
-		self::loadParams();
-
-		return array_key_exists($name, self::$params) ? self::$params[$name] : null;
-	}
-
-	/**
-	 * Get values of all parameters of Housekeeping (load parameters if need).
-	 *
-	 * @return array String array with all values of Housekeeping parameters in format <parameter name> => <value>.
-	 */
-	public static function getAll(): array {
-		self::loadParams();
-
-		return self::$params;
-	}
-
-	/**
-	 * Set value by parameter name of Housekeeping into $params (load parameters if need).
-	 *
-	 * @param string $name   Housekeeping parameter name.
-	 * @param string $value  Housekeeping parameter value.
-	 */
-	public static function set(string $key, string $value): void {
-		self::loadParams();
-
-		if (array_key_exists($key, self::$params)) {
-			self::$params[$key] = $value;
 		}
 	}
 }

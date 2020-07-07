@@ -231,6 +231,7 @@ class CSettings extends CApiService {
 					$settings['alert_usrgrpid']));
 			}
 		}
+
 		$output_fields = $this->output_fields;
 		$output_fields[] = 'configid';
 
@@ -243,7 +244,7 @@ class CSettings extends CApiService {
 	 * @param string $groupid   Host group ID
 	 * @param int    $internal  Value of internal option
 	 */
-	private static function setHostGroupInternal($groupid, $internal) {
+	private function setHostGroupInternal($groupid, $internal): void {
 		DB::update('hstgrp', [
 			'values' => ['internal' =>  $internal],
 			'where' => ['groupid' => $groupid]

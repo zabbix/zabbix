@@ -22,7 +22,7 @@
 /**
  * A class for accessing once loaded parameters of Settings API object.
  */
-class CSettingsHelper {
+class CSettingsHelper extends CConfigGeneralHelper {
 
 	public const ALERT_USRGRPID = 'alert_usrgrpid';
 	public const BLINK_PERIOD = 'blink_period';
@@ -74,56 +74,11 @@ class CSettingsHelper {
 	public const X_FRAME_OPTIONS = 'x_frame_options';
 
 	/**
-	 * Settings parameters array.
-	 *
-	 * @var array
+	 * @inheritdoc
 	 */
-	private static $params = [];
-
-	/**
-	 * Load once all parameters of Settings API object.
-	 */
-	private static function loadParams() {
+	protected static function loadParams(): void {
 		if (!self::$params) {
 			self::$params = API::Settings()->get(['output' => 'extend']);
-		}
-	}
-
-	/**
-	 * Get value by parameter name of Settings (load parameters if need).
-	 *
-	 * @param string  $name  Settings parameter name.
-	 *
-	 * @return string|null Parameter value. If parameter not exists, return null.
-	 */
-	public static function get(string $name): ?string {
-		self::loadParams();
-
-		return array_key_exists($name, self::$params) ? self::$params[$name] : null;
-	}
-
-	/**
-	 * Get values of all parameters of Settings (load parameters if need).
-	 *
-	 * @return array String array with all values of Settings parameters in format <parameter name> => <value>.
-	 */
-	public static function getAll(): array {
-		self::loadParams();
-
-		return self::$params;
-	}
-
-	/**
-	 * Set value by parameter name of Settings into $params (load parameters if need).
-	 *
-	 * @param string $name   Settings parameter name.
-	 * @param string $value  Settings parameter value.
-	 */
-	public static function set(string $key, string $value): void {
-		self::loadParams();
-
-		if (array_key_exists($key, self::$params)) {
-			self::$params[$key] = $value;
 		}
 	}
 }

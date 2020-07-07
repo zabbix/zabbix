@@ -22,7 +22,7 @@
 /**
  * A class for accessing once loaded parameters of Authentication API object.
  */
-class CAuthenticationHelper {
+class CAuthenticationHelper extends CConfigGeneralHelper {
 
 	public const AUTHENTICATION_TYPE = 'authentication_type';
 	public const HTTP_AUTH_ENABLED = 'http_auth_enabled';
@@ -54,56 +54,11 @@ class CAuthenticationHelper {
 	public const SAML_USERNAME_ATTRIBUTE = 'saml_username_attribute';
 
 	/**
-	 * Authentication parameters array.
-	 *
-	 * @var array
+	 * @inheritdoc
 	 */
-	private static $params = [];
-
-	/**
-	 * Load once all parameters of Authentication API object.
-	 */
-	private static function loadParams() {
+	protected static function loadParams(): void {
 		if (!self::$params) {
 			self::$params = API::Authentication()->get(['output' => 'extend']);
-		}
-	}
-
-	/**
-	 * Get value by parameter name of Authentication (load parameters if need).
-	 *
-	 * @param string  $name  Authentication parameter name.
-	 *
-	 * @return string|null Parameter value. If parameter not exists, return null.
-	 */
-	public static function get(string $name): ?string {
-		self::loadParams();
-
-		return array_key_exists($name, self::$params) ? self::$params[$name] : null;
-	}
-
-	/**
-	 * Get values of all parameters of Authentication (load parameters if need).
-	 *
-	 * @return array String array with all values of Authentication parameters in format <parameter name> => <value>.
-	 */
-	public static function getAll(): array {
-		self::loadParams();
-
-		return self::$params;
-	}
-
-	/**
-	 * Set value by parameter name of Authentication into $params (load parameters if need).
-	 *
-	 * @param string $name   Authentication parameter name.
-	 * @param string $value  Authentication parameter value.
-	 */
-	public static function set(string $key, string $value): void {
-		self::loadParams();
-
-		if (array_key_exists($key, self::$params)) {
-			self::$params[$key] = $value;
 		}
 	}
 }
