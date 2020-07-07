@@ -1237,8 +1237,6 @@ class testFormAction extends CLegacyWebTest {
 				break;
 			default:
 				if ($new_operation_opcommand_type != null) {
-
-
 					$this->zbxTestAssertElementNotPresentXpath('//li[@id="operation-command-pubkey"]//input[@id="operation_opcommand_publickey"]');
 					$this->zbxTestAssertElementNotPresentXpath('//li[@id="operation-command-privatekey"]//input[@id="operation_opcommand_privatekey"]');
 					$this->zbxTestAssertElementNotPresentXpath('//li[@id="operation-command-passphrase"]//input[@id="opcommand_passphrase"]');
