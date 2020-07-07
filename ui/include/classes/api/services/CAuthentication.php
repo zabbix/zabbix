@@ -85,7 +85,7 @@ class CAuthentication extends CApiService {
 	 * @return array
 	 */
 	public function update(array $auth): array {
-		$this->validateUpdate($auth, $db_auth);
+		$db_auth = $this->validateUpdate($auth);
 
 		$upd_config = [];
 
@@ -130,11 +130,12 @@ class CAuthentication extends CApiService {
 	 * Validate updated authentication parameters.
 	 *
 	 * @param array  $auth
-	 * @param array  $db_auth
 	 *
 	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array
 	 */
-	protected function validateUpdate(array &$auth, array &$db_auth = null) {
+	protected function validateUpdate(array $auth) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
 			'http_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
@@ -175,7 +176,8 @@ class CAuthentication extends CApiService {
 		}
 
 		$output_fields = $this->output_fields;
-		array_unshift($output_fields, 'configid');
-		$db_auth = DB::select('config', ['output' => $output_fields])[0];
+		$output_fields[] = 'configid';
+
+		return DB::select('config', ['output' => $output_fields])[0];
 	}
 }

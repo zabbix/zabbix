@@ -24,27 +24,27 @@
  */
 class CHousekeepingHelper {
 
-	const COMPRESS_OLDER = 'compress_older';
-	const COMPRESSION_AVAILABILITY = 'compression_availability';
-	const COMPRESSION_STATUS = 'compression_status';
-	const DB_EXTENSION = 'db_extension';
-	const HK_AUDIT = 'hk_audit';
-	const HK_AUDIT_MODE = 'hk_audit_mode';
-	const HK_EVENTS_AUTOREG = 'hk_events_autoreg';
-	const HK_EVENTS_DISCOVERY = 'hk_events_discovery';
-	const HK_EVENTS_INTERNAL = 'hk_events_internal';
-	const HK_EVENTS_MODE = 'hk_events_mode';
-	const HK_EVENTS_TRIGGER = 'hk_events_trigger';
-	const HK_HISTORY = 'hk_history';
-	const HK_HISTORY_GLOBAL = 'hk_history_global';
-	const HK_HISTORY_MODE = 'hk_history_mode';
-	const HK_SERVICES = 'hk_services';
-	const HK_SERVICES_MODE = 'hk_services_mode';
-	const HK_SESSIONS = 'hk_sessions';
-	const HK_SESSIONS_MODE = 'hk_sessions_mode';
-	const HK_TRENDS = 'hk_trends';
-	const HK_TRENDS_GLOBAL = 'hk_trends_global';
-	const HK_TRENDS_MODE = 'hk_trends_mode';
+	public const COMPRESS_OLDER = 'compress_older';
+	public const COMPRESSION_AVAILABILITY = 'compression_availability';
+	public const COMPRESSION_STATUS = 'compression_status';
+	public const DB_EXTENSION = 'db_extension';
+	public const HK_AUDIT = 'hk_audit';
+	public const HK_AUDIT_MODE = 'hk_audit_mode';
+	public const HK_EVENTS_AUTOREG = 'hk_events_autoreg';
+	public const HK_EVENTS_DISCOVERY = 'hk_events_discovery';
+	public const HK_EVENTS_INTERNAL = 'hk_events_internal';
+	public const HK_EVENTS_MODE = 'hk_events_mode';
+	public const HK_EVENTS_TRIGGER = 'hk_events_trigger';
+	public const HK_HISTORY = 'hk_history';
+	public const HK_HISTORY_GLOBAL = 'hk_history_global';
+	public const HK_HISTORY_MODE = 'hk_history_mode';
+	public const HK_SERVICES = 'hk_services';
+	public const HK_SERVICES_MODE = 'hk_services_mode';
+	public const HK_SESSIONS = 'hk_sessions';
+	public const HK_SESSIONS_MODE = 'hk_sessions_mode';
+	public const HK_TRENDS = 'hk_trends';
+	public const HK_TRENDS_GLOBAL = 'hk_trends_global';
+	public const HK_TRENDS_MODE = 'hk_trends_mode';
 
 	/**
 	 * Housekeeping parameters array.
@@ -67,12 +67,12 @@ class CHousekeepingHelper {
 	 *
 	 * @param string  $name  Housekeeping parameter name.
 	 *
-	 * @return string Parameter value. If parameter not exists, return null.
+	 * @return string|null Parameter value. If parameter not exists, return null.
 	 */
 	public static function get(string $name): ?string {
 		self::loadParams();
 
-		return (array_key_exists($name, self::$params) ? self::$params[$name] : null);
+		return array_key_exists($name, self::$params) ? self::$params[$name] : null;
 	}
 
 	/**

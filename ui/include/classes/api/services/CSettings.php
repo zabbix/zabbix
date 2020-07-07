@@ -88,7 +88,7 @@ class CSettings extends CApiService {
 	 * @return array
 	 */
 	public function update(array $settings): array {
-		$this->validateUpdate($settings, $db_settings);
+		$db_settings = $this->validateUpdate($settings);
 
 		$upd_config = [];
 
@@ -127,8 +127,8 @@ class CSettings extends CApiService {
 
 			if (array_key_exists('discovery_groupid', $upd_config)
 					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) != 0) {
-				setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-				setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
+				self::setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
+				self::setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
 			}
 		}
 
@@ -143,11 +143,12 @@ class CSettings extends CApiService {
 	 * Validate updated settings parameters.
 	 *
 	 * @param array  $settings
-	 * @param array  $db_settings
 	 *
 	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array
 	 */
-	protected function validateUpdate(array &$settings, array &$db_settings = null) {
+	protected function validateUpdate(array $settings) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'default_theme' =>				['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(APP::getThemes()))],
 			'search_limit' =>				['type' => API_INT32, 'in' => '1:999999'],
@@ -231,7 +232,21 @@ class CSettings extends CApiService {
 			}
 		}
 		$output_fields = $this->output_fields;
-		array_unshift($output_fields, 'configid');
-		$db_settings = DB::select('config', ['output' => $output_fields])[0];
+		$output_fields[] = 'configid';
+
+		return DB::select('config', ['output' => $output_fields])[0];
+	}
+
+	/**
+	 * Set or unset the host group as internal
+	 *
+	 * @param string $groupid   Host group ID
+	 * @param int    $internal  Value of internal option
+	 */
+	private static function setHostGroupInternal($groupid, $internal) {
+		DB::update('hstgrp', [
+			'values' => ['internal' =>  $internal],
+			'where' => ['groupid' => $groupid]
+		]);
 	}
 }

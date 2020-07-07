@@ -82,7 +82,7 @@ class CHousekeeping extends CApiService {
 	 * @return array
 	 */
 	public function update(array $hk): array {
-		$this->validateUpdate($hk, $db_hk);
+		$db_hk = $this->validateUpdate($hk);
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return [];
@@ -128,31 +128,32 @@ class CHousekeeping extends CApiService {
 	 * Validate updated housekeeping parameters.
 	 *
 	 * @param array  $hk
-	 * @param array  $db_hk
 	 *
 	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array
 	 */
-	protected function validateUpdate(array &$hk, array &$db_hk = null) {
+	protected function validateUpdate(array $hk) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'hk_events_mode' =>				['type' => API_INT32, 'in' => '0,1'],
-			'hk_events_trigger' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_events_internal' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_events_discovery' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_events_autoreg' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_services_mode' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_services' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_audit_mode' =>				['type' => API_INT32, 'in' => '0,1'],
-			'hk_audit' =>					['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_sessions_mode' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_sessions' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_history_mode' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_history_global' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_history' =>					['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'hk_trends_mode' =>				['type' => API_INT32, 'in' => '0,1'],
-			'hk_trends_global' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_trends' =>					['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
-			'compression_status' =>			['type' => API_INT32, 'in' => '0,1'],
-			'compress_older' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])]
+			'hk_events_mode' =>			['type' => API_INT32, 'in' => '0,1'],
+			'hk_events_trigger' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_internal' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_discovery' =>	['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_autoreg' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_services_mode' =>		['type' => API_INT32, 'in' => '0,1'],
+			'hk_services' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_audit_mode' =>			['type' => API_INT32, 'in' => '0,1'],
+			'hk_audit' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_sessions_mode' =>		['type' => API_INT32, 'in' => '0,1'],
+			'hk_sessions' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_history_mode' =>		['type' => API_INT32, 'in' => '0,1'],
+			'hk_history_global' =>		['type' => API_INT32, 'in' => '0,1'],
+			'hk_history' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_trends_mode' =>			['type' => API_INT32, 'in' => '0,1'],
+			'hk_trends_global' =>		['type' => API_INT32, 'in' => '0,1'],
+			'hk_trends' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'compression_status' =>		['type' => API_INT32, 'in' => '0,1'],
+			'compress_older' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $hk, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -162,8 +163,10 @@ class CHousekeeping extends CApiService {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
 		$output_fields = array_diff($this->output_fields, ['db_extension', 'compression_availability']);
-		array_unshift($output_fields, 'configid');
-		$db_hk = DB::select('config', ['output' => $output_fields])[0];
+		$output_fields[] = 'configid';
+
+		return DB::select('config', ['output' => $output_fields])[0];
 	}
 }

@@ -36,14 +36,6 @@ function select_config() {
 	return $config;
 }
 
-function setHostGroupInternal($groupid, $internal) {
-	return DBexecute(
-		'UPDATE hstgrp'.
-		' SET internal='.zbx_dbstr($internal).
-		' WHERE '.dbConditionInt('groupid', [$groupid])
-	);
-}
-
 function update_config($config) {
 	$update = [];
 
