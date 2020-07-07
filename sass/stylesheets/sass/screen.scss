@@ -3326,6 +3326,8 @@ $form-icon-btn: (
 	}
 
 	&.dashbrd-grid-iterator-focus {
+		z-index: 5;
+
 		.dashbrd-grid-iterator-head {
 			margin-top: -2rem;
 			height: 2rem;

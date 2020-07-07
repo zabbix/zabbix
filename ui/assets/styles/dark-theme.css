@@ -2920,15 +2920,17 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: flex; }
   .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-content {
     display: none; }
-  .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head {
-    margin-top: -2rem;
-    height: 2rem;
-    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-    opacity: 1;
-    transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out; }
-  .dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
-    margin-top: -4rem;
-    height: 4rem; }
+  .dashbrd-grid-iterator.dashbrd-grid-iterator-focus {
+    z-index: 5; }
+    .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head {
+      margin-top: -2rem;
+      height: 2rem;
+      box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+      opacity: 1;
+      transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out; }
+    .dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+      margin-top: -4rem;
+      height: 4rem; }
   .dashbrd-grid-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-iterator-container {
     top: auto;
     bottom: 0; }
