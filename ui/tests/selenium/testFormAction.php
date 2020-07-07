@@ -1248,6 +1248,7 @@ class testFormAction extends CLegacyWebTest {
 					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'operation_opcommand_publickey\']');
 					$this->zbxTestAssertElementNotPresentXpath('//input[@id=\'operation_opcommand_privatekey\']');
 				}
+				break;
 		}
 
 		switch ($new_operation_opcommand_type) {
