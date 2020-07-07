@@ -1284,7 +1284,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		$error_message = _('History cleanup is not supported if compression is enabled');
 	}
 	else {
-		$error_message = _("Cannot clear history: at least one of the selected items doesn't belong to any monitored host");
+		$error_message = _('Cannot clear history: at least one of the selected items doesn\'t belong to any monitored host');
 
 		$itemIds = getRequest('group_itemid');
 
