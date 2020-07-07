@@ -97,7 +97,7 @@ function sdFile($data, $persist = false, $fileName = 'debug.txt') {
 	fclose($fileStream);
 }
 
-function sdff($msg, $fileName = 'C:/Development/zabbix-src/feature/ZBXNEXT-2754-5.1/ui/conf/log.txt') {
+function sdff($msg, $fileName = '/tmp/zabbix.log') {
 	$fileStreem = @fopen($fileName, 'a');
 	if (is_array($msg)) {
 		$toImplode = [];
