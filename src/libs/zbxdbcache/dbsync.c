@@ -1735,11 +1735,14 @@ static char	**dbsync_item_preproc_row(char **row)
 #define ZBX_DBSYNC_ITEM_COLUMN_DELAY	0x01
 #define ZBX_DBSYNC_ITEM_COLUMN_HISTORY	0x02
 #define ZBX_DBSYNC_ITEM_COLUMN_TRENDS	0x04
+#define ZBX_DBSYNC_ITEM_COLUMN_CALCITEM	0x08
 
 	zbx_uint64_t	hostid;
-	unsigned char	flags = 0;
+	unsigned char	flags = 0, type;
 
 	/* return the original row if user macros are not used in target columns */
+
+	ZBX_STR2UCHAR(type, row[3]);
 
 	if (SUCCEED == dbsync_check_row_macros(row, 8))
 		flags |= ZBX_DBSYNC_ITEM_COLUMN_DELAY;
@@ -1749,6 +1752,9 @@ static char	**dbsync_item_preproc_row(char **row)
 
 	if (SUCCEED == dbsync_check_row_macros(row, 24))
 		flags |= ZBX_DBSYNC_ITEM_COLUMN_TRENDS;
+
+	if (ITEM_TYPE_CALCULATED == type && SUCCEED == dbsync_check_row_macros(row, 11))
+		flags |= ZBX_DBSYNC_ITEM_COLUMN_CALCITEM;
 
 	if (0 == flags)
 		return row;
@@ -1766,6 +1772,9 @@ static char	**dbsync_item_preproc_row(char **row)
 
 	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_TRENDS))
 		row[23] = dc_expand_user_macros(row[23], &hostid, 1);
+
+	if (0 != (flags & ZBX_DBSYNC_ITEM_COLUMN_CALCITEM))
+		row[11] = dc_expand_user_macros_in_calcitem(row[11], hostid);
 
 	return row;
 
@@ -2350,7 +2359,7 @@ static char	**dbsync_function_preproc_row(char **row)
 		/* get associated host identifier */
 		ZBX_STR2UINT64(hostid, row[5]);
 
-		row[3] = dc_expand_user_macros_in_func_params(hostid, row[3]);
+		row[3] = dc_expand_user_macros_in_func_params(row[3], hostid);
 	}
 
 	return row;
