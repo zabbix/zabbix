@@ -2347,36 +2347,10 @@ static char	**dbsync_function_preproc_row(char **row)
 	/* return the original row if user macros are not used in target columns */
 	if (SUCCEED == dbsync_check_row_macros(row, 3))
 	{
-		size_t	row_len;
-		char	*ptr, *buf = NULL;
-		size_t	buf_alloc = 0, buf_offset = 0, sep_pos;
-
 		/* get associated host identifier */
 		ZBX_STR2UINT64(hostid, row[5]);
-		row_len = strlen(row[3]);
 
-		for (ptr = row[3]; ptr < row[3] + row_len; ptr += sep_pos + 1)
-		{
-			size_t	param_pos, param_len;
-			int	quoted;
-			char	*param = NULL, *resolved_param;
-
-			if (0 != buf_offset)
-				zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
-
-			zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
-			param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-			resolved_param = zbx_dc_expand_user_macros(param, &hostid, 1);
-
-			if (SUCCEED == zbx_function_param_quote(&resolved_param, quoted))
-				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, resolved_param);
-			else
-				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos, param_len);
-
-			zbx_free(resolved_param);
-			zbx_free(param);
-		}
-		row[3] = buf;
+		row[3] = zbx_dc_expand_func_params_user_macros(hostid, row[3]);
 	}
 
 	return row;

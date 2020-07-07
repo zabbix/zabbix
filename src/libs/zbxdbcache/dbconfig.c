@@ -12706,6 +12706,53 @@ const char	*zbx_dc_get_instanceid(void)
 	return config->config->instanceid;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_expand_func_params_user_macros                            *
+ *                                                                            *
+ * Purpose: expand user macros in trigger function parameters                 *
+ *                                                                            *
+ * Parameters: hostid - [IN] host of the item used in function                *
+ *             params - [IN] the function parameters                          *
+ *                                                                            *
+ * Return value: The function parameters with expanded user macros.           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dc_expand_func_params_user_macros(zbx_uint64_t hostid, const char *params)
+{
+	const char	*ptr;
+	size_t		params_len;
+	char		*buf;
+	size_t		buf_alloc, buf_offset = 0, sep_pos;
+
+	buf_alloc = params_len = strlen(params);
+	buf = zbx_malloc(NULL, buf_alloc);
+
+	for (ptr = params; ptr < params + params_len; ptr += sep_pos + 1)
+	{
+		size_t	param_pos, param_len;
+		int	quoted;
+		char	*param = NULL, *resolved_param;
+
+		if (0 != buf_offset)
+			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
+
+		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+		resolved_param = zbx_dc_expand_user_macros(param, &hostid, 1);
+
+		if (SUCCEED == zbx_function_param_quote(&resolved_param, quoted))
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, resolved_param);
+		else
+			zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos, param_len);
+
+		zbx_free(resolved_param);
+		zbx_free(param);
+	}
+
+	return buf;
+}
+
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
 #endif
