@@ -121,6 +121,13 @@ class CElementQuery implements IWaitable {
 	protected static $page;
 
 	/**
+	 * Last input element selector.
+	 *
+	 * @var string
+	 */
+	protected static $selector;
+
+	/**
 	 * Initialize element query by specified selector.
 	 *
 	 * @param mixed  $type     selector type (method) or selector
@@ -195,6 +202,15 @@ class CElementQuery implements IWaitable {
 	 */
 	public function getContext() {
 		return $this->context;
+	}
+
+	/**
+	 * Get last selector.
+	 *
+	 * @return string|null
+	 */
+	public static function getLastSelector() {
+		return static::$selector;
 	}
 
 	/**
@@ -520,12 +536,14 @@ class CElementQuery implements IWaitable {
 				$xpaths[] = $prefix.$selector;
 			}
 
-			$element = $target->query('xpath', implode('|', $xpaths))->cast($class)->one(false);
+			static::$selector = 'xpath:'.implode('|', $xpaths);
+			$element = $target->query(static::$selector)->cast($class)->one(false);
 			if ($element->isValid()) {
 				return $element;
 			}
 		}
 
+		static::$selector = null;
 		return new CNullElement(['locator' => 'input element']);
 	}
 }

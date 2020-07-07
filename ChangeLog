@@ -1,9 +1,9 @@
 Changes for 5.0.2rc1
 
 New features:
+...G...... [ZBXNEXT-6044] added native support in agent2 for https key for net.tcp.service/.perf (esneiders)
 ...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
 ...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
-...G...... [ZBXCTR-9] Added agent2 PostgreSQL plugin and template (Daria_V)
 ........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
 A.F....PS. [ZBXNEXT-3205] added regex context matching support to user macros (rlataria, wiper)
 .........T [ZBXNEXT-5966] updated SNMP templates for version 5.0 (afayantsev)
@@ -17,6 +17,12 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
+.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
+A.F....... [ZBX-17715] fixed filtering and sorting of the Latest Data (averza)
+..F....... [ZBX-17802] fixed runtime errors in trigger list (talbergs)
+...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
+A.F....... [ZBX-17860] fixed host prototype import (rlataria)
 ..F....... [ZBX-17920] fixed browser error when user tries to access properties without permissions (kustalovs)
 .......PS. [ZBX-17252] fixed building of Zabbix daemons with link time optimization (vso)
 ..F....... [ZBX-17693] fixed headers and query fields in HTTP item test form; thanks to Mikhail Okhotin for the patch (Ivo, talbergs)
@@ -25,7 +31,7 @@ Bug fixes:
 ..F....... [ZBX-17663] fixed user not being redirected back to an URL he was coming from before signing in using SAML SSO (agriscenko)
 .........T [ZBX-17900] fixed the template description - the config file naming is in lowercase (mchudinov)
 .........T [ZBX-17905] changed type of physical disk performance items from wmi to perf_counter_en and perf_instance_en in Template Module Windows physical disks by Zabbix agent (mchudinov)
-...G...... [ZBXCTR-9] Removed username and password from 1st level configuration parameters and change connection; removed unused tests and handler (Daria_V)
+...G...... [ZBXCTR-9] removed username and password from 1st level configuration parameters and change connection; removed unused tests and handler (Daria_V)
 ..F....... [ZBX-17811] fixed runtime error messages on database connection error (kustalovs)
 ..F....... [ZBX-17721] fixed message on updating module (kustalovs)
 ..F....... [ZBX-17809] fixed dashboard save button becomes disabled after widget paste (vmaksimovs)
@@ -60,6 +66,7 @@ A.F....... [ZBX-14539] added validation of the calculated item formula in item.c
 A.F....... [ZBXNEXT-3035] removed identical HTML IDs in low-level discovery form, fixed Type of Calculation field not hiding in override popup, fixed incorrect field order during override create in API causing SQL errors, fixed validation of delay, history and trends fields in override popup (Ivo, miks)
 .........T [ZBX-17790] fixed preprocessing of mysql.created_tmp_files, mysql.created_tmp_disk_tables, mysql.created_tmp_tables, mysql.threads_created items in Template DB MySQL, added triggers (mchudinov)
 ........S. [ZBX-17792] fixed zabbix sending invalid delete elastic search scroll request (arimdjonoks)
+.........T [ZBX-17141] fixed discovery of block devices by using vfs.dev.discovery key instead of reading /proc/diskstats (tuskov)
 .........T [ZBX-17654] fixed "Memory utilization" item in template_os_linux and template_os_linux_active by splitting it into master and depended relation (tuskov)
 ...G...... [ZBX-17780] fixed memory leak (viktors)
 .......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
@@ -1562,6 +1569,16 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.23rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
+A.F....... [ZBX-17860] fixed host prototype import (rlataria)
+...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.22
