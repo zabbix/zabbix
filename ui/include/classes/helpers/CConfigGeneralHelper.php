@@ -50,9 +50,9 @@ abstract class CConfigGeneralHelper {
 	 * @return string|null Parameter value. If parameter not exists, return null.
 	 */
 	public static function get(string $name): ?string {
-		self::loadParams();
+		static::loadParams();
 
-		return array_key_exists($name, self::$params) ? self::$params[$name] : null;
+		return array_key_exists($name, static::$params) ? static::$params[$name] : null;
 	}
 
 	/**
@@ -63,9 +63,9 @@ abstract class CConfigGeneralHelper {
 	 * @return array String array with all values of API object parameters in format <parameter name> => <value>.
 	 */
 	public static function getAll(): array {
-		self::loadParams();
+		static::loadParams();
 
-		return self::$params;
+		return static::$params;
 	}
 
 	/**
@@ -77,10 +77,10 @@ abstract class CConfigGeneralHelper {
 	 * @param string $value  API object parameter value.
 	 */
 	public static function set(string $key, string $value): void {
-		self::loadParams();
+		static::loadParams();
 
-		if (array_key_exists($key, self::$params)) {
-			self::$params[$key] = $value;
+		if (array_key_exists($key, static::$params)) {
+			static::$params[$key] = $value;
 		}
 	}
 }
