@@ -43,6 +43,14 @@ static int	DBpatch_5010001(void)
 	return DBmodify_field_type("users", &field, NULL);
 }
 
+static int	DBpatch_5010002(void)
+{
+	if (ZBX_DB_OK > DBexecute("update users set lang='default',theme='default' where alias='guest'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -51,5 +59,6 @@ DBPATCH_START(5010)
 
 DBPATCH_ADD(5010000, 0, 1)
 DBPATCH_ADD(5010001, 0, 1)
+DBPATCH_ADD(5010002, 0, 1)
 
 DBPATCH_END()
