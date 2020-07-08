@@ -41,7 +41,9 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 3\. Select Import file [media_opsgenie.xml](media_opsgenie.xml) and click the **Import** button at the bottom to import the Opsgenie media type.
 
-4\. Change the values of the variables url (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts) , web (for example, https://myzabbix.app.opsgenie.com), token
+4\. Change the values of the variables opsgenie_api (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts) , opsgenie_web (for example, https://myzabbix.app.opsgenie.com), opsgenie_token.
+Also you could set own tags into opsgenie_tags as <comma_separated_list_of_tags> and team names into opsgenie_teams as <comma_separated_list_of_responders>.  
+The priority level in severity_default will be used for non-triggered actions.
 
 [![](images/tn_7.png?raw=true)](images/7.png)
 
@@ -82,4 +84,4 @@ For more information, use the [Zabbix](https://www.zabbix.com/documentation/curr
 
 ## Supported Versions
 
-Zabbix 4.4, Opsgenie Alert API.
+Zabbix 5.0, Opsgenie Alert API.
