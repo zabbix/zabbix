@@ -17,13 +17,13 @@ This guide describes how to integrate your Zabbix 4.4 installation with Opsgenie
 
 ## In Zabbix
 
-The configuration consists of a _media type_ in Zabbix, which will invoke webhookto send alerts to Opsgenie through the Opsgenie Rest API. To utilize the media type, we will create a Zabbix user to represent Opsgenie. We will then create an alert action to notify the user via this media type whenever there is a problem detected.
+The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to Opsgenie through the Opsgenie Rest API. To utilize the media type, we will create a Zabbix user to represent Opsgenie. We will then create an alert action to notify the user via this media type whenever there is a problem detected.
 
 ## Create Global Macro
 
 1\. Go to the **Administration** tab.
 
-2\. Under Administration, go to the **General** page and choose the **Macros** from drop-down list.
+2\. Under Administration, go to the **General** page and choose **Macros** from a drop-down list.
 
 3\. Add the macro {$ZABBIX.URL} with Zabbix frontend URL (for example http://192.168.7.123:8081)
 
@@ -61,7 +61,7 @@ The priority level in severity_default will be used for non-triggered actions.
 
 [![](images/tn_8.png?raw=true)](images/8.png)
 
-*   Please note, that in order to notify on problems with host this user must has at least read permissions for such host.
+*   Please note, that in order to be notified about problems on a host, this user must have at least read permissions for the host.
 
 5\. Click on the **Media** tab and, inside of the **Media** box, click the **Add** button.
 
@@ -78,9 +78,9 @@ The priority level in severity_default will be used for non-triggered actions.
 
 7\. Click the **Add** button at the bottom of the user page to save the user.
 
-8\. Use the Opsgenie User in any Actions of your choice. Text from "Action Operations" will be sent to "Opsgenie Alert" when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "Opsgenie Alert Notes" when the problem is resolved or updated.
+8\. Use the Opsgenie User in any actions of your choice. Text from "Action Operations" will be sent to "Opsgenie Alert" when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "Opsgenie Alert Notes" when the problem is resolved or updated.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Opsgenie](https://docs.opsgenie.com/docs/alert-api) documentations.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Opsgenie](https://docs.opsgenie.com/docs/alert-api) documentation.
 
 ## Supported Versions
 
