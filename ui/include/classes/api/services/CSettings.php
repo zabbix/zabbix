@@ -127,8 +127,8 @@ class CSettings extends CApiService {
 
 			if (array_key_exists('discovery_groupid', $upd_config)
 					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) != 0) {
-				self::setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-				self::setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
+				$this->setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
+				$this->setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
 			}
 		}
 

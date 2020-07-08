@@ -183,7 +183,7 @@ class CControllerAuditLogList extends CController {
 	static public function getResourcesList(): array {
 		return [
 			AUDIT_RESOURCE_USER => _('User'),
-			AUDIT_RESOURCE_AUTHENTICATION => _('Authentication'),
+			AUDIT_RESOURCE_ZABBIX_CONFIG => _('Configuration of Zabbix'),
 			AUDIT_RESOURCE_MEDIA_TYPE => _('Media type'),
 			AUDIT_RESOURCE_HOST => _('Host'),
 			AUDIT_RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
@@ -218,7 +218,8 @@ class CControllerAuditLogList extends CController {
 			AUDIT_RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
 			AUDIT_RESOURCE_MODULE => _('Module'),
 			AUDIT_RESOURCE_SETTINGS => _('Settings'),
-			AUDIT_RESOURCE_HOUSEKEEPING => _('Housekeeping')
+			AUDIT_RESOURCE_HOUSEKEEPING => _('Housekeeping'),
+			AUDIT_RESOURCE_AUTHENTICATION => _('Authentication')
 		];
 	}
 

@@ -220,7 +220,7 @@ define('AUDIT_ACTION_DISABLE',	6);
 define('AUDIT_ACTION_EXECUTE',	7);
 
 define('AUDIT_RESOURCE_USER',				0);
-define('AUDIT_RESOURCE_AUTHENTICATION',		2);
+define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2); // currently not used but need for compatibility with old audit records
 define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
 define('AUDIT_RESOURCE_HOST',				4);
 define('AUDIT_RESOURCE_ACTION',				5);
@@ -256,6 +256,7 @@ define('AUDIT_RESOURCE_AUTOREGISTRATION',	38);
 define('AUDIT_RESOURCE_MODULE',				39);
 define('AUDIT_RESOURCE_SETTINGS',			40);
 define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
+define('AUDIT_RESOURCE_AUTHENTICATION',		42);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
