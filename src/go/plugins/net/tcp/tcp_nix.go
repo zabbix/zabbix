@@ -1,3 +1,5 @@
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -31,6 +33,7 @@ func exportSystemTcpListen(port uint16) (result interface{}, err error) {
 
 func init() {
 	plugin.RegisterMetrics(&impl, "TCP",
+		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.",
 		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
 		"net.tcp.service.perf", "Checks performance of TCP service.")
 }
