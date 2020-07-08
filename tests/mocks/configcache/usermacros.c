@@ -30,42 +30,9 @@
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
 
-static ZBX_DC_CONFIG	*dc_config;
-static zbx_vector_ptr_t	host_macros;
-static zbx_vector_ptr_t	global_macros;
+#include "configcache.h"
 
-void	*__real_zbx_hashset_search(zbx_hashset_t *hs, const void *data);
-
-void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
-{
-	int	i;
-
-	if (hs == &dc_config->hmacros_hm)
-	{
-		const ZBX_DC_HMACRO_HM	*query = (const ZBX_DC_HMACRO_HM *)data;
-
-		for (i = 0; i < host_macros.values_num; i++)
-		{
-			ZBX_DC_HMACRO_HM	*hm = (ZBX_DC_HMACRO_HM *)host_macros.values[i];
-
-			if (query->hostid == hm->hostid && 0 == strcmp(hm->macro, query->macro))
-				return hm;
-		}
-	}
-	else if (hs == &dc_config->gmacros_m)
-	{
-		const ZBX_DC_GMACRO_M	*query = (const ZBX_DC_GMACRO_M *)data;
-
-		for (i = 0; i < global_macros.values_num; i++)
-		{
-			ZBX_DC_GMACRO_M	*gm = (ZBX_DC_GMACRO_M *)global_macros.values[i];
-			if (0 == strcmp(gm->macro, query->macro))
-				return gm;
-		}
-	}
-
-	return __real_zbx_hashset_search(hs, data);
-}
+extern zbx_mock_config_t	mock_config;
 
 static int	config_gmacro_context_compare(const void *d1, const void *d2)
 {
@@ -103,7 +70,7 @@ static int	config_hmacro_context_compare(const void *d1, const void *d2)
 	return strcmp(m1->context, m2->context);
 }
 
-void	mock_init_macros(void *config, const char *path)
+void	mock_config_load_user_macros(const char *path)
 {
 	zbx_mock_handle_t	hmacros, handle;
 	zbx_mock_error_t	err;
@@ -114,9 +81,8 @@ void	mock_init_macros(void *config, const char *path)
 	zbx_uint64_t		macro_hostid;
 	zbx_mock_handle_t	hhostid;
 
-	dc_config = config;
-	zbx_vector_ptr_create(&host_macros);
-	zbx_vector_ptr_create(&global_macros);
+	zbx_vector_ptr_create(&mock_config.host_macros);
+	zbx_vector_ptr_create(&mock_config.global_macros);
 
 	hmacros = zbx_mock_get_parameter_handle(path);
 	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hmacros, &handle))))
@@ -125,7 +91,7 @@ void	mock_init_macros(void *config, const char *path)
 
 		if (ZBX_MOCK_SUCCESS != err)
 		{
-			fail_msg("Cannot read 'macros' element #%d: %s", host_macros.values_num,
+			fail_msg("Cannot read 'macros' element #%d: %s", mock_config.host_macros.values_num,
 					zbx_mock_error_string(err));
 		}
 
@@ -148,19 +114,19 @@ void	mock_init_macros(void *config, const char *path)
 		{
 			ZBX_DC_GMACRO	*macro;
 
-			for (i = 0; i < global_macros.values_num; i++)
+			for (i = 0; i < mock_config.global_macros.values_num; i++)
 			{
-				gm = (ZBX_DC_GMACRO_M *)global_macros.values[i];
+				gm = (ZBX_DC_GMACRO_M *)mock_config.global_macros.values[i];
 				if (0 == strcmp(gm->macro, name))
 					break;
 			}
 
-			if (i == global_macros.values_num)
+			if (i == mock_config.global_macros.values_num)
 			{
 				gm = zbx_malloc(NULL, sizeof(ZBX_DC_GMACRO_M));
 				gm->macro = zbx_strdup(NULL, name);
 				zbx_vector_ptr_create(&gm->gmacros);
-				zbx_vector_ptr_append(&global_macros, gm);
+				zbx_vector_ptr_append(&mock_config.global_macros, gm);
 			}
 
 			macro = (ZBX_DC_GMACRO *)zbx_malloc(0, sizeof(ZBX_DC_GMACRO));
@@ -174,20 +140,20 @@ void	mock_init_macros(void *config, const char *path)
 		{
 			ZBX_DC_HMACRO	*macro;
 
-			for (i = 0; i < host_macros.values_num; i++)
+			for (i = 0; i < mock_config.host_macros.values_num; i++)
 			{
-				hm = (ZBX_DC_HMACRO_HM *)host_macros.values[i];
+				hm = (ZBX_DC_HMACRO_HM *)mock_config.host_macros.values[i];
 				if (hm->hostid == macro_hostid && 0 == strcmp(hm->macro, name))
 					break;
 			}
 
-			if (i == host_macros.values_num)
+			if (i == mock_config.host_macros.values_num)
 			{
 				hm = zbx_malloc(NULL, sizeof(ZBX_DC_HMACRO_HM));
 				hm->hostid = macro_hostid;
 				hm->macro = zbx_strdup(NULL, name);
 				zbx_vector_ptr_create(&hm->hmacros);
-				zbx_vector_ptr_append(&host_macros, hm);
+				zbx_vector_ptr_append(&mock_config.host_macros, hm);
 			}
 
 			macro = (ZBX_DC_HMACRO *)zbx_malloc(0, sizeof(ZBX_DC_HMACRO));
@@ -199,36 +165,31 @@ void	mock_init_macros(void *config, const char *path)
 		}
 	}
 
-	for (i = 0; i < global_macros.values_num; i++)
+	for (i = 0; i < mock_config.global_macros.values_num; i++)
 	{
-		gm = (ZBX_DC_GMACRO_M *)global_macros.values[i];
+		gm = (ZBX_DC_GMACRO_M *)mock_config.global_macros.values[i];
 		zbx_vector_ptr_sort(&gm->gmacros, config_gmacro_context_compare);
 	}
 
-	for (i = 0; i < host_macros.values_num; i++)
+	for (i = 0; i < mock_config.host_macros.values_num; i++)
 	{
-		hm = (ZBX_DC_HMACRO_HM *)host_macros.values[i];
+		hm = (ZBX_DC_HMACRO_HM *)mock_config.host_macros.values[i];
 		zbx_vector_ptr_sort(&hm->hmacros, config_hmacro_context_compare);
 	}
+
+	mock_config.initialized |= ZBX_MOCK_CONFIG_USERMACROS;
 }
 
-static void	free_string(const char *str)
-{
-	char	*ptr = (char *)str;
-	zbx_free(ptr);
-}
-
-void	mock_free_macros()
+void	mock_config_free_user_macros()
 {
 	int	i, j;
 
-
-	for (i = 0; i < global_macros.values_num; i++)
+	for (i = 0; i < mock_config.global_macros.values_num; i++)
 	{
 		ZBX_DC_GMACRO_M	*gm;
 		ZBX_DC_GMACRO	*macro;
 
-		gm = (ZBX_DC_GMACRO_M *)global_macros.values[i];
+		gm = (ZBX_DC_GMACRO_M *)mock_config.global_macros.values[i];
 		for (j = 0; j < gm->gmacros.values_num; j++)
 		{
 			macro = (ZBX_DC_GMACRO *)gm->gmacros.values[j];
@@ -240,14 +201,14 @@ void	mock_free_macros()
 		free_string(gm->macro);
 		zbx_free(gm);
 	}
-	zbx_vector_ptr_destroy(&global_macros);
+	zbx_vector_ptr_destroy(&mock_config.global_macros);
 
-	for (i = 0; i < host_macros.values_num; i++)
+	for (i = 0; i < mock_config.host_macros.values_num; i++)
 	{
 		ZBX_DC_HMACRO_HM	*hm;
 		ZBX_DC_HMACRO		*macro;
 
-		hm = (ZBX_DC_HMACRO_HM *)host_macros.values[i];
+		hm = (ZBX_DC_HMACRO_HM *)mock_config.host_macros.values[i];
 		for (j = 0; j < hm->hmacros.values_num; j++)
 		{
 			macro = (ZBX_DC_HMACRO *)hm->hmacros.values[j];
@@ -259,5 +220,5 @@ void	mock_free_macros()
 		free_string(hm->macro);
 		zbx_free(hm);
 	}
-	zbx_vector_ptr_destroy(&host_macros);
+	zbx_vector_ptr_destroy(&mock_config.host_macros);
 }

@@ -30,6 +30,8 @@
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
 
+#include "configcache_mock.h"
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_mock_test_entry                                              *
@@ -39,12 +41,11 @@ void	zbx_mock_test_entry(void **state)
 {
 	char		*returned_expression;
 	const char	*expression, *expected_expression;
-	ZBX_DC_CONFIG   dc_config = {0};
 
 	ZBX_UNUSED(state);
 
-	config = &dc_config;
-	mock_init_macros(config, "in.macros");
+	mock_config_init();
+	mock_config_load_user_macros("in.macros");
 
 	expression = zbx_mock_get_parameter_string("in.expression");
 	expected_expression = zbx_mock_get_parameter_string("out.expression");
@@ -56,5 +57,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_free(returned_expression);
 
-	mock_free_macros();
+	mock_config_free();
 }

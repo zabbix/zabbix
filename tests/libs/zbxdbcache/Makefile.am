@@ -151,23 +151,27 @@ dc_item_poller_type_update_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/libs
 
 zbx_dc_expand_user_macros_in_expression_CFLAGS = \
 	-I@top_srcdir@/tests \
+	-I@top_srcdir@/tests/mocks/configcache \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-Wl,--wrap=zbx_hashset_search
 zbx_dc_expand_user_macros_in_expression_SOURCES = \
-	zbx_dc_expand_user_macros_in_expression.c \
-	usermacros.c usermacros.h
-zbx_dc_expand_user_macros_in_expression_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
+	zbx_dc_expand_user_macros_in_expression.c 
+zbx_dc_expand_user_macros_in_expression_LDADD = \
+	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
+	$(CACHE_LIBS) @SERVER_LIBS@
 zbx_dc_expand_user_macros_in_expression_LDFLAGS = @SERVER_LDFLAGS@
 
 
 dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/tests \
+	-I@top_srcdir@/tests/mocks/configcache \
 	-I@top_srcdir@/src/libs/zbxdbcache \
 	-Wl,--wrap=zbx_hashset_search
 dc_expand_user_macros_in_func_params_SOURCES = \
-	dc_expand_user_macros_in_func_params.c \
-	usermacros.c usermacros.h
-dc_expand_user_macros_in_func_params_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
+	dc_expand_user_macros_in_func_params.c 
+dc_expand_user_macros_in_func_params_LDADD = \
+	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
+	$(CACHE_LIBS) @SERVER_LIBS@ 
 dc_expand_user_macros_in_func_params_LDFLAGS = @SERVER_LDFLAGS@
 
 endif

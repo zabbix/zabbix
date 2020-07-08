@@ -17,11 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_USERMACROS_H
-#define ZABBIX_USERMACROS_H
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
 
+#include "zbxserver.h"
+#include "common.h"
+#include "zbxalgo.h"
+#include "dbcache.h"
+#include "mutexs.h"
 
-void	mock_init_macros(void *config, const char *path);
-void	mock_free_macros();
+#ifndef ZABBIX_CONFIGCACHE_MOCK_H
+#define ZABBIX_CONFIGCACHE_MOCK_H
+
+void	mock_config_init();
+void	mock_config_free();
+
+void	mock_config_load_user_macros(const char *path);
+
 
 #endif

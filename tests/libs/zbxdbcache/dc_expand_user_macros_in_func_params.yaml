@@ -119,6 +119,16 @@ in:
   params: '{$A}{$B}{$C}'
 out:
   params: '"1\"2\"(3)"'
+---
+test case: Expand '{$A}' with {$A}=1,2,3
+in:
+  macros:
+    - hostid: 1
+      name: '{$A}'
+      value: 1,2,3
+  params: '{$A}'
+out:
+  params: '"1,2,3"'
 ...
 
 
