@@ -8,7 +8,8 @@ SERVER_tests = \
 	is_item_processed_by_server \
 	dc_item_poller_type_update \
 	dc_expand_user_macros_in_expression \
-	dc_expand_user_macros_in_func_params
+	dc_expand_user_macros_in_func_params \
+	dc_expand_user_macros_in_calcitem
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -161,7 +162,6 @@ dc_expand_user_macros_in_expression_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 dc_expand_user_macros_in_expression_LDFLAGS = @SERVER_LDFLAGS@
 
-
 dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/tests/mocks/configcache \
@@ -173,5 +173,17 @@ dc_expand_user_macros_in_func_params_LDADD = \
 	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
 	$(CACHE_LIBS) @SERVER_LIBS@ 
 dc_expand_user_macros_in_func_params_LDFLAGS = @SERVER_LDFLAGS@
+
+dc_expand_user_macros_in_calcitem_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/tests/mocks/configcache \
+	-I@top_srcdir@/src/libs/zbxdbcache \
+	-Wl,--wrap=zbx_hashset_search
+dc_expand_user_macros_in_calcitem_SOURCES = \
+	dc_expand_user_macros_in_calcitem.c 
+dc_expand_user_macros_in_calcitem_LDADD = \
+	$(top_srcdir)/tests/mocks/configcache/libconfigcachemock.a \
+	$(CACHE_LIBS) @SERVER_LIBS@ 
+dc_expand_user_macros_in_calcitem_LDFLAGS = @SERVER_LDFLAGS@
 
 endif

@@ -50,9 +50,6 @@ void	zbx_mock_test_entry(void **state)
 
 	params = zbx_mock_get_parameter_string("in.params");
 	expected_params = zbx_mock_get_parameter_string("out.params");
-
-	/* the macro expansion relies on wrapped zbx_hashset_search which returns mocked */
-	/* macros when used with global macro index hashset                              */
 	returned_params = dc_expand_user_macros_in_func_params(params, 1);
 	zbx_mock_assert_str_eq("Expanded parameters", expected_params, returned_params);
 

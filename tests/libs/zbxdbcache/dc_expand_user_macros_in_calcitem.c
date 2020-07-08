@@ -33,24 +33,30 @@
 
 #include "configcache_mock.h"
 
-#ifndef ZABBIX_CONFIGCACHE_H
-#define ZABBIX_CONFIGCACHE_H
-
-typedef struct
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_test_entry                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mock_test_entry(void **state)
 {
-	ZBX_DC_CONFIG		dc;
-	zbx_vector_ptr_t	host_macros;
-	zbx_vector_ptr_t	global_macros;
-	zbx_vector_ptr_t	hosts;
+	char		*returned_formula;
+	const char	*formula, *expected_formula;
+	zbx_uint64_t	hostid;
 
-	zbx_uint64_t		initialized;
+	ZBX_UNUSED(state);
 
+	mock_config_init();
+	mock_config_load_user_macros("in.macros");
+	mock_config_load_hosts("in.hosts");
+
+	formula = zbx_mock_get_parameter_string("in.formula");
+	hostid = zbx_mock_get_parameter_uint64("in.hostid");
+	expected_formula = zbx_mock_get_parameter_string("out.formula");
+	returned_formula = dc_expand_user_macros_in_calcitem(formula, hostid);
+	zbx_mock_assert_str_eq("Expanded parameters", expected_formula, returned_formula);
+
+	zbx_free(returned_formula);
+
+	mock_config_free();
 }
-zbx_mock_config_t;
-
-#define ZBX_MOCK_CONFIG_USERMACROS	0x0001
-#define ZBX_MOCK_CONFIG_HOSTS		0x0002
-
-void	free_string(const char *str);
-
-#endif

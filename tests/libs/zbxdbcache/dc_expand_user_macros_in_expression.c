@@ -49,9 +49,6 @@ void	zbx_mock_test_entry(void **state)
 
 	expression = zbx_mock_get_parameter_string("in.expression");
 	expected_expression = zbx_mock_get_parameter_string("out.expression");
-
-	/* the macro expansion relies on wrapped zbx_hashset_search which returns mocked */
-	/* macros when used with global macro index hashset                              */
 	returned_expression = dc_expand_user_macros_in_expression(expression, NULL, 0);
 	zbx_mock_assert_str_eq("Expanded expression", expected_expression, returned_expression);
 

@@ -74,12 +74,9 @@ void	mock_config_load_user_macros(const char *path)
 {
 	zbx_mock_handle_t	hmacros, handle;
 	zbx_mock_error_t	err;
-	const char		*macro_name, *macro_value;
 	int			i;
 	ZBX_DC_HMACRO_HM	*hm;
 	ZBX_DC_GMACRO_M		*gm;
-	zbx_uint64_t		macro_hostid;
-	zbx_mock_handle_t	hhostid;
 
 	zbx_vector_ptr_create(&mock_config.host_macros);
 	zbx_vector_ptr_create(&mock_config.global_macros);
@@ -87,7 +84,10 @@ void	mock_config_load_user_macros(const char *path)
 	hmacros = zbx_mock_get_parameter_handle(path);
 	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hmacros, &handle))))
 	{
-		char	*name = NULL, *context = NULL;
+		char			*name = NULL, *context = NULL;
+		const char		*macro_name, *macro_value;
+		zbx_uint64_t		macro_hostid;
+		zbx_mock_handle_t	hhostid;
 
 		if (ZBX_MOCK_SUCCESS != err)
 		{

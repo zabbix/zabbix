@@ -38,6 +38,7 @@ zbx_mock_config_t	mock_config;
 void	*__real_zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 
 void	mock_config_free_user_macros();
+void	mock_config_free_hosts();
 
 void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 {
@@ -72,6 +73,40 @@ void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 		}
 	}
 
+	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_HOSTS))
+	{
+		if (hs == &mock_config.dc.hosts)
+		{
+			zbx_uint64_t	hostid = *(zbx_uint64_t *)data;
+
+			for (i = 0; i < mock_config.hosts.values_num; i++)
+			{
+				ZBX_DC_HOST	*host = (ZBX_DC_HOST *)mock_config.hosts.values[i];
+				if (host->hostid == hostid)
+					return host;
+			}
+			return NULL;
+		}
+		if (hs == &mock_config.dc.hosts_h)
+		{
+			ZBX_DC_HOST_H	*hh = (ZBX_DC_HOST_H *)data;
+
+			for (i = 0; i < mock_config.hosts.values_num; i++)
+			{
+				ZBX_DC_HOST	*host = (ZBX_DC_HOST *)mock_config.hosts.values[i];
+				if (0 == strcmp(hh->host, host->host))
+				{
+					static ZBX_DC_HOST_H host_index;
+
+					host_index.host = host->host;
+					host_index.host_ptr = host;
+					return &host_index;
+				}
+			}
+			return NULL;
+		}
+	}
+
 	/* return NULL from searches in non mocked configuration cache hashsets */
 	if ((char *)hs >= (char *)&mock_config.dc && (char *)hs < (char *)(&mock_config.dc + 1))
 		return NULL;
@@ -96,6 +131,10 @@ void	mock_config_free()
 {
 	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_USERMACROS))
 		mock_config_free_user_macros();
+
+	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_HOSTS))
+		mock_config_free_hosts();
+
 }
 
 
