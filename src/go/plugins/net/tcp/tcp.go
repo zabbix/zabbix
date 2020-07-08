@@ -201,8 +201,10 @@ func loginRecived(buf []byte) bool {
 	return false
 }
 
-func telnetTestLogin(conn net.Conn, buf []byte) ([]byte, error) {
+func telnetTestLogin(conn net.Conn) ([]byte, error) {
 	var err error
+	var buf []byte
+
 	cmdIAC := byte(255)
 	cmdWILL := byte(251)
 	cmdWONT := byte(252)
@@ -279,8 +281,8 @@ func telnetTestLogin(conn net.Conn, buf []byte) ([]byte, error) {
 	}
 }
 
-func (p *Plugin) validateTelnet(buf []byte, conn net.Conn) ([]byte, int) {
-	buf, err := telnetTestLogin(conn, buf)
+func (p *Plugin) validateTelnet(conn net.Conn) ([]byte, int) {
+	buf, err := telnetTestLogin(conn)
 	if err != nil {
 		log.Debugf("TCP telnet network error: %s", err.Error())
 		return buf, tcpExpectFail
@@ -393,7 +395,7 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var checkResult int
 	var buf []byte
 	if service == "telnet" {
-		buf, checkResult = p.validateTelnet(buf, conn)
+		buf, checkResult = p.validateTelnet(conn)
 	} else {
 		buf = make([]byte, 2048)
 		for {
