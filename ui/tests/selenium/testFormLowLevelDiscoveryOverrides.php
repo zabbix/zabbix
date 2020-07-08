@@ -28,9 +28,10 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	const HOST_ID = 40001;
-	const LLD_UPDATE = 33800;
+	const UPDATED_ID = 33800;
 
-	public static $id;
+	public static $created_id;
+	public static $old_hash;
 
 	/**
 	 * Attach Behaviors to the test.
@@ -479,7 +480,52 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'action' => USER_ACTION_REMOVE,
+							'name' => 'Override for update 1',
+						],
+						[
+							'action' => USER_ACTION_REMOVE,
 							'name' => 'Override for update 2',
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'fields' => [
+								'Name' => 'Updated Override for update 1',
+								'If filter matches' => 'Stop processing'
+							],
+							'Filters' => [
+								'Type of calculation' => 'Custom expression',
+								'formula' => 'A and B',
+								'filter_conditions' => [
+									[
+										'action' => USER_ACTION_UPDATE,
+										'index' => 0,
+										'macro' => '{#UPDATED_MACRO1}',
+										'operator' => 'does not match',
+										'expression' => 'UPDATED expression_1'
+									],
+									[
+										'action' => USER_ACTION_UPDATE,
+										'index' => 1,
+										'macro' => '{#UPDATED_MACRO2}',
+										'operator' => 'matches',
+										'expression' => 'UPDATED expression_2'
+									]
+								]
+							],
+//							'Operations' => [
+//								[
+//									'Object' => 'Host prototype',
+//									'Link templates' => [],
+//								]
+//							]
 						]
 					]
 				]
@@ -489,10 +535,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	/**
 	 * @dataProvider getUpdateData
+	 *
+	 * @backup items
 	 */
 	public function testFormLowLevelDiscoveryOverrides_Update($data) {
 		$this->overridesUpdate($data);
-//		$this->checkSavedState($data);
+		$this->checkUpdatedState($data);
 	}
 
 	private function overridesCreate($data) {
@@ -527,12 +575,13 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($key)));
-			self::$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($key));
+			self::$created_id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($key));
 		}
 	}
 
 	private function overridesUpdate($data) {
-		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::LLD_UPDATE);
+		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
+		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::UPDATED_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$form->invalidate();
@@ -543,12 +592,16 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 //			$override[] = $override_container->getRow($k)->getColumn('Name')->getText();
 //		}
 
+		$state = [];
+
 		foreach ($data['overrides'] as $i => $override) {
 			$action = CTestArrayHelper::get($override, 'action', USER_ACTION_ADD);
 
 			switch ($action) {
 				case USER_ACTION_ADD:
 					$override_container->query('button:Add')->one()->click();
+
+					$state['Overrides'][] = $override;
 					break;
 
 				case USER_ACTION_UPDATE:
@@ -575,6 +628,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				case USER_ACTION_REMOVE:
 					$row = $override_container->findRow('Name', $override['name']);
 					$row->query('button:Remove')->one()->click();
+
+					foreach ($state['Overrides'] as $k => $o) {
+						if ($o['name'] === $override['name']) {
+							unset($state['Overrides'][$k]);
+						}
+					}
 					break;
 
 				default:
@@ -586,10 +645,47 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Submit LLD update.
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
-//			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($key)));
-//			self::$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($key));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE itemid ='.self::UPDATED_ID));
 		}
 	}
+
+	/**
+	 * @depends overridesUpdate
+	 */
+	private function checkUpdatedState($data) {
+		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+			$this->assertEquals(self::$old_hash, CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid'));
+			return;
+		}
+		// Open saved LLD.
+		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::UPDATED_ID);
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Overrides');
+		$override_container = $form->getField('Overrides')->asTable();
+//		// Get Overrides count.
+//		$overrides_count = $override_container->getRows()->count();
+
+		foreach ($data['overrides'] as $i=> $override) {
+			$action = CTestArrayHelper::get($override, 'action', USER_ACTION_ADD);
+
+			switch ($action) {
+				case USER_ACTION_ADD:
+
+					break;
+
+				case USER_ACTION_UPDATE:
+
+					break;
+
+				case USER_ACTION_REMOVE:
+					$this->assertFalse($override_container->query('link', $override['name'])->one(false)->isValid());
+					break;
+			}
+
+		}
+
+	}
+
 
 	/**
 	 * @depends overridesCreate
@@ -601,7 +697,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		}
 
 		// Open saved LLD.
-		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::$id);
+		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::$created_id);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$override_container = $form->getField('Overrides')->asTable();
@@ -612,7 +708,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		foreach ($data['overrides'] as $override) {
 			$override_names[] = $override['fields']['Name'];
 			$stop_processing[] = (CTestArrayHelper::get($override['fields'],
-				'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
+					'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
 		}
 
 		// Compare Override names from table with data.
@@ -636,7 +732,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			}
 
 			if (array_key_exists('Filters', $override)) {
-				// Check that Fiters are filled correctly.
+				//			if (array_key_exists('Filters', $override)) { Check that Fiters are filled correctly.
 				$this->assertValues($override['Filters']['filter_conditions']);
 
 				// Check that Evaluation type is filled correctly.
