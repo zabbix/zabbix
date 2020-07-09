@@ -637,7 +637,9 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 	 */
 	private function checkMessageTemplates($data, $templates_list) {
 		foreach ($data['message_templates'] as $template) {
-			switch (CTestArrayHelper::get($template, 'action', 'Edit')) {
+			$action = CTestArrayHelper::get($template, 'action', 'Edit');
+			unset($template['action']);
+			switch ($action) {
 				case 'Edit':
 				case 'Add':
 				case 'Skip':
@@ -645,10 +647,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Edit')->one()->click();
 					COverlayDialogElement::find()->one()->waitUntilReady();
 					$form = $this->query('id:mediatype_message_form')->asForm()->one();
-					if (array_key_exists('Subject', $template)) {
-						$this->assertEquals($template['Subject'], $form->getField('Subject')->getValue());
-					}
-					$this->assertEquals($template['Message'], $form->getField('Message')->getValue());
+					$form->checkValue($template);
 					COverlayDialogElement::find()->one()->close();
 					break;
 				case 'Remove':
