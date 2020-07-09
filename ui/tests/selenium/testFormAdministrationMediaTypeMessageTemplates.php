@@ -289,11 +289,11 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				$this->assertFalse($templates_list->query('button:Add')->one()->isEnabled());
 				$this->assertEquals('Add (message type limit reached)', $templates_list->query('button:Add')->one()->getText());
 			}
-			else{
+			else {
 				$templates_list->query('button:Add')->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$form->invalidate();
-				$this->assertFalse($form->getField('Message type')->checkOptionEnabled($template['Message type']));
+				$this->assertFalse($form->getField('Message type')->isOptionEnabled($template['Message type']));
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -629,9 +629,6 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				case 'Remove temporary':
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Remove')->one()->click();
 					break;
-				case 'Skip':
-					// Code is not missing here. No modifications thould be made to the corresponding message template.
-					break;
 			}
 		}
 	}
@@ -659,9 +656,6 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					// Check that the previously removed row is not present in message template list.
 					$this->assertFalse($templates_list->findRow('Message type', $template['Message type'])->isValid());
 					break;
-				case 'Remove temporary':
-					// Code is not missing here. The removed message template is added by another record in data provider.
-					break;
 			}
 		}
 	}
@@ -687,8 +681,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 	/**
 	 * Function that checks if the buttons with the passed selector are clickable.
 	 */
-	private function checkButtonsClickable($buttons, $element, $selector='button') {
-		foreach($buttons as $button) {
+	private function checkButtonsClickable($buttons, $element, $selector = 'button') {
+		foreach ($buttons as $button) {
 			$this->assertTrue($element->query($selector, $button)->one()->isClickable());
 		}
 	}

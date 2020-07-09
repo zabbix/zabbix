@@ -95,13 +95,25 @@ class CDropdownElement extends CElement {
 	}
 
 	/**
-	 * Check if dropdown option is enabled.
+	 * Check the state of the passed dropdown options.
 	 *
-	 * @param string	$option    element text to be checked
+	 * @param string|array	$option		element text to be checked
+	 * @param boolean		$enabled	flag that defines the desired state of dropdown options
 	 *
 	 * @return boolean
 	 */
-	public function checkOptionEnabled($option) {
-		return $this->query('xpath:.//option[text()='.CXPathHelper::escapeQuotes($option).']')->one()->isEnabled();
+	public function isOptionEnabled($options, $enabled = true) {
+		if (!is_array($options)) {
+			$options = [$options];
+		}
+
+		foreach ($options as $option) {
+			$get_option = $this->query('xpath:.//option[text()='.CXPathHelper::escapeQuotes($option).']')->one();
+			if ($get_option->isEnabled() !== $enabled) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
