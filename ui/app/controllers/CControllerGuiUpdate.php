@@ -24,15 +24,15 @@ class CControllerGuiUpdate extends CController {
 	protected function checkInput() {
 		$themes = array_keys(APP::getThemes());
 		$fields = [
-			'default_theme'           => 'required|in '.implode(',', $themes).'|db config.default_theme',
-			'search_limit'            => 'required|db config.search_limit|ge 1|le 999999',
-			'max_in_table'            => 'required|db config.max_in_table|ge 1|le 99999',
-			'server_check_interval'   => 'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL,
-			'work_period'             => 'required|db config.work_period|time_periods',
-			'show_technical_errors'   => 'db config.show_technical_errors|in 0,1',
-			'history_period'          => 'required|db config.history_period',
-			'period_default'          => 'required|db config.period_default',
-			'max_period'              => 'required|db config.max_period'
+			'default_theme' =>			'required|in '.implode(',', $themes).'|db config.default_theme',
+			'search_limit' =>			'required|db config.search_limit|ge 1|le 999999',
+			'max_in_table' =>			'required|db config.max_in_table|ge 1|le 99999',
+			'server_check_interval' =>	'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL,
+			'work_period' =>			'required|db config.work_period|time_periods',
+			'show_technical_errors' =>	'db config.show_technical_errors|in 0,1',
+			'history_period' =>			'required|db config.history_period',
+			'period_default' =>			'required|db config.period_default',
+			'max_period' =>				'required|db config.max_period'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -106,15 +106,15 @@ class CControllerGuiUpdate extends CController {
 
 	protected function doAction() {
 		$result = API::Settings()->update([
-			CSettingsHelper::DEFAULT_THEME         => $this->getInput('default_theme'),
-			CSettingsHelper::SEARCH_LIMIT          => $this->getInput('search_limit'),
-			CSettingsHelper::MAX_IN_TABLE          => $this->getInput('max_in_table'),
+			CSettingsHelper::DEFAULT_THEME => $this->getInput('default_theme'),
+			CSettingsHelper::SEARCH_LIMIT => $this->getInput('search_limit'),
+			CSettingsHelper::MAX_IN_TABLE => $this->getInput('max_in_table'),
 			CSettingsHelper::SERVER_CHECK_INTERVAL => $this->getInput('server_check_interval'),
-			CSettingsHelper::WORK_PERIOD           => $this->getInput('work_period'),
+			CSettingsHelper::WORK_PERIOD => $this->getInput('work_period'),
 			CSettingsHelper::SHOW_TECHNICAL_ERRORS => $this->getInput('show_technical_errors', 0),
-			CSettingsHelper::HISTORY_PERIOD        => $this->getInput('history_period'),
-			CSettingsHelper::PERIOD_DEFAULT        => $this->getInput('period_default'),
-			CSettingsHelper::MAX_PERIOD            => $this->getInput('max_period')
+			CSettingsHelper::HISTORY_PERIOD => $this->getInput('history_period'),
+			CSettingsHelper::PERIOD_DEFAULT => $this->getInput('period_default'),
+			CSettingsHelper::MAX_PERIOD => $this->getInput('max_period')
 		]);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))

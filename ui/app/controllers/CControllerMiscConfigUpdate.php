@@ -23,22 +23,22 @@ class CControllerMiscConfigUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'refresh_unsupported'     => 'required|db config.refresh_unsupported',
-			'discovery_groupid'       => 'required|db config.discovery_groupid',
-			'default_inventory_mode'  => 'required|in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
-			'alert_usrgrpid'          => 'db config.alert_usrgrpid',
-			'snmptrap_logging'        => 'required|db config.snmptrap_logging|in 0,1',
-			'login_attempts'          => 'required|db config.login_attempts|ge 1|le 32',
-			'login_block'             => 'required|db config.login_block',
-			'session_name'            => 'required|db config.session_name',
-			'validate_uri_schemes'    => 'required|db config.validate_uri_schemes|in 0,1',
-			'uri_valid_schemes'       => 'db config.uri_valid_schemes',
-			'x_frame_options'         => 'required|db config.x_frame_options',
-			'socket_timeout'          => 'required|db config.socket_timeout',
-			'connect_timeout'         => 'required|db config.connect_timeout',
-			'media_type_test_timeout' => 'required|db config.media_type_test_timeout',
-			'script_timeout'          => 'required|db config.script_timeout',
-			'item_test_timeout'       => 'required|db config.item_test_timeout'
+			'refresh_unsupported' =>		'required|db config.refresh_unsupported',
+			'discovery_groupid' =>			'required|db config.discovery_groupid',
+			'default_inventory_mode' =>		'required|in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
+			'alert_usrgrpid' =>				'db config.alert_usrgrpid',
+			'snmptrap_logging' =>			'required|db config.snmptrap_logging|in 0,1',
+			'login_attempts' =>				'required|db config.login_attempts|ge 1|le 32',
+			'login_block' =>				'required|db config.login_block',
+			'session_name' =>				'required|db config.session_name',
+			'validate_uri_schemes' =>		'required|db config.validate_uri_schemes|in 0,1',
+			'uri_valid_schemes' =>			'db config.uri_valid_schemes',
+			'x_frame_options' =>			'required|db config.x_frame_options',
+			'socket_timeout' =>				'required|db config.socket_timeout',
+			'connect_timeout' =>			'required|db config.connect_timeout',
+			'media_type_test_timeout' =>	'required|db config.media_type_test_timeout',
+			'script_timeout' =>				'required|db config.script_timeout',
+			'item_test_timeout' =>			'required|db config.item_test_timeout'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -160,20 +160,20 @@ class CControllerMiscConfigUpdate extends CController {
 
 	protected function doAction() {
 		$settings = [
-			CSettingsHelper::REFRESH_UNSUPPORTED     => $this->getInput('refresh_unsupported'),
-			CSettingsHelper::DISCOVERY_GROUPID       => $this->getInput('discovery_groupid'),
-			CSettingsHelper::DEFAULT_INVENTORY_MODE  => $this->getInput('default_inventory_mode'),
-			CSettingsHelper::SNMPTRAP_LOGGING        => $this->getInput('snmptrap_logging'),
-			CSettingsHelper::LOGIN_ATTEMPTS          => $this->getInput('login_attempts'),
-			CSettingsHelper::LOGIN_BLOCK             => $this->getInput('login_block'),
-			CSettingsHelper::SESSION_NAME            => $this->getInput('session_name'),
-			CSettingsHelper::VALIDATE_URI_SCHEMES    => $this->getInput('validate_uri_schemes'),
-			CSettingsHelper::X_FRAME_OPTIONS         => $this->getInput('x_frame_options'),
-			CSettingsHelper::SOCKET_TIMEOUT          => $this->getInput('socket_timeout'),
-			CSettingsHelper::CONNECT_TIMEOUT         => $this->getInput('connect_timeout'),
+			CSettingsHelper::REFRESH_UNSUPPORTED => $this->getInput('refresh_unsupported'),
+			CSettingsHelper::DISCOVERY_GROUPID => $this->getInput('discovery_groupid'),
+			CSettingsHelper::DEFAULT_INVENTORY_MODE => $this->getInput('default_inventory_mode'),
+			CSettingsHelper::SNMPTRAP_LOGGING => $this->getInput('snmptrap_logging'),
+			CSettingsHelper::LOGIN_ATTEMPTS => $this->getInput('login_attempts'),
+			CSettingsHelper::LOGIN_BLOCK => $this->getInput('login_block'),
+			CSettingsHelper::SESSION_NAME => $this->getInput('session_name'),
+			CSettingsHelper::VALIDATE_URI_SCHEMES => $this->getInput('validate_uri_schemes'),
+			CSettingsHelper::X_FRAME_OPTIONS => $this->getInput('x_frame_options'),
+			CSettingsHelper::SOCKET_TIMEOUT => $this->getInput('socket_timeout'),
+			CSettingsHelper::CONNECT_TIMEOUT => $this->getInput('connect_timeout'),
 			CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT => $this->getInput('media_type_test_timeout'),
-			CSettingsHelper::SCRIPT_TIMEOUT          => $this->getInput('script_timeout'),
-			CSettingsHelper::ITEM_TEST_TIMEOUT       => $this->getInput('item_test_timeout')
+			CSettingsHelper::SCRIPT_TIMEOUT => $this->getInput('script_timeout'),
+			CSettingsHelper::ITEM_TEST_TIMEOUT => $this->getInput('item_test_timeout')
 		];
 
 		$settings[CSettingsHelper::ALERT_USRGRPID] = $this->hasInput('alert_usrgrpid')

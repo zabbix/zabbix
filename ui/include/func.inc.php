@@ -1653,14 +1653,14 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 }
 
 /**
- * Filters messages that can be displayed to user based on defines (see ZBX_SHOW_TECHNICAL_ERRORS) and user settings.
+ * Filters messages that can be displayed to user based on CSettingsHelper::SHOW_TECHNICAL_ERRORS and user settings.
  *
  * @param array $messages	List of messages to filter.
  *
  * @return array
  */
 function filter_messages(array $messages = []) {
-	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+	if (!CSettingsHelper::get(CSettingsHelper::SHOW_TECHNICAL_ERRORS) && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$filtered_messages = [];
 		$generic_exists = false;
 

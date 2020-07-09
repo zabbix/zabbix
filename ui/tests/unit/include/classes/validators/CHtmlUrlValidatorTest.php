@@ -21,7 +21,7 @@
 
 class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 
-	// Expected results are defined assuming that VALIDATE_URI_SCHEMES is enabled (set to be true).
+	// Expected results are defined assuming that CSettingsHelper::VALIDATE_URI_SCHEMES is enabled (set to be 1).
 	public function providerValidateURL() {
 		return [
 			// Valid URLs.

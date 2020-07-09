@@ -147,8 +147,6 @@ define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
 define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
 define('ORACLE_MAX_STRING_SIZE', 4000);
 
-define('ZBX_SHOW_TECHNICAL_ERRORS', false);
-
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript
@@ -181,10 +179,6 @@ define('P_NZERO',				0x0020);
 define('P_NO_TRIM',				0x0040);
 define('P_ALLOW_USER_MACRO',	0x0080);
 define('P_ALLOW_LLD_MACRO',		0x0100);
-define('ZBX_URI_VALID_SCHEMES', 'http,https,ftp,file,mailto,tel,ssh');
-
-// Validate URI against schemes whitelist defined in ZBX_URI_VALID_SCHEMES.
-define('VALIDATE_URI_SCHEMES', true);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');
@@ -220,7 +214,7 @@ define('AUDIT_ACTION_DISABLE',	6);
 define('AUDIT_ACTION_EXECUTE',	7);
 
 define('AUDIT_RESOURCE_USER',				0);
-define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2); // currently not used but need for compatibility with old audit records
+define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2); // Currently not used but need for compatibility with old audit records.
 define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
 define('AUDIT_RESOURCE_HOST',				4);
 define('AUDIT_RESOURCE_ACTION',				5);
@@ -1936,15 +1930,3 @@ define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
  * https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html#attr-iframe-sandbox
  */
 define('ZBX_IFRAME_SANDBOX', '');
-
-// HTTP headers
-/*
- * Value of HTTP X-Frame-options header.
- *
- * Supported options:
- *  - SAMEORIGIN (string) - compatible with rfc7034.
- *  - DENY (string) - compatible with rfc7034.
- *  - a list (string) of comma-separated hostnames. If hostname is not between allowed, the SAMEORIGIN option is used.
- *  - null - disable X-Frame-options header.
- */
-define('X_FRAME_OPTIONS', 'SAMEORIGIN');

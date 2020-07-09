@@ -126,7 +126,7 @@ class CSettings extends CApiService {
 			]);
 
 			if (array_key_exists('discovery_groupid', $upd_config)
-					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) != 0) {
+					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) !== 0) {
 				$this->setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
 				$this->setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
 			}
@@ -165,13 +165,13 @@ class CSettings extends CApiService {
 			'severity_color_3' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			'severity_color_4' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			'severity_color_5' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
-			'severity_name_0' =>			['type' => API_STRING_UTF8, 'length' => 32],
-			'severity_name_1' =>			['type' => API_STRING_UTF8, 'length' => 32],
-			'severity_name_2' =>			['type' => API_STRING_UTF8, 'length' => 32],
-			'severity_name_3' =>			['type' => API_STRING_UTF8, 'length' => 32],
-			'severity_name_4' =>			['type' => API_STRING_UTF8, 'length' => 32],
-			'severity_name_5' =>			['type' => API_STRING_UTF8, 'length' => 32],
-			'custom_color' =>				['type' => API_INT32, 'in' => EVENT_CUSTOM_COLOR_DISABLED.','. EVENT_CUSTOM_COLOR_ENABLED],
+			'severity_name_0' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'severity_name_0')],
+			'severity_name_1' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'severity_name_1')],
+			'severity_name_2' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'severity_name_2')],
+			'severity_name_3' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'severity_name_3')],
+			'severity_name_4' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'severity_name_4')],
+			'severity_name_5' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'severity_name_5')],
+			'custom_color' =>				['type' => API_INT32, 'in' => EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED],
 			'ok_period' =>					['type' => API_TIME_UNIT],
 			'blink_period' =>				['type' => API_TIME_UNIT],
 			'problem_unack_color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
@@ -184,15 +184,15 @@ class CSettings extends CApiService {
 			'ok_ack_style' =>				['type' => API_INT32, 'in' => '0,1'],
 			'refresh_unsupported' =>		['type' => API_TIME_UNIT],
 			'discovery_groupid' =>			['type' => API_ID],
-			'default_inventory_mode' =>		['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','. HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
+			'default_inventory_mode' =>		['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
 			'alert_usrgrpid' =>				['type' => API_ID, 'flags' => API_ALLOW_NULL],
 			'snmptrap_logging' =>			['type' => API_INT32, 'in' => '0,1'],
 			'login_attempts' =>				['type' => API_INT32, 'in' => '1:32'],
 			'login_block' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [30, SEC_PER_HOUR])],
-			'session_name' =>				['type' => API_STRING_UTF8, 'length' => 32],
+			'session_name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'session_name')],
 			'validate_uri_schemes' =>		['type' => API_INT32, 'in' => '0,1'],
-			'uri_valid_schemes' =>			['type' => API_STRING_UTF8, 'length' => 255],
-			'x_frame_options' =>			['type' => API_STRING_UTF8, 'length' => 255],
+			'uri_valid_schemes' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'uri_valid_schemes')],
+			'x_frame_options' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'x_frame_options')],
 			'connect_timeout' =>			['type' => API_TIME_UNIT, 'in' => '1:30'],
 			'socket_timeout' =>				['type' => API_TIME_UNIT, 'in' => '1:300'],
 			'media_type_test_timeout' =>	['type' => API_TIME_UNIT, 'in' => '1:300'],

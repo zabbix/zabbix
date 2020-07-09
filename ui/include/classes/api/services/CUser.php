@@ -1176,7 +1176,9 @@ class CUser extends CApiService {
 		);
 
 		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
-			$sec_left = CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK) - (time() - $db_user['attempt_clock']);
+			$sec_left = (timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
+				- (time() - $db_user['attempt_clock'])
+			);
 
 			if ($sec_left > 0) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -1222,9 +1224,9 @@ class CUser extends CApiService {
 
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
 					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _n('Account is blocked for %1$s second.',
-					'Account is blocked for %1$s seconds.', CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)
-				));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)))
+				);
 			}
 
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());

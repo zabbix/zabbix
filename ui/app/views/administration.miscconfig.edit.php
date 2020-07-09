@@ -50,7 +50,7 @@ $from_list = (new CFormList())
 					'dstfrm' => 'otherForm',
 					'dstfld1' => 'discovery_groupid',
 					'normal_only' => '1',
-					'editable' => true,
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
