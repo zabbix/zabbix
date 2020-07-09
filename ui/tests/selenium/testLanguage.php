@@ -54,7 +54,7 @@ class testLanguage extends CWebTest {
 					'message' => 'Configuration updated',
 					'page_title' => 'Настройка веб-интерфейса',
 					'body_lang' => 'ru',
-					'db_lang' => 'ru_RU',
+					'defaultdb_lang' => 'ru_RU',
 					'info' => self::INFO_RUS,
 					'login_info' => [
 							'name' => 'Имя пользователя',
@@ -70,7 +70,7 @@ class testLanguage extends CWebTest {
 					'message' => 'Настройки обновлены',
 					'page_title' => 'Configuration of GUI',
 					'body_lang' => 'en',
-					'db_lang' => 'en_GB',
+					'defaultdb_lang' => 'en_GB',
 					'info' => self::INFO,
 					'login_info' => [
 							'name' => 'Username',
@@ -92,10 +92,7 @@ class testLanguage extends CWebTest {
 		$form->fill($data['field']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, $data['message']);
-		$this->assertPageTitle($data['page_title']);
-		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
-		$this->assertEquals($data['db_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
+		$this->checkLanguage($data['message'], $data['page_title'], $data['body_lang'], $data['defaultdb_lang']);
 
 		// Red info icon check.
 		$this->query('xpath://span[@class="icon-info status-red"]')->one()->click();
@@ -177,11 +174,9 @@ class testLanguage extends CWebTest {
 		$form->fill($data['field']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, $data['message']);
-		$this->assertPageTitle($data['page_title']);
-		$this->assertEquals($data['body_lang'], $this->query('xpath://body')->one()->getAttribute('lang'));
+		$this->checkLanguage($data['message'], $data['page_title'], $data['body_lang'], $data['defaultdb_lang']);
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias="user-zabbix"'));
-		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
+
 
 		// After logout, login menu has system language.
 		$this->page->logout();
@@ -272,5 +267,12 @@ class testLanguage extends CWebTest {
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
 		$this->query('xpath://button[@type="submit"]')->one()->click();
+	}
+
+	private function checkLanguage($message, $page_title, $body_lang, $defaultdb_lang) {
+		$this->assertMessage(TEST_GOOD, $message);
+		$this->assertPageTitle($page_title);
+		$this->assertEquals($body_lang, $this->query('xpath://body')->one()->getAttribute('lang'));
+		$this->assertEquals($defaultdb_lang, CDBHelper::getValue('SELECT default_lang FROM config'));
 	}
 }
