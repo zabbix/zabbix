@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,25 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package log
 
-class CControllerPopupActionRecovery extends CControllerPopupOperationCommon {
+import (
+	"fmt"
+	"log/syslog"
+)
 
-	protected function getCheckInputs() {
-		return [
-			'type' =>			'required|in '.ACTION_RECOVERY_OPERATION,
-			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL]),
-			'operationtype' =>	'in '.implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_RECOVERY_MESSAGE]),
-			'actionid' =>		'string',
-			'update' =>			'in 1',
-			'validate' =>		'in 1',
-			'operation' =>		'array'
-		];
+var syslogWriter *syslog.Writer
+
+func createSyslog() (err error) {
+	syslogWriter, err = syslog.New(syslog.LOG_WARNING|syslog.LOG_DAEMON, "zabbix_agent2")
+	return
+}
+
+func procSysLog(format string, args []interface{}, level int) {
+	switch level {
+	case Info:
+		syslogWriter.Info(fmt.Sprintf(format, args...))
+	case Crit:
+		syslogWriter.Crit(fmt.Sprintf(format, args...))
+	case Err:
+		syslogWriter.Err(fmt.Sprintf(format, args...))
+	case Warning:
+		syslogWriter.Warning(fmt.Sprintf(format, args...))
+	case Debug, Trace:
+		syslogWriter.Debug(fmt.Sprintf(format, args...))
 	}
-
-	protected function getFormDetails() {
-		return [
-			'param' => 'add_recovery_operation',
-			'input_name' => 'new_recovery_operation'
-		];
-	}
+	return
 }

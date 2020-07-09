@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 4.4  
+For Zabbix version: 5.0  
 The template to monitor HAProxy by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -18,6 +18,8 @@ This template was tested on:
 - Zabbix, version 4.4
 
 ## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Setup [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/).
 
@@ -183,6 +185,5 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide feedback, discuss the template or ask for help with it at
-[ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy).
+You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy).
 

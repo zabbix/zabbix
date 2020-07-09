@@ -291,6 +291,21 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
+	 * Get values of elements as array.
+	 *
+	 * @return array
+	 */
+	public function asValues() {
+		$values = [];
+
+		foreach ($this->elements as $key => $element) {
+			$values[$key] = $element->getValue();
+		}
+
+		return $values;
+	}
+
+	/**
 	 * Get elements as array.
 	 *
 	 * @return array
@@ -354,5 +369,32 @@ class CElementCollection implements Iterator {
 		}
 
 		return $this->each($name, $arguments);
+	}
+
+	/**
+	 * Index elements by attribute values.
+	 *
+	 * @param string $name    attribute name
+	 *
+	 * @return CElementCollection
+	 */
+	public function indexByAttribute($name) {
+		$elements = [];
+
+		foreach ($this->elements as $element) {
+			$key = $element->getAttribute($name);
+
+			if ($key === null) {
+				throw new Exception('Attribute "'.$name.'" is not present for all collection elements.');
+			}
+
+			if (array_key_exists($key, $elements)) {
+				CTest::addWarning('Element attribute "'.$name.'" values are not unique in element collection.');
+			}
+
+			$elements[$key] = $element;
+		}
+
+		return new CElementCollection($elements, $this->element_class);
 	}
 }

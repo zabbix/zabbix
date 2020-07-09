@@ -176,10 +176,7 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
-		'params_f' => [
-			'support_user_macros' => true,
-			'support_lld_macros' => true
-		],
+		'params_f' => [],
 		'ipmi_sensor' => [
 			'support_user_macros' => false,
 			'support_lld_macros' => true
@@ -879,6 +876,67 @@ abstract class CControllerPopupItemTest extends CController {
 	}
 
 	/**
+	 * Resolve macros used in the calculates item formula.
+	 *
+	 * @param string $formula  Calculated item formula.
+	 *
+	 * @return array
+	 */
+	private function resolveCalcFormulaMacros(string $formula) {
+		$macros_posted = $this->getInput('macros', []);
+
+		if (!$macros_posted) {
+			return $formula;
+		}
+
+		$expression_data = new CTriggerExpression([
+			'calculated' => true,
+			'lldmacros' => ($this->preproc_item instanceof CItemPrototype)
+		]);
+
+		if (($result = $expression_data->parse($formula)) === false) {
+			// Cannot parse a calculated item formula. Return as is.
+			return $formula;
+		}
+
+		$expression = [];
+		$pos_left = 0;
+
+		foreach ($result->getTokens() as $token) {
+			switch ($token['type']) {
+				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
+				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
+				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+					if ($pos_left != $token['pos']) {
+						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
+					}
+					$pos_left = $token['pos'] + $token['length'];
+					break;
+			}
+
+			switch ($token['type']) {
+				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
+				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
+					$expression[] = array_key_exists($token['value'], $macros_posted)
+						? CTriggerExpression::quoteString($macros_posted[$token['value']], false)
+						: $token['value'];
+					break;
+
+				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+					$string = strtr($token['data']['string'], $macros_posted);
+					$expression[] = CTriggerExpression::quoteString($string, false, true);
+					break;
+			}
+		}
+
+		if ($pos_left != strlen($formula)) {
+			$expression[] = substr($formula, $pos_left);
+		}
+
+		return implode('', $expression);
+	}
+
+	/**
 	 * Resolve macros used in item property fields.
 	 *
 	 * @param array $inputs  Item fields potentially having supported macros.
@@ -891,6 +949,12 @@ abstract class CControllerPopupItemTest extends CController {
 
 		foreach (array_keys($this->macros_by_item_props) as $field) {
 			if (!array_key_exists($field, $inputs)) {
+				continue;
+			}
+
+			// Special processing for calculated item formula.
+			if ($field === 'params_f') {
+				$inputs[$field] = $this->resolveCalcFormulaMacros($inputs[$field], $macros_posted);
 				continue;
 			}
 

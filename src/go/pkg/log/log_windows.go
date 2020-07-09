@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,25 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package log
 
-class CControllerPopupActionAcknowledge extends CControllerPopupOperationCommon {
+import (
+	"errors"
+)
 
-	protected function getCheckInputs() {
-		return [
-			'type' =>			'required|in '.ACTION_ACKNOWLEDGE_OPERATION,
-			'source' =>			'required|in '.EVENT_SOURCE_TRIGGERS,
-			'operationtype' =>	'in '.implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]),
-			'actionid' =>		'string',
-			'update' =>			'in 1',
-			'validate' =>		'in 1',
-			'operation' =>		'array'
-		];
-	}
+func createSyslog() error {
+	return errors.New("system log is not supported on Windows")
+}
 
-	protected function getFormDetails() {
-		return [
-			'param' => 'add_ack_operation',
-			'input_name' => 'new_ack_operation'
-		];
-	}
+func procSysLog(format string, args []interface{}, level int) {
+	return
 }

@@ -145,6 +145,31 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$texts_support_lld_macros = [];
 		$supported_macros = [];
 		foreach (array_keys(array_intersect_key($inputs, $this->macros_by_item_props)) as $field) {
+			// Special processing for calculated item formula.
+			if ($field === 'params_f') {
+				$expression_data = new CTriggerExpression(['calculated' => true, 'lldmacros' => $support_lldmacros]);
+
+				if (($result = $expression_data->parse($inputs[$field])) !== false) {
+					foreach ($result->getTokens() as $token) {
+						switch ($token['type']) {
+							case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
+								$texts_support_user_macros[] = $token['value'];
+								break;
+
+							case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
+								$texts_support_lld_macros[] = $token['value'];
+								break;
+
+							case CTriggerExprParserResult::TOKEN_TYPE_STRING:
+								$texts_support_user_macros[] = $token['data']['string'];
+								$texts_support_lld_macros[] = $token['data']['string'];
+								break;
+						}
+					}
+				}
+				continue;
+			}
+
 			$macros = $this->macros_by_item_props[$field];
 			unset($macros['support_lld_macros'], $macros['support_user_macros']);
 

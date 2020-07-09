@@ -3814,7 +3814,7 @@
 
 						// Activate 'Save' button.
 						var active_placeholders = data['widgets'].filter(w => {
-							return !w['type'];
+							return !w.type && w.uniqueid != widget_placeholder.uniqueid;
 						}).length;
 
 						if (!active_placeholders) {
