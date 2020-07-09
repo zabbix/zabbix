@@ -80,6 +80,11 @@ The priority level in severity_default will be used for non-triggered actions.
 
 8\. Use the Opsgenie User in any actions of your choice. Text from "Action Operations" will be sent to "Opsgenie Alert" when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "Opsgenie Alert Notes" when the problem is resolved or updated.
 
+## Internal alerts
+To receive notifications about internal problem and recovery events in Opsgenie: in the internal action configuration mark the Custom message checkbox and specify custom message templates for problem and recovery operations. 
+If an internal action operation is configured without a custom message, the notification will not be sent. 
+Note, that this step is required only for notifications about internal events; for other event types specifying a custom message is optional. 
+
 For more information, please see [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [Opsgenie](https://docs.opsgenie.com/docs/alert-api) documentation.
 
 ## Supported Versions
