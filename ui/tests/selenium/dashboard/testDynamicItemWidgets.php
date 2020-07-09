@@ -174,8 +174,7 @@ class testDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
-						// TODO: change after fix ZBX-17825, should be 'Dynamic widgets H2: Dynamic widgets H1 GP4 (H1 IP1 and H2 I1)'
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I2)']
+						['type' => 'Graph prototype', 'header' => 'Graph prototype']
 					]
 				]
 			],
