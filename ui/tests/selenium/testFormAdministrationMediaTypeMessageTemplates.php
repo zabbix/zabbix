@@ -134,8 +134,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 						[
 							'Message type' => 'Internal problem recovery',
 							'Subject' => '',
-							'Message' => '',
-							'last' => true
+							'Message' => ''
 						]
 					]
 				]
@@ -200,8 +199,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 						[
 							'Message type' => 'Internal problem recovery',
 							'Subject' => '',
-							'Message' => '',
-							'last' => true
+							'Message' => ''
 						]
 					]
 				]
@@ -247,8 +245,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 						],
 						[
 							'Message type' => 'Internal problem recovery',
-							'Message' => '',
-							'last' => true
+							'Message' => ''
 						]
 					]
 				]
@@ -264,25 +261,22 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$this->openMediaTypeTemplates('new', $data['media_type']);
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		// Add each type of message template and check the values of default messages.
-		foreach ($data['message_templates'] as $template) {
-			$rows_count = $templates_list->getRows()->count();
+		$last = count($data['message_templates']) - 1;
+		foreach ($data['message_templates'] as $i => $template) {
 			$templates_list->query('button:Add')->one()->click();
 			COverlayDialogElement::find()->one()->waitUntilReady();
+
+			// Check the fields available in the message template configuration form.
 			$form = $this->query('id:mediatype_message_form')->asForm()->one();
-			// Fill Subject if such should exist, otherwise check that only "Message type" and "Message" fields persist.
-			if (array_key_exists('Subject', $template)) {
-				$this->assertEquals($template['Subject'], $form->getField('Subject')->getValue());
+			$form->checkValue($template);
+			if ($data['media_type']['Type'] === 'SMS') {
+				$this->assertFalse($form->query('id:subject')->one(false)->isValid());
 			}
-			else {
-				$this->assertEquals(['Message type', 'Message'], $form->getLabels()->asText());
-			}
-			// Check the default message content.
-			$this->assertEquals($template['Message'], $form->getField('Message')->getValue());
 			$form->submit();
 			$templates_list->waitUntilReady()->invalidate();
+
 			// Check that the number of rows has increased after adding previously checked message template.
-			$rows_count++;
-			$this->assertEquals($rows_count, $templates_list->getRows()->count());
+			$this->assertEquals($i + 2, $templates_list->getRows()->count());
 			$row = $templates_list->findRow('Message type', $template['Message type']);
 			// Convert the reference message to a single line and compare it with the message added to message templates.
 			$message = preg_replace('/[\r\n ]+/', ' ', $template['Message']);
@@ -290,7 +284,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 			// Check that it is no logner possible to add same type of message template.
 			$templates_list->invalidate();
-			if (CTestArrayHelper::get($template, 'last', false)) {
+			if ($i === $last) {
 				$this->assertFalse($templates_list->query('button:Add')->one()->isEnabled());
 				$this->assertEquals('Add (message type limit reached)', $templates_list->query('button:Add')->one()->getText());
 			}
