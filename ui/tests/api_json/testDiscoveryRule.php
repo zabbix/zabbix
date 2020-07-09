@@ -20,6 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../../include/classes/parsers/CConditionFormula.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CConditionHelper.php';
 
 /**
  * @backup items
@@ -405,7 +407,7 @@ class testDiscoveryRule extends CAPITest {
 				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '999999',
+							'lld_macro_pathid' => '999999'
 						]
 					]
 				],
@@ -415,7 +417,7 @@ class testDiscoveryRule extends CAPITest {
 				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '992',
+							'lld_macro_pathid' => '992'
 						],
 						[
 							'lld_macro' => '{#B}',
@@ -1776,7 +1778,7 @@ class testDiscoveryRule extends CAPITest {
 					'lld_macro_paths' => [
 						[
 							'lld_macro_pathid' => '991',
-							'lld_macro' => '{#V}',
+							'lld_macro' => '{#V}'
 						],
 						[
 							'lld_macro_pathid' => '992',
@@ -1806,7 +1808,7 @@ class testDiscoveryRule extends CAPITest {
 					'lld_macro_paths' => [
 						[
 							'lld_macro_pathid' => '991',
-							'lld_macro' => '{#V}',
+							'lld_macro' => '{#V}'
 						],
 						[
 							'lld_macro_pathid' => '992',
@@ -2871,6 +2873,3147 @@ class testDiscoveryRule extends CAPITest {
 		}
 
 		// TODO: add templated discovery rules and check on errors.
+	}
+
+	public static function discoveryrule_overrides_delete_data() {
+		return [
+			'Test cannot delete nothing.' => [
+				[],
+				[],
+				[],
+				'Invalid parameter "/": cannot be empty.'
+			],
+			'Test cannot delete what does not exist.' => [
+				['9999999999'],
+				[],
+				[],
+				'No permissions to referred object or it does not exist!'
+			],
+			'Test overrides and override operations are deleted.' => [
+				['133763'],
+				['101', '102'],
+				['101', '102', '103', '104', '105', '106'],
+				null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_delete_data
+	 */
+	public function testDiscoveryRuleOverrides_Delete(array $itemids, array $overrideids, array $operationids, $error) {
+		$result = $this->call('discoveryrule.delete', $itemids, $error);
+
+		if ($error === null) {
+			$this->assertEquals($result['result']['ruleids'], $itemids);
+
+			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+				dbConditionId('lld_overrideid', $overrideids)
+			);
+			$this->assertEmpty($db_lld_overrides);
+
+			$lld_override_conditions = CDBHelper::getAll('SELECT * from lld_override_condition WHERE '.
+				dbConditionId('lld_overrideid', $overrideids)
+			);
+			$this->assertEmpty($lld_override_conditions);
+
+			$lld_override_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
+				dbConditionId('lld_overrideid', $overrideids)
+			);
+			$this->assertEmpty($lld_override_operations);
+
+			$lld_override_opdiscover = CDBHelper::getAll('SELECT * from lld_override_opdiscover WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_opdiscover);
+
+			$lld_override_opstatus = CDBHelper::getAll('SELECT * from lld_override_opstatus WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_opstatus);
+
+			$lld_override_ophistory = CDBHelper::getAll('SELECT * from lld_override_ophistory WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_ophistory);
+
+			$lld_override_opinventory = CDBHelper::getAll('SELECT * from lld_override_opinventory WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_opinventory);
+
+			$lld_override_opperiod = CDBHelper::getAll('SELECT * from lld_override_opperiod WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_opperiod);
+
+			$lld_override_opseverity = CDBHelper::getAll('SELECT * from lld_override_opseverity WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_opseverity);
+
+			$lld_override_optag = CDBHelper::getAll('SELECT * from lld_override_optag WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_optag);
+
+			$lld_override_optemplate = CDBHelper::getAll('SELECT * from lld_override_optemplate WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_optemplate);
+
+			$lld_override_optrends = CDBHelper::getAll('SELECT * from lld_override_optrends WHERE '.
+				dbConditionId('lld_override_operationid', $operationids)
+			);
+			$this->assertEmpty($lld_override_optrends);
+		}
+	}
+
+	public static function discoveryrule_overrides_create_data_invalid() {
+		$num = 0;
+		$new_lld_overrides = function(array $overrides) use (&$num) {
+			return [
+				'name' => 'Overrides (invalid)',
+				'key_' => 'invalid.lld.with.overrides.'.($num ++),
+				'hostid' => '50009',
+				'type' => ITEM_TYPE_TRAPPER,
+				'overrides' => $overrides
+			];
+		};
+
+		return [
+			// LLD rule overrides
+			'Test /1/overrides/2/name is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 2
+						],
+						[
+							'step' => 1
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2": the parameter "name" is missing.'
+			],
+			'Test /1/overrides/2/step must be numeric.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 'A'
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/step": an integer is expected.'
+			],
+			'Test /1/overrides/2/step is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 2
+						],
+						[
+							'name' => 'override 2'
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2": the parameter "step" is missing.'
+			],
+			'Test /1/overrides/2/step must be unique.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 2
+						],
+						[
+							'name' => 'override 2',
+							'step' => 2
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2": value (step)=(2) already exists.'
+			],
+			'Test /1/overrides/2/name must be unique.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 4
+						],
+						[
+							'name' => 'override',
+							'step' => 2
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2": value (name)=(override) already exists.'
+			],
+			'Test /1/overrides/1/stop field is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'stop' => 2
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/stop": value must be one of '.implode(', ', [ZBX_LLD_OVERRIDE_STOP_NO, ZBX_LLD_OVERRIDE_STOP_YES]).'.'
+			],
+			// LLD rule override filter
+			'Test /1/overrides/1/filter/evaltype is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => []
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter": the parameter "evaltype" is missing.'
+			],
+			'Test /1/overrides/1/filter/evaltype is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => 4
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/evaltype": value must be one of '.implode(', ', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]).'.'
+			],
+			'Test /1/overrides/1/filter/formula is required if /1/overrides/1/filter/evaltype == 3 (custom expression).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Formula missing for override "override".'
+			],
+			'Test /1/overrides/1/filter/formula cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => '',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect custom expression "" for override "override": expression is empty.'
+			],
+			'Test /1/overrides/1/filter/formula cannot be incorrect.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'x',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect custom expression "x" for override "override": check expression starting from "x".'
+			],
+			'Test /1/overrides/1/filter/formula refers to undefined condition (missing formulaid field).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or A',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Condition "B" used in formula "B or A" for override "override" is not defined.'
+			],
+			'Test /1/overrides/1/filter/formula refers to undefined condition (missing another condition).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or A',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'B'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Condition "A" used in formula "B or A" for override "override" is not defined.'
+			],
+			'Test /1/overrides/1/filter/eval_formula is read_only.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'eval_formula' => 'A',
+								'formula' => 'A',
+								'conditions' => [
+									[
+										'macro' => '{#CORRECT}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter": unexpected parameter "eval_formula".'
+			],
+			// LLD rule override filter conditions
+			'Test /1/overrides/1/filter/conditions field is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter": the parameter "conditions" is missing.'
+			],
+			'Test /1/overrides/1/filter/conditions object cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'conditions' => []
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions": cannot be empty.'
+			],
+			'Test /1/overrides/1/filter/conditions/1/macro field is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'conditions' => [
+									[]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1": the parameter "macro" is missing.'
+			],
+			'Test /1/overrides/1/filter/conditions/1/macro is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'A',
+								'conditions' => [
+									[
+										'macro' => '{##INCORRECT}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect filter condition macro for override "override".'
+			],
+			'Test /1/overrides/1/filter/conditions/1/value is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1": the parameter "value" is missing.'
+			],
+			'Test /1/overrides/1/filter/conditions/1/operator type is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_YES
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/conditions/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]).'.'
+			],
+			// LLD rule override operation
+			'Test /1/overrides/1/operations/1/operationobject type is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => 4
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operationobject": value must be one of '.implode(', ', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE]).'.'
+			],
+			'Test /1/overrides/1/operations/1/operator type is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_YES
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/operator": value must be one of '.implode(', ', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]).'.'
+			],
+			'Test /1/overrides/1/operations/1 at least one action is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": value must be one of opstatus, opdiscover, opperiod, ophistory, optrends.'
+			],
+			// LLD rule override operation status
+			'Test /1/overrides/1/operations/1/opstatus/status is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opstatus' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opstatus": the parameter "status" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opstatus/status is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opstatus' => [
+										'status' => 2
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opstatus/status": value must be one of '.implode(', ', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED]).'.'
+			],
+			'Test /1/overrides/1/operations/1/opstatus is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opstatus".'
+			],
+			// LLD rule override operation discover
+			'Test /1/overrides/1/operations/1/opdiscover/discover is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opdiscover' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opdiscover": the parameter "discover" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opdiscover/discover is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opdiscover' => [
+										'discover' => 2
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opdiscover/discover": value must be one of '.implode(', ', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]).'.'
+			],
+			// LLD rule override operation period
+			'Test /1/overrides/1/operations/1/opperiod/delay is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opperiod": the parameter "delay" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opperiod/delay is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => 'www'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Incorrect value for field "delay": invalid delay.'
+			],
+			'Test /1/overrides/1/operations/1/opperiod/delay cannot be 0.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '0'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+			],
+			'Test /1/overrides/1/operations/1/opperiod/delay has to be correct update interval.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '2w'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+			],
+			'Test /1/overrides/1/operations/1/opperiod/delay has to be correct flexible interval.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '0;0/1,00:00-23:00'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Item will not be refreshed. Please enter a correct update interval.'
+			],
+			'Test /1/overrides/1/operations/1/opperiod is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opperiod".'
+			],
+			'Test /1/overrides/1/operations/1/opperiod is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opperiod".'
+			],
+			'Test /1/overrides/1/operations/1/opperiod is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opperiod' => [
+										'delay' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opperiod".'
+			],
+			// LLD rule override operation history
+			'Test /1/overrides/1/operations/1/ophistory/history is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory": the parameter "history" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/ophistory/history is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => [
+										'history' => 'www'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": a time unit is expected.'
+			],
+			'Test /1/overrides/1/operations/1/ophistory/history max value is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => [
+										'history' => 25 * SEC_PER_YEAR + 1
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
+			],
+			'Test /1/overrides/1/operations/1/ophistory/history min value is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => [
+										'history' => SEC_PER_HOUR - 1
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
+			],
+			'Test /1/overrides/1/operations/1/ophistory is is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => [
+										'history' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "ophistory".'
+			],
+			'Test /1/overrides/1/operations/1/ophistory is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => [
+										'history' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "ophistory".'
+			],
+			'Test /1/overrides/1/operations/1/ophistory is is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'ophistory' => [
+										'history' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "ophistory".'
+			],
+			// LLD rule override operation trends
+			'Test /1/overrides/1/operations/1/optrends/trends is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends": the parameter "trends" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/optrends/trends is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => [
+										'trends' => 'www'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": a time unit is expected.'
+			],
+			'Test /1/overrides/1/operations/1/optrends/trends max value is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => [
+										'trends' => 25 * SEC_PER_YEAR + 1
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
+			],
+			'Test /1/overrides/1/operations/1/optrends/trends min value is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => [
+										'trends' => SEC_PER_HOUR - 1
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
+			],
+			'Test /1/overrides/1/operations/1/optrends is is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => [
+										'trends' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optrends".'
+			],
+			'Test /1/overrides/1/operations/1/optrends is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => [
+										'trends' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optrends".'
+			],
+			'Test /1/overrides/1/operations/1/optrends is is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optrends' => [
+										'trends' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optrends".'
+			],
+			// LLD rule override operation severity
+			'Test /1/overrides/1/operations/1/opseverity/severity is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opseverity' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opseverity": the parameter "severity" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opseverity/severity is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opseverity' => [
+										'severity' => 999
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opseverity/severity": value must be one of '.implode(', ', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)).'.'
+			],
+			'Test /1/overrides/1/operations/1/opseverity is is not supported for item prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_INFORMATION
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opseverity".'
+			],
+			'Test /1/overrides/1/operations/1/opseverity is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_WARNING
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opseverity".'
+			],
+			'Test /1/overrides/1/operations/1/opseverity is is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_WARNING
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opseverity".'
+			],
+			// LLD rule override operation tag
+			'Test /1/overrides/1/operations/1/optag cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optag' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag": cannot be empty.'
+			],
+			'Test /1/overrides/1/operations/1/optag/1/tag is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optag' => [
+										[]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag/1": the parameter "tag" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/optag/1/tag cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optag' => [
+										[
+											'tag' => ''
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag/1/tag": cannot be empty.'
+			],
+			'Test /1/overrides/1/operations/1/optag is is not supported for item prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optag' => [
+										['tag' => 'www']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
+			],
+			'Test /1/overrides/1/operations/1/optag is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optag' => [
+										['tag' => 'www']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
+			],
+			'Test /1/overrides/1/operations/1/optag is is not supported for host prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optag' => [
+										['tag' => 'www']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
+			],
+			// LLD rule override operation template
+			'Test /1/overrides/1/operations/1/optemplate cannot be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate": cannot be empty.'
+			],
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										[]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": the parameter "templateid" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid type is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										[
+											'templateid' => ''
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1/templateid": a number is expected.'
+			],
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid must exist.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										[
+											'templateid' => '1'
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Test /1/overrides/1/operations/1/optemplate/1/templateid cannot exist twice.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										[
+											'templateid' => '50010'
+										],
+										[
+											'templateid' => '50010'
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Test /1/overrides/1/operations/1/optemplate is is not supported for item prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										['template' => '1']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": unexpected parameter "template".'
+			],
+			'Test /1/overrides/1/operations/1/optemplate is is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										['template' => '1']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": unexpected parameter "template".'
+			],
+			'Test /1/overrides/1/operations/1/optemplate is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'optemplate' => [
+										['template' => '1']
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": unexpected parameter "template".'
+			],
+			// LLD rule override operation inventory
+			'Test /1/overrides/1/operations/1/opinventory/inventory_mode is mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opinventory' => []
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opinventory": the parameter "inventory_mode" is missing.'
+			],
+			'Test /1/overrides/1/operations/1/opinventory/inventory_mode is validated.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opinventory' => [
+										'inventory_mode' => -2
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opinventory/inventory_mode": value must be one of '.implode(', ', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]).'.'
+			],
+			'Test /1/overrides/1/operations/1/opinventory is is not supported for item prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_MANUAL
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
+			],
+			'Test /1/overrides/1/operations/1/opinventory is is not supported for trigger prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_MANUAL
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
+			],
+			'Test /1/overrides/1/operations/1/opinventory is is not supported for graph prototype object.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_MANUAL
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
+			]
+		];
+	}
+
+	public static function discoveryrule_overrides_create_data_valid() {
+		$num = 0;
+		$new_lld_overrides = function(array $overrides) use (&$num) {
+			return [
+				'name' => 'Overrides (valid)',
+				'key_' => 'valid.lld.with.overrides.'.($num ++),
+				'hostid' => '50009',
+				'type' => ITEM_TYPE_TRAPPER,
+				'overrides' => $overrides
+			];
+		};
+
+		$data = [
+			// LLD rule overrides
+			'Test /1/overrides/1/filter and /1/overrides/1/operations are not mandatory.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override 1',
+							'step' => 2
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations can be empty.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override 1',
+							'step' => 2,
+							'operations' => []
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/stop default value is set correctly.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override 1',
+							'step' => 2
+						],
+						[
+							'name' => 'override 2',
+							'step' => 3,
+							'stop' => ZBX_LLD_OVERRIDE_STOP_NO
+						],
+						[
+							'name' => 'override 3',
+							'step' => 1,
+							'stop' => ZBX_LLD_OVERRIDE_STOP_YES
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			// LLD rule override filter
+			'Test /1/overrides/1/filter/evaltype with three conditions where two are unique.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => ''
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => ''
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => ''
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			// LLD rule override filter condition
+			'Test /1/overrides/1/filter/conditions/3/operator default value is set correctly.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or A or C',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/filter/conditions/3/operator default value is set correctly (field ordering issue #2).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or A or C',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/filter/conditions/3/operator default value is set correctly (field ordering issue #3).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'step' => 1,
+							'name' => 'override',
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or A or C',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'formulaid' => 'B',
+										'operator' => CONDITION_OPERATOR_REGEXP
+									],
+									[
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'macro' => '{#MACRO}',
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/filter/formula is set correctly if ./evaltype is custom_expression.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'B or (A or C)',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/filter/formula and ./formulaid are silently ignored if ./evaltype is not custom_expression.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_OR,
+								'formula' => 'X or Y or Z',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'value' => '',
+										'formulaid' => 'C'
+									],
+									[
+										'macro' => '{#MACRO}',
+										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+										'value' => '',
+										'formulaid' => 'A'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			// LLD rule override operation
+			'Test /1/overrides/1/operations ./operator and ./value defaults are set.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations two similar operations can be set.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_LIKE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations (ordering issue #2).' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									]
+								],
+								[
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									],
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_LIKE
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/ all operation objects are set correctly for item_prototype.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'opperiod' => [
+										'delay' => '1d'
+									],
+									'ophistory' => [
+										'history' => '1d'
+									],
+									'optrends' => [
+										'trends' => '1d'
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/ all operation objects are set correctly for item_prototype.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_WARNING
+									],
+									'optag' => [
+										[
+											'value' => 'tag value',
+											'tag' => 'tag'
+										],
+										[
+											'tag' => 'tag 2'
+										]
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/ all operation objects are set correctly for graph_prototype.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/1/ all operation objects are set correctly for host_prototype.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'optemplate' => [
+										[
+											'templateid' => '50010'
+										]
+									],
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			],
+			'Test /1/overrides/1/operations/ multiple operations are set correctly.' => [
+				'discoveryrules' => [
+					$new_lld_overrides([
+						[
+							'name' => 'override',
+							'step' => 1,
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'opperiod' => [
+										'delay' => '1d'
+									],
+									'ophistory' => [
+										'history' => '1d'
+									],
+									'optrends' => [
+										'trends' => '1d'
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_WARNING
+									],
+									'optag' => [
+										[
+											'value' => 'tag value',
+											'tag' => 'tag'
+										],
+										[
+											'tag' => 'tag 2'
+										]
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_DISCOVER
+									],
+									'optemplate' => [
+										[
+											'templateid' => '50010'
+										]
+									],
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
+									]
+								]
+							]
+						]
+					])
+				],
+				'expected_error' => null
+			]
+		];
+
+		return $data;
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_create_data_invalid
+	 * @dataProvider discoveryrule_overrides_create_data_valid
+	 */
+	public function testDiscoveryRuleOverrides_Create(array $request, $expected_error) {
+		$result = $this->call('discoveryrule.create', $request, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['itemids'] as $num => $itemid) {
+				$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+					dbConditionId('itemid', (array) $itemid)
+				);
+
+				$request_lld_overrides = $request[$num]['overrides'];
+				foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+					$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param array $db_lld_override                     Table "lld_override" row (all fields).
+	 * @param array $db_lld_override['lld_overrideid']
+	 * @param array $db_lld_override['itemid']
+	 * @param array $db_lld_override['name']
+	 * @param array $db_lld_override['step']
+	 * @param array $db_lld_override['evaltype']
+	 * @param array $db_lld_override['formula']
+	 * @param array $db_lld_override['stop']
+	 * @param array $request_lld_override
+	 * @param array $request_lld_override['name']
+	 * @param array $request_lld_override['step']
+	 * @param array $request_lld_override['stop']        (optional)
+	 * @param array $request_lld_override['filter']      (optional)
+	 * @param array $request_lld_override['operations']  (optional)
+	 */
+	private function assertLLDOverride(array $db_lld_override, array $request_lld_override) {
+		$this->assertEquals($db_lld_override['name'], $request_lld_override['name']);
+		$this->assertEquals($db_lld_override['step'], $request_lld_override['step'], 'Override step value.');
+
+		$stop = array_key_exists('stop', $request_lld_override)
+			? $request_lld_override['stop']
+			: ZBX_LLD_OVERRIDE_STOP_NO;
+		$this->assertEquals($db_lld_override['stop'], $stop, 'Override stop value.');
+
+		if (array_key_exists('filter', $request_lld_override)) {
+			$this->assertLLDOverrideFilter($db_lld_override, $request_lld_override['filter']);
+		}
+		else {
+			$this->assertEmpty($db_lld_override['formula']);
+			$this->assertEquals($db_lld_override['evaltype'], CONDITION_EVAL_TYPE_AND_OR);
+		}
+
+		$db_lld_operations_count = CDBHelper::getCount('SELECT * from lld_override_operation WHERE '.
+			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
+		);
+
+		if (array_key_exists('operations', $request_lld_override)) {
+			$this->assertEquals(count($request_lld_override['operations']), $db_lld_operations_count,
+				'Expected count of operations.'
+			);
+
+			foreach ($request_lld_override['operations'] as $num => $operation) {
+				$db_lld_operations = CDBHelper::getAll('SELECT * from lld_override_operation WHERE '.
+					dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
+				);
+				usort($db_lld_operations, function ($a, $b) {
+					return $a['lld_override_operationid'] <=> $b['lld_override_operationid'];
+				});
+				$this->assertLLDOverrideOperation($db_lld_operations[$num], $operation);
+			}
+		}
+		else {
+			$this->assertEquals(0, $db_lld_operations_count, 'Expected no operations.');
+		}
+	}
+
+	/**
+	 * @param array $db_lld_override                            Table "lld_override" row (all fields).
+	 * @param array $filter                                     LLD rule override filter request object.
+	 * @param array $filter['evaltype']
+	 * @param array $filter['eval_formula']                     (optional)
+	 * @param array $filter['formula']                          (optional) if evaltype is CONDITION_EVAL_TYPE_EXPRESSION
+	 * @param array $filter['conditions']
+	 * @param array $filter['conditions'][]                     LLD rule override filter condition object.
+	 * @param array $filter['conditions'][]['macro']
+	 * @param array $filter['conditions'][]['value']
+	 * @param array $filter['conditions'][]['formulaid']        (optional) if evaltype is CONDITION_EVAL_TYPE_EXPRESSION
+	 * @param array $filter['conditions'][]['operator']         (optional)
+	 */
+	private function assertLLDOverrideFilter(array $db_lld_override, array $filter) {
+		$db_lld_conditions = CDBHelper::getAll('SELECT * from lld_override_condition WHERE '.
+			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
+		);
+
+		usort($db_lld_conditions, function ($a, $b) {
+			return $a['lld_override_conditionid'] <=> $b['lld_override_conditionid'];
+		});
+
+		$this->assertEquals($db_lld_override['evaltype'], $filter['evaltype'], 'Override evaltype value.');
+
+		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			$conditionid_by_formulaid = array_combine(
+				array_column($filter['conditions'], 'formulaid'),
+				array_column($db_lld_conditions, 'lld_override_conditionid')
+			);
+			$formula = CConditionHelper::replaceLetterIds($filter['formula'], $conditionid_by_formulaid);
+			$this->assertEquals($db_lld_override['formula'], $formula);
+		}
+
+		foreach ($filter['conditions'] as $num => $condition) {
+			$this->assertEquals($db_lld_conditions[$num]['macro'], $condition['macro']);
+			$this->assertEquals($db_lld_conditions[$num]['value'], $condition['value']);
+
+			$operator = array_key_exists('operator', $condition)
+				? $condition['operator']
+				: CONDITION_OPERATOR_REGEXP;
+
+			$this->assertEquals($db_lld_conditions[$num]['operator'], $operator);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op                              Table "lld_override_operation" row (all fields).
+	 * @param string $db_lld_override_op['lld_override_operationid']
+	 * @param string $db_lld_override_op['lld_overrideid']
+	 * @param string $db_lld_override_op['operationobject']
+	 * @param string $db_lld_override_op['operator']
+	 * @param array  $operation                                        LLD rule override operation object.
+	 * @param string $operation['operationobject']
+	 * @param string $operation['operator']                            (optional)
+	 * @param string $operation['value']                               (optional)
+	 * @param string $operation['opstatus']                            (optional)
+	 * @param string $operation['opdiscover']                          (optional)
+	 * @param string $operation['opperiod']                            (optional)
+	 * @param string $operation['ophistory']                           (optional)
+	 * @param string $operation['optrends']                            (optional)
+	 * @param string $operation['opseverity']                          (optional)
+	 * @param string $operation['optag']                               (optional)
+	 * @param string $operation['optemplate']                          (optional)
+	 * @param string $operation['opinventory']                         (optional)
+	 */
+	private function assertLLDOverrideOperation(array $db_lld_override_op, array $operation) {
+		$this->assertEquals($db_lld_override_op['operationobject'], $operation['operationobject'], 'Operation object.');
+
+		$condition_operator = array_key_exists('operator', $operation)
+			? $operation['operator']
+			: CONDITION_OPERATOR_EQUAL;
+		$this->assertEquals($db_lld_override_op['operator'], $condition_operator, 'Operation operator.');
+
+		$condition_value = array_key_exists('value', $operation)
+			? $operation['value']
+			: '';
+		$this->assertEquals($db_lld_override_op['value'], $condition_value);
+
+		$this->assertLLDOverrideOperationStatus($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationDiscover($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationHistory($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationPeriod($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationSeverity($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationTags($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationTemplates($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationTrends($db_lld_override_op, $operation);
+		$this->assertLLDOverrideOperationInventory($db_lld_override_op, $operation);
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationStatus(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opstatus = CDBHelper::getRow('SELECT * from lld_override_opstatus WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('opstatus', $operation)) {
+			$this->assertEquals($db_opstatus['status'], $operation['opstatus']['status'], 'Operation status.');
+		}
+		else {
+			$this->assertEmpty($db_opstatus, 'Expected opstatus.');
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationDiscover(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opdiscover = CDBHelper::getRow('SELECT * from lld_override_opdiscover WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('opdiscover', $operation)) {
+			$this->assertEquals($db_opdiscover['discover'], $operation['opdiscover']['discover']);
+		}
+		else {
+			$this->assertEmpty($db_opdiscover, 'Discovery operation.');
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationHistory(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_ophistory = CDBHelper::getRow('SELECT * from lld_override_ophistory WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('ophistory', $operation)) {
+			$this->assertEquals($db_ophistory['history'], $operation['ophistory']['history']);
+		}
+		else {
+			$this->assertEmpty($db_ophistory, 'ophistory.');
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationPeriod(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opperiod = CDBHelper::getRow('SELECT * from lld_override_opperiod WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('opperiod', $operation)) {
+			$this->assertEquals($db_opperiod['delay'], $operation['opperiod']['delay']);
+		}
+		else {
+			$this->assertEmpty($db_opperiod);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationSeverity(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opseverity = CDBHelper::getRow('SELECT * from lld_override_opseverity WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('opseverity', $operation)) {
+			$this->assertEquals($db_opseverity['severity'], $operation['opseverity']['severity']);
+		}
+		else {
+			$this->assertEmpty($db_opseverity);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationTags(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_optags = CDBHelper::getAll('SELECT * from lld_override_optag WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('optag', $operation)) {
+			$this->assertEquals(count($db_optags), count($operation['optag']));
+
+			usort($db_optags, function ($a, $b) {
+				return $a['value'].$a['tag'] <=> $b['value'].$b['tag'];
+			});
+
+			usort($operation['optag'], function ($a, $b) {
+				$a_value = array_key_exists('value', $a) ? $a['value'] : '';
+				$b_value = array_key_exists('value', $b) ? $b['value'] : '';
+
+				return $a_value.$a['tag'] <=> $b_value.$b['tag'];
+			});
+
+			foreach ($db_optags as $num => $db_optag) {
+				$optag_value = array_key_exists('value', $operation['optag'][$num])
+					? $operation['optag'][$num]['value']
+					: '';
+
+				$this->assertEquals($db_optag['value'], $optag_value);
+				$this->assertEquals($db_optag['tag'], $operation['optag'][$num]['tag']);
+			}
+		}
+		else {
+			$this->assertEmpty($db_optags, 'Expected no operation tags.');
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationTemplates(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_optemplates = CDBHelper::getAll('SELECT * from lld_override_optemplate WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('optemplate', $operation)) {
+			$this->assertEquals(count($db_optemplates), count($operation['optemplate']), 'optemplate count');
+			foreach ($db_optemplates as $num => $db_optemplate) {
+				$this->assertEquals($operation['optemplate'][$num]['templateid'], $db_optemplate['templateid']);
+			}
+		}
+		else {
+			$this->assertEmpty($db_optemplates);
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationTrends(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_optrends = CDBHelper::getRow('SELECT * from lld_override_optrends WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('optrends', $operation)) {
+			$this->assertEquals($db_optrends['trends'], $operation['optrends']['trends']);
+		}
+		else {
+			$this->assertEmpty($db_optrends, 'optrends');
+		}
+	}
+
+	/**
+	 * @param array  $db_lld_override_op
+	 * @param array  $operation
+	 */
+	private function assertLLDOverrideOperationInventory(array $db_lld_override_op, array $operation) {
+		$operationid = $db_lld_override_op['lld_override_operationid'];
+
+		$db_opinventory = CDBHelper::getRow('SELECT * from lld_override_opinventory WHERE '.
+			dbConditionId('lld_override_operationid', (array) $operationid)
+		);
+		if (array_key_exists('opinventory', $operation)) {
+			$this->assertEquals($db_opinventory['inventory_mode'], $operation['opinventory']['inventory_mode']);
+		}
+		else {
+			$this->assertEmpty($db_opinventory);
+		}
+	}
+
+	public function testDiscoveryRuleOverrides_TemplateConstraint() {
+		$templateid = 131001;
+		$itemid = 133766;
+		$request_lld_overrides = [
+			[
+				'stop' => ZBX_LLD_OVERRIDE_STOP_NO,
+				'name' => 'Only template operation',
+				'step' => 1,
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+						'optemplate' => [
+							['templateid' => $templateid]
+						]
+					]
+				]
+			],
+			[
+				'stop' => ZBX_LLD_OVERRIDE_STOP_NO,
+				'name' => 'Not only template operation',
+				'step' => 2,
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+						'opinventory' => [
+							'inventory_mode' => HOST_INVENTORY_MANUAL
+						],
+						'optemplate' => [
+							['templateid' => $templateid]
+						]
+					]
+				]
+			],
+		];
+
+		$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+			dbConditionId('itemid', (array) $itemid)
+		);
+
+		usort($db_lld_overrides, function ($a, $b) {
+			return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+		});
+
+		// Assertion confirms existing request.
+		foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+			$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+		}
+
+		$result = $this->call('template.delete', [131001]);
+		$this->assertEquals($result['result'], ['templateids' => [$templateid]]);
+
+		$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+			dbConditionId('itemid', (array) $itemid)
+		);
+
+		usort($db_lld_overrides, function ($a, $b) {
+			return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+		});
+
+		// Operation that had only optamplate is deleted.
+		unset($request_lld_overrides[0]['operations']);
+
+		// Operation that had not only optamplate is not deleted.
+		unset($request_lld_overrides[1]['operations'][0]['optemplate']);
+
+		foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+			$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+		}
+	}
+
+	public function testDiscoveryRuleOverrides_Copy() {
+		$itemid = '133764';
+		$hostids = ['90020', '90021'];
+
+		$result = $this->call('discoveryrule.copy', [
+			'discoveryids' => [$itemid],
+			'hostids' => $hostids
+		]);
+
+		$this->assertTrue($result['result']);
+
+		$request_lld_overrides = [
+			[
+				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+				'name' => 'override',
+				'step' => 1,
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+					'formula' => 'A or B or C',
+					'conditions' => [
+						[
+							'macro' => '{#MACRO1}',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'value' => 'd{3}$',
+							'formulaid' => 'A'
+						],
+						[
+							'macro' => '{#MACRO2}',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'value' => 'd{2}$',
+							'formulaid' => 'B'
+						],
+						[
+							'macro' => '{#MACRO3}',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'value' => 'd{1}$',
+							'formulaid' => 'C'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_NOT_LIKE,
+						'value' => '8',
+						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED]
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+						'value' => 'wW',
+						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_ENABLED],
+						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER],
+						'ophistory' => ['history' => '92d'],
+						'opperiod' => ['delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'],
+						'optrends' => ['trends' => '36d']
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_REGEXP,
+						'value' => '^c+$',
+						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED],
+						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER],
+						'opseverity' => ['severity' => TRIGGER_SEVERITY_AVERAGE],
+						'optag' => [
+							['tag' => 'tag1', 'value' => 'value1'],
+							['tag' => 'tag2', 'value' => 'value2']
+						]
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => '123',
+						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER]
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value' => '',
+						'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_DISABLED],
+						'optemplate' => [
+							['templateid' => '10264'],
+							['templateid' => '10265'],
+							['templateid' => '50010']
+						],
+						'opinventory' => ['inventory_mode' => HOST_INVENTORY_AUTOMATIC],
+						'opdiscover' => ['discover' => ZBX_PROTOTYPE_NO_DISCOVER]
+					]
+				]
+			],
+			[
+				'name' => 'override 2',
+				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+				'step' => 2,
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value' => '',
+						'optrends' => ['trends' => '5d']
+					]
+				]
+			]
+		];
+
+		$db_lld_ruleids = array_column(CDBHelper::getAll('SELECT itemid from items WHERE '.
+				dbConditionId('hostid', (array) $hostids)), 'itemid');
+		sort($db_lld_ruleids);
+
+		foreach ($db_lld_ruleids as $db_lld_ruleid) {
+			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+				dbConditionId('itemid', (array) $db_lld_ruleid)
+			);
+
+			usort($db_lld_overrides, function ($a, $b) {
+				return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+			});
+
+			foreach ($request_lld_overrides as $override_num => $request_lld_override) {
+				$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+			}
+		}
+	}
+
+	public static function discoveryrule_overrides_get_data_valid() {
+		$itemid = '133763';
+
+		return [
+			'Test getting lld_overrides extended output.' => [
+				'discoveryrule' => [
+					'output' => ['itemid'],
+					'selectOverrides' => ['name', 'step', 'stop', 'operations'],
+					'itemids' => [$itemid]
+				],
+				'get_result' => [
+					'itemid' => $itemid,
+					'overrides' => [
+						[
+							'name' => 'override',
+							'step' => '1',
+							'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+								'formula' => 'A or B or C',
+								'conditions' => [
+									[
+										'macro' => '{#MACRO1}',
+										'value' => 'd{3}$',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'formulaid' => 'A'
+									],
+									[
+										'macro' => '{#MACRO2}',
+										'value' => 'd{2}$',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'formulaid' => 'B'
+									],
+									[
+										'macro' => '{#MACRO3}',
+										'value' => 'd{1}$',
+										'operator' => CONDITION_OPERATOR_REGEXP,
+										'formulaid' => 'C'
+									]
+								],
+								'eval_formula' => 'A or B or C'
+							],
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_LIKE,
+									'value' => '8',
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+									'value' => 'wW',
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									],
+									'ophistory' => [
+										'history' => '92d'
+									],
+									'optrends' => [
+										'trends' => '36d'
+									],
+									'opperiod' => [
+										'delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_REGEXP,
+									'value' => '^c+$',
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									],
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_AVERAGE
+									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_LIKE,
+									'value' => '123',
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'value' => '',
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									],
+									'optemplate' => [
+										[
+											'templateid' => '10264'
+										],
+										[
+											'templateid' => '10265'
+										],
+										[
+											'templateid' => '50010'
+										]
+									],
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
+									]
+								]
+							]
+						],
+						[
+							'name' => 'override 2',
+							'step' => '2',
+							'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+							'filter' => [
+								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+								'formula' => '',
+								'conditions' => [],
+								'eval_formula' => ''
+							],
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'value' => '',
+									'optrends' => [
+										'trends' => '5d'
+									]
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test getting lld_overrides queried output.' => [
+				'discoveryrule' => [
+					'output' => ['itemid'],
+					'selectOverrides' => ['step', 'operations'],
+					'itemids' => [$itemid]
+				],
+				'get_result' => [
+					'itemid' => $itemid,
+					'overrides' => [
+						[
+							'step' => '1',
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_LIKE,
+									'value' => '8',
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+									'value' => 'wW',
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									],
+									'ophistory' => [
+										'history' => '92d'
+									],
+									'optrends' => [
+										'trends' => '36d'
+									],
+									'opperiod' => [
+										'delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_REGEXP,
+									'value' => '^c+$',
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									],
+									'opseverity' => [
+										'severity' => TRIGGER_SEVERITY_AVERAGE
+									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_LIKE,
+									'value' => '123',
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									]
+								],
+								[
+									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'value' => '',
+									'opstatus' => [
+										'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+									],
+									'opdiscover' => [
+										'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+									],
+									'optemplate' => [
+										[
+											'templateid' => '10264'
+										],
+										[
+											'templateid' => '10265'
+										],
+										[
+											'templateid' => '50010'
+										]
+									],
+									'opinventory' => [
+										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
+									]
+								]
+							]
+						],
+						[
+							'step' => '2',
+							'operations' => [
+								[
+									'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+									'operator' => CONDITION_OPERATOR_EQUAL,
+									'value' => '',
+									'optrends' => [
+										'trends' => '5d'
+									]
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_get_data_valid
+	 */
+	public function testDiscoveryRuleOverrides_Get($discoveryrule, $get_result, $expected_error) {
+		$result = $this->call('discoveryrule.get', $discoveryrule);
+
+		if ($expected_error === null) {
+			foreach ($result['result'] as $entry) {
+				$this->assertSame($entry['itemid'], $get_result['itemid']);
+
+				if (array_key_exists('selectOverrides', $discoveryrule)) {
+					$this->assertArrayHasKey('overrides', $get_result);
+					$this->assertSame($entry['overrides'], $get_result['overrides']);
+				}
+				else {
+					$this->assertArrayNotHasKey('overrides', $get_result);
+				}
+			}
+		}
+	}
+
+	public static function discoveryrule_overrides_update_data() {
+		$itemid = '133765';
+		$initial_overrides = [
+			[
+				'name' => 'override',
+				'step' => '1',
+				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+					'formula' => 'A or B or C',
+					'conditions' => [
+						[
+							'macro' => '{#MACRO1}',
+							'value' => 'd{3}$',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'formulaid' => 'A'
+						],
+						[
+							'macro' => '{#MACRO2}',
+							'value' => 'd{2}$',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'formulaid' => 'B'
+						],
+						[
+							'macro' => '{#MACRO3}',
+							'value' => 'd{1}$',
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'formulaid' => 'C'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_NOT_LIKE,
+						'value' => '8',
+						'opstatus' => [
+							'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+						]
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+						'value' => 'wW',
+						'opstatus' => [
+							'status' => ZBX_PROTOTYPE_STATUS_ENABLED
+						],
+						'opdiscover' => [
+							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+						],
+						'ophistory' => [
+							'history' => '92d'
+						],
+						'optrends' => [
+							'trends' => '36d'
+						],
+						'opperiod' => [
+							'delay' => '1m;wd1-3h4-16;10s/1-5,00:00-20:00;5s/5-7,00:00-24:00'
+						]
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_REGEXP,
+						'value' => '^c+$',
+						'opstatus' => [
+							'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+						],
+						'opdiscover' => [
+							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+						],
+						'opseverity' => [
+							'severity' => TRIGGER_SEVERITY_AVERAGE
+						],
+						'optag' => [
+							[
+								'tag' => 'tag1',
+								'value' => 'value1'
+							],
+							[
+								'tag' => 'tag2',
+								'value' => 'value2'
+							]
+						]
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => '123',
+						'opdiscover' => [
+							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+						]
+					],
+					[
+						'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value' => '',
+						'opstatus' => [
+							'status' => ZBX_PROTOTYPE_STATUS_DISABLED
+						],
+						'opdiscover' => [
+							'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+						],
+						'optemplate' => [
+							[
+								'templateid' => '10264'
+							],
+							[
+								'templateid' => '10265'
+							],
+							[
+								'templateid' => '50010'
+							]
+						],
+						'opinventory' => [
+							'inventory_mode' => HOST_INVENTORY_AUTOMATIC
+						]
+					]
+				]
+			],
+			[
+				'name' => 'override 2',
+				'step' => '2',
+				'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
+				'operations' => [
+					[
+						'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value' => '',
+						'optrends' => [
+							'trends' => '5d'
+						]
+					]
+				]
+			]
+		];
+
+		$edited_overrides = $initial_overrides;
+		unset($edited_overrides[1]);
+		$edited_overrides[0]['name'] = 'edited override';
+
+		$edited_invalid_overrides = $initial_overrides;
+		$edited_invalid_overrides[1]['operations'][0]['optrends']['trends'] = 'incorrect date value';
+
+		return [
+			'Test update override expects array.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => [
+						'incorrect' => '123'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1": an array is expected.',
+				'current_overrides' => null
+			],
+			'Test override object is validated.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => [
+						[]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/1": the parameter "step" is missing.',
+				'current_overrides' => null
+			],
+			'Test that overrides remain untouched if update request omits overrides field.' => [
+				'request' => [
+					'itemid' => $itemid
+				],
+				'expected_error' => null,
+				'current_overrides' => $initial_overrides
+			],
+			'Test all overrides array can only be completely rewritten.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => $edited_overrides
+				],
+				'expected_error' => null,
+				'current_overrides' => $edited_overrides
+			],
+			'Test overrides/2/operations/1/optrends/trends is validated.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => $edited_invalid_overrides
+				],
+				'expected_error' => 'Invalid parameter "/1/overrides/2/operations/1/optrends/trends": a time unit is expected.',
+				'current_overrides' => null
+			],
+			'Test all overrides can deleted.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => []
+				],
+				'expected_error' => null,
+				'current_overrides' => []
+			],
+			'Test all overrides can be recreated.' => [
+				'request' => [
+					'itemid' => $itemid,
+					'overrides' => $initial_overrides
+				],
+				'expected_error' => null,
+				'current_overrides' => $initial_overrides
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider discoveryrule_overrides_update_data
+	 */
+	public function testDiscoveryRuleOverrides_Update($request, $expected_error, $current_overrides) {
+		$this->call('discoveryrule.update', $request, $expected_error);
+
+		if ($expected_error === null) {
+			$itemid = $request['itemid'];
+
+			$db_lld_overrides = CDBHelper::getAll('SELECT * from lld_override WHERE '.
+				dbConditionId('itemid', (array) $itemid)
+			);
+
+			if (array_key_exists('overrides', $request)) {
+				$this->assertEquals(count($current_overrides), count($request['overrides']));
+			}
+
+			usort($db_lld_overrides, function ($a, $b) {
+				return $a['lld_overrideid'] <=> $b['lld_overrideid'];
+			});
+
+			foreach ($current_overrides as $override_num => $override) {
+				$this->assertLLDOverride($db_lld_overrides[$override_num], $override);
+			}
+		}
 	}
 
 	// TODO: add more tests to check other related discovery rule properties and perform more tests on templates and templated objects.

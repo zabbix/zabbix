@@ -50,7 +50,7 @@ $operations_popup_form_list = (new CFormList())
 			OPERATION_OBJECT_GRAPH_PROTOTYPE => _('Graph prototype'),
 			OPERATION_OBJECT_HOST_PROTOTYPE => _('Host prototype')
 		]))
-			->setId('operation_object')
+			->setId('operationobject')
 			->setReadonly($options['templated'])
 	)
 	->addRow((new CLabel(_('Condition'), 'operator')), [

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-07 11:21+0300\n"
+"POT-Creation-Date: 2020-07-03 19:59+0300\n"
 "PO-Revision-Date: 2014-10-03 08:43+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -81,7 +81,7 @@ msgid_plural "%1$d days"
 msgstr[0] "%1$d ημέρα"
 msgstr[1] "%1$d ημέρες"
 
-#: jsLoader.php:266
+#: jsLoader.php:269
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -110,8 +110,7 @@ msgstr "%1$s (έτος %2$s)"
 msgid "%1$s - thrown by module located at %2$s."
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:304
-#: app/partials/monitoring.latest.view.html.php:468
+#: app/partials/monitoring.latest.view.html.php:109
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -166,8 +165,8 @@ msgstr[1] ""
 #: include/classes/widgets/CWidgetConfig.php:162
 #: include/classes/widgets/CWidgetConfig.php:163
 #: include/classes/widgets/CWidgetConfig.php:164
-#: include/classes/widgets/CWidgetConfig.php:165 jsLoader.php:309
-#: jsLoader.php:310 jsLoader.php:311 jsLoader.php:312
+#: include/classes/widgets/CWidgetConfig.php:165 jsLoader.php:312
+#: jsLoader.php:313 jsLoader.php:314 jsLoader.php:315
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -181,7 +180,7 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
 
-#: jsLoader.php:267
+#: jsLoader.php:270
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -204,7 +203,7 @@ msgstr[1] ""
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2171 include/classes/screens/CScreenActions.php:129
-#: include/views/administration.auditacts.list.php:82
+#: include/views/administration.auditacts.list.php:83
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
@@ -213,15 +212,15 @@ msgstr[1] "%1$s προσπάθειες απέμειναν"
 
 #: app/views/administration.user.edit.php:377
 #: include/classes/widgets/CWidgetConfig.php:160
-#: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:307
-#: jsLoader.php:308
+#: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:310
+#: jsLoader.php:311
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] "%1$s δευτερόλεπτο"
 msgstr[1] "%1$s δευτερόλεπτα"
 
-#: jsLoader.php:248
+#: jsLoader.php:251
 #, c-format
 msgid "%1$s symbols remaining"
 msgstr ""
@@ -247,19 +246,19 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr ""
 
-#: jsLoader.php:261
+#: jsLoader.php:264
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr ""
 
-#: jsLoader.php:313
+#: jsLoader.php:316
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr ""
 
-#: include/func.inc.php:1850
+#: include/func.inc.php:1853
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
@@ -279,11 +278,11 @@ msgctxt "user fullname"
 msgid "(%1$s %2$s)"
 msgstr "(%1$s %2$s)"
 
-#: app/views/popup.operation.common.php:96
+#: app/partials/popup.operations.php:49
 msgid "(0 - infinitely)"
 msgstr ""
 
-#: app/views/popup.operation.common.php:102
+#: app/partials/popup.operations.php:60
 msgid "(0 - use action default)"
 msgstr ""
 
@@ -291,8 +290,8 @@ msgstr ""
 msgid "(Only super admins can create groups)"
 msgstr "(Μόνο υπερδιαχειριστές δημιουργούν ομάδες)"
 
-#: app/views/popup.itemtestedit.view.php:104
-#: app/views/popup.itemtestedit.view.php:106
+#: app/views/popup.itemtestedit.view.php:112
+#: app/views/popup.itemtestedit.view.php:114
 #: include/views/configuration.host.edit.php:200
 #: include/views/configuration.host.edit.php:205
 #: include/views/configuration.host.massupdate.php:96
@@ -394,7 +393,7 @@ msgstr "ΚΑΙ"
 msgid "Acceptable SLA"
 msgstr "Αποδεκτή SLA"
 
-#: include/func.inc.php:1529
+#: include/func.inc.php:1532
 msgid "Access denied"
 msgstr ""
 
@@ -411,7 +410,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: app/views/monitoring.widget.problems.view.php:64
-#: include/actions.inc.php:157 include/blocks.inc.php:765
+#: include/actions.inc.php:157 include/blocks.inc.php:768
 #: include/classes/screens/CScreenHostTriggers.php:220
 #: include/classes/screens/CScreenProblem.php:897
 #: include/classes/screens/CScreenProblem.php:922
@@ -420,7 +419,7 @@ msgstr[1] ""
 msgid "Ack"
 msgstr "Αναγνώριση"
 
-#: app/views/popup.acknowledge.edit.php:82 jsLoader.php:271
+#: app/views/popup.acknowledge.edit.php:82 jsLoader.php:274
 msgid "Acknowledge"
 msgstr "Αναγνώριση"
 
@@ -437,9 +436,11 @@ msgstr "Αναγνωρισμένα συμβάντα ΠΡΟΒΛΗΜΑ"
 msgid "Acknowledged RESOLVED events"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:188
+#: app/controllers/CControllerAuditLogList.php:190
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.tags.tab.php:41
+#: app/partials/popup.operations.php:78 app/partials/popup.operations.php:98
+#: app/partials/popup.operations.php:367
 #: app/views/administration.iconmap.edit.php:58
 #: app/views/administration.mediatype.edit.php:98
 #: app/views/administration.mediatype.edit.php:150
@@ -451,20 +452,18 @@ msgstr ""
 #: app/views/dashboard.sharing.edit.php:50
 #: app/views/monitoring.widget.actionlog.view.php:34
 #: app/views/popup.lldoperation.php:111 app/views/popup.lldoperation.php:240
-#: app/views/popup.lldoverride.php:93 app/views/popup.operation.common.php:139
-#: app/views/popup.operation.common.php:182
-#: app/views/popup.operation.common.php:671
-#: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:117
-#: app/views/reports.auditlog.list.php:46
-#: app/views/reports.auditlog.list.php:65 include/actions.inc.php:1838
+#: app/views/popup.lldoverride.php:93 app/views/popup.triggerwizard.php:47
+#: app/views/popup.triggerwizard.php:117
+#: app/views/reports.auditlog.list.php:56
+#: app/views/reports.auditlog.list.php:74 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/classes/screens/CScreenActions.php:112
-#: include/views/administration.auditacts.list.php:62
+#: include/views/administration.auditacts.list.php:63
 #: include/views/configuration.action.edit.php:56
 #: include/views/configuration.action.edit.php:170
 #: include/views/configuration.action.edit.php:174
-#: include/views/configuration.action.edit.php:313
-#: include/views/configuration.action.edit.php:395
-#: include/views/configuration.action.edit.php:472
+#: include/views/configuration.action.edit.php:316
+#: include/views/configuration.action.edit.php:399
+#: include/views/configuration.action.edit.php:469
 #: include/views/configuration.correlation.edit.php:53
 #: include/views/configuration.graph.edit.php:355
 #: include/views/configuration.host.discovery.edit.php:492
@@ -523,26 +522,26 @@ msgstr "Ενέργεια \"%1$s\" υπάρχει ήδη."
 msgid "Action \"%1$s\" no operations defined."
 msgstr "Ενέργεια \"%1$s\" χωρίς καθορισμένες λειτουργίες."
 
-#: actionconf.php:182
+#: actionconf.php:180
 msgid "Action added"
 msgstr "Η ενέργεια προστέθηκε"
 
-#: include/classes/core/ZBase.php:462
+#: include/classes/core/ZBase.php:459
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
 
-#: actionconf.php:204
+#: actionconf.php:202
 msgid "Action deleted"
 msgstr "Η ενέργεια διεγράφη"
 
-#: actionconf.php:405
+#: actionconf.php:381
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Ενέργεια απενεργοποιημένη"
 msgstr[1] "Ενέργειες απενεργοποιημένες"
 
-#: actionconf.php:404
+#: actionconf.php:380
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Ενέργεια ενεργοποιημένη"
@@ -555,13 +554,13 @@ msgstr[1] "Ενέργειες ενεργοποιημένες"
 msgid "Action log"
 msgstr "Ενέργεια καταγραφής"
 
-#: actionconf.php:174
+#: actionconf.php:172
 msgid "Action updated"
 msgstr "Η Ενέργεια ενημερώθηκε"
 
 #: app/views/administration.mediatype.edit.php:276
 #: app/views/monitoring.dashboard.view.php:97
-#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:766
+#: app/views/monitoring.widget.problems.view.php:65 include/blocks.inc.php:769
 #: include/classes/screens/CScreenHostTriggers.php:220
 #: include/classes/screens/CScreenProblem.php:898
 #: include/classes/screens/CScreenProblem.php:923
@@ -572,7 +571,7 @@ msgstr "Η Ενέργεια ενημερώθηκε"
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/monitoring.screen.list.php:89
 #: include/views/monitoring.slideconf.list.php:75
-#: include/views/monitoring.sysmap.list.php:67 jsLoader.php:270
+#: include/views/monitoring.sysmap.list.php:67 jsLoader.php:273
 #: tr_events.php:180
 msgid "Actions"
 msgstr "Ενέργειες"
@@ -601,13 +600,15 @@ msgstr "Ενεργό από"
 msgid "Active till"
 msgstr "Ενεργό έως"
 
-#: app/controllers/CControllerAuditLogList.php:168
+#: app/controllers/CControllerAuditLogList.php:169
 #: app/partials/common.filter.trigger.php:154
 #: app/partials/configuration.tags.tab.php:116
 #: app/partials/hostmacros.inherited.list.html.php:179
 #: app/partials/hostmacros.list.html.php:91
 #: app/partials/massupdate.macros.tab.php:77
 #: app/partials/massupdate.macros.tab.php:122
+#: app/partials/popup.operations.php:82 app/partials/popup.operations.php:102
+#: app/partials/popup.operations.php:371
 #: app/views/administration.iconmap.edit.php:102
 #: app/views/administration.iconmap.edit.php:148
 #: app/views/administration.image.edit.php:94
@@ -644,17 +645,13 @@ msgstr "Ενεργό έως"
 #: app/views/popup.lldoverride.php:192
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
 #: app/views/popup.media.php:116 app/views/popup.mediatype.message.php:92
-#: app/views/popup.operation.common.php:141
-#: app/views/popup.operation.common.php:184
-#: app/views/popup.operation.common.php:734
-#: app/views/popup.operation.common.php:759
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
 #: include/classes/widgets/CWidgetHelper.php:483 include/forms.inc.php:1444
 #: include/forms.inc.php:1963 include/views/configuration.action.edit.php:131
-#: include/views/configuration.action.edit.php:295
-#: include/views/configuration.action.edit.php:374
-#: include/views/configuration.action.edit.php:454
-#: include/views/configuration.action.edit.php:495
+#: include/views/configuration.action.edit.php:301
+#: include/views/configuration.action.edit.php:380
+#: include/views/configuration.action.edit.php:453
+#: include/views/configuration.action.edit.php:492
 #: include/views/configuration.application.edit.php:64
 #: include/views/configuration.correlation.edit.php:97
 #: include/views/configuration.correlation.edit.php:176
@@ -723,7 +720,7 @@ msgstr "Ενεργό έως"
 #: include/views/configuration.triggers.list.php:129
 #: include/views/configuration.triggers.massupdate.php:84
 #: include/views/configuration.triggers.massupdate.php:139
-#: include/views/js/configuration.action.edit.js.php:308
+#: include/views/js/configuration.action.edit.js.php:171
 #: include/views/js/configuration.correlation.edit.js.php:73
 #: include/views/js/configuration.discovery.edit.js.php:229
 #: include/views/js/monitoring.screen.edit.js.php:109
@@ -746,8 +743,8 @@ msgstr "Ενεργό έως"
 #: include/views/monitoring.sysmap.edit.php:281
 #: include/views/monitoring.sysmap.edit.php:301
 #: include/views/monitoring.sysmap.edit.php:337
-#: include/views/monitoring.sysmap.edit.php:405 jsLoader.php:129
-#: jsLoader.php:330
+#: include/views/monitoring.sysmap.edit.php:405 jsLoader.php:132
+#: jsLoader.php:333
 msgid "Add"
 msgstr "Προσθήκη"
 
@@ -755,7 +752,7 @@ msgstr "Προσθήκη"
 msgid "Add (message type limit reached)"
 msgstr ""
 
-#: jsLoader.php:137
+#: jsLoader.php:140
 msgid "Add a new widget"
 msgstr ""
 
@@ -763,7 +760,7 @@ msgstr ""
 msgid "Add child"
 msgstr "Προσθήκη θυγατρικού"
 
-#: jsLoader.php:332
+#: jsLoader.php:335
 msgid "Add child element"
 msgstr ""
 
@@ -775,7 +772,7 @@ msgstr "Προσθήκη ξενιστή"
 msgid "Add missing"
 msgstr ""
 
-#: jsLoader.php:333
+#: jsLoader.php:336
 msgid "Add multiple maps"
 msgstr ""
 
@@ -813,11 +810,11 @@ msgstr "Προσθήκη στην ομάδα ξενιστών"
 msgid "Add to host groups"
 msgstr "Προσθήκη στις ομάδες ξενιστών"
 
-#: app/views/monitoring.dashboard.view.php:108 jsLoader.php:124
+#: app/views/monitoring.dashboard.view.php:108 jsLoader.php:127
 msgid "Add widget"
 msgstr ""
 
-#: jsLoader.php:259
+#: jsLoader.php:262
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -906,14 +903,14 @@ msgstr "Ψευδώνυμο"
 msgid "Align map elements"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:147
 #: app/controllers/CControllerAuditLogList.php:148
+#: app/controllers/CControllerAuditLogList.php:149
 #: app/controllers/CControllerUserList.php:110
+#: app/partials/popup.operations.php:116 app/partials/popup.operations.php:124
 #: app/views/administration.script.edit.php:77
 #: app/views/administration.script.edit.php:86
 #: app/views/administration.script.list.php:111
 #: app/views/administration.script.list.php:112
-#: app/views/popup.operation.common.php:236
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:122
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
 #: include/views/monitoring.sysmap.edit.php:220
@@ -934,7 +931,7 @@ msgstr ""
 msgid "All hosts"
 msgstr ""
 
-#: jsLoader.php:215
+#: jsLoader.php:218
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Όλοι οι σύνδεσμοι πρέπει να έχουν \"Όνομα\" και \"URL\" καθορισμένο"
 
@@ -988,7 +985,7 @@ msgstr "Επιτρεπόμενοι ξενιστές"
 msgid "Alternatively, you can install it manually:"
 msgstr ""
 
-#: app/views/popup.lldoverride.php:69 app/views/popup.operation.common.php:720
+#: app/partials/popup.operations.php:352 app/views/popup.lldoverride.php:69
 #: include/triggers.inc.php:1317
 #: include/views/configuration.action.edit.php:117
 #: include/views/configuration.correlation.edit.php:108
@@ -1000,9 +997,9 @@ msgstr ""
 msgid "And"
 msgstr "Καί"
 
-#: app/views/monitoring.host.view.php:52
+#: app/partials/popup.operations.php:351 app/views/monitoring.host.view.php:52
 #: app/views/monitoring.problem.view.php:240
-#: app/views/popup.lldoverride.php:68 app/views/popup.operation.common.php:719
+#: app/views/popup.lldoverride.php:68
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:80
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:80
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
@@ -1039,7 +1036,7 @@ msgstr "Κάθε"
 msgid "Any character string included"
 msgstr "Οποιαδήποτε στοιχειοσειρά χαρακτήρων περιλαμβάνεται"
 
-#: app/controllers/CControllerAuditLogList.php:193
+#: app/controllers/CControllerAuditLogList.php:195
 #: app/partials/common.filter.trigger.php:92
 #: app/views/monitoring.latest.view.php:84
 #: app/views/monitoring.problem.view.php:138 httpconf.php:39
@@ -1052,7 +1049,7 @@ msgstr "Οποιαδήποτε στοιχειοσειρά χαρακτήρων �
 #: include/views/configuration.httpconf.edit.php:68
 #: include/views/configuration.httpconf.edit.php:73
 #: include/views/configuration.httpconf.list.php:118
-#: include/views/inventory.host.view.php:202
+#: include/views/inventory.host.view.php:203
 #: include/views/js/monitoring.sysmaps.js.php:227
 #: include/views/monitoring.overview.items.php:133
 #: include/views/monitoring.screen.constructor.edit.php:634
@@ -1116,7 +1113,7 @@ msgstr ""
 #: include/views/configuration.template.edit.php:134
 #: include/views/configuration.template.list.php:149
 #: include/views/configuration.template.list.php:252
-#: include/views/conf.import.php:37 include/views/inventory.host.view.php:169
+#: include/views/conf.import.php:37 include/views/inventory.host.view.php:170
 msgid "Applications"
 msgstr "Κατηγορίες"
 
@@ -1127,8 +1124,8 @@ msgstr "Κατηγορίες"
 #: include/views/js/monitoring.sysmaps.js.php:442
 #: include/views/js/monitoring.sysmaps.js.php:562
 #: include/views/js/monitoring.sysmaps.js.php:657
-#: include/views/js/monitoring.sysmaps.js.php:757 jsLoader.php:128
-#: jsLoader.php:250 jsLoader.php:329
+#: include/views/js/monitoring.sysmaps.js.php:757 jsLoader.php:131
+#: jsLoader.php:253 jsLoader.php:332
 msgid "Apply"
 msgstr "Εφαρμογή"
 
@@ -1146,7 +1143,7 @@ msgstr "Προσεγγίζοντας"
 msgid "Apr"
 msgstr "Απρ"
 
-#: include/func.inc.php:122 include/func.inc.php:259 jsLoader.php:167
+#: include/func.inc.php:122 include/func.inc.php:259 jsLoader.php:170
 msgid "April"
 msgstr "Απρίλιος"
 
@@ -1158,7 +1155,7 @@ msgstr "Σίγουρα θέλετε να εκτελέσετε αυτή την ε
 msgid "Are you sure you want to delete"
 msgstr "Σίγουρα θέλετε να διαγράψετε"
 
-#: jsLoader.php:134
+#: jsLoader.php:137
 msgid "Are you sure, you want to leave this page?"
 msgstr ""
 
@@ -1247,7 +1244,7 @@ msgstr ""
 msgid "At least one operation must be selected."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:505
+#: include/views/configuration.action.edit.php:502
 msgid "At least one operation must exist."
 msgstr ""
 
@@ -1259,7 +1256,7 @@ msgstr ""
 msgid "At least one update operation or message must exist."
 msgstr ""
 
-#: app/views/popup.operation.common.php:134
+#: app/partials/popup.operations.php:68
 msgid "At least one user or user group must be selected."
 msgstr ""
 
@@ -1283,8 +1280,8 @@ msgstr "Επιθεώρηση"
 msgid "Audit data storage period \"%1$s\"."
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:151
-#: app/views/reports.auditlog.list.php:50
+#: app/controllers/CControllerAuditLogList.php:152
+#: app/views/reports.auditlog.list.php:59
 msgid "Audit log"
 msgstr "Έλεγχος καταγραφής"
 
@@ -1292,7 +1289,7 @@ msgstr "Έλεγχος καταγραφής"
 msgid "Aug"
 msgstr "Αυγ"
 
-#: include/func.inc.php:126 include/func.inc.php:263 jsLoader.php:171
+#: include/func.inc.php:126 include/func.inc.php:263 jsLoader.php:174
 msgid "August"
 msgstr "Αύγουστος"
 
@@ -1314,12 +1311,12 @@ msgstr "Ταυτοποίηση"
 msgid "Authentication algorithm"
 msgstr "Αλγόριθμος ταυτοποίησης"
 
-#: include/classes/api/services/CUser.php:1571
+#: include/classes/api/services/CUser.php:1569
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr ""
 
-#: app/views/popup.operation.common.php:479
+#: app/partials/popup.operations.php:225
 #: include/views/configuration.host.discovery.edit.php:431
 #: include/views/configuration.item.edit.php:512
 #: include/views/configuration.item.massupdate.php:207
@@ -1370,9 +1367,9 @@ msgstr ""
 msgid "Auto-logout"
 msgstr ""
 
+#: app/partials/popup.operations.php:341
 #: app/views/administration.miscconfig.edit.php:55
-#: app/views/popup.lldoperation.php:278
-#: app/views/popup.operation.common.php:652 include/hosts.inc.php:1371
+#: app/views/popup.lldoperation.php:278 include/hosts.inc.php:1371
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.host.massupdate.php:206
 #: include/views/configuration.host.prototype.edit.php:322
@@ -1388,7 +1385,7 @@ msgstr "Αυτόματη αντιστοίχιση εικονιδίου"
 msgid "Automatic icon selection"
 msgstr "Αυτόματη επιλογή εικονιδίου"
 
-#: app/controllers/CControllerAuditLogList.php:216
+#: app/controllers/CControllerAuditLogList.php:218
 #: app/controllers/CControllerAutoregEdit.php:67
 #: app/views/administration.autoreg.edit.php:29
 #: app/views/administration.autoreg.edit.php:89
@@ -1543,11 +1540,11 @@ msgstr ""
 msgid "Bottom"
 msgstr "Κάτω"
 
-#: jsLoader.php:207
+#: jsLoader.php:210
 msgid "Bring forward"
 msgstr ""
 
-#: jsLoader.php:206
+#: jsLoader.php:209
 msgid "Bring to front"
 msgstr ""
 
@@ -1595,7 +1592,7 @@ msgstr ""
 msgid "CPU utilisation percentage. Returns float"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:156
+#: app/views/popup.itemtestedit.view.php:164
 msgid "CRLF"
 msgstr ""
 
@@ -1612,7 +1609,7 @@ msgstr "Υπολογισμός SLA, αποδεκτό SLA (in %)"
 msgid "Calculated"
 msgstr "Υπολογισμένο"
 
-#: jsLoader.php:163
+#: jsLoader.php:166
 msgid "Calendar"
 msgstr ""
 
@@ -1620,7 +1617,7 @@ msgstr ""
 msgid "Callback"
 msgstr "Επανάκληση"
 
-#: jsLoader.php:262
+#: jsLoader.php:265
 msgctxt "screen reader"
 msgid "Can not be removed"
 msgstr ""
@@ -1646,8 +1643,8 @@ msgstr ""
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:104
 #: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
-#: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:131
-#: jsLoader.php:148 jsLoader.php:251 jsLoader.php:331 jsLoader.php:343
+#: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:134
+#: jsLoader.php:151 jsLoader.php:254 jsLoader.php:334 jsLoader.php:346
 msgid "Cancel"
 msgstr "Ματαίωση"
 
@@ -1669,7 +1666,7 @@ msgstr "Αδύνατη η προσθήκη μη αριθμητικού συλλ�
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "Αδύνατη η προσθήκη μη αριθμητικού συλλέκτη \"%1$s\" στο πρωτότυπο γράφημα \"%2$s\"."
 
-#: actionconf.php:183
+#: actionconf.php:181
 msgid "Cannot add action"
 msgstr "Αδύνατη η προσθήκη ενέργειας"
 
@@ -1691,7 +1688,7 @@ msgstr ""
 msgid "Cannot add dependency from a host to a template."
 msgstr "Αδύνατη η προσθήκη εξάρτησης απο ξενιστή σε σχεδιότυπο."
 
-#: include/classes/api/services/CDiscoveryRule.php:905
+#: include/classes/api/services/CDiscoveryRule.php:857
 #: include/triggers.inc.php:553
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
@@ -1850,11 +1847,11 @@ msgstr "Αδύνατη η προσθήκη αντιστοιχίας τιμής"
 msgid "Cannot add web scenario"
 msgstr "Αδύνατη η προσθήκη σενάριου ιστού"
 
-#: jsLoader.php:145
+#: jsLoader.php:148
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr ""
 
-#: jsLoader.php:135
+#: jsLoader.php:138
 msgid "Cannot add widgets in kiosk mode"
 msgstr ""
 
@@ -1875,21 +1872,21 @@ msgstr ""
 msgid "Cannot clear history"
 msgstr "Αδύνατη η εκκαθάριση ιστορικού"
 
-#: include/classes/api/services/CDiscoveryRule.php:2480
+#: include/classes/api/services/CDiscoveryRule.php:2434
 msgid "Cannot clone graph prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων γραφημάτων."
 
-#: include/classes/api/services/CDiscoveryRule.php:2534
+#: include/classes/api/services/CDiscoveryRule.php:2488
 msgid "Cannot clone host prototypes."
 msgstr "Αδύνατη η κλωνοποίηση πρωτότυπων ξενιστών."
 
-#: include/classes/api/services/CDiscoveryRule.php:2285
-#: include/classes/api/services/CDiscoveryRule.php:2341
-#: include/classes/api/services/CDiscoveryRule.php:2359
+#: include/classes/api/services/CDiscoveryRule.php:2239
+#: include/classes/api/services/CDiscoveryRule.php:2295
+#: include/classes/api/services/CDiscoveryRule.php:2313
 msgid "Cannot clone item prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων συλλεκτών."
 
-#: include/classes/api/services/CDiscoveryRule.php:818
+#: include/classes/api/services/CDiscoveryRule.php:770
 msgid "Cannot clone trigger prototypes."
 msgstr "Αδύνατη η κλωνοποίηση προτότυπων εναυσμάτων."
 
@@ -1985,7 +1982,7 @@ msgstr ""
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Αδύνατη η διαγραφή Zabbix εσωτερικού χρήστη \"%1$s\", απενεργοποιήστε το χρήστη."
 
-#: actionconf.php:204
+#: actionconf.php:202
 msgid "Cannot delete action"
 msgstr "Αδύνατη η διαγραφή ενέργειας"
 
@@ -2062,10 +2059,6 @@ msgid "Cannot delete host group because maintenance \"%1$s\" must contain at lea
 msgid_plural "Cannot delete selected host groups because maintenance \"%1$s\" must contain at least one host or host group."
 msgstr[0] ""
 msgstr[1] ""
-
-#: include/classes/api/services/CDiscoveryRule.php:588
-msgid "Cannot delete host prototype."
-msgstr "Αδύνατη η διαγραφή πρωτότυπου ξενιστή."
 
 #: host_prototypes.php:132 host_prototypes.php:303
 msgid "Cannot delete host prototypes"
@@ -2150,7 +2143,7 @@ msgstr[1] "Αδύνατη η διαγραφή δέσμης ενεργειών"
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Αδύνατη η διαγραφή δεσμών ενεργειών. Η Δέσμη ενεργειών \"%1$s\" χρησιμοποιείτε στην εργασία ενέργειας \"%2$s\"."
 
-#: actionconf.php:424
+#: actionconf.php:400
 msgid "Cannot delete selected actions"
 msgstr "Αδύνατη η διαγραφή επιλεγμένων ενεργειών"
 
@@ -2194,7 +2187,7 @@ msgstr ""
 msgid "Cannot delete templated item."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπου συλλέκτη."
 
-#: include/classes/api/services/CDiscoveryRule.php:539
+#: include/classes/api/services/CDiscoveryRule.php:555
 msgid "Cannot delete templated items."
 msgstr "Αδύνατη η διαγραφή σχεδιότυπων συλλεκτών."
 
@@ -2252,7 +2245,7 @@ msgstr[1] "Αδύνατη η διαγραφή αντιστοίχισης τιμ�
 msgid "Cannot delete web scenario"
 msgstr "Αδύνατη η διαγραφή σενάριου ιστού"
 
-#: actionconf.php:413
+#: actionconf.php:389
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Αδύνατη η απενεργοποίηση ενέργειας"
@@ -2289,7 +2282,7 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Αδύνατη η απενεργοποίηση τύπου μέσου"
 msgstr[1] "Αδύνατη η απενεργοποίηση τύπων μέσου"
 
-#: app/controllers/CControllerModuleUpdate.php:159
+#: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
@@ -2316,7 +2309,7 @@ msgstr "Αδύνατη η εμφάνιση ουράς συλλέκτη."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Αδύνατη η εμφάνιση πλέον του ενός συλλέκτη τύπου \"Graph sum\"."
 
-#: actionconf.php:412
+#: actionconf.php:388
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Αδύνατη η ενεργοποίηση ενέργειας"
@@ -2353,7 +2346,7 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Αδύνατη η ενεργοποίηση τύπου μέσου"
 msgstr[1] "Αδύνατη η ενεργοποίηση τύπου μέσων"
 
-#: app/controllers/CControllerModuleUpdate.php:154
+#: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
@@ -2380,7 +2373,7 @@ msgstr ""
 msgid "Cannot execute script"
 msgstr ""
 
-#: jsLoader.php:218
+#: jsLoader.php:221
 msgid "Cannot expand macros."
 msgstr ""
 
@@ -2419,8 +2412,8 @@ msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμε
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Δεν βρίσκω ομάδα ξενιστή \"%1$s\" για πρωτότυπο ξενιστή \"%2$s\" κανόνα εντοπισμού \"%3$s\" σε \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:2130
-#: include/classes/api/services/CDiscoveryRule.php:2312
+#: include/classes/api/services/CDiscoveryRule.php:2084
+#: include/classes/api/services/CDiscoveryRule.php:2266
 #: include/classes/api/services/CItemGeneral.php:108 include/items.inc.php:498
 #: include/items.inc.php:644
 #, c-format
@@ -2541,7 +2534,7 @@ msgid "Cannot link template."
 msgstr "Αδύνατη η συσχέτιση σχεδιότυπου."
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:636
+#: include/classes/core/ZBase.php:633
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
@@ -2603,7 +2596,7 @@ msgstr ""
 msgid "Cannot read XML: %1$s."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:479
+#: include/classes/server/CZabbixServer.php:480
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Αδύνατη η ανάγνωση απάντησης, ελέγξτε σύνδεση με Zabbix εξυπηρετητή \"%1$s\"."
@@ -2622,7 +2615,7 @@ msgstr "Αδύνατη η αποθήκευση κανόνα εντοπισμού
 msgid "Cannot save widget \"%1$s\"."
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:420
+#: include/classes/server/CZabbixServer.php:421
 #, c-format
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "Αδύνατη η αποστολή εντολής, ελέγξτε σύνδεση με Zabbix εξυπηρετητή \"%1$s\"."
@@ -2697,7 +2690,7 @@ msgstr "Αδύνατη η τοποθέτηση πεδίων απογραφής �
 msgid "Cannot set resource ID for screen element."
 msgstr ""
 
-#: jsLoader.php:226
+#: jsLoader.php:229
 msgid "Cannot support notification audio for this device."
 msgstr ""
 
@@ -2716,17 +2709,13 @@ msgid_plural "Cannot unblock users"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/api/services/CHostGeneral.php:556
+#: include/classes/api/services/CHostGeneral.php:555
 msgid "Cannot unlink and clear Web scenarios."
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός σεναρίων ιστού."
 
-#: include/classes/api/services/CHostGeneral.php:617
+#: include/classes/api/services/CHostGeneral.php:616
 msgid "Cannot unlink and clear applications."
 msgstr "Αδύνατη η αποσύνδεση και καθαρισμός κατηγοριών."
-
-#: include/classes/api/services/CHostGeneral.php:428
-msgid "Cannot unlink and clear discovery rules"
-msgstr "Αδύνατη η αποσύνδεση και καθαρισμός κανόνων εντοπισμού"
 
 #: include/classes/api/services/CHost.php:1167
 msgid "Cannot unlink template"
@@ -2828,7 +2817,7 @@ msgstr "Αδύνατη η ενημέρωση εντοπισμένης ομάδο
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
 msgstr ""
 
-#: actionconf.php:175
+#: actionconf.php:173
 msgid "Cannot update action"
 msgstr "Αδύνατη η ενημέρωση ενέργειας"
 
@@ -2960,6 +2949,11 @@ msgstr "Αδύνατη η ενημέρωση συντήρησης"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "Αδύνατη η ενημέρωση τύπου μέσων"
+
+#: app/controllers/CControllerModuleUpdate.php:157
+#, c-format
+msgid "Cannot update module: %1$s."
+msgstr ""
 
 #: sysmaps.php:180
 msgid "Cannot update network map"
@@ -3110,8 +3104,8 @@ msgstr ""
 msgid "Certificate"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:61
-#: app/partials/monitoring.latest.view.html.php:77 include/items.inc.php:1755
+#: app/partials/monitoring.latest.view.html.php:55
+#: app/partials/monitoring.latest.view.html.php:69 include/items.inc.php:1755
 #: include/items.inc.php:1759
 msgctxt "noun"
 msgid "Change"
@@ -3292,7 +3286,7 @@ msgstr "Κυκλική αναφορά σε σχεδιότυπα: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Κυκλική σύνδεση σχεδιότυπου μη επιτρεπτή."
 
-#: include/classes/core/ZBase.php:456
+#: include/classes/core/ZBase.php:453
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
@@ -3313,11 +3307,11 @@ msgstr "Εκκαθάριση ιστορικού και τάσεων"
 msgid "Clear when unlinking"
 msgstr "Εκκαθάριση όταν αποσυνδέεται"
 
-#: jsLoader.php:139
+#: jsLoader.php:142
 msgid "Click and drag to desired size."
 msgstr ""
 
-#: jsLoader.php:249
+#: jsLoader.php:252
 msgid "Click to view or edit"
 msgstr ""
 
@@ -3331,7 +3325,7 @@ msgstr "Ρολόι"
 #: app/views/administration.regex.edit.php:143
 #: app/views/administration.script.edit.php:138
 #: app/views/administration.valuemap.edit.php:112
-#: include/views/configuration.action.edit.php:484
+#: include/views/configuration.action.edit.php:481
 #: include/views/configuration.application.edit.php:56
 #: include/views/configuration.correlation.edit.php:165
 #: include/views/configuration.discovery.edit.php:141
@@ -3349,16 +3343,16 @@ msgstr "Ρολόι"
 #: include/views/configuration.triggers.edit.php:627
 #: include/views/monitoring.screen.edit.php:226
 #: include/views/monitoring.slideconf.edit.php:279
-#: include/views/monitoring.sysmap.edit.php:396 jsLoader.php:273
+#: include/views/monitoring.sysmap.edit.php:396 jsLoader.php:276
 msgid "Clone"
 msgstr "Κλώνος"
 
-#: include/func.inc.php:1648 include/views/js/monitoring.sysmaps.js.php:297
+#: include/func.inc.php:1651 include/views/js/monitoring.sysmaps.js.php:297
 #: include/views/js/monitoring.sysmaps.js.php:449
 #: include/views/js/monitoring.sysmaps.js.php:569
 #: include/views/js/monitoring.sysmaps.js.php:664
-#: include/views/js/monitoring.sysmaps.js.php:761 jsLoader.php:149
-#: jsLoader.php:228 jsLoader.php:245 jsLoader.php:336
+#: include/views/js/monitoring.sysmaps.js.php:761 jsLoader.php:152
+#: jsLoader.php:231 jsLoader.php:248 jsLoader.php:339
 msgid "Close"
 msgstr "Κλείσιμο"
 
@@ -3384,8 +3378,8 @@ msgid "Close problem"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:951 jsLoader.php:239
-#: jsLoader.php:244
+#: include/classes/widgets/CWidgetHelper.php:951 jsLoader.php:242
+#: jsLoader.php:247
 msgid "Collapse"
 msgstr ""
 
@@ -3402,7 +3396,7 @@ msgstr ""
 msgid "Colour"
 msgstr "Χρώμα"
 
-#: include/classes/validators/CColorValidator.php:32 jsLoader.php:220
+#: include/classes/validators/CColorValidator.php:32 jsLoader.php:223
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Χρώμα \"%1$s\" λάθος: περιμένω δεκαεξαδικό κωδικό χρώματος (6 σύμβολα)."
@@ -3433,15 +3427,14 @@ msgid "Combined result"
 msgstr "Συνδυασμένο αποτέλεσμα"
 
 #: app/views/administration.script.edit.php:67
-#: include/views/administration.auditacts.list.php:101
+#: include/views/administration.auditacts.list.php:102
 msgid "Command"
 msgstr "Εντολή"
 
 #: app/controllers/CControllerPopupGeneric.php:374
+#: app/partials/popup.operations.php:289 app/partials/popup.operations.php:300
 #: app/views/administration.script.edit.php:60
 #: app/views/administration.script.list.php:68
-#: app/views/popup.operation.common.php:522
-#: app/views/popup.operation.common.php:529
 msgid "Commands"
 msgstr "Εντολές"
 
@@ -3495,12 +3488,12 @@ msgstr "Συνθήκη \"%2$s\" εκτός χρήσης σε τύπο \"%3$s\" �
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1799
+#: include/classes/api/services/CDiscoveryRule.php:1753
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr "Συνθήκη \"%2$s\" εκτός χρήσης σε τύπο \"%3$s\" για κανόνα εντοπισμού \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1593
+#: include/classes/api/services/CDiscoveryRule.php:1547
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
 msgstr ""
@@ -3515,17 +3508,17 @@ msgstr "Συνθήκη \"%2$s\" μέ χρήση σε τύπο \"%3$s\" για ε
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for correlation \"%1$s\" is not defined."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1798
+#: include/classes/api/services/CDiscoveryRule.php:1752
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
 msgstr "Συνθήκη \"%2$s\" μέ χρήση σε τύπο \"%3$s\" για κανόνα εντοπισμού \"%1$s\" ακαθόριστη."
 
-#: include/classes/api/services/CDiscoveryRule.php:1592
+#: include/classes/api/services/CDiscoveryRule.php:1546
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
 msgstr ""
 
-#: app/views/popup.operation.common.php:742
+#: app/partials/popup.operations.php:364
 #: include/views/configuration.action.edit.php:139
 #: include/views/configuration.action.list.php:89
 #: include/views/configuration.correlation.edit.php:120
@@ -3539,7 +3532,7 @@ msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr ""
 
 #: include/menu.inc.php:97 include/menu.inc.php:142
-#: include/views/inventory.host.view.php:210 jsLoader.php:272
+#: include/views/inventory.host.view.php:211 jsLoader.php:275
 msgid "Configuration"
 msgstr "Διαμόρφωση"
 
@@ -3560,7 +3553,7 @@ msgstr "Εισαγωγή διαμόρφωσης"
 msgid "Configuration of GUI"
 msgstr "Διαμόρφωση GUI"
 
-#: app/controllers/CControllerAuditLogList.php:184
+#: app/controllers/CControllerAuditLogList.php:186
 msgid "Configuration of Zabbix"
 msgstr "Διαμόρφωση Zabbix"
 
@@ -3749,12 +3742,12 @@ msgstr ""
 msgid "Connection security"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:433
+#: include/classes/server/CZabbixServer.php:434
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Τέλος χρόνου σύνδεσης %1$s υπέρβαση δευτερολέπτων κατά τη σύνδεση με τον εξυπηρετητή Zabbix \"%2$s\"."
 
-#: include/classes/server/CZabbixServer.php:544
+#: include/classes/server/CZabbixServer.php:545
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
@@ -3762,7 +3755,7 @@ msgid ""
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:532
+#: include/classes/server/CZabbixServer.php:533
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
@@ -3772,7 +3765,7 @@ msgid ""
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:540
+#: include/classes/server/CZabbixServer.php:541
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
@@ -3916,8 +3909,8 @@ msgstr "Συντεταγμένες"
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:222
 #: include/views/configuration.item.list.php:259
-#: include/views/configuration.triggers.list.php:340 jsLoader.php:126
-#: jsLoader.php:212
+#: include/views/configuration.triggers.list.php:340 jsLoader.php:129
+#: jsLoader.php:215
 msgid "Copy"
 msgstr "Αντιγραφή"
 
@@ -4019,11 +4012,11 @@ msgstr ""
 msgid "Create dashboard"
 msgstr ""
 
-#: jsLoader.php:277
+#: jsLoader.php:280
 msgid "Create dependent discovery rule"
 msgstr ""
 
-#: jsLoader.php:276
+#: jsLoader.php:279
 msgid "Create dependent item"
 msgstr ""
 
@@ -4129,7 +4122,7 @@ msgstr "Δημιουργία χάρτη"
 msgid "Create media type"
 msgstr "Δημιουργία τύπου μέσων"
 
-#: include/views/conf.import.php:29 jsLoader.php:274
+#: include/views/conf.import.php:29 jsLoader.php:277
 msgid "Create new"
 msgstr "Δημιουργία νέου"
 
@@ -4153,7 +4146,7 @@ msgstr "Δημιουργία προβολής διαφάνειας"
 msgid "Create template"
 msgstr "Δημιουργία σχεδιότυπου"
 
-#: include/views/configuration.triggers.list.php:168 jsLoader.php:275
+#: include/views/configuration.triggers.list.php:168 jsLoader.php:278
 msgid "Create trigger"
 msgstr "Δημιουργία εναύσματος"
 
@@ -4198,7 +4191,7 @@ msgstr ""
 msgid "Critical"
 msgstr "Κρίσιμο"
 
-#: app/views/popup.operation.common.php:392
+#: app/partials/popup.operations.php:158
 msgid "Current host"
 msgstr "Τρέχων ξενιστής"
 
@@ -4241,7 +4234,7 @@ msgstr "Προσαρμοσμένη ετικέτα"
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Η Προσαρμοσμένη ετικέτα για χάρτη \"%2$s\" στοιχείων τύπου \"%1$s\" δεν πρέπει να είναι άδεια."
 
-#: app/views/popup.operation.common.php:259
+#: app/partials/popup.operations.php:131
 msgid "Custom message"
 msgstr ""
 
@@ -4258,7 +4251,7 @@ msgstr ""
 msgid "Custom screens"
 msgstr "Προσαρμοσμένες οθόνες"
 
-#: app/views/popup.operation.common.php:458
+#: app/partials/popup.operations.php:188
 msgid "Custom script"
 msgstr "Προσαρμοσμένη δέσμη ενεργειών"
 
@@ -4316,7 +4309,7 @@ msgstr "Ημερησίως"
 msgid "Dark"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:215
+#: app/controllers/CControllerAuditLogList.php:217
 #: app/controllers/CControllerDashboardView.php:141 include/menu.inc.php:31
 msgid "Dashboard"
 msgstr "Πίνακας ελέγχου"
@@ -4404,7 +4397,7 @@ msgstr ""
 msgid "Data storage period"
 msgstr ""
 
-#: include/blocks.inc.php:698
+#: include/blocks.inc.php:701
 msgid "Database history tables upgraded"
 msgstr ""
 
@@ -4473,7 +4466,7 @@ msgstr "Ημερομηνία αγοράς HW"
 msgid "Day"
 msgstr "Ημέρα"
 
-#: include/func.inc.php:2519
+#: include/func.inc.php:2521
 msgid "Day before yesterday"
 msgstr ""
 
@@ -4492,7 +4485,7 @@ msgstr "Ημέρα της εβδομάδος"
 msgid "Days"
 msgstr "Ημέρες"
 
-#: app/controllers/CControllerPopupMediatypeTestSend.php:169 jsLoader.php:317
+#: app/controllers/CControllerPopupMediatypeTestSend.php:169 jsLoader.php:320
 msgid "Debug"
 msgstr "Εκσφαλμάτωση"
 
@@ -4506,17 +4499,17 @@ msgstr "Λειτουργία εκσφαλμάτωσης"
 msgid "Dec"
 msgstr "Δεκ"
 
-#: include/func.inc.php:130 include/func.inc.php:267 jsLoader.php:175
+#: include/func.inc.php:130 include/func.inc.php:267 jsLoader.php:178
 msgid "December"
 msgstr "Δεκέμβριος"
 
 #: app/views/administration.iconmap.edit.php:106
 #: include/classes/widgets/forms/CWidgetForm.php:49 include/hosts.inc.php:31
-#: include/hosts.inc.php:1476 include/views/configuration.action.edit.php:226
+#: include/hosts.inc.php:1476 include/views/configuration.action.edit.php:242
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:142
 #: include/views/js/monitoring.sysmaps.js.php:243
-#: include/views/js/monitoring.sysmaps.js.php:616 jsLoader.php:201
+#: include/views/js/monitoring.sysmaps.js.php:616 jsLoader.php:204
 msgid "Default"
 msgstr "Προκαθορισμένο"
 
@@ -4536,7 +4529,7 @@ msgstr ""
 msgid "Default login form"
 msgstr ""
 
-#: app/views/popup.operation.common.php:249
+#: app/partials/popup.operations.php:115
 msgid "Default media type"
 msgstr ""
 
@@ -4565,7 +4558,7 @@ msgstr "Καθυστέρηση"
 msgid "Delayed by"
 msgstr "Καθυστερημένο από"
 
-#: app/controllers/CControllerAuditLogList.php:170
+#: app/controllers/CControllerAuditLogList.php:171
 #: app/views/administration.iconmap.edit.php:135
 #: app/views/administration.image.edit.php:79
 #: app/views/administration.mediatype.edit.php:357
@@ -4604,8 +4597,8 @@ msgstr "Καθυστερημένο από"
 #: include/views/configuration.triggers.list.php:342
 #: include/views/monitoring.screen.list.php:134
 #: include/views/monitoring.slideconf.list.php:106
-#: include/views/monitoring.sysmap.list.php:105 jsLoader.php:132
-#: jsLoader.php:278
+#: include/views/monitoring.sysmap.list.php:105 jsLoader.php:135
+#: jsLoader.php:281
 msgid "Delete"
 msgstr "Διαγραφή"
 
@@ -4630,7 +4623,7 @@ msgstr "Διαγραφή και καθαρισμός σχεδιότυπου; (Π
 msgid "Delete application?"
 msgstr "Διαγραφή κατηγορίας;"
 
-#: include/views/configuration.action.edit.php:486
+#: include/views/configuration.action.edit.php:483
 msgid "Delete current action?"
 msgstr "Διαγραφή τρέχουσας ενέργειας;"
 
@@ -4638,7 +4631,7 @@ msgstr "Διαγραφή τρέχουσας ενέργειας;"
 msgid "Delete current correlation?"
 msgstr ""
 
-#: jsLoader.php:279
+#: jsLoader.php:282
 msgid "Delete dashboard?"
 msgstr ""
 
@@ -4682,7 +4675,7 @@ msgstr "Διαγραφή πρωτότυπου συλλέκτη;"
 msgid "Delete item?"
 msgstr "Διαγραφή συλλέκτη;"
 
-#: jsLoader.php:217
+#: jsLoader.php:220
 msgid "Delete links between selected elements?"
 msgstr "Διαγραφή συνδέσμων μεταξύ επιλεγμένων στοιχείων;"
 
@@ -4735,7 +4728,7 @@ msgstr ""
 msgid "Delete selected discovery rules?"
 msgstr "Διαγραφή επιλεγμένων κανόνων εντοπισμού;"
 
-#: jsLoader.php:204
+#: jsLoader.php:207
 msgid "Delete selected elements?"
 msgstr "Διαγραφή επιλεγμένων στοιχείων;"
 
@@ -4820,7 +4813,7 @@ msgstr "Διαγραφή επιλεγμένων οθονών;"
 msgid "Delete selected scripts?"
 msgstr "Διαγραφή επιλεγμένων δεσμών ενεργειών;"
 
-#: jsLoader.php:205
+#: jsLoader.php:208
 msgid "Delete selected shapes?"
 msgstr ""
 
@@ -4955,7 +4948,7 @@ msgstr "Κατάσταση υλοποίησης"
 #: app/views/administration.proxy.edit.php:82
 #: app/views/administration.script.edit.php:73
 #: app/views/popup.triggerwizard.php:129
-#: app/views/reports.auditlog.list.php:67
+#: app/views/reports.auditlog.list.php:76
 #: include/classes/screens/CScreenEvents.php:32 include/events.inc.php:235
 #: include/views/configuration.correlation.edit.php:128
 #: include/views/configuration.host.discovery.edit.php:555
@@ -4976,12 +4969,12 @@ msgid "Description"
 msgstr "Περιγραφή"
 
 #: app/views/administration.mediatype.list.php:77
-#: app/views/reports.auditlog.list.php:68 include/blocks.inc.php:617
-#: include/func.inc.php:1603 include/views/configuration.action.edit.php:170
+#: app/views/reports.auditlog.list.php:77 include/blocks.inc.php:617
+#: include/func.inc.php:1606 include/views/configuration.action.edit.php:170
 #: include/views/configuration.action.edit.php:174
-#: include/views/configuration.action.edit.php:313
-#: include/views/configuration.action.edit.php:395
-#: include/views/inventory.host.view.php:246
+#: include/views/configuration.action.edit.php:316
+#: include/views/configuration.action.edit.php:399
+#: include/views/inventory.host.view.php:247
 msgid "Details"
 msgstr "Λεπτομέρειες"
 
@@ -5015,7 +5008,7 @@ msgstr ""
 msgid "Directory size (in bytes). Returns integer"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:172
+#: app/controllers/CControllerAuditLogList.php:173
 #: app/views/administration.mediatype.list.php:163
 #: app/views/administration.module.list.php:124
 #: app/views/administration.usergroup.list.php:210
@@ -5197,8 +5190,8 @@ msgstr ""
 #: include/views/configuration.host.list.php:431
 #: include/views/configuration.template.list.php:154
 #: include/views/configuration.template.list.php:288
-#: include/views/inventory.host.view.php:190
-#: include/views/inventory.host.view.php:206
+#: include/views/inventory.host.view.php:191
+#: include/views/inventory.host.view.php:207
 msgid "Discovery"
 msgstr "Εντοπισμός"
 
@@ -5227,7 +5220,7 @@ msgstr "Κατάλογος εντοπισμού"
 msgid "Discovery object"
 msgstr "Αντικείμενο εντοπισμού"
 
-#: app/controllers/CControllerAuditLogList.php:205
+#: app/controllers/CControllerAuditLogList.php:207
 #: app/views/monitoring.discovery.view.php:49
 #: app/views/monitoring.widget.discovery.view.php:32
 #: include/actions.inc.php:52 include/forms.inc.php:933
@@ -5253,7 +5246,7 @@ msgstr "Κανόνας εντοπισμού \"%1$s\" υπάρχει ήδη σε 
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "Κανόνας εντοπισμού \"%1$s\" υπάρχει ήδη."
 
-#: include/classes/api/services/CDiscoveryRule.php:2149
+#: include/classes/api/services/CDiscoveryRule.php:2103
 #, c-format
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
 msgstr ""
@@ -5328,7 +5321,7 @@ msgstr ""
 msgid "Display OK triggers for"
 msgstr "Εμφάνιση εναυσμάτων OK για"
 
-#: app/partials/monitoring.latest.view.html.php:484
+#: app/partials/monitoring.latest.view.html.php:278
 msgid "Display graph"
 msgstr "Εμφάνιση γραφήματος"
 
@@ -5336,14 +5329,14 @@ msgstr "Εμφάνιση γραφήματος"
 msgid "Display problems"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:483
+#: app/partials/monitoring.latest.view.html.php:277
 msgid "Display stacked graph"
 msgstr "Εμφάνιση στοιβαγμένου γραφήματος"
 
 #: app/views/search.php:154 app/views/search.php:223 app/views/search.php:308
 #: include/actions.inc.php:1726 include/actions.inc.php:1798
 #: include/actions.inc.php:1889 include/classes/helpers/CPagerHelper.php:148
-#: jsLoader.php:339 queue.php:309
+#: jsLoader.php:342 queue.php:309
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Εμφάνιση %1$s από %2$s βρέθηκαν"
@@ -5377,7 +5370,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:157 jsLoader.php:280
+#: jsLoader.php:160 jsLoader.php:283
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Θέλετε να αντικαταστήσετε την υπο συνθήκη έκφραση;"
 
@@ -5400,7 +5393,7 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Ανενεργό"
 
-#: jsLoader.php:314
+#: jsLoader.php:317
 msgid "Download image"
 msgstr ""
 
@@ -5523,7 +5516,7 @@ msgstr ""
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:764
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:767
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:921
 #: include/classes/screens/CScreenProblem.php:1169 include/events.inc.php:249
@@ -5546,7 +5539,7 @@ msgstr "Δυναμικός συλλέκτης"
 msgid "Dynamic items"
 msgstr ""
 
-#: jsLoader.php:216
+#: jsLoader.php:219
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Κάθε URL πρέπει να έχει μοναδικό όνομα. Βεβαιωθείτε να υπάρχει μόνο ένα ονομαζόμενο URL"
 
@@ -5556,10 +5549,10 @@ msgstr ""
 
 #: app/views/administration.user.edit.php:284
 #: app/views/js/administration.mediatype.edit.js.php:50
-#: include/views/configuration.action.edit.php:243
-#: include/views/configuration.action.edit.php:269
-#: include/views/configuration.action.edit.php:348
-#: include/views/configuration.action.edit.php:428
+#: include/views/configuration.action.edit.php:259
+#: include/views/configuration.action.edit.php:280
+#: include/views/configuration.action.edit.php:359
+#: include/views/configuration.action.edit.php:432
 #: include/views/configuration.maintenance.edit.php:104
 #: include/views/configuration.trigger.prototype.edit.php:99
 #: include/views/configuration.trigger.prototype.edit.php:293
@@ -5568,8 +5561,8 @@ msgstr ""
 #: include/views/js/configuration.discovery.edit.js.php:33
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:110
 #: include/views/js/monitoring.sysmaps.js.php:778
-#: include/views/js/monitoring.sysmaps.js.php:793 jsLoader.php:130
-#: jsLoader.php:325
+#: include/views/js/monitoring.sysmaps.js.php:793 jsLoader.php:133
+#: jsLoader.php:328
 msgid "Edit"
 msgstr "Επεξεργασία"
 
@@ -5593,15 +5586,15 @@ msgstr ""
 msgid "Edit slide show"
 msgstr ""
 
-#: jsLoader.php:328
+#: jsLoader.php:331
 msgid "Edit tree element"
 msgstr ""
 
-#: jsLoader.php:281
+#: jsLoader.php:284
 msgid "Edit trigger"
 msgstr "Επεξεργασία εναύσματος"
 
-#: jsLoader.php:123
+#: jsLoader.php:126
 msgid "Edit widget"
 msgstr ""
 
@@ -5616,8 +5609,8 @@ msgstr ""
 msgid "Elasticsearch error: %1$s."
 msgstr ""
 
-#: include/classes/api/managers/CHistoryManager.php:1169
-#: include/classes/api/managers/CHistoryManager.php:1178
+#: include/classes/api/managers/CHistoryManager.php:1229
+#: include/classes/api/managers/CHistoryManager.php:1238
 #, c-format
 msgid "Elasticsearch url is not set for type: %1$s."
 msgstr ""
@@ -5671,12 +5664,12 @@ msgstr ""
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr "Κενό φίλτρο συνθήκης τύπου ID γιά ενέργεια \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1826
+#: include/classes/api/services/CDiscoveryRule.php:1780
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Κενό φίλτρο συνθήκης τύπου ID γιά  γιά κανόνα εντοπισμού \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1818
+#: include/classes/api/services/CDiscoveryRule.php:1772
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr "Κενό φίλτρο συνθήκης μακροεντολής γιά κανόνα εντοπισμού \"%1$s\"."
@@ -5693,7 +5686,6 @@ msgstr ""
 
 #: include/classes/api/services/CCorrelation.php:516
 #: include/classes/api/services/CCorrelation.php:693
-#: include/classes/api/services/CDiscoveryRule.php:520
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:576
@@ -5716,7 +5708,7 @@ msgstr ""
 #: include/classes/api/services/CTemplate.php:588
 #: include/classes/api/services/CTrigger.php:678
 #: include/classes/api/services/CTrigger.php:802
-#: include/classes/api/services/CUserMacro.php:609
+#: include/classes/api/services/CUserMacro.php:613
 msgid "Empty input parameter."
 msgstr "Κενή παράμετρος εισόδου."
 
@@ -5752,7 +5744,7 @@ msgstr "Κενό ID οθόνης γιά σχεδιότυπη οθόνη."
 msgid "Empty screen ID."
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:171
+#: app/controllers/CControllerAuditLogList.php:172
 #: app/views/administration.mediatype.list.php:162
 #: app/views/administration.module.list.php:123
 #: app/views/administration.usergroup.list.php:204
@@ -5933,7 +5925,7 @@ msgstr ""
 msgid "Encryption level"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:153
+#: app/views/popup.itemtestedit.view.php:161
 msgid "End of line sequence"
 msgstr ""
 
@@ -5975,7 +5967,7 @@ msgstr "Σφάλμα"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Σφάλμα στό αίτημα αναζήτησης για πίνακα \"%1$s\"."
 
-#: include/func.inc.php:1642 jsLoader.php:159
+#: include/func.inc.php:1645 jsLoader.php:162
 msgid "Error message"
 msgstr ""
 
@@ -5998,7 +5990,7 @@ msgstr "Αναγνωριστικό συμβάντος"
 msgid "Event acknowledged"
 msgstr "Αναγνωρισμένο συμβάν"
 
-#: app/controllers/CControllerAuditLogList.php:214 include/menu.inc.php:145
+#: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:145
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
 msgstr ""
@@ -6072,7 +6064,7 @@ msgstr "Εξαίρεση"
 msgid "Exclude host groups"
 msgstr ""
 
-#: jsLoader.php:150
+#: app/controllers/CControllerAuditLogList.php:174 jsLoader.php:153
 msgid "Execute"
 msgstr "Εκτέλεση"
 
@@ -6098,14 +6090,14 @@ msgid "Execute now"
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:373
+#: app/partials/popup.operations.php:213
 #: app/views/administration.script.edit.php:53
 #: app/views/administration.script.list.php:67
-#: app/views/popup.operation.common.php:471
 msgid "Execute on"
 msgstr "Εκτέλεση σε"
 
 #: include/actions.inc.php:2126
-#: include/views/administration.auditacts.list.php:76
+#: include/views/administration.auditacts.list.php:77
 msgid "Executed"
 msgstr "Εκτελεσμένο"
 
@@ -6116,13 +6108,13 @@ msgstr "Εκτελεσμένο"
 msgid "Executed script"
 msgstr "Εκτελέσιμη δέσμη ενεργειών"
 
-#: jsLoader.php:151
+#: jsLoader.php:154
 msgid "Execution confirmation"
 msgstr "Επιβεβαίωση εκτέλεσης"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:951 jsLoader.php:240
-#: jsLoader.php:243
+#: include/classes/widgets/CWidgetHelper.php:951 jsLoader.php:243
+#: jsLoader.php:246
 msgid "Expand"
 msgstr ""
 
@@ -6225,7 +6217,7 @@ msgstr "Εκφράσεις"
 msgid "External check"
 msgstr "Εξωτερικός έλεγχος"
 
-#: jsLoader.php:187
+#: jsLoader.php:190
 msgctxt "Friday short"
 msgid "F"
 msgstr "Π"
@@ -6244,7 +6236,7 @@ msgid "Fail"
 msgstr "Αποτυχία"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2138
-#: include/views/administration.auditacts.list.php:86
+#: include/views/administration.auditacts.list.php:87
 msgid "Failed"
 msgstr "Απέτυχε"
 
@@ -6289,7 +6281,7 @@ msgstr "Αγαπημένες οθόνες"
 msgid "Feb"
 msgstr "Φεβ"
 
-#: include/func.inc.php:120 include/func.inc.php:257 jsLoader.php:165
+#: include/func.inc.php:120 include/func.inc.php:257 jsLoader.php:168
 msgid "February"
 msgstr "Φεβρουάριος"
 
@@ -6428,11 +6420,11 @@ msgstr "Γεμισμένη περιοχή"
 #: app/views/monitoring.host.view.php:101
 #: app/views/monitoring.latest.view.php:47
 #: app/views/monitoring.problem.view.php:354
-#: app/views/monitoring.web.view.php:46 app/views/reports.auditlog.list.php:56
+#: app/views/monitoring.web.view.php:46 app/views/reports.auditlog.list.php:65
 #: hostinventoriesoverview.php:148 include/classes/html/CFilter.php:394
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/forms.inc.php:703
-#: include/views/administration.auditacts.list.php:52
+#: include/views/administration.auditacts.list.php:53
 #: include/views/configuration.action.list.php:62
 #: include/views/configuration.application.list.php:28
 #: include/views/configuration.correlation.list.php:40
@@ -6551,12 +6543,12 @@ msgstr "Τύπος"
 msgid "Formula missing for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1796
+#: include/classes/api/services/CDiscoveryRule.php:1750
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1589
+#: include/classes/api/services/CDiscoveryRule.php:1543
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
 msgstr ""
@@ -6569,7 +6561,7 @@ msgstr "Γαλλικά (fr_FR)"
 msgid "Fri"
 msgstr "Παρ"
 
-#: include/func.inc.php:142 include/func.inc.php:232 jsLoader.php:180
+#: include/func.inc.php:142 include/func.inc.php:232 jsLoader.php:183
 msgid "Friday"
 msgstr "Παρασκευή"
 
@@ -6628,7 +6620,7 @@ msgstr "GSM μόντεμ"
 msgid "GUI"
 msgstr "GUI"
 
-#: include/classes/user/CWebUser.php:76 index_sso.php:210
+#: include/classes/user/CWebUser.php:76 index_sso.php:231
 msgid "GUI access disabled."
 msgstr "Απενεργοποιημένη πρόσβαση GUI."
 
@@ -6654,16 +6646,16 @@ msgstr "Γερμανικά (de_DE)"
 msgid "Get content of web page. Returns web page source as text"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:128
+#: app/views/popup.itemtestedit.view.php:136
 msgid "Get value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:483
-#: app/views/popup.itemtestedit.view.php:296
+#: app/views/popup.itemtestedit.view.php:304
 msgid "Get value and test"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:86
+#: app/views/popup.itemtestedit.view.php:94
 msgid "Get value from host"
 msgstr ""
 
@@ -6677,7 +6669,7 @@ msgstr "Η δοσμένη έκφραση δεν είναι μακροεντολ�
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr ""
 
-#: app/views/popup.operation.common.php:461
+#: app/partials/popup.operations.php:191
 msgid "Global script"
 msgstr "Γενική δέσμη ενεργειών"
 
@@ -6694,11 +6686,11 @@ msgstr ""
 msgid "Go back to %1$s"
 msgstr ""
 
-#: jsLoader.php:286
+#: jsLoader.php:289
 msgid "Go to"
 msgstr "Μετάβαση σε"
 
-#: app/views/system.warning.php:31 include/func.inc.php:1542
+#: app/views/system.warning.php:31 include/func.inc.php:1545
 msgid "Go to dashboard"
 msgstr "Μετάβαση σε πίνακα ελέγχου"
 
@@ -6739,9 +6731,8 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Χρωμοβαθμισμένη γραμμή"
 
-#: app/controllers/CControllerAuditLogList.php:189
-#: app/partials/monitoring.latest.view.html.php:203
-#: app/partials/monitoring.latest.view.html.php:377
+#: app/controllers/CControllerAuditLogList.php:191
+#: app/partials/monitoring.latest.view.html.php:200
 #: app/views/monitoring.charts.view.php:52
 #: include/classes/macros/CMacrosResolverGeneral.php:847
 #: include/classes/screens/CScreenProblem.php:1310
@@ -6821,11 +6812,11 @@ msgstr[1] ""
 msgid "Graph deleted"
 msgstr "Γράφημα διεγράφη"
 
-#: app/controllers/CControllerAuditLogList.php:191
+#: app/controllers/CControllerAuditLogList.php:193
 msgid "Graph element"
 msgstr "Στοιχείο γραφήματος"
 
-#: app/controllers/CControllerAuditLogList.php:190
+#: app/controllers/CControllerAuditLogList.php:192
 #: app/views/popup.lldoperation.php:50
 #: include/classes/widgets/CWidgetConfig.php:41
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:32
@@ -6938,8 +6929,8 @@ msgstr "Υπάρχει γράφημα με ίδιο όνομα αλλά άλλο
 #: include/views/configuration.template.list.php:152
 #: include/views/configuration.template.list.php:276
 #: include/views/conf.import.php:41 include/views/inventory.host.view.php:153
-#: include/views/inventory.host.view.php:185
-#: include/views/inventory.host.view.php:205 jsLoader.php:287
+#: include/views/inventory.host.view.php:186
+#: include/views/inventory.host.view.php:206 jsLoader.php:290
 msgid "Graphs"
 msgstr "Γραφήματα"
 
@@ -7147,11 +7138,11 @@ msgstr "Βοήθεια"
 msgid "Hexadecimal to decimal"
 msgstr ""
 
-#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:194
+#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:197
 msgid "Hidden"
 msgstr "Κρυφό"
 
-#: jsLoader.php:318
+#: jsLoader.php:321
 msgid "Hide debug"
 msgstr ""
 
@@ -7192,9 +7183,8 @@ msgstr ""
 msgid "Highlight whole row"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:55
-#: app/partials/monitoring.latest.view.html.php:208
-#: app/partials/monitoring.latest.view.html.php:382
+#: app/partials/monitoring.latest.view.html.php:50
+#: app/partials/monitoring.latest.view.html.php:200
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/monitoring.problem.view.php:100
 #: app/views/popup.acknowledge.edit.php:42 history.php:27
@@ -7205,7 +7195,7 @@ msgstr ""
 #: include/forms.inc.php:259 include/forms.inc.php:689
 #: include/views/configuration.item.list.php:70
 #: include/views/configuration.item.prototype.list.php:59 items.php:257
-#: jsLoader.php:288
+#: jsLoader.php:291
 msgid "History"
 msgstr "Ιστορικό"
 
@@ -7265,15 +7255,14 @@ msgstr "Οριζόντια"
 msgid "Horizontal align"
 msgstr "Οριζόντια ευθυγράμμιση"
 
-#: app/controllers/CControllerAuditLogList.php:186
-#: app/partials/monitoring.latest.view.html.php:50
-#: app/partials/monitoring.latest.view.html.php:70
+#: app/controllers/CControllerAuditLogList.php:188
+#: app/partials/monitoring.latest.view.html.php:41
+#: app/partials/popup.operations.php:161
 #: app/views/monitoring.charts.view.php:82
 #: app/views/monitoring.dashboard.view.php:62
 #: app/views/monitoring.widget.problems.view.php:56
-#: app/views/popup.generic.php:93 app/views/popup.operation.common.php:396
-#: app/views/search.php:30 httpconf.php:183 httpconf.php:491
-#: include/actions.inc.php:50 include/blocks.inc.php:761
+#: app/views/popup.generic.php:93 app/views/search.php:30 httpconf.php:183
+#: httpconf.php:491 include/actions.inc.php:50 include/blocks.inc.php:764
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
@@ -7298,15 +7287,15 @@ msgstr "Οριζόντια ευθυγράμμιση"
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.triggers.list.php:198
 #: include/views/inventory.host.list.php:77
-#: include/views/inventory.host.view.php:165
-#: include/views/inventory.host.view.php:201
+#: include/views/inventory.host.view.php:166
+#: include/views/inventory.host.view.php:202
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/monitoring.screen.constructor.edit.php:511
 #: include/views/monitoring.screen.php:64
 #: include/views/monitoring.slides.php:76
 #: include/views/reports.toptriggers.php:83 items.php:893 items.php:1308
-#: jsLoader.php:196 jsLoader.php:289 queue.php:221 report2.php:480
+#: jsLoader.php:199 jsLoader.php:292 queue.php:221 report2.php:480
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Ξενιστής"
@@ -7350,7 +7339,7 @@ msgstr "Ξενιστής προστέθηκε"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:114
 #: app/controllers/CControllerPopupItemTestSend.php:154
-#: app/views/popup.itemtestedit.view.php:90
+#: app/views/popup.itemtestedit.view.php:98
 msgid "Host address"
 msgstr ""
 
@@ -7384,21 +7373,22 @@ msgid_plural "Hosts enabled"
 msgstr[0] "Ξενιστής ενεργοποιημένος"
 msgstr[1] "Ξενιστές ενεργοποιημένοι"
 
-#: app/controllers/CControllerAuditLogList.php:196
+#: app/controllers/CControllerAuditLogList.php:198
 #: app/partials/administration.usergroup.grouprights.html.php:29
 #: app/partials/administration.usergroup.tagfilters.html.php:29
+#: app/partials/popup.operations.php:169
 #: app/views/administration.script.edit.php:84
 #: app/views/administration.script.list.php:70
 #: app/views/administration.user.edit.php:332
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
-#: app/views/popup.operation.common.php:414 app/views/search.php:159
-#: include/actions.inc.php:48 include/blocks.inc.php:346
-#: include/maps.inc.php:25 include/views/configuration.hostgroups.edit.php:51
+#: app/views/search.php:159 include/actions.inc.php:48
+#: include/blocks.inc.php:346 include/maps.inc.php:25
+#: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
 #: include/views/js/monitoring.sysmaps.js.php:101
-#: include/views/js/monitoring.sysmaps.js.php:149 jsLoader.php:199
+#: include/views/js/monitoring.sysmaps.js.php:149 jsLoader.php:202
 #: report2.php:375
 msgid "Host group"
 msgstr "Ομάδα ξενιστών"
@@ -7443,13 +7433,13 @@ msgstr ""
 #: app/controllers/CControllerUsergroupGrouprightAdd.php:36
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/partials/common.filter.trigger.php:45
+#: app/partials/popup.operations.php:312
 #: app/views/monitoring.host.view.php:106
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.problem.view.php:103
 #: app/views/monitoring.web.view.php:48
 #: app/views/popup.condition.common.php:98
-#: app/views/popup.condition.common.php:269
-#: app/views/popup.operation.common.php:597 app/views/search.php:221
+#: app/views/popup.condition.common.php:269 app/views/search.php:221
 #: hostinventoriesoverview.php:151
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:31
@@ -7497,7 +7487,7 @@ msgstr "Διεπαφή ξενιστή"
 #: app/views/monitoring.problem.view.php:295
 #: app/views/popup.lldoperation.php:272 hostinventories.php:26
 #: include/views/inventory.host.list.php:26
-#: include/views/inventory.host.view.php:254
+#: include/views/inventory.host.view.php:255
 msgid "Host inventory"
 msgstr "Απογραφή ξενιστή"
 
@@ -7536,7 +7526,7 @@ msgstr "Όνομα ξενιστή"
 msgid "Host networks"
 msgstr "Δίκτυα ξενιστών"
 
-#: app/controllers/CControllerAuditLogList.php:187
+#: app/controllers/CControllerAuditLogList.php:189
 #: app/views/popup.lldoperation.php:51
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:160
 msgid "Host prototype"
@@ -7717,7 +7707,7 @@ msgstr ""
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
-#: app/views/reports.auditlog.list.php:66
+#: app/views/reports.auditlog.list.php:75
 msgid "ID"
 msgstr "ID"
 
@@ -7727,7 +7717,7 @@ msgstr "IMAP"
 
 #: app/views/administration.proxy.edit.php:53
 #: app/views/monitoring.host.view.php:123
-#: app/views/reports.auditlog.list.php:63 app/views/search.php:31
+#: app/views/reports.auditlog.list.php:72 app/views/search.php:31
 #: include/views/configuration.host.list.php:137
 #: include/views/inventory.host.view.php:92
 #: include/views/js/configuration.host.edit.js.php:54
@@ -7757,10 +7747,10 @@ msgstr "Περιοχή IP"
 msgid "IP range \"%1$s\" exceeds \"%2$s\" address limit"
 msgstr ""
 
+#: app/partials/popup.operations.php:187
 #: app/views/administration.script.edit.php:49
 #: app/views/administration.script.list.php:80
 #: app/views/monitoring.widget.hostavail.view.php:30
-#: app/views/popup.operation.common.php:457
 #: include/classes/widgets/views/widget.hostavail.form.view.php:47
 #: include/hosts.inc.php:471 include/hosts.inc.php:1437
 #: include/items.inc.php:348 include/views/configuration.host.edit.php:596
@@ -7846,7 +7836,7 @@ msgstr "Αντιστοίχιση εικονιδίου διεγράφη"
 msgid "Icon map updated"
 msgstr "Αντιστοίχιση εικονιδίου ενημερώθηκε"
 
-#: app/controllers/CControllerAuditLogList.php:213
+#: app/controllers/CControllerAuditLogList.php:215
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27 include/html.inc.php:911
 msgid "Icon mapping"
@@ -7889,16 +7879,16 @@ msgstr ""
 msgid "If filter matches"
 msgstr ""
 
-#: include/func.inc.php:1532 include/func.inc.php:1551
+#: include/func.inc.php:1535 include/func.inc.php:1554
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Αν νομίζετε ότι το μήνυμα είναι λάθος, συμβουλευτείτε τους διαχειριστές για τις αναγκαίες άδειες."
 
-#: app/controllers/CControllerAuditLogList.php:199
+#: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.image.edit.php:60
 #: app/views/administration.image.edit.php:66 image.php:26
 #: include/classes/helpers/CMapHelper.php:224 include/maps.inc.php:28
 #: include/maps.inc.php:302 include/views/js/monitoring.sysmaps.js.php:96
-#: jsLoader.php:200
+#: jsLoader.php:203
 msgid "Image"
 msgstr "Εικόνα"
 
@@ -7947,7 +7937,7 @@ msgstr "Εικόνες"
 msgid "Images for all maps will be updated!"
 msgstr "Οι εικόνες όλων των χαρτών θα ενημερωθούν!"
 
-#: include/views/configuration.action.edit.php:233
+#: include/views/configuration.action.edit.php:249
 msgid "Immediately"
 msgstr "Άμεσα"
 
@@ -7984,7 +7974,7 @@ msgid "In maintenance"
 msgstr "Σε συντήρηση"
 
 #: include/actions.inc.php:2133
-#: include/views/administration.auditacts.list.php:80
+#: include/views/administration.auditacts.list.php:81
 msgid "In progress"
 msgstr "Σε εξέλιξη"
 
@@ -8387,7 +8377,7 @@ msgstr "Λανθασμένοι χαρακτήρες σε χρήση για όν�
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr "Λανθασμένες συνθήκες ενέργειας \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1791
+#: include/classes/api/services/CDiscoveryRule.php:1745
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Λανθασμένες συνθήκες κανόνα εντοπισμού \"%1$s\"."
@@ -8406,12 +8396,12 @@ msgstr "Λανθασμένη προσαρμοσμένη έκφραση \"%2$s\" 
 msgid "Incorrect custom expression \"%2$s\" for correlation \"%1$s\": %3$s."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1797
+#: include/classes/api/services/CDiscoveryRule.php:1751
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "Λανθασμένη προσαρμοσμένη έκφραση \"%2$s\" κανόνα εντοπισμού \"%1$s\": %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:1590
+#: include/classes/api/services/CDiscoveryRule.php:1544
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
 msgstr ""
@@ -8462,7 +8452,7 @@ msgstr "Λανθασμένο αρχείο αναφόρτωσης."
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "Λανθασμένο φίλτρο ID είδους συνθήκης γιά ενέργεια \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1827
+#: include/classes/api/services/CDiscoveryRule.php:1781
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "Λανθασμένο φίλτρο ID είδους συνθήκης γιά κανόνα εντοπισμού \"%1$s\"."
@@ -8472,12 +8462,12 @@ msgstr "Λανθασμένο φίλτρο ID είδους συνθήκης γι�
 msgid "Incorrect filter condition formula ID given for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1819
+#: include/classes/api/services/CDiscoveryRule.php:1773
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "Λανθασμένο φίλτρο συνθήκης μακροεντολής γιά κανόνα εντοπισμού \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1625
+#: include/classes/api/services/CDiscoveryRule.php:1579
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
 msgstr ""
@@ -8488,7 +8478,7 @@ msgstr ""
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "Λανθασμένο φίλτρο συνθήκης τελεστή ενέργειας \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1831
+#: include/classes/api/services/CDiscoveryRule.php:1785
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "Λανθασμένο φίλτρο συνθήκης τελεστή γιά κανόνα εντοπισμού \"%1$s\"."
@@ -8692,9 +8682,9 @@ msgstr "Ανακριβής κανονική έκφραση \"%1$s\": \"%2$s\""
 msgid "Incorrect resource type provided for screen item."
 msgstr "Παρέχεται λανθασμένος τύπος πόρου για οθόνη συλλέκτη."
 
-#: include/classes/server/CZabbixServer.php:445
-#: include/classes/server/CZabbixServer.php:487
-#: include/classes/server/CZabbixServer.php:494
+#: include/classes/server/CZabbixServer.php:446
+#: include/classes/server/CZabbixServer.php:488
+#: include/classes/server/CZabbixServer.php:495
 #, c-format
 msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr "Ανακριβής απόκριση ληφθείσα από Zabbix εξυπηρετητή \"%1$s\"."
@@ -8809,7 +8799,7 @@ msgstr "Λανθασμένος τύπος υπολογισμού ενέργει�
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1784
+#: include/classes/api/services/CDiscoveryRule.php:1738
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Λανθασμένος τύπος υπολογισμού κανόνα εντοπισμού \"%1$s\"."
@@ -8989,8 +8979,8 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CCorrelation.php:1151
-#: include/classes/api/services/CDiscoveryRule.php:1853
-#: include/classes/api/services/CDiscoveryRule.php:2251
+#: include/classes/api/services/CDiscoveryRule.php:1807
+#: include/classes/api/services/CDiscoveryRule.php:2205
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:214
@@ -9210,20 +9200,20 @@ msgstr "Λανθασμένη τιμή σε χρήση κατάστασης δι�
 msgid "Indonesian (id_ID)"
 msgstr "Ινδονησιακά (id_ID)"
 
-#: include/func.inc.php:1355 include/func.inc.php:1359
+#: include/func.inc.php:1356 include/func.inc.php:1360
 msgid "Infinity"
 msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:169
-#: app/partials/monitoring.latest.view.html.php:63
+#: app/partials/monitoring.latest.view.html.php:57
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
-#: include/blocks.inc.php:760 include/classes/screens/CScreenActions.php:117
+#: include/blocks.inc.php:763 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:220
 #: include/classes/screens/CScreenProblem.php:891
 #: include/classes/screens/CScreenProblem.php:915
-#: include/views/administration.auditacts.list.php:67
+#: include/views/administration.auditacts.list.php:68
 #: include/views/configuration.application.list.php:85
 #: include/views/configuration.graph.list.php:126
 #: include/views/configuration.host.discovery.list.php:181
@@ -9277,7 +9267,7 @@ msgid "Insert"
 msgstr "Εισαγωγή"
 
 #: include/views/configuration.trigger.prototype.edit.php:124
-#: include/views/configuration.triggers.edit.php:149 jsLoader.php:282
+#: include/views/configuration.triggers.edit.php:149 jsLoader.php:285
 msgid "Insert expression"
 msgstr "Εισαγωγή έκφρασης"
 
@@ -9390,7 +9380,7 @@ msgstr ""
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: app/partials/monitoring.latest.view.html.php:54
+#: app/partials/monitoring.latest.view.html.php:49
 #: app/views/popup.lldoperation.php:109 include/forms.inc.php:699
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.edit.php:492
@@ -9480,7 +9470,7 @@ msgstr "Άκυρη τέταρτη παράμετρος."
 msgid "Invalid history data storage period: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CUserMacro.php:754
+#: include/classes/api/services/CUserMacro.php:758
 #, c-format
 msgid "Invalid hostid for macro \"%1$s\"."
 msgstr "Άκυρο hostid για μακροεντολή \"%1$s\"."
@@ -9523,7 +9513,7 @@ msgstr "Άκυρο κλειδί \"%1$s\" πρωτότυπου συλλέκτη \
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Άκυρο κλειδί \"%1$s\": %2$s."
 
-#: include/classes/api/services/CUserMacro.php:724
+#: include/classes/api/services/CUserMacro.php:728
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
 msgstr ""
@@ -9561,20 +9551,20 @@ msgstr "Άκυρος αριθμός παραμέτρων."
 #: include/classes/api/services/CAutoregistration.php:145
 #: include/classes/api/services/CAutoregistration.php:151
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CDiscoveryRule.php:1637
-#: include/classes/api/services/CDiscoveryRule.php:1657
-#: include/classes/api/services/CDiscoveryRule.php:1669
-#: include/classes/api/services/CDiscoveryRule.php:1688
-#: include/classes/api/services/CDiscoveryRule.php:1699
-#: include/classes/api/services/CDiscoveryRule.php:1711
-#: include/classes/api/services/CDiscoveryRule.php:1719
-#: include/classes/api/services/CDiscoveryRule.php:1730
-#: include/classes/api/services/CDiscoveryRule.php:1741
-#: include/classes/api/services/CDiscoveryRule.php:1873
-#: include/classes/api/services/CDiscoveryRule.php:1959
-#: include/classes/api/services/CDiscoveryRule.php:1976
-#: include/classes/api/services/CDiscoveryRule.php:1994
-#: include/classes/api/services/CDiscoveryRule.php:2002
+#: include/classes/api/services/CDiscoveryRule.php:1591
+#: include/classes/api/services/CDiscoveryRule.php:1611
+#: include/classes/api/services/CDiscoveryRule.php:1623
+#: include/classes/api/services/CDiscoveryRule.php:1642
+#: include/classes/api/services/CDiscoveryRule.php:1653
+#: include/classes/api/services/CDiscoveryRule.php:1665
+#: include/classes/api/services/CDiscoveryRule.php:1673
+#: include/classes/api/services/CDiscoveryRule.php:1684
+#: include/classes/api/services/CDiscoveryRule.php:1695
+#: include/classes/api/services/CDiscoveryRule.php:1827
+#: include/classes/api/services/CDiscoveryRule.php:1913
+#: include/classes/api/services/CDiscoveryRule.php:1930
+#: include/classes/api/services/CDiscoveryRule.php:1948
+#: include/classes/api/services/CDiscoveryRule.php:1956
 #: include/classes/api/services/CItemGeneral.php:2196
 #: include/classes/api/services/CItemGeneral.php:2203
 #: include/classes/api/services/CItemGeneral.php:2209
@@ -9745,7 +9735,7 @@ msgstr ""
 msgid "Invalid trigger data storage period: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CUserMacro.php:737
+#: include/classes/api/services/CUserMacro.php:741
 #, c-format
 msgid "Invalid type for macro \"%1$s\"."
 msgstr ""
@@ -9757,7 +9747,7 @@ msgstr ""
 
 #: include/menu.inc.php:59 include/views/configuration.host.edit.php:698
 #: include/views/configuration.host.massupdate.php:315
-#: include/views/configuration.host.prototype.edit.php:327 jsLoader.php:290
+#: include/views/configuration.host.prototype.edit.php:327 jsLoader.php:293
 msgid "Inventory"
 msgstr "Απογραφή"
 
@@ -9770,7 +9760,7 @@ msgstr "Απενεργοποιημένη απογραφή ξενιστή \"%1$s\
 msgid "Inventory field"
 msgstr "Πεδίο απογραφής"
 
-#: app/views/popup.operation.common.php:649
+#: app/partials/popup.operations.php:338
 #: include/views/configuration.host.massupdate.php:200
 msgid "Inventory mode"
 msgstr "Τρόπος απογραφής"
@@ -9802,7 +9792,7 @@ msgstr "Αναζήτηση με συνθηματικό χρήστη αδύνατ
 msgid "Italian (it_IT)"
 msgstr "Ιταλικά (it_IT)"
 
-#: app/controllers/CControllerAuditLogList.php:197
+#: app/controllers/CControllerAuditLogList.php:199
 #: app/views/popup.triggerexpr.php:96 app/views/popup.triggerwizard.php:86
 #: include/classes/screens/CScreenHistory.php:269
 #: include/classes/screens/CScreenPlainText.php:42
@@ -9844,7 +9834,7 @@ msgstr "Ο συλλέκτης \"%1$s\" δεν συμπληρώνει ελλιπ�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Συλλέκτης \"%1$s\" δέν υπάρχει σε σχεδιότυπο \"%2$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:2252
+#: include/classes/api/services/CDiscoveryRule.php:2206
 #: include/classes/api/services/CItemGeneral.php:1888
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
@@ -9898,7 +9888,7 @@ msgstr "Συλλέκτης μή επιλεγμένος"
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:198
+#: app/controllers/CControllerAuditLogList.php:200
 #: app/views/popup.lldoperation.php:48
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:48
 #: include/forms.inc.php:936
@@ -10043,8 +10033,8 @@ msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη �
 #: include/views/configuration.template.edit.php:158
 #: include/views/configuration.template.list.php:150
 #: include/views/configuration.template.list.php:260
-#: include/views/conf.import.php:38 include/views/inventory.host.view.php:175
-#: include/views/inventory.host.view.php:203 items.php:1683 queue.php:110
+#: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
+#: include/views/inventory.host.view.php:204 items.php:1683 queue.php:110
 msgid "Items"
 msgstr "Συλλέκτες"
 
@@ -10131,7 +10121,7 @@ msgstr ""
 msgid "Jan"
 msgstr "Ιαν"
 
-#: include/func.inc.php:119 include/func.inc.php:256 jsLoader.php:164
+#: include/func.inc.php:119 include/func.inc.php:256 jsLoader.php:167
 msgid "January"
 msgstr "Ιανουάριος"
 
@@ -10148,7 +10138,7 @@ msgstr ""
 msgid "Jul"
 msgstr "Ιούλ"
 
-#: include/func.inc.php:125 include/func.inc.php:262 jsLoader.php:170
+#: include/func.inc.php:125 include/func.inc.php:262 jsLoader.php:173
 msgid "July"
 msgstr "Ιούλιος"
 
@@ -10156,7 +10146,7 @@ msgstr "Ιούλιος"
 msgid "Jun"
 msgstr "Ιούν"
 
-#: include/func.inc.php:124 include/func.inc.php:261 jsLoader.php:169
+#: include/func.inc.php:124 include/func.inc.php:261 jsLoader.php:172
 msgid "June"
 msgstr "Ιούνιος"
 
@@ -10192,7 +10182,7 @@ msgstr "Κλειδί"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Το κλειδί \"%1$s\" δεν ταιριάζει <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: app/views/popup.operation.common.php:511
+#: app/partials/popup.operations.php:273
 #: include/views/js/common.item.edit.js.php:214
 msgid "Key passphrase"
 msgstr "Κλειδί συνθηματικής φράσης"
@@ -10234,7 +10224,7 @@ msgstr "Επιτυχής σύνδεση LDAP"
 msgid "LDAP settings"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:155
+#: app/views/popup.itemtestedit.view.php:163
 msgid "LF"
 msgstr ""
 
@@ -10247,7 +10237,7 @@ msgstr ""
 msgid "LLD macros"
 msgstr ""
 
-#: app/views/popup.lldoverride.php:93 app/views/popup.operation.common.php:671
+#: app/partials/popup.operations.php:367 app/views/popup.lldoverride.php:93
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:56
 #: include/views/configuration.correlation.edit.php:53
 #: include/views/configuration.host.discovery.edit.php:591
@@ -10276,42 +10266,42 @@ msgctxt "page navigation"
 msgid "Last"
 msgstr "Τελευταίο"
 
-#: include/func.inc.php:2572
+#: include/func.inc.php:2574
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2566
+#: include/func.inc.php:2568
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2559
+#: include/func.inc.php:2561
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2575
+#: include/func.inc.php:2577
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2552
+#: include/func.inc.php:2554
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/func.inc.php:2578
+#: include/func.inc.php:2580
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -10342,17 +10332,17 @@ msgstr "Τελευταία μεταβολή"
 msgid "Last change (descending)"
 msgstr "Τελευταία μεταβολή (φθίνουσα)"
 
-#: app/partials/monitoring.latest.view.html.php:58
-#: app/partials/monitoring.latest.view.html.php:74
+#: app/partials/monitoring.latest.view.html.php:53
+#: app/partials/monitoring.latest.view.html.php:67
 #: include/classes/screens/CScreenHttpTest.php:110
 msgid "Last check"
 msgstr "Τελευταίος έλεγχος"
 
-#: jsLoader.php:294
+#: jsLoader.php:297
 msgid "Last hour graph"
 msgstr "Γράφημα τελευταίας ώρας"
 
-#: jsLoader.php:295
+#: jsLoader.php:298
 msgid "Last month graph"
 msgstr "Γράφημα τελευταίου μήνα"
 
@@ -10372,12 +10362,12 @@ msgstr "Τελευταίο απο"
 msgid "Last seen (age)"
 msgstr "Τελευταία εμφάνιση (ηλικία)"
 
-#: app/partials/monitoring.latest.view.html.php:60
-#: app/partials/monitoring.latest.view.html.php:76
+#: app/partials/monitoring.latest.view.html.php:54
+#: app/partials/monitoring.latest.view.html.php:68
 msgid "Last value"
 msgstr "Τελευταία τιμή"
 
-#: jsLoader.php:296
+#: jsLoader.php:299
 msgid "Last week graph"
 msgstr "Γράφημα τελευταίας εβδομάδος"
 
@@ -10387,11 +10377,11 @@ msgstr "Γράφημα τελευταίας εβδομάδος"
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:33
 #: app/views/search.php:116 app/views/search.php:160 app/views/search.php:195
 #: include/menu.inc.php:44 include/views/inventory.host.view.php:140
-#: jsLoader.php:292
+#: jsLoader.php:295
 msgid "Latest data"
 msgstr "Τελευταία δεδομένα"
 
-#: jsLoader.php:293
+#: jsLoader.php:296
 msgid "Latest values"
 msgstr "Τελευταίες τιμές"
 
@@ -10631,10 +10621,10 @@ msgstr "Μορφότυπος καταγραφής ώρας"
 msgid "Log unmatched SNMP traps"
 msgstr "Καταγραφή αταίριαστων SNMP traps"
 
-#: app/controllers/CControllerAuditLogList.php:166
+#: app/controllers/CControllerAuditLogList.php:167
 #: app/views/administration.authentication.edit.php:127
-#: app/views/administration.user.list.php:97 include/func.inc.php:1539
-#: include/func.inc.php:1554 index_http.php:93 index_sso.php:229
+#: app/views/administration.user.list.php:97 include/func.inc.php:1542
+#: include/func.inc.php:1557 index_http.php:93 index_sso.php:250
 msgid "Login"
 msgstr "Σύνδεση"
 
@@ -10643,12 +10633,12 @@ msgid "Login failed."
 msgstr ""
 
 #: include/classes/api/services/CUser.php:1196
-#: include/classes/api/services/CUser.php:1567
+#: include/classes/api/services/CUser.php:1565
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:86
 msgid "Login name or password is incorrect."
 msgstr "Ανακριβές όνομα ή κωδικός σύνδεσης."
 
-#: app/controllers/CControllerAuditLogList.php:167
+#: app/controllers/CControllerAuditLogList.php:168
 msgid "Logout"
 msgstr "Αποσύνδεση"
 
@@ -10672,7 +10662,7 @@ msgstr "Κανόνας εντοπισμού χαμηλού επιπέδου σε
 msgid "M"
 msgstr ""
 
-#: jsLoader.php:183
+#: jsLoader.php:186
 msgctxt "Monday short"
 msgid "M"
 msgstr "Δ"
@@ -10699,7 +10689,7 @@ msgstr "MD5"
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:211
+#: app/controllers/CControllerAuditLogList.php:213
 #: app/partials/hostmacros.inherited.list.html.php:47
 #: app/partials/hostmacros.list.html.php:34
 #: app/partials/massupdate.macros.tab.php:29
@@ -10709,22 +10699,22 @@ msgstr ""
 msgid "Macro"
 msgstr "Μακροεντολή"
 
-#: include/classes/api/services/CUserMacro.php:923
+#: include/classes/api/services/CUserMacro.php:953
 #, c-format
 msgid "Macro \"%1$s\" already exists on \"%2$s\"."
 msgstr "Η μακροεντολή \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 
-#: include/classes/api/services/CUserMacro.php:410
+#: include/classes/api/services/CUserMacro.php:414
 #, c-format
 msgid "Macro \"%1$s\" already exists."
 msgstr "Η μακροεντολή \"%1$s\" υπάρχει ήδη."
 
-#: include/classes/api/services/CUserMacro.php:839
+#: include/classes/api/services/CUserMacro.php:855
 #, c-format
 msgid "Macro \"%1$s\" is not unique."
 msgstr "Η μακροεντολή \"%1$s\" δεν είναι μοναδική."
 
-#: include/classes/api/services/CUserMacro.php:946
+#: include/classes/api/services/CUserMacro.php:977
 #, c-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
 msgstr "Η μακροεντολή με hostmacroid \"%1$s\" δεν υπάρχει."
@@ -10732,7 +10722,7 @@ msgstr "Η μακροεντολή με hostmacroid \"%1$s\" δεν υπάρχε�
 #: app/partials/massupdate.macros.tab.php:118
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
-#: app/views/popup.itemtestedit.view.php:178 include/html.inc.php:913
+#: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:913
 #: include/views/configuration.host.edit.php:621
 #: include/views/configuration.host.massupdate.php:308
 #: include/views/configuration.host.prototype.edit.php:303
@@ -10761,7 +10751,7 @@ msgstr ""
 msgid "Main navigation"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:209 include/menu.inc.php:112
+#: app/controllers/CControllerAuditLogList.php:211 include/menu.inc.php:112
 #: include/views/configuration.maintenance.edit.php:248
 #: include/views/js/monitoring.sysmaps.js.php:250
 msgid "Maintenance"
@@ -10792,7 +10782,7 @@ msgstr "Συντήρηση προστέθηκε"
 msgid "Maintenance deleted"
 msgstr "Συντήρηση διεγράφη"
 
-#: app/controllers/CControllerPopupMaintenancePeriod.php:212
+#: app/controllers/CControllerPopupMaintenancePeriod.php:218
 msgid "Maintenance period"
 msgstr "Περίοδος συντήρησης"
 
@@ -10830,9 +10820,9 @@ msgstr ""
 msgid "Mandatory parameter is missing."
 msgstr "Λείπει υποχρεωτική παράμετρος."
 
+#: app/partials/popup.operations.php:340
 #: app/views/administration.miscconfig.edit.php:54
-#: app/views/popup.lldoperation.php:277
-#: app/views/popup.operation.common.php:651 include/hosts.inc.php:1370
+#: app/views/popup.lldoperation.php:277 include/hosts.inc.php:1370
 #: include/views/configuration.host.edit.php:639
 #: include/views/configuration.host.massupdate.php:205
 #: include/views/configuration.host.prototype.edit.php:321
@@ -10843,14 +10833,14 @@ msgstr "Χειροκίνητα"
 msgid "Manually closed"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:202
+#: app/controllers/CControllerAuditLogList.php:204
 #: include/classes/widgets/CWidgetConfig.php:43
 #: include/classes/widgets/forms/CWidgetFormMap.php:41
 #: include/classes/widgets/forms/CWidgetFormMap.php:70 include/maps.inc.php:27
 #: include/screens.inc.php:34 include/views/js/monitoring.sysmaps.js.php:93
 #: include/views/js/monitoring.sysmaps.js.php:205
 #: include/views/monitoring.screen.constructor.edit.php:372
-#: include/views/monitoring.sysmap.edit.php:294 jsLoader.php:197 map.php:25
+#: include/views/monitoring.sysmap.edit.php:294 jsLoader.php:200 map.php:25
 msgid "Map"
 msgstr "Χάρτης"
 
@@ -10944,7 +10934,7 @@ msgstr "Χάρτες"
 msgid "Mar"
 msgstr "Μαρ"
 
-#: include/func.inc.php:121 include/func.inc.php:258 jsLoader.php:166
+#: include/func.inc.php:121 include/func.inc.php:258 jsLoader.php:169
 msgid "March"
 msgstr "Μάρτιος"
 
@@ -11043,7 +11033,7 @@ msgstr[1] "Μέγιστη χρονική περίοδος εμφάνισης %1$
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr ""
 
-#: include/func.inc.php:123 include/func.inc.php:260 jsLoader.php:168
+#: include/func.inc.php:123 include/func.inc.php:260 jsLoader.php:171
 msgid "May"
 msgstr "Μάιος"
 
@@ -11058,7 +11048,7 @@ msgstr "Μάι"
 msgid "Media"
 msgstr "Μέσα ενημέρωσης"
 
-#: app/controllers/CControllerAuditLogList.php:185
+#: app/controllers/CControllerAuditLogList.php:187
 #: app/views/administration.mediatype.edit.php:265 report4.php:103
 msgid "Media type"
 msgstr "Τύπος μέσων"
@@ -11160,15 +11150,15 @@ msgstr ""
 msgid "Menu entry name"
 msgstr ""
 
+#: app/partials/popup.operations.php:146
 #: app/views/monitoring.widget.actionlog.view.php:37
 #: app/views/popup.acknowledge.edit.php:35
 #: app/views/popup.mediatype.message.php:77
-#: app/views/popup.mediatypetest.edit.php:75
-#: app/views/popup.operation.common.php:267 include/actions.inc.php:1703
+#: app/views/popup.mediatypetest.edit.php:75 include/actions.inc.php:1703
 #: include/actions.inc.php:1974 include/actions.inc.php:2082
 #: include/classes/screens/CScreenActions.php:115
-#: include/views/administration.auditacts.list.php:65
-#: include/views/administration.auditacts.list.php:96
+#: include/views/administration.auditacts.list.php:66
+#: include/views/administration.auditacts.list.php:97
 msgid "Message"
 msgstr "Μήνυμα"
 
@@ -11332,7 +11322,7 @@ msgstr "Τρόπος"
 msgid "Model"
 msgstr "Πρότυπο"
 
-#: app/controllers/CControllerAuditLogList.php:217
+#: app/controllers/CControllerAuditLogList.php:219
 #: app/views/administration.module.edit.php:52
 msgid "Module"
 msgstr ""
@@ -11356,19 +11346,24 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/controllers/CControllerModuleUpdate.php:147
+#: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/controllers/CControllerModuleUpdate.php:142
+#: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] ""
 msgstr[1] ""
+
+#: app/controllers/CControllerModuleUpdate.php:142
+#, c-format
+msgid "Module updated: %1$s."
+msgstr ""
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -11390,7 +11385,7 @@ msgstr ""
 msgid "Mon"
 msgstr "Δευ"
 
-#: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:176
+#: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:179
 msgid "Monday"
 msgstr "Δευτέρα"
 
@@ -11432,11 +11427,11 @@ msgstr "Μήνας"
 msgid "Monthly"
 msgstr "Μηνιαίως"
 
-#: include/classes/html/CMultiSelect.php:83 jsLoader.php:255
+#: include/classes/html/CMultiSelect.php:83 jsLoader.php:258
 msgid "More matches found..."
 msgstr "Βρέθηκαν περισσότερα ταιριάσματα..."
 
-#: jsLoader.php:265
+#: jsLoader.php:268
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -11464,7 +11459,7 @@ msgstr ""
 msgid "Multiple PROBLEM events"
 msgstr "Πολλαπλά ΠΡΟΒΛΗΜΑΤΙΚΑ συμβάντα"
 
-#: jsLoader.php:225
+#: jsLoader.php:228
 msgid "Mute"
 msgstr "Σίγαση"
 
@@ -11507,8 +11502,8 @@ msgstr "NTLM"
 #: app/partials/common.filter.trigger.php:108
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.latest.view.html.php:52
-#: app/partials/monitoring.latest.view.html.php:72
+#: app/partials/monitoring.latest.view.html.php:42
+#: app/partials/popup.operations.php:367
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
 #: app/views/administration.image.edit.php:45
@@ -11539,9 +11534,8 @@ msgstr "NTLM"
 #: app/views/monitoring.widget.plaintext.view.php:48
 #: app/views/popup.httpstep.php:45 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:193
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:201
 #: app/views/popup.lldoperation.php:240 app/views/popup.lldoverride.php:47
-#: app/views/popup.operation.common.php:671
 #: app/views/popup.triggerwizard.php:81 correlation.php:35
 #: disc_prototypes.php:44 graphs.php:43 host_discovery.php:48 httpconf.php:41
 #: include/classes/screens/CScreenHttpTest.php:108
@@ -11699,7 +11693,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupConditionActions.php:93
 #: app/controllers/CControllerPopupConditionEventCorr.php:87
-#: app/controllers/CControllerPopupConditionOperations.php:63
+#: app/controllers/CControllerPopupConditionOperations.php:68
 msgid "New condition"
 msgstr "Νέα συνθήκη"
 
@@ -11707,7 +11701,7 @@ msgstr "Νέα συνθήκη"
 msgid "New dashboard"
 msgstr ""
 
-#: jsLoader.php:211
+#: jsLoader.php:214
 msgid "New element"
 msgstr "Νέο στοιχείο"
 
@@ -11743,7 +11737,7 @@ msgstr ""
 msgid "New triggers"
 msgstr ""
 
-#: jsLoader.php:141
+#: jsLoader.php:144
 msgid "Next page"
 msgstr ""
 
@@ -11759,7 +11753,7 @@ msgstr ""
 #: app/views/popup.condition.common.php:647
 #: app/views/popup.lldoperation.php:79 app/views/popup.lldoperation.php:91
 #: include/actions.inc.php:33 include/blocks.inc.php:624
-#: include/blocks.inc.php:699 include/blocks.inc.php:866
+#: include/blocks.inc.php:702 include/blocks.inc.php:869
 #: include/classes/screens/CScreenHostTriggers.php:261
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/screens/CScreenProblem.php:1253 include/events.inc.php:173
@@ -11845,7 +11839,7 @@ msgstr "Δεν δίνεται \"%1$s\" σχεδιότυπης οθόνης."
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "Δέν δίνεται \"%2$s\" για συνθήκη φίλτρου ενέργειας \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1835
+#: include/classes/api/services/CDiscoveryRule.php:1789
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr "Δέν δίνεται \"%2$s\" για συνθήκη φίλτρου κανόνα εντοπισμού \"%1$s\"."
@@ -11855,7 +11849,7 @@ msgstr "Δέν δίνεται \"%2$s\" για συνθήκη φίλτρου κα
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "Δέν δίνεται \"%2$s\" για φίλτρο ενέργειας \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1803
+#: include/classes/api/services/CDiscoveryRule.php:1757
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "Δέν δίνεται \"%2$s\" γιά φίλτρο κανόνα εντοπισμού \"%1$s\"."
@@ -11934,7 +11928,7 @@ msgstr "Όχι προεπιλεγμένη διεπαφή για \"%1$s\" τύπ�
 msgid "No details"
 msgstr "Χωρίς λεπτομέρειες"
 
-#: include/classes/api/services/CDiscoveryRule.php:658
+#: include/classes/api/services/CDiscoveryRule.php:610
 msgid "No discovery rule IDs given."
 msgstr "Δεν δόθηκαν IDs κανόνα εντοπισμού."
 
@@ -11976,11 +11970,11 @@ msgstr "Δεν προβλέπεται ID πρωτότυπου γραφήματο
 msgid "No graphs added."
 msgstr "Δεν προστέθηκαν γραφήματα."
 
-#: include/classes/api/services/CDiscoveryRule.php:661
+#: include/classes/api/services/CDiscoveryRule.php:613
 msgid "No host IDs given."
 msgstr "Δεν δίνονται αναγνωριστικά ξενιστή."
 
-#: include/classes/api/services/CUserMacro.php:750
+#: include/classes/api/services/CUserMacro.php:754
 #, c-format
 msgid "No host given for macro \"%1$s\"."
 msgstr "Δεν δίνεται ξενιστής για μακροεντολή \"%1$s\"."
@@ -11995,7 +11989,7 @@ msgid "No host groups with groupid \"%1$s\"."
 msgstr ""
 
 #: app/controllers/CControllerWidgetUrlView.php:41
-#: include/classes/screens/CScreenUrl.php:44
+#: include/classes/screens/CScreenUrl.php:36
 msgid "No host selected."
 msgstr "Δεν επιλέχθηκε ξενιστής."
 
@@ -12018,7 +12012,7 @@ msgstr "Χωρίς εικόνα"
 #: include/views/configuration.item.massupdate.php:81
 #: include/views/configuration.item.prototype.edit.php:449
 #: include/views/configuration.item.prototype.massupdate.php:78
-#: jsLoader.php:322
+#: jsLoader.php:325
 msgid "No interface found"
 msgstr "Δεν βρέθηκε διεπαφή"
 
@@ -12073,7 +12067,7 @@ msgstr "Δεν παρέχεται ID χάρτη για στοιχείο οθόν
 msgid "No maps added."
 msgstr "Δεν προστέθηκαν χάρτες."
 
-#: include/classes/html/CMultiSelect.php:82 jsLoader.php:254
+#: include/classes/html/CMultiSelect.php:82 jsLoader.php:257
 msgid "No matches found"
 msgstr "Δεν βρέθηκαν ταιριάσματα"
 
@@ -12087,7 +12081,7 @@ msgid "No operation type given for correlation \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CUser.php:1201
-#: include/classes/api/services/CUser.php:1579
+#: include/classes/api/services/CUser.php:1577
 msgid "No permissions for system access."
 msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματος."
 
@@ -12135,11 +12129,11 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CDashboard.php:371
 #: include/classes/api/services/CDashboard.php:396
 #: include/classes/api/services/CDashboard.php:1236
-#: include/classes/api/services/CDiscoveryRule.php:536
-#: include/classes/api/services/CDiscoveryRule.php:637
-#: include/classes/api/services/CDiscoveryRule.php:673
-#: include/classes/api/services/CDiscoveryRule.php:1756
-#: include/classes/api/services/CDiscoveryRule.php:2028
+#: include/classes/api/services/CDiscoveryRule.php:548
+#: include/classes/api/services/CDiscoveryRule.php:589
+#: include/classes/api/services/CDiscoveryRule.php:625
+#: include/classes/api/services/CDiscoveryRule.php:1710
+#: include/classes/api/services/CDiscoveryRule.php:1982
 #: include/classes/api/services/CDRule.php:183
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CDRule.php:336
@@ -12242,9 +12236,9 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CTriggerPrototype.php:729
 #: include/classes/api/services/CUserGroup.php:329
 #: include/classes/api/services/CUserGroup.php:876
-#: include/classes/api/services/CUserMacro.php:368
-#: include/classes/api/services/CUserMacro.php:455
-#: include/classes/api/services/CUserMacro.php:803
+#: include/classes/api/services/CUserMacro.php:372
+#: include/classes/api/services/CUserMacro.php:459
+#: include/classes/api/services/CUserMacro.php:807
 #: include/classes/api/services/CUser.php:424
 #: include/classes/api/services/CUser.php:981
 #: include/classes/api/services/CValueMap.php:240
@@ -12282,7 +12276,7 @@ msgstr "Δεν καθορίστηκε αρχείο δημοσίου κλειδι
 msgid "No recipients for action operation message."
 msgstr "Χωρίς παραλήπτες για μήνυμα εργασίας ενέργειας."
 
-#: include/classes/widgets/CWidgetConfig.php:159 jsLoader.php:306
+#: include/classes/widgets/CWidgetConfig.php:159 jsLoader.php:309
 msgid "No refresh"
 msgstr ""
 
@@ -12449,7 +12443,7 @@ msgstr ""
 msgid "Nov"
 msgstr "Νοε"
 
-#: include/func.inc.php:129 include/func.inc.php:266 jsLoader.php:174
+#: include/func.inc.php:129 include/func.inc.php:266 jsLoader.php:177
 msgid "November"
 msgstr "Νοέμβριος"
 
@@ -12463,10 +12457,10 @@ msgid "Number of enabled items on the host."
 msgstr ""
 
 #: include/blocks.inc.php:628
-msgid "Number of hosts (enabled/disabled/templates)"
-msgstr "Αριθμός ξενιστών (ενεργοί/ανενεργοί/σχεδιότυπα)"
+msgid "Number of hosts (enabled/disabled)"
+msgstr ""
 
-#: include/blocks.inc.php:638
+#: include/blocks.inc.php:641
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Αριθμός συλλεκτών (ενεργοί/ανενεργοί/ανυποστήρικτοι)"
 
@@ -12534,7 +12528,11 @@ msgstr "Αριθμός αλλαγών κατάστασης"
 msgid "Number of steps"
 msgstr "Αριθμός βημάτων"
 
-#: include/blocks.inc.php:649
+#: include/blocks.inc.php:637
+msgid "Number of templates"
+msgstr ""
+
+#: include/blocks.inc.php:652
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Αριθμός εναυσμάτων (ενεργά/ανενεργά) [προβληματικά/ok]"
 
@@ -12550,7 +12548,7 @@ msgstr "Αριθμός ανυποστήρικτων συλλεκτών βάσε�
 msgid "Number of unsupported items on the host."
 msgstr ""
 
-#: include/blocks.inc.php:661
+#: include/blocks.inc.php:664
 msgid "Number of users (online)"
 msgstr "Αριθμός χρηστών (σε σύνδεση)"
 
@@ -12685,13 +12683,13 @@ msgstr "Οκτ"
 msgid "Octal to decimal"
 msgstr ""
 
-#: include/func.inc.php:128 include/func.inc.php:265 jsLoader.php:173
+#: include/func.inc.php:128 include/func.inc.php:265 jsLoader.php:176
 msgid "October"
 msgstr "Οκτώβριος"
 
 #: app/views/administration.proxy.list.php:153
 #: include/views/monitoring.sysmap.constructor.php:52
-#: include/views/monitoring.sysmap.constructor.php:62 jsLoader.php:193
+#: include/views/monitoring.sysmap.constructor.php:62 jsLoader.php:196
 msgid "Off"
 msgstr "Εκτός"
 
@@ -12723,7 +12721,7 @@ msgstr ""
 
 #: app/views/administration.proxy.list.php:152
 #: include/views/monitoring.sysmap.constructor.php:52
-#: include/views/monitoring.sysmap.constructor.php:62 jsLoader.php:192
+#: include/views/monitoring.sysmap.constructor.php:62 jsLoader.php:195
 msgid "On"
 msgstr "Επί"
 
@@ -12798,7 +12796,7 @@ msgstr ""
 msgid "Only administrators can set slide show owner."
 msgstr ""
 
-#: include/blocks.inc.php:639
+#: include/blocks.inc.php:642
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Απαριθμώνται μόνο συλλέκτες εκχωρημένοι σε ενεργούς ξενιστές"
 
@@ -12854,7 +12852,7 @@ msgstr ""
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Εμφανίζεται μόνο το τελευταίο 20%% του δείκτη."
 
-#: include/blocks.inc.php:650
+#: include/blocks.inc.php:653
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Απαριθμώνται μόνο εναύσματα εκχωρημένα σε ενεργούς ξενιστές και εξαρτώμενα απο ενεργούς συλλέκτες"
 
@@ -12867,7 +12865,7 @@ msgstr "Opera"
 msgid "Operating system information. Returns string"
 msgstr ""
 
-#: actionconf.php:307
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%1$s\" already exists."
 msgstr ""
@@ -12876,7 +12874,7 @@ msgstr ""
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Η λειτουργία δεν εκτελείται λόγω μη εξουσιοδοτημένης αίτησης."
 
-#: app/controllers/CControllerPopupOperationCommon.php:143
+#: jsLoader.php:123
 msgid "Operation details"
 msgstr "Λεπτομέρειες λειτουργίας"
 
@@ -12888,12 +12886,11 @@ msgstr "Η λειτουργία δεν έχει ομάδα να λειτουργ
 msgid "Operation has no template to operate."
 msgstr "Η λειτουργία δεν έχει σχεδιότυπο να λειτουργήσει."
 
-#: app/views/popup.operation.common.php:66
-#: app/views/popup.operation.common.php:79
+#: app/partials/popup.operations.php:37
 msgid "Operation type"
 msgstr "Τύπος λειτουργίας"
 
-#: app/views/monitoring.widget.problems.view.php:62 include/blocks.inc.php:763
+#: app/views/monitoring.widget.problems.view.php:62 include/blocks.inc.php:766
 #: include/classes/screens/CScreenProblem.php:919
 #: include/classes/screens/CScreenProblem.php:1168 include/events.inc.php:160
 #: include/views/configuration.trigger.prototype.edit.php:72
@@ -12904,8 +12901,8 @@ msgid "Operational data"
 msgstr ""
 
 #: app/views/popup.lldoverride.php:183
-#: include/views/configuration.action.edit.php:303
-#: include/views/configuration.action.edit.php:473
+#: include/views/configuration.action.edit.php:306
+#: include/views/configuration.action.edit.php:470
 #: include/views/configuration.action.list.php:90
 #: include/views/configuration.correlation.edit.php:155
 #: include/views/configuration.correlation.list.php:66
@@ -12946,9 +12943,9 @@ msgstr "Χειριστής"
 msgid "Options"
 msgstr ""
 
-#: app/views/monitoring.host.view.php:53
+#: app/partials/popup.operations.php:353 app/views/monitoring.host.view.php:53
 #: app/views/monitoring.problem.view.php:241
-#: app/views/popup.lldoverride.php:70 app/views/popup.operation.common.php:721
+#: app/views/popup.lldoverride.php:70
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:81
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:81
 #: include/classes/widgets/forms/CWidgetFormProblems.php:96
@@ -13110,7 +13107,7 @@ msgid "Overrides"
 msgstr ""
 
 #: include/menu.inc.php:42 include/menu.inc.php:63
-#: include/views/inventory.host.view.php:224 overview.php:27
+#: include/views/inventory.host.view.php:225 overview.php:27
 msgid "Overview"
 msgstr "Επισκόπηση"
 
@@ -13414,11 +13411,10 @@ msgid "Passive"
 msgstr "Παθητικός"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:98
+#: app/partials/popup.operations.php:226 app/partials/popup.operations.php:265
 #: app/views/administration.mediatype.edit.php:199
 #: app/views/administration.user.edit.php:112
-#: app/views/administration.user.edit.php:128
-#: app/views/popup.operation.common.php:483
-#: app/views/popup.operation.common.php:506 disc_prototypes.php:228
+#: app/views/administration.user.edit.php:128 disc_prototypes.php:228
 #: host_discovery.php:180 httpconf.php:64
 #: include/classes/setup/CSetupWizard.php:248
 #: include/views/configuration.host.discovery.edit.php:297
@@ -13451,15 +13447,15 @@ msgstr "Συνθηματικό (ξανά)"
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
 
-#: jsLoader.php:127 jsLoader.php:213
+#: jsLoader.php:130 jsLoader.php:216
 msgid "Paste"
 msgstr ""
 
-#: app/views/monitoring.dashboard.view.php:110 jsLoader.php:125
+#: app/views/monitoring.dashboard.view.php:110 jsLoader.php:128
 msgid "Paste widget"
 msgstr ""
 
-#: jsLoader.php:214
+#: jsLoader.php:217
 msgid "Paste without external links"
 msgstr ""
 
@@ -13467,7 +13463,7 @@ msgstr ""
 msgid "Pattern"
 msgstr ""
 
-#: actionconf.php:83 include/views/configuration.action.edit.php:161
+#: actionconf.php:81 include/views/configuration.action.edit.php:161
 msgid "Pause operations for suppressed problems"
 msgstr ""
 
@@ -13581,7 +13577,7 @@ msgstr ""
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr ""
 
-#: jsLoader.php:202
+#: jsLoader.php:205
 msgid "Please select two elements"
 msgstr "Επιλέξτε δύο στοιχεία"
 
@@ -13617,11 +13613,11 @@ msgstr "Συμπληρώνει πεδίο απογραφής ξενιστή"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:120
 #: app/controllers/CControllerPopupItemTestSend.php:160
+#: app/partials/popup.operations.php:282
 #: app/views/administration.authentication.edit.php:96
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
-#: app/views/popup.itemtestedit.view.php:116
-#: app/views/popup.operation.common.php:517
+#: app/views/popup.itemtestedit.view.php:124
 #: include/classes/setup/CSetupWizard.php:332 include/hosts.inc.php:1471
 #: include/views/configuration.host.list.php:140
 #: include/views/inventory.host.view.php:79 setup.php:56
@@ -13665,7 +13661,7 @@ msgstr ""
 msgid "Preprocessing"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:221
+#: app/views/popup.itemtestedit.view.php:229
 #: include/views/configuration.host.discovery.edit.php:765
 #: include/views/configuration.item.edit.php:864
 #: include/views/configuration.item.massupdate.php:248
@@ -13679,7 +13675,7 @@ msgstr ""
 #: app/controllers/CControllerPopupItemTestSend.php:191
 #: app/controllers/CControllerPopupItemTestSend.php:196
 #: app/controllers/CControllerPopupItemTestSend.php:201
-#: app/views/popup.itemtestedit.view.php:168
+#: app/views/popup.itemtestedit.view.php:176
 msgid "Prev. time"
 msgstr ""
 
@@ -13690,23 +13686,23 @@ msgstr ""
 msgid "Preview"
 msgstr "Προεπισκόπηση"
 
-#: include/func.inc.php:2522
+#: include/func.inc.php:2524
 msgid "Previous month"
 msgstr ""
 
-#: jsLoader.php:140
+#: jsLoader.php:143
 msgid "Previous page"
 msgstr ""
 
-#: app/views/popup.itemtestedit.view.php:146
+#: app/views/popup.itemtestedit.view.php:154
 msgid "Previous value"
 msgstr ""
 
-#: include/func.inc.php:2521
+#: include/func.inc.php:2523
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2523
+#: include/func.inc.php:2525
 msgid "Previous year"
 msgstr ""
 
@@ -13756,7 +13752,7 @@ msgstr "Ιδιωτικό πρωτόκολλο"
 msgid "Private"
 msgstr ""
 
-#: app/views/popup.operation.common.php:501
+#: app/partials/popup.operations.php:255
 #: include/views/configuration.host.discovery.edit.php:456
 #: include/views/configuration.item.edit.php:531
 #: include/views/configuration.item.massupdate.php:231
@@ -13774,7 +13770,7 @@ msgstr "Επίπεδο δικαιωμάτων"
 #: app/views/monitoring.problem.view.php:176
 #: app/views/monitoring.widget.problems.view.php:58
 #: app/views/popup.acknowledge.edit.php:33
-#: app/views/popup.mediatype.message.php:46 include/blocks.inc.php:762
+#: app/views/popup.mediatype.message.php:46 include/blocks.inc.php:765
 #: include/classes/helpers/CMediatypeHelper.php:45
 #: include/classes/screens/CScreenProblem.php:894
 #: include/classes/screens/CScreenProblem.php:917
@@ -13822,7 +13818,7 @@ msgstr ""
 msgid "Problem is suppressed"
 msgstr ""
 
-#: jsLoader.php:223
+#: jsLoader.php:226
 msgid "Problem on"
 msgstr "Πρόβλημα σε"
 
@@ -13867,7 +13863,7 @@ msgstr "Πρόβλημα, άν τουλάχιστον ένα θυγατρικό 
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/classes/widgets/views/widget.svggraph.form.view.php:293
 #: include/menu.inc.php:34 include/views/inventory.host.view.php:147
-#: jsLoader.php:297 report2.php:480
+#: jsLoader.php:300 report2.php:480
 msgid "Problems"
 msgstr "Προβλήματα"
 
@@ -13906,8 +13902,7 @@ msgstr ""
 #: app/controllers/CControllerMenuPopup.php:332
 #: app/controllers/CControllerMenuPopup.php:608
 #: app/controllers/CControllerWidgetUrlView.php:56
-#: include/classes/screens/CScreenUrl.php:38
-#: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:427
+#: include/classes/screens/CScreenUrl.php:70 include/events.inc.php:427
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr ""
@@ -13918,11 +13913,11 @@ msgstr ""
 msgid "Proxies"
 msgstr "Διαμεσολαβητές"
 
-#: app/controllers/CControllerAuditLogList.php:207
+#: app/controllers/CControllerAuditLogList.php:209
 #: app/views/administration.proxy.edit.php:87
 #: app/views/administration.proxy.edit.php:122
 #: app/views/popup.condition.common.php:507
-#: app/views/popup.itemtestedit.view.php:100 include/actions.inc.php:63
+#: app/views/popup.itemtestedit.view.php:108 include/actions.inc.php:63
 #: include/views/configuration.discovery.list.php:67
 #: include/views/configuration.host.list.php:148
 #: include/views/configuration.host.list.php:152
@@ -13993,7 +13988,7 @@ msgstr "Διαμεσολαβητής ενημερώθηκε"
 msgid "Public"
 msgstr ""
 
-#: app/views/popup.operation.common.php:484
+#: app/partials/popup.operations.php:227
 #: include/views/configuration.host.discovery.edit.php:434
 #: include/views/configuration.item.edit.php:501
 #: include/views/configuration.item.massupdate.php:211
@@ -14002,7 +13997,7 @@ msgstr ""
 msgid "Public key"
 msgstr "Δημόσιο κλειδί"
 
-#: app/views/popup.operation.common.php:495
+#: app/partials/popup.operations.php:245
 #: include/views/configuration.host.discovery.edit.php:449
 #: include/views/configuration.item.edit.php:524
 #: include/views/configuration.item.massupdate.php:224
@@ -14114,8 +14109,7 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:114
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:37
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:38
-#: include/views/administration.auditacts.list.php:30
-#: include/views/administration.auditacts.list.php:64
+#: include/views/administration.auditacts.list.php:65
 msgid "Recipient"
 msgstr "Παραλήπτης"
 
@@ -14126,6 +14120,10 @@ msgstr "Παραλήπτης (αύξουσα)"
 #: include/views/monitoring.screen.constructor.edit.php:572
 msgid "Recipient (descending)"
 msgstr "Παραλήπτης (φθίνουσα)"
+
+#: include/views/administration.auditacts.list.php:30
+msgid "Recipients"
+msgstr ""
 
 #: app/views/administration.user.edit.php:388
 #: include/classes/screens/CScreenProblem.php:1083
@@ -14149,7 +14147,7 @@ msgstr ""
 msgid "Recovery expression syntax error."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:383
+#: include/views/configuration.action.edit.php:387
 msgid "Recovery operations"
 msgstr ""
 
@@ -14172,11 +14170,11 @@ msgid "Refresh"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetForm.php:53 include/html.inc.php:182
-#: jsLoader.php:298
+#: jsLoader.php:301
 msgid "Refresh interval"
 msgstr ""
 
-#: jsLoader.php:299
+#: jsLoader.php:302
 msgid "Refresh interval multiplier"
 msgstr ""
 
@@ -14193,7 +14191,7 @@ msgstr ""
 msgid "Regular"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:208
+#: app/controllers/CControllerAuditLogList.php:210
 #: app/views/popup.lldoverride.php:93 include/items.inc.php:1720
 #: include/views/configuration.host.discovery.edit.php:591
 msgid "Regular expression"
@@ -14235,7 +14233,7 @@ msgstr "Κανονικές εκφράσεις"
 msgid "Regular items"
 msgstr ""
 
-#: jsLoader.php:138
+#: jsLoader.php:141
 msgid "Release to create a widget."
 msgstr ""
 
@@ -14283,14 +14281,13 @@ msgstr "Απομακρυσμένη εντολή"
 #: app/views/monitoring.problem.view.php:260
 #: app/views/popup.lldoperation.php:146 app/views/popup.lldoverride.php:133
 #: app/views/popup.media.php:45 app/views/popup.media.php:99
-#: app/views/popup.operation.common.php:699
 #: include/classes/widgets/CWidgetHelper.php:471
 #: include/classes/widgets/CWidgetHelper.php:515 include/forms.inc.php:1424
 #: include/forms.inc.php:1932 include/views/configuration.action.edit.php:94
-#: include/views/configuration.action.edit.php:254
-#: include/views/configuration.action.edit.php:280
-#: include/views/configuration.action.edit.php:359
-#: include/views/configuration.action.edit.php:439
+#: include/views/configuration.action.edit.php:265
+#: include/views/configuration.action.edit.php:286
+#: include/views/configuration.action.edit.php:365
+#: include/views/configuration.action.edit.php:438
 #: include/views/configuration.correlation.edit.php:82
 #: include/views/configuration.host.discovery.edit.php:134
 #: include/views/configuration.host.discovery.edit.php:226
@@ -14336,8 +14333,9 @@ msgstr "Απομακρυσμένη εντολή"
 #: include/views/js/common.template.edit.js.php:41
 #: include/views/js/common.template.edit.js.php:91
 #: include/views/js/common.template.edit.js.php:189
-#: include/views/js/configuration.action.edit.js.php:35
-#: include/views/js/configuration.action.edit.js.php:47
+#: include/views/js/configuration.action.edit.js.php:40
+#: include/views/js/configuration.action.edit.js.php:54
+#: include/views/js/configuration.action.edit.js.php:72
 #: include/views/js/configuration.discovery.edit.js.php:36
 #: include/views/js/configuration.graph.edit.js.php:119
 #: include/views/js/configuration.host.discovery.edit.js.php:59
@@ -14380,8 +14378,8 @@ msgstr "Απομακρυσμένη εντολή"
 #: include/views/monitoring.sysmap.constructor.php:41
 #: include/views/monitoring.sysmap.constructor.php:47
 #: include/views/monitoring.sysmap.edit.php:249
-#: include/views/monitoring.sysmap.edit.php:267 jsLoader.php:210
-#: jsLoader.php:326
+#: include/views/monitoring.sysmap.edit.php:267 jsLoader.php:213
+#: jsLoader.php:329
 msgid "Remove"
 msgstr "Αφαίρεση"
 
@@ -14417,7 +14415,7 @@ msgctxt "screen reader"
 msgid "Remove, %1$s"
 msgstr ""
 
-#: jsLoader.php:260
+#: jsLoader.php:263
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -14495,7 +14493,7 @@ msgstr "Απαιτούμενη απόδοση (vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Απαιτούμενη απόδοση εξυπηρετητή Zabbix, αναμένεται σε νέες τιμές ανά δευτερόλεπτο."
 
-#: include/blocks.inc.php:665
+#: include/blocks.inc.php:668
 msgid "Required server performance, new values per second"
 msgstr "Απαιτούμενη απόδοση εξυπηρετητή, νέες τιμές ανά δευτερόλεπτο"
 
@@ -14535,7 +14533,7 @@ msgstr "Επιβεβαίωση επαναφοράς"
 msgid "Reset defaults"
 msgstr "Επαναφορά προκαθορισμένων"
 
-#: jsLoader.php:224
+#: jsLoader.php:227
 msgid "Resolved"
 msgstr "Επιλυμένο"
 
@@ -14571,11 +14569,15 @@ msgstr ""
 msgid "Resolved by user \"%1$s\"."
 msgstr ""
 
-#: app/views/reports.auditlog.list.php:47
-#: app/views/reports.auditlog.list.php:64
+#: app/views/reports.auditlog.list.php:52
+#: app/views/reports.auditlog.list.php:73
 #: include/views/monitoring.screen.constructor.edit.php:100
 msgid "Resource"
 msgstr "Πόρος"
+
+#: app/views/reports.auditlog.list.php:53
+msgid "Resource ID"
+msgstr ""
 
 #: app/views/popup.mediatypetest.edit.php:46
 msgid "Response"
@@ -14599,8 +14601,8 @@ msgstr ""
 
 #: app/views/administration.regex.edit.php:119
 #: app/views/administration.regex.edit.php:124
-#: app/views/popup.itemtestedit.view.php:194
-#: app/views/popup.itemtestedit.view.php:229
+#: app/views/popup.itemtestedit.view.php:202
+#: app/views/popup.itemtestedit.view.php:237
 #: app/views/popup.testtriggerexpr.php:49
 #: app/views/popup.testtriggerexpr.php:102 app/views/popup.triggerexpr.php:168
 #: include/classes/debug/CProfiler.php:183
@@ -14795,12 +14797,12 @@ msgstr ""
 msgid "Russian (ru_RU)"
 msgstr "Ρωσικά (ru_RU)"
 
-#: jsLoader.php:188
+#: jsLoader.php:191
 msgctxt "Saturday short"
 msgid "S"
 msgstr "Σ"
 
-#: jsLoader.php:189
+#: jsLoader.php:192
 msgctxt "Sunday short"
 msgid "S"
 msgstr "Κ"
@@ -14948,7 +14950,7 @@ msgstr "Αποτυχία εκτέλεσης δήλωσης SQL \"%1$s\""
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Αποτυχία εκτέλεσης δήλωσης SQL \"%1$s\"."
 
-#: app/views/popup.operation.common.php:459 include/discovery.inc.php:47
+#: app/partials/popup.operations.php:189 include/discovery.inc.php:47
 msgid "SSH"
 msgstr "SSH"
 
@@ -15017,7 +15019,7 @@ msgstr ""
 msgid "Sat"
 msgstr "Σάβ"
 
-#: include/func.inc.php:143 include/func.inc.php:233 jsLoader.php:181
+#: include/func.inc.php:143 include/func.inc.php:233 jsLoader.php:184
 msgid "Saturday"
 msgstr "Σάββατο"
 
@@ -15064,7 +15066,7 @@ msgctxt "selected problems"
 msgid "Scope"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:203
+#: app/controllers/CControllerAuditLogList.php:205
 #: include/views/monitoring.screen.edit.php:124
 #: include/views/monitoring.slideconf.edit.php:117
 msgid "Screen"
@@ -15144,7 +15146,7 @@ msgstr "Οθόνη ενημερώθηκε"
 #: include/views/configuration.template.edit.php:310
 #: include/views/configuration.template.list.php:153
 #: include/views/configuration.template.list.php:284
-#: include/views/conf.import.php:43 include/views/inventory.host.view.php:159
+#: include/views/conf.import.php:43 include/views/inventory.host.view.php:160
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.constructor.list.php:28
 #: include/views/monitoring.screen.edit.php:28
@@ -15153,12 +15155,12 @@ msgstr "Οθόνη ενημερώθηκε"
 #: include/views/monitoring.screen.php:34
 #: include/views/monitoring.screen.php:38
 #: include/views/monitoring.slideconf.list.php:31
-#: include/views/monitoring.slides.php:36 jsLoader.php:291
+#: include/views/monitoring.slides.php:36 jsLoader.php:294
 #: tests/selenium/modules/module_number_6/Module.php:22
 msgid "Screens"
 msgstr "Οθόνες"
 
-#: app/controllers/CControllerAuditLogList.php:210
+#: app/controllers/CControllerAuditLogList.php:212
 #: app/views/administration.mediatype.edit.php:212
 #: app/views/administration.script.edit.php:50
 #: app/views/administration.script.edit.php:120
@@ -15187,9 +15189,9 @@ msgstr[1] "Δέσμη ενεργειών διεγράφη"
 msgid "Script menu path \"%1$s\" already used in script name \"%2$s\"."
 msgstr "Δέσμη ενεργειών διαδρομής καταλόγου \"%1$s\" σε χρήση στο όνομα δέσμης ενεργειών \"%2$s\"."
 
+#: app/partials/popup.operations.php:199
 #: app/views/administration.mediatype.edit.php:90
 #: app/views/administration.mediatype.list.php:91
-#: app/views/popup.operation.common.php:466
 msgid "Script name"
 msgstr "Όνομα δέσμης ενεργειών"
 
@@ -15219,7 +15221,7 @@ msgstr "Δέσμη ενεργειών ενημερώθηκε"
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:30
 #: app/views/administration.script.list.php:31 include/menu.inc.php:177
-#: jsLoader.php:300
+#: jsLoader.php:303
 msgid "Scripts"
 msgstr "Δέσμες ενεργειών"
 
@@ -15283,16 +15285,15 @@ msgid "Security name"
 msgstr "Όνομα ασφάλειας"
 
 #: app/partials/common.filter.trigger.php:95
+#: app/partials/popup.operations.php:205
 #: app/views/monitoring.latest.view.php:88
 #: app/views/monitoring.problem.view.php:142
 #: app/views/monitoring.widget.navtreeitem.edit.php:48
 #: app/views/popup.condition.common.php:390 app/views/popup.generic.php:638
-#: app/views/popup.operation.common.php:446 app/views/popup.services.php:132
-#: app/views/popup.triggerexpr.php:73 app/views/reports.auditlog.list.php:35
+#: app/views/popup.services.php:132 app/views/popup.triggerexpr.php:73
 #: include/classes/html/CMultiSelect.php:86
 #: include/classes/widgets/CWidgetHelper.php:340
 #: include/classes/widgets/CWidgetHelper.php:554 include/forms.inc.php:244
-#: include/views/administration.auditacts.list.php:35
 #: include/views/configuration.graph.edit.php:192
 #: include/views/configuration.graph.edit.php:274
 #: include/views/configuration.item.edit.php:99
@@ -15306,7 +15307,7 @@ msgstr "Όνομα ασφάλειας"
 #: include/views/monitoring.screen.constructor.edit.php:302
 #: include/views/monitoring.screen.constructor.edit.php:319
 #: include/views/monitoring.screen.constructor.edit.php:377
-#: include/views/monitoring.screen.constructor.edit.php:638 jsLoader.php:258
+#: include/views/monitoring.screen.constructor.edit.php:638 jsLoader.php:261
 msgid "Select"
 msgstr "Επιλέξτε"
 
@@ -15327,7 +15328,7 @@ msgstr ""
 msgid "Selected"
 msgstr "Επιλεγμένο"
 
-#: actionconf.php:424
+#: actionconf.php:400
 msgid "Selected actions deleted"
 msgstr "Επιλεγμένες ενέργειες διεγράφησαν"
 
@@ -15347,19 +15348,19 @@ msgstr "Επιλεγμένα στοιχεία"
 msgid "Selected items only"
 msgstr ""
 
-#: jsLoader.php:263
+#: jsLoader.php:266
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:264
+#: jsLoader.php:267
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:208
+#: jsLoader.php:211
 msgid "Send backward"
 msgstr ""
 
@@ -15375,7 +15376,7 @@ msgstr "Αποστολή μηνύματος σε ομάδες χρηστών"
 msgid "Send message to users"
 msgstr "Αποστολή μηνύματος σε χρήστες"
 
-#: app/views/popup.operation.common.php:252
+#: app/partials/popup.operations.php:123
 msgid "Send only to"
 msgstr "Αποστολή μόνο σε"
 
@@ -15384,20 +15385,20 @@ msgstr "Αποστολή μόνο σε"
 msgid "Send to"
 msgstr "Αποστολή σε"
 
-#: app/views/popup.operation.common.php:173
+#: app/partials/popup.operations.php:75
 msgid "Send to User groups"
 msgstr "Αποστολή σε Ομάδες χρηστών"
 
-#: app/views/popup.operation.common.php:220
+#: app/partials/popup.operations.php:95
 msgid "Send to Users"
 msgstr "Αποστολή σε Χρήστες"
 
-#: jsLoader.php:209
+#: jsLoader.php:212
 msgid "Send to back"
 msgstr ""
 
 #: include/actions.inc.php:2127
-#: include/views/administration.auditacts.list.php:75
+#: include/views/administration.auditacts.list.php:76
 msgid "Sent"
 msgstr "Εστάλη"
 
@@ -15417,7 +15418,7 @@ msgstr "Χωριστό"
 msgid "Separately"
 msgstr ""
 
-#: include/func.inc.php:127 include/func.inc.php:264 jsLoader.php:172
+#: include/func.inc.php:127 include/func.inc.php:264 jsLoader.php:175
 msgid "September"
 msgstr "Σεπτέμβριος"
 
@@ -15449,7 +15450,7 @@ msgstr ""
 msgid "Server time"
 msgstr "Ώρα εξυπηρετητή"
 
-#: app/controllers/CControllerAuditLogList.php:201
+#: app/controllers/CControllerAuditLogList.php:203
 #: app/views/popup.services.php:46 include/actions.inc.php:76
 #: include/views/configuration.services.edit.php:344 services.php:352
 #: srv_status.php:144
@@ -15558,7 +15559,7 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr ""
 
-#: include/classes/html/CInputSecret.php:81 jsLoader.php:346
+#: include/classes/html/CInputSecret.php:81 jsLoader.php:349
 msgid "Set new value"
 msgstr ""
 
@@ -15647,7 +15648,7 @@ msgstr ""
 
 #: include/views/monitoring.screen.edit.php:219
 #: include/views/monitoring.slideconf.edit.php:272
-#: include/views/monitoring.sysmap.edit.php:389 jsLoader.php:283
+#: include/views/monitoring.sysmap.edit.php:389 jsLoader.php:286
 msgid "Sharing"
 msgstr ""
 
@@ -15798,7 +15799,7 @@ msgstr "Εμφάνιση προειδοποίησης εάν εξυπηρετη�
 msgid "Show working time"
 msgstr "Εμφάνιση χρόνου εργασίας"
 
-#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:195
+#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:198
 msgid "Shown"
 msgstr "Ορατό"
 
@@ -15893,7 +15894,7 @@ msgstr "Κράτος / Επαρχία"
 msgid "Size"
 msgstr ""
 
-#: include/classes/server/CZabbixServer.php:466
+#: include/classes/server/CZabbixServer.php:467
 #, c-format
 msgid "Size of the response received from Zabbix server \"%1$s\" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php."
 msgstr "Μέγεθος ληφθείσης απόκρισης από εξυπηρετητή Zabbix \"%1$s\" υπερβαίνει το επιτρεπόμενο μέγεθος %2$s bytes. Η τιμή μπορεί να αυξηθεί στη σταθερά ZBX_SOCKET_BYTES_LIMIT στο include/defines.inc.php."
@@ -15907,7 +15908,7 @@ msgstr "Παράλειψη αντιγραφής γραφήματος \"%1$s\" σ
 msgid "Slide"
 msgstr "Διαφάνεια"
 
-#: app/controllers/CControllerAuditLogList.php:206
+#: app/controllers/CControllerAuditLogList.php:208
 msgid "Slide show"
 msgstr "Προβολή διαφάνειας"
 
@@ -15960,7 +15961,7 @@ msgstr "Διαφάνειες"
 msgid "Slovak (sk_SK)"
 msgstr "Σλοβακικά (sk_SK)"
 
-#: jsLoader.php:229
+#: jsLoader.php:232
 msgid "Snooze"
 msgstr "Αναβολή"
 
@@ -16001,7 +16002,7 @@ msgstr "Λογισμική εφαρμογή Ε"
 msgid "Software architecture information. Returns string"
 msgstr ""
 
-#: include/classes/api/managers/CHistoryManager.php:1065
+#: include/classes/api/managers/CHistoryManager.php:1125
 msgid "Some of the history for this item may be compressed, deletion is not available."
 msgstr ""
 
@@ -16120,7 +16121,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:247 include/events.inc.php:456
 #: include/forms.inc.php:231 include/forms.inc.php:664
-#: include/views/administration.auditacts.list.php:66
+#: include/views/administration.auditacts.list.php:67
 #: include/views/configuration.action.list.php:68
 #: include/views/configuration.action.list.php:91
 #: include/views/configuration.correlation.list.php:46
@@ -16197,7 +16198,7 @@ msgstr "Βήμα"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Βήμα \"%1$s\" [%2$s of %3$s] απέτυχε: %4$s"
 
-#: app/views/popup.operation.common.php:99
+#: app/partials/popup.operations.php:57
 msgid "Step duration"
 msgstr "Διάρκεια βήματος"
 
@@ -16210,7 +16211,7 @@ msgstr ""
 msgid "Step with name \"%1$s\" already exists."
 msgstr "Βήμα ονόματος \"%1$s\" υπάρχει ήδη."
 
-#: app/views/popup.operation.common.php:92 httpconf.php:52
+#: app/partials/popup.operations.php:44 httpconf.php:52
 #: include/views/configuration.action.edit.php:170
 #: include/views/configuration.httpconf.edit.php:224
 #: include/views/configuration.httpconf.edit.php:233
@@ -16264,10 +16265,10 @@ msgstr "Τρόπος"
 msgid "Subfilter"
 msgstr ""
 
+#: app/partials/popup.operations.php:138
 #: app/views/popup.mediatype.message.php:70
 #: app/views/popup.mediatypetest.edit.php:69
-#: app/views/popup.operation.common.php:263
-#: include/views/administration.auditacts.list.php:91
+#: include/views/administration.auditacts.list.php:92
 msgid "Subject"
 msgstr "Θέμα"
 
@@ -16279,7 +16280,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr ""
 
-#: jsLoader.php:301
+#: jsLoader.php:304
 msgid "Submap"
 msgstr "Υποχάρτης"
 
@@ -16287,7 +16288,7 @@ msgstr "Υποχάρτης"
 msgid "Success Audit"
 msgstr "Επιτυχής επιθεώρηση"
 
-#: include/func.inc.php:1642 jsLoader.php:158
+#: include/func.inc.php:1645 jsLoader.php:161
 msgid "Success message"
 msgstr ""
 
@@ -16300,7 +16301,7 @@ msgstr ""
 msgid "Sun"
 msgstr "Κυρ"
 
-#: include/func.inc.php:145 include/func.inc.php:227 jsLoader.php:182
+#: include/func.inc.php:145 include/func.inc.php:227 jsLoader.php:185
 msgid "Sunday"
 msgstr "Κυριακή"
 
@@ -16352,7 +16353,7 @@ msgstr ""
 msgid "System default"
 msgstr "Προκαθορισμένο σύστημα"
 
-#: include/func.inc.php:1669
+#: include/func.inc.php:1672
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr ""
 
@@ -16388,12 +16389,12 @@ msgstr ""
 msgid "System uptime in seconds. Returns integer"
 msgstr ""
 
-#: jsLoader.php:186
+#: jsLoader.php:189
 msgctxt "Thursday short"
 msgid "T"
 msgstr "Π"
 
-#: jsLoader.php:184
+#: jsLoader.php:187
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "Τ"
@@ -16499,7 +16500,7 @@ msgstr ""
 #: app/views/monitoring.host.view.php:149
 #: app/views/monitoring.problem.view.php:296
 #: app/views/monitoring.widget.problems.view.php:66
-#: app/views/popup.lldoperation.php:234 include/blocks.inc.php:767
+#: app/views/popup.lldoperation.php:234 include/blocks.inc.php:770
 #: include/classes/screens/CScreenProblem.php:868
 #: include/classes/screens/CScreenProblem.php:924
 #: include/classes/screens/CScreenProblem.php:1172
@@ -16540,7 +16541,7 @@ msgstr ""
 msgid "Target"
 msgstr "Στόχος"
 
-#: app/views/popup.operation.common.php:387
+#: app/partials/popup.operations.php:154
 msgid "Target list"
 msgstr "Κατάλογος στόχων"
 
@@ -16548,11 +16549,11 @@ msgstr "Κατάλογος στόχων"
 msgid "Target type"
 msgstr "Τύπος στόχου"
 
-#: app/views/popup.operation.common.php:460 include/discovery.inc.php:61
+#: app/partials/popup.operations.php:190 include/discovery.inc.php:61
 msgid "Telnet"
 msgstr "Telnet"
 
-#: app/controllers/CControllerAuditLogList.php:212
+#: app/controllers/CControllerAuditLogList.php:214
 #: app/views/administration.mediatype.edit.php:275 app/views/search.php:228
 #: include/actions.inc.php:49 include/forms.inc.php:281
 #: include/forms.inc.php:674 include/views/configuration.template.edit.php:46
@@ -16650,8 +16651,8 @@ msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Σχεδιότυπο με ίδιο ορατό όνομα \"%1$s\" υπάρχει ήδη."
 
 #: app/controllers/CControllerPopupGeneric.php:128
-#: app/views/popup.condition.common.php:344
-#: app/views/popup.operation.common.php:638 app/views/search.php:164
+#: app/partials/popup.operations.php:325
+#: app/views/popup.condition.common.php:344 app/views/search.php:164
 #: app/views/search.php:185 app/views/search.php:189 app/views/search.php:190
 #: app/views/search.php:306 include/menu.inc.php:103
 #: include/views/configuration.copy.elements.php:63
@@ -16684,7 +16685,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:135
 #: app/views/administration.regex.edit.php:136
 #: app/views/js/popup.itemtestedit.view.js.php:506
-#: app/views/popup.itemtestedit.view.php:296
+#: app/views/popup.itemtestedit.view.php:304
 #: app/views/popup.mediatypetest.edit.php:99
 #: app/views/popup.testtriggerexpr.php:124 include/forms.inc.php:1420
 #: include/views/configuration.host.discovery.edit.php:789
@@ -16721,7 +16722,7 @@ msgstr "Δοκιμή δεδομένων"
 msgid "Test expressions"
 msgstr "Δοκιμή εκφράσεων"
 
-#: app/controllers/CControllerPopupItemTestEdit.php:249
+#: app/controllers/CControllerPopupItemTestEdit.php:274
 msgid "Test item"
 msgstr ""
 
@@ -16854,7 +16855,7 @@ msgstr ""
 msgid "The number of processes. Returns integer"
 msgstr ""
 
-#: index_sso.php:161
+#: index_sso.php:182
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
@@ -16884,7 +16885,7 @@ msgstr "Η κατηγορία σενάριο ιστού ανήκει σε δια
 msgid "Theme"
 msgstr "Θέμα"
 
-#: include/func.inc.php:2520
+#: include/func.inc.php:2522
 msgid "This day last week"
 msgstr ""
 
@@ -16897,11 +16898,11 @@ msgstr ""
 msgid "This is the test message from Zabbix"
 msgstr ""
 
-#: include/func.inc.php:2528 srv_status.php:40
+#: include/func.inc.php:2530 srv_status.php:40
 msgid "This month"
 msgstr "Αυτό το μήνα"
 
-#: include/func.inc.php:2529
+#: include/func.inc.php:2531
 msgid "This month so far"
 msgstr ""
 
@@ -16913,19 +16914,19 @@ msgstr "Αυτή η στήλη οθόνης δεν είναι κενή. Να δ�
 msgid "This screen row is not empty. Delete it?"
 msgstr "Αυτή η γραμμή οθόνης δεν είναι κενή. Να διαγραφεί;"
 
-#: include/func.inc.php:2526 srv_status.php:39
+#: include/func.inc.php:2528 srv_status.php:39
 msgid "This week"
 msgstr "Αυτή την εβδομάδα"
 
-#: include/func.inc.php:2527
+#: include/func.inc.php:2529
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2530 srv_status.php:41
+#: include/func.inc.php:2532 srv_status.php:41
 msgid "This year"
 msgstr "Αυτό το έτος"
 
-#: include/func.inc.php:2531
+#: include/func.inc.php:2533
 msgid "This year so far"
 msgstr ""
 
@@ -16941,7 +16942,7 @@ msgstr ""
 msgid "Thu"
 msgstr "Πέμ"
 
-#: include/func.inc.php:141 include/func.inc.php:231 jsLoader.php:179
+#: include/func.inc.php:141 include/func.inc.php:231 jsLoader.php:182
 msgid "Thursday"
 msgstr "Πέμπτη"
 
@@ -16956,12 +16957,12 @@ msgstr "Έως"
 #: app/controllers/CControllerPopupTriggerExpr.php:188
 #: app/views/monitoring.widget.actionlog.view.php:33
 #: app/views/monitoring.widget.problems.view.php:36
-#: app/views/popup.itemtestedit.view.php:162
+#: app/views/popup.itemtestedit.view.php:170
 #: app/views/popup.triggerexpr.php:136 app/views/popup.triggerexpr.php:140
-#: app/views/reports.auditlog.list.php:61 include/actions.inc.php:1703
+#: app/views/reports.auditlog.list.php:70 include/actions.inc.php:1703
 #: include/actions.inc.php:1757 include/actions.inc.php:1838
 #: include/actions.inc.php:1922 include/actions.inc.php:1974
-#: include/blocks.inc.php:742 include/classes/screens/CScreenActions.php:111
+#: include/blocks.inc.php:745 include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenProblem.php:845
 #: include/classes/screens/CScreenProblem.php:1163
@@ -16971,7 +16972,7 @@ msgstr "Έως"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/events.inc.php:168 include/events.inc.php:245
 #: include/events.inc.php:443 include/events.inc.php:449
-#: include/views/administration.auditacts.list.php:61
+#: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.services.edit.php:299
 #: include/views/configuration.services.edit.php:313
 #: include/views/configuration.services.edit.php:346
@@ -17049,16 +17050,16 @@ msgstr "Σήμανση χρόνου"
 msgid "To"
 msgstr "Σε"
 
-#: jsLoader.php:321
+#: jsLoader.php:324
 msgid "To set a host interface select a single item type for all items"
 msgstr "Για να ορίσετε διεπαφή ξενιστή επιλέξτε απλό τύπο στοιχείου για όλα τα στοιχεία"
 
-#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2524
+#: include/classes/screens/CScreenProblem.php:745 include/func.inc.php:2526
 #: srv_status.php:38
 msgid "Today"
 msgstr "Σήμερα"
 
-#: include/func.inc.php:2525
+#: include/func.inc.php:2527
 msgid "Today so far"
 msgstr ""
 
@@ -17160,7 +17161,7 @@ msgstr ""
 msgid "Trend storage period"
 msgstr "Περίοδος αποθήκευσης τάσεων"
 
-#: app/partials/monitoring.latest.view.html.php:56
+#: app/partials/monitoring.latest.view.html.php:51
 #: app/views/administration.housekeeping.edit.php:139
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:278 include/forms.inc.php:694
@@ -17169,7 +17170,7 @@ msgstr "Περίοδος αποθήκευσης τάσεων"
 msgid "Trends"
 msgstr "Τάσεις"
 
-#: app/controllers/CControllerAuditLogList.php:194
+#: app/controllers/CControllerAuditLogList.php:196
 #: app/controllers/CControllerPopupTriggerWizard.php:221
 #: app/controllers/CControllerPopupTriggerWizard.php:293
 #: app/views/popup.services.php:48 include/actions.inc.php:46
@@ -17181,7 +17182,7 @@ msgstr "Τάσεις"
 #: include/views/configuration.triggers.massupdate.php:163
 #: include/views/js/monitoring.sysmaps.js.php:94
 #: include/views/js/monitoring.sysmaps.js.php:734
-#: include/views/reports.toptriggers.php:83 jsLoader.php:198 jsLoader.php:302
+#: include/views/reports.toptriggers.php:83 jsLoader.php:201 jsLoader.php:305
 #: services.php:355
 msgid "Trigger"
 msgstr "Έναυσμα"
@@ -17295,7 +17296,7 @@ msgstr "Όνομα εναύσματος"
 msgid "Trigger overview"
 msgstr "Επισκόπηση εναυσμάτων"
 
-#: app/controllers/CControllerAuditLogList.php:195
+#: app/controllers/CControllerAuditLogList.php:197
 #: app/views/popup.lldoperation.php:49
 #: include/views/configuration.trigger.prototype.edit.php:536
 #: include/views/configuration.trigger.prototype.massupdate.php:183
@@ -17378,11 +17379,11 @@ msgstr "Βαρύτητες εναυσμάτων"
 msgid "Trigger severity"
 msgstr "Σοβαρότητα εναύσματος"
 
-#: jsLoader.php:284
+#: jsLoader.php:287
 msgid "Trigger status \"OK\""
 msgstr "Κατάσταση εναύσματος \"OK\""
 
-#: jsLoader.php:285
+#: jsLoader.php:288
 msgid "Trigger status \"Problem\""
 msgstr "Κατάσταση εναύσματος \"Problem\""
 
@@ -17413,8 +17414,8 @@ msgstr "Έναυσμα ενημερώθηκε"
 #: include/views/configuration.triggers.edit.php:28
 #: include/views/configuration.triggers.list.php:165
 #: include/views/configuration.triggers.massupdate.php:28
-#: include/views/conf.import.php:40 include/views/inventory.host.view.php:180
-#: include/views/inventory.host.view.php:204
+#: include/views/conf.import.php:40 include/views/inventory.host.view.php:181
+#: include/views/inventory.host.view.php:205
 #: include/views/js/monitoring.sysmaps.js.php:167 triggers.php:670
 msgid "Triggers"
 msgstr "Εναύσματα"
@@ -17435,7 +17436,7 @@ msgstr ""
 msgid "Tue"
 msgstr "Τρι"
 
-#: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:177
+#: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:180
 msgid "Tuesday"
 msgstr "Τρίτη"
 
@@ -17448,13 +17449,14 @@ msgstr "Τουρκικά (tr_TR)"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Δύο συλλέκτες (\"%1$s\" και \"%2$s\") δεν μπορούν να συμπληρώσουν ίδιο πεδίο απογραφής ξενιστή \"%3$s\", αυτό θα οδηγούσε σε σύγκρουση."
 
-#: jsLoader.php:203
+#: jsLoader.php:206
 msgid "Two map elements should be selected"
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:264
 #: app/controllers/CControllerPopupGeneric.php:327
-#: app/partials/monitoring.latest.view.html.php:57
+#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/popup.operations.php:185
 #: app/views/administration.image.list.php:36
 #: app/views/administration.mediatype.edit.php:55
 #: app/views/administration.mediatype.list.php:74
@@ -17467,7 +17469,6 @@ msgstr ""
 #: app/views/popup.condition.common.php:161
 #: app/views/popup.condition.common.php:633 app/views/popup.generic.php:126
 #: app/views/popup.lldoperation.php:108 app/views/popup.media.php:59
-#: app/views/popup.operation.common.php:452
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:116
 #: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:50
@@ -17475,7 +17476,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
 #: include/forms.inc.php:178 include/hosts.inc.php:99
 #: include/hosts.inc.php:1451
-#: include/views/administration.auditacts.list.php:63
+#: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/configuration.graph.edit.php:341
 #: include/views/configuration.host.discovery.edit.php:58
@@ -17524,7 +17525,7 @@ msgstr "Τύπος (αύξουσα)"
 msgid "Type (descending)"
 msgstr "Τύπος (φθίνουσα)"
 
-#: app/views/popup.lldoverride.php:65 app/views/popup.operation.common.php:725
+#: app/partials/popup.operations.php:349 app/views/popup.lldoverride.php:65
 #: include/views/configuration.action.edit.php:123
 #: include/views/configuration.correlation.edit.php:105
 #: include/views/configuration.host.discovery.edit.php:568
@@ -17570,7 +17571,7 @@ msgstr "ΑΓΝΩΣΤΟ"
 #: include/views/configuration.triggers.edit.php:544
 #: include/views/js/monitoring.sysmaps.js.php:277
 #: include/views/monitoring.screen.constructor.edit.php:781
-#: include/views/monitoring.sysmap.edit.php:237 items.php:159 jsLoader.php:303
+#: include/views/monitoring.sysmap.edit.php:237 items.php:159 jsLoader.php:306
 msgid "URL"
 msgstr "URL"
 
@@ -17616,7 +17617,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:274
-#: include/views/monitoring.sysmap.edit.php:288 jsLoader.php:304
+#: include/views/monitoring.sysmap.edit.php:288 jsLoader.php:307
 msgid "URLs"
 msgstr "URLs"
 
@@ -17677,7 +17678,7 @@ msgstr ""
 msgid "Unblock selected users?"
 msgstr "Απεμπλοκή επιλεγμένων χρηστών;"
 
-#: include/classes/core/ZBase.php:551
+#: include/classes/core/ZBase.php:548
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr ""
@@ -17711,12 +17712,12 @@ msgstr "Μονάδες"
 #: include/screens.inc.php:56 include/triggers.inc.php:120
 #: include/triggers.inc.php:267 include/triggers.inc.php:2057
 #: include/users.inc.php:66 include/users.inc.php:89
-#: include/views/configuration.action.edit.php:230
+#: include/views/configuration.action.edit.php:246
 #: include/views/configuration.triggers.list.php:72
 msgid "Unknown"
 msgstr "Άγνωστο"
 
-#: app/views/reports.auditlog.list.php:89
+#: app/views/reports.auditlog.list.php:98
 msgid "Unknown action"
 msgstr "Άγνωστη ενέργεια"
 
@@ -17747,7 +17748,7 @@ msgstr "Άγνωστος ξενιστής, δεν υπάρχει τέτοιος 
 msgid "Unknown interface type."
 msgstr "Άγνωστος τύπος διεπαφής."
 
-#: app/views/reports.auditlog.list.php:86
+#: app/views/reports.auditlog.list.php:95
 msgid "Unknown resource"
 msgstr "Άγνωστος πόρος"
 
@@ -17786,37 +17787,37 @@ msgstr "Αποσύνδεση από σχεδιότυπο"
 msgid "Unlink from templates"
 msgstr "Αποσύνδεση από σχεδιότυπα"
 
-#: include/classes/api/services/CHostGeneral.php:623
+#: include/classes/api/services/CHostGeneral.php:622
 #, c-format
 msgid "Unlinked: Application \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Κατηγορία \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:437
+#: include/classes/api/services/CHostGeneral.php:436
 #, c-format
 msgid "Unlinked: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Κανόνας εντοπισμού \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:527
+#: include/classes/api/services/CHostGeneral.php:526
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Πρωτότυπος ξενιστής \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:453
+#: include/classes/api/services/CHostGeneral.php:452
 #, c-format
 msgid "Unlinked: Item \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:472
+#: include/classes/api/services/CHostGeneral.php:471
 #, c-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Πρωτότυπος συλλέκτης \"%1$s\" σε \"%2$s\"."
 
-#: include/classes/api/services/CHostGeneral.php:565
+#: include/classes/api/services/CHostGeneral.php:564
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Ασύνδετο: Σενάριο ιστού \"%1$s\" σε \"%2$s\"."
 
-#: jsLoader.php:227
+#: jsLoader.php:230
 msgid "Unmute"
 msgstr "Αναίρεση σίγασης"
 
@@ -17838,12 +17839,16 @@ msgstr "Ανυποστήρικτη εισαγωγή επέκτασης αρχε�
 msgid "Unsupported import format \"%1$s\"."
 msgstr "Ανυποστήρικτη εισαγωγή μορφότυπου \"%1$s\"."
 
+#: app/controllers/CControllerActionOperationGet.php:53
+msgid "Unsupported operation."
+msgstr ""
+
 #: include/classes/api/services/CAction.php:2770
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr "Ανυποστήρικτη παράμετρος \"%2$s\" γιά φίλτρο συνθήκης ενέργειας \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1836
+#: include/classes/api/services/CDiscoveryRule.php:1790
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr "Ανυποστήρικτη παράμετρος \"%2$s\" γιά φίλτρο συνθήκης κανόνα εντοπισμού \"%1$s\"."
@@ -17853,7 +17858,7 @@ msgstr "Ανυποστήρικτη παράμετρος \"%2$s\" γιά φίλτ
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr "Ανυποστήρικτη παράμετρος \"%2$s\" γιά φίλτρο ενέργειας \"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:1804
+#: include/classes/api/services/CDiscoveryRule.php:1758
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "Ανυποστήρικτη παράμετρος \"%2$s\" γιά φίλτρο κανόνα εντοπισμού \"%1$s\"."
@@ -17868,7 +17873,7 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Ανοικτά"
 
-#: app/controllers/CControllerAuditLogList.php:169
+#: app/controllers/CControllerAuditLogList.php:170
 #: app/partials/massupdate.macros.tab.php:123
 #: app/views/administration.authentication.edit.php:264
 #: app/views/administration.autoreg.edit.php:90
@@ -17895,9 +17900,8 @@ msgstr "Ανοικτά"
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
 #: app/views/popup.media.php:116 app/views/popup.mediatype.message.php:92
-#: app/views/popup.operation.common.php:759
 #: app/views/popup.triggerwizard.php:142
-#: include/views/configuration.action.edit.php:483
+#: include/views/configuration.action.edit.php:480
 #: include/views/configuration.application.edit.php:54
 #: include/views/configuration.correlation.edit.php:164
 #: include/views/configuration.discovery.edit.php:139
@@ -17948,7 +17952,7 @@ msgstr "Ενημέρωση υφιστάμενων"
 msgid "Update interval"
 msgstr "Διάστημα ενημέρωσης"
 
-#: include/views/configuration.action.edit.php:463
+#: include/views/configuration.action.edit.php:460
 msgid "Update operations"
 msgstr ""
 
@@ -18019,11 +18023,10 @@ msgstr "Χρησιμοποιείται σε ενέργειες"
 msgid "Used in items"
 msgstr ""
 
-#: app/controllers/CControllerAuditLogList.php:183
+#: app/controllers/CControllerAuditLogList.php:185
+#: app/partials/popup.operations.php:98
 #: app/views/administration.user.edit.php:217
-#: app/views/popup.operation.common.php:182
-#: app/views/reports.auditlog.list.php:30
-#: app/views/reports.auditlog.list.php:62 httpconf.php:58
+#: app/views/reports.auditlog.list.php:71 httpconf.php:58
 #: include/actions.inc.php:1703 include/actions.inc.php:1757
 #: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:245
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:167
@@ -18091,12 +18094,12 @@ msgid_plural "Users deleted"
 msgstr[0] "Χρήστης διεγράφη"
 msgstr[1] ""
 
-#: app/controllers/CControllerAuditLogList.php:192
+#: app/controllers/CControllerAuditLogList.php:194
+#: app/partials/popup.operations.php:78
 #: app/views/administration.script.edit.php:82
 #: app/views/administration.script.list.php:69
 #: app/views/administration.usergroup.edit.php:203
 #: app/views/administration.user.list.php:39
-#: app/views/popup.operation.common.php:139
 msgid "User group"
 msgstr "Ομάδα χρήστη"
 
@@ -18179,8 +18182,8 @@ msgstr "Ομάδες χρηστών"
 msgid "User is not allowed to delete himself."
 msgstr "Ο χρήστης δεν επιτρέπεται να διαγράψει τον εαυτό του."
 
-#: include/classes/api/services/CUserMacro.php:519
-#: include/classes/api/services/CUserMacro.php:716
+#: include/classes/api/services/CUserMacro.php:523
+#: include/classes/api/services/CUserMacro.php:720
 #, c-format
 msgid "User macro missing parameters: %1$s"
 msgstr ""
@@ -18189,7 +18192,7 @@ msgstr ""
 msgid "User menu"
 msgstr ""
 
-#: app/views/popup.operation.common.php:489 disc_prototypes.php:85
+#: app/partials/popup.operations.php:235 disc_prototypes.php:85
 #: host_discovery.php:77
 #: include/views/configuration.host.discovery.edit.php:289
 #: include/views/configuration.host.discovery.edit.php:444
@@ -18291,7 +18294,8 @@ msgstr ""
 #: app/views/administration.usergroup.edit.php:48
 #: app/views/administration.usergroup.list.php:188
 #: app/views/administration.user.list.php:31
-#: app/views/dashboard.sharing.edit.php:50 include/menu.inc.php:171
+#: app/views/dashboard.sharing.edit.php:50
+#: app/views/reports.auditlog.list.php:35 include/menu.inc.php:171
 #: include/views/monitoring.screen.edit.php:164
 #: include/views/monitoring.slideconf.edit.php:215
 #: include/views/monitoring.sysmap.edit.php:334
@@ -18530,7 +18534,7 @@ msgstr ""
 #: app/views/popup.condition.common.php:581
 #: app/views/popup.condition.common.php:600 app/views/popup.httpstep.php:70
 #: app/views/popup.httpstep.php:96 app/views/popup.httpstep.php:120
-#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:138
+#: app/views/popup.httpstep.php:139 app/views/popup.itemtestedit.view.php:146
 #: app/views/popup.lldoperation.php:240 app/views/popup.testtriggerexpr.php:31
 #: include/blocks.inc.php:617 include/classes/graphdraw/CPieGraphDraw.php:310
 #: include/classes/screens/CScreenEvents.php:32
@@ -18590,7 +18594,7 @@ msgstr "Αποτελεσματικότητα τιμής cache. Έγκυρες π
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Στατιστικά τιμής cache. Έγκυρες τρόποι: total, free, pfree, used and pused."
 
-#: app/controllers/CControllerAuditLogList.php:200
+#: app/controllers/CControllerAuditLogList.php:202
 #: app/views/administration.valuemap.list.php:62
 msgid "Value map"
 msgstr "Αντιστοιχία τιμής"
@@ -18733,7 +18737,7 @@ msgstr "Ορατό όνομα"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Το ορατό όνομα δεν μπορεί να είναι κενό αν το όνομα ξενιστή απουσιάζει."
 
-#: jsLoader.php:185
+#: jsLoader.php:188
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "Τ"
@@ -18750,11 +18754,11 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Προσοχή"
 
-#: jsLoader.php:160
+#: jsLoader.php:163
 msgid "Warning message"
 msgstr ""
 
-#: jsLoader.php:232
+#: jsLoader.php:235
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Λυπούμαστε, ο μέγιστος πιθανόν αριθμός στοιχείων για υπενθύμιση έχει καλυφθεί."
 
@@ -18769,8 +18773,8 @@ msgstr "Λυπούμαστε, ο μέγιστος πιθανόν αριθμός 
 #: include/views/configuration.template.list.php:155
 #: include/views/configuration.template.list.php:296
 #: include/views/inventory.host.view.php:135
-#: include/views/inventory.host.view.php:195
-#: include/views/inventory.host.view.php:207 jsLoader.php:305
+#: include/views/inventory.host.view.php:196
+#: include/views/inventory.host.view.php:208 jsLoader.php:308
 msgid "Web"
 msgstr "Ιστός"
 
@@ -18782,7 +18786,7 @@ msgstr "Ιστός"
 msgid "Web monitoring"
 msgstr "Εποπτεία Ιστού"
 
-#: app/controllers/CControllerAuditLogList.php:204 httpconf.php:182
+#: app/controllers/CControllerAuditLogList.php:206 httpconf.php:182
 #: httpconf.php:490
 msgid "Web scenario"
 msgstr ""
@@ -18845,7 +18849,7 @@ msgstr ""
 msgid "Wed"
 msgstr "Τετ"
 
-#: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:178
+#: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:181
 msgid "Wednesday"
 msgstr "Τετάρτη"
 
@@ -18866,7 +18870,7 @@ msgstr ""
 msgid "When active"
 msgstr "Όταν είναι ενεργά"
 
-#: jsLoader.php:143
+#: jsLoader.php:146
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr ""
 
@@ -18973,8 +18977,8 @@ msgstr "Λάθος πεδία για εξάρτηση υπηρεσίας \"%1$s\
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Λάθος πεδία για ξενιστή \"%1$s\"."
 
-#: include/classes/api/services/CUserMacro.php:479
-#: include/classes/api/services/CUserMacro.php:550
+#: include/classes/api/services/CUserMacro.php:483
+#: include/classes/api/services/CUserMacro.php:554
 #, c-format
 msgid "Wrong fields for macro \"%1$s\"."
 msgstr "Λάθος πεδία για μακροεντολή \"%1$s\"."
@@ -19143,7 +19147,7 @@ msgstr "Ετησίως"
 #: app/views/popup.condition.common.php:648
 #: app/views/popup.lldoperation.php:78 app/views/popup.lldoperation.php:90
 #: include/actions.inc.php:32 include/blocks.inc.php:624
-#: include/blocks.inc.php:866
+#: include/blocks.inc.php:869
 #: include/classes/screens/CScreenHostTriggers.php:261
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/screens/CScreenProblem.php:1253 include/events.inc.php:173
@@ -19167,11 +19171,11 @@ msgstr "Ετησίως"
 msgid "Yes"
 msgstr "Ναί"
 
-#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2518
+#: include/classes/screens/CScreenProblem.php:753 include/func.inc.php:2520
 msgid "Yesterday"
 msgstr ""
 
-#: include/func.inc.php:1531
+#: include/func.inc.php:1534
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr ""
@@ -19180,7 +19184,7 @@ msgstr ""
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Δεν μπορείται να επιλέξετε κάποια από τις γλώσσες, επειδή οι τοπικές ρυθμίσεις για αυτές δεν είναι εγκατεστημένες στον εξυπηρετητή ιστού."
 
-#: include/func.inc.php:1548 index_http.php:90 index_sso.php:226
+#: include/func.inc.php:1551 index_http.php:90 index_sso.php:247
 msgid "You are not logged in"
 msgstr ""
 
@@ -19221,8 +19225,8 @@ msgstr ""
 #: include/classes/api/services/CTemplate.php:1076
 #: include/classes/api/services/CTemplate.php:1182
 #: include/classes/api/services/CUserMacro.php:252
-#: include/classes/api/services/CUserMacro.php:343
-#: include/classes/api/services/CUserMacro.php:438
+#: include/classes/api/services/CUserMacro.php:347
+#: include/classes/api/services/CUserMacro.php:442
 msgid "You do not have permission to perform this operation."
 msgstr "Δεν έχετε άδεια για να εκτελέσετε αυτή τη λειτουργία."
 
@@ -19230,19 +19234,19 @@ msgstr "Δεν έχετε άδεια για να εκτελέσετε αυτή �
 msgid "You do not have permissions to create users."
 msgstr "Δεν έχετε δικαιώματα για δημιουργία χρηστών."
 
-#: jsLoader.php:136
+#: jsLoader.php:139
 msgid "You do not have permissions to edit dashboard"
 msgstr ""
 
-#: include/func.inc.php:1531
+#: include/func.inc.php:1534
 msgid "You have no permissions to access this page."
 msgstr "Χωρίς δικαίωμα πρόσβασης σε αυτή τη σελίδα."
 
-#: jsLoader.php:133
+#: jsLoader.php:136
 msgid "You have unsaved changes."
 msgstr ""
 
-#: include/func.inc.php:1550
+#: include/func.inc.php:1553
 msgid "You must login to view this page."
 msgstr "Πρέπει να συνδεθείτε για να δείτε αυτή τη σελίδα."
 
@@ -19278,9 +19282,10 @@ msgstr ""
 msgid "Zabbix User"
 msgstr "Zabbix Χρήστης"
 
+#: app/partials/popup.operations.php:215
 #: app/views/administration.script.edit.php:55
 #: app/views/monitoring.widget.hostavail.view.php:27
-#: app/views/popup.operation.common.php:473 include/actions.inc.php:870
+#: include/actions.inc.php:870
 #: include/classes/widgets/views/widget.hostavail.form.view.php:44
 #: include/discovery.inc.php:56 include/items.inc.php:86
 msgid "Zabbix agent"
@@ -19310,13 +19315,13 @@ msgstr "Zabbix εσωτερική ταυτοποίηση"
 msgid "Zabbix login form"
 msgstr ""
 
-#: app/views/administration.script.edit.php:57
-#: app/views/popup.operation.common.php:475 include/actions.inc.php:880
+#: app/partials/popup.operations.php:217
+#: app/views/administration.script.edit.php:57 include/actions.inc.php:880
 #: include/classes/setup/CSetupWizard.php:390
 msgid "Zabbix server"
 msgstr "Εξυπηρετητής Zabbix"
 
-#: include/classes/server/CZabbixServer.php:536
+#: include/classes/server/CZabbixServer.php:537
 #, c-format
 msgid ""
 "Zabbix server \"%1$s\" can not be reached. Possible reasons:\n"
@@ -19324,8 +19329,8 @@ msgid ""
 "2. Incorrect network configuration.\n"
 msgstr ""
 
-#: app/views/administration.script.edit.php:56
-#: app/views/popup.operation.common.php:474 include/actions.inc.php:875
+#: app/partials/popup.operations.php:216
+#: app/views/administration.script.edit.php:56 include/actions.inc.php:875
 msgid "Zabbix server (proxy)"
 msgstr ""
 
@@ -19652,7 +19657,7 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:1118
 #: include/classes/api/services/CCorrelation.php:1137
 #: include/classes/api/services/CCorrelation.php:1151
-#: include/classes/api/services/CDiscoveryRule.php:1977
+#: include/classes/api/services/CDiscoveryRule.php:1931
 #: include/classes/api/services/CDRule.php:203
 #: include/classes/api/services/CDRule.php:209
 #: include/classes/api/services/CDRule.php:319
@@ -19741,7 +19746,7 @@ msgstr ""
 msgid "cannot perform Scroll API request, data could be truncated"
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1960
+#: include/classes/api/services/CDiscoveryRule.php:1914
 msgid "cannot update property for templated discovery rule"
 msgstr ""
 
@@ -19763,7 +19768,7 @@ msgstr ""
 msgid "circular item dependency is not allowed"
 msgstr ""
 
-#: jsLoader.php:235
+#: jsLoader.php:238
 msgid "colour"
 msgstr ""
 
@@ -19790,7 +19795,7 @@ msgstr ""
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr ""
 
-#: include/func.inc.php:597 jsLoader.php:154
+#: include/func.inc.php:598 jsLoader.php:157
 msgctxt "day short"
 msgid "d"
 msgstr "η"
@@ -19951,7 +19956,7 @@ msgstr "καθολικές ρυθμίσεις τακτοποίησης"
 msgid "graph pattern"
 msgstr ""
 
-#: include/func.inc.php:598 jsLoader.php:155
+#: include/func.inc.php:599 jsLoader.php:158
 msgctxt "hour short"
 msgid "h"
 msgstr "ω"
@@ -20028,7 +20033,7 @@ msgid "incorrect element count"
 msgstr ""
 
 #: include/classes/parsers/CItemKey.php:80
-#: include/classes/parsers/CUserMacroParser.php:59
+#: include/classes/parsers/CUserMacroParser.php:61
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
 msgstr "ανακριβής σύνταξη πλησίον \"%1$s\""
@@ -20153,12 +20158,12 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr "κανόνας εντοπισμού χαμηλού επιπέδου"
 
-#: include/func.inc.php:599 jsLoader.php:120 jsLoader.php:156 jsLoader.php:340
+#: include/func.inc.php:600 jsLoader.php:120 jsLoader.php:159 jsLoader.php:343
 msgctxt "minute short"
 msgid "m"
 msgstr "λ"
 
-#: include/func.inc.php:596 jsLoader.php:153
+#: include/func.inc.php:597 jsLoader.php:156
 msgctxt "month short"
 msgid "m"
 msgstr "μ"
@@ -20173,7 +20178,7 @@ msgstr ""
 msgid "m-d H:i"
 msgstr ""
 
-#: include/classes/parsers/CUserMacroParser.php:45
+#: include/classes/parsers/CUserMacroParser.php:47
 msgid "macro is empty"
 msgstr ""
 
@@ -20246,7 +20251,7 @@ msgstr ""
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:601
+#: include/func.inc.php:602
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
@@ -20284,7 +20289,7 @@ msgstr ""
 msgid "name"
 msgstr ""
 
-#: include/classes/html/CMultiSelect.php:85 jsLoader.php:257
+#: include/classes/html/CMultiSelect.php:85 jsLoader.php:260
 msgid "new"
 msgstr "νέο"
 
@@ -20437,7 +20442,7 @@ msgstr ""
 #: app/views/popup.services.php:59 app/views/popup.services.php:62
 #: app/views/popup.services.php:64 app/views/popup.services.php:65
 #: include/services.inc.php:72 include/services.inc.php:75
-#: include/services.inc.php:163 jsLoader.php:327
+#: include/services.inc.php:163 jsLoader.php:330
 msgid "root"
 msgstr "root"
 
@@ -20445,7 +20450,7 @@ msgstr "root"
 msgid "ruleid of dependent item and master item should match"
 msgstr ""
 
-#: include/func.inc.php:600
+#: include/func.inc.php:601
 msgctxt "second short"
 msgid "s"
 msgstr "δ"
@@ -20539,7 +20544,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1571
+#: include/classes/api/services/CUser.php:1569
 msgid "supplied credentials are not unique"
 msgstr ""
 
@@ -20581,9 +20586,9 @@ msgstr "το ID σχεδιότυπου \"%1$s\" πέρασε %2$s φορές"
 #: app/controllers/CControllerDashboardUpdate.php:150
 #: include/classes/api/services/CAutoregistration.php:145
 #: include/classes/api/services/CDashboard.php:388
-#: include/classes/api/services/CDiscoveryRule.php:1638
-#: include/classes/api/services/CDiscoveryRule.php:1995
-#: include/classes/api/services/CDiscoveryRule.php:2003
+#: include/classes/api/services/CDiscoveryRule.php:1592
+#: include/classes/api/services/CDiscoveryRule.php:1949
+#: include/classes/api/services/CDiscoveryRule.php:1957
 #: include/classes/api/services/CHttpTest.php:742
 #: include/classes/validators/CApiInputValidator.php:930
 #, c-format
@@ -20614,7 +20619,7 @@ msgstr ""
 msgid "third parameter is expected"
 msgstr ""
 
-#: jsLoader.php:236
+#: jsLoader.php:239
 msgid "time shift"
 msgstr ""
 
@@ -20645,7 +20650,7 @@ msgid "trigger with linkages cannot be moved to another template or host"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:77
-#: include/classes/html/CMultiSelect.php:84 jsLoader.php:256
+#: include/classes/html/CMultiSelect.php:84 jsLoader.php:259
 msgid "type here to search"
 msgstr "Πληκτρολογήστε για αναζήτηση"
 
@@ -20672,14 +20677,14 @@ msgstr ""
 msgid "unexpected end of key"
 msgstr "απροσδόκητο τέλος κλειδιού"
 
-#: include/classes/parsers/CUserMacroParser.php:45
+#: include/classes/parsers/CUserMacroParser.php:47
 msgid "unexpected end of macro"
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1658
-#: include/classes/api/services/CDiscoveryRule.php:1689
-#: include/classes/api/services/CDiscoveryRule.php:1712
-#: include/classes/api/services/CDiscoveryRule.php:1731
+#: include/classes/api/services/CDiscoveryRule.php:1612
+#: include/classes/api/services/CDiscoveryRule.php:1643
+#: include/classes/api/services/CDiscoveryRule.php:1666
+#: include/classes/api/services/CDiscoveryRule.php:1685
 #: include/classes/api/services/CHttpTest.php:456
 #: include/classes/api/services/CHttpTest.php:480
 #: include/classes/validators/CApiInputValidator.php:902
@@ -20741,7 +20746,7 @@ msgstr ""
 #: app/views/js/popup.itemtestedit.view.js.php:446
 #: app/views/monitoring.host.view.php:69
 #: app/views/monitoring.problem.view.php:257
-#: app/views/popup.itemtestedit.view.php:74
+#: app/views/popup.itemtestedit.view.php:82
 #: include/classes/html/CMacroValue.php:121
 #: include/classes/html/CMacroValue.php:129
 #: include/classes/widgets/CWidgetHelper.php:466
@@ -20769,7 +20774,7 @@ msgstr ""
 msgid "value"
 msgstr "τιμή"
 
-#: include/classes/api/services/CDiscoveryRule.php:1874
+#: include/classes/api/services/CDiscoveryRule.php:1828
 #, c-format
 msgid "value \"%1$s\" already exists"
 msgstr ""
@@ -20807,10 +20812,10 @@ msgid "value is too long"
 msgstr ""
 
 #: app/controllers/CControllerPopupHttpStep.php:101
-#: include/classes/api/services/CDiscoveryRule.php:1670
-#: include/classes/api/services/CDiscoveryRule.php:1701
-#: include/classes/api/services/CDiscoveryRule.php:1721
-#: include/classes/api/services/CDiscoveryRule.php:1742
+#: include/classes/api/services/CDiscoveryRule.php:1624
+#: include/classes/api/services/CDiscoveryRule.php:1655
+#: include/classes/api/services/CDiscoveryRule.php:1675
+#: include/classes/api/services/CDiscoveryRule.php:1696
 #: include/classes/api/services/CEvent.php:772
 #: include/classes/api/services/CHost.php:987
 #: include/classes/api/services/CHost.php:1998
@@ -20857,7 +20862,7 @@ msgstr ""
 msgid "wrong item type"
 msgstr ""
 
-#: include/func.inc.php:595 jsLoader.php:152
+#: include/func.inc.php:596 jsLoader.php:155
 msgctxt "year short"
 msgid "y"
 msgstr "ε"
