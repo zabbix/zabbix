@@ -97,6 +97,67 @@ class CMultifieldTableElement extends CTableElement {
 	}
 
 	/**
+	 * Detect field mapping based on the first row elements.
+	 *
+	 * @param array    $headers    table headers
+	 *
+	 * @return array
+	 */
+	public function detectFieldMapping($headers = null) {
+		$rows = $this->getRows();
+
+		if ($rows->count() === 0) {
+			throw new \Exception('Failed to detect mapping for an empty multifield table.');
+		}
+
+		if ($headers === null) {
+			$headers = $this->getHeadersText();
+		}
+
+		$result = [];
+		foreach ($rows->first()->query('xpath:./td')->all() as $i => $column) {
+			$label = CTestArrayHelper::get($headers, $i, $i);
+			$element = CElementQuery::getInputElement($column, '.')->detect();
+
+			if (!$element->isValid()) {
+				$result[$label] = null;
+
+				continue;
+			}
+
+			$value = $element->getAttribute('name');
+			if ($value !== null) {
+				$element->query('xpath', './/*[@name]')->one(false);
+				if ($element->isValid()) {
+					$value = $element->getAttribute('name');
+				}
+			}
+
+			if ($value !== null) {
+				$name = $value;
+				if (substr($value, -1) === ']') {
+					$pos = strrpos($value, '[');
+					if ($pos !== false) {
+						$name = substr($value, $pos + 1, -1);
+					}
+				}
+			}
+			else {
+				// Element name cannot be detected, using label or index.
+				$name = $label;
+			}
+
+			$result[$label] = [
+				'name' => $name,
+				'class' => get_class($element),
+				'selector' => CElementQuery::getLastSelector()
+			];
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Get collection of table rows.
 	 *
 	 * @return CElementCollection
@@ -129,6 +190,10 @@ class CMultifieldTableElement extends CTableElement {
 
 		if ($headers === null) {
 			$headers = $this->getHeadersText();
+		}
+
+		if ($this->mapping === null) {
+			$this->mapping = $this->detectFieldMapping();
 		}
 
 		foreach ($row->query('xpath:./td|./th')->all() as $i => $column) {
@@ -333,6 +398,44 @@ class CMultifieldTableElement extends CTableElement {
 		if (CTestArrayHelper::isAssociative($data)) {
 			$data = [$data];
 		}
+
+		$rows = $this->getRows()->count();
+		if (CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
+			if ($this->mapping === null) {
+				$this->mapping = $this->detectFieldMapping();
+			}
+
+			$fields = [];
+			foreach ($this->mapping as $mapping) {
+				if (!is_array($mapping) || !array_key_exists('name', $mapping) || !array_key_exists('class', $mapping)) {
+					continue;
+				}
+
+				$fields[$mapping['name']] = $mapping['class'];
+			}
+
+			$empty = true;
+			$values = $this->getRowValue($rows - 1);
+
+			foreach ($values as $key => $value) {
+				// Elements with predefined values are always ignored.
+				if (in_array(CTestArrayHelper::get($fields, $key), [CDropdownElement::class, CCheckboxElement::class,
+					CRadioButtonList::class, CSegmentedRadioElement::class])) {
+					continue;
+				}
+
+				if ($value !== '') {
+					$empty = false;
+					break;
+				}
+			}
+
+			if ($empty) {
+				$data[0]['action'] = USER_ACTION_UPDATE;
+				$data[0]['index'] = $rows - 1;
+			}
+		}
+
 		foreach ($data as $row) {
 			$action = CTestArrayHelper::get($row, 'action', USER_ACTION_ADD);
 			unset($row['action']);

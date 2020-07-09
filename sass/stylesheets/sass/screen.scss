@@ -2835,10 +2835,8 @@ $form-icon-btn: (
 }
 
 .setup-title {
+	margin: 109px 0 16px 0;
 	color: $font-alt-color;
-	height: 345px;
-	display: table-cell;
-	vertical-align: middle;
 	font-size: $font-setup-title;
 	line-height: $setup-title-line-height;
 

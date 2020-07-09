@@ -154,7 +154,48 @@ class CSetupWizard extends CForm {
 		preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version);
 		$setup_title = (new CDiv([new CSpan(_('Welcome to')), 'Zabbix '.$version[0]]))->addClass(ZBX_STYLE_SETUP_TITLE);
 
-		return (new CDiv($setup_title))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY);
+		$default_lang = $this->getConfig('default_lang');
+		$lang_combobox = (new CComboBox('default_lang', $default_lang, 'submit();'))
+			->setAttribute('autofocus', 'autofocus');
+
+		$all_locales_available = 1;
+
+		foreach (getLocales() as $localeid => $locale) {
+			if (!$locale['display']) {
+				continue;
+			}
+
+			/*
+			 * Checking if this locale exists in the system. The only way of doing it is to try and set one
+			 * trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC.
+			 */
+			$locale_available = ($localeid === 'en_GB' || setlocale(LC_MONETARY, zbx_locale_variants($localeid)));
+
+			$lang_combobox->addItem($localeid, $locale['name'], null, $locale_available);
+
+			$all_locales_available &= (int) $locale_available;
+		}
+
+		// Restoring original locale.
+		setlocale(LC_MONETARY, zbx_locale_variants($default_lang));
+
+		$language_error = '';
+		if (!function_exists('bindtextdomain')) {
+			$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+			$lang_combobox->setEnabled(false);
+		}
+		elseif ($all_locales_available == 0) {
+			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+		}
+
+		$language_select = (new CFormList())
+			->addRow(_('Default language'),
+				($language_error !== '')
+					? [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
+					: $lang_combobox
+			);
+
+		return (new CDiv([$setup_title, $language_select]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY);
 	}
 
 	function stage1() {
@@ -401,6 +442,10 @@ class CSetupWizard extends CForm {
 	}
 
 	function stage5() {
+		$this->dbConnect();
+		DBexecute('UPDATE config SET default_lang='.zbx_dbstr($this->getConfig('default_lang')));
+		$this->dbClose();
+
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
 		$config_file_name = APP::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
