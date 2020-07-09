@@ -31,30 +31,35 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 	public function testFormAdministrationMediaTypeMessageTemplates_Layout() {
 		// Open a new media type configuration form and switch to Message templates tab.
 		$this->openMediaTypeTemplates('new');
+
+		// Check message templates tab.
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
-		// Make sure template adding is enabled.
 		$this->assertTrue($templates_list->query('button:Add')->one()->isEnabled());
-		// Make sure that all table headers are present.
 		$this->assertSame(['Message type', 'Template', 'Actions'], $templates_list->getHeadersText());
-		// Check that only the row with "Add" button is present in list of message templates by default.
 		$this->assertEquals(1, $templates_list->getRows()->count());
-		// Check that Add an Cancel buttons are accessible from Message templates tab.
 		$this->checkButtonsCLickable(['add', 'cancel'], $this, 'id');
-		// Check layout of the Message template configuration form.
+
+		// Check message template configuration form.
 		$templates_list->query('button:Add')->one()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Message template', $overlay->getTitle());
 		$form = $this->query('id:mediatype_message_form')->asForm()->one();
 		$this->assertEquals(['Message type', 'Subject', 'Message'], $form->getLabels()->asText());
+		$form->getField('Message type')->checkValue('Problem');
+		$this->assertEquals(255, $form->getField('Subject')->getAttribute('maxlength'));
+		$this->assertEquals(65535, $form->getField('Message')->getAttribute('maxlength'));
 		$this->checkButtonsCLickable(['Add', 'Cancel'], $overlay);
+
 		// Add a "Problem" message template and check that corresponding row is added in Message templates table.
 		$form->submit();
 		$templates_list->invalidate();
 		$row = $templates_list->findRow('Message type', 'Problem');
+
 		// Check that it is possible to edit a newly created message template.
 		$this->checkButtonsCLickable(['Edit', 'Remove'], $row->getColumn('Actions'));
 		$row->query('button:Edit')->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady()->close();
+
 		// Check that it is possible to remove a newly created message template.
 		$row->query('button:Remove')->one()->click();
 		// Check that only the row with "Add" button is present after removing the previously added row.
