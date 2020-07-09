@@ -196,7 +196,7 @@
         req.SetProxy(params.HTTPProxy);&#13;
     }&#13;
     var alertSourceKey = params['.ILERT.ALERT.SOURCE.KEY'];&#13;
-    if (typeof alertSourceKey === 'string' &amp;&amp; alertSourceKey.trim() === '') {&#13;
+    if (typeof alertSourceKey === 'string' || alertSourceKey.trim() === '') {&#13;
         throw 'incorrect value for variable &quot;ILERT.ALERT.SOURCE.KEY&quot;. The value must be a non-empty string.';&#13;
     }&#13;
     delete params['.ILERT.ALERT.SOURCE.KEY'];&#13;
@@ -219,7 +219,7 @@
     }&#13;
 &#13;
     if (req.Status() == 200) {&#13;
-        if (!!resp &amp;&amp; typeof resp === 'object' &amp;&amp; typeof resp.incidentUrl === 'string') {&#13;
+        if (typeof resp === 'object' &amp;&amp; typeof resp.incidentUrl === 'string') {&#13;
             result.tags.incident_id = resp.incidentUrl.replace(ilertBaseURL + &quot;/api/v1/incidents/&quot;, &quot;&quot;);&#13;
         }&#13;
         return JSON.stringify(result);&#13;
@@ -229,7 +229,7 @@
         return JSON.stringify(result);&#13;
     }&#13;
 &#13;
-    if (!!resp &amp;&amp; typeof resp === 'object' &amp;&amp; typeof resp.message === 'string') {&#13;
+    if (typeof resp === 'object' &amp;&amp; typeof resp.message === 'string') {&#13;
         throw resp.message;&#13;
     }&#13;
     else {&#13;
