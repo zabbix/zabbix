@@ -116,7 +116,7 @@ if (!in_array($default_lang, $available_locales)) {
 }
 
 CSession::setValue('default_lang', $default_lang);
-APP::getInstance()->initLocales(['lang' => $default_lang]);
+APP::getInstance()->initLocales($default_lang);
 
 $theme = CWebUser::$data ? getUserTheme(CWebUser::$data) : ZBX_DEFAULT_THEME;
 

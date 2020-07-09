@@ -152,6 +152,8 @@ class CWebUser {
 			return $sessionId;
 		}
 		catch (Exception $e) {
+			self::setDefault();
+
 			return false;
 		}
 	}
@@ -182,18 +184,14 @@ class CWebUser {
 	 * @static
 	 */
 	public static function setDefault(): void {
+		$config = select_config();
 		self::$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
-			'lang' => ZBX_DEFAULT_LANG,
+			'lang' => $config['default_lang'],
 			'type' => 0,
 			'debug_mode' => false
 		];
-
-		$config = select_config();
-		if ($config) {
-			self::$data['lang'] = $config['default_lang'];
-		}
 	}
 
 	/**
