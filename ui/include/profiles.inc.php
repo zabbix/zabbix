@@ -251,6 +251,9 @@ function update_config($config) {
 		if (array_key_exists('work_period', $config)) {
 			$msg[] = _s('Working time "%1$s".', $config['work_period']);
 		}
+		if (array_key_exists('default_lang', $config)) {
+			$msg[] = _s('Default language "%1$s".', $config['default_lang']);
+		}
 		if (array_key_exists('default_theme', $config)) {
 			$msg[] = _s('Default theme "%1$s".', $config['default_theme']);
 		}

@@ -36,8 +36,27 @@ catch (Exception $e) {
 	exit;
 }
 
+$default_lang = ZBX_DEFAULT_LANG;
+if (CSession::keyExists('default_lang')) {
+	$default_lang = CSession::getValue('default_lang');
+}
+elseif (CWebUser::$data) {
+	$default_lang = CWebUser::$data['lang'];
+}
+
+$available_locales = [];
+foreach (getLocales() as $localeid => $locale) {
+	if ($locale['display'] && setlocale(LC_MONETARY, zbx_locale_variants($localeid)) !== false) {
+		$available_locales[] = $localeid;
+	}
+}
+
+// Restoring original locale.
+setlocale(LC_MONETARY, zbx_locale_variants($default_lang));
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
+	'default_lang' =>		[T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', $available_locales).'"'), null],
 	'type' =>				[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'"'), null],
 	'server' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
 	'port' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
@@ -89,6 +108,16 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
 
+// Set default language.
+$default_lang = getRequest('default_lang', $default_lang);
+
+if (!in_array($default_lang, $available_locales)) {
+	$default_lang = ZBX_DEFAULT_LANG;
+}
+
+CSession::setValue('default_lang', $default_lang);
+APP::getInstance()->initLocales($default_lang);
+
 $theme = CWebUser::$data ? getUserTheme(CWebUser::$data) : ZBX_DEFAULT_THEME;
 
 DBclose();
@@ -98,18 +127,13 @@ DBclose();
  */
 $ZBX_SETUP_WIZARD = new CSetupWizard();
 
-// if init fails due to missing configuration, set user as guest with default en_GB language
-if (!CWebUser::$data) {
-	CWebUser::setDefault();
-}
-
 // page title
 (new CPageHeader(_('Installation')))
 	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)
-		->setArgument('lang', CWebUser::$data['lang'])
+		->setArgument('lang', $default_lang)
 		->getUrl()
 	)
 	->display();
@@ -121,14 +145,14 @@ $link = (new CLink('GPL v2', 'https://www.zabbix.com/license'))
 	->setTarget('_blank')
 	->addClass(ZBX_STYLE_GREY)
 	->addClass(ZBX_STYLE_LINK_ALT);
-$sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_LINKS);
+$sub_footer = (new CDiv([_('Licensed under'), ' ', $link]))->addClass(ZBX_STYLE_SIGNIN_LINKS);
 
 (new CTag('body', true,
 	(new CDiv([
 		(new CTag('main', true, [$ZBX_SETUP_WIZARD, $sub_footer])), makePageFooter()])
 	)->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
 ))
-	->setAttribute('lang', CWebUser::getLang())
+	->setAttribute('lang', substr($default_lang, 0, strpos($default_lang, '_')))
 	->show();
 ?>
 </html>

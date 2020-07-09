@@ -29,10 +29,27 @@
 
 extern unsigned char	program_type;
 
-/*static int	DBpatch_5010000(void)
+static int	DBpatch_5010000(void)
 {
-	*** put the first upgrade patch here ***
-}*/
+	const ZBX_FIELD	field = {"default_lang", "en_GB", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5010001(void)
+{
+	const ZBX_FIELD	field = {"lang", "default", NULL, NULL, 7, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
+static int	DBpatch_5010002(void)
+{
+	if (ZBX_DB_OK > DBexecute("update users set lang='default',theme='default' where alias='guest'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 #endif
 
@@ -40,6 +57,8 @@ DBPATCH_START(5010)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(5010000, 0, 1)*/
+DBPATCH_ADD(5010000, 0, 1)
+DBPATCH_ADD(5010001, 0, 1)
+DBPATCH_ADD(5010002, 0, 1)
 
 DBPATCH_END()
