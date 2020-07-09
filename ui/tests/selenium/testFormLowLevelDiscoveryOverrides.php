@@ -397,7 +397,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Condition' => ['operator' => 'does not match', 'value' => 'Host_Pattern'],
 									'Create enabled' => 'Yes',
 									'Discover' => 'Yes',
-									'Create enabled' => 'Yes',
 									'Link templates' => 'Test Item Template',
 									'Host inventory' => 'Disabled'
 								]
@@ -419,7 +418,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Condition' => ['operator' => 'does not match', 'value' => '2Host_Pattern'],
 									'Create enabled' => 'Yes',
 									'Discover' => 'No',
-									'Create enabled' => 'Yes',
 									'Link templates' => 'Test Item Template',
 									'Host inventory' => 'Automatic'
 								]
@@ -592,7 +590,74 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 //			$override[] = $override_container->getRow($k)->getColumn('Name')->getText();
 //		}
 
-		$state = [];
+		$original_overrides = [
+				[
+					'fields' => [
+						'Name' => 'Override for update 1',
+						'If filter matches' => 'Continue overrides'
+					],
+					'Filters' => [
+						'Type of calculation' => 'And',
+//						'formula' => 'A and B',
+						'filter_conditions' => [
+							[
+								'macro' => '{#MACRO1}',
+								'operator' => 'matches',
+								'expression' => 'test expression_1'
+							],
+							[
+								'macro' => '{#MACRO2}',
+								'operator' => 'does not match',
+								'expression' => 'test expression_2'
+							]
+						]
+					],
+					'Operations' => [
+						[
+							'Object' => 'Item prototype',
+							'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
+							'Create enabled' => 'Yes',
+							'Discover' => 'Yes',
+//									'Update interval' => [
+//										'Delay' => '1m',
+//										'Custom intervals' => [
+//											['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
+//											['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
+//										]
+//									],
+							'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
+							'Trend storage period' => ['optrends_trends_mode' => 'Do not keep history']
+						],
+						[
+							'Object' => 'Trigger prototype',
+							'Condition' => ['operator' => 'does not equal', 'value' => 'test trigger pattern'],
+							'Severity' => 'Warning',
+//									'Tags' => [
+//										['tag' => 'tag1', 'value' => 'value1'],
+//									]
+						]
+				],
+				[
+					'fields' => [
+						'Name' => 'Override for update 2',
+						'If filter matches' => 'Continue overrides'
+					],
+					'Operations' => [
+						[
+							'Object' => 'Graph prototype',
+							'Condition' => ['operator' => 'matches', 'value' => 'test graph pattern'],
+							'Discover' => 'Yes'
+						],
+						[
+							'Object' => 'Host prototype',
+							'Condition' => ['operator' => 'does not match', 'value' => 'test host pattern'],
+							'Link templates' => 'Test Item Template',
+							'Host inventory' => 'Automatic'
+						]
+					]
+				]
+			]
+		];
 
 		foreach ($data['overrides'] as $i => $override) {
 			$action = CTestArrayHelper::get($override, 'action', USER_ACTION_ADD);
@@ -601,10 +666,17 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				case USER_ACTION_ADD:
 					$override_container->query('button:Add')->one()->click();
 
-					$state['Overrides'][] = $override;
+
 					break;
 
 				case USER_ACTION_UPDATE:
+					foreach ($original_overrides as $j => $original_override){
+						$original_override['fields'] = $override['fields'];
+
+					}
+
+
+
 					$override_container->query('link', $override['name'])->one()->click();
 					break;
 			}
