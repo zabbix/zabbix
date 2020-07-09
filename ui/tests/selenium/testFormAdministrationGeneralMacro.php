@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/common/testFormMacros.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -26,6 +27,9 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup globalmacro
  */
 class testFormAdministrationGeneralMacro extends CLegacyWebTest {
+
+	use MacrosTrait;
+
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
 	private $macroClass = 'textarea-flexible macro';
@@ -63,7 +67,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 	private function checkGlobalMacrosOrder($skip_index = -1) {
 		$globalMacros = [];
 
-		$result = DBselect('select globalmacroid,macro,value,description from globalmacro');
+		$result = DBselect('select globalmacroid,macro,type,value,description from globalmacro');
 		while ($row = DBfetch($result)) {
 			$globalMacros[] = $row;
 		}
@@ -81,6 +85,10 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 					$globalMacros[$i]['globalmacroid']);
 			$this->zbxTestAssertElementValue('macros_'.$i.'_macro',
 					$globalMacros[$i]['macro']);
+
+			if ($globalMacros[$i]['type'] === '1') {
+				$globalMacros[$i]['value'] = '******';
+			}
 			$this->zbxTestAssertElementValue('macros_'.$i.'_value',
 					$globalMacros[$i]['value']);
 			$this->zbxTestAssertElementValue('macros_'.$i.'_description',
@@ -163,8 +171,15 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_macro']", "placeholder", $this->macroPlaceholder);
 			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_macro']", "class", $this->macroClass);
 
-			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_value']", "maxlength", $this->valueMaxLength);
-			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_value']", "placeholder", $this->valuePlaceholder);
+			$macro_name = $this->query('id:macros_'.$i.'_macro')->one()->getAttribute('value');
+			if ($macro_name !== '' && $this->getValueField($macro_name)->isSecret()) {
+				$element = 'input';
+			}
+			else {
+				$element = 'textarea';
+				$this->zbxTestAssertAttribute("//".$element."[@id='macros_${i}_value']", "placeholder", $this->valuePlaceholder);
+			}
+			$this->zbxTestAssertAttribute("//".$element."[@id='macros_${i}_value']", "maxlength", $this->valueMaxLength);
 
 			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_description']", "maxlength", $this->descriptionMaxLength);
 			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_description']", "placeholder", $this->descriptionPlaceholder);
@@ -599,5 +614,228 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$this->checkGlobalMacrosOrder();
 
 		$this->verifyHash();
+	}
+
+	public function getCreateSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$Z_NEW_SECRET_MACRO}',
+						'value' => [
+							'value' => 'secret value',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret description'
+					]
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$Z_NEW_TEXT_MACRO}',
+						'value' => [
+							'value' => 'plain text value',
+							'type' => 'Secret text'
+						],
+						'description' => 'plain text description'
+					],
+					'back_to_text' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateSecretMacrosData
+	 */
+	public function testFormAdministrationGeneralMacros_CreateSecretMacros($data) {
+		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
+		$this->fillMacros([$data['macro_fields']]);
+
+		// Check that value field is filled correctly.
+		$value_field = $this->query('xpath://div[contains(@class,"macro-value")]')->all()->last()->asInputGroup();
+		$this->assertEquals($data['macro_fields']['value']['type'], $value_field->getInputType());
+		$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
+		// Check that textarea input element is not available for secret text macros.
+		if ($value_field->isSecret()) {
+			$this->assertFalse($value_field->query('xpath:.//textarea[contains(@class, "textarea-flexible")]')
+					->one(false)->isValid());
+		}
+
+		// If needed, change value type back to "Text" and verify that value is accessible.
+		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
+			$value_field->changeInputType('Text');
+			$this->assertFalse($value_field->isSecret());
+			$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
+		}
+
+		$this->query('button:Update')->one()->click();
+		$value_field = $this->getValueField($data['macro_fields']['macro']);
+
+		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
+			$this->assertFalse($value_field->isSecret());
+			$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
+			$this->assertFalse($value_field->query('button:Set new value')->one(false)->isValid());
+			$this->assertFalse($value_field->query('xpath:.//button[@title="Revert changes"]')->one(false)->isValid());
+		}
+		else {
+			$this->assertEquals('******', $value_field->getValue());
+			$change_button = $value_field->query('button:Set new value')->one();
+			$revert_button = $value_field->query('xpath:.//button[@title="Revert changes"]')->one();
+
+			// Check that "Set new value" button is perent and "Revert" button is hidden if secret value wasn't modified.
+			$this->assertTrue($change_button->isEnabled());
+			$this->assertFalse($revert_button->isClickable());
+
+			// Modify secret value and check that Revert button becomes clickable and "Set new value" button is Disabled.
+			$change_button->click();
+			$value_field->invalidate();
+			$this->assertFalse($change_button->isEnabled());
+			$this->assertTrue($revert_button->isClickable());
+			// Revert changes
+			$value_field->pressRevertButton();
+		}
+		$this->query('button:Update')->one()->click();
+		// Check macro value, type and description in DB.
+		$sql = 'SELECT value, description, type FROM globalmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
+		$type = (CTestArrayHelper::get($data, 'back_to_text', false)) ? 0 : 1;
+		$this->assertEquals([$data['macro_fields']['value']['value'], $data['macro_fields']['description'], $type],
+				array_values(CDBHelper::getRow($sql)));
+	}
+
+	public function getUpdateSecretMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 9,
+					'macro' => '{$X_SECRET_2_SECRET}',
+					'value' => [
+						'value' => 'This text is updated and should stay secret'
+					]
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 10,
+					'macro' => '{$X_SECRET_2_TEXT}',
+					'value' => [
+						'value' => 'This text is updated and should become visible',
+						'type' => 'Text'
+					]
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 11,
+					'macro' => '{$X_TEXT_2_SECRET}',
+					'value' => [
+						'value' => 'This text is updated and should become secret',
+						'type' => 'Secret text'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateSecretMacrosData
+	 */
+	public function testFormAdministrationGeneralMacros_UpdateSecretMacros($data) {
+		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
+		$this->fillMacros([$data]);
+
+		$this->query('button:Update')->one()->click();
+
+		$value_field = $this->getValueField($data['macro']);
+		if (CTestArrayHelper::get($data['value'], 'type', 'Secret text') === 'Secret text') {
+			$this->assertTrue($value_field->isSecret());
+			$this->assertEquals('******', $value_field->getValue());
+		}
+		else {
+			$this->assertFalse($value_field->isSecret());
+			$this->assertEquals($data['value']['value'], $value_field->getValue());
+		}
+		$sql = 'SELECT value FROM globalmacro WHERE macro='.zbx_dbstr($data['macro']);
+		$this->assertEquals($data['value']['value'], CDBHelper::getValue($sql));
+	}
+
+	public function getRevertSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$Y_SECRET_MACRO_REVERT}',
+						'value' => 'Secret host value'
+					]
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$Y_SECRET_MACRO_2_TEXT_REVERT}',
+						'value' => 'Secret host value 2'
+					],
+					'set_to_text' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getRevertSecretMacrosData
+	 */
+	public function testFormAdministrationGeneralMacros_RevertSecretMacroChanges($data) {
+		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
+
+		$sql = 'SELECT * FROM globalmacro WHERE macro in ('.CDBHelper::escape($data['macro_fields']['macro']).')';
+		$old_values = CDBHelper::getRow($sql);
+
+		$value_field = $this->getValueField($data['macro_fields']['macro']);
+
+		// Check that the existing macro value is hidden.
+		$this->assertEquals('******', $value_field->getValue());
+
+		// Change the value of the secret macro
+		$value_field->query('button:Set new value')->one()->click();
+		$this->assertEquals('', $value_field->getValue());
+		$value_field->fill('New_macro_value');
+
+		if (CTestArrayHelper::get($data, 'set_to_text', false)) {
+			$value_field->changeInputType('Text');
+			$this->assertEquals('New_macro_value', $value_field->getValue());
+		}
+
+		// Press revert button amd save the changes and make sure that changes were reverted.
+		$value_field->pressRevertButton();
+		$this->query('button:Update')->one()->click();
+		// Check that no macro value changes took place.
+		$this->assertEquals('******', $this->getValueField($data['macro_fields']['macro'])->getValue());
+		$this->assertEquals($old_values, CDBHelper::getRow($sql));
+	}
+
+	public function testFormAdministrationGeneralMacros_ResolveSecretMacro() {
+		$item_url = 'items.php?filter_set=1&filter_hostids%5B0%5D=99134';
+		$macro = [
+			'macro' => '{$Z_GLOBAL_MACRO_2_RESOLVE}',
+			'value' => 'Value 2 B resolved'
+		];
+
+		// Open the list of "Available host" host items and check macro resolution in item name.
+		$this->page->login()->open($item_url)->waitUntilReady();
+		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->one(false)->isValid());
+
+		// Change macro type.
+		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
+		$value_field = $this->getValueField($macro['macro']);
+		$value_field->changeInputType('Secret text');
+		$this->query('button:Update')->one()->click();
+
+		// Open list of items and check that macro value is hidden.
+		$this->page->open($item_url)->waitUntilReady();
+		$this->assertTrue($this->query('link', 'Macro value: ******')->one(false)->isValid());
 	}
 }
