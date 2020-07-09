@@ -203,6 +203,8 @@ func main() {
 	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
 	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
 
+	loadAdditionalFlags()
+
 	var remoteCommand string
 	const (
 		remoteDefault     = ""
@@ -233,6 +235,13 @@ func main() {
 
 	if argVersion {
 		version.Display()
+		os.Exit(0)
+	}
+
+	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
+		if err := handleWindowsService(confFlag); err != nil {
+			fatalExit(fmt.Sprintf("cannot start %s as windows service", serviceName), err)
+		}
 		os.Exit(0)
 	}
 
