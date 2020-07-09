@@ -1394,7 +1394,7 @@
 		setDivPosition(widget['div'], data, widget['pos']);
 		resizeDashboardGrid($obj, data);
 
-		$.publish('widget.update.dimensions');
+		doAction('onWidgetPosition', $obj, data, widget);
 	}
 
 	function makeDraggable($obj, data, widget) {
@@ -2247,7 +2247,7 @@
 
 			pos = findEmptyPosition($obj, data, area_size);
 			if (!pos) {
-				showMessageExhausted(data);
+				showDialogMessageExhausted(data);
 				return;
 			}
 		}
@@ -3115,15 +3115,45 @@
 	}
 
 	/**
-	 * Show message if dashboard free space exhausted.
+	 * Show "dashboard is exhausted" warning message in dialog context.
 	 *
 	 * @param {object} data  Dashboard data and options object.
 	 */
-	function showMessageExhausted(data) {
+	function showDialogMessageExhausted(data) {
 		data.dialogue.body.children('.msg-warning').remove();
 		data.dialogue.body.prepend(makeMessageBox(
 			'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, false
 		));
+	}
+
+	/**
+	 * Show "dashboard is exhausted" warning message in dashboard context.
+	 *
+	 * @param {object} data  Dashboard data and options object.
+	 */
+	function showMessageExhausted(data) {
+		if (data.options.message_exhausted) {
+			return;
+		}
+
+		data.options.message_exhausted = makeMessageBox(
+			'warning', [], t('Cannot add widget: not enough free space on the dashboard.'), true, false
+		);
+		addMessage(data.options.message_exhausted);
+	}
+
+	/**
+	 * Hide "dashboard is exhausted" warning message in dashboard context.
+	 *
+	 * @param {object} data  Dashboard data and options object.
+	 */
+	function hideMessageExhausted(data) {
+		if (!data.options.message_exhausted) {
+			return;
+		}
+
+		data.options.message_exhausted.remove();
+		delete data.options.message_exhausted;
 	}
 
 	/**
@@ -3147,7 +3177,7 @@
 		}
 		else {
 			$.each(data['triggers'][hook_name], function(index, trigger) {
-				if (widget['uniqueid'] === trigger['uniqueid']) {
+				if (trigger['uniqueid'] === null || widget['uniqueid'] === trigger['uniqueid']) {
 					triggers.push(trigger);
 				}
 			});
@@ -3182,30 +3212,27 @@
 			}
 
 			var params = [];
-			if (typeof trigger['options']['parameters'] !== 'undefined') {
+			if (trigger['options']['parameters'] !== undefined) {
 				params = trigger['options']['parameters'];
 			}
 
-			if (typeof trigger['options']['grid'] !== 'undefined') {
+			if (trigger['options']['grid']) {
 				var grid = {};
-				if (typeof trigger['options']['grid']['widget'] !== 'undefined'
-						&& trigger['options']['grid']['widget']
-				) {
-					if (widget === null) {
+				if (trigger['options']['grid']['widget']) {
+					if (widget !== null) {
+						grid['widget'] = widget;
+					}
+					else if (trigger['uniqueid'] !== null) {
 						var widgets = methods.getWidgetsBy.call($obj, 'uniqueid', trigger['uniqueid']);
-						// Will return only first element.
 						if (widgets.length > 0) {
 							grid['widget'] = widgets[0];
 						}
 					}
-					else {
-						grid['widget'] = widget;
-					}
 				}
-				if (typeof trigger['options']['grid']['data'] !== 'undefined' && trigger['options']['grid']['data']) {
+				if (trigger['options']['grid']['data']) {
 					grid['data'] = data;
 				}
-				if (typeof trigger['options']['grid']['obj'] !== 'undefined' && trigger['options']['grid']['obj']) {
+				if (trigger['options']['grid']['obj']) {
 					grid['obj'] = $obj;
 				}
 				params.push(grid);
@@ -3315,7 +3342,9 @@
 					widget_defaults: {},
 					widgets: [],
 					triggers: {},
+					// A single placeholder used for positioning and resizing a widget.
 					placeholder: placeholder,
+					// A single placeholder used for prompting to add a new widget.
 					new_widget_placeholder: new_widget_placeholder,
 					widget_relation_submissions: [],
 					widget_relations: {
@@ -3352,6 +3381,10 @@
 						data['cell-width'] = getCurrentCellWidth(data);
 						data.new_widget_placeholder.updateLabelVisibility();
 					});
+
+				['onWidgetAdd', 'onWidgetDelete', 'onWidgetPosition'].forEach(action => {
+					methods.addAction.call($this, action, () => hideMessageExhausted(data), null, {});
+				});
 			});
 		},
 
@@ -3496,6 +3529,8 @@
 						trigger_name: 'onIteratorResizeEnd_' + widget_local['uniqueid']
 					});
 				}
+
+				doAction('onWidgetAdd', $this, data, widget);
 			});
 		},
 
@@ -3684,16 +3719,11 @@
 		pasteWidget: function(widget, pos) {
 			return this.each(function() {
 				var	$this = $(this),
-					$wrapper = $this.closest('main'),
-					data = $this.data('dashboardGrid'),
-					new_widget = data.storage.readKey('dashboard.copied_widget'),
-					warning_msg_remove = function() {
-						$wrapper.siblings('.msg-warning').not('.msg-global-footer').remove();
-						$.unsubscribe('widget.update.dimensions', warning_msg_remove);
-					};
+					data = $this.data('dashboardGrid');
 
-				$('#dashbrd-save').prop('disabled', true);
-				warning_msg_remove();
+				hideMessageExhausted(data);
+
+				var new_widget = data.storage.readKey('dashboard.copied_widget');
 
 				// Regenerate reference field values.
 				if ('reference' in new_widget.fields) {
@@ -3733,11 +3763,7 @@
 
 					pos = findEmptyPosition($this, data, area_size);
 					if (!pos) {
-						$.subscribe('widget.update.dimensions', warning_msg_remove);
-						$wrapper.siblings('.msg-good, .msg-bad').remove();
-						$wrapper.before(makeMessageBox(
-							'warning', [], t('Cannot add widget: not enough free space on the dashboard.'), true, false
-						));
+						showMessageExhausted(data);
 						return;
 					}
 
@@ -3752,6 +3778,8 @@
 				if (widget !== null) {
 					removeWidget($this, data, widget);
 				}
+
+				$('#dashbrd-save').prop('disabled', true);
 
 				// Create placeholder.
 				var widget_placeholder = makeWidgetPlaceholder($this, data, new_widget.pos);
@@ -3934,7 +3962,7 @@
 					};
 
 					if (widget === null && !findEmptyPosition($this, data, area_size)) {
-						showMessageExhausted(data);
+						showDialogMessageExhausted(data);
 					}
 					else {
 						// Enable save button after successful form update.
@@ -4192,14 +4220,14 @@
 		 *
 		 * @param {string} hook_name                  Name of trigger, when $function_to_call should be called.
 		 * @param {string} function_to_call           Name of function in global scope that will be called.
-		 * @param {string} uniqueid                   Identifier of widget, that added this action.
+		 * @param {string} uniqueid                   A widget to receive the event for (null for all widgets).
 		 * @param {array}  options                    Any key in options is optional.
 		 * @param {array}  options['parameters']      Array of parameters with which the function will be called.
 		 * @param {array}  options['grid']            Mark, what data from grid should be passed to $function_to_call.
 		 *                                            If is empty, parameter 'grid' will not be added to function_to_call params.
-		 * @param {string} options['grid']['widget']  Should contain 1. Will add widget object.
-		 * @param {string} options['grid']['data']    Should contain '1'. Will add dashboard grid data object.
-		 * @param {string} options['grid']['obj']     Should contain '1'. Will add dashboard grid object ($this).
+		 * @param {string} options['grid']['widget']  True to pass the widget as argument.
+		 * @param {string} options['grid']['data']    True to pass dashboard grid data as argument.
+		 * @param {string} options['grid']['obj']     True to pass dashboard grid object as argument.
 		 * @param {int}    options['priority']        Order, when it should be called, compared to others. Default = 10.
 		 * @param {int}    options['trigger_name']    Unique name. There can be only one trigger with this name for each hook.
 		 */
