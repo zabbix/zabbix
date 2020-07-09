@@ -188,8 +188,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			}
 		}
 
-		// Check if Interface details (SNMP) have macros and add them to list of macros.
-		if (array_key_exists('details', $inputs['interface'])) {
+		// Check if if there is an interface and its details (SNMP) have macros and add them to list of macros.
+		if (array_key_exists('interface', $inputs) && array_key_exists('details', $inputs['interface'])) {
 			foreach ($inputs['interface']['details'] as $field) {
 				if (strstr($field, '{') !== false) {
 					$texts_support_user_macros[] = $field;

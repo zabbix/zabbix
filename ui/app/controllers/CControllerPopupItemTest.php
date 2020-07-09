@@ -949,7 +949,7 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		// Resolve interface details (SNMP) macros separately.
-		if (array_key_exists('details', $inputs['interface'])) {
+		if (array_key_exists('interface', $inputs) && array_key_exists('details', $inputs['interface'])) {
 			foreach ($inputs['interface']['details'] as &$field) {
 				if (strstr($field, '{') !== false) {
 					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($field, ['usermacros' => true]);
