@@ -2358,18 +2358,18 @@ INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templatei
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99502, 99201, '{$DELETE_MACRO_1}', 'Delete macro value 1', 'Delete macro description 1');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99503, 99201, '{$DELETE_MACRO_2}', 'Delete macro value 2', 'Delete macro description 2');
 
-INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99202, 'Host prototype for Secret macros {#CREATE}', 'Host prototype for Secret macros {#CREATE}', 0, '', 2);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99202, 90001);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (222092, 99202, '', 5, NULL);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99205, 'Host prototype for Secret macros {#CREATE}', 'Host prototype for Secret macros {#CREATE}', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99205, 90001);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (222092, 99205, '', 5, NULL);
 
-INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99203, 'Host prototype for Secret macros {#UPDATE}', 'Host prototype for Secret macros {#UPDATE}', 0, '', 2);
-INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99203, 90001);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (222093, 99203, '', 5, NULL);
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99504, 99203, '{$PROTORYPE_SECRET_2_SECRET}', 'This text should stay secret', 'Secret macro to me updated', 1);
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99505, 99203, '{$PROTOTYPE_SECRET_2_TEXT}', 'This text should become visible', 'Secret macro to become visible', 1);
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99506, 99203, '{$PROTOTYPE_TEXT_2_SECRET}', 'This text should become secret', 'Text macro to become secret', 0);
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99507, 99203, '{$Z_HOST_PROTOTYPE_MACRO_REVERT}', 'Secret host value', 'Value change Revert', 1);
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99508, 99203, '{$Z_HOST_PROTOTYPE_MACRO_2_TEXT_REVERT}', 'Secret host value 2', 'Value and type change revert', 1);
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99206, 'Host prototype for Secret macros {#UPDATE}', 'Host prototype for Secret macros {#UPDATE}', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99206, 90001);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (222093, 99206, '', 5, NULL);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99504, 99206, '{$PROTORYPE_SECRET_2_SECRET}', 'This text should stay secret', 'Secret macro to me updated', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99505, 99206, '{$PROTOTYPE_SECRET_2_TEXT}', 'This text should become visible', 'Secret macro to become visible', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99506, 99206, '{$PROTOTYPE_TEXT_2_SECRET}', 'This text should become secret', 'Text macro to become secret', 0);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99507, 99206, '{$Z_HOST_PROTOTYPE_MACRO_REVERT}', 'Secret host value', 'Value change Revert', 1);
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99508, 99206, '{$Z_HOST_PROTOTYPE_MACRO_2_TEXT_REVERT}', 'Secret host value 2', 'Value and type change revert', 1);
 
 -- testFormAdministrationMediaTypeWebhook
 INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (101, 4, 'Reference webhook', 0, 'return 0;', 'Reference webhook media type');
