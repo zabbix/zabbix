@@ -2785,10 +2785,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-widget-content .msg-warning {
     margin: 0 10px; }
 
-.widget-placeholder .dashbrd-grid-widget-container .dashbrd-grid-widget-content {
-  margin-top: 0;
-  height: 100%; }
-
 .dashbrd-grid-widget-mask {
   position: absolute;
   top: .25rem;

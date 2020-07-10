@@ -77,6 +77,9 @@
 							'class': 'btn-iterator-page-previous',
 							'title': t('Previous page')
 						}).on('click', function() {
+							if (!widget.ready) {
+								return false;
+							}
 							if (widget['page'] > 1) {
 								widget['page']--;
 								updateWidgetContent($obj, data, widget);
@@ -88,6 +91,9 @@
 							'class': 'btn-iterator-page-next',
 							'title': t('Next page')
 						}).on('click', function() {
+							if (!widget.ready) {
+								return false;
+							}
 							if (widget['page'] < widget['page_count']) {
 								widget['page']++;
 								updateWidgetContent($obj, data, widget);
@@ -104,6 +110,9 @@
 								'class': 'btn-widget-edit',
 								'title': t('Edit')
 							}).on('click', function() {
+								if (!widget.ready) {
+									return false;
+								}
 								if (!methods.isEditMode.call($obj)) {
 									showEditMode();
 								}
@@ -126,6 +135,10 @@
 								'attr': {
 									'aria-expanded': false,
 									'aria-haspopup': true
+								}
+							}).on('click', function() {
+								if (!widget.ready) {
+									return false;
 								}
 							})
 						)
@@ -2147,24 +2160,27 @@
 			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
 		}
 
+		setDashboardBusy($obj, data, 'updateWidgetContent', widget.uniqueid);
+
 		startPreloader(widget);
-		$('#dashbrd-save').prop('disabled', true);
 
 		widget['updating_content'] = true;
 
-		return jQuery.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			data: ajax_data,
-			dataType: 'json'
-		})
+		var request = $.ajax({
+				url: url.getUrl(),
+				method: 'POST',
+				data: ajax_data,
+				dataType: 'json'
+			});
+
+		request
 			.then(function(response) {
 				delete widget['updating_content'];
 
 				stopPreloader(widget);
 
 				if (isDeletedWidget($obj, data, widget)) {
-					return;
+					return $.Deferred().reject();
 				}
 
 				var $content_header = $('h4', widget['content_header']);
@@ -2185,10 +2201,9 @@
 				}
 
 				doAction('onContentUpdated', $obj, data, null);
-				$('#dashbrd-save').prop('disabled', false);
 			})
 			.then(function() {
-				// Separate 'then' section allows to execute scripts added by widgets in previous section first.
+				// Separate 'then' section allows to execute JavaScripts added by widgets in previous section first.
 
 				setWidgetReady($obj, data, widget);
 
@@ -2210,12 +2225,47 @@
 					$obj.find('[data-expanded="true"][data-menu-popup]').menuPopup('refresh', widget);
 				}
 			})
-			.fail(function() {
-				// TODO: gentle message about failed update of widget content
-
-				delete widget['updating_content'];
-				setUpdateWidgetContentTimer($obj, data, widget, 3);
+			.always(function() {
+				clearDashboardBusy($obj, data, 'updateWidgetContent', widget.uniqueid);
 			});
+
+		request.fail(function() {
+			delete widget['updating_content'];
+			setUpdateWidgetContentTimer($obj, data, widget, 3);
+		});
+	}
+
+	/**
+	 * Smoothly scroll object of given position and dimension into view and return a promise.
+	 *
+	 * @param {object} $obj  Dashboard container jQuery object.
+	 * @param {object} data  Dashboard data and options object.
+	 * @param {object} pos   Object with position and dimension.
+	 *
+	 * @returns {object}  jQuery Deferred object.
+	 */
+	function promiseScrollIntoView($obj, data, pos) {
+		var	offset_top = $obj.offsetParent().position().top + $obj.position().top,
+			widget_top = offset_top + pos['y'] * data['options']['widget-height'],
+			widget_height = pos['height'] * data['options']['widget-height'],
+			wrapper_height = $('.wrapper').height(),
+			wrapper_scrollTop = $('.wrapper').scrollTop(),
+			wrapper_scrollTop_min = widget_top + Math.min(0, widget_height - wrapper_height),
+			wrapper_scrollTop_max = widget_top;
+
+		if (pos['y'] + pos['height'] > data['options']['rows']) {
+			resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
+		}
+
+		if (wrapper_scrollTop < wrapper_scrollTop_min) {
+			return $('.wrapper').animate({scrollTop: wrapper_scrollTop_min}).promise();
+		}
+		else if (wrapper_scrollTop > wrapper_scrollTop_max) {
+			return $('.wrapper').animate({scrollTop: wrapper_scrollTop_max}).promise();
+		}
+		else {
+			return $.Deferred().resolve();
+		}
 	}
 
 	/**
@@ -2367,20 +2417,7 @@
 							'configuration': configuration
 						};
 
-					if (pos['y'] + pos['height'] > data['options']['rows']) {
-						resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
-
-						// Body height should be adjusted to animate scrollTop work.
-						$('body').css('height', Math.max(
-							$('body').height(), (pos['y'] + pos['height']) * data['options']['widget-height']
-						));
-					}
-
-					// 5px shift is widget padding.
-					$('html, body')
-						.animate({scrollTop: pos['y'] * data['options']['widget-height']
-							+ $('.dashbrd-grid-container').position().top - 5})
-						.promise()
+					$.when(promiseScrollIntoView($obj, data, pos))
 						.then(function() {
 							methods.addWidget.call($obj, widget_data);
 
@@ -2388,9 +2425,6 @@
 							widget = data['widgets'].slice(-1)[0];
 							setWidgetModeEdit($obj, data, widget);
 							updateWidgetContent($obj, data, widget);
-
-							// Remove height attribute set for scroll animation.
-							$('body').css('height', '');
 						});
 				}
 				else if (widget['type'] === type) {
@@ -3013,6 +3047,8 @@
 			ajax_data['sharing'] = data['dashboard']['sharing'];
 		}
 
+		setDashboardBusy($obj, data, 'saveChanges', null);
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -3020,24 +3056,22 @@
 			data: ajax_data
 		})
 			.done(function(response) {
-				// We can have redirect with errors.
 				if ('redirect' in response) {
-					// There are no more unsaved changes.
-					data['options']['updated'] = false;
 					/*
 					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
 					 * It allows to use back browser button more user-friendly.
 					 */
 					window.location.replace(response.redirect);
 				}
-				else if ('errors' in response) {
-					// Error returned.
-					dashboardAddMessages(response.errors);
+				else {
+					if ('errors' in response) {
+						dashboardAddMessages(response.errors);
+					}
+					clearDashboardBusy($obj, data, 'saveChanges', null);
 				}
 			})
-			.always(function() {
-				var ul = $('#dashbrd-config').closest('ul');
-				$('#dashbrd-save', ul).prop('disabled', false);
+			.fail(function() {
+				clearDashboardBusy($obj, data, 'saveChanges', null);
 			});
 	}
 
@@ -3260,43 +3294,52 @@
 	}
 
 	/**
-	 * Function creates widget placeholder with loader.
+	 * Set dashboard busy state by registering a blocker.
 	 *
-	 * @param {jQuery} $obj  Dashboard object.
-	 * @param {object} data  Dashboard data object.
-	 * @param {object} pos   New widget position.
-	 *
-	 * @returns {object}
+	 * @param {object} $obj  Dashboard container jQuery object.
+	 * @param {object} data  Dashboard data and options object.
+	 * @param {string} type  Common type of the blocker.
+	 * @param {*}      item  Unique item of the blocker.
 	 */
-	function makeWidgetPlaceholder($obj, data, pos) {
-		var $div, placeholder;
+	function setDashboardBusy($obj, data, type, item) {
+		if (data.options.busy_blockers === undefined) {
+			data.options.busy_blockers = [];
 
-		$div = $('<div>', {'class': 'dashbrd-grid-widget widget-placeholder'})
-			.append(
-				$('<div>', {'class': 'dashbrd-grid-widget-container'}).append(
-					$('<div>', {'class': 'dashbrd-grid-widget-content'})
-				)
-			)
-			.data('widget-index', data['widgets'].length)
-			.css({
-				'min-height': data['options']['widget-height'] + 'px',
-				'min-width': data['options']['widget-width'] + '%'
-			});
+			$.publish('dashboard.grid.busy', {state: true});
+		}
 
-		placeholder = {
-			'uniqueid': generateUniqueId($obj, data),
-			'parent': false,
-			'div': $div,
-			'pos': pos
-		};
+		data.options.busy_blockers.push({type: type, item: item});
+	}
 
-		data['widgets'].push(placeholder);
-		$obj.append(placeholder['div']);
-		setDivPosition(placeholder['div'], data, placeholder['pos']);
-		showPreloader(placeholder);
+	/**
+	 * Clear dashboard busy state by unregistering a blocker.
+	 *
+	 * @param {object} $obj  Dashboard container jQuery object.
+	 * @param {object} data  Dashboard data and options object.
+	 * @param {string} type  Common type of the blocker.
+	 * @param {*}      item  Unique item of the blocker.
+	 */
+	function clearDashboardBusy($obj, data, type, item) {
+		if (data.options.busy_blockers === undefined) {
+			return;
+		}
 
-		return placeholder;
-	};
+		for (var i = 0; i < data.options.busy_blockers.length; i++) {
+			var blocker = data.options.busy_blockers[i];
+
+			if (type === blocker.type && Object.is(item, blocker.item)) {
+				data.options.busy_blockers.splice(i, 1);
+
+				break;
+			}
+		}
+
+		if (!data.options.busy_blockers.length) {
+			delete data.options.busy_blockers;
+
+			$.publish('dashboard.grid.busy', {state: false});
+		}
+	}
 
 	var	methods = {
 		init: function(options) {
@@ -3636,10 +3679,8 @@
 		saveDashboardChanges: function() {
 			return this.each(function() {
 				var	$this = $(this),
-					ul = $('#dashbrd-config').closest('ul'),
 					data = $this.data('dashboardGrid');
 
-				$('#dashbrd-save', ul).prop('disabled', true);
 				doAction('beforeDashboardSave', $this, data, null);
 				saveChanges($this, data);
 			});
@@ -3774,80 +3815,51 @@
 					new_widget = $.extend(new_widget, {pos: pos});
 				}
 
+				var dashboard_busy_item = {};
+
+				setDashboardBusy($this, data, 'pasteWidget', dashboard_busy_item);
+
 				// Remove old widget.
 				if (widget !== null) {
 					removeWidget($this, data, widget);
 				}
 
-				$('#dashbrd-save').prop('disabled', true);
+				$.when(promiseScrollIntoView($this, data, pos))
+					.then(function() {
+						methods.addWidget.call($this, new_widget);
+						new_widget = data['widgets'].slice(-1)[0];
+						setWidgetModeEdit($this, data, new_widget);
 
-				// Create placeholder.
-				var widget_placeholder = makeWidgetPlaceholder($this, data, new_widget.pos);
+						var url = new Curl('zabbix.php');
+						url.setArgument('action', 'dashboard.widget.sanitize');
 
-				var url = new Curl('zabbix.php');
-				url.setArgument('action', 'dashboard.widget.sanitize');
-
-				$.ajax({
-					url: url.getUrl(),
-					method: 'POST',
-					dataType: 'json',
-					data: {
-						fields: JSON.stringify(new_widget.fields),
-						type: new_widget.type
-					}
-				})
-					.done(function(response) {
-						if (!('errors' in response)) {
-							new_widget = $.extend(new_widget, {fields: response.fields});
-
-							if (pos['y'] + pos['height'] > data['options']['rows']) {
-								resizeDashboardGrid($this, data, pos['y'] + pos['height']);
-
-								// Body height should be adjusted to animate scrollTop work.
-								$('body').css('height', Math.max(
-									$('body').height(), (pos['y'] + pos['height']) * data['options']['widget-height']
-								));
+						return $.ajax({
+							url: url.getUrl(),
+							method: 'POST',
+							dataType: 'json',
+							data: {
+								fields: JSON.stringify(new_widget.fields),
+								type: new_widget.type
 							}
-
-							// 5px shift is widget padding.
-							$('html, body')
-								.animate({scrollTop: pos['y'] * data['options']['widget-height']
-									+ $('.dashbrd-grid-container').position().top - 5})
-								.promise()
-								.then(function() {
-									removeWidget($this, data, widget_placeholder);
-									methods.addWidget.call($this, new_widget);
-
-									// New widget is last element in data['widgets'] array.
-									new_widget = data['widgets'].slice(-1)[0];
-									setWidgetModeEdit($this, data, new_widget);
-									updateWidgetContent($this, data, new_widget);
-
-									// Remove height attribute set for scroll animation.
-									$('body').css('height', '');
-								});
+						});
+					})
+					.then(function(response) {
+						if ('errors' in response) {
+							return $.Deferred().reject();
 						}
-						else {
-							removeWidget($this, data, widget_placeholder);
-							resizeDashboardGrid($this, data, pos['y'] + pos['height']);
-						}
+
+						new_widget['fields'] = response.fields;
+
+						updateWidgetContent($this, data, new_widget);
 					})
 					.fail(function() {
-						removeWidget($this, data, widget_placeholder);
-						resizeDashboardGrid($this, data, pos['y'] + pos['height']);
+						deleteWidget($this, data, new_widget);
 					})
 					.always(function() {
 						// Mark dashboard as updated.
 						data['options']['updated'] = true;
 
-						// Activate 'Save' button.
-						var active_placeholders = data['widgets'].filter(w => {
-							return !w.type && w.uniqueid != widget_placeholder.uniqueid;
-						}).length;
-
-						if (!active_placeholders) {
-							$('#dashbrd-save').prop('disabled', false);
-						}
+						clearDashboardBusy($this, data, 'pasteWidget', dashboard_busy_item);
 					});
 			});
 		},
