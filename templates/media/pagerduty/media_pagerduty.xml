@@ -97,7 +97,7 @@
         'critical' // Disaster&#13;
     ];&#13;
 &#13;
-    if (!everityMapping[params.severity]) {&#13;
+    if (!severityMapping[params.severity]) {&#13;
         params.severity = '0';&#13;
     }&#13;
 &#13;
