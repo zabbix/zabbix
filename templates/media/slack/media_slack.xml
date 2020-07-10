@@ -545,7 +545,7 @@ try {&#13;
     }&#13;
 }&#13;
 catch (error) {&#13;
-    Zabbix.Log(4, '[ Mattermost Webhook ] Slack notification failed : ' + error);&#13;
+    Zabbix.Log(4, '[ Slack Webhook ] Slack notification failed : ' + error);&#13;
     throw 'Slack notification failed : ' + error;&#13;
 }</script>
             <process_tags>YES</process_tags>
