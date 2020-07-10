@@ -500,7 +500,7 @@ class CElementQuery implements IWaitable {
 				'/ul[contains(@class, "checkbox-list")]',
 				'/ul[contains(@class, "list-check-radio")]'
 			],
-			'CTableElement'				=> [
+			'CMultifieldTableElement'	=> [
 				'/table',
 				'/div/table', // TODO: remove when extra containers are removed
 				'/*[contains(@class, "table-forms-separator")]/table'
