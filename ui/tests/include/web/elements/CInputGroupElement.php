@@ -19,11 +19,10 @@
 **/
 
 require_once 'vendor/autoload.php';
-
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
- * Dashboard element.
+ * InputGroup element.
  */
 class CInputGroupElement extends CElement {
 
@@ -60,6 +59,8 @@ class CInputGroupElement extends CElement {
 	/**
 	 * Select the type of InputGroup element.
 	 *
+	 * @param	string	$new_type	vlaue field type to be selected
+	 *
 	 * @return $this
 	 */
 	public function changeInputType($new_type) {
@@ -70,15 +71,21 @@ class CInputGroupElement extends CElement {
 	}
 
 	/**
-	 * Press revert button for the corresponding InputGroup element
+	 * Get "Revert" button for the corresponding InputGroup element
+	 *
+	 * @return CElement
 	 */
-	public function pressRevertButton() {
-		try {
-			$this->query('xpath:.//button[@title="Revert changes"]')->one()->click();
-		}
-		catch (Exception $e) {
-			throw new Exception('Revert button is not elabled for this element.');
-		}
+	public function getRevertButton() {
+		return	$this->query('xpath:.//button[@title="Revert changes"]')->one(false);
+	}
+
+	/**
+	 * Get "Set new value" button for the corresponding InputGroup element
+	 *
+	 * @return CElement
+	 */
+	public function getNewValueButton() {
+		return	$this->query('button:Set new value')->one(false);
 	}
 
 	/**
@@ -94,8 +101,11 @@ class CInputGroupElement extends CElement {
 	}
 
 	/**
+	 * Fill InputGroup element type and value
 	 *
-	 * @param type $input
+	 * @param	array|string	$input		values to be set in InputGroups element
+	 *
+	 * @return	$this
 	 */
 	public function fill($input) {
 		if (!is_array($input)) {
@@ -121,5 +131,14 @@ class CInputGroupElement extends CElement {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Function checks if textarea element is present in the InputGroup element
+	 *
+	 * @return boolean
+	 */
+	public function isTextareaPresent() {
+		return $this->query($this->textarea_xpath)->one(false)->isValid();
 	}
 }

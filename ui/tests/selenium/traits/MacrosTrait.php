@@ -129,8 +129,15 @@ trait MacrosTrait {
 		$this->assertEquals($rows, $this->getMacros(), 'Macros on a page does not match macros in data provider.');
 	}
 
+	/**
+	 * Get value field for the provided macro name.
+	 *
+	 * @param string $macro    macro name for which value field needs to be fetched
+	 *
+	 * @return CElement
+	 */
 	public function getValueField($macro) {
 		return $value_field = $this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
-				']/../..//div[contains(@class,"macro-value")]')->asInputGroup()->waitUntilVisible()->one();
+				']/../..//div[contains(@class, "macro-value")]')->asInputGroup()->waitUntilVisible()->one();
 	}
 }

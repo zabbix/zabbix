@@ -425,7 +425,7 @@ class testFormTemplateMacros extends testFormMacros {
 						'index' => 0,
 						'macro' => '{$SECRET_MACRO}',
 						'value' => [
-							'value' => 'secret value',
+							'value' => 'template secret value',
 							'type' => 'Secret text'
 						],
 						'description' => 'secret description'
@@ -438,7 +438,7 @@ class testFormTemplateMacros extends testFormMacros {
 					'macro_fields' => [
 						'macro' => '{$TEXT_MACRO}',
 						'value' => [
-							'value' => 'plain text value',
+							'value' => 'template plain text value',
 							'type' => 'Secret text'
 						],
 						'description' => 'plain text description'
@@ -468,7 +468,7 @@ class testFormTemplateMacros extends testFormMacros {
 		$this->createSecretMacros($data, 'templates.php?form=update&templateid=99022', 'templates');
 	}
 
-		public function getRevertSecretMacrosData() {
+	public function getRevertSecretMacrosData() {
 		return [
 			[
 				[

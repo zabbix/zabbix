@@ -654,19 +654,19 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$this->fillMacros([$data['macro_fields']]);
 
 		// Check that value field is filled correctly.
-		$value_field = $this->query('xpath://div[contains(@class,"macro-value")]')->all()->last()->asInputGroup();
+		$value_field = $this->query('xpath://div[contains(@class, "macro-value")]')->all()->last()->asInputGroup();
 		$this->assertEquals($data['macro_fields']['value']['type'], $value_field->getInputType());
 		$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
 		// Check that textarea input element is not available for secret text macros.
 		if ($value_field->isSecret()) {
-			$this->assertFalse($value_field->query('xpath:.//textarea[contains(@class, "textarea-flexible")]')
-					->one(false)->isValid());
+			$this->assertFalse($value_field->isTextareaPresent());
 		}
 
 		// If needed, change value type back to "Text" and verify that value is accessible.
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
 			$value_field->changeInputType('Text');
 			$this->assertFalse($value_field->isSecret());
+			$this->assertTrue($value_field->isTextareaPresent());
 			$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
 		}
 
@@ -676,13 +676,13 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
 			$this->assertFalse($value_field->isSecret());
 			$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
-			$this->assertFalse($value_field->query('button:Set new value')->one(false)->isValid());
-			$this->assertFalse($value_field->query('xpath:.//button[@title="Revert changes"]')->one(false)->isValid());
+			$this->assertFalse($value_field->getNewValueButton()->isValid());
+			$this->assertFalse($value_field->getRevertButton()->isValid());
 		}
 		else {
 			$this->assertEquals('******', $value_field->getValue());
-			$change_button = $value_field->query('button:Set new value')->one();
-			$revert_button = $value_field->query('xpath:.//button[@title="Revert changes"]')->one();
+			$change_button = $value_field->getNewValueButton();
+			$revert_button = $value_field->getRevertButton();
 
 			// Check that "Set new value" button is perent and "Revert" button is hidden if secret value wasn't modified.
 			$this->assertTrue($change_button->isEnabled());
@@ -694,7 +694,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 			$this->assertFalse($change_button->isEnabled());
 			$this->assertTrue($revert_button->isClickable());
 			// Revert changes
-			$value_field->pressRevertButton();
+			$revert_button->click();
 		}
 		$this->query('button:Update')->one()->click();
 		// Check macro value, type and description in DB.
@@ -747,7 +747,6 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 	public function testFormAdministrationGeneralMacros_UpdateSecretMacros($data) {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data]);
-
 		$this->query('button:Update')->one()->click();
 
 		$value_field = $this->getValueField($data['macro']);
@@ -799,8 +798,8 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		// Check that the existing macro value is hidden.
 		$this->assertEquals('******', $value_field->getValue());
 
-		// Change the value of the secret macro
-		$value_field->query('button:Set new value')->one()->click();
+		// Change the value of the secret macro.
+		$value_field->getNewValueButton()->click();
 		$this->assertEquals('', $value_field->getValue());
 		$value_field->fill('New_macro_value');
 
@@ -810,7 +809,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		}
 
 		// Press revert button amd save the changes and make sure that changes were reverted.
-		$value_field->pressRevertButton();
+		$value_field->getRevertButton()->click();
 		$this->query('button:Update')->one()->click();
 		// Check that no macro value changes took place.
 		$this->assertEquals('******', $this->getValueField($data['macro_fields']['macro'])->getValue());

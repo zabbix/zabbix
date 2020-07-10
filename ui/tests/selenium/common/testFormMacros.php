@@ -274,7 +274,7 @@ abstract class testFormMacros extends CWebTest {
 	/**
 	 * Check host/host prototype/template inherited macros in form matching with global macros in DB.
 	 *
-	 * @param array $hostmacros			all macros defined particularly for this host
+	 * @param array $hostmacros		all macros defined particularly for this host
 	 */
 	public function checkInheritedGlobalMacros($hostmacros = []) {
 		// Create two macros arrays: from DB and from Frontend form.
@@ -321,7 +321,7 @@ abstract class testFormMacros extends CWebTest {
 	}
 
 	/**
-	 *  Check adding and saving secret macros for host, host prototype and template entities.
+	 * Check adding and saving secret macros for host, host prototype and template entities.
 	 *
 	 * @param array		$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
@@ -342,8 +342,7 @@ abstract class testFormMacros extends CWebTest {
 		$this->assertEquals($data['macro_fields']['value']['type'], $value_field->getInputType());
 
 		// Check that textarea input element is not available for secret text macros.
-		$this->assertFalse($value_field->query('xpath:.//textarea[contains(@class, "textarea-flexible")]')
-				->one(false)->isValid());
+		$this->assertFalse($value_field->isTextareaPresent());
 		$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
 
 		// Switch to tab with inherited and instance macros and verify that the value is secret but is still accessible.
@@ -356,6 +355,10 @@ abstract class testFormMacros extends CWebTest {
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
 			$value_field->changeInputType('Text');
 		}
+		// Check presence of "Set new value" and "Revert" buttons.
+		$this->assertFalse($value_field->getNewValueButton()->isValid());
+		$this->assertTrue($value_field->getRevertButton()->isValid());
+
 
 		$this->query('button:Update')->one()->click();
 		$this->openMacrosTab($url, $source);
@@ -363,8 +366,8 @@ abstract class testFormMacros extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
 			$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
-			$this->assertFalse($value_field->query('button:Set new value')->one(false)->isValid());
-			$this->assertFalse($value_field->query('xpath:.//button[@title="Revert changes"]')->one(false)->isValid());
+			$this->assertFalse($value_field->getNewValueButton()->isValid());
+			$this->assertFalse($value_field->getRevertButton()->isValid());
 
 			// Switch to tab with inherited and instance macros and verify that the value is plain text.
 			$this->checkInheritedTab($data['macro_fields'], false);
@@ -375,8 +378,8 @@ abstract class testFormMacros extends CWebTest {
 			// Switch to tab with inherited and instance macros and verify that the value is secret and is not accessible.
 			$this->checkInheritedTab($data['macro_fields'], true, false);
 
-			$change_button = $value_field->query('button:Set new value')->one();
-			$revert_button = $value_field->query('xpath:.//button[@title="Revert changes"]')->one();
+			$change_button = $value_field->getNewValueButton();
+			$revert_button = $value_field->getRevertButton();
 
 			// Check that "Set new value" button is perent and "Revert" button is hidden if secret value wasn't modified.
 			$this->assertTrue($change_button->isEnabled());
@@ -389,7 +392,7 @@ abstract class testFormMacros extends CWebTest {
 			$this->assertTrue($revert_button->isClickable());
 
 			// Revert changes
-			$value_field->pressRevertButton();
+			$value_field->getRevertButton()->click();
 		}
 		$this->query('button:Update')->one()->click();
 		// Check macro value, type and description in DB.
@@ -453,7 +456,7 @@ abstract class testFormMacros extends CWebTest {
 		$this->assertEquals('******', $value_field->getValue());
 
 		// Change the value of the secret macro
-		$value_field->query('button:Set new value')->one()->click();
+		$value_field->getNeValueButton()->click();
 		$this->assertEquals('', $value_field->getValue());
 		$value_field->fill('New_macro_value');
 
@@ -463,7 +466,7 @@ abstract class testFormMacros extends CWebTest {
 		}
 
 		// Press revert button and save the changes.
-		$value_field->pressRevertButton();
+		$value_field->getRevertButton()->click();
 		$this->query('button:Update')->one()->click();
 
 		// Check that no macro value changes took place.
@@ -533,12 +536,11 @@ abstract class testFormMacros extends CWebTest {
 	 * @param type $source		type of entity that is being checked (hots, hostPrototype, template)
 	 * @param type $login		flag that indicates whether login should occur before opening the configuration form
 	 */
-	private function openMacrosTab($url, $source, $login = false){
+	private function openMacrosTab($url, $source, $login = false) {
 		if ($login) {
 			$this->page->login();
 		}
 		$this->page->open($url)->waitUntilReady();
 		$this->query('id:'.$source.'Form')->asForm()->one()->selectTab('Macros');
 	}
-
 }

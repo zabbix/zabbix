@@ -425,7 +425,7 @@ class testFormHostMacros extends testFormMacros {
 						'index' => 0,
 						'macro' => '{$SECRET_MACRO}',
 						'value' => [
-							'value' => 'secret value',
+							'value' => 'host secret value',
 							'type' => 'Secret text'
 						],
 						'description' => 'secret description'
@@ -438,7 +438,7 @@ class testFormHostMacros extends testFormMacros {
 					'macro_fields' => [
 						'macro' => '{$TEXT_MACRO}',
 						'value' => [
-							'value' => 'plain text value',
+							'value' => 'host plain text value',
 							'type' => 'Secret text'
 						],
 						'description' => 'plain text description'
