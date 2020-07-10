@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-sleep(3);
 
 /**
  * Controller to sanitize widget fields before copied widget is created.
