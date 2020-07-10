@@ -1011,7 +1011,9 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
 		}
 	}
 
-	$history = Manager::History()->getLastValues($visible_items, 1, ZBX_HISTORY_PERIOD);
+	$history = Manager::History()->getLastValues($visible_items, 1,
+		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
+	);
 
 	$db_triggers = getTriggersWithActualSeverity([
 		'output' => ['triggerid', 'priority', 'value'],

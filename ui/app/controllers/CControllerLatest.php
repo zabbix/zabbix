@@ -163,7 +163,9 @@ abstract class CControllerLatest extends CController {
 
 			if ($items) {
 				// Get history.
-				$history = Manager::History()->getLastValues($items, 2, ZBX_HISTORY_PERIOD);
+				$history = Manager::History()->getLastValues($items, 2,
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
+				);
 
 				// Filter items without history.
 				if (!$filter['show_without_data']) {

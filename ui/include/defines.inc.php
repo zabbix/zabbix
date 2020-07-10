@@ -37,9 +37,14 @@ define('ZBX_GIBIBYTE',	'1073741824');
 define('ZBX_TEBIBYTE',	'1099511627776');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-// The maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1.
-// Both dates are included to the period, so one second is needed to cover the case from "now" till "now-2y".
-define('ZBX_MAX_PERIOD',		63162001);
+
+/**
+ * Value to be added to CSettingsHelper::MAX_PERIOD for final calculation of acceptable max period. The value contains:
+ * - 1 day (86400 seconds) for leap year;
+ * - 1 hour (3600 seconds) for winter/summer time transfer;
+ * - 1 second for correct displaying of the max_period border in graph.
+ */
+define('ZBX_MAX_PERIOD_ADDITIONAL_TIME', 90001);
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_UINT64',		'18446744073709551615');
@@ -50,8 +55,6 @@ define('ZBX_FLOAT_MIN', PHP_FLOAT_MIN);
 define('ZBX_FLOAT_MAX', PHP_FLOAT_MAX);
 
 define('ZBX_MAX_DATE',			ZBX_MAX_INT32); // 19 Jan 2038 05:14:07
-define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
-define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
@@ -1250,9 +1253,6 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
-define('ZBX_SOCKET_TIMEOUT',			3);		// Socket timeout limit.
-define('ZBX_CONNECT_TIMEOUT',			3);		// Zabbix server connect timeout limit.
-define('ZBX_MEDIA_TYPE_TEST_TIMEOUT',	65);	// Timeout limit set for media type test.
 define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
 // value is also used in servercheck.js file
@@ -1523,9 +1523,6 @@ define('ZBX_MONITORED_BY_PROXY', 2);
 define('QUEUE_OVERVIEW', 0);
 define('QUEUE_OVERVIEW_BY_PROXY', 1);
 define('QUEUE_DETAILS', 2);
-
-// item count to display in the details queue
-define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
 // target types to copy items/triggers/graphs
 define('COPY_TYPE_TO_HOST_GROUP',	0);

@@ -2020,7 +2020,9 @@ function get_status() {
 		'has_status' => false
 	];
 
-	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+	);
 	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
 
 	if ($status['is_running'] === false) {
@@ -2485,13 +2487,16 @@ function getTimeSelectorPeriod(array $options) {
 	$profileIdx2 = array_key_exists('profileIdx2', $options) ? $options['profileIdx2'] : null;
 
 	if ($profileIdx === null) {
-		$options['from'] = ZBX_PERIOD_DEFAULT_FROM;
-		$options['to'] = ZBX_PERIOD_DEFAULT_TO;
+		$options['from'] = 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT);
+		$options['to'] = 'now';
 	}
 	elseif (!array_key_exists('from', $options) || !array_key_exists('to', $options)
 			|| $options['from'] === null || $options['to'] === null) {
-		$options['from'] = CProfile::get($profileIdx.'.from', ZBX_PERIOD_DEFAULT_FROM, $profileIdx2);
-		$options['to'] = CProfile::get($profileIdx.'.to', ZBX_PERIOD_DEFAULT_TO, $profileIdx2);
+		$options['from'] = CProfile::get($profileIdx.'.from',
+			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT),
+			$profileIdx2
+		);
+		$options['to'] = CProfile::get($profileIdx.'.to', 'now', $profileIdx2);
 	}
 
 	$range_time_parser = new CRangeTimeParser();

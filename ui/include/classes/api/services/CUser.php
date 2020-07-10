@@ -1176,9 +1176,9 @@ class CUser extends CApiService {
 		);
 
 		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
-			$sec_left = (timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
+			$sec_left = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
 				- (time() - $db_user['attempt_clock'])
-			);
+			;
 
 			if ($sec_left > 0) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,

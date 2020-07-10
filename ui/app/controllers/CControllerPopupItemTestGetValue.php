@@ -182,7 +182,9 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 		];
 
 		// Send test to be executed on Zabbix server.
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
 		$result = $server->testItem($data, CWebUser::getSessionCookie());
 
 		// Handle the response.

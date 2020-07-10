@@ -1274,7 +1274,9 @@ class CScreenProblem extends CScreenBase {
 		$latest_values = [];
 
 		$items = zbx_toHash($items, 'itemid');
-		$history_values = Manager::History()->getLastValues($items, 1, ZBX_HISTORY_PERIOD);
+		$history_values = Manager::History()->getLastValues($items, 1, timeUnitToSeconds(CSettingsHelper::get(
+			CSettingsHelper::HISTORY_PERIOD
+		)));
 
 		if ($html) {
 			$hint_table = (new CTable())->addClass('list-table');

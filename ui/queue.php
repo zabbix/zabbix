@@ -46,7 +46,9 @@ $config = getRequest('config', CProfile::get('web.queue.config', 0));
 CProfile::update('web.queue.config', $config, PROFILE_TYPE_INT);
 
 // fetch data
-$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+	timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+);
 $queueRequests = [
 	QUEUE_OVERVIEW => CZabbixServer::QUEUE_OVERVIEW,
 	QUEUE_OVERVIEW_BY_PROXY => CZabbixServer::QUEUE_OVERVIEW_BY_PROXY,
@@ -279,9 +281,12 @@ elseif ($config == QUEUE_DETAILS) {
 				continue;
 			}
 
-			// display only the first QUEUE_DETAIL_ITEM_COUNT items (can only occur when using old server versions)
+			/**
+			 * Display only the first CSettingsHelper::SEARCH_LIMIT items (can only occur when using old server
+			 * versions).
+			 */
 			$i++;
-			if ($i > QUEUE_DETAIL_ITEM_COUNT) {
+			if ($i > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)) {
 				break;
 			}
 

@@ -104,6 +104,9 @@ class CControllerTimeSelectorUpdate extends CController {
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;
+		$max_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MAX_PERIOD), true)
+			+ ZBX_MAX_PERIOD_ADDITIONAL_TIME
+		;
 
 		switch ($method) {
 			case 'decrement':
@@ -147,8 +150,8 @@ class CControllerTimeSelectorUpdate extends CController {
 				$ts['from'] -= $left_offset;
 				$ts['to'] += $right_offset;
 
-				if ($ts['to'] - $ts['from'] + 1 > ZBX_MAX_PERIOD) {
-					$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD + 1;
+				if ($ts['to'] - $ts['from'] + 1 > $max_period) {
+					$ts['from'] = $ts['to'] - $max_period + 1;
 				}
 
 				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME);
@@ -195,7 +198,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			'to' => $value['to'],
 			'to_ts' => $ts['to'],
 			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME),
-			'can_zoomout' => ($ts['to'] - $ts['from'] + 1 < ZBX_MAX_PERIOD),
+			'can_zoomout' => ($ts['to'] - $ts['from'] + 1 < $max_period),
 			'can_decrement' => ($ts['from'] > 0),
 			'can_increment' => ($ts['to'] < $ts['now'] - ZBX_MIN_PERIOD)
 		])]));
@@ -231,15 +234,18 @@ class CControllerTimeSelectorUpdate extends CController {
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;
+		$max_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MAX_PERIOD), true)
+			+ ZBX_MAX_PERIOD_ADDITIONAL_TIME
+		;
 
 		if ($period < ZBX_MIN_PERIOD) {
 			$this->data['error']['from'] = _n('Minimum time period to display is %1$s minute.',
 				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
 			);
 		}
-		elseif ($period > ZBX_MAX_PERIOD) {
+		elseif ($period > $max_period) {
 			$this->data['error']['from'] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) (ZBX_MAX_PERIOD / SEC_PER_DAY)
+				'Maximum time period to display is %1$s days.', (int) ($max_period / SEC_PER_DAY)
 			);
 		}
 
