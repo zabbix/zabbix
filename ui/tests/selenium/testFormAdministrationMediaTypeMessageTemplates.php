@@ -37,7 +37,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$this->assertTrue($templates_list->query('button:Add')->one()->isEnabled());
 		$this->assertSame(['Message type', 'Template', 'Actions'], $templates_list->getHeadersText());
 		$this->assertEquals(1, $templates_list->getRows()->count());
-		$this->checkButtonsCLickable(['add', 'cancel'], $this, 'id');
+		// Check that media type configuration form buttons are clickable from Message templates tab.
+		$this->assertEquals(2, $this->query('id', ['add', 'cancel'])->all()->filter(CElementQuery::CLICKABLE)->count());
 
 		// Check message template configuration form.
 		$templates_list->query('button:Add')->one()->click();
@@ -48,15 +49,19 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$form->getField('Message type')->checkValue('Problem');
 		$this->assertEquals(255, $form->getField('Subject')->getAttribute('maxlength'));
 		$this->assertEquals(65535, $form->getField('Message')->getAttribute('maxlength'));
-		$this->checkButtonsCLickable(['Add', 'Cancel'], $overlay);
+		// Check that both buttons in the media type template configuration form are clickable.
+		$this->assertEquals(2, $overlay->query('button', ['Add', 'Cancel'])->all()->filter(CElementQuery::CLICKABLE)->count());
 
 		// Add a "Problem" message template and check that corresponding row is added in Message templates table.
 		$form->submit();
 		$templates_list->invalidate();
 		$row = $templates_list->findRow('Message type', 'Problem');
 
+		// Check that both buttons in column Actions are clickable.
+		$this->assertEquals(2, $row->getColumn('Actions')->query('button', ['Edit', 'Remove'])->all()->
+				filter(CElementQuery::CLICKABLE)->count()
+		);
 		// Check that it is possible to edit a newly created message template.
-		$this->checkButtonsCLickable(['Edit', 'Remove'], $row->getColumn('Actions'));
 		$row->query('button:Edit')->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady()->close();
 
@@ -292,7 +297,9 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				$templates_list->query('button:Add')->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$form->invalidate();
-				$this->assertFalse($form->getField('Message type')->isOptionEnabled($template['Message type']));
+				$disabled_options = $form->getField('Message type')->getOptions()->filter(CElementQuery::ATTRIBUTES_PRESENT,
+						['disabled'])->asText();
+				$this->assertContains($template['Message type'], $disabled_options);
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -543,7 +550,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 	 */
 	public function testFormAdministrationMediaTypeMessageTemplates_Update($data) {
 		// Open configuration of an existing media type, update its format if needed and switch to Message templates tab.
-		$this->openMediaTypeTemplates($data['media_type'], CTestArrayHelper::get($data, 'media_type_fields', null));
+		$this->openMediaTypeTemplates($data['media_type'], CTestArrayHelper::get($data, 'media_type_fields'));
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		// Edit the list of existing message templates or remove all message templates if corresponding key exists.
 		if (array_key_exists('remove_all', $data)) {
@@ -564,7 +571,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		}
 		else {
 			$this->assertEquals(CTestArrayHelper::get($data, 'rows', count($data['message_templates'])),
-					$templates_list->getRows()->count()-1);
+					$templates_list->getRows()->count() - 1
+			);
 			$this->checkMessageTemplates($data, $templates_list);
 		}
 	}
@@ -674,14 +682,5 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			$media_form->fill($media_type_fields);
 		}
 		$media_form->selectTab('Message templates');
-	}
-
-	/**
-	 * Function that checks if the buttons with the passed selector are clickable.
-	 */
-	private function checkButtonsClickable($buttons, $element, $selector = 'button') {
-		foreach ($buttons as $button) {
-			$this->assertTrue($element->query($selector, $button)->one()->isClickable());
-		}
 	}
 }
