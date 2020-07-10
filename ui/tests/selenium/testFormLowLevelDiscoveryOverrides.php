@@ -120,27 +120,27 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'overrides' => [
-//						[
-//							'fields' => [
-//								'Name' => 'Override with empty tag name',
-//							],
-//							'Operations' => [
-//								[
-//									'Object' => 'Trigger prototype',
-//									'Tags' => [
-//										['tag' => '', 'value' => 'value1'],
-//									]
-//								]
-//							],
-//							'error' => 'Incorrect value for field "Tag": cannot be empty.'
-//						]
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override with empty tag name',
+							],
+							'Operations' => [
+								[
+									'Object' => 'Trigger prototype',
+									'Tags' => [
+										['tag' => '', 'value' => 'value1'],
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tag": cannot be empty.'
+						]
+					]
+				]
+			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -382,10 +382,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Create enabled' => 'No',
 									'Discover' => 'No',
 									'Severity' => 'Warning',
-//									'Tags' => [
-//										['tag' => 'tag1', 'value' => 'value1'],
-//										['tag' => 'tag2', 'value' => 'value2']
-//									]
+									'Tags' => [
+										['tag' => 'tag1', 'value' => 'value1'],
+										['tag' => 'tag2', 'value' => 'value2']
+									]
 								],
 								[
 									'Object' => 'Graph prototype',
@@ -434,9 +434,45 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 */
 	public function testFormLowLevelDiscoveryOverrides_Create($data) {
 		$this->overridesCreate($data);
-		$this->checkSavedState($data);
 	}
 
+	private function overridesCreate($data) {
+		$this->page->login()->open('host_discovery.php?form=create&hostid='.self::HOST_ID);
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$key = 'lld_override'.time();
+		$form->fill(['Name' => 'LLD with overrides',
+					'Key' => $key]);
+		$form->selectTab('Overrides');
+		$form->invalidate();
+		$override_container = $form->getField('Overrides')->asTable();
+
+		// Add overrides from data to lld rule.
+		foreach($data['overrides'] as $i => $override){
+			$override_container->query('button:Add')->one()->click();
+			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+			$this->fillOverride($data, $override);
+			$this->checkSubmittedOverlay($data['expected'], $override_overlay, CTestArrayHelper::get($override, 'error'));
+
+			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
+				// Check that Override with correct name was added to Overrides table.
+				$this->assertEquals($override['fields']['Name'], $override_container->getRow($i)->getColumn('Name')->getText());
+				// Check that Override in table has correct processing status.
+				$stop_processing = (CTestArrayHelper::get($override['fields'],
+						'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
+				$this->assertEquals($stop_processing, $override_container->getRow($i)->getColumn('Stop processing')->getText());
+			}
+		}
+
+		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
+			// Submit LLD create.
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($key)));
+			self::$created_id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($key));
+		}
+
+		$this->checkSavedState($data);
+	}
 
 	/*
 	 * Overrides data for LLD creation.
@@ -538,43 +574,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 */
 	public function testFormLowLevelDiscoveryOverrides_Update($data) {
 		$this->overridesUpdate($data);
-		$this->checkUpdatedState($data);
-	}
-
-	private function overridesCreate($data) {
-		$this->page->login()->open('host_discovery.php?form=create&hostid='.self::HOST_ID);
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$key = 'lld_override'.time();
-		$form->fill(['Name' => 'LLD with overrides',
-					'Key' => $key]);
-		$form->selectTab('Overrides');
-		$form->invalidate();
-		$override_container = $form->getField('Overrides')->asTable();
-
-		// Add overrides from data to lld rule.
-		foreach($data['overrides'] as $i => $override){
-			$override_container->query('button:Add')->one()->click();
-			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
-			$this->fillOverride($data, $override);
-			$this->checkSubmittedOverlay($data['expected'], $override_overlay, CTestArrayHelper::get($override, 'error'));
-
-			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
-				// Check that Override with correct name was added to Overrides table.
-				$this->assertEquals($override['fields']['Name'], $override_container->getRow($i)->getColumn('Name')->getText());
-				// Check that Override in table has correct processing status.
-				$stop_processing = (CTestArrayHelper::get($override['fields'],
-						'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
-				$this->assertEquals($stop_processing, $override_container->getRow($i)->getColumn('Stop processing')->getText());
-			}
-		}
-
-		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
-			// Submit LLD create.
-			$form->submit();
-			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
-			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($key)));
-			self::$created_id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($key));
-		}
 	}
 
 	private function overridesUpdate($data) {
@@ -585,75 +584,70 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$form->invalidate();
 		$override_container = $form->getField('Overrides')->asTable();
 
-//		$overrides_count = $override_container->getRows()->count();
-//		for ($k = 0; $k < $overrides_count - 1; $k++) {
-//			$override[] = $override_container->getRow($k)->getColumn('Name')->getText();
-//		}
-
-		$original_overrides = [
-				[
-					'fields' => [
-						'Name' => 'Override for update 1',
-						'If filter matches' => 'Continue overrides'
-					],
-					'Filters' => [
-						'Type of calculation' => 'And',
-//						'formula' => 'A and B',
-						'filter_conditions' => [
-							[
-								'macro' => '{#MACRO1}',
-								'operator' => 'matches',
-								'expression' => 'test expression_1'
-							],
-							[
-								'macro' => '{#MACRO2}',
-								'operator' => 'does not match',
-								'expression' => 'test expression_2'
-							]
-						]
-					],
-					'Operations' => [
-						[
-							'Object' => 'Item prototype',
-							'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
-							'Create enabled' => 'Yes',
-							'Discover' => 'Yes',
-//									'Update interval' => [
-//										'Delay' => '1m',
-//										'Custom intervals' => [
-//											['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
-//											['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
-//										]
-//									],
-							'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
-							'Trend storage period' => ['optrends_trends_mode' => 'Do not keep history']
-						],
-						[
-							'Object' => 'Trigger prototype',
-							'Condition' => ['operator' => 'does not equal', 'value' => 'test trigger pattern'],
-							'Severity' => 'Warning',
-//									'Tags' => [
-//										['tag' => 'tag1', 'value' => 'value1'],
-//									]
-						]
+		$sources = [
+			[
+				'fields' => [
+					'Name' => 'Override for update 1',
+					'If filter matches' => 'Continue overrides'
 				],
-				[
-					'fields' => [
-						'Name' => 'Override for update 2',
-						'If filter matches' => 'Continue overrides'
-					],
-					'Operations' => [
+				'Filters' => [
+					'Type of calculation' => 'And',
+					'formula' => 'A and B',
+					'filter_conditions' => [
 						[
-							'Object' => 'Graph prototype',
-							'Condition' => ['operator' => 'matches', 'value' => 'test graph pattern'],
-							'Discover' => 'Yes'
+							'macro' => '{#MACRO1}',
+							'operator' => 'matches',
+							'expression' => 'test expression_1'
 						],
 						[
-							'Object' => 'Host prototype',
-							'Condition' => ['operator' => 'does not match', 'value' => 'test host pattern'],
-							'Link templates' => 'Test Item Template',
-							'Host inventory' => 'Automatic'
+							'macro' => '{#MACRO2}',
+							'operator' => 'does not match',
+							'expression' => 'test expression_2'
 						]
+					]
+				],
+				'Operations' => [
+					[
+						'Object' => 'Item prototype',
+						'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
+						'Create enabled' => 'Yes',
+						'Discover' => 'Yes',
+//						'Update interval' => [
+//							'Delay' => '1m',
+//							'Custom intervals' => [
+//								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
+//								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
+//							]
+//						],
+						'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
+						'Trend storage period' => ['optrends_trends_mode' => 'Do not keep history']
+					],
+					[
+						'Object' => 'Trigger prototype',
+						'Condition' => ['operator' => 'does not equal', 'value' => 'test trigger pattern'],
+						'Severity' => 'Warning',
+						'Tags' => [
+							['tag' => 'tag1', 'value' => 'value1'],
+						]
+					]
+				]
+			],
+			[
+				'fields' => [
+					'Name' => 'Override for update 2',
+					'If filter matches' => 'Continue overrides'
+				],
+				'Operations' => [
+					[
+						'Object' => 'Graph prototype',
+						'Condition' => ['operator' => 'matches', 'value' => 'test graph pattern'],
+						'Discover' => 'Yes'
+					],
+					[
+						'Object' => 'Host prototype',
+						'Condition' => ['operator' => 'does not match', 'value' => 'test host pattern'],
+						'Link templates' => 'Test Item Template',
+						'Host inventory' => 'Automatic'
 					]
 				]
 			]
@@ -665,23 +659,64 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			switch ($action) {
 				case USER_ACTION_ADD:
 					$override_container->query('button:Add')->one()->click();
-
-
 					break;
 
 				case USER_ACTION_UPDATE:
-					foreach ($original_overrides as $j => $original_override){
-						$original_override['fields'] = $override['fields'];
-
+					// Preparing reference data for overrides.
+					foreach ($sources as $id => $source) {
+						if ($source['fields']['Name'] === $override['name']) {
+							break;
+						}
 					}
 
+					$this->assertNotNull($id, 'Cannot find reference data by override name '.$override['name']);
 
+					// Check if source has fields from data to update them.
+					foreach (CTestArrayHelper::get($override, 'fields', []) as $key => $value) {
+						$this->assertArrayHasKey($key, $sources[$id]['fields'], 'Cannot find field '.$key.' in source');
+						$sources[$id]['fields'][$key] = $value;
+					}
+
+					// Preparing reference data for overrides for filter conditions.
+					$conditions = [];
+					foreach (CTestArrayHelper::get($override, 'Filters', []) as $key => $value) {
+						if ($key === 'filter_conditions') {
+							$conditions = $value;
+							continue;
+						}
+
+						$sources[$id]['Filters'][$key] = $value;
+					}
+
+					foreach ($conditions as $condition) {
+						switch($condition['action']) {
+							case USER_ACTION_ADD:
+								$sources[$id]['Filters']['filter_conditions'][] = $condition;
+								break;
+
+							case USER_ACTION_UPDATE:
+								foreach ($condition as $key => $value) {
+									// Skipping 'action' and 'index' fields from reference data.
+									if (in_array($key, ['action', 'index'])) {
+										continue;
+									}
+
+									$sources[$id]['Filters']['filter_conditions'][$condition['index']][$key] = $value;
+								}
+								break;
+
+							case USER_ACTION_REMOVE:
+								unset($sources[$id]['Filters']['filter_conditions'][$condition['index']]);
+								break;
+						}
+					}
 
 					$override_container->query('link', $override['name'])->one()->click();
 					break;
 			}
 
 			switch ($action) {
+				// Perform adding or updating override.
 				case USER_ACTION_ADD:
 				case USER_ACTION_UPDATE:
 					$override_overlay = $this->fillOverride($data, $override);
@@ -701,9 +736,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					$row = $override_container->findRow('Name', $override['name']);
 					$row->query('button:Remove')->one()->click();
 
-					foreach ($state['Overrides'] as $k => $o) {
-						if ($o['name'] === $override['name']) {
-							unset($state['Overrides'][$k]);
+					foreach ($sources as $id => $source) {
+						if ($source['fields']['Name'] === $override['name']) {
+							unset($sources[$id]);
 						}
 					}
 					break;
@@ -718,46 +753,11 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE itemid ='.self::UPDATED_ID));
+
+			self::$created_id = self::UPDATED_ID;
+			$this->checkSavedState(['overrides' => $sources]);
 		}
 	}
-
-	/**
-	 * @depends overridesUpdate
-	 */
-	private function checkUpdatedState($data) {
-		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
-			$this->assertEquals(self::$old_hash, CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid'));
-			return;
-		}
-		// Open saved LLD.
-		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::UPDATED_ID);
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$form->selectTab('Overrides');
-		$override_container = $form->getField('Overrides')->asTable();
-//		// Get Overrides count.
-//		$overrides_count = $override_container->getRows()->count();
-
-		foreach ($data['overrides'] as $i=> $override) {
-			$action = CTestArrayHelper::get($override, 'action', USER_ACTION_ADD);
-
-			switch ($action) {
-				case USER_ACTION_ADD:
-
-					break;
-
-				case USER_ACTION_UPDATE:
-
-					break;
-
-				case USER_ACTION_REMOVE:
-					$this->assertFalse($override_container->query('link', $override['name'])->one(false)->isValid());
-					break;
-			}
-
-		}
-
-	}
-
 
 	/**
 	 * @depends overridesCreate
@@ -846,24 +846,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	/**
-	 * Function for checking successful/failed overlay submitting.
-	 *
-	 * @param string		$expected	case GOOD or BAD
-	 * @param CFormElement	$overlay 	override or condition form in overlay
-	 * @param string	    $error		error message text
-	 */
-	private function checkSubmittedOverlay($expected, $overlay, $error) {
-		switch ($expected) {
-			case TEST_GOOD:
-				$overlay->waitUntilNotPresent();
-				break;
-			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, null, $error);
-				break;
-		}
-	}
-
-	/**
 	 *
 	 * @param array         $data              data provider
 	 * @param array         $override          override fields from data
@@ -918,5 +900,23 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$override_overlay->submit();
 
 		return $override_overlay;
+	}
+
+	/**
+	 * Function for checking successful/failed overlay submitting.
+	 *
+	 * @param string		$expected	case GOOD or BAD
+	 * @param CFormElement	$overlay 	override or condition form in overlay
+	 * @param string	    $error		error message text
+	 */
+	private function checkSubmittedOverlay($expected, $overlay, $error) {
+		switch ($expected) {
+			case TEST_GOOD:
+				$overlay->waitUntilNotPresent();
+				break;
+			case TEST_BAD:
+				$this->assertMessage(TEST_BAD, null, $error);
+				break;
+		}
 	}
 }
