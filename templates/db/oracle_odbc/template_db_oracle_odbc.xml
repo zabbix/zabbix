@@ -1,0 +1,2694 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>5.0</version>
+   <date>2020-07-10T13:03:17Z</date>
+   <groups>
+      <group>
+         <name>Templates/Databases</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template DB Oracle by ODBC</template>
+         <name>Template DB Oracle by ODBC</name>
+         <description>1. Create an Oracle user for monitoring.&#13;
+&#13;
+2. Set the user name and password in host macros ({$ORACLE.USER} and {$ORACLE.PASSWORD}).&#13;
+  Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.&#13;
+  See Oracle documentation for instructions: https://www.oracle.com/database/technologies/releasenote-odbc-ic.html.&#13;
+  Note! Credentials in the odbc.ini do not work for Oracle.&#13;
+The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.&#13;
+&#13;
+&#13;
+Template tooling version used: 0.37</description>
+         <groups>
+            <group>
+               <name>Templates/Databases</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Oracle</name>
+            </application>
+            <application>
+               <name>Zabbix raw items</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Oracle: Get all databases</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_all_db,"{$ORACLE.DSN}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT
+NAME as DBNAME,
+DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_status,
+DECODE(role, 'SNAPSHOT STANDBY', 1, 'LOGICAL STANDBY', 2, 'PHYSICAL STANDBY', 3, 'PRIMARY', 4, 'FAR SYNC', 5, 0) AS role
+FROM ( SELECT name,  open_mode, Null AS ROLE FROM v$pdbs
+UNION SELECT name,  open_mode, database_role FROM v$database );</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>Get list of all (PDB, CDB, No-CDB) databases on instansce.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Oracle: Get archive log info</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]</key>
+               <delay>5m</delay>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT
+d.dest_name, DECODE (d.status, 'VALID',3, 'DEFERRED', 2, 'ERROR', 1, 0) AS status,
+d.log_sequence,
+d.error
+FROM v$archive_dest d , v$database db
+WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Oracle: Get instance state</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT 
+INSTANCE_NAME,
+HOST_NAME, 
+VERSION || '-' || EDITION AS VERSION, 
+floor((SYSDATE - startup_time)*60*60*24) AS UPTIME, 
+decode(status,'STARTED',1,'MOUNTED',2,'OPEN',3,'OPEN MIGRATE',4, 0) AS STATUS, 
+decode(archiver,'STOPPED',1,'STARTED',2,'FAILED',3, 0) AS  ARCHIVER, 
+decode(INSTANCE_ROLE,'PRIMARY_INSTANCE',1,'SECONDARY_INSTANCE',2, 0) AS  INSTANCE_ROLE
+FROM v$instance;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>The item gets state of the current instance.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Oracle: Get system metrics</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               <delay>0;m0-59</delay>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT 'sysmetrics' AS  TYPE, METRIC_NAME, VALUE
+FROM V$SYSMETRIC
+WHERE GROUP_ID = 2
+UNION
+SELECT 'parameters' AS  TYPE, NAME AS METRIC_NAME,
+to_number(VALUE)
+FROM V$SYSTEM_PARAMETER
+WHERE NAME IN ('sessions','processes','db_files')
+UNION
+SELECT 'sessions' AS TYPE , status||'_'||TYPE AS METRIC_NAME, COUNT(*) as VALUE FROM v$session GROUP BY status, TYPE
+UNION
+SELECT 'sessions' AS TYPE ,'total' , COUNT(*) as VALUE FROM v$session
+UNION
+SELECT 'pga' AS TYPE, name, value FROM v$pgastat
+UNION
+SELECT 'fra', 'space_limit', space_limit FROM v$recovery_file_dest def
+UNION
+SELECT 'fra', 'space_used', space_used FROM v$recovery_file_dest def
+UNION
+SELECT 'fra', 'space_reclaimable', space_reclaimable FROM v$recovery_file_dest def
+UNION
+SELECT 'fra', 'number_of_files', number_of_files FROM v$recovery_file_dest def
+UNION
+SELECT 'fra', 'usable_pct', DECODE(space_limit, 0, 0,(100-(100 *(space_used - space_reclaimable)/ space_limit))) FROM v$recovery_file_dest
+UNION
+SELECT 'fra', 'restore_point', COUNT(*) FROM v$restore_point
+UNION
+SELECT 'processes', 'procnum', COUNT(*)  FROM v$process
+UNION
+SELECT 'datafile', 'count', COUNT(*)  FROM v$datafile
+UNION
+SELECT 'SGA Pool', pool, SUM(bytes) FROM V$SGASTAT WHERE pool IN ( 'java pool', 'large pool' ) GROUP BY pool
+UNION
+SELECT 'SGA Pool', 'shared pool', SUM(bytes) FROM V$SGASTAT WHERE pool = 'shared pool' AND name NOT IN ('library cache', 'dictionary cache', 'free memory','sql area')
+UNION
+SELECT 'SGA component name', name, bytes FROM V$SGASTAT WHERE pool IS NULL AND name IN ('log_buffer', 'fixed_sga')
+UNION
+SELECT 'SGA component name', 'buffer_cache', SUM(bytes) FROM V$SGASTAT WHERE pool IS NULL AND name IN ('buffer_cache', 'db_block_buffers');</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>The item gets system metric values.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Oracle: Get Tablespaces stats</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT
+df.tablespace_name AS tablespace,
+df.type AS TYPE,
+SUM(df.bytes) AS used_bytes,
+SUM(df.max_bytes) AS max_bytes,
+SUM(f.free) AS free_bytes,
+ROUND(SUM(df.bytes)/ SUM(df.max_bytes)* 100, 2) AS used_pct,
+DECODE(df.status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status
+FROM ( SELECT
+   ddf.file_id,
+   dt.contents AS TYPE,
+   dt.STATUS ,
+   ddf.file_name,
+   ddf.tablespace_name,
+   TRUNC(ddf.bytes) AS bytes,
+   TRUNC(GREATEST(ddf.bytes, ddf.maxbytes)) AS max_bytes
+   FROM
+    dba_data_files ddf,
+    dba_tablespaces dt
+  WHERE
+   ddf.tablespace_name = dt.tablespace_name ) df,
+   ( SELECT TRUNC(SUM(bytes)) AS FREE, file_id FROM dba_free_space GROUP BY file_id ) f
+   WHERE df.file_id = f.file_id (+)
+   GROUP BY df.tablespace_name, df.TYPE, df.status
+UNION ALL
+SELECT
+   Y.name AS tablespace_name,
+   Y.type AS TYPE,
+   SUM(Y.bytes) AS bytes,
+   SUM(Y.max_bytes) AS max_bytes,
+   MAX(NVL(Y.free_bytes, 0)) AS FREE,
+   ROUND(SUM(Y.bytes)/ SUM(Y.max_bytes)* 100, 2) AS used_pct,
+   DECODE(Y.tbs_status, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS status
+   FROM ( SELECT
+     dtf.tablespace_name AS name,
+     dt.contents AS TYPE,
+     dt.STATUS AS tbs_status,
+     dtf.status AS status,
+     dtf.bytes AS bytes,
+     (SELECT
+       ((f.total_blocks - s.tot_used_blocks)* vp.value)
+       FROM ( SELECT tablespace_name, SUM(used_blocks) tot_used_blocks FROM gv$sort_segment
+          WHERE tablespace_name != 'DUMMY'
+          GROUP BY tablespace_name) s,
+     ( SELECT tablespace_name, SUM(blocks) total_blocks FROM dba_temp_files
+       WHERE tablespace_name != 'DUMMY'
+       GROUP BY tablespace_name) f,
+     ( SELECT value FROM v$parameter WHERE name = 'db_block_size') vp
+   WHERE
+     f.tablespace_name = s.tablespace_name
+     AND f.tablespace_name = dtf.tablespace_name ) AS free_bytes,
+     CASE WHEN dtf.maxbytes = 0 THEN dtf.bytes
+     ELSE dtf.maxbytes END AS max_bytes
+   FROM
+    sys.dba_temp_files dtf,
+    sys.dba_tablespaces dt
+   WHERE
+   dtf.tablespace_name = dt.tablespace_name ) Y
+   GROUP BY Y.name, Y.TYPE, Y.tbs_status ORDER BY tablespace;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>Get tablespaces stats.</description>
+               <applications>
+                  <application>
+                     <name>Zabbix raw items</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Oracle: Service's TCP port state</name>
+               <key>net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}]</key>
+               <delay>30s</delay>
+               <history>7d</history>
+               <description>Test the availability of Oracle on TCP port.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Oracle: Active parallel sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.active_parallel_sessions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of active parallel sessions.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Active Parallel Sessions')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Active serial sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.active_serial_sessions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of active serial sessions.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Active Serial Sessions')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Average active sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.active_sessions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The average active sessions at a point in time. It is the number of sessions that are either working or waiting.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Average Active Sessions')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Archiver state</name>
+               <type>DEPENDENT</type>
+               <key>oracle.archiver_state</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Automatic archiving status.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Oracle archiver state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..ARCHIVER.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Buffer cache hit ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.buffer_cache_hit_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Ratio of buffer cache hits. (LogRead - PhyRead)/LogRead</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Buffer Cache Hit Ratio')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Global Cache Blocks Corrupted</name>
+               <type>DEPENDENT</type>
+               <key>oracle.cache_blocks_corrupt</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of blocks that encountered a corruption or checksum failure during interconnect.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Global Cache Blocks Corrupted')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Global Cache Blocks Lost</name>
+               <type>DEPENDENT</type>
+               <key>oracle.cache_blocks_lost</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of global cache blocks lost</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Global Cache Blocks Lost')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Cursor Cache Hit Ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.cursor_cache_hit_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Ratio of cursor cache hits. CursorCacheHit/SoftParse</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.METRIC_NAME=='Cursor Cache Hit Ratio')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Database CPU time ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.database_cpu_time_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Calculated by dividing the total CPU used by the database by the Oracle time model statistic DB time.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Database CPU Time Ratio')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Database Wait time ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.database_wait_time_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Wait time: the time that the server process spends waiting for available shared resources (to be released by other server processes) such as latches, locks, data buffers, and so on</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Database Wait Time Ratio')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Datafiles count</name>
+               <type>DEPENDENT</type>
+               <key>oracle.db_files_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Current number of datafile.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='datafile' &amp;&amp; @.METRIC_NAME=='count')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Datafiles limit</name>
+               <type>DEPENDENT</type>
+               <key>oracle.db_files_limit</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Max allowable number of  datafile.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='parameters' &amp;&amp; @.METRIC_NAME=='db_files')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Disk sort per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.disk_sorts</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The number of sorts going to disk per second</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Disk Sort Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Enqueue Timeouts per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.enqueue_timeouts_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>Enqueue timeouts per second.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Enqueue Timeouts Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: FRA, Number of files</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_number_of_files</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Number of files in the fast recovery area</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='number_of_files')].VALUE.first()</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: FRA, Number of restore points</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_restore_point</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='restore_point')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: FRA, Space limit</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_space_limit</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Byte</units>
+               <description>Maximum amount of disk space (in bytes) that the database can use for the fast recovery area.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='space_limit')].VALUE.first()</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: FRA, Space reclaimable</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_space_reclaimable</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Byte</units>
+               <description>Total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the fast recovery area.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='space_reclaimable')].VALUE.first()</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: FRA, Used space</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_space_used</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bytes</units>
+               <description>Amount of disk space (in bytes) used by fast recovery area files created in current and all previous fast recovery areas.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='space_used')].VALUE.first()</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: FRA, Used space in %</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_usable_pct</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='usable_pct')].VALUE.first()</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: GC CR Block Received per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.gc_cr_block_received_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>GC CR block received per second.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='GC CR Block Received Per Second')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Instance hostname</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance_hostname</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>Name of the host machine.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..HOST_NAME.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Oracle DB Instance hostname has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Oracle: Instance name</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance_name</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>Name of the instance.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..INSTANCE_NAME.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Oracle: Instance name has changed (new name received: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Oracle DB Instance name has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Oracle: Instance role</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance_role</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Indicates whether the instance is an active instance or an inactive secondary instance.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Oracle instance role</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..INSTANCE_ROLE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Instance status</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance_status</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Status of the instance.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Oracle instance status</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..STATUS.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Library Cache Hit Ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.library_cache_hit_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Ratio of library cache hits. Hits/Pins</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Library Cache Hit Ratio')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Logons per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.logons_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The number of logon attempts.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Logons Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Long table scans per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.long_table_scans_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The number of long table scans per second. A table is considered 'long' if the table is not cached and if its high-water mark is greater than 5 blocks.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Long Table Scans Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Memory sorts ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.memory_sorts_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The percentage of sorts (from ORDER BY clauses or index building) that are done to disk vs in-memory.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Memory Sorts Ratio')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: PGA, Global memory bound</name>
+               <type>DEPENDENT</type>
+               <key>oracle.pga_global_bound</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Byte</units>
+               <description>Maximum size of a work area executed in automatic mode.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='global memory bound')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: PGA, Aggregate target parameter</name>
+               <type>DEPENDENT</type>
+               <key>oracle.pga_target</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Byte</units>
+               <description>Current value of the PGA_AGGREGATE_TARGET initialization parameter. If this parameter is not set, then its value is 0 and automatic management of PGA memory is disabled.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='aggregate PGA target parameter')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Physical Reads Bytes per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.physical_read_bytes_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Read bytes per second.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Physical Read Bytes Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Physical Reads per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.physical_reads_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>Reads per second.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Physical Reads Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Physical Writes Bytes per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.physical_write_bytes_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Write bytes per second.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Physical Write Bytes Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Physical Writes per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.physical_writes_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>Writes per second.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Physical Writes Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Number of processes</name>
+               <type>DEPENDENT</type>
+               <key>oracle.processes_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='processes' &amp;&amp; @.METRIC_NAME=='procnum')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Processes limit</name>
+               <type>DEPENDENT</type>
+               <key>oracle.processes_limit</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>User processes.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='parameters' &amp;&amp; @.METRIC_NAME=='processes')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Rows per sort</name>
+               <type>DEPENDENT</type>
+               <key>oracle.rows_per_sort</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The average number of rows per sort for all types of sorts performed.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Rows Per Sort')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: SQL Service response time</name>
+               <type>DEPENDENT</type>
+               <key>oracle.service_response_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>SQL service response time in seconds.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='SQL Service Response Time')].VALUE.first()</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>0.01</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Active background sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_active_background</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of active background sessions.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sessions' &amp;&amp; @.METRIC_NAME=='ACTIVE_BACKGROUND')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Active user sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_active_user</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of active user sessions.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sessions' &amp;&amp; @.METRIC_NAME=='ACTIVE_USER')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Session count</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Session count.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sessions' &amp;&amp; @.METRIC_NAME=='total')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Inactive user sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_inactive_user</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of inactive user sessions.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sessions' &amp;&amp; @.METRIC_NAME=='INACTIVE_USER')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Sessions limit</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_limit</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>User and system sessions.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='parameters' &amp;&amp; @.METRIC_NAME=='sessions')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: SGA, buffer cache</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_buffer_cache</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bytes</units>
+               <description>The size of the cache of standard blocks.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='SGA component name' &amp;&amp; @.METRIC_NAME=='buffer_cache')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: SGA, fixed</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_fixed</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bytes</units>
+               <description>The fixed SGA is an internal housekeeping area.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='SGA component name' &amp;&amp; @.METRIC_NAME=='fixed_sga')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: SGA, java pool</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_java_pool</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bytes</units>
+               <description>Memory is allocated from the java pool.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='SGA Pool' &amp;&amp; @.METRIC_NAME=='java pool')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: SGA, large pool</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_large_pool</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bytes</units>
+               <description>Memory is allocated from the large pool.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='SGA Pool' &amp;&amp; @.METRIC_NAME=='large pool')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: SGA, log buffer</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_log_buffer</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bytes</units>
+               <description>The number of bytes allocated for the redo log buffer.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='SGA component name' &amp;&amp; @.METRIC_NAME=='log_buffer')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: SGA, shared pool</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_shared_pool</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bytes</units>
+               <description>Memory is allocated from the shared pool.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='SGA Pool' &amp;&amp; @.METRIC_NAME=='shared pool')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Shared Pool Free %</name>
+               <type>DEPENDENT</type>
+               <key>oracle.shared_pool_free</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Shared pool free memory percent. Free/Total</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Shared Pool Free %')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Total sorts per user call</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sorts_per_user_call</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Total sorts per user call.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Total Sorts Per User Call')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Temp space used</name>
+               <type>DEPENDENT</type>
+               <key>oracle.temp_space_used</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Byte</units>
+               <description>Temp space used.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Temp Space Used')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: PGA, Total allocated</name>
+               <type>DEPENDENT</type>
+               <key>oracle.total_pga_allocated</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Byte</units>
+               <description>Current amount of PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the PGA_AGGREGATE_TARGET initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when PGA_AGGREGATE_TARGET is set to a small value.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='total PGA allocated')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: PGA, Total freeable</name>
+               <type>DEPENDENT</type>
+               <key>oracle.total_pga_freeable</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Byte</units>
+               <description>Number of bytes of PGA memory in all processes that could be freed back to the operating system.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='total freeable PGA memory')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: PGA, Total inuse</name>
+               <type>DEPENDENT</type>
+               <key>oracle.total_pga_used</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Byte</units>
+               <description>Indicates how much PGA memory is currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='total PGA inuse')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Uptime</name>
+               <type>DEPENDENT</type>
+               <key>oracle.uptime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0d</trends>
+               <units>s</units>
+               <description>Oracle instance uptime in seconds.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..UPTIME.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Oracle: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>Oracle: Failed to fetch info data (or no data for 30m)</name>
+                     <priority>INFO</priority>
+                     <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>Oracle: Port {$ORACLE.PORT} is unavailable</name>
+                           <expression>{Template DB Oracle by ODBC:net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}].max(#3)}=0  and {Template DB Oracle by ODBC:proc.num[,,,"tnslsnr LISTENER"].max(#3)}&gt;0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Oracle: User rollbacks per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.user_rollbacks_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The number of times that users manually issue the ROLLBACK statement or an error occurred during a user's transactions.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='User Rollbacks Per Sec')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Oracle: Version</name>
+               <type>DEPENDENT</type>
+               <key>oracle.version</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>Oracle Server version.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..VERSION.first()</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <name>Oracle: Version has changed (new version value received: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Oracle DB version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Oracle: Number of LISTENER processes</name>
+               <key>proc.num[,,,"tnslsnr LISTENER"]</key>
+               <delay>30s</delay>
+               <history>7d</history>
+               <description>Number of LISTENER processes running</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{max(#3)}=0</expression>
+                     <name>Oracle: LISTENER process is not running</name>
+                     <priority>DISASTER</priority>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Archive log discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[archivelog,"{$ORACLE.DSN}"]</key>
+               <delay>1h</delay>
+               <params>SELECT d.dest_name
+FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>Log archive destinations.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Archivelog '{#DEST_NAME}': Error</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.archivelog_error["{#DEST_NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>Displays the error text</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle Archivelog</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].ERROR.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Archivelog '{#DEST_NAME}': Last sequence</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.archivelog_log_sequence["{#DEST_NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Identifies the sequence number of the last archived redo log to be archived</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle Archivelog</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].LOG_SEQUENCE.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Archivelog '{#DEST_NAME}': Status</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.archivelog_log_status["{#DEST_NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Identifies the current status of the destination: 1 - 'Valid', 2 - 'Dederred',3 - 'Error', 0 - 'Unknown'</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle Archivelog</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Oracle Archivelog status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.DEST_NAME=='{#DEST_NAME}')].STATUS.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;2</expression>
+                           <name>Archivelog '{#DEST_NAME}': Log Archive is not valid</name>
+                           <priority>HIGH</priority>
+                           <description>ARL destination not in 3 - Valid or 2 - Deferred.</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Database discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[dbname,"{$ORACLE.DSN}"]</key>
+               <delay>1h</delay>
+               <params>SELECT name as DBNAME , 'PDB' AS TYPE FROM v$pdbs
+UNION
+SELECT name, DECODE(CDB, 'YES', 'CDB', 'No-CDB') AS TYPE  FROM V$DATABASE;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#DBNAME}</macro>
+                        <value>{$ORACLE.DBNAME.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#DBNAME}</macro>
+                        <value>{$ORACLE.DBNAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Scanning databases in DBMS.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Oracle Database '{#DBNAME}': Open status</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.db_open_mode["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>1 - 'MOUNTED', 2 - 'READ WRITE', 3 - 'READ ONLY', 4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode)</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#TYPE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Oracle DB open status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.DBNAME=='{#DBNAME}')].OPEN_STATUS.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>15m</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_all_db,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=1</expression>
+                           <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
+                           <priority>WARNING</priority>
+                           <description>The Oracle DB has a MOUNTED state.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{diff()}=1</expression>
+                           <name>Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE})</name>
+                           <priority>INFO</priority>
+                           <description>Oracle DB open status has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
+                                 <expression>{Template DB Oracle by ODBC:oracle.db_open_mode["{#DBNAME}"].last()}=1</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle Database '{#DBNAME}': Role</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.db_role["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#TYPE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Oracle DB role</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.DBNAME=='{#DBNAME}')].ROLE.first()</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>15m</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_all_db,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{diff()}=1</expression>
+                           <name>Oracle Database '{#DBNAME}': Role has changed (new value received: {ITEM.VALUE})</name>
+                           <priority>INFO</priority>
+                           <description>Oracle DB role has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+               <overrides>
+                  <override>
+                     <name>Item Role</name>
+                     <step>1</step>
+                     <filter>
+                        <conditions>
+                           <condition>
+                              <macro>{#TYPE}</macro>
+                              <value>PDB</value>
+                              <formulaid>A</formulaid>
+                           </condition>
+                        </conditions>
+                     </filter>
+                     <operations>
+                        <operation>
+                           <operationobject>ITEM_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>Role</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Tablespace discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[tbsname,"{$ORACLE.DSN}"]</key>
+               <delay>1h</delay>
+               <params>SELECT
+tablespace_name AS tablespace,
+contents  FROM DBA_TABLESPACES;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#TABLESPACE}</macro>
+                        <value>{$ORACLE.TABLESPACE.NAME.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#TABLESPACE}</macro>
+                        <value>{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Scanning tablespaces in DBMS.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace free</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_free_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>Byte</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].FREE_BYTES.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace size</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>Byte</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].MAX_BYTES.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Open status</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_status["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Tablespace status. 1 - 'ONLINE' 2 - 'OFFLINE' 3- 'READ ONLY'</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <valuemap>
+                        <name>Oracle tablespace status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].STATUS.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{last()}=2</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</name>
+                           <priority>WARNING</priority>
+                           <description>The tablespase is in offline state.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{diff()}=1</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace status has changed (new value received: {ITEM.VALUE})</name>
+                           <priority>INFO</priority>
+                           <description>Oracle tablespace status has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</name>
+                                 <expression>{Template DB Oracle by ODBC:oracle.tbs_status["{#TABLESPACE}"].last()}=2</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>Byte</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage percent</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_pct["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_PCT.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[tablespace_stats,"{$ORACLE.DSN}"]</key>
+                     </master_item>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m)</name>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m)</name>
+                                 <expression>{Template DB Oracle by ODBC:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace Usage is is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m)</name>
+                           <priority>HIGH</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <host_prototypes/>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace '{#TABLESPACE}'</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB Oracle by ODBC</host>
+                              <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB Oracle by ODBC</host>
+                              <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1h</params>
+                  </step>
+               </preprocessing>
+            </discovery_rule>
+         </discovery_rules>
+         <macros>
+            <macro>
+               <macro>{$ORACLE.DB.FILE.MAX.WARN}</macro>
+               <value>80</value>
+               <description>Maximum percentage of database files for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.DBNAME.MATCHES}</macro>
+               <value>.*</value>
+               <description>This macro is used in database discovery. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.DBNAME.NOT_MATCHES}</macro>
+               <value>PDB$SEED</value>
+               <description>This macro is used in database discovery. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.DSN}</macro>
+               <value>&lt;Put your DSN here&gt;</value>
+               <description>System data source name</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.PASSWORD}</macro>
+               <value>&lt;Put your password here&gt;</value>
+               <description>Oracle user password.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.PGA.USE.MAX.WARN}</macro>
+               <value>90</value>
+               <description>Maximum percentage of PGA usage for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.PORT}</macro>
+               <value>1521</value>
+               <description>Oracle DB TCP port.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.PROCESSES.MAX.WARN}</macro>
+               <value>80</value>
+               <description>Maximum percentage of active processes for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SESSIONS.MAX.WARN}</macro>
+               <value>80</value>
+               <description>Maximum percentage of active sessions for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TABLESPACE.NAME.MATCHES}</macro>
+               <value>.*</value>
+               <description>This macro is used in tablespace discovery. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>This macro is used in tablespace discovery. It can be overridden on the host or linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.USED.PCT.MAX.HIGH}</macro>
+               <value>90</value>
+               <description>Maximum percentage of used tablespace for high trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.USED.PCT.MAX.WARN}</macro>
+               <value>80</value>
+               <description>Maximum percentage of used tablespace for warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.USER}</macro>
+               <value>&lt;Put your username here&gt;</value>
+               <description>Oracle username.</description>
+            </macro>
+         </macros>
+      </template>
+   </templates>
+   <triggers>
+      <trigger>
+         <expression>{Template DB Oracle by ODBC:net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}].max(#3)}=0  and {Template DB Oracle by ODBC:proc.num[,,,"tnslsnr LISTENER"].max(#3)}&gt;0</expression>
+         <name>Oracle: Port {$ORACLE.PORT} is unavailable</name>
+         <priority>DISASTER</priority>
+         <description>The TCP port of the Oracle Server service is currently unavailable.</description>
+      </trigger>
+      <trigger>
+         <expression>{Template DB Oracle by ODBC:oracle.processes_count.last()} * 100 / {Template DB Oracle by ODBC:oracle.processes_limit.last()} &gt; {$ORACLE.PROCESSES.MAX.WARN}</expression>
+         <name>Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)</name>
+         <priority>WARNING</priority>
+         <description>Active process are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available Process number</description>
+      </trigger>
+      <trigger>
+         <expression>{Template DB Oracle by ODBC:oracle.session_count.last()} * 100 / {Template DB Oracle by ODBC:oracle.session_limit.last()} &gt; {$ORACLE.SESSIONS.MAX.WARN}</expression>
+         <name>Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)</name>
+         <priority>WARNING</priority>
+         <description>Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions</description>
+      </trigger>
+      <trigger>
+         <expression>{Template DB Oracle by ODBC:oracle.db_files_count.last()} * 100 / {Template DB Oracle by ODBC:oracle.db_files_limit.last()} &gt; {$ORACLE.DB.FILE.MAX.WARN}</expression>
+         <name>Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)</name>
+         <priority>WARNING</priority>
+         <description>Number of datafiles more than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.</description>
+      </trigger>
+      <trigger>
+         <expression>{Template DB Oracle by ODBC:oracle.total_pga_used.last()} * 100 / {Template DB Oracle by ODBC:oracle.pga_target.last()} &gt; {$ORACLE.PGA.USE.MAX.WARN}</expression>
+         <name>Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)</name>
+         <priority>WARNING</priority>
+         <description>Total PGA inuse is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.</description>
+      </trigger>
+   </triggers>
+   <graphs>
+      <graph>
+         <name>Oracle: Datafiles</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.db_files_count</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.db_files_limit</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Oracle: PGA</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.total_pga_used</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.pga_target</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.total_pga_allocated</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Oracle: Physical Read\Write Rate</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.physical_writes_rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.physical_reads_rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Oracle: Physical Read\Write Rate, Bytes</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.physical_write_bytes_rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.physical_read_bytes_rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Oracle: Processes</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.processes_count</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.processes_limit</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Oracle: Sessions</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.session_count</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.session_active_background</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.session_inactive_user</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.session_active_user</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.session_limit</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <name>Oracle: SGA Memory Usage</name>
+         <type>STACKED</type>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.sga_java_pool</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.sga_large_pool</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.sga_shared_pool</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.sga_log_buffer</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.sga_fixed</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>5</sortorder>
+               <color>6C59DC</color>
+               <item>
+                  <host>Template DB Oracle by ODBC</host>
+                  <key>oracle.sga_buffer_cache</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle DB open status</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Mounted</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Read Only</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Read-Write</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Read Only with Apply</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle DB role</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Snapshot standby</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Logical standby</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Physical standby</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Primary</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Far sync</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle instance status</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Started</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Mounted</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Open</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Open migrate</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle instance role</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Primary</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Secondary</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle archiver state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Stopped</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Started</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle tablespace status</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Online</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Offline</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Read-Only</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Oracle Archivelog status</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Error</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Deferred</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Valid</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>
