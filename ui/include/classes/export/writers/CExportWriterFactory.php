@@ -21,7 +21,7 @@
 
 class CExportWriterFactory {
 
-	const YAML = 'yml';
+	const YAML = 'yaml';
 	const XML = 'xml';
 	const JSON = 'json';
 

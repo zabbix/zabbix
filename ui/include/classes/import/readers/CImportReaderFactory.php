@@ -21,7 +21,7 @@
 
 class CImportReaderFactory {
 
-	const YAML = 'yml';
+	const YAML = 'yaml';
 	const XML = 'xml';
 	const JSON = 'json';
 
@@ -63,6 +63,7 @@ class CImportReaderFactory {
 	 */
 	public static function fileExt2ImportFormat($ext) {
 		switch ($ext) {
+			case 'yaml':
 			case 'yml':
 				return CImportReaderFactory::YAML;
 
