@@ -476,7 +476,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 				[
 					'action' => USER_ACTION_UPDATE,
 					'index' => 0,
-					'macro' => '{$PROTORYPE_SECRET_2_SECRET}',
+					'macro' => '{$PROTOTYPE_SECRET_2_SECRET}',
 					'value' => [
 						'value' => 'Updated secret value'
 					]

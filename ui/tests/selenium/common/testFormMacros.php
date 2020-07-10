@@ -447,7 +447,7 @@ abstract class testFormMacros extends CWebTest {
 	public function revertSecretMacroChanges($data, $url, $source) {
 		$this->openMacrosTab($url, $source, true);
 
-		$sql = 'SELECT * FROM hostmacro WHERE macro in ('.CDBHelper::escape($data['macro_fields']['macro']).')';
+		$sql = 'SELECT * FROM hostmacro WHERE macro='.CDBHelper::escape($data['macro_fields']['macro']);
 		$old_values = CDBHelper::getRow($sql);
 
 		$value_field = $this->getValueField($data['macro_fields']['macro']);
@@ -456,7 +456,7 @@ abstract class testFormMacros extends CWebTest {
 		$this->assertEquals('******', $value_field->getValue());
 
 		// Change the value of the secret macro
-		$value_field->getNeValueButton()->click();
+		$value_field->getNewValueButton()->click();
 		$this->assertEquals('', $value_field->getValue());
 		$value_field->fill('New_macro_value');
 
