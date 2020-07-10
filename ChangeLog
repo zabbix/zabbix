@@ -1,6 +1,7 @@
 Changes for 5.2.0alpha1
 
 New features:
+A.F.....S. [ZBXNEXT-3362] added ability to set the default system language (agriscenko)
 ...G...... [ZBXNEXT-6044] added native support in agent2 for https key for net.tcp.service/.perf (esneiders)
 ...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
 ...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
