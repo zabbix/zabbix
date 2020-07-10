@@ -43,9 +43,9 @@ class CSettings extends CApiService {
 		'severity_name_5', 'custom_color', 'ok_period', 'blink_period', 'problem_unack_color', 'problem_ack_color',
 		'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style',
 		'ok_ack_style', 'refresh_unsupported', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid',
-		'snmptrap_logging', 'login_attempts', 'login_block', 'session_name', 'validate_uri_schemes',
-		'uri_valid_schemes', 'x_frame_options', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout',
-		'script_timeout', 'item_test_timeout'
+		'snmptrap_logging', 'login_attempts', 'login_block', 'validate_uri_schemes', 'uri_valid_schemes',
+		'x_frame_options', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
+		'item_test_timeout'
 	];
 
 	/**
@@ -97,7 +97,7 @@ class CSettings extends CApiService {
 			'severity_color_0', 'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4',
 			'severity_color_5', 'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3',
 			'severity_name_4', 'severity_name_5', 'ok_period', 'blink_period', 'problem_unack_color',
-			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'refresh_unsupported', 'login_block', 'session_name',
+			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'refresh_unsupported', 'login_block',
 			'uri_valid_schemes', 'x_frame_options', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout',
 			'script_timeout', 'item_test_timeout'
 		];
@@ -189,7 +189,6 @@ class CSettings extends CApiService {
 			'snmptrap_logging' =>			['type' => API_INT32, 'in' => '0,1'],
 			'login_attempts' =>				['type' => API_INT32, 'in' => '1:32'],
 			'login_block' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [30, SEC_PER_HOUR])],
-			'session_name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'session_name')],
 			'validate_uri_schemes' =>		['type' => API_INT32, 'in' => '0,1'],
 			'uri_valid_schemes' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'uri_valid_schemes')],
 			'x_frame_options' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'x_frame_options')],

@@ -34,7 +34,6 @@ class CControllerMiscConfigEdit extends CController {
 			'snmptrap_logging' =>			'db config.snmptrap_logging',
 			'login_attempts' =>				'db config.login_attempts',
 			'login_block' =>				'db config.login_block',
-			'session_name' =>				'db config.session_name',
 			'validate_uri_schemes' =>		'db config.validate_uri_schemes',
 			'uri_valid_schemes' =>			'db config.uri_valid_schemes',
 			'x_frame_options' =>			'db config.x_frame_options',
@@ -75,8 +74,6 @@ class CControllerMiscConfigEdit extends CController {
 				$this->getInput('login_attempts', CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)),
 			'login_block' =>
 				$this->getInput('login_block', CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)),
-			'session_name' =>
-				$this->getInput('session_name', CSettingsHelper::get(CSettingsHelper::SESSION_NAME)),
 			'validate_uri_schemes' =>
 				$this->getInput('validate_uri_schemes', CSettingsHelper::get(CSettingsHelper::VALIDATE_URI_SCHEMES)),
 			'uri_valid_schemes' =>

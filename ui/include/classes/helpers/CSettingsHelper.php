@@ -52,7 +52,6 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const SCRIPT_TIMEOUT = 'script_timeout';
 	public const SEARCH_LIMIT = 'search_limit';
 	public const SERVER_CHECK_INTERVAL = 'server_check_interval';
-	public const SESSION_NAME = 'session_name';
 	public const SEVERITY_COLOR_0 = 'severity_color_0';
 	public const SEVERITY_COLOR_1 = 'severity_color_1';
 	public const SEVERITY_COLOR_2 = 'severity_color_2';

@@ -2993,12 +2993,6 @@ return [
 				'length' => 32,
 				'default' => '30s',
 			],
-			'session_name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
-				'default' => 'zbx_sessionid',
-			],
 			'show_technical_errors' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,

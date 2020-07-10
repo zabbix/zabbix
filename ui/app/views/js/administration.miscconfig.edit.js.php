@@ -58,7 +58,6 @@ $default_inventory_mode = $schema['fields']['default_inventory_mode']['default']
 							);
 							$('#login_attempts').val("<?= $schema['fields']['login_attempts']['default'] ?>");
 							$('#login_block').val("<?= $schema['fields']['login_block']['default'] ?>");
-							$('#session_name').val("<?= $schema['fields']['session_name']['default'] ?>");
 							$('#validate_uri_schemes').prop('checked',
 								<?= ($schema['fields']['validate_uri_schemes']['default'] == 0) ? 'false' : 'true' ?>
 							);

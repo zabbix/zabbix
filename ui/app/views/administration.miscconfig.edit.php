@@ -97,11 +97,6 @@ $from_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Session name'), 'session_name'))->setAsteriskMark(),
-		(new CTextBox('session_name', $data['session_name']))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAriaRequired()
-	)
 	->addRow(null)
 	->addRow(new CTag('h4', true, _('Security')))
 	->addRow(_('Validate URI schemes'),
