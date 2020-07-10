@@ -355,7 +355,8 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		// applications
 		$applications = new CSpan([
 			new CLink(_('Applications'),
-				(new CUrl('applications.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'application.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 			),
