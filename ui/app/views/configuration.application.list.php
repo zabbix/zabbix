@@ -25,7 +25,7 @@
 
 $this->addJsFile('multiselect.js');
 
-$checkbox_domain = 'application'.crc32(json_encode($data['filter']));
+$checkbox_domain = 'application'.crc32(json_encode([$data['ms_groups'], $data['ms_hosts']]));
 if ($data['uncheck']) {
 	uncheckTableRows($checkbox_domain);
 }
@@ -41,7 +41,7 @@ $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'applicat
 				(new CMultiSelect([
 					'name' => 'filter_groupids[]',
 					'object_name' => 'hostGroup',
-					'data' => $data['filter']['groups'],
+					'data' => $data['ms_groups'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
@@ -59,7 +59,7 @@ $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'applicat
 				(new CMultiSelect([
 					'name' => 'filter_hostids[]',
 					'object_name' => 'host_templates',
-					'data' => $data['filter']['hosts'],
+					'data' => $data['ms_hosts'],
 					'popup' => [
 						'filter_preselect_fields' => [
 							'hostgroups' => 'filter_groupids_'

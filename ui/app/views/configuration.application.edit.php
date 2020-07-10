@@ -61,7 +61,12 @@ if ($data['applicationid']) {
 		new CSubmit('update', _('Update')),
 		[
 			(new CSimpleButton(_('Clone')))->setId('clone'),
-			new CButtonDelete(_('Delete application?'), url_params(['hostid', 'applicationid'])),
+			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'application.delete')
+					->setArgument('applicationids', [$data['applicationid']])
+					->setArgumentSID(),
+				_('Delete application?')
+			))->setId('delete'),
 			$cancel_button
 		]
 	));

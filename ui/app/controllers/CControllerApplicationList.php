@@ -33,7 +33,8 @@ class CControllerApplicationList extends CController {
 			'filter_set'      => 'in 1',
 			'filter_rst'      => 'in 1',
 			'filter_hostids'  => 'array_db hosts.hostid',
-			'filter_groupids' => 'array_db hstgrp.groupid'
+			'filter_groupids' => 'array_db hstgrp.groupid',
+			'page'            => 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -61,69 +62,109 @@ class CControllerApplicationList extends CController {
 		CProfile::update('web.applications.php.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		if ($this->hasInput('filter_set')) {
-			CProfile::updateArray('web.applications.filter_groups', $this->getInput('filter_groupids', []), PROFILE_TYPE_ID);
-			CProfile::updateArray('web.applications.filter_hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
+			CProfile::updateArray('web.applications.filter_groups', $this->getInput('filter_groupids', []),
+				PROFILE_TYPE_ID
+			);
+			CProfile::updateArray('web.applications.filter_hostids', $this->getInput('filter_hostids', []),
+				PROFILE_TYPE_ID
+			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.applications.filter_groups');
 
-			$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray('web.applications.filter_hostids', []));
+			$filter_hostids = $this->getInput('filter_hostids',
+				CProfile::getArray('web.applications.filter_hostids', [])
+			);
 			if (count($filter_hostids) != 1) {
 				CProfile::deleteIdx('web.applications.filter_hostids');
 			}
 		}
 
-		$filter = [
-			'groups' => CProfile::getArray('web.applications.filter_groups', null),
-			'hosts' => CProfile::getArray('web.applications.filter_hostids', null)
+		$filter_groupids = CProfile::getArray('web.applications.filter_groups', []);
+		$filter_hostids = CProfile::getArray('web.applications.filter_hostids', []);
+
+		$data = [
+			'paging' => null,
+			'ms_groups' => [],
+			'ms_hosts' => [],
+			'applications' => [],
+			'parent_templates' => [],
+			'showInfoColumn' => false,
+			'hostid' => 0,
+			'sort' => $sort_field,
+			'uncheck' => $this->hasInput('uncheck'),
+			'sortorder' => $sort_order,
+			'hostid' => (count($filter_hostids) == 1)
+				? $filter_hostids[0]
+				: $this->getInput('hostid', 0),
+			'showInfoColumn' => false,
+			'profileIdx' => 'web.applications.filter',
+			'active_tab' => CProfile::get('web.applications.filter.active', 1)
 		];
 
 		// Get host groups.
-		$filter['groups'] = $filter['groups']
+		$data['ms_groups'] = $filter_groupids
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => $filter['groups'],
+				'groupids' => $filter_groupids,
 				'with_hosts_and_templates' => true,
 				'editable' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];
 
-		$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
-		if ($filter_groupids) {
-			$filter_groupids = getSubGroups($filter_groupids);
-		}
-
-		$filter['hosts'] = $filter['hosts']
+		$data['ms_hosts'] = $filter_hostids
 			? CArrayHelper::renameObjectsKeys(API::Host()->get([
 				'output' => ['hostid', 'name'],
-				'hostids' => $filter['hosts'],
+				'hostids' => $filter_hostids,
 				'templated_hosts' => true,
 				'editable' => true,
 				'preservekeys' => true
 			]), ['hostid' => 'id'])
 			: [];
 
-		$hostid = (count($filter['hosts']) == 1) ? reset($filter['hosts'])['id'] : getRequest('hostid', 0);
+		$data['applications'] = $this->fetchApplications($filter_hostids, $filter_groupids, $sort_field, $sort_order);
+		$data['parent_templates'] = getApplicationParentTemplates($data['applications']);
 
-		$data = [
-			'filter' => $filter,
-			'sort' => $sort_field,
-			'uncheck' => $this->hasInput('uncheck'),
-			'sortorder' => $sort_order,
-			'hostid' => $hostid,
-			'showInfoColumn' => false,
-			'profileIdx' => 'web.applications.filter',
-			'active_tab' => CProfile::get('web.applications.filter.active', 1),
-		];
+		// Info column is show when all hosts are selected or current host is not a template.
+		if ($data['hostid'] > 0) {
+			$hosts = API::Host()->get([
+				'output' => ['status'],
+				'hostids' => [$data['hostid']]
+			]);
 
+			$data['showInfoColumn'] = $hosts
+				&& ($hosts[0]['status'] == HOST_STATUS_MONITORED || $hosts[0]['status'] == HOST_STATUS_NOT_MONITORED);
+		}
+		else {
+			$data['showInfoColumn'] = true;
+		}
+
+		$page_num = $this->getInput('page', 1);
+		CPagerHelper::savePage('application.list', $page_num);
+
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['applications'], $sort_order,
+			(new CUrl('zabbix.php'))->setArgument('action', 'application.list')
+		);
+
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of applications'));
+		$this->setResponse($response);
+	}
+
+	private function fetchApplications(array $filter_hostids, array $filter_groupids, string $sort_field,
+			string $sort_order): array {
 		$config = select_config();
 
+		if ($filter_groupids) {
+			$filter_groupids = getSubGroups($filter_groupids);
+		}
+
 		// Get applications.
-		$data['applications'] = API::Application()->get([
+		$applications = API::Application()->get([
 			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
-			'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
-			'groupids' => $filter_groupids,
+			'hostids' => $filter_hostids ? $filter_hostids : null,
+			'groupids' => $filter_groupids ? $filter_groupids : null,
 			'selectHost' => ['hostid', 'name'],
 			'selectItems' => ['itemid'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
@@ -133,19 +174,17 @@ class CControllerApplicationList extends CController {
 			'limit' => $config['search_limit'] + 1
 		]);
 
-		order_result($data['applications'], $sort_field, $sort_order);
-
-		$data['parent_templates'] = getApplicationParentTemplates($data['applications']);
+		order_result($applications, $sort_field, $sort_order);
 
 		/*
 		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
 		 * deleted. Also we need only 'ts_delete' for view, so get rid of the multidimensional array inside
 		 * 'applicationDiscovery' property.
 		 */
-		foreach ($data['applications'] as &$application) {
+		foreach ($applications as &$application) {
 			if ($application['applicationDiscovery']) {
 				if (count($application['applicationDiscovery']) > 1) {
-					$ts_delete = zbx_objectValues($application['applicationDiscovery'], 'ts_delete');
+					$ts_delete = array_column($application['applicationDiscovery'], 'ts_delete');
 
 					if (min($ts_delete) == 0) {
 						// One rule stops discovering application, but other rule continues to discover it.
@@ -168,37 +207,6 @@ class CControllerApplicationList extends CController {
 		}
 		unset($application);
 
-		// Info column is show when all hosts are selected or current host is not a template.
-		if ($data['hostid'] > 0) {
-			$hosts = API::Host()->get([
-				'output' => ['status'],
-				'hostids' => [$data['hostid']]
-			]);
-
-			$data['showInfoColumn'] = $hosts
-				&& ($hosts[0]['status'] == HOST_STATUS_MONITORED || $hosts[0]['status'] == HOST_STATUS_NOT_MONITORED);
-		}
-		else {
-			$data['showInfoColumn'] = true;
-		}
-
-		// pager
-		if (hasRequest('page')) {
-			$page_num = getRequest('page');
-		}
-		elseif (isRequestMethod('get') && !hasRequest('cancel')) {
-			$page_num = 1;
-		}
-		else {
-			$page_num = CPagerHelper::loadPage('application.list');
-		}
-
-		CPagerHelper::savePage('application.list', $page_num);
-
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['applications'], $sort_order, (new CUrl('zabbix.php'))->setArgument('action', 'application.list'));
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of proxies'));
-		$this->setResponse($response);
+		return $applications;
 	}
 }

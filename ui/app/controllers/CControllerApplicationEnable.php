@@ -42,7 +42,7 @@ class CControllerApplicationEnable extends CController {
 
 		return (bool) API::Application()->get([
 			'output' => [],
-			'applicationids' => $this->getInput('applicationid'),
+			'applicationids' => $this->getInput('applicationids'),
 			'editable' => true
 		]);
 	}
