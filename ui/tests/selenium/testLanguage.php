@@ -119,7 +119,7 @@ class testLanguage extends CWebTest {
 						'Language' => 'Russian (ru_RU)'
 					],
 					'message' => 'User updated',
-					'page_title' => 'ПАНЕЛЬ',
+					'page_title' => 'Панель',
 					'body_lang' => 'ru',
 					'menu_lang' => 'en',
 					'userdb_lang' => 'ru_RU',
@@ -201,7 +201,7 @@ class testLanguage extends CWebTest {
 						'Password (once again)' => 'test',
 						'Language' => 'Russian (ru_RU)'
 					],
-					'page_title' => 'ПАНЕЛЬ',
+					'page_title' => 'Панель',
 					'body_lang' => 'ru',
 					'userdb_lang' => 'ru_RU',
 					'defaultdb_lang' => 'en_GB'
