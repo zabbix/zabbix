@@ -25,6 +25,7 @@ class CControllerGuiUpdate extends CController {
 		$themes = array_keys(APP::getThemes());
 		$fields = [
 			'default_lang' =>			'required|in '.implode(',', array_keys(getLocales())).'|db config.default_lang',
+			'default_timezone' =>		'required|in '.implode(',', DateTimeZone::listIdentifiers()).'|db config.default_timezone',
 			'default_theme' =>			'required|in '.implode(',', $themes).'|db config.default_theme',
 			'search_limit' =>			'required|db config.search_limit|ge 1|le 999999',
 			'max_in_table' =>			'required|db config.max_in_table|ge 1|le 99999',
@@ -62,6 +63,7 @@ class CControllerGuiUpdate extends CController {
 		DBstart();
 		$result = update_config([
 			'default_lang' => $this->getInput('default_lang'),
+			'default_timezone' => $this->getInput('default_timezone'),
 			'default_theme' => $this->getInput('default_theme'),
 			'search_limit' => $this->getInput('search_limit'),
 			'max_in_table' => $this->getInput('max_in_table'),

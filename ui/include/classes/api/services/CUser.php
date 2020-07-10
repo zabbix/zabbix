@@ -261,6 +261,7 @@ class CUser extends CApiService {
 		}
 
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
@@ -272,6 +273,7 @@ class CUser extends CApiService {
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
+			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
@@ -327,7 +329,9 @@ class CUser extends CApiService {
 			$upd_user = [];
 
 			// strings
-			$field_names = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme'];
+			$field_names = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme',
+				'timezone'
+			];
 			foreach ($field_names as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] !== $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
@@ -369,6 +373,7 @@ class CUser extends CApiService {
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
@@ -381,6 +386,7 @@ class CUser extends CApiService {
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
+			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
@@ -410,7 +416,7 @@ class CUser extends CApiService {
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-				'theme', 'type', 'refresh', 'rows_per_page'
+				'theme', 'type', 'refresh', 'rows_per_page', 'timezone'
 			],
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
@@ -1344,7 +1350,7 @@ class CUser extends CApiService {
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page'
+				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone'
 			],
 			'userids' => $db_session['userid']
 		]);
@@ -1365,6 +1371,12 @@ class CUser extends CApiService {
 		$config = select_config();
 		if ($db_user['lang'] === LANG_DEFAULT) {
 			$db_user['lang'] = $config['default_lang'];
+		}
+		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
+			$db_user['timezone'] = $config['default_timezone'];
+		}
+		if ($db_user['timezone'] !== '') {
+			date_default_timezone_set($db_user['timezone']);
 		}
 
 		$autologout = timeUnitToSeconds($db_user['autologout']);
@@ -1598,6 +1610,12 @@ class CUser extends CApiService {
 		$config = select_config();
 		if ($db_user['lang'] === LANG_DEFAULT) {
 			$db_user['lang'] = $config['default_lang'];
+		}
+		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
+			$db_user['timezone'] = $config['default_timezone'];
+		}
+		if ($db_user['timezone'] !== '') {
+			date_default_timezone_set($db_user['timezone']);
 		}
 
 		return $db_user;

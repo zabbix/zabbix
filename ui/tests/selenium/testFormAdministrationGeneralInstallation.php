@@ -38,7 +38,6 @@ class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 		'PHP option "upload_max_filesize"',
 		'PHP option "max_execution_time"',
 		'PHP option "max_input_time"',
-		'PHP option "date.timezone"',
 		'PHP databases support',
 		'PHP bcmath',
 		'PHP mbstring',

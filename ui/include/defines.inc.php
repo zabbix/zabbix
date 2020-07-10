@@ -1512,6 +1512,12 @@ define('LANG_DEFAULT', 'default');
 // the default language
 define('ZBX_DEFAULT_LANG', 'en_GB');
 
+// user default time zone
+define('TIMEZONE_DEFAULT', 'default');
+
+// the default time zone
+define('ZBX_DEFAULT_TIMEZONE', 'UTC');
+
 // user default theme
 define('THEME_DEFAULT', 'default');
 

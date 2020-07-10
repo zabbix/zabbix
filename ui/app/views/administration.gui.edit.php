@@ -60,11 +60,18 @@ elseif ($all_locales_available == 0) {
 	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 }
 
+$timezones = DateTimeZone::listIdentifiers();
+
 $gui_tab = (new CFormList())
 	->addRow(_('Default language'),
 		($language_error !== '')
 			? [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
 			: $lang_combobox
+	)
+	->addRow(_('Default time zone'),
+		new CComboBox('default_timezone', $data['default_timezone'], null,
+			[ZBX_DEFAULT_TIMEZONE => ZBX_DEFAULT_TIMEZONE] + array_combine($timezones, $timezones)
+		)
 	)
 	->addRow(_('Default theme'),
 		new CComboBox('default_theme', $data['default_theme'], null, APP::getThemes())
