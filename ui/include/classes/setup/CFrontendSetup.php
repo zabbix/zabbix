@@ -485,7 +485,7 @@ class CFrontendSetup {
 	 *
 	 * @return array
 	 */
-	public function checkPhpLibYAML() {
+	public function checkPhpLibYAML(): array {
 		if (!$current = phpversion('yaml')) {
 			$current = _('unknown');
 		}

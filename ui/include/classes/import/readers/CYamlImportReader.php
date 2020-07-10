@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -20,19 +20,21 @@
 
 
 /**
- * Class for converting YAML data to PHP format.
+ * Class for converting YAML data stream to PHP array.
  */
 class CYamlImportReader extends CImportReader {
 
 	/**
-	 * Convert string with data in YAML format to PHP array. Suppress PHP notices when executing yaml_parse()
-	 * with custom error handler. Display only first error since that is where the syntax in file is incorrect.
+	 * Convert YAML data stream to PHP array. Suppress PHP notices when executing yaml_parse() with custom
+	 * error handler. Display only first error since that is where the syntax in file is incorrect.
 	 *
 	 * @param string $string
 	 *
+	 * @throws ErrorException
+	 *
 	 * @return array
 	 */
-	public function read($string) {
+	public function read($string): array {
 		$error = '';
 
 		set_error_handler(function ($errno, $errstr) use (&$error) {

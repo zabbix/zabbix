@@ -51,7 +51,17 @@ class CExportWriterFactory {
 		}
 	}
 
-	public static function getContentType($type) {
+	/**
+	 * Get content mime-type for specified type.
+	 *
+	 * @static
+	 * @throws Exception
+	 *
+	 * @param string $type
+	 *
+	 * @return string
+	 */
+	public static function getMimeType(string $type): string {
 		switch ($type) {
 			case self::YAML:
 				// See https://github.com/rails/rails/blob/d41d586/actionpack/lib/action_dispatch/http/mime_types.rb#L39

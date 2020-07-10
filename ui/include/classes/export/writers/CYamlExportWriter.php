@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -31,7 +31,7 @@ class CYamlExportWriter extends CExportWriter {
 	 *
 	 * @return string
 	 */
-	public function write(array $array) {
+	public function write(array $array): string {
 		return yaml_emit($array, YAML_UTF8_ENCODING, YAML_LN_BREAK);
 	}
 }

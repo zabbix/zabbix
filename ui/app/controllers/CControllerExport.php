@@ -113,7 +113,7 @@ class CControllerExport extends CController {
 		else {
 			$response = new CControllerResponseData([
 				'main_block' => $export_data,
-				'content_type' => CExportWriterFactory::getContentType($format),
+				'mime_type' => CExportWriterFactory::getMimeType($format),
 				'page' => ['file' => 'zbx_export_'.substr($action, 7).'.'.$format]
 			]);
 		}
