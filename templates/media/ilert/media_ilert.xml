@@ -184,8 +184,6 @@
                     <value>{$ZABBIX.URL}</value>
                 </parameter>
             </parameters>
-            <attempts>10</attempts>
-            <attempt_interval>30s</attempt_interval>
             <script>try {&#13;
     var result = { tags: {} },&#13;
         params = JSON.parse(value),&#13;
@@ -222,10 +220,6 @@
         if (typeof resp === 'object' &amp;&amp; typeof resp.incidentUrl === 'string') {&#13;
             result.tags.incident_id = resp.incidentUrl.replace(ilertBaseURL + &quot;/api/v1/incidents/&quot;, &quot;&quot;);&#13;
         }&#13;
-        return JSON.stringify(result);&#13;
-    }&#13;
-&#13;
-    if (req.Status() != 429 &amp;&amp; req.Status() &gt;= 400 &amp;&amp; req.Status() &lt;= 499) {&#13;
         return JSON.stringify(result);&#13;
     }&#13;
 &#13;
