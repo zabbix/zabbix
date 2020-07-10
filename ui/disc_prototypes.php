@@ -1200,7 +1200,6 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	$data = getItemFormData($itemPrototype);
-	$data['config'] = select_config();
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::$supported_preprocessing_types;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
@@ -1476,8 +1475,6 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$config = select_config();
-
 	$data = [
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
@@ -1492,7 +1489,7 @@ else {
 		'editable' => true,
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	]);
 
 	$data['items'] = expandItemNamesWithMasterItems($data['items'], 'itemprototypes');

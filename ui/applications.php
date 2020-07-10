@@ -271,8 +271,6 @@ else {
 		'active_tab' => CProfile::get('web.applications.filter.active', 1)
 	];
 
-	$config = select_config();
-
 	// Get applications.
 	$data['applications'] = API::Application()->get([
 		'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
@@ -284,7 +282,7 @@ else {
 		'selectApplicationDiscovery' => ['ts_delete'],
 		'editable' => true,
 		'sortfield' => $sort_field,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	]);
 
 	order_result($data['applications'], $sort_field, $sort_order);

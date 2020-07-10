@@ -660,8 +660,6 @@ elseif (isset($_REQUEST['form'])) {
 	echo (new CView('configuration.graph.edit', $data))->getOutput();
 }
 else {
-	$config = select_config();
-
 	$data = [
 		'filter' => $filter,
 		'hostid' => $hostid,
@@ -680,7 +678,7 @@ else {
 		'groupids' => $filter_groupids,
 		'discoveryids' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
 		'editable' => true,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	$data['graphs'] = hasRequest('parent_discoveryid')

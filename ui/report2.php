@@ -143,8 +143,6 @@ $timeselector_options = [
 ];
 updateTimeSelectorPeriod($timeselector_options);
 
-$config = select_config();
-
 /*
  * Header
  */
@@ -352,7 +350,7 @@ else {
 				'monitored' => true,
 				'groupids' => ($data['filter']['hostgroupid'] == 0) ? null : array_keys($hostgroupids),
 				'filter' => ['templateid' => array_keys($templated_triggers_all)],
-				'limit' => $config['search_limit'] + 1
+				'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 			]);
 		}
 		else {
@@ -413,7 +411,7 @@ else {
 			'hostids' => $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null,
 			'expandDescription' => true,
 			'monitored' => true,
-			'limit' => $config['search_limit'] + 1
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		]);
 
 		$filter_column

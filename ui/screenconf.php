@@ -369,8 +369,6 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$config = select_config();
-
 	$data = [
 		'templateid' => getRequest('templateid'),
 		'sort' => $sortField,
@@ -382,7 +380,7 @@ else {
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'templateids' => $data['templateid'],
 			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1,
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -404,7 +402,7 @@ else {
 		$data['screens'] = API::Screen()->get([
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1,
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
 			'search' => [
 				'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
 			],

@@ -336,14 +336,11 @@ elseif (hasRequest('action') && getRequest('action') === 'correlation.massdelete
  */
 show_messages();
 
-$config = select_config();
-
 if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'correlationid' => $correlationid,
-		'new_condition' => getRequest('new_condition', []),
-		'config' => $config
+		'new_condition' => getRequest('new_condition', [])
 	];
 
 	if ($correlationid !== null) {
@@ -453,7 +450,6 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'config' => $config,
 		'profileIdx' => 'web.correlation.filter',
 		'active_tab' => CProfile::get('web.correlation.filter.active', 1)
 	];
@@ -470,7 +466,7 @@ else {
 		'selectOperations' => ['type'],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	]);
 
 	order_result($data['correlations'], $sortField, $sortOrder);

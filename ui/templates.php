@@ -1032,8 +1032,6 @@ else {
 		];
 	}
 
-	$config = select_config();
-
 	$filter['templates'] = $filter['templates']
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
@@ -1070,7 +1068,7 @@ else {
 		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	]);
 
 	order_result($templates, $sortField, $sortOrder);
@@ -1154,9 +1152,6 @@ else {
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
-		'config' => [
-			'max_in_table' => $config['max_in_table']
-		],
 		'writable_templates' => $writable_templates,
 		'writable_hosts' => $writable_hosts,
 		'profileIdx' => 'web.templates.filter',

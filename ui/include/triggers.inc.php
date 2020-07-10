@@ -98,24 +98,23 @@ function getSeverityStyle($severity, $type = true) {
  * Get trigger severity name by given state and configuration.
  *
  * @param int   $severity  Trigger severity.
- * @param array $config    Array with configuration parameters containing severity names.
  *
  * @return string
  */
-function getSeverityName($severity, array $config) {
+function getSeverityName($severity) {
 	switch ($severity) {
 		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-			return _($config['severity_name_0']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0));
 		case TRIGGER_SEVERITY_INFORMATION:
-			return _($config['severity_name_1']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_1));
 		case TRIGGER_SEVERITY_WARNING:
-			return _($config['severity_name_2']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_2));
 		case TRIGGER_SEVERITY_AVERAGE:
-			return _($config['severity_name_3']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_3));
 		case TRIGGER_SEVERITY_HIGH:
-			return _($config['severity_name_4']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_4));
 		case TRIGGER_SEVERITY_DISASTER:
-			return _($config['severity_name_5']);
+			return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_5));
 		default:
 			return _('Unknown');
 	}
@@ -180,17 +179,15 @@ function getSeverities($min = TRIGGER_SEVERITY_NOT_CLASSIFIED, $max = TRIGGER_SE
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
  * @param int         $severity       Trigger, Event or Problem severity.
- * @param array|null  $config         Array of configuration parameters to get trigger severity name; can be omitted
- *                                    if $text is not null.
  * @param string|null $text           Trigger severity name.
  * @param bool        $force_normal   True to return 'normal' class, false to return corresponding severity class.
  * @param bool        $return_as_div  True to return severity cell as DIV element.
  *
  * @return CDiv|CCol
  */
-function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false, $return_as_div = false) {
+function getSeverityCell($severity, $text = null, $force_normal = false, $return_as_div = false) {
 	if ($text === null) {
-		$text = CHtml::encode(getSeverityName($severity, $config));
+		$text = CHtml::encode(getSeverityName($severity));
 	}
 
 	if ($force_normal) {

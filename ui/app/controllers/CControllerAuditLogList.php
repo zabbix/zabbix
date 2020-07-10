@@ -92,7 +92,6 @@ class CControllerAuditLogList extends CController {
 			$filter['resourceid'] = $data['resourceid'];
 		}
 
-		$config = select_config();
 		$params = [
 			'output' => ['auditid', 'userid', 'clock', 'action', 'resourcetype', 'note', 'ip', 'resourceid',
 				'resourcename'
@@ -101,7 +100,7 @@ class CControllerAuditLogList extends CController {
 			'filter' => $filter,
 			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN,
-			'limit' => $config['search_limit'] + 1
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 
 		if ($data['timeline']['from_ts'] !== null) {

@@ -171,7 +171,7 @@ foreach ($data['templates'] as $template) {
 	foreach ($template['parentTemplates'] as $parentTemplate) {
 		$i++;
 
-		if ($i > $data['config']['max_in_table']) {
+		if ($i > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
 			$linkedTemplatesOutput[] = ' &hellip;';
 
 			break;
@@ -204,7 +204,7 @@ foreach ($data['templates'] as $template) {
 	foreach ($linkedToObjects as $linkedToObject) {
 		$i++;
 
-		if ($i > $data['config']['max_in_table']) {
+		if ($i > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
 			$linkedToOutput[] = ' &hellip;';
 
 			break;

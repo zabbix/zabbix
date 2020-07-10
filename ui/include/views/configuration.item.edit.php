@@ -664,7 +664,7 @@ $form_list->addRow(_('Custom intervals'),
 
 // Append history storage to form list.
 $keep_history_hint = null;
-if ($data['config']['hk_history_global']
+if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
 		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
@@ -677,7 +677,7 @@ if ($data['config']['hk_history_global']
 	$keep_history_hint = (new CDiv(makeInformationIcon([
 		' '._x('Overridden by', 'item_form').' ',
 		$link,
-		' ('.$data['config']['hk_history'].')'
+		' ('.CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY).')'
 	])))
 		->addStyle('margin: 5px 0 0 5px;')
 		->setId('history_mode_hint');
@@ -700,7 +700,7 @@ $form_list->addRow((new CLabel(_('History storage period'), 'history'))->setAste
 
 // Append trend storage to form list.
 $keep_trend_hint = null;
-if ($data['config']['hk_trends_global']
+if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
 		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
@@ -713,7 +713,7 @@ if ($data['config']['hk_trends_global']
 	$keep_trend_hint = (new CDiv(makeInformationIcon([
 		' '._x('Overridden by', 'item_form').' ',
 		$link,
-		' ('.$data['config']['hk_trends'].')'
+		' ('.CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS).')'
 	])))
 		->addStyle('margin: 5px 0 0 5px;')
 		->setId('trends_mode_hint');
@@ -885,7 +885,7 @@ if ($data['itemid'] != 0) {
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 
 	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$buttons[] = ($data['config']['compression_status'])
+		$buttons[] = (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS))
 			? new CSubmit('del_history', _('Clear history and trends'))
 			: new CButtonQMessage(
 				'del_history',

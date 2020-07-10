@@ -864,9 +864,8 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = false;
-	$config = select_config();
 
-	if ($config['compression_status']) {
+	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
 		$error_message = _('History cleanup is not supported if compression is enabled');
 	}
 	else {
@@ -1278,9 +1277,8 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
 	$result = false;
-	$config = select_config();
 
-	if ($config['compression_status']) {
+	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
 		$error_message = _('History cleanup is not supported if compression is enabled');
 	}
 	else {
@@ -1440,7 +1438,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 
 	$data = getItemFormData($item);
 	$data['inventory_link'] = getRequest('inventory_link');
-	$data['config'] = select_config();
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
 	$data['preprocessing_types'] = CItem::$supported_preprocessing_types;
@@ -1705,7 +1702,6 @@ else {
 		'form' => getRequest('form'),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => select_config(),
 		'hostid' => $hostid
 	];
 
@@ -1723,7 +1719,7 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
 		'sortfield' => $sortField,
-		'limit' => $data['config']['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	$preFilter = count($options, COUNT_RECURSIVE);
 

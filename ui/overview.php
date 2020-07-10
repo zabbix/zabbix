@@ -57,7 +57,6 @@ $fields = [
 ];
 check_fields($fields);
 
-$config = select_config();
 if (hasRequest('filter_set')) {
 	CProfile::update('web.overview.filter.show_triggers', getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM),
 		PROFILE_TYPE_INT
@@ -128,7 +127,6 @@ if (hasRequest('view_style')) {
 $data = [
 	'type' => $type,
 	'view_style' => CProfile::get('web.overview.view_style', STYLE_TOP),
-	'config' => $config,
 	'profileIdx' => 'web.overview.filter',
 	'active_tab' => CProfile::get('web.overview.filter.active', 1),
 	'db_hosts' => [],

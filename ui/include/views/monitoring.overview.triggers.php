@@ -41,13 +41,13 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOTIF_INDIC)
 			->addClass(getSeverityStyle($severity)),
-		new CTag('h4', true, getSeverityName($severity, $data['config'])),
+		new CTag('h4', true, getSeverityName($severity)),
 		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
 	]);
 }
 
 // blinking preview in help popup (only if blinking is enabled)
-$blink_period = timeUnitToSeconds($data['config']['blink_period']);
+$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
 if ($blink_period > 0) {
 	$indic_container = (new CDiv())
 		->addClass(ZBX_STYLE_NOTIF_INDIC_CONTAINER)
@@ -137,7 +137,6 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			'groups' => $data['filter']['groups'],
 			'hosts' => $data['filter']['hosts']
 		],
-		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],
 		'active_tab' => $data['active_tab']
 	]));

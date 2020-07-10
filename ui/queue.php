@@ -87,8 +87,6 @@ $widget = (new CWidget())
 
 $table = new CTableInfo();
 
-$severityConfig = select_config();
-
 // overview
 if ($config == QUEUE_OVERVIEW) {
 	$itemTypes = [
@@ -138,22 +136,22 @@ if ($config == QUEUE_OVERVIEW) {
 
 			$table->addRow([
 				item_type2str($type),
-				getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $severityConfig, $itemTypeData['delay5'],
+				getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $itemTypeData['delay5'],
 					!$itemTypeData['delay5']
 				),
-				getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $severityConfig, $itemTypeData['delay10'],
+				getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $itemTypeData['delay10'],
 					!$itemTypeData['delay10']
 				),
-				getSeverityCell(TRIGGER_SEVERITY_WARNING, $severityConfig, $itemTypeData['delay30'],
+				getSeverityCell(TRIGGER_SEVERITY_WARNING, $itemTypeData['delay30'],
 					!$itemTypeData['delay30']
 				),
-				getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $severityConfig, $itemTypeData['delay60'],
+				getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $itemTypeData['delay60'],
 					!$itemTypeData['delay60']
 				),
-				getSeverityCell(TRIGGER_SEVERITY_HIGH, $severityConfig, $itemTypeData['delay300'],
+				getSeverityCell(TRIGGER_SEVERITY_HIGH, $itemTypeData['delay300'],
 					!$itemTypeData['delay300']
 				),
-				getSeverityCell(TRIGGER_SEVERITY_DISASTER, $severityConfig, $itemTypeData['delay600'],
+				getSeverityCell(TRIGGER_SEVERITY_DISASTER, $itemTypeData['delay600'],
 					!$itemTypeData['delay600']
 				)
 			]);
@@ -200,16 +198,16 @@ elseif ($config == QUEUE_OVERVIEW_BY_PROXY) {
 
 			$table->addRow([
 				$proxy['host'],
-				getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $severityConfig, $proxyData['delay5'],
+				getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $proxyData['delay5'],
 					!$proxyData['delay5']
 				),
-				getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $severityConfig, $proxyData['delay10'],
+				getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $proxyData['delay10'],
 					!$proxyData['delay10']
 				),
-				getSeverityCell(TRIGGER_SEVERITY_WARNING, $severityConfig, $proxyData['delay30'], !$proxyData['delay30']),
-				getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $severityConfig, $proxyData['delay60'], !$proxyData['delay60']),
-				getSeverityCell(TRIGGER_SEVERITY_HIGH, $severityConfig, $proxyData['delay300'], !$proxyData['delay300']),
-				getSeverityCell(TRIGGER_SEVERITY_DISASTER, $severityConfig, $proxyData['delay600'], !$proxyData['delay600'])
+				getSeverityCell(TRIGGER_SEVERITY_WARNING, $proxyData['delay30'], !$proxyData['delay30']),
+				getSeverityCell(TRIGGER_SEVERITY_AVERAGE, $proxyData['delay60'], !$proxyData['delay60']),
+				getSeverityCell(TRIGGER_SEVERITY_HIGH, $proxyData['delay300'], !$proxyData['delay300']),
+				getSeverityCell(TRIGGER_SEVERITY_DISASTER, $proxyData['delay600'], !$proxyData['delay600'])
 			]);
 		}
 	}

@@ -801,8 +801,6 @@ if (hasRequest('form')) {
 	}
 }
 else {
-	$config = select_config();
-
 	$data = [
 		'filter' => $filter,
 		'hostid' => (count($filter_hostids) == 1) ? reset($filter_hostids) : 0,
@@ -825,7 +823,7 @@ else {
 		'filter' => [],
 		'search' => [],
 		'sortfield' => $sort_field,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	if ($filter_groupids) {

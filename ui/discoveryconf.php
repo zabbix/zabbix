@@ -346,8 +346,6 @@ else {
 		'status' => CProfile::get('web.discoveryconf.filter_status', -1)
 	];
 
-	$config = select_config();
-
 	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
@@ -368,7 +366,7 @@ else {
 		],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	]);
 
 	if ($data['drules']) {

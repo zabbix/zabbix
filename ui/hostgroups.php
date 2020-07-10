@@ -275,13 +275,10 @@ else {
 		'name' => CProfile::get('web.groups.filter_name', '')
 	];
 
-	$config = select_config();
-
 	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'config' => $config,
 		'profileIdx' => 'web.groups.filter',
 		'active_tab' => CProfile::get('web.groups.filter.active', 1)
 	];
@@ -293,7 +290,7 @@ else {
 		],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	]);
 	order_result($groups, $sortField, $sortOrder);
 
@@ -331,7 +328,7 @@ else {
 		'selectTemplates' => ['templateid', 'name'],
 		'selectGroupDiscovery' => ['ts_delete'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'limitSelects' => $config['max_in_table'] + 1
+		'limitSelects' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1
 	]);
 	order_result($data['groups'], $sortField, $sortOrder);
 

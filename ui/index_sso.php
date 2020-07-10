@@ -21,10 +21,9 @@
 
 require_once __DIR__.'/include/config.inc.php';
 
-$config = select_config();
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
-if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
+if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_DISABLED) {
 	redirect($redirect_to->toString());
 }
 
@@ -71,36 +70,36 @@ elseif (file_exists('conf/certs/idp.crt')) {
 
 $settings = [
 	'sp' => [
-		'entityId' => $config['saml_sp_entityid'],
+		'entityId' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SP_ENTITYID),
 		'assertionConsumerService' => [
 			'url' => $baseurl.'?acs'
 		],
 		'singleLogoutService' => [
 			'url' => $baseurl.'?sls',
 		],
-		'NameIDFormat' => $config['saml_nameid_format'],
+		'NameIDFormat' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_NAMEID_FORMAT),
 		'x509cert' => $sp_cert,
 		'privateKey' => $sp_key
 	],
 	'idp' => [
-		'entityId' => $config['saml_idp_entityid'],
+		'entityId' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_IDP_ENTITYID),
 		'singleSignOnService' => [
-			'url' => $config['saml_sso_url'],
+			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL),
 		],
 		'singleLogoutService' => [
-			'url' => $config['saml_slo_url'],
+			'url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL),
 		],
 		'x509cert' => $idp_cert
 	],
 	'security' => [
-		'nameIdEncrypted' => (bool) $config['saml_encrypt_nameid'],
-		'authnRequestsSigned' => (bool) $config['saml_sign_authn_requests'],
-		'logoutRequestSigned' => (bool) $config['saml_sign_logout_requests'],
-		'logoutResponseSigned' => (bool) $config['saml_sign_logout_responses'],
-		'wantMessagesSigned' => (bool) $config['saml_sign_messages'],
-		'wantAssertionsEncrypted' => (bool) $config['saml_encrypt_assertions'],
-		'wantAssertionsSigned' => (bool) $config['saml_sign_assertions'],
-		'wantNameIdEncrypted' => (bool) $config['saml_encrypt_nameid']
+		'nameIdEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_NAMEID),
+		'authnRequestsSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_AUTHN_REQUESTS),
+		'logoutRequestSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_LOGOUT_REQUESTS),
+		'logoutResponseSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_LOGOUT_RESPONSES),
+		'wantMessagesSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_MESSAGES),
+		'wantAssertionsEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_ASSERTIONS),
+		'wantAssertionsSigned' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_SIGN_ASSERTIONS),
+		'wantNameIdEncrypted' => (bool) CAuthenticationHelper::get(CAuthenticationHelper::SAML_ENCRYPT_NAMEID)
 	]
 ];
 
@@ -156,14 +155,18 @@ try {
 
 		$user_attributes = $auth->getAttributes();
 
-		if (!array_key_exists($config['saml_username_attribute'], $user_attributes)) {
+		if (!array_key_exists(CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE),
+			$user_attributes
+		)) {
 			throw new Exception(
-				_s('The parameter "%1$s" is missing from the user attributes.', $config['saml_username_attribute'])
+				_s('The parameter "%1$s" is missing from the user attributes.', CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE))
 			);
 		}
 
 		CSession::setValue('saml_data', [
-			'username_attribute' => reset($user_attributes[$config['saml_username_attribute']]),
+			'username_attribute' => reset(
+				$user_attributes[CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)]
+			),
 			'nameid' => $auth->getNameId(),
 			'nameid_format' => $auth->getNameIdFormat(),
 			'nameid_name_qualifier' => $auth->getNameIdNameQualifier(),
@@ -176,7 +179,7 @@ try {
 		}
 	}
 
-	if ($config['saml_slo_url'] !== '') {
+	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL) !== '') {
 		if (hasRequest('slo') && CSession::keyExists('saml_data')) {
 			$saml_data = CSession::getValue('saml_data');
 
@@ -201,7 +204,8 @@ try {
 	if (CSession::keyExists('saml_data')) {
 		$saml_data = CSession::getValue('saml_data');
 		$user = API::getApiService('user')->loginByAlias($saml_data['username_attribute'],
-			($config['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE), $config['authentication_type']
+			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
 		if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {

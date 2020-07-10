@@ -117,11 +117,20 @@ class CControllerAuthenticationUpdate extends CController {
 		$is_valid = true;
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$ldap_fields = ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_search_attribute', 'ldap_configured'];
-		$config = select_config();
-		$this->getInputs($config, array_merge($ldap_fields, ['ldap_bind_dn', 'ldap_bind_password']));
-		$ldap_settings_changed = array_diff_assoc($config, select_config());
+		$ldap_auth_original = [
+			'ldap_host' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_HOST),
+			'ldap_port' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_PORT),
+			'ldap_base_dn' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_BASE_DN),
+			'ldap_search_attribute' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE),
+			'ldap_configured' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CONFIGURED),
+			'ldap_bind_dn' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_BIND_DN),
+			'ldap_bind_password' => CAuthenticationHelper::get(CAuthenticationHelper::LDAP_BIND_PASSWORD)
+		];
+		$ldap_auth = $ldap_auth_original;
+		$this->getInputs($ldap_auth, array_merge($ldap_fields, ['ldap_bind_dn', 'ldap_bind_password']));
+		$ldap_auth_changed = array_diff_assoc($ldap_auth, $ldap_auth_original);
 
-		if (!$ldap_settings_changed && !$this->hasInput('ldap_test')) {
+		if (!$ldap_auth_changed && !$this->hasInput('ldap_test')) {
 			return $is_valid;
 		}
 
@@ -130,7 +139,7 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		foreach ($ldap_fields as $field) {
-			if (trim($config[$field]) === '') {
+			if (trim($ldap_auth[$field]) === '') {
 				$this->response->setMessageError(
 					_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
 				);
@@ -139,7 +148,9 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
-		if ($is_valid && ($config['ldap_port'] < ZBX_MIN_PORT_NUMBER || $config['ldap_port'] > ZBX_MAX_PORT_NUMBER)) {
+		if ($is_valid
+				&& ($ldap_auth['ldap_port'] < ZBX_MIN_PORT_NUMBER
+					|| $ldap_auth['ldap_port'] > ZBX_MAX_PORT_NUMBER)) {
 			$this->response->setMessageError(_s(
 				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.', $this->getInput('ldap_port'),
 				'ldap_port', ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER
@@ -154,12 +165,12 @@ class CControllerAuthenticationUpdate extends CController {
 		elseif ($is_valid) {
 			$ldap_validator = new CLdapAuthValidator([
 				'conf' => [
-					'host' => $config['ldap_host'],
-					'port' => $config['ldap_port'],
-					'base_dn' => $config['ldap_base_dn'],
-					'bind_dn' => $config['ldap_bind_dn'],
-					'bind_password' => $config['ldap_bind_password'],
-					'search_attribute' => $config['ldap_search_attribute']
+					'host' => $ldap_auth['ldap_host'],
+					'port' => $ldap_auth['ldap_port'],
+					'base_dn' => $ldap_auth['ldap_base_dn'],
+					'bind_dn' => $ldap_auth['ldap_bind_dn'],
+					'bind_password' => $ldap_auth['ldap_bind_password'],
+					'search_attribute' => $ldap_auth['ldap_search_attribute']
 				]
 			]);
 
@@ -184,11 +195,16 @@ class CControllerAuthenticationUpdate extends CController {
 	 */
 	private function validateSamlAuth() {
 		$saml_fields = ['saml_idp_entityid', 'saml_sso_url', 'saml_sp_entityid', 'saml_username_attribute'];
-		$config = select_config();
-		$this->getInputs($config, $saml_fields);
+		$saml_auth = [
+			'saml_idp_entityid' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_IDP_ENTITYID),
+			'saml_sso_url' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SSO_URL),
+			'saml_sp_entityid' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_SP_ENTITYID),
+			'saml_username_attribute' => CAuthenticationHelper::get(CAuthenticationHelper::SAML_USERNAME_ATTRIBUTE)
+		];
+		$this->getInputs($saml_auth, $saml_fields);
 
 		foreach ($saml_fields as $field) {
-			if (trim($config[$field]) === '') {
+			if (trim($saml_auth[$field]) === '') {
 				$this->response->setMessageError(
 					_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
 				);
