@@ -1555,7 +1555,7 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_DISABLED => $default_auth
 		];
 		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
+			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd', 'timezone'
 		];
 
 		if ($case_sensitive) {
