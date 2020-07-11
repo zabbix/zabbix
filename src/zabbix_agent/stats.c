@@ -138,7 +138,7 @@ return_one:
 int	init_collector_data(char **error)
 {
 	int	cpu_count, ret = FAIL;
-	size_t	sz, sz_cpu;
+	size_t	sz, sz_cpu, sz_cpu_phys_util = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -156,8 +156,11 @@ int	init_collector_data(char **error)
 	collector->cpus.count = cpu_count;
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
+#ifdef _AIX
+	sz_cpu_phys_util = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_CPU_UTIL_PCT_AIX)) * MAX_COLLECTOR_HISTORY * (cpu_count + 1);
+#endif
 
-	if (-1 == (shm_id = zbx_shm_create(sz + sz_cpu)))
+	if (-1 == (shm_id = zbx_shm_create(sz + sz_cpu + sz_cpu_phys_util)))
 	{
 		*error = zbx_strdup(*error, "cannot allocate shared memory for collector");
 		goto out;
@@ -179,6 +182,13 @@ int	init_collector_data(char **error)
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)((char *)collector + sz);
 	collector->cpus.count = cpu_count;
 	collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
+#ifdef _AIX
+	collector->cpus_phys_util.counters = (ZBX_CPU_UTIL_PCT_AIX *)((char *)collector + sz + sz_cpu);
+	collector->cpus_phys_util.row_num = MAX_COLLECTOR_HISTORY;
+	collector->cpus_phys_util.column_num = cpu_count + 1;	/* each CPU + total for all CPUs */
+	collector->cpus_phys_util.h_latest = 0;
+	collector->cpus_phys_util.h_count = 0;
+#endif
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 	zbx_procstat_init();
@@ -427,7 +437,12 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		collect_perfstat();
 #else
 		if (0 != CPU_COLLECTOR_STARTED(collector))
+		{
 			collect_cpustat(&(collector->cpus));
+#ifdef _AIX
+			collect_cpustat_physical(&collector->cpus_phys_util);
+#endif
+		}
 
 		if (0 != DISKDEVICE_COLLECTOR_STARTED(collector))
 			collect_stats_diskdevices();
