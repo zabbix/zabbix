@@ -77,9 +77,6 @@
 							'class': 'btn-iterator-page-previous',
 							'title': t('Previous page')
 						}).on('click', function() {
-							if (!widget.ready) {
-								return false;
-							}
 							if (widget['page'] > 1) {
 								widget['page']--;
 								updateWidgetContent($obj, data, widget);
@@ -91,9 +88,6 @@
 							'class': 'btn-iterator-page-next',
 							'title': t('Next page')
 						}).on('click', function() {
-							if (!widget.ready) {
-								return false;
-							}
 							if (widget['page'] < widget['page_count']) {
 								widget['page']++;
 								updateWidgetContent($obj, data, widget);
@@ -110,9 +104,6 @@
 								'class': 'btn-widget-edit',
 								'title': t('Edit')
 							}).on('click', function() {
-								if (!widget.ready) {
-									return false;
-								}
 								if (!methods.isEditMode.call($obj)) {
 									showEditMode();
 								}
@@ -135,10 +126,6 @@
 								'attr': {
 									'aria-expanded': false,
 									'aria-haspopup': true
-								}
-							}).on('click', function() {
-								if (!widget.ready) {
-									return false;
 								}
 							})
 						)
@@ -2160,7 +2147,7 @@
 			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
 		}
 
-		setDashboardBusy($obj, data, 'updateWidgetContent', widget.uniqueid);
+		setDashboardBusy(data, 'updateWidgetContent', widget.uniqueid);
 
 		startPreloader(widget);
 
@@ -2226,7 +2213,7 @@
 				}
 			})
 			.always(function() {
-				clearDashboardBusy($obj, data, 'updateWidgetContent', widget.uniqueid);
+				clearDashboardBusy(data, 'updateWidgetContent', widget.uniqueid);
 			});
 
 		request.fail(function() {
@@ -2245,12 +2232,15 @@
 	 * @returns {object}  jQuery Deferred object.
 	 */
 	function promiseScrollIntoView($obj, data, pos) {
-		var	offset_top = $obj.offsetParent().position().top + $obj.position().top,
-			widget_top = offset_top + pos['y'] * data['options']['widget-height'],
-			widget_height = pos['height'] * data['options']['widget-height'],
-			wrapper_height = $('.wrapper').height(),
-			wrapper_scrollTop = $('.wrapper').scrollTop(),
-			wrapper_scrollTop_min = widget_top + Math.min(0, widget_height - wrapper_height),
+		var	$wrapper = $('.wrapper'),
+			offset_top = $wrapper.scrollTop() + $obj.offset().top,
+			// Allow 5px free space around the object.
+			margin = 5,
+			widget_top = offset_top + pos['y'] * data['options']['widget-height'] - widget_margin,
+			widget_height = pos['height'] * data['options']['widget-height'] + widget_margin * 2,
+			wrapper_height = $wrapper.height(),
+			wrapper_scrollTop = $wrapper.scrollTop(),
+			wrapper_scrollTop_min = Math.max(0, widget_top + Math.min(0, widget_height - wrapper_height)),
 			wrapper_scrollTop_max = widget_top;
 
 		if (pos['y'] + pos['height'] > data['options']['rows']) {
@@ -2953,6 +2943,10 @@
 
 	/**
 	 * Remove widget actions added by addAction.
+	 *
+	 * @param {object} $obj    Dashboard container jQuery object.
+	 * @param {object} data    Dashboard data and options object.
+	 * @param {object} widget  Dashboard widget object.
 	 */
 	function removeWidgetActions($obj, data, widget) {
 		for (var hook_name in data['triggers']) {
@@ -2962,6 +2956,24 @@
 				}
 			}
 		}
+	}
+
+	/**
+	 * Enable user functional interaction with widget.
+	 *
+	 * @param {object} widget  Dashboard widget object.
+	 */
+	function enableWidgetControls(widget) {
+		widget.content_header.find('button').prop('disabled', false);
+	}
+
+	/**
+	 * Disable user functional interaction with widget.
+	 *
+	 * @param {object} widget  Dashboard widget object.
+	 */
+	function disableWidgetControls(widget) {
+		widget.content_header.find('button').prop('disabled', true);
 	}
 
 	/**
@@ -3047,7 +3059,7 @@
 			ajax_data['sharing'] = data['dashboard']['sharing'];
 		}
 
-		setDashboardBusy($obj, data, 'saveChanges', null);
+		setDashboardBusy(data, 'saveChanges', null);
 
 		$.ajax({
 			url: url.getUrl(),
@@ -3057,6 +3069,9 @@
 		})
 			.done(function(response) {
 				if ('redirect' in response) {
+					// Prevent from asking to navigate away from the current page.
+					data['options']['updated'] = false;
+
 					/*
 					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
 					 * It allows to use back browser button more user-friendly.
@@ -3067,11 +3082,11 @@
 					if ('errors' in response) {
 						dashboardAddMessages(response.errors);
 					}
-					clearDashboardBusy($obj, data, 'saveChanges', null);
+					clearDashboardBusy(data, 'saveChanges', null);
 				}
 			})
 			.fail(function() {
-				clearDashboardBusy($obj, data, 'saveChanges', null);
+				clearDashboardBusy(data, 'saveChanges', null);
 			});
 	}
 
@@ -3296,12 +3311,11 @@
 	/**
 	 * Set dashboard busy state by registering a blocker.
 	 *
-	 * @param {object} $obj  Dashboard container jQuery object.
 	 * @param {object} data  Dashboard data and options object.
 	 * @param {string} type  Common type of the blocker.
 	 * @param {*}      item  Unique item of the blocker.
 	 */
-	function setDashboardBusy($obj, data, type, item) {
+	function setDashboardBusy(data, type, item) {
 		if (data.options.busy_blockers === undefined) {
 			data.options.busy_blockers = [];
 
@@ -3314,12 +3328,11 @@
 	/**
 	 * Clear dashboard busy state by unregistering a blocker.
 	 *
-	 * @param {object} $obj  Dashboard container jQuery object.
 	 * @param {object} data  Dashboard data and options object.
 	 * @param {string} type  Common type of the blocker.
 	 * @param {*}      item  Unique item of the blocker.
 	 */
-	function clearDashboardBusy($obj, data, type, item) {
+	function clearDashboardBusy(data, type, item) {
 		if (data.options.busy_blockers === undefined) {
 			return;
 		}
@@ -3817,7 +3830,7 @@
 
 				var dashboard_busy_item = {};
 
-				setDashboardBusy($this, data, 'pasteWidget', dashboard_busy_item);
+				setDashboardBusy(data, 'pasteWidget', dashboard_busy_item);
 
 				// Remove old widget.
 				if (widget !== null) {
@@ -3828,7 +3841,12 @@
 					.then(function() {
 						methods.addWidget.call($this, new_widget);
 						new_widget = data['widgets'].slice(-1)[0];
+
+						// Restrict loading content prior to sanitizing widget fields.
+						new_widget['update_paused'] = true;
+
 						setWidgetModeEdit($this, data, new_widget);
+						disableWidgetControls(new_widget);
 
 						var url = new Curl('zabbix.php');
 						url.setArgument('action', 'dashboard.widget.sanitize');
@@ -3849,7 +3867,8 @@
 						}
 
 						new_widget['fields'] = response.fields;
-
+						new_widget['update_paused'] = false;
+						enableWidgetControls(new_widget);
 						updateWidgetContent($this, data, new_widget);
 					})
 					.fail(function() {
@@ -3859,7 +3878,7 @@
 						// Mark dashboard as updated.
 						data['options']['updated'] = true;
 
-						clearDashboardBusy($this, data, 'pasteWidget', dashboard_busy_item);
+						clearDashboardBusy(data, 'pasteWidget', dashboard_busy_item);
 					});
 			});
 		},
