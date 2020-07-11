@@ -3067,7 +3067,7 @@
 			dataType: 'json',
 			data: ajax_data
 		})
-			.done(function(response) {
+			.then(function(response) {
 				if ('redirect' in response) {
 					// Prevent from asking to navigate away from the current page.
 					data['options']['updated'] = false;
@@ -3078,14 +3078,11 @@
 					 */
 					window.location.replace(response.redirect);
 				}
-				else {
-					if ('errors' in response) {
-						dashboardAddMessages(response.errors);
-					}
-					clearDashboardBusy(data, 'saveChanges', null);
+				else if ('errors' in response) {
+					dashboardAddMessages(response.errors);
 				}
 			})
-			.fail(function() {
+			.always(function() {
 				clearDashboardBusy(data, 'saveChanges', null);
 			});
 	}
