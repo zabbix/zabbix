@@ -2881,7 +2881,7 @@ class testDiscoveryRule extends CAPITest {
 				[],
 				[],
 				[],
-				'Empty input parameter.'
+				'Invalid parameter "/": cannot be empty.'
 			],
 			'Test cannot delete what does not exist.' => [
 				['9999999999'],
@@ -2891,8 +2891,8 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test overrides and override operations are deleted.' => [
 				['133763'],
-				['1', '2'],
-				['1', '2', '3', '4', '5', '6'],
+				['101', '102'],
+				['101', '102', '103', '104', '105', '106'],
 				null
 			]
 		];

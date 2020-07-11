@@ -424,8 +424,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (!empty($items[ZBX_FLAG_DISCOVERY_RULE])) {
 			if ($clear) {
-				$result = API::DiscoveryRule()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_RULE]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear discovery rules'));
+				CDiscoveryRuleManager::delete(array_keys($items[ZBX_FLAG_DISCOVERY_RULE]));
 			}
 			else{
 				DB::update('items', [
