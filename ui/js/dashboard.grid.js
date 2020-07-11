@@ -2236,8 +2236,8 @@
 			offset_top = $wrapper.scrollTop() + $obj.offset().top,
 			// Allow 5px free space around the object.
 			margin = 5,
-			widget_top = offset_top + pos['y'] * data['options']['widget-height'] - widget_margin,
-			widget_height = pos['height'] * data['options']['widget-height'] + widget_margin * 2,
+			widget_top = offset_top + pos['y'] * data['options']['widget-height'] - margin,
+			widget_height = pos['height'] * data['options']['widget-height'] + margin * 2,
 			wrapper_height = $wrapper.height(),
 			wrapper_scrollTop = $wrapper.scrollTop(),
 			wrapper_scrollTop_min = Math.max(0, widget_top + Math.min(0, widget_height - wrapper_height)),
