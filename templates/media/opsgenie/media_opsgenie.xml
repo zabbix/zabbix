@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-07-09T15:38:57Z</date>
+    <date>2020-07-13T13:49:52Z</date>
     <media_types>
         <media_type>
             <name>Opsgenie</name>
@@ -112,18 +112,8 @@
         }&#13;
 &#13;
         Media.params = params;&#13;
-        if (typeof Media.params.api === 'string') {&#13;
-            Media.params.api += Media.params.api.endsWith('/') ? '' : '/';&#13;
-        }&#13;
-        else {&#13;
-            throw 'Required ' + Media.name + ' API URL param is not exist.';&#13;
-        }&#13;
-        if (typeof Media.params.web === 'string') {&#13;
-            Media.params.web += Media.params.web.endsWith('/') ? '' : '/';&#13;
-        }&#13;
-        else {&#13;
-            throw 'Required ' + Media.name + ' web URL param is not exist.';&#13;
-        }&#13;
+        Media.params.api += Media.params.api.endsWith('/') ? '' : '/';&#13;
+        Media.params.web += Media.params.web.endsWith('/') ? '' : '/';&#13;
     },&#13;
 &#13;
     setProxy: function (HTTPProxy) {&#13;
@@ -133,7 +123,6 @@
     },&#13;
 &#13;
     setTags: function(event_tags_json) {&#13;
-&#13;
         if (typeof event_tags_json !== 'undefined' &amp;&amp; event_tags_json !== ''&#13;
                 &amp;&amp; event_tags_json !== '{EVENT.TAGSJSON}') {&#13;
 &#13;
@@ -203,7 +192,7 @@
                 response = JSON.parse(response);&#13;
             }&#13;
             catch (error) {&#13;
-                Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Failed to parse response received from ' + Media.name);&#13;
+                Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Failed to parse response.');&#13;
                 response = null;&#13;
             }&#13;
         }&#13;
@@ -247,7 +236,10 @@ try {&#13;
             'event_id',&#13;
             'event_source',&#13;
             'event_value',&#13;
-            'event_update_status'&#13;
+            'event_update_status',&#13;
+            'opsgenie_api',&#13;
+            'opsgenie_web',&#13;
+            'opsgenie_token'&#13;
         ],&#13;
         severities = [&#13;
             'not_classified',&#13;
@@ -263,11 +255,11 @@ try {&#13;
 &#13;
     Object.keys(params)&#13;
         .forEach(function (key) {&#13;
+            if (required_params.indexOf(key) !== -1 &amp;&amp; params[key].trim() === '') {&#13;
+                throw 'Parameter &quot;' + key + '&quot; cannot be empty.';&#13;
+            }&#13;
             if (key.startsWith('opsgenie_')) {&#13;
                 media[key.substring(9)] = params[key];&#13;
-            }&#13;
-            else if (required_params.indexOf(key) !== -1 &amp;&amp; params[key].trim() === '') {&#13;
-                throw 'Parameter &quot;' + key + '&quot; cannot be empty.';&#13;
             }&#13;
         });&#13;
 &#13;
@@ -316,7 +308,7 @@ try {&#13;
     Media.setProxy(params.HTTPProxy);&#13;
     Media.setTags(params.event_tags_json); // Set Media.labels&#13;
 &#13;
-    // Create a issue.&#13;
+    // Create an issue.&#13;
     // Numeric value of the event that triggered an action (1 for problem, 0 for recovering).&#13;
     // Numeric value of of the problem update status. Possible values:&#13;
     // 0 - Webhook was called because of problem/recovery event, 1 - Update operation.&#13;
@@ -339,16 +331,20 @@ try {&#13;
             fields.details = {'Zabbix server': params.zbxurl};&#13;
         }&#13;
 &#13;
-        responders = params.opsgenie_teams.split(',');&#13;
-        fields.responders = responders.map(function(team) {&#13;
-            return {type: 'team', name: team.trim()};&#13;
-        });&#13;
+        if (typeof params.opsgenie_teams === 'string') {&#13;
+            responders = params.opsgenie_teams.split(',');&#13;
+            fields.responders = responders.map(function(team) {&#13;
+                return {type: 'team', name: team.trim()};&#13;
+            });&#13;
+        }&#13;
 &#13;
         fields.tags = Media.labels;&#13;
-        tags = params.opsgenie_tags.split(',');&#13;
-        tags.forEach(function(item) {&#13;
-            fields.tags.push(item.trim());&#13;
-        });&#13;
+        if (typeof params.opsgenie_tags === 'string') {&#13;
+            tags = params.opsgenie_tags.split(',');&#13;
+            tags.forEach(function(item) {&#13;
+                fields.tags.push(item.trim());&#13;
+            });&#13;
+        }&#13;
 &#13;
         resp = Media.request('post', '', fields);&#13;
         if (typeof resp.response !== 'object' || typeof resp.response.result === 'undefined') {&#13;
