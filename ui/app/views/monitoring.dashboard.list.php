@@ -45,9 +45,30 @@ $widget = (new CWidget())
 		->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 		))
 		->setAttribute('aria-label', _('Content controls'))
+	)
+	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list')))
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			),
+			(new CFormList())->addRow(_('Show'),
+				(new CRadioButtonList('filter_userid', (int) $data['filter']['userid']))
+					->addValue(_('All'), -1)
+					->addValue(_('Created by me'), 1)
+					->setModern(true)
+			)
+		])
+		->addVar('action', 'dashboard.list')
 	);
 
 $form = (new CForm())->setName('dashboardForm');
+
+// create dashboard table
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.list')
+	->getUrl();
 
 $table = (new CTableInfo())
 	->setHeader([
@@ -55,11 +76,8 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_dashboards'))
 				->onClick("checkAll('".$form->getName()."', 'all_dashboards', 'dashboardids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.list')
-				->getUrl()
-		)
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
+		_('Owner')
 	]);
 
 $url = (new CUrl('zabbix.php'))
@@ -70,11 +88,18 @@ foreach ($data['dashboards'] as $dashboard) {
 	$table->addRow([
 		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
 			->setEnabled($dashboard['editable']),
-		new CLink($dashboard['name'],
-			$url
-				->setArgument('dashboardid', $dashboard['dashboardid'])
-				->getUrl()
-		)
+		[
+			new CLink($dashboard['name'],
+				$url
+					->setArgument('dashboardid', $dashboard['dashboardid'])
+					->getUrl()
+			),
+			((int) $dashboard['private'] === PUBLIC_SHARING
+				|| count($dashboard['users']) > 0 || count($dashboard['userGroups']) > 0)
+					? (new CSpan())->addClass(ZBX_STYLE_DASHBOARD_SHARED)->setAttribute('title', _('Shared'))
+					: ''
+		],
+		$data['owners'][$dashboard['userid']]
 	]);
 }
 

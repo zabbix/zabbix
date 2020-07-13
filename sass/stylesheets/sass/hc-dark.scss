@@ -585,6 +585,12 @@ $icon-widget-btn: (
 	background: url($sprite-path) no-repeat -318px -762px !important;
 }
 
+.icon-dashboard-shared {
+	&:after {
+		background: url($sprite-path) no-repeat -378px -10px;
+	}
+}
+
 // Colors and general.
 button {
 	&:focus {

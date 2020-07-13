@@ -2505,6 +2505,19 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     height: 14px;
     background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -659px; }
 
+.icon-dashboard-shared {
+  position: relative;
+  margin-left: 5px; }
+  .icon-dashboard-shared:after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 14px;
+    background: url("../img/icon-sprite.svg?20200407") no-repeat -337px -10px; }
+
 .setup-container {
   background-color: #ffffff;
   width: 766px;
@@ -5633,6 +5646,9 @@ table.preprocessing-test-results .rel-container {
 
 .drag-icon {
   background: url("../img/icon-sprite.svg?20200407") no-repeat -165px -762px !important; }
+
+.icon-dashboard-shared:after {
+  background: url("../img/icon-sprite.svg?20200407") no-repeat -418px -10px; }
 
 button:focus {
   background-color: #6f6f6f;

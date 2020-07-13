@@ -31,9 +31,13 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>		'in name',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1'
+			'sort' =>			'in name',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'filter_userid' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -59,20 +63,59 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		CProfile::update('web.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
+		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.dashbrd.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.dashbrd.filter_userid', $this->getInput('filter_userid', -1), PROFILE_TYPE_INT);
+		}
+		elseif ($this->hasInput('filter_rst')) {
+			CProfile::delete('web.dashbrd.filter_name');
+			CProfile::delete('web.dashbrd.filter_userid');
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.dashbrd.filter_name', ''),
+			'userid' => CProfile::get('web.dashbrd.filter_userid', -1)
+		];
+
 		$config = select_config();
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sort_field,
-			'sortorder' => $sort_order
+			'sortorder' => $sort_order,
+			'filter' => $filter,
+			'profileIdx' => 'web.dashbrd.filter',
+			'active_tab' => CProfile::get('web.dashbrd.filter.active', 1)
 		];
 
 		// list of dashboards
 		$data['dashboards'] = API::Dashboard()->get([
-			'output' => ['dashboardid', 'name'],
+			'output' => ['dashboardid', 'name', 'userid', 'private'],
+			'search' => [
+				'name' => ($filter['name'] === '') ? null : $filter['name']
+			],
+			'filter' => [
+				'userid' => ($filter['userid'] == -1) ? null : CWebUser::$data['userid']
+			],
+			'selectUsers' => ['userid', 'permission'],
+			'selectUserGroups' => ['usrgrpid', 'permission'],
 			'limit' => $config['search_limit'] + 1,
 			'preservekeys' => true
 		]);
+
+		$owners = [];
+		foreach ($data['dashboards'] as $dashboard) {
+			if (!array_key_exists($dashboard['userid'], $owners)) {
+				if ($dashboard['userid'] === CWebUser::$data['userid']) {
+					$owners[$dashboard['userid']] = _('me');
+				}
+				else {
+					$owner = getUserFullnameByUserid($dashboard['userid']);
+					$owners[$dashboard['userid']] = $owner['name'];
+				}
+			}
+		}
+		$data['owners'] = $owners;
 
 		// sorting & paging
 		order_result($data['dashboards'], $sort_field, $sort_order);
