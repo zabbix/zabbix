@@ -12735,7 +12735,7 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 	{
 		size_t	param_pos, param_len;
 		int	quoted;
-		char	*param = NULL, *resolved_param;
+		char	*param, *resolved_param;
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
