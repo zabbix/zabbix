@@ -202,6 +202,7 @@ class CAudit {
 						];
 					}
 				}
+
 				DB::insertBatch('auditlog_details', $auditlog_details);
 			}
 		}
