@@ -491,8 +491,9 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						data: {
 							'widgetid': options.widgetid,
 							'rf_rate': currentRate
-						},
-						success: function() {
+						}
+					})
+						.then(function() {
 							jQuery('a', $obj.closest('.menu-popup')).each(function() {
 								var link = jQuery(this);
 
@@ -515,12 +516,11 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 
 							jQuery('.dashbrd-grid-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetid, parseInt(currentRate));
-						},
-						error: function() {
+						})
+						.fail(function() {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 							// TODO: gentle message about failed saving of widget refresh rate
-						}
-					});
+						});
 				}
 			}
 		};
