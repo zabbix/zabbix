@@ -133,26 +133,23 @@ class CAudit {
 				}
 
 				if (array_key_exists($table_name, $masked_fields)) {
-					$object_old_conditions_accepted = true;
-					$object_conditions_accepted = true;
+					$mask_object_old = true;
+					$mask_object = true;
 
 					if (array_key_exists('conditions', $masked_fields[$table_name])) {
-						foreach ($masked_fields[$table_name]['conditions'] as $condition_field_name => $condition_value) {
-							$object_old_conditions_accepted = $object_old_conditions_accepted
-								&& ($object_old[$condition_field_name] == $condition_value);
-
-							$object_conditions_accepted = $object_conditions_accepted
-								&& ($object[$condition_field_name] == $condition_value);
+						foreach ($masked_fields[$table_name]['conditions'] as $field_name => $value) {
+							$mask_object_old = $mask_object_old && ($object_old[$field_name] == $value);
+							$mask_object = $mask_object && ($object[$field_name] == $value);
 						}
 					}
 
 					foreach ($object_diff as $field_name => &$values) {
 						if (array_key_exists($field_name, $masked_fields[$table_name]['fields'])) {
-							if ($object_old_conditions_accepted) {
+							if ($mask_object_old) {
 								$object_old[$field_name] = ZBX_SECRET_MASK;
 							}
 
-							if ($object_conditions_accepted) {
+							if ($mask_object) {
 								$object[$field_name] = ZBX_SECRET_MASK;
 							}
 						}
@@ -161,7 +158,6 @@ class CAudit {
 							'old' => $object_old[$field_name],
 							'new' => $object[$field_name]
 						];
-
 					}
 					unset($values);
 				}
