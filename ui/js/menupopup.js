@@ -405,6 +405,7 @@ function getMenuPopupMapElementImage(options) {
 /**
  * Get menu popup refresh section data.
  *
+ * @param {integer}  options['widgetid']	 Widget ID.
  * @param {string}   options['widgetName']   Widget name.
  * @param {string}   options['currentRate']  Current rate value.
  * @param {bool}     options['multiplier']   Multiplier or time mode.
@@ -488,7 +489,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						method: 'POST',
 						dataType: 'json',
 						data: {
-							'widgetid': options.widgetName,
+							'widgetid': options.widgetid,
 							'rf_rate': currentRate
 						},
 						success: function() {
@@ -513,7 +514,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 
 							jQuery('.dashbrd-grid-container')
-								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
+								.dashboardGrid('setWidgetRefreshRate', options.widgetid, parseInt(currentRate));
 						},
 						error: function() {
 							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
@@ -554,8 +555,10 @@ function getMenuPopupWidgetActions(options, trigger_elmnt) {
 		widget = $dashboard.dashboardGrid('getWidgetsBy', 'uniqueid', options.widget_uniqueid).pop(),
 		widgetid = widget.widgetid,
 		loading = (!widget['ready'] || widget['content_body'].find('.is-loading').length > 0),
-		menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
 		widget_actions = [];
+
+	options.widgetid = widgetid;
+	menu = editMode ? [] : getMenuPopupRefresh(options, trigger_elmnt),
 
 	widget_actions.push({
 		label: t('S_COPY'),
