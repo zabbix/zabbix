@@ -146,6 +146,7 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
 			(new CUrl('templates.php'))->getUrl()
 		),
+		_('Hosts'),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
@@ -154,7 +155,7 @@ $table = (new CTableInfo())
 		_('Discovery'),
 		_('Web'),
 		_('Linked templates'),
-		_('Linked to'),
+		_('Linked to templates'),
 		_('Tags')
 	]);
 
@@ -165,9 +166,6 @@ foreach ($data['templates'] as $template) {
 	$linkedToOutput = [];
 
 	$i = 0;
-
-	order_result($template['parentTemplates'], 'name');
-
 	foreach ($template['parentTemplates'] as $parentTemplate) {
 		$i++;
 
@@ -185,7 +183,7 @@ foreach ($data['templates'] as $template) {
 			->setArgument('form', 'update')
 			->setArgument('templateid', $parentTemplate['templateid']);
 
-		if (array_key_exists($parentTemplate['templateid'], $data['writable_templates'])) {
+		if (array_key_exists($parentTemplate['templateid'], $data['editable_templates'])) {
 			$linkedTemplatesOutput[] = (new CLink($parentTemplate['name'], $url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
@@ -197,11 +195,7 @@ foreach ($data['templates'] as $template) {
 	}
 
 	$i = 0;
-
-	$linkedToObjects = array_merge($template['hosts'], $template['templates']);
-	order_result($linkedToObjects, 'name');
-
-	foreach ($linkedToObjects as $linkedToObject) {
+	foreach ($template['templates'] as $child_template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
@@ -214,40 +208,31 @@ foreach ($data['templates'] as $template) {
 			$linkedToOutput[] = ', ';
 		}
 
-		if ($linkedToObject['status'] == HOST_STATUS_TEMPLATE) {
-			if (array_key_exists($linkedToObject['templateid'], $data['writable_templates'])) {
-				$url = (new CUrl('templates.php'))
-					->setArgument('form', 'update')
-					->setArgument('templateid', $linkedToObject['templateid']);
-				$link = (new CLink($linkedToObject['name'], $url))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
-			}
-			else {
-				$link = (new CSpan($linkedToObject['name']))
-					->addClass(ZBX_STYLE_GREY);
-			}
+		if (array_key_exists($child_template['templateid'], $data['editable_templates'])) {
+			$url = (new CUrl('templates.php'))
+				->setArgument('form', 'update')
+				->setArgument('templateid', $child_template['templateid']);
+			$linkedToOutput[] = (new CLink($child_template['name'], $url))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			if (array_key_exists($linkedToObject['hostid'], $data['writable_hosts'])) {
-				$url = (new CUrl('hosts.php'))
-					->setArgument('form', 'update')
-					->setArgument('hostid', $linkedToObject['hostid']);
-				$link = (new CLink($linkedToObject['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
-			}
-			else {
-				$link = (new CSpan($linkedToObject['name']));
-			}
-
-			$link->addClass($linkedToObject['status'] == HOST_STATUS_MONITORED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+			$linkedToOutput[] = (new CSpan($child_template['name']))
+				->addClass(ZBX_STYLE_GREY);
 		}
-
-		$linkedToOutput[] = $link;
 	}
 
 	$table->addRow([
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		[
+			new CLink(_('Hosts'),
+				(new CUrl('hosts.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_templates', [$template['templateid']])
+			),
+			CViewHelper::showNum(count(array_intersect_key($template['hosts'], $data['editable_hosts'])))
+		],
 		[
 			new CLink(_('Applications'),
 				(new CUrl('applications.php'))
