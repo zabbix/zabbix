@@ -766,6 +766,8 @@ class CHost extends CHostGeneral {
 				$hostInventory['hostid'] = $hostid;
 				DB::insert('host_inventory', [$hostInventory], false);
 			}
+
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host['name'], null, null, null);
 		}
 
 		if ($ins_tags) {
@@ -966,7 +968,7 @@ class CHost extends CHostGeneral {
 		sort($hostids);
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host'],
+			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
@@ -1112,22 +1114,14 @@ class CHost extends CHostGeneral {
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
 
-		if (isset($data['status'])) {
-			$updateStatus = $data['status'];
-		}
-
 		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
-			$data['macros'], $data['inventory'], $data['inventory_mode'], $data['status']);
+			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
 		if (!zbx_empty($data)) {
 			DB::update('hosts', [
 				'values' => $data,
 				'where' => ['hostid' => $hostids]
 			]);
-		}
-
-		if (isset($updateStatus)) {
-			updateHostStatus($hostids, $updateStatus);
 		}
 
 		/*
@@ -1320,6 +1314,18 @@ class CHost extends CHostGeneral {
 				]);
 			}
 		}
+
+		$new_hosts = [];
+		foreach ($db_hosts as $hostid => $db_host) {
+			$new_host = $data + $db_host;
+			if ($new_host['status'] != $db_host['status']) {
+				info(_s('Updated status of host "%1$s".', $new_host['host']));
+			}
+
+			$new_hosts[] = $new_host;
+		}
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $new_hosts, $db_hosts);
 
 		return ['hostids' => $inputHostIds];
 	}
