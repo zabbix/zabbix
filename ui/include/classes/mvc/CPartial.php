@@ -169,4 +169,8 @@ class CPartial {
 			array_unshift(self::$directories, $directory);
 		}
 	}
+
+	public function getName(): string {
+		return $this->name;
+	}
 }

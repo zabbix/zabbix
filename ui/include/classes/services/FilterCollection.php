@@ -68,7 +68,52 @@ class FilterCollection {
 	 */
 	public function __construct($userid, string $collectionid) {
 		$this->collectionid = $collectionid;
-		$this->data_providers = $this->readProfile($userid);
+		$this->data_providers = [];
+		$data_providers = $this->readProfile($userid);
+		$default = [
+			'type' => $this->default_provider,
+			'title' => '',
+			'active' => 1,
+			'fields' => [],
+			'show_count' => false,
+		];
+
+		if (!$data_providers) {
+			$data_providers = [$default];
+		}
+
+		foreach ($data_providers as $data_provider) {
+			$data_provider['instance'] = $this->getDataProviderInstance($data_provider);
+			$data_provider['default'] = is_a($data_provider['instance'], AbstractDataProvider::class)
+				? $data_provider['instance']->getFieldsDefaults() : [];
+			$this->data_providers[] = $data_provider + $default;
+		}
+	}
+
+	/**
+	 * Get data for every filter in collection.
+	 *
+	 * @return array
+	 */
+	public function getDataProvidersArray(): array {
+		$result = [];
+
+		foreach ($this->data_providers as $data_provider) {
+			$instance = $data_provider['instance'];
+
+			$result[] = [
+				'active' => $data_provider['active'],
+				'type' => $data_provider['type'],
+				'label' => $data_provider['label'],
+				'fields' => $data_provider['fields'],
+				'default' => $data_provider['default'],
+				'show_count' => $data_provider['show_count'],
+				'data' => $instance ? $data_provider['instance']->getTemplateData() : null,
+				'template' => $instance ? $data_provider['instance']->template_file : null
+			];
+		}
+
+		return $result;
 	}
 
 	/**
@@ -82,34 +127,29 @@ class FilterCollection {
 		return $this;
 	}
 
+	public function getDataProviderInstance(array $options) {
+		/** @var AbstractDataProvider $instance */
+		$id = array_key_exists('profileid', $options) ? $options['profileid'] : 'home';
+		$instance = DataProviderFactory::create($options['type'], $id);
+		$instance->updateFields($options['fields'] ? $options['fields'] : $instance->getFieldsDefaults());
+
+		return $instance;
+	}
+
 	/**
 	 * Get active data provider instance. If no active data provider were found default provider will be returned.
 	 */
 	public function getActiveDataProvider() {
-		if ($this->active_provider) {
-			return $this->active_provider;
-		}
+		$instance = null;
 
-		$data_providers = $this->data_providers;
-		$data_providers[] = [
-			'type' => $this->default_provider,
-			'active' => 1,
-			'fields' => []
-		];
-
-		foreach ($data_providers as $data_provider) {
-			if (!$data_provider['active']) {
-				continue;
+		foreach ($this->data_providers as $data_provider) {
+			if ($data_provider['active']) {
+				$instance = $data_provider['instance'];
+				break;
 			}
 
-			break;
+			$data_provider = [];
 		}
-
-		/** @var AbstractDataProvider $instance */
-		$id = array_key_exists('profileid', $data_provider) ? $data_provider['profileid'] : 'home';
-		$instance = DataProviderFactory::create($data_provider['type'], $id);
-		$instance->updateFields($data_provider['fields'] ? $data_provider['fields'] : $instance->getFieldsDefaults());
-		$this->active_provider = $instance;
 
 		return $instance;
 	}

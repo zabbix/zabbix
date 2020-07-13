@@ -46,7 +46,30 @@ class HostDataProvider extends AbstractDataProvider {
 	protected $paging;
 
 	/**
+	 * Get additional data required to represent data provider as HTML DOM node.
+	 *
+	 * @return array
+	 */
+	public function getTemplateData(): array {
+		$data = [];
+
+		if ($this->fields['groupids']) {
+			$groups = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $this->fields['groupids'],
+				'preservekeys' => true
+			]);
+
+			$data['groups_multiselect'] = CArrayHelper::renameObjectsKeys($groups, ['groupid' => 'id']);
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Get data for monitoring hosts page.
+	 *
+	 * @return array
 	 */
 	public function getData(): array {
 		$groupids = null;

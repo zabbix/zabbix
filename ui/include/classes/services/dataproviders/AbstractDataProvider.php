@@ -35,6 +35,11 @@ abstract class AbstractDataProvider {
 	public $fields = [];
 
 	/**
+	 * Additional data for filter template rendering.
+	 */
+	public $template_data = [];
+
+	/**
 	 * @param string $id    Unique string, is set by class implementing collection of data providers.
 	 */
 	public function __construct(string $id) {

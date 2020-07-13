@@ -20,38 +20,43 @@
 **/
 
 
+$fields = $data['fields'] + $data['default'];
 $filter_tags_table = (new CTable())
 	->setId('filter-tags')
 	->addRow(
 		(new CCol(
-			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
+			(new CRadioButtonList('filter_evaltype', (int) $fields['evaltype']))
 				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 				->setModern(true)
 		))->setColSpan(4)
 );
 
-$i = 0;
-foreach ($data['filter']['tags'] as $tag) {
+$tags = array_values($fields['tags']);
+if (!$tags) {
+	$tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
+
+foreach ($tags as $i => $tag) {
 	$filter_tags_table->addRow([
 		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
 			->setAttribute('placeholder', _('tag'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->removeId(),
 		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
 			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
 			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 			->setModern(true),
 		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 			->setAttribute('placeholder', _('value'))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->removeId(),
 		(new CCol(
 			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
-
-	$i++;
 }
 $filter_tags_table->addRow(
 	(new CCol(
@@ -61,16 +66,17 @@ $filter_tags_table->addRow(
 	))->setColSpan(3)
 );
 
-$columns = [];
-$columns[] = (new CFormList())
+$left_column = (new CFormList())
 	->addRow(_('Name'),
-		(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		(new CTextBox('filter_name', $fields['name']))
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->removeId()
 	)
 	->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
-			'data' => $data['multiselect_hostgroup_data'],
+			'data' => array_key_exists('groups_multiselect', $data['data']) ? $data['data']['groups_multiselect'] : [],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -84,26 +90,29 @@ $columns[] = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow(_('IP'),
-		(new CTextBox('filter_ip', $data['filter']['ip']))
+		(new CTextBox('filter_ip', $fields['ip']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->removeId()
 	)
 	->addRow(_('DNS'),
-		(new CTextBox('filter_dns', $data['filter']['dns']))
+		(new CTextBox('filter_dns', $fields['dns']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->removeId()
 	)
 	->addRow(_('Port'),
-		(new CTextBox('filter_port', $data['filter']['port']))
+		(new CTextBox('filter_port', $fields['port']))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			->removeId()
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('filter_severities'))->setChecked($data['filter']['severities'])
+		(new CSeverityCheckBoxList('filter_severities'))->setChecked($fields['severities'])
 	);
 
-$columns[] = (new CFormList())
+$right_column = (new CFormList())
 	->addRow(
 		_('Status'),
 		(new CHorList())
-			->addItem((new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+			->addItem((new CRadioButtonList('filter_status', (int) $fields['status']))
 				->addValue(_('Any'), -1)
 				->addValue(_('Enabled'), HOST_STATUS_MONITORED)
 				->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
@@ -113,40 +122,35 @@ $columns[] = (new CFormList())
 	->addRow(_('Tags'), $filter_tags_table)
 	->addRow(_('Show hosts in maintenance'), [
 		(new CCheckBox('filter_maintenance_status'))
-			->setChecked($data['filter']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
+			->setChecked($fields['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 			->setUncheckedValue(HOST_MAINTENANCE_STATUS_OFF),
 		(new CDiv([
 			(new CLabel(_('Show suppressed problems'), 'filter_show_suppressed'))
 				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('filter_show_suppressed'))
-				->setChecked($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+				->setChecked($fields['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
-				->setEnabled($data['filter']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON),
+				->setEnabled($fields['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON),
 		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	]);
 
-$footer[] = (new CDiv())
-	->addClass(ZBX_STYLE_FILTER_FORMS)
-	->addItem(
-		(new CSubmitButton(_('Save as'), 'save_as', 1))
-			->addClass(ZBX_STYLE_BTN_ALT)
-	)
-	->addItem(
-		(new CSubmitButton(_('Update'), 'filter_set', 1))
-	)
-	->addItem(
-		(new CSubmitButton(_('Apply'), 'filter_apply', 1))
-			->addClass(ZBX_STYLE_BTN_ALT)
-	)
-	->addItem(
-		(new CRedirectButton(_('Reset'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'host.view')
-				->setArgument('filter_rst', 1)
-				->getUrl()
-		))
-			->addClass(ZBX_STYLE_BTN_ALT)
-	);
+if (array_key_exists('render_html', $data)) {
+	/**
+	 * Render HTML to prevent filter flickering after initial page load. PHP created content will be replaced by
+	 * javascript with additional event handling (dynamic rows, etc.) when page will be fully loaded and javascript
+	 * executed.
+	 */
+	(new CDiv())
+		->addClass(ZBX_STYLE_TABLE)
+		->addClass(ZBX_STYLE_FILTER_FORMS)
+		->addItem([
+			(new CDiv($left_column))->addClass(ZBX_STYLE_CELL),
+			(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
+		])
+		->show();
+
+	return;
+}
 
 (new CScriptTemplate('filter-tag-row-tmpl'))
 	->addItem(
@@ -170,27 +174,37 @@ $footer[] = (new CDiv())
 			->addClass('form_row'))
 	->show();
 
-// TODO: remove
-(new CFilter($data['view_curl']))
-	->hideFilterButtons()
-	->setProfile('web.hostsmon.filter')
-	->setActiveTab($data['active_tab'])
-	->addFormItem((new CVar('action', 'host.view'))->removeId())
-	->addFilterTab(_('Filter'), $columns, $footer)
-	->addTimeSelector('now-1h', 'now')
+(new CScriptTemplate('filter-monitoring-hosts'))
+	->addItem([$left_column, $right_column])
 	->show();
-// TODO end
 
-// (new CScriptTemplate('web_monitoring_hosts_tmpl'))
-// 	->addItem([$columns, $footer])
-// 	->show();
 ?>
 <script type="text/javascript">
-jQuery(function($) {
-	$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
+$('#filter-monitoring-hosts').on('render', function(ev, data) {
+	// data.node = rendered template dom node
+	// data = rendered tab data
 
-	$('#filter_maintenance_status').on('change', function() {
-		$('#filter_show_suppressed').prop('disabled', !this.checked);
+	// Host groups multiselect.
+	$('#filter_groups_', data.node).multiSelect(data.groups_multiselect);
+
+	// Tags table
+	var tag_row = new CTemplate($('#filter-tag-row-tmpl').html()),
+		i = 0;
+
+	data.tags.forEach(tag => {
+		var $row = $(tag_row.evaluate({rowNum: i++}));
+
+		$row.find('[name$="[tag]"]').val(tag.tag);
+		$row.find('[name$="[value]"]').val(tag.value);
+		$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
+
+		$('#filter-tags', data.node).append($row);
+	});
+	$('#filter-tags', data.node).dynamicRows({template: '#filter-tag-row-tmpl'});
+
+	// Show hosts in maintenance events.
+	$('#filter_maintenance_status', data.node).click(function () {
+		$('#filter_show_suppressed', data.node).prop('disabled', !this.checked);
 	});
 });
 </script>

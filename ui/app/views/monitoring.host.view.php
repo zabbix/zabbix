@@ -25,6 +25,8 @@
 
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
+$this->addJsFile('class.tabfilter.js');
+$this->addJsFile('class.tabfilteritem.js');
 
 $this->includeJsFile('monitoring.host.view.js.php');
 
@@ -40,10 +42,27 @@ $widget = (new CWidget())
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$widget->addItem(new CPartial($data['filter.active.template'], $data));
+	$filter = new CTabFilter();
+	$containerid = 'tabcontent';
+
+	foreach ($data['filter_tabs'] as $tab) {
+		$container = null;
+		$label = (new CLink($tab['label']))->setAttribute('data-target', '#'.$containerid);
+
+		if ($tab['active']) {
+			$container = (new CDiv(new CPartial($tab['template'], ['render_html' => true] + $tab)))->setId($containerid);
+			$label->addClass('active');
+		}
+
+		$filter->addItem([$label, $container]);
+		$filter->addTemplate(new CPartial($tab['template'], ['fields' => []] + $tab));
+	}
+
+	$filter->setData($data['filter_tabs']);
+
+	$widget->addItem($filter);
 }
 
-// Partial 'monitoring.host.view.html' will be loaded via ajax call.
 $widget->addItem((new CForm())->setName('host_view')->addClass('is-loading'));
 
 $widget->show();

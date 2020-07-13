@@ -127,17 +127,6 @@ class CControllerHostView extends CController {
 			$filter_collection->updateProfile(CWebUser::$data['userid'], $data_provider);
 		}
 
-		$hostgroups = [];
-
-		if ($filter['groupids']) {
-			// Multiselect host groups.
-			$hostgroups = API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter['groupids']
-			]);
-			$hostgroups = CArrayHelper::renameObjectsKeys($hostgroups, ['groupid' => 'id']);
-		}
-
 		$refresh_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'host.view.refresh')
 			->setArgument('filter_name', $filter['name'] ? $filter['name'] : null)
@@ -154,20 +143,14 @@ class CControllerHostView extends CController {
 			->setArgument('sortorder', $filter['sortorder'])
 			->setArgument('page', $filter['page']);
 
-		if (!$filter['tags']) {
-			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-		}
 
 		$data = [
-			'filter' => $filter,
 			'config' => $config,
 			'view_curl' => $view_curl,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'active_tab' => 1,
 
-			'multiselect_hostgroup_data' => $hostgroups,
-			'filter.active.template' => $data_provider->template_file,
+			'filter_tabs' => $filter_collection->getDataProvidersArray()
 		];
 
 		$response = new CControllerResponseData($data);
