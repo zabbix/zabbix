@@ -43,7 +43,7 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	init(options) {
-		let container, item;
+		let container, item, i = 0;
 
 		for (const title of this._target.childNodes.item(0).querySelectorAll('[data-target]')) {
 			container = this._target.querySelector(title.getAttribute('data-target'));
@@ -51,6 +51,9 @@ class CTabFilter extends CBaseComponent {
 			item._can_toggle = options.can_toggle;
 
 			this._items.push(item);
+			// Initialize tab template and pass tamplate and data to CTabFilterItem object.
+			// console[log](`index ${i}`, options.data[i]);
+			i++;
 		}
 
 		this._templates = this._target.querySelectorAll('[type="text/x-jquery-tmpl"]');

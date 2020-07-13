@@ -170,6 +170,11 @@ class CPartial {
 		}
 	}
 
+	/**
+	 * Get partial file name.
+	 *
+	 * @return string
+	 */
 	public function getName(): string {
 		return $this->name;
 	}

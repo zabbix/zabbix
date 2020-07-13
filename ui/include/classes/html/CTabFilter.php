@@ -2,12 +2,17 @@
 
 class CTabFilter extends CDiv {
 
+	const CSS_TAB_ACTIVE = 'active';
+	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable';
+	const CSS_ID_PREFIX = 'tabfilter_';
+
 	/**
-	 * HTML Content of filter active tab.
+	 * Array of arrays for tabs data. Single element contains: tab label object, tab content object or null and tab data
+	 * array.
 	 *
-	 * @var string
+	 * @var array $tabs
 	 */
-	protected $active_html = '';
+	public $tabs = [];
 
 	/**
 	 * Array of CPartial elements used as tab content rendering templates.
@@ -16,33 +21,17 @@ class CTabFilter extends CDiv {
 	 */
 	protected $templates = [];
 
+	/**
+	 * Array of dynamic tabs data.
+	 */
 	protected $tabs_data = [];
 
 	public function __construct($items = null) {
 		parent::__construct($items);
 
 		$this
-			->setId(uniqid('tabfilter_'))
+			->setId(uniqid(static::CSS_ID_PREFIX))
 			->addClass(ZBX_STYLE_FILTER_CONTAINER);
-	}
-
-	// public function bodyToString() {
-	// 	$tabs = new CDiv(array_column($this->items, 1));
-	// 	$labels = (new CList())->addClass('ui-sortable');
-	// 	array_map([$labels, 'addItem'], array_column($this->items, 0));
-	// 	$templates = '';
-
-	// 	foreach ($this->templates as $template) {
-	// 		$templates .= $template->getOutput();
-	// 	}
-
-	// 	return implode('', [$labels, $tabs, $this->getFilterButtons(), $templates, $this->getJS()]);
-	// }
-
-	public function addTabData(array $data): CTabFilter {
-		$this->tabs_data[] = $data;
-
-		return $this;
 	}
 
 	/**
@@ -54,52 +43,41 @@ class CTabFilter extends CDiv {
 	 * @param CTag       $item[]  Tab item label node.
 	 * @param CTag|null  $item[]  Tab item content node.
 	 */
-	public function addItem($item) {
-		if (!is_array($item)) {
-			return $this;
-		}
+	// public function addItem($item) {
+	// 	if (!is_array($item)) {
+	// 		return $this;
+	// 	}
 
-		[$label, $content] = $item;
-		$tabid = is_a($content, CTag::class) ? $content->getId() : uniqid('tabfiltertab_');
+	// 	[$label, $content] = $item;
+	// 	$tabid = is_a($content, CTag::class) ? $content->getId() : uniqid('tabfiltertab_');
 
-		if (!is_a($label, CTag::class)) {
-			$label = new CLink($label);
-		}
+	// 	if (!is_a($label, CTag::class)) {
+	// 		$label = new CLink($label);
+	// 	}
 
-		if (is_a($content, CPartial::class)) {
-			$content = (new CDiv($content))->setId($tabid);
-		}
+	// 	if (is_a($content, CPartial::class)) {
+	// 		$content = (new CDiv($content))->setId($tabid);
+	// 	}
 
-		if (is_a($content, CTag::class) && $label->getAttribute('data-target') !== $tabid) {
-			$label->setAttribute('data-target', '#'.$tabid);
-		}
+	// 	if (is_a($content, CTag::class) && $label->getAttribute('data-target') !== $tabid) {
+	// 		$label->setAttribute('data-target', '#'.$tabid);
+	// 	}
 
-		$this->items[] = [$label, $content];
+	// 	$this->items[] = [$label, $content];
 
-		return $this;
-	}
-
-	public function addTemplate($template) {
-		if (is_a($template, CPartial::class)) {
-			$this->templates[$template->getName()] = $template;
-		}
-
-		return $this;
-	}
-
-	public function setData(array $data) {
-		$this->tabs_data = $data;
-	}
-
-
+	// 	return $this;
+	// }
 
 	/**
-	 * Array of arrays for tabs data. Single element contains: tab label object, tab content object or null and tab data
-	 * array.
+	 * Add template for browser side rendered tabs.
 	 *
-	 * @var array $tabs
+	 * @param CPartial $template  Template object.
 	 */
-	public $tabs = [];
+	public function addTemplate(CPartial $template) {
+		$this->templates[$template->getName()] = $template;
+
+		return $this;
+	}
 
 	/**
 	 * Add tab for render on browser side using passed $data. Active (expanded) tab will be pre-rendered on server side
@@ -107,16 +85,11 @@ class CTabFilter extends CDiv {
 	 *
 	 * @param string|CTag $label            Tab label.
 	 * @param string      $target_selector  CSS selector for tab content node to be shown/hidden.
-	 * @param array       $data             Array of tab data.
+	 * @param array       $data             Tab data associative array.
 	 *
 	 * @return CTabFilter
 	 */
-	public function addTemplatedTab($label, string $target_selector, array $data): CTabFilter {
-		if (!is_a($label, CTag::class)) {
-			$label = new CLink($label);
-		}
-
-		$label->setAttribute('data-target', $target_selector);
+	public function addTemplatedTab($label, array $data): CTabFilter {
 		$this->tabs[] = [$label, null, $data];
 
 		return $this;
@@ -132,13 +105,13 @@ class CTabFilter extends CDiv {
 	 */
 	public function addSimpleTab($label, $content): CTabFilter {
 		if (is_a($content, CPartial::class)) {
-			$content = (new CDiv($content))->setId(uniqid('tabfilter_'));
+			$content = (new CDiv($content))->setId(uniqid(static::CSS_ID_PREFIX));
 		}
 
 		$targetid = $content->getId();
 
 		if (!strlen($targetid)) {
-			$targetid = uniqid('tabfilter_');
+			$targetid = uniqid(static::CSS_ID_PREFIX);
 			$content->setId($targetid);
 		}
 
@@ -158,26 +131,53 @@ class CTabFilter extends CDiv {
 
 		$labels = [];
 		$contents = [];
-		$data = [];
 
 		foreach ($this->tabs as $tab_index => $tab) {
+			$targetid = static::CSS_ID_PREFIX.$tab_index;
 			[$tab_label, $tab_content, $tab_data] = $tab;
 
+			if ($tab_content !== null && method_exists($tab_content, 'getId') && $tab_content->getId()) {
+				$targetid = $tab_content->getId();
+			}
+
+			if (!is_a($tab_label, CTag::class)) {
+				// Temporary fix.
+				$tab_label = ($tab_index == 0) ? 'Home' : $tab_label;
+
+				$tab_label = (new CLink($tab_label))->setAttribute('data-target', '#'.$targetid);
+			}
+
 			if ($tab_content === null && $tab_active == $tab_index && $is_expanded) {
-				//$tab
+				/** Render active tab. */
+				$tab_content = (new CDiv(new CPartial($tab_data['template'], ['render_html' => true] + $tab_data)));
+				$tab_label->addClass(static::CSS_TAB_ACTIVE);
+			}
+
+			$tab_content->setId($targetid);
+
+			$labels[$tab_index] = $tab_label;
+			$contents[$tab_index] = $tab_content;
+
+			if (is_array($tab_data)) {
+				$this->tabs_data[$tab_index] = $tab_data;
 			}
 		}
-		// $tabs = new CDiv(array_column($this->items, 1));
-		// $labels = (new CList())->addClass('ui-sortable');
-		// array_map([$labels, 'addItem'], array_column($this->items, 0));
-		// $templates = '';
 
-		// foreach ($this->templates as $template) {
-		// 	$templates .= $template->getOutput();
-		// }
+		$templates = '';
 
-		// return implode('', [$labels, $tabs, $this->getFilterButtons(), $templates, $this->getJS()]);
+		foreach ($this->templates as $template) {
+			$templates .= $template->getOutput();
+		}
+
+		return implode('', [
+			(new CList($labels))->addClass(static::CSS_TAB_SORTABLE_CONTAINER),
+			new CDiv($contents),
+			$this->getFilterButtons(),
+			$templates,
+			$this->getJS()
+		]);
 	}
+
 	/**
 	 * Return javascript code for filter initialization. Page should include script 'class.tabs.js' to work properly.
 	 *
@@ -203,6 +203,7 @@ class CTabFilter extends CDiv {
 
 	/**
 	 * Get filter action buttons with CDiv wrapper container.
+	 * TODO: move to class property!
 	 *
 	 * @return CDiv
 	 */

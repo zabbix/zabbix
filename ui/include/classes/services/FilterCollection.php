@@ -31,6 +31,7 @@ class FilterCollection {
 	 * Unique id of collection. Is used as "Idx" when saving collection.
 	 */
 	protected $collectionid;
+	protected $userid;
 
 	/**
 	 * Array of filter collection data providers. Data provider fields:
@@ -69,10 +70,14 @@ class FilterCollection {
 	public function __construct($userid, string $collectionid) {
 		$this->collectionid = $collectionid;
 		$this->data_providers = [];
-		$data_providers = $this->readProfile($userid);
+		$this->userid = $userid;
+	}
+
+	public function init() {
+		$data_providers = $this->readProfile($this->userid);
 		$default = [
 			'type' => $this->default_provider,
-			'title' => '',
+			'label' => '',
 			'active' => 1,
 			'fields' => [],
 			'show_count' => false,

@@ -175,6 +175,7 @@ if (array_key_exists('render_html', $data)) {
 	->show();
 
 (new CScriptTemplate('filter-monitoring-hosts'))
+	->setAttribute('data-template', 'monitoring.filter.host')
 	->addItem([$left_column, $right_column])
 	->show();
 

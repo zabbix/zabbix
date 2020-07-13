@@ -43,22 +43,11 @@ $widget = (new CWidget())
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = new CTabFilter();
-	$containerid = 'tabcontent';
 
 	foreach ($data['filter_tabs'] as $tab) {
-		$container = null;
-		$label = (new CLink($tab['label']))->setAttribute('data-target', '#'.$containerid);
-
-		if ($tab['active']) {
-			$container = (new CDiv(new CPartial($tab['template'], ['render_html' => true] + $tab)))->setId($containerid);
-			$label->addClass('active');
-		}
-
-		$filter->addItem([$label, $container]);
 		$filter->addTemplate(new CPartial($tab['template'], ['fields' => []] + $tab));
+		$filter->addTemplatedTab($tab['label'], $tab);
 	}
-
-	$filter->setData($data['filter_tabs']);
 
 	$widget->addItem($filter);
 }

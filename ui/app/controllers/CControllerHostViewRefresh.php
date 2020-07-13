@@ -31,6 +31,7 @@ class CControllerHostViewRefresh extends CControllerHostView {
 		$config = select_config();
 		$filter_collection = new FilterCollection(CWebUser::$data['userid'], 'web.monitoring.hosts');
 		$filter_collection->setDefaultProvider(HostDataProvider::PROVIDER_TYPE);
+		$filter_collection->init();
 		$data_provider = $filter_collection->getActiveDataProvider();
 		$filter = [
 			'name' => $this->getInput('filter_name', ''),

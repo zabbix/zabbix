@@ -91,6 +91,7 @@ class CControllerHostView extends CController {
 		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view.refresh');
 		$filter_collection = new FilterCollection(CWebUser::$data['userid'], 'web.monitoring.hosts');
 		$filter_collection->setDefaultProvider(HostDataProvider::PROVIDER_TYPE);
+		$filter_collection->init();
 		$data_provider = $filter_collection->getActiveDataProvider();
 		$filter = $this->hasInput('filter_apply') ? $data_provider->getFieldsDefaults() : $data_provider->getFields();
 		$filter += [

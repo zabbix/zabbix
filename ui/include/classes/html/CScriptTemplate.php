@@ -29,6 +29,7 @@ class CScriptTemplate extends CTag {
 	public function __construct($id) {
 		parent::__construct('script', true);
 		$this->setAttribute('type', 'text/x-jquery-tmpl');
+		// TODO: ?? id attribute do not allow to use dot charatcer, consider use data-template attribute instead
 		$this->setId($id);
 	}
 
