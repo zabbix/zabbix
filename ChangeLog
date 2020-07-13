@@ -116,6 +116,11 @@ A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed
 .......PS. [ZBX-15484] shadow global auto_increment variables for MySQL (arimdjonoks)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.2
+
+5.0.2rc1 was released as 5.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.2rc1
 
 New features:
