@@ -105,6 +105,8 @@ $availableJScripts = [
 	'class.cviewswitcher.js' => '',
 	'class.pmaster.js' => '',
 	'class.rpc.js' => '',
+	'class.tabfilter.js' => '',
+	'class.tabfilteritem.js' => '',
 	'class.template.js' => '',
 	'init.js' => '',
 	// templates
