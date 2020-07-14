@@ -634,7 +634,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				}
 			}
 		}
-
 		unset($triggers, $monitored_triggers);
 	}
 
