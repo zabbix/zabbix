@@ -432,9 +432,9 @@ func (c *DiskCache) init(options *agent.AgentOptions) {
 
 	rows, err := c.database.Query(fmt.Sprintf("SELECT id FROM registry WHERE address = '%s'", c.uploader.Addr()))
 
-	defer rows.Close()
-
 	if err == nil {
+		defer rows.Close()
+
 		for rows.Next() {
 			if err = rows.Scan(&c.serverID); err != nil {
 				c.Errf("cannot retrieve diskcache server ID ")
