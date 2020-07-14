@@ -162,34 +162,34 @@ $table = (new CTableInfo())
 foreach ($data['templates'] as $template) {
 	$name = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
 
-	$linkedTemplatesOutput = [];
-	$linkedToOutput = [];
+	$linked_templates_output = [];
+	$linked_to_output = [];
 
 	$i = 0;
-	foreach ($template['parentTemplates'] as $parentTemplate) {
+	foreach ($template['parentTemplates'] as $parent_template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$linkedTemplatesOutput[] = ' &hellip;';
+			$linked_templates_output[] = ' &hellip;';
 
 			break;
 		}
 
-		if ($linkedTemplatesOutput) {
-			$linkedTemplatesOutput[] = ', ';
+		if ($linked_templates_output) {
+			$linked_templates_output[] = ', ';
 		}
 
 		$url = (new CUrl('templates.php'))
 			->setArgument('form', 'update')
-			->setArgument('templateid', $parentTemplate['templateid']);
+			->setArgument('templateid', $parent_template['templateid']);
 
-		if (array_key_exists($parentTemplate['templateid'], $data['editable_templates'])) {
-			$linkedTemplatesOutput[] = (new CLink($parentTemplate['name'], $url))
+		if (array_key_exists($parent_template['templateid'], $data['editable_templates'])) {
+			$linked_templates_output[] = (new CLink($parent_template['name'], $url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$linkedTemplatesOutput[] = (new CSpan($parentTemplate['name']))
+			$linked_templates_output[] = (new CSpan($parent_template['name']))
 				->addClass(ZBX_STYLE_GREY);
 		}
 	}
@@ -199,25 +199,25 @@ foreach ($data['templates'] as $template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$linkedToOutput[] = ' &hellip;';
+			$linked_to_output[] = ' &hellip;';
 
 			break;
 		}
 
-		if ($linkedToOutput) {
-			$linkedToOutput[] = ', ';
+		if ($linked_to_output) {
+			$linked_to_output[] = ', ';
 		}
 
 		if (array_key_exists($child_template['templateid'], $data['editable_templates'])) {
 			$url = (new CUrl('templates.php'))
 				->setArgument('form', 'update')
 				->setArgument('templateid', $child_template['templateid']);
-			$linkedToOutput[] = (new CLink($child_template['name'], $url))
+			$linked_to_output[] = (new CLink($child_template['name'], $url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$linkedToOutput[] = (new CSpan($child_template['name']))
+			$linked_to_output[] = (new CSpan($child_template['name']))
 				->addClass(ZBX_STYLE_GREY);
 		}
 	}
@@ -285,8 +285,8 @@ foreach ($data['templates'] as $template) {
 			),
 			CViewHelper::showNum($template['httpTests'])
 		],
-		$linkedTemplatesOutput,
-		$linkedToOutput,
+		$linked_templates_output,
+		$linked_to_output,
 		$data['tags'][$template['templateid']]
 	]);
 }

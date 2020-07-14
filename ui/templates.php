@@ -1110,7 +1110,7 @@ else {
 
 	order_result($templates, $sortField, $sortOrder);
 
-	// Select writable templates:
+	// Select editable templates:
 	$linked_templateids = [];
 	$editable_templates = [];
 	$linked_hostids = [];
