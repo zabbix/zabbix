@@ -29,6 +29,7 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const CONNECT_TIMEOUT = 'connect_timeout';
 	public const CUSTOM_COLOR = 'custom_color';
 	public const DEFAULT_INVENTORY_MODE = 'default_inventory_mode';
+	public const DEFAULT_LANG = 'default_lang';
 	public const DEFAULT_THEME = 'default_theme';
 	public const DISCOVERY_GROUPID = 'discovery_groupid';
 	public const HISTORY_PERIOD = 'history_period';

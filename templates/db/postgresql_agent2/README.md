@@ -15,10 +15,12 @@ This template was tested on:
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+
 1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
 
 ```bash
-CREATE USER 'zbx_monitor' IDENTIFIED BY '<password>';
+CREATE USER 'zbx_monitor' WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_dir(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
 ```
@@ -51,7 +53,7 @@ No specific Zabbix configuration is required.
 |{$PG.DEADLOCKS.MAX.WARN} |<p>-</p> |`0` |
 |{$PG.LLD.FILTER.DBNAME} |<p>-</p> |`(.+)` |
 |{$PG.PASSWORD} |<p>-</p> |`postgres` |
-|{$PG.URI} |<p>-</p> |`postgresql://localhost:5432` |
+|{$PG.URI} |<p>-</p> |`tcp://localhost:5432` |
 |{$PG.USER} |<p>-</p> |`postgres` |
 
 ## Template links
@@ -138,7 +140,7 @@ There are no template links in this template.
 |PostgreSQL |DB {#DBNAME}: Commits per second |<p>Number of transactions in this database that have been committed</p> |DEPENDENT |pgsql.dbstat.xact_commit.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].xact_commit`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Rollbacks per second |<p>Total number of transactions in this database that have been rolled back</p> |DEPENDENT |pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].xact_rollback`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Backends connected |<p>Number of backends currently connected to this database</p> |DEPENDENT |pgsql.dbstat.numbackends["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].numbackends`</p> |
-|PostgreSQL |DB {#DBNAME}: Checksum failures |<p>Number of data page checksum failures detected in this database</p> |DEPENDENT |pgsql.dbstat.checksum_failures.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].checksum_failures`</p><p>- CHANGE_PER_SECOND |
+|PostgreSQL |DB {#DBNAME}: Checksum failures |<p>Number of data page checksum failures detected in this database</p> |DEPENDENT |pgsql.dbstat.checksum_failures.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].checksum_failures`</p><p>- MATCHES_REGEX: `^\d*$`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_read_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Disk blocks read per second |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].blk_write_time`</p><p>- MULTIPLIER: `0.001`</p><p>- CHANGE_PER_SECOND |
 |PostgreSQL |DB {#DBNAME}: Num of accessexclusive locks |<p>Number of accessexclusive locks for each database</p> |DEPENDENT |pgsql.locks.accessexclusive["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$['{#DBNAME}'].accessexclusive`</p> |

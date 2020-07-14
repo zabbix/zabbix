@@ -2597,10 +2597,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin: 25% 0 .4em; }
 
 .setup-title {
+  margin: 109px 0 16px 0;
   color: #737373;
-  height: 345px;
-  display: table-cell;
-  vertical-align: middle;
   font-size: 7em;
   line-height: 0.75em; }
   .setup-title span {

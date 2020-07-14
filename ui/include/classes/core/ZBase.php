@@ -169,8 +169,15 @@ class ZBase {
 			case self::EXEC_MODE_DEFAULT:
 				$this->loadConfigFile();
 				$this->initDB();
+
+				$this->initLocales(CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG));
+
 				$this->authenticateUser();
-				$this->initLocales(CWebUser::$data);
+
+				if (CWebUser::$data['lang'] !== CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)) {
+					$this->initLocales(CWebUser::$data['lang']);
+				}
+
 				$this->initMessages();
 				$this->setLayoutModeByUrl();
 				$this->initComponents();
@@ -197,7 +204,7 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->initLocales(['lang' => 'en_gb']);
+				$this->initLocales('en_gb');
 				break;
 
 			case self::EXEC_MODE_SETUP:
@@ -206,7 +213,7 @@ class ZBase {
 					$this->loadConfigFile();
 					$this->initDB();
 					$this->authenticateUser();
-					$this->initLocales(CWebUser::$data);
+					$this->initLocales(CWebUser::$data['lang']);
 				}
 				catch (ConfigFileException $e) {}
 				break;
@@ -366,19 +373,18 @@ class ZBase {
 	/**
 	 * Initialize translations.
 	 *
-	 * @param array  $user_data          Array of user data.
-	 * @param string $user_data['lang']  Language.
+	 * @param string $lang  Language.
 	 */
-	protected function initLocales(array $user_data) {
+	public function initLocales(string $lang): void {
 		init_mbstrings();
 
-		$defaultLocales = [
+		$default_locales = [
 			'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
 		];
 
 		if (function_exists('bindtextdomain')) {
 			// initializing gettext translations depending on language selected by user
-			$locales = zbx_locale_variants($user_data['lang']);
+			$locales = zbx_locale_variants($lang);
 			$locale_found = false;
 			foreach ($locales as $locale) {
 				// since LC_MESSAGES may be unavailable on some systems, try to set all of the locales
@@ -394,8 +400,9 @@ class ZBase {
 				}
 			}
 
-			if (!$locale_found && $user_data['lang'] != 'en_GB' && $user_data['lang'] != 'en_gb') {
-				error('Locale for language "'.$user_data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
+			if (!$locale_found && $lang !== 'en_GB' && $lang !== 'en_gb') {
+				setlocale(LC_ALL, $default_locales);
+				error('Locale for language "'.$lang.'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
 			}
 			bindtextdomain('frontend', 'locale');
 			bind_textdomain_codeset('frontend', 'UTF-8');
@@ -403,7 +410,7 @@ class ZBase {
 		}
 
 		// reset the LC_NUMERIC locale so that PHP would always use a point instead of a comma for decimal numbers
-		setlocale(LC_NUMERIC, $defaultLocales);
+		setlocale(LC_NUMERIC, $default_locales);
 
 		// should be after locale initialization
 		require_once 'include/translateDefines.inc.php';

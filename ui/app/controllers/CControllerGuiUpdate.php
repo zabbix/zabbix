@@ -24,6 +24,7 @@ class CControllerGuiUpdate extends CController {
 	protected function checkInput() {
 		$themes = array_keys(APP::getThemes());
 		$fields = [
+			'default_lang' =>			'required|in '.implode(',', array_keys(getLocales())).'|db config.default_lang',
 			'default_theme' =>			'required|in '.implode(',', $themes).'|db config.default_theme',
 			'search_limit' =>			'required|db config.search_limit|ge 1|le 999999',
 			'max_in_table' =>			'required|db config.max_in_table|ge 1|le 99999',
@@ -106,6 +107,7 @@ class CControllerGuiUpdate extends CController {
 
 	protected function doAction() {
 		$result = API::Settings()->update([
+			CSettingsHelper::DEFAULT_LANG => $this->getInput('default_lang'),
 			CSettingsHelper::DEFAULT_THEME => $this->getInput('default_theme'),
 			CSettingsHelper::SEARCH_LIMIT => $this->getInput('search_limit'),
 			CSettingsHelper::MAX_IN_TABLE => $this->getInput('max_in_table'),

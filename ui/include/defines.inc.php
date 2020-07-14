@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.2.0alpha1');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		5010014);
+define('ZABBIX_DB_VERSION',		5010016);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -1498,6 +1498,12 @@ define('NOT_ZERO',	"({}!=0)&&");
 define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
+
+// user default language
+define('LANG_DEFAULT', 'default');
+
+// the default language
+define('ZBX_DEFAULT_LANG', 'en_GB');
 
 // user default theme
 define('THEME_DEFAULT', 'default');

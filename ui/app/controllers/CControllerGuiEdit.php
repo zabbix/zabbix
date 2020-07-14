@@ -27,6 +27,7 @@ class CControllerGuiEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'default_lang' =>			'db config.default_lang',
 			'default_theme' =>			'db config.default_theme',
 			'search_limit' =>			'db config.search_limit',
 			'max_in_table' =>			'db config.max_in_table',
@@ -53,6 +54,7 @@ class CControllerGuiEdit extends CController {
 
 	protected function doAction() {
 		$data = [
+			'default_lang' => $this->getInput('default_lang', CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)),
 			'default_theme' => $this->getInput('default_theme', CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME)),
 			'search_limit' => $this->getInput('search_limit', CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)),
 			'max_in_table' => $this->getInput('max_in_table', CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)),
