@@ -3286,7 +3286,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 {
 	zbx_host_key_t	host_key = {(char *)host, (char *)key};
 	DC_ITEM		item;
-	char		*value = NULL, *error = NULL, *resolved_params;
+	char		*value = NULL, *error = NULL, *resolved_params = NULL;
 	int		ret, errcode;
 	zbx_timespec_t	ts;
 
@@ -3298,9 +3298,10 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 
 	/* User macros in trigger and calculated function parameters are resolved during configuration sync. */
 	/* However simple macro user parameters are not expanded, do it now.                                 */
-	resolved_params = zbx_dc_expand_user_macros_in_func_params(parameter, item.host.hostid);
 
-	if (SUCCEED != errcode || SUCCEED != evaluate_function(&value, &item, function, resolved_params, &ts, &error))
+	if (SUCCEED != errcode || SUCCEED != evaluate_function(&value, &item, function,
+			(resolved_params = zbx_dc_expand_user_macros_in_func_params(parameter, item.host.hostid)),
+			&ts, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot evaluate function \"%s:%s.%s(%s)\": %s", host, key, function,
 				parameter, (NULL == error ? "item does not exist" : error));
