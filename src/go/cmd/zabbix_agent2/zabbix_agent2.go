@@ -26,6 +26,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 
 	_ "zabbix.com/plugins"
@@ -50,6 +51,8 @@ import (
 var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
+var closeChan = make(chan bool)
+var closeWg sync.WaitGroup
 
 func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
 	if len(params) != 2 {
@@ -147,6 +150,10 @@ loop:
 				}
 			}
 			client.Close()
+		case serviceStop := <-closeChan:
+			if serviceStop {
+				break loop
+			}
 		}
 	}
 	control.Stop()
@@ -204,7 +211,9 @@ func main() {
 	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
 
 	loadAdditionalFlags()
-
+	if err := validateExclusiveFlags(); err != nil {
+		fatalExit("", err)
+	}
 	var remoteCommand string
 	const (
 		remoteDefault     = ""
@@ -240,9 +249,17 @@ func main() {
 
 	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
 		if err := handleWindowsService(confFlag); err != nil {
-			fatalExit(fmt.Sprintf("cannot start %s as windows service", serviceName), err)
+			fatalExit("", err)
 		}
 		os.Exit(0)
+	}
+
+	isInteractive, err := isInteractive()
+	if err != nil {
+		fatalExit("can not determine if is interactive session", err)
+	}
+	if !isInteractive {
+		go runService()
 	}
 
 	if err := conf.Load(confFlag, &agent.Options); err != nil {
@@ -460,12 +477,14 @@ func main() {
 		serverConnectors[i].StopCache()
 	}
 	monitor.Wait(monitor.Output)
-
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
 	log.Infof(farewell)
 
 	if foregroundFlag && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
+	}
+	if !isInteractive {
+		closeWinService()
 	}
 }
 

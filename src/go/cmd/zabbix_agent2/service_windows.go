@@ -20,6 +20,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -27,6 +28,7 @@ import (
 	"time"
 
 	"golang.org/x/sys/windows/svc"
+	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
 )
 
@@ -67,6 +69,14 @@ func loadAdditionalFlags() {
 	)
 	flag.BoolVar(&svcStopFlag, "stop", svcStopDefault, svcStopDescription)
 	flag.BoolVar(&svcStopFlag, "x", svcStopDefault, svcStopDescription+" (shorthand)")
+}
+
+func validateExclusiveFlags() error {
+	return nil
+}
+
+func isInteractive() (bool, error) {
+	return svc.IsAnInteractiveSession()
 }
 
 func handleWindowsService(conf string) error {
@@ -131,40 +141,50 @@ func svcInstall(conf string) error {
 
 	m, err := mgr.Connect()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
 	}
 	defer m.Disconnect()
 
 	s, err := m.OpenService(serviceName)
 	if err == nil {
 		s.Close()
-		return err
+		return errors.New("service already exists")
 	}
 
-	s, err = m.CreateService(serviceName, fmt.Sprintf("\"%s\"", exepath), mgr.Config{StartType: mgr.StartAutomatic, DisplayName: serviceName,
-		Description: "Provides system monitoring"}, "-c", fmt.Sprintf("\"%s\"", conf))
+	s, err = m.CreateService(serviceName, exepath, mgr.Config{StartType: mgr.StartAutomatic, DisplayName: serviceName,
+		Description: "Provides system monitoring", BinaryPathName: fmt.Sprintf("%s -c %s", exepath, conf)}, "-c", conf)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create service: %s", err.Error())
 	}
 	defer s.Close()
-
+	err = eventlog.InstallAsEventCreate(serviceName, eventlog.Error|eventlog.Warning|eventlog.Info)
+	if err != nil {
+		//TODO: manage error
+		s.Delete()
+		return fmt.Errorf("failed to report service into the event log: %s", err.Error())
+	}
 	return nil
 }
 
 func svcUninstall() error {
 	m, err := mgr.Connect()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
 	}
 	defer m.Disconnect()
 	s, err := m.OpenService(serviceName)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open service: %s", err.Error())
 	}
 	defer s.Close()
 	err = s.Delete()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to delete service: %s", err.Error())
+	}
+
+	err = eventlog.Remove(serviceName)
+	if err != nil {
+		return fmt.Errorf("failed to remove service from the event log: %s", err.Error())
 	}
 
 	return nil
@@ -173,18 +193,18 @@ func svcUninstall() error {
 func svcStart(conf string) error {
 	m, err := mgr.Connect()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
 	}
 	defer m.Disconnect()
 	s, err := m.OpenService(serviceName)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open service: %s", err.Error())
 	}
 	defer s.Close()
 
-	err = s.Start()
+	err = s.Start("-c", conf)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to start service: %s", err.Error())
 	}
 
 	return nil
@@ -193,29 +213,64 @@ func svcStart(conf string) error {
 func svcStop() error {
 	m, err := mgr.Connect()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
 	}
 	defer m.Disconnect()
 	s, err := m.OpenService(serviceName)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open service: %s", err.Error())
 	}
 	defer s.Close()
 	status, err := s.Control(svc.Stop)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to send stop request to service: %s", err.Error())
 	}
-	timeout := time.Now().Add(10 * time.Second)
+	timeout := time.Now().Add(10 * time.Minute)
 	for status.State != svc.Stopped {
 		if timeout.Before(time.Now()) {
-			return err
+			return fmt.Errorf("failed to stop '%s' service", serviceName)
 		}
 		time.Sleep(300 * time.Millisecond)
 		status, err = s.Query()
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get service status: %s", err.Error())
 		}
 	}
 
 	return nil
+}
+
+func closeWinService() {
+	closeWg.Done()
+}
+
+func runService() {
+	err := svc.Run(serviceName, &winService{})
+	if err != nil {
+		fatalExit("", err)
+	}
+}
+
+type winService struct{}
+
+func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
+	changes <- svc.Status{State: svc.StartPending}
+	changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop}
+loop:
+	for {
+		c := <-r
+		switch c.Cmd {
+		case svc.Stop:
+			closeWg.Add(1)
+			break loop
+		default:
+			//TODO log to eventlog
+		}
+	}
+
+	closeChan <- true
+	closeWg.Wait()
+	changes <- svc.Status{State: svc.StopPending}
+
+	return
 }

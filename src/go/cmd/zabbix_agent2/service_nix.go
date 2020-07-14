@@ -32,3 +32,7 @@ func loadAdditionalFlags() {}
 func handleWindowsService(conf string) error {
 	return nil
 }
+
+func closeWinService() {}
+
+func runService() {}
