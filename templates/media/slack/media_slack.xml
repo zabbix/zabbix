@@ -12,6 +12,10 @@
                     <value>{ALERT.MESSAGE}</value>
                 </parameter>
                 <parameter>
+                    <name>alert_subject</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
                     <name>bot_token</name>
                     <value>&lt;PLACE YOUR KEY HERE&gt;</value>
                 </parameter>
@@ -34,10 +38,6 @@
                 <parameter>
                     <name>event_id</name>
                     <value>{EVENT.ID}</value>
-                </parameter>
-                <parameter>
-                    <name>event_name</name>
-                    <value>{EVENT.NAME}</value>
                 </parameter>
                 <parameter>
                     <name>event_nseverity</name>
@@ -93,7 +93,7 @@
                 </parameter>
                 <parameter>
                     <name>host_name</name>
-                    <value>{HOST.NAME}</value>
+                    <value>{HOST.HOST}</value>
                 </parameter>
                 <parameter>
                     <name>slack_as_user</name>
@@ -128,11 +128,6 @@ var SLACK_MODE_HANDLERS = {&#13;
     event: handlerEvent&#13;
 };&#13;
 &#13;
-var EVENT_STATUS = {&#13;
-    PROBLEM: 'PROBLEM',&#13;
-    UPDATE: 'UPDATE',&#13;
-    RESOLVE: 'OK'&#13;
-};&#13;
 &#13;
 if (!String.prototype.format) {&#13;
     String.prototype.format = function() {&#13;
@@ -225,7 +220,6 @@ function handlerAlarm(params) {&#13;
     if (isEventProblem(params)) {&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
-                EVENT_STATUS.PROBLEM,&#13;
                 SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
                 params.event_date,&#13;
                 params.event_time,&#13;
@@ -248,7 +242,6 @@ function handlerAlarm(params) {&#13;
         fields.thread_ts = getTagValue(params.event_tags, 'message_ts');&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
-                EVENT_STATUS.UPDATE,&#13;
                 SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
                 params.event_update_date,&#13;
                 params.event_update_time,&#13;
@@ -269,7 +262,6 @@ function handlerAlarm(params) {&#13;
         fields.ts = getTagValue(params.event_tags, 'message_ts');&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
-                EVENT_STATUS.RESOLVE,&#13;
                 RESOLVE_COLOR,&#13;
                 params.event_date,&#13;
                 params.event_time,&#13;
@@ -293,7 +285,6 @@ function handlerEvent(params) {&#13;
     if (isEventProblem(params)) {&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
-                EVENT_STATUS.PROBLEM,&#13;
                 SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
                 params.event_date,&#13;
                 params.event_time,&#13;
@@ -314,7 +305,6 @@ function handlerEvent(params) {&#13;
     else if (isEventUpdate(params)) {&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
-                EVENT_STATUS.UPDATE,&#13;
                 SEVERITY_COLORS[params.event_nseverity] || 0,&#13;
                 params.event_update_date,&#13;
                 params.event_update_time,&#13;
@@ -333,7 +323,6 @@ function handlerEvent(params) {&#13;
     else if (isEventResolve(params)) {&#13;
         fields.attachments = [&#13;
             createMessage(&#13;
-                EVENT_STATUS.RESOLVE,&#13;
                 RESOLVE_COLOR,&#13;
                 params.event_recovery_date,&#13;
                 params.event_recovery_time,&#13;
@@ -350,7 +339,6 @@ function handlerEvent(params) {&#13;
 }&#13;
 &#13;
 function createMessage(&#13;
-    status,&#13;
     event_severity_color,&#13;
     event_date,&#13;
     event_time,&#13;
@@ -359,8 +347,8 @@ function createMessage(&#13;
     messageText&#13;
 ) {&#13;
     var message = {&#13;
-        fallback: '{0}: {1}'.format(status, params.event_name),&#13;
-        title: '{0}: {1}'.format(status, params.event_name),&#13;
+        fallback: params.alert_subject,&#13;
+        title: params.alert_subject,&#13;
         color: event_severity_color,&#13;
         title_link: problem_url,&#13;
         pretext: messageText || '',&#13;
@@ -451,6 +439,7 @@ function validateParams(params) {&#13;
         params.event_nseverity = '0';&#13;
         params.event_severity = 'Not classified';&#13;
         params.event_update_status = '0';&#13;
+        params.slack_mode = 'event';&#13;
     }&#13;
 &#13;
     if (params.event_source === '1' || params.event_source === '2') {&#13;

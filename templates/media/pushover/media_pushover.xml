@@ -16,8 +16,16 @@
                     <value>{EVENT.ID}</value>
                 </parameter>
                 <parameter>
+                    <name>event_nseverity</name>
+                    <value>{EVENT.NSEVERITY}</value>
+                </parameter>
+                <parameter>
                     <name>event_source</name>
                     <value>{EVENT.SOURCE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_value</name>
+                    <value>{EVENT.VALUE}</value>
                 </parameter>
                 <parameter>
                     <name>expire</name>
@@ -28,7 +36,31 @@
                     <value>{ALERT.MESSAGE}</value>
                 </parameter>
                 <parameter>
-                    <name>priority</name>
+                    <name>priority_average</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
+                    <name>priority_default</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
+                    <name>priority_disaster</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
+                    <name>priority_high</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
+                    <name>priority_information</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
+                    <name>priority_not_classified</name>
+                    <value>0</value>
+                </parameter>
+                <parameter>
+                    <name>priority_warning</name>
                     <value>0</value>
                 </parameter>
                 <parameter>
@@ -65,7 +97,18 @@
     var params = JSON.parse(value),&#13;
         request = new CurlHttpRequest(),&#13;
         data,&#13;
-        response;&#13;
+        response,&#13;
+        severities = [&#13;
+            {name: 'not_classified', color: '#97AAB3'},&#13;
+            {name: 'information', color: '#7499FF'},&#13;
+            {name: 'warning', color: '#FFC859'},&#13;
+            {name: 'average', color: '#FFA059'},&#13;
+            {name: 'high', color: '#E97659'},&#13;
+            {name: 'disaster', color: '#E45959'},&#13;
+            {name: 'resolved', color: '#009900'},&#13;
+            {name: 'default', color: '#000000'}&#13;
+        ],&#13;
+        priority;&#13;
 &#13;
     if (typeof params.HTTPProxy === 'string' &amp;&amp; params.HTTPProxy.trim() !== '') {&#13;
         request.SetProxy(params.HTTPProxy);&#13;
@@ -75,8 +118,23 @@
         throw 'Incorrect &quot;event_source&quot; parameter given: &quot;' + params.event_source + '&quot;.\nMust be 0-3.';&#13;
     }&#13;
 &#13;
-    if (isNaN(params.priority) || params.priority &lt; -2 || params.priority &gt; 2) {&#13;
-        throw 'field &quot;priority&quot; should be -2..2';&#13;
+    if (params.event_value !== '0' &amp;&amp; params.event_value !== '1'&#13;
+        &amp;&amp; (params.event_source === '0' || params.event_source === '3')) {&#13;
+        throw 'Incorrect &quot;event_value&quot; parameter given: ' + params.event_value + '\nMust be 0 or 1.';&#13;
+    }&#13;
+&#13;
+    if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {&#13;
+        params.event_nseverity = '7';&#13;
+    }&#13;
+&#13;
+    if (params.event_value === '0') {&#13;
+        params.event_nseverity = '6';&#13;
+    }&#13;
+&#13;
+    priority = params['priority_' + severities[params.event_nseverity].name] || severities[7].name;&#13;
+&#13;
+    if (isNaN(priority) || priority &lt; -2 || priority &gt; 2) {&#13;
+        throw '&quot;priority&quot; should be -2..2';&#13;
     }&#13;
 &#13;
     if (params.event_source === '0' &amp;&amp; isNaN(params.triggerid)) {&#13;
@@ -100,10 +158,10 @@
             ? params.url + '/tr_events.php?triggerid=' + params.triggerid + '&amp;eventid=' + params.eventid&#13;
             : params.url,&#13;
         url_title: params.url_title,&#13;
-        priority: params.priority&#13;
+        priority: priority&#13;
     };&#13;
 &#13;
-    if (params.priority == 2) {&#13;
+    if (priority == 2) {&#13;
         if (isNaN(params.retry) || params.retry &lt; 30) {&#13;
             throw 'field &quot;retry&quot; should be a number with value of at least 30 if &quot;priority&quot; is set to 2';&#13;
         }&#13;
