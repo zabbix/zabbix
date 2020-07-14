@@ -1,0 +1,1 @@
+A......... [ZBX-18012] fixed undefined index error in history manager when Elasticsearch requests fails (miks)
