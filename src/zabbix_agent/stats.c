@@ -157,6 +157,7 @@ int	init_collector_data(char **error)
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 #ifdef _AIX
+	sz_cpu = ZBX_SIZE_T_ALIGN8(sz_cpu);
 	sz_cpu_phys_util = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_CPU_UTIL_PCT_AIX)) * MAX_COLLECTOR_HISTORY * (cpu_count + 1);
 #endif
 
