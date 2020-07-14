@@ -11,7 +11,7 @@ This template was tested on:
 - MySQL, version 5.7, 8.0
 - Percona, version 8.0
 - MariaDB, version 10.4
-- Zabbix, version 4.2.1
+- Zabbix, version 5.0.1
 
 ## Setup
 
@@ -21,21 +21,16 @@ This template was tested on:
 2. Copy `template_db_mysql.conf` into folder with Zabbix agent configuration (`/etc/zabbix/zabbix_agentd.d/` by default). Don't forget to restart zabbix-agent.
 3. Create MySQL user for monitoring (`<password>` at your discretion):
 
-```text
-CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
-GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
-```
+        ```text
+        CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
+        GRANT USAGE,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
+        ```
 
-For more information please read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
+        For more information please read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
 
-4. Create `.my.cnf` in home directory of Zabbix agent for Linux (`/var/lib/zabbix` by default ) or `my.cnf` in c:\ for Windows. The file must have three strings:
+4. Configure `{$MYSQL.USER}` and `{$MYSQL.PASSWORD}` on host on Zabbix Frontend.
 
-```text
-[client]
-user='zbx_monitor'
-password='<password>'
-```
-NOTE: Use systemd to start the Zabbix agent on Linux OS. 
+NOTE: Use systemd to start the Zabbix agent on Linux OS.
 For example in Centos use "systemctl edit zabbix-agent.service" to set the required user to start the Zabbix agent. 
 
 Add the rule to the SELinux policy (example for Centos):
@@ -83,9 +78,11 @@ No specific Zabbix configuration is required.
 |{$MYSQL.CREATED_TMP_FILES.MAX.WARN} |<p>The maximum number of created tmp files on a disk per second for trigger expressions.</p> |`10` |
 |{$MYSQL.CREATED_TMP_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables in memory per second for trigger expressions.</p> |`30` |
 |{$MYSQL.HOST} |<p>Hostname or IP of MySQL host or container.</p> |`localhost` |
+|{$MYSQL.PASSWORD} |<p>Password of MySQL monitoring.</p> |`secret` |
 |{$MYSQL.PORT} |<p>MySQL service port.</p> |`3306` |
 |{$MYSQL.REPL_LAG.MAX.WARN} |<p>The lag of slave from master for trigger expression.</p> |`30m` |
 |{$MYSQL.SLOW_QUERIES.MAX.WARN} |<p>The number of slow queries for trigger expression.</p> |`3` |
+|{$MYSQL.USER} |<p>Username of MySQL monitoring.</p> |`zbx_monitoring` |
 
 ## Template links
 
@@ -174,4 +171,3 @@ There are no template links in this template.
 Please report any issues with the template at https://support.zabbix.com
 
 You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql).
-
