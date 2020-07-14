@@ -32,7 +32,7 @@ class CTabFilter extends CBaseComponent {
 	/**
 	 * NodeList of available templates (<script> DOM elements).
 	 */
-	_templates;
+	_templates = {};
 
 	constructor(target, options) {
 		super(target);
@@ -43,21 +43,30 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	init(options) {
-		let container, item, i = 0;
+		let item, template, data_index = 0;
+
+		this._shared_domnode = this._target.querySelector('.form-buttons');
+
+		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
+			this._templates[template.getAttribute('data-template')] = template;
+		};
 
 		for (const title of this._target.childNodes.item(0).querySelectorAll('[data-target]')) {
-			container = this._target.querySelector(title.getAttribute('data-target'));
-			item = new CTabFilterItem(title, container);
-			item._can_toggle = options.can_toggle;
+			template = options.data[data_index] ? options.data[data_index].template : null;
+			item = new CTabFilterItem(title, {
+				can_toggle: options.can_toggle,
+				container: this._target.querySelector(title.getAttribute('data-target')),
+				data: options.data[data_index],
+				template: this._templates[template]
+			});
 
 			this._items.push(item);
-			// Initialize tab template and pass tamplate and data to CTabFilterItem object.
-			// console[log](`index ${i}`, options.data[i]);
-			i++;
-		}
+			data_index++;
 
-		this._templates = this._target.querySelectorAll('[type="text/x-jquery-tmpl"]');
-		this._shared_domnode = this._target.querySelector('.form-buttons');
+			if (item._expanded) {
+				this._active_item = item;
+			}
+		}
 
 		$('.ui-sortable', this._target).sortable({});
 	}

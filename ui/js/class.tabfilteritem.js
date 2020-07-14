@@ -33,9 +33,12 @@ class CTabFilterItem extends CBaseComponent {
 	_expanded;
 	_can_toggle = true;
 
-	constructor(title, container) {
+	constructor(title, options) {
 		super(title);
-		this._content_container = container;
+		this._content_container = options.container;
+		this._can_toggle = options.can_toggle;
+		this._data = options.data||{};
+		this._template = options.template;
 
 		this.init();
 		this.registerEvents();
@@ -61,6 +64,14 @@ class CTabFilterItem extends CBaseComponent {
 				this._expanded = true;
 				this.addClass('active');
 				this._content_container.classList.remove('display-none');
+
+				if (this._template) {
+					this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data.fields);
+					this._template.dispatchEvent(new CustomEvent('afterRender', {detail: {
+						data: this._data,
+						content: this._content_container
+					}}));
+				}
 			},
 
 			collapse: () => {

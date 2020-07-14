@@ -134,20 +134,21 @@ $right_column = (new CFormList())
 		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	]);
 
+$template = (new CDiv())
+	->addClass(ZBX_STYLE_TABLE)
+	->addClass(ZBX_STYLE_FILTER_FORMS)
+	->addItem([
+		(new CDiv($left_column))->addClass(ZBX_STYLE_CELL),
+		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
+	]);
+
 if (array_key_exists('render_html', $data)) {
 	/**
 	 * Render HTML to prevent filter flickering after initial page load. PHP created content will be replaced by
 	 * javascript with additional event handling (dynamic rows, etc.) when page will be fully loaded and javascript
 	 * executed.
 	 */
-	(new CDiv())
-		->addClass(ZBX_STYLE_TABLE)
-		->addClass(ZBX_STYLE_FILTER_FORMS)
-		->addItem([
-			(new CDiv($left_column))->addClass(ZBX_STYLE_CELL),
-			(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
-		])
-		->show();
+	$template->show();
 
 	return;
 }
@@ -175,37 +176,59 @@ if (array_key_exists('render_html', $data)) {
 	->show();
 
 (new CScriptTemplate('filter-monitoring-hosts'))
-	->setAttribute('data-template', 'monitoring.filter.host')
-	->addItem([$left_column, $right_column])
+	->setAttribute('data-template', 'monitoring.host.filter')
+	->addItem($template)
 	->show();
 
 ?>
 <script type="text/javascript">
-$('#filter-monitoring-hosts').on('render', function(ev, data) {
-	// data.node = rendered template dom node
-	// data = rendered tab data
+$('[data-template="monitoring.host.filter"]').on('afterRender', function(ev) {
+	let data = ev.detail.data,
+		fields = $.extend({}, data.default, data.fields);
+
+	var content = ev.detail.content;
 
 	// Host groups multiselect.
-	$('#filter_groups_', data.node).multiSelect(data.groups_multiselect);
+	$('#filter_groupids_', content).multiSelectHelper({
+		id: 'elementNameHostGroup',
+		object_name: 'hostGroup',
+		name: 'elementValue',
+		popup: {
+			parameters: {
+				multiselect: '1',
+				noempty: '1',
+				srctbl: 'host_groups',
+				srcfld1: 'groupid',
+				dstfrm: 'zbx_filter',
+				dstfld1: 'filter_groupids_',
+				real_hosts: 1,
+				enrich_parent_groups: 1
+			}
+		}
+	});
+
+	if (data.groups_multiselect) {
+		$('#filter_groupids_', content).multiSelect('addData', data.groups_multiselect);
+	}
 
 	// Tags table
-	var tag_row = new CTemplate($('#filter-tag-row-tmpl').html()),
+	var tag_row = new Template($('#filter-tag-row-tmpl').html()),
 		i = 0;
 
-	data.tags.forEach(tag => {
+	fields.tags.forEach(tag => {
 		var $row = $(tag_row.evaluate({rowNum: i++}));
 
 		$row.find('[name$="[tag]"]').val(tag.tag);
 		$row.find('[name$="[value]"]').val(tag.value);
 		$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
 
-		$('#filter-tags', data.node).append($row);
+		$('#filter-tags', content).append($row);
 	});
-	$('#filter-tags', data.node).dynamicRows({template: '#filter-tag-row-tmpl'});
+	$('#filter-tags', content).dynamicRows({template: '#filter-tag-row-tmpl'});
 
 	// Show hosts in maintenance events.
-	$('#filter_maintenance_status', data.node).click(function () {
-		$('#filter_show_suppressed', data.node).prop('disabled', !this.checked);
+	$('#filter_maintenance_status', content).click(function () {
+		$('#filter_show_suppressed', content).prop('disabled', !this.checked);
 	});
 });
 </script>
