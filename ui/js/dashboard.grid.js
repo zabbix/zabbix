@@ -2501,18 +2501,7 @@
 			delete data['options']['config_dialogue_active'];
 			$.unsubscribe('overlay.close', config_dialogue_close);
 
-			data.add_widget_dimension = {};
-
-			if (data.widgets.length) {
-				data.new_widget_placeholder.container.hide();
-				data.new_widget_placeholder.setPositioning();
-			}
-			else {
-				data.new_widget_placeholder.setDefault(function(e) {
-					methods.addNewWidget.call($obj, this);
-					return cancelEvent(e);
-				});
-			}
+			updateNewWidgetPlaceholderState($obj, data);
 		};
 		$.subscribe('overlay.close', config_dialogue_close);
 
@@ -2657,19 +2646,8 @@
 		$.subscribe('overlay.close', function(e, dialogue) {
 			if (data['pos-action'] === 'addmodal' && dialogue.dialogueid === 'widgetConfg') {
 				data['pos-action'] = '';
-				data.add_widget_dimension = {};
 
-				if (data.widgets.length) {
-					data.new_widget_placeholder.container.hide();
-					data.new_widget_placeholder.setPositioning();
-				}
-				else {
-					data.new_widget_placeholder.setDefault(function(e) {
-						methods.addNewWidget.call($obj, this);
-						return cancelEvent(e);
-					});
-				}
-
+				updateNewWidgetPlaceholderState($obj, data);
 				resizeDashboardGrid($obj, data);
 
 				$obj.trigger('mouseenter');
@@ -2698,19 +2676,9 @@
 						},
 						closeCallback: function() {
 							data['pos-action'] = '';
-							data.add_widget_dimension = {};
 
 							if (!data['options']['config_dialogue_active']) {
-								if (data.widgets.length || $obj.is(':hover')) {
-									data.new_widget_placeholder.container.hide();
-									data.new_widget_placeholder.setPositioning();
-								}
-								else if (!data.widgets.length && !$obj.is(':hover')) {
-									data.new_widget_placeholder.setDefault(function(e) {
-										methods.addNewWidget.call($obj, this);
-										return cancelEvent(e);
-									});
-								}
+								updateNewWidgetPlaceholderState($obj, data);
 							}
 						}
 					};
@@ -2761,18 +2729,7 @@
 					return;
 				}
 
-				data.add_widget_dimension = {};
-
-				if (data.widgets.length) {
-					data.new_widget_placeholder.container.hide();
-					data.new_widget_placeholder.setPositioning();
-				}
-				else {
-					data.new_widget_placeholder.setDefault(function(e) {
-						methods.addNewWidget.call($obj, this);
-						return cancelEvent(e);
-					});
-				}
+				updateNewWidgetPlaceholderState($obj, data);
 			})
 			.on('mouseenter mousemove', function(event) {
 				var drag = (data['pos-action'] === 'add'),
@@ -3310,6 +3267,27 @@
 
 		return placeholder;
 	};
+
+	/**
+	 * Function update widget placeholder state.
+	 *
+	 * @param {jQuery} $obj  Dashboard object.
+	 * @param {object} data  Dashboard data object.
+	 */
+	function updateNewWidgetPlaceholderState($obj, data) {
+		data.add_widget_dimension = {};
+
+		if (data.widgets.length || $obj.is(':hover')) {
+			data.new_widget_placeholder.container.hide();
+			data.new_widget_placeholder.setPositioning();
+		}
+		else {
+			data.new_widget_placeholder.setDefault(function(e) {
+				methods.addNewWidget.call($obj, this);
+				return cancelEvent(e);
+			});
+		}
+	}
 
 	var	methods = {
 		init: function(options) {
