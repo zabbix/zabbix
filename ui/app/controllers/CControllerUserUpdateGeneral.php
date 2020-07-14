@@ -40,10 +40,10 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 * @return int
 	 */
 	private static function hasInternalAuth($usrgrps) {
-		$config = select_config();
-		$system_gui_access = ($config['authentication_type'] == ZBX_AUTH_INTERNAL)
-			? GROUP_GUI_ACCESS_INTERNAL
-			: GROUP_GUI_ACCESS_LDAP;
+		$system_gui_access = 
+			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
+				? GROUP_GUI_ACCESS_INTERNAL
+				: GROUP_GUI_ACCESS_LDAP;
 
 		foreach($usrgrps as $usrgrp) {
 			$gui_access = ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM)

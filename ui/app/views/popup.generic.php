@@ -243,8 +243,7 @@ switch ($data['popup_type']) {
 				: null;
 
 			$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
-				zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');'
-			;
+				zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');';
 
 			$name = (new CLink($item['name'], 'javascript: void(0);'))
 						->setId('spanid'.$item['usrgrpid'])
@@ -309,7 +308,7 @@ switch ($data['popup_type']) {
 			$table->addRow([
 				$check_box,
 				$description,
-				getSeverityCell($trigger['priority'], $options['config']),
+				getSeverityCell($trigger['priority']),
 				(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 					->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 			]);

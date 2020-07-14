@@ -138,7 +138,7 @@ foreach ($data['users'] as $user) {
 	foreach ($user['usrgrps'] as $user_group) {
 		$i++;
 
-		if ($i > $data['config']['max_in_table']) {
+		if ($i > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
 			$users_groups[] = ' &hellip;';
 
 			break;

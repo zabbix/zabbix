@@ -399,10 +399,11 @@ else {
 	];
 
 	// get maps
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['maps'] = API::Map()->get([
 		'output' => ['sysmapid', 'name', 'width', 'height'],
 		'sortfield' => $sortField,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+		'limit' => $limit,
 		'search' => [
 			'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
 		],

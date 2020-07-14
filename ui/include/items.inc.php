@@ -1074,8 +1074,6 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
  * @return array
  */
 function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
-	$config = select_config();
-
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1085,23 +1083,25 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'preservekeys' => true
 		]));
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $config['search_limit'],
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 	}
 	else {
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'hostids' => $hostids,
 			'groupids' => $groupids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $config['search_limit'],
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 	}
@@ -1125,7 +1125,6 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
-	$config = select_config();
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1135,6 +1134,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'preservekeys' => true
 		]));
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_hosts = API::Host()->get([
 			'output' => ['name', 'hostid'],
 			'groupids' => $groupids,
@@ -1142,10 +1142,11 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => $config['search_limit']
+			'limit' => $limit
 		]);
 	}
 	else {
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_hosts = API::Host()->get([
 			'output' => ['name', 'hostid'],
 			'monitored_hosts' => true,
@@ -1154,7 +1155,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'groupids' => $groupids,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => $config['search_limit']
+			'limit' => $limit
 		]);
 	}
 

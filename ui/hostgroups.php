@@ -283,6 +283,7 @@ else {
 		'active_tab' => CProfile::get('web.groups.filter.active', 1)
 	];
 
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$groups = API::HostGroup()->get([
 		'output' => ['groupid', $sortField],
 		'search' => [
@@ -290,7 +291,7 @@ else {
 		],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => $limit
 	]);
 	order_result($groups, $sortField, $sortOrder);
 
@@ -321,6 +322,7 @@ else {
 	]);
 
 	// get host groups
+	$limitSelects = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
 	$data['groups'] = API::HostGroup()->get([
 		'output' => ['groupid', 'name', 'flags'],
 		'groupids' => $groupIds,
@@ -328,7 +330,7 @@ else {
 		'selectTemplates' => ['templateid', 'name'],
 		'selectGroupDiscovery' => ['ts_delete'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'limitSelects' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1
+		'limitSelects' => $limitSelects
 	]);
 	order_result($data['groups'], $sortField, $sortOrder);
 

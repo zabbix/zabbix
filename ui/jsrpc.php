@@ -101,10 +101,11 @@ switch ($data['method']) {
 	case 'trigger.get':
 		$result = [];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'priority'],
 			'triggerids' => $data['triggerids'],
-			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+			'limit' => $limit
 		]);
 
 		if ($triggers) {
@@ -292,11 +293,12 @@ switch ($data['method']) {
 				break;
 
 			case 'templates':
+				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$templates = API::Template()->get([
 					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['templateid', 'name'],
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 
 				if ($templates) {
@@ -313,10 +315,11 @@ switch ($data['method']) {
 				break;
 
 			case 'proxies':
+				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$proxies = API::Proxy()->get([
 					'output' => ['proxyid', 'host'],
 					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 
 				if ($proxies) {
@@ -331,11 +334,12 @@ switch ($data['method']) {
 				break;
 
 			case 'applications':
+				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$applications = API::Application()->get([
 					'output' => ['applicationid', 'name'],
 					'hostids' => zbx_toArray($data['hostid']),
 					'search' => isset($data['search']) ? ['name' => $data['search']] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 
 				if ($applications) {
@@ -352,11 +356,12 @@ switch ($data['method']) {
 				break;
 
 			case 'application_prototypes':
+				$limit_selects = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$discovery_rules = API::DiscoveryRule()->get([
 					'output' => [],
 					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
 					'itemids' => [$data['parent_discoveryid']],
-					'limitSelects' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limitSelects' => $limit_selects
 				]);
 
 				if ($discovery_rules) {
@@ -388,13 +393,14 @@ switch ($data['method']) {
 					$host_fields[] = 'status';
 				}
 
+				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid', 'description'],
 					'selectHosts' => $host_fields,
 					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'monitored' => isset($data['monitored']) ? $data['monitored'] : null,
 					'search' => isset($data['search']) ? ['description' => $data['search']] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 
 				if ($triggers) {
@@ -437,6 +443,7 @@ switch ($data['method']) {
 				break;
 
 			case 'users':
+				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$users = API::User()->get([
 					'output' => ['userid', 'alias', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
@@ -447,7 +454,7 @@ switch ($data['method']) {
 						]
 						: null,
 					'searchByAny' => true,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 
 				if ($users) {
@@ -469,10 +476,11 @@ switch ($data['method']) {
 				break;
 
 			case 'usersGroups':
+				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$groups = API::UserGroup()->get([
 					'output' => ['usrgrpid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 
 				if ($groups) {
@@ -489,11 +497,12 @@ switch ($data['method']) {
 				break;
 
 			case 'drules':
+				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$drules = API::DRule()->get([
 					'output' => ['druleid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => ['status' => DRULE_STATUS_ACTIVE],
-					'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+					'limit' => $limit
 				]);
 
 				if ($drules) {

@@ -124,29 +124,28 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 	if ($value == TRIGGER_VALUE_FALSE) {
 		return 'AAFFAA';
 	}
-	$config = select_config();
 
 	switch ($severity) {
 		case TRIGGER_SEVERITY_DISASTER:
-			$color = $config['severity_color_5'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_5);
 			break;
 		case TRIGGER_SEVERITY_HIGH:
-			$color = $config['severity_color_4'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_4);
 			break;
 		case TRIGGER_SEVERITY_AVERAGE:
-			$color = $config['severity_color_3'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_3);
 			break;
 		case TRIGGER_SEVERITY_WARNING:
-			$color = $config['severity_color_2'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_2);
 			break;
 		case TRIGGER_SEVERITY_INFORMATION:
-			$color = $config['severity_color_1'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_1);
 			break;
 		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-			$color = $config['severity_color_0'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_0);
 			break;
 		default:
-			$color = $config['severity_color_0'];
+			$color = CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_0);
 	}
 
 	return $color;
@@ -162,11 +161,10 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  */
 function getSeverities($min = TRIGGER_SEVERITY_NOT_CLASSIFIED, $max = TRIGGER_SEVERITY_COUNT - 1) {
 	$severities = [];
-	$config = select_config();
 
 	foreach (range($min, $max) as $severity) {
 		$severities[] = [
-			'name' => getSeverityName($severity, $config),
+			'name' => getSeverityName($severity),
 			'value' => $severity,
 			'style' => getSeverityStyle($severity)
 		];
@@ -208,27 +206,25 @@ function getSeverityCell($severity, $text = null, $force_normal = false, $return
  * @param bool $isAcknowledged
  */
 function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged) {
-	$config = select_config();
-
 	$color_class = null;
 	$blinks = null;
 
 	// Color class for text and blinking depends on trigger value and whether event is acknowledged.
 	if ($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged) {
 		$color_class = ZBX_STYLE_PROBLEM_UNACK_FG;
-		$blinks = $config['problem_unack_style'];
+		$blinks = CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE);
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_TRUE && $isAcknowledged) {
 		$color_class = ZBX_STYLE_PROBLEM_ACK_FG;
-		$blinks = $config['problem_ack_style'];
+		$blinks = CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE);
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && !$isAcknowledged) {
 		$color_class = ZBX_STYLE_OK_UNACK_FG;
-		$blinks = $config['ok_unack_style'];
+		$blinks = CSettingsHelper::get(CSettingsHelper::OK_UNACK_STYLE);
 	}
 	elseif ($triggerValue == TRIGGER_VALUE_FALSE && $isAcknowledged) {
 		$color_class = ZBX_STYLE_OK_ACK_FG;
-		$blinks = $config['ok_ack_style'];
+		$blinks = CSettingsHelper::get(CSettingsHelper::OK_ACK_STYLE);
 	}
 
 	if ($color_class != null && $blinks != null) {
@@ -236,11 +232,11 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 
 		// blinking
 		$timeSinceLastChange = time() - $triggerLastChange;
-		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+		$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
 
-		if ($blinks && $timeSinceLastChange < $config['blink_period']) {
+		if ($blinks && $timeSinceLastChange < $blink_period) {
 			$object->addClass('blink'); // elements with this class will blink
-			$object->setAttribute('data-time-to-blink', $config['blink_period'] - $timeSinceLastChange);
+			$object->setAttribute('data-time-to-blink', $blink_period - $timeSinceLastChange);
 		}
 	}
 	else {
@@ -979,13 +975,12 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 		->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 	$eventid = 0;
-	$config = select_config();
-	$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
+	$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
 	$duration = time() - $trigger['lastchange'];
 
-	if ($config['blink_period'] > 0 && $duration < $config['blink_period']) {
+	if ($blink_period > 0 && $duration < $blink_period) {
 		$column->addClass('blink');
-		$column->setAttribute('data-time-to-blink', $config['blink_period'] - $duration);
+		$column->setAttribute('data-time-to-blink', $blink_period - $duration);
 		$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 	}
 
@@ -1142,13 +1137,11 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 		return 0;
 	}
 
-	$config = select_config();
-
 	$options = [
 		'monitored' => true,
 		'countOutput' => true,
 		'filter' => [],
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	if ($ack) {
@@ -1185,8 +1178,6 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 function make_trigger_details($trigger, $eventid) {
 	$hostNames = [];
 
-	$config = select_config();
-
 	$hostIds = zbx_objectValues($trigger['hosts'], 'hostid');
 
 	$hosts = API::Host()->get([
@@ -1217,7 +1208,7 @@ function make_trigger_details($trigger, $eventid) {
 		])
 		->addRow([
 			_('Severity'),
-			getSeverityCell($trigger['priority'], $config)
+			getSeverityCell($trigger['priority'])
 		]);
 
 	$trigger = CMacrosResolverHelper::resolveTriggerExpressions(zbx_toHash($trigger, 'triggerid'), [

@@ -59,37 +59,49 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'refresh_unsupported' =>
-				$this->getInput('refresh_unsupported', CSettingsHelper::get(CSettingsHelper::REFRESH_UNSUPPORTED)),
-			'discovery_groupid' =>
-				$this->getInput('discovery_groupid', CSettingsHelper::get(CSettingsHelper::DISCOVERY_GROUPID)),
+			'refresh_unsupported' => $this->getInput('refresh_unsupported', CSettingsHelper::get(
+				CSettingsHelper::REFRESH_UNSUPPORTED
+			)),
+			'discovery_groupid' => $this->getInput('discovery_groupid', CSettingsHelper::get(
+				CSettingsHelper::DISCOVERY_GROUPID
+			)),
 			'default_inventory_mode' => $this->getInput('default_inventory_mode', CSettingsHelper::get(
 				CSettingsHelper::DEFAULT_INVENTORY_MODE
 			)),
-			'alert_usrgrpid' =>
-				$this->getInput('alert_usrgrpid', CSettingsHelper::get(CSettingsHelper::ALERT_USRGRPID)),
-			'snmptrap_logging' =>
-				$this->getInput('snmptrap_logging', CSettingsHelper::get(CSettingsHelper::SNMPTRAP_LOGGING)),
-			'login_attempts' =>
-				$this->getInput('login_attempts', CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)),
-			'login_block' =>
-				$this->getInput('login_block', CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)),
-			'validate_uri_schemes' =>
-				$this->getInput('validate_uri_schemes', CSettingsHelper::get(CSettingsHelper::VALIDATE_URI_SCHEMES)),
-			'uri_valid_schemes' =>
-				$this->getInput('uri_valid_schemes', CSettingsHelper::get(CSettingsHelper::URI_VALID_SCHEMES)),
-			'x_frame_options' =>
-				$this->getInput('x_frame_options', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS)),
-			'socket_timeout' =>
-				$this->getInput('socket_timeout', CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)),
-			'connect_timeout' =>
-				$this->getInput('connect_timeout', CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-			'media_type_test_timeout' =>
-				$this->getInput('media_type_test_timeout', CSettingsHelper::get(CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT)),
-			'script_timeout' =>
-				$this->getInput('script_timeout', CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)),
-			'item_test_timeout' =>
-				$this->getInput('item_test_timeout', CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT))
+			'alert_usrgrpid' => $this->getInput('alert_usrgrpid', CSettingsHelper::get(
+				CSettingsHelper::ALERT_USRGRPID
+			)),
+			'snmptrap_logging' => $this->getInput('snmptrap_logging', CSettingsHelper::get(
+				CSettingsHelper::SNMPTRAP_LOGGING
+			)),
+			'login_attempts' => $this->getInput('login_attempts', CSettingsHelper::get(
+				CSettingsHelper::LOGIN_ATTEMPTS
+			)),
+			'login_block' => $this->getInput('login_block', CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)),
+			'validate_uri_schemes' => $this->getInput('validate_uri_schemes', CSettingsHelper::get(
+				CSettingsHelper::VALIDATE_URI_SCHEMES
+			)),
+			'uri_valid_schemes' => $this->getInput('uri_valid_schemes', CSettingsHelper::get(
+				CSettingsHelper::URI_VALID_SCHEMES
+			)),
+			'x_frame_options' => $this->getInput('x_frame_options', CSettingsHelper::get(
+				CSettingsHelper::X_FRAME_OPTIONS
+			)),
+			'socket_timeout' => $this->getInput('socket_timeout', CSettingsHelper::get(
+				CSettingsHelper::SOCKET_TIMEOUT
+			)),
+			'connect_timeout' => $this->getInput('connect_timeout', CSettingsHelper::get(
+				CSettingsHelper::CONNECT_TIMEOUT
+			)),
+			'media_type_test_timeout' => $this->getInput('media_type_test_timeout', CSettingsHelper::get(
+				CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT
+			)),
+			'script_timeout' => $this->getInput('script_timeout', CSettingsHelper::get(
+				CSettingsHelper::SCRIPT_TIMEOUT
+			)),
+			'item_test_timeout' => $this->getInput('item_test_timeout', CSettingsHelper::get(
+				CSettingsHelper::ITEM_TEST_TIMEOUT
+			))
 		];
 
 		$data['discovery_group_data'] = API::HostGroup()->get([

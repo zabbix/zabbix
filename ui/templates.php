@@ -1057,6 +1057,7 @@ else {
 	}
 
 	// Select templates.
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$templates = API::Template()->get([
 		'output' => ['templateid', $sortField],
 		'evaltype' => $filter['evaltype'],
@@ -1068,7 +1069,7 @@ else {
 		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => $limit
 	]);
 
 	order_result($templates, $sortField, $sortOrder);

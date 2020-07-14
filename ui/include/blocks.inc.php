@@ -325,12 +325,10 @@ function getSystemStatusData(array $filter) {
  * @param array  $data['triggers'][<triggerid>]['hosts']
  * @param string $data['triggers'][<triggerid>]['hosts'][]['name']
  * @param array  $data['triggers'][<triggerid>]['opdata']
- * @param array  $config
- * @param string $config['severity_name_*']
  *
  * @return CDiv
  */
-function makeSystemStatus(array $filter, array $data, array $config) {
+function makeSystemStatus(array $filter, array $data) {
 	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
 		? $filter['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
@@ -347,7 +345,7 @@ function makeSystemStatus(array $filter, array $data, array $config) {
 
 	for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
 		if (in_array($severity, $filter_severities)) {
-			$header[] = getSeverityName($severity, $config);
+			$header[] = getSeverityName($severity);
 		}
 	}
 
@@ -385,17 +383,13 @@ function makeSystemStatus(array $filter, array $data, array $config) {
 			$allTriggersNum = $stat['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CLinkAction($allTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $data['actions'], $config,
-						$filter
-					));
+					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $data['actions'], $filter));
 			}
 
 			$unackTriggersNum = $stat['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = (new CLinkAction($unackTriggersNum))
-					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $data['actions'], $config,
-						$filter
-					));
+					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $data['actions'], $filter));
 			}
 
 			switch ($filter_ext_ack) {
@@ -409,12 +403,12 @@ function makeSystemStatus(array $filter, array $data, array $config) {
 
 				case EXTACK_OPTION_BOTH:
 					if ($stat['count_unack'] != 0) {
-						$row[] = getSeverityCell($severity, $config, [
+						$row[] = getSeverityCell($severity, [
 							$unackTriggersNum, ' '._('of').' ', $allTriggersNum
 						]);
 					}
 					else {
-						$row[] = getSeverityCell($severity, $config, $allTriggersNum);
+						$row[] = getSeverityCell($severity, $allTriggersNum);
 					}
 					break;
 			}
@@ -729,7 +723,6 @@ function make_status_of_zbx() {
  * @param string $triggers[<triggerid>]['hosts'][]['name']
  * @param string $triggers[<triggerid>]['opdata']
  * @param array  $actions
- * @param array  $config
  * @param array  $filter
  * @param array  $filter['show_suppressed']  (optional)
  * @param array  $filter['show_timeline']    (optional)
@@ -737,7 +730,7 @@ function make_status_of_zbx() {
  *
  * @return CTableInfo
  */
-function makeProblemsPopup(array $problems, array $triggers, array $actions, array $config, array $filter) {
+function makeProblemsPopup(array $problems, array $triggers, array $actions, array $filter) {
 	$url_details = (new CUrl('tr_events.php'))
 		->setArgument('triggerid', '')
 		->setArgument('eventid', '');
@@ -884,7 +877,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			zbx_date2age($problem['clock']),
 			$problem_update_link,
 			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'],
-				$actions['users'], $config
+				$actions['users']
 			),
 			$tags[$problem['eventid']]
 		]));

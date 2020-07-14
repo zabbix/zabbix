@@ -604,6 +604,7 @@ else {
 		'active_tab' => CProfile::get('web.actionconf.filter.active', 1)
 	];
 
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['actions'] = API::Action()->get([
 		'output' => API_OUTPUT_EXTEND,
 		'search' => [
@@ -617,7 +618,7 @@ else {
 		'selectOperations' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => $limit
 	]);
 
 	// pager

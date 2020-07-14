@@ -1483,13 +1483,14 @@ else {
 		'sortorder' => $sortOrder
 	];
 
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['items'] = API::ItemPrototype()->get([
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'sortfield' => $sortField,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => $limit
 	]);
 
 	$data['items'] = expandItemNamesWithMasterItems($data['items'], 'itemprototypes');

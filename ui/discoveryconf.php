@@ -355,6 +355,7 @@ else {
 	];
 
 	// get drules
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['drules'] = API::DRule()->get([
 		'output' => ['proxy_hostid', 'name', 'status', 'iprange', 'delay'],
 		'selectDChecks' => ['type'],
@@ -366,7 +367,7 @@ else {
 		],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => $limit
 	]);
 
 	if ($data['drules']) {

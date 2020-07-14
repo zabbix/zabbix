@@ -36,14 +36,14 @@ $scripts = $data['javascript']['files'];
 
 $theme = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {
-	$config = select_config();
 	$theme = getUserTheme($data['user']);
 
-	$pageHeader->addStyle(getTriggerSeverityCss($config));
-	$pageHeader->addStyle(getTriggerStatusCss($config));
+	$pageHeader->addStyle(getTriggerSeverityCss());
+	$pageHeader->addStyle(getTriggerStatusCss());
 
 	// perform Zabbix server check only for standard pages
-	if ($config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
+	if (CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL) && !empty($ZBX_SERVER)
+			&& !empty($ZBX_SERVER_PORT)) {
 		$scripts[] = 'servercheck.js';
 	}
 }

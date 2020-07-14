@@ -54,7 +54,9 @@ $queueRequests = [
 	QUEUE_OVERVIEW_BY_PROXY => CZabbixServer::QUEUE_OVERVIEW_BY_PROXY,
 	QUEUE_DETAILS => CZabbixServer::QUEUE_DETAILS
 ];
-$queueData = $zabbixServer->getQueue($queueRequests[$config], get_cookie(ZBX_SESSION_NAME), QUEUE_DETAIL_ITEM_COUNT);
+$queueData = $zabbixServer->getQueue($queueRequests[$config], get_cookie(ZBX_SESSION_NAME), CSettingsHelper::get(
+	CSettingsHelper::SEARCH_LIMIT
+));
 
 // check for errors error
 if ($zabbixServer->getError()) {

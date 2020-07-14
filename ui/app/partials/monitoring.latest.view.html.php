@@ -81,8 +81,6 @@ else {
 
 $tab_rows = [];
 
-$config = select_config();
-
 // Resolve delay, history and trend macros.
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $simple_interval_parser = new CSimpleIntervalParser();
@@ -103,9 +101,9 @@ foreach ($data['items'] as &$item) {
 		$item['delay'] = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
 	}
 
-	if ($config['hk_history_global']) {
-		$keep_history = timeUnitToSeconds($config['hk_history']);
-		$item['history'] = $config['hk_history'];
+	if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+		$keep_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+		$item['history'] = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY);
 	}
 	elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 		$keep_history = timeUnitToSeconds($item['history']);
@@ -116,9 +114,9 @@ foreach ($data['items'] as &$item) {
 	}
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		if ($config['hk_trends_global']) {
-			$keep_trends = timeUnitToSeconds($config['hk_trends']);
-			$item['trends'] = $config['hk_trends'];
+		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
+			$keep_trends = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+			$item['trends'] = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS);
 		}
 		elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
 			$keep_trends = timeUnitToSeconds($item['trends']);

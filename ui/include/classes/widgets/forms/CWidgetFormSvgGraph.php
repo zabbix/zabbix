@@ -441,8 +441,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		$period = $ts['to'] - $ts['from'] + 1;
 		$max_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MAX_PERIOD), true)
-			+ ZBX_MAX_PERIOD_ADDITIONAL_TIME
-		;
+			+ ZBX_MAX_PERIOD_ADDITIONAL_TIME;
 
 		if ($period < ZBX_MIN_PERIOD) {
 			$errors[] = _n('Minimum time period to display is %1$s minute.',

@@ -126,7 +126,6 @@ class ZBase {
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
 		require_once 'include/validate.inc.php';
-		require_once 'include/profiles.inc.php';
 		require_once 'include/locales.inc.php';
 		require_once 'include/db.inc.php';
 

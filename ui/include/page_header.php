@@ -134,14 +134,14 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		global $DB;
 
 		if (!empty($DB['DB'])) {
-			$config = select_config();
 			$theme = getUserTheme(CWebUser::$data);
 
-			$pageHeader->addStyle(getTriggerSeverityCss($config));
-			$pageHeader->addStyle(getTriggerStatusCss($config));
+			$pageHeader->addStyle(getTriggerSeverityCss());
+			$pageHeader->addStyle(getTriggerStatusCss());
 
 			// perform Zabbix server check only for standard pages
-			if ($is_standard_page && $config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
+			if ($is_standard_page && CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL) && !empty($ZBX_SERVER)
+					&& !empty($ZBX_SERVER_PORT)) {
 				$page['scripts'][] = 'servercheck.js';
 			}
 		}

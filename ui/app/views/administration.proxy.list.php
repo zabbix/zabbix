@@ -85,7 +85,7 @@ foreach ($data['proxies'] as $proxy) {
 	$i = 0;
 
 	foreach ($proxy['hosts'] as $host) {
-		if (++$i > $data['config']['max_in_table']) {
+		if (++$i > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
 			$hosts[] = ' &hellip;';
 
 			break;

@@ -37,7 +37,6 @@ abstract class CControllerLatest extends CController {
 	 * @param string $sort_order                  Sorting order.
 	 */
 	protected function prepareData(array $filter, $sort_field, $sort_order) {
-		$config = select_config();
 
 		$applications = [];
 		$items = [];
@@ -82,13 +81,14 @@ abstract class CControllerLatest extends CController {
 			$groupids = array_keys($filter_groups);
 		}
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$hosts = API::Host()->get([
 			'output' => ['name', 'hostid', 'status'],
 			'hostids' => $filter['hostids'],
 			'groupids' => $groupids,
 			'with_monitored_items' => true,
 			'sortfield' => 'host',
-			'limit' => $config['search_limit'] + 1,
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 
@@ -113,6 +113,7 @@ abstract class CControllerLatest extends CController {
 				]);
 			}
 
+			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 			$items = API::Item()->get([
 				'hostids' => array_keys($hosts),
 				'output' => ['itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
@@ -125,7 +126,7 @@ abstract class CControllerLatest extends CController {
 				'filter' => [
 					'status' => [ITEM_STATUS_ACTIVE]
 				],
-				'limit' => $config['search_limit'] + 1,
+				'limit' => $limit,
 				'preservekeys' => true
 			]);
 

@@ -791,10 +791,6 @@ class CControllerPopupGeneric extends CController {
 			]
 		];
 
-		if ($this->source_table === 'triggers' || $this->source_table === 'trigger_prototypes') {
-			$data['options']['config'] = select_config();
-		}
-
 		if (($messages = getMessages()) !== null) {
 			$data['messages'] = $messages;
 		}

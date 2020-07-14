@@ -376,11 +376,12 @@ else {
 	];
 
 	if ($data['templateid']) {
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['screens'] = API::TemplateScreen()->get([
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'templateids' => $data['templateid'],
 			'sortfield' => $sortField,
-			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+			'limit' => $limit,
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -399,10 +400,11 @@ else {
 			'name' => CProfile::get('web.screenconf.filter_name', '')
 		];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['screens'] = API::Screen()->get([
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'sortfield' => $sortField,
-			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+			'limit' => $limit,
 			'search' => [
 				'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
 			],

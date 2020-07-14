@@ -101,6 +101,7 @@ if ($data['filter_userids']) {
 
 if (!$data['filter_userids'] || $data['users']) {
 	// Fetch alerts for different objects and sources and combine them in a single stream.
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	foreach (eventSourceObjects() as $eventSource) {
 		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get([
 			'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
@@ -115,7 +116,7 @@ if (!$data['filter_userids'] || $data['users']) {
 			'eventobject' => $eventSource['object'],
 			'sortfield' => 'alertid',
 			'sortorder' => ZBX_SORT_DOWN,
-			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+			'limit' => $limit
 		]));
 	}
 

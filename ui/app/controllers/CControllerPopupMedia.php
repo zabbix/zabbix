@@ -25,9 +25,8 @@ class CControllerPopupMedia extends CController {
 	protected function init() {
 		$this->disableSIDvalidation();
 
-		$config = select_config();
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$this->severities[$severity] = getSeverityName($severity, $config);
+			$this->severities[$severity] = getSeverityName($severity);
 		}
 	}
 

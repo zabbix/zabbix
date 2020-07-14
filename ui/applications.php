@@ -272,6 +272,7 @@ else {
 	];
 
 	// Get applications.
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['applications'] = API::Application()->get([
 		'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
@@ -282,7 +283,7 @@ else {
 		'selectApplicationDiscovery' => ['ts_delete'],
 		'editable' => true,
 		'sortfield' => $sort_field,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => $limit
 	]);
 
 	order_result($data['applications'], $sort_field, $sort_order);

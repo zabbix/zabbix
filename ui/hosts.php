@@ -1484,6 +1484,7 @@ else {
 	}
 
 	// Select hosts.
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$hosts = API::Host()->get([
 		'output' => ['hostid', $sortField],
 		'evaltype' => $filter['evaltype'],
@@ -1492,7 +1493,7 @@ else {
 		'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
+		'limit' => $limit,
 		'search' => [
 			'name' => ($filter['host'] === '') ? null : $filter['host'],
 			'ip' => ($filter['ip'] === '') ? null : $filter['ip'],

@@ -56,8 +56,6 @@ class CScreenHttpTest extends CScreenBase {
 		$httptests = [];
 		$paging = [];
 
-		$config = select_config();
-
 		$options = [
 			'output' => ['httptestid', 'name', 'hostid'],
 			'selectHosts' => ['name', 'status'],
@@ -65,7 +63,7 @@ class CScreenHttpTest extends CScreenBase {
 			'templated' => false,
 			'preservekeys' => true,
 			'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
-			'limit' => $config['search_limit'] + 1
+			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 
 		$options['hostids'] = $this->data['hostids'] ? $this->data['hostids'] : null;

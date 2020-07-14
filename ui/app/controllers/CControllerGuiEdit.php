@@ -53,24 +53,23 @@ class CControllerGuiEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'default_theme' =>
-				$this->getInput('default_theme', CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME)),
-			'search_limit' =>
-				$this->getInput('search_limit', CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)),
-			'max_in_table' =>
-				$this->getInput('max_in_table', CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)),
-			'server_check_interval' =>
-				$this->getInput('server_check_interval', CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL)),
-			'work_period' =>
-				$this->getInput('work_period', CSettingsHelper::get(CSettingsHelper::WORK_PERIOD)),
-			'show_technical_errors' =>
-				$this->getInput('show_technical_errors', CSettingsHelper::get(CSettingsHelper::SHOW_TECHNICAL_ERRORS)),
-			'history_period' =>
-				$this->getInput('history_period', CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)),
-			'period_default' =>
-				$this->getInput('period_default', CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)),
-			'max_period' =>
-				$this->getInput('max_period', CSettingsHelper::get(CSettingsHelper::MAX_PERIOD))
+			'default_theme' => $this->getInput('default_theme', CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME)),
+			'search_limit' => $this->getInput('search_limit', CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)),
+			'max_in_table' => $this->getInput('max_in_table', CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)),
+			'server_check_interval' => $this->getInput('server_check_interval', CSettingsHelper::get(
+				CSettingsHelper::SERVER_CHECK_INTERVAL
+			)),
+			'work_period' => $this->getInput('work_period', CSettingsHelper::get(CSettingsHelper::WORK_PERIOD)),
+			'show_technical_errors' => $this->getInput('show_technical_errors', CSettingsHelper::get(
+				CSettingsHelper::SHOW_TECHNICAL_ERRORS
+			)),
+			'history_period' => $this->getInput('history_period', CSettingsHelper::get(
+				CSettingsHelper::HISTORY_PERIOD
+			)),
+			'period_default' => $this->getInput('period_default', CSettingsHelper::get(
+				CSettingsHelper::PERIOD_DEFAULT
+			)),
+			'max_period' => $this->getInput('max_period', CSettingsHelper::get(CSettingsHelper::MAX_PERIOD))
 		];
 
 		$response = new CControllerResponseData($data);

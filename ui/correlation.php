@@ -454,6 +454,7 @@ else {
 		'active_tab' => CProfile::get('web.correlation.filter.active', 1)
 	];
 
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['correlations'] = API::Correlation()->get([
 		'output' => ['correlationid', 'name', 'description', 'status'],
 		'search' => [
@@ -466,7 +467,7 @@ else {
 		'selectOperations' => ['type'],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		'limit' => $limit
 	]);
 
 	order_result($data['correlations'], $sortField, $sortOrder);
