@@ -165,7 +165,7 @@ func (c *ConnManager) create(uri URI) *MCConn {
 	}
 
 	client := mc.NewMCwithConfig(
-		uri.Scheme()+"://"+uri.Addr(),
+		uri.URI(),
 		uri.User(),
 		uri.Password(),
 		&mc.Config{
