@@ -374,9 +374,9 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
 	];
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 	if ($data['templateid']) {
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['screens'] = API::TemplateScreen()->get([
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'templateids' => $data['templateid'],
@@ -400,7 +400,6 @@ else {
 			'name' => CProfile::get('web.screenconf.filter_name', '')
 		];
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['screens'] = API::Screen()->get([
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'sortfield' => $sortField,

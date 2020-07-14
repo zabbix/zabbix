@@ -1074,6 +1074,7 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
  * @return array
  */
 function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1083,7 +1084,6 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'preservekeys' => true
 		]));
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'applicationids' => $applicationids,
@@ -1094,7 +1094,6 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		]);
 	}
 	else {
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'hostids' => $hostids,
@@ -1125,6 +1124,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1134,7 +1134,6 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'preservekeys' => true
 		]));
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_hosts = API::Host()->get([
 			'output' => ['name', 'hostid'],
 			'groupids' => $groupids,
@@ -1146,7 +1145,6 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 		]);
 	}
 	else {
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_hosts = API::Host()->get([
 			'output' => ['name', 'hostid'],
 			'monitored_hosts' => true,

@@ -52,6 +52,7 @@ if (!is_array($data) || !isset($data['method'])
 }
 
 $result = [];
+$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 switch ($data['method']) {
 	case 'search':
@@ -101,7 +102,6 @@ switch ($data['method']) {
 	case 'trigger.get':
 		$result = [];
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'priority'],
 			'triggerids' => $data['triggerids'],
@@ -293,7 +293,6 @@ switch ($data['method']) {
 				break;
 
 			case 'templates':
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$templates = API::Template()->get([
 					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'output' => ['templateid', 'name'],
@@ -315,7 +314,6 @@ switch ($data['method']) {
 				break;
 
 			case 'proxies':
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$proxies = API::Proxy()->get([
 					'output' => ['proxyid', 'host'],
 					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
@@ -334,7 +332,6 @@ switch ($data['method']) {
 				break;
 
 			case 'applications':
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$applications = API::Application()->get([
 					'output' => ['applicationid', 'name'],
 					'hostids' => zbx_toArray($data['hostid']),
@@ -356,12 +353,11 @@ switch ($data['method']) {
 				break;
 
 			case 'application_prototypes':
-				$limit_selects = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$discovery_rules = API::DiscoveryRule()->get([
 					'output' => [],
 					'selectApplicationPrototypes' => ['application_prototypeid', 'name'],
 					'itemids' => [$data['parent_discoveryid']],
-					'limitSelects' => $limit_selects
+					'limitSelects' => $limit
 				]);
 
 				if ($discovery_rules) {
@@ -393,7 +389,6 @@ switch ($data['method']) {
 					$host_fields[] = 'status';
 				}
 
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid', 'description'],
 					'selectHosts' => $host_fields,
@@ -443,7 +438,6 @@ switch ($data['method']) {
 				break;
 
 			case 'users':
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$users = API::User()->get([
 					'output' => ['userid', 'alias', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
@@ -476,7 +470,6 @@ switch ($data['method']) {
 				break;
 
 			case 'usersGroups':
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$groups = API::UserGroup()->get([
 					'output' => ['usrgrpid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
@@ -497,7 +490,6 @@ switch ($data['method']) {
 				break;
 
 			case 'drules':
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 				$drules = API::DRule()->get([
 					'output' => ['druleid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,

@@ -322,7 +322,7 @@ else {
 	]);
 
 	// get host groups
-	$limitSelects = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
+	$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
 	$data['groups'] = API::HostGroup()->get([
 		'output' => ['groupid', 'name', 'flags'],
 		'groupids' => $groupIds,
@@ -330,7 +330,7 @@ else {
 		'selectTemplates' => ['templateid', 'name'],
 		'selectGroupDiscovery' => ['ts_delete'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'limitSelects' => $limitSelects
+		'limitSelects' => $limit
 	]);
 	order_result($data['groups'], $sortField, $sortOrder);
 
