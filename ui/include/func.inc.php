@@ -1573,8 +1573,7 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 	return $default;
 }
 
-function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
-{
+function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false) {
 	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
 	$msg_details = null;
 	$link_details = null;
@@ -1640,31 +1639,29 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 /**
  * Filters messages that can be displayed to user based on defines (see ZBX_SHOW_TECHNICAL_ERRORS) and user settings.
  *
- * @param array $messages	List of messages to filter.
- *
  * @return array
  */
-function filter_messages(array $messages = []) {
+function filter_messages() {
 	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
-		$filtered_messages = [];
-		$generic_exists = false;
+		$messages = CMessageHelper::getMessages();
+		CMessageHelper::clear();
 
+		$generic_exists = false;
 		foreach ($messages as $message) {
-			if (array_key_exists('src', $message) && ($message['src'] === 'sql' || $message['src'] === 'php')) {
+			if ($message['type'] === CMessageHelper::MessageTypeError
+				&& ($message['source'] === 'sql' || $message['source'] === 'php')) {
 				if (!$generic_exists) {
-					$message['message'] = _('System error occurred. Please contact Zabbix administrator.');
-					$filtered_messages[] = $message;
+					CMessageHelper::addError(_('System error occurred. Please contact Zabbix administrator.'));
 					$generic_exists = true;
 				}
 			}
 			else {
-				$filtered_messages[] = $message;
+				CMessageHelper::addSuccess($message['message']);
 			}
 		}
-		$messages = $filtered_messages;
 	}
 
-	return $messages;
+	return CMessageHelper::getMessages();
 }
 
 /**
@@ -1677,13 +1674,11 @@ function filter_messages(array $messages = []) {
  * @return CDiv|null
  */
 function getMessages($good = false, $title = null, $show_close_box = true) {
-	$messages = filter_messages(CMessages::get());
+	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
 		? makeMessageBox($good, $messages, $title, $show_close_box)
 		: null;
-
-	CMessages::clear();
 
 	return $message_box;
 }
@@ -1696,9 +1691,7 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	}
 
 	$title = $good ? $okmsg : $errmsg;
-	$messages = filter_messages(CMessages::get());
-
-	CMessages::clear();
+	$messages = get_and_clear_messages();
 
 	if ($title === null && !$messages) {
 		return;
@@ -1816,11 +1809,11 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 	else {
 		$messages_current = [];
-		$restore_messages = CMessages::get();
+		$restore_messages = CMessageHelper::getMessages();
 		$restore_messages_prepared = $ZBX_MESSAGES_PREPARED;
 	}
 
-	CMessages::clear();
+	CMessageHelper::clear();
 	$ZBX_MESSAGES_PREPARED = [];
 
 	// Process authentication warning if user had unsuccessful authentication attempts.
@@ -1843,18 +1836,18 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 
 	$messages_authentication = $ZBX_MESSAGES_PREPARED;
-	CMessages::clear();
+	CMessageHelper::clear();
 	$ZBX_MESSAGES_PREPARED = [];
 
 	// Process messages passed by the previous request.
 
 	if ($options['with_session_messages']) {
-		if (CMessages::getSuccess()) {
-			show_messages(true, CMessages::getSuccess(), null);
-		}
-
-		if (CMessages::getError()) {
-			show_messages(false, null, CMessages::getError());
+		if (CMessageHelper::getTitle() !== null) {
+			show_messages(
+				CMessageHelper::getType() === CMessageHelper::MessageTypeSuccess,
+				CMessageHelper::getTitle(),
+				CMessageHelper::getTitle()
+			);
 		}
 	}
 
@@ -1869,9 +1862,14 @@ function get_prepared_messages(array $options = []): ?string {
 		)->toString();
 	}
 
-	array_map(function ($value) {
-		return CMessages::add($value);
-	}, $restore_messages);
+	foreach ($restore_messages as $message) {
+		if ($message['type'] === CMessageHelper::MessageTypeSuccess) {
+			CMessageHelper::addSuccess($message['message']);
+		}
+		else {
+			CMessageHelper::addError($message['message'], $message['source']);
+		}
+	}
 
 	$ZBX_MESSAGES_PREPARED = $restore_messages_prepared;
 
@@ -1890,7 +1888,7 @@ function info($msgs) {
 	zbx_value2array($msgs);
 
 	foreach ($msgs as $msg) {
-		CMessages::add(['type' => 'info', 'message' => $msg]);
+		CMessageHelper::addSuccess($msg);
 	}
 }
 
@@ -1904,7 +1902,7 @@ function error($msgs, $src = '') {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		CMessages::add(['type' => 'error', 'message' => $msg, 'src' => $src]);
+		CMessageHelper::addError($msg, $src);
 	}
 }
 
@@ -1921,11 +1919,11 @@ function error_group($data) {
 	}
 }
 
-function clear_messages() {
-	$messages = CMessages::get();
-	CMessages::clear();
+function get_and_clear_messages() {
+	$messages = filter_messages();
+	CMessageHelper::clear();
 
-	return filter_messages($messages);
+	return $messages;
 }
 
 function fatal_error($msg) {
@@ -2172,13 +2170,7 @@ function imageOut(&$image, $format = null) {
  * @return bool
  */
 function hasErrorMesssages() {
-	foreach (CMessages::get() as $message) {
-		if (array_key_exists('type', $message) && $message['type'] === 'error') {
-			return true;
-		}
-	}
-
-	return false;
+	return CMessageHelper::getType() === CMessageHelper::MessageTypeError;
 }
 
 /**

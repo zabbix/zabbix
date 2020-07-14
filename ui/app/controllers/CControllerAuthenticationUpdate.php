@@ -100,7 +100,7 @@ class CControllerAuthenticationUpdate extends CController {
 				|| $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 
 		if (!$is_valid) {
-			CMessages::addError(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type',
+			CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type',
 				_('LDAP is not configured')
 			));
 		}
@@ -131,14 +131,14 @@ class CControllerAuthenticationUpdate extends CController {
 
 		foreach ($ldap_fields as $field) {
 			if (trim($config[$field]) === '') {
-				CMessages::addError(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
+				CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
 				$is_valid = false;
 				break;
 			}
 		}
 
 		if ($is_valid && ($config['ldap_port'] < ZBX_MIN_PORT_NUMBER || $config['ldap_port'] > ZBX_MAX_PORT_NUMBER)) {
-			CMessages::addError(_s(
+			CMessageHelper::setErrorTitle(_s(
 				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.', $this->getInput('ldap_port'),
 				'ldap_port', ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER
 			));
@@ -146,7 +146,7 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
-			CMessages::addError($ldap_status['error']);
+			CMessageHelper::setErrorTitle($ldap_status['error']);
 			$is_valid = false;
 		}
 		elseif ($is_valid) {
@@ -167,7 +167,7 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			if (!$login) {
-				CMessages::addError($ldap_validator->getError());
+				CMessageHelper::setErrorTitle($ldap_validator->getError());
 				$is_valid = false;
 			}
 		}
@@ -187,7 +187,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		foreach ($saml_fields as $field) {
 			if (trim($config[$field]) === '') {
-				CMessages::addError(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
+				CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
 
 				return false;
 			}
@@ -222,7 +222,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		// Only ZBX_AUTH_LDAP have 'Test' option.
 		if ($this->hasInput('ldap_test')) {
-			CMessages::addSuccess(_('LDAP login successful'));
+			CMessageHelper::setSuccessTitle(_('LDAP login successful'));
 			$this->response->setFormData($this->getInputAll());
 			$this->setResponse($this->response);
 			return;
@@ -297,12 +297,12 @@ class CControllerAuthenticationUpdate extends CController {
 					$this->invalidateSessions();
 				}
 
-				CMessages::addSuccess(_('Authentication settings updated'));
+				CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed'));
 			}
 			else {
 				$this->response->setFormData($this->getInputAll());
-				CMessages::addError(_('Cannot update authentication'));
+				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
 		}
 

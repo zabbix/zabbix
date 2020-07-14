@@ -425,11 +425,11 @@ class ZBase {
 	 */
 	private function initMessages(): void {
 		if (CCookieHelper::has('system-message-ok')) {
-			CMessages::addSuccess(CCookieHelper::get('system-message-ok'));
+			CMessageHelper::setSuccessTitle(CCookieHelper::get('system-message-ok'));
 			CCookieHelper::unset('system-message-ok');
 		}
 		if (CCookieHelper::has('system-message-error')) {
-			CMessages::addError(CCookieHelper::get('system-message-error'));
+			CMessageHelper::setErrorTitle(CCookieHelper::get('system-message-error'));
 			CCookieHelper::unset('system-message-error');
 		}
 	}
@@ -516,10 +516,7 @@ class ZBase {
 		if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
 
-			$messages =  filter_messages(CMessages::get());
-			foreach ($messages as $message) {
-				CMessages::add($message);
-			}
+			filter_messages();
 
 			$response->redirect();
 		}
@@ -527,16 +524,13 @@ class ZBase {
 		elseif ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
 
-			$messages =  filter_messages(CMessages::get());
-			foreach ($messages as $message) {
-				CMessages::add($message);
-			}
+			filter_messages();
 
-			CMessages::add(['message' => 'Controller: '.$router->getAction()]);
+			CMessageHelper::addError(['message' => 'Controller: '.$router->getAction()]);
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
 				if ($key !== 'sid') {
-					CMessages::add(['message' => is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value)]);
+					CMessageHelper::addError(['message' => is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value)]);
 				}
 			}
 

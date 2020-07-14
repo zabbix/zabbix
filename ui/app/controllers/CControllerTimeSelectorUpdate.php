@@ -61,7 +61,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			 * throw a JS alert() with current message in timeSelectorEventHandler() in gtlc.js.
 			 */
 
-			$messages = CMessages::get();
+			$messages = CMessageHelper::getMessages();
 
 			$this->setResponse(new CControllerResponseData([
 				'main_block' => json_encode(['error' => $messages[0]['message']])

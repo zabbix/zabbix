@@ -37,7 +37,7 @@ class CControllerModuleScan extends CController {
 	}
 
 	protected function doAction() {
-		clear_messages();
+		get_and_clear_messages();
 
 		$db_modules_create = [];
 		$db_modules_create_names = [];
@@ -132,10 +132,10 @@ class CControllerModuleScan extends CController {
 			: _('No new modules discovered');
 
 		if (hasErrorMesssages()) {
-			CMessages::addError($message);
+			CMessageHelper::setErrorTitle($message);
 		}
 		else {
-			CMessages::addSuccess($message);
+			CMessageHelper::setSuccessTitle($message);
 		}
 
 		$this->setResponse($response);

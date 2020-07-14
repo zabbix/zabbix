@@ -40,7 +40,7 @@ class CControllerGuiUpdate extends CController {
 						->getUrl()
 					);
 					$response->setFormData($this->getInputAll());
-					CMessages::addError(_('Cannot update configuration'));
+					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 					$this->setResponse($response);
 					break;
 
@@ -73,11 +73,11 @@ class CControllerGuiUpdate extends CController {
 		);
 
 		if ($result) {
-			CMessages::addSuccess(_('Configuration updated'));
+			CMessageHelper::setSuccessTitle(_('Configuration updated'));
 		}
 		else {
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot update configuration'));
+			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 		}
 
 		$this->setResponse($response);

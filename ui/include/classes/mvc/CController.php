@@ -160,15 +160,20 @@ abstract class CController {
 
 		if ($data['messages']) {
 			if (array_key_exists('success', $data['messages'])) {
-				CMessages::addSuccess($data['messages']['success']);
+				CMessageHelper::setSuccessTitle($data['messages']['success']);
 			}
 			if (array_key_exists('error', $data['messages'])) {
-				CMessages::addError($data['messages']['error']);
+				CMessageHelper::setErrorTitle($data['messages']['error']);
 			}
 
 			if (array_key_exists('messages', $data['messages'])) {
 				foreach ($data['messages']['messages'] as $message) {
-					CMessages::add($message);
+					if ($message['type'] === CMessageHelper::MessageTypeSuccess) {
+						CMessageHelper::addSuccess($message['message']);
+					}
+					else {
+						CMessageHelper::addError($message['message'], $message['source']);
+					}
 				}
 			}
 		}

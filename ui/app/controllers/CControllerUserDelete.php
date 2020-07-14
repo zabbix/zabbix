@@ -53,10 +53,10 @@ class CControllerUserDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			CMessages::addSuccess(_n('User deleted', 'Users deleted', $deleted));
+			CMessageHelper::setSuccessTitle(_n('User deleted', 'Users deleted', $deleted));
 		}
 		else {
-			CMessages::addError(_n('Cannot delete user', 'Cannot delete users', $deleted));
+			CMessageHelper::setErrorTitle(_n('Cannot delete user', 'Cannot delete users', $deleted));
 		}
 
 		$this->setResponse($response);

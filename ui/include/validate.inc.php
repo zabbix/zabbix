@@ -365,15 +365,20 @@ function invalid_url($msg = null) {
 	global $DB;
 
 	// backup messages before including page_header.php
-	$temp = CMessages::get();
-	CMessages::clear();
+	$messages_backup = CMessageHelper::getMessages();
+	CMessageHelper::clear();
 
 	require_once dirname(__FILE__).'/page_header.php';
 
 	// Rollback reset messages.
-	array_map(function ($value) {
-		return CMessages::add($value);
-	}, $temp);
+	foreach ($messages_backup as $message) {
+		if ($message['type'] === CMessageHelper::MessageTypeSuccess) {
+			CMessageHelper::addSuccess($message['message']);
+		}
+		else {
+			CMessageHelper::addError($message['message'], $message['source']);
+		}
+	}
 
 	unset_all();
 	show_error_message($msg);

@@ -53,7 +53,7 @@ class CControllerProxyCreate extends CController {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=proxy.edit');
 					$response->setFormData($this->getInputAll());
-					CMessages::addError(_('Cannot add proxy'));
+					CMessageHelper::setErrorTitle(_('Cannot add proxy'));
 					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
@@ -102,14 +102,14 @@ class CControllerProxyCreate extends CController {
 				->setArgument('page', CPagerHelper::loadPage('proxy.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			CMessages::addSuccess(_('Proxy added'));
+			CMessageHelper::setSuccessTitle(_('Proxy added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'proxy.edit')
 			);
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot add proxy'));
+			CMessageHelper::setErrorTitle(_('Cannot add proxy'));
 		}
 		$this->setResponse($response);
 	}

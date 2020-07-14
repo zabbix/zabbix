@@ -46,14 +46,14 @@ class CControllerIconMapCreate extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'iconmap.list')
 			);
-			CMessages::addSuccess(_('Icon map created'));
+			CMessageHelper::setSuccessTitle(_('Icon map created'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'iconmap.edit')
 			);
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot create icon map'));
+			CMessageHelper::setErrorTitle(_('Cannot create icon map'));
 		}
 
 		$this->setResponse($response);

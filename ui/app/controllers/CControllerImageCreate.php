@@ -38,7 +38,7 @@ class CControllerImageCreate extends CController {
 
 					$response = new CControllerResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
-					CMessages::addError(_('Cannot add image'));
+					CMessageHelper::setErrorTitle(_('Cannot add image'));
 					$this->setResponse($response);
 					break;
 
@@ -104,7 +104,7 @@ class CControllerImageCreate extends CController {
 			$response = new CControllerResponseRedirect($url);
 			error($error);
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot add image'));
+			CMessageHelper::setErrorTitle(_('Cannot add image'));
 
 			return $this->setResponse($response);
 		}
@@ -122,7 +122,7 @@ class CControllerImageCreate extends CController {
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $this->getInput('imagetype'))
 			);
-			CMessages::addSuccess(_('Image added'));
+			CMessageHelper::setSuccessTitle(_('Image added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -130,7 +130,7 @@ class CControllerImageCreate extends CController {
 				->setArgument('imagetype', $this->getInput('imagetype'))
 			);
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot add image'));
+			CMessageHelper::setErrorTitle(_('Cannot add image'));
 		}
 
 		$this->setResponse($response);

@@ -32,7 +32,7 @@ abstract class CControllerResponse {
 	public function redirect(): void {
 		// Redirect as simple request.
 		if ($this instanceof CControllerResponseRedirect) {
-			if ($this->getFormData() === null && CMessages::getSuccess() === null && CMessages::getError() === null) {
+			if ($this->getFormData() === null && CMessageHelper::getTitle() === null) {
 				redirect($this->getLocation());
 			}
 		}
@@ -84,23 +84,11 @@ abstract class CControllerResponse {
 
 	private function getData(): array {
 		$data = [];
-		$messages = [];
-
-		foreach (CMessages::get() as $value) {
-			if (!is_array($value)) {
-				$value = ['message' => $value];
-			}
-
-			$messages['messages'][] = $value;
-		}
+		$messages['messages'] = CMessageHelper::getMessages();
 
 		if ($this instanceof CControllerResponseRedirect) {
-			if (CMessages::getSuccess() !== null) {
-				$messages['success'] = CMessages::getSuccess();
-			}
-
-			if (CMessages::getError() !== null) {
-				$messages['error'] = CMessages::getError();
+			if (CMessageHelper::getTitle() !== null) {
+				$messages[CMessageHelper::getType()] = CMessageHelper::getTitle();
 			}
 
 			$data = $this->getFormData();

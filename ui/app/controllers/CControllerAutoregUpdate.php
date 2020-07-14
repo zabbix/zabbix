@@ -38,7 +38,7 @@ class CControllerAutoregUpdate extends CController {
 						->getUrl()
 					);
 					$response->setFormData($this->getInputAll());
-					CMessages::addError(_('Cannot update configuration'));
+					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
@@ -66,11 +66,11 @@ class CControllerAutoregUpdate extends CController {
 		);
 
 		if ($result) {
-			CMessages::addSuccess(_('Configuration updated'));
+			CMessageHelper::setSuccessTitle(_('Configuration updated'));
 		}
 		else {
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot update configuration'));
+			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 		}
 
 		$this->setResponse($response);

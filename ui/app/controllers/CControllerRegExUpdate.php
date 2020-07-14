@@ -42,7 +42,7 @@ class CControllerRegExUpdate extends CController {
 						->setArgument('regexid', $this->getInput('regexid'))
 					);
 					$response->setFormData($this->getInputAll());
-					CMessages::addError(_('Cannot update regular expression'));
+					CMessageHelper::setErrorTitle(_('Cannot update regular expression'));
 					$this->setResponse($response);
 					break;
 
@@ -91,14 +91,14 @@ class CControllerRegExUpdate extends CController {
 
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
-			CMessages::addSuccess(_('Regular expression updated'));
+			CMessageHelper::setSuccessTitle(_('Regular expression updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'regex.edit')
 				->setArgument('regexid', $this->getInput('regexid')));
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot update regular expression'));
+			CMessageHelper::setErrorTitle(_('Cannot update regular expression'));
 		}
 
 		$this->setResponse($response);

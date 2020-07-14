@@ -39,7 +39,7 @@ class CControllerSystemWarning extends CController {
 			'messages' => []
 		];
 
-		$data['messages'] = CMessages::get();
+		$data['messages'] = CMessageHelper::getMessages();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

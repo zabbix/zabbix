@@ -88,7 +88,7 @@ if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 	redirect(CWebUser::$data['url'] ? CWebUser::$data['url'] : ZBX_DEFAULT_URL);
 }
 
-$messages = clear_messages();
+$messages = get_and_clear_messages();
 
 echo (new CView('general.login', [
 	'http_login_url' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)

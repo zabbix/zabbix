@@ -43,7 +43,7 @@ class CControllerTrigSeverityUpdate extends CController {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'trigseverity.edit')
 			);
-			CMessages::addError(_('Cannot update configuration'));
+			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 			$response->setFormData($this->getInputAll());
 			$this->setResponse($response);
 		}
@@ -76,11 +76,11 @@ class CControllerTrigSeverityUpdate extends CController {
 		]);
 
 		if ($result) {
-			CMessages::addSuccess(_('Configuration updated'));
+			CMessageHelper::setSuccessTitle(_('Configuration updated'));
 		}
 		else {
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot update configuration'));
+			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 		}
 
 		$this->setResponse($response);

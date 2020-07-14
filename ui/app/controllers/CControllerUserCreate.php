@@ -58,7 +58,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
 					$response->setFormData($this->getInputAll());
-					CMessages::addError(_('Cannot add user'));
+					CMessageHelper::setErrorTitle(_('Cannot add user'));
 					$this->setResponse($response);
 					break;
 
@@ -107,14 +107,14 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				->setArgument('page', CPagerHelper::loadPage('user.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
-			CMessages::addSuccess(_('User added'));
+			CMessageHelper::setSuccessTitle(_('User added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'user.edit')
 			);
 			$response->setFormData($this->getInputAll());
-			CMessages::addError(_('Cannot add user'));
+			CMessageHelper::setErrorTitle(_('Cannot add user'));
 		}
 		$this->setResponse($response);
 	}

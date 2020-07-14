@@ -139,30 +139,30 @@ class CControllerModuleUpdate extends CController {
 
 		if ($result) {
 			if ($this->getAction() === 'module.update') {
-				CMessages::addSuccess(_s('Module updated: %1$s.', $db_modules_update_names[0]));
+				CMessageHelper::setSuccessTitle(_s('Module updated: %1$s.', $db_modules_update_names[0]));
 			}
 			elseif ($set_status == MODULE_STATUS_ENABLED) {
-				CMessages::addSuccess(_n('Module enabled: %1$s.', 'Modules enabled: %1$s.',
+				CMessageHelper::setSuccessTitle(_n('Module enabled: %1$s.', 'Modules enabled: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 			else {
-				CMessages::addSuccess(_n('Module disabled: %1$s.', 'Modules disabled: %1$s.',
+				CMessageHelper::setSuccessTitle(_n('Module disabled: %1$s.', 'Modules disabled: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 		}
 		else {
 			if ($this->getAction() === 'module.update') {
-				CMessages::addError(_s('Cannot update module: %1$s.', $db_modules_update_names[0]));
+				CMessageHelper::setErrorTitle(_s('Cannot update module: %1$s.', $db_modules_update_names[0]));
 			}
 			elseif ($set_status == MODULE_STATUS_ENABLED) {
-				CMessages::addError(_n('Cannot enable module: %1$s.', 'Cannot enable modules: %1$s.',
+				CMessageHelper::setErrorTitle(_n('Cannot enable module: %1$s.', 'Cannot enable modules: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}
 			else {
-				CMessages::addError(_n('Cannot disable module: %1$s.', 'Cannot disable modules: %1$s.',
+				CMessageHelper::setErrorTitle(_n('Cannot disable module: %1$s.', 'Cannot disable modules: %1$s.',
 					implode(', ', $db_modules_update_names), count($this->modules)
 				));
 			}

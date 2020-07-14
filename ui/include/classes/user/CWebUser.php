@@ -100,7 +100,7 @@ class CWebUser {
 			]);
 
 			if (empty(self::$data)) {
-				clear_messages();
+				CMessageHelper::clear();
 				throw new Exception();
 			}
 

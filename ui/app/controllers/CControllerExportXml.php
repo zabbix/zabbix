@@ -106,7 +106,7 @@ class CControllerExportXml extends CController {
 			$response = new CControllerResponseRedirect(
 				$this->getInput('backurl', 'zabbix.php?action=dashboard.view'));
 
-			CMessages::addError(_('No permissions to referred object or it does not exist!'));
+			CMessageHelper::setErrorTitle(_('No permissions to referred object or it does not exist!'));
 		}
 		else {
 			$response = new CControllerResponseData([

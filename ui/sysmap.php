@@ -116,7 +116,7 @@ if (isset($_REQUEST['favobj'])) {
 				DBend(false);
 				$msg = [$e->getMessage()];
 
-				foreach (clear_messages() as $errMsg) {
+				foreach (get_and_clear_messages() as $errMsg) {
 					$msg[] = $errMsg['type'].': '.$errMsg['message'];
 				}
 

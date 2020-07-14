@@ -63,10 +63,10 @@ class CControllerUsergroupMassUpdate extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			CMessages::addSuccess(_n('User group updated', 'User groups updated', $updated));
+			CMessageHelper::setSuccessTitle(_n('User group updated', 'User groups updated', $updated));
 		}
 		else {
-			CMessages::addError(_n('Cannot update user group', 'Cannot update user groups', $updated));
+			CMessageHelper::setErrorTitle(_n('Cannot update user group', 'Cannot update user groups', $updated));
 		}
 
 		$this->setResponse($response);
