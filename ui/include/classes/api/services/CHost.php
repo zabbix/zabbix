@@ -2006,8 +2006,12 @@ class CHost extends CHostGeneral {
 		$host_names = [];
 
 		foreach ($hosts as $host) {
-			if (!array_key_exists('interfaces', $host) || !is_array($host['interfaces']) || !$host['interfaces']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
+			if (array_key_exists('interfaces', $host)) {
+				if ($host['interfaces'] !== null && !is_array($host['interfaces'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect interface specified for host "%1$s".', $host['host'])
+					);
+				}
 			}
 
 			if (array_key_exists('status', $host)) {
@@ -2184,8 +2188,10 @@ class CHost extends CHostGeneral {
 			$this->checkPartialValidator($host, $update_discovered_validator, $db_host);
 
 			if (array_key_exists('interfaces', $host)) {
-				if (!is_array($host['interfaces']) || !$host['interfaces']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
+				if ($host['interfaces'] !== null && !is_array($host['interfaces'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect interface specified for host "%1$s".', $host['host'])
+					);
 				}
 			}
 

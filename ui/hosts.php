@@ -55,9 +55,7 @@ $fields = [
 	'status' =>					[T_ZBX_INT, O_OPT, null,
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-									'isset({add}) || isset({update})'
-								],
+	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mass_update_tags' =>		[T_ZBX_INT, O_OPT, null,
