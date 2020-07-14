@@ -40,7 +40,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 * @return int
 	 */
 	private static function hasInternalAuth($usrgrps) {
-		$system_gui_access = 
+		$system_gui_access =
 			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
 				? GROUP_GUI_ACCESS_INTERNAL
 				: GROUP_GUI_ACCESS_LDAP;
