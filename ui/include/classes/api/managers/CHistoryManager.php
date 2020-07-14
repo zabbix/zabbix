@@ -333,6 +333,7 @@ class CHistoryManager {
 			'size' => 1
 		];
 
+		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$filters = [
 			[
 				[
@@ -363,7 +364,7 @@ class CHistoryManager {
 					'range' => [
 						'clock' => [
 							'lt' => $clock
-						] + (ZBX_HISTORY_PERIOD ? ['gte' => $clock - ZBX_HISTORY_PERIOD] : [])
+						] + ($history_period ? ['gte' => $clock - $history_period] : [])
 					]
 				]
 			]
@@ -422,11 +423,12 @@ class CHistoryManager {
 		}
 
 		if ($max_clock == 0) {
+			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 			$sql = 'SELECT MAX(clock) AS clock'.
 					' FROM '.$table.
 					' WHERE itemid='.zbx_dbstr($item['itemid']).
 						' AND clock<'.zbx_dbstr($clock).
-						(ZBX_HISTORY_PERIOD ? ' AND clock>='.zbx_dbstr($clock - ZBX_HISTORY_PERIOD) : '');
+						($history_period ? ' AND clock>='.zbx_dbstr($clock - $history_period) : '');
 
 			if (($row = DBfetch(DBselect($sql))) !== false) {
 				$max_clock = $row['clock'];

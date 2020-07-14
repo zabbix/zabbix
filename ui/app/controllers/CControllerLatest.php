@@ -170,11 +170,12 @@ abstract class CControllerLatest extends CController {
 			});
 
 			$select_items = [];
+			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 
 			foreach ($items_of_hosts as $host_items) {
 				$select_items += $filter['show_without_data']
 					? $host_items
-					: Manager::History()->getItemsHavingValues($host_items, ZBX_HISTORY_PERIOD);
+					: Manager::History()->getItemsHavingValues($host_items, $history_period);
 
 				if (count($select_items) > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)) {
 					break;
@@ -279,7 +280,7 @@ abstract class CControllerLatest extends CController {
 			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
 			// Choosing max history period for already filtered items having data.
-			$history_period = $filter['show_without_data'] ? ZBX_HISTORY_PERIOD : null;
+			$history_period = $filter['show_without_data'] ? $history_period : null;
 
 			$history = Manager::History()->getLastValues($items, 2, $history_period);
 		}

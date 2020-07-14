@@ -66,10 +66,6 @@ define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
 
-// the maximum period to display history data for the latest data and item overview pages in seconds
-// by default set to 86400 seconds (24 hours)
-define('ZBX_HISTORY_PERIOD', 86400);
-
 define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
 define('ZBX_HISTORY_SOURCE_SQL',		'sql');
 

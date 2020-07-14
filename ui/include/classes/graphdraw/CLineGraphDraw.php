@@ -1245,7 +1245,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$config = [CSettingsHelper::WORK_PERIOD => CSettingsHelper::get(CSettingsHelper::WORK_PERIOD)];
 		$config = CMacrosResolverHelper::resolveTimeUnitMacros([$config], [CSettingsHelper::WORK_PERIOD])[0];
 
-		$periods = parse_period($config['work_period']);
+		$periods = parse_period($config[CSettingsHelper::WORK_PERIOD]);
 		if (!$periods) {
 			return;
 		}
