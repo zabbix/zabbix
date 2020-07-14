@@ -43,6 +43,8 @@ This template was tested on:
   Do not forget to install the ODBC driver on the Zabbix server or the Zabbix proxy.
   See Oracle documentation for instructions: https://www.oracle.com/database/technologies/releasenote-odbc-ic.html.
   **Note! Credentials in the odbc.ini do not work for Oracle.**
+  **Note! Be sure that ODBC connects to Oracle with session parameter NLS_NUMERIC_CHARACTERS= '.,' It is important for correct display float numbers in Zabbix.**
+
 
   The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
 
