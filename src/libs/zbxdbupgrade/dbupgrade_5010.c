@@ -96,7 +96,8 @@ static int	DBpatch_5010001(void)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot read \"%s\": %s", rnd_dev, zbx_strerror(errno));
 		return FAIL;
 	}
-	else if (sizeof(buff) != n)
+
+	if (sizeof(buff) != n)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot read %d bits from %s", (int)sizeof(buff) * 8, rnd_dev);
 		return FAIL;
