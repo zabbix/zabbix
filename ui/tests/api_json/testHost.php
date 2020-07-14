@@ -63,9 +63,52 @@ class testHost extends CAPITest {
 		];
 	}
 
+	public static function host_create() {
+		return [
+			[
+				'request' => [
+					'groups' => ['5'],
+					'host' => 'new host 1'
+				],
+				'expected_error' => null
+			],
+			[
+				'request' => [
+					'groups' => ['5'],
+					'host' => 'new host 2',
+					'interfaces' => []
+				],
+				'expected_error' => null
+			],
+			[
+				'request' => [
+					'groups' => ['5'],
+					'host' => 'new host 3',
+					'interfaces' => 'string'
+				],
+				'expected_error' => 'Incorrect interface specified for host "new host 3".'
+			],
+			[
+				'request' => [
+					'groups' => ['5'],
+					'host' => 'new host 4',
+					'interfaces' => 10
+				],
+				'expected_error' => 'Incorrect interface specified for host "new host 4".'
+			]
+		];
+	}
+
 	/**
-	* @dataProvider host_delete
-	*/
+	 * @dataProvider host_create
+	 */
+	public function testHost_Create($request, $expected_error) {
+		$this->call('host.create', $request, $expected_error);
+	}
+
+	/**
+	 * @dataProvider host_delete
+	 */
 	public function testHost_Delete($hostids, $expected_error) {
 		$result = $this->call('host.delete', $hostids, $expected_error);
 
