@@ -882,7 +882,7 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
  *                                                                            *
  * dc_expand_user_macros - has no autoquoting                                 *
  * for triggers and calculated items use                                      *
- * zbx_dc_expand_user_macros_in_expression - which autoquotes macros that are *
+ * dc_expand_user_macros_in_expression - which autoquotes macros that are     *
  * not already quoted and cannot be casted to a double                        *
  *                                                                            *
  ******************************************************************************/

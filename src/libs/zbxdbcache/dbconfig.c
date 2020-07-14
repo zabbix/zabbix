@@ -12757,17 +12757,6 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t host
 	return buf;
 }
 
-char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
-{
-	char	*expression;
-
-	RDLOCK_CACHE;
-	expression = dc_expand_user_macros_in_expression(text, hostids, hostids_num);
-	UNLOCK_CACHE;
-
-	return expression;
-}
-
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid)
 {
 	char	*resolved_params;
