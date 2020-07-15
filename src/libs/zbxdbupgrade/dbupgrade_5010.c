@@ -34,9 +34,6 @@ static int	DBpatch_5010000(void)
 {
 	const ZBX_FIELD	field = {"session_key", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	return DBadd_field("config", &field);
 }
 
