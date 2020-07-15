@@ -66,7 +66,8 @@ static int	DBpatch_5010001(void)
 	const char	rnd_dev[] = "/dev/urandom";
 	unsigned char	buff[16];
 	char		str[33];
-	int		fd, n;
+	int		fd;
+	ssize_t		n;
 	unsigned int	i;
 #if defined(__linux__)
 	zbx_uint64_t	value;
