@@ -1244,7 +1244,7 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 const OSVERSIONINFOEX	*zbx_win_getversion(void);
-void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, char **utf8_value);
+void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
