@@ -2407,7 +2407,7 @@
 							'configuration': configuration
 						};
 
-					$.when(promiseScrollIntoView($obj, data, pos))
+					promiseScrollIntoView($obj, data, pos)
 						.then(function() {
 							methods.addWidget.call($obj, widget_data);
 
@@ -3834,7 +3834,7 @@
 					removeWidget($this, data, widget);
 				}
 
-				$.when(promiseScrollIntoView($this, data, pos))
+				promiseScrollIntoView($this, data, pos)
 					.then(function() {
 						methods.addWidget.call($this, new_widget);
 						new_widget = data['widgets'].slice(-1)[0];
