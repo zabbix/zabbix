@@ -47,6 +47,15 @@ class CHousekeepingHelper extends CConfigGeneralHelper {
 	public const HK_TRENDS_MODE = 'hk_trends_mode';
 
 	/**
+	 * Housekeeping API object parameters array.
+	 *
+	 * @static
+	 *
+	 * @var array
+	 */
+	protected static $params = [];
+
+	/**
 	 * @inheritdoc
 	 */
 	protected static function loadParams(): void {

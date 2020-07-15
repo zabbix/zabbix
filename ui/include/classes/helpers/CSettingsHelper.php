@@ -74,6 +74,15 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const X_FRAME_OPTIONS = 'x_frame_options';
 
 	/**
+	 * Settings API object parameters array.
+	 *
+	 * @static
+	 *
+	 * @var array
+	 */
+	protected static $params = [];
+
+	/**
 	 * @inheritdoc
 	 */
 	protected static function loadParams(): void {

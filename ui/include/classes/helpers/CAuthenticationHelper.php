@@ -54,6 +54,15 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const SAML_USERNAME_ATTRIBUTE = 'saml_username_attribute';
 
 	/**
+	 * Authentication API object parameters array.
+	 *
+	 * @static
+	 *
+	 * @var array
+	 */
+	protected static $params = [];
+
+	/**
 	 * @inheritdoc
 	 */
 	protected static function loadParams(): void {
