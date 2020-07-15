@@ -398,8 +398,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Get /proc/diskstats:'
-						. ' Block devices discovery',
+						'Template Module Linux block devices by Zabbix agent: Block devices discovery',
 						'Template Module Linux filesystems by Zabbix agent: Mounted filesystem discovery',
 						'Template Module Linux network interfaces by Zabbix agent: Network interface discovery'
 					]
@@ -412,8 +411,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'State' => 'Normal'
 					],
 					'expected' => [
-						'Template Module Linux block devices by Zabbix agent: Get /proc/diskstats:'
-						. ' Block devices discovery'
+						'Template Module Linux block devices by Zabbix agent: Block devices discovery'
 					]
 				]
 			],
@@ -423,18 +421,18 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Operating systems',
 						'Type' => 'Dependent item'
 					],
-					'rows' => 10
+					'rows' => 6
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Type' => 'Database monitor',
-						'Update interval' => '1h'
+						'Type' => 'Zabbix agent',
+						'Update interval' => '15m'
 					],
 					'expected' => [
-						'Databases discovery',
-						'Replication discovery'
+						'Containers discovery',
+						'Images discovery'
 					]
 				]
 			],
