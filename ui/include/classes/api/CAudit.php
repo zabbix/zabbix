@@ -142,8 +142,14 @@ class CAudit {
 
 					if (array_key_exists('conditions', $masked_fields[$table_name])) {
 						foreach ($masked_fields[$table_name]['conditions'] as $field_name => $value) {
-							$mask_object_old = $mask_object_old && ($object_old[$field_name] == $value);
-							$mask_object = $mask_object && ($object[$field_name] == $value);
+							if ($mask_object_old) {
+								$mask_object_old = ($object_old[$field_name] == $value);
+							}
+							if ($mask_object) {
+								$mask_object = array_key_exists($field_name, $object)
+									? ($object[$field_name] == $value)
+									: ($object_old[$field_name] == $value);
+							}
 						}
 					}
 				}
@@ -154,12 +160,13 @@ class CAudit {
 				}
 
 				foreach ($object_diff as $field_name => &$values) {
-					if ($mask_object_old && array_key_exists($field_name, $table_masked_fields)) {
-						$object_old[$field_name] = ZBX_SECRET_MASK;
-					}
-
-					if ($mask_object && array_key_exists($field_name, $table_masked_fields)) {
-						$object[$field_name] = ZBX_SECRET_MASK;
+					if (array_key_exists($field_name, $table_masked_fields)) {
+						if ($mask_object_old) {
+							$object_old[$field_name] = ZBX_SECRET_MASK;
+						}
+						if ($mask_object) {
+							$object[$field_name] = ZBX_SECRET_MASK;
+						}
 					}
 
 					$values = [
