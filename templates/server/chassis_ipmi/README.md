@@ -15,6 +15,8 @@ This template was tested on:
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/ipmi) for basic instructions.
+
 You can set {$IPMI.USER} and {$IPMI.PASSWORD} macros in the template for using on the host level.
 
 

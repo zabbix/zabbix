@@ -15,10 +15,12 @@ This template was tested on:
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+
 1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
 
 ```bash
-CREATE USER 'zbx_monitor' IDENTIFIED BY '<password>';
+CREATE USER 'zbx_monitor' WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_dir(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
 ```

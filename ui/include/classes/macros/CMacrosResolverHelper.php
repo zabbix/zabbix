@@ -532,7 +532,7 @@ class CMacrosResolverHelper {
 	 * @param array $data
 	 * @param array $field_names
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public static function resolveTimeUnitMacros(array $data, array $field_names) {
 		self::init();
