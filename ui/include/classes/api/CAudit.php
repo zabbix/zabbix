@@ -85,8 +85,16 @@ class CAudit {
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
-			'users' => ['passwd' => true],
-			'config' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			'users' => [
+				'fields' => ['passwd' => true]
+			],
+			'config' => [
+				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			],
+			'globalmacro' => [
+				'fields' => ['value' => true],
+				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+			]
 		];
 
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
@@ -124,20 +132,35 @@ class CAudit {
 					continue;
 				}
 
-				foreach ($object_diff as $field_name => &$values) {
-					if (array_key_exists($table_name, $masked_fields)
-							&& array_key_exists($field_name, $masked_fields[$table_name])) {
-						$object_old[$field_name] = '********';
-						$object[$field_name] = '********';
+				if (array_key_exists($table_name, $masked_fields)) {
+					$mask_object_old = true;
+					$mask_object = true;
+
+					if (array_key_exists('conditions', $masked_fields[$table_name])) {
+						foreach ($masked_fields[$table_name]['conditions'] as $field_name => $value) {
+							$mask_object_old = $mask_object_old && ($object_old[$field_name] == $value);
+							$mask_object = $mask_object && ($object[$field_name] == $value);
+						}
 					}
 
-					$values = [
-						'old' => $object_old[$field_name],
-						'new' => $object[$field_name]
-					];
+					foreach ($object_diff as $field_name => &$values) {
+						if (array_key_exists($field_name, $masked_fields[$table_name]['fields'])) {
+							if ($mask_object_old) {
+								$object_old[$field_name] = ZBX_SECRET_MASK;
+							}
 
+							if ($mask_object) {
+								$object[$field_name] = ZBX_SECRET_MASK;
+							}
+						}
+
+						$values = [
+							'old' => $object_old[$field_name],
+							'new' => $object[$field_name]
+						];
+					}
+					unset($values);
 				}
-				unset($values);
 
 				$objects_diff[] = $object_diff;
 
