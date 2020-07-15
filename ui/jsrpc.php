@@ -550,21 +550,11 @@ switch ($data['method']) {
 				break;
 
 			case 'graphs':
-				if (!array_key_exists('monitored_hosts', $data) && array_key_exists('real_hosts', $data)) {
-					$templated = false;
-				}
-				elseif (array_key_exists('templated_hosts')) {
-					$templated = true;
-				}
-				else {
-					$templated = null;
-				}
-
 				$options = [
 					'output' => ['name'],
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
-					'templated' => $templated,
+					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'limit' => $config['search_limit']
 				];
