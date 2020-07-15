@@ -169,6 +169,21 @@ typedef struct
 }
 zbx_id_xmlnode_t;
 
+/* VMware events host information */
+typedef struct
+{
+	const char	*node_name;
+	int		flag;
+	char		*name;
+}
+event_hostinfo_node_t;
+
+#define ZBX_HOSTINFO_NODES_DATACENTER		0x01
+#define ZBX_HOSTINFO_NODES_COMPRES		0x02
+#define ZBX_HOSTINFO_NODES_HOST			0x04
+#define ZBX_HOSTINFO_NODES_MASK_ALL		\
+		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST)
+
 ZBX_VECTOR_DECL(id_xmlnode, zbx_id_xmlnode_t)
 ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 
@@ -251,6 +266,12 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
+
+#define ZBX_XPATH_EVT_INFO(param)									\
+	"*[local-name()='" param "']/*[local-name()='name']"
+
+#define ZBX_XPATH_EVT_ARGUMENT(key)									\
+	"*[local-name()='arguments'][*[local-name()='key'][text()='" key "']]/*[local-name()='value']"
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
@@ -3487,15 +3508,65 @@ out:
  ******************************************************************************/
 static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnode_t xml_event, xmlDoc *xdoc)
 {
-	zbx_vmware_event_t	*event = NULL;
-	char			*message, *time_str;
-	int			timestamp = 0;
+	zbx_vmware_event_t		*event = NULL;
+	char				*message, *time_str, *ip;
+	int				timestamp = 0, nodes_det = 0;
+	unsigned int			i;
+	static event_hostinfo_node_t	host_nodes[] =
+	{
+		{ ZBX_XPATH_EVT_INFO("datacenter"),		ZBX_HOSTINFO_NODES_DATACENTER,	NULL },
+		{ ZBX_XPATH_EVT_INFO("computeResource"),	ZBX_HOSTINFO_NODES_COMPRES,	NULL },
+		{ ZBX_XPATH_EVT_INFO("host"),			ZBX_HOSTINFO_NODES_HOST,	NULL },
+		{ ZBX_XPATH_EVT_ARGUMENT("_sourcehost_"),	ZBX_HOSTINFO_NODES_HOST,	NULL },
+		{ ZBX_XPATH_EVT_ARGUMENT("entityName"),		ZBX_HOSTINFO_NODES_HOST,	NULL }
+	};
 
 	if (NULL == (message = zbx_xml_read_node_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("fullFormattedMessage"))))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "skipping event key '" ZBX_FS_UI64 "', fullFormattedMessage"
 				" is missing", xml_event.id);
 		return FAIL;
+	}
+
+	for (i = 0; i < ARRSIZE(host_nodes); i++)
+	{
+		if (0 == (nodes_det & host_nodes[i].flag) && NULL != (host_nodes[i].name =
+				zbx_xml_read_node_value(xdoc, xml_event.xml_node, host_nodes[i].node_name)))
+		{
+			nodes_det |= host_nodes[i].flag;
+
+			if (ZBX_HOSTINFO_NODES_MASK_ALL == (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
+				break;
+		}
+	}
+
+	if (0 != (nodes_det & ZBX_HOSTINFO_NODES_HOST))
+	{
+		message = zbx_strdcat(message, "\n\nsource: ");
+
+		for (i = 0; i < ARRSIZE(host_nodes); i++)
+		{
+			if (NULL == host_nodes[i].name)
+				continue;
+
+			message = zbx_dsprintf(message, "%s%s%s", message, host_nodes[i].name,
+					0 != (host_nodes[i].flag & ZBX_HOSTINFO_NODES_HOST) ? "" : "/");
+			zbx_free(host_nodes[i].name);
+		}
+	}
+	else
+	{
+		if (0 != (nodes_det | ZBX_HOSTINFO_NODES_MASK_ALL))
+		{
+			for (i = 0; i < ARRSIZE(host_nodes); i++)
+				zbx_free(host_nodes[i].name);
+		}
+
+		if (NULL != (ip = zbx_xml_read_node_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("ipAddress"))))
+		{
+			message = zbx_dsprintf(message, "%s\n\nsource: %s", message, ip);
+			zbx_free(ip);
+		}
 	}
 
 	zbx_replace_invalid_utf8(message);
