@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2020-04-17T10:01:13Z</date>
+   <version>5.0</version>
+   <date>2020-06-29T22:46:45Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -16,7 +16,7 @@ https://httpd.apache.org/docs/current/mod/mod_status.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -775,6 +775,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Apache: Current async connections{#SINGLETON}</name>
