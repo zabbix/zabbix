@@ -1884,8 +1884,11 @@ static int	parse_user_macro(const char *str, int *len)
 {
 	int	macro_r, context_l, context_r;
 
-	if ('{' != *str || '$' != *(str + 1) || SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r))
+	if ('{' != *str || '$' != *(str + 1) || SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r,
+			NULL))
+	{
 		return FAIL;
+	}
 
 	*len = macro_r + 1;
 
@@ -3763,6 +3766,39 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	return token;
 }
 
+
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+/******************************************************************************
+ *                                                                            *
+ * Function: update_resolver_conf                                             *
+ *                                                                            *
+ * Purpose: react to "/etc/resolv.conf" update                                *
+ *                                                                            *
+ * Comments: it is intended to call this function in the end of each process  *
+ *           main loop. The purpose of calling it at the end (instead of the  *
+ *           beginning of main loop) is to let the first initialization of    *
+ *           libc resolver proceed internally.                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	update_resolver_conf(void)
+{
+#define ZBX_RESOLV_CONF_FILE	"/etc/resolv.conf"
+
+	static time_t	mtime = 0;
+	zbx_stat_t	buf;
+
+	if (0 == zbx_stat(ZBX_RESOLV_CONF_FILE, &buf) && mtime != buf.st_mtime)
+	{
+		mtime = buf.st_mtime;
+
+		if (0 != res_init())
+			zabbix_log(LOG_LEVEL_WARNING, "update_resolver_conf(): res_init() failed");
+	}
+
+#undef ZBX_RESOLV_CONF_FILE
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_update_env                                                   *
@@ -3783,7 +3819,7 @@ void	zbx_update_env(double time_now)
 		time_update = time_now;
 		zbx_handle_log();
 #if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();
+		update_resolver_conf();
 #endif
 	}
 }

@@ -714,12 +714,6 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old_file->mtime > new_file->mtime)
-	{
-		/* file mtime cannot decrease unless manipulated */
-		return ZBX_SAME_FILE_NO;
-	}
-
 	if (old_file->size > new_file->size)
 	{
 		/* File size cannot decrease. Truncating or replacing a file with a smaller one */
@@ -1671,6 +1665,9 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 			ret = FAIL;
 			goto clean;
 		}
+
+		/* mtime is not used for log, log.count items, reset to ignore */
+		file_buf.st_mtime = 0;
 
 		add_logfile(logfiles, logfiles_alloc, logfiles_num, filename, &file_buf);
 #if defined(_WINDOWS) || defined(__MINGW32__)

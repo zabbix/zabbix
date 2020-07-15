@@ -28,7 +28,6 @@ class CControllerPopupLldOperation extends CController {
 	}
 
 	protected function checkInput() {
-
 		$fields = [
 			'no' =>					'int32',
 			'templated' =>			'in 0,1',
@@ -95,7 +94,7 @@ class CControllerPopupLldOperation extends CController {
 			'optemplate' => [],
 			'opinventory' => [
 				'inventory_mode' => HOST_INVENTORY_MANUAL
-			],
+			]
 		];
 
 		$page_options = [
@@ -141,25 +140,31 @@ class CControllerPopupLldOperation extends CController {
 			}
 
 			if (array_key_exists('optemplate', $page_options) && !$page_options['optemplate']) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Link new templates'), _('cannot be empty')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Link templates'), _('cannot be empty')));
 			}
 
 			/*
-			 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
-			 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
+			 * $page_options['opperiod']['delay_flex'] is a temporary field that collects flexible and scheduling
+			 * intervals separated by a semicolon. In the end, custom intervals together with
+			 * $page_options['opperiod']['delay'] are stored in the $page_options['opperiod']['delay'] variable.
 			 */
 			if (array_key_exists('opperiod', $page_options)) {
-				$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
-				$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
-				$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
-
-				if (!array_key_exists('delay', $page_options['opperiod'])
-						|| $simple_interval_parser->parse($page_options['opperiod']['delay']) != CParser::PARSE_SUCCESS
-				) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'Delay', _('a time unit is expected')));
+				if (!array_key_exists('delay', $page_options['opperiod'])) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Update interval'),
+						_('a time unit is expected'))
+					);
 				}
-				elseif (array_key_exists('delay_flex', $page_options['opperiod'])) {
+
+				$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
+				$result = true;
+
+				if (array_key_exists('delay_flex', $page_options['opperiod'])) {
 					$intervals = [];
+					$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true, 'lldmacros' => true]);
+					$time_period_parser = new CTimePeriodParser(['usermacros' => true, 'lldmacros' => true]);
+					$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true,
+						'lldmacros' => true]
+					);
 
 					foreach ($page_options['opperiod']['delay_flex'] as $interval) {
 						if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
@@ -199,6 +204,27 @@ class CControllerPopupLldOperation extends CController {
 						$page_options['opperiod']['delay'] .= ';'.implode(';', $intervals);
 					}
 				}
+
+				if ($result && !validateDelay($update_interval_parser, _('Update interval'),
+						$page_options['opperiod']['delay'], $error)) {
+					error($error);
+				}
+			}
+
+			if (array_key_exists('ophistory', $page_options)
+					&& array_key_exists('history_mode', $page_options['ophistory'])
+					&& $page_options['ophistory']['history_mode'] == ITEM_STORAGE_CUSTOM
+					&& !validateTimeUnit($page_options['ophistory']['history'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true,
+						$error, ['usermacros' => true, 'lldmacros' => true])) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('History storage period'), $error));
+			}
+
+			if (array_key_exists('optrends', $page_options)
+					&& array_key_exists('trends_mode', $page_options['optrends'])
+					&& $page_options['optrends']['trends_mode'] == ITEM_STORAGE_CUSTOM
+					&& !validateTimeUnit($page_options['optrends']['trends'], SEC_PER_DAY, 25 * SEC_PER_YEAR, true,
+						$error, ['usermacros' => true, 'lldmacros' => true])) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Trend storage period'), $error));
 			}
 
 			// Return collected error messages.
@@ -253,7 +279,7 @@ class CControllerPopupLldOperation extends CController {
 			);
 		}
 		else {
-			// Combines received values and default, to use as values for all action fields.
+			// Combines received and default values to use as values for all action fields.
 			$field_values = [];
 			foreach ($actions as $action) {
 				if ($this->hasInput($action)) {
@@ -284,7 +310,7 @@ class CControllerPopupLldOperation extends CController {
 				$field_values['optrends']['trends'] = DB::getDefault('items', 'trends');
 			}
 
-			// Delay calculation
+			// Delay calculation.
 			$update_interval_parser = new CUpdateIntervalParser([
 				'usermacros' => true,
 				'lldmacros' => true

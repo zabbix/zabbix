@@ -716,10 +716,10 @@ class CTriggerExpression {
 	}
 
 	/**
-	 * Parses a function constant in the calculated item expression and
-	 * moves a current position ($this->pos) on a last symbol of the macro
+	 * Parses a function in the calculated item formula and moves
+	 * a current position ($this->pos) on a last symbol of the macro.
 	 *
-	 * @return bool  returns true if parsed successfully, false otherwise
+	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
 	private function parseFunction() {
 		$startPos = $this->pos;

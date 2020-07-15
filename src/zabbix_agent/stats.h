@@ -34,6 +34,10 @@
 #	include "vmstats.h"
 #endif
 
+#ifdef HAVE_KSTAT_H	/* Solaris */
+#	include "zbxkstat.h"
+#endif
+
 #ifdef ZBX_PROCSTAT_COLLECTOR
 #	include "procstat.h"
 #endif
@@ -50,6 +54,9 @@ typedef struct
 #ifdef _AIX
 	ZBX_VMSTAT_DATA		vmstat;
 #endif
+#ifdef HAVE_KSTAT_H
+	zbx_kstat_t		kstat;
+#endif
 }
 ZBX_COLLECTOR_DATA;
 
@@ -59,7 +66,7 @@ extern ZBX_DISKDEVICES_DATA	*diskdevices;
 extern int			my_diskstat_shmid;
 #endif
 
-ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
+ZBX_THREAD_ENTRY(collector_thread, args);
 
 int	init_collector_data(char **error);
 void	free_collector_data(void);

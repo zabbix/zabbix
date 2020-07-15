@@ -58,7 +58,8 @@ class CDashboardElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getWidgets() {
-		return $this->query('class:dashbrd-grid-widget')->asWidget()->all();
+		return $this->query("xpath:.//div[".CXPathHelper::fromClass("dashbrd-grid-widget").
+				" or ".CXPathHelper::fromClass("dashbrd-grid-iterator")."]")->asWidget()->all();
 	}
 
 	/**
@@ -70,7 +71,8 @@ class CDashboardElement extends CElement {
 	 * @return CWidgetElement|CNullElement
 	 */
 	public function getWidget($name, $should_exist = true) {
-		$query = $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
+		$query = $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
+				' contains(@class, "dashbrd-grid-iterator-head")]/h4[text()='.
 				CXPathHelper::escapeQuotes($name).']/../../..');
 
 		if ($should_exist) {
@@ -117,8 +119,8 @@ class CDashboardElement extends CElement {
 	 * @return COverlayDialogElement
 	 */
 	public function addWidget() {
-		$controls = $this->getControls();
-		$controls->query('id:dashbrd-add-widget')->one()->click();
+		$this->checkIfEditable();
+		$this->getControls()->query('id:dashbrd-add-widget')->one()->click();
 
 		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
 				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
@@ -162,13 +164,89 @@ class CDashboardElement extends CElement {
 
 	/**
 	 * Delete widget with the provided name.
+	 * Dashboard should be in editing mode.
+	 *
+	 * @param string $name    name of widget to be deleted
+	 *
+	 * @return $this
+	 */
+	public function deleteWidget($name) {
+		$this->checkIfEditable();
+		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or contains(@class,'.
+				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
+				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Delete')->waitUntilNotVisible();
+
+
+		return $this;
+	}
+
+	/**
+	 * Copy widget with the provided name.
+	 *
+	 * @param string $name    name of widget to be copied
+	 *
+	 * @return $this
+	 */
+	public function copyWidget($name) {
+		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or contains(@class,'.
+				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
+				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Copy');
+
+		return $this;
+	}
+
+	/**
+	 * Paste copied widget.
+	 * Dashboard should be in editing mode.
+	 *
+	 * @return $this
+	 */
+	public function pasteWidget() {
+		$this->checkIfEditable();
+		$this->getControls()->query('id:dashbrd-paste-widget')->one()->waitUntilClickable()->click(true);
+
+		return $this;
+	}
+
+	/**
+	 * Replace widget with the provided name to previously copied widget.
+	 * Dashboard should be in editing mode.
+	 *
+	 * @param string $name    name of widget to be replaced
+	 *
+	 * @return $this
+	 */
+	public function replaceWidget($name) {
+		$this->checkIfEditable();
+
+		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or contains(@class,'.
+				' "dashbrd-grid-iterator-head")]/h4[text()="'.$name.
+				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Paste');
+
+		return $this;
+	}
+
+	/**
+	 * Checking Dashboard controls state.
+	 *
+	 * @param boolean $editable    editable state of dashboard
 	 *
 	 * @return boolean
 	 */
-	public function deleteWidget($name) {
-		$this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()="'.$name.
-				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Delete')->waitUntilNotVisible();
+	public function isEditable($editable = true) {
+		return $this->getControls()->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed($editable);
+	}
 
-		return $this;
+	/**
+	 * Checking that Dashboard is in edit mode.
+	 *
+	 * @param boolean $editable    editable state of dashboard
+	 *
+	 * @throws \Exception
+	 */
+	public function checkIfEditable($editable = true) {
+		if ($this->isEditable($editable) === false) {
+			throw new \Exception('Dashboard is'.($editable ? ' not' : '').' in editing mode.');
+		}
 	}
 }

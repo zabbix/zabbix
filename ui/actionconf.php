@@ -65,7 +65,6 @@ $fields = [
 	'edit_ack_operationid' =>			[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	'new_ack_operation' =>				[null,		O_OPT,	null,	null,		null],
 	'opconditions' =>					[null,		O_OPT,	null,	null,		null],
-	'new_opcondition' =>				[null,		O_OPT,	null,	null,		'isset({add_opcondition})'],
 	// actions
 	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 											IN('"action.massdelete","action.massdisable","action.massenable"'),
@@ -76,7 +75,6 @@ $fields = [
 	'add_operation' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_recovery_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_ack_operation' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_opcondition' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'pause_suppressed' =>				[T_ZBX_STR, O_OPT, null,
 											IN([ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]),
 											null,
@@ -247,28 +245,6 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 		}
 
 		$_REQUEST['conditions'] = $conditions;
-	}
-}
-elseif (hasRequest('add_opcondition') && hasRequest('new_opcondition')) {
-	$new_opcondition = getRequest('new_opcondition');
-
-	try {
-		CAction::validateOperationConditions($new_opcondition);
-		$new_operation = getRequest('new_operation', []);
-
-		if (!isset($new_operation['opconditions'])) {
-			$new_operation['opconditions'] = [];
-		}
-		if (!str_in_array($new_opcondition, $new_operation['opconditions'])) {
-			array_push($new_operation['opconditions'], $new_opcondition);
-		}
-
-		$_REQUEST['new_operation'] = $new_operation;
-
-		unset($_REQUEST['new_opcondition']);
-	}
-	catch (APIException $e) {
-		error($e->getMessage());
 	}
 }
 elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
@@ -443,7 +419,7 @@ $config = select_config();
 if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
-		'actionid' => getRequest('actionid'),
+		'actionid' => getRequest('actionid', '0'),
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
 		'new_recovery_operation' => getRequest('new_recovery_operation'),

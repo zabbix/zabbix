@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2020-06-04T17:53:49Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -11,12 +11,7 @@
       <template>
          <template>Template Module Linux block devices by Zabbix agent</template>
          <name>Template Module Linux block devices by Zabbix agent</name>
-         <description>Known Issues:&#13;
-&#13;
-  Description: If having problems accessing /proc/diskstats on CloudLinux, please read this https://docs.cloudlinux.com/cloudlinux_os_kernel/#virtualized-proc-filesystem.&#13;
-  Device: CloudLinux&#13;
-&#13;
-Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -30,53 +25,30 @@ Template tooling version used: 0.34</description>
                <name>Zabbix raw items</name>
             </application>
          </applications>
-         <items>
-            <item>
-               <name>Get /proc/diskstats</name>
-               <key>vfs.file.contents[/proc/diskstats]</key>
-               <history>1h</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>Get contents of /proc/diskstats for discovery and disk stats.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-               <preprocessing>
-                  <step>
-                     <type>JAVASCRIPT</type>
-                     <params>var parsed = value.split("\n").reduce(function(acc, x, i) {
-  parts = x.trim().split(/ +/)
-  acc["values"][parts[2]] = parts
-  acc["lld"].push({"{#DEVNAME}":parts[2]})
-  return acc;
-}, {"values":{}, "lld": []});
-
-return JSON.stringify(parsed);</params>
-                  </step>
-               </preprocessing>
-            </item>
-         </items>
          <discovery_rules>
             <discovery_rule>
                <name>Block devices discovery</name>
-               <type>DEPENDENT</type>
+               <type>ZABBIX_PASSIVE</type>
                <key>vfs.dev.discovery</key>
-               <delay>0</delay>
+               <delay>1h</delay>
                <filter>
                   <evaltype>AND</evaltype>
                   <conditions>
                      <condition>
+                        <macro>{#DEVTYPE}</macro>
+                        <value>disk</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
                         <macro>{#DEVNAME}</macro>
                         <value>{$VFS.DEV.DEVNAME.MATCHES}</value>
-                        <formulaid>A</formulaid>
+                        <formulaid>B</formulaid>
                      </condition>
                      <condition>
                         <macro>{#DEVNAME}</macro>
                         <value>{$VFS.DEV.DEVNAME.NOT_MATCHES}</value>
                         <operator>NOT_MATCHES_REGEX</operator>
-                        <formulaid>B</formulaid>
+                        <formulaid>C</formulaid>
                      </condition>
                   </conditions>
                </filter>
@@ -97,7 +69,7 @@ return JSON.stringify(parsed);</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.values['{#DEVNAME}'][13]</params>
+                           <params>$[10]</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -109,7 +81,7 @@ return JSON.stringify(parsed);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>vfs.file.contents[/proc/diskstats]</key>
+                        <key>vfs.file.contents[/sys/block/{#DEVNAME}/stat]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -144,7 +116,7 @@ return JSON.stringify(parsed);</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.values['{#DEVNAME}'][3]</params>
+                           <params>$[0]</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -152,7 +124,7 @@ return JSON.stringify(parsed);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>vfs.file.contents[/proc/diskstats]</key>
+                        <key>vfs.file.contents[/sys/block/{#DEVNAME}/stat]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -171,7 +143,7 @@ return JSON.stringify(parsed);</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.values['{#DEVNAME}'][6]</params>
+                           <params>$[3]</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -183,7 +155,7 @@ return JSON.stringify(parsed);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>vfs.file.contents[/proc/diskstats]</key>
+                        <key>vfs.file.contents[/sys/block/{#DEVNAME}/stat]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -203,7 +175,7 @@ return JSON.stringify(parsed);</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.values['{#DEVNAME}'][12]</params>
+                           <params>$[9]</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -215,7 +187,7 @@ return JSON.stringify(parsed);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>vfs.file.contents[/proc/diskstats]</key>
+                        <key>vfs.file.contents[/sys/block/{#DEVNAME}/stat]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -250,7 +222,7 @@ return JSON.stringify(parsed);</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.values['{#DEVNAME}'][7]</params>
+                           <params>$[4]</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -258,7 +230,7 @@ return JSON.stringify(parsed);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>vfs.file.contents[/proc/diskstats]</key>
+                        <key>vfs.file.contents[/sys/block/{#DEVNAME}/stat]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -277,7 +249,7 @@ return JSON.stringify(parsed);</params>
                      <preprocessing>
                         <step>
                            <type>JSONPATH</type>
-                           <params>$.values['{#DEVNAME}'][10]</params>
+                           <params>$[7]</params>
                         </step>
                         <step>
                            <type>CHANGE_PER_SECOND</type>
@@ -289,8 +261,27 @@ return JSON.stringify(parsed);</params>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>vfs.file.contents[/proc/diskstats]</key>
+                        <key>vfs.file.contents[/sys/block/{#DEVNAME}/stat]</key>
                      </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DEVNAME}: Get stats</name>
+                     <key>vfs.file.contents[/sys/block/{#DEVNAME}/stat]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>Get contents of /sys/block/{#DEVNAME}/stat for disk stats.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JAVASCRIPT</type>
+                           <params>return JSON.stringify(value.trim().split(/ +/));</params>
+                        </step>
+                     </preprocessing>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
@@ -368,14 +359,7 @@ return JSON.stringify(parsed);</params>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
-               <master_item>
-                  <key>vfs.file.contents[/proc/diskstats]</key>
-               </master_item>
                <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$.lld</params>
-                  </step>
                   <step>
                      <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>1h</params>
@@ -409,7 +393,7 @@ return JSON.stringify(parsed);</params>
       <template>
          <template>Template Module Linux CPU by Zabbix agent</template>
          <name>Template Module Linux CPU by Zabbix agent</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -692,7 +676,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
       <template>
          <template>Template Module Linux filesystems by Zabbix agent</template>
          <name>Template Module Linux filesystems by Zabbix agent</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -918,7 +902,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux generic by Zabbix agent</template>
          <name>Template Module Linux generic by Zabbix agent</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1269,7 +1253,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
       <template>
          <template>Template Module Linux memory by Zabbix agent</template>
          <name>Template Module Linux memory by Zabbix agent</name>
-         <description>Template tooling version used: 0.34</description>
+         <description>Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1331,8 +1315,35 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                </applications>
             </item>
             <item>
-               <name>Memory utilization</name>
+               <name>Available memory in %</name>
                <key>vm.memory.size[pavailable]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Available memory as percentage of total. See also: https://www.zabbix.com/documentation/current/manual/appendix/items/vm.memory.size_params</description>
+               <applications>
+                  <application>
+                     <name>Memory</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Total memory</name>
+               <key>vm.memory.size[total]</key>
+               <history>7d</history>
+               <units>B</units>
+               <description>Total memory in Bytes</description>
+               <applications>
+                  <application>
+                     <name>Memory</name>
+                  </application>
+               </applications>
+            </item>
+            <item>
+               <name>Memory utilization</name>
+               <type>DEPENDENT</type>
+               <key>vm.memory.utilization</key>
+               <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
@@ -1348,6 +1359,9 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <params>return (100-value);</params>
                   </step>
                </preprocessing>
+               <master_item>
+                  <key>vm.memory.size[pavailable]</key>
+               </master_item>
                <triggers>
                   <trigger>
                      <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
@@ -1362,18 +1376,6 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      </dependencies>
                   </trigger>
                </triggers>
-            </item>
-            <item>
-               <name>Total memory</name>
-               <key>vm.memory.size[total]</key>
-               <history>7d</history>
-               <units>B</units>
-               <description>Total memory in Bytes</description>
-               <applications>
-                  <application>
-                     <name>Memory</name>
-                  </application>
-               </applications>
             </item>
          </items>
          <macros>
@@ -1400,7 +1402,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
 &#13;
   Description: High interface utilization trigger is removed since currently it is not possible to retrieve interface speed to determine the max bandwidth.&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.36</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -1596,7 +1598,7 @@ return newvalue;</params>
                         <trigger_prototype>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                            <name>Interface {#IFNAME}: Link down</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
@@ -1655,7 +1657,7 @@ and&#13;
                         <dependency>
                            <name>Interface {#IFNAME}: Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1674,7 +1676,7 @@ and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNA
                         <dependency>
                            <name>Interface {#IFNAME}: Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1773,7 +1775,7 @@ and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNA
                         <name>Interface {#IFNAME}: Network traffic</name>
                         <host>Template Module Linux network interfaces by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1803,7 +1805,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.36</description>
          <templates>
             <template>
                <name>Template Module Linux block devices by Zabbix agent</name>
@@ -1845,7 +1847,7 @@ Template tooling version used: 0.34</description>
                         <name>System load</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1867,7 +1869,7 @@ Template tooling version used: 0.34</description>
                         <name>CPU usage</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1889,7 +1891,7 @@ Template tooling version used: 0.34</description>
                         <name>Memory usage</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1911,7 +1913,7 @@ Template tooling version used: 0.34</description>
                         <name>Swap usage</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1933,7 +1935,7 @@ Template tooling version used: 0.34</description>
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1955,7 +1957,7 @@ Template tooling version used: 0.34</description>
                         <name>{#DEVNAME}: Disk read/write rates</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>3</y>
@@ -1977,7 +1979,7 @@ Template tooling version used: 0.34</description>
                         <name>{#DEVNAME}: Disk average waiting time</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>4</y>
@@ -1999,7 +2001,7 @@ Template tooling version used: 0.34</description>
                         <name>{#DEVNAME}: Disk utilization and queue</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>5</y>
@@ -2021,7 +2023,7 @@ Template tooling version used: 0.34</description>
                         <name>Interface {#IFNAME}: Network traffic</name>
                         <host>Template OS Linux by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>6</y>
@@ -2057,7 +2059,7 @@ Template tooling version used: 0.34</description>
          <dependencies>
             <dependency>
                <name>High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
-               <expression>{Template Module Linux memory by Zabbix agent:vm.memory.size[pavailable].min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
+               <expression>{Template Module Linux memory by Zabbix agent:vm.memory.utilization.min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
             </dependency>
             <dependency>
                <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
@@ -2229,7 +2231,7 @@ and {Template Module Linux CPU by Zabbix agent:system.cpu.load[all,avg15].last()
                <color>1A7C11</color>
                <item>
                   <host>Template Module Linux memory by Zabbix agent</host>
-                  <key>vm.memory.size[pavailable]</key>
+                  <key>vm.memory.utilization</key>
                </item>
             </graph_item>
          </graph_items>

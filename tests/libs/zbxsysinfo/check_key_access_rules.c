@@ -60,7 +60,7 @@ void	zbx_mock_test_entry(void **state)
 		type = zbx_mock_get_object_member_string(hrule, "type");
 		pattern = zbx_mock_get_object_member_string(hrule, "pattern");
 
-		if (SUCCEED != add_key_access_rule(pattern, zbx_mock_str_to_key_access_type(type)))
+		if (SUCCEED != add_key_access_rule("key", (char *)pattern, zbx_mock_str_to_key_access_type(type)))
 		{
 			free_key_access_rules();
 			fail_msg("Bad key access rule definition");

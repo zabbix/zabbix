@@ -24,7 +24,6 @@
  */
 insert_javascript_for_visibilitybox();
 ?>
-
 <script type="text/x-jquery-tmpl" id="lldoverride-row-templated">
 	<?= (new CRow([
 			'',
@@ -39,7 +38,6 @@ insert_javascript_for_visibilitybox();
 		]))->toString()
 	?>
 </script>
-
 <script type="text/x-jquery-tmpl" id="lldoverride-row">
 	<?= (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
@@ -62,7 +60,6 @@ insert_javascript_for_visibilitybox();
 			->toString()
 	?>
 </script>
-
 <script type="text/x-jquery-tmpl" id="override-filters-row">
 	<?=
 		(new CRow([[
@@ -94,7 +91,6 @@ insert_javascript_for_visibilitybox();
 			->toString()
 	?>
 </script>
-
 <script type="text/x-jquery-tmpl" id="lldoverride-operation-row-templated">
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
@@ -102,12 +98,11 @@ insert_javascript_for_visibilitybox();
 				(new CButton(null, _('View')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-open')
-					->onClick("lldoverrides.operations.open(#{no});")
+					->onClick('lldoverrides.operations.open(#{no});')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()
 	?>
 </script>
-
 <script type="text/x-jquery-tmpl" id="lldoverride-operation-row">
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
@@ -115,7 +110,7 @@ insert_javascript_for_visibilitybox();
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-open')
-					->onClick("lldoverrides.operations.open(#{no});"),
+					->onClick('lldoverrides.operations.open(#{no});'),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
@@ -123,7 +118,6 @@ insert_javascript_for_visibilitybox();
 		]))->toString()
 	?>
 </script>
-
 <script type="text/x-jquery-tmpl" id="lldoverride-custom-intervals-row">
 	<?= (new CRow([
 			(new CRadioButtonList('opperiod[delay_flex][#{rowNum}][type]', 0))
@@ -147,11 +141,9 @@ insert_javascript_for_visibilitybox();
 			->toString()
 	?>
 </script>
-
 <script type="text/x-jquery-tmpl" id="lldoverride-tag-row">
 	<?= renderTagTableRow('#{rowNum}', '', '', ['field_name' => 'optag', 'add_post_js' => false]) ?>
 </script>
-
 <script type="text/javascript">
 	jQuery(function($) {
 		window.lldoverrides = {
@@ -185,9 +177,12 @@ insert_javascript_for_visibilitybox();
 			: '#lldoverride-operation-row'
 		).html());
 
-		window.lldoverrides.overrides = new Overrides($('#overridesTab'), <?= json_encode(array_values($data['overrides'])) ?>);
+		window.lldoverrides.overrides = new Overrides($('#overridesTab'),
+			<?= json_encode(array_values($data['overrides'])) ?>
+		);
 		window.lldoverrides.actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity',
-			'optag', 'optemplate', 'opinventory'];
+			'optag', 'optemplate', 'opinventory'
+		];
 
 		window.lldoverrides.$form = $('form[name="itemForm"]').on('submit', function(e) {
 			var hidden_form = this.querySelector('#hidden-form');
@@ -263,9 +258,9 @@ insert_javascript_for_visibilitybox();
 	 *
 	 * @param {string} name
 	 * @param {string} value
-	 * @param {string?} prefix
+	 * @param {string} prefix
 	 *
-	 * @return {Node}
+	 * @return {object}  Return input element node.
 	 */
 	function hiddenInput(name, value, prefix) {
 		var input = window.document.createElement('input');
@@ -278,9 +273,9 @@ insert_javascript_for_visibilitybox();
 	}
 
 	/**
-	 * @param {jQuery} $element
-	 * @param {Object} options
-	 * @param {Array} data
+	 * @param {object} $element
+	 * @param {object} options
+	 * @param {array}  data
 	 */
 	function DynamicRows($element, options, data) {
 		if (!(options.add_before instanceof Node)) {
@@ -311,7 +306,7 @@ insert_javascript_for_visibilitybox();
 	 * @param {string} evt_key
 	 * @param {object} evt_data  Optional object to be merged into event data.
 	 *
-	 * @return {jQuery.Event}
+	 * @return {object}  Returns a jQuery.Event object.
 	 */
 	DynamicRows.prototype.dispatch = function(evt_key, evt_data) {
 		var evt = jQuery.Event('dynamic_rows.' + evt_key, evt_data);
@@ -324,9 +319,9 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * Adds a row before the given row.
 	 *
-	 * @param {object} data          Data to be passed into template.
-	 * @param {integer?} data_index  Optional index, if data with given index exists, then in place update will happen.
-	 *                               In case of update all events dispatched as if add new was performed.
+	 * @param {object} data        Data to be passed into template.
+	 * @param {number} data_index  Optional index, if data with given index exists, then in place update will happen.
+	 *                             In case of update all events dispatched as if add new was performed.
 	 */
 	DynamicRows.prototype.addRow = function(row_data, data_index) {
 		if (this.options.disabled) {
@@ -360,7 +355,7 @@ insert_javascript_for_visibilitybox();
 		}
 		else {
 			evt_before_add.add_before.parentNode.insertBefore(evt_before_add.new_node, evt_before_add.add_before);
-			this.length ++;
+			this.length++;
 		}
 
 		this.data[data_index] = new_row;
@@ -375,7 +370,7 @@ insert_javascript_for_visibilitybox();
 	*
 	* @param {array} data  Array of data for row templates.
 	*
-	* @return {DynamicRows}
+	* @return {object}  Returns the DynamicRows object.
 	*/
 	DynamicRows.prototype.setData = function(data) {
 		if (!(data  instanceof Array)) {
@@ -411,7 +406,7 @@ insert_javascript_for_visibilitybox();
 	 *
 	 * @param {object} data  Data to be passed into template.
 	 *
-	 * @return {Node}
+	 * @return {object}
 	 */
 	DynamicRows.prototype.createRowNode = function(data) {
 		var evt = this.dispatch('beforerender', {view_data: data});
@@ -424,7 +419,7 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * Removes data at given index. Method is to be used by plugin internally, does not dispatch events.
 	 *
-	 * @param {int} data_index
+	 * @param {number} data_index
 	 *
 	 * @return {object}  Object that just got removed.
 	 */
@@ -433,7 +428,7 @@ insert_javascript_for_visibilitybox();
 		var ref = this.data[data_index];
 
 		delete this.data[data_index];
-		this.length --;
+		this.length--;
 
 		return ref;
 	}
@@ -441,7 +436,7 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * Removes the given row.
 	 *
-	 * @param {int} data_index
+	 * @param {number} data_index
 	 */
 	DynamicRows.prototype.removeRow = function(data_index) {
 		if (this.options.disabled) {
@@ -459,7 +454,7 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * Represents overrides tab in discovery rules layout.
 	 *
-	 * @param {jQuery} $tab
+	 * @param {object} $tab
 	 * @param {array}  overrides  Initial overrides objects data array.
 	 */
 	function Overrides($tab, overrides) {
@@ -507,7 +502,7 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * The parts of form that are easier to maintain in functional objects are transformed into hidden input fields.
 	 *
-	 * @return {DocumentFragment}
+	 * @return {object}  Returns DocumentFragment object.
 	 */
 	Overrides.prototype.toFragment = function() {
 		var frag = document.createDocumentFragment(),
@@ -515,33 +510,33 @@ insert_javascript_for_visibilitybox();
 
 		this.sort_index.forEach(function(id) {
 			var override = this.data[id],
-				prefix_override = 'overrides[' + (iter_step ++) + ']',
+				prefix_override = 'overrides[' + (iter_step++) + ']',
 				prefix_filter = prefix_override + '[filter]',
 				iter_filters = 0,
 				iter_operations = 0;
 
-			frag.appendChild(hiddenInput('step',     iter_step,                        prefix_override));
-			frag.appendChild(hiddenInput('name',     override.data.name,               prefix_override));
-			frag.appendChild(hiddenInput('stop',     override.data.stop,               prefix_override));
+			frag.appendChild(hiddenInput('step', iter_step, prefix_override));
+			frag.appendChild(hiddenInput('name', override.data.name, prefix_override));
+			frag.appendChild(hiddenInput('stop', override.data.stop, prefix_override));
 
 			if (override.data.overrides_filters.length > 0) {
 				frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
 
 				if (override.data.overrides_evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
-					frag.appendChild(hiddenInput('formula',  override.data.overrides_formula,  prefix_filter));
+					frag.appendChild(hiddenInput('formula', override.data.overrides_formula, prefix_filter));
 				}
 
 				override.data.overrides_filters.forEach(function(override_filter) {
-					var prefix = prefix_filter + '[conditions][' + (iter_filters ++) + ']';
+					var prefix = prefix_filter + '[conditions][' + (iter_filters++) + ']';
 					frag.appendChild(hiddenInput('formulaid', override_filter.formulaid, prefix));
-					frag.appendChild(hiddenInput('macro',     override_filter.macro,     prefix));
-					frag.appendChild(hiddenInput('value',     override_filter.value,     prefix));
-					frag.appendChild(hiddenInput('operator',  override_filter.operator,  prefix));
+					frag.appendChild(hiddenInput('macro', override_filter.macro, prefix));
+					frag.appendChild(hiddenInput('value', override_filter.value, prefix));
+					frag.appendChild(hiddenInput('operator', override_filter.operator, prefix));
 				});
 			}
 
 			override.data.operations.forEach(function(operation) {
-				var prefix = prefix_override + '[operations][' + (iter_operations ++) + ']';
+				var prefix = prefix_override + '[operations][' + (iter_operations++) + ']';
 				frag.appendChild(hiddenInput('operationobject', operation.operationobject, prefix));
 				frag.appendChild(hiddenInput('operator', operation.operator, prefix));
 				frag.appendChild(hiddenInput('value', operation.value, prefix));
@@ -568,7 +563,7 @@ insert_javascript_for_visibilitybox();
 					var iter_tags = 0;
 
 					operation.optag.forEach(function(tag) {
-						var prefix_tag = prefix + '[optag][' + (iter_tags ++) + ']';
+						var prefix_tag = prefix + '[optag][' + (iter_tags++) + ']';
 						frag.appendChild(hiddenInput('tag', tag.tag, prefix_tag));
 
 						if (('value' in tag) && 'value' !== '') {
@@ -580,12 +575,14 @@ insert_javascript_for_visibilitybox();
 					var iter_templates = 0;
 
 					operation.optemplate.forEach(function(template) {
-						var prefix_template = prefix + '[optemplate][' + (iter_templates ++) + ']';
+						var prefix_template = prefix + '[optemplate][' + (iter_templates++) + ']';
 						frag.appendChild(hiddenInput('templateid', template.templateid, prefix_template));
 					});
 				}
 				if ('opinventory' in operation) {
-					frag.appendChild(hiddenInput('inventory_mode', operation.opinventory.inventory_mode, prefix + '[opinventory]'));
+					frag.appendChild(hiddenInput('inventory_mode', operation.opinventory.inventory_mode,
+						prefix + '[opinventory]'
+					));
 				}
 			});
 		}.bind(this));
@@ -624,7 +621,7 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * This method hydrates the parsed html PopUp form with data from specific override.
 	 *
-	 * @param {int} no  Override index.
+	 * @param {number} no  Override index.
 	 */
 	Overrides.prototype.onStepOverlayReadyCb = function(no) {
 		var override_ref = this.data[no] ? this.data[no] : this.new_override;
@@ -655,11 +652,10 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * Opens popup for a override.
 	 *
-	 * @param {integer} no
+	 * @param {number} no
 	 */
 	Overrides.prototype.open = function(no) {
-		this.data[no]
-			.open(no, this.$container.find('[data-index="' + no + '"] a'));
+		this.data[no].open(no, this.$container.find('[data-index="' + no + '"] a'));
 	};
 
 	/**
@@ -686,8 +682,10 @@ insert_javascript_for_visibilitybox();
 		this.data.overrides_filters = this.data.filter.conditions;
 		delete this.data.filter;
 
-		// Used to add propper letter, when creating new dynamic row for filter. If no filters are configured,
-		// one empty row is created by View.
+		/*
+		 * Used to add propper letter, when creating new dynamic row for filter. If no filters are configured,
+		 * one empty row is created by View.
+		 */
 		this.filter_counter = (this.data.overrides_filters.length > 0) ? this.data.overrides_filters.length : 1;
 	}
 
@@ -702,8 +700,8 @@ insert_javascript_for_visibilitybox();
 	 * Opens override popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {int}  step     Override index.
-	 * @param {Node} refocus  A node to set focus to, when popup is closed.
+	 * @param {number} step     Override index.
+	 * @param {object} refocus  A node to set focus to, when popup is closed.
 	 */
 	Override.prototype.open = function(no, refocus) {
 		return PopUp('popup.lldoverride', {
@@ -723,8 +721,8 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * Represents popup form.
 	 *
-	 * @param {jQuery} $form
-	 * @param {Override} override_ref  Reference to override instance from Overrides object.
+	 * @param {object} $form
+	 * @param {object} override_ref  Reference to override instance from Overrides object.
 	 */
 	function OverrideEditForm($form, override_ref) {
 		this.$form = $form;
@@ -791,6 +789,8 @@ insert_javascript_for_visibilitybox();
 			if (!show_formula) {
 				that.updateExpression();
 			}
+
+			overlays_stack.end().centerDialog();
 		});
 
 		jQuery('#overrides_evaltype').trigger('change');
@@ -800,7 +800,7 @@ insert_javascript_for_visibilitybox();
 	 * This method is bound via popup button attribute. It posts serialized version of current form to be validated.
 	 * Note that we do not bother posting dynamic fields, since they are not validated at this point.
 	 *
-	 * @param {Overlay} overlay
+	 * @param {object} overlay
 	 */
 	OverrideEditForm.prototype.validate = function(overlay) {
 		var url = new Curl(this.$form.attr('action'));
@@ -930,7 +930,7 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * This method hydrates the parsed html PopUp form with data from specific override.
 	 *
-	 * @param {int} no  Override index.
+	 * @param {number} no  Override index.
 	 */
 	Operations.prototype.onOperationOverlayReadyCb = function(no) {
 		var operation_ref = this.data[no] ? this.data[no] : this.new_operation;
@@ -959,11 +959,10 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * Opens popup for a override.
 	 *
-	 * @param {integer} no
+	 * @param {number} no
 	 */
 	Operations.prototype.open = function(no) {
-		this.data[no]
-			.open(no, this.$container.find('[data-index="' + no + '"] .element-table-open'));
+		this.data[no].open(no, this.$container.find('[data-index="' + no + '"] .element-table-open'));
 	};
 
 	function Operation(data, no) {
@@ -982,8 +981,8 @@ insert_javascript_for_visibilitybox();
 	 * Opens override popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {int}  step     Override index.
-	 * @param {Node} refocus  A node to set focus to, when popup is closed.
+	 * @param {number}  step     Override index.
+	 * @param {object}  refocus  A node to set focus to, when popup is closed.
 	 */
 	Operation.prototype.open = function(no, refocus) {
 		var params = {
@@ -1006,16 +1005,16 @@ insert_javascript_for_visibilitybox();
 	/**
 	 * Represents popup form.
 	 *
-	 * @param {jQuery} $form
-	 * @param {Operation} operation_ref  Reference to override instance from Overrides object.
+	 * @param {object} $form
+	 * @param {object} operation_ref  Reference to override instance from Overrides object.
 	 */
 	function OperationEditForm($form, operation_ref) {
 		this.$form = $form;
 		this.operation = operation_ref;
 
-		var that = this;
+		var that = this,
+			$custom_intervals = jQuery('#lld_overrides_custom_intervals', this.$form);
 
-		var $custom_intervals = jQuery('#lld_overrides_custom_intervals', this.$form);
 		$custom_intervals.on('click', 'input[type="radio"]', function() {
 			var rowNum = jQuery(this).attr('id').split('_')[3];
 
@@ -1072,7 +1071,7 @@ insert_javascript_for_visibilitybox();
 			'<?= OPERATION_OBJECT_HOST_PROTOTYPE ?>': ['opstatus', 'opdiscover', 'optemplate', 'opinventory']
 		};
 
-		jQuery('#operation_object', this.$form)
+		jQuery('#operationobject', this.$form)
 			.change(function() {
 				window.lldoverrides.actions.forEach(function(action) {
 					if (available_actions[this.value].indexOf(action) !== -1) {
@@ -1086,16 +1085,16 @@ insert_javascript_for_visibilitybox();
 	};
 
 	OperationEditForm.prototype.initHideActionRows = function() {
-		jQuery('#operation_object', this.$form).trigger('change');
+		jQuery('#operationobject', this.$form).trigger('change');
 	};
 
 	OperationEditForm.prototype.showActionRow = function(row_id) {
 		var obj = document.getElementById(row_id);
 		if (is_null(obj)) {
-			throw "Cannot find action row with id [" + row_id +"]";
+			throw 'Cannot find action row with id [' + row_id + ']';
 		}
 
-		// I need to show it only, if it was previously hidden.
+		// Show it only if it was previously hidden.
 		if (obj.originalObject) {
 			obj.parentNode.replaceChild(obj.originalObject, obj);
 		}
@@ -1104,17 +1103,17 @@ insert_javascript_for_visibilitybox();
 	OperationEditForm.prototype.hideActionRow = function(row_id) {
 		var obj = document.getElementById(row_id);
 		if (is_null(obj)) {
-			throw "Cannot find action row with id [" + row_id +"]";
+			throw 'Cannot find action row with id [' + row_id +']';
 		}
 
-		// I need to hide it only, if it was previously visible.
+		// Hide it only if it was previously visible.
 		if (!('originalObject' in obj)) {
 			try {
-				var new_obj = document.createElement("li");
-				new_obj.setAttribute("id", obj.id);
+				var new_obj = document.createElement('li');
+				new_obj.setAttribute('id', obj.id);
 			}
 			catch(e) {
-				throw "Cannot create new element";
+				throw 'Cannot create new element';
 			}
 
 			new_obj.originalObject = obj;
@@ -1126,7 +1125,7 @@ insert_javascript_for_visibilitybox();
 	 * This method is bound via popup button attribute. It posts serialized version of current form to be validated.
 	 * Note that we do not bother posting dynamic fields, since they are not validated at this point.
 	 *
-	 * @param {Overlay} overlay
+	 * @param {object} overlay
 	 */
 	OperationEditForm.prototype.validate = function(overlay) {
 		var url = new Curl(this.$form.attr('action'));

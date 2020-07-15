@@ -129,7 +129,7 @@ class CNewValidator {
 
 				case 'int32':
 					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !$this->is_int32($this->input[$field])) {
+						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])) {
 							$this->addError($fatal,
 								is_scalar($this->input[$field])
 									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
@@ -142,7 +142,7 @@ class CNewValidator {
 
 				case 'id':
 					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !$this->is_id($this->input[$field])) {
+						if (!is_string($this->input[$field]) || !self::is_id($this->input[$field])) {
 							$this->addError($fatal,
 								is_scalar($this->input[$field])
 									? _s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
@@ -208,7 +208,7 @@ class CNewValidator {
 				 */
 				case 'ge':
 					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !$this->is_int32($this->input[$field])
+						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])
 								|| $this->input[$field] < $params) {
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
@@ -224,7 +224,7 @@ class CNewValidator {
 				 */
 				case 'le':
 					if (array_key_exists($field, $this->input)) {
-						if (!is_string($this->input[$field]) || !$this->is_int32($this->input[$field])
+						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])
 								|| $this->input[$field] > $params) {
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
@@ -330,7 +330,7 @@ class CNewValidator {
 		return true;
 	}
 
-	private function is_id($value) {
+	public static function is_id($value) {
 		if (!preg_match('/^'.ZBX_PREG_INT.'$/', $value)) {
 			return false;
 		}
@@ -368,10 +368,10 @@ class CNewValidator {
 	private function check_db_value($field_schema, &$value, $flags) {
 		switch ($field_schema['type']) {
 			case DB::FIELD_TYPE_ID:
-				return $this->is_id($value);
+				return self::is_id($value);
 
 			case DB::FIELD_TYPE_INT:
-				return $this->is_int32($value);
+				return self::is_int32($value);
 
 			case DB::FIELD_TYPE_CHAR:
 				if ($flags & P_CRLF) {
@@ -396,7 +396,7 @@ class CNewValidator {
 
 	private function is_array_id(array $values) {
 		foreach ($values as $value) {
-			if (!is_string($value) || !$this->is_id($value)) {
+			if (!is_string($value) || !self::is_id($value)) {
 				return false;
 			}
 		}

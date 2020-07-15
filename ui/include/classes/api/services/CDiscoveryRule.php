@@ -511,98 +511,50 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Delete DiscoveryRules.
 	 *
 	 * @param array $ruleids
-	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $ruleids, $nopermissions = false) {
-		if (empty($ruleids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	public function delete(array $ruleids) {
+		$this->validateDelete($ruleids);
+
+		CDiscoveryRuleManager::delete($ruleids);
+
+		return ['ruleids' => $ruleids];
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $ruleids   [IN/OUT]
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateDelete(array &$ruleids) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $ruleids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$ruleids = array_keys(array_flip($ruleids));
-
-		$delRules = $this->get([
-			'output' => API_OUTPUT_EXTEND,
+		$db_rules = $this->get([
+			'output' => ['templateid'],
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		// TODO: remove $nopermissions hack
-		if (!$nopermissions) {
-			foreach ($ruleids as $ruleid) {
-				if (!isset($delRules[$ruleid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-				}
-				if ($delRules[$ruleid]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
-				}
-			}
-		}
-
-		// get child discovery rules
-		$parentItemids = $ruleids;
-		$childTuleids = [];
-		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
-			$parentItemids = [];
-			while ($dbItem = DBfetch($dbItems)) {
-				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
-				$childTuleids[$dbItem['itemid']] = $dbItem['itemid'];
-			}
-		} while (!empty($parentItemids));
-
-		$delRulesChildren = $this->get([
-			'output' => API_OUTPUT_EXTEND,
-			'itemids' => $childTuleids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-
-		$delRules = array_merge($delRules, $delRulesChildren);
-		$ruleids = array_merge($ruleids, $childTuleids);
-
-		$iprototypeids = [];
-		$dbItems = DBselect(
-			'SELECT i.itemid'.
-			' FROM item_discovery id,items i'.
-			' WHERE i.itemid=id.itemid'.
-				' AND '.dbConditionInt('parent_itemid', $ruleids)
-		);
-		while ($item = DBfetch($dbItems)) {
-			$iprototypeids[$item['itemid']] = $item['itemid'];
-		}
-		if ($iprototypeids) {
-			CItemPrototypeManager::delete($iprototypeids);
-		}
-
-		// delete host prototypes
-		$hostPrototypeIds = DBfetchColumn(DBselect(
-			'SELECT hd.hostid'.
-			' FROM host_discovery hd'.
-			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
-		), 'hostid');
-		if ($hostPrototypeIds) {
-			if (!API::HostPrototype()->delete($hostPrototypeIds, true)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
-			}
-		}
-
-		// delete LLD rules
-		DB::delete('items', ['itemid' => $ruleids]);
-
-		$insert = [];
 		foreach ($ruleids as $ruleid) {
-			$insert[] = [
-				'tablename' => 'events',
-				'field' => 'lldruleid',
-				'value' => $ruleid
-			];
-		}
-		DB::insertBatch('housekeeper', $insert);
+			if (!array_key_exists($ruleid, $db_rules)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 
-		return ['ruleids' => $ruleids];
+			$db_rule = $db_rules[$ruleid];
+
+			if ($db_rule['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
+			}
+		}
 	}
 
 	/**
@@ -1040,8 +992,17 @@ class CDiscoveryRule extends CItemGeneral {
 
 						if (array_key_exists('filter', $override)) {
 							foreach ($override['filter']['conditions'] as $condition) {
-								$condition['lld_overrideid'] = $override['lld_overrideid'];
-								$ovrd_conditions[] = $condition;
+								$ovrd_conditions[] = [
+									'macro' => $condition['macro'],
+									'value' => $condition['value'],
+									'formulaid' => array_key_exists('formulaid', $condition)
+										? $condition['formulaid']
+										: '',
+									'operator' => array_key_exists('operator', $condition)
+										? $condition['operator']
+										: DB::getDefault('lld_override_condition', 'operator'),
+									'lld_overrideid' => $override['lld_overrideid']
+								];
 							}
 						}
 					}
@@ -1099,7 +1060,7 @@ class CDiscoveryRule extends CItemGeneral {
 									'operationobject' => $operation['operationobject'],
 									'operator' => array_key_exists('operator', $operation)
 										? $operation['operator']
-										: CONDITION_OPERATOR_EQUAL,
+										: DB::getDefault('lld_override_operation', 'operator'),
 									'value' => array_key_exists('value', $operation) ? $operation['value'] : ''
 								];
 							}
@@ -1537,14 +1498,14 @@ class CDiscoveryRule extends CItemGeneral {
 				'formula' =>		['type' => API_STRING_UTF8],
 				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
 					'macro' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_condition', 'macro')],
-					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_REGEXP],
+					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => DB::getDefault('lld_override_condition', 'operator')],
 					'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_condition', 'value')],
 					'formulaid' =>		['type' => API_STRING_UTF8]
 				]]
 			]],
 			'operations' =>	['type' => API_OBJECTS, 'fields' => [
 				'operationobject' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE])],
-				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => CONDITION_OPERATOR_EQUAL],
+				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => DB::getDefault('lld_override_operation', 'operator')],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_operation', 'value')],
 				'opstatus' =>			['type' => API_OBJECT, 'fields' => [
 					'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED])],
@@ -1568,7 +1529,7 @@ class CDiscoveryRule extends CItemGeneral {
 					'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_optag', 'tag')],
 					'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_optag', 'value'), 'default' => DB::getDefault('lld_override_optag', 'value')]
 				]],
-				'optemplate' =>			['type' => API_OBJECTS, 'fields' => [
+				'optemplate' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 					'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
 				'opinventory' =>		['type' => API_OBJECT, 'fields' => [
@@ -1666,8 +1627,10 @@ class CDiscoveryRule extends CItemGeneral {
 										));
 									}
 
-									if (array_key_exists('opperiod', $operation)) {
-										$this->validateDelay($update_interval_parser, $operation['opperiod']['delay']);
+									if (array_key_exists('opperiod', $operation)
+											&& !validateDelay($update_interval_parser, 'delay',
+												$operation['opperiod']['delay'], $error)) {
+										self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 									}
 									break;
 

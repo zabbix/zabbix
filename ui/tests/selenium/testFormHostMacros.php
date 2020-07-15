@@ -56,6 +56,11 @@ class testFormHostMacros extends testFormMacros {
 							'description' => '!@#$%^&*()_+/*'
 						],
 						[
+							'macro' => '{$M:regex:^[0-9a-z]}',
+							'value' => 'regex',
+							'description' => 'context macro with regex'
+						],
+						[
 							'macro' => '{$MACRO1}',
 							'value' => 'Value_1',
 							'description' => 'Test macro Description 1'
@@ -84,6 +89,11 @@ class testFormHostMacros extends testFormMacros {
 							'macro' => '{$MACRO:A}',
 							'value' => '{$MACRO:A}',
 							'description' => '{$MACRO:A}'
+						],
+						[
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => '',
+							'description' => ''
 						]
 					],
 						'success_message' => 'Host added'
@@ -141,6 +151,28 @@ class testFormHostMacros extends testFormMacros {
 					],
 					'error_message' => 'Cannot add host',
 					'error_details' => 'Macro "{$MACRO}" is not unique.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'Host With repeated regex Macros',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_message' => 'Cannot add host',
+					'error_details' => 'Macro "{$MACRO:regex:"^[0-9].*$"}" is not unique.'
 				]
 			]
 		];
@@ -235,6 +267,35 @@ class testFormHostMacros extends testFormMacros {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[a-z]"}',
+							'value' => 'regex',
+							'description' => ''
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$MACRO:regex:^[0-9a-z]}',
+							'value' => '',
+							'description' => 'DESCRIPTION'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'macro' => '{$UPDATED_MACRO_2}',
+							'value' => 'Значение',
+							'description' => 'Описание'
+						]
+					],
+					'success_message' => 'Host updated'
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'Name' => 'Without dollar in Macros',
 					'macros' => [
@@ -287,6 +348,54 @@ class testFormHostMacros extends testFormMacros {
 					],
 					'error_message' => 'Cannot update host',
 					'error_details' => 'Macro "{$MACRO}" is not unique.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated regex Macros',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$M:regex:"[a-z]"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$M:regex:"[a-z]"}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_message' => 'Cannot update host',
+					'error_details' => 'Macro "{$M:regex:"[a-z]"}" is not unique.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => 'With repeated regex Macros and quotes',
+					'macros' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'macro' => '{$MACRO:regex:"^[0-9].*$"}',
+							'value' => 'Macro_Value_1',
+							'description' => 'Macro Description_1'
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'macro' => '{$MACRO:regex:^[0-9].*$}',
+							'value' => 'Macro_Value_2',
+							'description' => 'Macro Description_2'
+						]
+					],
+					'error_message' => 'Cannot update host',
+					'error_details' => 'Macro "{$MACRO:regex:^[0-9].*$}" is not unique.'
 				]
 			]
 		];
