@@ -91,6 +91,9 @@ class CAudit {
 			'config' => [
 				'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
 			],
+			'media_type' => [
+				'fields' => ['passwd' => true]
+			],
 			'globalmacro' => [
 				'fields' => ['value' => true],
 				'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
@@ -133,6 +136,7 @@ class CAudit {
 				}
 
 				if (array_key_exists($table_name, $masked_fields)) {
+					$table_masked_fields = $masked_fields[$table_name]['fields'];
 					$mask_object_old = true;
 					$mask_object = true;
 
@@ -142,25 +146,28 @@ class CAudit {
 							$mask_object = $mask_object && ($object[$field_name] == $value);
 						}
 					}
-
-					foreach ($object_diff as $field_name => &$values) {
-						if (array_key_exists($field_name, $masked_fields[$table_name]['fields'])) {
-							if ($mask_object_old) {
-								$object_old[$field_name] = ZBX_SECRET_MASK;
-							}
-
-							if ($mask_object) {
-								$object[$field_name] = ZBX_SECRET_MASK;
-							}
-						}
-
-						$values = [
-							'old' => $object_old[$field_name],
-							'new' => $object[$field_name]
-						];
-					}
-					unset($values);
 				}
+				else {
+					$table_masked_fields = [];
+					$mask_object_old = false;
+					$mask_object = false;
+				}
+
+				foreach ($object_diff as $field_name => &$values) {
+					if ($mask_object_old && array_key_exists($field_name, $table_masked_fields)) {
+						$object_old[$field_name] = ZBX_SECRET_MASK;
+					}
+
+					if ($mask_object && array_key_exists($field_name, $table_masked_fields)) {
+						$object[$field_name] = ZBX_SECRET_MASK;
+					}
+
+					$values = [
+						'old' => $object_old[$field_name],
+						'new' => $object[$field_name]
+					];
+				}
+				unset($values);
 
 				$objects_diff[] = $object_diff;
 
