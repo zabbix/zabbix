@@ -34,15 +34,21 @@ Edit Pushover media type parameters and replace token with your Pushover applica
 
 [![](images/tn/zabbix1.png?raw=true)](images/zabbix1.png)
 
+
+
 ### Setup media in user profile
 
 Next, proceed to your User profile and create new Media of Pushover type, use your User key in Send to field.
 
 [![](images/tn/zabbix2.png?raw=true)](images/zabbix2.png)
 
+Also, you can customize Pushover message priority for each Zabbix severity. Change value of **priority_\<severity_name\>** parameter. It must be between -2 and 2.<br>
+By default, messages have normal priority (a priority of 0).
+For more information check [Pushover documentation](https://pushover.net/api#priority).
+
 ### Check trigger actions
 
-Make sure proper trigger actions are set at Configuration→Actions page. For starters, you can enable default “Report problems to Zabbix administrators” rule.
+Make sure proper trigger actions are set at Configuration→Actions page. For starters, you can enable default "Report problems to Zabbix administrators" rule.
 
 [![](images/tn/zabbix3.png?raw=true)](images/zabbix3.png)
 
