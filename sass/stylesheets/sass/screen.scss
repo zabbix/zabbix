@@ -343,6 +343,12 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	}
 }
 
+form {
+	&.is-loading {
+		position: relative;
+	}
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -5557,7 +5563,7 @@ a.overlay-close-btn {
 			animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear;
 		}
 
-		.delayed-15s {
+		&.delayed-15s {
 			&::before,
 			&::after {
 				animation-delay: 15s;

@@ -1072,6 +1072,9 @@ pre, pre a, pre td, pre span {
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 
+form.is-loading {
+  position: relative; }
+
 .list-table {
   width: 100%;
   background-color: #2b2b2b;
@@ -4400,7 +4403,7 @@ td[class] + td.disaster-bg {
   .is-loading.is-loading-fadein::after {
     opacity: 0;
     animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear; }
-  .is-loading.is-loading-fadein .delayed-15s::before, .is-loading.is-loading-fadein .delayed-15s::after {
+  .is-loading.is-loading-fadein.delayed-15s::before, .is-loading.is-loading-fadein.delayed-15s::after {
     animation-delay: 15s; }
 
 button.is-loading {
