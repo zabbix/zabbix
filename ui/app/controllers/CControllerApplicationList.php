@@ -90,7 +90,6 @@ class CControllerApplicationList extends CController {
 			'applications' => [],
 			'parent_templates' => [],
 			'showInfoColumn' => false,
-			'hostid' => 0,
 			'sort' => $sort_field,
 			'uncheck' => $this->hasInput('uncheck'),
 			'sortorder' => $sort_order,
