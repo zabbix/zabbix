@@ -97,7 +97,6 @@ class CControllerApplicationList extends CController {
 			'hostid' => (count($filter_hostids) == 1)
 				? $filter_hostids[0]
 				: $this->getInput('hostid', 0),
-			'showInfoColumn' => false,
 			'profileIdx' => 'web.applications.filter',
 			'active_tab' => CProfile::get('web.applications.filter.active', 1)
 		];
