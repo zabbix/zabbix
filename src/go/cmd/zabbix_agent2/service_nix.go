@@ -23,6 +23,12 @@ package main
 
 func loadAdditionalFlags() {}
 
+func openEventLog() (err error) { return }
+
+func eventLogInfo(msg string) (err error) { return }
+
+func eventLogErr(err error) error { return }
+
 func validateExclusiveFlags() error { return nil }
 
 func handleWindowsService(conf string) error { return nil }

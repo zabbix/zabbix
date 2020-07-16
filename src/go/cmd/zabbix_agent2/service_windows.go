@@ -48,7 +48,7 @@ var (
 
 	isInteractive bool
 
-	elog *eventlog.Log
+	eLog *eventlog.Log
 )
 
 func loadAdditionalFlags() {
@@ -88,6 +88,34 @@ func loadAdditionalFlags() {
 	flag.BoolVar(&svcMultipleAgentFlag, "m", svcMultipleDefault, svcMultipleDescription+" (shorthand)")
 }
 
+func isWinService() bool {
+	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcMultipleAgentFlag {
+		return true
+	}
+	return false
+}
+
+func openEventLog() (err error) {
+	if isWinService() {
+		eLog, err = eventlog.Open(serviceName)
+	}
+	return
+}
+
+func eventLogInfo(msg string) (err error) {
+	if isWinService() {
+		return eLog.Info(1, msg)
+	}
+	return nil
+}
+
+func eventLogErr(err error) error {
+	if isWinService() {
+		return eLog.Error(3, err.Error())
+	}
+	return nil
+}
+
 func validateExclusiveFlags() error {
 	/* check for mutually exclusive options */
 	/* Allowed option combinations.		*/
@@ -116,6 +144,10 @@ func validateExclusiveFlags() error {
 		if count >= 2 || (serserviceFlagSet && defaultFlagSet) {
 			return errors.New("mutually exclusive options used, use help '-help'('-h'), for additional information")
 		}
+	}
+
+	if svcMultipleAgentFlag && count == 0 {
+		return errors.New("multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information")
 	}
 
 	return nil
@@ -182,29 +214,35 @@ func resolveWindowsService(conf string) error {
 		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.Options.Hostname)
 	}
 
+	var msg string
 	switch true {
 	case svcInstallFlag:
 		if err := svcInstall(conf); err != nil {
 			return fmt.Errorf("failed to install %s as service: %s", serviceName, err)
 		}
-		fmt.Printf("service '%s' installed succesfully\n", serviceName)
+		msg = fmt.Sprintf("'%s' installed succesfully", serviceName)
 	case svcUninstallFlag:
 		if err := svcUninstall(); err != nil {
 			return fmt.Errorf("failed to uninstall %s as service: %s", serviceName, err)
 		}
-		fmt.Printf("service '%s' uninstalled succesfully\n", serviceName)
+		msg = fmt.Sprintf("'%s' uninstalled succesfully", serviceName)
 	case svcStartFlag:
 		if err := svcStart(conf); err != nil {
 			return fmt.Errorf("failed to start %s service: %s", serviceName, err)
 		}
-		fmt.Printf("service '%s' started succesfully\n", serviceName)
+		msg = fmt.Sprintf("'%s' started succesfully", serviceName)
 	case svcStopFlag:
 		if err := svcStop(); err != nil {
 			return fmt.Errorf("failed to stop %s service: %s", serviceName, err)
 		}
-		fmt.Printf("service '%s' stopped succesfully\n", serviceName)
+		msg = fmt.Sprintf("'%s' stopped succesfully", serviceName)
 	}
 
+	msg = fmt.Sprintf("zabbix_agent2 [%d]: %s\n", os.Getpid(), msg)
+	fmt.Fprintf(os.Stdout, msg)
+	if err := eventLogInfo(msg); err != nil {
+		return fmt.Errorf("failed to log to event log: %s", err)
+	}
 	return nil
 }
 
@@ -371,7 +409,7 @@ loop:
 			closeWg.Add(1)
 			break loop
 		default:
-			//TODO log to eventlog
+			log.Warningf("unsupported windows service command recieved")
 		}
 	}
 

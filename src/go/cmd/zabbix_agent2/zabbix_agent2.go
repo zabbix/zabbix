@@ -251,12 +251,24 @@ func main() {
 		os.Exit(0)
 	}
 
+	if err := openEventLog(); err != nil {
+		fatalExit("", err)
+	}
+
 	if err := validateExclusiveFlags(); err != nil {
+		eerr := eventLogErr(err)
+		if eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
 		fatalExit("", err)
 	}
 
 	if err := conf.Load(confFlag, &agent.Options); err != nil {
 		if argConfig || !(argTest || argPrint) {
+			eerr := eventLogErr(err)
+			if eerr != nil {
+				err = fmt.Errorf("%s and %s", err, eerr)
+			}
 			fatalExit("", err)
 		}
 		// create default configuration for testing options
@@ -266,10 +278,18 @@ func main() {
 	}
 
 	if err := agent.ValidateOptions(agent.Options); err != nil {
+		eerr := eventLogErr(err)
+		if eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
 		fatalExit("cannot validate configuration", err)
 	}
 
 	if err := handleWindowsService(confFlag); err != nil {
+		eerr := eventLogErr(err)
+		if eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
 		fatalExit("", err)
 	}
 
