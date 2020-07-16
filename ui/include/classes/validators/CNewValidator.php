@@ -293,7 +293,7 @@ class CNewValidator {
 				 */
 				case 'time_unit':
 					if (array_key_exists($field, $this->input)) {
-						$result = $this->isTimeUnit($this->input[$field], $params); 
+						$result = $this->isTimeUnit($this->input[$field], $params);
 						if (!$result['is_valid']) {
 							$this->addError($fatal,
 								_s('Incorrect value for field "%1$s": %2$s.', $field, $result['error'])
