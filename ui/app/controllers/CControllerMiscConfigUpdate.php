@@ -32,7 +32,7 @@ class CControllerMiscConfigUpdate extends CController {
 			'login_block' =>				'required|db config.login_block|time_unit '.implode(':', [30, SEC_PER_HOUR]),
 			'validate_uri_schemes' =>		'required|db config.validate_uri_schemes|in 0,1',
 			'uri_valid_schemes' =>			'db config.uri_valid_schemes',
-			'x_frame_options' =>			'required|db config.x_frame_options',
+			'x_frame_options' =>			'required|db config.x_frame_options|not_empty',
 			'socket_timeout' =>				'required|db config.socket_timeout|time_unit '.implode(':', [1, 300]),
 			'connect_timeout' =>			'required|db config.connect_timeout|time_unit '.implode(':', [1, 30]),
 			'media_type_test_timeout' =>	'required|db config.media_type_test_timeout|time_unit '.implode(':', [1, 300]),
