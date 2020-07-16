@@ -20,18 +20,21 @@
 
 
 /**
- * Convert array keys to numeric.
+ * Class to normalize incoming data.
  */
-class CArrayKeysImportConverter extends CConverter {
+class CImportDataNormalizer {
 
 	protected $rules;
+
+	const EOL_LF = 0x01;
 
 	public function __construct(array $schema) {
 		$this->rules = $schema;
 	}
 
-	public function convert($data) {
-		$data['zabbix_export'] = $this->normalizeArrayKeys($data['zabbix_export'], $this->rules);
+	public function normalize($data) {
+		$data['zabbix_export'] = $this->normalizeArrayKeys($data['zabbix_export']);
+		$data['zabbix_export'] = $this->normalizeStrings($data['zabbix_export']);
 
 		return $data;
 	}
@@ -40,17 +43,16 @@ class CArrayKeysImportConverter extends CConverter {
 	 * Convert array keys to numeric.
 	 *
 	 * @param mixed $data   Import data.
-	 * @param array $rules  XML rules.
 	 *
 	 * @return array
 	 */
-	protected function normalizeArrayKeys($data, array $rules) {
+	protected function normalizeArrayKeys($data) {
 		if (!is_array($data)) {
 			return $data;
 		}
 
-		if ($rules['type'] & XML_ARRAY) {
-			foreach ($rules['rules'] as $tag => $tag_rules) {
+		if ($this->rules['type'] & XML_ARRAY) {
+			foreach ($this->rules['rules'] as $tag => $tag_rules) {
 				if (array_key_exists('ex_rules', $tag_rules)) {
 					$tag_rules = call_user_func($tag_rules['ex_rules'], $data);
 				}
@@ -60,14 +62,35 @@ class CArrayKeysImportConverter extends CConverter {
 				}
 			}
 		}
-		elseif ($rules['type'] & XML_INDEXED_ARRAY) {
-			$prefix = $rules['prefix'];
+		elseif ($this->rules['type'] & XML_INDEXED_ARRAY) {
+			$prefix = $this->rules['prefix'];
 
 			foreach ($data as $tag => $value) {
-				$data[$tag] = $this->normalizeArrayKeys($value, $rules['rules'][$prefix]);
+				$data[$tag] = $this->normalizeArrayKeys($value, $this->rules['rules'][$prefix]);
 			}
 
 			$data = array_values($data);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Add CR to string type fields.
+	 *
+	 * @param mixed $data   Import data.
+	 *
+	 * @return mixed
+	 */
+	protected function normalizeStrings($data) {
+		if ($this->rules['type'] & XML_STRING) {
+			$data = str_replace("\r\n", "\n", $data);
+
+			if (array_key_exists('flags', $this->rules) && $this->rules['flags'] & self::EOL_LF) {
+			}
+			else {
+				$data = str_replace("\n", "\r\n", $data);
+			}
 		}
 
 		return $data;

@@ -44,11 +44,11 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Build XML data.
+	 * Build data structure.
 	 *
 	 * @param array  $schema    Tag schema from validation class.
 	 * @param array  $data      Export data.
-	 * @param string $main_tag  XML tag (for error reporting).
+	 * @param string $main_tag  Main element (for error reporting).
 	 *
 	 * @return array
 	 */
@@ -66,6 +66,7 @@ class CConfigurationExportBuilder {
 			$store = [];
 			foreach ($rules as $tag => $val) {
 				$is_required = $val['type'] & XML_REQUIRED;
+				$is_string = $val['type'] & XML_STRING;
 				$is_array = $val['type'] & XML_ARRAY;
 				$is_indexed_array = $val['type'] & XML_INDEXED_ARRAY;
 				$has_data = array_key_exists($tag, $row);
@@ -97,6 +98,10 @@ class CConfigurationExportBuilder {
 						$store[$tag] = $temp_store;
 					}
 					continue;
+				}
+
+				if ($is_string && $value !== null) {
+					$value = str_replace("\r\n", "\n", $value);
 				}
 
 				if (array_key_exists('in', $val)) {
