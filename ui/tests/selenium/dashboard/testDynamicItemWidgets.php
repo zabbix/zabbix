@@ -294,9 +294,6 @@ class testDynamicItemWidgets extends CWebTest {
 				$host->clear()->type($data['host_filter']);
 			}
 			$this->page->waitUntilReady();
-			// TODO: remove after fix ZBX-17821
-			$this->page->refresh();
-			$this->page->waitUntilReady();
 		}
 
 		$this->assertWidgetContent($data['widgets']);
