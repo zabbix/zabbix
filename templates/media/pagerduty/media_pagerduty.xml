@@ -53,7 +53,7 @@
                 </parameter>
                 <parameter>
                     <name>token</name>
-                    <value>&lt;put your key&gt;</value>
+                    <value>{ALERT.SENDTO}</value>
                 </parameter>
                 <parameter>
                     <name>triggerdesc</name>
