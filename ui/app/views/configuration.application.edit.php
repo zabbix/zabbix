@@ -56,7 +56,7 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('page', CPagerHelper::loadPage('application.list', null))
 ))->setId('cancel');
 
-if ($data['applicationid']) {
+if ($data['applicationid'] == 0) {
 	$application_tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
