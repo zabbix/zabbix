@@ -526,11 +526,11 @@ class ZBase {
 
 			filter_messages();
 
-			CMessageHelper::addError(['message' => 'Controller: '.$router->getAction()]);
+			CMessageHelper::addError('Controller: '.$router->getAction());
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
 				if ($key !== 'sid') {
-					CMessageHelper::addError(['message' => is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value)]);
+					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
 

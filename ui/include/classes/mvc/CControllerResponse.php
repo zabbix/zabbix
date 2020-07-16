@@ -87,8 +87,13 @@ abstract class CControllerResponse {
 		$messages['messages'] = CMessageHelper::getMessages();
 
 		if ($this instanceof CControllerResponseRedirect) {
-			if (CMessageHelper::getTitle() !== null) {
-				$messages[CMessageHelper::getType()] = CMessageHelper::getTitle();
+			switch (CMessageHelper::getType()) {
+				case CMessageHelper::MESSAGE_TYPE_ERROR:
+					$messages[CMessageHelper::MESSAGE_TYPE_ERROR] = CMessageHelper::getTitle();
+					break;
+				case CMessageHelper::MESSAGE_TYPE_SUCCESS:
+					$messages[CMessageHelper::MESSAGE_TYPE_SUCCESS] = CMessageHelper::getTitle();
+					break;
 			}
 
 			$data = $this->getFormData();

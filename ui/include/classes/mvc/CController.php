@@ -168,7 +168,7 @@ abstract class CController {
 
 			if (array_key_exists('messages', $data['messages'])) {
 				foreach ($data['messages']['messages'] as $message) {
-					if ($message['type'] === CMessageHelper::MessageTypeSuccess) {
+					if ($message['type'] === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
 						CMessageHelper::addSuccess($message['message']);
 					}
 					else {

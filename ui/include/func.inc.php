@@ -1641,14 +1641,14 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
  *
  * @return array
  */
-function filter_messages() {
+function filter_messages(): array {
 	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 		$messages = CMessageHelper::getMessages();
 		CMessageHelper::clear();
 
 		$generic_exists = false;
 		foreach ($messages as $message) {
-			if ($message['type'] === CMessageHelper::MessageTypeError
+			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR
 				&& ($message['source'] === 'sql' || $message['source'] === 'php')) {
 				if (!$generic_exists) {
 					CMessageHelper::addError(_('System error occurred. Please contact Zabbix administrator.'));
@@ -1671,9 +1671,9 @@ function filter_messages() {
  * @param  string  $title           Message box title.
  * @param  bool    $show_close_box  Show or hide close button in error message box.
  *
- * @return CDiv|null
+ * @return CTag|null
  */
-function getMessages($good = false, $title = null, $show_close_box = true) {
+function getMessages(bool $good = false, string $title = null, bool $show_close_box = true): ?CTag {
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
@@ -1844,13 +1844,12 @@ function get_prepared_messages(array $options = []): ?string {
 	if ($options['with_session_messages']) {
 		if (CMessageHelper::getTitle() !== null) {
 			show_messages(
-				CMessageHelper::getType() === CMessageHelper::MessageTypeSuccess,
+				CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
 				CMessageHelper::getTitle(),
 				CMessageHelper::getTitle()
 			);
 		}
 	}
-
 	$messages_session = $ZBX_MESSAGES_PREPARED;
 
 	// Create message boxes for all requested messages types in the correct order.
@@ -1863,7 +1862,7 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 
 	foreach ($restore_messages as $message) {
-		if ($message['type'] === CMessageHelper::MessageTypeSuccess) {
+		if ($message['type'] === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
 			CMessageHelper::addSuccess($message['message']);
 		}
 		else {
@@ -1876,15 +1875,15 @@ function get_prepared_messages(array $options = []): ?string {
 	return ($html === '') ? null : $html;
 }
 
-function show_message($msg) {
+function show_message(string $msg): void {
 	show_messages(true, $msg, '');
 }
 
-function show_error_message($msg) {
+function show_error_message(string $msg): void {
 	show_messages(false, '', $msg);
 }
 
-function info($msgs) {
+function info($msgs): void {
 	zbx_value2array($msgs);
 
 	foreach ($msgs as $msg) {
@@ -1898,7 +1897,7 @@ function info($msgs) {
  * @param string | array $msg	Error message text.
  * @param string		 $src	The source of error message.
  */
-function error($msgs, $src = '') {
+function error($msgs, string $src = ''): void {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
@@ -1919,7 +1918,7 @@ function error_group($data) {
 	}
 }
 
-function get_and_clear_messages() {
+function get_and_clear_messages(): array {
 	$messages = filter_messages();
 	CMessageHelper::clear();
 
@@ -2170,7 +2169,7 @@ function imageOut(&$image, $format = null) {
  * @return bool
  */
 function hasErrorMesssages() {
-	return CMessageHelper::getType() === CMessageHelper::MessageTypeError;
+	return CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_ERROR;
 }
 
 /**

@@ -20,17 +20,17 @@
 
 
 /**
- * Helper to store succes / error messages.
+ * Helper to store success / error messages.
  */
 class CMessageHelper {
 
-	public const MessageTypeError   = 'error';
-	public const MessageTypeSuccess = 'success';
+	public const MESSAGE_TYPE_ERROR   = 'error';
+	public const MESSAGE_TYPE_SUCCESS = 'success';
 
 	/**
 	 * @var string
 	 */
-	private static $type = self::MessageTypeSuccess;
+	private static $type = self::MESSAGE_TYPE_SUCCESS;
 
 	/**
 	 * @var string
@@ -60,9 +60,9 @@ class CMessageHelper {
 	 * @param string $source
 	 */
 	public static function addError(string $message, string $source = ''): void {
-		self::$type = self::MessageTypeError;
+		self::$type = self::MESSAGE_TYPE_ERROR;
 		self::$messages[] = [
-			'type' => self::MessageTypeError,
+			'type' => self::MESSAGE_TYPE_ERROR,
 			'message' => $message,
 			'source' => $source
 		];
@@ -75,7 +75,7 @@ class CMessageHelper {
 	 */
 	public static function addSuccess(string $message): void {
 		self::$messages[] = [
-			'type' => self::MessageTypeSuccess,
+			'type' => self::MESSAGE_TYPE_SUCCESS,
 			'message' => $message
 		];
 	}
@@ -95,7 +95,7 @@ class CMessageHelper {
 	 * @param string $title
 	 */
 	public static function setErrorTitle(string $title): void {
-		self::$type = self::MessageTypeError;
+		self::$type = self::MESSAGE_TYPE_ERROR;
 		self::$title = $title;
 	}
 
@@ -121,8 +121,8 @@ class CMessageHelper {
 	 * Clear messages.
 	 */
 	public static function clear(): void {
-		self::$type = self::MessageTypeSuccess;
-		self::$title = null;
+		// self::$type = self::MESSAGE_TYPE_SUCCESS;
+		// self::$title = null;
 		self::$messages = [];
 	}
 }
