@@ -151,6 +151,14 @@ class CControllerApplicationList extends CController {
 		$this->setResponse($response);
 	}
 
+	/**
+	 * @param array $filter_hostids
+	 * @param array $filter_groupids
+	 * @param string $sort_field
+	 * @param string $sort_order
+	 *
+	 * @return array
+	 */
 	private function fetchApplications(array $filter_hostids, array $filter_groupids, string $sort_field,
 			string $sort_order): array {
 		$config = select_config();
