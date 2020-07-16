@@ -134,52 +134,55 @@ else {
 	);
 }
 
-// Append languages to form list.
-$lang = new CComboBox('lang', $data['lang']);
+// Append languages & themes to form list.
+$lang_combobox = (new CComboBox('lang', $data['lang']))->addItem(LANG_DEFAULT, _('System default'));
+$theme_combobox = (new CComboBox('theme', $data['theme']))->addItem(THEME_DEFAULT, _('System default'));
 
-$all_locales_available = 1;
+if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
+	$lang_combobox->setEnabled(false);
+	$theme_combobox->setEnabled(false);
+}
+else {
+	$all_locales_available = 1;
 
-foreach (getLocales() as $localeid => $locale) {
-	if (!$locale['display']) {
-		continue;
+	foreach (getLocales() as $localeid => $locale) {
+		if (!$locale['display']) {
+			continue;
+		}
+
+		/*
+		 * Checking if this locale exists in the system. The only way of doing it is to try and set one
+		 * trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC.
+		 */
+		$locale_available = ($localeid === 'en_GB' || setlocale(LC_MONETARY, zbx_locale_variants($localeid)));
+
+		$lang_combobox->addItem($localeid, $locale['name'], null, $locale_available);
+
+		$all_locales_available &= (int) $locale_available;
 	}
 
-	/*
-	 * Checking if this locale exists in the system. The only way of doing it is to try and set one
-	 * trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC.
-	 */
-	$locale_available = ($localeid === 'en_GB' || setlocale(LC_MONETARY, zbx_locale_variants($localeid)));
+	// Restoring original locale.
+	setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
 
-	$lang->addItem($localeid, $locale['name'], null, $locale_available);
+	$language_error = '';
+	if (!function_exists('bindtextdomain')) {
+		$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+		$lang_combobox->setEnabled(false);
+	}
+	elseif ($all_locales_available == 0) {
+		$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+	}
 
-	$all_locales_available &= (int) $locale_available;
-}
+	if ($language_error !== '') {
+		$lang_combobox = [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')];
+	}
 
-// Restoring original locale.
-setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
-
-$language_error = '';
-if (!function_exists('bindtextdomain')) {
-	$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
-	$lang->setAttribute('disabled', 'disabled');
-}
-elseif ($all_locales_available == 0) {
-	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+	$theme_combobox->addItems(APP::getThemes());
 }
 
 $user_form_list
-	->addRow(_('Language'),
-		($language_error !== '')
-			? [$lang, (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CSpan($language_error))
-					->addClass('red')
-					->addClass('wrap')
-			]
-			: $lang
-	)
-	->addRow(_('Theme'),
-		new CComboBox('theme', $data['theme'], null, [THEME_DEFAULT => _('System default')] + APP::getThemes())
-	);
+	->addRow(_('Language'), $lang_combobox)
+	->addRow(_('Theme'), $theme_combobox);
 
 // Append auto-login & auto-logout to form list.
 if ($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER) {

@@ -125,7 +125,6 @@ class CWebUser {
 			}
 
 			if ($sessionId === null || empty(self::$data)) {
-				self::setDefault();
 				self::$data = API::User()->login([
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
@@ -154,6 +153,7 @@ class CWebUser {
 		}
 		catch (Exception $e) {
 			self::setDefault();
+
 			return false;
 		}
 	}
@@ -178,11 +178,17 @@ class CWebUser {
 		return get_cookie(ZBX_SESSION_NAME);
 	}
 
-	public static function setDefault() {
+	/**
+	 * Sets user data defaults.
+	 *
+	 * @static
+	 */
+	public static function setDefault(): void {
+		$config = select_config();
 		self::$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
-			'lang' => 'en_gb',
+			'lang' => $config['default_lang'],
 			'type' => 0,
 			'debug_mode' => false
 		];

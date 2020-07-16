@@ -248,7 +248,7 @@ class testUsers extends CAPITest {
 				$this->assertEquals($dbRowUser['surname'], '');
 				$this->assertEquals($dbRowUser['autologin'], 0);
 				$this->assertEquals($dbRowUser['autologout'], '15m');
-				$this->assertEquals($dbRowUser['lang'], 'en_GB');
+				$this->assertEquals($dbRowUser['lang'], 'default');
 				$this->assertEquals($dbRowUser['refresh'], '30s');
 				$this->assertEquals($dbRowUser['rows_per_page'], 50);
 				$this->assertEquals($dbRowUser['theme'], 'default');
@@ -779,7 +779,7 @@ class testUsers extends CAPITest {
 					],
 					'lang' => '123456'
 				],
-				'expected_error' => 'Invalid parameter "/1/lang": value must be one of en_GB, en_US, bg_BG, ca_ES, zh_CN, '
+				'expected_error' => 'Invalid parameter "/1/lang": value must be one of default, en_GB, en_US, bg_BG, ca_ES, zh_CN, '
 				. 'zh_TW, cs_CZ, nl_NL, fi_FI, fr_FR, ka_GE, de_DE, el_GR, he_IL, hu_HU, id_ID, it_IT, ko_KR, ja_JP, lv_LV, '
 				. 'lt_LT, nb_NO, fa_IR, pl_PL, pt_BR, pt_PT, ro_RO, ru_RU, sk_SK, es_ES, sv_SE, tr_TR, uk_UA, vi_VN.'
 			],

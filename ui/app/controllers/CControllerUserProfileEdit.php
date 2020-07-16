@@ -26,6 +26,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
+		$locales[] = LANG_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 

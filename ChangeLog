@@ -1,6 +1,8 @@
 Changes for 5.2.0alpha1
 
 New features:
+A.F.....S. [ZBXNEXT-3362] added ability to set the default system language (agriscenko)
+...G...... [ZBXNEXT-6044] added native support in agent2 for https key for net.tcp.service/.perf (esneiders)
 ...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
 ...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
 ........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
@@ -24,6 +26,12 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5880] added component version item to server and proxy remote monitoring templates (vjaceslavs)
 
 Bug fixes:
+A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
+.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
+A.F....... [ZBX-17715] fixed filtering and sorting of the Latest Data (averza)
+..F....... [ZBX-17802] fixed runtime errors in trigger list (talbergs)
+...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
+A.F....... [ZBX-17860] fixed host prototype import (rlataria)
 ..F....... [ZBX-17920] fixed browser error when user tries to access properties without permissions (kustalovs)
 ..F....... [ZBX-17693] fixed headers and query fields in HTTP item test form; thanks to Mikhail Okhotin for the patch (Ivo, talbergs)
 .......PS. [ZBX-17837] fixed memory leaks when handling CurlHttpRequest errors (Andris, wiper)
@@ -66,6 +74,7 @@ A.F....... [ZBX-14539] added validation of the calculated item formula in item.c
 A.F....... [ZBXNEXT-3035] removed identical HTML IDs in low-level discovery form, fixed Type of Calculation field not hiding in override popup, fixed incorrect field order during override create in API causing SQL errors, fixed validation of delay, history and trends fields in override popup (Ivo, miks)
 .........T [ZBX-17790] fixed preprocessing of mysql.created_tmp_files, mysql.created_tmp_disk_tables, mysql.created_tmp_tables, mysql.threads_created items in Template DB MySQL, added triggers (mchudinov)
 ........S. [ZBX-17792] fixed zabbix sending invalid delete elastic search scroll request (arimdjonoks)
+.........T [ZBX-17141] fixed discovery of block devices by using vfs.dev.discovery key instead of reading /proc/diskstats (tuskov)
 .........T [ZBX-17654] fixed "Memory utilization" item in template_os_linux and template_os_linux_active by splitting it into master and depended relation (tuskov)
 ...G...... [ZBX-17780] fixed memory leak (viktors)
 .......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
@@ -107,9 +116,22 @@ A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed
 .......PS. [ZBX-15484] shadow global auto_increment variables for MySQL (arimdjonoks)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.3rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.2
+
+5.0.2rc1 was released as 5.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.2rc1
 
 New features:
+...G...... [ZBXNEXT-6044] added native support in agent2 for https key for net.tcp.service/.perf (esneiders)
 ...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
 ...G...... [ZBXNEXT-5939] added native support of item 'vfs.file.exists' to Agent2 (Andris, viktors, wiper)
 ........S. [ZBXNEXT-6007] improved Zabbix server performance when evaluating action conditions for network discovery results from Zabbix proxy (vso)
@@ -125,6 +147,12 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
+.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
+A.F....... [ZBX-17715] fixed filtering and sorting of the Latest Data (averza)
+..F....... [ZBX-17802] fixed runtime errors in trigger list (talbergs)
+...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
+A.F....... [ZBX-17860] fixed host prototype import (rlataria)
 ..F....... [ZBX-17920] fixed browser error when user tries to access properties without permissions (kustalovs)
 .......PS. [ZBX-17252] fixed building of Zabbix daemons with link time optimization (vso)
 ..F....... [ZBX-17693] fixed headers and query fields in HTTP item test form; thanks to Mikhail Okhotin for the patch (Ivo, talbergs)
@@ -168,6 +196,7 @@ A.F....... [ZBX-14539] added validation of the calculated item formula in item.c
 A.F....... [ZBXNEXT-3035] removed identical HTML IDs in low-level discovery form, fixed Type of Calculation field not hiding in override popup, fixed incorrect field order during override create in API causing SQL errors, fixed validation of delay, history and trends fields in override popup (Ivo, miks)
 .........T [ZBX-17790] fixed preprocessing of mysql.created_tmp_files, mysql.created_tmp_disk_tables, mysql.created_tmp_tables, mysql.threads_created items in Template DB MySQL, added triggers (mchudinov)
 ........S. [ZBX-17792] fixed zabbix sending invalid delete elastic search scroll request (arimdjonoks)
+.........T [ZBX-17141] fixed discovery of block devices by using vfs.dev.discovery key instead of reading /proc/diskstats (tuskov)
 .........T [ZBX-17654] fixed "Memory utilization" item in template_os_linux and template_os_linux_active by splitting it into master and depended relation (tuskov)
 ...G...... [ZBX-17780] fixed memory leak (viktors)
 .......PS. [ZBX-17694] fixed high memory consumption when using dependent items (vso)
@@ -1677,6 +1706,9 @@ Changes for 4.0.23rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
+A.F....... [ZBX-17860] fixed host prototype import (rlataria)
+...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.22
