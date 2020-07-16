@@ -240,7 +240,10 @@ if ($data['admin']) {
 		$httptest_count = CViewHelper::showNum($template['httpTests']);
 
 		$template_cell = $template['editable']
-			? [new CLink($visible_name,'templates.php?form=update&'.'&templateid='.$templateid)]
+			? [new CLink($visible_name, (new CUrl('templates.php'))
+				->setArgument('form', 'update')
+				->setArgument('templateid', $templateid)
+			)]
 			: [new CSpan($visible_name)];
 
 		$applications_link = $template['editable']
