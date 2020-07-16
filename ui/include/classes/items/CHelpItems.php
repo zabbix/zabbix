@@ -719,6 +719,10 @@ class CHelpItems {
 					'description' => _('VMware service full name, <url> - VMware service URL')
 				],
 				[
+					'key' => 'vmware.dc.discovery[<url>]',
+					'description' => _('VMware datacenters and their IDs. Returns JSON')
+				],
+				[
 					'key' => 'vmware.datastore.read[<url>,<datastore>,<mode>]',
 					'description' => _('VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum')
 				],
