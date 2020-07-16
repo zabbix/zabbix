@@ -289,6 +289,21 @@ class CNewValidator {
 					break;
 
 				/*
+				 * 'time_unit' => true
+				 */
+				case 'time_unit':
+					if (array_key_exists($field, $this->input)) {
+						$result = $this->isTimeUnit($this->input[$field], $params); 
+						if (!$result['is_valid']) {
+							$this->addError($fatal,
+								_s('Incorrect value for field "%1$s": %2$s.', $field, $result['error'])
+							);
+							return false;
+						}
+					}
+					break;
+
+				/*
 				 * 'rgb' => true
 				 */
 				case 'rgb':
@@ -449,6 +464,57 @@ class CNewValidator {
 		}
 
 		return is_string($value) && $this->time_periods_parser->parse($value) == CParser::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Validate a configuration value. Use simple interval parser to parse the string, convert to seconds and check
+	 * if the value is in between given min and max values. In some cases it's possible to enter 0, or even 0s or 0d.
+	 * If the value is incorrect, set an error.
+	 *
+	 * @param string $value                  Value to parse and validate.
+	 * @param bool   $options['with_year']   Set to "true" to allow month and year unit support.
+	 * @param bool   $options['allow_zero']  Set to "true" to allow value to be zero.
+	 * @param string $options['min']         Lower bound.
+	 * @param string $options['max']         Upper bound.
+	 *
+	 * @return array  An array with parameter 'is_valid' containing validation result. If validation fails, additionally
+	 *                returned parameter 'error' containing error message.
+	 */
+	private function isTimeUnit($value, $params) {
+		$simple_interval_parser = new CSimpleIntervalParser(
+			array_key_exists('with_year', $params) ? ['with_year' => true] : []
+		);
+		$value = (string) $value;
+
+		if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			if (!$params) {
+				return ['is_valid' => true];
+			}
+
+			if ($value[0] !== '{') {
+				$value = timeUnitToSeconds($value,
+					array_key_exists('with_year', $params) ? $params['with_year'] : false
+				);
+
+				$params['allow_zero'] = array_key_exists('allow_zero', $params) ? $params['allow_zero'] : false;
+				if ($params['allow_zero'] && $value == 0) {
+					return ['is_valid' => true];
+				}
+
+				if (array_key_exists('min', $params) && array_key_exists('max', $params)
+						&& $value < $params['min'] || $value > $params['max']) {
+					return [
+						'is_valid' => false,
+						'error' => _s('value must be one of %1$s', ($params['allow_zero'] ? '0, ' : '').$params['min'].'-'.$params['max'])
+					];
+				}
+			}
+		}
+		else {
+			return ['is_valid' => false, 'error' => _('a time unit is expected')];
+		}
+
+		return ['is_valid' => true];
 	}
 
 	private function isRangeTime($value) {

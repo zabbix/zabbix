@@ -561,6 +561,7 @@ function validateDateInterval($year, $month, $day) {
  * @param array  $options
  * @param bool   $options['usermacros']
  * @param bool   $options['lldmacros']
+ * @param bool   $options['with_year']
  *
  * @return bool
  */

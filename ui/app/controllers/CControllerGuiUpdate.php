@@ -31,9 +31,9 @@ class CControllerGuiUpdate extends CController {
 			'server_check_interval' =>	'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL,
 			'work_period' =>			'required|db config.work_period|time_periods',
 			'show_technical_errors' =>	'db config.show_technical_errors|in 0,1',
-			'history_period' =>			'required|db config.history_period',
-			'period_default' =>			'required|db config.period_default',
-			'max_period' =>				'required|db config.max_period'
+			'history_period' =>			'required|db config.history_period|time_unit '.implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY]),
+			'period_default' =>			'required|db config.period_default|time_unit_year '.implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR]),
+			'max_period' =>				'required|db config.max_period|time_unit_year '.implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -53,48 +53,6 @@ class CControllerGuiUpdate extends CController {
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
-			}
-		}
-		else {
-			$fields = [
-				'history_period' => [
-					'min' => SEC_PER_DAY,
-					'max' => 7 * SEC_PER_DAY,
-					'allow_zero' => false,
-					'message' => _('Invalid max history display period: %1$s.')
-				],
-				'period_default' => [
-					'min' => SEC_PER_MIN,
-					'max' => 10 * SEC_PER_YEAR,
-					'allow_zero' => false,
-					'message' => _('Invalid time filter default period: %1$s.')
-				],
-				'max_period' => [
-					'min' => SEC_PER_YEAR,
-					'max' => 10 * SEC_PER_YEAR,
-					'allow_zero' => false,
-					'message' => _('Invalid max period: %1$s.'),
-					'with_year' => true
-				]
-			];
-
-			foreach ($fields as $field => $args) {
-				$options = array_key_exists('with_year', $args) ? ['with_year' => true] : [];
-				if (!validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],$error,
-					$options
-				)) {
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'gui.edit')
-						->getUrl()
-					);
-					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update configuration'));
-					$this->setResponse($response);
-					error(sprintf($args['message'], $error));
-
-					$ret = false;
-					break;
-				}
 			}
 		}
 

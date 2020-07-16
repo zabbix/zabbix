@@ -32,8 +32,8 @@ class CControllerTrigDisplayUpdate extends CController {
 			'problem_ack_style' =>		'required|db config.problem_ack_style|in 0,1',
 			'ok_unack_style' =>			'required|db config.ok_unack_style|in 0,1',
 			'ok_ack_style' =>			'required|db config.ok_ack_style|in 0,1',
-			'ok_period' =>				'required|db config.ok_period|not_empty',
-			'blink_period' =>			'required|db config.blink_period|not_empty',
+			'ok_period' =>				'required|db config.ok_period|not_empty|time_unit '.implode(':', [0, SEC_PER_DAY]),
+			'blink_period' =>			'required|db config.blink_period|not_empty|time_unit '.implode(':', [0, SEC_PER_DAY]),
 			'severity_name_0' =>		'required|db config.severity_name_0|not_empty',
 			'severity_color_0' =>		'required|db config.severity_color_0|rgb',
 			'severity_name_1' =>		'required|db config.severity_name_1|not_empty',
@@ -59,58 +59,6 @@ class CControllerTrigDisplayUpdate extends CController {
 			$response->setMessageError(_('Cannot update configuration'));
 
 			$this->setResponse($response);
-		}
-		else {
-			$fields = [
-				'ok_period' => [
-					'min' => 0,
-					'max' => SEC_PER_DAY,
-					'allow_zero' => false,
-					'message' => _('Invalid displaying of OK triggers: %1$s.')
-				],
-				'blink_period' => [
-					'min' => 0,
-					'max' => SEC_PER_DAY,
-					'allow_zero' => false,
-					'message' => _('Invalid blinking on trigger status change: %1$s.')
-				],
-			];
-
-			foreach ($fields as $field => $args) {
-				if (!validateTimeUnit($this->getInput($field), $args['min'], $args['max'], $args['allow_zero'],
-					$error
-				)) {
-					error(sprintf($args['message'], $error));
-
-					$ret = false;
-					break;
-				}
-			}
-
-			// check duplicate severity names and if name is empty.
-			$names = [];
-			for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-				$severity_name = 'severity_name_'.$i;
-
-				if (isset($names[$this->getInput($severity_name)])) {
-					error(_s('Duplicate severity name "%1$s".', $this->getInput($severity_name)));
-					$ret = false;
-					break;
-				}
-				else {
-					$names[$this->getInput($severity_name)] = true;
-				}
-			}
-
-			if (!$ret) {
-				$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-					->setArgument('action', 'trigdisplay.edit')
-					->getUrl()
-				);
-				$response->setFormData($this->getInputAll());
-				$response->setMessageError(_('Cannot update configuration'));
-				$this->setResponse($response);
-			}
 		}
 
 		return $ret;

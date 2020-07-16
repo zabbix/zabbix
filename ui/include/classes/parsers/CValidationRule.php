@@ -59,6 +59,7 @@ class CValidationRule {
 							if (!$this->parseString($buffer, $pos, $rule)		// string
 									&& !$this->parseRangeTime($buffer, $pos, $rule)		// range time
 									&& !$this->parseTimePeriods($buffer, $pos, $rule)	// time periods
+									&& !$this->parseTimeUnit($buffer, $pos, $rule)	// time unit
 									&& !$this->parseRgb($buffer, $pos, $rule)			// rgb
 									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
@@ -185,6 +186,58 @@ class CValidationRule {
 
 		$pos += 12;
 		$rules['time_periods'] = true;
+
+		return true;
+	}
+
+	/**
+	 * time_unit
+	 *
+	 * 'time_unit' => true
+	 */
+	private function parseTimeUnit($buffer, &$pos, &$rules) {
+		$values = [];
+		if (strncmp(substr($buffer, $pos), 'time_unit_year', 14) === 0) {
+			$pos += 14;
+			$values['with_year'] = true;
+		}
+		else if (strncmp(substr($buffer, $pos), 'time_unit', 9) === 0) {
+			$pos += 9;
+		}
+		else {
+			return false;
+		}
+
+		while (isset($buffer[$pos]) && $buffer[$pos] == ' ') {
+			$pos++;
+		}
+
+		$range_string = '';
+
+		while (isset($buffer[$pos]) && $buffer[$pos] != '|') {
+			$range_string .= $buffer[$pos];
+			$pos++;
+		}
+
+		if (isset($range_string[0]) && $range_string[0] === '0') {
+			if (isset($range_string[1])) {
+				if ($range_string[1] === ',') {
+					$range_string = substr($range_string, 2);
+					$values['allow_zero'] = true;
+				}
+			}
+			else {
+				$values['allow_zero'] = true;
+			}
+		}
+
+		$range = explode(':', $range_string);
+		if (count($range) === 2 && ctype_digit($range[0]) && ctype_digit($range[1])) {
+			$values['min'] = $range[0];
+			$values['max'] = $range[1];
+		}
+
+		$rules['time_unit'] = $values;
 
 		return true;
 	}
