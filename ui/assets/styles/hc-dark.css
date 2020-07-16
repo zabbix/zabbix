@@ -1046,6 +1046,9 @@ pre, pre a, pre td, pre span {
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 
+form.is-loading {
+  position: relative; }
+
 .list-table {
   width: 100%;
   background-color: #000000;
@@ -4344,7 +4347,7 @@ a.link-action {
   .is-loading.is-loading-fadein::after {
     opacity: 0;
     animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear; }
-  .is-loading.is-loading-fadein .delayed-15s::before, .is-loading.is-loading-fadein .delayed-15s::after {
+  .is-loading.is-loading-fadein.delayed-15s::before, .is-loading.is-loading-fadein.delayed-15s::after {
     animation-delay: 15s; }
 
 button.is-loading {
@@ -4498,8 +4501,6 @@ main .server-name {
   overflow: hidden; }
   .flickerfreescreen.is-loading {
     min-height: 64px; }
-    .flickerfreescreen.is-loading img {
-      opacity: 0; }
 
 .graph-wrapper {
   display: inline; }
