@@ -1,1 +1,1 @@
-A......... [ZBX-18012] fixed undefined index error in history manager and added error message in charts when Elasticsearch requests fails (miks)
+A.F....... [ZBX-18012] fixed undefined index error in history manager and added error message in charts when Elasticsearch requests fails (miks)
