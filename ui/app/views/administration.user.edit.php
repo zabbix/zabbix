@@ -222,13 +222,13 @@ $tabs->addTab('userTab', _('User'), $user_form_list);
 // Media tab.
 if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 	$media_form_list = new CFormList('userMediaFormList');
-	$user_form->addVar('user_medias', $data['user_medias']);
+	$user_form->addVar('medias', $data['medias']);
 
 	$media_table_info = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), ('Status'), _('Action')]);
 
-	foreach ($data['user_medias'] as $index => $media) {
+	foreach ($data['medias'] as $index => $media) {
 		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
 			$status = (new CLink(_('Enabled'), '#'))
 				->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
@@ -292,7 +292,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 							->onClick('javascript: removeMedia('.$index.');')
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
-			]))->setId('user_medias_'.$index)
+			]))->setId('medias_'.$index)
 		);
 	}
 

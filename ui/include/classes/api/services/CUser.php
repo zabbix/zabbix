@@ -232,7 +232,7 @@ class CUser extends CApiService {
 		$ins_users = [];
 
 		foreach ($users as $user) {
-			unset($user['usrgrps'], $user['user_medias']);
+			unset($user['usrgrps'], $user['medias']);
 			$ins_users[] = $user;
 		}
 		$userids = DB::insert('users', $ins_users);
@@ -279,7 +279,14 @@ class CUser extends CApiService {
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'user_medias' =>	['type' => API_OBJECTS, 'fields' => [
+			'user_medias' =>	['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'fields' => [
+				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
+				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
+				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
+				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
+			]],
+			'medias' =>			['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
@@ -287,11 +294,21 @@ class CUser extends CApiService {
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		foreach ($users as &$user) {
+			if (array_key_exists('user_medias', $user)) {
+				if (array_key_exists('medias', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'user_medias'));
+				}
+
+				$user['medias'] = $user['user_medias'];
+				unset($user['user_medias']);
+			}
+
 			$user = $this->checkLoginOptions($user);
 
 			/*
@@ -388,7 +405,14 @@ class CUser extends CApiService {
 			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'user_medias' =>	['type' => API_OBJECTS, 'fields' => [
+			'medias' =>	['type' => API_OBJECTS, 'fields' => [
+				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
+				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
+				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
+				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
+			]],
+			'user_medias' =>	['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
@@ -419,6 +443,15 @@ class CUser extends CApiService {
 		$aliases = [];
 
 		foreach ($users as &$user) {
+			if (array_key_exists('user_medias', $user)) {
+				if (array_key_exists('medias', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'user_medias'));
+				}
+
+				$user['medias'] = $user['user_medias'];
+				unset($user['user_medias']);
+			}
+
 			if (!array_key_exists($user['userid'], $db_users)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
@@ -594,7 +627,7 @@ class CUser extends CApiService {
 	 * Check for valid media types.
 	 *
 	 * @param array $users                               Array of users.
-	 * @param array $users[]['user_medias']  (optional)  Array of user medias.
+	 * @param array $users[]['medias']       (optional)  Array of user medias.
 	 *
 	 * @throws APIException if user media type does not exist.
 	 *
@@ -604,8 +637,8 @@ class CUser extends CApiService {
 		$mediatypeids = [];
 
 		foreach ($users as $user) {
-			if (array_key_exists('user_medias', $user)) {
-				foreach ($user['user_medias'] as $media) {
+			if (array_key_exists('medias', $user)) {
+				foreach ($user['medias'] as $media) {
 					$mediatypeids[$media['mediatypeid']] = true;
 				}
 			}
@@ -639,8 +672,8 @@ class CUser extends CApiService {
 	 * only e-mail media types.
 	 *
 	 * @param array         $users                                    Array of users.
-	 * @param string        $users[]['user_medias'][]['mediatypeid']  Media type ID.
-	 * @param array|string  $users[]['user_medias'][]['sendto']       Address where to send the alert.
+	 * @param string        $users[]['medias'][]['mediatypeid']       Media type ID.
+	 * @param array|string  $users[]['medias'][]['sendto']            Address where to send the alert.
 	 * @param array         $db_mediatypes                            List of available media types.
 	 *
 	 * @throws APIException if e-mail is not valid or exceeds maximum DB field length.
@@ -659,8 +692,8 @@ class CUser extends CApiService {
 			$email_validator = new CEmailValidator();
 
 			foreach ($users as $user) {
-				if (array_key_exists('user_medias', $user)) {
-					foreach ($user['user_medias'] as $media) {
+				if (array_key_exists('medias', $user)) {
+					foreach ($user['medias'] as $media) {
 						/*
 						 * For non-email media types only one value allowed. Since value is normalized, need to validate
 						 * if array contains only one item. If there are more than one string, error message is
@@ -866,27 +899,27 @@ class CUser extends CApiService {
 	 * @param string $method
 	 */
 	private function updateMedias(array $users, $method) {
-		$medias = [];
+		$users_medias = [];
 
 		foreach ($users as $user) {
-			if (array_key_exists('user_medias', $user)) {
-				$medias[$user['userid']] = [];
+			if (array_key_exists('medias', $user)) {
+				$users_medias[$user['userid']] = [];
 
-				foreach ($user['user_medias'] as $media) {
+				foreach ($user['medias'] as $media) {
 					$media['sendto'] = implode("\n", $media['sendto']);
-					$medias[$user['userid']][] = $media;
+					$users_medias[$user['userid']][] = $media;
 				}
 			}
 		}
 
-		if (!$medias) {
+		if (!$users_medias) {
 			return;
 		}
 
 		$db_medias = ($method === 'update')
 			? DB::select('media', [
 				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
-				'filter' => ['userid' => array_keys($medias)]
+				'filter' => ['userid' => array_keys($users_medias)]
 			])
 			: [];
 
@@ -895,12 +928,12 @@ class CUser extends CApiService {
 		$del_mediaids = [];
 
 		foreach ($db_medias as $db_media) {
-			$index = $this->getSimilarMedia($medias[$db_media['userid']], $db_media['mediatypeid'],
+			$index = $this->getSimilarMedia($users_medias[$db_media['userid']], $db_media['mediatypeid'],
 				$db_media['sendto']
 			);
 
 			if ($index != -1) {
-				$media = $medias[$db_media['userid']][$index];
+				$media = $users_medias[$db_media['userid']][$index];
 
 				$upd_media = [];
 
@@ -921,15 +954,15 @@ class CUser extends CApiService {
 					];
 				}
 
-				unset($medias[$db_media['userid']][$index]);
+				unset($users_medias[$db_media['userid']][$index]);
 			}
 			else {
 				$del_mediaids[] = $db_media['mediaid'];
 			}
 		}
 
-		foreach ($medias as $userid => $user_medias) {
-			foreach ($user_medias as $media) {
+		foreach ($users_medias as $userid => $medias) {
+			foreach ($medias as $media) {
 				$ins_medias[] = ['userid' => $userid] + $media;
 			}
 		}
