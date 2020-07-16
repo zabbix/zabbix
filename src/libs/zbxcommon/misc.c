@@ -436,7 +436,7 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	char		*old_tz;
 	struct tm	*tm;
 
-	if (NULL == tz || '\0' == *tz)
+	if (NULL == tz || 0 == strcmp(tz, "system"))
 		return localtime(time);
 
 	if (NULL != (old_tz = getenv("TZ")))
