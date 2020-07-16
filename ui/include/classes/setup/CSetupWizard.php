@@ -690,20 +690,6 @@ class CSetupWizard extends CForm {
 				$this->doNext();
 			}
 		}
-		elseif ($this->getStep() == 4) {
-			$this->setConfig('default_timezone',
-				getRequest('default_timezone', $this->getConfig('default_timezone', ZBX_DEFAULT_TIMEZONE))
-			);
-
-			if (hasRequest('next') && array_key_exists(4, getRequest('next'))) {
-				$this->doNext();
-			}
-		}
-		elseif ($this->getStep() == 5) {
-			if (hasRequest('next') && array_key_exists(5, getRequest('next'))) {
-				$this->doNext();
-			}
-		}
 		elseif ($this->getStep() == 6) {
 			if (hasRequest('save_config')) {
 				// make zabbix.conf.php downloadable

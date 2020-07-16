@@ -122,14 +122,34 @@ if (!in_array($default_lang, $available_locales)) {
 CSession::setValue('default_lang', $default_lang);
 APP::getInstance()->initLocales($default_lang);
 
+// Set default time zone.
+$default_timezone = ZBX_DEFAULT_TIMEZONE;
+
+if (CSession::keyExists('default_timezone')) {
+	$default_timezone = CSession::getValue('default_timezone');
+}
+elseif (CWebUser::$data) {
+	$default_timezone = CWebUser::$data['timezone'];
+}
+
+$default_timezone = getRequest('default_timezone', $default_timezone);
+
+if ($default_timezone !== ZBX_DEFAULT_TIMEZONE && !in_array($default_timezone, DateTimeZone::listIdentifiers())) {
+	$default_timezone = ZBX_DEFAULT_TIMEZONE;
+}
+
+CSession::setValue('default_timezone', $default_timezone);
+
 // Set default theme.
 $default_theme = ZBX_DEFAULT_THEME;
+
 if (CSession::keyExists('default_theme')) {
 	$default_theme = CSession::getValue('default_theme');
 }
 elseif (CWebUser::$data) {
-	$default_theme = CWebUser::$data['theme'];
+	$default_theme = getUserTheme(CWebUser::$data);
 }
+
 $default_theme = getRequest('default_theme', $default_theme);
 
 if (!in_array($default_theme, array_keys(APP::getThemes()))) {
