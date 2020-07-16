@@ -23,9 +23,8 @@ class CControllerApplicationCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'          => 'db applications.name',
-			'hostid'        => 'required|db hosts.hostid',
-			'applicationid' => 'db applications.applicationid'
+			'name'   => 'db applications.name',
+			'hostid' => 'required|db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -62,7 +61,6 @@ class CControllerApplicationCreate extends CController {
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'application.edit')
-				->setArgument('applicationid', $this->getInput('applicationid', 0))
 				->setArgument('hostid', $this->getInput('hostid'))
 			);
 			$response->setFormData($this->getInputAll());
