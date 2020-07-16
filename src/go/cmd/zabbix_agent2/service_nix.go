@@ -23,11 +23,11 @@ package main
 
 func loadAdditionalFlags() {}
 
-func openEventLog() (err error) { return }
+func openEventLog() error { return nil }
 
-func eventLogInfo(msg string) (err error) { return }
+func eventLogInfo(msg string) error { return nil }
 
-func eventLogErr(err error) error { return }
+func eventLogErr(err error) error { return nil }
 
 func validateExclusiveFlags() error { return nil }
 

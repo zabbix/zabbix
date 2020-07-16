@@ -117,23 +117,6 @@ func eventLogErr(err error) error {
 }
 
 func validateExclusiveFlags() error {
-	/* check for mutually exclusive options */
-	/* Allowed option combinations.		*/
-	/* Option 'c' is always optional.	*/
-	/*   p  t  v  i  d  s  x  m    	*/
-	/* ------------------------    	*/
-	/*   p  -  -  -  -  -  -  - 	*/
-	/*   -  t  -  -  -  -  -  -		*/
-	/*   -  -  v  -  -  -  -  -		*/
-	/*   -  -  -  i  -  -  -  -		*/
-	/*   -  -  -  -  d  -  -  -		*/
-	/*   -  -  -  -  -  s  -  -		*/
-	/*   -  -  -  -  -  -  x  -		*/
-	/*   -  -  -  i  -  -  -  m		*/
-	/*   -  -  -  -  d  -  -  m		*/
-	/*   -  -  -  -  -  s  -  m		*/
-	/*   -  -  -  -  -  -  x  m		*/
-	/*   -  -  -  -  -  -  -  m	 special case required for starting as a service with '-m' option */
 	defaultFlagSet := argTest || argPrint || argVerbose
 	serviceFlagsSet := []bool{svcInstallFlag, svcUninstallFlag, svcStartFlag, svcStopFlag}
 	var count int
@@ -296,6 +279,7 @@ func svcInstall(conf string) error {
 		return fmt.Errorf("failed to create service: %s", err.Error())
 	}
 	defer s.Close()
+
 	err = eventlog.InstallAsEventCreate(serviceName, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
 		err = fmt.Errorf("failed to report service into the event log: %s", err.Error())
@@ -315,11 +299,13 @@ func svcUninstall() error {
 		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
 	}
 	defer m.Disconnect()
+
 	s, err := m.OpenService(serviceName)
 	if err != nil {
 		return fmt.Errorf("failed to open service: %s", err.Error())
 	}
 	defer s.Close()
+
 	err = s.Delete()
 	if err != nil {
 		return fmt.Errorf("failed to delete service: %s", err.Error())
@@ -339,6 +325,7 @@ func svcStart(conf string) error {
 		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
 	}
 	defer m.Disconnect()
+
 	s, err := m.OpenService(serviceName)
 	if err != nil {
 		return fmt.Errorf("failed to open service: %s", err.Error())
@@ -359,16 +346,19 @@ func svcStop() error {
 		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
 	}
 	defer m.Disconnect()
+
 	s, err := m.OpenService(serviceName)
 	if err != nil {
 		return fmt.Errorf("failed to open service: %s", err.Error())
 	}
 	defer s.Close()
+
 	status, err := s.Control(svc.Stop)
 	if err != nil {
 		return fmt.Errorf("failed to send stop request to service: %s", err.Error())
 	}
-	timeout := time.Now().Add(10 * time.Minute)
+
+	timeout := time.Now().Add(10 * time.Second)
 	for status.State != svc.Stopped {
 		if timeout.Before(time.Now()) {
 			return fmt.Errorf("failed to stop '%s' service", serviceName)
