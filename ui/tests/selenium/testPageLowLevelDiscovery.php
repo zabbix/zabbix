@@ -222,8 +222,6 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Name' => 'Temp Status Discovery'
 					],
 					'template' => true,
-//					'message' => 'Cannot send request',
-//					'details' => 'Cannot send request: host is not monitored.',
 					'hostid' => 10250
 				]
 			]
