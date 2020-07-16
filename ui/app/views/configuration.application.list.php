@@ -98,7 +98,7 @@ $current_time = time();
 foreach ($data['applications'] as $application) {
 	$info_icons = [];
 
-	// inherited app, display the template list
+	// Inherited app, display the template list.
 	if ($application['templateids']) {
 		$name = makeApplicationTemplatePrefix($application['applicationid'], $data['parent_templates']);
 		$name[] = $application['name'];
@@ -147,7 +147,7 @@ foreach ($data['applications'] as $application) {
 	]);
 }
 
-// append table to form
+// Append table to form.
 $form->addItem([
 	$application_table,
 	$data['paging'],
