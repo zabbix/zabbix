@@ -34,7 +34,7 @@ FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
 FIELD		|lang		|t_varchar(7)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|refresh	|t_varchar(32)	|'30s'	|NOT NULL	|0
 FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
-FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|0
+FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
@@ -638,7 +638,7 @@ FIELD		|saml_encrypt_nameid	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_encrypt_assertions|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_case_sensitive	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_lang		|t_varchar(5)	|'en_GB'|NOT NULL	|ZBX_NODATA
-FIELD		|default_timezone	|t_varchar(50)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|default_timezone	|t_varchar(50)	|'system'|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 

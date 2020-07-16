@@ -401,8 +401,8 @@ class CSetupWizard extends CForm {
 
 		$table = (new CFormList())
 			->addRow(_('Default time zone'),
-				new CComboBox('default_timezone', $this->getConfig('default_timezone'), 'submit()',
-					[ZBX_DEFAULT_TIMEZONE => ZBX_DEFAULT_TIMEZONE] + array_combine($timezones, $timezones)
+				new CComboBox('default_timezone', $this->getConfig('default_timezone'), null,
+					[ZBX_DEFAULT_TIMEZONE => _('System')] + array_combine($timezones, $timezones)
 				)
 			)
 			->addRow(_('Default theme'),

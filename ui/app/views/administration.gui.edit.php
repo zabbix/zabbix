@@ -70,7 +70,7 @@ $gui_tab = (new CFormList())
 	)
 	->addRow(_('Default time zone'),
 		new CComboBox('default_timezone', $data['default_timezone'], null,
-			[ZBX_DEFAULT_TIMEZONE => ZBX_DEFAULT_TIMEZONE] + array_combine($timezones, $timezones)
+			[ZBX_DEFAULT_TIMEZONE => _('System')] + array_combine($timezones, $timezones)
 		)
 	)
 	->addRow(_('Default theme'),

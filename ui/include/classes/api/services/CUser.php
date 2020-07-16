@@ -1408,7 +1408,7 @@ class CUser extends CApiService {
 		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
 			$db_user['timezone'] = $config['default_timezone'];
 		}
-		if ($db_user['timezone'] !== '') {
+		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
 			date_default_timezone_set($db_user['timezone']);
 		}
 
@@ -1647,7 +1647,7 @@ class CUser extends CApiService {
 		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
 			$db_user['timezone'] = $config['default_timezone'];
 		}
-		if ($db_user['timezone'] !== '') {
+		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
 			date_default_timezone_set($db_user['timezone']);
 		}
 

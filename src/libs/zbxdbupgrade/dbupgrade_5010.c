@@ -91,7 +91,7 @@ static int	DBpatch_5010004(void)
 
 static int	DBpatch_5010005(void)
 {
-	const ZBX_FIELD	field = {"default_timezone", "", NULL, NULL, 50, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"default_timezone", "system", NULL, NULL, 50, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }

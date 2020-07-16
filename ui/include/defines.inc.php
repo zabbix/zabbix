@@ -1517,7 +1517,7 @@ define('ZBX_DEFAULT_LANG', 'en_GB');
 define('TIMEZONE_DEFAULT', 'default');
 
 // the default time zone
-define('ZBX_DEFAULT_TIMEZONE', 'UTC');
+define('ZBX_DEFAULT_TIMEZONE', 'system');
 
 // user default theme
 define('THEME_DEFAULT', 'default');

@@ -136,7 +136,7 @@ else {
 
 // Append languages, timezones & themes to form list.
 $lang_combobox = (new CComboBox('lang', $data['lang']))->addItem(LANG_DEFAULT, _('System default'));
-$timezone_combobox = (new CComboBox('timezone', $data['timezone']))->addItem(ZBX_DEFAULT_TIMEZONE, _('System default'));
+$timezone_combobox = (new CComboBox('timezone', $data['timezone']))->addItem(TIMEZONE_DEFAULT, _('System default'));
 $theme_combobox = (new CComboBox('theme', $data['theme']))->addItem(THEME_DEFAULT, _('System default'));
 
 if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
@@ -180,9 +180,7 @@ else {
 	}
 
 	$timezones = DateTimeZone::listIdentifiers();
-	$timezone_combobox->addItems(
-		[ZBX_DEFAULT_TIMEZONE => ZBX_DEFAULT_TIMEZONE] + array_combine($timezones, $timezones)
-	);
+	$timezone_combobox->addItems(array_combine($timezones, $timezones));
 	$theme_combobox->addItems(APP::getThemes());
 }
 
