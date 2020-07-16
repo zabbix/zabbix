@@ -41,7 +41,7 @@ foreach (getLocales() as $localeid => $locale) {
 	 * Checking if this locale exists in the system. The only way of doing it is to try and set one
 	 * trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC.
 	 */
-	$locale_available = ($localeid === 'en_GB' || setlocale(LC_MONETARY, zbx_locale_variants($localeid)));
+	$locale_available = ($localeid === ZBX_DEFAULT_LANG || setlocale(LC_MONETARY, zbx_locale_variants($localeid)));
 
 	$lang_combobox->addItem($localeid, $locale['name'], null, $locale_available);
 
