@@ -3723,7 +3723,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	}
 	else
 	{
-		if (0 != (nodes_det | ZBX_HOSTINFO_NODES_MASK_ALL))
+		if (0 != (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
 		{
 			for (i = 0; i < ARRSIZE(host_nodes); i++)
 				zbx_free(host_nodes[i].name);
