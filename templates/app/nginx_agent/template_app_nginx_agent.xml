@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2020-07-14T12:30:33Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -17,7 +17,7 @@ https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384765-discussion-thread-for-official-zabbix-template-nginx&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -359,7 +359,7 @@ if (a) {
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>Server: nginx/(.+)
+                     <params>Server: nginx\/(.+(?&lt;!\r))
 \1</params>
                   </step>
                   <step>
