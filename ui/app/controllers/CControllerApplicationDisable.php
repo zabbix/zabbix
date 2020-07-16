@@ -40,8 +40,8 @@ class CControllerApplicationDisable extends CController {
 			return false;
 		}
 
-		return (bool) API::Application()->get([
-			'output' => [],
+		return count($this->getInput('applicationids')) == API::Application()->get([
+			'countOutput' => true,
 			'applicationids' => $this->getInput('applicationids'),
 			'editable' => true
 		]);
