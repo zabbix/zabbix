@@ -343,6 +343,12 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	}
 }
 
+form {
+	&.is-loading {
+		position: relative;
+	}
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -3159,6 +3165,7 @@ $form-icon-btn: (
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+				z-index: 5;
 			}
 		}
 	}
@@ -3323,6 +3330,8 @@ $form-icon-btn: (
 	}
 
 	&.dashbrd-grid-iterator-focus {
+		z-index: 5;
+
 		.dashbrd-grid-iterator-head {
 			margin-top: -2rem;
 			height: 2rem;
@@ -4098,10 +4107,11 @@ $form-icon-btn: (
 		@extend %webkit-scrollbar;
 	}
 
-	.hintbox-description {
+	.hintbox-wrap {
 		overflow: auto;
 		max-height: 240px;
 		max-width: 800px;
+		overflow-wrap: break-word;
 		@extend %webkit-scrollbar;
 	}
 
@@ -5551,7 +5561,7 @@ a.overlay-close-btn {
 			animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear;
 		}
 
-		.delayed-15s {
+		&.delayed-15s {
 			&::before,
 			&::after {
 				animation-delay: 15s;
@@ -5792,10 +5802,6 @@ main {
 
 	&.is-loading {
 		min-height: 64px;
-
-		img {
-			opacity: 0;
-		}
 	}
 }
 

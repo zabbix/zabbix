@@ -36,27 +36,9 @@ catch (Exception $e) {
 	exit;
 }
 
-$default_lang = ZBX_DEFAULT_LANG;
-if (CSession::keyExists('default_lang')) {
-	$default_lang = CSession::getValue('default_lang');
-}
-elseif (CWebUser::$data) {
-	$default_lang = CWebUser::$data['lang'];
-}
-
-$available_locales = [];
-foreach (getLocales() as $localeid => $locale) {
-	if ($locale['display'] && setlocale(LC_MONETARY, zbx_locale_variants($localeid)) !== false) {
-		$available_locales[] = $localeid;
-	}
-}
-
-// Restoring original locale.
-setlocale(LC_MONETARY, zbx_locale_variants($default_lang));
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'default_lang' =>		[T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', $available_locales).'"'), null],
+	'default_lang' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	'type' =>				[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'"'), null],
 	'server' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
 	'port' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
@@ -111,6 +93,26 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
 }
 
 // Set default language.
+$default_lang = ZBX_DEFAULT_LANG;
+
+if (CSession::keyExists('default_lang')) {
+	$default_lang = CSession::getValue('default_lang');
+}
+elseif (CWebUser::$data) {
+	$default_lang = CWebUser::$data['lang'];
+}
+
+$available_locales = [];
+
+foreach (getLocales() as $localeid => $locale) {
+	if ($locale['display'] && setlocale(LC_MONETARY, zbx_locale_variants($localeid)) !== false) {
+		$available_locales[] = $localeid;
+	}
+}
+
+// Restoring original locale.
+setlocale(LC_MONETARY, zbx_locale_variants($default_lang));
+
 $default_lang = getRequest('default_lang', $default_lang);
 
 if (!in_array($default_lang, $available_locales)) {

@@ -24,9 +24,9 @@ class CControllerGuiUpdate extends CController {
 	protected function checkInput() {
 		$themes = array_keys(APP::getThemes());
 		$fields = [
-			'default_lang' =>			'required|in '.implode(',', array_keys(getLocales())).'|db config.default_lang',
+			'default_lang' =>			'db config.default_lang|in '.implode(',', array_keys(getLocales())),
 			'default_timezone' =>		'required|in '.implode(',', DateTimeZone::listIdentifiers()).'|db config.default_timezone',
-			'default_theme' =>			'required|in '.implode(',', $themes).'|db config.default_theme',
+			'default_theme' =>			'required|db config.default_theme|in '.implode(',', $themes),
 			'search_limit' =>			'required|db config.search_limit|ge 1|le 999999',
 			'max_in_table' =>			'required|db config.max_in_table|ge 1|le 99999',
 			'server_check_interval' =>	'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL
@@ -60,15 +60,14 @@ class CControllerGuiUpdate extends CController {
 	}
 
 	protected function doAction() {
-		DBstart();
-		$result = update_config([
-			'default_lang' => $this->getInput('default_lang'),
-			'default_timezone' => $this->getInput('default_timezone'),
-			'default_theme' => $this->getInput('default_theme'),
-			'search_limit' => $this->getInput('search_limit'),
-			'max_in_table' => $this->getInput('max_in_table'),
-			'server_check_interval' => $this->getInput('server_check_interval')
+		$data = [];
+
+		$this->getInputs($data, ['default_lang', 'default_timezone', 'default_theme', 'search_limit', 'max_in_table',
+			'server_check_interval'
 		]);
+
+		DBstart();
+		$result = update_config($data);
 		$result = DBend($result);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
