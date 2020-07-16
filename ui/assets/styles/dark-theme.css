@@ -4552,8 +4552,6 @@ main .server-name {
   overflow: hidden; }
   .flickerfreescreen.is-loading {
     min-height: 64px; }
-    .flickerfreescreen.is-loading img {
-      opacity: 0; }
 
 .graph-wrapper {
   display: inline; }
