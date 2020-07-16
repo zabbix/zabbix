@@ -10,10 +10,10 @@ Most of the metrics are collected in one go, thanks to Zabbix bulk data collecti
 `Template App Nginx by Zabbix agent` collects metrics by polling [ngx_http_stub_status_module](https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html) locally with Zabbix agent:
 
 ```text
-Active connections: 291 
+Active connections: 291
 server accepts handled requests
-16630948 16630948 31070465 
-Reading: 6 Writing: 179 Waiting: 106 
+16630948 16630948 31070465
+Reading: 6 Writing: 179 Waiting: 106
 ```
 
 Note that this template doesn't support https and redirects (limitations of web.page.get).
@@ -36,7 +36,8 @@ Example configuration of Nginx:
 ```text
 location = /basic_status {
     stub_status;
-    allow localhost;
+    allow 127.0.0.1;
+	allow ::1;
     deny all;
 }
 ```
