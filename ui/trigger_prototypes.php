@@ -595,7 +595,6 @@ else {
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => $config,
 		'dependencyTriggers' => []
 	];
 
@@ -605,7 +604,7 @@ else {
 		'output' => ['triggerid', $sortField],
 		'discoveryids' => $data['parent_discoveryid'],
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	$data['triggers'] = API::TriggerPrototype()->get($options);
 

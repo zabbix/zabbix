@@ -553,7 +553,7 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 		return '';
 	}
 
-	$severity_name = $is_total ? ' '.getSeverityName($severity, $data['severity_names']) : '';
+	$severity_name = $is_total ? ' '.getSeverityName($severity) : '';
 	$ext_ack = array_key_exists('ext_ack', $data['filter']) ? $data['filter']['ext_ack'] : EXTACK_OPTION_ALL;
 
 	$allTriggersNum = $stat['count'];
