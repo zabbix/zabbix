@@ -112,8 +112,8 @@ foreach ($data['applications'] as $application) {
 		$name[] = NAME_DELIMITER.$application['name'];
 
 		if ($application['applicationDiscovery']['ts_delete'] != 0) {
-			$info_icons[] = getApplicationLifetimeIndicator(
-				$current_time, $application['applicationDiscovery']['ts_delete']
+			$info_icons[] = getApplicationLifetimeIndicator( $current_time,
+				$application['applicationDiscovery']['ts_delete']
 			);
 		}
 	}
