@@ -25,9 +25,9 @@
 
 $this->addJsFile('multiselect.js');
 
-$checkbox_domain = 'application'.crc32(json_encode([$data['ms_groups'], $data['ms_hosts']]));
+$checkbox_hash = 'application'.crc32(json_encode([$data['ms_groups'], $data['ms_hosts']]));
 if ($data['uncheck']) {
-	uncheckTableRows($checkbox_domain);
+	uncheckTableRows($checkbox_hash);
 }
 
 $filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'application.list')))
@@ -157,7 +157,7 @@ $form->addItem([
 			'application.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected applications?')],
 			'application.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected applications?')]
 		],
-		$checkbox_domain
+		$checkbox_hash
 	)
 ]);
 
