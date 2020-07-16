@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,25 +17,40 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
 
-class CControllerPopupActionRecovery extends CControllerPopupOperationCommon {
+#include "zbxserver.h"
+#include "common.h"
+#include "zbxalgo.h"
+#include "dbcache.h"
+#include "mutexs.h"
 
-	protected function getCheckInputs() {
-		return [
-			'type' =>			'required|in '.ACTION_RECOVERY_OPERATION,
-			'source' =>			'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL]),
-			'operationtype' =>	'in '.implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_RECOVERY_MESSAGE]),
-			'actionid' =>		'string',
-			'update' =>			'in 1',
-			'validate' =>		'in 1',
-			'operation' =>		'array'
-		];
-	}
+#define ZBX_DBCONFIG_IMPL
+#include "dbconfig.h"
 
-	protected function getFormDetails() {
-		return [
-			'param' => 'add_recovery_operation',
-			'input_name' => 'new_recovery_operation'
-		];
-	}
+#include "configcache_mock.h"
+
+#ifndef ZABBIX_CONFIGCACHE_H
+#define ZABBIX_CONFIGCACHE_H
+
+typedef struct
+{
+	ZBX_DC_CONFIG		dc;
+	zbx_vector_ptr_t	host_macros;
+	zbx_vector_ptr_t	global_macros;
+	zbx_vector_ptr_t	hosts;
+
+	zbx_uint64_t		initialized;
+
 }
+zbx_mock_config_t;
+
+#define ZBX_MOCK_CONFIG_USERMACROS	0x0001
+#define ZBX_MOCK_CONFIG_HOSTS		0x0002
+
+void	free_string(const char *str);
+
+#endif

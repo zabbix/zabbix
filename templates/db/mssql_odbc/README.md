@@ -13,6 +13,8 @@ This template was tested on:
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
+
 1. Create an MSSQL user for monitoring.  
   **View Server State** and **View Any Definition** permissions should be granted to the user.  
   For more information please see the MSSQL documentation:  

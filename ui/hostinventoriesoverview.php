@@ -68,7 +68,7 @@ $filter = [
 ];
 
 $ms_groups = [];
-$filter_groupids = $filter['groups'] ? getSubGroups($filter['groups'], $ms_groups, ['real_hosts' => true]) : null;
+$filter_groupids = $filter['groups'] ? getSubGroups($filter['groups'], $ms_groups) : null;
 
 if (count($ms_groups) != count($filter['groups'])) {
 	show_error_message(_('No permissions to referred object or it does not exist!'));
@@ -159,7 +159,8 @@ $grouping_options = array_merge(['' => _('not selected')], $inventories);
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groups_',
-									'real_hosts' => 1
+									'real_hosts' => 1,
+									'enrich_parent_groups' => true
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)

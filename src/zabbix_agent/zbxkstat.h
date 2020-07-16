@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,25 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
 
-class CControllerPopupActionAcknowledge extends CControllerPopupOperationCommon {
+#ifndef ZABBIX_ZBXKSTAT_H
+#define ZABBIX_ZBXKSTAT_H
 
-	protected function getCheckInputs() {
-		return [
-			'type' =>			'required|in '.ACTION_ACKNOWLEDGE_OPERATION,
-			'source' =>			'required|in '.EVENT_SOURCE_TRIGGERS,
-			'operationtype' =>	'in '.implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]),
-			'actionid' =>		'string',
-			'update' =>			'in 1',
-			'validate' =>		'in 1',
-			'operation' =>		'array'
-		];
-	}
+#ifdef HAVE_KSTAT_H
 
-	protected function getFormDetails() {
-		return [
-			'param' => 'add_ack_operation',
-			'input_name' => 'new_ack_operation'
-		];
-	}
+#include "zbxtypes.h"
+
+typedef struct
+{
+	zbx_uint64_t	freemem;
+	zbx_uint64_t	updates;
 }
+zbx_kstat_vminfo_t;
+
+typedef struct
+{
+	zbx_kstat_vminfo_t	vminfo[2];
+	int			vminfo_index;
+}
+zbx_kstat_t;
+
+int	zbx_kstat_init(zbx_kstat_t *kstat, char **error);
+void	zbx_kstat_destroy(void);
+void	zbx_kstat_collect(zbx_kstat_t *kstat);
+int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error);
+
+#endif
+
+#endif
