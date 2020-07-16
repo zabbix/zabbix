@@ -46,6 +46,18 @@ class CControllerApplicationEdit extends CController {
 			return false;
 		}
 
+		if ($this->getInput('applicationid', 0) != 0) {
+			$db_applications = API::Application()->get([
+				'output' => ['applicationid'],
+				'applicationids' => (array) $this->getInput('applicationid'),
+				'editable' => true
+			]);
+
+			if (!$db_applications) {
+				return false;
+			}
+		}
+
 		return isWritableHostTemplates((array) $this->getInput('hostid'));
 	}
 
