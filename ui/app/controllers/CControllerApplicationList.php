@@ -163,12 +163,12 @@ class CControllerApplicationList extends CController {
 		// Get applications.
 		$applications = API::Application()->get([
 			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
-			'hostids' => $filter_hostids ? $filter_hostids : null,
-			'groupids' => $filter_groupids ? $filter_groupids : null,
 			'selectHost' => ['hostid', 'name'],
 			'selectItems' => ['itemid'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectApplicationDiscovery' => ['ts_delete'],
+			'hostids' => $filter_hostids ? $filter_hostids : null,
+			'groupids' => $filter_groupids ? $filter_groupids : null,
 			'editable' => true,
 			'sortfield' => $sort_field,
 			'limit' => $config['search_limit'] + 1
