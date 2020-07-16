@@ -170,7 +170,7 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initDB();
 
-				$this->initLocales(CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG));
+				$this->initLocales(API::Settings()->getDefaultLang([]));
 
 				$this->authenticateUser();
 

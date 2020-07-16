@@ -81,6 +81,25 @@ class CSettings extends CApiService {
 	}
 
 	/**
+	 * Get default language value without authentication.
+	 *
+	 * @param array $options
+	 *
+	 * @return string
+	 */
+	public function getDefaultLang(array $options): string {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' =>[]];
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$options['output'] = ['default_lang'];
+		$result = DBfetch(DBselect($this->createSelectQuery($this->tableName(), ['output' => ['default_lang']])));
+
+		return $result['default_lang'];
+	}
+
+	/**
 	 * Update settings parameters.
 	 *
 	 * @param array $settings

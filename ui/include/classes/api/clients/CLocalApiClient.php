@@ -214,6 +214,6 @@ class CLocalApiClient extends CApiClient {
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkauthentication')
 			|| ($api === 'apiinfo' && $method === 'version')
-			|| ($api === 'settings' && $method === 'get'));
+			|| ($api === 'settings' && $method === 'getdefaultlang'));
 	}
 }
