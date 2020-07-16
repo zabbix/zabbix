@@ -30,15 +30,25 @@ import (
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
+	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/keyaccess"
+	"zabbix.com/internal/agent/scheduler"
+	"zabbix.com/internal/monitor"
+	"zabbix.com/pkg/log"
 )
 
-const serviceName = "Zabbix Agent 2"
-
 var (
-	svcInstallFlag   bool
-	svcUninstallFlag bool
-	svcStartFlag     bool
-	svcStopFlag      bool
+	serviceName = "Zabbix Agent 2"
+
+	svcInstallFlag       bool
+	svcUninstallFlag     bool
+	svcStartFlag         bool
+	svcStopFlag          bool
+	svcMultipleAgentFlag bool
+
+	isInteractive bool
+
+	elog *eventlog.Log
 )
 
 func loadAdditionalFlags() {
@@ -69,17 +79,109 @@ func loadAdditionalFlags() {
 	)
 	flag.BoolVar(&svcStopFlag, "stop", svcStopDefault, svcStopDescription)
 	flag.BoolVar(&svcStopFlag, "x", svcStopDefault, svcStopDescription+" (shorthand)")
+
+	const (
+		svcMultipleDefault     = false
+		svcMultipleDescription = "For -i -d -s -x functions service name will\ninclude Hostname parameter specified in\nconfiguration file"
+	)
+	flag.BoolVar(&svcMultipleAgentFlag, "multiple-agents", svcMultipleDefault, svcMultipleDescription)
+	flag.BoolVar(&svcMultipleAgentFlag, "m", svcMultipleDefault, svcMultipleDescription+" (shorthand)")
 }
 
 func validateExclusiveFlags() error {
+	/* check for mutually exclusive options */
+	/* Allowed option combinations.		*/
+	/* Option 'c' is always optional.	*/
+	/*   p  t  v  i  d  s  x  m    	*/
+	/* ------------------------    	*/
+	/*   p  -  -  -  -  -  -  - 	*/
+	/*   -  t  -  -  -  -  -  -		*/
+	/*   -  -  v  -  -  -  -  -		*/
+	/*   -  -  -  i  -  -  -  -		*/
+	/*   -  -  -  -  d  -  -  -		*/
+	/*   -  -  -  -  -  s  -  -		*/
+	/*   -  -  -  -  -  -  x  -		*/
+	/*   -  -  -  i  -  -  -  m		*/
+	/*   -  -  -  -  d  -  -  m		*/
+	/*   -  -  -  -  -  s  -  m		*/
+	/*   -  -  -  -  -  -  x  m		*/
+	/*   -  -  -  -  -  -  -  m	 special case required for starting as a service with '-m' option */
+	defaultFlagSet := argTest || argPrint || argVerbose
+	serviceFlagsSet := []bool{svcInstallFlag, svcUninstallFlag, svcStartFlag, svcStopFlag}
+	var count int
+	for _, serserviceFlagSet := range serviceFlagsSet {
+		if serserviceFlagSet {
+			count++
+		}
+		if count >= 2 || (serserviceFlagSet && defaultFlagSet) {
+			return errors.New("mutually exclusive options used, use help '-help'('-h'), for additional information")
+		}
+	}
+
 	return nil
 }
 
-func isInteractive() (bool, error) {
+func isInteractiveSession() (bool, error) {
 	return svc.IsAnInteractiveSession()
 }
 
+func setHostname() error {
+	if err := log.Open(log.Console, log.None, "", 0); err != nil {
+		return fmt.Errorf("cannot initialize logger: %s", err)
+	}
+
+	if err := keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
+		return fmt.Errorf("failed to load key access rules: %s", err)
+	}
+
+	var m *scheduler.Manager
+	var err error
+	if m, err = scheduler.NewManager(&agent.Options); err != nil {
+		return fmt.Errorf("cannot create scheduling manager: %s", err)
+	}
+	m.Start()
+	if err = configUpdateItemParameters(m, &agent.Options); err != nil {
+		return fmt.Errorf("cannot process configuration: %s", err)
+	}
+	m.Stop()
+	monitor.Wait(monitor.Scheduler)
+	return nil
+}
+
 func handleWindowsService(conf string) error {
+	var err error
+	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
+		err = resolveWindowsService(conf)
+		if err != nil {
+			return err
+		}
+
+		os.Exit(0)
+	}
+
+	isInteractive, err = isInteractiveSession()
+	if err != nil {
+		return fmt.Errorf("can not determine if is interactive session: %s", err)
+	}
+
+	if !isInteractive {
+		go runService()
+	}
+
+	return nil
+}
+
+func resolveWindowsService(conf string) error {
+	if svcMultipleAgentFlag {
+		if len(agent.Options.Hostname) == 0 {
+			err := setHostname()
+			if err != nil {
+				return err
+			}
+		}
+		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.Options.Hostname)
+	}
+
 	switch true {
 	case svcInstallFlag:
 		if err := svcInstall(conf); err != nil {
@@ -102,10 +204,10 @@ func handleWindowsService(conf string) error {
 		}
 		fmt.Printf("service '%s' stopped succesfully\n", serviceName)
 	}
+
 	return nil
 }
 
-//TODO: add unit test
 func getAgentPath() (p string, err error) {
 	p, err = filepath.Abs(os.Args[0])
 	if err != nil {
@@ -132,11 +234,10 @@ func getAgentPath() (p string, err error) {
 	return
 }
 
-//TODO: maybe grupe connect and open service into a single func, so they are not coded multiple times
 func svcInstall(conf string) error {
 	exepath, err := getAgentPath()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get Zabbix Agent 2 exeutable path: %s", err.Error())
 	}
 
 	m, err := mgr.Connect()
@@ -159,9 +260,13 @@ func svcInstall(conf string) error {
 	defer s.Close()
 	err = eventlog.InstallAsEventCreate(serviceName, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
-		//TODO: manage error
-		s.Delete()
-		return fmt.Errorf("failed to report service into the event log: %s", err.Error())
+		err = fmt.Errorf("failed to report service into the event log: %s", err.Error())
+		derr := s.Delete()
+		if derr != nil {
+			return fmt.Errorf("%s and %s", err.Error(), derr.Error())
+		}
+
+		return err
 	}
 	return nil
 }
@@ -241,7 +346,9 @@ func svcStop() error {
 }
 
 func closeWinService() {
-	closeWg.Done()
+	if !isInteractive {
+		closeWg.Done()
+	}
 }
 
 func runService() {

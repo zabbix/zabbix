@@ -160,7 +160,15 @@ loop:
 	return nil
 }
 
-var confDefault string
+var (
+	confDefault string
+
+	argConfig  bool
+	argTest    bool
+	argPrint   bool
+	argVersion bool
+	argVerbose bool
+)
 
 func main() {
 	var confFlag string
@@ -210,10 +218,6 @@ func main() {
 	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
 	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
 
-	loadAdditionalFlags()
-	if err := validateExclusiveFlags(); err != nil {
-		fatalExit("", err)
-	}
 	var remoteCommand string
 	const (
 		remoteDefault     = ""
@@ -221,9 +225,9 @@ func main() {
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
-	flag.Parse()
+	loadAdditionalFlags()
 
-	var argConfig, argTest, argPrint, argVersion, argVerbose bool
+	flag.Parse()
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
@@ -247,19 +251,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
-		if err := handleWindowsService(confFlag); err != nil {
-			fatalExit("", err)
-		}
-		os.Exit(0)
-	}
-
-	isInteractive, err := isInteractive()
-	if err != nil {
-		fatalExit("can not determine if is interactive session", err)
-	}
-	if !isInteractive {
-		go runService()
+	if err := validateExclusiveFlags(); err != nil {
+		fatalExit("", err)
 	}
 
 	if err := conf.Load(confFlag, &agent.Options); err != nil {
@@ -274,6 +267,10 @@ func main() {
 
 	if err := agent.ValidateOptions(agent.Options); err != nil {
 		fatalExit("cannot validate configuration", err)
+	}
+
+	if err := handleWindowsService(confFlag); err != nil {
+		fatalExit("", err)
 	}
 
 	if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
@@ -483,9 +480,7 @@ func main() {
 	if foregroundFlag && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
 	}
-	if !isInteractive {
-		closeWinService()
-	}
+	closeWinService()
 }
 
 func fatalExit(message string, err error) {

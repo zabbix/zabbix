@@ -19,20 +19,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-var (
-	svcInstallFlag   bool
-	svcUninstallFlag bool
-	svcStartFlag     bool
-	svcStopFlag      bool
-)
-
+package main
 
 func loadAdditionalFlags() {}
 
-func handleWindowsService(conf string) error {
-	return nil
-}
+func validateExclusiveFlags() error { return nil }
+
+func handleWindowsService(conf string) error { return nil }
 
 func closeWinService() {}
-
-func runService() {}
