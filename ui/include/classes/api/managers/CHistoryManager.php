@@ -25,17 +25,77 @@
 class CHistoryManager {
 
 	/**
+	 * Returns a subset of $items having history data within the $period of time.
+	 *
+	 * @param array $items   An array of items with the 'itemid' and 'value_type' properties.
+	 * @param int   $period  The maximum period of time to search for history values within.
+	 *
+	 * @return array  An array with items IDs as keys and the original item data as values.
+	 */
+	public function getItemsHavingValues(array $items, $period = null) {
+		$items = zbx_toHash($items, 'itemid');
+
+		$results = [];
+		$grouped_items = $this->getItemsGroupedByStorage($items);
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
+			$results += $this->getLastValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC], 1, $period);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
+			$results += $this->getItemsHavingValuesFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL], $period);
+		}
+
+		return array_intersect_key($items, $results);
+	}
+
+	/**
+	 * SQL specific implementation of getItemsHavingValues.
+	 *
+	 * @see CHistoryManager::getItemsHavingValues
+	 */
+	private function getItemsHavingValuesFromSql(array $items, $period = null) {
+		$results = [];
+
+		if ($period) {
+			$period = time() - $period;
+		}
+
+		$items = zbx_toHash($items, 'itemid');
+
+		$itemids_by_type = [];
+
+		foreach ($items as $itemid => $item) {
+			$itemids_by_type[$item['value_type']][] = $itemid;
+		}
+
+		foreach ($itemids_by_type as $type => $type_itemids) {
+			$type_results = DBfetchColumn(DBselect(
+				'SELECT itemid'.
+				' FROM '.self::getTableName($type).
+				' WHERE '.dbConditionInt('itemid', $type_itemids).
+				' GROUP BY itemid'.
+					($period ? ' HAVING MAX(clock)>'.$period : '')
+			), 'itemid');
+
+			$results += array_intersect_key($items, array_flip($type_results));
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Returns the last $limit history objects for the given items.
 	 *
-	 * @param array $items     an array of items with the 'itemid' and 'value_type' properties
-	 * @param int   $limit     max object count to be returned
-	 * @param int   $period    the maximum period to retrieve data for
+	 * @param array $items   An array of items with the 'itemid' and 'value_type' properties.
+	 * @param int   $limit   Max object count to be returned.
+	 * @param int   $period  The maximum period to retrieve data for.
 	 *
-	 * @return array    an array with items IDs as keys and arrays of history objects as values
+	 * @return array  An array with items IDs as keys and arrays of history objects as values.
 	 */
 	public function getLastValues(array $items, $limit = 1, $period = null) {
 		$results = [];
-		$grouped_items = self::getItemsGroupedByStorage($items);
+		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
 			$results += $this->getLastValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC], $limit,
@@ -404,16 +464,16 @@ class CHistoryManager {
 	 *
 	 * The $item parameter must have the value_type, itemid and source properties set.
 	 *
-	 * @param array  $items      items to get aggregated values for
-	 * @param int    $time_from  minimal timestamp (seconds) to get data from
-	 * @param int    $time_to    maximum timestamp (seconds) to get data from
-	 * @param string $function   function for data aggregation
-	 * @param string $interval   aggregation interval in seconds
+	 * @param array  $items      Items to get aggregated values for.
+	 * @param int    $time_from  Minimal timestamp (seconds) to get data from.
+	 * @param int    $time_to    Maximum timestamp (seconds) to get data from.
+	 * @param string $function   Function for data aggregation.
+	 * @param string $interval   Aggregation interval in seconds.
 	 *
-	 * @return array    history value aggregation for graphs
+	 * @return array  History value aggregation for graphs.
 	 */
 	public function getGraphAggregationByInterval(array $items, $time_from, $time_to, $function, $interval) {
-		$grouped_items = self::getItemsGroupedByStorage($items);
+		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		$results = [];
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
@@ -658,15 +718,15 @@ class CHistoryManager {
 	 *
 	 * The $item parameter must have the value_type, itemid and source properties set.
 	 *
-	 * @param array $items      items to get aggregated values for
-	 * @param int   $time_from  minimal timestamp (seconds) to get data from
-	 * @param int   $time_to    maximum timestamp (seconds) to get data from
-	 * @param int   $width      graph width in pixels (is not required for pie charts)
+	 * @param array $items      Items to get aggregated values for.
+	 * @param int   $time_from  Minimal timestamp (seconds) to get data from.
+	 * @param int   $time_to    Maximum timestamp (seconds) to get data from.
+	 * @param int   $width      Graph width in pixels (is not required for pie charts).
 	 *
-	 * @return array    history value aggregation for graphs
+	 * @return array  History value aggregation for graphs.
 	 */
 	public function getGraphAggregationByWidth(array $items, $time_from, $time_to, $width = null) {
-		$grouped_items = self::getItemsGroupedByStorage($items);
+		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		$results = [];
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
@@ -907,11 +967,11 @@ class CHistoryManager {
 	 *
 	 * The $item parameter must have the value_type and itemid properties set.
 	 *
-	 * @param array  $item         item to get aggregated value for
-	 * @param string $aggregation  aggregation to be applied (min / max / avg)
-	 * @param int    $time_from    timestamp (seconds)
+	 * @param array  $item         Item to get aggregated value for.
+	 * @param string $aggregation  Aggregation to be applied (min / max / avg).
+	 * @param int    $time_from    Timestamp (seconds).
 	 *
-	 * @return string    aggregated history value
+	 * @return string  Aggregated history value.
 	 */
 	public function getAggregatedValue(array $item, $aggregation, $time_from) {
 		switch (self::getDataSourceType($item['value_type'])) {
@@ -1065,7 +1125,7 @@ class CHistoryManager {
 			error(_('Some of the history for this item may be compressed, deletion is not available.'));
 
 			return false;
-		};
+		}
 
 		foreach ($item_tables as $table_name) {
 			$itemids = array_keys(array_intersect($items, [(string) $table_names[$table_name]]));
@@ -1081,9 +1141,9 @@ class CHistoryManager {
 	/**
 	 * Get type name by value type id.
 	 *
-	 * @param int $value_type    value type id
+	 * @param int $value_type  Value type id.
 	 *
-	 * @return string    value type name
+	 * @return string  Value type name.
 	 */
 	public static function getTypeNameByTypeId($value_type) {
 		$mapping = [
@@ -1105,9 +1165,9 @@ class CHistoryManager {
 	/**
 	 * Get type id by value type name.
 	 *
-	 * @param int $type_name    value type name
+	 * @param int $type_name  Value type name.
 	 *
-	 * @return int    value type id
+	 * @return int  Value type id.
 	 */
 	public static function getTypeIdByTypeName($type_name) {
 		$mapping = [
@@ -1129,9 +1189,9 @@ class CHistoryManager {
 	/**
 	 * Get data source (SQL or Elasticsearch) type based on value type id.
 	 *
-	 * @param int $value_type    value type id
+	 * @param int $value_type  Value type id.
 	 *
-	 * @return string    data source type
+	 * @return string  Data source type.
 	 */
 	public static function getDataSourceType($value_type) {
 		static $cache = [];
@@ -1196,9 +1256,9 @@ class CHistoryManager {
 	/**
 	 * Get endpoints for Elasticsearch requests.
 	 *
-	 * @param mixed $value_types    value type(s)
+	 * @param mixed $value_types  Value type(s).
 	 *
-	 * @return array    Elasticsearch query endpoints
+	 * @return array  Elasticsearch query endpoints.
 	 */
 	public static function getElasticsearchEndpoints($value_types, $action = '_search') {
 		if (!is_array($value_types)) {
@@ -1226,9 +1286,9 @@ class CHistoryManager {
 	/**
 	 * Return the name of the table where the data for the given value type is stored.
 	 *
-	 * @param int $value_type    value type
+	 * @param int $value_type  Value type.
 	 *
-	 * @return string|array    table name| all tables
+	 * @return string|array  Table name | all tables.
 	 */
 	public static function getTableName($value_type = null) {
 		$tables = [
@@ -1245,9 +1305,9 @@ class CHistoryManager {
 	/**
 	 * Returns the items grouped by the storage type.
 	 *
-	 * @param array $items     an array of items with the 'value_type' property
+	 * @param array $items  An array of items with the 'value_type' property.
 	 *
-	 * @return array    an array with storage type as a keys and item arrays as a values
+	 * @return array  An array with storage type as a keys and item arrays as a values.
 	 */
 	private function getItemsGroupedByStorage(array $items) {
 		$grouped_items = [];

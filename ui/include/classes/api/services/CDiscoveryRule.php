@@ -511,98 +511,50 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Delete DiscoveryRules.
 	 *
 	 * @param array $ruleids
-	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $ruleids, $nopermissions = false) {
-		if (empty($ruleids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	public function delete(array $ruleids) {
+		$this->validateDelete($ruleids);
+
+		CDiscoveryRuleManager::delete($ruleids);
+
+		return ['ruleids' => $ruleids];
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $ruleids   [IN/OUT]
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateDelete(array &$ruleids) {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $ruleids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$ruleids = array_keys(array_flip($ruleids));
-
-		$delRules = $this->get([
-			'output' => API_OUTPUT_EXTEND,
+		$db_rules = $this->get([
+			'output' => ['templateid'],
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		// TODO: remove $nopermissions hack
-		if (!$nopermissions) {
-			foreach ($ruleids as $ruleid) {
-				if (!isset($delRules[$ruleid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-				}
-				if ($delRules[$ruleid]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
-				}
-			}
-		}
-
-		// get child discovery rules
-		$parentItemids = $ruleids;
-		$childTuleids = [];
-		do {
-			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
-			$parentItemids = [];
-			while ($dbItem = DBfetch($dbItems)) {
-				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
-				$childTuleids[$dbItem['itemid']] = $dbItem['itemid'];
-			}
-		} while (!empty($parentItemids));
-
-		$delRulesChildren = $this->get([
-			'output' => API_OUTPUT_EXTEND,
-			'itemids' => $childTuleids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-
-		$delRules = array_merge($delRules, $delRulesChildren);
-		$ruleids = array_merge($ruleids, $childTuleids);
-
-		$iprototypeids = [];
-		$dbItems = DBselect(
-			'SELECT i.itemid'.
-			' FROM item_discovery id,items i'.
-			' WHERE i.itemid=id.itemid'.
-				' AND '.dbConditionInt('parent_itemid', $ruleids)
-		);
-		while ($item = DBfetch($dbItems)) {
-			$iprototypeids[$item['itemid']] = $item['itemid'];
-		}
-		if ($iprototypeids) {
-			CItemPrototypeManager::delete($iprototypeids);
-		}
-
-		// delete host prototypes
-		$hostPrototypeIds = DBfetchColumn(DBselect(
-			'SELECT hd.hostid'.
-			' FROM host_discovery hd'.
-			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
-		), 'hostid');
-		if ($hostPrototypeIds) {
-			if (!API::HostPrototype()->delete($hostPrototypeIds, true)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
-			}
-		}
-
-		// delete LLD rules
-		DB::delete('items', ['itemid' => $ruleids]);
-
-		$insert = [];
 		foreach ($ruleids as $ruleid) {
-			$insert[] = [
-				'tablename' => 'events',
-				'field' => 'lldruleid',
-				'value' => $ruleid
-			];
-		}
-		DB::insertBatch('housekeeper', $insert);
+			if (!array_key_exists($ruleid, $db_rules)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 
-		return ['ruleids' => $ruleids];
+			$db_rule = $db_rules[$ruleid];
+
+			if ($db_rule['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
+			}
+		}
 	}
 
 	/**

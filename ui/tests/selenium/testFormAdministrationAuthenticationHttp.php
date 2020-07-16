@@ -288,10 +288,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					]
 				]
 			],
-			// HTTP authentication - Login with user admin-zabbix (Zabbix Admin).
+			// HTTP authentication - Login with user http-auth-admin (Zabbix Admin).
 			[
 				[
-					'user' => 'local.com\\admin-zabbix',
+					'user' => 'local.com\\http-auth-admin',
 					'password' => 'zabbix',
 					'file' => 'htaccess',
 					'http_authentication' => [
