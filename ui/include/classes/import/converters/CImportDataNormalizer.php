@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -85,12 +85,9 @@ class CImportDataNormalizer {
 	protected function normalizeStrings($data) {
 		if ($this->rules['type'] & XML_STRING) {
 			$data = str_replace("\r\n", "\n", $data);
-
-			if (array_key_exists('flags', $this->rules) && $this->rules['flags'] & self::EOL_LF) {
-			}
-			else {
-				$data = str_replace("\n", "\r\n", $data);
-			}
+			$data = (array_key_exists('flags', $this->rules) && $this->rules['flags'] & self::EOL_LF)
+				? str_replace("\n", "\r\n", $data)
+				: $data;
 		}
 
 		return $data;
