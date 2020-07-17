@@ -15,7 +15,9 @@ class CTabFilter extends CDiv {
 	 */
 	public $tabs = [];
 
-	// TODO: remove $tabs_data.
+	/**
+	 * Tab options array.
+	 */
 	public $options = [
 		// allow to reorder tabs
 		'sortable' => true,
@@ -27,6 +29,9 @@ class CTabFilter extends CDiv {
 		'data' => [],
 	];
 
+	/**
+	 * Tab form available buttons node. Will be initialized during __construct but can be overwritten if needed.
+	 */
 	public $buttons = null;
 
 	/**
@@ -68,12 +73,7 @@ class CTabFilter extends CDiv {
 					->addClass(ZBX_STYLE_BTN_ALT)
 			)
 			->addItem(
-				(new CRedirectButton(_('Reset'),
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'host.view')
-						->setArgument('filter_rst', 1)
-						->getUrl()
-				))
+				(new CSubmitButton(_('Reset'), 'filter_reset', 1))
 					->addClass(ZBX_STYLE_BTN_ALT)
 			)
 			->addClass('form-buttons');
@@ -91,7 +91,12 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Add tab item, is tab dynamic or no is decided by $content
+	 * Add tab item, is tab dynamic or no is decided by $content.
+	 *
+	 * @param CTag|string $label    String or CTag as tab label element. Content node if it is not null will have
+	 *                              id attribute equal [data-target] attribute of $label.
+	 * @param CTag|null   $content  Tab content node or null is dynamic tab is added.
+	 * @param array       $data     Array of data used by tab.
 	 */
 	public function addTab($label, $content, array $data = []) {
 		$tab_index = count($this->labels);
@@ -135,35 +140,36 @@ class CTabFilter extends CDiv {
 	}
 
 	/**
-	 * Add pre-rendered tab.
-	 *
-	 * @param string|CTag   $label    Tab label.
-	 * @param CPartial|CTag $content  Tab content object.
-	 *
-	 * @return CTabFilter
+	 * Return top navigation markup.
 	 */
-	// public function addSimpleTab($label, $content): CTabFilter {
-		// TODO: change!!!
-		// if (is_a($content, CPartial::class)) {
-		// 	$content = (new CDiv($content))->setId(uniqid(static::CSS_ID_PREFIX));
-		// }
+	protected function getNavigation() {
+		$home = reset($this->labels);
+		$sortable = (new CList(array_slice($this->labels, 1, -1)))->addClass(static::CSS_TAB_SORTABLE_CONTAINER);
+		$timetablabel = end($this->labels);
+		$nav = [
+			(new CSimpleButton())
+				->setAttribute('data-action', 'selectPrevTab')
+				->addClass('btn-iterator-page-previous'),
+			$home, $sortable, $timetablabel,
+			(new CSimpleButton())
+				->setAttribute('data-action', 'toggleTabsList')
+				->addClass('btn-widget-expand'),
+			(new CSimpleButton())
+				->setAttribute('data-action', 'selectNextTab')
+				->addClass('btn-iterator-page-next'),
+			(new CSimpleButton())
+				->setEnabled(false)
+				->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+			(new CSimpleButton(_('Zoom out')))
+				->setEnabled(false)
+				->addClass(ZBX_STYLE_BTN_TIME_OUT),
+			(new CSimpleButton())
+				->setEnabled(false)
+				->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+		];
 
-		// $targetid = $content->getId();
-
-		// if (!strlen($targetid)) {
-		// 	$targetid = uniqid(static::CSS_ID_PREFIX);
-		// 	$content->setId($targetid);
-		// }
-
-		// if (!is_a($label, CTag::class)) {
-		// 	$label = new CLink($label);
-		// }
-
-		// $label->setAttribute('data-target', '#'.$targetid);
-		// $this->tabs[] = [$label, $content, []];
-
-		// return $this;
-	// }
+		return new CTag('nav', true , new CList($nav));
+	}
 
 	public function bodyToString() {
 		$tab_active = 0;
@@ -193,7 +199,7 @@ class CTabFilter extends CDiv {
 		}
 
 		return implode('', [
-			new CTag('nav', true , (new CList($this->labels))->addClass(static::CSS_TAB_SORTABLE_CONTAINER)),
+			$this->getNavigation(),
 			(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
 			$this->buttons,
 			$templates,

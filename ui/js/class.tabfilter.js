@@ -44,7 +44,7 @@ class CTabFilter extends CBaseComponent {
 			this._templates[template.getAttribute('data-template')] = template;
 		};
 
-		for (const title of this._target.childNodes.item(0).querySelectorAll('[data-target]')) {
+		for (const title of this._target.querySelectorAll('nav [data-target]')) {
 			template = options.data[data_index] ? options.data[data_index].template : null;
 			container = containers.querySelector('#'+title.getAttribute('data-target'));
 
@@ -71,9 +71,6 @@ class CTabFilter extends CBaseComponent {
 				this._active_item = item;
 			}
 		}
-
-		// TODO: add .tabfilter-sortable container for sortable tabs.
-		$('.ui-sortable', this._target).sortable({});
 	}
 
 	registerEvents(options) {
@@ -95,6 +92,30 @@ class CTabFilter extends CBaseComponent {
 
 			afterTabContentRender: (ev) => {
 				this.afterTabContentRender(ev.detail.target);
+			},
+
+			tabSortChanged: (ev, ui) => {
+				// Tab order changed, update changes via ajax
+			},
+
+			selectPrevTab: (ev) => {
+				let index = this._items.indexOf(this._active_item);
+
+				if (index > 0) {
+					this._items[index - 1].select();
+				}
+			},
+
+			selectNextTab: (ev) => {
+				let index = this._items.indexOf(this._active_item);
+
+				if (index > -1 && index < this._items.length - 1) {
+					this._items[index + 1].select();
+				}
+			},
+
+			toggleTabsList: (ev) => {
+
 			}
 		}
 
@@ -102,6 +123,14 @@ class CTabFilter extends CBaseComponent {
 			item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
 			item.on(TABFILTERITEM_EVENT_AFTER_RENDER, this._events.afterTabContentRender);
+		}
+
+		$('.ui-sortable', this._target).sortable({
+			update: this._events.tabSortChanged
+		});
+
+		for (const action of this._target.querySelectorAll('nav [data-action]')) {
+			action.addEventListener('click', this._events[action.getAttribute('data-action')]);
 		}
 	}
 
