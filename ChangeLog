@@ -1704,8 +1704,20 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.23rc1
 
 New features:
+.......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
+.......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
 
 Bug fixes:
+...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
+........S. [ZBX-18014] fixed memory leak when action message does not have to be sent (viktors)
+..F....... [ZBX-15117] fixed graph configuration with large amount of items (talbergs)
+........S. [ZBX-18069] fixed server exit when trying to execute IPMI script without IPMI pollers (wiper)
+A......... [ZBX-17960] fixed undefined index in trends API (talbergs)
+..F....... [ZBX-17682] fixed button disable state in template item list and discovery list (rlataria)
+..F....... [ZBX-17820] fixed classic graph widget default header (talbergs)
+..F....... [ZBX-17924] fixed php errors in "System information" window for MySQL (talbergs)
+...G...... [ZBX-17917] changed vm.memory.size keys on Solaris to get memory usage statistics from kstat (wiper)
+...G...... [ZBX-18029] fixed cpu counter wraparound handling on Solaris (wiper)
 .......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
 A.F....... [ZBX-17860] fixed host prototype import (rlataria)
 ...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
