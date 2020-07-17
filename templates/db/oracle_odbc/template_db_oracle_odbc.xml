@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-14T10:52:33Z</date>
+   <date>2020-07-17T11:26:51Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -86,14 +86,14 @@ WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';</params>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT 
+               <params>SELECT
 INSTANCE_NAME,
-HOST_NAME, 
-VERSION || '-' || EDITION AS VERSION, 
-floor((SYSDATE - startup_time)*60*60*24) AS UPTIME, 
-decode(status,'STARTED',1,'MOUNTED',2,'OPEN',3,'OPEN MIGRATE',4, 0) AS STATUS, 
-decode(archiver,'STOPPED',1,'STARTED',2,'FAILED',3, 0) AS  ARCHIVER, 
-decode(INSTANCE_ROLE,'PRIMARY_INSTANCE',1,'SECONDARY_INSTANCE',2, 0) AS  INSTANCE_ROLE
+HOST_NAME,
+VERSION || '-' || EDITION AS VERSION,
+floor((SYSDATE - startup_time)*60*60*24) AS UPTIME,
+decode(status,'STARTED',1,'MOUNTED',2,'OPEN',3,'OPEN MIGRATE',4, 0) AS STATUS,
+decode(archiver,'STOPPED',1,'STARTED',2,'FAILED',3, 0) AS  ARCHIVER,
+decode(instance_role,'PRIMARY_INSTANCE',1,'SECONDARY_INSTANCE',2, 0) AS  INSTANCE_ROLE
 FROM v$instance;</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
@@ -112,44 +112,47 @@ FROM v$instance;</params>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <params>SELECT 'sysmetrics' AS  TYPE, METRIC_NAME, VALUE
-FROM V$SYSMETRIC
-WHERE GROUP_ID = 2
+               <params>SELECT 'SYS::' || METRIC_NAME AS METRIC, VALUE
+ FROM V$SYSMETRIC WHERE GROUP_ID = 2
 UNION
-SELECT 'parameters' AS  TYPE, NAME AS METRIC_NAME,
-to_number(VALUE)
-FROM V$SYSTEM_PARAMETER
-WHERE NAME IN ('sessions','processes','db_files')
+ SELECT 'SYSPARAM::' || INITCAP(NAME) AS METRIC, to_number(VALUE)
+ FROM V$SYSTEM_PARAMETER WHERE NAME IN ('sessions', 'processes', 'db_files')
 UNION
-SELECT 'sessions' AS TYPE , status||'_'||TYPE AS METRIC_NAME, COUNT(*) as VALUE FROM v$session GROUP BY status, TYPE
+ SELECT 'SESSION::' || INITCAP(STATUS)|| ' ' || INITCAP(TYPE) AS METRIC, COUNT(*) AS VALUE
+ FROM V$SESSION GROUP BY STATUS, TYPE
 UNION
-SELECT 'sessions' AS TYPE ,'total' , COUNT(*) as VALUE FROM v$session
+SELECT 'SESSION::Total', COUNT(*) AS VALUE
+  FROM V$SESSION
 UNION
-SELECT 'pga' AS TYPE, name, value FROM v$pgastat
+ SELECT 'PGA::' || INITCAP(NAME), VALUE FROM V$PGASTAT
 UNION
-SELECT 'fra', 'space_limit', space_limit FROM v$recovery_file_dest def
+ SELECT 'FRA::Space Limit' AS METRIC, space_limit AS VALUE FROM V$RECOVERY_FILE_DEST
 UNION
-SELECT 'fra', 'space_used', space_used FROM v$recovery_file_dest def
+ SELECT 'FRA::Space Used', space_used AS VALUE FROM V$RECOVERY_FILE_DEST
 UNION
-SELECT 'fra', 'space_reclaimable', space_reclaimable FROM v$recovery_file_dest def
+ SELECT 'FRA::Space Reclaimable', space_reclaimable AS VALUE FROM V$RECOVERY_FILE_DEST
 UNION
-SELECT 'fra', 'number_of_files', number_of_files FROM v$recovery_file_dest def
+ SELECT 'FRA::Number Of Files', number_of_files AS VALUE FROM V$RECOVERY_FILE_DEST
 UNION
-SELECT 'fra', 'usable_pct', DECODE(space_limit, 0, 0,(100-(100 *(space_used - space_reclaimable)/ space_limit))) FROM v$recovery_file_dest
+ SELECT 'FRA::Usable Pct', DECODE(space_limit, 0, 0,(100-(100 *(space_used-space_reclaimable)/ space_limit))) AS VALUE FROM V$RECOVERY_FILE_DEST
 UNION
-SELECT 'fra', 'restore_point', COUNT(*) FROM v$restore_point
+ SELECT 'FRA::Restore Point', COUNT(*) AS VALUE FROM V$RESTORE_POINT
 UNION
-SELECT 'processes', 'procnum', COUNT(*)  FROM v$process
+ SELECT 'PROC::Procnum', COUNT(*) FROM v$process
 UNION
-SELECT 'datafile', 'count', COUNT(*)  FROM v$datafile
+ SELECT 'DATAFILE::Count', COUNT(*) FROM v$datafile
 UNION
-SELECT 'SGA Pool', pool, SUM(bytes) FROM V$SGASTAT WHERE pool IN ( 'java pool', 'large pool' ) GROUP BY pool
+ SELECT 'SGA::' || INITCAP(pool), SUM(bytes) FROM V$SGASTAT
+  WHERE pool IN ( 'java pool', 'large pool' ) GROUP BY pool
 UNION
-SELECT 'SGA Pool', 'shared pool', SUM(bytes) FROM V$SGASTAT WHERE pool = 'shared pool' AND name NOT IN ('library cache', 'dictionary cache', 'free memory','sql area')
+ SELECT 'SGA::Shared Pool', SUM(bytes) FROM V$SGASTAT
+  WHERE pool = 'shared pool' AND name NOT IN ('library cache', 'dictionary cache', 'free memory', 'sql area')
 UNION
-SELECT 'SGA component name', name, bytes FROM V$SGASTAT WHERE pool IS NULL AND name IN ('log_buffer', 'fixed_sga')
+ SELECT 'SGA::' || INITCAP(name), bytes FROM V$SGASTAT
+  WHERE pool IS NULL AND name IN ('log_buffer', 'fixed_sga')
 UNION
-SELECT 'SGA component name', 'buffer_cache', SUM(bytes) FROM V$SGASTAT WHERE pool IS NULL AND name IN ('buffer_cache', 'db_block_buffers');</params>
+ SELECT 'SGA::Buffer_Cache', SUM(bytes) FROM V$SGASTAT
+  WHERE pool IS NULL AND name IN ('buffer_cache', 'db_block_buffers');</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
                <description>The item gets system metric values.</description>
@@ -271,7 +274,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Active Parallel Sessions')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Active Parallel Sessions')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -294,7 +297,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Active Serial Sessions')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Active Serial Sessions')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -317,7 +320,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Average Active Sessions')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Average Active Sessions')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -366,7 +369,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Buffer Cache Hit Ratio')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Buffer Cache Hit Ratio')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -388,7 +391,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Global Cache Blocks Corrupted')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Global Cache Blocks Corrupted')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -410,7 +413,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Global Cache Blocks Lost')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Global Cache Blocks Lost')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -434,7 +437,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.METRIC_NAME=='Cursor Cache Hit Ratio')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Cursor Cache Hit Ratio')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -458,7 +461,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Database CPU Time Ratio')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Database CPU Time Ratio')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -482,7 +485,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Database Wait Time Ratio')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Database Wait Time Ratio')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -495,7 +498,6 @@ SELECT
                <key>oracle.db_files_count</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <description>Current number of datafile.</description>
                <applications>
                   <application>
@@ -505,7 +507,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='datafile' &amp;&amp; @.METRIC_NAME=='count')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='DATAFILE::Count')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -518,7 +520,6 @@ SELECT
                <key>oracle.db_files_limit</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <description>Max allowable number of  datafile.</description>
                <applications>
                   <application>
@@ -528,7 +529,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='parameters' &amp;&amp; @.METRIC_NAME=='db_files')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYSPARAM::Db_Files')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -552,7 +553,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Disk Sort Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Disk Sort Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -576,7 +577,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Enqueue Timeouts Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Enqueue Timeouts Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -589,7 +590,6 @@ SELECT
                <key>oracle.fra_number_of_files</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <description>Number of files in the fast recovery area</description>
                <applications>
                   <application>
@@ -599,7 +599,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='number_of_files')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='FRA::Number Of Files')].VALUE.first()</params>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -623,7 +623,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='restore_point')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='FRA::Restore Point')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -636,8 +636,7 @@ SELECT
                <key>oracle.fra_space_limit</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>Byte</units>
+               <units>B</units>
                <description>Maximum amount of disk space (in bytes) that the database can use for the fast recovery area.</description>
                <applications>
                   <application>
@@ -647,7 +646,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='space_limit')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='FRA::Space Limit')].VALUE.first()</params>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -662,8 +661,7 @@ SELECT
                <key>oracle.fra_space_reclaimable</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>Byte</units>
+               <units>B</units>
                <description>Total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the fast recovery area.</description>
                <applications>
                   <application>
@@ -673,7 +671,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='space_reclaimable')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='FRA::Space Reclaimable')].VALUE.first()</params>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -688,7 +686,6 @@ SELECT
                <key>oracle.fra_space_used</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <units>Bytes</units>
                <description>Amount of disk space (in bytes) used by fast recovery area files created in current and all previous fast recovery areas.</description>
                <applications>
@@ -699,7 +696,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='space_used')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='FRA::Space Used')].VALUE.first()</params>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -724,7 +721,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='fra' &amp;&amp; @.METRIC_NAME=='usable_pct')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='FRA::Usable Pct')].VALUE.first()</params>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
                   </step>
@@ -750,7 +747,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='GC CR Block Received Per Second')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::GC CR Block Received Per Second')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -824,31 +821,6 @@ SELECT
                </triggers>
             </item>
             <item>
-               <name>Oracle: Instance role</name>
-               <type>DEPENDENT</type>
-               <key>oracle.instance_role</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <description>Indicates whether the instance is an active instance or an inactive secondary instance.</description>
-               <applications>
-                  <application>
-                     <name>Oracle</name>
-                  </application>
-               </applications>
-               <valuemap>
-                  <name>Oracle instance role</name>
-               </valuemap>
-               <preprocessing>
-                  <step>
-                     <type>JSONPATH</type>
-                     <params>$..INSTANCE_ROLE.first()</params>
-                  </step>
-               </preprocessing>
-               <master_item>
-                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
-               </master_item>
-            </item>
-            <item>
                <name>Oracle: Instance status</name>
                <type>DEPENDENT</type>
                <key>oracle.instance_status</key>
@@ -874,6 +846,31 @@ SELECT
                </master_item>
             </item>
             <item>
+               <name>Oracle: Instance role</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance.role</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Indicates whether the instance is an active instance or an inactive secondary instance.</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>Oracle instance role</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$..INSTANCE_ROLE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,"{$ORACLE.DSN}"]</key>
+               </master_item>
+            </item>
+            <item>
                <name>Oracle: Library Cache Hit Ratio</name>
                <type>DEPENDENT</type>
                <key>oracle.library_cache_hit_ratio</key>
@@ -890,7 +887,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Library Cache Hit Ratio')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Library Cache Hit Ratio')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -914,7 +911,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Logons Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Logons Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -938,7 +935,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Long Table Scans Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Long Table Scans Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -962,7 +959,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Memory Sorts Ratio')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Memory Sorts Ratio')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -975,8 +972,7 @@ SELECT
                <key>oracle.pga_global_bound</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>Byte</units>
+               <units>B</units>
                <description>Maximum size of a work area executed in automatic mode.</description>
                <applications>
                   <application>
@@ -986,7 +982,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='global memory bound')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='PGA::Global Memory Bound')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -999,8 +995,7 @@ SELECT
                <key>oracle.pga_target</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>Byte</units>
+               <units>B</units>
                <description>Current value of the PGA_AGGREGATE_TARGET initialization parameter. If this parameter is not set, then its value is 0 and automatic management of PGA memory is disabled.</description>
                <applications>
                   <application>
@@ -1010,7 +1005,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='aggregate PGA target parameter')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='PGA::Aggregate Pga Target Parameter')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1034,7 +1029,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Physical Read Bytes Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Physical Read Bytes Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1058,7 +1053,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Physical Reads Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Physical Reads Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1082,7 +1077,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Physical Write Bytes Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Physical Write Bytes Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1106,7 +1101,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Physical Writes Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Physical Writes Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1119,7 +1114,6 @@ SELECT
                <key>oracle.processes_count</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1128,7 +1122,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='processes' &amp;&amp; @.METRIC_NAME=='procnum')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='PROC::Procnum')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1141,8 +1135,7 @@ SELECT
                <key>oracle.processes_limit</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <description>User processes.</description>
+               <description>Max user processes.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1151,7 +1144,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='parameters' &amp;&amp; @.METRIC_NAME=='processes')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYSPARAM::Processes')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1174,7 +1167,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Rows Per Sort')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Rows Per Sort')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1198,7 +1191,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='SQL Service Response Time')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::SQL Service Response Time')].VALUE.first()</params>
                   </step>
                   <step>
                      <type>MULTIPLIER</type>
@@ -1225,7 +1218,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sessions' &amp;&amp; @.METRIC_NAME=='ACTIVE_BACKGROUND')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SESSION::Active Background')].VALUE.first()</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1248,7 +1243,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sessions' &amp;&amp; @.METRIC_NAME=='ACTIVE_USER')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SESSION::Active User')].VALUE.first()</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1271,7 +1268,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sessions' &amp;&amp; @.METRIC_NAME=='total')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SESSION::Total')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1294,7 +1291,9 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sessions' &amp;&amp; @.METRIC_NAME=='INACTIVE_USER')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SESSION::Inactive User')].VALUE.first()</params>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1307,7 +1306,6 @@ SELECT
                <key>oracle.session_limit</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <description>User and system sessions.</description>
                <applications>
                   <application>
@@ -1317,7 +1315,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='parameters' &amp;&amp; @.METRIC_NAME=='sessions')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYSPARAM::Sessions')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1330,7 +1328,6 @@ SELECT
                <key>oracle.sga_buffer_cache</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <units>Bytes</units>
                <description>The size of the cache of standard blocks.</description>
                <applications>
@@ -1341,7 +1338,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='SGA component name' &amp;&amp; @.METRIC_NAME=='buffer_cache')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SGA::Buffer_Cache')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1354,7 +1351,6 @@ SELECT
                <key>oracle.sga_fixed</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <units>Bytes</units>
                <description>The fixed SGA is an internal housekeeping area.</description>
                <applications>
@@ -1365,7 +1361,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='SGA component name' &amp;&amp; @.METRIC_NAME=='fixed_sga')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SGA::Fixed_Sga')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1378,7 +1374,6 @@ SELECT
                <key>oracle.sga_java_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <units>Bytes</units>
                <description>Memory is allocated from the java pool.</description>
                <applications>
@@ -1389,7 +1384,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='SGA Pool' &amp;&amp; @.METRIC_NAME=='java pool')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SGA::Java Pool')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1402,7 +1397,6 @@ SELECT
                <key>oracle.sga_large_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <units>Bytes</units>
                <description>Memory is allocated from the large pool.</description>
                <applications>
@@ -1413,7 +1407,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='SGA Pool' &amp;&amp; @.METRIC_NAME=='large pool')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SGA::Large Pool')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1426,7 +1420,6 @@ SELECT
                <key>oracle.sga_log_buffer</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <units>Bytes</units>
                <description>The number of bytes allocated for the redo log buffer.</description>
                <applications>
@@ -1437,7 +1430,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='SGA component name' &amp;&amp; @.METRIC_NAME=='log_buffer')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SGA::Log_Buffer')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1450,7 +1443,6 @@ SELECT
                <key>oracle.sga_shared_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
                <units>Bytes</units>
                <description>Memory is allocated from the shared pool.</description>
                <applications>
@@ -1461,7 +1453,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='SGA Pool' &amp;&amp; @.METRIC_NAME=='shared pool')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SGA::Shared Pool')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1485,7 +1477,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Shared Pool Free %')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Shared Pool Free %')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1508,7 +1500,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Total Sorts Per User Call')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Total Sorts Per User Call')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1522,7 +1514,7 @@ SELECT
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <units>Byte</units>
+               <units>B</units>
                <description>Temp space used.</description>
                <applications>
                   <application>
@@ -1532,7 +1524,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='Temp Space Used')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::Temp Space Used')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1545,8 +1537,7 @@ SELECT
                <key>oracle.total_pga_allocated</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>Byte</units>
+               <units>B</units>
                <description>Current amount of PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the PGA_AGGREGATE_TARGET initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when PGA_AGGREGATE_TARGET is set to a small value.</description>
                <applications>
                   <application>
@@ -1556,7 +1547,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='total PGA allocated')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='PGA::Total Pga Allocated')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1569,8 +1560,7 @@ SELECT
                <key>oracle.total_pga_freeable</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>Byte</units>
+               <units>B</units>
                <description>Number of bytes of PGA memory in all processes that could be freed back to the operating system.</description>
                <applications>
                   <application>
@@ -1580,7 +1570,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='total freeable PGA memory')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='PGA::Total Freeable Pga Memory')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1593,8 +1583,7 @@ SELECT
                <key>oracle.total_pga_used</key>
                <delay>0</delay>
                <history>7d</history>
-               <value_type>FLOAT</value_type>
-               <units>Byte</units>
+               <units>B</units>
                <description>Indicates how much PGA memory is currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).</description>
                <applications>
                   <application>
@@ -1604,7 +1593,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='pga' &amp;&amp; @.METRIC_NAME=='total PGA inuse')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='PGA::Total Pga Inuse')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -1673,7 +1662,7 @@ SELECT
                <preprocessing>
                   <step>
                      <type>JSONPATH</type>
-                     <params>$[?(@.TYPE=='sysmetrics' &amp;&amp; @.METRIC_NAME=='User Rollbacks Per Sec')].VALUE.first()</params>
+                     <params>$[?(@.METRIC=='SYS::User Rollbacks Per Sec')].VALUE.first()</params>
                   </step>
                </preprocessing>
                <master_item>
@@ -2025,7 +2014,7 @@ contents  FROM DBA_TABLESPACES;</params>
                      <key>oracle.tbs_free_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <units>Byte</units>
+                     <units>B</units>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2047,7 +2036,7 @@ contents  FROM DBA_TABLESPACES;</params>
                      <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <units>Byte</units>
+                     <units>B</units>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2115,7 +2104,7 @@ contents  FROM DBA_TABLESPACES;</params>
                      <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <units>Byte</units>
+                     <units>B</units>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
