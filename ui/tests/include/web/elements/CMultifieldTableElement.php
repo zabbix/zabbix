@@ -400,7 +400,7 @@ class CMultifieldTableElement extends CTableElement {
 		}
 
 		$rows = $this->getRows()->count();
-		if (CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
+		if (count($data) >= 1 && CTestArrayHelper::get($data[0], 'action') === null && $rows >= 1) {
 			if ($this->mapping === null) {
 				$this->mapping = $this->detectFieldMapping();
 			}
