@@ -66,7 +66,7 @@ abstract class CParser {
 	 *
 	 * @return string
 	 */
-	public function getError() {
+	public function getError(): string {
 		if ($this->error_source === false) {
 			return '';
 		}
@@ -85,7 +85,7 @@ abstract class CParser {
 	 * @param string $source
 	 * @param int $pos
 	 */
-	protected function errorPos($source, $pos) {
+	protected function errorPos($source, $pos): void {
 		$this->error_source = $source;
 		$this->error_pos = $pos;
 	}
@@ -93,7 +93,7 @@ abstract class CParser {
 	/**
 	 * Clears error, when parse is used multiple times with same parser.
 	 */
-	protected function errorClear() {
+	protected function errorClear(): void {
 		$this->error_source = false;
 		$this->error_pos = 0;
 	}
@@ -106,7 +106,7 @@ abstract class CParser {
 	 *
 	 * @return string
 	 */
-	protected function errorPosMessage($source, $pos) {
+	protected function errorPosMessage($source, $pos): string {
 		$maxChunkSize = 50;
 		$chunk = substr($source, $pos);
 
