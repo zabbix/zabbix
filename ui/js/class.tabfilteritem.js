@@ -22,19 +22,13 @@ const TABFILTERITEM_EVENT_CLICK = 'click';
 const TABFILTERITEM_EVENT_COLLAPSE = 'collapse';
 const TABFILTERITEM_EVENT_EXPAND   = 'expand';
 const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expandbefore';
+const TABFILTERITEM_EVENT_AFTER_RENDER = 'afterrender';
 
 class CTabFilterItem extends CBaseComponent {
 
-	/**
-	 * Node of tab content.
-	 */
-	_content_container;
+	constructor(target, options) {
+		super(target);
 
-	_expanded;
-	_can_toggle = true;
-
-	constructor(title, options) {
-		super(title);
 		this._content_container = options.container;
 		this._can_toggle = options.can_toggle;
 		this._data = options.data||{};
@@ -46,6 +40,11 @@ class CTabFilterItem extends CBaseComponent {
 
 	init() {
 		this._expanded = this.hasClass('active');
+
+		if (this._expanded) {
+			this.renderContentTemplate();
+			this.fire(TABFILTERITEM_EVENT_AFTER_RENDER);
+		}
 	}
 
 	registerEvents() {
@@ -63,15 +62,13 @@ class CTabFilterItem extends CBaseComponent {
 			expand: () => {
 				this._expanded = true;
 				this.addClass('active');
-				this._content_container.classList.remove('display-none');
 
-				if (this._template) {
-					this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data.fields);
-					this._template.dispatchEvent(new CustomEvent('afterRender', {detail: {
-						data: this._data,
-						content: this._content_container
-					}}));
+				if (!this._content_container.children.length) {
+					this.renderContentTemplate();
+					this.fire(TABFILTERITEM_EVENT_AFTER_RENDER);
 				}
+
+				this._content_container.classList.remove('display-none');
 			},
 
 			collapse: () => {
@@ -85,5 +82,9 @@ class CTabFilterItem extends CBaseComponent {
 			.on(TABFILTERITEM_EVENT_EXPAND, this._events.expand)
 			.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse)
 			.on(TABFILTERITEM_EVENT_CLICK, this._events.click);
+	}
+
+	renderContentTemplate() {
+		this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
 	}
 }

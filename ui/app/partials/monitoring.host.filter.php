@@ -22,17 +22,18 @@
 
 $fields = $data['fields'] + $data['default'];
 $filter_tags_table = (new CTable())
-	->setId('filter-tags')
+	->setId('filter_tags_#{uniqid}')
 	->addRow(
 		(new CCol(
 			(new CRadioButtonList('filter_evaltype', (int) $fields['evaltype']))
+				->setId('filter_evaltype_#{uniqid}')
 				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 				->setModern(true)
 		))->setColSpan(4)
 );
-
 $tags = array_values($fields['tags']);
+
 if (!$tags) {
 	$tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
@@ -46,6 +47,7 @@ foreach ($tags as $i => $tag) {
 		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
 			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
 			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+			->setId('filter_tags_'.$i.'_#{uniqid}')
 			->setModern(true),
 		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 			->setAttribute('placeholder', _('value'))
@@ -86,8 +88,9 @@ $left_column = (new CFormList())
 					'real_hosts' => true,
 					'enrich_parent_groups' => true
 				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			],
+			'add_post_js' => false
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('filter_groupids_#{uniqid}')
 	)
 	->addRow(_('IP'),
 		(new CTextBox('filter_ip', $fields['ip']))
@@ -105,7 +108,10 @@ $left_column = (new CFormList())
 			->removeId()
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('filter_severities'))->setChecked($fields['severities'])
+		(new CSeverityCheckBoxList('filter_severities'))
+			->setChecked($fields['severities'])
+			->setUniqid('#{uniqid}')
+			->setId('filter_severities_#{uniqid}')
 	);
 
 $right_column = (new CFormList())
@@ -113,9 +119,10 @@ $right_column = (new CFormList())
 		_('Status'),
 		(new CHorList())
 			->addItem((new CRadioButtonList('filter_status', (int) $fields['status']))
-				->addValue(_('Any'), -1)
-				->addValue(_('Enabled'), HOST_STATUS_MONITORED)
-				->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
+				->addValue(_('Any'), -1, 'filter_status_1#{uniqid}')
+				->addValue(_('Enabled'), HOST_STATUS_MONITORED, 'filter_status_2#{uniqid}')
+				->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED, 'filter_status_3#{uniqid}')
+				->setId('filter_status_#{uniqid}')
 				->setModern(true)
 			)
 	)
@@ -123,11 +130,13 @@ $right_column = (new CFormList())
 	->addRow(_('Show hosts in maintenance'), [
 		(new CCheckBox('filter_maintenance_status'))
 			->setChecked($fields['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
+			->setId('filter_maintenance_status_#{uniqid}')
 			->setUncheckedValue(HOST_MAINTENANCE_STATUS_OFF),
 		(new CDiv([
-			(new CLabel(_('Show suppressed problems'), 'filter_show_suppressed'))
+			(new CLabel(_('Show suppressed problems'), 'filter_show_suppressed_#{uniqid}'))
 				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('filter_show_suppressed'))
+				->setId('filter_show_suppressed_#{uniqid}')
 				->setChecked($fields['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
 				->setEnabled($fields['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON),
@@ -141,6 +150,7 @@ $template = (new CDiv())
 		(new CDiv($left_column))->addClass(ZBX_STYLE_CELL),
 		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
 	]);
+$template = (new CForm())->addItem($template);
 
 if (array_key_exists('render_html', $data)) {
 	/**
@@ -153,82 +163,7 @@ if (array_key_exists('render_html', $data)) {
 	return;
 }
 
-(new CScriptTemplate('filter-tag-row-tmpl'))
-	->addItem(
-		(new CRow([
-			(new CTextBox('filter_tags[#{rowNum}][tag]'))
-				->setAttribute('placeholder', _('tag'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CRadioButtonList('filter_tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-				->setModern(true),
-			(new CTextBox('filter_tags[#{rowNum}][value]'))
-				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-			(new CCol(
-				(new CButton('filter_tags[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row'))
-	->show();
-
 (new CScriptTemplate('filter-monitoring-hosts'))
 	->setAttribute('data-template', 'monitoring.host.filter')
 	->addItem($template)
 	->show();
-
-?>
-<script type="text/javascript">
-$('[data-template="monitoring.host.filter"]').on('afterRender', function(ev) {
-	let data = ev.detail.data,
-		fields = $.extend({}, data.default, data.fields);
-
-	var content = ev.detail.content;
-
-	// Host groups multiselect.
-	$('#filter_groupids_', content).multiSelectHelper({
-		id: 'elementNameHostGroup',
-		object_name: 'hostGroup',
-		name: 'elementValue',
-		popup: {
-			parameters: {
-				multiselect: '1',
-				noempty: '1',
-				srctbl: 'host_groups',
-				srcfld1: 'groupid',
-				dstfrm: 'zbx_filter',
-				dstfld1: 'filter_groupids_',
-				real_hosts: 1,
-				enrich_parent_groups: 1
-			}
-		}
-	});
-
-	if (data.groups_multiselect) {
-		$('#filter_groupids_', content).multiSelect('addData', data.groups_multiselect);
-	}
-
-	// Tags table
-	var tag_row = new Template($('#filter-tag-row-tmpl').html()),
-		i = 0;
-
-	fields.tags.forEach(tag => {
-		var $row = $(tag_row.evaluate({rowNum: i++}));
-
-		$row.find('[name$="[tag]"]').val(tag.tag);
-		$row.find('[name$="[value]"]').val(tag.value);
-		$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
-
-		$('#filter-tags', content).append($row);
-	});
-	$('#filter-tags', content).dynamicRows({template: '#filter-tag-row-tmpl'});
-
-	// Show hosts in maintenance events.
-	$('#filter_maintenance_status', content).click(function () {
-		$('#filter_show_suppressed', content).prop('disabled', !this.checked);
-	});
-});
-</script>

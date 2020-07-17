@@ -28,8 +28,6 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
 
-$this->includeJsFile('monitoring.host.view.js.php');
-
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
@@ -43,18 +41,27 @@ $widget = (new CWidget())
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = new CTabFilter();
+	$filter->setId('monitoringhostsfilter');
 
 	foreach ($data['filter_tabs'] as $tab) {
 		$filter->addTemplate(new CPartial($tab['template'], ['fields' => []] + $tab));
 		$filter->addTemplatedTab($tab['label'], $tab);
+
+		$tab['label'] = 'Test tab 2';
+		$filter->addTemplatedTab($tab['label'], $tab);
+
+		$tab['label'] = 'Demo';
+		$filter->addTemplatedTab($tab['label'], $tab);
 	}
+
+	$data['filter_options'] = $filter->options;
 
 	$widget->addItem($filter);
 }
 
 $widget->addItem((new CForm())->setName('host_view')->addClass('is-loading'));
-
 $widget->show();
+$this->includeJsFile('monitoring.host.view.js.php', $data);
 
 (new CScriptTag('host_page.start();'))
 	->setOnDocumentReady()

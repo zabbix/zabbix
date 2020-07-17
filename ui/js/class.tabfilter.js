@@ -20,32 +20,25 @@
 
 class CTabFilter extends CBaseComponent {
 
-	_options = {};
-
-	/**
-	 * Array of CTabFilterItem objects.
-	 */
-	_items = [];
-	_active_item;
-	_shared_domnode;
-
-	/**
-	 * NodeList of available templates (<script> DOM elements).
-	 */
-	_templates = {};
-
 	constructor(target, options) {
 		super(target);
 		this._options = options;
+		// Array of CTabFilterItem objects.
+		this._items = [];
+		this._active_item = null;
+		this._shared_domnode = null;
+		// NodeList of available templates (<script> DOM elements).
+		this._templates = {};
 
 		this.init(options);
 		this.registerEvents(options);
 	}
 
 	init(options) {
-		let item, template, data_index = 0;
+		let item, template, container, containers, data_index = 0;
 
 		this._shared_domnode = this._target.querySelector('.form-buttons');
+		containers = this._target.querySelector('.tabfilter-tabs-container');
 
 		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
@@ -53,9 +46,20 @@ class CTabFilter extends CBaseComponent {
 
 		for (const title of this._target.childNodes.item(0).querySelectorAll('[data-target]')) {
 			template = options.data[data_index] ? options.data[data_index].template : null;
+			container = containers.querySelector('#'+title.getAttribute('data-target'));
+
+			if (!container) {
+				container = document.createElement('form');
+				container.setAttribute('id', title.getAttribute('data-target'));
+				container.setAttribute('method', 'get');
+				// TODO: add action and other filter tab specific input variables except data
+				container.classList.add('display-none');
+				containers.appendChild(container);
+			}
+
 			item = new CTabFilterItem(title, {
 				can_toggle: options.can_toggle,
-				container: this._target.querySelector(title.getAttribute('data-target')),
+				container: container,
 				data: options.data[data_index],
 				template: this._templates[template]
 			});
@@ -68,6 +72,7 @@ class CTabFilter extends CBaseComponent {
 			}
 		}
 
+		// TODO: add .tabfilter-sortable container for sortable tabs.
 		$('.ui-sortable', this._target).sortable({});
 	}
 
@@ -79,7 +84,6 @@ class CTabFilter extends CBaseComponent {
 
 				if (!ev.detail.target._expanded && (!this._active_item || !this._active_item._expanded)) {
 					this._shared_domnode.classList.remove('display-none');
-					this.render();
 				}
 			},
 
@@ -87,12 +91,17 @@ class CTabFilter extends CBaseComponent {
 				if (ev.detail.target === this._active_item) {
 					this._shared_domnode.classList.add('display-none');
 				}
+			},
+
+			afterTabContentRender: (ev) => {
+				this.afterTabContentRender(ev.detail.target);
 			}
 		}
 
 		for (const item of this._items) {
 			item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
+			item.on(TABFILTERITEM_EVENT_AFTER_RENDER, this._events.afterTabContentRender);
 		}
 	}
 
@@ -104,7 +113,6 @@ class CTabFilter extends CBaseComponent {
 		}
 	}
 
-	render() {
-
+	afterTabContentRender(tabitem) {
 	}
 }

@@ -22,6 +22,28 @@
 /**
  * @var CView $this
  */
+(new CScriptTemplate('filter-tag-row-tmpl'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('filter_tags[#{rowNum}][tag]'))
+				->setAttribute('placeholder', _('tag'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('filter_tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+				->setModern(true),
+			(new CTextBox('filter_tags[#{rowNum}][value]'))
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('filter_tags[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row'))
+	->show();
+
 ?>
 <script type="text/javascript">
 	jQuery(function($) {
@@ -30,9 +52,63 @@
 			this.refresh_interval = <?= $data['refresh_interval'] ?>;
 			this.running = false;
 			this.timeout = null;
+
+			this.filter = new CTabFilter($('#monitoringhostsfilter')[0], <?= json_encode($data['filter_options']) ?>);
+			this.filter.afterTabContentRender = this.afterTabContentRender.bind(this);
+
+			if (this.filter._active_item) {
+				this.afterTabContentRender(this.filter._active_item);
+			}
 		}
 
 		hostPage.prototype = {
+			afterTabContentRender: function (item) {
+				let data = item._data,
+					fields = $.extend({}, data.default, data.fields);
+
+				var content = item._content_container;
+				console.log(`${data.uniqid} rendered`, data);
+
+				// Host groups multiselect.
+				$('#filter_groupids_' + data.uniqid, content).multiSelectHelper({
+					id: 'filter_groupids_' + data.uniqid, content,
+					object_name: 'hostGroup',
+					name: 'filter_groupids[]',
+					data: data.groups_multiselect||[],
+					popup: {
+						parameters: {
+							multiselect: '1',
+							noempty: '1',
+							srctbl: 'host_groups',
+							srcfld1: 'groupid',
+							dstfrm: 'zbx_filter',
+							dstfld1: 'filter_groupids_' + data.uniqid,
+							real_hosts: 1,
+							enrich_parent_groups: 1
+						}
+					}
+				});
+
+				// Tags table
+				var tag_row = new Template($('#filter-tag-row-tmpl').html()),
+					i = 0;
+
+				fields.tags.forEach(tag => {
+					var $row = $(tag_row.evaluate({rowNum: i++}));
+
+					$row.find('[name$="[tag]"]').val(tag.tag);
+					$row.find('[name$="[value]"]').val(tag.value);
+					$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
+
+					$('#filter_tags_' + data.uniqid, content).append($row);
+				});
+				$('#filter_tags_' + data.uniqid, content).dynamicRows({template: '#filter-tag-row-tmpl'});
+
+				// Show hosts in maintenance events.
+				$('[name="filter_maintenance_status"]', content).click(function () {
+					$('[name="filter_show_suppressed"]', content).prop('disabled', !this.checked);
+				});
+			},
 			getCurrentForm: function() {
 				return $('form[name=host_view]');
 			},

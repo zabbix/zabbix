@@ -37,6 +37,11 @@ class CCheckBoxList extends CList {
 	protected $enabled = true;
 
 	/**
+	 * Checboxes id unique suffix.
+	 */
+	protected $uniqid = '';
+
+	/**
 	 * @param string $name
 	 */
 	public function __construct($name) {
@@ -111,12 +116,13 @@ class CCheckBoxList extends CList {
 	 */
 	public function toString($destroy = true) {
 		foreach ($this->values as $value) {
-			parent::addItem(
-				(new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
-					->setLabel($value['name'])
-					->setChecked($value['checked'])
-					->setEnabled($this->enabled)
-			);
+			$checkbox = (new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
+				->setLabel($value['name'])
+				->setChecked($value['checked'])
+				->setEnabled($this->enabled);
+			$checkbox->setId($checkbox->getId().$this->uniqid);
+
+			parent::addItem($checkbox);
 		}
 
 		return parent::toString($destroy);

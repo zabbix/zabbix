@@ -1,0 +1,35 @@
+.filter-container.tabfilter-container {
+	padding-top: 0;
+	border-top: 0 none;
+
+	/* Top navigation labels */
+	nav > ul {
+		background-color: $body-bg-color;
+	}
+
+	& > nav li {
+		display: inline-block;
+
+		a[data-target] {
+			@extend button;
+
+			display: inline-block;
+			line-height: 24px;
+			margin: 6px 5px 4px 0;
+
+			&.active,
+			&.active:hover {
+				background-color: $header-bg-color;
+				border-color: $header-bg-color;
+				color: $btn-form-font-color;
+				margin-top: 0;
+				margin-bottom: 0;
+				line-height: 28px;
+			}
+		}
+	}
+
+	.tabfilter-tabs-container > div {
+		padding-top: 10px;
+	}
+}
