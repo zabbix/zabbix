@@ -2143,7 +2143,7 @@
 		if (typeof widget['fields'] !== 'undefined' && Object.keys(widget['fields']).length != 0) {
 			ajax_data['fields'] = JSON.stringify(widget['fields']);
 		}
-		if (typeof widget['dynamic_hostid'] !== null) {
+		if (widget['dynamic_hostid'] !== null) {
 			ajax_data['dynamic_hostid'] = widget['dynamic_hostid'];
 		}
 
@@ -3370,10 +3370,7 @@
 			var	$this = $(this),
 				data = $this.data('dashboardGrid');
 
-			data.dashboard.dynamic_hostid = null;
-			if (host !== null) {
-				data.dashboard.dynamic_hostid = host.id;
-			}
+			data.dashboard.dynamic_hostid = (host === null) ? null : host.id;
 
 			$.each(data['widgets'], function(index, widget) {
 				if (widget.fields.dynamic && widget.fields.dynamic == 1) {

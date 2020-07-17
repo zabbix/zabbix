@@ -127,7 +127,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 				$data['dynamic'] = [
 					'has_dynamic_widgets' => true,
-					'host' => $hostid ? $hosts[0] : null
+					'host' => array_key_exists(0, $hosts) ? $hosts[0] : null
 				];
 			}
 			else {
