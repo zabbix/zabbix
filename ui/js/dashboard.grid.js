@@ -2631,7 +2631,7 @@
 
 				break;
 
-			case this.STATE_KIOSK:
+			case this.STATE_KIOSK_MODE:
 				this.$placeholder_box_label_wrap.text(t('Cannot add widgets in kiosk mode'));
 				this.$placeholder.addClass('disabled');
 
