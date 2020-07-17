@@ -97,7 +97,7 @@ class CHtmlUrlValidator {
 
 		if (array_key_exists('scheme', $url_parts)) {
 			if (!in_array(strtolower($url_parts['scheme']), explode(',', strtolower(CSettingsHelper::get(
-				CSettingsHelper::URI_VALID_SCHEMES
+					CSettingsHelper::URI_VALID_SCHEMES
 			))))) {
 				return false;
 			}
