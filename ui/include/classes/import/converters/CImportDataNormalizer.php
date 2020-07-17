@@ -86,8 +86,8 @@ class CImportDataNormalizer {
 		if ($this->rules['type'] & XML_STRING) {
 			$data = str_replace("\r\n", "\n", $data);
 			$data = (array_key_exists('flags', $this->rules) && $this->rules['flags'] & self::EOL_LF)
-				? str_replace("\n", "\r\n", $data)
-				: $data;
+				? $data
+				: str_replace("\n", "\r\n", $data);
 		}
 
 		return $data;
