@@ -3907,9 +3907,6 @@
 					ajax_data = {},
 					fields;
 
-				// Disable saving, while form is being updated.
-				$('.dialogue-widget-save', footer).prop('disabled', true);
-
 				url.setArgument('action', 'dashboard.widget.edit');
 
 				if (form.length) {
@@ -3984,19 +3981,6 @@
 						updateWidgetConfig($this, data, widget);
 					});
 
-					var area_size = {
-						'width': data.widget_defaults[data.dialogue.widget_type].size.width,
-						'height': data.widget_defaults[data.dialogue.widget_type].size.height
-					};
-
-					if (widget === null && !findEmptyPosition($this, data, area_size)) {
-						showDialogMessageExhausted(data);
-					}
-					else {
-						// Enable save button after successful form update.
-						$('.dialogue-widget-save', footer).prop('disabled', false);
-					}
-
 					var $overlay = jQuery('[data-dialogueid="widgetConfg"]');
 					$overlay.toggleClass('sticked-to-top', data.dialogue['widget_type'] === 'svggraph');
 
@@ -4004,6 +3988,16 @@
 					Overlay.prototype.containFocus.call({'$dialogue': $overlay});
 
 					overlay.unsetLoading();
+
+					var area_size = {
+						'width': data.widget_defaults[data.dialogue.widget_type].size.width,
+						'height': data.widget_defaults[data.dialogue.widget_type].size.height
+					};
+
+					if (widget === null && !findEmptyPosition($this, data, area_size)) {
+						showDialogMessageExhausted(data);
+						$('.dialogue-widget-save', footer).prop('disabled', true);
+					}
 				});
 			});
 		},
