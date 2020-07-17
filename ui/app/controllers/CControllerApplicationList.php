@@ -150,6 +150,8 @@ class CControllerApplicationList extends CController {
 	}
 
 	/**
+	 * Get list of applications.
+	 *
 	 * @param array $filter_hostids
 	 * @param array $filter_groupids
 	 * @param string $sort_field
@@ -179,7 +181,7 @@ class CControllerApplicationList extends CController {
 			'limit' => $config['search_limit'] + 1
 		]);
 
-		order_result($applications, $sort_field, $sort_order);
+		CArrayHelper::sort($applications, [['field' => $sort_field, 'order' => $sort_order]]);
 
 		/*
 		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be

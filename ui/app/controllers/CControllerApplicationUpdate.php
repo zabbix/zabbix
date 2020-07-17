@@ -42,7 +42,13 @@ class CControllerApplicationUpdate extends CController {
 			return false;
 		}
 
-		return isWritableHostTemplates((array) $this->getInput('hostid'));
+		$result = (bool) API::Application()->get([
+			'output' => [],
+			'applicationids' => $this->getInput('applicationid'),
+			'editable' => true
+		]);
+
+		return $result && isWritableHostTemplates((array) $this->getInput('hostid'));
 	}
 
 	protected function doAction() {

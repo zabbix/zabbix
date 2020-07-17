@@ -57,6 +57,9 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 ))->setId('cancel');
 
 if ($data['applicationid'] == 0) {
+	$application_tab->setFooter(makeFormFooter(new CSubmit('add', _('Add')), [$cancel_button]));
+}
+else {
 	$application_tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
@@ -71,13 +74,8 @@ if ($data['applicationid'] == 0) {
 		]
 	));
 }
-else {
-	$application_tab->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[$cancel_button]
-	));
-}
 
 $application_form->addItem($application_tab);
-$widget->addItem($application_form);
-$widget->show();
+$widget
+	->addItem($application_form)
+	->show();

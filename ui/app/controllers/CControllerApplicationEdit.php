@@ -47,8 +47,8 @@ class CControllerApplicationEdit extends CController {
 		}
 
 		if ($this->getInput('applicationid', 0) != 0) {
-			$db_applications = API::Application()->get([
-				'output' => ['applicationid'],
+			$db_applications = (bool) API::Application()->get([
+				'output' => [],
 				'applicationids' => $this->getInput('applicationid'),
 				'editable' => true
 			]);
@@ -68,7 +68,7 @@ class CControllerApplicationEdit extends CController {
 			'name' => $this->getInput('name', '')
 		];
 
-		if ($this->getInput('applicationid', 0) != 0) {
+		if ($data['applicationid'] != 0) {
 			$db_applications = API::Application()->get([
 				'output' => ['applicationid', 'name', 'hostid'],
 				'applicationids' => $data['applicationid'],
