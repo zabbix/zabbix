@@ -1093,8 +1093,8 @@ else {
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
 		'selectHosts' => ['hostid'],
-		'selectTemplates' => ['templateid', 'name', 'status'],
-		'selectParentTemplates' => ['templateid', 'name', 'status'],
+		'selectTemplates' => ['templateid', 'name'],
+		'selectParentTemplates' => ['templateid', 'name'],
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
