@@ -137,10 +137,10 @@ class testDynamicItemWidgets extends CWebTest {
 					'widgets' => [
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H2I1'],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G1 (I1)'],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
 						[
@@ -174,8 +174,7 @@ class testDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
-						// TODO: change after fix ZBX-17825, should be 'Dynamic widgets H2: Dynamic widgets H1 GP4 (H1 IP1 and H2 I1)'
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I2)']
+						['type' => 'Graph prototype', 'header' => 'Graph prototype']
 					]
 				]
 			],
@@ -293,9 +292,6 @@ class testDynamicItemWidgets extends CWebTest {
 			else {
 				$host->clear()->type($data['host_filter']);
 			}
-			$this->page->waitUntilReady();
-			// TODO: remove after fix ZBX-17821
-			$this->page->refresh();
 			$this->page->waitUntilReady();
 		}
 

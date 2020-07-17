@@ -934,7 +934,7 @@ function makeInformationIcon($message) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
-		->setHint($message);
+		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**
@@ -1038,7 +1038,7 @@ function makeDescriptionIcon($description) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->setHint(zbx_str2links($description), 'hintbox-description');
+		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**
@@ -1052,7 +1052,7 @@ function makeErrorIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
-		->setHint($error, ZBX_STYLE_RED);
+		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }
 
 /**
@@ -1066,7 +1066,7 @@ function makeUnknownIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
-		->setHint($error, ZBX_STYLE_RED);
+		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }
 
 /**
@@ -1080,7 +1080,7 @@ function makeWarningIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
-		->setHint($error);
+		->setHint($error, ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**

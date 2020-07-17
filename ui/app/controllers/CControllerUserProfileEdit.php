@@ -47,7 +47,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$fields += [
-				'user_medias' =>	'array',
+				'medias' =>			'array',
 				'new_media' =>		'array',
 				'enable_media' =>	'int32',
 				'disable_media' =>	'int32'
@@ -114,7 +114,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 		];
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$data['user_medias'] = $this->user['medias'];
+			$data['medias'] = $this->user['medias'];
 		}
 
 		// Overwrite with input variables.
@@ -124,7 +124,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			if ($data['form_refresh'] != 0) {
-				$data['user_medias'] = $this->getInput('user_medias', []);
+				$data['medias'] = $this->getInput('medias', []);
 			}
 
 			$data = $this->setUserMedias($data);

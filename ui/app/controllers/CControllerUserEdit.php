@@ -46,7 +46,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'refresh' =>			'db users.refresh',
 			'rows_per_page' =>		'db users.rows_per_page',
 			'url' =>				'db users.url',
-			'user_medias' =>		'array',
+			'medias' =>				'array',
 			'new_media' =>			'array',
 			'enable_media' =>		'int32',
 			'disable_media' =>		'int32',
@@ -106,7 +106,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'refresh' => $db_defaults['refresh'],
 			'rows_per_page' => $db_defaults['rows_per_page'],
 			'url' => '',
-			'user_medias' => [],
+			'medias' => [],
 			'new_media' => [],
 			'type' => $db_defaults['type'],
 			'sid' => $this->getUserSID(),
@@ -132,7 +132,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['refresh'] = $this->user['refresh'];
 			$data['rows_per_page'] = $this->user['rows_per_page'];
 			$data['url'] = $this->user['url'];
-			$data['user_medias'] = $this->user['medias'];
+			$data['medias'] = $this->user['medias'];
 			$data['type'] = $this->user['type'];
 			$data['db_user']['alias'] = $this->user['alias'];
 		}
@@ -146,7 +146,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		]);
 		if ($data['form_refresh'] != 0) {
 			$user_groups = $this->getInput('user_groups', []);
-			$data['user_medias'] = $this->getInput('user_medias', []);
+			$data['medias'] = $this->getInput('medias', []);
 		}
 
 		$data = $this->setUserMedias($data);

@@ -221,8 +221,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'names' => [
 						'Name' => 'Temp Status Discovery'
 					],
-					'message' => 'Cannot send request',
-					'details' => 'Cannot send request: host is not monitored.',
+					'template' => true,
 					'hostid' => 10250
 				]
 			]
@@ -246,8 +245,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 			$this->selectTableRows($data['names']);
 		}
 
-		$this->query('button:Execute now')->one()->click();
-		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
+		if (CTestArrayHelper::get($data, 'template', false)) {
+			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
+		}
+		else {
+			$this->query('button:Execute now')->one()->click();
+			$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
+		}
 	}
 
 	/**

@@ -1045,7 +1045,6 @@ else {
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groups'],
-			'templated_hosts' => true,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['groupid' => 'id'])

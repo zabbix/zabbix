@@ -24,8 +24,8 @@ class CControllerGuiUpdate extends CController {
 	protected function checkInput() {
 		$themes = array_keys(APP::getThemes());
 		$fields = [
-			'default_lang' =>			'required|in '.implode(',', array_keys(getLocales())).'|db config.default_lang',
-			'default_theme' =>			'required|in '.implode(',', $themes).'|db config.default_theme',
+			'default_lang' =>			'db config.default_lang|in '.implode(',', array_keys(getLocales())),
+			'default_theme' =>			'required|db config.default_theme|in '.implode(',', $themes),
 			'search_limit' =>			'required|db config.search_limit|ge 1|le 999999',
 			'max_in_table' =>			'required|db config.max_in_table|ge 1|le 99999',
 			'server_check_interval' =>	'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL,
@@ -64,8 +64,7 @@ class CControllerGuiUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$result = API::Settings()->update([
-			CSettingsHelper::DEFAULT_LANG => $this->getInput('default_lang'),
+		$settings =  [
 			CSettingsHelper::DEFAULT_THEME => $this->getInput('default_theme'),
 			CSettingsHelper::SEARCH_LIMIT => $this->getInput('search_limit'),
 			CSettingsHelper::MAX_IN_TABLE => $this->getInput('max_in_table'),
@@ -75,7 +74,13 @@ class CControllerGuiUpdate extends CController {
 			CSettingsHelper::HISTORY_PERIOD => $this->getInput('history_period'),
 			CSettingsHelper::PERIOD_DEFAULT => $this->getInput('period_default'),
 			CSettingsHelper::MAX_PERIOD => $this->getInput('max_period')
-		]);
+		];
+
+		if ($this->hasInput('default_lang')) {
+			$settings[CSettingsHelper::DEFAULT_LANG] = $this->getInput('default_lang');
+		}
+
+		$result = API::Settings()->update($settings);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'gui.edit')

@@ -44,6 +44,18 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 		return $this->getGraphsForSurrogateScreen($createdGraphIds);
 	}
 
+	public function get() {
+		$output = parent::get();
+
+		if ($output === null) {
+			$item = (new CTableInfo())->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
+
+			return $this->getOutput($item);
+		}
+
+		return $output;
+	}
+
 	/**
 	 * Retrieves graphs created for graph prototype given as resource for this screen item
 	 * and returns array of the graph IDs.
