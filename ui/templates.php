@@ -1116,17 +1116,13 @@ else {
 	$linked_hostids = [];
 	$editable_hosts = [];
 	foreach ($templates as &$template) {
-		$template['hosts'] = array_flip(array_column($template['hosts'], 'hostid'));
-
 		order_result($template['templates'], 'name');
 		order_result($template['parentTemplates'], 'name');
 
-		$linked_templateids = array_merge(
-			$linked_templateids,
-			array_column($template['parentTemplates'], 'templateid'),
-			array_column($template['templates'], 'templateid')
-		);
+		$linked_templateids += array_flip(array_column($template['parentTemplates'], 'templateid'));
+		$linked_templateids += array_flip(array_column($template['templates'], 'templateid'));
 
+		$template['hosts'] = array_flip(array_column($template['hosts'], 'hostid'));
 		$linked_hostids += $template['hosts'];
 	}
 	unset($template);
@@ -1134,7 +1130,7 @@ else {
 	if ($linked_templateids) {
 		$editable_templates = API::Template()->get([
 			'output' => ['templateid'],
-			'templateids' => array_keys(array_flip($linked_templateids)),
+			'templateids' => array_keys($linked_templateids),
 			'editable' => true,
 			'preservekeys' => true
 		]);
