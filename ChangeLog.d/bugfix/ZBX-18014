@@ -1,0 +1,1 @@
+........S. [ZBX-18014] fixed memory leak when action message does not have to be sent (viktors)
