@@ -26,6 +26,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
+		$locales[] = LANG_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -37,7 +38,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'user_groups' =>	'required|array_id|not_empty',
 			'password1' =>		'string',
 			'password2' =>		'string',
-			'user_medias' =>	'array',
+			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
@@ -99,10 +100,10 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['user_medias'] = [];
+		$user['medias'] = [];
 
-		foreach ($this->getInput('user_medias', []) as $media) {
-			$user['user_medias'][] = [
+		foreach ($this->getInput('medias', []) as $media) {
+			$user['medias'][] = [
 				'mediatypeid' => $media['mediatypeid'],
 				'sendto' => $media['sendto'],
 				'active' => $media['active'],

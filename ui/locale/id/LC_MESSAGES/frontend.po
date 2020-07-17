@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-03 19:59+0300\n"
+"POT-Creation-Date: 2020-07-10 19:54+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -192,7 +192,7 @@ msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
 msgstr[0] ""
 
-#: app/views/administration.user.edit.php:377
+#: app/views/administration.user.edit.php:380
 #: include/classes/widgets/CWidgetConfig.php:160
 #: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:310
 #: jsLoader.php:311
@@ -277,7 +277,7 @@ msgstr ""
 msgid "(no proxy)"
 msgstr "(tanpa proxy)"
 
-#: include/classes/setup/CSetupWizard.php:231
+#: include/classes/setup/CSetupWizard.php:272
 msgid "0 - use default port"
 msgstr ""
 
@@ -379,8 +379,8 @@ msgstr ""
 msgid "Access denied!"
 msgstr "Akses ditolak!"
 
-#: include/classes/api/services/CUser.php:1183
-#: include/classes/api/services/CUser.php:1225
+#: include/classes/api/services/CUser.php:1192
+#: include/classes/api/services/CUser.php:1234
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -423,7 +423,7 @@ msgstr ""
 #: app/views/administration.mediatype.edit.php:150
 #: app/views/administration.mediatype.list.php:78
 #: app/views/administration.regex.edit.php:52
-#: app/views/administration.user.edit.php:226
+#: app/views/administration.user.edit.php:229
 #: app/views/administration.valuemap.edit.php:55
 #: app/views/dashboard.sharing.edit.php:29
 #: app/views/dashboard.sharing.edit.php:50
@@ -503,7 +503,7 @@ msgstr ""
 msgid "Action added"
 msgstr "Aksi ditambahkan"
 
-#: include/classes/core/ZBase.php:459
+#: include/classes/core/ZBase.php:467
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
 msgstr ""
@@ -596,8 +596,8 @@ msgstr "Aktif sampai"
 #: app/views/administration.regex.edit.php:94
 #: app/views/administration.regex.edit.php:157
 #: app/views/administration.script.edit.php:129
-#: app/views/administration.user.edit.php:299
-#: app/views/administration.user.edit.php:476
+#: app/views/administration.user.edit.php:302
+#: app/views/administration.user.edit.php:479
 #: app/views/administration.usergroup.edit.php:140
 #: app/views/administration.usergroup.edit.php:191
 #: app/views/administration.usergroup.edit.php:230
@@ -897,8 +897,8 @@ msgid "All dashboards"
 msgstr ""
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
-#: app/views/administration.user.edit.php:335
-#: app/views/administration.user.edit.php:341
+#: app/views/administration.user.edit.php:338
+#: app/views/administration.user.edit.php:344
 msgid "All groups"
 msgstr ""
 
@@ -956,7 +956,7 @@ msgstr ""
 msgid "Allowed hosts"
 msgstr "Host yang diizinkan"
 
-#: include/classes/setup/CSetupWizard.php:447
+#: include/classes/setup/CSetupWizard.php:492
 msgid "Alternatively, you can install it manually:"
 msgstr ""
 
@@ -1286,7 +1286,7 @@ msgstr "Otentikasi"
 msgid "Authentication algorithm"
 msgstr "Algoritma otentikasi"
 
-#: include/classes/api/services/CUser.php:1569
+#: include/classes/api/services/CUser.php:1583
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr ""
@@ -1330,15 +1330,15 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr ""
 
-#: app/views/administration.user.edit.php:188
+#: app/views/administration.user.edit.php:191
 msgid "Auto-login"
 msgstr "Login-otomatis"
 
-#: include/classes/api/services/CUser.php:767
+#: include/classes/api/services/CUser.php:776
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr ""
 
-#: app/views/administration.user.edit.php:193
+#: app/views/administration.user.edit.php:196
 msgid "Auto-logout"
 msgstr ""
 
@@ -1408,7 +1408,7 @@ msgid "Axes"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:122
-#: include/classes/setup/CSetupWizard.php:397
+#: include/classes/setup/CSetupWizard.php:438
 msgid "Back"
 msgstr ""
 
@@ -1460,7 +1460,7 @@ msgstr "Bind password"
 msgid "Blocked"
 msgstr "Diblokir"
 
-#: include/classes/core/ZBase.php:312
+#: include/classes/core/ZBase.php:320
 msgid "Blue"
 msgstr ""
 
@@ -1607,8 +1607,8 @@ msgstr ""
 #: app/views/administration.regex.edit.php:149
 #: app/views/administration.regex.edit.php:159
 #: app/views/administration.script.edit.php:123
-#: app/views/administration.user.edit.php:455
-#: app/views/administration.user.edit.php:486
+#: app/views/administration.user.edit.php:458
+#: app/views/administration.user.edit.php:489
 #: app/views/administration.usergroup.edit.php:210
 #: app/views/administration.valuemap.edit.php:92
 #: app/views/js/administration.housekeeping.edit.js.php:76
@@ -1802,8 +1802,8 @@ msgstr "Tidak dapat menambah trigger"
 msgid "Cannot add trigger prototype"
 msgstr ""
 
-#: app/controllers/CControllerUserCreate.php:61
-#: app/controllers/CControllerUserCreate.php:117
+#: app/controllers/CControllerUserCreate.php:62
+#: app/controllers/CControllerUserCreate.php:118
 msgid "Cannot add user"
 msgstr "Tidak dapat menambah user"
 
@@ -1873,7 +1873,7 @@ msgstr ""
 msgid "Cannot connect to LDAP server."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:308
+#: include/classes/setup/CSetupWizard.php:349
 msgid "Cannot connect to the database."
 msgstr ""
 
@@ -1939,7 +1939,7 @@ msgstr ""
 msgid "Cannot create template."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:445
+#: include/classes/setup/CSetupWizard.php:490
 msgid "Cannot create the configuration file."
 msgstr ""
 
@@ -1948,7 +1948,7 @@ msgstr ""
 msgid "Cannot create widget: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:993
+#: include/classes/api/services/CUser.php:1002
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Tidak dapat menghapus user Zabbix internal \"%1$s\", coba non-aktifkan user tersebut."
@@ -2473,13 +2473,13 @@ msgid "Cannot link template."
 msgstr ""
 
 #: app/controllers/CControllerModuleEdit.php:106
-#: include/classes/core/ZBase.php:633
+#: include/classes/core/ZBase.php:641
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
 msgstr[0] ""
 
-#: include/classes/api/services/CUser.php:1132
+#: include/classes/api/services/CUser.php:1141
 msgid "Cannot logout."
 msgstr "Tidak bisa logout."
 
@@ -2768,8 +2768,8 @@ msgstr ""
 
 #: app/controllers/CControllerAutoregUpdate.php:41
 #: app/controllers/CControllerAutoregUpdate.php:73
-#: app/controllers/CControllerGuiUpdate.php:43
-#: app/controllers/CControllerGuiUpdate.php:80
+#: app/controllers/CControllerGuiUpdate.php:44
+#: app/controllers/CControllerGuiUpdate.php:82
 #: app/controllers/CControllerHousekeepingUpdate.php:57
 #: app/controllers/CControllerHousekeepingUpdate.php:126
 #: app/controllers/CControllerMiscConfigUpdate.php:43
@@ -2972,10 +2972,10 @@ msgstr ""
 msgid "Cannot update trigger prototypes"
 msgstr ""
 
-#: app/controllers/CControllerUserProfileUpdate.php:61
-#: app/controllers/CControllerUserProfileUpdate.php:119
-#: app/controllers/CControllerUserUpdate.php:65
-#: app/controllers/CControllerUserUpdate.php:129
+#: app/controllers/CControllerUserProfileUpdate.php:62
+#: app/controllers/CControllerUserProfileUpdate.php:120
+#: app/controllers/CControllerUserUpdate.php:66
+#: app/controllers/CControllerUserUpdate.php:130
 msgid "Cannot update user"
 msgstr "Tidak dapat perbarui user"
 
@@ -3121,7 +3121,7 @@ msgid "Check for error using regular expression"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:37
-#: include/classes/setup/CSetupWizard.php:205
+#: include/classes/setup/CSetupWizard.php:246
 msgid "Check of pre-requisites"
 msgstr ""
 
@@ -3215,7 +3215,7 @@ msgstr "Referensi melingkar pada template: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Template linkage melingkar tidak diperbolehkan."
 
-#: include/classes/core/ZBase.php:453
+#: include/classes/core/ZBase.php:461
 #, c-format
 msgid "Class %1$s not found for action %2$s."
 msgstr ""
@@ -3469,7 +3469,7 @@ msgstr "Konfigurasi"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:462
+#: include/classes/setup/CSetupWizard.php:507
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr ""
@@ -3478,7 +3478,7 @@ msgstr ""
 msgid "Configuration import"
 msgstr "Konfigurasi impor"
 
-#: app/controllers/CControllerGuiEdit.php:59
+#: app/controllers/CControllerGuiEdit.php:61
 msgid "Configuration of GUI"
 msgstr "Konfigurasi GUI"
 
@@ -3613,7 +3613,7 @@ msgstr "Konfigurasi trigger"
 msgid "Configuration of user groups"
 msgstr "Konfigurasi grup user"
 
-#: app/controllers/CControllerUserEdit.php:185
+#: app/controllers/CControllerUserEdit.php:186
 #: app/controllers/CControllerUserList.php:155
 msgid "Configuration of users"
 msgstr "Konfigurasi user"
@@ -3632,7 +3632,7 @@ msgid "Configuration of working time"
 msgstr "Konfigurasi waktu kerja"
 
 #: app/controllers/CControllerAutoregUpdate.php:69
-#: app/controllers/CControllerGuiUpdate.php:76
+#: app/controllers/CControllerGuiUpdate.php:78
 #: app/controllers/CControllerHousekeepingUpdate.php:122
 #: app/controllers/CControllerMiscConfigUpdate.php:77
 #: app/controllers/CControllerTrigDisplayUpdate.php:86
@@ -3642,7 +3642,7 @@ msgid "Configuration updated"
 msgstr "Konfigurasi diperbarui"
 
 #: include/classes/setup/CSetupWizard.php:41
-#: include/classes/setup/CSetupWizard.php:315
+#: include/classes/setup/CSetupWizard.php:356
 msgid "Configure DB connection"
 msgstr ""
 
@@ -3650,7 +3650,7 @@ msgstr ""
 msgid "Confirmation text"
 msgstr "Teks konfirmasi"
 
-#: include/classes/setup/CSetupWizard.php:460
+#: include/classes/setup/CSetupWizard.php:505
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr ""
 
@@ -4122,7 +4122,7 @@ msgstr ""
 msgid "Current host"
 msgstr "Host saat ini"
 
-#: include/classes/setup/CSetupWizard.php:163
+#: include/classes/setup/CSetupWizard.php:204
 msgid "Current value"
 msgstr "Nilai saat ini"
 
@@ -4232,7 +4232,7 @@ msgstr "Nama DNS"
 msgid "Daily"
 msgstr "Harian"
 
-#: include/classes/core/ZBase.php:313
+#: include/classes/core/ZBase.php:321
 msgid "Dark"
 msgstr ""
 
@@ -4327,7 +4327,7 @@ msgstr ""
 msgid "Database history tables upgraded"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:221
+#: include/classes/setup/CSetupWizard.php:262
 msgid "Database host"
 msgstr "Host database"
 
@@ -4335,35 +4335,35 @@ msgstr "Host database"
 msgid "Database monitor"
 msgstr "Monitor database"
 
-#: include/classes/setup/CSetupWizard.php:234
-#: include/classes/setup/CSetupWizard.php:364 setup.php:44
+#: include/classes/setup/CSetupWizard.php:275
+#: include/classes/setup/CSetupWizard.php:405 setup.php:63
 msgid "Database name"
 msgstr "Nama database"
 
-#: include/classes/setup/CSetupWizard.php:366
+#: include/classes/setup/CSetupWizard.php:407
 msgid "Database password"
 msgstr "Password database"
 
-#: include/classes/setup/CSetupWizard.php:226
-#: include/classes/setup/CSetupWizard.php:363 setup.php:43
+#: include/classes/setup/CSetupWizard.php:267
+#: include/classes/setup/CSetupWizard.php:404 setup.php:62
 msgid "Database port"
 msgstr "Port database"
 
-#: include/classes/setup/CSetupWizard.php:240
-#: include/classes/setup/CSetupWizard.php:368
+#: include/classes/setup/CSetupWizard.php:281
+#: include/classes/setup/CSetupWizard.php:409
 msgid "Database schema"
 msgstr "Schema database"
 
-#: include/classes/setup/CSetupWizard.php:362
+#: include/classes/setup/CSetupWizard.php:403
 msgid "Database server"
 msgstr "Server database"
 
-#: include/classes/setup/CSetupWizard.php:217
-#: include/classes/setup/CSetupWizard.php:357
+#: include/classes/setup/CSetupWizard.php:258
+#: include/classes/setup/CSetupWizard.php:398
 msgid "Database type"
 msgstr "Tipe database"
 
-#: include/classes/setup/CSetupWizard.php:365
+#: include/classes/setup/CSetupWizard.php:406
 msgid "Database user"
 msgstr "User database"
 
@@ -4451,6 +4451,16 @@ msgstr ""
 msgid "Default host inventory mode"
 msgstr ""
 
+#: app/views/administration.gui.edit.php:64
+#: include/classes/setup/CSetupWizard.php:192
+msgid "Default language"
+msgstr ""
+
+#: include/profiles.inc.php:255
+#, c-format
+msgid "Default language \"%1$s\"."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:46
 msgid "Default login form"
 msgstr ""
@@ -4463,11 +4473,11 @@ msgstr ""
 msgid "Default operation step duration"
 msgstr "Standar durasi langkah operasi"
 
-#: app/views/administration.gui.edit.php:31
+#: app/views/administration.gui.edit.php:69
 msgid "Default theme"
 msgstr "Standar theme"
 
-#: include/profiles.inc.php:255
+#: include/profiles.inc.php:258
 #, c-format
 msgid "Default theme \"%1$s\"."
 msgstr "Standar theme \"%1$s\"."
@@ -4495,7 +4505,7 @@ msgstr "Delay oleh"
 #: app/views/administration.regex.list.php:91
 #: app/views/administration.script.edit.php:139
 #: app/views/administration.script.list.php:122
-#: app/views/administration.user.edit.php:464
+#: app/views/administration.user.edit.php:467
 #: app/views/administration.usergroup.edit.php:219
 #: app/views/administration.usergroup.list.php:228
 #: app/views/administration.user.list.php:210
@@ -4759,7 +4769,7 @@ msgstr ""
 msgid "Delete selected triggers?"
 msgstr "Hapus trigger yang dipilih?"
 
-#: app/views/administration.user.edit.php:466
+#: app/views/administration.user.edit.php:469
 msgid "Delete selected user?"
 msgstr "Hapus user yang dipilih?"
 
@@ -5029,7 +5039,7 @@ msgstr ""
 #: app/views/administration.miscconfig.edit.php:53
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
-#: app/views/administration.user.edit.php:236
+#: app/views/administration.user.edit.php:239
 #: app/views/administration.usergroup.list.php:53
 #: app/views/administration.usergroup.list.php:91
 #: app/views/administration.usergroup.list.php:129
@@ -5320,7 +5330,7 @@ msgstr "Mati"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:449
+#: include/classes/setup/CSetupWizard.php:494
 msgid "Download the configuration file"
 msgstr ""
 
@@ -5470,7 +5480,7 @@ msgstr "Setiap URL haru memiliki nama yang unik. Pastikan hanya ada satu URL ber
 msgid "Each item"
 msgstr ""
 
-#: app/views/administration.user.edit.php:284
+#: app/views/administration.user.edit.php:287
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: include/views/configuration.action.edit.php:259
 #: include/views/configuration.action.edit.php:280
@@ -5798,7 +5808,7 @@ msgstr ""
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
-#: app/views/administration.user.edit.php:230
+#: app/views/administration.user.edit.php:233
 #: app/views/administration.usergroup.edit.php:75
 #: app/views/administration.usergroup.edit.php:88
 #: app/views/administration.usergroup.edit.php:89
@@ -6153,7 +6163,7 @@ msgstr "PALSU"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:179
+#: include/classes/setup/CSetupWizard.php:220
 msgid "Fail"
 msgstr "Gagal"
 
@@ -6503,7 +6513,7 @@ msgstr "Dari"
 msgid "Frontend access"
 msgstr "Akses frontend"
 
-#: app/views/administration.user.edit.php:365
+#: app/views/administration.user.edit.php:368
 msgid "Frontend messaging"
 msgstr "Sistem pesan frontend"
 
@@ -6538,7 +6548,7 @@ msgid "GSM modem"
 msgstr "Modem GSM"
 
 #: app/views/administration.gui.edit.php:27
-#: app/views/administration.gui.edit.php:52 include/html.inc.php:907
+#: app/views/administration.gui.edit.php:89 include/html.inc.php:907
 msgid "GUI"
 msgstr "GUI"
 
@@ -6915,7 +6925,7 @@ msgstr[0] "Grup dihapus"
 msgid "Group for discovered hosts"
 msgstr "Grup untuk host yang ditemukan"
 
-#: include/profiles.inc.php:267
+#: include/profiles.inc.php:270
 #, c-format
 msgid "Group for discovered hosts \"%1$s\"."
 msgstr ""
@@ -7051,7 +7061,7 @@ msgid "Height"
 msgstr "Tinggi"
 
 #: include/menu.inc.php:211 include/menu.inc.php:214
-#: include/views/general.login.php:89
+#: include/views/general.login.php:90
 msgid "Help"
 msgstr "Bantuan"
 
@@ -7092,11 +7102,11 @@ msgstr ""
 msgid "High"
 msgstr "Tinggi"
 
-#: include/classes/core/ZBase.php:315
+#: include/classes/core/ZBase.php:323
 msgid "High-contrast dark"
 msgstr ""
 
-#: include/classes/core/ZBase.php:314
+#: include/classes/core/ZBase.php:322
 msgid "High-contrast light"
 msgstr ""
 
@@ -7194,7 +7204,7 @@ msgstr "Luruskan horisontal"
 #: include/classes/screens/CScreenProblem.php:916
 #: include/classes/screens/CScreenProblem.php:1166
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:327
+#: include/classes/setup/CSetupWizard.php:368
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
@@ -7297,7 +7307,7 @@ msgstr[0] ""
 #: app/partials/popup.operations.php:169
 #: app/views/administration.script.edit.php:84
 #: app/views/administration.script.list.php:70
-#: app/views/administration.user.edit.php:332
+#: app/views/administration.user.edit.php:335
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
@@ -8537,7 +8547,7 @@ msgid "Incorrect media type ID."
 msgstr ""
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1282
+#: include/classes/api/services/CUser.php:1291
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr ""
@@ -9042,7 +9052,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:854
 #: include/classes/api/services/CTriggerGeneral.php:862
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:535
+#: include/classes/api/services/CUser.php:544
 #: include/classes/graphdraw/CLineGraphDraw.php:117
 #: include/classes/graphdraw/CLineGraphDraw.php:243
 #: include/classes/graphdraw/CLineGraphDraw.php:253
@@ -9188,11 +9198,11 @@ msgid "Insert expression"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:467
+#: include/classes/setup/CSetupWizard.php:512
 msgid "Install"
 msgstr ""
 
-#: setup.php:107
+#: setup.php:131
 msgid "Installation"
 msgstr "Instalasi"
 
@@ -9364,7 +9374,7 @@ msgstr ""
 msgid "Invalid email address \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:689
+#: include/classes/api/services/CUser.php:698
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr ""
@@ -9491,8 +9501,8 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:2271
 #: include/classes/api/services/CItemGeneral.php:2300
 #: include/classes/api/services/CModule.php:291
-#: include/classes/api/services/CUser.php:663
-#: include/classes/api/services/CUser.php:674
+#: include/classes/api/services/CUser.php:672
+#: include/classes/api/services/CUser.php:683
 #: include/classes/validators/CApiInputValidator.php:262
 #: include/classes/validators/CApiInputValidator.php:267
 #: include/classes/validators/CApiInputValidator.php:272
@@ -10163,11 +10173,11 @@ msgstr "Label"
 msgid "Label location"
 msgstr "Label lokasi"
 
-#: app/views/administration.user.edit.php:171
+#: app/views/administration.user.edit.php:184
 msgid "Language"
 msgstr "Bahasa"
 
-#: include/classes/api/services/CUser.php:551
+#: include/classes/api/services/CUser.php:560
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10332,7 +10342,11 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:35
+#: setup.php:148
+msgid "Licensed under"
+msgstr ""
+
+#: app/views/administration.gui.edit.php:72
 msgid "Limit for search and filter results"
 msgstr "Cari/Filter batas elemen"
 
@@ -10533,12 +10547,12 @@ msgstr "Log jebakan SNMP yang tidak sama"
 msgid "Login"
 msgstr "Login"
 
-#: include/classes/api/services/CUser.php:1219
+#: include/classes/api/services/CUser.php:1228
 msgid "Login failed."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1196
-#: include/classes/api/services/CUser.php:1565
+#: include/classes/api/services/CUser.php:1205
+#: include/classes/api/services/CUser.php:1579
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:86
 msgid "Login name or password is incorrect."
 msgstr "Login nama atau passwordk salah."
@@ -10904,11 +10918,11 @@ msgstr ""
 msgid "Max columns"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:40
+#: app/views/administration.gui.edit.php:77
 msgid "Max count of elements to show inside table cell"
 msgstr "Hitung max elemen untuk menampilkan didalam sel tabel"
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:261
 #, c-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
 msgstr "Hitung max elemen untuk menampilkan didalam sel tabel \"%1$s\"."
@@ -10932,7 +10946,7 @@ msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] ""
 
-#: include/classes/api/services/CUser.php:696
+#: include/classes/api/services/CUser.php:705
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr ""
@@ -10947,8 +10961,8 @@ msgid "May"
 msgstr "Mei"
 
 #: app/controllers/CControllerPopupMedia.php:170
-#: app/views/administration.user.edit.php:296
-#: app/views/administration.user.edit.php:311 app/views/popup.media.php:58
+#: app/views/administration.user.edit.php:299
+#: app/views/administration.user.edit.php:314 app/views/popup.media.php:58
 msgid "Media"
 msgstr "Media"
 
@@ -11008,7 +11022,7 @@ msgstr ""
 msgid "Media type updated"
 msgstr "Tipe media diperbarui"
 
-#: include/classes/api/services/CUser.php:620
+#: include/classes/api/services/CUser.php:629
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr ""
@@ -11076,8 +11090,8 @@ msgstr ""
 msgid "Message templates"
 msgstr ""
 
-#: app/views/administration.user.edit.php:370
-#: app/views/administration.user.edit.php:378
+#: app/views/administration.user.edit.php:373
+#: app/views/administration.user.edit.php:381
 msgid "Message timeout"
 msgstr "Habis waktu pesan"
 
@@ -11095,7 +11109,7 @@ msgstr ""
 msgid "Messages"
 msgstr "Pesan"
 
-#: app/views/administration.user.edit.php:450
+#: app/views/administration.user.edit.php:453
 msgid "Messaging"
 msgstr "Pesan"
 
@@ -11639,8 +11653,8 @@ msgid "Next page"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:116
-#: include/classes/setup/CSetupWizard.php:317
-#: include/classes/setup/CSetupWizard.php:397
+#: include/classes/setup/CSetupWizard.php:358
+#: include/classes/setup/CSetupWizard.php:438
 msgid "Next step"
 msgstr ""
 
@@ -11977,8 +11991,8 @@ msgstr ""
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1201
-#: include/classes/api/services/CUser.php:1577
+#: include/classes/api/services/CUser.php:1210
+#: include/classes/api/services/CUser.php:1591
 msgid "No permissions for system access."
 msgstr "Tidak ada izin untuk akses sistem."
 
@@ -12137,7 +12151,7 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: include/classes/api/services/CUserMacro.php:459
 #: include/classes/api/services/CUserMacro.php:807
 #: include/classes/api/services/CUser.php:424
-#: include/classes/api/services/CUser.php:981
+#: include/classes/api/services/CUser.php:990
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -12228,7 +12242,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:140
 #: include/classes/widgets/forms/CWidgetFormProblems.php:160
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
-#: include/profiles.inc.php:276 include/users.inc.php:437
+#: include/profiles.inc.php:279 include/users.inc.php:437
 #: include/views/configuration.host.discovery.edit.php:279
 #: include/views/configuration.host.list.php:352
 #: include/views/configuration.host.list.php:358
@@ -12278,9 +12292,17 @@ msgstr ""
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
 
+#: include/classes/api/services/CUser.php:450
+msgid "Not allowed to set language for user \"guest\"."
+msgstr ""
+
 #: include/classes/api/services/CUser.php:442
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Tidak diizinkan menggunakan password untuk user \"guest\"."
+
+#: include/classes/api/services/CUser.php:453
+msgid "Not allowed to set theme for user \"guest\"."
+msgstr ""
 
 #: include/classes/api/clients/CLocalApiClient.php:166
 msgid "Not authorised."
@@ -12626,7 +12648,7 @@ msgstr "Nyala"
 msgid "On status change triggers blink for"
 msgstr "Pada perubahan status trigger berkedip untuk"
 
-#: app/views/administration.user.edit.php:376
+#: app/views/administration.user.edit.php:379
 msgid "Once"
 msgstr "Sekali"
 
@@ -13312,7 +13334,7 @@ msgstr "Pasif"
 #: app/views/administration.user.edit.php:112
 #: app/views/administration.user.edit.php:128 disc_prototypes.php:228
 #: host_discovery.php:180 httpconf.php:64
-#: include/classes/setup/CSetupWizard.php:248
+#: include/classes/setup/CSetupWizard.php:289
 #: include/views/configuration.host.discovery.edit.php:297
 #: include/views/configuration.host.discovery.edit.php:433
 #: include/views/configuration.host.discovery.edit.php:462
@@ -13330,7 +13352,7 @@ msgstr "Pasif"
 #: include/views/configuration.item.prototype.edit.php:505
 #: include/views/configuration.item.prototype.massupdate.php:206
 #: include/views/configuration.item.prototype.massupdate.php:234
-#: include/views/general.login.php:74
+#: include/views/general.login.php:75
 #: include/views/js/common.item.edit.js.php:217 items.php:217
 msgid "Password"
 msgstr "Password"
@@ -13408,9 +13430,9 @@ msgid "Periods"
 msgstr "Periode"
 
 #: app/partials/administration.usergroup.grouprights.html.php:29
-#: app/views/administration.user.edit.php:332
-#: app/views/administration.user.edit.php:352
-#: app/views/administration.user.edit.php:359
+#: app/views/administration.user.edit.php:335
+#: app/views/administration.user.edit.php:355
+#: app/views/administration.user.edit.php:362
 #: app/views/administration.usergroup.edit.php:102
 #: app/views/administration.usergroup.edit.php:153
 #: app/views/administration.usergroup.edit.php:204
@@ -13425,7 +13447,7 @@ msgstr "Periode"
 msgid "Permissions"
 msgstr "Izin"
 
-#: app/views/administration.user.edit.php:357
+#: app/views/administration.user.edit.php:360
 msgid "Permissions can be assigned for user groups only."
 msgstr "Perizinan dapat diberikan hanya untuk grup user."
 
@@ -13446,16 +13468,16 @@ msgstr "Menempatkan algoritma"
 msgid "Plain text"
 msgstr "Plain text"
 
-#: app/views/administration.user.edit.php:394
-#: app/views/administration.user.edit.php:426
+#: app/views/administration.user.edit.php:397
+#: app/views/administration.user.edit.php:429
 msgid "Play"
 msgstr "Mainkan"
 
-#: app/views/administration.user.edit.php:374
+#: app/views/administration.user.edit.php:377
 msgid "Play sound"
 msgstr "Mainkan suara"
 
-#: include/classes/setup/CSetupWizard.php:397
+#: include/classes/setup/CSetupWizard.php:438
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr ""
@@ -13464,12 +13486,12 @@ msgstr ""
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:317
+#: include/classes/setup/CSetupWizard.php:358
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:346
+#: include/classes/setup/CSetupWizard.php:387
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr ""
 
@@ -13514,9 +13536,9 @@ msgstr "Mengisi field inventaris host"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:124
-#: include/classes/setup/CSetupWizard.php:332 include/hosts.inc.php:1471
+#: include/classes/setup/CSetupWizard.php:373 include/hosts.inc.php:1471
 #: include/views/configuration.host.list.php:140
-#: include/views/inventory.host.view.php:79 setup.php:56
+#: include/views/inventory.host.view.php:79 setup.php:75
 msgid "Port"
 msgstr "Port"
 
@@ -13545,7 +13567,7 @@ msgid "Post type"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:49
-#: include/classes/setup/CSetupWizard.php:395
+#: include/classes/setup/CSetupWizard.php:436
 msgid "Pre-installation summary"
 msgstr ""
 
@@ -14018,7 +14040,7 @@ msgstr "Penerima (descending)"
 msgid "Recipients"
 msgstr ""
 
-#: app/views/administration.user.edit.php:388
+#: app/views/administration.user.edit.php:391
 #: include/classes/screens/CScreenProblem.php:1083
 #: include/views/configuration.item.list.php:173
 #: include/views/configuration.trigger.prototype.list.php:153
@@ -14058,7 +14080,7 @@ msgstr ""
 msgid "Rectangle"
 msgstr ""
 
-#: app/views/administration.user.edit.php:203
+#: app/views/administration.user.edit.php:206
 msgid "Refresh"
 msgstr ""
 
@@ -14075,7 +14097,7 @@ msgstr ""
 msgid "Refresh unsupported items"
 msgstr ""
 
-#: include/profiles.inc.php:264
+#: include/profiles.inc.php:267
 #, c-format
 msgid "Refresh unsupported items \"%1$s\"."
 msgstr ""
@@ -14129,7 +14151,7 @@ msgstr ""
 msgid "Release to create a widget."
 msgstr ""
 
-#: include/views/general.login.php:79
+#: include/views/general.login.php:80
 msgid "Remember me for 30 days"
 msgstr "Ingatkan saya selama 30 hari"
 
@@ -14155,7 +14177,7 @@ msgstr "Perintah jarak jauh"
 #: app/views/administration.mediatype.edit.php:164
 #: app/views/administration.mediatype.edit.php:183
 #: app/views/administration.regex.edit.php:76
-#: app/views/administration.user.edit.php:287
+#: app/views/administration.user.edit.php:290
 #: app/views/administration.valuemap.edit.php:65
 #: app/views/js/administration.iconmap.edit.js.php:54
 #: app/views/js/administration.macros.edit.js.php:45
@@ -14368,7 +14390,7 @@ msgstr ""
 msgid "Request type"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:163
+#: include/classes/setup/CSetupWizard.php:204
 #: include/views/configuration.httpconf.edit.php:202
 msgid "Required"
 msgstr "Dibutuhkan"
@@ -14634,7 +14656,7 @@ msgstr "Jarak baris"
 msgid "Rows"
 msgstr "Baris"
 
-#: app/views/administration.user.edit.php:208
+#: app/views/administration.user.edit.php:211
 msgid "Rows per page"
 msgstr "Baris per halaman"
 
@@ -14919,7 +14941,7 @@ msgstr "Sabtu"
 msgid "Save changes"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:450
+#: include/classes/setup/CSetupWizard.php:495
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr ""
@@ -15270,7 +15292,7 @@ msgstr "Kirim pesan ke user"
 msgid "Send only to"
 msgstr "Hanya kirim ke"
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:61
+#: app/views/administration.user.edit.php:229 app/views/popup.media.php:61
 #: app/views/popup.media.php:68 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "Kirim ke"
@@ -15429,9 +15451,9 @@ msgstr "Service"
 msgid "Services form a circular dependency."
 msgstr "Form service dependensi melingkar."
 
-#: include/classes/api/services/CUser.php:1331
-#: include/classes/api/services/CUser.php:1344
-#: include/classes/api/services/CUser.php:1370
+#: include/classes/api/services/CUser.php:1340
+#: include/classes/api/services/CUser.php:1353
+#: include/classes/api/services/CUser.php:1384
 msgid "Session terminated, re-login, please."
 msgstr "Sesi dimatikan, mohon login kembali."
 
@@ -15631,7 +15653,7 @@ msgid "Show sidebar"
 msgstr ""
 
 #: app/partials/common.filter.trigger.php:167
-#: app/views/administration.user.edit.php:444
+#: app/views/administration.user.edit.php:447
 #: app/views/monitoring.host.view.php:155
 #: app/views/monitoring.problem.view.php:312
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
@@ -15681,7 +15703,7 @@ msgstr ""
 msgid "Show value"
 msgstr "Tampilkan nilai"
 
-#: app/views/administration.gui.edit.php:45
+#: app/views/administration.gui.edit.php:82
 msgid "Show warning if Zabbix server is down"
 msgstr "Tampilkan peringatan jika server Zabbix mati"
 
@@ -15701,15 +15723,15 @@ msgstr ""
 msgid "Sign"
 msgstr ""
 
-#: include/views/general.login.php:64 include/views/general.login.php:82
+#: include/views/general.login.php:65 include/views/general.login.php:83
 msgid "Sign in"
 msgstr "Masuk"
 
-#: include/views/general.login.php:45
+#: include/views/general.login.php:46
 msgid "Sign in with HTTP"
 msgstr ""
 
-#: include/views/general.login.php:49
+#: include/views/general.login.php:50
 msgid "Sign in with Single Sign-On (SAML)"
 msgstr ""
 
@@ -16108,8 +16130,8 @@ msgstr ""
 msgid "Steps"
 msgstr "Langkah"
 
-#: app/views/administration.user.edit.php:399
-#: app/views/administration.user.edit.php:431
+#: app/views/administration.user.edit.php:402
+#: app/views/administration.user.edit.php:434
 msgid "Stop"
 msgstr "Berhenti"
 
@@ -16195,7 +16217,7 @@ msgstr "Sen"
 msgid "Sunday"
 msgstr "Senin"
 
-#: include/menu.inc.php:195 include/views/general.login.php:96
+#: include/menu.inc.php:195 include/views/general.login.php:97
 msgid "Support"
 msgstr "Dukungan"
 
@@ -16239,7 +16261,8 @@ msgstr "Pengalihan metode otentikasi akan mengatur ulang semua kecuali sesi ini!
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr ""
 
-#: app/views/administration.user.edit.php:181 include/users.inc.php:83
+#: app/views/administration.user.edit.php:138
+#: app/views/administration.user.edit.php:139 include/users.inc.php:83
 msgid "System default"
 msgstr "Standar sistem"
 
@@ -16297,14 +16320,14 @@ msgstr "TCP"
 msgid "TELNET agent"
 msgstr "Agen TELNET"
 
-#: include/classes/setup/CSetupWizard.php:273
-#: include/classes/setup/CSetupWizard.php:377
+#: include/classes/setup/CSetupWizard.php:314
+#: include/classes/setup/CSetupWizard.php:418
 msgid "TLS certificate authority file"
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:269
-#: include/classes/setup/CSetupWizard.php:374
+#: include/classes/setup/CSetupWizard.php:310
+#: include/classes/setup/CSetupWizard.php:415
 msgid "TLS certificate file"
 msgstr ""
 
@@ -16312,18 +16335,18 @@ msgstr ""
 msgid "TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:291
-#: include/classes/setup/CSetupWizard.php:383
+#: include/classes/setup/CSetupWizard.php:332
+#: include/classes/setup/CSetupWizard.php:424
 msgid "TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:253
-#: include/classes/setup/CSetupWizard.php:370
+#: include/classes/setup/CSetupWizard.php:294
+#: include/classes/setup/CSetupWizard.php:411
 msgid "TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:265
-#: include/classes/setup/CSetupWizard.php:373
+#: include/classes/setup/CSetupWizard.php:306
+#: include/classes/setup/CSetupWizard.php:414
 msgid "TLS key file"
 msgstr ""
 
@@ -16769,7 +16792,7 @@ msgstr ""
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr ""
 
-#: app/views/administration.user.edit.php:180
+#: app/views/administration.user.edit.php:185
 msgid "Theme"
 msgstr "Theme"
 
@@ -17258,7 +17281,7 @@ msgstr ""
 msgid "Trigger severities"
 msgstr "Trigger tingkat keparahan"
 
-#: app/views/administration.user.edit.php:443 include/actions.inc.php:45
+#: app/views/administration.user.edit.php:446 include/actions.inc.php:45
 msgid "Trigger severity"
 msgstr "Trigger keparahan"
 
@@ -17345,7 +17368,7 @@ msgstr ""
 #: app/views/administration.mediatype.list.php:74
 #: app/views/administration.script.edit.php:47
 #: app/views/administration.script.list.php:66
-#: app/views/administration.user.edit.php:226
+#: app/views/administration.user.edit.php:229
 #: app/views/dashboard.sharing.edit.php:78
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/popup.condition.common.php:53
@@ -17458,7 +17481,7 @@ msgstr "TIDAK DIKENAL"
 msgid "URL"
 msgstr "URL"
 
-#: app/views/administration.user.edit.php:213
+#: app/views/administration.user.edit.php:216
 msgid "URL (after login)"
 msgstr "URL (setelah masuk)"
 
@@ -17561,7 +17584,7 @@ msgstr ""
 msgid "Unblock selected users?"
 msgstr "Membuka blokir user yang dipilih?"
 
-#: include/classes/core/ZBase.php:548
+#: include/classes/core/ZBase.php:556
 #, c-format
 msgid "Unexpected response for action %1$s."
 msgstr ""
@@ -17759,7 +17782,7 @@ msgstr "Nyala"
 #: app/partials/massupdate.macros.tab.php:123
 #: app/views/administration.authentication.edit.php:264
 #: app/views/administration.autoreg.edit.php:90
-#: app/views/administration.gui.edit.php:53
+#: app/views/administration.gui.edit.php:90
 #: app/views/administration.housekeeping.edit.php:186
 #: app/views/administration.iconmap.edit.php:132
 #: app/views/administration.image.edit.php:77
@@ -17772,8 +17795,8 @@ msgstr "Nyala"
 #: app/views/administration.script.edit.php:137
 #: app/views/administration.trigdisplay.edit.php:108
 #: app/views/administration.trigseverity.edit.php:97
-#: app/views/administration.user.edit.php:462
-#: app/views/administration.user.edit.php:485
+#: app/views/administration.user.edit.php:465
+#: app/views/administration.user.edit.php:488
 #: app/views/administration.usergroup.edit.php:217
 #: app/views/administration.valuemap.edit.php:110
 #: app/views/administration.workingtime.edit.php:40
@@ -17893,7 +17916,7 @@ msgstr ""
 msgid "Use custom event status colours"
 msgstr ""
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:77
+#: app/views/administration.user.edit.php:229 app/views/popup.media.php:77
 msgid "Use if severity"
 msgstr "Gunakan jika kondisi parah"
 
@@ -17907,10 +17930,10 @@ msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:185
 #: app/partials/popup.operations.php:98
-#: app/views/administration.user.edit.php:217
+#: app/views/administration.user.edit.php:220
 #: app/views/reports.auditlog.list.php:71 httpconf.php:58
 #: include/actions.inc.php:1703 include/actions.inc.php:1757
-#: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:245
+#: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:286
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:167
 msgid "User"
 msgstr "User"
@@ -17920,27 +17943,27 @@ msgstr "User"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1066
+#: include/classes/api/services/CUser.php:1075
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1023
+#: include/classes/api/services/CUser.php:1032
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1036
+#: include/classes/api/services/CUser.php:1045
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1051
+#: include/classes/api/services/CUser.php:1060
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1009
+#: include/classes/api/services/CUser.php:1018
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr ""
@@ -17949,7 +17972,7 @@ msgstr ""
 msgid "User action"
 msgstr ""
 
-#: app/controllers/CControllerUserCreate.php:110
+#: app/controllers/CControllerUserCreate.php:111
 msgid "User added"
 msgstr "User ditambah"
 
@@ -17957,16 +17980,16 @@ msgstr "User ditambah"
 msgid "User agent string"
 msgstr ""
 
-#: app/views/administration.user.edit.php:323
+#: app/views/administration.user.edit.php:326
 msgid "User can't change type for himself"
 msgstr "User tidak dapat mengganti tipe untuk dirinya sendiri"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:734
+#: include/classes/api/services/CUser.php:743
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "User tidak dapat menambah dirinya sendiri ke grup non-aktif atau grup dengan akses GUI non-aktif."
 
-#: include/classes/api/services/CUser.php:721
+#: include/classes/api/services/CUser.php:730
 msgid "User cannot change their user type."
 msgstr ""
 
@@ -18017,7 +18040,7 @@ msgstr[0] ""
 msgid "User group for database down message"
 msgstr "Grup user untuk pesan mati database"
 
-#: include/profiles.inc.php:275
+#: include/profiles.inc.php:278
 #, c-format
 msgid "User group for database down message \"%1$s\"."
 msgstr ""
@@ -18042,7 +18065,7 @@ msgstr[0] ""
 
 #: include/classes/api/services/CDashboard.php:530
 #: include/classes/api/services/CScript.php:423
-#: include/classes/api/services/CUser.php:517
+#: include/classes/api/services/CUser.php:526
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr ""
@@ -18057,7 +18080,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Grup user"
 
-#: include/classes/api/services/CUser.php:988
+#: include/classes/api/services/CUser.php:997
 msgid "User is not allowed to delete himself."
 msgstr "User tidak diizinkan menghapus dirinya sendiri."
 
@@ -18088,7 +18111,7 @@ msgstr "Nama user"
 msgid "User password"
 msgstr "Password user"
 
-#: app/controllers/CControllerUserProfileEdit.php:142
+#: app/controllers/CControllerUserProfileEdit.php:143
 #: app/views/administration.user.edit.php:37
 msgid "User profile"
 msgstr "Profil user"
@@ -18118,8 +18141,8 @@ msgstr ""
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr ""
 
-#: app/views/administration.user.edit.php:322
-#: app/views/administration.user.edit.php:327
+#: app/views/administration.user.edit.php:325
+#: app/views/administration.user.edit.php:330
 #: app/views/administration.user.list.php:65
 #: app/views/administration.user.list.php:94
 msgid "User type"
@@ -18130,8 +18153,8 @@ msgid "User unblocked"
 msgid_plural "Users unblocked"
 msgstr[0] ""
 
-#: app/controllers/CControllerUserProfileUpdate.php:114
-#: app/controllers/CControllerUserUpdate.php:122
+#: app/controllers/CControllerUserProfileUpdate.php:115
+#: app/controllers/CControllerUserUpdate.php:123
 msgid "User updated"
 msgstr "User diperbarui"
 
@@ -18142,7 +18165,7 @@ msgstr "User diperbarui"
 msgid "User with ID \"%1$s\" is not available."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:476
+#: include/classes/api/services/CUser.php:485
 #, c-format
 msgid "User with alias \"%1$s\" already exists."
 msgstr ""
@@ -18155,7 +18178,7 @@ msgstr ""
 #: host_discovery.php:173 include/views/configuration.host.edit.php:600
 #: include/views/configuration.host.massupdate.php:183
 #: include/views/configuration.host.prototype.edit.php:291
-#: include/views/general.login.php:69 index.php:33 items.php:210
+#: include/views/general.login.php:70 index.php:33 items.php:210
 msgid "Username"
 msgstr "Username"
 
@@ -18625,7 +18648,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "Peringatan"
 
-#: include/classes/setup/CSetupWizard.php:175
+#: include/classes/setup/CSetupWizard.php:216
 msgctxt "setup"
 msgid "Warning"
 msgstr ""
@@ -18740,7 +18763,7 @@ msgstr ""
 msgid "Welcome to"
 msgstr ""
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:72
+#: app/views/administration.user.edit.php:229 app/views/popup.media.php:72
 msgid "When active"
 msgstr "Ketidak aktif"
 
@@ -18786,8 +18809,8 @@ msgstr ""
 msgid "With header row"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:288
-#: include/classes/setup/CSetupWizard.php:380
+#: include/classes/setup/CSetupWizard.php:329
+#: include/classes/setup/CSetupWizard.php:421
 msgid "With host verification"
 msgstr ""
 
@@ -19054,7 +19077,9 @@ msgstr ""
 msgid "You are logged in as \"%1$s\"."
 msgstr ""
 
-#: app/views/administration.user.edit.php:167
+#: app/views/administration.gui.edit.php:60
+#: app/views/administration.user.edit.php:173
+#: include/classes/setup/CSetupWizard.php:188
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Anda tidak dapat memilih beberapa bahasa, karena locale untuk mereka tidak terinstall pada web server."
 
@@ -19191,7 +19216,7 @@ msgstr ""
 
 #: app/partials/popup.operations.php:217
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:390
+#: include/classes/setup/CSetupWizard.php:431
 msgid "Zabbix server"
 msgstr "Server Zabbix"
 
@@ -19209,7 +19234,7 @@ msgid "Zabbix server (proxy)"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:45
-#: include/classes/setup/CSetupWizard.php:344
+#: include/classes/setup/CSetupWizard.php:385
 msgid "Zabbix server details"
 msgstr ""
 
@@ -19221,16 +19246,16 @@ msgstr "Server Zabbix tidak berjalan: Informasi yang ditampilkan mungkin tidak s
 msgid "Zabbix server is running"
 msgstr "Server Zabbix berjalan"
 
-#: include/profiles.inc.php:261
+#: include/profiles.inc.php:264
 #, c-format
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Server Zabbix sedang berjalan pemeriksaan interval \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:392
+#: include/classes/setup/CSetupWizard.php:433
 msgid "Zabbix server name"
 msgstr "Nama server Zabbix"
 
-#: include/classes/setup/CSetupWizard.php:391
+#: include/classes/setup/CSetupWizard.php:432
 msgid "Zabbix server port"
 msgstr "Port server Zabbix"
 
@@ -19258,7 +19283,7 @@ msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:663
+#: include/classes/api/services/CUser.php:672
 #: include/classes/import/validators/CXmlValidatorGeneral.php:201
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:262
@@ -19573,8 +19598,8 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:830
 #: include/classes/api/services/CTriggerGeneral.php:848
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:535
-#: include/classes/api/services/CUser.php:674
+#: include/classes/api/services/CUser.php:544
+#: include/classes/api/services/CUser.php:683
 #: include/classes/import/CConfigurationImport.php:775
 #: include/classes/import/CConfigurationImport.php:986
 #: include/classes/import/CConfigurationImport.php:1133
@@ -19696,7 +19721,7 @@ msgid "days"
 msgstr "hari"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:359
+#: include/classes/setup/CSetupWizard.php:400
 #: include/classes/widgets/CWidgetHelper.php:63
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -19884,7 +19909,7 @@ msgid "in"
 msgstr "dalam"
 
 #: app/partials/administration.usergroup.grouprights.html.php:61
-#: app/views/administration.user.edit.php:342
+#: app/views/administration.user.edit.php:345
 msgid "including subgroups"
 msgstr ""
 
@@ -20211,7 +20236,7 @@ msgstr ""
 msgid "of"
 msgstr "dari"
 
-#: app/views/administration.user.edit.php:261
+#: app/views/administration.user.edit.php:264
 #: include/classes/setup/CFrontendSetup.php:255
 #: include/classes/setup/CFrontendSetup.php:308
 #: include/classes/setup/CFrontendSetup.php:325
@@ -20233,7 +20258,7 @@ msgstr "dari"
 msgid "off"
 msgstr ""
 
-#: app/views/administration.user.edit.php:261
+#: app/views/administration.user.edit.php:264
 #: include/classes/setup/CFrontendSetup.php:308
 #: include/classes/setup/CFrontendSetup.php:325
 #: include/classes/setup/CFrontendSetup.php:346
@@ -20255,6 +20280,10 @@ msgstr "pada"
 
 #: app/controllers/CControllerPopupItemTestSend.php:187
 msgid "only one time unit is allowed"
+msgstr ""
+
+#: include/views/general.login.php:41
+msgid "or"
 msgstr ""
 
 #: include/views/configuration.httpconf.edit.php:98
@@ -20401,6 +20430,10 @@ msgstr "tampilkan pemetaan ikon"
 msgid "show value mappings"
 msgstr "tampilkan nilai pemetaan"
 
+#: include/views/general.login.php:41
+msgid "sign in as guest"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:319
 msgid "str() - Find string V in last (most recent) value (1 - found, 0 - not found)"
 msgstr ""
@@ -20417,7 +20450,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1569
+#: include/classes/api/services/CUser.php:1583
 msgid "supplied credentials are not unique"
 msgstr ""
 
