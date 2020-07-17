@@ -559,9 +559,9 @@
 	/**
 	 * Set height of dashboard container DOM element.
 	 *
-	 * @param {object} $obj       Dashboard container jQuery object.
-	 * @param {object} data       Dashboard data and options object.
-	 * @param {integer} min_rows  Minimal desired rows count.
+	 * @param {object} $obj      Dashboard container jQuery object.
+	 * @param {object} data      Dashboard data and options object.
+	 * @param {int}    min_rows  Minimal desired rows count.
 	 */
 	function resizeDashboardGrid($obj, data, min_rows) {
 		data['options']['rows'] = 0;
@@ -593,7 +593,7 @@
 	 *
 	 * @param {object} $obj  Dashboard container jQuery object.
 	 *
-	 * @returns {integer}
+	 * @returns {int}
 	 */
 	function calculateGridMinHeight($obj) {
 		return $(window).height() - $obj.offset().top - $('.wrapper').scrollTop();
@@ -675,7 +675,7 @@
 		data['pos-action'] = action;
 		data['cell-width'] = getCurrentCellWidth(data);
 		data['placeholder'].css('visibility', (action === 'resize') ? 'hidden' : 'visible').show();
-		data.new_widget_placeholder.container.hide();
+		data.new_widget_placeholder.hide();
 		resetCurrentPositions(data['widgets']);
 	}
 
@@ -2501,7 +2501,7 @@
 			delete data['options']['config_dialogue_active'];
 			$.unsubscribe('overlay.close', config_dialogue_close);
 
-			updateNewWidgetPlaceholderState($obj, data);
+			resetNewWidgetPlaceholderState(data);
 		};
 		$.subscribe('overlay.close', config_dialogue_close);
 
@@ -2542,89 +2542,181 @@
 	}
 
 	/**
-	 * Creates placeholder object for 'Add a new Widget'.
+	 * Create new widget placeholder instance.
 	 *
-	 * @returns {object}    Placeholder object with DOM elements and additional methods to set visual style.
+	 * @param {int}      cell_width        Dashboard grid cell width in percents.
+	 * @param {int}      cell_height       Dashboard grid cell height in pixels.
+	 * @param {callback} add_new_callback  Callback to execute on click on "Add new widget".
+
+	 * @returns {object}  Placeholder instance.
 	 */
-	function createNewWidgetPlaceholder() {
-		var $label = $('<div>', {'class': 'dashbrd-grid-new-widget-label'}),
-			$inner_box = $('<div>', {'class': 'dashbrd-grid-widget-new-box'}).append($label),
-			$placeholder = $('<div>', {'class': 'dashbrd-grid-new-widget-placeholder'}).append($inner_box),
-			updateLabelVisibility = function() {
-				if (!$inner_box.is('.dashbrd-grid-widget-set-size,.dashbrd-grid-widget-set-position')) {
-					return;
-				}
+	function createNewWidgetPlaceholder(cell_width, cell_height, add_new_callback) {
+		this.cell_width = cell_width;
+		this.cell_height = cell_height;
+		this.add_new_callback = add_new_callback;
 
-				var message = $inner_box.is('.dashbrd-grid-widget-set-size')
-						? t('Release to create a widget.')
-						: t('Click and drag to desired size.'),
-					frame_callback,
-					size_detection,
-					callback = function() {
-						if (size_detection.height()) {
-							$label.text($label.height() >= size_detection.height() ? message : '');
-							window.cancelAnimationFrame(frame_callback);
-						}
-						else if (size_detection.is(':visible')) {
-							frame_callback = window.requestAnimationFrame(callback);
-						}
-					};
+		this.$placeholder = $('<div>', {'class': this.classes.placeholder});
+		this.$placeholder_box = $('<div>', {'class': this.classes.placeholder_box});
+		this.$placeholder_box_label = $('<div>', {'class': this.classes.placeholder_box_label});
+		this.$placeholder_box_label_wrap = $('<span>');
 
-				// Create container to detect text overflow on y axis. Message div container will be removed on repaint.
-				size_detection = $('<div>').text(message).appendTo($label);
+		this.$placeholder_box_label_wrap.appendTo(this.$placeholder_box_label);
+		this.$placeholder_box_label.appendTo(this.$placeholder_box);
+		this.$placeholder_box.appendTo(this.$placeholder);
 
-				callback();
-			};
-
-		return {
-			container: $placeholder,
-			inner_box: $inner_box,
-			label: $label,
-			setDefault: function(callback) {
-				$inner_box.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position');
-				$label.empty().append($('<a>', {
-					href: '#',
-					text: t('Add a new widget')
-				}));
-
-				$placeholder.click(callback);
-				this.setDefaultPositionAndSize();
-			},
-			setPositioning: function() {
-				$placeholder.off('click');
-				$inner_box
-					.removeClass('dashbrd-grid-widget-set-size')
-					.addClass('dashbrd-grid-widget-set-position');
-				updateLabelVisibility();
-			},
-			setResizing: function() {
-				$placeholder.off('click');
-				$inner_box
-					.removeClass('dashbrd-grid-widget-set-position')
-					.addClass('dashbrd-grid-widget-set-size');
-				updateLabelVisibility();
-			},
-			updateLabelVisibility: updateLabelVisibility,
-			setPositionAndSize: function(pos) {
-				$placeholder.css({
-					position: 'absolute',
-					top: pos.top,
-					left: pos.left,
-					height: pos.height,
-					width: pos.width
-				});
-			},
-			setDefaultPositionAndSize: function() {
-				$placeholder.css({
-					position: '',
-					top: '',
-					left: '',
-					height: '',
-					width: ''
-				});
-			}
-		};
+		this.setState(this.STATE_ADD_NEW);
 	}
+
+	createNewWidgetPlaceholder.prototype.STATE_ADD_NEW = 0;
+	createNewWidgetPlaceholder.prototype.STATE_RESIZING = 1;
+	createNewWidgetPlaceholder.prototype.STATE_POSITIONING = 2;
+	createNewWidgetPlaceholder.prototype.STATE_KIOSK_MODE = 3;
+	createNewWidgetPlaceholder.prototype.STATE_READONLY = 4;
+
+	createNewWidgetPlaceholder.prototype.classes = {
+		placeholder: 'dashbrd-grid-new-widget-placeholder',
+		placeholder_box: 'dashbrd-grid-widget-new-box',
+		placeholder_box_label: 'dashbrd-grid-new-widget-label',
+		resizing: 'dashbrd-grid-widget-set-size',
+		positioning: 'dashbrd-grid-widget-set-position'
+	};
+
+	/**
+	 * Get jQuery obejct of the new widget placeholder.
+	 *
+	 * @returns {jQuery}
+	 */
+	createNewWidgetPlaceholder.prototype.getObject = function() {
+		return this.$placeholder;
+	};
+
+	/**
+	 * Set state of the new widget placeholder.
+	 *
+	 * @param {int} state  createNewWidgetPlaceholder.prototype.STATE_* constant.
+	 *
+	 * @returns {this}
+	 */
+	createNewWidgetPlaceholder.prototype.setState = function(state) {
+		this.$placeholder.hide();
+
+		if (state === this.state) {
+			return this;
+		}
+
+		this.$placeholder.off('click');
+		this.$placeholder.removeClass('disabled');
+		this.$placeholder_box.removeClass(this.classes.resizing + ' ' + this.classes.positioning);
+		this.$placeholder_box_label_wrap.empty();
+
+		switch (state) {
+			case this.STATE_ADD_NEW:
+				this.$placeholder_box_label_wrap.append(
+					$('<a>', {href: '#'}).text(t('Add a new widget'))
+				);
+
+				this.$placeholder.on('click', this.add_new_callback);
+
+				break;
+
+			case this.STATE_RESIZING:
+				this.$placeholder_box.addClass(this.classes.resizing);
+				this.$placeholder_box_label_wrap.text(t('Release to create a widget.'));
+
+				break;
+
+			case this.STATE_POSITIONING:
+				this.$placeholder_box.addClass(this.classes.positioning);
+				this.$placeholder_box_label_wrap.text(t('Click and drag to desired size.'));
+
+				break;
+
+			case this.STATE_KIOSK:
+				this.$placeholder_box_label_wrap.text(t('Cannot add widgets in kiosk mode'));
+				this.$placeholder.addClass('disabled');
+
+				break;
+
+			case this.STATE_READONLY:
+				this.$placeholder_box_label_wrap.text(t('You do not have permissions to edit dashboard'));
+				this.$placeholder.addClass('disabled');
+
+				break;
+		}
+
+		return this;
+	};
+
+	/**
+	 * Resize the new widget placeholder. Use to update visibility of the label of the placeholder.
+	 *
+	 * @returns {this}
+	 */
+	createNewWidgetPlaceholder.prototype.resize = function() {
+		if (this.$placeholder.is(':visible')) {
+			this.$placeholder_box_label_wrap.show();
+			if (this.$placeholder_box_label[0].scrollHeight > this.$placeholder_box_label.outerHeight()) {
+				this.$placeholder_box_label_wrap.hide();
+			}
+		}
+
+		return this;
+	};
+
+	/**
+	 * Show new widget placeholder at given position.
+	 *
+	 * @param {object} pos  Object with position and dimension.
+	 *
+	 * @returns {this}
+	 */
+	createNewWidgetPlaceholder.prototype.showAtPosition = function(pos) {
+		this.$placeholder
+			.css({
+				position: 'absolute',
+				left: (pos.x * this.cell_width) + '%',
+				top: (pos.y * this.cell_height) + 'px',
+				width: (pos.width * this.cell_width) + '%',
+				height: (pos.height * this.cell_height) + 'px'
+			})
+			.show();
+
+		this.resize();
+
+		return this;
+	};
+
+	/**
+	 * Show new widget placeholder at the default position.
+	 *
+	 * @returns {this}
+	 */
+	createNewWidgetPlaceholder.prototype.showAtDefaultPosition = function() {
+		this.$placeholder
+			.css({
+				position: '',
+				top: '',
+				left: '',
+				height: '',
+				width: ''
+			})
+			.show();
+
+		this.resize();
+
+		return this;
+	};
+
+	/**
+	 * Hide new widget placeholder.
+	 *
+	 * @returns {this}
+	 */
+	createNewWidgetPlaceholder.prototype.hide = function() {
+		this.$placeholder.hide();
+
+		return this;
+	};
 
 	function setModeEditDashboard($obj, data) {
 		$obj.addClass('dashbrd-mode-edit');
@@ -2647,10 +2739,8 @@
 			if (data['pos-action'] === 'addmodal' && dialogue.dialogueid === 'widgetConfg') {
 				data['pos-action'] = '';
 
-				updateNewWidgetPlaceholderState($obj, data);
 				resizeDashboardGrid($obj, data);
-
-				$obj.trigger('mouseenter');
+				resetNewWidgetPlaceholderState(data);
 			}
 		});
 
@@ -2666,10 +2756,9 @@
 
 			if (isWidgetCopied($obj)) {
 				var menu = getDashboardWidgetActionMenu(dimension),
-					placeholder = $obj.data('dashboardGrid').new_widget_placeholder,
 					options = {
 						position: {
-							of: placeholder.container,
+							of: data.new_widget_placeholder.getObject(),
 							my: ['left', 'top'],
 							at: ['right', 'bottom'],
 							collision: 'fit'
@@ -2678,7 +2767,7 @@
 							data['pos-action'] = '';
 
 							if (!data['options']['config_dialogue_active']) {
-								updateNewWidgetPlaceholderState($obj, data);
+								resetNewWidgetPlaceholderState(data);
 							}
 						}
 					};
@@ -2703,7 +2792,7 @@
 				options.position.my = options.position.my.join(' ');
 				options.position.at = options.position.at.join(' ');
 
-				placeholder.container.menuPopup(menu, event, options);
+				data.new_widget_placeholder.getObject().menuPopup(menu, event, options);
 			}
 			else {
 				$obj.dashboardGrid('addNewWidget', null, dimension);
@@ -2712,42 +2801,49 @@
 
 		$obj
 			.on('mousedown', function(event) {
+				var $target = $(event.target);
+
 				if (event.which != 1 || data['pos-action'] !== ''
-						|| (!$(event.target).is(data.new_widget_placeholder.container)
-						&& data.new_widget_placeholder.container.has(event.target).length == 0)) {
+						|| (!$target.is(data.new_widget_placeholder.getObject())
+							&& !data.new_widget_placeholder.getObject().has($target).length)) {
 					return;
 				}
 
 				setResizableState('disable', data.widgets, '');
-				data['pos-action'] = 'add';
-				data.new_widget_placeholder.setResizing();
 
-				return cancelEvent(event);
+				data['pos-action'] = 'add';
+
+				delete data.add_widget_dimension.left;
+				delete data.add_widget_dimension.top;
+
+				data.new_widget_placeholder
+					.setState(data.new_widget_placeholder.STATE_RESIZING)
+					.showAtPosition(data.add_widget_dimension);
+
+				return false;
 			})
 			.on('mouseleave', function(event) {
 				if (data['pos-action']) {
 					return;
 				}
 
-				updateNewWidgetPlaceholderState($obj, data);
+				data.add_widget_dimension = {};
+				resetNewWidgetPlaceholderState(data);
 			})
 			.on('mouseenter mousemove', function(event) {
-				var drag = (data['pos-action'] === 'add'),
-					$target = $(event.target);
+				var $target = $(event.target);
 
-				if (!drag && data['pos-action'] !== '') {
+				if (data['pos-action'] !== '' && data['pos-action'] !== 'add') {
 					return;
 				}
 
-				if (event.type === 'mouseenter' && data['pos-action'] === '') {
-					data.new_widget_placeholder.container.show();
-					data.new_widget_placeholder.setPositioning();
-				}
-				else if (!drag && !$target.is($obj) && !$target.is(data.new_widget_placeholder.container)
-						&& data.new_widget_placeholder.container.has($target).length == 0) {
-					resizeDashboardGrid($obj, data);
+				if (data['pos-action'] !== 'add' && !$target.is($obj)
+						&& !$target.is(data.new_widget_placeholder.getObject())
+						&& !data.new_widget_placeholder.getObject().has($target).length) {
 					data.add_widget_dimension = {};
-					data.new_widget_placeholder.container.hide();
+					data.new_widget_placeholder.hide();
+					resizeDashboardGrid($obj, data);
+
 					return;
 				}
 
@@ -2771,7 +2867,7 @@
 						height: data.options['widget-min-rows']
 					};
 
-				if (drag) {
+				if (data['pos-action'] === 'add') {
 					if (('top' in data.add_widget_dimension) === false) {
 						data.add_widget_dimension.left = x;
 						data.add_widget_dimension.top = Math.min(y, data.add_widget_dimension.y);
@@ -2807,7 +2903,6 @@
 					}
 				}
 				else {
-
 					if ((pos.x + pos.width) > data.options['max-columns']) {
 						pos.x = data.options['max-columns'] - pos.width;
 					}
@@ -2847,6 +2942,7 @@
 						}
 
 						overlap = false;
+
 						if (rectOverlap({
 							x: 0,
 							y: 0,
@@ -2855,19 +2951,22 @@
 						}, c_pos)) {
 							$.each(data.widgets, function(_, box) {
 								overlap |= rectOverlap(box.pos, c_pos);
+
 								return !overlap;
 							});
 						}
 
 						if (!overlap) {
 							pos = c_pos;
+
 							return false;
 						}
 					});
 
 					if (overlap) {
 						data.add_widget_dimension = {};
-						data.new_widget_placeholder.container.hide();
+						data.new_widget_placeholder.hide();
+
 						return;
 					}
 				}
@@ -2876,19 +2975,17 @@
 					resizeDashboardGrid($obj, data, pos.y + pos.height);
 				}
 
-				data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
+				$.extend(data.add_widget_dimension, pos);
 
 				// Hide widget headers, not to interfere with the new widget placeholder.
 				doLeaveWidgetsExcept($obj, data);
 
-				data.new_widget_placeholder.setPositionAndSize({
-					top: (data.add_widget_dimension.y * data.options['widget-height']) + 'px',
-					left: (data.add_widget_dimension.x * data.options['widget-width']) + '%',
-					height: (data.add_widget_dimension.height * data.options['widget-height']) + 'px',
-					width: (data.add_widget_dimension.width * data.options['widget-width']) + '%'
-				});
-				data.new_widget_placeholder.container.show();
-				data.new_widget_placeholder.updateLabelVisibility();
+				data.new_widget_placeholder
+					.setState((data['pos-action'] === 'add')
+						? data.new_widget_placeholder.STATE_RESIZING
+						: data.new_widget_placeholder.STATE_POSITIONING
+					)
+					.showAtPosition(data.add_widget_dimension);
 			});
 	}
 
@@ -2959,16 +3056,7 @@
 			data['options']['updated'] = true;
 
 			resizeDashboardGrid($obj, data);
-
-			if (!data.widgets.length && !$obj.is(':hover')) {
-				data.add_widget_dimension = {};
-				data.new_widget_placeholder.setDefault(function(e) {
-					methods.addNewWidget.call($obj, this);
-					return cancelEvent(e);
-				});
-
-				data.new_widget_placeholder.container.show();
-			}
+			resetNewWidgetPlaceholderState(data);
 		}
 	}
 
@@ -3269,23 +3357,18 @@
 	};
 
 	/**
-	 * Function update widget placeholder state.
+	 * Reset new widget placeholder state.
 	 *
-	 * @param {jQuery} $obj  Dashboard object.
-	 * @param {object} data  Dashboard data object.
+	 * @param {object} data  Dashboard data and options object.
 	 */
-	function updateNewWidgetPlaceholderState($obj, data) {
-		data.add_widget_dimension = {};
-
-		if (data.widgets.length || $obj.is(':hover')) {
-			data.new_widget_placeholder.container.hide();
-			data.new_widget_placeholder.setPositioning();
+	function resetNewWidgetPlaceholderState(data) {
+		if (data.widgets.length) {
+			data.new_widget_placeholder.hide();
 		}
 		else {
-			data.new_widget_placeholder.setDefault(function(e) {
-				methods.addNewWidget.call($obj, this);
-				return cancelEvent(e);
-			});
+			data.new_widget_placeholder
+				.setState(data.new_widget_placeholder.STATE_ADD_NEW)
+				.showAtDefaultPosition();
 		}
 	}
 
@@ -3301,31 +3384,35 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					new_widget_placeholder = createNewWidgetPlaceholder(),
+					add_new_widget_callback = function(e) {
+						if (!methods.isEditMode.call($this)) {
+							showEditMode();
+						}
+						methods.addNewWidget.call($this, e.target);
+
+						return false;
+					},
+					new_widget_placeholder = new createNewWidgetPlaceholder(options['widget-width'],
+						options['widget-height'], add_new_widget_callback
+					),
+					// This placeholder is used while positioning/resizing widgets.
 					placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).append($('<div>')).hide();
+
+				$this.append(new_widget_placeholder.getObject(), placeholder);
 
 				if (options['editable']) {
 					if (options['kioskmode']) {
-						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'));
-						new_widget_placeholder.container.addClass('disabled');
+						new_widget_placeholder.setState(new_widget_placeholder.STATE_KIOSK_MODE);
 					}
 					else {
-						new_widget_placeholder.setDefault(function(e) {
-							if (!methods.isEditMode.call($this)) {
-								showEditMode();
-							}
-
-							methods.addNewWidget.call($this, this);
-							return cancelEvent(e);
-						});
+						new_widget_placeholder.setState(new_widget_placeholder.STATE_ADD_NEW);
 					}
 				}
 				else {
-					new_widget_placeholder.label.text(t('You do not have permissions to edit dashboard'));
-					new_widget_placeholder.container.addClass('disabled');
+					new_widget_placeholder.setState(new_widget_placeholder.STATE_READONLY);
 				}
 
-				$this.append(new_widget_placeholder.container, placeholder);
+				new_widget_placeholder.showAtDefaultPosition();
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -3368,7 +3455,7 @@
 						// Recalculate dashboard container minimal required height.
 						data.minimalHeight = calculateGridMinHeight($this);
 						data['cell-width'] = getCurrentCellWidth(data);
-						data.new_widget_placeholder.updateLabelVisibility();
+						data.new_widget_placeholder.resize();
 						resizeDashboardGrid($this, data);
 					});
 			});
@@ -3501,7 +3588,7 @@
 				}
 
 				showPreloader(widget_local);
-				data.new_widget_placeholder.container.hide();
+				data.new_widget_placeholder.hide();
 
 				if (widget_local['iterator']) {
 					// Placeholders will be shown while the iterator will be loading.
