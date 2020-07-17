@@ -116,7 +116,7 @@ class CControllerMiscConfigEdit extends CController {
 
 		$data['alert_usrgrp_data'] = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name'],
-			'usrgrpids' => $data['alert_usrgrpid'],
+			'usrgrpids' => $data['alert_usrgrpid']
 		]);
 		$data['alert_usrgrp_data'] = CArrayHelper::renameObjectsKeys($data['alert_usrgrp_data'], ['usrgrpid' => 'id']);
 

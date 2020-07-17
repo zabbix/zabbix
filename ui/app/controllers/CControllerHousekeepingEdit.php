@@ -63,56 +63,55 @@ class CControllerHousekeepingEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'hk_events_mode' =>
-				$this->getInput('hk_events_mode', CHousekeepingHelper::get(CHousekeepingHelper::HK_EVENTS_MODE)),
-			'hk_events_trigger' =>
-				$this->getInput('hk_events_trigger', CHousekeepingHelper::get(CHousekeepingHelper::HK_EVENTS_TRIGGER)),
-			'hk_events_internal' =>
-				$this->getInput('hk_events_internal', CHousekeepingHelper::get(
-					CHousekeepingHelper::HK_EVENTS_INTERNAL
-				)),
-			'hk_events_discovery' =>
-				$this->getInput('hk_events_discovery', CHousekeepingHelper::get(
-					CHousekeepingHelper::HK_EVENTS_DISCOVERY
-				)),
-			'hk_events_autoreg' =>
-				$this->getInput('hk_events_autoreg', CHousekeepingHelper::get(
-					CHousekeepingHelper::HK_EVENTS_AUTOREG
-				)),
-			'hk_services_mode' =>
-				$this->getInput('hk_services_mode', CHousekeepingHelper::get(CHousekeepingHelper::HK_SERVICES_MODE)),
-			'hk_services' =>
-				$this->getInput('hk_services', CHousekeepingHelper::get(CHousekeepingHelper::HK_SERVICES)),
-			'hk_audit_mode' =>
-				$this->getInput('hk_audit_mode', CHousekeepingHelper::get(CHousekeepingHelper::HK_AUDIT_MODE)),
-			'hk_audit' =>
-				$this->getInput('hk_audit', CHousekeepingHelper::get(CHousekeepingHelper::HK_AUDIT)),
-			'hk_sessions_mode' =>
-				$this->getInput('hk_sessions_mode', CHousekeepingHelper::get(CHousekeepingHelper::HK_SESSIONS_MODE)),
-			'hk_sessions' =>
-				$this->getInput('hk_sessions', CHousekeepingHelper::get(CHousekeepingHelper::HK_SESSIONS)),
-			'hk_history_mode' =>
-				$this->getInput('hk_history_mode', CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE)),
-			'hk_history_global' =>
-				$this->getInput('hk_history_global', CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)),
-			'hk_history' =>
-				$this->getInput('hk_history', CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)),
-			'hk_trends_mode' =>
-				$this->getInput('hk_trends_mode', CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE)),
-			'hk_trends_global' =>
-				$this->getInput('hk_trends_global', CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)),
-			'hk_trends' =>
-				$this->getInput('hk_trends', CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)),
-			'compression_status' =>
-				$this->getInput('compression_status', CHousekeepingHelper::get(
-					CHousekeepingHelper::COMPRESSION_STATUS
-				)),
-			'compress_older' =>
-				$this->getInput('compress_older', CHousekeepingHelper::get(CHousekeepingHelper::COMPRESS_OLDER)),
-			'db_extension' =>
-				CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION),
-			'compression_availability' =>
-				CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_AVAILABILITY)
+			'hk_events_mode' => $this->getInput('hk_events_mode', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_EVENTS_MODE
+			)),
+			'hk_events_trigger' => $this->getInput('hk_events_trigger', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_EVENTS_TRIGGER
+			)),
+			'hk_events_internal' => $this->getInput('hk_events_internal', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_EVENTS_INTERNAL
+			)),
+			'hk_events_discovery' => $this->getInput('hk_events_discovery', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_EVENTS_DISCOVERY
+			)),
+			'hk_events_autoreg' => $this->getInput('hk_events_autoreg', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_EVENTS_AUTOREG
+			)),
+			'hk_services_mode' => $this->getInput('hk_services_mode', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_SERVICES_MODE
+			)),
+			'hk_services' => $this->getInput('hk_services', CHousekeepingHelper::get(CHousekeepingHelper::HK_SERVICES)),
+			'hk_audit_mode' => $this->getInput('hk_audit_mode', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_AUDIT_MODE
+			)),
+			'hk_audit' => $this->getInput('hk_audit', CHousekeepingHelper::get(CHousekeepingHelper::HK_AUDIT)),
+			'hk_sessions_mode' => $this->getInput('hk_sessions_mode', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_SESSIONS_MODE
+			)),
+			'hk_sessions' => $this->getInput('hk_sessions', CHousekeepingHelper::get(CHousekeepingHelper::HK_SESSIONS)),
+			'hk_history_mode' => $this->getInput('hk_history_mode', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_HISTORY_MODE
+			)),
+			'hk_history_global' => $this->getInput('hk_history_global', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_HISTORY_GLOBAL
+			)),
+			'hk_history' => $this->getInput('hk_history', CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)),
+			'hk_trends_mode' => $this->getInput('hk_trends_mode', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_TRENDS_MODE
+			)),
+			'hk_trends_global' => $this->getInput('hk_trends_global', CHousekeepingHelper::get(
+				CHousekeepingHelper::HK_TRENDS_GLOBAL
+			)),
+			'hk_trends' => $this->getInput('hk_trends', CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)),
+			'compression_status' => $this->getInput('compression_status', CHousekeepingHelper::get(
+				CHousekeepingHelper::COMPRESSION_STATUS
+			)),
+			'compress_older' => $this->getInput('compress_older', CHousekeepingHelper::get(
+				CHousekeepingHelper::COMPRESS_OLDER
+			)),
+			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION),
+			'compression_availability' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_AVAILABILITY)
 		];
 
 		$response = new CControllerResponseData($data);

@@ -25,15 +25,6 @@
 abstract class CConfigGeneralHelper {
 
 	/**
-	 * API object parameters array.
-	 *
-	 * @static
-	 *
-	 * @var array
-	 */
-	protected static $params = [];
-
-	/**
 	 * Load once all parameters of API object.
 	 *
 	 * @static
