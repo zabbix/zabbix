@@ -1105,91 +1105,91 @@ INSERT INTO rights (rightid, groupid, id, permission) VALUES (50101, 50101, 5010
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50101, 'test-trigger-permissions-host-N', 'test-trigger-permissions-host-N', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50101, 50101, 50101);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50101, 50101, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50101, 50101, 50101, 'test-trigger-permissions-item-N', 0, 'test-trigger-permissions-item-N', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50101, 50101, 50101, 'test-trigger-permissions-item-N', 0, 'test-trigger-permissions-item-N', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50101);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50102, 'test-trigger-permissions-host-D', 'test-trigger-permissions-host-D', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50102, 50102, 50102);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50102, 50102, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50102, 50102, 50102, 'test-trigger-permissions-item-D', 0, 'test-trigger-permissions-item-D', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50102, 50102, 50102, 'test-trigger-permissions-item-D', 0, 'test-trigger-permissions-item-D', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50102);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50103, 'test-trigger-permissions-host-R', 'test-trigger-permissions-host-R', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50103, 50103, 50103);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50103, 50103, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50103, 50103, 50103, 'test-trigger-permissions-item-R', 0, 'test-trigger-permissions-item-R', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50103, 50103, 50103, 'test-trigger-permissions-item-R', 0, 'test-trigger-permissions-item-R', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50103);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50104, 'test-trigger-permissions-host-W', 'test-trigger-permissions-host-W', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50104, 50104, 50104);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50104, 50104, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50104, 50104, 50104, 'test-trigger-permissions-item-W', 0, 'test-trigger-permissions-item-W', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50104, 50104, 50104, 'test-trigger-permissions-item-W', 0, 'test-trigger-permissions-item-W', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50104);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50105, 'test-trigger-permissions-host-ND', 'test-trigger-permissions-host-ND', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50105, 50105, 50101), (50106, 50105, 50102);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50105, 50105, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50105, 50105, 50105, 'test-trigger-permissions-item-ND', 0, 'test-trigger-permissions-item-ND', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50105, 50105, 50105, 'test-trigger-permissions-item-ND', 0, 'test-trigger-permissions-item-ND', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50105);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50106, 'test-trigger-permissions-host-NR', 'test-trigger-permissions-host-NR', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50107, 50106, 50101), (50108, 50106, 50103);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50106, 50106, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50106, 50106, 50106, 'test-trigger-permissions-item-NR', 0, 'test-trigger-permissions-item-NR', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50106, 50106, 50106, 'test-trigger-permissions-item-NR', 0, 'test-trigger-permissions-item-NR', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50106);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50107, 'test-trigger-permissions-host-NW', 'test-trigger-permissions-host-NW', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50109, 50107, 50101), (50110, 50107, 50104);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50107, 50107, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50107, 50107, 50107, 'test-trigger-permissions-item-NW', 0, 'test-trigger-permissions-item-NW', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50107, 50107, 50107, 'test-trigger-permissions-item-NW', 0, 'test-trigger-permissions-item-NW', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50107);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50108, 'test-trigger-permissions-host-DR', 'test-trigger-permissions-host-DR', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50111, 50108, 50102), (50112, 50108, 50103);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50108, 50108, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50108, 50108, 50108, 'test-trigger-permissions-item-DR', 0, 'test-trigger-permissions-item-DR', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50108, 50108, 50108, 'test-trigger-permissions-item-DR', 0, 'test-trigger-permissions-item-DR', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50108);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50109, 'test-trigger-permissions-host-DW', 'test-trigger-permissions-host-DW', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50113, 50109, 50102), (50114, 50109, 50104);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50109, 50109, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50109, 50109, 50109, 'test-trigger-permissions-item-DW', 0, 'test-trigger-permissions-item-DW', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50109, 50109, 50109, 'test-trigger-permissions-item-DW', 0, 'test-trigger-permissions-item-DW', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50109);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50110, 'test-trigger-permissions-host-RW', 'test-trigger-permissions-host-RW', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50115, 50110, 50103), (50116, 50110, 50104);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50110, 50110, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50110, 50110, 50110, 'test-trigger-permissions-item-RW', 0, 'test-trigger-permissions-item-RW', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50110, 50110, 50110, 'test-trigger-permissions-item-RW', 0, 'test-trigger-permissions-item-RW', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50110);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50111, 'test-trigger-permissions-host-NDR', 'test-trigger-permissions-host-NDR', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50117, 50111, 50101), (50118, 50111, 50102), (50119, 50111, 50103);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50111, 50111, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50111, 50111, 50111, 'test-trigger-permissions-item-NDR', 0, 'test-trigger-permissions-item-NDR', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50111, 50111, 50111, 'test-trigger-permissions-item-NDR', 0, 'test-trigger-permissions-item-NDR', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50111);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50112, 'test-trigger-permissions-host-NDW', 'test-trigger-permissions-host-NDW', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50120, 50112, 50101), (50121, 50112, 50102), (50122, 50112, 50104);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50112, 50112, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50112, 50112, 50112, 'test-trigger-permissions-item-NDW', 0, 'test-trigger-permissions-item-NDW', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50112, 50112, 50112, 'test-trigger-permissions-item-NDW', 0, 'test-trigger-permissions-item-NDW', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50112);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50113, 'test-trigger-permissions-host-NRW', 'test-trigger-permissions-host-NRW', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50123, 50113, 50101), (50124, 50113, 50103), (50125, 50113, 50104);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50113, 50113, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50113, 50113, 50113, 'test-trigger-permissions-item-NRW', 0, 'test-trigger-permissions-item-NRW', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50113, 50113, 50113, 'test-trigger-permissions-item-NRW', 0, 'test-trigger-permissions-item-NRW', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50113);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50114, 'test-trigger-permissions-host-DRW', 'test-trigger-permissions-host-DRW', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50126, 50114, 50102), (50127, 50114, 50103), (50128, 50114, 50104);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50114, 50114, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50114, 50114, 50114, 'test-trigger-permissions-item-DRW', 0, 'test-trigger-permissions-item-DRW', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50114, 50114, 50114, 'test-trigger-permissions-item-DRW', 0, 'test-trigger-permissions-item-DRW', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50114);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50115, 'test-trigger-permissions-host-NDRW', 'test-trigger-permissions-host-NDRW', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50129, 50115, 50101), (50130, 50115, 50102), (50131, 50115, 50103), (50132, 50115, 50104);
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50115, 50115, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, description, status) VALUES (50115, 50115, 50115, 'test-trigger-permissions-item-NDRW', 0, 'test-trigger-permissions-item-NDRW', 3, '1m', '90d', '365d', '', 0);
+INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers, status) VALUES (50115, 50115, 50115, 'test-trigger-permissions-item-NDRW', 0, 'test-trigger-permissions-item-NDRW', 3, '1m', '90d', '365d', '', '', '', '', 0);
 INSERT INTO item_rtdata (itemid) VALUES (50115);
 
 INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50101, 'test-trigger-permissions-trigger-{N}', '{50101}', '');
