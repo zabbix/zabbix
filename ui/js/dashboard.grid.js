@@ -2143,8 +2143,8 @@
 		if (typeof widget['fields'] !== 'undefined' && Object.keys(widget['fields']).length != 0) {
 			ajax_data['fields'] = JSON.stringify(widget['fields']);
 		}
-		if (typeof widget['dynamic'] !== 'undefined') {
-			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
+		if (typeof widget['dynamic_hostid'] !== null) {
+			ajax_data['dynamic_hostid'] = widget['dynamic_hostid'];
 		}
 
 		startPreloader(widget);
@@ -3050,15 +3050,11 @@
 	function updateWidgetDynamic($obj, data, widget) {
 		// This function may be called for widget that is not in data['widgets'] array yet.
 		if (typeof widget['fields']['dynamic'] !== 'undefined') {
-			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
-				var dynamic_hosts = data['dashboard']['dynamic']['host'];
-
-				widget['dynamic'] = {
-					'hostid': dynamic_hosts.length ? dynamic_hosts[0]['id'] : undefined
-				};
+			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic_hostid'] !== null) {
+				widget['dynamic_hostid'] = data['dashboard']['dynamic_hostid'];
 			}
 			else {
-				delete widget['dynamic'];
+				delete widget['dynamic_hostid'];
 			}
 		}
 	}
@@ -3374,14 +3370,18 @@
 			var	$this = $(this),
 				data = $this.data('dashboardGrid');
 
+			data.dashboard.dynamic_hostid = null;
+			if (host !== null) {
+				data.dashboard.dynamic_hostid = host.id;
+			}
+
 			$.each(data['widgets'], function(index, widget) {
-				if (widget.fields.dynamic && +widget.fields.dynamic == 1) {
-					if (host) {
-						widget.dynamic = {};
-						widget.dynamic.hostid = host.id;
+				if (widget.fields.dynamic && widget.fields.dynamic == 1) {
+					if (host !== null) {
+						widget.dynamic_hostid = host.id;
 					}
 					else {
-						delete widget.dynamic;
+						delete widget.dynamic_hostid;
 					}
 
 					updateWidgetContent($this, data, widget);
