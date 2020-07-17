@@ -2550,7 +2550,7 @@
 
 	 * @returns {object}  Placeholder instance.
 	 */
-	function createNewWidgetPlaceholder(cell_width, cell_height, add_new_callback) {
+	function newWidgetPlaceholder(cell_width, cell_height, add_new_callback) {
 		this.cell_width = cell_width;
 		this.cell_height = cell_height;
 		this.add_new_callback = add_new_callback;
@@ -2567,13 +2567,13 @@
 		this.setState(this.STATE_ADD_NEW);
 	}
 
-	createNewWidgetPlaceholder.prototype.STATE_ADD_NEW = 0;
-	createNewWidgetPlaceholder.prototype.STATE_RESIZING = 1;
-	createNewWidgetPlaceholder.prototype.STATE_POSITIONING = 2;
-	createNewWidgetPlaceholder.prototype.STATE_KIOSK_MODE = 3;
-	createNewWidgetPlaceholder.prototype.STATE_READONLY = 4;
+	newWidgetPlaceholder.prototype.STATE_ADD_NEW = 0;
+	newWidgetPlaceholder.prototype.STATE_RESIZING = 1;
+	newWidgetPlaceholder.prototype.STATE_POSITIONING = 2;
+	newWidgetPlaceholder.prototype.STATE_KIOSK_MODE = 3;
+	newWidgetPlaceholder.prototype.STATE_READONLY = 4;
 
-	createNewWidgetPlaceholder.prototype.classes = {
+	newWidgetPlaceholder.prototype.classes = {
 		placeholder: 'dashbrd-grid-new-widget-placeholder',
 		placeholder_box: 'dashbrd-grid-widget-new-box',
 		placeholder_box_label: 'dashbrd-grid-new-widget-label',
@@ -2586,18 +2586,18 @@
 	 *
 	 * @returns {jQuery}
 	 */
-	createNewWidgetPlaceholder.prototype.getObject = function() {
+	newWidgetPlaceholder.prototype.getObject = function() {
 		return this.$placeholder;
 	};
 
 	/**
 	 * Set state of the new widget placeholder.
 	 *
-	 * @param {int} state  createNewWidgetPlaceholder.prototype.STATE_* constant.
+	 * @param {int} state  newWidgetPlaceholder.prototype.STATE_* constant.
 	 *
 	 * @returns {this}
 	 */
-	createNewWidgetPlaceholder.prototype.setState = function(state) {
+	newWidgetPlaceholder.prototype.setState = function(state) {
 		this.$placeholder.hide();
 
 		if (state === this.state) {
@@ -2652,7 +2652,7 @@
 	 *
 	 * @returns {this}
 	 */
-	createNewWidgetPlaceholder.prototype.resize = function() {
+	newWidgetPlaceholder.prototype.resize = function() {
 		if (this.$placeholder.is(':visible')) {
 			this.$placeholder_box_label_wrap.show();
 			if (this.$placeholder_box_label[0].scrollHeight > this.$placeholder_box_label.outerHeight()) {
@@ -2670,7 +2670,7 @@
 	 *
 	 * @returns {this}
 	 */
-	createNewWidgetPlaceholder.prototype.showAtPosition = function(pos) {
+	newWidgetPlaceholder.prototype.showAtPosition = function(pos) {
 		this.$placeholder
 			.css({
 				position: 'absolute',
@@ -2691,7 +2691,7 @@
 	 *
 	 * @returns {this}
 	 */
-	createNewWidgetPlaceholder.prototype.showAtDefaultPosition = function() {
+	newWidgetPlaceholder.prototype.showAtDefaultPosition = function() {
 		this.$placeholder
 			.css({
 				position: '',
@@ -2712,7 +2712,7 @@
 	 *
 	 * @returns {this}
 	 */
-	createNewWidgetPlaceholder.prototype.hide = function() {
+	newWidgetPlaceholder.prototype.hide = function() {
 		this.$placeholder.hide();
 
 		return this;
@@ -3392,8 +3392,8 @@
 
 						return false;
 					},
-					new_widget_placeholder = new createNewWidgetPlaceholder(options['widget-width'],
-						options['widget-height'], add_new_widget_callback
+					new_widget_placeholder = new newWidgetPlaceholder(options['widget-width'], options['widget-height'],
+						add_new_widget_callback
 					),
 					// This placeholder is used while positioning/resizing widgets.
 					placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).append($('<div>')).hide();
