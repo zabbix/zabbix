@@ -89,7 +89,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'Details' => [
 							'config.tls_accept: 1 => 2',
 							'config.tls_psk_identity: ****** => ******',
-							'config.tls_psk: ******** => ******'
+							'config.tls_psk: ****** => ******'
 						]
 					]
 				]
