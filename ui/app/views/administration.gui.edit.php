@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.gui.edit.js.php');
+
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
@@ -115,7 +117,10 @@ $gui_tab = (new CFormList())
 
 $gui_view = (new CTabView())
 	->addTab('gui', _('GUI'), $gui_tab)
-	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
+	->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		[new CButton('resetDefaults', _('Reset defaults'))]
+	));
 
 $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
