@@ -61,7 +61,6 @@ const (
 type ResultCache interface {
 	Start()
 	Stop()
-	UpdateOptions(options *agent.AgentOptions)
 	Upload(u Uploader)
 }
 
@@ -114,10 +113,6 @@ func (c *cacheData) Stop() {
 
 func (c *cacheData) Write(result *plugin.Result) {
 	c.input <- result
-}
-
-func (c *cacheData) UpdateOptions(options *agent.AgentOptions) {
-	c.input <- options
 }
 
 func (c *cacheData) Upload(u Uploader) {

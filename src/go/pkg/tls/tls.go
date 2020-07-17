@@ -1000,9 +1000,6 @@ func (c *tlsConn) flushTLS() (err error) {
 func (c *tlsConn) recvTLS() (err error) {
 
 	var n int
-	if err = c.conn.SetDeadline(time.Now().Add(c.timeout)); err != nil {
-		return
-	}
 	if n, err = c.conn.Read(c.buf); err != nil {
 		return
 	}
