@@ -60,6 +60,7 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
 .......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
 A.F....... [ZBX-17715] fixed filtering and sorting of the Latest Data (averza)
@@ -1647,6 +1648,7 @@ New features:
 ........S. [ZBXNEXT-3588] improved Zabbix server performance when evaluating trigger, discovery, autoregistration and internal actions (vso)
 
 Bug fixes:
+..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 .......PS. [ZBX-17720] exclude disabled items from preprocessing configuration sync (wiper)
 ........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
 .....J.... [ZBX-17406] fixed null value for a field of CompositeData in JMX discovery (arimdjonoks)
@@ -4538,6 +4540,7 @@ Changes for 3.0.32rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.31
