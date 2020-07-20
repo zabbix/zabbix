@@ -343,7 +343,8 @@ class CConfigurationExportBuilder {
 	/**
 	 * Format maps.
 	 *
-	 * @param array $maps
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $maps    Export data.
 	 */
 	public function buildMaps(array $schema, array $maps) {
 		$this->data['maps'] = [];
