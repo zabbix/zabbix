@@ -155,12 +155,31 @@ class CElementQuery implements IWaitable {
 		}
 
 		if ($locator === null) {
-			$parts = explode(':', $type, 2);
-			if (count($parts) !== 2) {
-				throw new Exception('Element selector "'.$type.'" is not well formatted.');
+			if (!is_array($type)) {
+				$parts = explode(':', $type, 2);
+				if (count($parts) !== 2) {
+					throw new Exception('Element selector "'.$selector.'" is not well formatted.');
+				}
+
+				list($type, $locator) = $parts;
+			}
+			else {
+				$selectors = [];
+				foreach ($type as $selector) {
+					$selectors[] = './/'.CXPathHelper::fromSelector($selector);
+				}
+
+				$type = 'xpath';
+				$locator = implode('|', $selectors);
+			}
+		}
+		else if (is_array($locator)) {
+			foreach ($locator as $selector) {
+				$selectors[] = './/'.CXPathHelper::fromSelector($type, $selector);
 			}
 
-			list($type, $locator) = $parts;
+			$type = 'xpath';
+			$locator = implode('|', $selectors);
 		}
 
 		$mapping = [
