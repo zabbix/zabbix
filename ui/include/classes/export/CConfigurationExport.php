@@ -1443,10 +1443,14 @@ class CConfigurationExport {
 						break;
 				}
 
-				$selement['iconid_off'] = $selement['iconid_off'] > 0 ? $images[$selement['iconid_off']] : '';
-				$selement['iconid_on'] = $selement['iconid_on'] > 0 ? $images[$selement['iconid_on']] : '';
-				$selement['iconid_disabled'] = $selement['iconid_disabled'] > 0 ? $images[$selement['iconid_disabled']] : '';
-				$selement['iconid_maintenance'] = $selement['iconid_maintenance'] > 0 ? $images[$selement['iconid_maintenance']] : '';
+				$selement['iconid_off'] = ($selement['iconid_off'] > 0) ? $images[$selement['iconid_off']] : [];
+				$selement['iconid_on'] = ($selement['iconid_on'] > 0) ? $images[$selement['iconid_on']] : [];
+				$selement['iconid_disabled'] = ($selement['iconid_disabled'] > 0)
+					? $images[$selement['iconid_disabled']]
+					: [];
+				$selement['iconid_maintenance'] = ($selement['iconid_maintenance'] > 0)
+					? $images[$selement['iconid_maintenance']]
+					: [];
 			}
 			unset($selement);
 

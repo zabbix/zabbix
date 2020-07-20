@@ -33,7 +33,7 @@ class CImportDataNormalizer {
 	}
 
 	public function normalize($data) {
-		$data['zabbix_export'] = $this->normalizeArrayKeys($data['zabbix_export']);
+		$data['zabbix_export'] = $this->normalizeArrayKeys($data['zabbix_export'], $this->rules);
 		$data['zabbix_export'] = $this->normalizeStrings($data['zabbix_export']);
 
 		return $data;
@@ -43,16 +43,17 @@ class CImportDataNormalizer {
 	 * Convert array keys to numeric.
 	 *
 	 * @param mixed $data   Import data.
+	 * @param array $rules  Schema rules.
 	 *
-	 * @return array
+	 * @return mixed
 	 */
-	protected function normalizeArrayKeys($data) {
+	protected function normalizeArrayKeys($data, array $rules) {
 		if (!is_array($data)) {
 			return $data;
 		}
 
-		if ($this->rules['type'] & XML_ARRAY) {
-			foreach ($this->rules['rules'] as $tag => $tag_rules) {
+		if ($rules['type'] & XML_ARRAY) {
+			foreach ($rules['rules'] as $tag => $tag_rules) {
 				if (array_key_exists('ex_rules', $tag_rules)) {
 					$tag_rules = call_user_func($tag_rules['ex_rules'], $data);
 				}
@@ -62,11 +63,11 @@ class CImportDataNormalizer {
 				}
 			}
 		}
-		elseif ($this->rules['type'] & XML_INDEXED_ARRAY) {
-			$prefix = $this->rules['prefix'];
+		elseif ($rules['type'] & XML_INDEXED_ARRAY) {
+			$prefix = $rules['prefix'];
 
 			foreach ($data as $tag => $value) {
-				$data[$tag] = $this->normalizeArrayKeys($value, $this->rules['rules'][$prefix]);
+				$data[$tag] = $this->normalizeArrayKeys($value, $rules['rules'][$prefix]);
 			}
 
 			$data = array_values($data);
