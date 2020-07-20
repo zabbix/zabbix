@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-24T15:46:34Z</date>
+    <date>2020-07-06T12:07:50Z</date>
     <media_types>
         <media_type>
             <name>SIGNL4</name>
@@ -49,7 +49,7 @@
                 </parameter>
                 <parameter>
                     <name>teamsecret</name>
-                    <value>Your SIGNL4 Team Secret</value>
+                    <value>{ALERT.SENDTO}</value>
                 </parameter>
                 <parameter>
                     <name>Trigger_ID</name>
@@ -65,7 +65,7 @@
                 </parameter>
                 <parameter>
                     <name>Zabbix_URL</name>
-                    <value>Your Zabbix URL</value>
+                    <value>{$ZABBIX.URL}</value>
                 </parameter>
             </parameters>
             <script>// SIGNL4 Webhook&#13;
@@ -100,7 +100,7 @@ try {&#13;
         params.Event_Update_Action = '';&#13;
     }&#13;
 &#13;
-	// Assamble X-S4-ExternalID for two-way integration&#13;
+	// Assemble X-S4-ExternalID for two-way integration&#13;
 	// Format: &quot;ZabbixEventID: 222 ZabbixURL: https://your-zabbix-server/zabbix/&quot;&#13;
 	params['X-S4-ExternalID'] = 'ZabbixEventID: ' + params.Event_ID;&#13;
 	if (typeof params.Zabbix_URL === 'string' &amp;&amp; params.Zabbix_URL.indexOf('http') == 0) {&#13;
@@ -113,6 +113,14 @@ try {&#13;
 &#13;
 		// Add Link parameter&#13;
 		params['Link'] = params.Zabbix_URL + &quot;tr_events.php?triggerid=&quot;+params.Trigger_ID + &quot;&amp;eventid=&quot; + params.Event_ID;&#13;
+	}&#13;
+&#13;
+	// Check if this is a new problem or a recovery&#13;
+	if (params.Trigger_Status == 'OK') {&#13;
+		params['X-S4-Status'] = 'resolved';&#13;
+	}&#13;
+	else {&#13;
+		params['X-S4-Status'] = 'new';&#13;
 	}&#13;
 &#13;
     payload = JSON.stringify(params);&#13;
@@ -139,7 +147,10 @@ catch (error) {&#13;
 }</script>
             <description>SIGNL4 is a mobile alert notification app for powerful alerting, alert management and mobile assignment of work items. It offers alerting via app push, SMS and voice calls including escalations, tracking, and duty scheduling.&#13;
 &#13;
-Get the app at https://www.signl4.com.</description>
+Get the app at https://www.signl4.com.&#13;
+&#13;
+Find out more including an integration video here: https://www.signl4.com/blog/portfolio_item/zabbix-mobile-alert-notification-duty-schedule-escalation/&#13;
+</description>
             <message_templates>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
