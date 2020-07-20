@@ -1853,6 +1853,10 @@
 				}
 				iterator['content_body'].append($alt_content);
 				iterator['div'].addClass('iterator-alt-content');
+
+				iterator['page'] = 1;
+				iterator['page_count'] = 1;
+				updateIteratorPager(iterator);
 			}
 			else {
 				iterator['update_pending'] = true;
