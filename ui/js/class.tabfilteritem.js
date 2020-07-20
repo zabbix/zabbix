@@ -43,7 +43,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		if (this._expanded) {
 			this.renderContentTemplate();
-			this.fire(TABFILTERITEM_EVENT_AFTER_RENDER);
+			this.fire(TABFILTERITEM_EVENT_AFTER_RENDER, {is_init: true});
 		}
 	}
 
@@ -60,15 +60,17 @@ class CTabFilterItem extends CBaseComponent {
 			},
 
 			expand: () => {
+				let is_init = (this._content_container.children.length == 0);
+
 				this._expanded = true;
 				this.addClass('active');
 
-				if (!this._content_container.children.length) {
+				if (is_init) {
 					this.renderContentTemplate();
-					this.fire(TABFILTERITEM_EVENT_AFTER_RENDER);
 				}
 
 				this._content_container.classList.remove('display-none');
+				this.fire(TABFILTERITEM_EVENT_AFTER_RENDER, {is_init: is_init});
 			},
 
 			collapse: () => {

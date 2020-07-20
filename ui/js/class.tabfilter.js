@@ -91,7 +91,7 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			afterTabContentRender: (ev) => {
-				this.afterTabContentRender(ev.detail.target);
+				this.afterTabContentRender(ev.detail.target, ev.detail.is_init);
 			},
 
 			tabSortChanged: (ev, ui) => {
@@ -168,6 +168,6 @@ class CTabFilter extends CBaseComponent {
 		}
 	}
 
-	afterTabContentRender(tabitem) {
+	afterTabContentRender(tabitem, is_init) {
 	}
 }
