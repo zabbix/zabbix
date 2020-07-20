@@ -144,19 +144,19 @@ class CTabFilter extends CDiv {
 	 */
 	protected function getNavigation() {
 		$home = reset($this->labels);
-		$sortable = (new CList(array_slice($this->labels, 1, -1)))->addClass(static::CSS_TAB_SORTABLE_CONTAINER);
-		$timetablabel = end($this->labels);
+		$sortable = (new CList(array_slice($this->labels, 1)))->addClass(static::CSS_TAB_SORTABLE_CONTAINER);
 		$nav = [
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectPrevTab')
 				->addClass('btn-iterator-page-previous'),
-			$home, $sortable, $timetablabel,
+			$home, $sortable,
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
 				->addClass('btn-widget-expand'),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass('btn-iterator-page-next'),
+			(new CSimpleButton('Timeselector tab goes here')),
 			(new CSimpleButton())
 				->setEnabled(false)
 				->addClass(ZBX_STYLE_BTN_TIME_LEFT),

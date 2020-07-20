@@ -67,7 +67,6 @@
 					fields = $.extend({}, data.default, data.fields);
 
 				var content = item._content_container;
-				console.log(`${data.uniqid} rendered`, data);
 
 				// Host groups multiselect.
 				$('#filter_groupids_' + data.uniqid, content).multiSelectHelper({

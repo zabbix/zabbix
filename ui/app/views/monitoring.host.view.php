@@ -25,6 +25,7 @@
 
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
+$this->addJsFile('menupopup.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
 

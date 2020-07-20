@@ -115,7 +115,23 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			toggleTabsList: (ev) => {
+				var items = [{items: []}, {items: []}];
+				this._items.forEach((item, index) => {
+					items[index ? 1 : 0].items.push({
+						label: index ? item._data.label : t('Home'),
+						clickCallback: (ev) => {
+							return this._items[index].select();
+						}
+					})
+				});
 
+				$(this._target).menuPopup(items, $(ev), {
+					position: {
+						of: ev.target,
+						my: 'left bottom',
+						at: 'left top'
+					}
+				});
 			}
 		}
 
@@ -126,7 +142,9 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		$('.ui-sortable', this._target).sortable({
-			update: this._events.tabSortChanged
+			update: this._events.tabSortChanged,
+			axis: 'x',
+			containment: 'parent'
 		});
 
 		for (const action of this._target.querySelectorAll('nav [data-action]')) {
