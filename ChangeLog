@@ -1,11 +1,14 @@
 Changes for 5.0.3rc1
 
 New features:
+.........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
 .......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
 .......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
 ........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-18036] fixed endpoint URL for Elasticsearch API requests (miks)
+..F....... [ZBX-18068] fixed incorrect function call and redundant code (miks)
 ...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
 ........S. [ZBX-18014] fixed memory leak when action message does not have to be sent (viktors)
 ..F....... [ZBX-15117] fixed graph configuration with large amount of items (talbergs)
