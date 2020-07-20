@@ -24,16 +24,17 @@ class CControllerGuiUpdate extends CController {
 	protected function checkInput() {
 		$themes = array_keys(APP::getThemes());
 		$fields = [
-			'default_lang' =>			'db config.default_lang|in '.implode(',', array_keys(getLocales())),
-			'default_theme' =>			'required|db config.default_theme|in '.implode(',', $themes),
-			'search_limit' =>			'required|db config.search_limit|ge 1|le 999999',
-			'max_in_table' =>			'required|db config.max_in_table|ge 1|le 99999',
-			'server_check_interval' =>	'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL,
-			'work_period' =>			'required|db config.work_period|time_periods',
-			'show_technical_errors' =>	'db config.show_technical_errors|in 0,1',
-			'history_period' =>			'required|db config.history_period|time_unit '.implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY]),
-			'period_default' =>			'required|db config.period_default|time_unit_year '.implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR]),
-			'max_period' =>				'required|db config.max_period|time_unit_year '.implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])
+			'default_lang' =>				'db config.default_lang|in '.implode(',', array_keys(getLocales())),
+			'default_theme' =>				'required|db config.default_theme|in '.implode(',', $themes),
+			'search_limit' =>				'required|db config.search_limit|ge 1|le 999999',
+			'max_overview_table_size' =>	'required|db config.max_overview_table_size|ge 5|le 999999',
+			'max_in_table' =>				'required|db config.max_in_table|ge 1|le 99999',
+			'server_check_interval' =>		'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL,
+			'work_period' =>				'required|db config.work_period|time_periods',
+			'show_technical_errors' =>		'db config.show_technical_errors|in 0,1',
+			'history_period' =>				'required|db config.history_period|time_unit '.implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY]),
+			'period_default' =>				'required|db config.period_default|time_unit_year '.implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR]),
+			'max_period' =>					'required|db config.max_period|time_unit_year '.implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -67,6 +68,7 @@ class CControllerGuiUpdate extends CController {
 		$settings =  [
 			CSettingsHelper::DEFAULT_THEME => $this->getInput('default_theme'),
 			CSettingsHelper::SEARCH_LIMIT => $this->getInput('search_limit'),
+			CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE => $this->getInput('max_overview_table_size'),
 			CSettingsHelper::MAX_IN_TABLE => $this->getInput('max_in_table'),
 			CSettingsHelper::SERVER_CHECK_INTERVAL => $this->getInput('server_check_interval'),
 			CSettingsHelper::WORK_PERIOD => $this->getInput('work_period'),

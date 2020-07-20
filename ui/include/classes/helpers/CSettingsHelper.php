@@ -33,11 +33,14 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const DEFAULT_THEME = 'default_theme';
 	public const DISCOVERY_GROUPID = 'discovery_groupid';
 	public const HISTORY_PERIOD = 'history_period';
+	public const IFRAME_SANDBOXING_ENABLED = 'iframe_sandboxing_enabled';
+	public const IFRAME_SANDBOXING_EXCEPTIONS = 'iframe_sandboxing_exceptions';
 	public const ITEM_TEST_TIMEOUT = 'item_test_timeout';
 	public const LOGIN_ATTEMPTS = 'login_attempts';
 	public const LOGIN_BLOCK = 'login_block';
 	public const MAX_IN_TABLE = 'max_in_table';
 	public const MAX_PERIOD = 'max_period';
+	public const MAX_OVERVIEW_TABLE_SIZE = 'max_overview_table_size';
 	public const MEDIA_TYPE_TEST_TIMEOUT = 'media_type_test_timeout';
 	public const OK_ACK_COLOR = 'ok_ack_color';
 	public const OK_ACK_STYLE = 'ok_ack_style';

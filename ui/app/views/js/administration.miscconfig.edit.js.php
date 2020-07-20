@@ -33,6 +33,10 @@ $default_inventory_mode = $schema['fields']['default_inventory_mode']['default']
 			$('#uri_valid_schemes').prop('disabled', !this.checked);
 		});
 
+		$('#iframe_sandboxing_enabled').change(function() {
+			$('#iframe_sandboxing_exceptions').prop('disabled', !this.checked);
+		});
+
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
@@ -63,6 +67,12 @@ $default_inventory_mode = $schema['fields']['default_inventory_mode']['default']
 							);
 							$('#uri_valid_schemes').val("<?= $schema['fields']['uri_valid_schemes']['default'] ?>");
 							$('#x_frame_options').val("<?= $schema['fields']['x_frame_options']['default'] ?>");
+							$('#iframe_sandboxing_enabled').prop('checked',
+								<?= ($schema['fields']['iframe_sandboxing_enabled']['default'] == 0) ? 'false' : 'true' ?>
+							);
+							$('#iframe_sandboxing_exceptions').val(
+								"<?= $schema['fields']['iframe_sandboxing_exceptions']['default'] ?>"
+							);
 							$('#socket_timeout').val("<?= $schema['fields']['socket_timeout']['default'] ?>");
 							$('#connect_timeout').val("<?= $schema['fields']['connect_timeout']['default'] ?>");
 							$('#media_type_test_timeout').val("<?= $schema['fields']['media_type_test_timeout']['default'] ?>");

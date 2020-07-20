@@ -777,8 +777,8 @@ function getTriggersOverviewData(array $groupids, string $application, array $ho
 	$triggers_by_name = [];
 	$hosts_by_name = [];
 
-	$limit = ZBX_MAX_TABLE_COLUMNS;
-	$axis_limit = ZBX_MAX_TABLE_COLUMNS;
+	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+	$axis_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
 
 	do {
 		if (!$exhausted_hosts) {

@@ -3023,6 +3023,24 @@ return [
 				'length' => 255,
 				'default' => 'SAMEORIGIN',
 			],
+			'iframe_sandboxing_enabled' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'iframe_sandboxing_exceptions' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'max_overview_table_size' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '50',
+			],
 			'history_period' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,

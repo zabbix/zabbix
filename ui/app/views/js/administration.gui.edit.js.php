@@ -46,6 +46,9 @@ $schema = DB::getSchema('config');
 							$('#default_lang').val("<?= $schema['fields']['default_lang']['default'] ?>");
 							$('#default_theme').val("<?= $schema['fields']['default_theme']['default'] ?>");
 							$('#search_limit').val("<?= $schema['fields']['search_limit']['default'] ?>");
+							$('#max_overview_table_size').val(
+								"<?= $schema['fields']['max_overview_table_size']['default'] ?>"
+							);
 							$('#max_in_table').val("<?= $schema['fields']['max_in_table']['default'] ?>");
 							$('#server_check_interval').prop('checked',
 								<?= ($schema['fields']['server_check_interval']['default'] == 0) ? 'false' : 'true' ?>

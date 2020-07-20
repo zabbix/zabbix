@@ -29,8 +29,8 @@ if ($data['url']['error'] !== null) {
 else {
 	$item = (new CIFrame($data['url']['url'], '100%', '100%', 'auto'))->addClass(ZBX_STYLE_WIDGET_URL);
 
-	if (ZBX_IFRAME_SANDBOX !== false) {
-		$item->setAttribute('sandbox', ZBX_IFRAME_SANDBOX);
+	if (CSettingsHelper::get(CSettingsHelper::IFRAME_SANDBOXING_ENABLED) == 1) {
+		$item->setAttribute('sandbox', CSettingsHelper::get(CSettingsHelper::IFRAME_SANDBOXING_EXCEPTIONS));
 	}
 }
 

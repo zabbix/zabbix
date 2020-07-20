@@ -115,6 +115,17 @@ $from_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
 	)
+	->addRow(_('Use iframe sandboxing'),
+		(new CCheckBox('iframe_sandboxing_enabled'))
+			->setUncheckedValue('0')
+			->setChecked($data['iframe_sandboxing_enabled'] == 1)
+	)
+	->addRow((new CLabel(_('Iframe sandboxing exceptions'), 'iframe_sandboxing_exceptions')),
+		(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions']))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setEnabled($data['iframe_sandboxing_enabled'] == 1)
+			->setAriaRequired()
+	)
 	->addRow(null)
 	->addRow(new CTag('h4', true, _('Communication with Zabbix server')))
 	->addRow(

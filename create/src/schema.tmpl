@@ -643,6 +643,9 @@ FIELD		|show_technical_errors	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|validate_uri_schemes	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|uri_valid_schemes	|t_varchar(255)	|'http,https,ftp,file,mailto,tel,ssh'	|NOT NULL	|ZBX_NODATA
 FIELD		|x_frame_options	|t_varchar(255)	|'SAMEORIGIN'	|NOT NULL	|ZBX_NODATA
+FIELD		|iframe_sandboxing_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
+FIELD		|iframe_sandboxing_exceptions	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|max_overview_table_size	|t_integer	|'50'	|NOT NULL	|ZBX_NODATA
 FIELD		|history_period	|t_varchar(32)|	'24h'	|NOT NULL	|ZBX_NODATA
 FIELD		|period_default	|t_varchar(32)	|'1h'	|NOT NULL	|ZBX_NODATA
 FIELD		|max_period	|t_varchar(32)	|'2y'	|NOT NULL	|ZBX_NODATA
@@ -1843,4 +1846,4 @@ FIELD	|inventory_mode			|t_integer	|'0'	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5010018	|5010018
+ROW		|5010021	|5010021

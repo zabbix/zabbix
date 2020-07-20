@@ -27,21 +27,23 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'refresh_unsupported' =>		'db config.refresh_unsupported',
-			'discovery_groupid' =>			'db config.discovery_groupid',
-			'default_inventory_mode' =>		'db config.default_inventory_mode',
-			'alert_usrgrpid' =>				'db config.alert_usrgrpid',
-			'snmptrap_logging' =>			'db config.snmptrap_logging',
-			'login_attempts' =>				'db config.login_attempts',
-			'login_block' =>				'db config.login_block',
-			'validate_uri_schemes' =>		'db config.validate_uri_schemes',
-			'uri_valid_schemes' =>			'db config.uri_valid_schemes',
-			'x_frame_options' =>			'db config.x_frame_options',
-			'socket_timeout' =>				'db config.socket_timeout',
-			'connect_timeout' =>			'db config.connect_timeout',
-			'media_type_test_timeout' =>	'db config.media_type_test_timeout',
-			'script_timeout' =>				'db config.script_timeout',
-			'item_test_timeout' =>			'db config.item_test_timeout'
+			'refresh_unsupported' =>			'db config.refresh_unsupported',
+			'discovery_groupid' =>				'db config.discovery_groupid',
+			'default_inventory_mode' =>			'db config.default_inventory_mode',
+			'alert_usrgrpid' =>					'db config.alert_usrgrpid',
+			'snmptrap_logging' =>				'db config.snmptrap_logging',
+			'login_attempts' =>					'db config.login_attempts',
+			'login_block' =>					'db config.login_block',
+			'validate_uri_schemes' =>			'db config.validate_uri_schemes',
+			'uri_valid_schemes' =>				'db config.uri_valid_schemes',
+			'x_frame_options' =>				'db config.x_frame_options',
+			'iframe_sandboxing_enabled' =>		'db config.iframe_sandboxing_enabled',
+			'iframe_sandboxing_exceptions' =>	'db config.iframe_sandboxing_exceptions',
+			'socket_timeout' =>					'db config.socket_timeout',
+			'connect_timeout' =>				'db config.connect_timeout',
+			'media_type_test_timeout' =>		'db config.media_type_test_timeout',
+			'script_timeout' =>					'db config.script_timeout',
+			'item_test_timeout' =>				'db config.item_test_timeout'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -86,6 +88,12 @@ class CControllerMiscConfigEdit extends CController {
 			)),
 			'x_frame_options' => $this->getInput('x_frame_options', CSettingsHelper::get(
 				CSettingsHelper::X_FRAME_OPTIONS
+			)),
+			'iframe_sandboxing_enabled' => $this->getInput('iframe_sandboxing_enabled', CSettingsHelper::get(
+				CSettingsHelper::IFRAME_SANDBOXING_ENABLED
+			)),
+			'iframe_sandboxing_exceptions' => $this->getInput('iframe_sandboxing_exceptions', CSettingsHelper::get(
+				CSettingsHelper::IFRAME_SANDBOXING_EXCEPTIONS
 			)),
 			'socket_timeout' => $this->getInput('socket_timeout', CSettingsHelper::get(
 				CSettingsHelper::SOCKET_TIMEOUT

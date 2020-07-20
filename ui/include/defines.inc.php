@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.2.0alpha1');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		5010018);
+define('ZABBIX_DB_VERSION',		5010021);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -58,8 +58,6 @@ define('ZBX_MAX_DATE',			ZBX_MAX_INT32); // 19 Jan 2038 05:14:07
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
-// Applied to tables with variable count of columns. Columns above this limit will be truncated.
-define('ZBX_MAX_TABLE_COLUMNS', 50);
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
@@ -1923,11 +1921,3 @@ define('PROBLEMS_TAG_NAME_NONE',      2);
 define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
-
-/**
- * The sandbox attribute enables an extra set of restrictions for the content in the iframe. Default is set to empty
- * string, which means all restrictions are applied. To disable, set to FALSE. To set a specific set of restrictions,
- * write a custom string.
- * https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html#attr-iframe-sandbox
- */
-define('ZBX_IFRAME_SANDBOX', '');
