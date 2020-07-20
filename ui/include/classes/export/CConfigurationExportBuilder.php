@@ -345,7 +345,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @param array $maps
 	 */
-	public function buildMaps(array $maps) {
+	public function buildMaps(array $schema, array $maps) {
 		$this->data['maps'] = [];
 
 		CArrayHelper::sort($maps, ['name']);
@@ -388,6 +388,8 @@ class CConfigurationExportBuilder {
 				'links' => $this->formatMapLinks($map['links'], $tmpSelements)
 			];
 		}
+
+		$this->data['maps'] = $this->build($schema, $this->data['maps'], 'maps');
 	}
 
 	/**

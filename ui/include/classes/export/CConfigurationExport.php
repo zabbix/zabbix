@@ -175,7 +175,7 @@ class CConfigurationExport {
 			}
 
 			if ($this->data['maps']) {
-				$this->builder->buildMaps($this->data['maps']);
+				$this->builder->buildMaps($schema['rules']['maps'], $this->data['maps']);
 			}
 
 			if ($this->data['mediaTypes']) {
