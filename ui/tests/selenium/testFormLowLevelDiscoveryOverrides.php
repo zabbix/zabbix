@@ -76,7 +76,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => '',
+								'Name' => ''
 							],
 							'error' => 'Incorrect value for field "Name": cannot be empty.'
 						]
@@ -89,11 +89,13 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override without actions',
+								'Name' => 'Override without actions'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Item prototype'
+									'fields' => [
+										'Object' => 'Item prototype'
+									]
 								]
 							],
 							'error' => 'At least one action is mandatory.'
@@ -107,12 +109,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty tags',
+								'Name' => 'Override with empty tags'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Trigger prototype',
-									'Tags' => [],
+									'fields' => [
+										'Object' => 'Trigger prototype',
+										'Tags' => []
+									]
 								]
 							],
 							'error' => 'Incorrect value for field "Tags": cannot be empty.'
@@ -126,13 +130,15 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty tag name',
+								'Name' => 'Override with empty tag name'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Trigger prototype',
-									'Tags' => [
-										['tag' => '', 'value' => 'value1'],
+									'fields' => [
+										'Object' => 'Trigger prototype',
+										'Tags' => [
+											['tag' => '', 'value' => 'value1']
+										]
 									]
 								]
 							],
@@ -147,12 +153,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty template',
+								'Name' => 'Override with empty template'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Host prototype',
-									'Link templates' => [],
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Link templates' => []
+									]
 								]
 							],
 							'error' => 'Incorrect value for field "Link templates": cannot be empty.'
@@ -166,15 +174,17 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty delay',
+								'Name' => 'Override with empty delay'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Item prototype'
+									'fields' => [
+										'Object' => 'Item prototype'
+									],
+									'Update interval' => [
+										'Delay' => ''
+									]
 								]
-							],
-							'Update interval' => [
-									'Delay' => ''
 							],
 							'error' => 'Incorrect value for field "Update interval": invalid delay.'
 						]
@@ -187,15 +197,17 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with zero delay',
+								'Name' => 'Override with zero delay'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Item prototype',
+									'fields' => [
+										'Object' => 'Item prototype'
+									],
+									'Update interval' => [
+										'Delay' => '0'
+									]
 								]
-							],
-							'Update interval' => [
-								'Delay' => '0'
 							],
 							'error' => 'Item will not be refreshed. '.
 									'Specified update interval requires having at least one either flexible or scheduling interval.'
@@ -209,15 +221,17 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with 2 days delay',
+								'Name' => 'Override with 2 days delay'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Item prototype',
+									'fields' => [
+										'Object' => 'Item prototype'
+									],
+									'Update interval' => [
+										'Delay' => '2d'
+									]
 								]
-							],
-							'Update interval' => [
-								'Delay' => '2d'
 							],
 							'error' => 'Item will not be refreshed. '.
 									'Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
@@ -231,17 +245,19 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty interval',
+								'Name' => 'Override with empty interval'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Item prototype',
-								]
-							],
-							'Update interval' => [
-								'Delay' => '50m',
-								'Custom intervals' => [
-									['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '', 'period' => '1-5,01:01-13:05'],
+									'fields' => [
+										'Object' => 'Item prototype'
+									],
+									'Update interval' => [
+										'Delay' => '50m',
+										'Custom intervals' => [
+											['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '', 'period' => '1-5,01:01-13:05']
+										]
+									]
 								]
 							],
 							'error' => 'Invalid interval "".'
@@ -255,17 +271,19 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with empty period',
+								'Name' => 'Override with empty period'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Item prototype',
-								]
-							],
-							'Update interval' => [
-								'Delay' => '50m',
-								'Custom intervals' => [
-									['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '20s', 'period' => ''],
+									'fields' => [
+										'Object' => 'Item prototype'
+									],
+									'Update interval' => [
+										'Delay' => '50m',
+										'Custom intervals' => [
+											['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '20s', 'period' => '']
+										]
+									]
 								]
 							],
 							'error' => 'Invalid interval "".'
@@ -279,17 +297,19 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Override with wrong period',
+								'Name' => 'Override with wrong period'
 							],
 							'Operations' => [
 								[
-									'Object' => 'Item prototype',
-								]
-							],
-							'Update interval' => [
-								'Delay' => '50m',
-								'Custom intervals' => [
-									['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '20s', 'period' => '1-2'],
+									'fields' => [
+										'Object' => 'Item prototype'
+									],
+									'Update interval' => [
+										'Delay' => '50m',
+										'Custom intervals' => [
+											['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '20s', 'period' => '1-2']
+										]
+									]
 								]
 							],
 							'error' => 'Invalid interval "1-2".'
@@ -297,37 +317,39 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'overrides' => [
-//						[
-//							'fields' => [
-//								'Name' => 'Override with wrong scheduling interval',
-//							],
-//							'Operations' => [
-//								[
-//									'Object' => 'Item prototype',
-//								]
-//							],
-//							'Update interval' => [
-//								'Delay' => '50m',
-//								'Custom intervals' => [
-//									['action' => USER_ACTION_ADD, 'Type' => 'Scheduling', 'delay' => 'wd1-9'],
-//								]
-//							],
-//							'error' => 'Invalid interval "wd1-9".'
-//						]
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override with wrong scheduling interval'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Item prototype'
+									],
+									'Update interval' => [
+										'Delay' => '50m',
+										'Custom intervals' => [
+											['action' => USER_ACTION_ADD, 'Type' => 'Scheduling', 'delay' => 'wd1-9']
+										]
+									]
+								]
+							],
+							'error' => 'Invalid interval "wd1-9".'
+						]
+					]
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'overrides' => [
 						[
 							'fields' => [
-								'Name' => 'Minimal override',
+								'Name' => 'Minimal override'
 							]
 						]
 					]
@@ -362,43 +384,57 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							],
 							'Operations' => [
 								[
-									'Object' => 'Item prototype',
-									'Condition' => ['operator' => 'does not match', 'value' => 'item_pattern'],
-									'Create enabled' => 'No',
-									'Discover' => 'No',
-//									'Update interval' => [
-//										'Delay' => '50m',
-//										'Custom intervals' => [
-//											['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '60s', 'period' => '1-5,01:01-13:05'],
-//											['action' => USER_ACTION_ADD,'Type' => 'Scheduling', 'delay' => 'wd1-3h10-17']
-//										]
-//									],
-									'History storage period' => ['ophistory_history_mode' => 'Storage period', 'ophistory_history' => '500d'],
-									'Trend storage period' => ['optrends_trends_mode' => 'Storage period', 'optrends_trends' => '200d']
-								],
-								[
-									'Object' => 'Trigger prototype',
-									'Condition' => ['operator' => 'contains', 'value' => 'trigger_Pattern'],
-									'Create enabled' => 'No',
-									'Discover' => 'No',
-									'Severity' => 'Warning',
-									'Tags' => [
-										['tag' => 'tag1', 'value' => 'value1'],
-										['tag' => 'tag2', 'value' => 'value2']
+									'fields' => [
+										'Object' => 'Item prototype',
+										'Condition' => ['operator' => 'does not match', 'value' => 'item_pattern'],
+										'Create enabled' => 'No',
+										'Discover' => 'No',
+										'History storage period' => [
+											'ophistory_history_mode' => 'Storage period',
+											'ophistory_history' => '500d'
+										],
+										'Trend storage period' => [
+											'optrends_trends_mode' => 'Storage period',
+											'optrends_trends' => '200d'
+										]
+									],
+									'Update interval' => [
+										'Delay' => '50m',
+										'Custom intervals' => [
+											['Type' => 'Flexible', 'delay' => '60s', 'period' => '1-5,01:01-13:05'],
+											['Type' => 'Scheduling', 'delay' => 'wd1-3h10-17']
+										]
 									]
 								],
 								[
-									'Object' => 'Graph prototype',
-									'Condition' => ['operator' => 'matches', 'value' => 'Graph_Pattern'],
-									'Discover' => 'Yes'
+									'fields' => [
+										'Object' => 'Trigger prototype',
+										'Condition' => ['operator' => 'contains', 'value' => 'trigger_Pattern'],
+										'Create enabled' => 'No',
+										'Discover' => 'No',
+										'Severity' => 'Warning',
+										'Tags' => [
+											['tag' => 'tag1', 'value' => 'value1'],
+											['tag' => 'tag2', 'value' => 'value2']
+										]
+									]
 								],
 								[
-									'Object' => 'Host prototype',
-									'Condition' => ['operator' => 'does not match', 'value' => 'Host_Pattern'],
-									'Create enabled' => 'Yes',
-									'Discover' => 'Yes',
-									'Link templates' => 'Test Item Template',
-									'Host inventory' => 'Disabled'
+									'fields' => [
+										'Object' => 'Graph prototype',
+										'Condition' => ['operator' => 'matches', 'value' => 'Graph_Pattern'],
+										'Discover' => 'Yes'
+									]
+								],
+								[
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Condition' => ['operator' => 'does not match', 'value' => 'Host_Pattern'],
+										'Create enabled' => 'Yes',
+										'Discover' => 'Yes',
+										'Link templates' => 'Test Item Template',
+										'Host inventory' => 'Disabled'
+									]
 								]
 							]
 						],
@@ -409,17 +445,21 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							],
 							'Operations' => [
 								[
-									'Object' => 'Graph prototype',
-									'Condition' => ['operator' => 'matches', 'value' => '2Graph_Pattern'],
-									'Discover' => 'No'
+									'fields' => [
+										'Object' => 'Graph prototype',
+										'Condition' => ['operator' => 'matches', 'value' => '2Graph_Pattern'],
+										'Discover' => 'No'
+									]
 								],
 								[
-									'Object' => 'Host prototype',
-									'Condition' => ['operator' => 'does not match', 'value' => '2Host_Pattern'],
-									'Create enabled' => 'Yes',
-									'Discover' => 'No',
-									'Link templates' => 'Test Item Template',
-									'Host inventory' => 'Automatic'
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Condition' => ['operator' => 'does not match', 'value' => '2Host_Pattern'],
+										'Create enabled' => 'Yes',
+										'Discover' => 'No',
+										'Link templates' => 'Test Item Template',
+										'Host inventory' => 'Automatic'
+									]
 								]
 							]
 						]
@@ -494,7 +534,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							'action' => USER_ACTION_UPDATE,
 							'name' => 'Override for update 1',
 							'fields' => [
-								'Name' => '',
+								'Name' => ''
 							],
 							'error' => 'Incorrect value for field "Name": cannot be empty.'
 						]
@@ -508,7 +548,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						[
 							'action' => USER_ACTION_ADD,
 							'fields' => [
-								'Name' => '',
+								'Name' => ''
 							],
 							'error' => 'Incorrect value for field "Name": cannot be empty.'
 						]
@@ -551,12 +591,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							'Operations' => [
 								[
 									'action' => USER_ACTION_ADD,
-									'Object' => 'Host prototype',
-									'Condition' => ['operator' => 'contains', 'value' => 'new host pattern'],
-									'Create enabled' => 'No',
-									'Discover' => 'Yes',
-									'Link templates' => 'Test Item Template',
-									'Host inventory' => 'Disabled'
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Condition' => ['operator' => 'contains', 'value' => 'new host pattern'],
+										'Create enabled' => 'No',
+										'Discover' => 'Yes',
+										'Link templates' => 'Test Item Template',
+										'Host inventory' => 'Disabled'
+									]
 								]
 							]
 						]
@@ -598,25 +640,35 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								[
 									'action' => USER_ACTION_UPDATE,
 									'index' => 0,
-									'Create enabled' => 'No',
-									'Discover' => 'No',
-//									'Update interval' => [
-//										'Delay' => '50m',
-//										'Custom intervals' => [
-//											['Type' => 'Flexible', 'delay' => '60s', 'period' => '1-5,01:01-13:05'],
-//											['Type' => 'Scheduling', 'delay' => 'wd1-3h10-17']
-//										]
-//									],
-									'History storage period' => ['ophistory_history_mode' => 'Storage period', 'ophistory_history' => '500d'],
-									'Trend storage period' => ['optrends_trends_mode' => 'Storage period', 'optrends_trends' => '200d']
+									'fields' => [
+										'Create enabled' => 'No',
+										'Discover' => 'No',
+										'History storage period' => [
+											'ophistory_history_mode' => 'Storage period',
+											'ophistory_history' => '500d'
+										],
+										'Trend storage period' => [
+											'optrends_trends_mode' => 'Storage period',
+											'optrends_trends' => '200d'
+										]
+									],
+									'Update interval' => [
+										'Delay' => '50m',
+										'Custom intervals' => [
+											['Type' => 'Flexible', 'delay' => '60s', 'period' => '1-5,01:01-13:05'],
+											['Type' => 'Scheduling', 'delay' => 'wd1-3h10-17']
+										]
+									]
 								],
 								[
 									'action' => USER_ACTION_UPDATE,
 									'index' => 1,
-									'Create enabled' => 'No',
-									'Discover' => 'Yes',
-									'Severity' => null,
-									'Tags' => null,
+									'fields' => [
+										'Create enabled' => 'No',
+										'Discover' => 'Yes',
+										'Severity' => null,
+										'Tags' => null
+									]
 								]
 							]
 						]
@@ -671,13 +723,13 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
 						'Create enabled' => 'Yes',
 						'Discover' => 'Yes',
-//						'Update interval' => [
-//							'Delay' => '1m',
-//							'Custom intervals' => [
-//								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
-//								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
-//							]
-//						],
+						'Update interval' => [
+							'Delay' => '1m',
+							'Custom intervals' => [
+								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
+								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
+							]
+						],
 						'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
 						'Trend storage period' => ['optrends_trends_mode' => 'Do not keep history']
 					],
@@ -731,7 +783,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							unset($sources[$id]);
 						}
 					}
-
 					break;
 
 				case USER_ACTION_UPDATE:
@@ -796,11 +847,15 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						// Preparing reference data for Operations.
 						switch ($operation_action) {
 							case USER_ACTION_ADD:
-								$sources[$id]['Operations'][] = $operation;
+								$temp = $operation['fields'];
+								if (array_key_exists('Update interval', $operation)) {
+									$temp['Update interval'] = $operation['Update interval'];
+								}
+								$sources[$id]['Operations'][] = $temp;
 								break;
 							case USER_ACTION_UPDATE:
 								// Check if source has Operations from data to update them.
-								foreach ($operation as $key => $value) {
+								foreach ($operation['fields'] as $key => $value) {
 									// Skipping 'action' and 'index' fields from reference data.
 									if (in_array($key, ['action', 'index'])) {
 										continue;
@@ -871,95 +926,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	/**
-	 * @depends overridesCreate
-	 */
-	private function checkSavedState($data) {
-		// Skip Bad cases.
-		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
-			return;
-		}
-
-		// Open saved LLD.
-		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::$created_id);
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$form->selectTab('Overrides');
-		$override_container = $form->getField('Overrides')->asTable();
-		// Get Overrides count.
-		$overrides_count = $override_container->getRows()->count();
-
-		// Write Override names from data to array.
-		foreach ($data['overrides'] as $override) {
-			$override_names[] = $override['fields']['Name'];
-			$stop_processing[] = (CTestArrayHelper::get($override['fields'],
-					'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
-		}
-
-		// Compare Override names from table with data.
-		for ($k = 0; $k < $overrides_count - 1; $k++) {
-			$this->assertEquals($override_names[$k],
-					$override_container->getRow($k)->getColumn('Name')->getText()
-			);
-			// Check that Override in table has correct processing status.
-			$this->assertEquals($stop_processing[$k], $override_container->getRow($k)->getColumn('Stop processing')->getText());
-		}
-
-		foreach ($data['overrides'] as $override) {
-			// Open each override dialog.
-			$row = $override_container->findRow('Name', $override['fields']['Name']);
-			$row->query('link', $override['fields']['Name'])->one()->click();
-			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
-
-			// Check that Override fields filled with correct data.
-			foreach ($override['fields'] as $field => $value) {
-				$override_overlay->getField($field)->checkValue($value);
-			}
-
-			if (array_key_exists('Filters', $override)) {
-				// Check that Fiters are filled correctly.
-				$this->assertValues($override['Filters']['filter_conditions']);
-
-				// Check that Evaluation type is filled correctly.
-				if (array_key_exists('Type of calculation', $override['Filters'])) {
-					$evaluation_type = $override_overlay->query('id:overrides_evaltype')->one()->asDropdown()->getValue();
-					$this->assertEquals($override['Filters']['Type of calculation'], $evaluation_type);
-
-					// Check that Formula is filled correctly.
-					if (array_key_exists('formula', $override['Filters'])) {
-						$formula = CTestArrayHelper::get($override['Filters'], 'Type of calculation') !== 'Custom expression'
-							? $override_overlay->query('id:overrides_expression')->one()->getText()
-							: $override_overlay->query('id:overrides_formula')->one()->getValue();
-						$this->assertEquals($override['Filters']['formula'], $formula);
-					}
-				}
-			}
-
-
-
-			$operation_container = $override_overlay->getField('Operations')->asTable();
-			// Get Operations count.
-			$operation_count = $operation_container->getRows()->count();
-
-			if (array_key_exists('Operations', $override)) {
-				// Write Condititons from data to array.
-				$condition_text = [];
-				foreach($override['Operations'] as $operation){
-					$condition_text[] = $operation['Object'].' '.$operation['Condition']['operator'].' '.$operation['Condition']['value'];
-				}
-
-				// Compare Conditions from table with data.
-				for ($n = 0; $n < $operation_count - 1; $n++) {
-					$this->assertEquals($condition_text[$n],
-							$operation_container->getRow($n)->getColumn('Condition')->getText()
-					);
-				}
-			}
-
-			// Close Override dialog.
-			COverlayDialogElement::find()->one()->close();
-		}
-	}
-
-	/**
 	 * @param array         $override          override fields from data
 	 *
 	 * @return CFormElement $override_overlay  override or condition form in overlay
@@ -1024,20 +990,21 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					case USER_ACTION_ADD:
 					case USER_ACTION_UPDATE:
 						$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
-						$operation_overlay->fill($operation);
+						$operation_overlay->fill($operation['fields']);
 
 						// Fill Delay and Intervals.
-						if (CTestArrayHelper::get($override, 'Update interval')) {
-							if ($override['Update interval'] !== null){
+						if (CTestArrayHelper::get($operation, 'Update interval')) {
+							if ($operation['Update interval'] !== null) {
 								$intervals = $operation_overlay->getField('Update interval');
 								$operation_overlay->query('id:visible_opperiod')->one()->fill(true);
-								if (array_key_exists('Delay', $override['Update interval'])) {
+								if (array_key_exists('Delay', $operation['Update interval'])) {
 									$intervals->query('id:opperiod_delay')->waitUntilVisible()->one()
-											->fill($override['Update interval']['Delay']);
+											->fill($operation['Update interval']['Delay']);
 								}
-								if (array_key_exists('Custom intervals', $override['Update interval'])) {
+								if (array_key_exists('Custom intervals', $operation['Update interval'])) {
 									$this->query('xpath:.//table[@id="lld_overrides_custom_intervals"]')
-											->asMultifieldTable()->one()->fill($override['Update interval']['Custom intervals']);
+											->asMultifieldTable()->one()
+											->fill($operation['Update interval']['Custom intervals']);
 								}
 							}
 							else {
@@ -1046,29 +1013,36 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						}
 
 						$operation_overlay->submit();
-						$this->checkSubmittedOverlay($data['expected'], $operation_overlay, CTestArrayHelper::get($override, 'error'));
+						$this->checkSubmittedOverlay($data['expected'], $operation_overlay,
+								CTestArrayHelper::get($override, 'error'));
 
 						if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 							// Check that Operation was added to Operations table.
-							$object = (CTestArrayHelper::get($operation, 'Object'))
-								? $operation['Object']
-								: $sources[$id]['Operations'][$i]['Object'];
+							$object = CTestArrayHelper::get($operation, 'fields.Object');
+							if ($object === null) {
+								$object = $sources[$id]['Operations'][$i]['Object'];
+							}
 
-							$operator =( CTestArrayHelper::get($operation, 'Condition.operator'))
-								? $operation['Condition']['operator']
-								: $sources[$id]['Operations'][$i]['Condition']['operator'];
+							$operator = CTestArrayHelper::get($operation, 'fields.Condition.operator');
+							if ($operator === null) {
+								$operator = $sources[$id]['Operations'][$i]['Condition']['operator'];
+							}
 
-							$value = (CTestArrayHelper::get($operation, 'Condition.value'))
-								? $operation['Condition']['value']
-								: $sources[$id]['Operations'][$i]['Condition']['value'];
+							$value = CTestArrayHelper::get($operation, 'fields.Condition.value');
+							if ($value === null) {
+								$value = $sources[$id]['Operations'][$i]['Condition']['value'];
+							}
 
 							$condition_text = $object.' '.$operator.' '.$value;
-							$this->assertEquals($condition_text, $operation_container->getRow($row)->getColumn('Condition')->getText());
+							$this->assertEquals($condition_text, $operation_container->getRow($row)->getColumn('Condition')
+									->getText());
 						}
 						break;
 
 					case USER_ACTION_REMOVE:
-						$condition_text = $operation['Object'].' '.$operation['Condition']['operator'].' '.$operation['Condition']['value'];
+						$condition_text = $operation['fields']['Object'].' '.
+								$operation['fields']['Condition']['operator'].' '.
+								$operation['fields']['Condition']['value'];
 						$row = $operation_container->findRow('Condition', $condition_text)
 							->query('button:Remove')->one()->click();
 						$row->waitUntilNotPresent();
@@ -1097,6 +1071,108 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			case TEST_BAD:
 				$this->assertMessage(TEST_BAD, null, $error);
 				break;
+		}
+	}
+
+	private function checkSavedState($data) {
+		// Skip Bad cases.
+		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+			return;
+		}
+
+		// Open saved LLD.
+		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::$created_id);
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->selectTab('Overrides');
+		$override_container = $form->getField('Overrides')->asTable();
+		// Get Overrides count.
+		$overrides_count = $override_container->getRows()->count();
+
+		// Write Override names from data to array.
+		foreach ($data['overrides'] as $override) {
+			$override_names[] = $override['fields']['Name'];
+			$stop_processing[] = (CTestArrayHelper::get($override['fields'],
+					'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
+		}
+
+		// Compare Override names from table with data.
+		for ($k = 0; $k < $overrides_count - 1; $k++) {
+			$this->assertEquals($override_names[$k],
+					$override_container->getRow($k)->getColumn('Name')->getText()
+			);
+			// Check that Override in table has correct processing status.
+			$this->assertEquals($stop_processing[$k], $override_container->getRow($k)->getColumn('Stop processing')->getText());
+		}
+
+		foreach ($data['overrides'] as $override) {
+			// Open each override dialog.
+			$row = $override_container->findRow('Name', $override['fields']['Name']);
+			$row->query('link', $override['fields']['Name'])->one()->click();
+			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
+
+			// Check that Override fields filled with correct data.
+			foreach ($override['fields'] as $field => $value) {
+				$override_overlay->getField($field)->checkValue($value);
+			}
+
+			if (array_key_exists('Filters', $override)) {
+				// Check that Fiters are filled correctly.
+				$this->assertValues($override['Filters']['filter_conditions']);
+
+				// Check that Evaluation type is filled correctly.
+				if (array_key_exists('Type of calculation', $override['Filters'])) {
+					$evaluation_type = $override_overlay->query('id:overrides_evaltype')->one()->asDropdown()->getValue();
+					$this->assertEquals($override['Filters']['Type of calculation'], $evaluation_type);
+
+					// Check that Formula is filled correctly.
+					if (array_key_exists('formula', $override['Filters'])) {
+						$formula = CTestArrayHelper::get($override['Filters'], 'Type of calculation') !== 'Custom expression'
+							? $override_overlay->query('id:overrides_expression')->one()->getText()
+							: $override_overlay->query('id:overrides_formula')->one()->getValue();
+						$this->assertEquals($override['Filters']['formula'], $formula);
+					}
+				}
+			}
+
+			$operation_container = $override_overlay->getField('Operations')->asTable();
+			// Get Operations count.
+			$operation_count = $operation_container->getRows()->count();
+
+			if (array_key_exists('Operations', $override)) {
+				// Write Condititons from data to array.
+				$condition_text = [];
+				foreach($override['Operations'] as $operation) {
+					$fields = array_key_exists('fields', $operation) ? $operation['fields'] : $operation;
+
+					$condition_text[] = $fields['Object'].' '.
+							$fields['Condition']['operator'].' '.
+							$fields['Condition']['value'];
+				}
+
+				// Compare Conditions from table with data.
+				for ($n = 0; $n < $operation_count - 1; $n++) {
+					$row = $operation_container->getRow($n);
+					$this->assertEquals($condition_text[$n],
+							$row->getColumn('Condition')->getText()
+					);
+				}
+
+				foreach($override['Operations'] as $i => $operation) {
+					$row = $operation_container->getRow($i);
+					$row->query('button:Edit')->one()->click();
+					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
+
+//					foreach ($operation['fields'] as $field => $value) {
+//						$operation_overlay->getField($field)->checkValue($value);
+//					}
+
+					// Close Operation dialog.
+					$operation_overlay->submit();
+				}
+			}
+
+			// Close Override dialog.
+			COverlayDialogElement::find()->one()->close();
 		}
 	}
 }
