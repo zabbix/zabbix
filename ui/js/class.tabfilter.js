@@ -95,7 +95,16 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			tabSortChanged: (ev, ui) => {
-				// Tab order changed, update changes via ajax
+				// Update order of this._items array.
+				var from, to, target = ui.item[0].querySelector('[data-target]');
+
+				this._items.forEach((item, index) => from = (item._target === target) ? index : from);
+				this._target.querySelectorAll('nav [data-target]')
+					.forEach((elm, index) => to = (elm === target) ? index : to);
+				this._items[to] = this._items.splice(from, 1, this._items[to])[0];
+
+				// Tab order changed, update changes via ajax.
+
 			},
 
 			selectPrevTab: (ev) => {
@@ -115,17 +124,16 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			toggleTabsList: (ev) => {
-				var items = [{items: []}, {items: []}];
+				var dropdown = [{items: []}, {items: []}];
+
 				this._items.forEach((item, index) => {
-					items[index ? 1 : 0].items.push({
+					dropdown[index ? 1 : 0].items.push({
 						label: index ? item._data.label : t('Home'),
-						clickCallback: (ev) => {
-							return this._items[index].select();
-						}
+						clickCallback: (ev) => this._items[index].select()
 					})
 				});
 
-				$(this._target).menuPopup(items, $(ev), {
+				$(this._target).menuPopup(dropdown, $(ev), {
 					position: {
 						of: ev.target,
 						my: 'left bottom',
