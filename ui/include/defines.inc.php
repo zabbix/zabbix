@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.2');
-define('ZABBIX_API_VERSION',	'5.0.2');
+define('ZABBIX_VERSION',		'5.0.3rc1');
+define('ZABBIX_API_VERSION',	'5.0.3');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -1373,7 +1373,8 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
-define('ZBX_MACRO_SECRET_MASK', '******'); // Placeholder for masked macro value.
+
+define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
@@ -1675,6 +1676,7 @@ define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
+define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
