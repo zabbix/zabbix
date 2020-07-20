@@ -372,12 +372,7 @@ function invalid_url($msg = null) {
 
 	// Rollback reset messages.
 	foreach ($messages_backup as $message) {
-		if ($message['type'] === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
-			CMessageHelper::addSuccess($message['message']);
-		}
-		else {
-			CMessageHelper::addError($message['message'], $message['source']);
-		}
+		CMessageHelper::addMessage($messages);
 	}
 
 	unset_all();

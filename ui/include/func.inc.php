@@ -1863,12 +1863,7 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 
 	foreach ($restore_messages as $message) {
-		if ($message['type'] === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
-			CMessageHelper::addSuccess($message['message']);
-		}
-		else {
-			CMessageHelper::addError($message['message'], $message['source']);
-		}
+		CMessageHelper::addMessage($message);
 	}
 
 	$ZBX_MESSAGES_PREPARED = $restore_messages_prepared;

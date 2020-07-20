@@ -61,6 +61,20 @@ class CMessageHelper {
 	}
 
 	/**
+	 * Add message.
+	 *
+	 * @param array $message
+	 */
+	public static function addMessage(array $message): void {
+		if ($message['type'] === self::MESSAGE_TYPE_SUCCESS) {
+			self::addSuccess($message['message']);
+		}
+		else {
+			self::addError($message['message'], $message['source']);
+		}
+	}
+
+	/**
 	 * Add message with type error.
 	 *
 	 * @param string $message
@@ -144,23 +158,22 @@ class CMessageHelper {
 	 * Initialize schedule messages.
 	 */
 	public static function initScheduleMessage() {
-		if (array_key_exists('success', self::$schedule_messages)) {
-			CMessageHelper::setSuccessTitle(self::$schedule_messages['success']);
-		}
+		if (self::$schedule_messages) {
+			if (array_key_exists('success', self::$schedule_messages)) {
+				self::setSuccessTitle(self::$schedule_messages['success']);
+			}
 
-		if (array_key_exists('error', self::$schedule_messages)) {
-			CMessageHelper::setErrorTitle(self::$schedule_messages['error']);
-		}
+			if (array_key_exists('error', self::$schedule_messages)) {
+				self::setErrorTitle(self::$schedule_messages['error']);
+			}
 
-		if (array_key_exists('messages', self::$schedule_messages)) {
-			foreach (self::$schedule_messages['messages'] as $message) {
-				if ($message['type'] === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
-					CMessageHelper::addSuccess($message['message']);
-				}
-				else {
-					CMessageHelper::addError($message['message'], $message['source']);
+			if (array_key_exists('messages', self::$schedule_messages)) {
+				foreach (self::$schedule_messages['messages'] as $message) {
+					self::addMessage($message);
 				}
 			}
+
+			self::setScheduleMessages([]);
 		}
 	}
 }
