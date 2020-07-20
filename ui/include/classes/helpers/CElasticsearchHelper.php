@@ -77,7 +77,7 @@ class CElasticsearchHelper {
 	private static function getScrollApiEndpoint($endpoint) {
 		$url = $endpoint;
 
-		for ($i = 0; $i < 3; $i++) {
+		for ($i = 0; $i < 2; $i++) {
 			if (($pos = strrpos($url, '/')) !== false) {
 				$url = substr($url, 0, $pos);
 			}
