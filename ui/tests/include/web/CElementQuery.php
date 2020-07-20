@@ -169,7 +169,7 @@ class CElementQuery implements IWaitable {
 			'tag' => 'tagName',
 			'link' => 'linkText',
 			'button' => function () use ($locator) {
-				return WebDriverBy::xpath('.//button[contains(text(),'.CXPathHelper::escapeQuotes($locator).')]');
+				return WebDriverBy::xpath('.//button[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
 			}
 		];
 
@@ -483,7 +483,8 @@ class CElementQuery implements IWaitable {
 	public static function getInputElement($target, $prefix = './', $class = null) {
 		$classes = [
 			'CElement'					=> [
-				'/input[@name][not(@type) or @type="text" or @type="password"]',
+				// TODO: hidden input task
+				'/input[@name][not(@type) or @type="text" or @type="password"][not(@style) or not(contains(@style,"display: none"))]',
 				'/textarea[@name]'
 			],
 			'CDropdownElement'			=> '/select[@name]',
