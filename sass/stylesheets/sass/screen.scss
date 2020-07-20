@@ -2549,16 +2549,18 @@ $icon-widget-btn: (
 	opacity: .5;
 	transition: opacity .2s ease-out;
 
-	&:hover {
-		@extend %btn-widget-hover-active;
-	}
-
-	&:focus {
-		@extend %btn-widget-hover-active;
-	}
-
+	&:hover,
+	&:focus,
 	&:active {
 		@extend %btn-widget-hover-active;
+	}
+
+	&[disabled],
+	&[disabled]:hover,
+	&[disabled]:focus,
+	&[disabled]:active {
+		background-color: transparent;
+		opacity: .25;
 	}
 }
 
@@ -3047,10 +3049,8 @@ $form-icon-btn: (
 	border-bottom: 0;
 	background-color: $ui-bg-color;
 
-	/*
-	 * For floating headers to appear over other widgets.
-	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-	 */
+	// For floating headers to appear over other widgets.
+	// Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
 	z-index: 3;
 
 	h4 {
@@ -3124,15 +3124,6 @@ $form-icon-btn: (
 	.msg-good,
 	.msg-warning {
 		margin: 0 10px;
-	}
-}
-
-.widget-placeholder {
-	.dashbrd-grid-widget-container {
-		.dashbrd-grid-widget-content {
-			margin-top: 0;
-			height: 100%;
-		}
 	}
 }
 
