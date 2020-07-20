@@ -297,9 +297,21 @@ class CMultifieldTableElement extends CTableElement {
 	 * return $this
 	 */
 	public function updateRow($index, $values) {
-		foreach ($this->getRowControls($this->getRow($index)) as $name => $control) {
-			if (array_key_exists($name, $values)) {
-				$control->fill($values[$name]);
+		$controls = $this->getRowControls($this->getRow($index));
+		foreach ($values as $name => $value) {
+			if (array_key_exists($name, $controls)) {
+				try {
+					$controls[$name]->fill($value);
+				}
+				catch (\Facebook\WebDriver\Exception\UnrecognizedExceptionException $e1) {
+					try {
+						$controls = $this->getRowControls($this->getRow($index));
+						$controls[$name]->fill($value);
+					}
+					catch (\Exception $e2) {
+						throw $e1;
+					}
+				}
 				unset($values[$name]);
 			}
 		}
