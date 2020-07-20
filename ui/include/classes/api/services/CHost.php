@@ -968,10 +968,9 @@ class CHost extends CHostGeneral {
 		sort($hostids);
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'proxy_hostid', 'host', 'status', 'lastaccess', 'ipmi_authtype', 'ipmi_privilege',
-				'ipmi_username', 'ipmi_password', 'name', 'templateid', 'description', 'tls_connect', 'tls_accept',
-				'tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk', 'proxy_address', 'auto_compress',
-				'discover', 'inventory_mode'
+			'output' => ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+				'ipmi_password', 'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
+				'tls_psk_identity', 'tls_psk', 'inventory_mode'
 			],
 			'hostids' => $hostids,
 			'editable' => true,
