@@ -48,7 +48,7 @@ class CEncryptHelper {
 	private static function getKey(): string {
 		if (!self::$key) {
 			$config = select_config();
-			if (!array_key_exists('session_key', $config)) {
+			if (!array_key_exists('session_key', $config) || $config['session_key'] === '') {
 				throw new \Exception(_('Session secret not defined.'));
 			}
 

@@ -45,6 +45,13 @@ class CMessageHelper {
 	private static $messages = [];
 
 	/**
+	 * Schedule messages from form data.
+	 *
+	 * @var array
+	 */
+	private static $schedule_messages = [];
+
+	/**
 	 * Get messages.
 	 *
 	 * @return array
@@ -121,8 +128,39 @@ class CMessageHelper {
 	 * Clear messages.
 	 */
 	public static function clear(): void {
-		// self::$type = self::MESSAGE_TYPE_SUCCESS;
-		// self::$title = null;
 		self::$messages = [];
+	}
+
+	/**
+	 * Set messages from FormData.
+	 *
+	 * @param array $messages
+	 */
+	public static function setScheduleMessages(array $messages): void {
+		self::$schedule_messages = $messages;
+	}
+
+	/**
+	 * Initialize schedule messages.
+	 */
+	public static function initScheduleMessage() {
+		if (array_key_exists('success', self::$schedule_messages)) {
+			CMessageHelper::setSuccessTitle(self::$schedule_messages['success']);
+		}
+
+		if (array_key_exists('error', self::$schedule_messages)) {
+			CMessageHelper::setErrorTitle(self::$schedule_messages['error']);
+		}
+
+		if (array_key_exists('messages', self::$schedule_messages)) {
+			foreach (self::$schedule_messages['messages'] as $message) {
+				if ($message['type'] === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
+					CMessageHelper::addSuccess($message['message']);
+				}
+				else {
+					CMessageHelper::addError($message['message'], $message['source']);
+				}
+			}
+		}
 	}
 }

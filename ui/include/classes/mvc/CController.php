@@ -159,23 +159,7 @@ abstract class CController {
 		$_REQUEST = array_merge($_REQUEST, $data['form']);
 
 		if ($data['messages']) {
-			if (array_key_exists('success', $data['messages'])) {
-				CMessageHelper::setSuccessTitle($data['messages']['success']);
-			}
-			if (array_key_exists('error', $data['messages'])) {
-				CMessageHelper::setErrorTitle($data['messages']['error']);
-			}
-
-			if (array_key_exists('messages', $data['messages'])) {
-				foreach ($data['messages']['messages'] as $message) {
-					if ($message['type'] === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
-						CMessageHelper::addSuccess($message['message']);
-					}
-					else {
-						CMessageHelper::addError($message['message'], $message['source']);
-					}
-				}
-			}
+			CMessageHelper::setScheduleMessages($data['messages']);
 		}
 
 		return true;

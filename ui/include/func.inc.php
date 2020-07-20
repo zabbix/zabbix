@@ -1811,9 +1811,9 @@ function get_prepared_messages(array $options = []): ?string {
 		$messages_current = [];
 		$restore_messages = CMessageHelper::getMessages();
 		$restore_messages_prepared = $ZBX_MESSAGES_PREPARED;
+		CMessageHelper::clear();
 	}
 
-	CMessageHelper::clear();
 	$ZBX_MESSAGES_PREPARED = [];
 
 	// Process authentication warning if user had unsuccessful authentication attempts.
@@ -1836,12 +1836,13 @@ function get_prepared_messages(array $options = []): ?string {
 	}
 
 	$messages_authentication = $ZBX_MESSAGES_PREPARED;
-	CMessageHelper::clear();
 	$ZBX_MESSAGES_PREPARED = [];
 
 	// Process messages passed by the previous request.
 
 	if ($options['with_session_messages']) {
+		CMessageHelper::initScheduleMessage();
+
 		if (CMessageHelper::getTitle() !== null) {
 			show_messages(
 				CMessageHelper::getType() === CMessageHelper::MESSAGE_TYPE_SUCCESS,
