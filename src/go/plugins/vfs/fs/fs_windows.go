@@ -23,6 +23,7 @@ import (
 	"syscall"
 
 	"golang.org/x/sys/windows"
+	"zabbix.com/pkg/plugin"
 )
 
 func getMountPaths() (paths []string, err error) {
