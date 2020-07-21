@@ -33,6 +33,8 @@ class CFormElement extends CElement {
 	const TABLE_FORM_LEFT = 'div[contains(@class, "table-forms-td-left")]';
 	const TABLE_FORM_RIGHT = 'div[contains(@class, "table-forms-td-right")]';
 
+	protected $toggle_fields = true;
+
 	/**
 	 * Local form input cache.
 	 * @var array
@@ -109,7 +111,7 @@ class CFormElement extends CElement {
 	/**
 	 * Get element field by label element.
 	 *
-	 * @param CElement $label    label element
+	 * @param CElement $label     label element
 	 *
 	 * @return CElement|CNullElement
 	 */
@@ -117,7 +119,7 @@ class CFormElement extends CElement {
 		if (($element = CElementQuery::getInputElement($label, './../../'.self::TABLE_FORM_RIGHT))->isValid()) {
 			return $element;
 		}
-		else {
+		elseif ($this->toggle_fields) {
 			$for = $label->getAttribute('for');
 			if (substr($for, 0, 8) === 'visible_') {
 				try {
@@ -186,7 +188,7 @@ class CFormElement extends CElement {
 		if (!$element->isValid()) {
 			$label = $this->getLabel($name);
 
-			if (($element = $this->getFieldByLabelElement($label))->isValid() === false) {
+			if (($element = $this->getFieldByLabelElement($label))->isValid() === false && $this->toggle_fields !== false) {
 				throw new Exception('Failed to find form field by label name or selector: "'.$name.'".');
 			}
 		}
@@ -375,17 +377,73 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	 * @inheritdoc
-	 */
+	* @inheritdoc
+	*/
 	public function checkValue($expected, $raise_exception = true) {
-		if ($expected && is_array($expected)) {
-			foreach ($expected as $field => $value) {
-				if ($this->getField($field)->checkValue($value, $raise_exception) === false) {
-					return false;
+		$state = $this->toggle_fields;
+		$this->toggle_fields = false;
+
+		try {
+			if ($expected && is_array($expected)) {
+				foreach ($expected as $field => $value) {
+					if ($this->checkFieldValue($field, $value, $raise_exception) === false) {
+						$this->toggle_fields = $state;
+						return false;
+					}
 				}
 			}
 		}
+		catch (\Exception $e) {
+			$this->toggle_fields = $state;
+			throw $e;
+		}
 
 		return true;
+	}
+
+	/**
+	 * Check single form field value to have a specific value.
+	 *
+	 * @param string  $field              field name to filled checked
+	 * @param mixed   $values             value to be checked in field
+	 * @param boolean $raise_exception    flag to raise exceptions on error
+	 *
+	 * @return boolean
+	 *
+	 * @throws Exception
+	 */
+	private function checkFieldValue($field, $values, $raise_exception = true) {
+		$element = $this->getField($field);
+
+		if ($values === null) {
+			$label = $this->getLabel($field);
+			$for = $label->getAttribute('for');
+
+			if (substr($for, 0, 8) === 'visible_') {
+				$checkbox = $this->query('id', $for)->asCheckbox()->one(false);
+				if ($checkbox->isValid()) {
+					return $checkbox->checkValue(false, $raise_exception);
+				}
+			}
+
+			return true;
+		}
+		elseif (is_array($values) && !in_array(get_class($element),
+				[CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class])) {
+
+			if ($values !== []) {
+				$container = $this->getFieldContainer($field);
+
+				foreach ($values as $name => $value) {
+					if (!$container->query('id', $name)->one()->detect()->checkValue($value, $raise_exception)) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		$element->checkValue($values, $raise_exception);
 	}
 }
