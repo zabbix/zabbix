@@ -3738,17 +3738,16 @@
 		},
 
 		/**
-		 * Function to store selected widget into dashboard.copied_widget storage buffer.
+		 * Function to store copied widget into storage buffer.
 		 *
-		 * @param {string} uniqueid  Identifier for widget to copy.
+		 * @param {object} widget  Widget object copied.
 		 *
 		 * @returns {jQuery}
 		 */
-		copyWidget: function(uniqueid) {
+		copyWidget: function(widget) {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('dashboardGrid'),
-					widget = methods.getWidgetsBy.call($this, 'uniqueid', uniqueid).pop();
+					data = $this.data('dashboardGrid');
 
 				doAction('onWidgetCopy', $this, data, widget);
 
