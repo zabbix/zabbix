@@ -55,11 +55,13 @@ class CCookieHelper {
 	 *
 	 * @static
 	 *
-	 * @param string  $name
-	 * @param string  $value
+	 * @param string $name
+	 * @param string $value
 	 * @param integer $time
 	 *
 	 * @return boolean
+	 *
+	 * @throws Exception
 	 */
 	public static function set(string $name, string $value, int $time = 0): bool {
 		if (headers_sent()) {

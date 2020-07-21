@@ -44,6 +44,8 @@ class CEncryptHelper {
 	 * @static
 	 *
 	 * @return string
+	 *
+	 * @throws Exception
 	 */
 	private static function getKey(): string {
 		if (!self::$key) {
