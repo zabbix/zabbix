@@ -328,7 +328,9 @@ class CFormElement extends CElement {
 				}
 			}
 		}
-		elseif (is_array($values) && get_class($element) !== CMultifieldTableElement::class) {
+		elseif (is_array($values) && !in_array(get_class($element),
+				[CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class])) {
+
 			if ($values !== []) {
 				$container = $this->getFieldContainer($field);
 
