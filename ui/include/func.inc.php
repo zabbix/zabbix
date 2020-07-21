@@ -1841,7 +1841,7 @@ function get_prepared_messages(array $options = []): ?string {
 	// Process messages passed by the previous request.
 
 	if ($options['with_session_messages']) {
-		CMessageHelper::initScheduleMessage();
+		CMessageHelper::initScheduleMessages();
 
 		if (CMessageHelper::getTitle() !== null) {
 			show_messages(
