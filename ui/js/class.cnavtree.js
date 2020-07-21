@@ -1322,7 +1322,9 @@ jQuery(function($) {
 							lastId: 0
 						});
 
-						var	triggers = ['onEditStart', 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad', 'onDashboardReady'];
+						var	triggers = ['onEditStart', 'beforeDashboardSave', 'onWidgetCopy', 'beforeConfigLoad',
+							'onDashboardReady'
+						];
 
 						$.each(triggers, function(index, trigger) {
 							$(".dashbrd-grid-container").dashboardGrid("addAction", trigger,
