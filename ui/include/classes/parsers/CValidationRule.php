@@ -56,10 +56,10 @@ class CValidationRule {
 							$is_empty = false;
 							$rule = [];
 
-							if (!$this->parseString($buffer, $pos, $rule)		// string
+							if (!$this->parseString($buffer, $pos, $rule)				// string
 									&& !$this->parseRangeTime($buffer, $pos, $rule)		// range time
 									&& !$this->parseTimePeriods($buffer, $pos, $rule)	// time periods
-									&& !$this->parseTimeUnit($buffer, $pos, $rule)	// time unit
+									&& !$this->parseTimeUnit($buffer, $pos, $rule)		// time unit
 									&& !$this->parseRgb($buffer, $pos, $rule)			// rgb
 									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
@@ -193,29 +193,32 @@ class CValidationRule {
 	/**
 	 * time_unit
 	 *
-	 * 'time_unit' => true
+	 * 'time_unit' =>  ['<value1>', ..., '<valueN>']
 	 */
-	private function parseTimeUnit($buffer, &$pos, &$rules) {
+	private function parseTimeUnit($buffer, &$pos, &$rules): bool {
+		$TIME_UNIT_LENGTH = mb_strlen('time_unit');
+		$TIME_UNIT_YEAR_LENGTH = mb_strlen('time_unit_year');
+
 		$values = [];
-		if (strncmp(substr($buffer, $pos), 'time_unit_year', 14) === 0) {
-			$pos += 14;
+		$ranges_string = '';
+		$ranges = [];
+
+		if (strncmp(substr($buffer, $pos), 'time_unit_year', $TIME_UNIT_YEAR_LENGTH) === 0) {
+			$pos += $TIME_UNIT_YEAR_LENGTH;
 			$values['with_year'] = true;
 		}
-		else if (strncmp(substr($buffer, $pos), 'time_unit', 9) === 0) {
-			$pos += 9;
+		else if (strncmp(substr($buffer, $pos), 'time_unit', $TIME_UNIT_LENGTH) === 0) {
+			$pos += $TIME_UNIT_LENGTH;
 		}
 		else {
 			return false;
 		}
 
-		while (isset($buffer[$pos]) && $buffer[$pos] == ' ') {
+		while (isset($buffer[$pos]) && $buffer[$pos] === ' ') {
 			$pos++;
 		}
 
-		$ranges_string = '';
-		$ranges = [];
-
-		while (isset($buffer[$pos]) && $buffer[$pos] != '|') {
+		while (isset($buffer[$pos]) && $buffer[$pos] !== '|') {
 			$ranges_string .= $buffer[$pos];
 			$pos++;
 		}
@@ -234,7 +237,7 @@ class CValidationRule {
 			}
 		}
 
-		if ($ranges !== []) {
+		if ($ranges) {
 			$values['ranges'] = $ranges;
 		}
 
