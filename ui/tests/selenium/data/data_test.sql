@@ -2790,11 +2790,11 @@ INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values 
 
 INSERT INTO lld_override_ophistory (lld_override_operationid, history) values (2, 0);
 
-INSERT INTO lld_override_opinventory (lld_override_operationid, inventory_mode) values (5, 0);
+INSERT INTO lld_override_opinventory (lld_override_operationid, inventory_mode) values (5, 1);
 
 INSERT INTO lld_override_opperiod (lld_override_operationid, delay) values (2, '1m;50s/1-7,00:00-24:00;wd1-5h9-18');
 
-INSERT INTO lld_override_opseverity (lld_override_operationid, severity) values (3, 0);
+INSERT INTO lld_override_opseverity (lld_override_operationid, severity) values (3, 2);
 
 INSERT INTO lld_override_opstatus (lld_override_operationid, status) values (2, 0);
 

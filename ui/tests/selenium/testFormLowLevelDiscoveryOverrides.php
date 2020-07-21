@@ -723,15 +723,15 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
 						'Create enabled' => 'Yes',
 						'Discover' => 'Yes',
-						'Update interval' => [
-							'Delay' => '1m',
-							'Custom intervals' => [
-								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
-								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
-							]
-						],
+//						'Update interval' => [
+//							'Delay' => '1m',
+//							'Custom intervals' => [
+//								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
+//								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
+//							]
+//						],
 						'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
-						'Trend storage period' => ['optrends_trends_mode' => 'Do not keep history']
+						'Trend storage period' => ['optrends_trends_mode' => 'Do not keep trends']
 					],
 					[
 						'Object' => 'Trigger prototype',
@@ -889,7 +889,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					}
 					$this->fillOverrideFilter($override);
 					$this->fillOverrideOperations($data, $override, $sources, $id);
-					$this->checkSubmittedOverlay($data['expected'], $override_overlay, CTestArrayHelper::get($override, 'error'));
+					$this->checkSubmittedOverlay($data['expected'], $override_overlay,
+							CTestArrayHelper::get($override, 'error'));
 
 					if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 						// Check that Override with correct name was added to Overrides table.
@@ -900,7 +901,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						// Check that Override in table has correct processing status.
 						$stop_processing = (CTestArrayHelper::get($override,
 								'fields.If filter matches') === 'Stop processing') ? 'Yes' : 'No';
-						$this->assertEquals($stop_processing, $override_container->getRow($i)->getColumn('Stop processing')->getText());
+						$this->assertEquals($stop_processing, $override_container->getRow($i)->getColumn('Stop processing')
+								->getText());
 					}
 					break;
 
@@ -953,7 +955,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		return $override_overlay;
 	}
 
-		/**
+	/**
 	 *
 	 * @param array         $data              data provider
 	 * @param array         $override          override fields from data
@@ -1161,10 +1163,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					$row = $operation_container->getRow($i);
 					$row->query('button:Edit')->one()->click();
 					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
-
-//					foreach ($operation['fields'] as $field => $value) {
-//						$operation_overlay->getField($field)->checkValue($value);
-//					}
+					$operation_overlay->checkValue(
+							array_key_exists('fields', $operation) ? $operation['fields'] : $operation
+					);
 
 					// Close Operation dialog.
 					$operation_overlay->submit();
