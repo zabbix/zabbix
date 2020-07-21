@@ -212,29 +212,30 @@ class CValidationRule {
 			$pos++;
 		}
 
-		$range_string = '';
+		$ranges_string = '';
+		$ranges = [];
 
 		while (isset($buffer[$pos]) && $buffer[$pos] != '|') {
-			$range_string .= $buffer[$pos];
+			$ranges_string .= $buffer[$pos];
 			$pos++;
 		}
 
-		if (isset($range_string[0]) && $range_string[0] === '0') {
-			if (isset($range_string[1])) {
-				if ($range_string[1] === ',') {
-					$range_string = substr($range_string, 2);
-					$values['allow_zero'] = true;
-				}
+		foreach (explode(',', $ranges_string) as $range_string) {
+			if (strpos($range_string, ':') !== false) {
+				[$from, $to] = explode(':', $range_string);
 			}
 			else {
-				$values['allow_zero'] = true;
+				$from = $range_string;
+				$to = $range_string;
+			}
+
+			if (ctype_digit($from) && ctype_digit($to)) {
+				$ranges[] = ['from' => $from, 'to' => $to];
 			}
 		}
 
-		$range = explode(':', $range_string);
-		if (count($range) === 2 && ctype_digit($range[0]) && ctype_digit($range[1])) {
-			$values['min'] = $range[0];
-			$values['max'] = $range[1];
+		if ($ranges !== []) {
+			$values['ranges'] = $ranges;
 		}
 
 		$rules['time_unit'] = $values;

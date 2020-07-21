@@ -496,17 +496,27 @@ class CNewValidator {
 					array_key_exists('with_year', $params) ? $params['with_year'] : false
 				);
 
-				$params['allow_zero'] = array_key_exists('allow_zero', $params) ? $params['allow_zero'] : false;
-				if ($params['allow_zero'] && $value == 0) {
-					return ['is_valid' => true];
-				}
+				if (array_key_exists('ranges', $params)) {
+					$in_range = false;
+					$message_ranges = [];
 
-				if (array_key_exists('min', $params) && array_key_exists('max', $params)
-						&& $value < $params['min'] || $value > $params['max']) {
-					return [
-						'is_valid' => false,
-						'error' => _s('value must be one of %1$s', ($params['allow_zero'] ? '0, ' : '').$params['min'].'-'.$params['max'])
-					];
+					foreach ($params['ranges'] as $range) {
+						if ($range['from'] <= $value && $value <= $range['to']) {
+							$in_range = true;
+							break;
+						}
+
+						$message_ranges[] = ($range['from'] == $range['to'])
+							?  $range['from']
+							:  $range['from'].'-'.$range['to'];
+					}
+
+					if (!$in_range) {
+						return [
+							'is_valid' => false,
+							'error' => _s('value must be one of %1$s', implode(', ', $message_ranges))
+						];
+					}
 				}
 			}
 		}
