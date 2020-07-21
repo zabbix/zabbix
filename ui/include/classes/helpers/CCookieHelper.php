@@ -55,8 +55,8 @@ class CCookieHelper {
 	 *
 	 * @static
 	 *
-	 * @param string $name
-	 * @param string $value
+	 * @param string  $name
+	 * @param string  $value
 	 * @param integer $time
 	 *
 	 * @return boolean

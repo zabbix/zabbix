@@ -157,8 +157,7 @@ class CMessageHelper {
 	/**
 	 * Initialize schedule messages.
 	 */
-	public static function initScheduleMessage(): void
-	{
+	public static function initScheduleMessage(): void {
 		if (self::$schedule_messages) {
 			if (array_key_exists('success', self::$schedule_messages)) {
 				self::setSuccessTitle(self::$schedule_messages['success']);
