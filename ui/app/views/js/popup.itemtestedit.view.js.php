@@ -140,7 +140,8 @@ function cleanPreviousTestResults() {
  * @param {object} overlay  Overlay dialog object.
  */
 function itemGetValueTest(overlay) {
-	var $form = overlay.$dialogue.find('form'),
+	var $body = overlay.$dialogue.$body,
+		$form = overlay.$dialogue.find('form'),
 		form_data = $form.serializeJSON(),
 		post_data = getItemTestProperties('#preprocessing-test-form'),
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
@@ -189,7 +190,7 @@ function itemGetValueTest(overlay) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore($form);
+				jQuery($body).prepend(ret.messages);
 			}
 			else {
 				<?php if ($data['show_prev']): ?>
@@ -219,7 +220,8 @@ function itemGetValueTest(overlay) {
  * @param {object} overlay  Overlay dialog object.
  */
 function itemCompleteTest(overlay) {
-	var $form = overlay.$dialogue.find('form'),
+	var $body = overlay.$dialogue.$body,
+		$form = overlay.$dialogue.find('form'),
 		form_data = $form.serializeJSON(),
 		post_data = getItemTestProperties('#preprocessing-test-form'),
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
@@ -274,7 +276,7 @@ function itemCompleteTest(overlay) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if (typeof ret.messages !== 'undefined') {
-				jQuery(ret.messages).insertBefore($form);
+				jQuery($body).prepend(ret.messages);
 			}
 
 			processItemPreprocessingTestResults(ret.steps);
