@@ -40,7 +40,8 @@ $filter = (new CFilter(new CUrl('applications.php')))
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
 							'with_hosts_and_templates' => 1,
-							'editable' => 1
+							'editable' => 1,
+							'enrich_parent_groups' => 1
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)

@@ -343,6 +343,12 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	}
 }
 
+form {
+	&.is-loading {
+		position: relative;
+	}
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -2543,16 +2549,18 @@ $icon-widget-btn: (
 	opacity: .5;
 	transition: opacity .2s ease-out;
 
-	&:hover {
-		@extend %btn-widget-hover-active;
-	}
-
-	&:focus {
-		@extend %btn-widget-hover-active;
-	}
-
+	&:hover,
+	&:focus,
 	&:active {
 		@extend %btn-widget-hover-active;
+	}
+
+	&[disabled],
+	&[disabled]:hover,
+	&[disabled]:focus,
+	&[disabled]:active {
+		background-color: transparent;
+		opacity: .25;
 	}
 }
 
@@ -3043,10 +3051,8 @@ $form-icon-btn: (
 	border-bottom: 0;
 	background-color: $ui-bg-color;
 
-	/*
-	 * For floating headers to appear over other widgets.
-	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-	 */
+	// For floating headers to appear over other widgets.
+	// Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
 	z-index: 3;
 
 	h4 {
@@ -3123,15 +3129,6 @@ $form-icon-btn: (
 	}
 }
 
-.widget-placeholder {
-	.dashbrd-grid-widget-container {
-		.dashbrd-grid-widget-content {
-			margin-top: 0;
-			height: 100%;
-		}
-	}
-}
-
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	top: .25rem;
@@ -3161,6 +3158,7 @@ $form-icon-btn: (
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+				z-index: 5;
 			}
 		}
 	}
@@ -3325,6 +3323,8 @@ $form-icon-btn: (
 	}
 
 	&.dashbrd-grid-iterator-focus {
+		z-index: 5;
+
 		.dashbrd-grid-iterator-head {
 			margin-top: -2rem;
 			height: 2rem;
@@ -4100,10 +4100,11 @@ $form-icon-btn: (
 		@extend %webkit-scrollbar;
 	}
 
-	.hintbox-description {
+	.hintbox-wrap {
 		overflow: auto;
 		max-height: 240px;
 		max-width: 800px;
+		overflow-wrap: break-word;
 		@extend %webkit-scrollbar;
 	}
 
@@ -5553,7 +5554,7 @@ a.overlay-close-btn {
 			animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear;
 		}
 
-		.delayed-15s {
+		&.delayed-15s {
 			&::before,
 			&::after {
 				animation-delay: 15s;
@@ -5794,10 +5795,6 @@ main {
 
 	&.is-loading {
 		min-height: 64px;
-
-		img {
-			opacity: 0;
-		}
 	}
 }
 
