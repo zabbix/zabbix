@@ -34,7 +34,7 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 		$api_service_factory = $this->createMock(CApiServiceFactory::class);
 		$api_service_factory->method('getObject')
 			->will($this->returnValueMap($instances_map));
-		
+
 		API::setApiServiceFactory($api_service_factory);
 	}
 
