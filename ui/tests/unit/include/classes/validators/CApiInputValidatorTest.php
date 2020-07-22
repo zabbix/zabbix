@@ -22,20 +22,21 @@
 class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 
 	public function setUp() {
-		$client_mock = $this->getMockBuilder('CLocalApiClient')
-			->setMethods(['callMethod'])
-			->getMock();
-		$client_mock->expects($this->any())->method('callMethod')
+		$settings = $this->createMock(CSettings::class);
+		$settings->method('get')
 			->will($this->returnValue([
 				CSettingsHelper::VALIDATE_URI_SCHEMES => '1',
 				CSettingsHelper::URI_VALID_SCHEMES => 'http,https,ftp,file,mailto,tel,ssh'
 			]));
 
-		API::setWrapper(new CApiWrapper($client_mock));
-	}
-
-	public function tearDown() {
-		API::setWrapper();
+		$instances_map = [
+			['settings', $settings]
+		];
+		$api_service_factory = $this->createMock('CApiServiceFactory');
+		$api_service_factory->method('getObject')
+			->will($this->returnValueMap($instances_map));
+		
+		API::setApiServiceFactory($api_service_factory);
 	}
 
 	public function dataProviderInput() {

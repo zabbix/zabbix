@@ -20,6 +20,23 @@
 
 
 class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
+	public function setUp() {
+		$settings = $this->createMock(CSettings::class);
+		$settings->method('get')
+			->will($this->returnValue([
+				CSettingsHelper::VALIDATE_URI_SCHEMES => '1',
+				CSettingsHelper::URI_VALID_SCHEMES => 'http,https,ftp,file,mailto,tel,ssh'
+			]));
+
+		$instances_map = [
+			['settings', $settings]
+		];
+		$api_service_factory = $this->createMock(CApiServiceFactory::class);
+		$api_service_factory->method('getObject')
+			->will($this->returnValueMap($instances_map));
+		
+		API::setApiServiceFactory($api_service_factory);
+	}
 
 	// Expected results are defined assuming that CSettingsHelper::VALIDATE_URI_SCHEMES is enabled (set to be 1).
 	public function providerValidateURL() {
