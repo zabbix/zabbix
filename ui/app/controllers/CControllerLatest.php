@@ -211,12 +211,12 @@ abstract class CControllerLatest extends CController {
 			CArrayHelper::sort($applications, [$application_sort_options]);
 			$applicationids = array_keys($applications);
 
-			$applications_size = [];
+			$stats = [];
 			$items_grouped = [];
 
 			foreach ($items as $itemid => $item) {
-				if (!array_key_exists($item['hostid'], $applications_size)) {
-					$applications_size[$item['hostid']] = [];
+				if (!array_key_exists($item['hostid'], $stats)) {
+					$stats[$item['hostid']] = [];
 				}
 
 				$item_applicationids = $item['applications']
@@ -230,11 +230,11 @@ abstract class CControllerLatest extends CController {
 
 					$items_grouped[$item['hostid']][$applicationid][$itemid] = $item;
 
-					if (array_key_exists($applicationid, $applications_size[$item['hostid']])) {
-						$applications_size[$item['hostid']][$applicationid]++;
+					if (array_key_exists($applicationid, $stats[$item['hostid']])) {
+						$stats[$item['hostid']][$applicationid]['total']++;
 					}
 					else {
-						$applications_size[$item['hostid']][$applicationid] = 1;
+						$stats[$item['hostid']][$applicationid]['total'] = 1;
 					}
 				}
 			}
@@ -289,7 +289,7 @@ abstract class CControllerLatest extends CController {
 			$rows = [];
 			$hosts = [];
 			$applications = [];
-			$applications_size = [];
+			$stats = [];
 			$history = [];
 		}
 
@@ -311,11 +311,57 @@ abstract class CControllerLatest extends CController {
 			'rows' => $rows,
 			'hosts' => $hosts,
 			'applications' => $applications,
-			'applications_size' => $applications_size,
+			'stats' => $stats,
 			'items' => $items,
 			'history' => $history,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
 			'multiselect_host_data' => $multiselect_host_data
 		];
+	}
+
+	/**
+	 * Function counts how many items for each application are left in previous and next pages.
+	 *
+	 * @param array $prepared_data  Array returned by self::prepareData and having 'rows' altered by paginator.
+	 * @param array $data_rows      Complete set of rows.
+	 */
+	protected function extendStatistics(array &$prepared_data, array $data_rows) {
+		$keys = array_keys($prepared_data['rows']);
+		$config = select_config();
+		$data_rows = array_slice($data_rows, 0, $config['search_limit']);
+		$rows_in_prev_pages = array_slice($data_rows, 0, $keys[0]);
+		$rows_in_next_pages = array_slice($data_rows, $keys[count($keys)-1] + 1);
+		$items_displayed = array_count_values(array_column($prepared_data['rows'], 'applicationid'));
+
+		foreach ($prepared_data['rows'] as $row) {
+			$item = $prepared_data['items'][$row['itemid']];
+
+			if (array_key_exists('before', $prepared_data['stats'][$item['hostid']][$row['applicationid']])) {
+				continue;
+			}
+			else {
+				$stats = &$prepared_data['stats'][$item['hostid']][$row['applicationid']];
+				$stats += [
+					'displayed' => $items_displayed[$row['applicationid']],
+					'not_selected' => 0,
+					'before' => 0,
+					'after' => 0
+				];
+			}
+
+			foreach ($rows_in_prev_pages as $prev_page_row) {
+				if ($prev_page_row['applicationid'] == $row['applicationid']) {
+					$stats['before']++;
+				}
+			}
+
+			foreach ($rows_in_next_pages as $next_page_row) {
+				if ($next_page_row['applicationid'] == $row['applicationid']) {
+					$stats['after']++;
+				}
+			}
+
+			$stats['not_selected'] = $stats['total'] - $stats['displayed'] - $stats['before'] - $stats['after'];
+		}
 	}
 }

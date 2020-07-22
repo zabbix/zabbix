@@ -113,9 +113,23 @@ foreach ($data['rows'] as $row) {
 			? $data['applications'][$row['applicationid']]['name']
 			: '- '.('other').' -';
 
-		$application_size = $data['applications_size'][$item['hostid']][$row['applicationid']];
+		$stats = $data['stats'][$item['hostid']][$row['applicationid']];
+		$texts = [_n('%1$s Item', '%1$s Items', $stats['displayed'])];
+		if ($stats['before'] > 0) {
+			$texts[] = ($stats['before'] > CWebUser::$data['rows_per_page'])
+				? _s('%1$s on previous pages', $stats['before'])
+				: _s('%1$s on previous page', $stats['before']);
+		}
+		if ($stats['after'] > 0) {
+			$texts[] = ($stats['after'] > CWebUser::$data['rows_per_page'])
+				? _s('%1$s on next pages', $stats['after'])
+				: _s('%1$s on next page', $stats['after']);
+		}
+		elseif ($stats['not_selected'] > 0) {
+			$texts[] = _s('%1$s not selected', $stats['not_selected']);
+		}
 
-		$col_name = (new CCol([bold($application_name), ' ('._n('%1$s Item', '%1$s Items', $application_size).')']))
+		$col_name = (new CCol([bold($application_name), ' ('.implode(', ', $texts).')']))
 			->setColSpan($table_columns - 2);
 
 		$toggle_app = (new CSimpleButton())
