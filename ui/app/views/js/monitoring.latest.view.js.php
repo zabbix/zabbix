@@ -141,13 +141,13 @@
 					);
 
 					if (!open_state) {
-						var	hostid = $(this).attr('data-host-id');
+						var	hostid = $(this).attr('data-hostid');
 
 						if (hostid) {
-							$('tr[parent_host_id=' + hostid + ']').hide();
+							$('tr[data-parent-hostid=' + hostid + ']').hide();
 						}
 						else {
-							$('tr[parent_app_id=' + $(this).attr('data-app-id') + ']').hide();
+							$('tr[data-parent-appid=' + $(this).attr('data-appid') + ']').hide();
 						}
 					}
 					else {
@@ -162,7 +162,7 @@
 				);
 
 				// Click event for main toggle (+-) button.
-				$('.app-list-toggle-all').click(function() {
+				$('.app-list-toggle-all').on('click', function() {
 					/*
 					 * This is for Opera browser with large tables, which renders table layout while showing/hiding
 					 * rows.
@@ -193,17 +193,17 @@
 								.removeClass(del_class)
 								.addClass(add_class);
 
-							var hostid = $(this).attr('data-host-id');
+							var hostid = $(this).attr('data-hostid');
 
 							if (hostid) {
-								$('tr[parent_host_id=' + hostid + ']').toggle(open_state);
+								$('tr[data-parent-hostid=' + hostid + ']').toggle(open_state);
 								hostids.push(hostid);
 							}
 							else {
-								var applicationid = $(this).attr('data-app-id');
+								var appid = $(this).attr('data-appid');
 
-								$('tr[parent_app_id=' + applicationid + ']').toggle(open_state);
-								applicationids.push(applicationid);
+								$('tr[data-parent-appid=' + appid + ']').toggle(open_state);
+								applicationids.push(appid);
 							}
 						}
 					});
@@ -223,7 +223,7 @@
 				});
 
 				// Click event for every toggle (+-) button.
-				$('.app-list-toggle').click(function() {
+				$('.app-list-toggle').on('click', function() {
 					var open_state = ($(this).data('open-state') === 0),
 						del_class = (open_state)
 							? '<?= ZBX_STYLE_ARROW_RIGHT ?>'
@@ -258,17 +258,17 @@
 							.addClass(add_class);
 					}
 
-					var hostid = $(this).attr('data-host-id');
+					var hostid = $(this).attr('data-hostid');
 
 					if (hostid) {
-						$('tr[parent_host_id=' + hostid + ']').toggle(open_state);
+						$('tr[data-parent-hostid=' + hostid + ']').toggle(open_state);
 						updateUserProfile('web.latest.toggle_other', Number(open_state), [hostid]);
 					}
 					else {
-						var applicationid = $(this).attr('data-app-id');
+						var appid = $(this).attr('data-appid');
 
-						$('tr[parent_app_id=' + applicationid + ']').toggle(open_state);
-						updateUserProfile('web.latest.toggle', Number(open_state), [applicationid]);
+						$('tr[data-parent-appid=' + appid + ']').toggle(open_state);
+						updateUserProfile('web.latest.toggle', Number(open_state), [appid]);
 					}
 				});
 			}

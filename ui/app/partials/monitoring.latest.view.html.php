@@ -41,8 +41,16 @@ $view_url = $data['view_curl']->getUrl();
 $col_host = make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url);
 $col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url);
 
+$col_toggle_all = (new CColHeader(
+	(new CSimpleButton())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->addClass('app-list-toggle-all')
+			->addItem(new CSpan())
+));
+
 if ($data['filter']['show_details']) {
 	$table->setHeader([
+		$col_toggle_all->addStyle('width: 18px'),
 		$col_check_all->addStyle('width: 15px;'),
 		$col_host->addStyle('width: 13%'),
 		$col_name->addStyle('width: 21%'),
@@ -61,6 +69,7 @@ if ($data['filter']['show_details']) {
 }
 else {
 	$table->setHeader([
+		$col_toggle_all->addStyle('width: 18px'),
 		$col_check_all->addStyle('width: 15px'),
 		$col_host->addStyle('width: 17%'),
 		$col_name->addStyle('width: 40%'),
@@ -109,7 +118,23 @@ foreach ($data['rows'] as $row) {
 		$col_name = (new CCol([bold($application_name), ' ('._n('%1$s Item', '%1$s Items', $application_size).')']))
 			->setColSpan($table_columns - 2);
 
-		$table->addRow(['', $col_host, $col_name]);
+		$toggle_app = (new CSimpleButton())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->addClass('app-list-toggle')
+			->addItem(new CSpan());
+
+		if ($row['applicationid']) {
+			$toggle_app
+				->setAttribute('data-open-state', CProfile::get('web.latest.toggle', null, $row['applicationid']))
+				->setAttribute('data-appid', $row['applicationid']);
+		}
+		else {
+			$toggle_app
+				->setAttribute('data-open-state', CProfile::get('web.latest.toggle_other', null, $host['hostid']))
+				->setAttribute('data-hostid', $item['hostid']);
+		}
+
+		$table->addRow([$toggle_app, '', $col_host, $col_name]);
 
 		$last_hostid = $item['hostid'];
 		$last_applicationid = $row['applicationid'];
@@ -240,7 +265,8 @@ foreach ($data['rows'] as $row) {
 			$item_icons[] = makeErrorIcon($item['error']);
 		}
 
-		$row = new CRow([
+		$table_row = new CRow([
+			'',
 			$checkbox,
 			'',
 			(new CCol([$item_name, $item_key]))->addClass($state_css),
@@ -256,7 +282,8 @@ foreach ($data['rows'] as $row) {
 		]);
 	}
 	else {
-		$row = new CRow([
+		$table_row = new CRow([
+			'',
 			$checkbox,
 			'',
 			(new CCol($item_name))->addClass($state_css),
@@ -267,7 +294,14 @@ foreach ($data['rows'] as $row) {
 		]);
 	}
 
-	$table->addRow($row);
+	if ($row['applicationid']) {
+		$table_row->setAttribute('data-parent-appid', $row['applicationid']);
+	}
+	else {
+		$table_row->setAttribute('data-parent-hostid', $item['hostid']);
+	}
+
+	$table->addRow($table_row);
 }
 
 $form->addItem([
