@@ -30,6 +30,20 @@ class CTabFilter extends CDiv {
 	];
 
 	/**
+	 * Zero based index of selected tab.
+	 *
+	 * @var int
+	 */
+	public $selected = 3;
+
+	/**
+	 * Expanded or collapsed state of selected tab.
+	 *
+	 * @var bool
+	 */
+	public $expanded = true;
+
+	/**
 	 * Tab form available buttons node. Will be initialized during __construct but can be overwritten if needed.
 	 */
 	public $buttons = null;
@@ -115,7 +129,6 @@ class CTabFilter extends CDiv {
 
 		if ($content) {
 			$content->setId($targetid);
-			$content->addClass('display-none');
 		}
 
 		$this->labels[] = $label;
@@ -123,6 +136,26 @@ class CTabFilter extends CDiv {
 		$this->options['data'][] = $data;
 
 		return $this;
+	}
+
+	/**
+	 * Add time range selector tab. Time range selcetor have static [data-target] equal 'tabfilter_timeselector'.
+	 *
+	 * @param string $from         Time range start.
+	 * @param string $to           Time range end.
+	 * @param string $date_format  Date selector format.
+	 */
+	public function addTimeselector($from, $to, $date_format = ZBX_FULL_DATE_TIME) {
+		$data = [
+			'format' => $date_format,
+			'label' => relativeDateToText($from, $to),
+			'from' => $from,
+			'to' => $to
+		];
+
+		$content = (new CDiv(new CPartial('timeselector.filter', $data)))->setId(static::CSS_ID_PREFIX.'timeselector');
+
+		return $this->addTab($data['label'], $content);
 	}
 
 	/**
@@ -143,51 +176,81 @@ class CTabFilter extends CDiv {
 	 * Return top navigation markup.
 	 */
 	protected function getNavigation() {
-		$home = reset($this->labels);
-		$sortable = (new CList(array_slice($this->labels, 1)))->addClass(static::CSS_TAB_SORTABLE_CONTAINER);
+		$sortable = [];
+		$static = [];
+
+		foreach ($this->labels as $index => $label) {
+			if ($this->contents[$index] === null) {
+				$sortable[$index] = $label;
+			}
+			else {
+				$static[$index] = $label;
+			}
+		}
+
+		// First dynamic tab is 'Home' tab and cannot be sorted.
+		$home = array_shift($sortable);
+		// Last static tab is timeselector.
+		$timeselector = end($static);
+		$index = key($static);
+
+		if (is_a($this->contents[$index], CTag::class)
+				&& $this->contents[$index]->getId() === static::CSS_ID_PREFIX.'timeselector') {
+			$timeselector = array_pop($static);
+		}
+		else {
+			$timeselector = null;
+		}
+
 		$nav = [
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectPrevTab')
 				->addClass('btn-iterator-page-previous'),
-			$home, $sortable,
+			$home,
+			(new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER),
+			$static,
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
 				->addClass('btn-widget-expand'),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass('btn-iterator-page-next'),
-			(new CSimpleButton('Timeselector tab goes here')),
-			(new CSimpleButton())
-				->setEnabled(false)
-				->addClass(ZBX_STYLE_BTN_TIME_LEFT),
-			(new CSimpleButton(_('Zoom out')))
-				->setEnabled(false)
-				->addClass(ZBX_STYLE_BTN_TIME_OUT),
-			(new CSimpleButton())
-				->setEnabled(false)
-				->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
 		];
+
+		if ($timeselector) {
+			$nav = array_merge($nav, [
+				$timeselector,
+				(new CSimpleButton())
+					->setEnabled(false)
+					->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+				(new CSimpleButton(_('Zoom out')))
+					->setEnabled(false)
+					->addClass(ZBX_STYLE_BTN_TIME_OUT),
+				(new CSimpleButton())
+					->setEnabled(false)
+					->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+			]);
+		}
 
 		return new CTag('nav', true , new CList($nav));
 	}
 
 	public function bodyToString() {
-		$tab_active = 0;
-		$is_expanded = 1;
-		$this->labels[$tab_active]->addClass(static::CSS_TAB_ACTIVE);
+		$this->labels[$this->selected]->addClass(static::CSS_TAB_ACTIVE);
+		$nav = $this->getNavigation();
 
-		if ($is_expanded) {
-			if ($this->contents[$tab_active] === null) {
-				$tab_data = $this->options['data'][$tab_active];
+		if ($this->expanded) {
+			if ($this->contents[$this->selected] === null) {
+				$tab_data = $this->options['data'][$this->selected];
 				$tab_data['render_html'] = true;
-				$this->contents[$tab_active] = (new CDiv([new CPartial($tab_data['template'], $tab_data)]))
-					->setId($this->labels[$tab_active]->getAttribute('data-target'));
+				$this->contents[$this->selected] = (new CDiv([new CPartial($tab_data['template'], $tab_data)]))
+					->setId($this->labels[$this->selected]->getAttribute('data-target'));
 			}
 		}
 
 		foreach ($this->contents as $index => $content) {
 			if (is_a($content, CTag::class)) {
-				$content->addClass($index == $tab_active ? null : 'display-none');
+				$content->addClass($index == $this->selected ? null : 'display-none');
 			}
 		}
 
@@ -198,7 +261,7 @@ class CTabFilter extends CDiv {
 		}
 
 		return implode('', [
-			$this->getNavigation(),
+			$nav,
 			(new CDiv($this->contents))->addClass('tabfilter-tabs-container'),
 			$this->buttons,
 			$templates,

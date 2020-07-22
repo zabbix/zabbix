@@ -87,7 +87,9 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	renderContentTemplate() {
-		this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
+		if (this._template) {
+			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
+		}
 	}
 
 	select() {

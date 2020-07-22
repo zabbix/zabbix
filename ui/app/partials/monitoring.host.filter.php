@@ -150,7 +150,9 @@ $template = (new CDiv())
 		(new CDiv($left_column))->addClass(ZBX_STYLE_CELL),
 		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
 	]);
-$template = (new CForm('get'))->addItem($template);
+$template = (new CForm('get'))
+	->cleanItems()
+	->addItem($template);
 
 if (array_key_exists('render_html', $data)) {
 	/**

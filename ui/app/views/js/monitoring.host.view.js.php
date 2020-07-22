@@ -71,8 +71,8 @@
 				$('[name="save_as"],[name="filter_set"]').hide()
 					.filter(is_sortable ? '[name="filter_set"]' : '[name="save_as"]').show();
 
-				if (!is_init) {
-					// Initialize tab content components only once.
+				if (!is_init || typeof item._template === 'undefined') {
+					// Initialize tab content components only once and only for dynamic tabs.
 					return;
 				}
 

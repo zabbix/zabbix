@@ -123,6 +123,11 @@ class CTabFilter extends CBaseComponent {
 				var dropdown = [{items: []}, {items: []}];
 
 				this._items.forEach((item, index) => {
+					// List only dynamic tabs in dropdown.
+					if (typeof item._template === 'undefined') {
+						return;
+					}
+
 					dropdown[index ? 1 : 0].items.push({
 						label: index ? item._data.name : t('Home'),
 						clickCallback: (ev) => this._items[index].select()
