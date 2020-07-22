@@ -20,7 +20,7 @@
 **/
 
 
-$fields = $data['fields'] + $data['default'];
+$fields = $data['filter'];
 $filter_tags_table = (new CTable())
 	->setId('filter_tags_#{uniqid}')
 	->addRow(
@@ -78,7 +78,7 @@ $left_column = (new CFormList())
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => 'hostGroup',
-			'data' => array_key_exists('groups_multiselect', $data['data']) ? $data['data']['groups_multiselect'] : [],
+			'data' => array_key_exists('groups_multiselect', $data) ? $data['groups_multiselect'] : [],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -150,7 +150,7 @@ $template = (new CDiv())
 		(new CDiv($left_column))->addClass(ZBX_STYLE_CELL),
 		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
 	]);
-$template = (new CForm())->addItem($template);
+$template = (new CForm('get'))->addItem($template);
 
 if (array_key_exists('render_html', $data)) {
 	/**

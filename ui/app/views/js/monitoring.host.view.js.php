@@ -57,20 +57,28 @@
 			this.filter.afterTabContentRender = this.afterTabContentRender.bind(this);
 
 			if (this.filter._active_item) {
-				this.afterTabContentRender(this.filter._active_item);
+				this.afterTabContentRender(this.filter._active_item, true);
 			}
 		}
 
 		hostPage.prototype = {
-			afterTabContentRender: function (item) {
+			afterTabContentRender: function (item, is_init) {
 				let data = item._data,
-					fields = $.extend({}, data.default, data.fields);
+					is_sortable = $(item._target).closest('.ui-sortable').length > 0,
+					content = item._content_container;
 
-				var content = item._content_container;
+				// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
+				$('[name="save_as"],[name="filter_set"]').hide()
+					.filter(is_sortable ? '[name="filter_set"]' : '[name="save_as"]').show();
+
+				if (!is_init) {
+					// Initialize tab content components only once.
+					return;
+				}
 
 				// Host groups multiselect.
 				$('#filter_groupids_' + data.uniqid, content).multiSelectHelper({
-					id: 'filter_groupids_' + data.uniqid, content,
+					id: 'filter_groupids_' + data.uniqid,
 					object_name: 'hostGroup',
 					name: 'filter_groupids[]',
 					data: data.groups_multiselect||[],
@@ -92,7 +100,7 @@
 				var tag_row = new Template($('#filter-tag-row-tmpl').html()),
 					i = 0;
 
-				fields.tags.forEach(tag => {
+				data.filter.tags.forEach(tag => {
 					var $row = $(tag_row.evaluate({rowNum: i++}));
 
 					$row.find('[name$="[tag]"]').val(tag.tag);

@@ -49,11 +49,7 @@ class CTabFilter extends CBaseComponent {
 			container = containers.querySelector('#'+title.getAttribute('data-target'));
 
 			if (!container) {
-				container = document.createElement('form');
-				container.setAttribute('id', title.getAttribute('data-target'));
-				container.setAttribute('method', 'get');
-				// TODO: add action and other filter tab specific input variables except data
-				container.classList.add('display-none');
+				container = this.createTabContainer(title.getAttribute('data-target'));
 				containers.appendChild(container);
 			}
 
@@ -128,7 +124,7 @@ class CTabFilter extends CBaseComponent {
 
 				this._items.forEach((item, index) => {
 					dropdown[index ? 1 : 0].items.push({
-						label: index ? item._data.label : t('Home'),
+						label: index ? item._data.name : t('Home'),
 						clickCallback: (ev) => this._items[index].select()
 					})
 				});
@@ -166,6 +162,15 @@ class CTabFilter extends CBaseComponent {
 				item.fire(TABFILTERITEM_EVENT_COLLAPSE)
 			}
 		}
+	}
+
+	createTabContainer(targetid) {
+		let container = document.createElement('div');
+
+		container.setAttribute('id', targetid);
+		container.classList.add('display-none');
+
+		return container;
 	}
 
 	afterTabContentRender(tabitem, is_init) {

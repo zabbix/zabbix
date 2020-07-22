@@ -43,18 +43,16 @@ $widget = (new CWidget())
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = new CTabFilter();
 	$filter->setId('monitoringhostsfilter');
+	$filter->addTemplate(new CPartial($data['filter_template'], [
+		'filter' => $data['filter_defaults']
+	]));
 
 	foreach ($data['filter_tabs'] as $tab) {
-		$filter->addTemplate(new CPartial($tab['template'], ['fields' => []] + $tab));
-		$filter->addTemplatedTab($tab['label'], $tab);
-
-		$tab['label'] = 'Test tab 2';
-		$filter->addTemplatedTab($tab['label'], $tab);
-
-		$tab['label'] = 'Demo';
-		$filter->addTemplatedTab($tab['label'], $tab);
+		$tab['template'] = $data['filter_template'];
+		$filter->addTemplatedTab($tab['name'], $tab);
 	}
 
+	// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
 	$data['filter_options'] = $filter->options;
 
 	$widget->addItem($filter);

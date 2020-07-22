@@ -180,8 +180,7 @@ class CTabFilter extends CDiv {
 			if ($this->contents[$tab_active] === null) {
 				$tab_data = $this->options['data'][$tab_active];
 				$tab_data['render_html'] = true;
-				$this->contents[$tab_active] = (new CForm('get'))
-					->addItem(new CPartial($tab_data['template'], $tab_data))
+				$this->contents[$tab_active] = (new CDiv([new CPartial($tab_data['template'], $tab_data)]))
 					->setId($this->labels[$tab_active]->getAttribute('data-target'));
 			}
 		}
