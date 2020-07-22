@@ -180,11 +180,3 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfo, err error) {
 	}
 	return
 }
-
-func init() {
-	plugin.RegisterMetrics(&impl, "VfsFs",
-		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics.",
-		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
-	)
-}

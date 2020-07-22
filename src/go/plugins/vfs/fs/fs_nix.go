@@ -22,18 +22,51 @@
 package vfsfs
 
 import (
+	"bufio"
 	"errors"
+	"io"
+	"os"
+	"strings"
 
 	"golang.org/x/sys/unix"
-	"zabbix.com/pkg/plugin"
 )
 
 func (p *Plugin) getFsInfoStats() (data []*FsInfo, err error) {
 	return nil, errors.New("Unsupported item key.")
 }
 
+func (p *Plugin) readMounts(file io.Reader) (data []*FsInfo, err error) {
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		mnt := strings.Split(line, " ")
+		if len(mnt) < 3 {
+			p.Debugf(`cannot discern the mount in given line: %s`, line)
+			continue
+		}
+		data = append(data, &FsInfo{FsName: &mnt[1], FsType: &mnt[2]})
+	}
+
+	if err = scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return
+}
+
 func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
-	return nil, errors.New("Unsupported item key.")
+	file, err := os.Open("/proc/mounts")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	data, err = p.readMounts(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func getFsStats(path string) (stats *FsStats, err error) {
@@ -55,10 +88,4 @@ func getFsStats(path string) (stats *FsStats, err error) {
 	}
 
 	return
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "VfsFs",
-		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
-	)
 }
