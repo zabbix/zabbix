@@ -74,8 +74,8 @@ class CHistoryManager {
 				'SELECT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-				' GROUP BY itemid'.
-					($period ? ' HAVING MAX(clock)>'.$period : '')
+					($period ? ' AND clock>'.$period : '').
+				' GROUP BY itemid'
 			), 'itemid');
 
 			$results += array_intersect_key($items, array_flip($type_results));

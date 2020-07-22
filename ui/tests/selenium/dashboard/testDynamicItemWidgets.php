@@ -184,10 +184,10 @@ class testDynamicItemWidgets extends CWebTest {
 					'widgets' => [
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H3I1'],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G1 (I1)'],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
 						[
@@ -230,13 +230,13 @@ class testDynamicItemWidgets extends CWebTest {
 					'host_filter' => 'Host for suppression',
 					'widgets' => [
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
-						['type' => 'Graph (classic)', 'header' => ''],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
-						['type' => 'Graph (classic)', 'header' => ''],
-						['type' => 'Graph (classic)', 'header' => ''],
-						['type' => 'Graph (classic)', 'header' => ''],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						[
 							'type' => 'Plain text',
 							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
@@ -309,7 +309,7 @@ class testDynamicItemWidgets extends CWebTest {
 
 		foreach ($data as $key => $expected) {
 			$widget = $widgets->get($key);
-			$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+			$widget->waitUntilReady();
 			$widget_content = $widget->getContent();
 			$this->assertEquals($expected['header'], $widget->getHeaderText());
 

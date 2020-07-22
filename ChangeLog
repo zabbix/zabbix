@@ -1,6 +1,10 @@
 Changes for 5.2.0alpha1
 
 New features:
+.........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
+.......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
+.......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
+........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 A.F.....S. [ZBXNEXT-3362] added ability to set the default system language (agriscenko)
 ...G...... [ZBXNEXT-6044] added native support in agent2 for https key for net.tcp.service/.perf (esneiders)
 ...G...... [ZBXNEXT-6034] added native support of key 'ldap' for item 'net.tcp.service/.perf' to Agent2 (esneiders)
@@ -26,6 +30,37 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5880] added component version item to server and proxy remote monitoring templates (vjaceslavs)
 
 Bug fixes:
+..F....... [ZBX-18036] fixed endpoint URL for Elasticsearch API requests (miks)
+..F....... [ZBX-18068] fixed incorrect function call and redundant code (miks)
+...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
+........S. [ZBX-18014] fixed memory leak when action message does not have to be sent (viktors)
+..F....... [ZBX-15117] fixed graph configuration with large amount of items (talbergs)
+..F....... [ZBX-17820] fixed classic graph widget default header (talbergs)
+........S. [ZBX-18069] fixed server exit when trying to execute IPMI script without IPMI pollers (wiper)
+..F....... [ZBX-18025] fixed availability report link (talbergs)
+..F....... [ZBX-17977] fixed port filter not preserved in Monitoring -> Hosts across refresh (talbergs)
+A......... [ZBX-17960] fixed undefined index in trends API (talbergs)
+..F....... [ZBX-18032] fixed host address and port values are not preserved in item test form (talbergs)
+..F....... [ZBX-18031] fixed missing "loading" state in Monitoring → Latest data and Monitoring → Hosts (talbergs)
+A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
+..F....... [ZBX-17925] fixed graph image flicker during update in screens (talbergs)
+.........T [ZBX-18054] changed preprocessing for nginx.version (mchudinov)
+A.F....... [ZBX-17825] fixed dynamic item switching for graph prototype widget (talbergs)
+.........T [ZBX-17903] fixed the trigger condition for net.if.status in "Template Module Windows network", changed the wmi query in the master item, filters and preprocessing of LLD rule (mchudinov)
+.........T [ZBX-17994] fixed the configuration example in documentation of Template App Nginx (mchudinov)
+..F....... [ZBX-17682] fixed button disable state in template item list and discovery list (rlataria)
+..F....... [ZBX-17821] fixed default header for inaccessible iterator widget content (talbergs)
+..F....... [ZBX-17858] fixed host group filter in templates general popup (miks)
+..F....... [ZBX-18001] fixed graph prototype widget paging (miks)
+..F....... [ZBX-17924] fixed php errors in "System information" window for MySQL (talbergs)
+..F....... [ZBX-17997] fixed user media passwords appearing in plain text in audit log (kustalovs)
+..F....... [ZBX-17968] fixed z-index issue in floating widget header (rlataria)
+..F....... [ZBX-17827] fixed broken layout of the notification popup window (kustalovs)
+A.F....... [ZBX-18009] fixed non-masked secret macros in audit log (kustalovs)
+..F....... [ZBX-17908] fixed too wide popup error messages (kustalovs)
+..F....... [ZBX-17782] fixed PHP errors occurring during history search using Elasticsearch (Ivo)
+...G...... [ZBX-17917] changed vm.memory.size keys on Solaris to get memory usage statistics from kstat (wiper)
+...G...... [ZBX-18029] fixed cpu counter wraparound handling on Solaris (wiper)
 A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
 .......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
 A.F....... [ZBX-17715] fixed filtering and sorting of the Latest Data (averza)
@@ -119,8 +154,42 @@ A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed
 Changes for 5.0.3rc1
 
 New features:
+.........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
+.......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
+.......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
+........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-18036] fixed endpoint URL for Elasticsearch API requests (miks)
+..F....... [ZBX-18068] fixed incorrect function call and redundant code (miks)
+...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
+........S. [ZBX-18014] fixed memory leak when action message does not have to be sent (viktors)
+..F....... [ZBX-15117] fixed graph configuration with large amount of items (talbergs)
+........S. [ZBX-18069] fixed server exit when trying to execute IPMI script without IPMI pollers (wiper)
+..F....... [ZBX-17820] fixed classic graph widget default header (talbergs)
+..F....... [ZBX-18025] fixed availability report link (talbergs)
+..F....... [ZBX-17977] fixed port filter not preserved in Monitoring -> Hosts across refresh (talbergs)
+A......... [ZBX-17960] fixed undefined index in trends API (talbergs)
+..F....... [ZBX-18032] fixed host address and port values are not preserved in item test form (talbergs)
+..F....... [ZBX-18031] fixed missing "loading" state in Monitoring → Latest data and Monitoring → Hosts (talbergs)
+..F....... [ZBX-17925] fixed graph image flicker during update in screens (talbergs)
+A.F....... [ZBX-17825] fixed dynamic item switching for graph prototype widget (talbergs)
+.........T [ZBX-18054] changed preprocessing for nginx.version (mchudinov)
+.........T [ZBX-17903] fixed the trigger condition for net.if.status in "Template Module Windows network", changed the wmi query in the master item, filters and preprocessing of LLD rule (mchudinov)
+.........T [ZBX-17994] fixed the configuration example in documentation of Template App Nginx (mchudinov)
+..F....... [ZBX-17682] fixed button disable state in template item list and discovery list (rlataria)
+..F....... [ZBX-17821] fixed default header for inaccessible iterator widget content (talbergs)
+..F....... [ZBX-17858] fixed host group filter in templates general popup (miks)
+..F....... [ZBX-18001] fixed graph prototype widget paging (miks)
+..F....... [ZBX-17924] fixed php errors in "System information" window for MySQL (talbergs)
+..F....... [ZBX-17997] fixed user media passwords appearing in plain text in audit log (kustalovs)
+..F....... [ZBX-17968] fixed z-index issue in floating widget header (rlataria)
+..F....... [ZBX-17827] fixed broken layout of the notification popup window (kustalovs)
+A.F....... [ZBX-18009] fixed non-masked secret macros in audit log (kustalovs)
+..F....... [ZBX-17908] fixed too wide popup error messages (kustalovs)
+..F....... [ZBX-17782] fixed PHP errors occurring during history search using Elasticsearch (Ivo)
+...G...... [ZBX-17917] changed vm.memory.size keys on Solaris to get memory usage statistics from kstat (wiper)
+...G...... [ZBX-18029] fixed cpu counter wraparound handling on Solaris (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.2
@@ -147,6 +216,7 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
 .......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
 A.F....... [ZBX-17715] fixed filtering and sorting of the Latest Data (averza)
@@ -1704,8 +1774,20 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.23rc1
 
 New features:
+.......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
+.......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
 
 Bug fixes:
+...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
+........S. [ZBX-18014] fixed memory leak when action message does not have to be sent (viktors)
+..F....... [ZBX-15117] fixed graph configuration with large amount of items (talbergs)
+........S. [ZBX-18069] fixed server exit when trying to execute IPMI script without IPMI pollers (wiper)
+A......... [ZBX-17960] fixed undefined index in trends API (talbergs)
+..F....... [ZBX-17682] fixed button disable state in template item list and discovery list (rlataria)
+..F....... [ZBX-17820] fixed classic graph widget default header (talbergs)
+..F....... [ZBX-17924] fixed php errors in "System information" window for MySQL (talbergs)
+...G...... [ZBX-17917] changed vm.memory.size keys on Solaris to get memory usage statistics from kstat (wiper)
+...G...... [ZBX-18029] fixed cpu counter wraparound handling on Solaris (wiper)
 .......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
 A.F....... [ZBX-17860] fixed host prototype import (rlataria)
 ...G...... [ZBX-17922] removed mtime check when matching files on disk with the cached list, this should reduce chances of log files being scanned again after system time changes (wiper)
@@ -1722,6 +1804,7 @@ New features:
 ........S. [ZBXNEXT-3588] improved Zabbix server performance when evaluating trigger, discovery, autoregistration and internal actions (vso)
 
 Bug fixes:
+..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 .......PS. [ZBX-17720] exclude disabled items from preprocessing configuration sync (wiper)
 ........S. [ZBX-17851] fixed possible deadlocks when deleting escalations (wiper)
 .....J.... [ZBX-17406] fixed null value for a field of CompositeData in JMX discovery (arimdjonoks)
@@ -4613,6 +4696,7 @@ Changes for 3.0.32rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.31

@@ -140,7 +140,7 @@ func TitleMessage() string {
 }
 
 func Display() {
-	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), LongStr())
+	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
 	fmt.Printf("Revision %s %s, compilation time: %s %s\n\n", Revision(), RevDate(), CompileDate(), CompileTime())
 	fmt.Println(CopyrightMessage())
 }
