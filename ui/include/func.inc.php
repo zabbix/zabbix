@@ -1662,7 +1662,9 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
  * @return array
  */
 function filter_messages(array $messages = []) {
-	if (!CSettingsHelper::get(CSettingsHelper::SHOW_TECHNICAL_ERRORS) && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+	if (!CSettingsHelper::get(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
+			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN
+			&& !CWebUser::getDebugMode()) {
 		$filtered_messages = [];
 		$generic_exists = false;
 

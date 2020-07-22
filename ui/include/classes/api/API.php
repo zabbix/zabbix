@@ -38,7 +38,7 @@ class API {
 	/**
 	 * Sets the API wrapper.
 	 *
-	 * @param CApiWrapper $wrapper
+	 * @param CApiWrapper|null $wrapper
 	 */
 	public static function setWrapper(CApiWrapper $wrapper = null) {
 		self::$wrapper = $wrapper;
@@ -56,7 +56,7 @@ class API {
 	/**
 	 * Returns the API wrapper.
 	 *
-	 * @return CApiWrapper
+	 * @return CApiWrapper|null
 	 */
 	public static function getWrapper() {
 		return self::$wrapper;

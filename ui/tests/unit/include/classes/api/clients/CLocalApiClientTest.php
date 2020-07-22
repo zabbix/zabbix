@@ -67,14 +67,6 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			// no params
 			['Apiinfo', 'Version', null, null,
 				ZBX_API_ERROR_PARAMETERS, 'Cannot call method "Apiinfo.Version" without parameters.'
-			],
-			// unnecessary auth token
-			['Settings', 'getdefaultlang', [], '',
-				ZBX_API_ERROR_PARAMETERS, 'The "Settings.getdefaultlang" method must be called without the "auth" parameter.'
-			],
-			// no params
-			['Settings', 'getdefaultlang', null, null,
-				ZBX_API_ERROR_PARAMETERS, 'Cannot call method "Settings.getdefaultlang" without parameters.'
 			]
 		];
 	}
@@ -94,22 +86,11 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			'debug_mode' => false
 		]));
 
-		$settingMock = $this->getMockBuilder('CSettings')
-			->setMethods(['getdefaultlang'])
-			->getMock();
-
-		$settingMock->expects($this->any())->method('getdefaultlang')->will($this->returnValue([
-			'default_lang' => 'en_GB'
-		]));
-
 		$this->client->setServiceFactory(new CRegistryFactory([
 			'host' => 'CHost',
 			'apiinfo' => 'CAPIInfo',
 			'user' => function() use ($userMock) {
 				return $userMock;
-			},
-			'settings' => function() use ($settingMock) {
-				return $settingMock;
 			}
 		]));
 

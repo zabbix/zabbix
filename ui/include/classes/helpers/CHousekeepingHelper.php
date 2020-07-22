@@ -60,7 +60,7 @@ class CHousekeepingHelper extends CConfigGeneralHelper {
 	 */
 	protected static function loadParams(): void {
 		if (!self::$params) {
-			self::$params = API::Housekeeping()->get(['output' => 'extend']);
+			self::$params = API::getApiService('housekeeping')->get(['output' => 'extend']);
 		}
 	}
 }
