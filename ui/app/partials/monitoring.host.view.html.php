@@ -27,15 +27,15 @@ $url = (new CUrl('zabbix.php'))
 
 $table = (new CTableInfo());
 
-$view_url = $data['filter']['view_curl']->getUrl();
+$view_url = $data['view_curl']->getUrl();
 
 $table->setHeader([
-	make_sorting_header(_('Name'), 'name', $data['filter']['sort'], $data['filter']['sortorder'], $view_url),
+	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
 	(new CColHeader(_('Interface'))),
 	(new CColHeader(_('Availability'))),
 	(new CColHeader(_('Tags'))),
 	(new CColHeader(_('Problems'))),
-	make_sorting_header(_('Status'), 'status', $data['filter']['sort'], $data['filter']['sortorder'], $view_url),
+	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url),
 	(new CColHeader(_('Latest data'))),
 	(new CColHeader(_('Problems'))),
 	(new CColHeader(_('Graphs'))),
@@ -81,9 +81,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$maintenance_icon = '';
 
 	if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-		if (array_key_exists('maintenance', $host)) {
-			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $host['maintenance']['name'],
-				$host['maintenance']['description']
+		if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+			$maintenance = $data['maintenances'][$host['maintenanceid']];
+			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+				$maintenance['description']
 			);
 		}
 		else {
