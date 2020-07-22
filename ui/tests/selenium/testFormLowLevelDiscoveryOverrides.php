@@ -109,6 +109,66 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					'overrides' => [
 						[
 							'fields' => [
+								'Name' => 'Override without actions'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Trigger prototype'
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override without actions'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Graph prototype'
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override without actions'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Host prototype'
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
 								'Name' => 'Override with empty tags'
 							],
 							'Operations' => [
@@ -209,8 +269,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									]
 								]
 							],
-							'error' => 'Item will not be refreshed. '.
-									'Specified update interval requires having at least one either flexible or scheduling interval.'
+							'error' => 'Item will not be refreshed. Specified update interval requires '.
+									'having at least one either flexible or scheduling interval.'
 						]
 					]
 				]
@@ -233,8 +293,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									]
 								]
 							],
-							'error' => 'Item will not be refreshed. '.
-									'Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+							'error' => 'Item will not be refreshed. Update interval should be between 1s and 1d. '.
+									'Also Scheduled/Flexible intervals can be used.'
 						]
 					]
 				]
@@ -255,7 +315,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Update interval' => [
 										'Delay' => '50m',
 										'Custom intervals' => [
-											['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '', 'period' => '1-5,01:01-13:05']
+											[
+												'action' => USER_ACTION_ADD,
+												'Type' => 'Flexible',
+												'delay' => '',
+												'period' => '1-5,01:01-13:05'
+											]
 										]
 									]
 								]
@@ -281,7 +346,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Update interval' => [
 										'Delay' => '50m',
 										'Custom intervals' => [
-											['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '20s', 'period' => '']
+											[
+												'action' => USER_ACTION_ADD,
+												'Type' => 'Flexible',
+												'delay' => '20s',
+												'period' => ''
+											]
 										]
 									]
 								]
@@ -307,7 +377,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Update interval' => [
 										'Delay' => '50m',
 										'Custom intervals' => [
-											['action' => USER_ACTION_ADD, 'Type' => 'Flexible', 'delay' => '20s', 'period' => '1-2']
+											[
+												'action' => USER_ACTION_ADD,
+												'Type' => 'Flexible',
+												'delay' => '20s',
+												'period' => '1-2'
+											]
 										]
 									]
 								]
@@ -333,7 +408,11 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Update interval' => [
 										'Delay' => '50m',
 										'Custom intervals' => [
-											['action' => USER_ACTION_ADD, 'Type' => 'Scheduling', 'delay' => 'wd1-9']
+											[
+												'action' => USER_ACTION_ADD,
+												'Type' => 'Scheduling',
+												'delay' => 'wd1-9'
+											]
 										]
 									]
 								]
@@ -502,11 +581,15 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 				// Check that Override with correct name was added to Overrides table.
-				$this->assertEquals($override['fields']['Name'], $override_container->getRow($i)->getColumn('Name')->getText());
+				$this->assertEquals($override['fields']['Name'],
+						$override_container->getRow($i)->getColumn('Name')->getText()
+				);
 				// Check that Override in table has correct processing status.
 				$stop_processing = (CTestArrayHelper::get($override['fields'],
 						'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
-				$this->assertEquals($stop_processing, $override_container->getRow($i)->getColumn('Stop processing')->getText());
+				$this->assertEquals($stop_processing,
+						$override_container->getRow($i)->getColumn('Stop processing')->getText()
+				);
 			}
 		}
 
@@ -551,6 +634,457 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								'Name' => ''
 							],
 							'error' => 'Incorrect value for field "Name": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_ADD,
+									'fields' => [
+										'Object' => 'Item prototype'
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_ADD,
+									'fields' => [
+										'Object' => 'Trigger prototype'
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_ADD,
+									'fields' => [
+										'Object' => 'Graph prototype'
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_ADD,
+									'fields' => [
+										'Object' => 'Host prototype'
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'fields' => [
+										'Object' => 'Item prototype',
+										'Create enabled' => null,
+										'Discover' => null,
+										'History storage period' => null,
+										'Trend storage period' => null
+									],
+									'Update interval' => null
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Trigger prototype',
+										'Create enabled' => null,
+										'Discover' => null,
+										'Severity' => null,
+										'Tags' => null
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'fields' => [
+										'Object' => 'Graph prototype',
+										'Discover' => null
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Create enabled' => null,
+										'Discover' => null,
+										'Link templates' => null,
+										'Host inventory' => null
+									]
+								]
+							],
+							'error' => 'At least one action is mandatory.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Trigger prototype',
+										'Tags' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'tag' => '',
+												'value' => ''
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tags": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Trigger prototype',
+										'Tags' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'tag' => '',
+												'value' => 'value1'
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Tag": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'fields' => [
+										'Object' => 'Host prototype',
+										'Link templates' => []
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Link templates": cannot be empty.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'Update interval' => [
+										'Delay' => ''
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Update interval": invalid delay.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'Update interval' => [
+										'Delay' => '0',
+										'Custom intervals' => [
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 1
+											],
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 0
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Item will not be refreshed. Specified update interval requires '.
+									'having at least one either flexible or scheduling interval.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'Update interval' => [
+										'Delay' => '2d',
+										'Custom intervals' => [
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 1
+											],
+											[
+												'action' => USER_ACTION_REMOVE,
+												'index' => 0
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Item will not be refreshed. Update interval should be between 1s and 1d. '.
+									'Also Scheduled/Flexible intervals can be used.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'Update interval' => [
+										'Custom intervals' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'delay' => '',
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Invalid interval "".'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'Update interval' => [
+										'Custom intervals' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'period' => ''
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Invalid interval "".'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'Update interval' => [
+										'Custom intervals' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'period' => '1-2'
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Invalid interval "1-2".'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'Update interval' => [
+										'Custom intervals' => [
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 1,
+												'delay' => 'wd1-9'
+											]
+										]
+									]
+								]
+							],
+							'error' => 'Invalid interval "wd1-9".'
 						]
 					]
 				]
@@ -655,8 +1189,19 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'Update interval' => [
 										'Delay' => '50m',
 										'Custom intervals' => [
-											['Type' => 'Flexible', 'delay' => '60s', 'period' => '1-5,01:01-13:05'],
-											['Type' => 'Scheduling', 'delay' => 'wd1-3h10-17']
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 0,
+												'Type' => 'Scheduling',
+												'delay' => 'wd1-3h10-17'
+											],
+											[
+												'action' => USER_ACTION_UPDATE,
+												'index' => 1,
+												'Type' => 'Flexible',
+												'delay' => '60s',
+												'period' => '1-5,01:01-13:05'
+											]
 										]
 									]
 								],
@@ -669,6 +1214,43 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Severity' => null,
 										'Tags' => null
 									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_REMOVE,
+									'index' => 1,
+									'fields' =>
+										[
+											'Object' => 'Trigger prototype',
+											'Condition' => ['operator' => 'does not equal', 'value' => 'test trigger pattern']
+										]
+								]
+							]
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 2',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_REMOVE,
+									'index' => 1,
+									'fields' =>
+										[
+											'Object' => 'Host prototype',
+											'Condition' => ['operator' => 'does not match', 'value' => 'test host pattern']
+										]
 								]
 							]
 						]
@@ -855,7 +1437,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								break;
 							case USER_ACTION_UPDATE:
 								// Check if source has Operations from data to update them.
-								foreach ($operation['fields'] as $key => $value) {
+								foreach (CTestArrayHelper::get($operation, 'fields', []) as $key => $value) {
 									// Skipping 'action' and 'index' fields from reference data.
 									if (in_array($key, ['action', 'index'])) {
 										continue;
@@ -868,11 +1450,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 								break;
 							case USER_ACTION_REMOVE:
-								unset($sources[$id]['Filters']['filter_conditions'][$condition['index']]);
+								unset($sources[$id]['Operations'][$operation['index']]);
 								break;
 						}
 					}
-
 					break;
 			}
 
@@ -956,7 +1537,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	/**
-	 *
 	 * @param array         $data              data provider
 	 * @param array         $override          override fields from data
 	 *
@@ -992,10 +1572,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					case USER_ACTION_ADD:
 					case USER_ACTION_UPDATE:
 						$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
-						$operation_overlay->fill($operation['fields']);
+						if (array_key_exists('fields', $operation)) {
+							$operation_overlay->fill($operation['fields']);
+						}
 
 						// Fill Delay and Intervals.
-						if (CTestArrayHelper::get($operation, 'Update interval')) {
+						if (array_key_exists('Update interval', $operation)) {
 							if ($operation['Update interval'] !== null) {
 								$intervals = $operation_overlay->getField('Update interval');
 								$operation_overlay->query('id:visible_opperiod')->one()->fill(true);
@@ -1010,7 +1592,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								}
 							}
 							else {
-								$operation_overlay->query('id:visible_opperiod')->one()->fill(false);
+								$operation_overlay->query('id:visible_opperiod')->one()->asCheckbox()->fill(false);
 							}
 						}
 
@@ -1036,8 +1618,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							}
 
 							$condition_text = $object.' '.$operator.' '.$value;
-							$this->assertEquals($condition_text, $operation_container->getRow($row)->getColumn('Condition')
-									->getText());
+							$this->assertEquals($condition_text,
+									$operation_container->getRow($row)->getColumn('Condition')->getText()
+							);
 						}
 						break;
 
@@ -1103,7 +1686,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					$override_container->getRow($k)->getColumn('Name')->getText()
 			);
 			// Check that Override in table has correct processing status.
-			$this->assertEquals($stop_processing[$k], $override_container->getRow($k)->getColumn('Stop processing')->getText());
+			$this->assertEquals($stop_processing[$k],
+					$override_container->getRow($k)->getColumn('Stop processing')->getText()
+			);
 		}
 
 		foreach ($data['overrides'] as $override) {
