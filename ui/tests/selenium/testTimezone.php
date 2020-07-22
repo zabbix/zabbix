@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/behaviors/MessageBehavior.php';
  */
 class testTimezone extends CWebTest {
 
-    /**
+	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
@@ -68,12 +68,12 @@ class testTimezone extends CWebTest {
 				]
 			],
 			[
-                [
-                    'user_timezone' => 'America/Inuvik',
-                    'time_diff' => '-9 hours'
-                ]
-            ],
-            [
+				[
+					'user_timezone' => 'America/Inuvik',
+					'time_diff' => '-9 hours'
+				]
+			],
+			[
 				[
 					'user_timezone' => 'Asia/Magadan',
 					'time_diff' => '+8 hours'

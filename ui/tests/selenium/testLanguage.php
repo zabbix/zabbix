@@ -85,7 +85,7 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getGuiData
 	 */
 	public function testLanguage_Gui($data) {
-        $this->userLogin('Admin', 'zabbix');
+		$this->userLogin('Admin', 'zabbix');
 		$this->page->open('zabbix.php?action=gui.edit');
 
 		// Change default language.
