@@ -194,13 +194,16 @@
         req.SetProxy(params.HTTPProxy);&#13;
     }&#13;
     var alertSourceKey = params['.ILERT.ALERT.SOURCE.KEY'];&#13;
-    if (typeof alertSourceKey === 'string' || alertSourceKey.trim() === '') {&#13;
+    if (!alertSourceKey || (typeof alertSourceKey === 'string' &amp;&amp; alertSourceKey.trim() === '')) {&#13;
         throw 'incorrect value for variable &quot;ILERT.ALERT.SOURCE.KEY&quot;. The value must be a non-empty string.';&#13;
     }&#13;
     delete params['.ILERT.ALERT.SOURCE.KEY'];&#13;
+    &#13;
+    var ilertApiBaseURL = &quot;https://api.ilert.com&quot;;&#13;
+    var reqURL = ilertApiBaseURL + &quot;/api/v1/events/zabbix-mt/&quot; + alertSourceKey&#13;
 &#13;
-    var ilertBaseURL = &quot;https://api.ilert.com&quot;;&#13;
-    var reqURL = ilertBaseURL + &quot;/api/v1/events/zabbix-mt/&quot; + alertSourceKey&#13;
+    var incidentKey = &quot;zabbix-&quot; + params['EVENT.ID'];&#13;
+    var incidentViewURL = ilertApiBaseURL + &quot;/api/v1/incidents/resolve-ik/&quot; + alertSourceKey + &quot;/&quot; + incidentKey;&#13;
 &#13;
     req.AddHeader('Accept: application/json');&#13;
     req.AddHeader('Content-Type: application/json');&#13;
@@ -217,10 +220,18 @@
     }&#13;
 &#13;
     if (req.Status() == 200) {&#13;
-        if (typeof resp === 'object' &amp;&amp; typeof resp.incidentUrl === 'string') {&#13;
-            result.tags.incident_id = resp.incidentUrl.replace(ilertBaseURL + &quot;/api/v1/incidents/&quot;, &quot;&quot;);&#13;
-        }&#13;
+        result.tags.__ilert_incident_url = incidentViewURL;&#13;
         return JSON.stringify(result);&#13;
+    }&#13;
+&#13;
+    if (req.Status() == 400 &amp;&amp; typeof resp === 'object' &amp;&amp; typeof resp.code === 'string') {&#13;
+        if (resp.code === 'NO_OPEN_INCIDENT_WITH_KEY') {&#13;
+          return JSON.stringify(result);&#13;
+        }&#13;
+        if (resp.code === 'INCIDENT_ALREADY_ACCEPTED') {&#13;
+          result.tags.__ilert_incident_url = incidentViewURL;&#13;
+          return JSON.stringify(result);&#13;
+        }&#13;
     }&#13;
 &#13;
     if (typeof resp === 'object' &amp;&amp; typeof resp.message === 'string') {&#13;
@@ -236,8 +247,8 @@ catch (error) {&#13;
 }</script>
             <process_tags>YES</process_tags>
             <show_event_menu>YES</show_event_menu>
-            <event_menu_url>{EVENT.TAGS.ilert_incident_url}</event_menu_url>
-            <event_menu_name>Alert in iLert</event_menu_name>
+            <event_menu_url>{EVENT.TAGS.__ilert_incident_url}</event_menu_url>
+            <event_menu_name>iLert incident</event_menu_name>
             <description>Please refer to https://docs.ilert.com/integration/zabbix &#13;
   &#13;
 Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
