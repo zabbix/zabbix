@@ -69,10 +69,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		return unsafe.Pointer(C.NET_TCP_LISTEN)
 	case "net.tcp.port":
 		return unsafe.Pointer(C.NET_TCP_PORT)
-	case "net.tcp.service", "net.udp.service":
-		return unsafe.Pointer(C.CHECK_SERVICE)
-	case "net.tcp.service.perf", "net.udp.service.perf":
-		return unsafe.Pointer(C.CHECK_SERVICE_PERF)
 	case "net.udp.listen":
 		return unsafe.Pointer(C.NET_UDP_LISTEN)
 	case "system.cpu.load":
