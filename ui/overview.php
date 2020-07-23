@@ -218,6 +218,10 @@ if ($type == SHOW_TRIGGERS) {
 
 	$data['filter'] = $filter;
 
+	$data['config'] = [
+		'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
+	];
+
 	// Render view.
 	echo (new CView('monitoring.overview.triggers', $data))->getOutput();
 }

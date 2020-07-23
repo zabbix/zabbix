@@ -285,7 +285,7 @@ foreach ($data['hosts'] as $host) {
 	foreach ($host['parentTemplates'] as $template) {
 		$i++;
 
-		if ($i > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
+		if ($i > $data['config']['max_in_table']) {
 			$hostTemplates[] = ' &hellip;';
 
 			break;

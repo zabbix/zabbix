@@ -130,7 +130,13 @@ class CControllerLatestView extends CControllerLatest {
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'active_tab' => CProfile::get('web.latest.filter.active', 1),
-			'paging' => $paging
+			'paging' => $paging,
+			'config' => [
+				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
+				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
+			]
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

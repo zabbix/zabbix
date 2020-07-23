@@ -47,7 +47,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // blinking preview in help popup (only if blinking is enabled)
-$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
+$blink_period = timeUnitToSeconds($data['config']['blink_period']);
 if ($blink_period > 0) {
 	$indic_container = (new CDiv())
 		->addClass(ZBX_STYLE_NOTIF_INDIC_CONTAINER)

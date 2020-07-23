@@ -243,7 +243,7 @@ $massclearhistory = [
 	'disabled' => $data['is_template']
 ];
 
-if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
+if ($data['config']['compression_status']) {
 	unset($massclearhistory['confirm']);
 }
 

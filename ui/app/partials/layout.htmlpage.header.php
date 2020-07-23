@@ -41,9 +41,8 @@ if (!empty($DB['DB'])) {
 	$pageHeader->addStyle(getTriggerSeverityCss());
 	$pageHeader->addStyle(getTriggerStatusCss());
 
-	// perform Zabbix server check only for standard pages
-	if (CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL) && !empty($ZBX_SERVER)
-			&& !empty($ZBX_SERVER_PORT)) {
+	// Perform Zabbix server check only for standard pages.
+	if ($data['config']['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
 		$scripts[] = 'servercheck.js';
 	}
 }

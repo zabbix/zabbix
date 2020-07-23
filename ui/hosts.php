@@ -1634,7 +1634,10 @@ else {
 		'proxies_ms' => $proxies_ms,
 		'profileIdx' => 'web.hosts.filter',
 		'active_tab' => CProfile::get('web.hosts.filter.active', 1),
-		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+		'config' => [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		]
 	];
 
 	$hostView = new CView('configuration.host.list', $data);

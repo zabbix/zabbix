@@ -147,6 +147,11 @@ class CControllerUserList extends CController {
 			}
 		}
 
+		$data['config'] = [
+			'login_attempts' => CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS),
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		];
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));
 		$this->setResponse($response);

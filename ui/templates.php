@@ -1156,7 +1156,10 @@ else {
 		'writable_hosts' => $writable_hosts,
 		'profileIdx' => 'web.templates.filter',
 		'active_tab' => CProfile::get('web.templates.filter.active', 1),
-		'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+		'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+		'config' => [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		]
 	];
 
 	$view = new CView('configuration.template.list', $data);

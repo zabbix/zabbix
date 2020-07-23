@@ -28,14 +28,14 @@ function local_showHeader(array $data): void {
 	header('X-Content-Type-Options: nosniff');
 	header('X-XSS-Protection: 1; mode=block');
 
-	if (CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS) !== '') {
-		if (strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'SAMEORIGIN') == 0
-				|| strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'DENY') == 0) {
-			$x_frame_options = CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS);
+	if ($data['config']['x_frame_options'] !== '') {
+		if (strcasecmp($data['config']['x_frame_options'], 'SAMEORIGIN') == 0
+				|| strcasecmp($data['config']['x_frame_options'], 'DENY') == 0) {
+			$x_frame_options = $data['config']['x_frame_options'];
 		}
 		else {
 			$x_frame_options = 'SAMEORIGIN';
-			$allowed_urls = explode(',', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
+			$allowed_urls = explode(',', $data['config']['x_frame_options']);
 			$url_to_check = array_key_exists('HTTP_REFERER', $_SERVER)
 				? parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST)
 				: null;
@@ -64,7 +64,10 @@ function local_showHeader(array $data): void {
 			'lang' => CWebUser::$data['lang'],
 			'theme' => CWebUser::$data['theme']
 		],
-		'web_layout_mode' => $data['web_layout_mode']
+		'web_layout_mode' => $data['web_layout_mode'],
+		'config' => [
+			'server_check_interval' => $data['config']['server_check_interval']
+		]
 	]))->getOutput();
 }
 

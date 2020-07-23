@@ -280,7 +280,10 @@ else {
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
 		'profileIdx' => 'web.groups.filter',
-		'active_tab' => CProfile::get('web.groups.filter.active', 1)
+		'active_tab' => CProfile::get('web.groups.filter.active', 1),
+		'config' => [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		]
 	];
 
 	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;

@@ -76,7 +76,7 @@ foreach ($this->data['groups'] as $group) {
 	foreach ($group['templates'] as $template) {
 		$n++;
 
-		if ($n > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
+		if ($n > $data['config']['max_in_table']) {
 			$hostsOutput[] = ' &hellip;';
 
 			break;
@@ -104,7 +104,7 @@ foreach ($this->data['groups'] as $group) {
 	foreach ($group['hosts'] as $host) {
 		$n++;
 
-		if ($n > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
+		if ($n > $data['config']['max_in_table']) {
 			$hostsOutput[] = ' &hellip;';
 
 			break;

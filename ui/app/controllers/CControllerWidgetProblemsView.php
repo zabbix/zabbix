@@ -98,6 +98,11 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'sortorder' => $sortorder,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
+			],
+			'config' => [
+				'problem_ack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE),
+				'problem_unack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE),
+				'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
 			]
 		]));
 	}

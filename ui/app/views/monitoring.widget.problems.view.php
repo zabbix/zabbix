@@ -208,11 +208,11 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	}
 
 	if (!$show_recovery_data
-			&& (($is_acknowledged && CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE))
-				|| (!$is_acknowledged && CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE)))) {
+			&& (($is_acknowledged && $data['config']['problem_ack_style'])
+				|| (!$is_acknowledged && $data['config']['problem_unack_style']))) {
 		// blinking
 		$duration = time() - $problem['clock'];
-		$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
+		$blink_period = timeUnitToSeconds($data['config']['blink_period']);
 
 		if ($blink_period != 0 && $duration < $blink_period) {
 			$description

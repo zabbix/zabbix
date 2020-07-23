@@ -123,7 +123,7 @@ foreach ($data['users'] as $user) {
 		$online = (new CCol(_('No')))->addClass(ZBX_STYLE_RED);
 	}
 
-	$blocked = ($user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS))
+	$blocked = ($user['attempt_failed'] >= $data['config']['login_attempts'])
 		? (new CLink(_('Blocked'), 'zabbix.php?action=user.unblock&userids[]='.$userid))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
@@ -138,7 +138,7 @@ foreach ($data['users'] as $user) {
 	foreach ($user['usrgrps'] as $user_group) {
 		$i++;
 
-		if ($i > CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)) {
+		if ($i > $data['config']['max_in_table']) {
 			$users_groups[] = ' &hellip;';
 
 			break;

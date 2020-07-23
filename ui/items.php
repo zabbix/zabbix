@@ -1477,6 +1477,14 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		$data['inventory_link'] = $item['inventory_link'];
 	}
 
+	$data['config'] = [
+		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS),
+		'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL),
+		'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+		'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
+	];
+
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.item.edit', $data))->getOutput();
@@ -2033,6 +2041,10 @@ else {
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
+
+	$data['config'] = [
+		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
+	];
 
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();

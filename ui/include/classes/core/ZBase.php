@@ -566,7 +566,11 @@ class ZBase {
 				'javascript' => [
 					'files' => []
 				],
-				'web_layout_mode' => ZBX_LAYOUT_NORMAL
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL,
+				'config' => [
+					'server_check_interval' => CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL),
+					'x_frame_options' => CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS)
+				]
 			];
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {
