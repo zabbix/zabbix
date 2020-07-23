@@ -732,7 +732,7 @@ void	zbx_mem_get_stats(const zbx_mem_info_t *info, zbx_mem_stats_t *stats)
 {
 	void		*chunk;
 	int		i;
-	zbx_uint64_t	counter, total, total_free = 0;
+	zbx_uint64_t	counter;
 
 	stats->free_chunks = 0;
 	stats->max_chunk_size = __UINT64_C(0);

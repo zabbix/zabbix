@@ -28,6 +28,7 @@
 #include "../actions.h"
 #include "export.h"
 #include "taskmanager.h"
+#include "zbxdiag.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -520,14 +521,21 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
  ******************************************************************************/
 static void	tm_process_debuginfo(zbx_uint64_t taskid, const char *data)
 {
-	zbx_tm_task_t	*task;
-	int		ret;
-	char		*info = NULL;
+	zbx_tm_task_t		*task;
+	int			ret;
+	char			*info = NULL;
+	struct zbx_json_parse	jp_data;
 
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
-	ret = zbx_tm_get_debuginfo(data, &info);
-	task->data = zbx_tm_data_result_create(taskid, ret, info);
-	zbx_free(info);
+
+	if (SUCCEED == zbx_json_open(data, &jp_data))
+	{
+		ret = zbx_diag_get_info(&jp_data, &info);
+		task->data = zbx_tm_data_result_create(taskid, ret, info);
+		zbx_free(info);
+	}
+	else
+		task->data = zbx_tm_data_result_create(taskid, FAIL, zbx_json_strerror());
 
 	zbx_tm_save_task(task);
 	zbx_tm_task_free(task);

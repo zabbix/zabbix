@@ -4488,10 +4488,6 @@ void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index, zbx_mem
 {
 	LOCK_CACHE;
 
-	zbx_mem_dump_stats(3, hc_mem);
-	zbx_mem_dump_stats(3, hc_index_mem);
-	zbx_mem_dump_stats(3, trend_mem);
-
 	if (NULL != data)
 		zbx_mem_get_stats(hc_mem, data);
 

@@ -25,6 +25,7 @@
 #include "db.h"
 #include "dbcache.h"
 #include "zbxcrypto.h"
+#include "zbxdiag.h"
 
 #include "../../zabbix_server/scripts/scripts.h"
 #include "taskmanager.h"
@@ -214,22 +215,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_get_debuginfo                                                 *
- *                                                                            *
- * Purpose: get proxy debug information                                       *
- *                                                                            *
- * Return value: SUCCEED - the debug information was retrieved successfully   *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	tm_get_debuginfo(struct zbx_json_parse *jp, char **info)
-{
-	*info = zbx_strdup(*info, "Not implemented (proxy).");
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: tm_execute_data_json                                             *
  *                                                                            *
  * Purpose: process data task with json contents                              *
@@ -253,7 +238,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info)
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 			return zbx_trapper_item_test_run(&jp_data, 0, info);
 		case ZBX_TM_DATA_TYPE_DEBUGINFO:
-			return tm_get_debuginfo(&jp_data, info);
+			return zbx_diag_get_info(&jp_data, info);
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -280,7 +265,6 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	int			ret = FAIL, data_type;
 	char			*info = NULL;
 	zbx_uint64_t		parent_taskid;
-	struct zbx_json_parse	jp_data;
 
 	result = DBselect("select parent_taskid,data,type"
 				" from task_data"
@@ -293,6 +277,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
 	ZBX_STR2UINT64(parent_taskid, row[0]);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] check task");
 	if (0 != ttl && clock + ttl < now)
 	{
 		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "The task has been expired.");
@@ -305,6 +290,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 			ZBX_FALLTHROUGH;
 		case ZBX_TM_DATA_TYPE_DEBUGINFO:
 			ret = tm_execute_data_json(data_type, row[1], &info);
+			zabbix_log(LOG_LEVEL_DEBUG, "[WDN] executed: %d", ret);
 			break;
 		default:
 			task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task.");
