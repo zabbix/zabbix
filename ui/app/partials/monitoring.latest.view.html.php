@@ -147,7 +147,7 @@ foreach ($data['rows'] as $row_index => $row) {
 		else {
 			$toggle_app
 				->setAttribute('data-collapsed',
-					(CProfile::get('web.latest.toggle_other', null, $row['hostid']) !== null) ? 1 : 0
+					(CProfile::get('web.latest.toggle_other', null, $item['hostid']) !== null) ? 1 : 0
 				)
 				->setAttribute('data-hostid', $item['hostid']);
 		}
