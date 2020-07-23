@@ -85,9 +85,9 @@ class testTimezone extends CWebTest {
 
 	/**
 	 * @dataProvider getUserSettingsData
-     * 
-     * Change timezones for user, from user setting. Check that time for user displayed correctly according
-     * to choosed timezone.
+	 *
+	 * Change timezones for user, from user setting. Check that time for user displayed correctly according
+	 * to choosed timezone.
 	 */
 	public function testTimezone_UserSettings($data) {
 		// Set system timezone.
@@ -175,7 +175,7 @@ class testTimezone extends CWebTest {
 
 	/**
 	 * @dataProvider getCreateUsersData
-	 * 
+	 *
 	 * Create users with different timezones and check that time displayed for them correctly, according
 	 * to choosed timezone.
 	 */
@@ -222,7 +222,7 @@ class testTimezone extends CWebTest {
 
 	/**
 	 * Change time zone in GUI or in user settings.
-	 * 
+	 *
 	 * @param string $timezone  time zone
 	 * @param string $page      part of page link you want to open
 	 */
@@ -240,7 +240,7 @@ class testTimezone extends CWebTest {
 
 	/**
 	 * Allows to login with user credentials.
-	 * 
+	 *
 	 * @param string $alias     Username on login screen
 	 * @param string $password  Password on login screen
 	 */
