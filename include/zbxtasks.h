@@ -47,6 +47,7 @@
 
 /* task data type */
 #define ZBX_TM_DATA_TYPE_TEST_ITEM		0
+#define ZBX_TM_DATA_TYPE_DEBUGINFO		1
 
 /* the time period after which finished (done/expired) tasks are removed */
 #define ZBX_TM_CLEANUP_TASK_AGE			SEC_PER_DAY

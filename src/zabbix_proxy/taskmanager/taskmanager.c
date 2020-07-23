@@ -214,6 +214,56 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
+ * Function: tm_get_debuginfo                                                 *
+ *                                                                            *
+ * Purpose: get proxy debug information                                       *
+ *                                                                            *
+ * Return value: SUCCEED - the debug information was retrieved successfully   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_get_debuginfo(struct zbx_json_parse *jp, char **info)
+{
+	*info = zbx_strdup(*info, "Not implemented (proxy).");
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: tm_execute_data_json                                             *
+ *                                                                            *
+ * Purpose: process data task with json contents                              *
+ *                                                                            *
+ * Return value: SUCCEED - the data task was executed                         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_execute_data_json(int type, const char *data, char **info)
+{
+	struct zbx_json_parse	jp_data;
+
+	if (SUCCEED != zbx_json_brackets_open(data, &jp_data))
+	{
+		*info = zbx_strdup(*info, zbx_json_strerror());
+		return FAIL;
+	}
+
+	switch (type)
+	{
+		case ZBX_TM_DATA_TYPE_TEST_ITEM:
+			return zbx_trapper_item_test_run(&jp_data, 0, info);
+		case ZBX_TM_DATA_TYPE_DEBUGINFO:
+			return tm_get_debuginfo(&jp_data, info);
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+
+	*info = zbx_strdup(*info, "Unknown task data type");
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: tm_execute_data                                                  *
  *                                                                            *
  * Purpose: process data task                                                 *
@@ -227,7 +277,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	DB_ROW			row;
 	DB_RESULT		result;
 	zbx_tm_task_t		*task = NULL;
-	int			ret = FAIL;
+	int			ret = FAIL, data_type;
 	char			*info = NULL;
 	zbx_uint64_t		parent_taskid;
 	struct zbx_json_parse	jp_data;
@@ -249,16 +299,17 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 		goto finish;
 	}
 
-	if (ZBX_TM_DATA_TYPE_TEST_ITEM != atoi(row[2]))
+	switch (data_type = atoi(row[2]))
 	{
-		task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task.");
-		goto finish;
+		case ZBX_TM_DATA_TYPE_TEST_ITEM:
+			ZBX_FALLTHROUGH;
+		case ZBX_TM_DATA_TYPE_DEBUGINFO:
+			ret = tm_execute_data_json(data_type, row[1], &info);
+			break;
+		default:
+			task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task.");
+			goto finish;
 	}
-
-	if (SUCCEED != (ret = zbx_json_brackets_open(row[1], &jp_data)))
-		info = zbx_strdup(NULL, zbx_json_strerror());
-	else
-		ret = zbx_trapper_item_test_run(&jp_data, 0, &info);
 
 	task->data = zbx_tm_data_result_create(parent_taskid, ret, info);
 
