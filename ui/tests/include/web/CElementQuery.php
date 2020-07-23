@@ -522,7 +522,7 @@ class CElementQuery implements IWaitable {
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
-				'/div/table', // TODO: remove when extra containers are removed
+				'/div/table', // TODO: remove after fix DEV-1071.
 				'/*[contains(@class, "table-forms-separator")]/table'
 			],
 			'CCompositeInputElement'	=> [
