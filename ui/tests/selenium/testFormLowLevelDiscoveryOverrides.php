@@ -559,8 +559,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$this->page->login()->open('host_discovery.php?form=create&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$key = 'lld_override'.time();
-		$form->fill(['Name' => 'LLD with overrides',
-					'Key' => $key]);
+		$form->fill([
+			'Name' => 'LLD with overrides',
+			'Key' => $key
+		]);
 		$form->selectTab('Overrides');
 		$form->invalidate();
 		$override_container = $form->getField('Overrides')->asTable();
@@ -597,7 +599,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Submit LLD create.
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
-			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($key)));
 			self::$created_id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($key));
 		}
 
@@ -1305,6 +1306,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
 						'Create enabled' => 'Yes',
 						'Discover' => 'Yes',
+						// TODO: uncomment after fix DEV-1071 and it is possible to check this field.
 //						'Update interval' => [
 //							'Delay' => '1m',
 //							'Custom intervals' => [
@@ -1423,8 +1425,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					// Get Operations Table.
 					$operations_container = $override_overlay->getField('Operations')->asTable();
 
-					$operations = CTestArrayHelper::get($override, 'Operations', []);
-					foreach ($operations  as $j => $operation) {
+					foreach (CTestArrayHelper::get($override, 'Operations', []) as $j => $operation) {
 						$operation_action = CTestArrayHelper::get($operation, 'action', USER_ACTION_ADD);
 						// Preparing reference data for Operations.
 						switch ($operation_action) {
@@ -1546,93 +1547,90 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asForm()->one();
 		$operation_container = $override_overlay->getField('Operations')->asTable();
 
-		if (array_key_exists('Operations', $override)) {
+		// Add Operations to override.
+		foreach(CTestArrayHelper::get($override, 'Operations', []) as $i =>$operation){
 
-			// Add Operations to override.
-			foreach($override['Operations'] as $i =>$operation){
+			$operation_action = CTestArrayHelper::get($operation, 'action', USER_ACTION_ADD);
+			unset($operation['action']);
 
-				$operation_action = CTestArrayHelper::get($operation, 'action', USER_ACTION_ADD);
-				unset($operation['action']);
+			$row = null;
+			switch ($operation_action) {
+				case USER_ACTION_ADD:
+					$row = $operation_container->getRows()->count() - 1;
+					$operation_container->query('button:Add')->one()->click();
+					break;
 
-				$row = null;
-				switch ($operation_action) {
-					case USER_ACTION_ADD:
-						$row = $operation_container->getRows()->count() - 1;
-						$operation_container->query('button:Add')->one()->click();
-						break;
+				case USER_ACTION_UPDATE:
+					$row = $operation['index'];
+					$operation_container->getRow($row)->query('button:Edit')->one()->click();
+					unset($operation['index']);
+					break;
+			}
 
-					case USER_ACTION_UPDATE:
-						$row = $operation['index'];
-						$operation_container->getRow($row)->query('button:Edit')->one()->click();
-						unset($operation['index']);
-						break;
-				}
+			switch ($operation_action) {
+				case USER_ACTION_ADD:
+				case USER_ACTION_UPDATE:
+					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
+					if (array_key_exists('fields', $operation)) {
+						$operation_overlay->fill($operation['fields']);
+					}
 
-				switch ($operation_action) {
-					case USER_ACTION_ADD:
-					case USER_ACTION_UPDATE:
-						$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
-						if (array_key_exists('fields', $operation)) {
-							$operation_overlay->fill($operation['fields']);
-						}
-
-						// Fill Delay and Intervals.
-						if (array_key_exists('Update interval', $operation)) {
-							if ($operation['Update interval'] !== null) {
-								$intervals = $operation_overlay->getField('Update interval');
-								$operation_overlay->query('id:visible_opperiod')->one()->fill(true);
-								if (array_key_exists('Delay', $operation['Update interval'])) {
-									$intervals->query('id:opperiod_delay')->waitUntilVisible()->one()
-											->fill($operation['Update interval']['Delay']);
-								}
-								if (array_key_exists('Custom intervals', $operation['Update interval'])) {
-									$this->query('xpath:.//table[@id="lld_overrides_custom_intervals"]')
-											->asMultifieldTable()->one()
-											->fill($operation['Update interval']['Custom intervals']);
-								}
+					// Fill Delay and Intervals.
+					if (array_key_exists('Update interval', $operation)) {
+						if ($operation['Update interval'] !== null) {
+							$intervals = $operation_overlay->getField('Update interval');
+							$operation_overlay->query('id:visible_opperiod')->one()->fill(true);
+							if (array_key_exists('Delay', $operation['Update interval'])) {
+								$intervals->query('id:opperiod_delay')->waitUntilVisible()->one()
+										->fill($operation['Update interval']['Delay']);
 							}
-							else {
-								$operation_overlay->query('id:visible_opperiod')->one()->asCheckbox()->fill(false);
+							if (array_key_exists('Custom intervals', $operation['Update interval'])) {
+								$this->query('xpath:.//table[@id="lld_overrides_custom_intervals"]')
+										->asMultifieldTable()->one()
+										->fill($operation['Update interval']['Custom intervals']);
 							}
 						}
-
-						$operation_overlay->submit();
-						$this->checkSubmittedOverlay($data['expected'], $operation_overlay,
-								CTestArrayHelper::get($override, 'error'));
-
-						if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
-							// Check that Operation was added to Operations table.
-							$object = CTestArrayHelper::get($operation, 'fields.Object');
-							if ($object === null) {
-								$object = $sources[$id]['Operations'][$i]['Object'];
-							}
-
-							$operator = CTestArrayHelper::get($operation, 'fields.Condition.operator');
-							if ($operator === null) {
-								$operator = $sources[$id]['Operations'][$i]['Condition']['operator'];
-							}
-
-							$value = CTestArrayHelper::get($operation, 'fields.Condition.value');
-							if ($value === null) {
-								$value = $sources[$id]['Operations'][$i]['Condition']['value'];
-							}
-
-							$condition_text = $object.' '.$operator.' '.$value;
-							$this->assertEquals($condition_text,
-									$operation_container->getRow($row)->getColumn('Condition')->getText()
-							);
+						else {
+							$operation_overlay->query('id:visible_opperiod')->one()->asCheckbox()->fill(false);
 						}
-						break;
+					}
 
-					case USER_ACTION_REMOVE:
-						$condition_text = $operation['fields']['Object'].' '.
-								$operation['fields']['Condition']['operator'].' '.
-								$operation['fields']['Condition']['value'];
-						$row = $operation_container->findRow('Condition', $condition_text)
-							->query('button:Remove')->one()->click();
-						$row->waitUntilNotPresent();
-						break;
-				}
+					$operation_overlay->submit();
+					$this->checkSubmittedOverlay($data['expected'], $operation_overlay,
+							CTestArrayHelper::get($override, 'error'));
+
+					if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
+						// Check that Operation was added to Operations table.
+						$object = CTestArrayHelper::get($operation, 'fields.Object');
+						if ($object === null) {
+							$object = $sources[$id]['Operations'][$i]['Object'];
+						}
+
+						$operator = CTestArrayHelper::get($operation, 'fields.Condition.operator');
+						if ($operator === null) {
+							$operator = $sources[$id]['Operations'][$i]['Condition']['operator'];
+						}
+
+						$value = CTestArrayHelper::get($operation, 'fields.Condition.value');
+						if ($value === null) {
+							$value = $sources[$id]['Operations'][$i]['Condition']['value'];
+						}
+
+						$condition_text = $object.' '.$operator.' '.$value;
+						$this->assertEquals($condition_text,
+								$operation_container->getRow($row)->getColumn('Condition')->getText()
+						);
+					}
+					break;
+
+				case USER_ACTION_REMOVE:
+					$condition_text = $operation['fields']['Object'].' '.
+							$operation['fields']['Condition']['operator'].' '.
+							$operation['fields']['Condition']['value'];
+					$row = $operation_container->findRow('Condition', $condition_text)
+						->query('button:Remove')->one()->click();
+					$row->waitUntilNotPresent();
+					break;
 			}
 		}
 		// Submit Override.
@@ -1738,15 +1736,13 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 				// Compare Conditions from table with data.
 				for ($n = 0; $n < $operation_count - 1; $n++) {
-					$row = $operation_container->getRow($n);
 					$this->assertEquals($condition_text[$n],
-							$row->getColumn('Condition')->getText()
+							$operation_container->getRow($n)->getColumn('Condition')->getText()
 					);
 				}
 
 				foreach($override['Operations'] as $i => $operation) {
-					$row = $operation_container->getRow($i);
-					$row->query('button:Edit')->one()->click();
+					$operation_container->getRow($i)->query('button:Edit')->one()->click();
 					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asForm()->one();
 					$operation_overlay->checkValue(
 							array_key_exists('fields', $operation) ? $operation['fields'] : $operation
