@@ -123,13 +123,24 @@ class CTabFilterProfile {
 	/**
 	 * Order tabfilters value according $taborder string. It should contain comma separated list of $tabfilter indexes.
 	 * Tabs not in $taborder will be removed.
+	 *
+	 * @param string $taborder  Comma separated string of tab indexes.
 	 */
-	public function order($taborder) {
+	public function sort(string $taborder) {
 		$source = $this->tabfilters;
 		$this->tabfilters = [];
+		$taborder = explode(',', $taborder);
 
-		foreach (explode(',', $taborder) as $index) {
-			$this->tabfilters[$index] = $source[$index];
+		foreach ($taborder as $index) {
+			if (array_key_exists($index, $source)) {
+				$this->tabfilters[$index] = $source[$index];
+			}
+		}
+
+		$selected = array_search($this->selected, $taborder);
+
+		if ($selected !== false) {
+			$this->selected = $selected;
 		}
 
 		return $this;
@@ -140,7 +151,7 @@ class CTabFilterProfile {
 	 */
 	public function read() {
 		$this->selected = (int) CProfile::get($this->namespace.'.selected', 0);
-		$this->expanded = (bool) CProfile::get($this->namespace.'.expanded', false);
+		$this->expanded = (bool) CProfile::get($this->namespace.'.expanded', true);
 		// CProfile::updateArray assign new idx2 values do not need to store order in profile
 		$this->tabfilters = CProfile::getArray($this->namespace.'.properties', []);
 

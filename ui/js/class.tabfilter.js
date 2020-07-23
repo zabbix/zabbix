@@ -29,6 +29,8 @@ class CTabFilter extends CBaseComponent {
 		this._shared_domnode = null;
 		// NodeList of available templates (<script> DOM elements).
 		this._templates = {};
+		this._fetchpromise = null;
+		this._idx_namespace = 'web.monitoringhosts';
 
 		this.init(options);
 		this.registerEvents(options);
@@ -54,6 +56,8 @@ class CTabFilter extends CBaseComponent {
 			}
 
 			item = new CTabFilterItem(title, {
+				idx_namespace: this._idx_namespace,
+				index: data_index,
 				can_toggle: options.can_toggle,
 				container: container,
 				data: options.data[data_index],
@@ -77,12 +81,18 @@ class CTabFilter extends CBaseComponent {
 
 				if (!ev.detail.target._expanded && (!this._active_item || !this._active_item._expanded)) {
 					this._shared_domnode.classList.remove('display-none');
+					this.profileUpdate('selected', {
+						value_int: this._active_item._index
+					});
 				}
 			},
 
 			collapse: (ev) => {
 				if (ev.detail.target === this._active_item) {
 					this._shared_domnode.classList.add('display-none');
+					this.profileUpdate('expanded', {
+						value_int: 0
+					});
 				}
 			},
 
@@ -100,7 +110,15 @@ class CTabFilter extends CBaseComponent {
 				this._items[to] = this._items.splice(from, 1, this._items[to])[0];
 
 				// Tab order changed, update changes via ajax.
+				let value_str = this._items.map((item) => item._index).join(',');
 
+				this.profileUpdate('taborder', {
+					value_str: value_str
+				}).then(() => {
+					this._items.forEach((item, index) => {
+						item._index = index;
+					});
+				});
 			},
 
 			selectPrevTab: (ev) => {
@@ -176,6 +194,25 @@ class CTabFilter extends CBaseComponent {
 		container.classList.add('display-none');
 
 		return container;
+	}
+
+	profileUpdate(property, body) {
+		if (this._fetch && 'abort' in this._fetch && !this._fetch.aborted) {
+			this._fetch.abort();
+		}
+
+		body.idx = this._idx_namespace + '.' + property;
+		this._fetch = new AbortController();
+
+		return fetch('zabbix.php?action=profile.update', {
+			method: 'POST',
+			signal: this._fetch.signal,
+			body: new URLSearchParams(body)
+		}).then(() => {
+			this._fetch = null;
+		}).catch((err) => {
+			// Catch DOMExeception: The user aborted a request.
+		});
 	}
 
 	afterTabContentRender(tabitem, is_init) {

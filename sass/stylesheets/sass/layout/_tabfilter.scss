@@ -9,6 +9,20 @@
 
 	& > nav li {
 		display: inline-block;
+		vertical-align: middle;
+
+		&.active {
+			background-color: $header-bg-color;
+
+			a[data-target],
+			a[data-target]:hover {
+				border-color: $header-bg-color;
+				color: $btn-form-font-color;
+				margin-top: 0;
+				margin-bottom: 0;
+				line-height: 28px;
+			}
+		}
 
 		a[data-target] {
 			@extend button;
@@ -17,6 +31,7 @@
 			line-height: 24px;
 			margin: 6px 5px 4px 0;
 
+			/* temp, remove when .active will be set to _target.parentNode */
 			&.active,
 			&.active:hover {
 				background-color: $header-bg-color;
@@ -26,6 +41,39 @@
 				margin-bottom: 0;
 				line-height: 28px;
 			}
+			/* temp, remove when .active will be set to _target.parentNode */
+		}
+
+		/* development solution, replace with styles from ZBXNEXT-4803 */
+		a.active[data-counter]::after {
+			display: none;
+		}
+
+		a[data-counter]::after {
+			display: inline-block;
+			min-width: 15px;
+			height: 15px;
+			color: black;
+			background: silver;
+			margin-left: 5px;
+			line-height: 15px;
+			vertical-align: middle;
+			text-align: center;
+			content: attr(data-counter);
+		}
+		/* development solution, replace with styles from ZBXNEXT-4803 */
+
+		.icon-edit {
+			@extend .btn-widget-edit;
+
+			cursor: pointer;
+			vertical-align: middle;
+			display: inline-block;
+			opacity: 0;
+		}
+
+		&:hover .icon-edit {
+			opacity: 1;
 		}
 	}
 

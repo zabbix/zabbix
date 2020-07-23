@@ -149,6 +149,7 @@ class CRouter {
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
 		'popup.scriptexec'				=> ['CControllerPopupScriptExec',					'layout.json',			'popup.scriptexec'],
 		'popup.services'				=> ['CControllerPopupServices',						'layout.json',			'popup.services'],
+		'popup.tabfilter.edit'			=> ['CControllerPopupTabFilterEdit',				'layout.json',			'popup.tabfilter.edit'],
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerexpr'				=> ['CControllerPopupTriggerExpr',					'layout.json',			'popup.triggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],

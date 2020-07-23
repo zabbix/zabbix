@@ -121,10 +121,16 @@ class CTabFilter extends CDiv {
 		}
 
 		if (!is_a($label, CTag::class)) {
-			// Temporary fix.
-			$label = ($tab_index == 0) ? 'Home' : $label;
-
-			$label = (new CLink($label))->setAttribute('data-target', $targetid);
+			if ($tab_index == 0) {
+				$label = (new CLink('&nbsp;'))
+					->setAttribute('data-target', $targetid)
+					->addClass('icon-home');
+				$data['sortable'] = false;
+				unset($data['name']);
+			}
+			else {
+				$label = (new CLink($label))->setAttribute('data-target', $targetid);
+			}
 		}
 
 		if ($content) {
@@ -133,7 +139,7 @@ class CTabFilter extends CDiv {
 
 		$this->labels[] = $label;
 		$this->contents[] = $content;
-		$this->options['data'][] = $data;
+		$this->options['data'][] = $data + ['sortable' => true];
 
 		return $this;
 	}
@@ -180,7 +186,7 @@ class CTabFilter extends CDiv {
 		$static = [];
 
 		foreach ($this->labels as $index => $label) {
-			if ($this->contents[$index] === null) {
+			if ($this->contents[$index] === null && $this->options['data'][$index]['sortable']) {
 				$sortable[$index] = $label;
 			}
 			else {
@@ -188,11 +194,11 @@ class CTabFilter extends CDiv {
 			}
 		}
 
-		// First dynamic tab is 'Home' tab and cannot be sorted.
-		$home = array_shift($sortable);
 		// Last static tab is timeselector.
 		$timeselector = end($static);
 		$index = key($static);
+		// First dynamic tab is 'Home' tab and cannot be sorted.
+		$home = array_shift($static);
 
 		if (is_a($this->contents[$index], CTag::class)
 				&& $this->contents[$index]->getId() === static::CSS_ID_PREFIX.'timeselector') {
