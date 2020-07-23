@@ -139,12 +139,16 @@ foreach ($data['rows'] as $row_index => $row) {
 
 		if ($row['applicationid']) {
 			$toggle_app
-				->setAttribute('data-collapsed', CProfile::get('web.latest.collapsed', 0, $row['applicationid']))
+				->setAttribute('data-collapsed',
+					(CProfile::get('web.latest.toggle', null, $row['applicationid']) !== null) ? 1 : 0
+				)
 				->setAttribute('data-applicationid', $row['applicationid']);
 		}
 		else {
 			$toggle_app
-				->setAttribute('data-collapsed', CProfile::get('web.latest.collapsed_other', 0, $host['hostid']))
+				->setAttribute('data-collapsed',
+					(CProfile::get('web.latest.toggle_other', null, $row['hostid']) !== null) ? 1 : 0
+				)
 				->setAttribute('data-hostid', $item['hostid']);
 		}
 

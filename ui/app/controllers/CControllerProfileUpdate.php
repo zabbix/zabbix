@@ -85,8 +85,8 @@ class CControllerProfileUpdate extends CController {
 
 				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 				case 'web.dashbrd.navtree.item.selected':
-				case 'web.latest.collapsed':
-				case 'web.latest.collapsed_other':
+				case 'web.latest.toggle':
+				case 'web.latest.toggle_other':
 					$ret = $this->hasInput('idx2');
 					break;
 
@@ -112,6 +112,8 @@ class CControllerProfileUpdate extends CController {
 
 		DBstart();
 		switch ($idx) {
+			case 'web.latest.toggle':
+			case 'web.latest.toggle_other':
 			case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 				if ($value_int == 1) { // default value
 					CProfile::delete($idx, $this->getInput('idx2'));
@@ -126,18 +128,6 @@ class CControllerProfileUpdate extends CController {
 			case 'web.dashbrd.navtree.item.selected':
 				foreach ($this->getInput('idx2') as $idx2) {
 					CProfile::update($idx, $value_int, PROFILE_TYPE_INT, $idx2);
-				}
-				break;
-
-			case 'web.latest.collapsed':
-			case 'web.latest.collapsed_other':
-				if ($value_int == 1) {
-					foreach ($this->getInput('idx2') as $idx2) {
-						CProfile::update($idx, 1, PROFILE_TYPE_INT, $idx2);
-					}
-				}
-				else {
-					CProfile::delete($idx, $this->getInput('idx2'));
 				}
 				break;
 

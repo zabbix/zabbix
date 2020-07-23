@@ -231,10 +231,10 @@
 			$(this).closest('table').fadeTo(0, 1);
 
 			if (updates.applicationid.length) {
-				updateUserProfile('web.latest.collapsed', collapsed_all, updates.applicationid);
+				updateUserProfile('web.latest.toggle', collapsed_all ? 0 : 1, updates.applicationid);
 			}
 			if (updates.hostid.length) {
-				updateUserProfile('web.latest.collapsed_other', collapsed_all, updates.hostid);
+				updateUserProfile('web.latest.toggle_other', collapsed_all ? 0 : 1, updates.hostid);
 			}
 		});
 
@@ -254,10 +254,10 @@
 			self.updateToggleAll();
 
 			if (group === 'applicationid') {
-				updateUserProfile('web.latest.collapsed', collapsed ? 1 : 0, [group_id]);
+				updateUserProfile('web.latest.toggle', collapsed ? 0 : 1, [group_id]);
 			}
 			else {
-				updateUserProfile('web.latest.collapsed_other', collapsed ? 1 : 0, [group_id]);
+				updateUserProfile('web.latest.toggle_other', collapsed ? 0 : 1, [group_id]);
 			}
 		});
 	};
