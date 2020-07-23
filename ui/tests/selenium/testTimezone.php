@@ -35,6 +35,9 @@ class testTimezone extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
+	/**
+	 * Change zabbix timezone from GUI and check that system time displayed correctly according to timezone.
+	 */
 	public function testTimezone_Gui() {
 		$this->userLogin('Admin', 'zabbix');
 		$this->setTimezone('Europe/Riga', 'gui');
@@ -82,16 +85,19 @@ class testTimezone extends CWebTest {
 
 	/**
 	 * @dataProvider getUserSettingsData
+     * 
+     * Change timezones for user, from user setting. Check that time for user displayed correctly according
+     * to choosed timezone.
 	 */
 	public function testTimezone_UserSettings($data) {
-		// Set system timezone
+		// Set system timezone.
 		$this->userLogin('Admin', 'zabbix');
 		$this->setTimezone('Europe/Riga', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
 		$system_time = $this->getTime();
 		$this->page->logout();
 
-		// User timezone change
+		// User timezone change.
 		$this->userLogin('test-timezone', 'zabbix');
 		$this->setTimezone($data['user_timezone'], 'userprofile');
 		date_modify($system_time, $data['time_diff']);
@@ -169,6 +175,9 @@ class testTimezone extends CWebTest {
 
 	/**
 	 * @dataProvider getCreateUsersData
+	 * 
+	 * Create users with different timezones and check that time displayed for them correctly, according
+	 * to choosed timezone.
 	 */
 	public function testTimezone_CreateUsers($data) {
 		$this->userLogin('Admin', 'zabbix');
@@ -200,6 +209,9 @@ class testTimezone extends CWebTest {
 		$this->page->logout();
 	}
 
+	/**
+	 * Time received from Monitoring->Problems table.
+	 */
 	private function getTime() {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row = $table->findRow('Problem', 'Trigger for tag permissions Oracle');
@@ -208,6 +220,12 @@ class testTimezone extends CWebTest {
 		return date_create($time);
 	}
 
+	/**
+	 * Change time zone in GUI or in user settings.
+	 * 
+	 * @param string $timezone  time zone
+	 * @param string $page      part of page link you want to open
+	 */
 	private function setTimezone($timezone, $page) {
 		$field_name = ($page == 'gui') ? 'Default time zone' : 'Time zone';
 		$message = ($page == 'gui') ? 'Configuration updated' : 'User updated';
@@ -220,6 +238,12 @@ class testTimezone extends CWebTest {
 		$this->assertMessage(TEST_GOOD, $message);
 	}
 
+	/**
+	 * Allows to login with user credentials.
+	 * 
+	 * @param string $alias     Username on login screen
+	 * @param string $password  Password on login screen
+	 */
 	private function userLogin($alias, $password) {
 		$this->page->open('index.php');
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
