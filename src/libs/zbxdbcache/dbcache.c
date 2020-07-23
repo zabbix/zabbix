@@ -4473,3 +4473,33 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+void	zbx_hc_get_simple_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
+{
+	LOCK_CACHE;
+
+	*values_num = cache->history_num;
+	*items_num = cache->history_items.num_data;
+
+	UNLOCK_CACHE;
+}
+
+void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index, zbx_mem_stats_t *trends)
+{
+	LOCK_CACHE;
+
+	zbx_mem_dump_stats(3, hc_mem);
+	zbx_mem_dump_stats(3, hc_index_mem);
+	zbx_mem_dump_stats(3, trend_mem);
+
+	if (NULL != data)
+		zbx_mem_get_stats(hc_mem, data);
+
+	if (NULL != index)
+		zbx_mem_get_stats(hc_index_mem, index);
+
+	if (NULL != trends)
+		zbx_mem_get_stats(trend_mem, trends);
+
+	UNLOCK_CACHE;
+}

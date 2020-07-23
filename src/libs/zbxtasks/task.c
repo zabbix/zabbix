@@ -49,7 +49,7 @@ static void	tm_remote_command_clear(zbx_tm_remote_command_t *data)
  * Function: tm_remote_command_result_clear                                   *
  *                                                                            *
  * Purpose: frees remote command result task resources                        *
- *                                                                            *
+ *                                     int	zbx_tm_get_debuginfo(const char *request, char **info)                                       *
  * Parameters: data - [IN] the remote command result task data                *
  *                                                                            *
  ******************************************************************************/
@@ -1313,4 +1313,3 @@ int	zbx_tm_execute_task_data(const char *data, int len, zbx_uint64_t proxy_hosti
 
 	return zbx_tm_task_result_wait(taskid, info);
 }
-

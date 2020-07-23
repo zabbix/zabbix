@@ -3,4 +3,5 @@
 noinst_LIBRARIES = libzbxtasks.a
 
 libzbxtasks_a_SOURCES = \
-	task.c
+	task.c \
+	debuginfo.c

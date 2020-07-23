@@ -521,9 +521,14 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 static void	tm_process_debuginfo(zbx_uint64_t taskid, const char *data)
 {
 	zbx_tm_task_t	*task;
+	int		ret;
+	char		*info = NULL;
 
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
-	task->data = zbx_tm_data_result_create(taskid, FAIL, "Not implemented (server).");
+	ret = zbx_tm_get_debuginfo(data, &info);
+	task->data = zbx_tm_data_result_create(taskid, ret, info);
+	zbx_free(info);
+
 	zbx_tm_save_task(task);
 	zbx_tm_task_free(task);
 }
@@ -558,7 +563,7 @@ static int	tm_process_data(zbx_vector_uint64_t *taskids)
 			" from task t"
 			" left join task_data td"
 				" on t.taskid=td.taskid"
-			" where t.proxy_id is null"
+			" where t.proxy_hostid is null"
 				" and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", taskids->values, taskids->values_num);
 	result = DBselect("%s", sql);
