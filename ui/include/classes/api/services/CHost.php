@@ -1945,7 +1945,19 @@ class CHost extends CHostGeneral {
 				);
 			}
 
-			$groupids = array_merge($groupids, zbx_objectValues($host['groups'], 'groupid'));
+			$host['groups'] = zbx_toArray($host['groups']);
+
+			foreach ($host['groups'] as $group) {
+				if (!is_array($group) || (is_array($group) && !array_key_exists('groupid', $group))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'groups',
+							_s('the parameter "%1$s" is missing', 'groupid')
+						)
+					);
+				}
+
+				$groupids[$group['groupid']] = true;
+			}
 
 			// Validate tags.
 			if (array_key_exists('tags', $host)) {
@@ -1970,14 +1982,14 @@ class CHost extends CHostGeneral {
 		}
 
 		// Validate permissions to host groups.
-		if ($groupids) {
-			$db_groups = API::HostGroup()->get([
+		$db_groups = $groupids
+			? API::HostGroup()->get([
 				'output' => ['groupid'],
-				'groupids' => $groupids,
+				'groupids' => array_keys($groupids),
 				'editable' => true,
 				'preservekeys' => true
-			]);
-		}
+			])
+			: [];
 
 		foreach ($hosts as $host) {
 			foreach ($host['groups'] as $group) {
@@ -2099,7 +2111,7 @@ class CHost extends CHostGeneral {
 	protected function validateUpdate(array $hosts, array $db_hosts) {
 		$host_db_fields = ['hostid' => null];
 
-		foreach ($hosts as $host) {
+		foreach ($hosts as &$host) {
 			// Validate mandatory fields.
 			if (!check_db_fields($host_db_fields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -2120,14 +2132,29 @@ class CHost extends CHostGeneral {
 			}
 
 			// Validate "groups" field.
-			if (array_key_exists('groups', $host) && (!is_array($host['groups']) || !$host['groups'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Host "%1$s" cannot be without host group.', $db_hosts[$host['hostid']]['host'])
-				);
+			if (array_key_exists('groups', $host)) {
+				if (!is_array($host['groups']) || !$host['groups']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Host "%1$s" cannot be without host group.', $db_hosts[$host['hostid']]['host'])
+					);
+				}
+
+				$host['groups'] = zbx_toArray($host['groups']);
+
+				foreach ($host['groups'] as $group) {
+					if (!is_array($group) || (is_array($group) && !array_key_exists('groupid', $group))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', 'groups',
+								_s('the parameter "%1$s" is missing', 'groupid')
+							)
+						);
+					}
+				}
 			}
 
 			// Permissions to host groups is validated in massUpdate().
 		}
+		unset($host);
 
 		$inventory_fields = zbx_objectValues(getHostInventories(), 'db_field');
 
