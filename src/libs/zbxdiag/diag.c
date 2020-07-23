@@ -222,7 +222,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, const zbx_diag_m
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
-			zbx_json_addobject(j, "mem");
+			zbx_json_addobject(j, "memory");
 			diag_add_mem_stats(j, "data", pdata_mem);
 			diag_add_mem_stats(j, "index", pindex_mem);
 			diag_add_mem_stats(j, "trends", ptrends_mem);

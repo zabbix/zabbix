@@ -47,10 +47,10 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 				{"all", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEM},
 				{"items", ZBX_DIAG_HISTORYCACHE_ITEMS},
 				{"values", ZBX_DIAG_HISTORYCACHE_VALUES},
-				{"mem", ZBX_DIAG_HISTORYCACHE_MEM},
-				{"mem.data", ZBX_DIAG_HISTORYCACHE_MEM_DATA},
-				{"mem.index", ZBX_DIAG_HISTORYCACHE_MEM_INDEX},
-				{"mem.trends", ZBX_DIAG_HISTORYCACHE_MEM_TRENDS},
+				{"memory", ZBX_DIAG_HISTORYCACHE_MEM},
+				{"memory.data", ZBX_DIAG_HISTORYCACHE_MEM_DATA},
+				{"memory.index", ZBX_DIAG_HISTORYCACHE_MEM_INDEX},
+				{"memory.trends", ZBX_DIAG_HISTORYCACHE_MEM_TRENDS},
 				{NULL, 0}
 		};
 
