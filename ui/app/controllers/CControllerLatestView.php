@@ -119,12 +119,7 @@ class CControllerLatestView extends CControllerLatest {
 		// data sort and pager
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
-		$orig_data_rows = $prepared_data['rows'];
-
 		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['rows'], ZBX_SORT_UP, $view_curl);
-
-		$this->extendStatistics($prepared_data, $orig_data_rows);
-		unset($orig_data_rows);
 
 		// display
 		$data = [

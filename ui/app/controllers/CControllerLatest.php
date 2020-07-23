@@ -211,14 +211,10 @@ abstract class CControllerLatest extends CController {
 			CArrayHelper::sort($applications, [$application_sort_options]);
 			$applicationids = array_keys($applications);
 
-			$stats = [];
+			$applications_size = [];
 			$items_grouped = [];
 
 			foreach ($items as $itemid => $item) {
-				if (!array_key_exists($item['hostid'], $stats)) {
-					$stats[$item['hostid']] = [];
-				}
-
 				$item_applicationids = $item['applications']
 					? array_column($item['applications'], 'applicationid')
 					: [0];
@@ -230,15 +226,16 @@ abstract class CControllerLatest extends CController {
 
 					$items_grouped[$item['hostid']][$applicationid][$itemid] = $item;
 
-					if (array_key_exists($applicationid, $stats[$item['hostid']])) {
-						$stats[$item['hostid']][$applicationid]['total']++;
+					if (array_key_exists($applicationid, $applications_size)) {
+						$applications_size[$applicationid]++;
 					}
 					else {
-						$stats[$item['hostid']][$applicationid]['total'] = 1;
+						$applications_size[$applicationid] = 1;
 					}
 				}
 			}
 
+			$applications_index = [];
 			$items = [];
 			$rows = [];
 
@@ -258,9 +255,14 @@ abstract class CControllerLatest extends CController {
 				foreach ($host_items_grouped as $applicationid => $application_items) {
 					CArrayHelper::sort($application_items, [$item_sort_options]);
 
+					$applications_index[$applicationid] = [
+						'start' => count($rows)
+					];
+
 					foreach ($application_items as $itemid => $item) {
 						unset($item['applications']);
 
+						$applications_index[$applicationid]['end'] = count($rows);
 						$items[$itemid] = $item;
 						$rows[] = [
 							'itemid' => $itemid,
@@ -289,7 +291,8 @@ abstract class CControllerLatest extends CController {
 			$rows = [];
 			$hosts = [];
 			$applications = [];
-			$stats = [];
+			$applications_size = [];
+			$applications_index = [];
 			$history = [];
 		}
 
@@ -311,57 +314,12 @@ abstract class CControllerLatest extends CController {
 			'rows' => $rows,
 			'hosts' => $hosts,
 			'applications' => $applications,
-			'stats' => $stats,
+			'applications_size' => $applications_size,
+			'applications_index' => $applications_index,
 			'items' => $items,
 			'history' => $history,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
 			'multiselect_host_data' => $multiselect_host_data
 		];
-	}
-
-	/**
-	 * Function counts how many items for each application are left in previous and next pages.
-	 *
-	 * @param array $prepared_data  Array returned by self::prepareData and having 'rows' altered by paginator.
-	 * @param array $data_rows      Complete set of rows.
-	 */
-	protected function extendStatistics(array &$prepared_data, array $data_rows) {
-		$keys = array_keys($prepared_data['rows']);
-		$config = select_config();
-		$data_rows = array_slice($data_rows, 0, $config['search_limit']);
-		$rows_in_prev_pages = array_slice($data_rows, 0, $keys[0]);
-		$rows_in_next_pages = array_slice($data_rows, $keys[count($keys)-1] + 1);
-		$items_displayed = array_count_values(array_column($prepared_data['rows'], 'applicationid'));
-
-		foreach ($prepared_data['rows'] as $row) {
-			$item = $prepared_data['items'][$row['itemid']];
-
-			if (array_key_exists('before', $prepared_data['stats'][$item['hostid']][$row['applicationid']])) {
-				continue;
-			}
-			else {
-				$stats = &$prepared_data['stats'][$item['hostid']][$row['applicationid']];
-				$stats += [
-					'displayed' => $items_displayed[$row['applicationid']],
-					'not_selected' => 0,
-					'before' => 0,
-					'after' => 0
-				];
-			}
-
-			foreach ($rows_in_prev_pages as $prev_page_row) {
-				if ($prev_page_row['applicationid'] == $row['applicationid']) {
-					$stats['before']++;
-				}
-			}
-
-			foreach ($rows_in_next_pages as $next_page_row) {
-				if ($next_page_row['applicationid'] == $row['applicationid']) {
-					$stats['after']++;
-				}
-			}
-
-			$stats['not_selected'] = $stats['total'] - $stats['displayed'] - $stats['before'] - $stats['after'];
-		}
 	}
 }

@@ -32,6 +32,13 @@ $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
 // Latest data header.
 
+$col_toggle_all = (new CColHeader(
+	(new CSimpleButton())
+		->addClass(ZBX_STYLE_TREEVIEW)
+		->addClass('app-list-toggle-all')
+		->addItem(new CSpan())
+));
+
 $col_check_all = (new CColHeader(
 	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
 ));
@@ -40,13 +47,6 @@ $view_url = $data['view_curl']->getUrl();
 
 $col_host = make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url);
 $col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url);
-
-$col_toggle_all = (new CColHeader(
-	(new CSimpleButton())
-			->addClass(ZBX_STYLE_TREEVIEW)
-			->addClass('app-list-toggle-all')
-			->addItem(new CSpan())
-));
 
 if ($data['filter']['show_details']) {
 	$table->setHeader([
@@ -92,7 +92,9 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $last_hostid = null;
 $last_applicationid = null;
 
-foreach ($data['rows'] as $row) {
+$last_row_index = array_keys($data['rows'])[count($data['rows']) - 1];
+
+foreach ($data['rows'] as $row_index => $row) {
 	$item = $data['items'][$row['itemid']];
 
 	// Secondary header for the next host or application.
@@ -113,23 +115,21 @@ foreach ($data['rows'] as $row) {
 			? $data['applications'][$row['applicationid']]['name']
 			: '- '.('other').' -';
 
-		$stats = $data['stats'][$item['hostid']][$row['applicationid']];
-		$texts = [_n('%1$s Item', '%1$s Items', $stats['displayed'])];
-		if ($stats['before'] > 0) {
-			$texts[] = ($stats['before'] > CWebUser::$data['rows_per_page'])
-				? _s('%1$s on previous pages', $stats['before'])
-				: _s('%1$s on previous page', $stats['before']);
+		$application_size = $data['applications_size'][$row['applicationid']];
+		$application_index = $data['applications_index'][$row['applicationid']];
+
+		if ($application_index['start'] < $row_index || $application_index['end'] > $last_row_index) {
+			$application_stats = _s('displaying %1$s to %2$s of %3$s Items',
+				max(0, $row_index - $application_index['start']) + 1,
+				min($last_row_index, $application_index['end']) - $application_index['start'] + 1,
+				$application_size
+			);
 		}
-		if ($stats['after'] > 0) {
-			$texts[] = ($stats['after'] > CWebUser::$data['rows_per_page'])
-				? _s('%1$s on next pages', $stats['after'])
-				: _s('%1$s on next page', $stats['after']);
-		}
-		elseif ($stats['not_selected'] > 0) {
-			$texts[] = _s('%1$s not selected', $stats['not_selected']);
+		else {
+			$application_stats = _n('%1$s Item', '%1$s Items', $application_size);
 		}
 
-		$col_name = (new CCol([bold($application_name), ' ('.implode(', ', $texts).')']))
+		$col_name = (new CCol([bold($application_name), ' ('.$application_stats.')']))
 			->setColSpan($table_columns - 2);
 
 		$toggle_app = (new CSimpleButton())
@@ -139,12 +139,12 @@ foreach ($data['rows'] as $row) {
 
 		if ($row['applicationid']) {
 			$toggle_app
-				->setAttribute('data-open-state', CProfile::get('web.latest.toggle', null, $row['applicationid']))
-				->setAttribute('data-appid', $row['applicationid']);
+				->setAttribute('data-collapsed', CProfile::get('web.latest.collapsed', 0, $row['applicationid']))
+				->setAttribute('data-applicationid', $row['applicationid']);
 		}
 		else {
 			$toggle_app
-				->setAttribute('data-open-state', CProfile::get('web.latest.toggle_other', null, $host['hostid']))
+				->setAttribute('data-collapsed', CProfile::get('web.latest.collapsed_other', 0, $host['hostid']))
 				->setAttribute('data-hostid', $item['hostid']);
 		}
 
@@ -309,10 +309,10 @@ foreach ($data['rows'] as $row) {
 	}
 
 	if ($row['applicationid']) {
-		$table_row->setAttribute('data-parent-appid', $row['applicationid']);
+		$table_row->setAttribute('data-applicationid', $row['applicationid']);
 	}
 	else {
-		$table_row->setAttribute('data-parent-hostid', $item['hostid']);
+		$table_row->setAttribute('data-hostid', $item['hostid']);
 	}
 
 	$table->addRow($table_row);
