@@ -589,14 +589,22 @@
 	}
 
 	/**
-	 * Calculate minimal required height of dashboard container.
+	 * Calculate minimal height for dashboard grid in edit mode (maximal height without vertical page scrolling).
 	 *
 	 * @param {object} $obj  Dashboard container jQuery object.
 	 *
 	 * @returns {int}
 	 */
 	function calculateGridMinHeight($obj) {
-		return $(window).height() - $obj.offset().top - $('.wrapper').scrollTop();
+		var height = $(window).height() - $('footer').outerHeight() - $obj.offset().top - $('.wrapper').scrollTop();
+
+		$obj.parentsUntil('.wrapper').each(function() {
+			height -= parseInt($(this).css('padding-bottom'));
+		});
+
+		height -= parseInt($obj.css('margin-bottom'));
+
+		return height;
 	}
 
 	function getWidgetByTarget(widgets, $div) {
@@ -2723,6 +2731,7 @@
 
 		// Recalculate minimal height and expand dashboard to the whole screen.
 		data.minimalHeight = calculateGridMinHeight($obj);
+
 		resizeDashboardGrid($obj, data);
 
 		data['widgets'].forEach(function(widget) {
