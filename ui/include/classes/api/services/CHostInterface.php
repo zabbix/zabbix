@@ -625,19 +625,21 @@ class CHostInterface extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$this->checkDns($interface);
-			$this->checkIp($interface);
-			$this->checkPort($interface);
+			$filter = [
+				'hostid' => $data['hostids'],
+				'ip' => $interface['ip'],
+				'dns' => $interface['dns'],
+				'port' => $interface['port']
+			];
+
+			if (array_key_exists('bulk', $interface)) {
+				$filter['bulk'] = $interface['bulk'];
+			}
 
 			// check main interfaces
 			$interfacesToRemove = API::getApiService()->select($this->tableName(), [
 				'output' => ['interfaceid'],
-				'filter' => [
-					'hostid' => $data['hostids'],
-					'ip' => $interface['ip'],
-					'dns' => $interface['dns'],
-					'port' => $interface['port']
-				]
+				'filter' => $filter
 			]);
 			if ($interfacesToRemove) {
 				$this->checkMainInterfacesOnDelete(zbx_objectValues($interfacesToRemove, 'interfaceid'));
