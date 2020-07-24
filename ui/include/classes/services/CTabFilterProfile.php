@@ -64,6 +64,7 @@ class CTabFilterProfile {
 	public function __construct($idx) {
 		$this->namespace = $idx;
 		$this->tabfilters = [];
+		$this->filter_defaults = [];
 		$this->selected = 0;
 		$this->expanded = false;
 	}

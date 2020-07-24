@@ -156,6 +156,8 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	select() {
-		this._events.click();
+		if (!this._expanded) {
+			this._events.click();
+		}
 	}
 }

@@ -57,8 +57,6 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	}
 
 	$filter->addTimeselector($data['from'], $data['to']);
-
-
 	// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
 	$data['filter_options'] = $filter->options;
 

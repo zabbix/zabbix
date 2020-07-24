@@ -22,11 +22,11 @@
 
 $fields = $data['filter'];
 $filter_tags_table = (new CTable())
-	->setId('filter_tags_#{uniqid}')
+	->setId('tags_#{uniqid}')
 	->addRow(
 		(new CCol(
-			(new CRadioButtonList('filter_evaltype', (int) $fields['evaltype']))
-				->setId('filter_evaltype_#{uniqid}')
+			(new CRadioButtonList('evaltype', (int) $fields['evaltype']))
+				->setId('evaltype_#{uniqid}')
 				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 				->setModern(true)
@@ -40,21 +40,21 @@ if (!$tags) {
 
 foreach ($tags as $i => $tag) {
 	$filter_tags_table->addRow([
-		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
+		(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
 			->setAttribute('placeholder', _('tag'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->removeId(),
-		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
+		(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
 			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
 			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
-			->setId('filter_tags_'.$i.'_#{uniqid}')
+			->setId('tags_'.$i.'_#{uniqid}')
 			->setModern(true),
-		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
+		(new CTextBox('tags['.$i.'][value]', $tag['value']))
 			->setAttribute('placeholder', _('value'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->removeId(),
 		(new CCol(
-			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
+			(new CButton('tags['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 		))->addClass(ZBX_STYLE_NOWRAP)
@@ -62,7 +62,7 @@ foreach ($tags as $i => $tag) {
 }
 $filter_tags_table->addRow(
 	(new CCol(
-		(new CButton('filter_tags_add', _('Add')))
+		(new CButton('tags_add', _('Add')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-add')
 	))->setColSpan(3)
@@ -70,13 +70,13 @@ $filter_tags_table->addRow(
 
 $left_column = (new CFormList())
 	->addRow(_('Name'),
-		(new CTextBox('filter_name', $fields['name']))
+		(new CTextBox('name', $fields['name']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->removeId()
 	)
-	->addRow((new CLabel(_('Host groups'), 'filter_groupids__ms')),
+	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
 		(new CMultiSelect([
-			'name' => 'filter_groupids[]',
+			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
 			'data' => array_key_exists('groups_multiselect', $data) ? $data['groups_multiselect'] : [],
 			'popup' => [
@@ -84,59 +84,59 @@ $left_column = (new CFormList())
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'filter_groupids_',
+					'dstfld1' => 'groupids_',
 					'real_hosts' => true,
 					'enrich_parent_groups' => true
 				]
 			],
 			'add_post_js' => false
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('filter_groupids_#{uniqid}')
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('groupids_#{uniqid}')
 	)
 	->addRow(_('IP'),
-		(new CTextBox('filter_ip', $fields['ip']))
+		(new CTextBox('ip', $fields['ip']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->removeId()
 	)
 	->addRow(_('DNS'),
-		(new CTextBox('filter_dns', $fields['dns']))
+		(new CTextBox('dns', $fields['dns']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->removeId()
 	)
 	->addRow(_('Port'),
-		(new CTextBox('filter_port', $fields['port']))
+		(new CTextBox('port', $fields['port']))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->removeId()
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('filter_severities'))
+		(new CSeverityCheckBoxList('severities'))
 			->setChecked($fields['severities'])
 			->setUniqid('#{uniqid}')
-			->setId('filter_severities_#{uniqid}')
+			->setId('severities_#{uniqid}')
 	);
 
 $right_column = (new CFormList())
 	->addRow(
 		_('Status'),
 		(new CHorList())
-			->addItem((new CRadioButtonList('filter_status', (int) $fields['status']))
-				->addValue(_('Any'), -1, 'filter_status_1#{uniqid}')
-				->addValue(_('Enabled'), HOST_STATUS_MONITORED, 'filter_status_2#{uniqid}')
-				->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED, 'filter_status_3#{uniqid}')
-				->setId('filter_status_#{uniqid}')
+			->addItem((new CRadioButtonList('status', (int) $fields['status']))
+				->addValue(_('Any'), -1, 'status_1#{uniqid}')
+				->addValue(_('Enabled'), HOST_STATUS_MONITORED, 'status_2#{uniqid}')
+				->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED, 'status_3#{uniqid}')
+				->setId('status_#{uniqid}')
 				->setModern(true)
 			)
 	)
 	->addRow(_('Tags'), $filter_tags_table)
 	->addRow(_('Show hosts in maintenance'), [
-		(new CCheckBox('filter_maintenance_status'))
+		(new CCheckBox('maintenance_status'))
 			->setChecked($fields['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
-			->setId('filter_maintenance_status_#{uniqid}')
+			->setId('maintenance_status_#{uniqid}')
 			->setUncheckedValue(HOST_MAINTENANCE_STATUS_OFF),
 		(new CDiv([
-			(new CLabel(_('Show suppressed problems'), 'filter_show_suppressed_#{uniqid}'))
+			(new CLabel(_('Show suppressed problems'), 'show_suppressed_#{uniqid}'))
 				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-			(new CCheckBox('filter_show_suppressed'))
-				->setId('filter_show_suppressed_#{uniqid}')
+			(new CCheckBox('show_suppressed'))
+				->setId('show_suppressed_#{uniqid}')
 				->setChecked($fields['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
 				->setEnabled($fields['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON),
@@ -183,10 +183,10 @@ $(function($) {
 			.filter(is_sortable ? '[name="filter_set"]' : '[name="save_as"]').show();
 
 		// Host groups multiselect.
-		$('#filter_groupids_' + data.uniqid, container).multiSelectHelper({
-			id: 'filter_groupids_' + data.uniqid,
+		$('#groupids_' + data.uniqid, container).multiSelectHelper({
+			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
-			name: 'filter_groupids[]',
+			name: 'groupids[]',
 			data: data.groups_multiselect||[],
 			popup: {
 				parameters: {
@@ -195,7 +195,7 @@ $(function($) {
 					srctbl: 'host_groups',
 					srcfld1: 'groupid',
 					dstfrm: 'zbx_filter',
-					dstfld1: 'filter_groupids_' + data.uniqid,
+					dstfld1: 'groupids_' + data.uniqid,
 					real_hosts: 1,
 					enrich_parent_groups: 1
 				}
@@ -213,13 +213,13 @@ $(function($) {
 			$row.find('[name$="[value]"]').val(tag.value);
 			$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
 
-			$('#filter_tags_' + data.uniqid, container).append($row);
+			$('#tags_' + data.uniqid, container).append($row);
 		});
-		$('#filter_tags_' + data.uniqid, container).dynamicRows({template: '#filter-tag-row-tmpl'});
+		$('#tags_' + data.uniqid, container).dynamicRows({template: '#filter-tag-row-tmpl'});
 
 		// Show hosts in maintenance events.
-		$('[name="filter_maintenance_status"]', container).click(function () {
-			$('[name="filter_show_suppressed"]', container).prop('disabled', !this.checked);
+		$('[name="maintenance_status"]', container).click(function () {
+			$('[name="show_suppressed"]', container).prop('disabled', !this.checked);
 		});
 	}
 

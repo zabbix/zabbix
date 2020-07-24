@@ -173,7 +173,16 @@ class CControllerProfileUpdate extends CController {
 			case 'web.monitoringhosts.properties':
 				$idx2 = $this->getInput('idx2');
 				$idx2 = reset($idx2);
-				CProfile::update($idx, $this->getInput('value_str'), PROFILE_TYPE_STR, $idx2);
+				$properties = [];
+				parse_str($this->getInput('value_str'), $properties);
+				$filter = new CTabFilterProfile('web.monitoringhosts');
+				$filter->read();
+
+				if (array_key_exists($idx2, $filter->tabfilters)) {
+					$properties['severities'] = array_values($properties['severities']);
+					$filter->setTabFilter($idx2, $properties);
+					$filter->update();
+				}
 
 				break;
 

@@ -160,6 +160,16 @@ class CTabFilter extends CBaseComponent {
 						at: 'left top'
 					}
 				});
+			},
+
+			updateFields: (ev) => {
+				let form = this._active_item._content_container.querySelector('form'),
+					query_string = new URLSearchParams(new FormData(form)).toString();
+
+				this.profileUpdate('properties', {
+					'idx2[]': this._active_item._index,
+					'value_str': query_string
+				});
 			}
 		}
 
@@ -177,6 +187,8 @@ class CTabFilter extends CBaseComponent {
 		for (const action of this._target.querySelectorAll('nav [data-action]')) {
 			action.addEventListener('click', this._events[action.getAttribute('data-action')]);
 		}
+
+		this._shared_domnode.querySelector('[name="filter_set"]').addEventListener('click', this._events.updateFields);
 	}
 
 	collapseAllItemsExcept(except) {

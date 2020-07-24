@@ -31,29 +31,29 @@ class CControllerHostViewRefresh extends CControllerHost {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'sort' =>						'in name,status',
-			'sortorder' =>					'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
-			'page' =>						'ge 1',
-			'filter_set' =>					'in 1',
-			'filter_rst' =>					'in 1',
-			'filter_name' =>				'string',
-			'filter_groupids' =>			'array_id',
-			'filter_ip' =>					'string',
-			'filter_dns' =>					'string',
-			'filter_port' =>				'string',
-			'filter_status' =>				'in -1,'.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED,
-			'filter_evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
-			'filter_tags' =>				'array',
-			'filter_severities' =>			'array',
-			'filter_show_suppressed' =>		'in '.ZBX_PROBLEM_SUPPRESSED_FALSE.','.ZBX_PROBLEM_SUPPRESSED_TRUE,
-			'filter_maintenance_status' =>	'in '.HOST_MAINTENANCE_STATUS_OFF.','.HOST_MAINTENANCE_STATUS_ON
+			'sort' =>					'in name,status',
+			'sortorder' =>				'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
+			'page' =>					'ge 1',
+			'filter_set' =>				'in 1',
+			'filter_rst' =>				'in 1',
+			'name' =>					'string',
+			'groupids' =>				'array_id',
+			'ip' =>						'string',
+			'dns' =>					'string',
+			'port' =>					'string',
+			'status' =>					'in -1,'.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED,
+			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'tags' =>					'array',
+			'severities' =>				'array',
+			'show_suppressed' =>		'in '.ZBX_PROBLEM_SUPPRESSED_FALSE.','.ZBX_PROBLEM_SUPPRESSED_TRUE,
+			'maintenance_status' =>		'in '.HOST_MAINTENANCE_STATUS_OFF.','.HOST_MAINTENANCE_STATUS_ON
 		];
 
 		$ret = $this->validateInput($fields);
 
 		// Validate tags filter.
-		if ($ret && $this->hasInput('filter_tags')) {
-			foreach ($this->getInput('filter_tags') as $filter_tag) {
+		if ($ret && $this->hasInput('tags')) {
+			foreach ($this->getInput('tags') as $filter_tag) {
 				if (count($filter_tag) != 3
 						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
 						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
@@ -65,8 +65,8 @@ class CControllerHostViewRefresh extends CControllerHost {
 		}
 
 		// Validate severity checkbox filter.
-		if ($ret && $this->hasInput('filter_severities')) {
-			foreach ($this->getInput('filter_severities') as $severity) {
+		if ($ret && $this->hasInput('severities')) {
+			foreach ($this->getInput('severities') as $severity) {
 				if (!in_array($severity, range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))) {
 					$ret = false;
 					break;
@@ -87,19 +87,20 @@ class CControllerHostViewRefresh extends CControllerHost {
 
 	protected function doAction(): void {
 		$filter = [
-			'name' => $this->getInput('filter_name', ''),
-			'groupids' => $this->hasInput('filter_groupids') ? $this->getInput('filter_groupids') : null,
-			'ip' => $this->getInput('filter_ip', ''),
-			'dns' => $this->getInput('filter_dns', ''),
-			'port' => $this->getInput('filter_port', ''),
-			'status' => $this->getInput('filter_status', -1),
-			'evaltype' => $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
-			'tags' => $this->getInput('filter_tags', []),
-			'severities' => $this->getInput('filter_severities', []),
-			'show_suppressed' => $this->getInput('filter_show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
-			'maintenance_status' => $this->getInput('filter_maintenance_status', HOST_MAINTENANCE_STATUS_ON),
-			'page' => $this->hasInput('page') ? $this->getInput('page') : null
+			'name' =>				'',
+			'groupids' =>			null,
+			'ip' =>					'',
+			'dns' =>				'',
+			'port' =>				'',
+			'status' =>				-1,
+			'evaltype' =>			TAG_EVAL_TYPE_AND_OR,
+			'tags' =>				[],
+			'severities' =>			[],
+			'show_suppressed' =>	ZBX_PROBLEM_SUPPRESSED_FALSE,
+			'maintenance_status' =>	HOST_MAINTENANCE_STATUS_ON,
+			'page' =>				null
 		];
+		$this->getInputs($filter, array_keys($filter));
 
 		$sort = $this->getInput('sort', 'name');
 		$sortorder = $this->getInput('sortorder', ZBX_SORT_UP);
