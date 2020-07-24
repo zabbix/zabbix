@@ -44,7 +44,7 @@ class testConfiguration extends CAPITest {
 					],
 					'format' => ''
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of xml, json.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json.'
 			],
 			[
 				'export' => [
@@ -55,7 +55,7 @@ class testConfiguration extends CAPITest {
 					],
 					'format' => 'test'
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of xml, json.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json.'
 			],
 			[
 				'export' => [
@@ -213,7 +213,7 @@ class testConfiguration extends CAPITest {
 					],
 					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of xml, json.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json.'
 			],
 			[
 				'import' => [
@@ -225,7 +225,7 @@ class testConfiguration extends CAPITest {
 					],
 					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of xml, json.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json.'
 			],
 			[
 				'import' => [
