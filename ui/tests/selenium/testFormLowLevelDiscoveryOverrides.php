@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CFormParametersBehavior.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
@@ -39,30 +38,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			[
-				'class' => CFormParametersBehavior::class,
-				'table_selector' => 'id:overrides_filters',
-				'table_mapping' => [
-					'Macro' => [
-						'name' => 'macro',
-						'selector' => 'xpath:./input|./textarea',
-						'class' => 'CElement'
-					],
-					'' => [
-						'name' => 'operator',
-						'selector' => 'xpath:.//select[contains(@id, "_operator")]',
-						'class' => 'CDropdownElement'
-					],
-					'Regular expression' => [
-						'name' => 'expression',
-						'selector' => 'xpath:./input|./textarea',
-						'class' => 'CElement'
-					]
-				]
-			],
-			'class' => CMessageBehavior::class
-		];
+		return ['class' => CMessageBehavior::class];
 	}
 
 	/*
@@ -452,12 +428,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'index' => 0,
 										'macro' => '{#MACRO1}',
 										'operator' => 'does not match',
-										'expression' => 'expression_1'
+										'value' => 'expression_1'
 									],
 									[
 										'macro' => '{#MACRO2}',
 										'operator' => 'matches',
-										'expression' => 'expression_2'
+										'value' => 'expression_2'
 									]
 								]
 							],
@@ -583,12 +559,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 				// Check that Override with correct name was added to Overrides table.
-				$this->assertEquals($override['fields']['Name'],
+				$this->assertEquals(CTestArrayHelper::get($override, 'fields.Name'),
 						$override_container->getRow($i)->getColumn('Name')->getText()
 				);
 				// Check that Override in table has correct processing status.
-				$stop_processing = (CTestArrayHelper::get($override['fields'],
-						'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
+				$stop_processing = (CTestArrayHelper::get($override,
+						'fields.If filter matches') === 'Stop processing') ? 'Yes' : 'No';
 				$this->assertEquals($stop_processing,
 						$override_container->getRow($i)->getColumn('Stop processing')->getText()
 				);
@@ -1119,7 +1095,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'action' => USER_ACTION_ADD,
 										'macro' => '{#UPDATED_MACRO3}',
 										'operator' => 'does not match',
-										'expression' => 'ADDED expression_3'
+										'value' => 'ADDED expression_3'
 									]
 								]
 							],
@@ -1160,14 +1136,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'index' => 0,
 										'macro' => '{#UPDATED_MACRO1}',
 										'operator' => 'does not match',
-										'expression' => 'UPDATED expression_1'
+										'value' => 'UPDATED expression_1'
 									],
 									[
 										'action' => USER_ACTION_UPDATE,
 										'index' => 1,
 										'macro' => '{#UPDATED_MACRO2}',
 										'operator' => 'matches',
-										'expression' => 'UPDATED expression_2'
+										'value' => 'UPDATED expression_2'
 									]
 								]
 							],
@@ -1291,12 +1267,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						[
 							'macro' => '{#MACRO1}',
 							'operator' => 'matches',
-							'expression' => 'test expression_1'
+							'value' => 'test expression_1'
 						],
 						[
 							'macro' => '{#MACRO2}',
 							'operator' => 'does not match',
-							'expression' => 'test expression_2'
+							'value' => 'test expression_2'
 						]
 					]
 				],
@@ -1519,7 +1495,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 		// Add Filters to override.
 		if (array_key_exists('Filters', $override)) {
-			$this->fillParameters($override['Filters']['filter_conditions']);
+			$override_overlay->query('id:overrides_filters')->asMultifieldTable()->one()
+					->fill($override['Filters']['filter_conditions']);
 
 			// Add Type of calculation if there are more then 2 filters.
 			if (array_key_exists('Type of calculation', $override['Filters'])) {
@@ -1701,8 +1678,15 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			}
 
 			if (array_key_exists('Filters', $override)) {
+				foreach ($override['Filters']['filter_conditions'] as &$condition) {
+					unset($condition['index']);
+					unset($condition['action']);
+				}
+				unset($condition);
+
 				// Check that Fiters are filled correctly.
-				$this->assertValues($override['Filters']['filter_conditions']);
+				$override_overlay->query('id:overrides_filters')->asMultifieldTable()->one()
+					->checkValue($override['Filters']['filter_conditions']);
 
 				// Check that Evaluation type is filled correctly.
 				if (array_key_exists('Type of calculation', $override['Filters'])) {

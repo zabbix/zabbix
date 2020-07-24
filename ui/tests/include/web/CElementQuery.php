@@ -502,7 +502,7 @@ class CElementQuery implements IWaitable {
 	public static function getInputElement($target, $prefix = './', $class = null) {
 		$classes = [
 			'CElement'					=> [
-				// TODO: hidden input task
+				// TODO: change after DEV-1630 (1) is resolved.
 				'/input[@name][not(@type) or @type="text" or @type="password"][not(@style) or not(contains(@style,"display: none"))]',
 				'/textarea[@name]'
 			],
