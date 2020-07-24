@@ -33,14 +33,12 @@
 #define ZBX_DIAG_HISTORYCACHE_VALUES		0x00000002
 #define ZBX_DIAG_HISTORYCACHE_MEM_DATA		0x00000004
 #define ZBX_DIAG_HISTORYCACHE_MEM_INDEX		0x00000008
-#define ZBX_DIAG_HISTORYCACHE_MEM_TRENDS	0x00000010
 
 #define ZBX_DIAG_HISTORYCACHE_SIMPLE	(ZBX_DIAG_HISTORYCACHE_ITEMS | \
 					ZBX_DIAG_HISTORYCACHE_VALUES)
 
-#define ZBX_DIAG_HISTORYCACHE_MEM		(ZBX_DIAG_HISTORYCACHE_MEM_DATA | \
-					ZBX_DIAG_HISTORYCACHE_MEM_INDEX | \
-					ZBX_DIAG_HISTORYCACHE_MEM_TRENDS)
+#define ZBX_DIAG_HISTORYCACHE_MEM	(ZBX_DIAG_HISTORYCACHE_MEM_DATA | \
+					ZBX_DIAG_HISTORYCACHE_MEM_INDEX)
 
 typedef struct
 {
@@ -49,10 +47,8 @@ typedef struct
 }
 zbx_diag_map_t;
 
-int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *j,
-		char **error);
+int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *j, char **error);
 
-int	diag_add_historycache_info(const struct zbx_json_parse *jp, const zbx_diag_map_t *stats, struct zbx_json *j,
-		char **error);
+int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *j, char **error);
 
 #endif

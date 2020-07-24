@@ -179,13 +179,21 @@ static void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_m
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	diag_add_historycache_info(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map, struct zbx_json *j,
-		char **error)
+int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *j, char **error)
 {
 	zbx_vector_ptr_t	tops;
 	int			ret;
 	double			time1, time2, time_total;
 	zbx_uint64_t		fields;
+	zbx_diag_map_t		field_map[] = {
+					{"all", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEM},
+					{"items", ZBX_DIAG_HISTORYCACHE_ITEMS},
+					{"values", ZBX_DIAG_HISTORYCACHE_VALUES},
+					{"memory", ZBX_DIAG_HISTORYCACHE_MEM},
+					{"memory.data", ZBX_DIAG_HISTORYCACHE_MEM_DATA},
+					{"memory.index", ZBX_DIAG_HISTORYCACHE_MEM_INDEX},
+					{NULL, 0}
+					};
 
 	zbx_vector_ptr_create(&tops);
 
@@ -211,21 +219,19 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, const zbx_diag_m
 
 		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEM))
 		{
-			zbx_mem_stats_t	data_mem, index_mem, trends_mem, *pdata_mem, *pindex_mem, *ptrends_mem;
+			zbx_mem_stats_t	data_mem, index_mem, *pdata_mem, *pindex_mem;
 
 			pdata_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEM_DATA) ? &data_mem : NULL);
 			pindex_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEM_INDEX) ? &index_mem : NULL);
-			ptrends_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEM_TRENDS) ? &trends_mem : NULL);
 
 			time1 = zbx_time();
-			zbx_hc_get_mem_stats(pdata_mem, pindex_mem, ptrends_mem);
+			zbx_hc_get_mem_stats(pdata_mem, pindex_mem);
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
 			zbx_json_addobject(j, "memory");
 			diag_add_mem_stats(j, "data", pdata_mem);
 			diag_add_mem_stats(j, "index", pindex_mem);
-			diag_add_mem_stats(j, "trends", ptrends_mem);
 			zbx_json_close(j);
 		}
 

@@ -985,6 +985,6 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 
 /* diagnostic data */
 void	zbx_hc_get_simple_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
-void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index, zbx_mem_stats_t *trends);
+void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index);
 
 #endif

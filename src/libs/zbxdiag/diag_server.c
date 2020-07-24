@@ -42,20 +42,7 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 	int	ret = FAIL;
 
 	if (0 == strcmp(section, "historycache"))
-	{
-		zbx_diag_map_t	field_map[] = {
-				{"all", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEM},
-				{"items", ZBX_DIAG_HISTORYCACHE_ITEMS},
-				{"values", ZBX_DIAG_HISTORYCACHE_VALUES},
-				{"memory", ZBX_DIAG_HISTORYCACHE_MEM},
-				{"memory.data", ZBX_DIAG_HISTORYCACHE_MEM_DATA},
-				{"memory.index", ZBX_DIAG_HISTORYCACHE_MEM_INDEX},
-				{"memory.trends", ZBX_DIAG_HISTORYCACHE_MEM_TRENDS},
-				{NULL, 0}
-		};
-
-		ret = diag_add_historycache_info(jp, field_map, j, error);
-	}
+		ret = diag_add_historycache_info(jp, j, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
 

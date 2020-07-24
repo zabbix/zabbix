@@ -4484,7 +4484,7 @@ void	zbx_hc_get_simple_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
 	UNLOCK_CACHE;
 }
 
-void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index, zbx_mem_stats_t *trends)
+void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
 {
 	LOCK_CACHE;
 
@@ -4493,9 +4493,6 @@ void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index, zbx_mem
 
 	if (NULL != index)
 		zbx_mem_get_stats(hc_index_mem, index);
-
-	if (NULL != trends)
-		zbx_mem_get_stats(trend_mem, trends);
 
 	UNLOCK_CACHE;
 }
