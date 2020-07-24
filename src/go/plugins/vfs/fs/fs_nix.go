@@ -23,7 +23,7 @@ package vfsfs
 
 import (
 	"bufio"
-	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -32,7 +32,25 @@ import (
 )
 
 func (p *Plugin) getFsInfoStats() (data []*FsInfo, err error) {
-	return nil, errors.New("Unsupported item key.")
+	fullData, err := p.getFsInfo()
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("got here")
+
+	for _, info := range fullData {
+		bytes, err := getFsStats(*info.FsName)
+		if err != nil {
+			return nil, err
+		}
+		if bytes.Total > 0 {
+			info.Bytes = bytes
+			//TODO: add inode
+			data = append(data, info)
+		}
+	}
+
+	return
 }
 
 func (p *Plugin) readMounts(file io.Reader) (data []*FsInfo, err error) {
