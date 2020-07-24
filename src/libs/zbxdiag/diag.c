@@ -249,7 +249,6 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 				{
 					zbx_vector_uint64_pair_t	top;
 					int				i, limit;
-					char				buffer[MAX_ID_LEN + 1];
 
 					zbx_vector_uint64_pair_create(&top);
 					zbx_hc_get_values_by_items(&top);
@@ -259,9 +258,9 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 
 					for (i = 0; i < limit; i++)
 					{
-						zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, top.values[i].first);
 						zbx_json_addobject(j, NULL);
-						zbx_json_addint64(j, buffer, top.values[i].second);
+						zbx_json_addint64(j, "itemid", top.values[i].first);
+						zbx_json_addint64(j, "values", top.values[i].second);
 						zbx_json_close(j);
 					}
 
