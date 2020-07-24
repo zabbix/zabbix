@@ -22,6 +22,7 @@ package vfsfs
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"zabbix.com/pkg/plugin"
 )
@@ -38,12 +39,18 @@ const (
 	statModePUsed
 )
 
+type percent float64
+
+func (n percent) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%f", n)), nil
+}
+
 type FsStats struct {
 	Total uint64  `json:"total"`
 	Free  uint64  `json:"free"`
 	Used  uint64  `json:"used"`
-	PFree float64 `json:"pfree"`
-	PUsed float64 `json:"pused"`
+	PFree percent `json:"pfree"`
+	PUsed percent `json:"pused"`
 }
 
 type FsInfo struct {
@@ -51,6 +58,15 @@ type FsInfo struct {
 	FsType    *string  `json:"{#FSTYPE},omitempty"`
 	DriveType *string  `json:"{#FSDRIVETYPE},omitempty"`
 	Bytes     *FsStats `json:"bytes,omitempty"`
+	Inodes    *FsStats `json:"inodes,omitempty"`
+}
+
+type FsInfoNew struct {
+	FsName    *string  `json:"fsname,omitempty"`
+	FsType    *string  `json:"fstype,omitempty"`
+	DriveType *string  `json:"fsdrivetype,omitempty"`
+	Bytes     *FsStats `json:"bytes,omitempty"`
+	Inodes    *FsStats `json:"inodes,omitempty"`
 }
 
 type Plugin struct {
@@ -78,7 +94,7 @@ func (p *Plugin) exportGet(params []string) (value interface{}, err error) {
 	if len(params) != 0 {
 		return nil, errors.New(errorInvalidParameters)
 	}
-	var d []*FsInfo
+	var d []*FsInfoNew
 	if d, err = p.getFsInfoStats(); err != nil {
 		return
 	}
@@ -89,7 +105,7 @@ func (p *Plugin) exportGet(params []string) (value interface{}, err error) {
 	return string(b), nil
 }
 
-func (p *Plugin) exportSize(params []string) (value interface{}, err error) {
+func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)) (value interface{}, err error) {
 	if len(params) < 1 || params[0] == "" {
 		return nil, errors.New("Invalid first parameter.")
 	}
@@ -113,7 +129,7 @@ func (p *Plugin) exportSize(params []string) (value interface{}, err error) {
 		}
 	}
 	var stats *FsStats
-	if stats, err = getFsStats(params[0]); err != nil {
+	if stats, err = getStats(params[0]); err != nil {
 		return
 	}
 
@@ -140,17 +156,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "vfs.fs.get":
 		return p.exportGet(params)
 	case "vfs.fs.size":
-		return p.exportSize(params)
+		return p.export(params, getFsStats)
+	case "vfs.fs.inode":
+		return p.export(params, getFsInode)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-}
-
-//TODO: vfs.fs.get has no test run
-func init() {
-	plugin.RegisterMetrics(&impl, "VfsFs",
-		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
-		"vfs.fs.get", "List of mounted filesystems with statistics.",
-		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
-	)
 }

@@ -23,30 +23,36 @@ package vfsfs
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"strings"
 
 	"golang.org/x/sys/unix"
+	"zabbix.com/pkg/plugin"
 )
 
-func (p *Plugin) getFsInfoStats() (data []*FsInfo, err error) {
-	fullData, err := p.getFsInfo()
+func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
+	allData, err := p.getFsInfo()
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("got here")
 
-	for _, info := range fullData {
+	for _, info := range allData {
 		bytes, err := getFsStats(*info.FsName)
 		if err != nil {
 			return nil, err
 		}
-		if bytes.Total > 0 {
+
+		inodes, err := getFsInode(*info.FsName)
+		if err != nil {
+			return nil, err
+		}
+
+		if bytes.Total > 0 && inodes.Total > 0 {
+
 			info.Bytes = bytes
-			//TODO: add inode
-			data = append(data, info)
+			info.Inodes = inodes
+			data = append(data, &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes})
 		}
 	}
 
@@ -101,9 +107,39 @@ func getFsStats(path string) (stats *FsStats, err error) {
 		Total: total,
 		Free:  free,
 		Used:  used,
-		PFree: float64(free) / float64(total) * 100,
-		PUsed: float64(used) / float64(total) * 100,
+		PFree: percent(free) / percent(total) * 100,
+		PUsed: percent(used) / percent(total) * 100,
 	}
 
 	return
+}
+
+func getFsInode(path string) (stats *FsStats, err error) {
+	fs := unix.Statfs_t{}
+	err = unix.Statfs(path, &fs)
+	if err != nil {
+		return nil, err
+	}
+
+	total := fs.Files
+	free := fs.Ffree
+	used := fs.Files - fs.Ffree
+	stats = &FsStats{
+		Total: total,
+		Free:  free,
+		Used:  used,
+		PFree: percent(free) / percent(total) * 100,
+		PUsed: percent(used) / percent(total) * 100,
+	}
+
+	return
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "VfsFs",
+		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.",
+		"vfs.fs.get", "List of mounted filesystems with statistics.",
+		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
+		"vfs.fs.inode", "Disk space in bytes or in percentage from total.",
+	)
 }
