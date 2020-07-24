@@ -1,1 +1,1 @@
-..F....... [ZBX-17653] fixed dashboard calculating height after deleting widget (kustalovs)
+..F....... [ZBX-17653] fixed new widget placeholder behavior and dashboard height calculation in edit mode (averza, kustalovs)
