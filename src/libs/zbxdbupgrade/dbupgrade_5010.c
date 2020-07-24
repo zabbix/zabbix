@@ -89,6 +89,13 @@ static int	DBpatch_5010004(void)
 	return ret;
 }
 
+static int	DBpatch_5010005(void)
+{
+	const ZBX_FIELD	field = {"custom_interfaces", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -100,5 +107,6 @@ DBPATCH_ADD(5010001, 0, 1)
 DBPATCH_ADD(5010002, 0, 1)
 DBPATCH_ADD(5010003, 0, 1)
 DBPATCH_ADD(5010004, 0, 1)
+DBPATCH_ADD(5010005, 0, 1)
 
 DBPATCH_END()
