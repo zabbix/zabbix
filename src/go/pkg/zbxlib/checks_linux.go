@@ -82,10 +82,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_BOOTTIME)
 	case "net.tcp.listen":
 		cfunc = unsafe.Pointer(C.NET_TCP_LISTEN)
-	case "net.tcp.service":
-		cfunc = unsafe.Pointer(C.CHECK_SERVICE)
-	case "net.tcp.service.perf":
-		cfunc = unsafe.Pointer(C.CHECK_SERVICE_PERF)
 	case "net.udp.listen":
 		cfunc = unsafe.Pointer(C.NET_UDP_LISTEN)
 	case "sensor":

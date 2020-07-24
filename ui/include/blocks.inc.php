@@ -619,22 +619,25 @@ function make_status_of_zbx() {
 
 	$status = get_status();
 
-	$table->addRow([
-		_('Zabbix server is running'),
-		(new CSpan($status['is_running'] ? _('Yes') : _('No')))
-			->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
-		$server_details
-	]);
-	$table->addRow([_('Number of hosts (enabled/disabled/templates)'),
-		$status['has_status'] ? $status['hosts_count'] : '',
-		$status['has_status']
-			? [
-				(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-				(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED), ' / ',
-				(new CSpan($status['hosts_count_template']))->addClass(ZBX_STYLE_GREY)
-			]
-			: ''
-	]);
+	$table
+		->addRow([_('Zabbix server is running'),
+			(new CSpan($status['is_running'] ? _('Yes') : _('No')))
+				->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+			$server_details
+		])
+		->addRow([_('Number of hosts (enabled/disabled)'),
+			$status['has_status'] ? $status['hosts_count'] : '',
+			$status['has_status']
+				? [
+					(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
+					(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED)
+				]
+				: ''
+		])
+		->addRow([_('Number of templates'),
+			$status['has_status'] ? $status['hosts_count_template'] : '', ''
+		]);
+
 	$title = (new CSpan(_('Number of items (enabled/disabled/not supported)')))
 		->setTitle(_('Only items assigned to enabled hosts are counted'));
 	$table->addRow([$title, $status['has_status'] ? $status['items_count'] : '',

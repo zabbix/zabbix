@@ -1343,8 +1343,12 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 int	zbx_strcmp_null(const char *s1, const char *s2);
 
-int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r);
-int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length);
+#define ZBX_MACRO_REGEX_PREFIX		"regex:"
+
+int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r,
+		unsigned char *context_op);
+int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length,
+		unsigned char *context_op);
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
 
@@ -1385,9 +1389,6 @@ void	zbx_alarm_flag_clear(void);
 #ifndef _WINDOWS
 unsigned int	zbx_alarm_on(unsigned int seconds);
 unsigned int	zbx_alarm_off(void);
-#if defined(HAVE_RESOLV_H)
-void	zbx_update_resolver_conf(void);		/* handle /etc/resolv.conf update */
-#endif
 #endif
 
 int	zbx_alarm_timed_out(void);
@@ -1641,5 +1642,8 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, in
 #endif
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
+
+#define AUDIT_ACTION_EXECUTE	7
+#define AUDIT_RESOURCE_SCRIPT	25
 
 #endif

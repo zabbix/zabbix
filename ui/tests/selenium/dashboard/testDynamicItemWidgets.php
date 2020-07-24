@@ -137,10 +137,10 @@ class testDynamicItemWidgets extends CWebTest {
 					'widgets' => [
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H2I1'],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G1 (I1)'],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
 						[
@@ -174,8 +174,7 @@ class testDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
-						// TODO: change after fix ZBX-17825, should be 'Dynamic widgets H2: Dynamic widgets H1 GP4 (H1 IP1 and H2 I1)'
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I2)']
+						['type' => 'Graph prototype', 'header' => 'Graph prototype']
 					]
 				]
 			],
@@ -185,10 +184,10 @@ class testDynamicItemWidgets extends CWebTest {
 					'widgets' => [
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H3I1'],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G1 (I1)'],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
 						[
@@ -231,13 +230,13 @@ class testDynamicItemWidgets extends CWebTest {
 					'host_filter' => 'Host for suppression',
 					'widgets' => [
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
-						['type' => 'Graph (classic)', 'header' => ''],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
-						['type' => 'Graph (classic)', 'header' => ''],
-						['type' => 'Graph (classic)', 'header' => ''],
-						['type' => 'Graph (classic)', 'header' => ''],
-						['type' => 'Graph (classic)', 'header' => ''],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						[
 							'type' => 'Plain text',
 							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
@@ -275,6 +274,9 @@ class testDynamicItemWidgets extends CWebTest {
 	}
 
 	/**
+	 * @on-before createTestFile
+	 * @on-after removeTestFile
+	 *
 	 * @dataProvider getWidgetsData
 	 */
 	public function testDynamicItemWidgets_Layout($data) {
@@ -290,9 +292,6 @@ class testDynamicItemWidgets extends CWebTest {
 			else {
 				$host->clear()->type($data['host_filter']);
 			}
-			$this->page->waitUntilReady();
-			// TODO: remove after fix ZBX-17821
-			$this->page->refresh();
 			$this->page->waitUntilReady();
 		}
 
@@ -310,6 +309,7 @@ class testDynamicItemWidgets extends CWebTest {
 
 		foreach ($data as $key => $expected) {
 			$widget = $widgets->get($key);
+			$widget->waitUntilReady();
 			$widget_content = $widget->getContent();
 			$this->assertEquals($expected['header'], $widget->getHeaderText());
 
@@ -337,11 +337,21 @@ class testDynamicItemWidgets extends CWebTest {
 
 				case 'URL':
 					$this->page->switchTo($widget_content->query('id:iframe')->one());
-					$form = $this->query('xpath://form[@action="hostinventories.php"]')->asForm()->one();
-					$this->assertEquals($expected['host'], $form->getFieldContainer('Host name')->getText());
+					$params = json_decode($this->query('xpath://body')->one()->getText(), true);
+					$this->assertEquals($expected['host'], $params['name']);
 					$this->page->switchTo();
 					break;
 			}
 		}
+	}
+
+	public function createTestFile() {
+		if (file_put_contents(PHPUNIT_BASEDIR.'/ui/iframe.php', '<?php echo json_encode($_GET);') === false) {
+			throw new Exception('Failed to create iframe test file.');
+		}
+	}
+
+	public function removeTestFile() {
+		@unlink(PHPUNIT_BASEDIR.'/frontends/php/iframe.php');
 	}
 }

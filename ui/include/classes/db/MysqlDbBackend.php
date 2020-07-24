@@ -83,7 +83,8 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkTablesEncoding(array $DB) {
-		$tables = DBfetchColumn(DBSelect('SELECT table_name FROM information_schema.columns'.
+		// Aliasing table_name to ensure field name is lowercase.
+		$tables = DBfetchColumn(DBSelect('SELECT table_name AS table_name FROM information_schema.columns'.
 			' WHERE table_schema='.zbx_dbstr($DB['DATABASE']).
 				' AND '.dbConditionString('table_name', array_keys(DB::getSchema())).
 				' AND '.dbConditionString('data_type', ['text', 'varchar', 'longtext']).
@@ -169,7 +170,7 @@ class MysqlDbBackend extends DbBackend {
 			$tls_mode = MYSQLI_CLIENT_SSL;
 		}
 
-		$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
+		@$resource->real_connect($host, $user, $password, $dbname, $port, null, $tls_mode);
 
 		if ($resource->error) {
 			$this->setError($resource->error);

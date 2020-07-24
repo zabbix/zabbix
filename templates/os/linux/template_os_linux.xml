@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-03T06:06:34Z</date>
+   <date>2020-06-04T17:53:49Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1598,7 +1598,7 @@ return newvalue;</params>
                         <trigger_prototype>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                            <name>Interface {#IFNAME}: Link down</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
@@ -1657,7 +1657,7 @@ and&#13;
                         <dependency>
                            <name>Interface {#IFNAME}: Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1676,7 +1676,7 @@ and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNA
                         <dependency>
                            <name>Interface {#IFNAME}: Link down</name>
                            <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2 and {Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2</recovery_expression>
+                           <recovery_expression>{Template Module Linux network interfaces by Zabbix agent:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}&lt;&gt;2 or {$IFCONTROL:"{#IFNAME}"}=0</recovery_expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -1775,7 +1775,7 @@ and {Template Module Linux network interfaces by Zabbix agent:net.if.out["{#IFNA
                         <name>Interface {#IFNAME}: Network traffic</name>
                         <host>Template Module Linux network interfaces by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>

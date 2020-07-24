@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.2rc1');
-define('ZABBIX_API_VERSION',	'5.0.2');
+define('ZABBIX_VERSION',		'5.0.3rc1');
+define('ZABBIX_API_VERSION',	'5.0.3');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -220,6 +220,7 @@ define('AUDIT_ACTION_LOGIN',	3);
 define('AUDIT_ACTION_LOGOUT',	4);
 define('AUDIT_ACTION_ENABLE',	5);
 define('AUDIT_ACTION_DISABLE',	6);
+define('AUDIT_ACTION_EXECUTE',	7);
 
 define('AUDIT_RESOURCE_USER',				0);
 define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2);
@@ -1372,7 +1373,8 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
-define('ZBX_MACRO_SECRET_MASK', '******'); // Placeholder for masked macro value.
+
+define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
@@ -1674,6 +1676,7 @@ define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
+define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
@@ -1928,6 +1931,14 @@ define('PROBLEMS_TAG_NAME_NONE',      2);
 define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
+
+/**
+ * The sandbox attribute enables an extra set of restrictions for the content in the iframe. Default is set to empty
+ * string, which means all restrictions are applied. To disable, set to FALSE. To set a specific set of restrictions,
+ * write a custom string.
+ * https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html#attr-iframe-sandbox
+ */
+define('ZBX_IFRAME_SANDBOX', '');
 
 // HTTP headers
 /*
