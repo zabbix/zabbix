@@ -1,6 +1,8 @@
 Changes for 5.2.0alpha1
 
 New features:
+A.F.I...S. [ZBXNEXT-250] added support of global and per-user time zones for frontend, notifications and for time limit when notifications are sent (agriscenko, vso)
+...G...... [ZBXNEXT-6080] add telnet support for net.tcp.service/.perf key and enable it on linux/darwin (esneiders)
 .........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
 .......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
 .......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
@@ -30,6 +32,13 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5880] added component version item to server and proxy remote monitoring templates (vjaceslavs)
 
 Bug fixes:
+..F....... [ZBX-17653] fixed new widget placeholder behavior and dashboard height calculation in edit mode (averza, kustalovs)
+..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
+..F....... [ZBX-16819] added link to hosts linked to each template in templates list (miks)
+...G...... [ZBX-18023] fixed format of agent2 version number (MVekslers)
+A......... [ZBX-18071] fixed slow SQL query when filtering items with latest data available (averza)
+..F....... [ZBX-17898] fixed JavaScript errors on pasting widgets (averza)
+........S. [ZBX-17569] fixed calculating items not allowing negative values be corrected in the preprocessing (arimdjonoks)
 ..F....... [ZBX-18036] fixed endpoint URL for Elasticsearch API requests (miks)
 ..F....... [ZBX-18068] fixed incorrect function call and redundant code (miks)
 ...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
