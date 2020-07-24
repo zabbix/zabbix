@@ -64,6 +64,7 @@ class CTabFilter extends CBaseComponent {
 				template: this._templates[template]
 			});
 
+			item._parent = this;
 			this._items.push(item);
 			data_index++;
 
@@ -165,7 +166,6 @@ class CTabFilter extends CBaseComponent {
 		for (const item of this._items) {
 			item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
-			item.on(TABFILTERITEM_EVENT_AFTER_RENDER, this._events.afterTabContentRender);
 		}
 
 		$('.ui-sortable', this._target).sortable({
@@ -213,8 +213,5 @@ class CTabFilter extends CBaseComponent {
 		}).catch((err) => {
 			// Catch DOMExeception: The user aborted a request.
 		});
-	}
-
-	afterTabContentRender(tabitem, is_init) {
 	}
 }

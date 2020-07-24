@@ -19,16 +19,17 @@
 
 
 const TABFILTERITEM_EVENT_CLICK = 'click';
-const TABFILTERITEM_EVENT_COLLAPSE = 'collapse';
-const TABFILTERITEM_EVENT_EXPAND   = 'expand';
-const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expand.tabfilter';
-const TABFILTERITEM_EVENT_AFTER_RENDER = 'render.tabfilter';
+const TABFILTERITEM_EVENT_COLLAPSE = 'collapse.tabfilter';
+const TABFILTERITEM_EVENT_EXPAND   = 'expand.tabfilter';
+const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expandbefore.tabfilter';
+const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
 
 class CTabFilterItem extends CBaseComponent {
 
 	constructor(target, options) {
 		super(target);
 
+		this._parent = null;
 		this._idx_namespace = options.idx_namespace;
 		this._index = options.index;
 		this._content_container = options.container;
@@ -78,7 +79,9 @@ class CTabFilterItem extends CBaseComponent {
 					this.renderContentTemplate();
 				}
 				else {
-					this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND_BEFORE, {detail: this}));
+					(this._template||this._content_container.querySelector('[data-template]')).dispatchEvent(
+						new CustomEvent(TABFILTERITEM_EVENT_EXPAND, {detail: this})
+					);
 				}
 
 				this._content_container.classList.remove('display-none');
@@ -92,6 +95,9 @@ class CTabFilterItem extends CBaseComponent {
 				this._expanded = false;
 				this.removeClass('active');
 				this._content_container.classList.add('display-none');
+				(this._template||this._content_container.querySelector('[data-template]')).dispatchEvent(
+					new CustomEvent(TABFILTERITEM_EVENT_COLLAPSE, {detail: this})
+				);
 				this.removeActionIcons();
 			}
 		}
@@ -105,7 +111,7 @@ class CTabFilterItem extends CBaseComponent {
 	renderContentTemplate() {
 		if (this._template) {
 			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
-			this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_AFTER_RENDER, {detail: this}));
+			this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_RENDER, {detail: this}));
 		}
 	}
 

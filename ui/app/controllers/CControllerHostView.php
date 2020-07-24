@@ -196,6 +196,8 @@ class CControllerHostView extends CControllerHost {
 			'severities' => [],
 			'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
 			'maintenance_status' => HOST_MAINTENANCE_STATUS_ON,
+			'from' => 'now-1d',
+			'to' => 'now',
 			'sort' => 'name',
 			'sortorder' => ZBX_SORT_UP
 		];
@@ -216,7 +218,11 @@ class CControllerHostView extends CControllerHost {
 
 			'filter_template' => 'monitoring.host.filter',
 			'filter_defaults' => $data['filter_defaults'],
+			'from' => $filter['from'],
+			'to' => $filter['to'],
 			'filter_tabs' => $profile->getTabsWithDefaults(),
+			'tab_selected' => $profile->selected,
+			'tab_expanded' => $profile->expanded
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

@@ -100,7 +100,7 @@ class CTabFilterProfile {
 	 */
 	public function getTabFilter($index): array {
 		return array_key_exists($index, $this->tabfilters)
-			? $this->tabfilters[$index]['filter']
+			? $this->tabfilters[$index]['filter'] + $this->filter_defaults
 			: $this->filter_defaults;
 	}
 

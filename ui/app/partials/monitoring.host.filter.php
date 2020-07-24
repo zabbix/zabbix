@@ -232,10 +232,10 @@ $(function($) {
 	}
 
 	// Tab filter item events handlers.
-	template.addEventListener(TABFILTERITEM_EVENT_AFTER_RENDER, function (ev) {
+	template.addEventListener(TABFILTERITEM_EVENT_RENDER, function (ev) {
 		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
-	template.addEventListener(TABFILTERITEM_EVENT_EXPAND_BEFORE, function (ev) {
+	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
 		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
 	});
 });

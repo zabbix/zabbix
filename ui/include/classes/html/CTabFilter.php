@@ -19,29 +19,12 @@ class CTabFilter extends CDiv {
 	 * Tab options array.
 	 */
 	public $options = [
-		// allow to reorder tabs
 		'sortable' => true,
-		// allow to collapse tab
 		'can_toggle' => true,
-		// active/selected tab
-		'active_tab' => 1,
-		// tabs custom data
+		'selected' => 0,
+		'expanded' => false,
 		'data' => [],
 	];
-
-	/**
-	 * Zero based index of selected tab.
-	 *
-	 * @var int
-	 */
-	public $selected = 3;
-
-	/**
-	 * Expanded or collapsed state of selected tab.
-	 *
-	 * @var bool
-	 */
-	public $expanded = true;
 
 	/**
 	 * Tab form available buttons node. Will be initialized during __construct but can be overwritten if needed.
@@ -93,6 +76,27 @@ class CTabFilter extends CDiv {
 			->addClass('form-buttons');
 	}
 
+	/**
+	 * Set selected tab uses zero based index for selected tab.
+	 *
+	 * @param int $value  Index of selected tab.
+	 */
+	public function setSelected(int $value) {
+		$this->options['selected'] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Update expanded or collapsed state of selected tab.
+	 *
+	 * @param bool $value  Expanede when true, collapsed otherwise.
+	 */
+	public function setExpanded(bool $value) {
+		$this->options['expanded'] = $value;
+
+		return $this;
+	}
 	/**
 	 * Add template for browser side rendered tabs.
 	 *
@@ -242,21 +246,22 @@ class CTabFilter extends CDiv {
 	}
 
 	public function bodyToString() {
-		$this->labels[$this->selected]->addClass(static::CSS_TAB_ACTIVE);
+		$selected = $this->options['selected'];
+		$this->labels[$selected]->addClass(static::CSS_TAB_ACTIVE);
 		$nav = $this->getNavigation();
 
-		if ($this->expanded) {
-			if ($this->contents[$this->selected] === null) {
-				$tab_data = $this->options['data'][$this->selected];
+		if ($this->options['expanded']) {
+			if ($this->contents[$selected] === null) {
+				$tab_data = $this->options['data'][$selected];
 				$tab_data['render_html'] = true;
-				$this->contents[$this->selected] = (new CDiv([new CPartial($tab_data['template'], $tab_data)]))
-					->setId($this->labels[$this->selected]->getAttribute('data-target'));
+				$this->contents[$selected] = (new CDiv([new CPartial($tab_data['template'], $tab_data)]))
+					->setId($this->labels[$selected]->getAttribute('data-target'));
 			}
 		}
 
 		foreach ($this->contents as $index => $content) {
 			if (is_a($content, CTag::class)) {
-				$content->addClass($index == $this->selected ? null : 'display-none');
+				$content->addClass($index == $selected ? null : 'display-none');
 			}
 		}
 

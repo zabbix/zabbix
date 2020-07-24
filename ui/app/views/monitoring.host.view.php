@@ -26,6 +26,8 @@
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('menupopup.js');
+$this->addJsFile('gtlc.js');
+$this->addJsFile('class.calendar.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
 
@@ -41,16 +43,21 @@ $widget = (new CWidget())
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$filter = new CTabFilter();
-	$filter->setId('monitoringhostsfilter');
-	$filter->addTemplate(new CPartial($data['filter_template'], [
-		'filter' => $data['filter_defaults']
-	]));
+	$filter = (new CTabFilter())
+		->setId('monitoringhostsfilter')
+		->setSelected((int) $data['tab_selected'])
+		->setExpanded((bool) $data['tab_expanded'])
+		->addTemplate(new CPartial($data['filter_template'], [
+			'filter' => $data['filter_defaults']
+		]));
 
 	foreach ($data['filter_tabs'] as $tab) {
 		$tab['template'] = $data['filter_template'];
 		$filter->addTemplatedTab($tab['name'], $tab);
 	}
+
+	$filter->addTimeselector($data['from'], $data['to']);
+
 
 	// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
 	$data['filter_options'] = $filter->options;

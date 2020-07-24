@@ -21,10 +21,15 @@
 
 class CControllerProfileUpdate extends CController {
 
+	public function init() {
+		$this->disableSIDvalidation();
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'idx' =>		'required|string',
-			'value_int' =>	'required|int32',
+			'value_int' =>	'int32',
+			'value_str' =>	'string',
 			'idx2' =>		'array_id'
 		];
 
@@ -80,14 +85,27 @@ class CControllerProfileUpdate extends CController {
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
 				case CControllerDashboardView::DYNAMIC_ITEM_HOST_PROFILE_KEY:
-					$ret = true;
+					$ret = $this->hasInput('value_int');
 					break;
 
 				case !!preg_match('/web.dashbrd.navtree-\d+.toggle/', $this->getInput('idx')):
 				case 'web.dashbrd.navtree.item.selected':
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
-					$ret = $this->hasInput('idx2');
+					$ret = $this->hasInput('idx2') && $this->hasInput('value_int');
+					break;
+
+				case 'web.monitoringhosts.selected':
+				case 'web.monitoringhosts.expanded':
+					$ret = $this->hasInput('value_int');
+					break;
+
+				case 'web.monitoringhosts.properties':
+					$ret = $this->hasInput('idx2') && $this->hasInput('value_str');
+					break;
+
+				case 'web.monitoringhosts.taborder':
+					$ret = $this->hasInput('value_str');
 					break;
 
 				default:
@@ -108,7 +126,7 @@ class CControllerProfileUpdate extends CController {
 
 	protected function doAction() {
 		$idx = $this->getInput('idx');
-		$value_int = $this->getInput('value_int');
+		$value_int = $this->getInput('value_int', 0);
 
 		DBstart();
 		switch ($idx) {
@@ -138,6 +156,38 @@ class CControllerProfileUpdate extends CController {
 			case 'web.sidebar.mode':
 				CViewHelper::saveSidebarMode($value_int);
 				break;
+
+			case 'web.monitoringhosts.selected':
+				$filter = new CTabFilterProfile('web.monitoringhosts');
+				$filter->read();
+				$dynamictabs = count($filter->tabfilters);
+
+				if ($value_int >= 0 && $value_int < $dynamictabs) {
+					$filter->selected = (int) $value_int;
+					$filter->expanded = true;
+					$filter->update();
+				}
+
+				break;
+
+			case 'web.monitoringhosts.properties':
+				$idx2 = $this->getInput('idx2');
+				$idx2 = reset($idx2);
+				CProfile::update($idx, $this->getInput('value_str'), PROFILE_TYPE_STR, $idx2);
+
+				break;
+
+			case 'web.monitoringhosts.taborder':
+				$filter = new CTabFilterProfile('web.monitoringhosts');
+				$filter->read();
+				$filter->sort($this->getInput('value_str'));
+				$filter->update();
+
+				break;
+
+			case 'web.monitoringhosts.expanded':
+				$value_int = $value_int > 0 ? 1 : 0;
+				// break is not missing here.
 
 			default:
 				if ($value_int == 1) { // default value

@@ -103,6 +103,32 @@ foreach ($time_ranges as $column_ranges) {
 	]))->addClass(ZBX_STYLE_TIME_INPUT),
 	(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
 ]))
+	->setAttribute('data-template', 'timeselector')
 	->addClass(ZBX_STYLE_FILTER_CONTAINER)
 	->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
 	->show();
+
+?>
+<script type="text/javascript">
+$(function($) {
+	let template = document.querySelector('[data-template="timeselector"]');
+
+	function expand(data, container) {
+		$(container).closest('.tabfilter-container').find('.filter-forms.form-buttons').css('visibility', 'hidden');
+	}
+
+	function collapse(data, container) {
+		if (this._parent && this._parent._active_item !== this) {
+			$(container).closest('.tabfilter-container').find('.filter-forms.form-buttons').css('visibility', 'visible');
+		}
+	}
+
+	// Tab filter item events handlers.
+	template.addEventListener(TABFILTERITEM_EVENT_EXPAND, function (ev) {
+		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
+	});
+	template.addEventListener(TABFILTERITEM_EVENT_COLLAPSE, function (ev) {
+		collapse.call(ev.detail, ev.detail._data, ev.detail._content_container);
+	});
+});
+</script>
