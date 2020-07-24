@@ -211,7 +211,7 @@ class testTimezone extends CWebTest {
 
 	/**
 	 * Time received from Monitoring->Problems table.
-	 * 
+	 *
 	 * @param string $problem   problem name from monitoring->problems
 	 */
 	private function getProblemTime($problem) {
