@@ -404,7 +404,7 @@ A.F....PS. [ZBXNEXT-2297] added user defined macros creation/edition for host pr
 .........T [ZBXCTR-1] added Telegram media type (ableev)
 .........T [ZBXNEXT-5824] added media "Redmine" (afayantsev)
 ..F.I..... [ZBXNEXT-5861] added {EVENT.DURATION} macro to subject of message templates (MVekslers)
-..F.....S. [ZBXNEXT-5848] Expand acknowledge message maximum size to more than 256 characters (arimdjonoks)
+A.F.....S. [ZBXNEXT-5848] increased acknowledge message maximum size to 2048 characters (arimdjonoks)
 ..F.I..... [ZBXNEXT-5702] improved UI performance for large installations (miks, talbergs)
 .........T [ZBXNEXT-5599] Added MS Teams media type (tuskov)
 .........T [ZBXNEXT-5715] Added Jira media type (tuskov)
