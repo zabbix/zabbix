@@ -54,68 +54,9 @@
 			this.timeout = null;
 
 			this.filter = new CTabFilter($('#monitoringhostsfilter')[0], <?= json_encode($data['filter_options']) ?>);
-			this.filter.afterTabContentRender = this.afterTabContentRender.bind(this);
-
-			if (this.filter._active_item) {
-				this.afterTabContentRender(this.filter._active_item, true);
-			}
 		}
 
 		hostPage.prototype = {
-			afterTabContentRender: function (item, is_init) {
-				let data = item._data,
-					is_sortable = $(item._target).closest('.ui-sortable').length > 0,
-					content = item._content_container;
-
-				// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-				$('[name="save_as"],[name="filter_set"]').hide()
-					.filter(is_sortable ? '[name="filter_set"]' : '[name="save_as"]').show();
-
-				if (!is_init || typeof item._template === 'undefined') {
-					// Initialize tab content components only once and only for dynamic tabs.
-					return;
-				}
-
-				// Host groups multiselect.
-				$('#filter_groupids_' + data.uniqid, content).multiSelectHelper({
-					id: 'filter_groupids_' + data.uniqid,
-					object_name: 'hostGroup',
-					name: 'filter_groupids[]',
-					data: data.groups_multiselect||[],
-					popup: {
-						parameters: {
-							multiselect: '1',
-							noempty: '1',
-							srctbl: 'host_groups',
-							srcfld1: 'groupid',
-							dstfrm: 'zbx_filter',
-							dstfld1: 'filter_groupids_' + data.uniqid,
-							real_hosts: 1,
-							enrich_parent_groups: 1
-						}
-					}
-				});
-
-				// Tags table
-				var tag_row = new Template($('#filter-tag-row-tmpl').html()),
-					i = 0;
-
-				data.filter.tags.forEach(tag => {
-					var $row = $(tag_row.evaluate({rowNum: i++}));
-
-					$row.find('[name$="[tag]"]').val(tag.tag);
-					$row.find('[name$="[value]"]').val(tag.value);
-					$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
-
-					$('#filter_tags_' + data.uniqid, content).append($row);
-				});
-				$('#filter_tags_' + data.uniqid, content).dynamicRows({template: '#filter-tag-row-tmpl'});
-
-				// Show hosts in maintenance events.
-				$('[name="filter_maintenance_status"]', content).click(function () {
-					$('[name="filter_show_suppressed"]', content).prop('disabled', !this.checked);
-				});
-			},
 			getCurrentForm: function() {
 				return $('form[name=host_view]');
 			},

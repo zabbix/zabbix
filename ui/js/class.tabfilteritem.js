@@ -21,8 +21,8 @@
 const TABFILTERITEM_EVENT_CLICK = 'click';
 const TABFILTERITEM_EVENT_COLLAPSE = 'collapse';
 const TABFILTERITEM_EVENT_EXPAND   = 'expand';
-const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expandbefore';
-const TABFILTERITEM_EVENT_AFTER_RENDER = 'afterrender';
+const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expand.tabfilter';
+const TABFILTERITEM_EVENT_AFTER_RENDER = 'render.tabfilter';
 
 class CTabFilterItem extends CBaseComponent {
 
@@ -45,7 +45,6 @@ class CTabFilterItem extends CBaseComponent {
 
 		if (this._expanded) {
 			this.renderContentTemplate();
-			this.fire(TABFILTERITEM_EVENT_AFTER_RENDER, {is_init: true});
 
 			if ('name' in this._data && this._data.name.length) {
 				this.addActionIcons();
@@ -78,9 +77,11 @@ class CTabFilterItem extends CBaseComponent {
 				if (is_init) {
 					this.renderContentTemplate();
 				}
+				else {
+					this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_EXPAND_BEFORE, {detail: this}));
+				}
 
 				this._content_container.classList.remove('display-none');
-				this.fire(TABFILTERITEM_EVENT_AFTER_RENDER, {is_init: is_init});
 
 				if ('name' in this._data && this._data.name.length) {
 					this.addActionIcons();
@@ -104,6 +105,7 @@ class CTabFilterItem extends CBaseComponent {
 	renderContentTemplate() {
 		if (this._template) {
 			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
+			this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_AFTER_RENDER, {detail: this}));
 		}
 	}
 

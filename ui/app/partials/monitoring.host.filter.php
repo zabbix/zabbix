@@ -169,3 +169,74 @@ if (array_key_exists('render_html', $data)) {
 	->setAttribute('data-template', 'monitoring.host.filter')
 	->addItem($template)
 	->show();
+
+?>
+<script type="text/javascript">
+$(function($) {
+	let template = document.querySelector('[data-template="monitoring.host.filter"]');
+
+	function render(data, container) {
+		let is_sortable = $(this._target).closest('.ui-sortable').length > 0;
+
+		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
+		$('[name="save_as"],[name="filter_set"]').hide()
+			.filter(is_sortable ? '[name="filter_set"]' : '[name="save_as"]').show();
+
+		// Host groups multiselect.
+		$('#filter_groupids_' + data.uniqid, container).multiSelectHelper({
+			id: 'filter_groupids_' + data.uniqid,
+			object_name: 'hostGroup',
+			name: 'filter_groupids[]',
+			data: data.groups_multiselect||[],
+			popup: {
+				parameters: {
+					multiselect: '1',
+					noempty: '1',
+					srctbl: 'host_groups',
+					srcfld1: 'groupid',
+					dstfrm: 'zbx_filter',
+					dstfld1: 'filter_groupids_' + data.uniqid,
+					real_hosts: 1,
+					enrich_parent_groups: 1
+				}
+			}
+		});
+
+		// Tags table
+		var tag_row = new Template($('#filter-tag-row-tmpl').html()),
+			i = 0;
+
+		data.filter.tags.forEach(tag => {
+			var $row = $(tag_row.evaluate({rowNum: i++}));
+
+			$row.find('[name$="[tag]"]').val(tag.tag);
+			$row.find('[name$="[value]"]').val(tag.value);
+			$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
+
+			$('#filter_tags_' + data.uniqid, container).append($row);
+		});
+		$('#filter_tags_' + data.uniqid, container).dynamicRows({template: '#filter-tag-row-tmpl'});
+
+		// Show hosts in maintenance events.
+		$('[name="filter_maintenance_status"]', container).click(function () {
+			$('[name="filter_show_suppressed"]', container).prop('disabled', !this.checked);
+		});
+	}
+
+	function expand(data, container) {
+		let is_sortable = $(this._target).closest('.ui-sortable').length > 0;
+
+		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
+		$('[name="save_as"],[name="filter_set"]').hide()
+			.filter(is_sortable ? '[name="filter_set"]' : '[name="save_as"]').show();
+	}
+
+	// Tab filter item events handlers.
+	template.addEventListener(TABFILTERITEM_EVENT_AFTER_RENDER, function (ev) {
+		render.call(ev.detail, ev.detail._data, ev.detail._content_container);
+	});
+	template.addEventListener(TABFILTERITEM_EVENT_EXPAND_BEFORE, function (ev) {
+		expand.call(ev.detail, ev.detail._data, ev.detail._content_container);
+	});
+});
+</script>
