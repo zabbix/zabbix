@@ -23,6 +23,7 @@ import (
 	"syscall"
 
 	"golang.org/x/sys/windows"
+	"zabbix.com/pkg/plugin"
 )
 
 func getMountPaths() (paths []string, err error) {
@@ -120,8 +121,8 @@ func getFsStats(path string) (stats *FsStats, err error) {
 		Total: total,
 		Free:  totalFree,
 		Used:  totalUsed,
-		PFree: float64(totalFree) / float64(total) * 100,
-		PUsed: float64(totalUsed) / float64(total) * 100,
+		PFree: percent(totalFree) / percent(total) * 100,
+		PUsed: percent(totalUsed) / percent(total) * 100,
 	}
 	return
 }
@@ -178,6 +179,10 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 		}
 	}
 	return
+}
+
+func getFsInode(string) (*FsStats, error) {
+	return nil, plugin.UnsupportedMetricError
 }
 
 func init() {
