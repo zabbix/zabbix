@@ -145,7 +145,7 @@ static void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_m
 	zbx_json_adduint64(j, "min", stats->min_chunk_size);
 	zbx_json_adduint64(j, "max", stats->max_chunk_size);
 
-	zbx_json_addobject(j, "buckets");
+	zbx_json_addarray(j, "buckets");
 	for (i = 0; i < MEM_BUCKET_COUNT; i++)
 	{
 		if (0 != stats->chunks_num[i])
@@ -154,7 +154,9 @@ static void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_m
 
 			zbx_snprintf(buf, sizeof(buf), "%d%s", MEM_MIN_BUCKET_SIZE + 8 * i,
 					(MEM_BUCKET_COUNT - 1 == i ? "+" : ""));
+			zbx_json_addobject(j, NULL);
 			zbx_json_adduint64(j, buf, stats->chunks_num[i]);
+			zbx_json_close(j);
 		}
 	}
 
@@ -258,7 +260,9 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 					for (i = 0; i < limit; i++)
 					{
 						zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, top.values[i].first);
+						zbx_json_addobject(j, NULL);
 						zbx_json_addint64(j, buffer, top.values[i].second);
+						zbx_json_close(j);
 					}
 
 					zbx_json_close(j);
