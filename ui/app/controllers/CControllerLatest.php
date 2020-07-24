@@ -256,10 +256,6 @@ abstract class CControllerLatest extends CController {
 					return (array_search($id_1, $applicationids, true) <=> array_search($id_2, $applicationids, true));
 				});
 
-				if (!array_key_exists($hostid, $applications_size)) {
-					$applications_size[$hostid] = [];
-				}
-
 				foreach ($host_items_grouped as $applicationid => $application_items) {
 					CArrayHelper::sort($application_items, [$item_sort_options]);
 
