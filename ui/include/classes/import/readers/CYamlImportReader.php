@@ -47,6 +47,16 @@ class CYamlImportReader extends CImportReader {
 
 		restore_error_handler();
 
+		/*
+		 * Unfortunately yaml_parse() not always returns FALSE. If file is empty, it returns NULL and if file contains
+		 * gibberish and not a "zabbix_export" array, $data contains same input string, but Import Validator expects
+		 * $data to be an array. Create a custom error message for these cases.
+		 */
+		if (!is_array($data) && $data !== false) {
+			$data = false;
+			$error = _('Invalid file content');
+		}
+
 		if ($data === false) {
 			throw new ErrorException(_s('Cannot read YAML: %1$s.', $error));
 		}
