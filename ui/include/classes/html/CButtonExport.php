@@ -49,7 +49,7 @@ class CButtonExport extends CList {
 				),
 			(new CButton('export', '&#8203;'))
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass(ZBX_STYLE_BTN_TOGGLE)
+				->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
 				->setMenuPopup([
 					'type' => 'dropdown',
 					'data' => [

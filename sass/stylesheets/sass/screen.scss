@@ -7085,6 +7085,53 @@ table.preprocessing-test-results {
 	}
 }
 
+.btn-toggle-chevron {
+	position: relative;
+
+	&[aria-expanded="true"] {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		right: 8px;
+		top: calc(50% - 3px);
+		width: 5px;
+		height: 5px;
+		border-top: 1px solid $btn-alt-font-color;
+		border-right: 1px solid $btn-alt-font-color;
+		transform: rotate(135deg) translate(-1px,1px);
+		transition: transform .3s;
+	}
+
+	&[disabled] {
+		&::after {
+			border-top-color: $btn-disabled-font-color;
+			border-right-color: $btn-disabled-font-color;
+		}
+	}
+
+	&:enabled {
+		&:active,
+		&[aria-expanded="true"] {
+			&::after {
+				transform: rotate(315deg) translate(-1px,1px);
+			}
+		}
+
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+			&::after {
+				border-top-color:  $btn-font-color;
+				border-right-color: $btn-font-color;
+			}
+		}
+	}
+}
+
 .btn-dropdown-toggle {
 	white-space: nowrap;
 	overflow: hidden;

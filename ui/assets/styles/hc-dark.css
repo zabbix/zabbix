@@ -5415,6 +5415,32 @@ table.preprocessing-test-results .rel-container {
     .btn-split li:only-child button {
       border-radius: 2px; }
 
+.btn-toggle-chevron {
+  position: relative; }
+  .btn-toggle-chevron[aria-expanded="true"] {
+    color: #333333;
+    background-color: lightgray;
+    border-color: lightgray; }
+  .btn-toggle-chevron::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: calc(50% - 3px);
+    width: 5px;
+    height: 5px;
+    border-top: 1px solid #ffffff;
+    border-right: 1px solid #ffffff;
+    transform: rotate(135deg) translate(-1px, 1px);
+    transition: transform .3s; }
+  .btn-toggle-chevron[disabled]::after {
+    border-top-color: #7d7d7d;
+    border-right-color: #7d7d7d; }
+  .btn-toggle-chevron:enabled:active::after, .btn-toggle-chevron:enabled[aria-expanded="true"]::after {
+    transform: rotate(315deg) translate(-1px, 1px); }
+  .btn-toggle-chevron:enabled:hover::after, .btn-toggle-chevron:enabled:focus::after, .btn-toggle-chevron:enabled:active::after, .btn-toggle-chevron:enabled[aria-expanded="true"]::after {
+    border-top-color: #333333;
+    border-right-color: #333333; }
+
 .btn-dropdown-toggle {
   white-space: nowrap;
   overflow: hidden;
