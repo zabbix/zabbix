@@ -7,6 +7,12 @@ New features:
 ........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-17653] fixed new widget placeholder behavior and dashboard height calculation in edit mode (averza, kustalovs)
+..F....... [ZBX-16819] added link to hosts linked to each template in templates list (miks)
+...G...... [ZBX-18023] fixed format of agent2 version number (MVekslers)
+A......... [ZBX-18071] fixed slow SQL query when filtering items with latest data available (averza)
+..F....... [ZBX-17898] fixed JavaScript errors on pasting widgets (averza)
+........S. [ZBX-17569] fixed calculating items not allowing negative values be corrected in the preprocessing (arimdjonoks)
 ..F....... [ZBX-18036] fixed endpoint URL for Elasticsearch API requests (miks)
 ..F....... [ZBX-18068] fixed incorrect function call and redundant code (miks)
 ...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
