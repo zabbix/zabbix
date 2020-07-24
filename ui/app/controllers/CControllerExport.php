@@ -64,31 +64,35 @@ class CControllerExport extends CController {
 
 	protected function doAction() {
 		$action = $this->getInput('action');
-		$format = $this->getInput('format', CExportWriterFactory::YAML);
+		$params = [
+			'format' => $this->getInput('format', CExportWriterFactory::YAML),
+			'prettyprint' => true,
+			'options' => []
+		];
 
 		switch ($action) {
 			case 'export.valuemaps':
-				$export = new CConfigurationExport(['valueMaps' => $this->getInput('valuemapids', [])]);
+				$params['options']['valueMaps'] = $this->getInput('valuemapids', []);
 				break;
 
 			case 'export.hosts':
-				$export = new CConfigurationExport(['hosts' => $this->getInput('hosts', [])]);
+				$params['options']['hosts'] = $this->getInput('hosts', []);
 				break;
 
 			case 'export.mediatypes':
-				$export = new CConfigurationExport(['mediaTypes' => $this->getInput('mediatypeids', [])]);
+				$params['options']['mediaTypes'] = $this->getInput('mediatypeids', []);
 				break;
 
 			case 'export.screens':
-				$export = new CConfigurationExport(['screens' => $this->getInput('screens', [])]);
+				$params['options']['screens'] = $this->getInput('screens', []);
 				break;
 
 			case 'export.sysmaps':
-				$export = new CConfigurationExport(['maps' => $this->getInput('maps', [])]);
+				$params['options']['maps'] = $this->getInput('maps', []);
 				break;
 
 			case 'export.templates':
-				$export = new CConfigurationExport(['templates' => $this->getInput('templates', [])]);
+				$params['options']['templates'] = $this->getInput('templates', []);
 				break;
 
 			default:
@@ -97,25 +101,18 @@ class CControllerExport extends CController {
 				return;
 		}
 
-		$export->setBuilder(new CConfigurationExportBuilder());
-		$export->setWriter(CExportWriterFactory::getWriter($format));
+		$result = API::Configuration()->export($params);
 
-		$export_data = $export->export();
-
-		if ($export_data === false) {
-			// Access denied.
-
-			$response = new CControllerResponseRedirect(
-				$this->getInput('backurl', 'zabbix.php?action=dashboard.view'));
-
-			$response->setMessageError(_('No permissions to referred object or it does not exist!'));
+		if ($result) {
+			$response = new CControllerResponseData([
+				'main_block' => $result,
+				'mime_type' => CExportWriterFactory::getMimeType($params['format']),
+				'page' => ['file' => 'zbx_export_'.substr($action, 7).'.'.$params['format']]
+			]);
 		}
 		else {
-			$response = new CControllerResponseData([
-				'main_block' => $export_data,
-				'mime_type' => CExportWriterFactory::getMimeType($format),
-				'page' => ['file' => 'zbx_export_'.substr($action, 7).'.'.$format]
-			]);
+			$response = new CControllerResponseRedirect($this->getInput('backurl', 'zabbix.php?action=dashboard.view'));
+			$response->setMessageError(_('Export failed'));
 		}
 
 		$this->setResponse($response);
