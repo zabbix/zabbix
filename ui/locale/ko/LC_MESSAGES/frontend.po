@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-17 20:04+0300\n"
+"POT-Creation-Date: 2020-07-24 19:54+0300\n"
 "PO-Revision-Date: 2018-12-04 06:16+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -193,7 +193,7 @@ msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
 msgstr[0] "%1$s 의 재시도 가능"
 
-#: app/views/administration.user.edit.php:380
+#: app/views/administration.user.edit.php:385
 #: include/classes/widgets/CWidgetConfig.php:160
 #: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:310
 #: jsLoader.php:311
@@ -278,7 +278,7 @@ msgstr "(최고관리자만 그룹을 작성할 수 있습니다)"
 msgid "(no proxy)"
 msgstr "(프록시 없음)"
 
-#: include/classes/setup/CSetupWizard.php:274
+#: include/classes/setup/CSetupWizard.php:278
 msgid "0 - use default port"
 msgstr "0 - 기본 포트 사용"
 
@@ -380,8 +380,8 @@ msgstr "엑세스가 거부되었습니다"
 msgid "Access denied!"
 msgstr "엑세스가 거부되었습니다!"
 
-#: include/classes/api/services/CUser.php:1225
-#: include/classes/api/services/CUser.php:1267
+#: include/classes/api/services/CUser.php:1231
+#: include/classes/api/services/CUser.php:1273
 #, c-format
 msgid "Account is blocked for %1$s second."
 msgid_plural "Account is blocked for %1$s seconds."
@@ -424,7 +424,7 @@ msgstr "대응 완료된 해결 이벤트"
 #: app/views/administration.mediatype.edit.php:150
 #: app/views/administration.mediatype.list.php:78
 #: app/views/administration.regex.edit.php:52
-#: app/views/administration.user.edit.php:229
+#: app/views/administration.user.edit.php:234
 #: app/views/administration.valuemap.edit.php:55
 #: app/views/dashboard.sharing.edit.php:29
 #: app/views/dashboard.sharing.edit.php:50
@@ -597,13 +597,14 @@ msgstr "종료시간"
 #: app/views/administration.regex.edit.php:94
 #: app/views/administration.regex.edit.php:157
 #: app/views/administration.script.edit.php:129
-#: app/views/administration.user.edit.php:302
-#: app/views/administration.user.edit.php:479
+#: app/views/administration.user.edit.php:307
+#: app/views/administration.user.edit.php:484
 #: app/views/administration.usergroup.edit.php:140
 #: app/views/administration.usergroup.edit.php:191
 #: app/views/administration.usergroup.edit.php:230
 #: app/views/administration.valuemap.edit.php:75
 #: app/views/administration.valuemap.edit.php:124
+#: app/views/configuration.application.edit.php:60
 #: app/views/dashboard.sharing.edit.php:33
 #: app/views/dashboard.sharing.edit.php:54
 #: app/views/js/administration.mediatype.edit.js.php:134
@@ -628,7 +629,6 @@ msgstr "종료시간"
 #: include/views/configuration.action.edit.php:380
 #: include/views/configuration.action.edit.php:453
 #: include/views/configuration.action.edit.php:492
-#: include/views/configuration.application.edit.php:64
 #: include/views/configuration.correlation.edit.php:97
 #: include/views/configuration.correlation.edit.php:176
 #: include/views/configuration.discovery.edit.php:78
@@ -824,7 +824,7 @@ msgid "Age less than %1$s"
 msgstr ""
 
 #: app/views/administration.script.list.php:87 app/views/popup.generic.php:610
-#: include/hosts.inc.php:1434 include/items.inc.php:345
+#: include/hosts.inc.php:1435 include/items.inc.php:345
 #: include/views/configuration.httpconf.edit.php:104
 #: include/views/js/configuration.host.edit.js.php:163
 msgid "Agent"
@@ -898,8 +898,8 @@ msgid "All dashboards"
 msgstr "전체 대시보드"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
-#: app/views/administration.user.edit.php:338
-#: app/views/administration.user.edit.php:344
+#: app/views/administration.user.edit.php:343
+#: app/views/administration.user.edit.php:349
 msgid "All groups"
 msgstr "모든 그룹"
 
@@ -911,7 +911,7 @@ msgstr "모든 호스트"
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "모든 링크는 반드시 \"이름\"과 \"URL\"을 설정할 필요가 있습니다"
 
-#: include/html.inc.php:538
+#: include/html.inc.php:539
 msgid "All maps"
 msgstr "모든 맵"
 
@@ -957,7 +957,7 @@ msgstr "수동으로 클로즈 허가"
 msgid "Allowed hosts"
 msgstr "허가된 호스트"
 
-#: include/classes/setup/CSetupWizard.php:494
+#: include/classes/setup/CSetupWizard.php:521
 msgid "Alternatively, you can install it manually:"
 msgstr "혹은, 수동으로 인스톨 하실 수 있습니다:"
 
@@ -1014,18 +1014,17 @@ msgstr "어떤 문자열이 포함됨"
 
 #: app/controllers/CControllerAuditLogList.php:195
 #: app/partials/common.filter.trigger.php:93
+#: app/views/configuration.application.edit.php:44
+#: app/views/configuration.application.list.php:89
 #: app/views/monitoring.latest.view.php:84
 #: app/views/monitoring.problem.view.php:138 httpconf.php:39
 #: include/actions.inc.php:62
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:49
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:65
-#: include/forms.inc.php:240
-#: include/views/configuration.application.edit.php:41
-#: include/views/configuration.application.list.php:82
-#: include/views/configuration.httpconf.edit.php:68
+#: include/forms.inc.php:240 include/views/configuration.httpconf.edit.php:68
 #: include/views/configuration.httpconf.edit.php:73
 #: include/views/configuration.httpconf.list.php:119
-#: include/views/inventory.host.view.php:203
+#: include/views/inventory.host.view.php:204
 #: include/views/js/monitoring.sysmaps.js.php:227
 #: include/views/monitoring.overview.items.php:133
 #: include/views/monitoring.screen.constructor.edit.php:634
@@ -1037,11 +1036,11 @@ msgstr "어플리케이션"
 msgid "Application \"%1$s\" already exists."
 msgstr "어플리케이션 \"%1$s\"는 이미 존재합니다."
 
-#: applications.php:170
+#: app/controllers/CControllerApplicationCreate.php:59
 msgid "Application added"
 msgstr "어플리케이션을 추가하였습니다"
 
-#: applications.php:189 applications.php:200
+#: app/controllers/CControllerApplicationDelete.php:64
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "어플리케이션이 삭제 되었습니다"
@@ -1056,7 +1055,7 @@ msgstr "어플리케이션 에러."
 msgid "Application prototypes"
 msgstr "어플리케이션 프로토타입"
 
-#: applications.php:162
+#: app/controllers/CControllerApplicationUpdate.php:66
 msgid "Application updated"
 msgstr "어플리케이션을 갱신하였습니다"
 
@@ -1070,13 +1069,12 @@ msgstr "\"%2$s\"에 ID \"%1$s\" 를 가진 어플리케이션은 이용할 수 �
 msgid "Application with applicationid \"%1$s\" does not exist."
 msgstr "applicationid \"%1$s\"의 어플리케이션이 없습니다."
 
-#: app/controllers/CControllerPopupGeneric.php:176 app/views/search.php:38
-#: app/views/search.php:60 app/views/search.php:64 app/views/search.php:228
-#: app/views/search.php:246 app/views/search.php:250 include/forms.inc.php:649
-#: include/html.inc.php:357
-#: include/views/configuration.application.edit.php:27
-#: include/views/configuration.application.list.php:157
-#: include/views/configuration.host.edit.php:235
+#: app/controllers/CControllerPopupGeneric.php:176
+#: app/views/configuration.application.edit.php:29
+#: app/views/configuration.application.list.php:167 app/views/search.php:38
+#: app/views/search.php:60 app/views/search.php:65 app/views/search.php:229
+#: app/views/search.php:250 app/views/search.php:255 include/forms.inc.php:649
+#: include/html.inc.php:357 include/views/configuration.host.edit.php:235
 #: include/views/configuration.host.list.php:184
 #: include/views/configuration.host.list.php:400
 #: include/views/configuration.item.edit.php:815
@@ -1086,8 +1084,8 @@ msgstr "applicationid \"%1$s\"의 어플리케이션이 없습니다."
 #: include/views/configuration.item.prototype.list.php:62
 #: include/views/configuration.item.prototype.massupdate.php:425
 #: include/views/configuration.template.edit.php:134
-#: include/views/configuration.template.list.php:150
-#: include/views/configuration.template.list.php:253
+#: include/views/configuration.template.list.php:151
+#: include/views/configuration.template.list.php:238
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:170
 msgid "Applications"
 msgstr "어플리케이션"
@@ -1211,7 +1209,7 @@ msgstr "적어도 1개의 호스트 그룹 혹은 호스트가 선택되어 있�
 msgid "At least one maintenance period must be created."
 msgstr "최소 하나 이상의 메인터넌스 기간을 작성할 필요가 있습니다."
 
-#: include/classes/setup/CFrontendSetup.php:258
+#: include/classes/setup/CFrontendSetup.php:240
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr ""
 
@@ -1286,7 +1284,7 @@ msgstr "인증"
 msgid "Authentication algorithm"
 msgstr "인증 알고리즘"
 
-#: include/classes/api/services/CUser.php:1616
+#: include/classes/api/services/CUser.php:1628
 #, c-format
 msgid "Authentication failed: %1$s."
 msgstr "인증에 실패하였습니다 : %1$s"
@@ -1330,21 +1328,21 @@ msgctxt "history source selection method"
 msgid "Auto"
 msgstr "자동"
 
-#: app/views/administration.user.edit.php:191
+#: app/views/administration.user.edit.php:196
 msgid "Auto-login"
 msgstr "자동 로그인 (1개월)"
 
-#: include/classes/api/services/CUser.php:809
+#: include/classes/api/services/CUser.php:815
 msgid "Auto-login and auto-logout options cannot be enabled together."
 msgstr "자동 로그인과 자동 로그아웃을 동시에 활성화 할 수는 없습니다."
 
-#: app/views/administration.user.edit.php:196
+#: app/views/administration.user.edit.php:201
 msgid "Auto-logout"
 msgstr "자동 로그아웃"
 
 #: app/partials/popup.operations.php:341
 #: app/views/administration.miscconfig.edit.php:55
-#: app/views/popup.lldoperation.php:278 include/hosts.inc.php:1371
+#: app/views/popup.lldoperation.php:278 include/hosts.inc.php:1372
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.host.massupdate.php:206
 #: include/views/configuration.host.prototype.edit.php:322
@@ -1365,7 +1363,7 @@ msgstr "아이콘의 자동선택"
 #: app/views/administration.autoreg.edit.php:29
 #: app/views/administration.autoreg.edit.php:89
 #: app/views/popup.mediatype.message.php:58
-#: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:908
+#: include/classes/helpers/CMediatypeHelper.php:119 include/html.inc.php:909
 msgid "Autoregistration"
 msgstr ""
 
@@ -1407,8 +1405,8 @@ msgstr "가벼운 장애"
 msgid "Axes"
 msgstr "축"
 
-#: include/classes/setup/CSetupWizard.php:122
-#: include/classes/setup/CSetupWizard.php:440
+#: include/classes/setup/CSetupWizard.php:126
+#: include/classes/setup/CSetupWizard.php:463
 msgid "Back"
 msgstr "돌아가기"
 
@@ -1607,16 +1605,17 @@ msgstr "삭제할 수 없습니다"
 #: app/views/administration.regex.edit.php:149
 #: app/views/administration.regex.edit.php:159
 #: app/views/administration.script.edit.php:123
-#: app/views/administration.user.edit.php:458
-#: app/views/administration.user.edit.php:489
+#: app/views/administration.user.edit.php:463
+#: app/views/administration.user.edit.php:494
 #: app/views/administration.usergroup.edit.php:210
 #: app/views/administration.valuemap.edit.php:92
+#: app/views/configuration.application.edit.php:54
 #: app/views/js/administration.housekeeping.edit.js.php:76
 #: app/views/js/administration.trigdisplay.edit.js.php:45
 #: app/views/js/administration.trigseverity.edit.js.php:37
 #: app/views/monitoring.dashboard.view.php:114
 #: include/classes/html/CButtonCancel.php:25
-#: include/classes/setup/CSetupWizard.php:104
+#: include/classes/setup/CSetupWizard.php:108
 #: include/views/conf.import.php:131 include/views/js/conf.import.js.php:42
 #: include/views/monitoring.slideconf.edit.php:281 jsLoader.php:134
 #: jsLoader.php:151 jsLoader.php:254 jsLoader.php:334 jsLoader.php:346
@@ -1645,7 +1644,7 @@ msgstr "수치형이 아닌 아이템 \"%1$s\"는 그래프 프로토타입 \"%2
 msgid "Cannot add action"
 msgstr "액션을 추가할 수 없습니다"
 
-#: applications.php:170
+#: app/controllers/CControllerApplicationCreate.php:67
 msgid "Cannot add application"
 msgstr "애플리케이션을 추가할 수 없습니다"
 
@@ -1802,8 +1801,8 @@ msgstr "트리거를 추가할 수 없습니다"
 msgid "Cannot add trigger prototype"
 msgstr "트리거 프로토타입을 추가할 수 없습니다"
 
-#: app/controllers/CControllerUserCreate.php:62
-#: app/controllers/CControllerUserCreate.php:118
+#: app/controllers/CControllerUserCreate.php:65
+#: app/controllers/CControllerUserCreate.php:121
 msgid "Cannot add user"
 msgstr "사용자를 추가할 수 없습니다"
 
@@ -1877,7 +1876,7 @@ msgstr "장애를 클로즈할 수 없습니다 : %1$s."
 msgid "Cannot connect to LDAP server."
 msgstr "LDAP서버에 접속할 수 없습니다."
 
-#: include/classes/setup/CSetupWizard.php:351
+#: include/classes/setup/CSetupWizard.php:355
 msgid "Cannot connect to the database."
 msgstr "데이터베이스에 접속할 수 없습니다."
 
@@ -1943,7 +1942,7 @@ msgstr "신규 어플리케이션을 작성할 수 없습니다. Web시나리오
 msgid "Cannot create template."
 msgstr "템플릿을 작성할 수 없습니다."
 
-#: include/classes/setup/CSetupWizard.php:492
+#: include/classes/setup/CSetupWizard.php:519
 msgid "Cannot create the configuration file."
 msgstr "설정 파일을 작성할 수 없습니다."
 
@@ -1952,7 +1951,7 @@ msgstr "설정 파일을 작성할 수 없습니다."
 msgid "Cannot create widget: %1$s."
 msgstr "위젯을 작성할 수 없습니다 : %1$s。"
 
-#: include/classes/api/services/CUser.php:1035
+#: include/classes/api/services/CUser.php:1041
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Zabbix 유저 \"%1$s\"를 삭제할 수 없습니다. 유저를 비활성으로 설정해 주십시오."
@@ -1961,7 +1960,7 @@ msgstr "Zabbix 유저 \"%1$s\"를 삭제할 수 없습니다. 유저를 비활�
 msgid "Cannot delete action"
 msgstr "액션을 삭제할 수 없습니다"
 
-#: applications.php:189 applications.php:201
+#: app/controllers/CControllerApplicationDelete.php:67
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
 msgstr[0] "애플리케이션을 삭제할 수 없습니다"
@@ -2224,7 +2223,7 @@ msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "호스트를 비활성화 할 수 없습니다."
 
-#: applications.php:231 items.php:1230
+#: app/controllers/CControllerApplicationDisable.php:78 items.php:1230
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "아이템을 비활성화 할 수 없습니다."
@@ -2279,7 +2278,7 @@ msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "호스트를 활성화 할 수 없습니다."
 
-#: applications.php:230 items.php:1229
+#: app/controllers/CControllerApplicationEnable.php:78 items.php:1229
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "아이템을 활성화 할 수 없습니다."
@@ -2479,7 +2478,7 @@ msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
 msgstr[0] ""
 
-#: include/classes/api/services/CUser.php:1174
+#: include/classes/api/services/CUser.php:1180
 msgid "Cannot logout."
 msgstr "로그아웃 할 수 없습니다."
 
@@ -2539,7 +2538,7 @@ msgstr "XML: %1$s 을 읽을 수 없습니다."
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "응답을 받을 수 없습니다. Zabbix서버 \"%1$s\"의 접속을 확인해 주십시오."
 
-#: include/classes/api/services/CUser.php:465
+#: include/classes/api/services/CUser.php:471
 msgid "Cannot rename guest user."
 msgstr "게스트 사용자의 이름을 변경할 수 없습니다"
 
@@ -2758,7 +2757,7 @@ msgstr "템플릿으로 된 Web 시나리오 \"%1$s\"를 갱신할 수 없습니
 msgid "Cannot update action"
 msgstr "액션을 갱신할 수 없습니다"
 
-#: applications.php:162
+#: app/controllers/CControllerApplicationUpdate.php:75
 msgid "Cannot update application"
 msgstr "애플리케이션을 갱신할 수 없습니다"
 
@@ -2768,8 +2767,8 @@ msgstr "인증 설정을 갱신할 수 없습니다"
 
 #: app/controllers/CControllerAutoregUpdate.php:41
 #: app/controllers/CControllerAutoregUpdate.php:73
-#: app/controllers/CControllerGuiUpdate.php:44
-#: app/controllers/CControllerGuiUpdate.php:82
+#: app/controllers/CControllerGuiUpdate.php:45
+#: app/controllers/CControllerGuiUpdate.php:83
 #: app/controllers/CControllerHousekeepingUpdate.php:57
 #: app/controllers/CControllerHousekeepingUpdate.php:126
 #: app/controllers/CControllerMiscConfigUpdate.php:43
@@ -2972,10 +2971,10 @@ msgstr "트리거 프로토타입 \"%1$s\"을 갱신할 수 없습니다: %2$s"
 msgid "Cannot update trigger prototypes"
 msgstr "트리거 프로토타입을 갱신할 수 없습니다"
 
-#: app/controllers/CControllerUserProfileUpdate.php:62
-#: app/controllers/CControllerUserProfileUpdate.php:120
-#: app/controllers/CControllerUserUpdate.php:66
-#: app/controllers/CControllerUserUpdate.php:130
+#: app/controllers/CControllerUserProfileUpdate.php:65
+#: app/controllers/CControllerUserProfileUpdate.php:125
+#: app/controllers/CControllerUserUpdate.php:69
+#: app/controllers/CControllerUserUpdate.php:133
 msgid "Cannot update user"
 msgstr "사용자를 갱신할 수 없습니다"
 
@@ -3121,7 +3120,7 @@ msgid "Check for error using regular expression"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:37
-#: include/classes/setup/CSetupWizard.php:248
+#: include/classes/setup/CSetupWizard.php:252
 msgid "Check of pre-requisites"
 msgstr "전제조건의 체크"
 
@@ -3254,8 +3253,8 @@ msgstr "시각"
 #: app/views/administration.regex.edit.php:143
 #: app/views/administration.script.edit.php:138
 #: app/views/administration.valuemap.edit.php:112
+#: app/views/configuration.application.edit.php:66
 #: include/views/configuration.action.edit.php:481
-#: include/views/configuration.application.edit.php:56
 #: include/views/configuration.correlation.edit.php:165
 #: include/views/configuration.discovery.edit.php:141
 #: include/views/configuration.graph.edit.php:487
@@ -3461,7 +3460,7 @@ msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "상관관계 \"%1$s\"의 실행조건이 중복되어 있습니다."
 
 #: include/menu.inc.php:97 include/menu.inc.php:142
-#: include/views/inventory.host.view.php:211 jsLoader.php:275
+#: include/views/inventory.host.view.php:212 jsLoader.php:275
 msgid "Configuration"
 msgstr "설정"
 
@@ -3469,7 +3468,7 @@ msgstr "설정"
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "설정한 캐쉬의 통계. cache - buffer (mode: pfree, total, used, free)."
 
-#: include/classes/setup/CSetupWizard.php:509
+#: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Configuration file \"%1$s\" created."
 msgstr "설정 파일 \"%1$s\"를 작성하였습니다."
@@ -3478,7 +3477,7 @@ msgstr "설정 파일 \"%1$s\"를 작성하였습니다."
 msgid "Configuration import"
 msgstr "가져오기 설정"
 
-#: app/controllers/CControllerGuiEdit.php:61
+#: app/controllers/CControllerGuiEdit.php:63
 msgid "Configuration of GUI"
 msgstr "GUI 설정"
 
@@ -3490,7 +3489,8 @@ msgstr "ZABBIX 설정"
 msgid "Configuration of actions"
 msgstr "액션 설정"
 
-#: applications.php:26
+#: app/controllers/CControllerApplicationEdit.php:83
+#: app/controllers/CControllerApplicationList.php:148
 msgid "Configuration of applications"
 msgstr "어플리케이션 설정"
 
@@ -3613,7 +3613,7 @@ msgstr "트리거 설정"
 msgid "Configuration of user groups"
 msgstr "유저 그룹 설정"
 
-#: app/controllers/CControllerUserEdit.php:186
+#: app/controllers/CControllerUserEdit.php:191
 #: app/controllers/CControllerUserList.php:155
 msgid "Configuration of users"
 msgstr "유저 설정"
@@ -3632,7 +3632,7 @@ msgid "Configuration of working time"
 msgstr "워킹 타임 설정"
 
 #: app/controllers/CControllerAutoregUpdate.php:69
-#: app/controllers/CControllerGuiUpdate.php:78
+#: app/controllers/CControllerGuiUpdate.php:79
 #: app/controllers/CControllerHousekeepingUpdate.php:122
 #: app/controllers/CControllerMiscConfigUpdate.php:77
 #: app/controllers/CControllerTrigDisplayUpdate.php:86
@@ -3642,7 +3642,7 @@ msgid "Configuration updated"
 msgstr "설정을 갱신하였습니다"
 
 #: include/classes/setup/CSetupWizard.php:41
-#: include/classes/setup/CSetupWizard.php:358
+#: include/classes/setup/CSetupWizard.php:362
 msgid "Configure DB connection"
 msgstr "DB접속 설정"
 
@@ -3650,11 +3650,11 @@ msgstr "DB접속 설정"
 msgid "Confirmation text"
 msgstr "확인 텍스트"
 
-#: include/classes/setup/CSetupWizard.php:507
+#: include/classes/setup/CSetupWizard.php:534
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "축하합니다! Zabbix frontend 설치가 종료되었습니다."
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1466
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1467
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:719
 msgid "Connect to"
@@ -3763,6 +3763,7 @@ msgstr "포함"
 #: app/views/administration.usergroup.list.php:37
 #: app/views/administration.user.list.php:47
 #: app/views/administration.valuemap.list.php:45
+#: app/views/configuration.application.list.php:176
 #: app/views/monitoring.charts.view.php:67
 #: app/views/monitoring.dashboard.list.php:47
 #: app/views/monitoring.dashboard.view.php:102
@@ -3775,7 +3776,6 @@ msgstr "포함"
 #: app/views/monitoring.web.view.php:40 app/views/report.services.php:68
 #: httpdetails.php:192 include/classes/html/widget/CWidget.php:102
 #: include/views/configuration.action.list.php:57
-#: include/views/configuration.application.list.php:166
 #: include/views/configuration.correlation.list.php:35
 #: include/views/configuration.discovery.list.php:35
 #: include/views/configuration.graph.list.php:37
@@ -3919,11 +3919,11 @@ msgstr "로그의 일치하는 행의 개수. integer를 리턴"
 msgid "Create action"
 msgstr "액션 작성"
 
-#: include/views/configuration.application.list.php:161
+#: app/views/configuration.application.list.php:171
 msgid "Create application"
 msgstr "어플리케이션 작성"
 
-#: include/views/configuration.application.list.php:160
+#: app/views/configuration.application.list.php:170
 msgid "Create application (select host first)"
 msgstr "어플리케이션 작성 (먼저 호스트를 선택)"
 
@@ -4122,7 +4122,7 @@ msgstr "크리티컬"
 msgid "Current host"
 msgstr "현재 호스트"
 
-#: include/classes/setup/CSetupWizard.php:206
+#: include/classes/setup/CSetupWizard.php:210
 msgid "Current value"
 msgstr "현재 값"
 
@@ -4220,7 +4220,7 @@ msgstr "DES"
 msgid "DNS"
 msgstr "DNS"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1461
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1462
 #: include/views/configuration.discovery.edit.php:106
 #: include/views/configuration.discovery.edit.php:119
 #: include/views/inventory.host.view.php:79
@@ -4327,7 +4327,7 @@ msgstr "데이터 보존기간"
 msgid "Database history tables upgraded"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:264
+#: include/classes/setup/CSetupWizard.php:268
 msgid "Database host"
 msgstr "데이터베이스 호스트"
 
@@ -4335,35 +4335,35 @@ msgstr "데이터베이스 호스트"
 msgid "Database monitor"
 msgstr "데이터베이스 모니터"
 
-#: include/classes/setup/CSetupWizard.php:277
-#: include/classes/setup/CSetupWizard.php:407 setup.php:45
+#: include/classes/setup/CSetupWizard.php:281
+#: include/classes/setup/CSetupWizard.php:430 setup.php:45
 msgid "Database name"
 msgstr "데이터베이스 이름"
 
-#: include/classes/setup/CSetupWizard.php:409
+#: include/classes/setup/CSetupWizard.php:432
 msgid "Database password"
 msgstr "데이터베이스 패스워드"
 
-#: include/classes/setup/CSetupWizard.php:269
-#: include/classes/setup/CSetupWizard.php:406 setup.php:44
+#: include/classes/setup/CSetupWizard.php:273
+#: include/classes/setup/CSetupWizard.php:429 setup.php:44
 msgid "Database port"
 msgstr "데이터베이스 포트"
 
-#: include/classes/setup/CSetupWizard.php:283
-#: include/classes/setup/CSetupWizard.php:411
+#: include/classes/setup/CSetupWizard.php:287
+#: include/classes/setup/CSetupWizard.php:434
 msgid "Database schema"
 msgstr "데이터베이스 스키마"
 
-#: include/classes/setup/CSetupWizard.php:405
+#: include/classes/setup/CSetupWizard.php:428
 msgid "Database server"
 msgstr "데이터베이스 서버"
 
-#: include/classes/setup/CSetupWizard.php:260
-#: include/classes/setup/CSetupWizard.php:400
+#: include/classes/setup/CSetupWizard.php:264
+#: include/classes/setup/CSetupWizard.php:423
 msgid "Database type"
 msgstr "데이터베이스 타입"
 
-#: include/classes/setup/CSetupWizard.php:408
+#: include/classes/setup/CSetupWizard.php:431
 msgid "Database user"
 msgstr "데이터베이스 유저"
 
@@ -4431,7 +4431,7 @@ msgstr "12월"
 
 #: app/views/administration.iconmap.edit.php:106
 #: include/classes/widgets/forms/CWidgetForm.php:49 include/hosts.inc.php:31
-#: include/hosts.inc.php:1476 include/views/configuration.action.edit.php:242
+#: include/hosts.inc.php:1477 include/views/configuration.action.edit.php:242
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:142
 #: include/views/js/monitoring.sysmaps.js.php:243
@@ -4451,8 +4451,8 @@ msgstr "디폴트 갱신간격"
 msgid "Default host inventory mode"
 msgstr "기본 호스트 인벤토리 모드"
 
-#: app/views/administration.gui.edit.php:64
-#: include/classes/setup/CSetupWizard.php:194
+#: app/views/administration.gui.edit.php:66
+#: include/classes/setup/CSetupWizard.php:198
 msgid "Default language"
 msgstr ""
 
@@ -4473,14 +4473,25 @@ msgstr "기본 미디어 타입"
 msgid "Default operation step duration"
 msgstr "디폴트 액션 실행 스텝의 간격"
 
-#: app/views/administration.gui.edit.php:69
+#: app/views/administration.gui.edit.php:76
+#: include/classes/setup/CSetupWizard.php:408
 msgid "Default theme"
 msgstr "디폴트 테마"
 
-#: include/profiles.inc.php:258
+#: include/profiles.inc.php:261
 #, c-format
 msgid "Default theme \"%1$s\"."
 msgstr "디폴트 테마 \"%1$s\"."
+
+#: app/views/administration.gui.edit.php:71
+#: include/classes/setup/CSetupWizard.php:403
+msgid "Default time zone"
+msgstr ""
+
+#: include/profiles.inc.php:258
+#, c-format
+msgid "Default time zone \"%1$s\"."
+msgstr ""
 
 #: app/views/popup.lldoperation.php:99
 #: include/views/configuration.item.massupdate.php:257
@@ -4505,30 +4516,31 @@ msgstr "연장 시간"
 #: app/views/administration.regex.list.php:91
 #: app/views/administration.script.edit.php:139
 #: app/views/administration.script.list.php:122
-#: app/views/administration.user.edit.php:467
+#: app/views/administration.user.edit.php:472
 #: app/views/administration.usergroup.edit.php:219
 #: app/views/administration.usergroup.list.php:228
 #: app/views/administration.user.list.php:210
 #: app/views/administration.valuemap.edit.php:113
 #: app/views/administration.valuemap.list.php:99
+#: app/views/configuration.application.edit.php:67
+#: app/views/configuration.application.list.php:159
 #: app/views/monitoring.dashboard.list.php:85
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:644
 #: include/classes/widgets/CWidgetHelper.php:996 include/services.inc.php:118
 #: include/views/configuration.action.list.php:151
-#: include/views/configuration.application.list.php:149
 #: include/views/configuration.correlation.list.php:132
 #: include/views/configuration.discovery.list.php:103
 #: include/views/configuration.graph.list.php:225
 #: include/views/configuration.host.discovery.list.php:293
 #: include/views/configuration.hostgroups.list.php:169
-#: include/views/configuration.host.list.php:479
+#: include/views/configuration.host.list.php:480
 #: include/views/configuration.host.prototype.list.php:178
 #: include/views/configuration.httpconf.list.php:195
 #: include/views/configuration.item.list.php:262
 #: include/views/configuration.item.prototype.list.php:196
 #: include/views/configuration.maintenance.list.php:121
-#: include/views/configuration.template.list.php:324
+#: include/views/configuration.template.list.php:310
 #: include/views/configuration.trigger.prototype.list.php:188
 #: include/views/configuration.triggers.list.php:342
 #: include/views/monitoring.screen.list.php:134
@@ -4543,11 +4555,11 @@ msgid "Delete all elements that are not present in the XML file?"
 msgstr "XML파일 내의 존재하지 않는 모든 요소를 삭제하시겠습니까?"
 
 #: include/views/configuration.template.edit.php:448
-#: include/views/configuration.template.list.php:325
+#: include/views/configuration.template.list.php:311
 msgid "Delete and clear"
 msgstr "삭제와 클리어"
 
-#: include/views/configuration.template.list.php:326
+#: include/views/configuration.template.list.php:312
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "선택한 템플릿과 데이터를 삭제하시겠습니까? (경고: 링크되어 있는 모든 호스트에서 데이터가 삭제됩니다!)"
 
@@ -4555,7 +4567,7 @@ msgstr "선택한 템플릿과 데이터를 삭제하시겠습니까? (경고: �
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr "템플릿과 데이터를 삭제하시겠습니까? (경고: 링크되어 있는 모든 호스트에서 데이터가 삭제됩니다!)"
 
-#: include/views/configuration.application.edit.php:57
+#: app/views/configuration.application.edit.php:71
 msgid "Delete application?"
 msgstr "어플리케이션을 삭제하시겠습니까?"
 
@@ -4647,7 +4659,7 @@ msgstr "스크립트를 삭제하시겠습니까?"
 msgid "Delete selected actions?"
 msgstr "선택한 액션을 삭제하시겠습니까?"
 
-#: include/views/configuration.application.list.php:149
+#: app/views/configuration.application.list.php:159
 msgid "Delete selected applications?"
 msgstr "선택한 어플리케이션을 삭제하시겠습니까?"
 
@@ -4701,7 +4713,7 @@ msgstr "선택한 호스트 프로토타입을 삭제하시겠습니까?"
 msgid "Delete selected host?"
 msgstr "선택한 호스트를 삭제하시겠습니까?"
 
-#: include/views/configuration.host.list.php:479
+#: include/views/configuration.host.list.php:480
 msgid "Delete selected hosts?"
 msgstr "선택한 호스트를 삭제하시겠습니까?"
 
@@ -4757,7 +4769,7 @@ msgstr "선택한 도형을 삭제하시겠습니까?"
 msgid "Delete selected slide shows?"
 msgstr "선택한 슬라이드 쇼를 삭제하시겠습니까?"
 
-#: include/views/configuration.template.list.php:324
+#: include/views/configuration.template.list.php:310
 msgid "Delete selected templates?"
 msgstr "선택한 템플릿을 삭제하시겠습니까?"
 
@@ -4769,7 +4781,7 @@ msgstr "선택한 트리거 프로토타입을 삭제하시겠습니까?"
 msgid "Delete selected triggers?"
 msgstr "선택한 트리거를 삭제하시겠습니까?"
 
-#: app/views/administration.user.edit.php:469
+#: app/views/administration.user.edit.php:474
 msgid "Delete selected user?"
 msgstr "선택한 사용자를 삭제하시겠습니까?"
 
@@ -4909,7 +4921,7 @@ msgstr "이름"
 #: include/views/configuration.action.edit.php:174
 #: include/views/configuration.action.edit.php:316
 #: include/views/configuration.action.edit.php:399
-#: include/views/inventory.host.view.php:247
+#: include/views/inventory.host.view.php:248
 msgid "Details"
 msgstr "자세히"
 
@@ -4947,12 +4959,12 @@ msgstr "디렉토리 사이즈 (바이트). integer를 리턴"
 #: app/views/administration.mediatype.list.php:163
 #: app/views/administration.module.list.php:124
 #: app/views/administration.usergroup.list.php:210
+#: app/views/configuration.application.list.php:158
 #: include/views/configuration.action.list.php:150
-#: include/views/configuration.application.list.php:148
 #: include/views/configuration.correlation.list.php:131
 #: include/views/configuration.discovery.list.php:102
 #: include/views/configuration.host.discovery.list.php:289
-#: include/views/configuration.host.list.php:469
+#: include/views/configuration.host.list.php:470
 #: include/views/configuration.httpconf.list.php:191
 #: include/views/configuration.item.list.php:257
 #: include/views/configuration.triggers.list.php:339
@@ -4992,7 +5004,7 @@ msgstr "선택한 프록시에 의한 호스트 감시를 비활성으로 하시
 msgid "Disable selected actions?"
 msgstr "선택한 액션을 비활성으로 하시겠습니까?"
 
-#: include/views/configuration.application.list.php:148
+#: app/views/configuration.application.list.php:158
 msgid "Disable selected applications?"
 msgstr "선택한 어플리케이션을 비활성으로 하시겠습니까?"
 
@@ -5009,7 +5021,7 @@ msgstr "선택한 디스커버리 규칙을 비활성으로 하시겠습니까?"
 msgid "Disable selected groups?"
 msgstr "선택한 그룹을 비활성으로 하시겠습니까?"
 
-#: include/views/configuration.host.list.php:469
+#: include/views/configuration.host.list.php:470
 msgid "Disable selected hosts?"
 msgstr "선택한 호스트을 비활성으로 하시겠습니까?"
 
@@ -5039,7 +5051,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: app/views/administration.miscconfig.edit.php:53
 #: app/views/administration.module.list.php:54
 #: app/views/administration.module.list.php:101
-#: app/views/administration.user.edit.php:239
+#: app/views/administration.user.edit.php:244
 #: app/views/administration.usergroup.list.php:53
 #: app/views/administration.usergroup.list.php:91
 #: app/views/administration.usergroup.list.php:129
@@ -5047,7 +5059,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: app/views/administration.user.list.php:197
 #: app/views/administration.user.list.php:199
 #: app/views/monitoring.host.view.php:143 app/views/popup.lldoperation.php:276
-#: include/discovery.inc.php:108 include/hosts.inc.php:1369
+#: include/discovery.inc.php:108 include/hosts.inc.php:1370
 #: include/html.inc.php:319 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:185 include/maps.inc.php:320
@@ -5117,16 +5129,16 @@ msgid "Discovered items"
 msgstr "디스커버리된 아이템"
 
 #: app/views/popup.mediatype.message.php:55 app/views/search.php:42
-#: app/views/search.php:88 app/views/search.php:92 app/views/search.php:228
-#: app/views/search.php:278 app/views/search.php:282
+#: app/views/search.php:89 app/views/search.php:93 app/views/search.php:229
+#: app/views/search.php:283 app/views/search.php:287
 #: include/classes/helpers/CMediatypeHelper.php:93 include/forms.inc.php:293
 #: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
 #: include/views/configuration.host.list.php:188
-#: include/views/configuration.host.list.php:432
-#: include/views/configuration.template.list.php:155
-#: include/views/configuration.template.list.php:289
-#: include/views/inventory.host.view.php:191
-#: include/views/inventory.host.view.php:207
+#: include/views/configuration.host.list.php:433
+#: include/views/configuration.template.list.php:156
+#: include/views/configuration.template.list.php:275
+#: include/views/inventory.host.view.php:192
+#: include/views/inventory.host.view.php:208
 msgid "Discovery"
 msgstr "디스커버리"
 
@@ -5147,7 +5159,7 @@ msgstr "디스커버리 체크"
 msgid "Discovery checks"
 msgstr "디스커버리 체크"
 
-#: include/html.inc.php:463
+#: include/html.inc.php:464
 msgid "Discovery list"
 msgstr "디스커버리 리스트"
 
@@ -5216,7 +5228,7 @@ msgid "Discovery rule updated"
 msgstr "디스커버리 규칙을 갱신하였습니다"
 
 #: app/controllers/CControllerPopupGeneric.php:344
-#: app/views/popup.condition.common.php:455 include/html.inc.php:424
+#: app/views/popup.condition.common.php:455 include/html.inc.php:425
 #: include/views/configuration.discovery.edit.php:28
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.edit.php:27
@@ -5267,7 +5279,7 @@ msgstr "장애의 표시"
 msgid "Display stacked graph"
 msgstr "누계 그래프 표시"
 
-#: app/views/search.php:154 app/views/search.php:223 app/views/search.php:308
+#: app/views/search.php:155 app/views/search.php:224 app/views/search.php:313
 #: include/actions.inc.php:1726 include/actions.inc.php:1798
 #: include/actions.inc.php:1889 include/classes/helpers/CPagerHelper.php:148
 #: jsLoader.php:342 queue.php:309
@@ -5331,7 +5343,7 @@ msgstr "Down"
 msgid "Download image"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:496
+#: include/classes/setup/CSetupWizard.php:523
 msgid "Download the configuration file"
 msgstr "설정 파일 다운로드"
 
@@ -5481,7 +5493,7 @@ msgstr "각URL의 이름은 중복될 수 없습니다. 같은 URL 이름이 이
 msgid "Each item"
 msgstr ""
 
-#: app/views/administration.user.edit.php:287
+#: app/views/administration.user.edit.php:292
 #: app/views/js/administration.mediatype.edit.js.php:50
 #: include/views/configuration.action.edit.php:259
 #: include/views/configuration.action.edit.php:280
@@ -5682,12 +5694,12 @@ msgstr "스크린ID가 비어있습니다."
 #: app/views/administration.mediatype.list.php:162
 #: app/views/administration.module.list.php:123
 #: app/views/administration.usergroup.list.php:204
+#: app/views/configuration.application.list.php:157
 #: include/views/configuration.action.list.php:149
-#: include/views/configuration.application.list.php:147
 #: include/views/configuration.correlation.list.php:130
 #: include/views/configuration.discovery.list.php:101
 #: include/views/configuration.host.discovery.list.php:286
-#: include/views/configuration.host.list.php:468
+#: include/views/configuration.host.list.php:469
 #: include/views/configuration.httpconf.list.php:190
 #: include/views/configuration.item.list.php:256
 #: include/views/configuration.triggers.list.php:338
@@ -5752,7 +5764,7 @@ msgstr "데이터 삭제처리를 활성화"
 msgid "Enable selected actions?"
 msgstr "선택한 액션을 활성화 하시겠습니까?"
 
-#: include/views/configuration.application.list.php:147
+#: app/views/configuration.application.list.php:157
 msgid "Enable selected applications?"
 msgstr "선택한 어플리케이션을 활성화 하시겠습니까?"
 
@@ -5770,7 +5782,7 @@ msgid "Enable selected groups?"
 msgstr "선택한 그룹을 활성화 하시겠습니까?"
 
 #: include/views/configuration.hostgroups.list.php:165
-#: include/views/configuration.host.list.php:468
+#: include/views/configuration.host.list.php:469
 msgid "Enable selected hosts?"
 msgstr "선택한 호스트를 활성화 하시겠습니까?"
 
@@ -5809,7 +5821,7 @@ msgstr "트래핑의 활성화"
 #: app/views/administration.module.edit.php:45
 #: app/views/administration.module.list.php:53
 #: app/views/administration.module.list.php:95
-#: app/views/administration.user.edit.php:233
+#: app/views/administration.user.edit.php:238
 #: app/views/administration.usergroup.edit.php:75
 #: app/views/administration.usergroup.edit.php:88
 #: app/views/administration.usergroup.edit.php:89
@@ -6080,8 +6092,8 @@ msgstr "분해도 그래프"
 
 #: app/views/administration.mediatype.list.php:164
 #: app/views/administration.valuemap.list.php:90
-#: include/views/configuration.host.list.php:470
-#: include/views/configuration.template.list.php:315
+#: include/views/configuration.host.list.php:471
+#: include/views/configuration.template.list.php:301
 #: include/views/monitoring.screen.list.php:124
 #: include/views/monitoring.sysmap.list.php:97
 msgid "Export"
@@ -6163,7 +6175,7 @@ msgstr "정상"
 msgid "FTP"
 msgstr "FTP"
 
-#: include/classes/setup/CSetupWizard.php:222
+#: include/classes/setup/CSetupWizard.php:226
 msgid "Fail"
 msgstr "실패"
 
@@ -6347,6 +6359,7 @@ msgstr "면"
 #: app/views/administration.script.list.php:41
 #: app/views/administration.usergroup.list.php:43
 #: app/views/administration.user.list.php:53
+#: app/views/configuration.application.list.php:37
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.discovery.view.php:46
 #: app/views/monitoring.host.view.php:101
@@ -6358,7 +6371,6 @@ msgstr "면"
 #: include/forms.inc.php:703
 #: include/views/administration.auditacts.list.php:53
 #: include/views/configuration.action.list.php:62
-#: include/views/configuration.application.list.php:28
 #: include/views/configuration.correlation.list.php:40
 #: include/views/configuration.discovery.list.php:40
 #: include/views/configuration.graph.list.php:65
@@ -6400,7 +6412,7 @@ msgstr "파일내의 문자열 검색. 일치하는 문자열을 포함한 행�
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
 msgstr "Web페이지 상의 문자열 검색. 일치하는 문자열이나 output 파라미터로 지정한 것을 리턴."
 
-#: include/classes/setup/CSetupWizard.php:119
+#: include/classes/setup/CSetupWizard.php:123
 msgid "Finish"
 msgstr "종료"
 
@@ -6513,7 +6525,7 @@ msgstr "시작"
 msgid "Frontend access"
 msgstr "Web 인터페이스에 액세스"
 
-#: app/views/administration.user.edit.php:368
+#: app/views/administration.user.edit.php:373
 msgid "Frontend messaging"
 msgstr "Web 인터페이스 알림 표시"
 
@@ -6548,13 +6560,18 @@ msgid "GSM modem"
 msgstr "GSM 모뎀"
 
 #: app/views/administration.gui.edit.php:27
-#: app/views/administration.gui.edit.php:89 include/html.inc.php:907
+#: app/views/administration.gui.edit.php:96 include/html.inc.php:908
 msgid "GUI"
 msgstr "표시 설정"
 
 #: include/classes/user/CWebUser.php:76 index_sso.php:231
 msgid "GUI access disabled."
 msgstr "GUI 액세스를 비활성 하였습니다"
+
+#: include/classes/setup/CSetupWizard.php:49
+#: include/classes/setup/CSetupWizard.php:413
+msgid "GUI settings"
+msgstr ""
 
 #: include/menu.inc.php:154
 msgid "General"
@@ -6794,7 +6811,7 @@ msgstr "그래프 프로토타입을 갱신하였습니다"
 msgid "Graph prototype with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 그래프의 프로토타입은 사용할 수 없습니다."
 
-#: app/controllers/CControllerPopupGeneric.php:304 include/html.inc.php:496
+#: app/controllers/CControllerPopupGeneric.php:304 include/html.inc.php:497
 #: include/views/configuration.graph.edit.php:35
 #: include/views/configuration.graph.list.php:28
 #: include/views/configuration.host.discovery.list.php:261
@@ -6848,21 +6865,21 @@ msgstr "같은 이름에 다른 타입의 그래프가 존재합니다."
 #: app/views/monitoring.charts.view.php:39
 #: app/views/monitoring.charts.view.php:107
 #: app/views/monitoring.charts.view.php:135 app/views/search.php:35
-#: app/views/search.php:41 app/views/search.php:81 app/views/search.php:85
-#: app/views/search.php:128 app/views/search.php:228 app/views/search.php:267
-#: app/views/search.php:271 graphs.php:480 include/html.inc.php:399
+#: app/views/search.php:41 app/views/search.php:82 app/views/search.php:86
+#: app/views/search.php:129 app/views/search.php:229 app/views/search.php:272
+#: app/views/search.php:276 graphs.php:480 include/html.inc.php:400
 #: include/views/configuration.graph.edit.php:30
 #: include/views/configuration.graph.list.php:43
 #: include/views/configuration.host.discovery.list.php:175
 #: include/views/configuration.host.edit.php:318
 #: include/views/configuration.host.list.php:187
-#: include/views/configuration.host.list.php:424
+#: include/views/configuration.host.list.php:425
 #: include/views/configuration.template.edit.php:200
-#: include/views/configuration.template.list.php:153
-#: include/views/configuration.template.list.php:277
+#: include/views/configuration.template.list.php:154
+#: include/views/configuration.template.list.php:263
 #: include/views/conf.import.php:41 include/views/inventory.host.view.php:153
-#: include/views/inventory.host.view.php:186
-#: include/views/inventory.host.view.php:206 jsLoader.php:290
+#: include/views/inventory.host.view.php:187
+#: include/views/inventory.host.view.php:207 jsLoader.php:290
 msgid "Graphs"
 msgstr "그래프"
 
@@ -6925,7 +6942,7 @@ msgstr[0] "그룹을 삭제하였습니다"
 msgid "Group for discovered hosts"
 msgstr "디스커버리에서 발견한 호스트 그룹"
 
-#: include/profiles.inc.php:270
+#: include/profiles.inc.php:273
 #, c-format
 msgid "Group for discovered hosts \"%1$s\"."
 msgstr "디스커버리에서 발견한 호스트 \"%1$s\" 그룹."
@@ -7092,7 +7109,7 @@ msgid "Hide sidebar"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:125 include/html.inc.php:275
-#: include/html.inc.php:534 include/views/monitoring.screen.php:45
+#: include/html.inc.php:535 include/views/monitoring.screen.php:45
 #: include/views/monitoring.slides.php:43
 msgctxt "screen reader"
 msgid "Hierarchy"
@@ -7189,6 +7206,7 @@ msgstr "가로 위치"
 #: app/controllers/CControllerAuditLogList.php:188
 #: app/partials/monitoring.latest.view.html.php:41
 #: app/partials/popup.operations.php:161
+#: app/views/configuration.application.list.php:88
 #: app/views/monitoring.charts.view.php:82
 #: app/views/monitoring.dashboard.view.php:62
 #: app/views/monitoring.widget.problems.view.php:56
@@ -7204,12 +7222,11 @@ msgstr "가로 위치"
 #: include/classes/screens/CScreenProblem.php:916
 #: include/classes/screens/CScreenProblem.php:1166
 #: include/classes/screens/CScreenTriggersInfo.php:40
-#: include/classes/setup/CSetupWizard.php:370
+#: include/classes/setup/CSetupWizard.php:374
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/classes/widgets/forms/CWidgetFormProblems.php:207
 #: include/hostgroups.inc.php:249 include/maps.inc.php:24
 #: include/triggers.inc.php:1212
-#: include/views/configuration.application.list.php:81
 #: include/views/configuration.host.discovery.list.php:171
 #: include/views/configuration.host.edit.php:466
 #: include/views/configuration.host.massupdate.php:304
@@ -7219,7 +7236,7 @@ msgstr "가로 위치"
 #: include/views/configuration.triggers.list.php:198
 #: include/views/inventory.host.list.php:78
 #: include/views/inventory.host.view.php:166
-#: include/views/inventory.host.view.php:202
+#: include/views/inventory.host.view.php:203
 #: include/views/js/monitoring.sysmaps.js.php:92
 #: include/views/js/monitoring.sysmaps.js.php:158
 #: include/views/monitoring.screen.constructor.edit.php:511
@@ -7307,11 +7324,11 @@ msgstr[0] "호스트를 활성화 하였습니다"
 #: app/partials/popup.operations.php:169
 #: app/views/administration.script.edit.php:84
 #: app/views/administration.script.list.php:70
-#: app/views/administration.user.edit.php:335
+#: app/views/administration.user.edit.php:340
 #: app/views/monitoring.widget.problemhosts.view.php:31
 #: app/views/monitoring.widget.problemsbysv.view.php:40
 #: app/views/monitoring.widget.web.view.php:30 app/views/popup.generic.php:69
-#: app/views/search.php:159 include/actions.inc.php:48
+#: app/views/search.php:160 include/actions.inc.php:48
 #: include/blocks.inc.php:346 include/maps.inc.php:25
 #: include/views/configuration.hostgroups.edit.php:51
 #: include/views/js/monitoring.sysmaps.js.php:95
@@ -7362,12 +7379,13 @@ msgstr "ID \"%1$s\"의 호스트그룹은 사용할 수 없습니다."
 #: app/controllers/CControllerUsergroupTagfilterAdd.php:41
 #: app/partials/common.filter.trigger.php:45
 #: app/partials/popup.operations.php:312
+#: app/views/configuration.application.list.php:40
 #: app/views/monitoring.host.view.php:106
 #: app/views/monitoring.latest.view.php:49
 #: app/views/monitoring.problem.view.php:103
 #: app/views/monitoring.web.view.php:48
 #: app/views/popup.condition.common.php:98
-#: app/views/popup.condition.common.php:269 app/views/search.php:221
+#: app/views/popup.condition.common.php:269 app/views/search.php:222
 #: hostinventoriesoverview.php:151
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:31
@@ -7378,7 +7396,6 @@ msgstr "ID \"%1$s\"의 호스트그룹은 사용할 수 없습니다."
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:46
 #: include/classes/widgets/forms/CWidgetFormWeb.php:31
 #: include/forms.inc.php:161 include/menu.inc.php:101
-#: include/views/configuration.application.list.php:31
 #: include/views/configuration.copy.elements.php:61
 #: include/views/configuration.graph.list.php:68
 #: include/views/configuration.host.discovery.list.php:55
@@ -7415,7 +7432,7 @@ msgstr "호스트 인터페이스"
 #: app/views/monitoring.problem.view.php:295
 #: app/views/popup.lldoperation.php:272 hostinventories.php:26
 #: include/views/inventory.host.list.php:26
-#: include/views/inventory.host.view.php:255
+#: include/views/inventory.host.view.php:256
 msgid "Host inventory"
 msgstr "호스트 인벤토리"
 
@@ -7497,7 +7514,7 @@ msgstr "호스트명 \"%1$s\"를 가진 호스트 프로토타입은 디스커�
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "호스트의 표시명 \"%1$s\"를 가진 호스트 프로토타입은 디스커버리 규칙 \"%2$s\"에 이미 존재합니다."
 
-#: include/html.inc.php:507
+#: include/html.inc.php:508
 #: include/views/configuration.host.discovery.list.php:267
 #: include/views/configuration.host.edit.php:440
 #: include/views/configuration.host.prototype.edit.php:35
@@ -7561,13 +7578,14 @@ msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미
 #: app/partials/dataoverview.table.left.php:29
 #: app/partials/trigoverview.table.left.php:29
 #: app/views/administration.proxy.list.php:80
+#: app/views/configuration.application.list.php:59
 #: app/views/monitoring.host.view.php:35
 #: app/views/monitoring.latest.view.php:66
 #: app/views/monitoring.problem.view.php:120
 #: app/views/monitoring.web.view.php:67
-#: app/views/popup.condition.common.php:238 app/views/search.php:152
-#: app/views/search.php:163 app/views/search.php:176 app/views/search.php:180
-#: app/views/search.php:181
+#: app/views/popup.condition.common.php:238 app/views/search.php:153
+#: app/views/search.php:164 app/views/search.php:177 app/views/search.php:181
+#: app/views/search.php:182
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:39
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:51
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:51
@@ -7576,7 +7594,6 @@ msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:207 include/forms.inc.php:644 include/menu.inc.php:37
 #: include/menu.inc.php:65 include/menu.inc.php:106
-#: include/views/configuration.application.list.php:50
 #: include/views/configuration.copy.elements.php:62
 #: include/views/configuration.graph.list.php:87
 #: include/views/configuration.graph.list.php:135
@@ -7589,6 +7606,8 @@ msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미
 #: include/views/configuration.host.massupdate.php:28
 #: include/views/configuration.httpconf.list.php:51
 #: include/views/configuration.maintenance.edit.php:224
+#: include/views/configuration.template.list.php:150
+#: include/views/configuration.template.list.php:230
 #: include/views/configuration.triggers.list.php:45
 #: include/views/conf.import.php:33
 #: include/views/monitoring.overview.items.php:112
@@ -7617,7 +7636,7 @@ msgid "Hours"
 msgstr "시간"
 
 #: app/views/administration.housekeeping.edit.php:29
-#: app/views/administration.housekeeping.edit.php:184 include/html.inc.php:909
+#: app/views/administration.housekeeping.edit.php:184 include/html.inc.php:910
 msgid "Housekeeping"
 msgstr "데이터 보존기간"
 
@@ -7650,7 +7669,7 @@ msgstr "IMAP"
 msgid "IP"
 msgstr "IP 주소"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1456
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1457
 #: include/maps.inc.php:46 include/views/configuration.discovery.edit.php:95
 #: include/views/configuration.discovery.edit.php:107
 #: include/views/configuration.discovery.edit.php:120
@@ -7678,7 +7697,7 @@ msgstr "IP주소의 범위 \"%1$s\"가 주소제한 \"%2$s\"을 초과합니다.
 #: app/views/administration.script.list.php:80
 #: app/views/monitoring.widget.hostavail.view.php:30
 #: include/classes/widgets/views/widget.hostavail.form.view.php:47
-#: include/hosts.inc.php:471 include/hosts.inc.php:1437
+#: include/hosts.inc.php:471 include/hosts.inc.php:1438
 #: include/items.inc.php:348 include/views/configuration.host.edit.php:596
 #: include/views/configuration.host.massupdate.php:306
 #: include/views/configuration.host.prototype.edit.php:298
@@ -7764,7 +7783,7 @@ msgstr "아이콘 매핑를 갱신하였습니다"
 
 #: app/controllers/CControllerAuditLogList.php:215
 #: app/views/administration.iconmap.edit.php:29
-#: app/views/administration.iconmap.list.php:27 include/html.inc.php:911
+#: app/views/administration.iconmap.list.php:27 include/html.inc.php:912
 msgid "Icon mapping"
 msgstr "아이콘 매핑"
 
@@ -7854,7 +7873,7 @@ msgid "Image updated"
 msgstr "이미지를 갱신하였습니다"
 
 #: app/views/administration.image.edit.php:29
-#: app/views/administration.image.list.php:28 include/html.inc.php:910
+#: app/views/administration.image.list.php:28 include/html.inc.php:911
 #: include/views/conf.import.php:50
 msgid "Images"
 msgstr "이미지"
@@ -7952,7 +7971,7 @@ msgid "Inaccessible map"
 msgstr "접근할 수 없는 맵"
 
 #: include/graphs.inc.php:274 include/hosts.inc.php:658
-#: include/hosts.inc.php:829 include/httptest.inc.php:217
+#: include/hosts.inc.php:830 include/httptest.inc.php:217
 #: include/items.inc.php:889 include/triggers.inc.php:2351
 msgid "Inaccessible template"
 msgstr "접근할 수 없는 템플릿"
@@ -8547,7 +8566,7 @@ msgid "Incorrect media type ID."
 msgstr "미디어 타입 ID가 올바르지 않습니다."
 
 #: include/classes/api/clients/CLocalApiClient.php:79
-#: include/classes/api/services/CUser.php:1324
+#: include/classes/api/services/CUser.php:1330
 #, c-format
 msgid "Incorrect method \"%1$s.%2$s\"."
 msgstr "메소트 \"%1$s.%2$s\"가 올바르지 않습니다."
@@ -9052,7 +9071,7 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:854
 #: include/classes/api/services/CTriggerGeneral.php:862
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:577
+#: include/classes/api/services/CUser.php:583
 #: include/classes/graphdraw/CLineGraphDraw.php:117
 #: include/classes/graphdraw/CLineGraphDraw.php:243
 #: include/classes/graphdraw/CLineGraphDraw.php:253
@@ -9132,6 +9151,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:169
 #: app/partials/monitoring.latest.view.html.php:57
+#: app/views/configuration.application.list.php:94
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
@@ -9140,7 +9160,6 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:891
 #: include/classes/screens/CScreenProblem.php:915
 #: include/views/administration.auditacts.list.php:68
-#: include/views/configuration.application.list.php:86
 #: include/views/configuration.graph.list.php:127
 #: include/views/configuration.host.discovery.list.php:181
 #: include/views/configuration.hostgroups.list.php:67
@@ -9197,12 +9216,12 @@ msgstr "삽입"
 msgid "Insert expression"
 msgstr "조건식의 삽입"
 
-#: include/classes/setup/CSetupWizard.php:53
-#: include/classes/setup/CSetupWizard.php:514
+#: include/classes/setup/CSetupWizard.php:57
+#: include/classes/setup/CSetupWizard.php:541
 msgid "Install"
 msgstr "설치"
 
-#: setup.php:133
+#: setup.php:169
 msgid "Installation"
 msgstr "설치"
 
@@ -9374,7 +9393,7 @@ msgstr "복귀 트리거의 표시기간이 올바르지 않습니다 : %1$s."
 msgid "Invalid email address \"%1$s\"."
 msgstr "메일 주소 \"%1$s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CUser.php:731
+#: include/classes/api/services/CUser.php:737
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"의 미디어 타입의 메일 주소가 올바르지 않습니다."
@@ -9501,8 +9520,8 @@ msgstr "파라미터의 수가 올바르지 않습니다."
 #: include/classes/api/services/CItemGeneral.php:2271
 #: include/classes/api/services/CItemGeneral.php:2300
 #: include/classes/api/services/CModule.php:291
-#: include/classes/api/services/CUser.php:705
-#: include/classes/api/services/CUser.php:716
+#: include/classes/api/services/CUser.php:711
+#: include/classes/api/services/CUser.php:722
 #: include/classes/validators/CApiInputValidator.php:262
 #: include/classes/validators/CApiInputValidator.php:267
 #: include/classes/validators/CApiInputValidator.php:272
@@ -9788,12 +9807,12 @@ msgstr "아이템 수"
 msgid "Item deleted"
 msgstr "아이템을 삭제하였습니다"
 
-#: applications.php:228 items.php:1227
+#: app/controllers/CControllerApplicationDisable.php:75 items.php:1227
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "아이템을 비활성화 하였습니다"
 
-#: applications.php:227 items.php:1226
+#: app/controllers/CControllerApplicationEnable.php:75 items.php:1226
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "아이템을 활성화 하였습니다"
@@ -9854,7 +9873,7 @@ msgstr[0] "아이템 프로토타입을 갱신하였습니다"
 msgid "Item prototype with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 아이템의 프로토타입은 사용할 수 없습니다."
 
-#: app/controllers/CControllerPopupGeneric.php:317 include/html.inc.php:474
+#: app/controllers/CControllerPopupGeneric.php:317 include/html.inc.php:475
 #: include/views/configuration.host.discovery.list.php:247
 #: include/views/configuration.host.edit.php:367
 #: include/views/configuration.item.prototype.edit.php:26
@@ -9936,26 +9955,25 @@ msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "키\"%1$s\"가 설정된 아이템은 지정한 호스트 \"%2$s\"에 이미 존재합니다."
 
 #: app/controllers/CControllerPopupGeneric.php:254
-#: app/partials/dataoverview.table.top.php:29 app/views/search.php:39
-#: app/views/search.php:67 app/views/search.php:71 app/views/search.php:228
-#: app/views/search.php:253 app/views/search.php:257
+#: app/partials/dataoverview.table.top.php:29
+#: app/views/configuration.application.list.php:93
+#: app/views/configuration.application.list.php:139 app/views/search.php:39
+#: app/views/search.php:68 app/views/search.php:72 app/views/search.php:229
+#: app/views/search.php:258 app/views/search.php:262
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
-#: include/html.inc.php:371
-#: include/views/configuration.application.list.php:85
-#: include/views/configuration.application.list.php:129
-#: include/views/configuration.graph.edit.php:440
+#: include/html.inc.php:372 include/views/configuration.graph.edit.php:440
 #: include/views/configuration.host.discovery.list.php:173
 #: include/views/configuration.host.edit.php:258
 #: include/views/configuration.host.list.php:185
-#: include/views/configuration.host.list.php:408
+#: include/views/configuration.host.list.php:409
 #: include/views/configuration.item.edit.php:26
 #: include/views/configuration.item.list.php:29
 #: include/views/configuration.item.massupdate.php:26
 #: include/views/configuration.template.edit.php:158
-#: include/views/configuration.template.list.php:151
-#: include/views/configuration.template.list.php:261
-#: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
-#: include/views/inventory.host.view.php:204 items.php:1690 queue.php:110
+#: include/views/configuration.template.list.php:152
+#: include/views/configuration.template.list.php:247
+#: include/views/conf.import.php:38 include/views/inventory.host.view.php:177
+#: include/views/inventory.host.view.php:205 items.php:1690 queue.php:110
 msgid "Items"
 msgstr "아이템"
 
@@ -9977,7 +9995,7 @@ msgstr "아이템을 갱신하였습니다"
 
 #: app/views/monitoring.widget.hostavail.view.php:29
 #: include/classes/widgets/views/widget.hostavail.form.view.php:46
-#: include/hosts.inc.php:468 include/hosts.inc.php:1436
+#: include/hosts.inc.php:468 include/hosts.inc.php:1437
 #: include/items.inc.php:347
 #: include/views/js/configuration.host.edit.js.php:165
 msgid "JMX"
@@ -10173,11 +10191,11 @@ msgstr "라벨"
 msgid "Label location"
 msgstr "라벨 위치"
 
-#: app/views/administration.user.edit.php:184
+#: app/views/administration.user.edit.php:188
 msgid "Language"
 msgstr "언어"
 
-#: include/classes/api/services/CUser.php:593
+#: include/classes/api/services/CUser.php:599
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
@@ -10290,7 +10308,7 @@ msgstr "최근 1주일의 그래프"
 #: app/partials/monitoring.host.view.html.php:39
 #: app/partials/monitoring.host.view.html.php:107
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:33
-#: app/views/search.php:116 app/views/search.php:160 app/views/search.php:195
+#: app/views/search.php:117 app/views/search.php:161 app/views/search.php:196
 #: include/menu.inc.php:44 include/views/inventory.host.view.php:140
 #: jsLoader.php:295
 msgid "Latest data"
@@ -10343,11 +10361,11 @@ msgstr "왼쪽 trim"
 msgid "Legend"
 msgstr "범례"
 
-#: setup.php:150
+#: setup.php:186
 msgid "Licensed under"
 msgstr ""
 
-#: app/views/administration.gui.edit.php:72
+#: app/views/administration.gui.edit.php:79
 msgid "Limit for search and filter results"
 msgstr "검색/필터 항목의 상한치"
 
@@ -10429,14 +10447,14 @@ msgstr "링크된 맵"
 #: include/views/configuration.template.edit.php:401
 #: include/views/configuration.template.edit.php:414
 #: include/views/configuration.template.list.php:99
-#: include/views/configuration.template.list.php:157
+#: include/views/configuration.template.list.php:158
 #: include/views/configuration.template.massupdate.php:158
 msgid "Linked templates"
 msgstr "템플릿과의 링크"
 
-#: include/views/configuration.template.list.php:158
-msgid "Linked to"
-msgstr "다음에 링크"
+#: include/views/configuration.template.list.php:159
+msgid "Linked to templates"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:682
 #: include/views/js/monitoring.sysmaps.js.php:693
@@ -10548,12 +10566,12 @@ msgstr "매치하지 않은 SNMP트랩을 로그에 기록"
 msgid "Login"
 msgstr "로그인"
 
-#: include/classes/api/services/CUser.php:1261
+#: include/classes/api/services/CUser.php:1267
 msgid "Login failed."
 msgstr "로그인 실패."
 
-#: include/classes/api/services/CUser.php:1238
-#: include/classes/api/services/CUser.php:1612
+#: include/classes/api/services/CUser.php:1244
+#: include/classes/api/services/CUser.php:1624
 #: include/classes/validators/CLdapAuthValidator.php:73 index_http.php:86
 msgid "Login name or password is incorrect."
 msgstr "로그인 이름이나 패스워드가 잘못되어 있습니다."
@@ -10642,7 +10660,7 @@ msgstr "hostmacroid \"%1$s\"를 가진 매크로는 업습니다."
 #: app/partials/massupdate.macros.tab.php:118
 #: app/views/administration.macros.edit.php:33
 #: app/views/administration.macros.edit.php:94
-#: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:913
+#: app/views/popup.itemtestedit.view.php:186 include/html.inc.php:914
 #: include/views/configuration.host.edit.php:621
 #: include/views/configuration.host.massupdate.php:308
 #: include/views/configuration.host.prototype.edit.php:303
@@ -10723,15 +10741,15 @@ msgstr "메인터넌스 타입"
 msgid "Maintenance updated"
 msgstr "메인터넌스를 갱신하였습니다"
 
-#: include/html.inc.php:962
+#: include/html.inc.php:963
 msgid "Maintenance with data collection"
 msgstr "데이터수집을 하는 메인터넌스"
 
-#: include/html.inc.php:961
+#: include/html.inc.php:962
 msgid "Maintenance without data collection"
 msgstr "데이터수집을 하지 않는 메인터넌스"
 
-#: include/html.inc.php:998
+#: include/html.inc.php:999
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "메인테넌스 : %1$s"
@@ -10742,7 +10760,7 @@ msgstr "필수 파라미터가 설정되어 있지 않습니다."
 
 #: app/partials/popup.operations.php:340
 #: app/views/administration.miscconfig.edit.php:54
-#: app/views/popup.lldoperation.php:277 include/hosts.inc.php:1370
+#: app/views/popup.lldoperation.php:277 include/hosts.inc.php:1371
 #: include/views/configuration.host.edit.php:639
 #: include/views/configuration.host.massupdate.php:205
 #: include/views/configuration.host.prototype.edit.php:321
@@ -10875,10 +10893,10 @@ msgid "Mask"
 msgstr "마스크"
 
 #: include/classes/screens/CScreenProblem.php:1147
-#: include/views/configuration.host.list.php:478
+#: include/views/configuration.host.list.php:479
 #: include/views/configuration.item.list.php:261
 #: include/views/configuration.item.prototype.list.php:195
-#: include/views/configuration.template.list.php:323
+#: include/views/configuration.template.list.php:309
 #: include/views/configuration.trigger.prototype.list.php:187
 #: include/views/configuration.triggers.list.php:341
 msgid "Mass update"
@@ -10919,11 +10937,11 @@ msgstr "최대치"
 msgid "Max columns"
 msgstr "최대 열 수"
 
-#: app/views/administration.gui.edit.php:77
+#: app/views/administration.gui.edit.php:84
 msgid "Max count of elements to show inside table cell"
 msgstr "일람표시의 최대항목수"
 
-#: include/profiles.inc.php:261
+#: include/profiles.inc.php:264
 #, c-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
 msgstr "일람표시의 최대항목수 \"%1$s\"."
@@ -10947,7 +10965,7 @@ msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] "표시 가능한 최대 기간은 %1$s일 입니다."
 
-#: include/classes/api/services/CUser.php:738
+#: include/classes/api/services/CUser.php:744
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"의 미디어 타입의 메일주소가 최대 길이를 넘었습니다."
@@ -10962,8 +10980,8 @@ msgid "May"
 msgstr "5월"
 
 #: app/controllers/CControllerPopupMedia.php:170
-#: app/views/administration.user.edit.php:299
-#: app/views/administration.user.edit.php:314 app/views/popup.media.php:58
+#: app/views/administration.user.edit.php:304
+#: app/views/administration.user.edit.php:319 app/views/popup.media.php:58
 msgid "Media"
 msgstr "연락 방법"
 
@@ -11021,7 +11039,7 @@ msgstr ""
 msgid "Media type updated"
 msgstr "연락 방법을 갱신하였습니다"
 
-#: include/classes/api/services/CUser.php:662
+#: include/classes/api/services/CUser.php:668
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 미디어 타입은 사용할 수 없습니다."
@@ -11089,8 +11107,8 @@ msgstr ""
 msgid "Message templates"
 msgstr ""
 
-#: app/views/administration.user.edit.php:373
-#: app/views/administration.user.edit.php:381
+#: app/views/administration.user.edit.php:378
+#: app/views/administration.user.edit.php:386
 msgid "Message timeout"
 msgstr "표시기간"
 
@@ -11108,7 +11126,7 @@ msgstr "메세지/커맨드"
 msgid "Messages"
 msgstr "메시지"
 
-#: app/views/administration.user.edit.php:453
+#: app/views/administration.user.edit.php:458
 msgid "Messaging"
 msgstr "알림 표시"
 
@@ -11132,32 +11150,32 @@ msgstr "가운데"
 msgid "Min"
 msgstr "최소치"
 
-#: include/classes/setup/CFrontendSetup.php:124
+#: include/classes/setup/CFrontendSetup.php:123
 #, c-format
 msgid "Minimum required PHP memory limit is %1$s (configuration option \"memory_limit\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:162
+#: include/classes/setup/CFrontendSetup.php:161
 #, c-format
 msgid "Minimum required PHP upload filesize is %1$s (configuration option \"upload_max_filesize\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:106
+#: include/classes/setup/CFrontendSetup.php:105
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:193
+#: include/classes/setup/CFrontendSetup.php:192
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:216
+#: include/classes/setup/CFrontendSetup.php:215
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %1$s (configuration option \"max_input_time\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:143
+#: include/classes/setup/CFrontendSetup.php:142
 #, c-format
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr ""
@@ -11283,7 +11301,7 @@ msgstr ""
 #: app/controllers/CControllerModuleEdit.php:98
 #: app/controllers/CControllerModuleList.php:123
 #: app/views/administration.module.edit.php:23
-#: app/views/administration.module.list.php:27 include/html.inc.php:918
+#: app/views/administration.module.list.php:27 include/html.inc.php:919
 msgid "Modules"
 msgstr ""
 
@@ -11408,7 +11426,7 @@ msgstr "NTLM"
 #: app/controllers/CControllerPopupTriggerWizard.php:134
 #: app/controllers/CControllerRegExCreate.php:78
 #: app/controllers/CControllerRegExDelete.php:68
-#: app/controllers/CControllerRegExUpdate.php:87 applications.php:37
+#: app/controllers/CControllerRegExUpdate.php:87
 #: app/partials/common.filter.trigger.php:109
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/monitoring.host.view.html.php:33
@@ -11436,6 +11454,7 @@ msgstr "NTLM"
 #: app/views/administration.user.list.php:59
 #: app/views/administration.valuemap.edit.php:46
 #: app/views/administration.valuemap.list.php:57
+#: app/views/configuration.application.edit.php:46
 #: app/views/dashboard.properties.edit.php:54
 #: app/views/monitoring.dashboard.list.php:58
 #: app/views/monitoring.host.view.php:103
@@ -11455,7 +11474,6 @@ msgstr "NTLM"
 #: include/views/configuration.action.edit.php:56
 #: include/views/configuration.action.list.php:63
 #: include/views/configuration.action.list.php:88
-#: include/views/configuration.application.edit.php:43
 #: include/views/configuration.correlation.edit.php:42
 #: include/views/configuration.correlation.edit.php:53
 #: include/views/configuration.correlation.list.php:41
@@ -11651,9 +11669,9 @@ msgstr "신규 트리거"
 msgid "Next page"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:116
-#: include/classes/setup/CSetupWizard.php:360
-#: include/classes/setup/CSetupWizard.php:440
+#: include/classes/setup/CSetupWizard.php:120
+#: include/classes/setup/CSetupWizard.php:364
+#: include/classes/setup/CSetupWizard.php:463
 msgid "Next step"
 msgstr "다음 스텝"
 
@@ -11990,8 +12008,8 @@ msgstr ""
 msgid "No operation type given for correlation \"%1$s\"."
 msgstr "상관관계 \"%1$s\"에 실행내용 타입이 정의되어 있지 않습니다."
 
-#: include/classes/api/services/CUser.php:1243
-#: include/classes/api/services/CUser.php:1624
+#: include/classes/api/services/CUser.php:1249
+#: include/classes/api/services/CUser.php:1636
 msgid "No permissions for system access."
 msgstr "시스템 액세스 권한이 없습니다."
 
@@ -12149,8 +12167,8 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CUserMacro.php:372
 #: include/classes/api/services/CUserMacro.php:459
 #: include/classes/api/services/CUserMacro.php:807
-#: include/classes/api/services/CUser.php:457
-#: include/classes/api/services/CUser.php:1023
+#: include/classes/api/services/CUser.php:463
+#: include/classes/api/services/CUser.php:1029
 #: include/classes/api/services/CValueMap.php:240
 #: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:82
@@ -12242,7 +12260,7 @@ msgstr "boolean이 아닌 플래그는 폐지될 예정입니다."
 #: include/classes/widgets/forms/CWidgetFormProblems.php:140
 #: include/classes/widgets/forms/CWidgetFormProblems.php:160
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
-#: include/profiles.inc.php:279 include/users.inc.php:437
+#: include/profiles.inc.php:282 include/users.inc.php:437
 #: include/views/configuration.host.discovery.edit.php:279
 #: include/views/configuration.host.list.php:353
 #: include/views/configuration.host.list.php:359
@@ -12292,15 +12310,15 @@ msgstr ""
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:483
+#: include/classes/api/services/CUser.php:489
 msgid "Not allowed to set language for user \"guest\"."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:475
+#: include/classes/api/services/CUser.php:481
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "\"손님\" 사용자는 패스워드를 설정할 수 없습니다."
 
-#: include/classes/api/services/CUser.php:486
+#: include/classes/api/services/CUser.php:492
 msgid "Not allowed to set theme for user \"guest\"."
 msgstr ""
 
@@ -12648,7 +12666,7 @@ msgstr "ON"
 msgid "On status change triggers blink for"
 msgstr "상태가 바뀐 트리거의 점멸기간"
 
-#: app/views/administration.user.edit.php:379
+#: app/views/administration.user.edit.php:384
 msgid "Once"
 msgstr "한번"
 
@@ -12971,7 +12989,7 @@ msgstr "Or"
 msgid "Original"
 msgstr "변경 안함"
 
-#: include/html.inc.php:919
+#: include/html.inc.php:920
 msgid "Other"
 msgstr "기타"
 
@@ -13025,7 +13043,7 @@ msgid "Overrides"
 msgstr "오버라이드"
 
 #: include/menu.inc.php:42 include/menu.inc.php:63
-#: include/views/inventory.host.view.php:225 overview.php:27
+#: include/views/inventory.host.view.php:226 overview.php:27
 msgid "Overview"
 msgstr "개요"
 
@@ -13036,158 +13054,157 @@ msgstr "개요"
 msgid "Owner"
 msgstr "소유자"
 
-#: include/classes/setup/CFrontendSetup.php:547
+#: include/classes/setup/CFrontendSetup.php:529
 msgid "PHP LDAP"
 msgstr "PHP LDAP"
 
-#: include/classes/setup/CFrontendSetup.php:551
+#: include/classes/setup/CFrontendSetup.php:533
 #: include/classes/validators/CLdapAuthValidator.php:69
 msgid "PHP LDAP extension missing."
 msgstr "PHP LDAP모듈이 존재하지 않습니다."
 
-#: include/classes/setup/CFrontendSetup.php:307
+#: include/classes/setup/CFrontendSetup.php:289
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:293
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "PHP bcmath모듈이 존재하지 않습니다 (PHP의 설정 파라미터 --enable-bcmath)."
 
-#: include/classes/setup/CFrontendSetup.php:574
+#: include/classes/setup/CFrontendSetup.php:556
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:578
+#: include/classes/setup/CFrontendSetup.php:560
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "PHP ctype모듈이 존재하지 않습니다 (PHP 설정 파라미터 --enable-ctype)."
 
-#: include/classes/setup/CFrontendSetup.php:254
+#: include/classes/setup/CFrontendSetup.php:236
 msgid "PHP databases support"
 msgstr "PHP데이터베이스 지원"
 
-#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:369
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:473
+#: include/classes/setup/CFrontendSetup.php:455
 msgid "PHP gd FreeType support"
 msgstr "PHP gd FreeType 지원"
 
-#: include/classes/setup/CFrontendSetup.php:477
+#: include/classes/setup/CFrontendSetup.php:459
 msgid "PHP gd FreeType support missing."
 msgstr "PHP gd FreeType 지원"
 
-#: include/classes/setup/CFrontendSetup.php:454
+#: include/classes/setup/CFrontendSetup.php:436
 msgid "PHP gd GIF image support missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:450
+#: include/classes/setup/CFrontendSetup.php:432
 msgid "PHP gd GIF support"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:437
+#: include/classes/setup/CFrontendSetup.php:419
 msgid "PHP gd JPEG image support missing."
 msgstr "PHP gd JPEG이미지가 지원되지 않습니다."
 
-#: include/classes/setup/CFrontendSetup.php:433
+#: include/classes/setup/CFrontendSetup.php:415
 msgid "PHP gd JPEG support"
 msgstr "PHP gd JPEG 지원"
 
-#: include/classes/setup/CFrontendSetup.php:414
+#: include/classes/setup/CFrontendSetup.php:396
 msgid "PHP gd PNG image support missing."
 msgstr "PHP gd PNG이미지가 지원되지 않습니다."
 
-#: include/classes/setup/CFrontendSetup.php:410
+#: include/classes/setup/CFrontendSetup.php:392
 msgid "PHP gd PNG support"
 msgstr "PHP gd PNG 지원"
 
-#: include/classes/setup/CFrontendSetup.php:391
+#: include/classes/setup/CFrontendSetup.php:373
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr "PHP GD모듈이 존재하지 않습니다 (PHP 설정 파라미터 --with-gd)."
 
-#: include/classes/setup/CFrontendSetup.php:625
+#: include/classes/setup/CFrontendSetup.php:607
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:629
+#: include/classes/setup/CFrontendSetup.php:611
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr "PHP gettext모듈이 존재하지 않습니다 (PHP 설정 파라미터 --with-gettext). 번역을 이용할 수 없습니다."
 
-#: include/classes/setup/CFrontendSetup.php:496
+#: include/classes/setup/CFrontendSetup.php:478
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:500
+#: include/classes/setup/CFrontendSetup.php:482
 msgid "PHP libxml extension missing."
 msgstr "PHP libxml모듈이 존재하지 않습니다."
 
-#: include/classes/setup/CFrontendSetup.php:324
+#: include/classes/setup/CFrontendSetup.php:306
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:310
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr "PHP mbstring모듈이 존재하지 않습니다 (PHP의 설정시 파라미터 --enable-mbstring)."
 
-#: include/classes/setup/CFrontendSetup.php:120
-#: include/classes/setup/CFrontendSetup.php:139
-#: include/classes/setup/CFrontendSetup.php:158
-#: include/classes/setup/CFrontendSetup.php:189
-#: include/classes/setup/CFrontendSetup.php:212
-#: include/classes/setup/CFrontendSetup.php:231
-#: include/classes/setup/CFrontendSetup.php:345
-#: include/classes/setup/CFrontendSetup.php:608
-#: include/classes/setup/CFrontendSetup.php:642
+#: include/classes/setup/CFrontendSetup.php:119
+#: include/classes/setup/CFrontendSetup.php:138
+#: include/classes/setup/CFrontendSetup.php:157
+#: include/classes/setup/CFrontendSetup.php:188
+#: include/classes/setup/CFrontendSetup.php:211
+#: include/classes/setup/CFrontendSetup.php:327
+#: include/classes/setup/CFrontendSetup.php:590
+#: include/classes/setup/CFrontendSetup.php:624
 #, c-format
 msgid "PHP option \"%1$s\""
 msgstr "PHP의 \"%1$s\" 옵션"
 
-#: include/classes/setup/CFrontendSetup.php:646
+#: include/classes/setup/CFrontendSetup.php:628
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
 msgstr "PHP의 \"%1$s\" 옵션은 \"%2$s\"에 설정할 필요가 있습니다"
 
-#: include/classes/setup/CFrontendSetup.php:591
+#: include/classes/setup/CFrontendSetup.php:573
 msgid "PHP session"
 msgstr "PHP session"
 
-#: include/classes/setup/CFrontendSetup.php:612
+#: include/classes/setup/CFrontendSetup.php:594
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr "PHP session auto start는 비활성으로 설정할 필요가 있습니다. (PHP의 파라미터 \"session.auto_start\")."
 
-#: include/classes/setup/CFrontendSetup.php:595
+#: include/classes/setup/CFrontendSetup.php:577
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr "PHP session모듈이 존재하지 않습니다 (PHP 설정시 파라미터 --enable-session)."
 
-#: include/classes/setup/CFrontendSetup.php:362
+#: include/classes/setup/CFrontendSetup.php:344
 msgid "PHP sockets"
 msgstr "PHP sockets"
 
-#: include/classes/setup/CFrontendSetup.php:366
+#: include/classes/setup/CFrontendSetup.php:348
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr "PHP sockets모듈이 존재하지 않습니다 (PHP 설정시 파라미터 --enable-sockets)."
 
-#: include/classes/setup/CFrontendSetup.php:349
+#: include/classes/setup/CFrontendSetup.php:331
 msgid "PHP string function overloading must be disabled."
 msgstr "PHP 문자열함수의 오버로드는 비활성으로 설정할 필요가 있습니다."
 
-#: include/classes/setup/CFrontendSetup.php:102
+#: include/classes/setup/CFrontendSetup.php:101
 msgid "PHP version"
 msgstr "PHP 버전"
 
-#: include/classes/setup/CFrontendSetup.php:530
+#: include/classes/setup/CFrontendSetup.php:512
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:534
+#: include/classes/setup/CFrontendSetup.php:516
 msgid "PHP xmlreader extension missing."
 msgstr "PHP xmlreader 모듈이 존재하지 않습니다."
 
-#: include/classes/setup/CFrontendSetup.php:513
+#: include/classes/setup/CFrontendSetup.php:495
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:517
+#: include/classes/setup/CFrontendSetup.php:499
 msgid "PHP xmlwriter extension missing."
 msgstr "PHP xmlwriter 모듈이 존재하지 않습니다."
 
@@ -13261,8 +13278,8 @@ msgstr ""
 msgid "Parameter"
 msgstr "파라미터"
 
-#: include/classes/api/services/CUser.php:305
-#: include/classes/api/services/CUser.php:448
+#: include/classes/api/services/CUser.php:307
+#: include/classes/api/services/CUser.php:454
 #: include/classes/validators/CApiInputValidator.php:925
 #, c-format
 msgid "Parameter \"%1$s\" is deprecated."
@@ -13336,7 +13353,7 @@ msgstr "패시브"
 #: app/views/administration.user.edit.php:112
 #: app/views/administration.user.edit.php:128 disc_prototypes.php:228
 #: host_discovery.php:180 httpconf.php:64
-#: include/classes/setup/CSetupWizard.php:291
+#: include/classes/setup/CSetupWizard.php:295
 #: include/views/configuration.host.discovery.edit.php:297
 #: include/views/configuration.host.discovery.edit.php:433
 #: include/views/configuration.host.discovery.edit.php:462
@@ -13432,9 +13449,9 @@ msgid "Periods"
 msgstr "기간"
 
 #: app/partials/administration.usergroup.grouprights.html.php:29
-#: app/views/administration.user.edit.php:335
-#: app/views/administration.user.edit.php:355
-#: app/views/administration.user.edit.php:362
+#: app/views/administration.user.edit.php:340
+#: app/views/administration.user.edit.php:360
+#: app/views/administration.user.edit.php:367
 #: app/views/administration.usergroup.edit.php:102
 #: app/views/administration.usergroup.edit.php:153
 #: app/views/administration.usergroup.edit.php:204
@@ -13449,7 +13466,7 @@ msgstr "기간"
 msgid "Permissions"
 msgstr "권한"
 
-#: app/views/administration.user.edit.php:360
+#: app/views/administration.user.edit.php:365
 msgid "Permissions can be assigned for user groups only."
 msgstr "권한은 사용자그룹만 할당할 수 있습니다."
 
@@ -13470,16 +13487,16 @@ msgstr "배치 알고리즘"
 msgid "Plain text"
 msgstr "일반 텍스트"
 
-#: app/views/administration.user.edit.php:397
-#: app/views/administration.user.edit.php:429
+#: app/views/administration.user.edit.php:402
+#: app/views/administration.user.edit.php:434
 msgid "Play"
 msgstr "재생"
 
-#: app/views/administration.user.edit.php:377
+#: app/views/administration.user.edit.php:382
 msgid "Play sound"
 msgstr "사운드 재생"
 
-#: include/classes/setup/CSetupWizard.php:440
+#: include/classes/setup/CSetupWizard.php:463
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
 msgstr "설정 값을 확인해주세요. 올바른 값이면 \"%1$s\"버튼을 눌러 주세요. 아니면 \"%2$s\" 버튼을 눌러 설정값을 수정해 주세요."
@@ -13488,12 +13505,12 @@ msgstr "설정 값을 확인해주세요. 올바른 값이면 \"%1$s\"버튼을 
 msgid "Please confirm that you want to remove all macros."
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:360
+#: include/classes/setup/CSetupWizard.php:364
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
 msgstr "데이터베이스를 수동으로 작성해주세요. 그리고 데이터베이스에 접속하기 위한 설정치를 설정해 주세요. 종료하였다면 \"%1$s\"버튼을 눌러주세요."
 
-#: include/classes/setup/CSetupWizard.php:389
+#: include/classes/setup/CSetupWizard.php:393
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Zabbix 서버의 호스트명이나 호스트 IP주소와 포트 번호를 입력해주세요. 필요하다면 이름도 입력해주세요 (옵션)."
 
@@ -13538,7 +13555,7 @@ msgstr "호스트 인벤토리 필드의 자동설정"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:124
-#: include/classes/setup/CSetupWizard.php:375 include/hosts.inc.php:1471
+#: include/classes/setup/CSetupWizard.php:379 include/hosts.inc.php:1472
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:57
 msgid "Port"
@@ -13568,8 +13585,8 @@ msgstr "포스트 필드"
 msgid "Post type"
 msgstr "포스트 형식"
 
-#: include/classes/setup/CSetupWizard.php:49
-#: include/classes/setup/CSetupWizard.php:438
+#: include/classes/setup/CSetupWizard.php:53
+#: include/classes/setup/CSetupWizard.php:461
 msgid "Pre-installation summary"
 msgstr "설치 사전 준비 요약"
 
@@ -13776,7 +13793,7 @@ msgstr "자식에 하나라도 문제가 발생한 경우 장애로 검사"
 #: app/views/monitoring.problem.view.php:357 app/views/report.services.php:72
 #: app/views/report.services.php:73 app/views/report.services.php:74
 #: app/views/report.services.php:75 app/views/search.php:34
-#: app/views/search.php:122 app/views/search.php:161 app/views/search.php:201
+#: app/views/search.php:123 app/views/search.php:162 app/views/search.php:202
 #: chart4.php:168 include/classes/widgets/CWidgetConfig.php:47
 #: include/classes/widgets/forms/CWidgetFormProblems.php:35
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
@@ -14042,7 +14059,7 @@ msgstr "수신처 (내림차순)"
 msgid "Recipients"
 msgstr ""
 
-#: app/views/administration.user.edit.php:391
+#: app/views/administration.user.edit.php:396
 #: include/classes/screens/CScreenProblem.php:1083
 #: include/views/configuration.item.list.php:173
 #: include/views/configuration.trigger.prototype.list.php:153
@@ -14082,7 +14099,7 @@ msgstr "복구시각"
 msgid "Rectangle"
 msgstr "직사각형"
 
-#: app/views/administration.user.edit.php:206
+#: app/views/administration.user.edit.php:211
 msgid "Refresh"
 msgstr "새로고침"
 
@@ -14099,7 +14116,7 @@ msgstr "새로고침 간격의 곱수"
 msgid "Refresh unsupported items"
 msgstr "취득불가 아이템의 갱신간격"
 
-#: include/profiles.inc.php:267
+#: include/profiles.inc.php:270
 #, c-format
 msgid "Refresh unsupported items \"%1$s\"."
 msgstr "취득불가 아이템의 갱신간격 \"%1$s\"."
@@ -14141,7 +14158,7 @@ msgid "Regular expression updated"
 msgstr "정규표현식을 갱신하였습니다"
 
 #: app/views/administration.regex.edit.php:29
-#: app/views/administration.regex.list.php:31 include/html.inc.php:912
+#: app/views/administration.regex.list.php:31 include/html.inc.php:913
 msgid "Regular expressions"
 msgstr "정규표현식"
 
@@ -14179,7 +14196,7 @@ msgstr "원격 명령"
 #: app/views/administration.mediatype.edit.php:164
 #: app/views/administration.mediatype.edit.php:183
 #: app/views/administration.regex.edit.php:76
-#: app/views/administration.user.edit.php:290
+#: app/views/administration.user.edit.php:295
 #: app/views/administration.valuemap.edit.php:65
 #: app/views/js/administration.iconmap.edit.js.php:54
 #: app/views/js/administration.macros.edit.js.php:45
@@ -14395,7 +14412,7 @@ msgstr "리퀘스트를 송신을 성공하였습니다"
 msgid "Request type"
 msgstr "리퀘스트 타입"
 
-#: include/classes/setup/CSetupWizard.php:206
+#: include/classes/setup/CSetupWizard.php:210
 #: include/views/configuration.httpconf.edit.php:202
 msgid "Required"
 msgstr "요구 문자열"
@@ -14662,7 +14679,7 @@ msgstr "행 합치기"
 msgid "Rows"
 msgstr "행"
 
-#: app/views/administration.user.edit.php:211
+#: app/views/administration.user.edit.php:216
 msgid "Rows per page"
 msgstr "페이지간 표시 행의 수"
 
@@ -14775,7 +14792,7 @@ msgstr "SMTP 서버 포트 번호"
 
 #: app/views/monitoring.widget.hostavail.view.php:28
 #: include/classes/widgets/views/widget.hostavail.form.view.php:45
-#: include/hosts.inc.php:465 include/hosts.inc.php:1435
+#: include/hosts.inc.php:465 include/hosts.inc.php:1436
 #: include/items.inc.php:346
 #: include/views/js/configuration.host.edit.js.php:164
 msgid "SNMP"
@@ -14947,7 +14964,7 @@ msgstr "토"
 msgid "Save changes"
 msgstr "변경을 저장"
 
-#: include/classes/setup/CSetupWizard.php:497
+#: include/classes/setup/CSetupWizard.php:524
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"로 저장하였습니다"
@@ -15061,11 +15078,11 @@ msgstr "스크린을 갱신하였습니다"
 #: app/partials/monitoring.host.view.html.php:42
 #: app/partials/monitoring.host.view.html.php:136
 #: app/partials/monitoring.host.view.html.php:139 app/views/search.php:36
-#: app/views/search.php:134 app/views/search.php:228 app/views/search.php:274
-#: app/views/search.php:275 include/html.inc.php:413 include/menu.inc.php:47
+#: app/views/search.php:135 app/views/search.php:229 app/views/search.php:279
+#: app/views/search.php:280 include/html.inc.php:414 include/menu.inc.php:47
 #: include/views/configuration.template.edit.php:310
-#: include/views/configuration.template.list.php:154
-#: include/views/configuration.template.list.php:285
+#: include/views/configuration.template.list.php:155
+#: include/views/configuration.template.list.php:271
 #: include/views/conf.import.php:43 include/views/inventory.host.view.php:160
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.constructor.list.php:28
@@ -15144,7 +15161,7 @@ msgid "Scripts"
 msgstr "스크립트"
 
 #: app/controllers/CControllerSearch.php:94
-#: app/partials/layout.htmlpage.aside.php:62 app/views/search.php:313
+#: app/partials/layout.htmlpage.aside.php:62 app/views/search.php:318
 msgid "Search"
 msgstr "찾기"
 
@@ -15298,7 +15315,7 @@ msgstr "사용자에게 메시지를 송신"
 msgid "Send only to"
 msgstr "다른 미디어만 사용"
 
-#: app/views/administration.user.edit.php:229 app/views/popup.media.php:61
+#: app/views/administration.user.edit.php:234 app/views/popup.media.php:61
 #: app/views/popup.media.php:68 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "수신처"
@@ -15457,9 +15474,9 @@ msgstr "서비스"
 msgid "Services form a circular dependency."
 msgstr "서비스의 의존관계가 모순되어있습니다."
 
-#: include/classes/api/services/CUser.php:1373
-#: include/classes/api/services/CUser.php:1386
-#: include/classes/api/services/CUser.php:1417
+#: include/classes/api/services/CUser.php:1379
+#: include/classes/api/services/CUser.php:1392
+#: include/classes/api/services/CUser.php:1429
 msgid "Session terminated, re-login, please."
 msgstr "세션이 끊겼습니다. 다시 로그인하여 주십시오."
 
@@ -15659,7 +15676,7 @@ msgid "Show sidebar"
 msgstr ""
 
 #: app/partials/common.filter.trigger.php:168
-#: app/views/administration.user.edit.php:447
+#: app/views/administration.user.edit.php:452
 #: app/views/monitoring.host.view.php:152
 #: app/views/monitoring.problem.view.php:312
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
@@ -15709,7 +15726,7 @@ msgstr "사용불가 맵의 표시"
 msgid "Show value"
 msgstr "값 매핑 사용"
 
-#: app/views/administration.gui.edit.php:82
+#: app/views/administration.gui.edit.php:89
 msgid "Show warning if Zabbix server is down"
 msgstr "Zabbix 서버 정지시 경고 보이기"
 
@@ -16137,8 +16154,8 @@ msgstr "\"%1$s\"의 이름를 지닌 스텝이 이미 존재합니다."
 msgid "Steps"
 msgstr "스텝"
 
-#: app/views/administration.user.edit.php:402
-#: app/views/administration.user.edit.php:434
+#: app/views/administration.user.edit.php:407
+#: app/views/administration.user.edit.php:439
 msgid "Stop"
 msgstr "정지"
 
@@ -16228,7 +16245,7 @@ msgstr "일"
 msgid "Support"
 msgstr "지원"
 
-#: include/html.inc.php:993
+#: include/html.inc.php:994
 #, c-format
 msgid "Suppressed till: %1$s"
 msgstr "억제기한: %1$s"
@@ -16263,13 +16280,19 @@ msgstr "스웨덴어 (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "인증방식을 변경하면 현재 세션이외에는 모두 리셋됩니다! 실행하시겠습니까?"
 
+#: app/views/administration.gui.edit.php:73
+#: include/classes/setup/CSetupWizard.php:405
+msgid "System"
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:491
 msgid "System boot time. Returns integer (Unix timestamp)"
 msgstr "시스템 부팅 시간. UNIX의 타임스탬프로 integer를 리턴."
 
 #: app/views/administration.user.edit.php:138
-#: app/views/administration.user.edit.php:139 include/users.inc.php:83
+#: app/views/administration.user.edit.php:139
+#: app/views/administration.user.edit.php:140 include/users.inc.php:83
 msgid "System default"
 msgstr "시스템 기본"
 
@@ -16327,33 +16350,33 @@ msgstr "TCP"
 msgid "TELNET agent"
 msgstr "TELNET 에이전트"
 
-#: include/classes/setup/CSetupWizard.php:316
-#: include/classes/setup/CSetupWizard.php:420
+#: include/classes/setup/CSetupWizard.php:320
+#: include/classes/setup/CSetupWizard.php:443
 msgid "TLS certificate authority file"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:668
-#: include/classes/setup/CSetupWizard.php:312
-#: include/classes/setup/CSetupWizard.php:417
+#: include/classes/setup/CFrontendSetup.php:650
+#: include/classes/setup/CSetupWizard.php:316
+#: include/classes/setup/CSetupWizard.php:440
 msgid "TLS certificate file"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:672
+#: include/classes/setup/CFrontendSetup.php:654
 msgid "TLS certificate files must be read-only"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:334
-#: include/classes/setup/CSetupWizard.php:426
+#: include/classes/setup/CSetupWizard.php:338
+#: include/classes/setup/CSetupWizard.php:449
 msgid "TLS cipher list"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:296
-#: include/classes/setup/CSetupWizard.php:413
+#: include/classes/setup/CSetupWizard.php:300
+#: include/classes/setup/CSetupWizard.php:436
 msgid "TLS encryption"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:308
-#: include/classes/setup/CSetupWizard.php:416
+#: include/classes/setup/CSetupWizard.php:312
+#: include/classes/setup/CSetupWizard.php:439
 msgid "TLS key file"
 msgstr ""
 
@@ -16437,7 +16460,7 @@ msgstr "태그 값"
 #: include/views/configuration.maintenance.edit.php:240
 #: include/views/configuration.template.edit.php:417
 #: include/views/configuration.template.list.php:118
-#: include/views/configuration.template.list.php:159
+#: include/views/configuration.template.list.php:160
 #: include/views/configuration.template.massupdate.php:140
 #: include/views/configuration.template.massupdate.php:159
 #: include/views/configuration.trigger.prototype.edit.php:539
@@ -16474,7 +16497,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: app/controllers/CControllerAuditLogList.php:214
-#: app/views/administration.mediatype.edit.php:275 app/views/search.php:228
+#: app/views/administration.mediatype.edit.php:275 app/views/search.php:229
 #: include/actions.inc.php:49 include/forms.inc.php:281
 #: include/forms.inc.php:674 include/views/configuration.template.edit.php:46
 #: include/views/configuration.template.edit.php:338
@@ -16572,9 +16595,9 @@ msgstr "같은 표시 이름\"%1$s\"를 지닌 템플릿이 이미 존재합니�
 
 #: app/controllers/CControllerPopupGeneric.php:128
 #: app/partials/popup.operations.php:325
-#: app/views/popup.condition.common.php:344 app/views/search.php:164
-#: app/views/search.php:185 app/views/search.php:189 app/views/search.php:190
-#: app/views/search.php:306 include/menu.inc.php:103
+#: app/views/popup.condition.common.php:344 app/views/search.php:165
+#: app/views/search.php:186 app/views/search.php:190 app/views/search.php:191
+#: app/views/search.php:311 include/menu.inc.php:103
 #: include/views/configuration.copy.elements.php:63
 #: include/views/configuration.host.edit.php:574
 #: include/views/configuration.hostgroups.list.php:65
@@ -16699,12 +16722,12 @@ msgstr "스크린\"%3$s\"의 X - %1$s Y - %2$s에 있는 스크린 요소의 Y�
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
-#: include/html.inc.php:712
+#: include/html.inc.php:713
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "어플리케이션이 디스커버리할 수 없게 되었기 때문에 %1$s에 삭제됩니다. (날짜 %2$s at %3$s)"
 
-#: include/html.inc.php:707
+#: include/html.inc.php:708
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 어플리케이션을 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
@@ -16720,30 +16743,30 @@ msgstr ""
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
-#: include/html.inc.php:739
+#: include/html.inc.php:740
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: include/html.inc.php:734
+#: include/html.inc.php:735
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
-#: include/html.inc.php:658
+#: include/html.inc.php:659
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "호스트 그룹이 발견되지 않게 되었기 때문에 %1$s에 삭제됩니다. (일시 %2$s at %3$s)"
 
-#: include/html.inc.php:653
+#: include/html.inc.php:654
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 호스트 그룹을 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
-#: include/html.inc.php:685
+#: include/html.inc.php:686
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "호스트가 발견되지 않게 되었기 때문에 %1$s에 삭제됩니다. (일시 %2$s at %3$s)"
 
-#: include/html.inc.php:680
+#: include/html.inc.php:681
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 호스트를 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
@@ -16759,12 +16782,12 @@ msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
 msgstr[0] "이미지는 맵 %1$s에 사용되고 있습니다."
 
-#: include/html.inc.php:793
+#: include/html.inc.php:794
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr "아이템이 발견되지 않게 되었기 때문에 %1$s에 삭제됩니다.(일시 %2$s %3$s)"
 
-#: include/html.inc.php:788
+#: include/html.inc.php:789
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "디스커버리된 아이템을 찾을 수 없었습니다. 다음 디스커버리 규칙의 처리시에 삭제됩니다."
 
@@ -16786,12 +16809,12 @@ msgstr "수신된 JSON은 올바르지 않은 JSON-RPC리퀘스트 입니다."
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "수신된 리모트 프로시져는 존재하지 않거나 이용할 수 없습니다."
 
-#: include/html.inc.php:766
+#: include/html.inc.php:767
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: include/html.inc.php:761
+#: include/html.inc.php:762
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
@@ -16799,7 +16822,7 @@ msgstr ""
 msgid "The web scenario application belongs to a different host than the web scenario host."
 msgstr "Web시나리오가 설정되어있는 호스트와 다른 호스트에 소속한 어플리케이션이 이용되고 있습니다."
 
-#: app/views/administration.user.edit.php:185
+#: app/views/administration.user.edit.php:190
 msgid "Theme"
 msgstr "테마"
 
@@ -16939,9 +16962,9 @@ msgstr "타임 시프트"
 msgid "Time type"
 msgstr "사용할 시간"
 
-#: include/classes/setup/CFrontendSetup.php:235
-msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
-msgstr "PHP의 타임존이 설정되어 있지 않습니다 (\"date.timezone\"설정파라미터)."
+#: app/views/administration.user.edit.php:189
+msgid "Time zone"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:225
 #: app/views/popup.httpstep.php:165
@@ -17159,7 +17182,7 @@ msgid_plural "Triggers disabled"
 msgstr[0] "트리거를 비활성화 하였습니다"
 
 #: app/views/administration.trigdisplay.edit.php:31
-#: app/views/administration.trigdisplay.edit.php:106 include/html.inc.php:917
+#: app/views/administration.trigdisplay.edit.php:106 include/html.inc.php:918
 msgid "Trigger displaying options"
 msgstr "트리거 표시 옵션"
 
@@ -17261,7 +17284,7 @@ msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "트리거 프로토타입을 갱신하였습니다"
 
-#: app/controllers/CControllerPopupGeneric.php:214 include/html.inc.php:484
+#: app/controllers/CControllerPopupGeneric.php:214 include/html.inc.php:485
 #: include/views/configuration.host.discovery.list.php:254
 #: include/views/configuration.host.edit.php:395
 #: include/views/configuration.template.edit.php:268
@@ -17284,11 +17307,11 @@ msgid "Trigger recovery expression must contain at least one host:key reference.
 msgstr "트리거 복구조건식에는 적어도 하나의 host:key에 참조가 필요합니다."
 
 #: app/views/administration.trigseverity.edit.php:31
-#: app/views/administration.trigseverity.edit.php:95 include/html.inc.php:916
+#: app/views/administration.trigseverity.edit.php:95 include/html.inc.php:917
 msgid "Trigger severities"
 msgstr "트리거 심각도"
 
-#: app/views/administration.user.edit.php:446 include/actions.inc.php:45
+#: app/views/administration.user.edit.php:451 include/actions.inc.php:45
 msgid "Trigger severity"
 msgstr "트리거 심각도"
 
@@ -17312,23 +17335,23 @@ msgstr "트리거를 갱신하였습니다"
 #: app/partials/trigoverview.table.top.php:29
 #: app/views/monitoring.problem.view.php:155
 #: app/views/popup.condition.common.php:193 app/views/search.php:40
-#: app/views/search.php:74 app/views/search.php:78 app/views/search.php:228
-#: app/views/search.php:260 app/views/search.php:264 include/forms.inc.php:262
-#: include/html.inc.php:385
+#: app/views/search.php:75 app/views/search.php:79 app/views/search.php:229
+#: app/views/search.php:265 app/views/search.php:269 include/forms.inc.php:262
+#: include/html.inc.php:386
 #: include/views/configuration.host.discovery.list.php:174
 #: include/views/configuration.host.edit.php:286
 #: include/views/configuration.host.list.php:186
-#: include/views/configuration.host.list.php:416
+#: include/views/configuration.host.list.php:417
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.list.php:191
 #: include/views/configuration.template.edit.php:179
-#: include/views/configuration.template.list.php:152
-#: include/views/configuration.template.list.php:269
+#: include/views/configuration.template.list.php:153
+#: include/views/configuration.template.list.php:255
 #: include/views/configuration.triggers.edit.php:28
 #: include/views/configuration.triggers.list.php:165
 #: include/views/configuration.triggers.massupdate.php:28
-#: include/views/conf.import.php:40 include/views/inventory.host.view.php:181
-#: include/views/inventory.host.view.php:205
+#: include/views/conf.import.php:40 include/views/inventory.host.view.php:182
+#: include/views/inventory.host.view.php:206
 #: include/views/js/monitoring.sysmaps.js.php:167 triggers.php:670
 msgid "Triggers"
 msgstr "트리거"
@@ -17375,7 +17398,7 @@ msgstr "2개의 타입요소를 선택할 필요가 있습니다"
 #: app/views/administration.mediatype.list.php:74
 #: app/views/administration.script.edit.php:47
 #: app/views/administration.script.list.php:66
-#: app/views/administration.user.edit.php:229
+#: app/views/administration.user.edit.php:234
 #: app/views/dashboard.sharing.edit.php:78
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/popup.condition.common.php:53
@@ -17388,7 +17411,7 @@ msgstr "2개의 타입요소를 선택할 필요가 있습니다"
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
 #: include/forms.inc.php:178 include/hosts.inc.php:99
-#: include/hosts.inc.php:1451
+#: include/hosts.inc.php:1452
 #: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/configuration.graph.edit.php:343
@@ -17488,7 +17511,7 @@ msgstr "알 수 없음"
 msgid "URL"
 msgstr "URL"
 
-#: app/views/administration.user.edit.php:216
+#: app/views/administration.user.edit.php:221
 msgid "URL (after login)"
 msgstr "로그인 후 URL"
 
@@ -17789,7 +17812,7 @@ msgstr "Up"
 #: app/partials/massupdate.macros.tab.php:123
 #: app/views/administration.authentication.edit.php:264
 #: app/views/administration.autoreg.edit.php:90
-#: app/views/administration.gui.edit.php:90
+#: app/views/administration.gui.edit.php:97
 #: app/views/administration.housekeeping.edit.php:186
 #: app/views/administration.iconmap.edit.php:132
 #: app/views/administration.image.edit.php:77
@@ -17802,11 +17825,12 @@ msgstr "Up"
 #: app/views/administration.script.edit.php:137
 #: app/views/administration.trigdisplay.edit.php:108
 #: app/views/administration.trigseverity.edit.php:97
-#: app/views/administration.user.edit.php:465
-#: app/views/administration.user.edit.php:488
+#: app/views/administration.user.edit.php:470
+#: app/views/administration.user.edit.php:493
 #: app/views/administration.usergroup.edit.php:217
 #: app/views/administration.valuemap.edit.php:110
 #: app/views/administration.workingtime.edit.php:40
+#: app/views/configuration.application.edit.php:64
 #: app/views/dashboard.sharing.edit.php:105
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
@@ -17814,7 +17838,6 @@ msgstr "Up"
 #: app/views/popup.media.php:116 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
-#: include/views/configuration.application.edit.php:54
 #: include/views/configuration.correlation.edit.php:164
 #: include/views/configuration.discovery.edit.php:139
 #: include/views/configuration.graph.edit.php:471
@@ -17897,7 +17920,7 @@ msgstr ""
 msgid "Upload"
 msgstr "업로드"
 
-#: include/html.inc.php:556 include/html.inc.php:559
+#: include/html.inc.php:557 include/html.inc.php:560
 msgid "Upper level maps"
 msgstr "상위레벨 맵"
 
@@ -17923,7 +17946,7 @@ msgstr "bulk 리퀘스트를 사용"
 msgid "Use custom event status colours"
 msgstr "이벤트 스테이터스 문자 색상의 변경"
 
-#: app/views/administration.user.edit.php:229 app/views/popup.media.php:77
+#: app/views/administration.user.edit.php:234 app/views/popup.media.php:77
 msgid "Use if severity"
 msgstr "심각도 선택"
 
@@ -17937,10 +17960,10 @@ msgstr "아이템으로 사용"
 
 #: app/controllers/CControllerAuditLogList.php:185
 #: app/partials/popup.operations.php:98
-#: app/views/administration.user.edit.php:220
+#: app/views/administration.user.edit.php:225
 #: app/views/reports.auditlog.list.php:71 httpconf.php:58
 #: include/actions.inc.php:1703 include/actions.inc.php:1757
-#: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:288
+#: include/actions.inc.php:1974 include/classes/setup/CSetupWizard.php:292
 #: include/hosts.inc.php:61 include/views/configuration.httpconf.edit.php:167
 msgid "User"
 msgstr "유저"
@@ -17950,27 +17973,27 @@ msgstr "유저"
 msgid "User \"%1$s\" cannot be without user group."
 msgstr "유저 \"%1$s\"에 유저 그룹을 설정해주세요."
 
-#: include/classes/api/services/CUser.php:1108
+#: include/classes/api/services/CUser.php:1114
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
 msgstr "유저 \"%1$s\"는 대시보드 \"%2$s\"의 소유자입니다."
 
-#: include/classes/api/services/CUser.php:1065
+#: include/classes/api/services/CUser.php:1071
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
 msgstr "유저 \"%1$s\"는 맵 \"%2$s\"의 소유자입니다."
 
-#: include/classes/api/services/CUser.php:1078
+#: include/classes/api/services/CUser.php:1084
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
 msgstr "유저 \"%1$s\"는 스크린 \"%2$s\"의 소유자입니다."
 
-#: include/classes/api/services/CUser.php:1093
+#: include/classes/api/services/CUser.php:1099
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
 msgstr "유저 \"%1$s\" 는 슬라이드쇼 \"%2$s\"의 소유자입니다."
 
-#: include/classes/api/services/CUser.php:1051
+#: include/classes/api/services/CUser.php:1057
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
 msgstr "유저 \"%1$s\"는 \"%2$s\" 액션 내에서 이용되고 있습니다."
@@ -17979,7 +18002,7 @@ msgstr "유저 \"%1$s\"는 \"%2$s\" 액션 내에서 이용되고 있습니다."
 msgid "User action"
 msgstr "유저 액션"
 
-#: app/controllers/CControllerUserCreate.php:111
+#: app/controllers/CControllerUserCreate.php:114
 msgid "User added"
 msgstr "사용자를 추가하였습니다"
 
@@ -17987,16 +18010,16 @@ msgstr "사용자를 추가하였습니다"
 msgid "User agent string"
 msgstr "유저 에이전트 문자열"
 
-#: app/views/administration.user.edit.php:326
+#: app/views/administration.user.edit.php:331
 msgid "User can't change type for himself"
 msgstr "사용자는 자신의 사용자타입을 변경할 수 없습니다"
 
 #: include/classes/api/services/CUserGroup.php:535
-#: include/classes/api/services/CUser.php:776
+#: include/classes/api/services/CUser.php:782
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "사용자는 비활성의 그룹이나 GUI액세스가 비활성인 그룹에 자기자신을 추가할 수 없습니다."
 
-#: include/classes/api/services/CUser.php:763
+#: include/classes/api/services/CUser.php:769
 msgid "User cannot change their user type."
 msgstr "유저는 유저의 종류를 변경할 수 없습니다."
 
@@ -18047,7 +18070,7 @@ msgstr[0] ""
 msgid "User group for database down message"
 msgstr "데이터베이스 정지 메시지 송신 대상 유저 그룹"
 
-#: include/profiles.inc.php:278
+#: include/profiles.inc.php:281
 #, c-format
 msgid "User group for database down message \"%1$s\"."
 msgstr "데이터베이스 정지메시지 \"%1$s\"의 송신처 그룹."
@@ -18072,7 +18095,7 @@ msgstr[0] ""
 
 #: include/classes/api/services/CDashboard.php:530
 #: include/classes/api/services/CScript.php:423
-#: include/classes/api/services/CUser.php:559
+#: include/classes/api/services/CUser.php:565
 #, c-format
 msgid "User group with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 유저 그룹은 사용할 수 없습니다."
@@ -18087,7 +18110,7 @@ msgstr "ID \"%1$s\"의 유저 그룹은 사용할 수 없습니다."
 msgid "User groups"
 msgstr "유저 그룹"
 
-#: include/classes/api/services/CUser.php:1030
+#: include/classes/api/services/CUser.php:1036
 msgid "User is not allowed to delete himself."
 msgstr "자신의 사용자는 삭제할 수 없습니다."
 
@@ -18118,7 +18141,7 @@ msgstr "유저 명"
 msgid "User password"
 msgstr "유저 패스워드"
 
-#: app/controllers/CControllerUserProfileEdit.php:143
+#: app/controllers/CControllerUserProfileEdit.php:147
 #: app/views/administration.user.edit.php:37
 msgid "User profile"
 msgstr "유저 프로파일"
@@ -18148,8 +18171,8 @@ msgstr "맵 \"%2$s\"의 유저로 공유하기 위해서는 파라미터 :%1$s �
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"의 유저의 공유는 파라미터:%1$s 가 필요합니다."
 
-#: app/views/administration.user.edit.php:325
 #: app/views/administration.user.edit.php:330
+#: app/views/administration.user.edit.php:335
 #: app/views/administration.user.list.php:65
 #: app/views/administration.user.list.php:94
 msgid "User type"
@@ -18160,8 +18183,8 @@ msgid "User unblocked"
 msgid_plural "Users unblocked"
 msgstr[0] ""
 
-#: app/controllers/CControllerUserProfileUpdate.php:115
-#: app/controllers/CControllerUserUpdate.php:123
+#: app/controllers/CControllerUserProfileUpdate.php:120
+#: app/controllers/CControllerUserUpdate.php:126
 msgid "User updated"
 msgstr "사용자를 갱신하였습니다"
 
@@ -18172,7 +18195,7 @@ msgstr "사용자를 갱신하였습니다"
 msgid "User with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"의 유저는 사용할 수 없습니다."
 
-#: include/classes/api/services/CUser.php:518
+#: include/classes/api/services/CUser.php:524
 #, c-format
 msgid "User with alias \"%1$s\" already exists."
 msgstr ""
@@ -18531,7 +18554,7 @@ msgstr "값 매핑을 갱신하였습니다"
 
 #: app/views/administration.valuemap.edit.php:29
 #: app/views/administration.valuemap.edit.php:89
-#: app/views/administration.valuemap.list.php:31 include/html.inc.php:914
+#: app/views/administration.valuemap.list.php:31 include/html.inc.php:915
 msgid "Value mapping"
 msgstr "값 매핑"
 
@@ -18659,7 +18682,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "경고"
 
-#: include/classes/setup/CSetupWizard.php:218
+#: include/classes/setup/CSetupWizard.php:222
 msgctxt "setup"
 msgid "Warning"
 msgstr "경고"
@@ -18675,16 +18698,16 @@ msgstr "요소를 보존가능한 최대치에 도달하였습니다."
 #: app/partials/monitoring.host.view.html.php:43
 #: app/partials/monitoring.host.view.html.php:142
 #: app/partials/monitoring.host.view.html.php:150 app/views/search.php:37
-#: app/views/search.php:43 app/views/search.php:95 app/views/search.php:99
-#: app/views/search.php:135 app/views/search.php:162 app/views/search.php:207
-#: app/views/search.php:228 app/views/search.php:285 app/views/search.php:289
+#: app/views/search.php:43 app/views/search.php:96 app/views/search.php:100
+#: app/views/search.php:136 app/views/search.php:163 app/views/search.php:208
+#: app/views/search.php:229 app/views/search.php:290 app/views/search.php:294
 #: include/views/configuration.host.list.php:189
-#: include/views/configuration.host.list.php:440
-#: include/views/configuration.template.list.php:156
-#: include/views/configuration.template.list.php:297
+#: include/views/configuration.host.list.php:441
+#: include/views/configuration.template.list.php:157
+#: include/views/configuration.template.list.php:283
 #: include/views/inventory.host.view.php:135
-#: include/views/inventory.host.view.php:196
-#: include/views/inventory.host.view.php:208 jsLoader.php:308
+#: include/views/inventory.host.view.php:197
+#: include/views/inventory.host.view.php:209 jsLoader.php:308
 msgid "Web"
 msgstr "웹"
 
@@ -18739,7 +18762,7 @@ msgstr[0] "Web시나리오를 활성화 하였습니다"
 msgid "Web scenario updated"
 msgstr "Web시나리오를 갱신했습니다."
 
-#: include/html.inc.php:437 include/views/configuration.host.edit.php:462
+#: include/html.inc.php:438 include/views/configuration.host.edit.php:462
 #: include/views/configuration.template.edit.php:332
 #: include/views/conf.import.php:42
 msgid "Web scenarios"
@@ -18770,11 +18793,11 @@ msgstr "주간"
 msgid "Welcome"
 msgstr "환영합니다"
 
-#: include/classes/setup/CSetupWizard.php:155
+#: include/classes/setup/CSetupWizard.php:159
 msgid "Welcome to"
 msgstr "환영합니다"
 
-#: app/views/administration.user.edit.php:229 app/views/popup.media.php:72
+#: app/views/administration.user.edit.php:234 app/views/popup.media.php:72
 msgid "When active"
 msgstr "연락 허용 시간대"
 
@@ -18820,8 +18843,8 @@ msgstr ""
 msgid "With header row"
 msgstr ""
 
-#: include/classes/setup/CSetupWizard.php:331
-#: include/classes/setup/CSetupWizard.php:423
+#: include/classes/setup/CSetupWizard.php:335
+#: include/classes/setup/CSetupWizard.php:446
 msgid "With host verification"
 msgstr ""
 
@@ -18855,7 +18878,7 @@ msgstr "마법사"
 
 #: app/views/administration.workingtime.edit.php:27
 #: app/views/administration.workingtime.edit.php:31
-#: app/views/administration.workingtime.edit.php:33 include/html.inc.php:915
+#: app/views/administration.workingtime.edit.php:33 include/html.inc.php:916
 msgid "Working time"
 msgstr "워킹 타임"
 
@@ -19089,8 +19112,8 @@ msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\"로 로그인 하였습니다."
 
 #: app/views/administration.gui.edit.php:60
-#: app/views/administration.user.edit.php:173
-#: include/classes/setup/CSetupWizard.php:190
+#: app/views/administration.user.edit.php:175
+#: include/classes/setup/CSetupWizard.php:194
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Web서버의 언어가 인스톨되어있지 않기 때문에 몇 언어를 이용할 수 없습니다."
 
@@ -19227,7 +19250,7 @@ msgstr "Zabbix의 로그인 화면"
 
 #: app/partials/popup.operations.php:217
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
-#: include/classes/setup/CSetupWizard.php:433
+#: include/classes/setup/CSetupWizard.php:456
 msgid "Zabbix server"
 msgstr "Zabbix 서버"
 
@@ -19245,7 +19268,7 @@ msgid "Zabbix server (proxy)"
 msgstr "Zabbix 서버 (프록시)"
 
 #: include/classes/setup/CSetupWizard.php:45
-#: include/classes/setup/CSetupWizard.php:387
+#: include/classes/setup/CSetupWizard.php:391
 msgid "Zabbix server details"
 msgstr "Zabbix서버 상세정보"
 
@@ -19257,16 +19280,16 @@ msgstr "Zabbix 서버가 동작하지 않습니다. (화면을 재시작하여 �
 msgid "Zabbix server is running"
 msgstr "Zabbix 서버 가동 중"
 
-#: include/profiles.inc.php:264
+#: include/profiles.inc.php:267
 #, c-format
 msgid "Zabbix server is running check interval \"%1$s\"."
 msgstr "Zabbix 서버의 동작체크간격 \"%1$s\"."
 
-#: include/classes/setup/CSetupWizard.php:435
+#: include/classes/setup/CSetupWizard.php:458
 msgid "Zabbix server name"
 msgstr "Zabbix 서버 이름"
 
-#: include/classes/setup/CSetupWizard.php:434
+#: include/classes/setup/CSetupWizard.php:457
 msgid "Zabbix server port"
 msgstr "Zabbix 서버 포트"
 
@@ -19294,7 +19317,7 @@ msgstr "boolean을 지정해주세요"
 
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CUser.php:705
+#: include/classes/api/services/CUser.php:711
 #: include/classes/import/validators/CXmlValidatorGeneral.php:201
 #: include/classes/validators/CActionCondValidator.php:185
 #: include/classes/validators/CApiInputValidator.php:262
@@ -19611,8 +19634,8 @@ msgstr "변경할 수 없습니다"
 #: include/classes/api/services/CTriggerGeneral.php:830
 #: include/classes/api/services/CTriggerGeneral.php:848
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/api/services/CUser.php:577
-#: include/classes/api/services/CUser.php:716
+#: include/classes/api/services/CUser.php:583
+#: include/classes/api/services/CUser.php:722
 #: include/classes/import/CConfigurationImport.php:775
 #: include/classes/import/CConfigurationImport.php:986
 #: include/classes/import/CConfigurationImport.php:1133
@@ -19735,7 +19758,7 @@ msgid "days"
 msgstr "일"
 
 #: app/controllers/CControllerMapView.php:124
-#: include/classes/setup/CSetupWizard.php:402
+#: include/classes/setup/CSetupWizard.php:425
 #: include/classes/widgets/CWidgetHelper.php:63
 #: include/views/js/monitoring.slideconf.edit.js.php:40
 #: include/views/monitoring.slideconf.edit.php:136
@@ -19923,7 +19946,7 @@ msgid "in"
 msgstr "범위 내"
 
 #: app/partials/administration.usergroup.grouprights.html.php:61
-#: app/views/administration.user.edit.php:345
+#: app/views/administration.user.edit.php:350
 msgid "including subgroups"
 msgstr "서브 그룹을 포함"
 
@@ -20255,44 +20278,44 @@ msgstr "수치"
 msgid "of"
 msgstr "of"
 
-#: app/views/administration.user.edit.php:264
-#: include/classes/setup/CFrontendSetup.php:255
-#: include/classes/setup/CFrontendSetup.php:308
-#: include/classes/setup/CFrontendSetup.php:325
-#: include/classes/setup/CFrontendSetup.php:346
-#: include/classes/setup/CFrontendSetup.php:347
-#: include/classes/setup/CFrontendSetup.php:363
-#: include/classes/setup/CFrontendSetup.php:411
-#: include/classes/setup/CFrontendSetup.php:434
-#: include/classes/setup/CFrontendSetup.php:451
-#: include/classes/setup/CFrontendSetup.php:474
-#: include/classes/setup/CFrontendSetup.php:514
-#: include/classes/setup/CFrontendSetup.php:531
-#: include/classes/setup/CFrontendSetup.php:548
-#: include/classes/setup/CFrontendSetup.php:575
+#: app/views/administration.user.edit.php:269
+#: include/classes/setup/CFrontendSetup.php:237
+#: include/classes/setup/CFrontendSetup.php:290
+#: include/classes/setup/CFrontendSetup.php:307
+#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:329
+#: include/classes/setup/CFrontendSetup.php:345
+#: include/classes/setup/CFrontendSetup.php:393
+#: include/classes/setup/CFrontendSetup.php:416
+#: include/classes/setup/CFrontendSetup.php:433
+#: include/classes/setup/CFrontendSetup.php:456
+#: include/classes/setup/CFrontendSetup.php:496
+#: include/classes/setup/CFrontendSetup.php:513
+#: include/classes/setup/CFrontendSetup.php:530
+#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:574
+#: include/classes/setup/CFrontendSetup.php:591
 #: include/classes/setup/CFrontendSetup.php:592
-#: include/classes/setup/CFrontendSetup.php:609
-#: include/classes/setup/CFrontendSetup.php:610
-#: include/classes/setup/CFrontendSetup.php:626
+#: include/classes/setup/CFrontendSetup.php:608
 msgid "off"
 msgstr "off"
 
-#: app/views/administration.user.edit.php:264
-#: include/classes/setup/CFrontendSetup.php:308
-#: include/classes/setup/CFrontendSetup.php:325
-#: include/classes/setup/CFrontendSetup.php:346
-#: include/classes/setup/CFrontendSetup.php:363
-#: include/classes/setup/CFrontendSetup.php:411
-#: include/classes/setup/CFrontendSetup.php:434
-#: include/classes/setup/CFrontendSetup.php:451
-#: include/classes/setup/CFrontendSetup.php:474
-#: include/classes/setup/CFrontendSetup.php:514
-#: include/classes/setup/CFrontendSetup.php:531
-#: include/classes/setup/CFrontendSetup.php:548
-#: include/classes/setup/CFrontendSetup.php:575
-#: include/classes/setup/CFrontendSetup.php:592
-#: include/classes/setup/CFrontendSetup.php:609
-#: include/classes/setup/CFrontendSetup.php:626
+#: app/views/administration.user.edit.php:269
+#: include/classes/setup/CFrontendSetup.php:290
+#: include/classes/setup/CFrontendSetup.php:307
+#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:345
+#: include/classes/setup/CFrontendSetup.php:393
+#: include/classes/setup/CFrontendSetup.php:416
+#: include/classes/setup/CFrontendSetup.php:433
+#: include/classes/setup/CFrontendSetup.php:456
+#: include/classes/setup/CFrontendSetup.php:496
+#: include/classes/setup/CFrontendSetup.php:513
+#: include/classes/setup/CFrontendSetup.php:530
+#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:574
+#: include/classes/setup/CFrontendSetup.php:591
+#: include/classes/setup/CFrontendSetup.php:608
 #: include/views/monitoring.hostscreen.php:37
 msgid "on"
 msgstr "on"
@@ -20469,7 +20492,7 @@ msgstr ""
 msgid "sum() - Sum of values of a period T"
 msgstr "sum() - 기간 T안의 합계치"
 
-#: include/classes/api/services/CUser.php:1616
+#: include/classes/api/services/CUser.php:1628
 msgid "supplied credentials are not unique"
 msgstr "지정된 자격 정보는 유니크 값이 아닙니다."
 
@@ -20649,9 +20672,8 @@ msgstr "텍스트 \"%1$s\"가 잘못되었습니다."
 msgid "unexpected value \"%1$s\""
 msgstr "값 \"%1$s\"가 잘못되었습니다"
 
-#: include/classes/setup/CFrontendSetup.php:232
-#: include/classes/setup/CFrontendSetup.php:382
-#: include/classes/setup/CFrontendSetup.php:491
+#: include/classes/setup/CFrontendSetup.php:364
+#: include/classes/setup/CFrontendSetup.php:473
 msgid "unknown"
 msgstr "불명"
 
