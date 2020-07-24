@@ -115,8 +115,8 @@ foreach ($data['rows'] as $row_index => $row) {
 			? $data['applications'][$row['applicationid']]['name']
 			: '- '.('other').' -';
 
-		$application_size = $data['applications_size'][$row['applicationid']];
-		$application_index = $data['applications_index'][$row['applicationid']];
+		$application_size = $data['applications_size'][$item['hostid']][$row['applicationid']];
+		$application_index = $data['applications_index'][$item['hostid']][$row['applicationid']];
 
 		if ($application_index['start'] < $row_index || $application_index['end'] > $last_row_index) {
 			$application_stats = _s('displaying %1$s to %2$s of %3$s Items',
