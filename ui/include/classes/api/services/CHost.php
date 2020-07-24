@@ -1332,11 +1332,17 @@ class CHost extends CHostGeneral {
 	 * Additional supported $data parameters are:
 	 * - interfaces  - an array of interfaces to delete from the hosts
 	 *
+	 * @throws APIException if the input is invalid.
+	 *
 	 * @param array $data
 	 *
 	 * @return array
 	 */
 	public function massRemove(array $data) {
+		if (!array_key_exists('hostids', $data) || $data['hostids'] === null) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+
 		$hostids = zbx_toArray($data['hostids']);
 
 		$this->checkPermissions($hostids, _('No permissions to referred object or it does not exist!'));
