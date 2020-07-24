@@ -55,6 +55,8 @@ $fields = [
 	'zbx_server' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_name' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_port' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')],
+	'default_timezone' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
+	'default_theme' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	// actions
 	'save_config' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
 	'retry' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
@@ -74,13 +76,13 @@ if (!CSession::keyExists('step')) {
 if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
 	// on the last step of the setup we always have a guest user logged in;
 	// when he presses the "Finish" button he must be redirected to the login screen
-	if (CWebUser::isGuest() && CSession::getValue('step') == 5 && hasRequest('finish')) {
+	if (CWebUser::isGuest() && CSession::getValue('step') == 6 && hasRequest('finish')) {
 		CSession::clear();
 		redirect('index.php');
 	}
 	// the guest user can also view the last step of the setup
 	// all other user types must not have access to the setup
-	elseif (!(CWebUser::isGuest() && CSession::getValue('step') == 5)) {
+	elseif (!(CWebUser::isGuest() && CSession::getValue('step') == 6)) {
 		access_deny(ACCESS_DENY_PAGE);
 	}
 }
@@ -120,7 +122,41 @@ if (!in_array($default_lang, $available_locales)) {
 CSession::setValue('default_lang', $default_lang);
 APP::getInstance()->initLocales($default_lang);
 
-$theme = CWebUser::$data ? getUserTheme(CWebUser::$data) : ZBX_DEFAULT_THEME;
+// Set default time zone.
+$default_timezone = ZBX_DEFAULT_TIMEZONE;
+
+if (CSession::keyExists('default_timezone')) {
+	$default_timezone = CSession::getValue('default_timezone');
+}
+elseif (CWebUser::$data) {
+	$default_timezone = CWebUser::$data['timezone'];
+}
+
+$default_timezone = getRequest('default_timezone', $default_timezone);
+
+if ($default_timezone !== ZBX_DEFAULT_TIMEZONE && !in_array($default_timezone, DateTimeZone::listIdentifiers())) {
+	$default_timezone = ZBX_DEFAULT_TIMEZONE;
+}
+
+CSession::setValue('default_timezone', $default_timezone);
+
+// Set default theme.
+$default_theme = ZBX_DEFAULT_THEME;
+
+if (CSession::keyExists('default_theme')) {
+	$default_theme = CSession::getValue('default_theme');
+}
+elseif (CWebUser::$data) {
+	$default_theme = getUserTheme(CWebUser::$data);
+}
+
+$default_theme = getRequest('default_theme', $default_theme);
+
+if (!in_array($default_theme, array_keys(APP::getThemes()))) {
+	$default_theme = ZBX_DEFAULT_THEME;
+}
+
+CSession::setValue('default_theme', $default_theme);
 
 DBclose();
 
@@ -131,7 +167,7 @@ $ZBX_SETUP_WIZARD = new CSetupWizard();
 
 // page title
 (new CPageHeader(_('Installation')))
-	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
+	->addCssFile('assets/styles/'.CHtml::encode($default_theme).'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)

@@ -27,6 +27,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
+		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -40,6 +42,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'password1' =>			'string',
 			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
+			'timezone' =>			'db users.timezone|in '.implode(',', $timezones),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
@@ -71,7 +74,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'type'
+					'rows_per_page', 'url', 'type', 'timezone'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
 				'selectUsrgrps' => ['usrgrpid'],
@@ -101,6 +104,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'password1' => '',
 			'password2' => '',
 			'lang' => $db_defaults['lang'],
+			'timezone' => $db_defaults['timezone'],
 			'theme' => $db_defaults['theme'],
 			'autologin' => $db_defaults['autologin'],
 			'autologout' => '0',
@@ -135,6 +139,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['password1'] = '';
 			$data['password2'] = '';
 			$data['lang'] = $this->user['lang'];
+			$data['timezone'] = $this->user['timezone'];
 			$data['theme'] = $this->user['theme'];
 			$data['autologin'] = $this->user['autologin'];
 			$data['autologout'] = $this->user['autologout'];
@@ -150,8 +155,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		}
 
 		// Overwrite with input variables.
-		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'theme', 'autologin',
-			'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'type'
+		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'timezone', 'theme',
+			'autologin', 'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'type'
 		]);
 		if ($data['form_refresh'] != 0) {
 			$user_groups = $this->getInput('user_groups', []);
