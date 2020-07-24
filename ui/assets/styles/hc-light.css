@@ -5459,7 +5459,7 @@ table.preprocessing-test-results .rel-container {
     display: none; }
   .interface-container .interface-row {
     display: grid;
-    grid-template-columns: 26px 36px 225px 175px auto 100px 20px 1fr;
+    grid-template-columns: 26px 36px 225px 175px 85px 100px 20px 1fr;
     grid-template-rows: 24px 1fr;
     gap: 5px; }
     .interface-container .interface-row:not(:first-of-type) {
