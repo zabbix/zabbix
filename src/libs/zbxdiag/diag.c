@@ -23,7 +23,7 @@
 
 #include "diag.h"
 
-static void	diag_map_free(zbx_diag_map_t *map)
+void	diag_map_free(zbx_diag_map_t *map)
 {
 	zbx_free(map->name);
 	zbx_free(map);
@@ -47,7 +47,7 @@ static void	diag_map_free(zbx_diag_map_t *map)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map,
+int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map,
 		zbx_uint64_t *field_mask, zbx_vector_ptr_t *top_views, char **error)
 {
 	struct zbx_json_parse	jp_stats;
@@ -126,7 +126,7 @@ out:
  *             stats - [IN] the memory statistics                             *
  *                                                                            *
  ******************************************************************************/
-static void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_mem_stats_t *stats)
+void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_mem_stats_t *stats)
 {
 	int	i;
 
@@ -167,6 +167,25 @@ static void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_m
 
 /******************************************************************************
  *                                                                            *
+ * Function: diag_historycache_item_compare_values                            *
+ *                                                                            *
+ * Purpose: sort value cache item diagnostic stats by item values_num         *
+ *                                                                            *
+ ******************************************************************************/
+static int	diag_historycache_item_compare_values(const void *d1, const void *d2)
+{
+	zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
+	zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
+
+	if (p1->second < p2->second)
+		return 1;
+	if (p1->second > p2->second)
+		return -1;
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: diag_add_historycache_info                                       *
  *                                                                            *
  * Purpose: add requested history cache diagnostic information to json data   *
@@ -174,26 +193,26 @@ static void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_m
  * Parameters: jp        - [IN] the request                                   *
  *             field_map - [IN] a map of supported statistic field names to   *
  *                               bitmasks                                     *
- *             j         - [IN/OUT] the json to update                        *
+ *             json      - [IN/OUT] the json to update                        *
  *             error     - [OUT] error message                                *
  *                                                                            *
  * Return value: SUCCEED - the request was parsed successfully                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *j, char **error)
+int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
 	zbx_vector_ptr_t	tops;
 	int			ret;
-	double			time1, time2, time_total;
+	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"all", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEM},
+					{"all", ZBX_DIAG_HISTORYCACHE_SIMPLE | ZBX_DIAG_HISTORYCACHE_MEMORY},
 					{"items", ZBX_DIAG_HISTORYCACHE_ITEMS},
 					{"values", ZBX_DIAG_HISTORYCACHE_VALUES},
-					{"memory", ZBX_DIAG_HISTORYCACHE_MEM},
-					{"memory.data", ZBX_DIAG_HISTORYCACHE_MEM_DATA},
-					{"memory.index", ZBX_DIAG_HISTORYCACHE_MEM_INDEX},
+					{"memory", ZBX_DIAG_HISTORYCACHE_MEMORY},
+					{"memory.data", ZBX_DIAG_HISTORYCACHE_MEMORY_DATA},
+					{"memory.index", ZBX_DIAG_HISTORYCACHE_MEMORY_INDEX},
 					{NULL, 0}
 					};
 
@@ -203,43 +222,43 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 	{
 		int	i;
 
-		zbx_json_addobject(j, "historycache");
+		zbx_json_addobject(json, "historycache");
 
 		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_SIMPLE))
 		{
 			zbx_uint64_t	values_num, items_num;
 			time1 = zbx_time();
-			zbx_hc_get_simple_stats(&items_num, &values_num);
+			zbx_hc_get_diag_stats(&items_num, &values_num);
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
 			if (0 != (fields & ZBX_DIAG_HISTORYCACHE_ITEMS))
-				zbx_json_addint64(j, "items", items_num);
+				zbx_json_addint64(json, "items", items_num);
 			if (0 != (fields & ZBX_DIAG_HISTORYCACHE_VALUES))
-				zbx_json_addint64(j, "values", values_num);
+				zbx_json_addint64(json, "values", values_num);
 		}
 
-		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEM))
+		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEMORY))
 		{
 			zbx_mem_stats_t	data_mem, index_mem, *pdata_mem, *pindex_mem;
 
-			pdata_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEM_DATA) ? &data_mem : NULL);
-			pindex_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEM_INDEX) ? &index_mem : NULL);
+			pdata_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEMORY_DATA) ? &data_mem : NULL);
+			pindex_mem = (0 != (fields & ZBX_DIAG_HISTORYCACHE_MEMORY_INDEX) ? &index_mem : NULL);
 
 			time1 = zbx_time();
 			zbx_hc_get_mem_stats(pdata_mem, pindex_mem);
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
-			zbx_json_addobject(j, "memory");
-			diag_add_mem_stats(j, "data", pdata_mem);
-			diag_add_mem_stats(j, "index", pindex_mem);
-			zbx_json_close(j);
+			zbx_json_addobject(json, "memory");
+			diag_add_mem_stats(json, "data", pdata_mem);
+			diag_add_mem_stats(json, "index", pindex_mem);
+			zbx_json_close(json);
 		}
 
 		if (0 != tops.values_num)
 		{
-			zbx_json_addobject(j, "top");
+			zbx_json_addobject(json, "top");
 
 			for (i = 0; i < tops.values_num; i++)
 			{
@@ -247,30 +266,31 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 
 				if (0 == strcmp(map->name, "values"))
 				{
-					zbx_vector_uint64_pair_t	top;
-					int				i, limit;
+					zbx_vector_uint64_pair_t	items;
+					int				j, limit;
 
-					zbx_vector_uint64_pair_create(&top);
+					zbx_vector_uint64_pair_create(&items);
 
 					time1 = zbx_time();
-					zbx_hc_get_values_by_items(&top);
+					zbx_hc_get_items_diag(&items);
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
-					limit = MIN((int)map->value, top.values_num);
+					zbx_vector_uint64_pair_sort(&items, diag_historycache_item_compare_values);
+					limit = MIN((int)map->value, items.values_num);
 
-					zbx_json_addarray(j, map->name);
+					zbx_json_addarray(json, map->name);
 
-					for (i = 0; i < limit; i++)
+					for (j = 0; j < limit; j++)
 					{
-						zbx_json_addobject(j, NULL);
-						zbx_json_addint64(j, "itemid", top.values[i].first);
-						zbx_json_addint64(j, "values", top.values[i].second);
-						zbx_json_close(j);
+						zbx_json_addobject(json, NULL);
+						zbx_json_addint64(json, "itemid", items.values[j].first);
+						zbx_json_addint64(json, "values", items.values[j].second);
+						zbx_json_close(json);
 					}
 
-					zbx_json_close(j);
-					zbx_vector_uint64_pair_destroy(&top);
+					zbx_json_close(json);
+					zbx_vector_uint64_pair_destroy(&items);
 				}
 				else
 				{
@@ -281,9 +301,9 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 			}
 		}
 
-		zbx_json_addfloat(j, "time", time_total);
+		zbx_json_addfloat(json, "time", time_total);
 
-		zbx_json_close(j);
+		zbx_json_close(json);
 	}
 
 	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);

@@ -23,22 +23,31 @@
 
 #include "common.h"
 #include "zbxjson.h"
+#include "zbxalgo.h"
+#include "memalloc.h"
 
 #define ZBX_DIAG_SECTION_MAX	64
 #define ZBX_DIAG_FIELD_MAX	64
 
-#define ZBX_DIAG_STATS_ALL			0xFFFFFFFF
-
 #define ZBX_DIAG_HISTORYCACHE_ITEMS		0x00000001
 #define ZBX_DIAG_HISTORYCACHE_VALUES		0x00000002
-#define ZBX_DIAG_HISTORYCACHE_MEM_DATA		0x00000004
-#define ZBX_DIAG_HISTORYCACHE_MEM_INDEX		0x00000008
+#define ZBX_DIAG_HISTORYCACHE_MEMORY_DATA	0x00000004
+#define ZBX_DIAG_HISTORYCACHE_MEMORY_INDEX	0x00000008
 
 #define ZBX_DIAG_HISTORYCACHE_SIMPLE	(ZBX_DIAG_HISTORYCACHE_ITEMS | \
 					ZBX_DIAG_HISTORYCACHE_VALUES)
 
-#define ZBX_DIAG_HISTORYCACHE_MEM	(ZBX_DIAG_HISTORYCACHE_MEM_DATA | \
-					ZBX_DIAG_HISTORYCACHE_MEM_INDEX)
+#define ZBX_DIAG_HISTORYCACHE_MEMORY	(ZBX_DIAG_HISTORYCACHE_MEMORY_DATA | \
+					ZBX_DIAG_HISTORYCACHE_MEMORY_INDEX)
+
+#define ZBX_DIAG_VALUECACHE_ITEMS		0x00000001
+#define ZBX_DIAG_VALUECACHE_VALUES		0x00000002
+#define ZBX_DIAG_VALUECACHE_MODE		0x00000004
+#define ZBX_DIAG_VALUECACHE_MEMORY		0x00000008
+
+#define ZBX_DIAG_VALUECACHE_SIMPLE	(ZBX_DIAG_VALUECACHE_ITEMS | \
+					ZBX_DIAG_VALUECACHE_VALUES | \
+					ZBX_DIAG_VALUECACHE_MODE)
 
 typedef struct
 {
@@ -46,6 +55,13 @@ typedef struct
 	zbx_uint64_t	value;
 }
 zbx_diag_map_t;
+
+void	diag_map_free(zbx_diag_map_t *map);
+
+int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map, zbx_uint64_t *field_mask,
+		zbx_vector_ptr_t *top_views, char **error);
+
+void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_mem_stats_t *stats);
 
 int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *j, char **error);
 

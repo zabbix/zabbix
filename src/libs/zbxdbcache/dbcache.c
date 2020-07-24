@@ -4476,7 +4476,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_hc_get_simple_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
+void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
 {
 	LOCK_CACHE;
 
@@ -4499,35 +4499,21 @@ void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
 	UNLOCK_CACHE;
 }
 
-static int	hc_top_values_compare(const void *d1, const void *d2)
-{
-	zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
-	zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
-
-	if (p1->second < p2->second)
-		return 1;
-	if (p1->second > p2->second)
-		return -1;
-	return 0;
-}
-
-void	zbx_hc_get_values_by_items(zbx_vector_uint64_pair_t *top)
+void	zbx_hc_get_items_diag(zbx_vector_uint64_pair_t *items)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;
 
 	LOCK_CACHE;
 
-	zbx_vector_uint64_pair_reserve(top, cache->history_items.num_data);
+	zbx_vector_uint64_pair_reserve(items, cache->history_items.num_data);
 
 	zbx_hashset_iter_reset(&cache->history_items, &iter);
 	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
-		zbx_vector_uint64_pair_append_ptr(top, &pair);
+		zbx_vector_uint64_pair_append_ptr(items, &pair);
 	}
 
 	UNLOCK_CACHE;
-
-	zbx_vector_uint64_pair_sort(top, hc_top_values_compare);
 }
