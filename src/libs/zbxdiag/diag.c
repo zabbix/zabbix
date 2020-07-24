@@ -71,7 +71,7 @@ static int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_ma
 			{
 				if (NULL == stat->name)
 				{
-					*error = zbx_dsprintf(*error, "Unknown statistics field: %s", name);
+					*error = zbx_dsprintf(*error, "Unsupported statistics field: %s", name);
 					goto out;
 				}
 
@@ -235,11 +235,42 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 			zbx_json_close(j);
 		}
 
-		for (i = 0; i < tops.values_num; i++)
+		if (0 != tops.values_num)
 		{
-			zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
+			zbx_json_addobject(j, "top");
 
-			/* TODO: process top requests */
+			for (i = 0; i < tops.values_num; i++)
+			{
+				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
+
+				if (0 == strcmp(map->name, "values"))
+				{
+					zbx_vector_uint64_pair_t	top;
+					int				i, limit;
+					char				buffer[MAX_ID_LEN + 1];
+
+					zbx_vector_uint64_pair_create(&top);
+					zbx_hc_get_values_by_items(&top);
+					limit = MIN((int)map->value, top.values_num);
+
+					zbx_json_addarray(j, map->name);
+
+					for (i = 0; i < limit; i++)
+					{
+						zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, top.values[i].first);
+						zbx_json_addint64(j, buffer, top.values[i].second);
+					}
+
+					zbx_json_close(j);
+					zbx_vector_uint64_pair_destroy(&top);
+				}
+				else
+				{
+					*error = zbx_dsprintf(*error, "Unsupported top field: %s", map->name);
+					ret = FAIL;
+					break;
+				}
+			}
 		}
 
 		zbx_json_close(j);

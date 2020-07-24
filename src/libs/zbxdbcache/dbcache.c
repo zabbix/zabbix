@@ -3721,7 +3721,7 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
  ******************************************************************************/
 static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
-	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, data, data};
+	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, 0, data, data};
 
 	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
 }
@@ -3985,6 +3985,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			item->head->next = data;
 			item->head = data;
 		}
+		item->values_num++;
 	}
 }
 
@@ -4139,6 +4140,7 @@ void	hc_push_items(zbx_vector_ptr_t *history_items)
 				hc_queue_item(item);
 				break;
 			case ZBX_HC_ITEM_STATUS_NORMAL:
+				item->values_num--;
 				data_free = item->tail;
 				item->tail = item->tail->next;
 				hc_free_data(data_free);
@@ -4495,4 +4497,37 @@ void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
 		zbx_mem_get_stats(hc_index_mem, index);
 
 	UNLOCK_CACHE;
+}
+
+static int	hc_top_values_compare(const void *d1, const void *d2)
+{
+	zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
+	zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
+
+	if (p1->second < p2->second)
+		return 1;
+	if (p1->second > p2->second)
+		return -1;
+	return 0;
+}
+
+void	zbx_hc_get_values_by_items(zbx_vector_uint64_pair_t *top)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_hc_item_t		*item;
+
+	LOCK_CACHE;
+
+	zbx_vector_uint64_pair_reserve(top, cache->history_items.num_data);
+
+	zbx_hashset_iter_reset(&cache->history_items, &iter);
+	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
+		zbx_vector_uint64_pair_append_ptr(top, &pair);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_pair_sort(top, hc_top_values_compare);
 }
