@@ -54,7 +54,7 @@ class testFormApplication extends CLegacyWebTest {
 		}
 
 		// Open an application.
-		$this->zbxTestLogin('applications.php');
+		$this->zbxTestLogin('zabbix.php?action=application.list&filter_rst=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Host groups')->select('Zabbix servers');
 		$filter->getField('Hosts')->select('Simple form test host');
@@ -63,7 +63,7 @@ class testFormApplication extends CLegacyWebTest {
 
 		// Change application name if new name differs from existing name.
 		if ($new_name !== $name) {
-			$this->zbxTestInputTypeOverwrite('appname', $new_name);
+			$this->zbxTestInputTypeOverwrite('name', $new_name);
 		}
 
 		$this->zbxTestClickWait('update');
@@ -89,7 +89,7 @@ class testFormApplication extends CLegacyWebTest {
 		$name = self::$application;
 
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->zbxTestLogin('zabbix.php?action=application.list&filter_rst=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Host groups')->select('Zabbix servers');
 		$filter->getField('Hosts')->select('Simple form test host');
@@ -97,7 +97,7 @@ class testFormApplication extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create application');
 
 		// Set application name and submit the form.
-		$this->zbxTestInputTypeWait('appname', $name);
+		$this->zbxTestInputTypeWait('name', $name);
 		$this->zbxTestClickWait('add');
 
 		// Check the results in frontend.
@@ -114,7 +114,7 @@ class testFormApplication extends CLegacyWebTest {
 	 */
 	public function testFormApplication_CheckValidation() {
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->zbxTestLogin('zabbix.php?action=application.list&filter_rst=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Host groups')->select('Zabbix servers');
 		$filter->getField('Hosts')->select('Simple form test host');
@@ -123,12 +123,12 @@ class testFormApplication extends CLegacyWebTest {
 
 		// Check error message on posting the empty form.
 		$this->zbxTestClickWait('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Incorrect value for field "Name": cannot be empty.');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Invalid parameter "/1/name": cannot be empty.');
 
 		// Change application name to multiple spaces and check an error message.
-		$this->zbxTestInputTypeOverwrite('appname', '      ');
+		$this->zbxTestInputTypeOverwrite('name', '      ');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Incorrect value for field "Name": cannot be empty.');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Invalid parameter "/1/name": cannot be empty.');
 	}
 
 	/**
@@ -166,7 +166,7 @@ class testFormApplication extends CLegacyWebTest {
 		$old_hash = CDBHelper::getHash($sql_hash);
 
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->zbxTestLogin('zabbix.php?action=application.list&filter_rst=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Host groups')->select('Zabbix servers');
 		$filter->getField('Hosts')->select('Simple form test host');
@@ -174,7 +174,7 @@ class testFormApplication extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait(self::$application);
 
 		// Change application name.
-		$this->zbxTestInputTypeOverwrite('appname', self::$application.' (updated)');
+		$this->zbxTestInputTypeOverwrite('name', self::$application.' (updated)');
 
 		// Close the form.
 		$this->zbxTestClickWait('cancel');
@@ -193,7 +193,7 @@ class testFormApplication extends CLegacyWebTest {
 		$name = self::$application;
 
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->zbxTestLogin('zabbix.php?action=application.list&filter_rst=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Host groups')->select('Zabbix servers');
 		$filter->getField('Hosts')->select('Simple form test host');
@@ -202,7 +202,7 @@ class testFormApplication extends CLegacyWebTest {
 
 		// Clone the application, rename the clone and save it.
 		$this->zbxTestClickWait('clone');
-		$this->zbxTestInputTypeOverwrite('appname', $name.$suffix);
+		$this->zbxTestInputTypeOverwrite('name', $name.$suffix);
 		$this->zbxTestClickWait('add');
 
 		// Check the result in frontend.
@@ -218,7 +218,7 @@ class testFormApplication extends CLegacyWebTest {
 		$name = self::$application;
 
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->zbxTestLogin('zabbix.php?action=application.list&filter_rst=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Host groups')->select('Zabbix servers');
 		$filter->getField('Hosts')->select('Simple form test host');
