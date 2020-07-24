@@ -107,7 +107,7 @@ class testTimezone extends CWebTest {
 		$user_time = $this->getProblemTime('Trigger for tag permissions Oracle');
 		$this->assertEquals($system_time, $user_time);
 		$timezone_db = ($data['user_timezone'] == 'System default') ? 'default' : $data['user_timezone'];
-		$this->assertEquals($timezone_db, CDBHelper::getValue('SELECT timezone FROM users WHERE alias='.zbx_dbst('test-timezone')));
+		$this->assertEquals($timezone_db, CDBHelper::getValue('SELECT timezone FROM users WHERE alias='.zbx_dbstr('test-timezone')));
 		$this->assertEquals('Europe/Riga', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
 		$this->page->logout();
 	}
