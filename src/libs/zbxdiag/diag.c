@@ -20,6 +20,7 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
+#include "preproc.h"
 
 #include "diag.h"
 
@@ -227,6 +228,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_SIMPLE))
 		{
 			zbx_uint64_t	values_num, items_num;
+
 			time1 = zbx_time();
 			zbx_hc_get_diag_stats(&items_num, &values_num);
 			time2 = zbx_time();
@@ -299,6 +301,8 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 					break;
 				}
 			}
+
+			zbx_json_close(json);
 		}
 
 		zbx_json_addfloat(json, "time", time_total);
@@ -306,6 +310,126 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 		zbx_json_close(json);
 	}
 
+	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
+	zbx_vector_ptr_destroy(&tops);
+
+	return ret;
+}
+
+static void	diag_add_preproc_items(struct zbx_json *json, zbx_vector_ptr_t *items)
+{
+	int	i;
+
+	zbx_json_addarray(json, NULL);
+
+	for (i = 0; i < items->values_num; i++)
+	{
+		zbx_preproc_item_stats_t	*item = (zbx_preproc_item_stats_t *)items->values[i];
+
+		zbx_json_addobject(json, NULL);
+		zbx_json_adduint64(json, "itemid", item->itemid);
+		zbx_json_adduint64(json, "values", item->values_num);
+		zbx_json_adduint64(json, "steps", item->steps_num);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_add_preproc_info                                            *
+ *                                                                            *
+ * Purpose: add requested preprocessing diagnostic information to json data   *
+ *                                                                            *
+ * Parameters: jp        - [IN] the request                                   *
+ *             field_map - [IN] a map of supported statistic field names to   *
+ *                               bitmasks                                     *
+ *             json      - [IN/OUT] the json to update                        *
+ *             error     - [OUT] error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the request was parsed successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+{
+	zbx_vector_ptr_t	tops;
+	int			ret = FAIL;
+	double			time1, time2, time_total = 0;
+	zbx_uint64_t		fields;
+	zbx_diag_map_t		field_map[] = {
+					{"all", ZBX_DIAG_PREPROC_VALUES | ZBX_DIAG_PREPROC_VALUES_PREPROC},
+					{"values", ZBX_DIAG_PREPROC_VALUES},
+					{"preproc.values", ZBX_DIAG_PREPROC_VALUES_PREPROC},
+					{NULL, 0}
+					};
+
+	zbx_vector_ptr_create(&tops);
+
+	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
+	{
+		int	i;
+
+		zbx_json_addobject(json, "preprocessing");
+
+		if (0 != (fields & ZBX_DIAG_PREPROC_SIMPLE))
+		{
+			int	values_num, values_preproc_num;
+
+			time1 = zbx_time();
+			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&values_num, &values_preproc_num, error)))
+				goto out;
+
+			time2 = zbx_time();
+			time_total += time2 - time1;
+
+			if (0 != (fields & ZBX_DIAG_PREPROC_VALUES))
+				zbx_json_addint64(json, "values", values_num);
+			if (0 != (fields & ZBX_DIAG_PREPROC_VALUES_PREPROC))
+				zbx_json_addint64(json, "preproc.values", values_preproc_num);
+		}
+
+		if (0 != tops.values_num)
+		{
+			zbx_json_addobject(json, "top");
+
+			for (i = 0; i < tops.values_num; i++)
+			{
+				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
+
+				if (0 == strcmp(map->name, "values"))
+				{
+					zbx_vector_ptr_t	items;
+
+					zbx_vector_ptr_create(&items);
+					if (FAIL == (ret = zbx_preprocessor_get_top_items(map->name, map->value, &items,
+							error)))
+					{
+						break;
+					}
+
+					diag_add_preproc_items(json, &items);
+					zbx_vector_ptr_clear_ext(&items, zbx_ptr_free);
+					zbx_vector_ptr_destroy(&items);
+				}
+				else
+				{
+					*error = zbx_dsprintf(*error, "Unsupported top field: %s", map->name);
+					ret = FAIL;
+					break;
+				}
+			}
+
+			zbx_json_close(json);
+		}
+
+		zbx_json_addfloat(json, "time", time_total);
+		zbx_json_close(json);
+	}
+
+	ret = SUCCEED;
+out:
 	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
 	zbx_vector_ptr_destroy(&tops);
 

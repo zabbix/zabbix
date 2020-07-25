@@ -49,6 +49,12 @@
 					ZBX_DIAG_VALUECACHE_VALUES | \
 					ZBX_DIAG_VALUECACHE_MODE)
 
+#define ZBX_DIAG_PREPROC_VALUES			0x00000001
+#define ZBX_DIAG_PREPROC_VALUES_PREPROC		0x00000002
+
+#define ZBX_DIAG_PREPROC_SIMPLE		(ZBX_DIAG_PREPROC_VALUES | \
+					ZBX_DIAG_PREPROC_VALUES_PREPROC)
+
 typedef struct
 {
 	char		*name;
@@ -66,5 +72,7 @@ void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_mem_stat
 int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *j, char **error);
 
 int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *j, char **error);
+
+int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 
 #endif

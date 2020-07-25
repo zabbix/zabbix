@@ -222,6 +222,8 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 		ret = diag_add_historycache_info(jp, j, error);
 	if (0 == strcmp(section, "valuecache"))
 		ret = diag_add_valuecache_info(jp, j, error);
+	if (0 == strcmp(section, "preprocessing"))
+		ret = diag_add_preproc_info(jp, j, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
 
