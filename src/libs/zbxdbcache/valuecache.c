@@ -2846,7 +2846,7 @@ void	zbx_vc_disable(void)
  *                                                                            *
  * Function: zbx_hc_get_diag_stats                                            *
  *                                                                            *
- * Purpose: retrieve simple value cache statistics                            *
+ * Purpose: get value cache diagnostic statistics                             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, int *mode)
@@ -2872,7 +2872,7 @@ void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, in
  *                                                                            *
  * Function: zbx_hc_get_mem_stats                                             *
  *                                                                            *
- * Purpose: retrieve value cache shared memory statistics                     *
+ * Purpose: get value cache shared memory statistics                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem)
@@ -2884,12 +2884,12 @@ void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vc_get_item_diag                                             *
+ * Function: zbx_vc_get_diag_items                                            *
  *                                                                            *
- * Purpose: retrieve value cache item diagnostic statistics                   *
+ * Purpose: get diagnostic data of cached items                               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vc_get_items_diag(zbx_vector_ptr_t *items)
+void	zbx_vc_get_diag_items(zbx_vector_ptr_t *items)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vc_item_t		*item;

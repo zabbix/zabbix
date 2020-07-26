@@ -4476,6 +4476,13 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_diag_stats                                            *
+ *                                                                            *
+ * Purpose: get history cache diagnostics statistics                          *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
 {
 	LOCK_CACHE;
@@ -4486,6 +4493,13 @@ void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_mem_stats                                             *
+ *                                                                            *
+ * Purpose: get shared memory allocator statistics                            *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
 {
 	LOCK_CACHE;
@@ -4499,7 +4513,14 @@ void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
 	UNLOCK_CACHE;
 }
 
-void	zbx_hc_get_items_diag(zbx_vector_uint64_pair_t *items)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hc_get_diag_items                                            *
+ *                                                                            *
+ * Purpose: get diagnostic data of cached items                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_get_diag_items(zbx_vector_uint64_pair_t *items)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;

@@ -1202,7 +1202,7 @@ out:
  *                                                                            *
  * Function: zbx_preprocessor_get_diag_stats                                  *
  *                                                                            *
- * Purpose: get simple diagnostic statistics                                  *
+ * Purpose: get preprocessing manager diagnostic statistics                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, char **error)

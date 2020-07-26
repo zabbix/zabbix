@@ -274,7 +274,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 					zbx_vector_uint64_pair_create(&items);
 
 					time1 = zbx_time();
-					zbx_hc_get_items_diag(&items);
+					zbx_hc_get_diag_items(&items);
 					time2 = zbx_time();
 					time_total += time2 - time1;
 

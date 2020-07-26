@@ -145,7 +145,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 			zbx_vector_ptr_create(&items);
 
 			time1 = zbx_time();
-			zbx_vc_get_items_diag(&items);
+			zbx_vc_get_diag_items(&items);
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
