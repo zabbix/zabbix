@@ -25,17 +25,35 @@
  */
 class CControllerHostViewRefresh extends CControllerHost {
 
+	const FILTER_IDX = 'web.monitoringhosts';
+	/**
+	 * Filter fields default values.
+	 */
+	const FILTER_FIELDS_DEFAULT = [
+		'name' => '',
+		'groupids' => [],
+		'ip' => '',
+		'dns' => '',
+		'port' => '',
+		'status' => '',
+		'evaltype' => TAG_EVAL_TYPE_AND_OR,
+		'tags' => [],
+		'severities' => [],
+		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
+		'maintenance_status' => HOST_MAINTENANCE_STATUS_ON,
+		'from' => 'now-1d',
+		'to' => 'now',
+		'page' => null,
+		'sort' => 'name',
+		'sortorder' => ZBX_SORT_UP
+	];
+
 	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'sort' =>					'in name,status',
-			'sortorder' =>				'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
-			'page' =>					'ge 1',
-			'filter_set' =>				'in 1',
-			'filter_rst' =>				'in 1',
 			'name' =>					'string',
 			'groupids' =>				'array_id',
 			'ip' =>						'string',
@@ -46,7 +64,13 @@ class CControllerHostViewRefresh extends CControllerHost {
 			'tags' =>					'array',
 			'severities' =>				'array',
 			'show_suppressed' =>		'in '.ZBX_PROBLEM_SUPPRESSED_FALSE.','.ZBX_PROBLEM_SUPPRESSED_TRUE,
-			'maintenance_status' =>		'in '.HOST_MAINTENANCE_STATUS_OFF.','.HOST_MAINTENANCE_STATUS_ON
+			'maintenance_status' =>		'in '.HOST_MAINTENANCE_STATUS_OFF.','.HOST_MAINTENANCE_STATUS_ON,
+			'sort' =>					'in name,status',
+			'sortorder' =>				'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
+			'page' =>					'ge 1',
+			'filter_set' =>				'in 1',
+			'filter_rst' =>				'in 1',
+			'filter_counters' =>		'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -86,35 +110,28 @@ class CControllerHostViewRefresh extends CControllerHost {
 	}
 
 	protected function doAction(): void {
-		$filter = [
-			'name' =>				'',
-			'groupids' =>			null,
-			'ip' =>					'',
-			'dns' =>				'',
-			'port' =>				'',
-			'status' =>				-1,
-			'evaltype' =>			TAG_EVAL_TYPE_AND_OR,
-			'tags' =>				[],
-			'severities' =>			[],
-			'show_suppressed' =>	ZBX_PROBLEM_SUPPRESSED_FALSE,
-			'maintenance_status' =>	HOST_MAINTENANCE_STATUS_ON,
-			'page' =>				null
-		];
-		$this->getInputs($filter, array_keys($filter));
+		$filter = static::FILTER_FIELDS_DEFAULT;
 
-		$sort = $this->getInput('sort', 'name');
-		$sortorder = $this->getInput('sortorder', ZBX_SORT_UP);
+		if ($this->getInput('filter_counters', 0)) {
+			$profile = (new CTabFilterProfile(static::FILTER_IDX))->read();
+			$profile->setFilterDefaults(static::FILTER_FIELDS_DEFAULT);
+			$show_counters = [];
 
-		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
+			foreach ($profile->getTabsWithDefaults() as $index => $filter) {
+				$show_counters[$index] = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
+			}
 
-		$prepared_data = $this->prepareData($filter, $sort, $sortorder);
+			$data['show_counters'] = $show_counters;
+		}
+		else {
+			$this->getInputs($filter, array_keys($filter));
+			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
 
-		$data = [
-			'filter' => $filter,
-			'sort' => $sort,
-			'sortorder' => $sortorder,
-			'view_curl' => $view_curl
-		] + $prepared_data;
+			$data = [
+				'filter' => $filter,
+				'view_curl' => (new CUrl('zabbix.php'))->setArgument('action', 'host.view')
+			] + $prepared_data;
+		}
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

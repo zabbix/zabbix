@@ -81,13 +81,14 @@ class CTabFilterProfile {
 	}
 
 	/**
-	 * Set filter fields values of specific tab.
+	 * Set filter fields values of specific tab, filter out values equal to default value.
 	 *
 	 * @param int   $index  Tab index to modify.
 	 * @param array $input  Fields values.
 	 */
 	public function setTabFilter($index, array $input) {
-		$this->tabfilters[$index]['filter'] = $input;
+		$input = array_intersect_key($input, $this->filter_defaults);
+		$this->tabfilters[$index]['filter'] = array_diff_assoc($input, $this->filter_defaults);
 
 		return $this;
 	}
