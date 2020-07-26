@@ -403,11 +403,15 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 					zbx_vector_ptr_t	items;
 
 					zbx_vector_ptr_create(&items);
+					time1 = zbx_time();
 					if (FAIL == (ret = zbx_preprocessor_get_top_items(map->name, map->value, &items,
 							error)))
 					{
 						break;
 					}
+
+					time2 = zbx_time();
+					time_total += time2 - time1;
 
 					diag_add_preproc_items(json, &items);
 					zbx_vector_ptr_clear_ext(&items, zbx_ptr_free);
