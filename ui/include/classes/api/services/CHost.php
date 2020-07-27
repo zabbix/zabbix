@@ -2008,9 +2008,7 @@ class CHost extends CHostGeneral {
 		foreach ($hosts as $host) {
 			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
 					&& !is_array($host['interfaces'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect interface specified for host "%1$s".', $host['host'])
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (array_key_exists('status', $host)) {
@@ -2188,9 +2186,7 @@ class CHost extends CHostGeneral {
 
 			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
 					&& !is_array($host['interfaces'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect interface specified for host "%1$s".', $host['host'])
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (array_key_exists('host', $host)) {
