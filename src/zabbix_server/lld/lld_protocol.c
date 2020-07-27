@@ -149,7 +149,6 @@ static zbx_uint32_t	zbx_lld_serialize_top_request(unsigned char **data, const ch
  *                                                                            *
  ******************************************************************************/
 void	zbx_lld_deserialize_top_request(const unsigned char *data, char **field, int *limit)
-
 {
 	zbx_uint32_t	len;
 
@@ -197,7 +196,6 @@ zbx_uint32_t	zbx_lld_serialize_top_result(unsigned char **data, zbx_uint64_pair_
  *                                                                            *
  ******************************************************************************/
 static void	zbx_lld_deserialize_top_result(const unsigned char *data, zbx_vector_uint64_pair_t *items)
-
 {
 	int	i, items_num;
 
@@ -398,4 +396,3 @@ out:
 
 	return ret;
 }
-

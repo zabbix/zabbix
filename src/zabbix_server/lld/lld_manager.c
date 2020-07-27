@@ -572,7 +572,6 @@ static void	lld_process_diag_top(zbx_lld_manager_t *manager, zbx_ipc_client_t *c
 	zbx_free(field);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
 }
 
 /******************************************************************************

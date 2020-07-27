@@ -22,6 +22,7 @@
 #include "memalloc.h"
 #include "../../libs/zbxdbcache/valuecache.h"
 #include "zbxlld.h"
+#include "zbxalert.h"
 
 #include "diag.h"
 
@@ -83,7 +84,7 @@ static void	diag_valuecache_add_item(struct zbx_json *json, zbx_vc_item_stats_t 
  *             json      - [IN/OUT] the json to update                        *
  *             error     - [OUT] error message                                *
  *                                                                            *
- * Return value: SUCCEED - the request was parsed successfully                *
+ * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -239,7 +240,7 @@ static void	diag_add_lld_items(struct zbx_json *json, zbx_vector_uint64_pair_t *
  *             json      - [IN/OUT] the json to update                        *
  *             error     - [OUT] error message                                *
  *                                                                            *
- * Return value: SUCCEED - the request was parsed successfully                *
+ * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -326,6 +327,183 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_add_alerting_mediatypes                                     *
+ *                                                                            *
+ * Purpose: add mediatype top list to output json                             *
+ *                                                                            *
+ * Parameters: json  - [OUT] the output json                                  *
+ *             field - [IN] the field name                                    *
+ *             items - [IN] a top mediatype list consisting of                *
+ *                          mediatype, alerts_num pairs                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_add_alerting_mediatypes(struct zbx_json *json, const char *field,
+		zbx_vector_uint64_pair_t *mediatypes)
+{
+	int	i;
+
+	zbx_json_addarray(json, field);
+
+	for (i = 0; i < mediatypes->values_num; i++)
+	{
+		zbx_json_addobject(json, NULL);
+		zbx_json_adduint64(json, "mediatypeid", mediatypes->values[i].first);
+		zbx_json_adduint64(json, "alerts", mediatypes->values[i].second);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_add_alerting_sources                                        *
+ *                                                                            *
+ * Purpose: add alert source top list to output json                          *
+ *                                                                            *
+ * Parameters: json  - [OUT] the output json                                  *
+ *             field - [IN] the field name                                    *
+ *             items - [IN] a top alert source list consisting of             *
+ *                          zbx_am_source_stats_t structures                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_add_alerting_sources(struct zbx_json *json, const char *field, zbx_vector_ptr_t *sources)
+{
+	int	i;
+
+	zbx_json_addarray(json, field);
+
+	for (i = 0; i < sources->values_num; i++)
+	{
+		zbx_am_source_stats_t	*source= (zbx_am_source_stats_t *)sources->values[i];
+
+		zbx_json_addobject(json, NULL);
+		zbx_json_adduint64(json, "source", source->source);
+		zbx_json_adduint64(json, "object", source->object);
+		zbx_json_adduint64(json, "objectid", source->objectid);
+		zbx_json_adduint64(json, "alerts", source->alerts_num);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_add_alerting_info                                           *
+ *                                                                            *
+ * Purpose: add requested alert manager diagnostic information to json data   *
+ *                                                                            *
+ * Parameters: jp        - [IN] the request                                   *
+ *             field_map - [IN] a map of supported statistic field names to   *
+ *                               bitmasks                                     *
+ *             json      - [IN/OUT] the json to update                        *
+ *             error     - [OUT] error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the information was added successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+{
+	zbx_vector_ptr_t	tops;
+	int			ret;
+	double			time1, time2, time_total = 0;
+	zbx_uint64_t		fields;
+	zbx_diag_map_t		field_map[] = {
+					{"all", ZBX_DIAG_ALERTING_SIMPLE},
+					{"alerts", ZBX_DIAG_ALERTING_ALERTS},
+					{NULL, 0}
+					};
+
+	zbx_vector_ptr_create(&tops);
+
+	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
+	{
+		zbx_json_addobject(json, "alerting");
+
+		if (0 != (fields & ZBX_DIAG_ALERTING_SIMPLE))
+		{
+			zbx_uint64_t	alerts_num;
+
+			time1 = zbx_time();
+			if (FAIL == (ret = zbx_alerter_get_diag_stats(&alerts_num, error)))
+				goto out;
+			time2 = zbx_time();
+			time_total += time2 - time1;
+
+			if (0 != (fields & ZBX_DIAG_ALERTING_ALERTS))
+				zbx_json_addint64(json, "alerts", alerts_num);
+		}
+
+		if (0 != tops.values_num)
+		{
+			int	i;
+
+			zbx_json_addobject(json, "top");
+
+			for (i = 0; i < tops.values_num; i++)
+			{
+				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
+
+				if (0 == strcmp(map->name, "media.alerts"))
+				{
+					zbx_vector_uint64_pair_t	mediatypes;
+
+					zbx_vector_uint64_pair_create(&mediatypes);
+
+					time1 = zbx_time();
+					if (FAIL == (ret = zbx_alerter_get_top_mediatypes(map->value, &mediatypes,
+							error)))
+					{
+						goto out;
+					}
+					time2 = zbx_time();
+					time_total += time2 - time1;
+
+					diag_add_alerting_mediatypes(json, map->name, &mediatypes);
+					zbx_vector_uint64_pair_destroy(&mediatypes);
+				}
+				else if (0 == strcmp(map->name, "source.alerts"))
+				{
+					zbx_vector_ptr_t	sources;
+
+					zbx_vector_ptr_create(&sources);
+
+					time1 = zbx_time();
+					if (FAIL == (ret = zbx_alerter_get_top_sources(map->value, &sources, error)))
+					{
+						goto out;
+					}
+					time2 = zbx_time();
+					time_total += time2 - time1;
+
+					diag_add_alerting_sources(json, map->name, &sources);
+					zbx_vector_ptr_clear_ext(&sources, zbx_ptr_free);
+					zbx_vector_ptr_destroy(&sources);
+				}
+				else
+				{
+					*error = zbx_dsprintf(*error, "Unsupported top field: %s", map->name);
+					ret = FAIL;
+					goto out;
+				}
+			}
+
+			zbx_json_close(json);
+		}
+
+		zbx_json_addfloat(json, "time", time_total);
+		zbx_json_close(json);
+	}
+out:
+	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
+	zbx_vector_ptr_destroy(&tops);
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -355,6 +533,8 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 		ret = diag_add_preproc_info(jp, j, error);
 	if (0 == strcmp(section, "lld"))
 		ret = diag_add_lld_info(jp, j, error);
+	if (0 == strcmp(section, "alerting"))
+		ret = diag_add_alerting_info(jp, j, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
 

@@ -198,7 +198,7 @@ static int	diag_historycache_item_compare_values_desc(const void *d1, const void
  *             json      - [IN/OUT] the json to update                        *
  *             error     - [OUT] error message                                *
  *                                                                            *
- * Return value: SUCCEED - the request was parsed successfully                *
+ * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -359,7 +359,7 @@ static void	diag_add_preproc_items(struct zbx_json *json, zbx_vector_ptr_t *item
  *             json      - [IN/OUT] the json to update                        *
  *             error     - [OUT] error message                                *
  *                                                                            *
- * Return value: SUCCEED - the request was parsed successfully                *
+ * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
