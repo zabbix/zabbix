@@ -249,7 +249,8 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getCreateUserData
 	 */
 	public function testLanguage_CreateUser($data) {
-		$this->page->login()->open('zabbix.php?action=user.edit');
+		$this->userLogin('Admin', 'zabbix');
+		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 		$form->submit();
