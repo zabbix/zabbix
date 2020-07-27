@@ -2006,12 +2006,11 @@ class CHost extends CHostGeneral {
 		$host_names = [];
 
 		foreach ($hosts as $host) {
-			if (array_key_exists('interfaces', $host)) {
-				if ($host['interfaces'] !== null && !is_array($host['interfaces'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect interface specified for host "%1$s".', $host['host'])
-					);
-				}
+			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
+					&& !is_array($host['interfaces'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect interface specified for host "%1$s".', $host['host'])
+				);
 			}
 
 			if (array_key_exists('status', $host)) {
@@ -2187,12 +2186,11 @@ class CHost extends CHostGeneral {
 			$update_discovered_validator->setObjectName($host_name);
 			$this->checkPartialValidator($host, $update_discovered_validator, $db_host);
 
-			if (array_key_exists('interfaces', $host)) {
-				if ($host['interfaces'] !== null && !is_array($host['interfaces'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect interface specified for host "%1$s".', $host['host'])
-					);
-				}
+			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
+					&& !is_array($host['interfaces'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect interface specified for host "%1$s".', $host['host'])
+				);
 			}
 
 			if (array_key_exists('host', $host)) {
