@@ -168,12 +168,13 @@ void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_mem_stat
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_historycache_item_compare_values                            *
+ * Function: diag_historycache_item_compare_values_desc                       *
  *                                                                            *
- * Purpose: sort value cache item diagnostic stats by item values_num         *
+ * Purpose: sort history cache item view by second value (number of values)   *
+ *          in descending order                                               *
  *                                                                            *
  ******************************************************************************/
-static int	diag_historycache_item_compare_values(const void *d1, const void *d2)
+static int	diag_historycache_item_compare_values_desc(const void *d1, const void *d2)
 {
 	zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
 	zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
@@ -274,11 +275,11 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 					zbx_vector_uint64_pair_create(&items);
 
 					time1 = zbx_time();
-					zbx_hc_get_diag_items(&items);
+					zbx_hc_get_items(&items);
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
-					zbx_vector_uint64_pair_sort(&items, diag_historycache_item_compare_values);
+					zbx_vector_uint64_pair_sort(&items, diag_historycache_item_compare_values_desc);
 					limit = MIN((int)map->value, items.values_num);
 
 					zbx_json_addarray(json, map->name);
@@ -316,6 +317,16 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_add_preproc_items                                           *
+ *                                                                            *
+ * Purpose: add item top list to output json                                  *
+ *                                                                            *
+ * Parameters: json  - [OUT] the output json                                  *
+ *             items - [IN] a top item list                                   *
+ *                                                                            *
+ ******************************************************************************/
 static void	diag_add_preproc_items(struct zbx_json *json, zbx_vector_ptr_t *items)
 {
 	int	i;
@@ -369,8 +380,6 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 
 	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
-		int	i;
-
 		zbx_json_addobject(json, "preprocessing");
 
 		if (0 != (fields & ZBX_DIAG_PREPROC_SIMPLE))
@@ -392,6 +401,8 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 
 		if (0 != tops.values_num)
 		{
+			int	i;
+
 			zbx_json_addobject(json, "top");
 
 			for (i = 0; i < tops.values_num; i++)
@@ -407,7 +418,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 					if (FAIL == (ret = zbx_preprocessor_get_top_items(map->name, map->value, &items,
 							error)))
 					{
-						break;
+						goto out;
 					}
 
 					time2 = zbx_time();
@@ -421,7 +432,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 				{
 					*error = zbx_dsprintf(*error, "Unsupported top field: %s", map->name);
 					ret = FAIL;
-					break;
+					goto out;
 				}
 			}
 
@@ -431,8 +442,6 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 		zbx_json_addfloat(json, "time", time_total);
 		zbx_json_close(json);
 	}
-
-	ret = SUCCEED;
 out:
 	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
 	zbx_vector_ptr_destroy(&tops);

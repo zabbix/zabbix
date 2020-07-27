@@ -930,15 +930,20 @@ void	zbx_preprocessor_unpack_top_result(zbx_vector_ptr_t *items, const unsigned 
 
 	data += zbx_deserialize_value(data, &items_num);
 
-	for (i = 0; i < items_num; i++)
+	if (0 != items_num)
 	{
-		zbx_preproc_item_stats_t	*item;
+		zbx_vector_ptr_reserve(items, items_num);
 
-		item = (zbx_preproc_item_stats_t *)zbx_malloc(NULL, sizeof(zbx_preproc_item_stats_t));
-		data += zbx_deserialize_value(data, &item->itemid);
-		data += zbx_deserialize_value(data, &item->values_num);
-		data += zbx_deserialize_value(data, &item->steps_num);
-		zbx_vector_ptr_append(items, item);
+		for (i = 0; i < items_num; i++)
+		{
+			zbx_preproc_item_stats_t	*item;
+
+			item = (zbx_preproc_item_stats_t *)zbx_malloc(NULL, sizeof(zbx_preproc_item_stats_t));
+			data += zbx_deserialize_value(data, &item->itemid);
+			data += zbx_deserialize_value(data, &item->values_num);
+			data += zbx_deserialize_value(data, &item->steps_num);
+			zbx_vector_ptr_append(items, item);
+		}
 	}
 }
 

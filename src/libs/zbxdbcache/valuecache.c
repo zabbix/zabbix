@@ -2884,16 +2884,16 @@ void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vc_get_diag_items                                            *
+ * Function: zbx_vc_get_items                                                 *
  *                                                                            *
- * Purpose: get diagnostic data of cached items                               *
+ * Purpose: get statistics of cached items                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vc_get_diag_items(zbx_vector_ptr_t *items)
+void	zbx_vc_get_items(zbx_vector_ptr_t *items)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vc_item_t		*item;
-	zbx_vc_item_diag_t	*diag;
+	zbx_vc_item_stats_t	*diag;
 
 	vc_try_lock();
 
@@ -2902,7 +2902,7 @@ void	zbx_vc_get_diag_items(zbx_vector_ptr_t *items)
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		diag = (zbx_vc_item_diag_t *)zbx_malloc(NULL, sizeof(zbx_vc_item_diag_t));
+		diag = (zbx_vc_item_stats_t *)zbx_malloc(NULL, sizeof(zbx_vc_item_stats_t));
 		diag->itemid = item->itemid;
 		diag->values_num = item->values_total;
 		diag->hourly_num = item->last_hourly_num;

@@ -1183,11 +1183,11 @@ static void	preprocessor_get_diag_top(zbx_preprocessing_manager_t *manager, zbx_
 	}
 	else
 	{
+		THIS_SHOULD_NEVER_HAPPEN;
+
 		data_len = zbx_preprocessor_pack_top_result(&data, NULL, 0);
 		zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_TOP_RESULT, data, data_len);
 		zbx_free(data);
-
-		THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	zbx_free(field);

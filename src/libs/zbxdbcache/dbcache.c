@@ -4515,12 +4515,12 @@ void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_hc_get_diag_items                                            *
+ * Function: zbx_hc_get_items                                                 *
  *                                                                            *
- * Purpose: get diagnostic data of cached items                               *
+ * Purpose: get statistics of cached items                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_get_diag_items(zbx_vector_uint64_pair_t *items)
+void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;
