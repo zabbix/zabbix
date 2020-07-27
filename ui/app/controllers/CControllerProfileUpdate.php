@@ -175,7 +175,9 @@ class CControllerProfileUpdate extends CController {
 				$idx2 = reset($idx2);
 				$properties = [];
 				parse_str($this->getInput('value_str'), $properties);
-				$properties['severities'] = array_values($properties['severities']);
+				$properties['severities'] = array_key_exists('severities', $properties)
+					? array_values($properties['severities'])
+					: [];
 
 				$filter = (new CTabFilterProfile(CControllerHostViewRefresh::FILTER_IDX))->read();
 				$filter->setFilterDefaults(CControllerHostViewRefresh::FILTER_FIELDS_DEFAULT);

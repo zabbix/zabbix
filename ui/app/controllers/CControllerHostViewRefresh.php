@@ -25,29 +25,6 @@
  */
 class CControllerHostViewRefresh extends CControllerHost {
 
-	const FILTER_IDX = 'web.monitoringhosts';
-	/**
-	 * Filter fields default values.
-	 */
-	const FILTER_FIELDS_DEFAULT = [
-		'name' => '',
-		'groupids' => [],
-		'ip' => '',
-		'dns' => '',
-		'port' => '',
-		'status' => '',
-		'evaltype' => TAG_EVAL_TYPE_AND_OR,
-		'tags' => [],
-		'severities' => [],
-		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
-		'maintenance_status' => HOST_MAINTENANCE_STATUS_ON,
-		'from' => 'now-1d',
-		'to' => 'now',
-		'page' => null,
-		'sort' => 'name',
-		'sortorder' => ZBX_SORT_UP
-	];
-
 	protected function init(): void {
 		$this->disableSIDValidation();
 	}
@@ -118,14 +95,14 @@ class CControllerHostViewRefresh extends CControllerHost {
 			$show_counters = [];
 
 			foreach ($profile->getTabsWithDefaults() as $index => $filter) {
-				$show_counters[$index] = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
+				$show_counters[$index] = $filter['show_counter'] ? $this->getCount($filter) : 0;
 			}
 
-			$data['show_counters'] = $show_counters;
+			$data['show_counter'] = $show_counters;
 		}
 		else {
 			$this->getInputs($filter, array_keys($filter));
-			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
+			$prepared_data = $this->getData($filter);
 
 			$data = [
 				'filter' => $filter,

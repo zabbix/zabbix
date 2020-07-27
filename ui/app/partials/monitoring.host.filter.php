@@ -205,6 +205,7 @@ $(function($) {
 		// Tags table
 		var tag_row = new Template($('#filter-tag-row-tmpl').html()),
 			i = 0;
+		$('#tags_' + data.uniqid + ' tr.form_row', container).remove();
 
 		data.filter.tags.forEach(tag => {
 			var $row = $(tag_row.evaluate({rowNum: i++}));
@@ -213,13 +214,32 @@ $(function($) {
 			$row.find('[name$="[value]"]').val(tag.value);
 			$row.find('[name$="[operator]"][value="'+tag.operator+'"]').attr('checked', 'checked');
 
-			$('#tags_' + data.uniqid, container).append($row);
+			$row.insertBefore($('#tags_' + data.uniqid + ' tr', container).last());
 		});
 		$('#tags_' + data.uniqid, container).dynamicRows({template: '#filter-tag-row-tmpl'});
 
 		// Show hosts in maintenance events.
 		$('[name="maintenance_status"]', container).click(function () {
 			$('[name="show_suppressed"]', container).prop('disabled', !this.checked);
+		});
+
+		for (key in data.filter) {
+			var elm = $('[name="' + key + '"]');
+
+			if (!elm.length || typeof data.filter[key] === 'object') {
+				continue;
+			}
+
+			if (elm.is(':radio,:checkbox')) {
+				elm.filter('[value="' + data.filter[key] + '"]').attr('checked', true);
+			}
+			else {
+				elm.val(data.filter[key]);
+			}
+		};
+
+		data.filter.severities.forEach((value) => {
+			$('[name="severities[' + value + ']"]', container).attr('checked', true);
 		});
 	}
 

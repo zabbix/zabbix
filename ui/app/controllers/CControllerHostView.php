@@ -44,12 +44,10 @@ class CControllerHostView extends CControllerHostViewRefresh {
 			->setArgument('sortorder', $filter['sortorder'])
 			->setArgument('page', $filter['page']);
 
-		$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
+		$prepared_data = $this->getData($filter);
 
 		$data = [
-			'filter' => $filter,
-			// 'sort' => $sort,
-			// 'sortorder' => $sortorder,
+			//'filter' => $filter,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 

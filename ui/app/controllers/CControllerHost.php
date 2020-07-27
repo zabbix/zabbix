@@ -25,6 +25,53 @@
  */
 abstract class CControllerHost extends CController {
 
+	const FILTER_IDX = 'web.monitoringhosts';
+	/**
+	 * Filter fields default values.
+	 */
+	const FILTER_FIELDS_DEFAULT = [
+		'name' => '',
+		'groupids' => [],
+		'ip' => '',
+		'dns' => '',
+		'port' => '',
+		'status' => HOST_STATUS_MONITORED,
+		'evaltype' => TAG_EVAL_TYPE_AND_OR,
+		'tags' => [],
+		'severities' => [],
+		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
+		'maintenance_status' => HOST_MAINTENANCE_STATUS_ON,
+		'from' => 'now-1d',
+		'to' => 'now',
+		'page' => null,
+		'sort' => 'name',
+		'sortorder' => ZBX_SORT_UP
+	];
+
+	/**
+	 * Get host list results count for passed filter.
+	 *
+	 * @param array  $filter                        Filter options.
+	 * @param string $filter['name']                Filter hosts by name.
+	 * @param array  $filter['groupids']            Filter hosts by host groups.
+	 * @param string $filter['ip']                  Filter hosts by IP.
+	 * @param string $filter['dns']	                Filter hosts by DNS.
+	 * @param string $filter['port']                Filter hosts by port.
+	 * @param string $filter['status']              Filter hosts by status.
+	 * @param string $filter['evaltype']            Filter hosts by tags.
+	 * @param string $filter['tags']                Filter hosts by tag names and values.
+	 * @param string $filter['severities']          Filter problems on hosts by severities.
+	 * @param string $filter['show_suppressed']     Filter supressed problems.
+	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
+	 * @param int    $filter['page']                Page number.
+	 *
+	 * @return int
+	 */
+	protected function getCount(array $filter) {
+		// TODO
+		return 1;
+	}
+
 	/**
 	 * Prepares the host list based on the given filter and sorting options.
 	 *
@@ -41,12 +88,12 @@ abstract class CControllerHost extends CController {
 	 * @param string $filter['show_suppressed']     Filter supressed problems.
 	 * @param int    $filter['maintenance_status']  Filter hosts by maintenance.
 	 * @param int    $filter['page']                Page number.
-	 * @param string $sort						    Sorting field.
-	 * @param string $sortorder                     Sorting order.
+	 * @param string $filter['sort']                Sorting field.
+	 * @param string $filter['sortorder']           Sorting order.
 	 *
 	 * @return array
 	 */
-	protected function prepareData(array $filter, string $sort, string $sortorder): array {
+	protected function getData(array $filter): array {
 		$child_groups = [];
 
 		// Multiselect host groups.
@@ -117,12 +164,12 @@ abstract class CControllerHost extends CController {
 		]);
 
 		// Sort for paging so we know which IDs go to which page.
-		CArrayHelper::sort($hosts, [['field' => $sort, 'order' => $sortorder]]);
+		CArrayHelper::sort($hosts, [['field' => $filter['sort'], 'order' => $filter['sortorder']]]);
 
 		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
 
 		// Split result array and create paging.
-		$paging = CPagerHelper::paginate($filter['page'], $hosts, $sortorder, $view_curl);
+		$paging = CPagerHelper::paginate($filter['page'], $hosts, $filter['sortorder'], $view_curl);
 
 		// Get additonal data to limited host amount.
 		$hosts = API::Host()->get([
@@ -140,7 +187,7 @@ abstract class CControllerHost extends CController {
 			'preservekeys' => true
 		]);
 		// Re-sort the results again.
-		CArrayHelper::sort($hosts, [['field' => $sort, 'order' => $sortorder]]);
+		CArrayHelper::sort($hosts, [['field' => $filter['sort'], 'order' => $filter['sortorder']]]);
 
 		$maintenanceids = [];
 
