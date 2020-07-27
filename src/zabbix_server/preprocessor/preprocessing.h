@@ -36,8 +36,8 @@
 #define ZBX_IPC_PREPROCESSOR_TEST_RESULT	6
 #define ZBX_IPC_PREPROCESSOR_DIAG_STATS		7
 #define ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT	8
-#define ZBX_IPC_PREPROCESSOR_DIAG_TOP		9
-#define ZBX_IPC_PREPROCESSOR_DIAG_TOP_RESULT	10
+#define ZBX_IPC_PREPROCESSOR_TOP_ITEMS		9
+#define ZBX_IPC_PREPROCESSOR_TOP_ITEMS_RESULT	10
 
 typedef struct {
 	AGENT_RESULT	*result;
@@ -83,11 +83,12 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int values_n
 
 void	zbx_preprocessor_unpack_diag_stats(int *values_num, int *values_preproc_num, const unsigned char *data);
 
-zbx_uint32_t	zbx_preprocessor_pack_top_request(unsigned char **data, const char *field, int limit);
+zbx_uint32_t	zbx_preprocessor_pack_top_items_request(unsigned char **data, int limit);
 
-void	zbx_preprocessor_unpack_top_request(char **field, int *limit, const unsigned char *data);
+void	zbx_preprocessor_unpack_top_request(int *limit, const unsigned char *data);
 
-zbx_uint32_t	zbx_preprocessor_pack_top_result(unsigned char **data, zbx_preproc_item_stats_t **items, int items_num);
+zbx_uint32_t	zbx_preprocessor_pack_top_items_result(unsigned char **data, zbx_preproc_item_stats_t **items,
+		int items_num);
 
 void	zbx_preprocessor_unpack_top_result(zbx_vector_ptr_t *items, const unsigned char *data);
 

@@ -58,17 +58,26 @@ static int	diag_valuecache_item_compare_hourly(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_valuecache_add_item                                         *
+ * Function: diag_valuecache_add_items                                        *
  *                                                                            *
- * Purpose: add valuecache item diagnostic statistics to json                 *
+ * Purpose: add valuecache items diagnostic statistics to json                *
  *                                                                            *
  ******************************************************************************/
-static void	diag_valuecache_add_item(struct zbx_json *json, zbx_vc_item_stats_t *item)
+static void	diag_valuecache_add_items(struct zbx_json *json, const char *field, zbx_vc_item_stats_t **items,
+		int items_num)
 {
-	zbx_json_addobject(json, NULL);
-	zbx_json_addint64(json, "itemid", item->itemid);
-	zbx_json_addint64(json, "values", item->values_num);
-	zbx_json_addint64(json, "request.values", item->hourly_num);
+	int	i;
+
+	zbx_json_addarray(json, field);
+
+	for (i = 0; i < items_num; i++)
+	{
+		zbx_json_addobject(json, NULL);
+		zbx_json_addint64(json, "itemid", items[i]->itemid);
+		zbx_json_addint64(json, "values", items[i]->values_num);
+		zbx_json_addint64(json, "request.values", items[i]->hourly_num);
+		zbx_json_close(json);
+	}
 	zbx_json_close(json);
 }
 
@@ -155,8 +164,8 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 			for (i = 0; i < tops.values_num; i++)
 			{
-				zbx_diag_map_t			*map = (zbx_diag_map_t *)tops.values[i];
-				int				j, limit;
+				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
+				int		limit;
 
 				if (0 == strcmp(map->name, "values"))
 				{
@@ -174,14 +183,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 				}
 
 				limit = MIN((int)map->value, items.values_num);
-
-				zbx_json_addarray(json, map->name);
-
-				for (j = 0; j < limit; j++)
-					diag_valuecache_add_item(json, items.values[j]);
-
-				zbx_json_close(json);
-
+				diag_valuecache_add_items(json, map->name, (zbx_vc_item_stats_t **)items.values, limit);
 			}
 			zbx_json_close(json);
 
@@ -204,18 +206,14 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
  *                                                                            *
  * Function: diag_add_lld_items                                               *
  *                                                                            *
- * Purpose: add item top list to output json                                  *
- *                                                                            *
- * Parameters: json  - [OUT] the output json                                  *
- *             items - [IN] a top item list consisting of itemid, values_num  *
- *                     pairs                                                  *
+ * Purpose: add lld item top list to output json                              *
  *                                                                            *
  ******************************************************************************/
-static void	diag_add_lld_items(struct zbx_json *json, zbx_vector_uint64_pair_t *items)
+static void	diag_add_lld_items(struct zbx_json *json, const char *field, zbx_vector_uint64_pair_t *items)
 {
 	int	i;
 
-	zbx_json_addarray(json, NULL);
+	zbx_json_addarray(json, field);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -296,14 +294,14 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 					zbx_vector_uint64_pair_create(&items);
 
 					time1 = zbx_time();
-					if (FAIL == (ret = zbx_lld_get_top_items(map->name, map->value, &items, error)))
+					if (FAIL == (ret = zbx_lld_get_top_items(map->value, &items, error)))
 					{
 						goto out;
 					}
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
-					diag_add_lld_items(json, &items);
+					diag_add_lld_items(json, map->name, &items);
 					zbx_vector_uint64_pair_destroy(&items);
 				}
 				else

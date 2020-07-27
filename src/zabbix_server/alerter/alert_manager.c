@@ -758,7 +758,6 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	return alert;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: am_alert_free                                                    *

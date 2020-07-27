@@ -188,6 +188,31 @@ static int	diag_historycache_item_compare_values_desc(const void *d1, const void
 
 /******************************************************************************
  *                                                                            *
+ * Function: diag_historycahe_add_items                                       *
+ *                                                                            *
+ * Purpose: add history cache items diagnostic statistics to json             *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_historycache_add_items(struct zbx_json *json, const char *field, zbx_uint64_pair_t *pairs,
+		int pairs_num)
+{
+	int	i;
+
+	zbx_json_addarray(json, field);
+
+	for (i = 0; i < pairs_num; i++)
+	{
+		zbx_json_addobject(json, NULL);
+		zbx_json_addint64(json, "itemid", pairs[i].first);
+		zbx_json_addint64(json, "values", pairs[i].second);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: diag_add_historycache_info                                       *
  *                                                                            *
  * Purpose: add requested history cache diagnostic information to json data   *
@@ -270,7 +295,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 				if (0 == strcmp(map->name, "values"))
 				{
 					zbx_vector_uint64_pair_t	items;
-					int				j, limit;
+					int				limit;
 
 					zbx_vector_uint64_pair_create(&items);
 
@@ -282,17 +307,8 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 					zbx_vector_uint64_pair_sort(&items, diag_historycache_item_compare_values_desc);
 					limit = MIN((int)map->value, items.values_num);
 
-					zbx_json_addarray(json, map->name);
-
-					for (j = 0; j < limit; j++)
-					{
-						zbx_json_addobject(json, NULL);
-						zbx_json_addint64(json, "itemid", items.values[j].first);
-						zbx_json_addint64(json, "values", items.values[j].second);
-						zbx_json_close(json);
-					}
-
-					zbx_json_close(json);
+					diag_historycache_add_items(json, map->name, (zbx_uint64_pair_t *)items.values,
+							limit);
 					zbx_vector_uint64_pair_destroy(&items);
 				}
 				else
@@ -324,14 +340,15 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
  * Purpose: add item top list to output json                                  *
  *                                                                            *
  * Parameters: json  - [OUT] the output json                                  *
+ *             field - [IN] the field name                                    *
  *             items - [IN] a top item list                                   *
  *                                                                            *
  ******************************************************************************/
-static void	diag_add_preproc_items(struct zbx_json *json, zbx_vector_ptr_t *items)
+static void	diag_add_preproc_items(struct zbx_json *json, const char *field, zbx_vector_ptr_t *items)
 {
 	int	i;
 
-	zbx_json_addarray(json, NULL);
+	zbx_json_addarray(json, field);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -415,8 +432,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 
 					zbx_vector_ptr_create(&items);
 					time1 = zbx_time();
-					if (FAIL == (ret = zbx_preprocessor_get_top_items(map->name, map->value, &items,
-							error)))
+					if (FAIL == (ret = zbx_preprocessor_get_top_items(map->value, &items, error)))
 					{
 						goto out;
 					}
@@ -424,7 +440,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
-					diag_add_preproc_items(json, &items);
+					diag_add_preproc_items(json, map->name, &items);
 					zbx_vector_ptr_clear_ext(&items, zbx_ptr_free);
 					zbx_vector_ptr_destroy(&items);
 				}

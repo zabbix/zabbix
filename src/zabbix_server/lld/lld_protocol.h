@@ -44,10 +44,10 @@
 #define ZBX_IPC_LLD_DIAG_STATS_RESULT	1401
 
 /* process -> manager */
-#define ZBX_IPC_LLD_DIAG_TOP		1402
+#define ZBX_IPC_LLD_TOP_ITEMS		1402
 
 /* manager -> process */
-#define ZBX_IPC_LLD_DIAG_TOP_RESULT	1403
+#define ZBX_IPC_LLD_TOP_ITEMS_RESULT	1403
 
 
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, const char *value,
@@ -58,8 +58,8 @@ void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *ite
 
 zbx_uint32_t	zbx_lld_serialize_diag_stats(unsigned char **data, zbx_uint64_t items_num, zbx_uint64_t values_num);
 
-void	zbx_lld_deserialize_top_request(const unsigned char *data, char **field, int *limit);
+void	zbx_lld_deserialize_top_items_request(const unsigned char *data, int *limit);
 
-zbx_uint32_t	zbx_lld_serialize_top_result(unsigned char **data, zbx_uint64_pair_t **items, int items_num);
+zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, zbx_uint64_pair_t **items, int items_num);
 
 #endif

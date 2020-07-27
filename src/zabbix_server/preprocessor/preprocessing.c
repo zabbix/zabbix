@@ -638,19 +638,13 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int values_n
  *             limit - [IN] the number of top values to return                *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_top_request(unsigned char **data, const char *field, int limit)
+zbx_uint32_t	zbx_preprocessor_pack_top_items_request(unsigned char **data, int limit)
 {
-	unsigned char	*ptr;
-	zbx_uint32_t	data_len = 0, field_len;
+	zbx_uint32_t	data_len = 0;
 
-	zbx_serialize_prepare_str(data_len, field);
 	zbx_serialize_prepare_value(data_len, limit);
-
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
-
-	ptr = *data;
-	ptr += zbx_serialize_str(ptr, field, field_len);
-	(void)zbx_serialize_value(ptr, limit);
+	(void)zbx_serialize_value(*data, limit);
 
 	return data_len;
 }
@@ -666,7 +660,8 @@ zbx_uint32_t	zbx_preprocessor_pack_top_request(unsigned char **data, const char 
  *             items_num - [IN] the number of items                           *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_top_result(unsigned char **data, zbx_preproc_item_stats_t **items, int items_num)
+zbx_uint32_t	zbx_preprocessor_pack_top_items_result(unsigned char **data, zbx_preproc_item_stats_t **items,
+		int items_num)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, item_len = 0;
@@ -901,18 +896,13 @@ void	zbx_preprocessor_unpack_diag_stats(int *values_num, int *values_preproc_num
  * Purpose: unpack preprocessing test data from IPC data buffer               *
  *                                                                            *
  * Parameters: data  - [OUT] memory buffer for packed data                    *
- *             field - [IN] the sort field                                    *
  *             limit - [IN] the number of top values to return                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_unpack_top_request(char **field, int *limit, const unsigned char *data)
+void	zbx_preprocessor_unpack_top_request(int *limit, const unsigned char *data)
 {
-	zbx_uint32_t	len;
-
-	data += zbx_deserialize_str(data, field, len);
 	(void)zbx_deserialize_value(data, limit);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1233,15 +1223,15 @@ int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, ch
  * Purpose: get the top N items by the specified field                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_top_items(const char *field, int limit, zbx_vector_ptr_t *items, char **error)
+int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error)
 {
 	int			ret;
 	unsigned char		*data, *result;
 	zbx_uint32_t		data_len;
 
-	data_len = zbx_preprocessor_pack_top_request(&data, field, limit);
+	data_len = zbx_preprocessor_pack_top_items_request(&data, limit);
 
-	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_DIAG_TOP,
+	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_TOP_ITEMS,
 			SEC_PER_MIN, data, data_len, &result, error)))
 	{
 		goto  out;

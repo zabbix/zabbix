@@ -58,5 +58,5 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx
 int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, char **error);
 
 
-int	zbx_preprocessor_get_top_items(const char *field, int limit, zbx_vector_ptr_t *items, char **error);
+int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error);
 #endif /* ZABBIX_PREPROC_H */

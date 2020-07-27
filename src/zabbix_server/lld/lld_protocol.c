@@ -126,19 +126,13 @@ static void	zbx_lld_deserialize_diag_stats(const unsigned char *data, zbx_uint64
  * Function: zbx_lld_serialize_top_request                                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint32_t	zbx_lld_serialize_top_request(unsigned char **data, const char *field, int limit)
+static zbx_uint32_t	zbx_lld_serialize_top_items_request(unsigned char **data, int limit)
 {
-	unsigned char	*ptr;
-	zbx_uint32_t	data_len = 0, field_len;
+	zbx_uint32_t	data_len = 0;
 
-	zbx_serialize_prepare_str(data_len, field);
 	zbx_serialize_prepare_value(data_len, limit);
-
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
-
-	ptr = *data;
-	ptr += zbx_serialize_str(ptr, field, field_len);
-	(void)zbx_serialize_value(ptr, limit);
+	(void)zbx_serialize_value(*data, limit);
 
 	return data_len;
 }
@@ -148,20 +142,17 @@ static zbx_uint32_t	zbx_lld_serialize_top_request(unsigned char **data, const ch
  * Function: lld_deserialize_top_request                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_lld_deserialize_top_request(const unsigned char *data, char **field, int *limit)
+void	zbx_lld_deserialize_top_items_request(const unsigned char *data, int *limit)
 {
-	zbx_uint32_t	len;
-
-	data += zbx_deserialize_str(data, field, len);
 	(void)zbx_deserialize_value(data, limit);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_lld_serialize_top_result                                     *
+ * Function: zbx_lld_serialize_top_items_result                               *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_lld_serialize_top_result(unsigned char **data, zbx_uint64_pair_t **items, int items_num)
+zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, zbx_uint64_pair_t **items, int items_num)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, item_len = 0;
@@ -195,7 +186,7 @@ zbx_uint32_t	zbx_lld_serialize_top_result(unsigned char **data, zbx_uint64_pair_
  * Function: zbx_lld_deserialize_top_result                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_lld_deserialize_top_result(const unsigned char *data, zbx_vector_uint64_pair_t *items)
+static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_vector_uint64_pair_t *items)
 {
 	int	i, items_num;
 
@@ -375,21 +366,21 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_lld_get_top_items(const char *field, int limit, zbx_vector_uint64_pair_t *items, char **error)
+int	zbx_lld_get_top_items(int limit, zbx_vector_uint64_pair_t *items, char **error)
 {
 	int			ret;
 	unsigned char		*data, *result;
 	zbx_uint32_t		data_len;
 
-	data_len = zbx_lld_serialize_top_request(&data, field, limit);
+	data_len = zbx_lld_serialize_top_items_request(&data, limit);
 
-	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_LLD, ZBX_IPC_LLD_DIAG_TOP, SEC_PER_MIN, data,
+	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_LLD, ZBX_IPC_LLD_TOP_ITEMS, SEC_PER_MIN, data,
 			data_len, &result, error)))
 	{
 		goto  out;
 	}
 
-	zbx_lld_deserialize_top_result(result, items);
+	zbx_lld_deserialize_top_items_result(result, items);
 	zbx_free(result);
 out:
 	zbx_free(data);

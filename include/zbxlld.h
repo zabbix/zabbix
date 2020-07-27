@@ -32,6 +32,6 @@ int	zbx_lld_get_queue_size(zbx_uint64_t *size, char **error);
 
 int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, char **error);
 
-int	zbx_lld_get_top_items(const char *field, int limit, zbx_vector_uint64_pair_t *items, char **error);
+int	zbx_lld_get_top_items(int limit, zbx_vector_uint64_pair_t *items, char **error);
 
 #endif	/* ZABBIX_LLD_H */
