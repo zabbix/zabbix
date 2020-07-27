@@ -46,6 +46,9 @@ require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
 require_once dirname(__FILE__).'/CastableTrait.php';
 
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+
 /**
  * Element selection query.
  */
@@ -117,6 +120,13 @@ class CElementQuery implements IWaitable {
 	protected static $page;
 
 	/**
+	 * Last input element selector.
+	 *
+	 * @var string
+	 */
+	protected static $selector;
+
+	/**
 	 * Initialize element query by specified selector.
 	 *
 	 * @param mixed  $type     selector type (method) or selector
@@ -145,12 +155,31 @@ class CElementQuery implements IWaitable {
 		}
 
 		if ($locator === null) {
-			$parts = explode(':', $type, 2);
-			if (count($parts) !== 2) {
-				throw new Exception('Element selector "'.$type.'" is not well formatted.');
+			if (!is_array($type)) {
+				$parts = explode(':', $type, 2);
+				if (count($parts) !== 2) {
+					throw new Exception('Element selector "'.$selector.'" is not well formatted.');
+				}
+
+				list($type, $locator) = $parts;
+			}
+			else {
+				$selectors = [];
+				foreach ($type as $selector) {
+					$selectors[] = './/'.CXPathHelper::fromSelector($selector);
+				}
+
+				$type = 'xpath';
+				$locator = implode('|', $selectors);
+			}
+		}
+		else if (is_array($locator)) {
+			foreach ($locator as $selector) {
+				$selectors[] = './/'.CXPathHelper::fromSelector($type, $selector);
 			}
 
-			list($type, $locator) = $parts;
+			$type = 'xpath';
+			$locator = implode('|', $selectors);
 		}
 
 		$mapping = [
@@ -172,7 +201,7 @@ class CElementQuery implements IWaitable {
 			}
 		}
 
-		return call_user_func(['WebDriverBy', $type], $locator);
+		return call_user_func([WebDriverBy::class, $type], $locator);
 	}
 
 	/**
@@ -191,6 +220,15 @@ class CElementQuery implements IWaitable {
 	 */
 	public function getContext() {
 		return $this->context;
+	}
+
+	/**
+	 * Get last selector.
+	 *
+	 * @return string|null
+	 */
+	public static function getLastSelector() {
+		return static::$selector;
 	}
 
 	/**
@@ -317,7 +355,10 @@ class CElementQuery implements IWaitable {
 			throw $exception;
 		}
 
-		return new $class($element, array_merge($this->options, ['parent' => $parent, 'by' => $this->by]));
+		return call_user_func([$class, 'createInstance'], $element, array_merge($this->options, [
+			'parent' => $parent,
+			'by' => $this->by
+		]));
 	}
 
 	/**
@@ -332,7 +373,7 @@ class CElementQuery implements IWaitable {
 
 		if ($this->class !== 'RemoteWebElement') {
 			foreach ($elements as &$element) {
-				$element = new $class($element, $this->options);
+				$element = call_user_func([$class, 'createInstance'], $element, $this->options);
 			}
 			unset($element);
 		}
@@ -512,12 +553,14 @@ class CElementQuery implements IWaitable {
 				$xpaths[] = $prefix.$selector;
 			}
 
-			$element = $target->query('xpath', implode('|', $xpaths))->cast($class)->one(false);
+			static::$selector = 'xpath:'.implode('|', $xpaths);
+			$element = $target->query(static::$selector)->cast($class)->one(false);
 			if ($element->isValid()) {
 				return $element;
 			}
 		}
 
+		static::$selector = null;
 		return new CNullElement(['locator' => 'input element']);
 	}
 }

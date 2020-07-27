@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2020-06-29T22:48:19Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -16,7 +16,7 @@ https://httpd.apache.org/docs/current/mod/mod_status.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -56,7 +56,7 @@ Template tooling version used: 0.34</description>
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -89,7 +89,7 @@ BytesPerSec is not used, as it counts average since last Apache server start.</d
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -111,7 +111,7 @@ BytesPerSec is not used, as it counts average since last Apache server start.</d
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -139,7 +139,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -162,7 +162,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -199,7 +199,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
                <triggers>
                   <trigger>
@@ -230,7 +230,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -252,7 +252,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -274,7 +274,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -296,7 +296,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -318,7 +318,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -340,7 +340,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -362,7 +362,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -384,7 +384,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -406,7 +406,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -428,7 +428,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -450,7 +450,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -472,7 +472,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -494,7 +494,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                   </step>
                </preprocessing>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
             </item>
             <item>
@@ -616,7 +616,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
             </item>
             <item>
                <name>Apache: Get status</name>
-               <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+               <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                <history>1h</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -631,43 +631,44 @@ https://httpd.apache.org/docs/current/mod/mod_status.html</description>
                   <step>
                      <type>JAVASCRIPT</type>
                      <params>// Convert Apache status to JSON
-var lines = value.split("\n");
-var fields = {},
-    output = {},
+var lines = value.split('\n');
+var output = {},
     workers = {
-        "_": 0, "S": 0, "R": 0,
-        "W": 0, "K": 0, "D": 0,
-        "C": 0, "L": 0, "G": 0,
-        "I": 0, ".": 0
+        '_': 0, 'S': 0, 'R': 0, 'W': 0,
+        'K': 0, 'D': 0, 'C': 0, 'L': 0,
+        'G': 0, 'I': 0, '.': 0
     };
 
 // Get all "Key: Value" pairs as an object
 for (var i = 0; i &lt; lines.length; i++) {
     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);
+
     if (line !== null) {
         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);
     }
 }
 
-// For versions without "ServerUptimeSeconds" metric
-output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime
- 
-// Parse "Scoreboard" to get worker count
+// Multiversion metrics
+output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime;
+output.ServerVersion = output.Server || output.ServerVersion;
+
+// Parse "Scoreboard" to get worker count.
 if (typeof output.Scoreboard === 'string') {
     for (var i = 0; i &lt; output.Scoreboard.length; i++) {
         var char = output.Scoreboard[i];
+
         workers[char]++;
     }
 }
- 
+
 // Add worker data to the output
 output.Workers = {
-    waiting: workers["_"], starting: workers["S"], reading: workers["R"],
-    sending: workers["W"], keepalive: workers["K"], dnslookup: workers["D"],
-    closing: workers["C"], logging: workers["L"], finishing: workers["G"],
-    cleanup: workers["I"], slot: workers["."]
+    waiting: workers['_'], starting: workers['S'], reading: workers['R'],
+    sending: workers['W'], keepalive: workers['K'], dnslookup: workers['D'],
+    closing: workers['C'], logging: workers['L'], finishing: workers['G'],
+    cleanup: workers['I'], slot: workers['.']
 };
- 
+
 // Return JSON string
 return JSON.stringify(output);</params>
                   </step>
@@ -723,7 +724,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                        <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -745,7 +746,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                        <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -767,7 +768,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                        <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -789,7 +790,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                        <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -811,7 +812,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                        <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -833,10 +834,11 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                        <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Apache: Current async connections{#SINGLETON}</name>
@@ -890,7 +892,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                   </graph_prototype>
                </graph_prototypes>
                <master_item>
-                  <key>web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]</key>
+                  <key>web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]</key>
                </master_item>
                <preprocessing>
                   <step>
@@ -930,6 +932,11 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <value>80</value>
                <description>The port of Apache status page</description>
             </macro>
+            <macro>
+               <macro>{$APACHE.STATUS.SCHEME}</macro>
+               <value>http</value>
+               <description>Request scheme which may be http or https</description>
+            </macro>
          </macros>
          <screens>
             <screen>
@@ -944,7 +951,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Requests per second</name>
                         <host>Template App Apache by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -966,7 +973,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Workers total</name>
                         <host>Template App Apache by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -988,7 +995,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Current async connections{#SINGLETON}</name>
                         <host>Template App Apache by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1010,7 +1017,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Current async processes{#SINGLETON}</name>
                         <host>Template App Apache by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1032,7 +1039,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         <name>Apache: Worker states</name>
                         <host>Template App Apache by Zabbix agent</host>
                      </resource>
-                     <width>750</width>
+                     <width>500</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>

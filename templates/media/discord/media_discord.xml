@@ -190,7 +190,7 @@ try {&#13;
             body.embeds[0].title = stringTruncate('OK: ' + params.event_name, 256);&#13;
             fields.push(&#13;
                 {&#13;
-                    name: 'Revovery time',&#13;
+                    name: 'Recovery time',&#13;
                     value: params.event_recovery_time + ' ' + params.event_recovery_date,&#13;
                     inline: 'True'&#13;
                 }&#13;

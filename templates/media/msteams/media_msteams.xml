@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-03T06:11:10Z</date>
+    <date>2020-05-22T11:57:30Z</date>
     <media_types>
         <media_type>
             <name>MS Teams</name>
@@ -226,7 +226,7 @@ try {&#13;
         // Resolved message.&#13;
         else {&#13;
             facts.push({&#13;
-                name: 'Revovery time',&#13;
+                name: 'Recovery time',&#13;
                 value: params.event_recovery_time + ' ' + params.event_recovery_date&#13;
             });&#13;
         }&#13;
@@ -253,6 +253,27 @@ try {&#13;
             });&#13;
         }&#13;
 &#13;
+        Object.keys(params)&#13;
+            .forEach(function (key) {&#13;
+                if (key.startsWith('fact_') &amp;&amp; params[key] !== '') {&#13;
+                    facts.push({&#13;
+                        name: key.substring(5),&#13;
+                        value: params[key]&#13;
+                    });&#13;
+                }&#13;
+                else if (key.startsWith('openUri_') &amp;&amp; params[key] !== '' &amp;&amp; !params[key].startsWith('{')) {&#13;
+                    body.potentialAction.push({&#13;
+                        '@type': 'OpenUri',&#13;
+                        name: key.substring(8),&#13;
+                        targets: [&#13;
+                            {&#13;
+                                os: 'default',&#13;
+                                uri: params[key]&#13;
+                            }&#13;
+                        ]&#13;
+                    });&#13;
+                }&#13;
+            });&#13;
         body.sections[0].facts = facts;&#13;
     }&#13;
 &#13;

@@ -77,7 +77,8 @@ else {
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groups_',
 									'with_hosts_and_templates' => 1,
-									'editable' => 1
+									'editable' => 1,
+									'enrich_parent_groups' => true
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -201,7 +202,7 @@ foreach ($data['graphs'] as $graph) {
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
 	else if (array_key_exists('ts_delete', $graph['graphDiscovery']) && $graph['graphDiscovery']['ts_delete'] > 0) {
-		$info_icons[] = getItemLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
+		$info_icons[] = getGraphLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
 	}
 
 	$graphTable->addRow([

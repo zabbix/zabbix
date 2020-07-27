@@ -326,8 +326,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr',
 				'popup.triggerwizard'
 			],
-			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.action.recovery',
-				'popup.action.acknowledge', 'popup.action.operation', 'popup.condition.operations',
+			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
 				'popup.mediatype.message'
 			],

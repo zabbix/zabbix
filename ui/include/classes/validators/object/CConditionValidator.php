@@ -22,6 +22,13 @@
 class CConditionValidator extends CValidator {
 
 	/**
+	 * Error message if the formula is not given.
+	 *
+	 * @var string
+	 */
+	public $messageMissingFormula;
+
+	/**
 	 * Error message if the formula is invalid.
 	 *
 	 * @var string
@@ -79,6 +86,12 @@ class CConditionValidator extends CValidator {
 		// validate only custom expressions
 		if ($object['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 			return true;
+		}
+
+		if (!array_key_exists('formula', $object)) {
+			$this->error($this->messageMissingFormula);
+
+			return false;
 		}
 
 		// check if the formula is valid

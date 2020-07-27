@@ -37,6 +37,7 @@
 #include "dbconfig.h"
 #include "dbsync.h"
 #include "proxy.h"
+#include "actions.h"
 
 int	sync_in_progress = 0;
 
@@ -702,8 +703,10 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
  * Parameters: gmacro_index - [IN/OUT] a global macro index hashset           *
  *             gmacro       - [IN] the macro to index                         *
  *                                                                            *
+ * Return value: The macro index record.                                      *
+ *                                                                            *
  ******************************************************************************/
-static void	config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
+static ZBX_DC_GMACRO_M	*config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
 {
 	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
 
@@ -719,6 +722,7 @@ static void	config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *
 	}
 
 	zbx_vector_ptr_append(&gmacro_m->gmacros, gmacro);
+	return gmacro_m;
 }
 
 /******************************************************************************
@@ -731,7 +735,7 @@ static void	config_gmacro_add_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *
  *             gmacro       - [IN] the macro to remove                        *
  *                                                                            *
  ******************************************************************************/
-static void	config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
+static ZBX_DC_GMACRO_M	*config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACRO *gmacro)
 {
 	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
 	int		index;
@@ -742,14 +746,34 @@ static void	config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACR
 	{
 		if (FAIL != (index = zbx_vector_ptr_search(&gmacro_m->gmacros, gmacro, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			zbx_vector_ptr_remove(&gmacro_m->gmacros, index);
-
-		if (0 == gmacro_m->gmacros.values_num)
-		{
-			zbx_strpool_release(gmacro_m->macro);
-			zbx_vector_ptr_destroy(&gmacro_m->gmacros);
-			zbx_hashset_remove(gmacro_index, &gmacro_m_local);
-		}
 	}
+	return gmacro_m;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: config_gmacro_context_compare                                    *
+ *                                                                            *
+ * Purpose: comparison function to sort global macro vector by context        *
+ *          operator, value and macro name                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	config_gmacro_context_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_GMACRO	*m1 = *(const ZBX_DC_GMACRO **)d1;
+	const ZBX_DC_GMACRO	*m2 = *(const ZBX_DC_GMACRO **)d2;
+
+	/* macros without context have higher priority than macros with */
+	if (NULL == m1->context)
+		return NULL == m2->context ? 0 : -1;
+
+	if (NULL == m2->context)
+		return 1;
+
+	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
+
+	return strcmp(m1->context, m2->context);
 }
 
 /******************************************************************************
@@ -762,7 +786,7 @@ static void	config_gmacro_remove_index(zbx_hashset_t *gmacro_index, ZBX_DC_GMACR
  *             hmacro       - [IN] the macro to index                         *
  *                                                                            *
  ******************************************************************************/
-static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
+static ZBX_DC_HMACRO_HM	*config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
 {
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
 
@@ -779,6 +803,7 @@ static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *
 	}
 
 	zbx_vector_ptr_append(&hmacro_hm->hmacros, hmacro);
+	return hmacro_hm;
 }
 
 /******************************************************************************
@@ -791,7 +816,7 @@ static void	config_hmacro_add_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *
  *             hmacro       - [IN] the macro name to remove                   *
  *                                                                            *
  ******************************************************************************/
-static void	config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
+static ZBX_DC_HMACRO_HM	*config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACRO *hmacro)
 {
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
 	int			index;
@@ -803,14 +828,34 @@ static void	config_hmacro_remove_index(zbx_hashset_t *hmacro_index, ZBX_DC_HMACR
 	{
 		if (FAIL != (index = zbx_vector_ptr_search(&hmacro_hm->hmacros, hmacro, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			zbx_vector_ptr_remove(&hmacro_hm->hmacros, index);
-
-		if (0 == hmacro_hm->hmacros.values_num)
-		{
-			zbx_strpool_release(hmacro_hm->macro);
-			zbx_vector_ptr_destroy(&hmacro_hm->hmacros);
-			zbx_hashset_remove(hmacro_index, &hmacro_hm_local);
-		}
 	}
+	return hmacro_hm;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: config_hmacro_context_compare                                    *
+ *                                                                            *
+ * Purpose: comparison function to sort host macro vector by context          *
+ *          operator, value and macro name                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	config_hmacro_context_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_HMACRO	*m1 = *(const ZBX_DC_HMACRO **)d1;
+	const ZBX_DC_HMACRO	*m2 = *(const ZBX_DC_HMACRO **)d2;
+
+	/* macros without context have higher priority than macros with */
+	if (NULL == m1->context)
+		return NULL == m2->context ? 0 : -1;
+
+	if (NULL == m2->context)
+		return 1;
+
+	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
+
+	return strcmp(m1->context, m2->context);
 }
 
 /******************************************************************************
@@ -1753,17 +1798,19 @@ static void	DCsync_htmpls(zbx_dbsync_t *sync)
 
 static void	DCsync_gmacros(zbx_dbsync_t *sync)
 {
-	char		**row;
-	zbx_uint64_t	rowid;
-	unsigned char	tag;
-
-	ZBX_DC_GMACRO	*gmacro;
-
-	int		found, context_existed, update_index, ret;
-	zbx_uint64_t	globalmacroid;
-	char		*macro = NULL, *context = NULL;
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag, context_op;
+	ZBX_DC_GMACRO		*gmacro;
+	int			found, context_existed, update_index, ret, i;
+	zbx_uint64_t		globalmacroid;
+	char			*macro = NULL, *context = NULL;
+	zbx_vector_ptr_t	indexes;
+	ZBX_DC_GMACRO_M		*gmacro_m;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&indexes);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1773,7 +1820,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(globalmacroid, row[0]);
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL))
+		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL, &context_op))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\"", row[1]);
 			continue;
@@ -1784,16 +1831,21 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		/* see whether we should and can update gmacros_m index at this point */
 		update_index = 0;
 
-		if (0 == found || 0 != strcmp(gmacro->macro, macro) || 0 != zbx_strcmp_null(gmacro->context, context))
+		if (0 == found || 0 != strcmp(gmacro->macro, macro) || 0 != zbx_strcmp_null(gmacro->context, context) ||
+				gmacro->context_op != context_op)
 		{
 			if (1 == found)
-				config_gmacro_remove_index(&config->gmacros_m, gmacro);
+			{
+				gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
+				zbx_vector_ptr_append(&indexes, gmacro_m);
+			}
 
 			update_index = 1;
 		}
 
 		/* store new information in macro structure */
 		ZBX_STR2UCHAR(gmacro->type, row[3]);
+		gmacro->context_op = context_op;
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
 
@@ -1815,16 +1867,20 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 
 		/* update gmacros_m index using new data */
 		if (1 == update_index)
-			config_gmacro_add_index(&config->gmacros_m, gmacro);
+		{
+			gmacro_m = config_gmacro_add_index(&config->gmacros_m, gmacro);
+			zbx_vector_ptr_append(&indexes, gmacro_m);
+		}
 	}
 
-	/* remove deleted globalmacros from buffer */
+	/* remove deleted global macros from cache */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		if (NULL == (gmacro = (ZBX_DC_GMACRO *)zbx_hashset_search(&config->gmacros, &rowid)))
 			continue;
 
-		config_gmacro_remove_index(&config->gmacros_m, gmacro);
+		gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
+		zbx_vector_ptr_append(&indexes, gmacro_m);
 
 		zbx_strpool_release(gmacro->macro);
 		zbx_strpool_release(gmacro->value);
@@ -1835,25 +1891,44 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->gmacros, gmacro);
 	}
 
+	zbx_vector_ptr_sort(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < indexes.values_num; i++)
+	{
+		gmacro_m = (ZBX_DC_GMACRO_M *)indexes.values[i];
+		if (0 == gmacro_m->gmacros.values_num)
+		{
+			zbx_strpool_release(gmacro_m->macro);
+			zbx_vector_ptr_destroy(&gmacro_m->gmacros);
+			zbx_hashset_remove_direct(&config->gmacros_m, gmacro_m);
+		}
+		else
+			zbx_vector_ptr_sort(&gmacro_m->gmacros, config_gmacro_context_compare);
+	}
+
 	zbx_free(context);
 	zbx_free(macro);
+	zbx_vector_ptr_destroy(&indexes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_hmacros(zbx_dbsync_t *sync)
 {
-	char		**row;
-	zbx_uint64_t	rowid;
-	unsigned char	tag;
-
-	ZBX_DC_HMACRO	*hmacro;
-
-	int		found, context_existed, update_index, ret;
-	zbx_uint64_t	hostmacroid, hostid;
-	char		*macro = NULL, *context = NULL;
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag, context_op;
+	ZBX_DC_HMACRO		*hmacro;
+	int			found, context_existed, update_index, ret, i;
+	zbx_uint64_t		hostmacroid, hostid;
+	char			*macro = NULL, *context = NULL;
+	zbx_vector_ptr_t	indexes;
+	ZBX_DC_HMACRO_HM	*hmacro_hm;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&indexes);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -1864,7 +1939,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(hostmacroid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL))
+		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL, &context_op))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\"", row[1], row[2]);
 			continue;
@@ -1876,10 +1951,13 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		update_index = 0;
 
 		if (0 == found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, macro) ||
-				0 != zbx_strcmp_null(hmacro->context, context))
+				0 != zbx_strcmp_null(hmacro->context, context) || hmacro->context_op != context_op)
 		{
 			if (1 == found)
-				config_hmacro_remove_index(&config->hmacros_hm, hmacro);
+			{
+				hmacro_hm = config_hmacro_remove_index(&config->hmacros_hm, hmacro);
+				zbx_vector_ptr_append(&indexes, hmacro_hm);
+			}
 
 			update_index = 1;
 		}
@@ -1887,6 +1965,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
 		ZBX_STR2UCHAR(hmacro->type, row[4]);
+		hmacro->context_op = context_op;
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
 
@@ -1908,7 +1987,10 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 		/* update hmacros_hm index using new data */
 		if (1 == update_index)
-			config_hmacro_add_index(&config->hmacros_hm, hmacro);
+		{
+			hmacro_hm = config_hmacro_add_index(&config->hmacros_hm, hmacro);
+			zbx_vector_ptr_append(&indexes, hmacro_hm);
+		}
 	}
 
 	/* remove deleted host macros from buffer */
@@ -1917,7 +1999,8 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		if (NULL == (hmacro = (ZBX_DC_HMACRO *)zbx_hashset_search(&config->hmacros, &rowid)))
 			continue;
 
-		config_hmacro_remove_index(&config->hmacros_hm, hmacro);
+		hmacro_hm = config_hmacro_remove_index(&config->hmacros_hm, hmacro);
+		zbx_vector_ptr_append(&indexes, hmacro_hm);
 
 		zbx_strpool_release(hmacro->macro);
 		zbx_strpool_release(hmacro->value);
@@ -1928,8 +2011,25 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->hmacros, hmacro);
 	}
 
+	zbx_vector_ptr_sort(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&indexes, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < indexes.values_num; i++)
+	{
+		hmacro_hm = (ZBX_DC_HMACRO_HM *)indexes.values[i];
+		if (0 == hmacro_hm->hmacros.values_num)
+		{
+			zbx_strpool_release(hmacro_hm->macro);
+			zbx_vector_ptr_destroy(&hmacro_hm->hmacros);
+			zbx_hashset_remove_direct(&config->hmacros_hm, hmacro_hm);
+		}
+		else
+			zbx_vector_ptr_sort(&hmacro_hm->hmacros, config_hmacro_context_compare);
+	}
+
 	zbx_free(context);
 	zbx_free(macro);
+	zbx_vector_ptr_destroy(&indexes);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -7181,13 +7281,20 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 			item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &item_local, sizeof(item_local));
 		}
 
-		item->dep_itemids_num = dc_masteritem->dep_itemids.values_num;
+		item->dep_itemids_num = 0;
+		item->dep_itemids = (zbx_uint64_pair_t *)zbx_malloc(NULL, sizeof(zbx_uint64_pair_t) *
+				dc_masteritem->dep_itemids.values_num);
 
-		item->dep_itemids = (zbx_uint64_pair_t *)zbx_malloc(NULL,
-				sizeof(zbx_uint64_pair_t) * item->dep_itemids_num);
-
-		memcpy(item->dep_itemids, dc_masteritem->dep_itemids.values,
-				sizeof(zbx_uint64_pair_t) * item->dep_itemids_num);
+		for (i = 0; i < dc_masteritem->dep_itemids.values_num; i++)
+		{
+			if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+					&dc_masteritem->dep_itemids.values[i].first)) ||
+					ITEM_STATUS_ACTIVE != dc_item->status)
+			{
+				continue;
+			}
+			item->dep_itemids[item->dep_itemids_num++] = dc_masteritem->dep_itemids.values[i];
+		}
 	}
 
 	zbx_hashset_iter_reset(&config->items, &iter);
@@ -8661,7 +8768,7 @@ void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint6
  *                                                                            *
  * Purpose: releases resources allocated to store host availability data      *
  *                                                                            *
- * Parameters: availability - [IN] host availability data                     *
+ * Parameters: ha - [IN] host availability data                               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_host_availability_clean(zbx_host_availability_t *ha)
@@ -8848,7 +8955,7 @@ out:
  *                                  OUT: the host availability data in cache  *
  *                                       before changes                       *
  *             out        - [OUT] the host availability data after changes    *
- *             error      - [IN] the error message                            *
+ *             error_msg  - [IN] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the host was deactivated successfully              *
  *               FAIL    - the host was already deactivated or deactivation   *
@@ -9476,6 +9583,22 @@ static void	dc_get_host_macro_value(const ZBX_DC_HMACRO *macro, char **value)
 		*value = zbx_strdup(*value, macro->value);
 }
 
+static int	dc_match_macro_context(const char *context, const char *pattern, unsigned char op)
+{
+	switch (op)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			return 0 == zbx_strcmp_null(context, pattern) ? SUCCEED : FAIL;
+		case CONDITION_OPERATOR_REGEXP:
+			if (NULL == context)
+				return FAIL;
+			return NULL != zbx_regexp_match(context, pattern, NULL) ? SUCCEED : FAIL;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+}
+
 static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
@@ -9484,6 +9607,7 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 	ZBX_DC_HMACRO_HM	hmacro_hm_local;
 	const ZBX_DC_HTMPL	*htmpl;
 	zbx_vector_uint64_t	templateids;
+	const ZBX_DC_HMACRO	*hmacro;
 
 	if (0 == host_num)
 		return;
@@ -9498,21 +9622,19 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 		{
 			for (j = 0; j < hmacro_hm->hmacros.values_num; j++)
 			{
-				const ZBX_DC_HMACRO	*hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[j];
+				hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[j];
 
-				if (0 == strcmp(hmacro->macro, macro))
+				if (SUCCEED == dc_match_macro_context(context, hmacro->context, hmacro->context_op))
 				{
-					if (0 == zbx_strcmp_null(hmacro->context, context))
-					{
-						dc_get_host_macro_value(hmacro, value);
-						return;
-					}
-
-					/* check for the default (without parameters) macro value */
-					if (NULL == *value_default && NULL != context && NULL == hmacro->context)
-						dc_get_host_macro_value(hmacro, value_default);
+					dc_get_host_macro_value(hmacro, value);
+					return;
 				}
 			}
+			/* Check for the default (without context) macro value. If macro has a value without */
+			/* context it will be the first element in the macro index vector.                   */
+			hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[0];
+			if (NULL == *value_default && NULL != context && NULL == hmacro->context)
+				dc_get_host_macro_value(hmacro, value_default);
 		}
 	}
 
@@ -9550,6 +9672,7 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 	int			i;
 	const ZBX_DC_GMACRO_M	*gmacro_m;
 	ZBX_DC_GMACRO_M		gmacro_m_local;
+	const ZBX_DC_GMACRO	*gmacro;
 
 	gmacro_m_local.macro = macro;
 
@@ -9557,21 +9680,20 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 	{
 		for (i = 0; i < gmacro_m->gmacros.values_num; i++)
 		{
-			const ZBX_DC_GMACRO	*gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[i];
+			gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[i];
 
-			if (0 == strcmp(gmacro->macro, macro))
+			if (SUCCEED == dc_match_macro_context(context, gmacro->context, gmacro->context_op))
 			{
-				if (0 == zbx_strcmp_null(gmacro->context, context))
-				{
-					dc_get_global_macro_value(gmacro, value);
-					break;
-				}
-
-				/* check for the default (without parameters) macro value */
-				if (NULL == *value_default && NULL != context && NULL == gmacro->context)
-					dc_get_global_macro_value(gmacro, value_default);
+				dc_get_global_macro_value(gmacro, value);
+				break;
 			}
 		}
+
+		/* Check for the default (without context) macro value. If macro has a value without */
+		/* context it will be the first element in the macro index vector.                   */
+		gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[0];
+		if (NULL == *value_default && NULL != context && NULL == gmacro->context)
+			dc_get_global_macro_value(gmacro, value_default);
 	}
 }
 
@@ -9616,7 +9738,7 @@ void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __func__, macro);
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL, NULL))
 		goto out;
 
 	RDLOCK_CACHE;
@@ -9633,7 +9755,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros                                        *
+ * Function: dc_expand_user_macros                                            *
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
  * WARNING - DO NOT USE FOR TRIGGERS, for triggers use the dedicated function *
@@ -9649,7 +9771,7 @@ out:
  *           This function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
+char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, len, last_pos = 0;
@@ -9664,7 +9786,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len, NULL))
 			continue;
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
@@ -9696,7 +9818,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expand_user_macros_in_expression                          *
+ * Function: dc_expand_user_macros_in_expression                              *
  *                                                                            *
  * Purpose: expand user macros for triggers and calculated items in the       *
  *          specified text value and autoquote macros that are not already    *
@@ -9712,7 +9834,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  * Comments: The returned value must be freed by the caller.                  *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
+char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0, cur_token_inside_quote = 0, prev_token_loc_r = -1, len;
@@ -9744,7 +9866,7 @@ char	*zbx_dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *ho
 			continue;
 		}
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len, NULL))
 		{
 			prev_token_loc_r = token.loc.r;
 			continue;
@@ -9832,9 +9954,9 @@ static char	*dc_expression_expand_user_macros(const char *expression)
 	zbx_vector_uint64_create(&hostids);
 
 	get_functionids(&functionids, expression);
-	zbx_dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
+	dc_get_hostids_by_functionids(functionids.values, functionids.values_num, &hostids);
 
-	out = zbx_dc_expand_user_macros_in_expression(expression, hostids.values, hostids.values_num);
+	out = dc_expand_user_macros_in_expression(expression, hostids.values, hostids.values_num);
 
 	if (NULL != strstr(out, "{$"))
 	{
@@ -10020,7 +10142,7 @@ static int	dc_trigger_items_hosts_enabled(const char *expression)
 		{
 			int	macro_r, context_l, context_r;
 
-			if (SUCCEED == zbx_user_macro_parse(p, &macro_r, &context_l, &context_r))
+			if (SUCCEED == zbx_user_macro_parse(p, &macro_r, &context_l, &context_r, NULL))
 				p += macro_r;
 			else
 				p++;
@@ -10599,7 +10721,7 @@ unlock:
  * Comments: this function must be used only by configuration syncer          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
+void	dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids)
 {
 	const ZBX_DC_FUNCTION	*function;
@@ -10635,7 +10757,7 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 
 	RDLOCK_CACHE;
 
-	zbx_dc_get_hostids_by_functionids(functionids->values, functionids->values_num, hostids);
+	dc_get_hostids_by_functionids(functionids->values, functionids->values_num, hostids);
 
 	UNLOCK_CACHE;
 
@@ -11006,59 +11128,6 @@ void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_condition_clean                                           *
- *                                                                            *
- * Purpose: cleans condition data structure                                   *
- *                                                                            *
- * Parameters: condition - [IN] the condition data to free                    *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_condition_clean(DB_CONDITION *condition)
-{
-	zbx_free(condition->value2);
-	zbx_free(condition->value);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_conditions_eval_clean                                        *
- *                                                                            *
- * Purpose: cleans condition data structures from hashset                     *
- *                                                                            *
- * Parameters: uniq_conditions - [IN] hashset with data structures to clean   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_conditions_eval_clean(zbx_hashset_t *uniq_conditions)
-{
-	zbx_hashset_iter_t	iter;
-	DB_CONDITION		*condition;
-
-	zbx_hashset_iter_reset(uniq_conditions, &iter);
-
-	while (NULL != (condition = (DB_CONDITION *)zbx_hashset_iter_next(&iter)))
-		zbx_db_condition_clean(condition);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_action_eval_free                                             *
- *                                                                            *
- * Purpose: frees action evaluation data structure                            *
- *                                                                            *
- * Parameters: action - [IN] the action evaluation to free                    *
- *                                                                            *
- ******************************************************************************/
-void	zbx_action_eval_free(zbx_action_eval_t *action)
-{
-	zbx_free(action->formula);
-
-	zbx_vector_ptr_destroy(&action->conditions);
-
-	zbx_free(action);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dc_action_copy_conditions                                        *
  *                                                                            *
  * Purpose: copies configuration cache action conditions to the specified     *
@@ -11071,7 +11140,7 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
 static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
 {
 	int				i;
-	DB_CONDITION			*condition;
+	zbx_condition_t			*condition;
 	zbx_dc_action_condition_t	*dc_condition;
 
 	zbx_vector_ptr_reserve(conditions, dc_action->conditions.values_num);
@@ -11080,7 +11149,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 	{
 		dc_condition = (zbx_dc_action_condition_t *)dc_action->conditions.values[i];
 
-		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
+		condition = (zbx_condition_t *)zbx_malloc(NULL, sizeof(zbx_condition_t));
 
 		condition->conditionid = dc_condition->conditionid;
 		condition->actionid = dc_action->actionid;
@@ -11088,6 +11157,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		condition->op = dc_condition->op;
 		condition->value = zbx_strdup(NULL, dc_condition->value);
 		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
+		zbx_vector_uint64_create(&condition->eventids);
 
 		zbx_vector_ptr_append(conditions, condition);
 	}
@@ -11127,75 +11197,6 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 
 /******************************************************************************
  *                                                                            *
- * Function: prepare_actions_eval                                             *
- *                                                                            *
- * Purpose: make actions to point, to conditions from hashset, where all      *
- *          conditions are unique, this ensures that we don't double check    *
- *          same conditions.                                                  *
- *                                                                            *
- * Parameters: actions         - [IN/OUT] all conditions are added to hashset *
- *                                        then cleaned, actions will now      *
- *                                        point to conditions from hashset.   *
- *                                        for custom expression also          *
- *                                        replaces formula                    *
- *             uniq_conditions - [OUT]    unique conditions that actions      *
- *                                        point to (several sources)          *
- *                                                                            *
- * Comments: The returned conditions must be freed with                       *
- *           zbx_conditions_eval_clean() function later.                      *
- *                                                                            *
- ******************************************************************************/
-static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions)
-{
-	int	i, j;
-
-	for (i = 0; i < actions->values_num; i++)
-	{
-		zbx_action_eval_t	*action = (zbx_action_eval_t *)actions->values[i];
-
-		for (j = 0; j < action->conditions.values_num; j++)
-		{
-			DB_CONDITION	*uniq_condition = NULL, *condition = (DB_CONDITION *)action->conditions.values[j];
-
-			if (EVENT_SOURCE_COUNT <= action->eventsource)
-			{
-				zbx_db_condition_clean(condition);
-			}
-			else if (NULL == (uniq_condition = (DB_CONDITION *)zbx_hashset_search(&uniq_conditions[action->eventsource],
-					condition)))
-			{
-				uniq_condition = (DB_CONDITION *)zbx_hashset_insert(&uniq_conditions[action->eventsource],
-						condition, sizeof(DB_CONDITION));
-			}
-			else
-			{
-				if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
-				{
-					char	search[ZBX_MAX_UINT64_LEN + 2];
-					char	replace[ZBX_MAX_UINT64_LEN + 2];
-					char	*old_formula;
-
-					zbx_snprintf(search, sizeof(search), "{" ZBX_FS_UI64 "}",
-							condition->conditionid);
-					zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}",
-							uniq_condition->conditionid);
-
-					old_formula = action->formula;
-					action->formula = string_replace(action->formula, search, replace);
-					zbx_free(old_formula);
-				}
-
-				zbx_db_condition_clean(condition);
-			}
-
-			zbx_free(action->conditions.values[j]);
-			action->conditions.values[j] = uniq_condition;
-		}
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dc_get_actions_eval                                          *
  *                                                                            *
  * Purpose: gets action evaluation data                                       *
@@ -11208,11 +11209,10 @@ static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_
  *                                    (see ZBX_ACTION_OPCLASS_* defines)      *
  *                                                                            *
  * Comments: The returned actions and conditions must be freed with           *
- *           zbx_action_eval_free() and zbx_conditions_eval_clean()           *
- *           functions later.                                                 *
+ *           zbx_action_eval_free() function later.                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions, unsigned char opflags)
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags)
 {
 	const zbx_dc_action_t		*dc_action;
 	zbx_hashset_iter_t		iter;
@@ -11230,8 +11230,6 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_cond
 	}
 
 	UNLOCK_CACHE;
-
-	prepare_actions_eval(actions, uniq_conditions);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __func__, actions->values_num);
 }
@@ -12706,6 +12704,158 @@ const char	*zbx_dc_get_instanceid(void)
 	/* instanceid is initialized during the first configuration cache synchronization */
 	/* and is never updated - so it can be accessed without locking cache             */
 	return config->config->instanceid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_expand_user_macros_in_func_params                             *
+ *                                                                            *
+ * Purpose: expand user macros in trigger function parameters                 *
+ *                                                                            *
+ * Parameters: params - [IN] the function parameters                          *
+ *             hostid - [IN] host of the item used in function                *
+ *                                                                            *
+ * Return value: The function parameters with expanded user macros.           *
+ *                                                                            *
+ ******************************************************************************/
+char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid)
+{
+	const char	*ptr;
+	size_t		params_len;
+	char		*buf;
+	size_t		buf_alloc, buf_offset = 0, sep_pos;
+
+	if ('\0' == *params)
+		return zbx_strdup(NULL, params);
+
+	buf_alloc = params_len = strlen(params);
+	buf = zbx_malloc(NULL, buf_alloc);
+
+	for (ptr = params; ptr < params + params_len; ptr += sep_pos + 1)
+	{
+		size_t	param_pos, param_len;
+		int	quoted;
+		char	*param, *resolved_param;
+
+		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+
+		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+		resolved_param = dc_expand_user_macros(param, &hostid, 1);
+
+		if (SUCCEED == zbx_function_param_quote(&resolved_param, quoted))
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, resolved_param);
+		else
+			zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos, param_len);
+
+		if (',' == ptr[sep_pos])
+			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
+
+		zbx_free(resolved_param);
+		zbx_free(param);
+	}
+
+	return buf;
+}
+
+char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid)
+{
+	char	*resolved_params;
+
+	RDLOCK_CACHE;
+	resolved_params = dc_expand_user_macros_in_func_params(params, hostid);
+	UNLOCK_CACHE;
+
+	return resolved_params;
+}
+
+char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid)
+{
+	char		*exp, *tmp,*expanded, error[128];
+	const char	*e;
+	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, f_pos, par_l, par_r;
+	ZBX_DC_HOST	*dc_host;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() formula:%s", __func__, formula);
+
+	exp = (char *)zbx_malloc(NULL, exp_alloc);
+	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
+
+	for (e = formula; SUCCEED == zbx_function_find(e, &f_pos, &par_l, &par_r, error, sizeof(error)); e += par_r + 1)
+	{
+		size_t		param_pos, param_len, sep_pos;
+		int		quoted;
+		char		*hostkey, *host = NULL, *key = NULL;
+		zbx_uint64_t	func_hostid = 0;
+
+		/* substitute user macros in the part of the string preceding function parameters */
+
+		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, par_l + 1);
+		expanded = dc_expand_user_macros_in_expression(tmp, &hostid, 1);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, expanded);
+		zbx_free(expanded);
+		tmp_offset = 0;
+
+		/* substitute user macros in function parameters */
+
+		zbx_function_param_parse(e + par_l + 1, &param_pos, &param_len, &sep_pos);
+
+		/* convert relative offset to absolute */
+		param_pos += par_l + 1;
+		sep_pos += par_l + 1;
+
+		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, e + par_l + 1, sep_pos - par_l);
+
+		/* calculated function has only fist parameter - host:key */
+		if (sep_pos == par_r)
+			continue;
+
+		/* extract host:key parameter to find the function hostid */
+		hostkey = zbx_function_param_unquote_dyn(e + param_pos, param_len, &quoted);
+		if (SUCCEED == parse_host_key(hostkey, &host, &key))
+		{
+			if (NULL != host)
+			{
+				if (NULL != (dc_host = DCfind_host(host)))
+					func_hostid = dc_host->hostid;
+			}
+			else
+				func_hostid = hostid;
+		}
+		zbx_free(host);
+		zbx_free(key);
+		zbx_free(hostkey);
+
+		if (0 == func_hostid)
+		{
+			/* couldn't obtain target host, copy the rest of the function as it is */
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, e + sep_pos + 1, par_r - sep_pos);
+			continue;
+		}
+
+		/* extract remaining parameters and expand user macros */
+		zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e + sep_pos + 1, par_r - sep_pos - 1);
+		expanded = dc_expand_user_macros_in_func_params(tmp, func_hostid);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, expanded);
+		zbx_free(expanded);
+		tmp_offset = 0;
+
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, ")");
+	}
+
+	if (par_l <= par_r)
+	{
+		/* substitute user macros in the remaining part */
+		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e);
+		expanded = dc_expand_user_macros_in_expression(tmp, &hostid, 1);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, expanded);
+		zbx_free(expanded);
+	}
+
+	zbx_free(tmp);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() formula:%s", __func__, exp);
+
+	return exp;
 }
 
 #ifdef HAVE_TESTS

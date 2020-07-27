@@ -616,6 +616,9 @@ class CConfigurationExport {
 			if ($item['overrides']) {
 				foreach ($item['overrides'] as &$override) {
 					if (array_key_exists('filter', $override)) {
+						if (!$override['filter']['conditions']) {
+							unset($override['filter']);
+						}
 						unset($override['filter']['eval_formula']);
 					}
 

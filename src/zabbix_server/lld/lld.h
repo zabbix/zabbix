@@ -52,18 +52,18 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *discover);
 
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macros, char **error, int lifetime, int lastcheck);
+		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
 void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows);
 
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macros, char **error, int lifetime, int lastcheck);
+		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macros,
-		char **error, int lifetime, int lastcheck);
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
 int	lld_end_of_life(int lastcheck, int lifetime);
 

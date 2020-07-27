@@ -185,7 +185,7 @@ class ZBase {
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')
-					->setSelectedByAction($action_name,
+					->setSelectedByAction($action_name, $_GET,
 						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
 					);
 
@@ -325,10 +325,7 @@ class ZBase {
 		require_once 'conf/maintenance.inc.php';
 
 		if (defined('ZBX_DENY_GUI_ACCESS')) {
-			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-					? $_SERVER['HTTP_X_FORWARDED_FOR']
-					: $_SERVER['REMOTE_ADDR'];
-			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
+			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array(CWebUser::getIp(), $ZBX_GUI_ACCESS_IP_RANGE)) {
 				throw new Exception($_REQUEST['warning_msg']);
 			}
 		}

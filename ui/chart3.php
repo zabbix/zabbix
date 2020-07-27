@@ -51,6 +51,7 @@ $fields = [
 	'percent_right' =>	[T_ZBX_DBL,			O_OPT, null,		BETWEEN_DBL(0, 100, 4),	null],
 	'outer' =>			[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
 	'items' =>			[T_ZBX_STR,			O_OPT, null,		null,				null],
+	'i' =>				[T_ZBX_STR,			O_OPT, null,		null,				null],
 	'onlyHeight' =>		[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null]
 ];
@@ -92,15 +93,21 @@ if ($httptestid = getRequest('httptestid', false)) {
 		$graph_items[] = $item + [
 			'color' => ($color === false) ? reset($colors) : $color,
 			'host' => $hosts[$item['hostid']]['host'],
-			'hostname' => $hosts[$item['hostid']]['name'],
-			'preprocessing' => []
+			'hostname' => $hosts[$item['hostid']]['name']
 		];
 		$color = next($colors);
 	}
 
 	$name = getRequest('name', '');
 }
-elseif ($items = getRequest('items', [])) {
+elseif (hasRequest('i') || hasRequest('items')) {
+	if (hasRequest('i')) {
+		$items = array_map('expandShortGraphItem', getRequest('i', []));
+	}
+	else {
+		$items = getRequest('items', []);
+	}
+
 	CArrayHelper::sort($items, ['sortorder']);
 
 	$dbItems = API::Item()->get([
@@ -108,7 +115,6 @@ elseif ($items = getRequest('items', [])) {
 		'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
 			'value_type', 'key_'
 		],
-		'selectPreprocessing' => ['type', 'params'],
 		'selectHosts' => ['hostid', 'name', 'host'],
 		'filter' => [
 			'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]

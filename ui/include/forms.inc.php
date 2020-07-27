@@ -781,7 +781,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
-		'discover' => getRequest('discover', DB::getDefault('items', 'discover')),
 		'type' => getRequest('type', 0),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
@@ -832,6 +831,15 @@ function getItemFormData(array $item = [], array $options = []) {
 		'preprocessing' => getRequest('preprocessing', []),
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params')
 	];
+
+	if ($data['parent_discoveryid'] != 0) {
+		$data['discover'] = hasRequest('form_refresh')
+			? getRequest('discover', DB::getDefault('items', 'discover'))
+			: ($item
+				? $item['discover']
+				: DB::getDefault('items', 'discover')
+			);
+	}
 
 	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
 		foreach (['query_fields', 'headers'] as $property) {
@@ -903,6 +911,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['item'] = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
+		$data['interfaceid'] = $item['interfaceid'];
 
 		// discovery rule
 		if ($data['is_discovery_rule']) {
@@ -910,7 +919,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 		// item prototype
 		elseif ($data['parent_discoveryid'] != 0) {
-			$data['discover'] = $data['item']['discover'];
 			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		// plain item
@@ -1509,6 +1517,7 @@ function getTriggerMassupdateFormData() {
 		'visible' => getRequest('visible', []),
 		'dependencies' => getRequest('dependencies', []),
 		'tags' => getRequest('tags', []),
+		'mass_update_tags' => getRequest('mass_update_tags', ZBX_ACTION_ADD),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'massupdate' => getRequest('massupdate', 1),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),

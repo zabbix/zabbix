@@ -58,6 +58,7 @@ abstract class CItemGeneral extends CApiService {
 			'history'				=> [],
 			'trends'				=> [],
 			'status'				=> [],
+			'discover'				=> [],
 			'value_type'			=> ['template' => 1],
 			'trapper_hosts'			=> [],
 			'units'					=> ['template' => 1],
@@ -81,6 +82,7 @@ abstract class CItemGeneral extends CApiService {
 			'inventory_link'		=> [],
 			'lifetime'				=> [],
 			'preprocessing'			=> ['template' => 1],
+			'overrides'				=> ['template' => 1],
 			'jmx_endpoint'			=> [],
 			'url'					=> ['template' => 1],
 			'timeout'				=> ['template' => 1],
@@ -318,11 +320,24 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			if ($fullItem['type'] == ITEM_TYPE_CALCULATED) {
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'params' => ['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0],
+				]];
+
+				$data = array_intersect_key($item, $api_input_rules['fields']);
+
+				if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($inum + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+
 			$host = $dbHosts[$fullItem['hostid']];
 
 			// Validate update interval.
-			if (!in_array($fullItem['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])) {
-				$this->validateDelay($update_interval_parser, $fullItem['delay']);
+			if (!in_array($fullItem['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
+					&& !validateDelay($update_interval_parser, 'delay', $fullItem['delay'], $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
@@ -2285,59 +2300,6 @@ abstract class CItemGeneral extends CApiService {
 						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
 					);
 				}
-			}
-		}
-	}
-
-	/**
-	 * Validates update interval.
-	 *
-	 * @param CUpdateIntervalParser $parser  Parser used for delay validation.
-	 * @param string                $value   Update interval to parse and validate.
-	 *
-	 * @throws APIException if update interval is incorrect.
-	 */
-	protected function validateDelay(CUpdateIntervalParser $parser, $value) {
-		if ($parser->parse($value) != CParser::PARSE_SUCCESS) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('invalid delay'))
-			);
-		}
-
-		$delay = $parser->getDelay();
-
-		if ($delay[0] !== '{') {
-			$delay_sec = timeUnitToSeconds($delay);
-			$intervals = $parser->getIntervals();
-			$flexible_intervals = $parser->getIntervals(ITEM_DELAY_FLEXIBLE);
-			$has_scheduling_intervals = (bool) $parser->getIntervals(ITEM_DELAY_SCHEDULING);
-			$has_macros = false;
-
-			foreach ($intervals as $interval) {
-				if (strpos($interval['interval'], '{') !== false) {
-					$has_macros = true;
-					break;
-				}
-			}
-
-			// If delay is 0, there must be at least one either flexible or scheduling interval.
-			if ($delay_sec == 0 && !$intervals) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.')
-				);
-			}
-			elseif ($delay_sec < 0 || $delay_sec > SEC_PER_DAY) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.')
-				);
-			}
-
-			// If there are scheduling intervals or intervals with macros, skip the next check calculation.
-			if (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
-					&& calculateItemNextCheck(0, $delay_sec, $flexible_intervals, time()) == ZBX_JAN_2038) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Item will not be refreshed. Please enter a correct update interval.')
-				);
 			}
 		}
 	}

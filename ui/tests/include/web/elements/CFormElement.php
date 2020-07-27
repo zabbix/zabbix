@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\Remote\RemoteWebElement;
+
 /**
  * Form element.
  */
@@ -295,7 +297,19 @@ class CFormElement extends CElement {
 	public function fill($data) {
 		if ($data && is_array($data)) {
 			foreach ($data as $field => $value) {
-				$this->getField($field)->fill($value);
+				try {
+					$this->getField($field)->fill($value);
+				}
+				catch (\Exception $e1) {
+					sleep(1);
+
+					try {
+						$this->invalidate();
+						$this->getField($field)->fill($value);
+					} catch (\Exception $e2) {
+						throw $e1;
+					}
+				}
 			}
 		}
 

@@ -23,12 +23,14 @@
  * @var CView $this
  */
 
+(new CWidget())->show();
+
 (new CScriptTag(
 	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).', null, null);'.
 
 	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
 		'clearMessages();'.
-		'addMessage(makeMessageBox("good", response.message, null, true));'.
+		'addMessage(makeMessageBox("good", [], response.message, true, false));'.
 	'});'
 ))
 	->setOnDocumentReady()

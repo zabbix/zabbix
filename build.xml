@@ -20,9 +20,9 @@
 		<property name="dbhost" value="${DBHOST}"/>
 		<property name="dbname" value="${DBNAME}"/>
 		<property name="dbuser" value="${DBUSER}"/>
-	 	<property name="dbpassword" value="${DBPASSWORD}"/>
-	 	<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
-	 	<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
+		<property name="dbpassword" value="${DBPASSWORD}"/>
+		<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
+		<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
 		<property name="screenshot_references_dir" value="${SCREENSHOT_REFERENCES_DIR}"/>
 		<condition property="phpunit_driver_address" value="${PHPUNIT_DRIVER_ADDRESS}" else="localhost">
 			<and>
@@ -56,9 +56,28 @@
 		<replace file="ui/conf/zabbix.conf.php" token="{PHPUNIT_ERROR_LOG}" value="${phpunit_error_log}"/>
 	</target>
 
+	<target name="create-saml-configs">
+		<property name="phpunit_simplesaml_baseurl" value="${PHPUNIT_SIMPLESAML_BASEURL}"/>
+		<property name="phpunit_sp_entity_id" value="${PHPUNIT_SP_ENTITY_ID}"/>
+
+		<!-- SAML settings -->
+		<replace file="ui/tests/bootstrap.php" token="'PHPUNIT_SAML_TESTS_ENABLED', false" value="'PHPUNIT_SAML_TESTS_ENABLED', true"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_IDP_ENTITY_ID}" value="${phpunit_simplesaml_baseurl}/saml2/idp/metadata.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SSO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SSOService.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SLO_SERVICE_URL}" value="${phpunit_simplesaml_baseurl}/saml2/idp/SingleLogoutService.php"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_SP_ENTITY_ID}" value="${phpunit_sp_entity_id}"/>
+		<!-- Download SAML X509 certificates -->
+		<get src="${phpunit_simplesaml_baseurl}/module.php/saml/idp/certs.php/idp.crt" dest="ui/conf/certs"/>
+	</target>
+
 	<target name="init-integration">
 		<!-- Copy agent2 configuration file -->
 		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
+	</target>
+
+	<target name="init-frontend-modules">
+		<!-- Copy modules directory for selenium tests -->
+		<copydir forceoverwrite="true" src="ui/tests/selenium/modules" dest="ui/modules"/>
 	</target>
 
 	<target name="make-dbschema">
@@ -71,6 +90,15 @@
 			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="dbschema"/>
+		</exec>
+	</target>
+
+	<target name="make-gettext">
+		<!-- Build translation strings -->
+		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
+			<arg line="-s"/>
+			<arg line="gettext"/>
 		</exec>
 	</target>
 
@@ -174,7 +202,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,make-dbschema,init-server-postgresql">
+	<target name="init-frontend-postgresql" depends="create-configs,create-saml-configs,make-dbschema,make-gettext,init-server-postgresql,init-frontend-modules">
 		<exec executable="psql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -290,7 +318,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="create-configs,make-dbschema,init-server-mysql">
+	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,make-dbschema,make-gettext,init-server-mysql,init-frontend-modules">
 		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
 			<arg line="--user=${dbuser}"/>

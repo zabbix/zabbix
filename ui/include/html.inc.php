@@ -720,6 +720,60 @@ function getApplicationLifetimeIndicator($current_time, $ts_delete) {
 }
 
 /**
+ * Returns the discovered graph lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the graph
+ *
+ * @return CDiv
+ */
+function getGraphLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The graph is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($current_time, $ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
+	}
+
+	return makeWarningIcon($warning);
+}
+
+/**
+ * Returns the discovered trigger lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the trigger
+ *
+ * @return CDiv
+ */
+function getTriggerLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The trigger is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($current_time, $ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
+	}
+
+	return makeWarningIcon($warning);
+}
+
+/**
  * Returns the discovered item lifetime indicator.
  *
  * @param string $current_time	current Unix timestamp
@@ -890,7 +944,7 @@ function makeInformationIcon($message) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
-		->setHint($message);
+		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**
@@ -994,7 +1048,7 @@ function makeDescriptionIcon($description) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->setHint(zbx_str2links($description), 'hintbox-description');
+		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**
@@ -1008,7 +1062,7 @@ function makeErrorIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
-		->setHint($error, ZBX_STYLE_RED);
+		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }
 
 /**
@@ -1022,7 +1076,7 @@ function makeUnknownIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
-		->setHint($error, ZBX_STYLE_RED);
+		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }
 
 /**
@@ -1036,7 +1090,7 @@ function makeWarningIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
-		->setHint($error);
+		->setHint($error, ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**

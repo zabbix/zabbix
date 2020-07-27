@@ -79,23 +79,6 @@ function copy_expression(id, type) {
 	}
 }
 
-/*
- * Graph related stuff
- */
-var graphs = {
-	graphtype : 0,
-
-	submit : function(obj) {
-		if (obj.name == 'graphtype') {
-			if ((obj.selectedIndex > 1 && this.graphtype < 2) || (obj.selectedIndex < 2 && this.graphtype > 1)) {
-				var refr = document.getElementsByName('form_refresh');
-				refr[0].value = 0;
-			}
-		}
-		document.getElementsByName('frm_graph')[0].submit();
-	}
-};
-
 function cloneRow(elementid, count) {
 	if (typeof(cloneRow.count) === 'undefined') {
 		cloneRow.count = count;
@@ -786,7 +769,9 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		});
 
 	if (title !== null) {
-		$msg_box.prepend($link_details);
+		if (Array.isArray(messages) && messages.length > 0) {
+			$msg_box.prepend($link_details);
+		}
 		jQuery('<span>')
 			.text(title)
 			.appendTo($msg_box);
@@ -819,6 +804,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 	if (show_close_box) {
 		var $button = jQuery('<button>')
 				.addClass('overlay-close-btn')
+				.attr('type', 'button')
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)

@@ -99,7 +99,9 @@ $graphFormList
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Graph type'), 'graphtype')),
-		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))->setEnabled(!$readonly)
+		(new CComboBox('graphtype', $this->data['graphtype'], 'jQuery(\'form[name="graphForm"]\').submit()',
+			graphType())
+		)->setEnabled(!$readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -442,7 +444,11 @@ foreach ($this->data['items'] as $n => $item) {
 		$item['yaxisside'] = 0;
 	}
 
-	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$this->data['graphid'].', '.$item['itemid'].', '.
+	if (!array_key_exists('gitemid', $item)) {
+		$item['gitemid'] = '';
+	}
+
+	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$item['itemid'].', '.
 		json_encode($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
 		$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
 		true
@@ -456,10 +462,9 @@ $graphFormList->addRow(
 
 if ($data['parent_discoveryid']) {
 	$graphFormList->addRow(_('Discover'),
-		(new CRadioButtonList('discover', (int) $data['discover']))
-			->addValue(_('Yes'), ZBX_PROTOTYPE_DISCOVER)
-			->addValue(_('No'), ZBX_PROTOTYPE_NO_DISCOVER)
-			->setModern(true)
+		(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+			->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
+			->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
 	);
 }
 

@@ -459,9 +459,6 @@ void	discovery_update_host(DB_DHOST *dhost, int status, int now)
 	if (0 != dhost->dhostid)
 		discovery_update_host_status(dhost, status, now);
 
-	zbx_process_events(NULL, NULL);
-	zbx_clean_events();
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

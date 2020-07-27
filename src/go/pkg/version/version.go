@@ -32,7 +32,7 @@ const (
 	ZABBIX_REVDATE          = "9 October 2019"
 	ZABBIX_VERSION_MAJOR    = 5
 	ZABBIX_VERSION_MINOR    = 0
-	ZABBIX_VERSION_PATCH    = 1
+	ZABBIX_VERSION_PATCH    = 3
 	ZABBIX_VERSION_RC       = "rc1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
@@ -140,7 +140,7 @@ func TitleMessage() string {
 }
 
 func Display() {
-	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), LongStr())
+	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
 	fmt.Printf("Revision %s %s, compilation time: %s %s\n\n", Revision(), RevDate(), CompileDate(), CompileTime())
 	fmt.Println(CopyrightMessage())
 }

@@ -129,7 +129,7 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
 	unsigned char		ts_marker, result_marker, log_marker;
 
 	ts_marker = (NULL != value->ts);
-	result_marker = (NULL != value->result);
+	result_marker = (NULL != value->result_ptr->result);
 
 	*offset++ = PACKED_FIELD(&value->itemid, sizeof(zbx_uint64_t));
 	*offset++ = PACKED_FIELD(&value->item_value_type, sizeof(unsigned char));
@@ -146,27 +146,27 @@ static zbx_uint32_t	preprocessor_pack_value(zbx_ipc_message_t *message, zbx_prep
 
 	*offset++ = PACKED_FIELD(&result_marker, sizeof(unsigned char));
 
-	if (NULL != value->result)
+	if (NULL != value->result_ptr->result)
 	{
 
-		*offset++ = PACKED_FIELD(&value->result->lastlogsize, sizeof(zbx_uint64_t));
-		*offset++ = PACKED_FIELD(&value->result->ui64, sizeof(zbx_uint64_t));
-		*offset++ = PACKED_FIELD(&value->result->dbl, sizeof(double));
-		*offset++ = PACKED_FIELD(value->result->str, 0);
-		*offset++ = PACKED_FIELD(value->result->text, 0);
-		*offset++ = PACKED_FIELD(value->result->msg, 0);
-		*offset++ = PACKED_FIELD(&value->result->type, sizeof(int));
-		*offset++ = PACKED_FIELD(&value->result->mtime, sizeof(int));
+		*offset++ = PACKED_FIELD(&value->result_ptr->result->lastlogsize, sizeof(zbx_uint64_t));
+		*offset++ = PACKED_FIELD(&value->result_ptr->result->ui64, sizeof(zbx_uint64_t));
+		*offset++ = PACKED_FIELD(&value->result_ptr->result->dbl, sizeof(double));
+		*offset++ = PACKED_FIELD(value->result_ptr->result->str, 0);
+		*offset++ = PACKED_FIELD(value->result_ptr->result->text, 0);
+		*offset++ = PACKED_FIELD(value->result_ptr->result->msg, 0);
+		*offset++ = PACKED_FIELD(&value->result_ptr->result->type, sizeof(int));
+		*offset++ = PACKED_FIELD(&value->result_ptr->result->mtime, sizeof(int));
 
-		log_marker = (NULL != value->result->log);
+		log_marker = (NULL != value->result_ptr->result->log);
 		*offset++ = PACKED_FIELD(&log_marker, sizeof(unsigned char));
-		if (NULL != value->result->log)
+		if (NULL != value->result_ptr->result->log)
 		{
-			*offset++ = PACKED_FIELD(value->result->log->value, 0);
-			*offset++ = PACKED_FIELD(value->result->log->source, 0);
-			*offset++ = PACKED_FIELD(&value->result->log->timestamp, sizeof(int));
-			*offset++ = PACKED_FIELD(&value->result->log->severity, sizeof(int));
-			*offset++ = PACKED_FIELD(&value->result->log->logeventid, sizeof(int));
+			*offset++ = PACKED_FIELD(value->result_ptr->result->log->value, 0);
+			*offset++ = PACKED_FIELD(value->result_ptr->result->log->source, 0);
+			*offset++ = PACKED_FIELD(&value->result_ptr->result->log->timestamp, sizeof(int));
+			*offset++ = PACKED_FIELD(&value->result_ptr->result->log->severity, sizeof(int));
+			*offset++ = PACKED_FIELD(&value->result_ptr->result->log->logeventid, sizeof(int));
 		}
 	}
 
@@ -663,7 +663,9 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 		agent_result->log = log;
 	}
 
-	value->result = agent_result;
+	value->result_ptr = (zbx_result_ptr_t *)zbx_malloc(NULL, sizeof(zbx_result_ptr_t));
+	value->result_ptr->result = agent_result;
+	value->result_ptr->refcount = 1;
 
 	return offset - data;
 }
@@ -832,8 +834,11 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
-	zbx_preproc_item_value_t	value = {.itemid = itemid, .item_value_type = item_value_type, .result = result,
+	zbx_preproc_item_value_t	value = {.itemid = itemid, .item_value_type = item_value_type,
 					.error = error, .item_flags = item_flags, .state = state, .ts = ts};
+	zbx_result_ptr_t			result_ptr = {.result = result};
+
+	value.result_ptr = &result_ptr;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

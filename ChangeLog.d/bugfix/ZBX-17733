@@ -1,1 +1,0 @@
-.......... [ZBX-17733] fixed web.page.get,web.page,web.page.regexp keys on Zabbix agent2 not to verify server's certificate chain and host name (vso)
