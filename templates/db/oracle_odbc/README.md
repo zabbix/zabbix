@@ -40,8 +40,10 @@ This template was tested on:
  GRANT SELECT ON DBA_USERS TO zabbix_mon;
  ```
 **Note! Be sure that ODBC connects to Oracle with session parameter NLS_NUMERIC_CHARACTERS= '.,' It is important for correct display float numbers in Zabbix.**
+
 2. Install the ODBC driver on the Zabbix server or the Zabbix proxy.
   See Oracle documentation for instructions: https://www.oracle.com/database/technologies/releasenote-odbc-ic.html.
+
 3. Add new record to odbc.ini
 ```
 [$ORACLE.DSN]
@@ -50,10 +52,12 @@ Servername =  $ORACLE.DSN
 DSN = $ORACLE.DSN
 ```
 **Note! Credentials in the odbc.ini do not work for Oracle.**
+
 4. Check the connection via isql
 ```
 isql $TNS_NAME $DB_USER $DB_PASSWORD
 ```
+
 5. If result succesful (fix the mistakes in odbc.ini if not), configure zabbix-server for Oracle ENV Usage or zabbix-proxy if you use proxy for Oracle DB monitoring
    Edit or add new file
 
@@ -66,8 +70,11 @@ isql $TNS_NAME $DB_USER $DB_PASSWORD
    export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/usr/lib64:/usr/lib:$ORACLE_HOME/bin
    export TNS_ADMIN=$ORACLE_HOME/network/admin
    ```
+
 6. Restart Zabbix-server or zabbix-proxy service
+
 7. Set the user name and password in host macros ({$ORACLE.USER} and {$ORACLE.PASSWORD}).
+
 8. Set the {$ORACLE.DSN} in host macros.
 
   The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
