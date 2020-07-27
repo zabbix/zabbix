@@ -187,7 +187,7 @@ $(function($) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.groups_multiselect||[],
+			data: data.filter.groups_multiselect||[],
 			popup: {
 				parameters: {
 					multiselect: '1',
@@ -206,6 +206,10 @@ $(function($) {
 		var tag_row = new Template($('#filter-tag-row-tmpl').html()),
 			i = 0;
 		$('#tags_' + data.uniqid + ' tr.form_row', container).remove();
+
+		if (!data.filter.tags.length) {
+			data.filter.tags.push({tag: '', value: '', operator: <?= TAG_OPERATOR_LIKE ?>});
+		}
 
 		data.filter.tags.forEach(tag => {
 			var $row = $(tag_row.evaluate({rowNum: i++}));

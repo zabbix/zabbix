@@ -96,8 +96,6 @@ abstract class CControllerHost extends CController {
 	protected function getData(array $filter): array {
 		$child_groups = [];
 
-		// Multiselect host groups.
-		$multiselect_hostgroup_data = [];
 		if ($filter['groupids']) {
 			$filter_groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
@@ -107,11 +105,6 @@ abstract class CControllerHost extends CController {
 
 			if ($filter_groups) {
 				foreach ($filter_groups as $group) {
-					$multiselect_hostgroup_data[] = [
-						'id' => $group['groupid'],
-						'name' => $group['name']
-					];
-
 					$child_groups[] = $group['name'].'/';
 				}
 			}
@@ -281,12 +274,29 @@ abstract class CControllerHost extends CController {
 
 		return [
 			'paging' => $paging,
-			'view_curl' => $view_curl,
 			'hosts' => $hosts,
-			'maintenances' => $maintenances,
-			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
-			'filter' => $filter,
-			'config' => $config
+			'maintenances' => $maintenances
 		];
+	}
+
+	/**
+	 * Get additional data for filters. Selected groups for multiselect, etc.
+	 *
+	 * @param array $filter  Filter fields values array.
+	 *
+	 * @return array
+	 */
+	protected function getAdditionalData($filter): array {
+		$data = [];
+
+		if ($filter['groupids']) {
+			$groups= API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter['groupids']
+			]);
+			$data['groups_multiselect'] = CArrayHelper::renameObjectsKeys(array_values($groups), ['groupid' => 'id']);
+		}
+
+		return $data;
 	}
 }

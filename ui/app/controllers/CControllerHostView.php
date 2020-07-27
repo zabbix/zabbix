@@ -27,6 +27,7 @@ class CControllerHostView extends CControllerHostViewRefresh {
 		$profile = (new CTabFilterProfile(static::FILTER_IDX))->read();
 		$profile->setFilterDefaults($data['filter_defaults']);
 		$filter = $profile->getTabFilter($profile->selected);
+		$filter_tabs = $profile->getTabsWithDefaults();
 
 		$refresh_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'host.view.refresh')
@@ -46,8 +47,12 @@ class CControllerHostView extends CControllerHostViewRefresh {
 
 		$prepared_data = $this->getData($filter);
 
+		foreach ($filter_tabs as &$filter_tab) {
+			$filter_tab['filter'] += $this->getAdditionalData($filter_tab['filter']);
+		}
+		unset($filter_tab);
+
 		$data = [
-			//'filter' => $filter,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 
@@ -55,7 +60,7 @@ class CControllerHostView extends CControllerHostViewRefresh {
 			'filter_defaults' => $data['filter_defaults'],
 			'from' => $filter['from'],
 			'to' => $filter['to'],
-			'filter_tabs' => $profile->getTabsWithDefaults(),
+			'filter_tabs' => $filter_tabs,
 			'tab_selected' => $profile->selected,
 			'tab_expanded' => $profile->expanded
 		] + $prepared_data;

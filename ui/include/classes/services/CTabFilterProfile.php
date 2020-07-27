@@ -88,7 +88,7 @@ class CTabFilterProfile {
 	 */
 	public function setTabFilter($index, array $input) {
 		$input = array_intersect_key($input, $this->filter_defaults);
-		$this->tabfilters[$index]['filter'] = array_diff_assoc($input, $this->filter_defaults);
+		$this->tabfilters[$index]['filter'] = CArrayHelper::unsetEqualValues($input, $this->filter_defaults);
 
 		return $this;
 	}
@@ -188,7 +188,7 @@ class CTabFilterProfile {
 
 		if ($this->filter_defaults) {
 			foreach ($tabfilters as &$tabfilter) {
-				$tabfilter['filter'] = array_diff_assoc($tabfilter['filter'], $this->filter_defaults);
+				$tabfilter['filter'] = CArrayHelper::unsetEqualValues($tabfilter['filter'], $this->filter_defaults);
 			}
 			unset($tabfilter);
 		}
