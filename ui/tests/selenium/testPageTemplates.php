@@ -143,12 +143,6 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
 	}
 
-	public function testPageTemplates_FilterReset() {
-		$this->zbxTestLogin('templates.php');
-		$this->query('button:Reset')->one()->click();
-		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
-	}
-
 	public static function getFilterByTagsData() {
 		return [
 			// "And" and "And/Or" checks.
@@ -271,5 +265,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
 		$this->assertTableDataColumn($hosts);
 		$this->assertRowCount(count($hosts));
+	}
+
+	public function testPageTemplates_FilterReset() {
+		$this->zbxTestLogin('templates.php');
+		$this->query('button:Reset')->one()->click();
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 }
