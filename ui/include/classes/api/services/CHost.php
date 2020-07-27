@@ -710,6 +710,7 @@ class CHost extends CHostGeneral {
 			$hostid = reset($hostid);
 			$host['hostid'] = $hostid;
 			$hostids[] = $hostid;
+			$host['groups'] = zbx_toArray($host['groups']);
 
 			// Save groups. Groups must be added before calling massAdd() for permission validation to work.
 			$groupsToAdd = [];
