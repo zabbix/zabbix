@@ -166,6 +166,12 @@
 				<?= INTERFACE_TYPE_IPMI ?>: '<?= _('IPMI') ?>'
 			};
 
+			this.$noInterfacesMsg = jQuery('<div class="<?= ZBX_STYLE_GREY ?>"></div>')
+				.text('<?= _('No interfaces are defined for this host.') ?>')
+				.addClass('<?= ZBX_STYLE_GREY ?>')
+				.css('padding', '5px 0px')
+				.insertAfter(jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER ?>'));
+
 			// Variables.
 			this.interfaces = {};
 
@@ -381,6 +387,7 @@
 			delete this.data[id];
 
 			this.resetMainInterfaces();
+			this.renderLayout();
 
 			return true;
 		}
@@ -395,6 +402,7 @@
 			this.renderRow(new_data);
 
 			this.resetMainInterfaces();
+			this.renderLayout();
 
 			if (new_data.type == <?= INTERFACE_TYPE_SNMP ?>) {
 				const elem = document.getElementById(`interface_row_${new_data.interfaceid}`);
@@ -499,6 +507,7 @@
 			}
 
 			this.resetMainInterfaces();
+			this.renderLayout();
 
 			// Add accordion functionality to SNMP interfaces.
 			jQuery(this.CONTAINER_IDS[<?= INTERFACE_TYPE_SNMP ?>])
@@ -512,6 +521,17 @@
 			});
 
 			return true;
+		}
+
+		renderLayout() {
+			if (Object.keys(this.data).length > 0) {
+				jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER ?>').show();
+				this.$noInterfacesMsg.hide();
+			}
+			else {
+				jQuery('.<?= ZBX_STYLE_HOST_INTERFACE_CONTAINER ?>').hide();
+				this.$noInterfacesMsg.show();
+			}
 		}
 
 		static disableEdit() {
