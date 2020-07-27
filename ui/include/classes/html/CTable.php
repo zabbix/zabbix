@@ -73,7 +73,15 @@ class CTable extends CTag {
 		return $item;
 	}
 
-	public function setColgroup($cols_attributes) {
+	/**
+	 * Set attributes for table columns styling via colgroup html element. If this method was called, an element
+	 * colgroup will be added to the begining of table element.
+	 *
+	 * @param array $cols_attributes  Html attributes for columns.
+	 *
+	 * @return CTable
+	 */
+	public function setColgroup(array $cols_attributes): self {
 		$cols = [];
 		foreach ($cols_attributes as $attributes) {
 			$col = new CTag('col');
