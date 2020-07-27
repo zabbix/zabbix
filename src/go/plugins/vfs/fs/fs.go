@@ -41,8 +41,8 @@ const (
 
 type percent float64
 
-func (n percent) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%f", n)), nil
+func (p percent) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%f", p)), nil
 }
 
 type FsStats struct {
@@ -141,9 +141,9 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 	case statModeUsed:
 		return stats.Used, nil
 	case statModePFree:
-		return stats.PFree, nil
+		return fmt.Sprintf("%f", stats.PFree), nil
 	case statModePUsed:
-		return stats.PUsed, nil
+		return fmt.Sprintf("%f", stats.PUsed), nil
 	}
 
 	return nil, errors.New("Invalid second parameter.")
