@@ -92,7 +92,7 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $last_hostid = null;
 $last_applicationid = null;
 
-$last_row_index = array_keys($data['rows'])[count($data['rows']) - 1];
+$last_row_index = $data['rows'] ? array_slice(array_keys($data['rows']), -1)[0] : null;
 
 foreach ($data['rows'] as $row_index => $row) {
 	$item = $data['items'][$row['itemid']];
