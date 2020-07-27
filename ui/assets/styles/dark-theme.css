@@ -1072,6 +1072,9 @@ pre, pre a, pre td, pre span {
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 
+form.is-loading {
+  position: relative; }
+
 .list-table {
   width: 100%;
   background-color: #2b2b2b;
@@ -2421,6 +2424,9 @@ button {
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
+  [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, [disabled].btn-widget-expand, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle, [disabled].btn-dashbrd-conf, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, [disabled].btn-widget-expand:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:hover, [disabled].btn-dashbrd-conf:hover, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, [disabled].btn-widget-expand:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:focus, [disabled].btn-dashbrd-conf:focus, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, [disabled].btn-widget-expand:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:active, [disabled].btn-dashbrd-conf:active {
+    background-color: transparent;
+    opacity: .25; }
 
 .btn-conf, .btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
@@ -2740,10 +2746,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 1px solid #303030;
   border-bottom: 0;
   background-color: #2b2b2b;
-  /*
-   * For floating headers to appear over other widgets.
-   * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-   */
   z-index: 3; }
   .dashbrd-grid-widget-head h4 {
     flex-grow: 1;
@@ -2785,10 +2787,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-widget-content .msg-warning {
     margin: 0 10px; }
 
-.widget-placeholder .dashbrd-grid-widget-container .dashbrd-grid-widget-content {
-  margin-top: 0;
-  height: 100%; }
-
 .dashbrd-grid-widget-mask {
   position: absolute;
   top: .25rem;
@@ -2809,7 +2807,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head {
     height: 2rem;
     margin-top: -2rem;
-    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15); }
+    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+    z-index: 5; }
   .dashbrd-grid-widget.dashbrd-grid-widget-focus .dashbrd-grid-widget-actions {
     opacity: 1; }
   .dashbrd-grid-widget.ui-resizable-resizing.resizing-top .dashbrd-grid-widget-container {
@@ -2919,15 +2918,17 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: flex; }
   .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-content {
     display: none; }
-  .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head {
-    margin-top: -2rem;
-    height: 2rem;
-    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-    opacity: 1;
-    transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out; }
-  .dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
-    margin-top: -4rem;
-    height: 4rem; }
+  .dashbrd-grid-iterator.dashbrd-grid-iterator-focus {
+    z-index: 5; }
+    .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head {
+      margin-top: -2rem;
+      height: 2rem;
+      box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+      opacity: 1;
+      transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out; }
+    .dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+      margin-top: -4rem;
+      height: 4rem; }
   .dashbrd-grid-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-iterator-container {
     top: auto;
     bottom: 0; }
@@ -3386,10 +3387,11 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     max-height: calc(100vh - 190px);
     max-width: 45vw;
     white-space: nowrap; }
-  .overlay-dialogue .hintbox-description {
+  .overlay-dialogue .hintbox-wrap {
     overflow: auto;
     max-height: 240px;
-    max-width: 800px; }
+    max-width: 800px;
+    overflow-wrap: break-word; }
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good,
   .overlay-dialogue .msg-warning {
@@ -4396,7 +4398,7 @@ td[class] + td.disaster-bg {
   .is-loading.is-loading-fadein::after {
     opacity: 0;
     animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear; }
-  .is-loading.is-loading-fadein .delayed-15s::before, .is-loading.is-loading-fadein .delayed-15s::after {
+  .is-loading.is-loading-fadein.delayed-15s::before, .is-loading.is-loading-fadein.delayed-15s::after {
     animation-delay: 15s; }
 
 button.is-loading {
@@ -4484,11 +4486,11 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar, .overlay-dialogue .hintbox-description::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+.msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
-.msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-track, .overlay-dialogue .hintbox-description::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+.msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #1f1f1f; }
-.msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-description::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+.msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #383838;
   border: 1px solid #2b2b2b; }
 
@@ -4550,8 +4552,6 @@ main .server-name {
   overflow: hidden; }
   .flickerfreescreen.is-loading {
     min-height: 64px; }
-    .flickerfreescreen.is-loading img {
-      opacity: 0; }
 
 .graph-wrapper {
   display: inline; }

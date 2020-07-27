@@ -583,6 +583,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 read_again:
 		if (NULL != (*ksp)[idx - 1])
 		{
+			zbx_uint64_t	last_idle, last_user, last_system, last_iowait;
+
 			id = kstat_read(kc, (*ksp)[idx - 1], NULL);
 			if (-1 == id || kc_id != id)	/* error or our kstat chain copy is out-of-date */
 			{
@@ -599,10 +601,46 @@ read_again:
 
 			memset(counter, 0, sizeof(counter));
 
-			total[ZBX_CPU_STATE_IDLE] += counter[ZBX_CPU_STATE_IDLE] = cpu->cpu_sysinfo.cpu[CPU_IDLE];
-			total[ZBX_CPU_STATE_USER] += counter[ZBX_CPU_STATE_USER] = cpu->cpu_sysinfo.cpu[CPU_USER];
-			total[ZBX_CPU_STATE_SYSTEM] += counter[ZBX_CPU_STATE_SYSTEM] = cpu->cpu_sysinfo.cpu[CPU_KERNEL];
-			total[ZBX_CPU_STATE_IOWAIT] += counter[ZBX_CPU_STATE_IOWAIT] = cpu->cpu_sysinfo.cpu[CPU_WAIT];
+			/* The cpu counters are stored in 32 bit unsigned integer that can wrap around. */
+			/* To account for possible wraparounds instead of storing the counter directly  */
+			/* in cache, increment the last stored value by the unsigned 32 bit difference  */
+			/* between new value and last value.                                            */
+			if (0 != pcpus->cpu[idx].h_count)
+			{
+				int	index;
+
+				/* only collector can write into cpu history, so for reading */
+				/* collector itself can access it without locking            */
+
+				if (MAX_COLLECTOR_HISTORY <= (index = pcpus->cpu[idx].h_first + pcpus->cpu[idx].h_count - 1))
+					index -= MAX_COLLECTOR_HISTORY;
+
+				last_idle = pcpus->cpu[idx].h_counter[ZBX_CPU_STATE_IDLE][index];
+				last_user = pcpus->cpu[idx].h_counter[ZBX_CPU_STATE_USER][index];
+				last_system = pcpus->cpu[idx].h_counter[ZBX_CPU_STATE_SYSTEM][index];
+				last_iowait = pcpus->cpu[idx].h_counter[ZBX_CPU_STATE_IOWAIT][index];
+			}
+			else
+			{
+				last_idle = 0;
+				last_user = 0;
+				last_system = 0;
+				last_iowait = 0;
+			}
+
+			counter[ZBX_CPU_STATE_IDLE] = cpu->cpu_sysinfo.cpu[CPU_IDLE] - (zbx_uint32_t)last_idle +
+					last_idle;
+			counter[ZBX_CPU_STATE_USER] = cpu->cpu_sysinfo.cpu[CPU_USER] - (zbx_uint32_t)last_user +
+					last_user;
+			counter[ZBX_CPU_STATE_SYSTEM] = cpu->cpu_sysinfo.cpu[CPU_KERNEL] - (zbx_uint32_t)last_system +
+					last_system;
+			counter[ZBX_CPU_STATE_IOWAIT] = cpu->cpu_sysinfo.cpu[CPU_WAIT] - (zbx_uint32_t)last_iowait +
+					last_iowait;
+
+			total[ZBX_CPU_STATE_IDLE] += counter[ZBX_CPU_STATE_IDLE];
+			total[ZBX_CPU_STATE_USER] += counter[ZBX_CPU_STATE_USER];
+			total[ZBX_CPU_STATE_SYSTEM] += counter[ZBX_CPU_STATE_SYSTEM];
+			total[ZBX_CPU_STATE_IOWAIT] += counter[ZBX_CPU_STATE_IOWAIT];
 
 			update_cpu_counters(&pcpus->cpu[idx], counter);
 		}

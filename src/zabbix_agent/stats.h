@@ -34,6 +34,10 @@
 #	include "vmstats.h"
 #endif
 
+#ifdef HAVE_KSTAT_H	/* Solaris */
+#	include "zbxkstat.h"
+#endif
+
 #ifdef ZBX_PROCSTAT_COLLECTOR
 #	include "procstat.h"
 #endif
@@ -50,6 +54,9 @@ typedef struct
 #ifdef _AIX
 	ZBX_VMSTAT_DATA		vmstat;
 	ZBX_CPUS_UTIL_DATA_AIX	cpus_phys_util;
+#endif
+#ifdef HAVE_KSTAT_H
+	zbx_kstat_t		kstat;
 #endif
 }
 ZBX_COLLECTOR_DATA;
