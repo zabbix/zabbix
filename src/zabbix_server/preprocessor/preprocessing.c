@@ -1220,7 +1220,7 @@ int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, ch
  *                                                                            *
  * Function: zbx_preprocessor_get_top_items                                   *
  *                                                                            *
- * Purpose: get the top N items by the specified field                        *
+ * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error)

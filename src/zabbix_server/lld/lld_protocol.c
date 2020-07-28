@@ -355,7 +355,7 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
  *                                                                            *
  * Function: zbx_lld_get_top_items                                            *
  *                                                                            *
- * Purpose: get the top N items by the specified field                        *
+ * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
  * Parameters field - [IN] the sort field                                     *
  *            limit - [IN] the number of top records to retrieve              *

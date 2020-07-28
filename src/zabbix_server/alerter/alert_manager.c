@@ -2003,7 +2003,7 @@ static void	am_process_diag_top_mediatypes(zbx_am_t *manager, zbx_ipc_client_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/* alert source hahset support */
+/* alert source hashset support */
 
 static zbx_hash_t	am_source_hash_func(const void *data)
 {

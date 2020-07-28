@@ -743,9 +743,7 @@ zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t
 	zbx_uint32_t	data_len = 0;
 
 	zbx_serialize_prepare_value(data_len, alerts_num);
-
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
-
 	(void)zbx_serialize_value(*data, alerts_num);
 
 	return data_len;
