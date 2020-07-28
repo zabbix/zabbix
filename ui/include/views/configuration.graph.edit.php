@@ -357,7 +357,7 @@ $items_table = (new CTable())
 	->setId('itemsTable')
 	->setColgroup($cols_attributes)
 	->setHeader([
-		(new CColHeader())->setAttribute('style', 'padding-right: 11px;'),
+		(new CColHeader()),
 		(new CColHeader()),
 		(new CColHeader(_('Name'))),
 		in_array($this->data['graphtype'], [GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED])

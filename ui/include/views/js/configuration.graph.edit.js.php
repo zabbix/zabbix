@@ -501,6 +501,7 @@
 			opacity: 0.6,
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
+				ui = ui.clone();
 				ui.children().each(function(i) {
 					$(this).width(header_cells.eq(i).width());
 				});
@@ -515,11 +516,6 @@
 			},
 			start: function(e, ui) {
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-			},
-			stop: function(e, ui) {
-				ui.item.children().each(function(i) {
-					$(this).width('');
-				});
 			}
 		});
 	}
