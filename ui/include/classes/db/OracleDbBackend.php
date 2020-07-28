@@ -135,10 +135,9 @@ class OracleDbBackend extends DbBackend {
 		));
 
 		if ($row) {
-			$this->setWarning((_s('Incorrect parameter "%1$s" value: %2$s.',
-				$row['parameter'], _s('"%1$s" instead "%2$s"', $row['value'],
-					ORACLE_UTF8_CHARSET.','.ORACLE_CESU8_CHARSET)
-			)));
+			$this->setWarning(_s('Incorrect parameter "%1$s" value: %2$s.', $row['parameter'],
+				_s('"%1$s" instead "%2$s"', $row['value'], ORACLE_UTF8_CHARSET.', '.ORACLE_CESU8_CHARSET)
+			));
 		}
 
 		return !$row;
