@@ -488,6 +488,8 @@
 	}
 
 	function initSortable() {
+		let header_cells = $('#itemsTable th');
+
 		$('#itemsTable').sortable({
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
@@ -500,7 +502,7 @@
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
 				ui.children().each(function(i) {
-					$(this).width($('#itemsTable th').eq(i).width());
+					$(this).width(header_cells.eq(i).width());
 				});
 
 				// when dragging element on safari, it jumps out of the table
