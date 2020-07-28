@@ -168,7 +168,7 @@ Please, locate Oracle directories using --with-oracle or \
         LDFLAGS="$LDFLAGS $oci_ldflags"
 
         saved_LIBS="$LIBS"
-        oci_libs="-lclntsh -lclntshcore"
+        oci_libs="-lclntsh"
         LIBS="$LIBS $oci_libs"
 
         dnl
