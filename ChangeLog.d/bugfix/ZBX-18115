@@ -1,0 +1,1 @@
+.........T [ZBX-18115] added {$MSSQL.INSTANCE} macro and changed queries and item preprocessing for support MS SQL instance name (mchudinov)
