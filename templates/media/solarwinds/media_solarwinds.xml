@@ -324,7 +324,7 @@ try {&#13;
             throw 'Incorrect incident key given: ' + samanage.incident_id;&#13;
         }&#13;
         if (!params.alert_message) {&#13;
-            throw 'Parameter "alert_message" can't be empty.';&#13;
+            throw 'Parameter "alert_message" can\'t be empty.';&#13;
         }&#13;
         SolarWinds.updateIncident(params.alert_subject, fields, params.alert_message);&#13;
     }&#13;
