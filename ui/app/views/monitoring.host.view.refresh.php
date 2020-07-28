@@ -19,9 +19,14 @@
 **/
 
 
-$output = [
-	'body' => (new CPartial('monitoring.host.view.html', $data))->getOutput()
-];
+$output = [];
+
+if (array_key_exists('filter_counters', $data)) {
+	$output['filter_counters'] = $data['filter_counters'];
+}
+else {
+	$output['body'] = (new CPartial('monitoring.host.view.html', $data))->getOutput();
+}
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

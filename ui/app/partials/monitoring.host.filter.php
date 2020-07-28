@@ -229,7 +229,7 @@ $(function($) {
 
 		// Input, radio and single checkboxes.
 		['name', 'ip', 'dns', 'port', 'status', 'evaltype', 'maintenance_status', 'show_suppressed'].forEach((key) => {
-			var elm = $('[name="' + key + '"]');
+			var elm = $('[name="' + key + '"]', container);
 
 			if (elm.is(':radio,:checkbox')) {
 				elm.filter('[value="' + data.filter[key] + '"]').attr('checked', true);

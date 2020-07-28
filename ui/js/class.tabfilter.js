@@ -320,4 +320,26 @@ class CTabFilter extends CBaseComponent {
 		history.replaceState(history.state, '', url.getUrl());
 		this.fire(TABFILTER_EVENT_URLSET);
 	}
+
+	/**
+	 * Update all tab filter counters values.
+	 *
+	 * @param {array} counters  Array of counters to be set.
+	 */
+	updateCounters(counters) {
+		counters.forEach((value, index) => {
+			let item = this._items[index];
+
+			if (!item) {
+				return;
+			}
+
+			if (item._data.show_counter) {
+				item.setCounter(value);
+			}
+			else {
+				item.removeCounter();
+			}
+		});
+	}
 }

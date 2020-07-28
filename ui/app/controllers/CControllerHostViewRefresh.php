@@ -98,7 +98,7 @@ class CControllerHostViewRefresh extends CControllerHost {
 				$show_counters[$index] = $filter['show_counter'] ? $this->getCount($filter) : 0;
 			}
 
-			$data['show_counter'] = $show_counters;
+			$data['filter_counters'] = $show_counters;
 		}
 		else {
 			$this->getInputs($filter, array_keys($filter));

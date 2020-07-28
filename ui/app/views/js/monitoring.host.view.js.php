@@ -53,6 +53,7 @@
 			this.running = false;
 			this.timeout = null;
 
+			this.refresh_counters = this.createCountersRefresh();
 			this.filter = new CTabFilter($('#monitoringhostsfilter')[0], <?= json_encode($data['filter_options']) ?>);
 			this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
 				let url = new Curl('', false);
@@ -65,6 +66,26 @@
 		}
 
 		hostPage.prototype = {
+			createCountersRefresh: function() {
+				if (this.refresh_counters) {
+					clearTimeout(this.refresh_counters);
+					this.refresh_counters = null;
+				}
+
+				return setTimeout(() => this.getFiltersCounters(), this.refresh_interval);
+			},
+			getFiltersCounters: function() {
+				return $.post('zabbix.php', {
+						action: 'host.view.refresh',
+						filter_counters: 1
+					}).done((json) => {
+						if (json.filter_counters) {
+							this.filter.updateCounters(json.filter_counters);
+						}
+					}).always(() => {
+						this.refresh_counters = this.createCountersRefresh();
+					});
+			},
 			getCurrentForm: function() {
 				return $('form[name=host_view]');
 			},

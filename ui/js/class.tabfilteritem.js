@@ -52,7 +52,7 @@ class CTabFilterItem extends CBaseComponent {
 		}
 
 		if (this._data.show_counter) {
-			this._target.setAttribute('data-counter', '1');
+			this.setCounter('-');
 		}
 	}
 
@@ -107,6 +107,14 @@ class CTabFilterItem extends CBaseComponent {
 			.on(TABFILTERITEM_EVENT_CLICK, this._events.click);
 	}
 
+	setCounter(value) {
+		this._target.setAttribute('data-counter', value);
+	}
+
+	removeCounter() {
+		this._target.removeAttribute('data-counter');
+	}
+
 	renderContentTemplate() {
 		if (this._template) {
 			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
@@ -134,6 +142,13 @@ class CTabFilterItem extends CBaseComponent {
 		if (data.custom_time) {
 			this._data.from = data.tabfilter_from;
 			this._data.to = data.tabfilter_to;
+		}
+
+		if (data.show_counter) {
+			this.setCounter('');
+		}
+		else {
+			this.removeCounter();
 		}
 
 		this._target.text = data.name;
