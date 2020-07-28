@@ -2405,7 +2405,7 @@ void	DBcheck_character_set(void)
 					(0 == strcasecmp("NLS_NCHAR_CHARACTERSET", parameter)))
 			{
 				if (0 != strcasecmp(ZBX_ORACLE_UTF8_CHARSET, value) &&
-					0 != strcasecmp(ZBX_ORACLE_CESU8_CHARSET, value))
+						0 != strcasecmp(ZBX_ORACLE_CESU8_CHARSET, value))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "database \"%s\" parameter \"%s\" has value"
 							" \"%s\". Zabbix supports only \"%s\" or \"%s\" character sets",
