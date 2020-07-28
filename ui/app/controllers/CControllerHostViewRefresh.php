@@ -94,8 +94,8 @@ class CControllerHostViewRefresh extends CControllerHost {
 			$profile->setFilterDefaults(static::FILTER_FIELDS_DEFAULT);
 			$show_counters = [];
 
-			foreach ($profile->getTabsWithDefaults() as $index => $filter) {
-				$show_counters[$index] = $filter['show_counter'] ? $this->getCount($filter) : 0;
+			foreach ($profile->getTabsWithDefaults() as $index => $tabfilter) {
+				$show_counters[$index] = $tabfilter['show_counter'] ? $this->getCount($tabfilter['filter']) : 0;
 			}
 
 			$data['filter_counters'] = $show_counters;

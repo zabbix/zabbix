@@ -68,8 +68,68 @@ abstract class CControllerHost extends CController {
 	 * @return int
 	 */
 	protected function getCount(array $filter) {
-		// TODO
-		return 1;
+		$child_groups = [];
+
+		if ($filter['groupids']) {
+			$filter_groups = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter['groupids'],
+				'preservekeys' => true
+			]);
+
+			if ($filter_groups) {
+				foreach ($filter_groups as $group) {
+					$child_groups[] = $group['name'].'/';
+				}
+			}
+			else {
+				$filter['groupids'] = [];
+			}
+		}
+
+		$groupids = null;
+
+		if ($child_groups) {
+			$filter_groups += API::HostGroup()->get([
+				'output' => ['groupid'],
+				'search' => ['name' => $child_groups],
+				'startSearch' => true,
+				'searchByAny' => true,
+				'preservekeys' => true
+			]);
+
+			$groupids = array_keys($filter_groups);
+		}
+
+		$config = select_config();
+
+		$count = API::Host()->get([
+			'output' => ['hostid', 'name', 'status'],
+			'evaltype' => $filter['evaltype'],
+			'tags' => $filter['tags'],
+			'inheritedTags' => true,
+			'groupids' => $groupids,
+			'severities' => $filter['severities'] ? $filter['severities'] : null,
+			'withProblemsSuppressed' => $filter['severities']
+				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
+				: null,
+			'search' => [
+				'name' => ($filter['name'] === '') ? null : $filter['name'],
+				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
+				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
+			],
+			'filter' => [
+				'status' => ($filter['status'] == -1) ? null : $filter['status'],
+				'port' => ($filter['port'] === '') ? null : $filter['port'],
+				'maintenance_status' => ($filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
+					? null
+					: HOST_MAINTENANCE_STATUS_OFF,
+			],
+			'limit' => $config['search_limit'] + 1,
+			'countOutput' => true
+		]);
+
+		return $count;
 	}
 
 	/**
