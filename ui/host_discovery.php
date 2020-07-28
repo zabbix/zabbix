@@ -256,7 +256,7 @@ if (getRequest('itemid', false)) {
 }
 elseif ($hostid) {
 	$hosts = API::Host()->get([
-		'output' => ['hostid', 'name', 'status', 'flags'],
+		'output' => ['hostid', 'name', 'status'],
 		'hostids' => $hostid,
 		'templated_hosts' => true,
 		'editable' => true
