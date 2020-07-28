@@ -53,11 +53,9 @@ To utilize the media type, we will create a Zabbix user to represent iLert. We w
 
 3\. Select the Import file [media_ilert.xml](media_ilert.xml) and click **Import** at the bottom to import the iLert media type.
 
-4\. Set the **.ILERT.ALERT.SOURCE.KEY** variable to the alert source api key that you generated in iLert
-
 [![](images/tn_6.png?raw=true)](images/6.png)
 
-5\. Optional: you can overwrite the standard incident summary with a custom template using the **.ILERT.INCIDENT.SUMMARY** variable e.g. `{TRIGGER.NAME}: {TRIGGER.STATUS} for {HOST.HOST}`
+4\. Optional: you can overwrite the standard incident summary with a custom template using the **.ILERT.INCIDENT.SUMMARY** variable e.g. `{TRIGGER.NAME}: {TRIGGER.STATUS} for {HOST.HOST}`
 ​
 
 ## Create the iLert user for alerting
@@ -81,11 +79,9 @@ To utilize the media type, we will create a Zabbix user to represent iLert. We w
 [![](images/tn_9.png?raw=true)](images/9.png)
 
 6\. In the new window that appears, configure the media for the user as follows:
-
-[![](images/tn_10.png?raw=true)](images/10.png)
 ​
 *   For the **Type**, select **iLert** (the new media type that was created).
-*   For **Send to**: enter any text, as this value is not used, but is required.
+*   For **Send to**: paste the alert source api key that you generated in iLert.
 *   Make sure the **Enabled** box is checked.
 *   Click the **Add** button when you are done.
 

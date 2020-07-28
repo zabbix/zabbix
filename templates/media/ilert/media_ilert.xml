@@ -9,7 +9,7 @@
             <parameters>
                 <parameter>
                     <name>.ILERT.ALERT.SOURCE.KEY</name>
-                    <value>&lt;put your iLert alert source key here&gt;</value>
+                    <value>{ALERT.SENDTO}</value>
                 </parameter>
                 <parameter>
                     <name>.ILERT.INCIDENT.SUMMARY</name>
