@@ -49,7 +49,6 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 		}
 
 		if bytes.Total > 0 && inodes.Total > 0 {
-
 			info.Bytes = bytes
 			info.Inodes = inodes
 			data = append(data, &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes})

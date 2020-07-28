@@ -87,6 +87,8 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		return unsafe.Pointer(C.VFS_FS_DISCOVERY)
 	case "vfs.fs.inode":
 		return unsafe.Pointer(C.VFS_FS_INODE)
+	case "vfs.fs.size":
+		return unsafe.Pointer(C.VFS_FS_SIZE)
 	case "vfs.fs.get":
 		return unsafe.Pointer(C.VFS_FS_GET)
 	case "vm.memory.size":
