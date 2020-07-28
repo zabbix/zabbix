@@ -256,8 +256,9 @@ class testPageTemplates extends CLegacyWebTest {
 		$template = 'Form test template';
 		$hosts = ['Simple form test host'];
 
-		// Reset filter from possible previous scenario.
-		$this->resetTemplatesFilter();
+		$this->page->login()->open('templates.php?groupid=0');
+		// Reset Templates filter from possible previous scenario.
+		$this->resetFilter();
 		// Click on Hosts link in Temlate row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
@@ -269,12 +270,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
 		$this->assertTableDataColumn($hosts);
 		$this->assertRowCount(count($hosts));
-		// Reset filter after scenario.
-		$this->resetTemplatesFilter();
+		// Reset Hosts filter after scenario.
+		$this->resetFilter();
 	}
 
-	private function resetTemplatesFilter() {
-		$this->page->login()->open('templates.php?groupid=0');
+	private function resetFilter() {
 		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 	}
