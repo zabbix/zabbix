@@ -252,7 +252,7 @@ catch (error) {&#13;
             <description>Please refer to https://docs.ilert.com/integration/zabbix &#13;
   &#13;
 Set global macro {$ZABBIX.URL} with your Zabbix server URL.&#13;
-Add a dedicated user with the media type &quot;iLert&quot; and place the alert source key in the &quot;.ILERT.ALERT.SOURCE.KEY&quot; parameter to integrate into the service. You can also rewrite the incident summary via &quot;.ILERT.INCIDENT.SUMMARY&quot; parameter or leave it empty to use the standard pattern.</description>
+Add a dedicated user with the media type &quot;iLert&quot;. You can also rewrite the incident summary via &quot;.ILERT.INCIDENT.SUMMARY&quot; parameter or leave it empty to use the standard pattern.</description>
             <message_templates>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
