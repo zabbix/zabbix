@@ -18,6 +18,8 @@
 **/
 
 
+const TABFILTER_EVENT_URLSET = 'urlset.tabfilter';
+
 class CTabFilter extends CBaseComponent {
 
 	constructor(target, options) {
@@ -149,7 +151,7 @@ class CTabFilter extends CBaseComponent {
 				});
 			},
 
-			updateFields: () => {
+			update: () => {
 				var params = this.getActiveFilterParams();
 
 				this.profileUpdate('properties', {
@@ -160,7 +162,7 @@ class CTabFilter extends CBaseComponent {
 				});
 			},
 
-			create: (ev) => {
+			create: () => {
 				let title, item,
 					index = this._items.length;
 
@@ -175,6 +177,15 @@ class CTabFilter extends CBaseComponent {
 				item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
 				item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
 				item.select();
+			},
+
+			apply: () => {
+				this.setBrowserLocation(this.getActiveFilterParams());
+			},
+
+			reset: () => {
+				this.setBrowserLocation(new URLSearchParams());
+				window.location.reload(true);
 			}
 		}
 
@@ -193,8 +204,10 @@ class CTabFilter extends CBaseComponent {
 			action.addEventListener('click', this._events[action.getAttribute('data-action')]);
 		}
 
-		this._shared_domnode.querySelector('[name="filter_update"]').addEventListener('click', this._events.updateFields);
+		this._shared_domnode.querySelector('[name="filter_update"]').addEventListener('click', this._events.update);
 		this._shared_domnode.querySelector('[name="filter_new"]').addEventListener('click', this._events.create);
+		this._shared_domnode.querySelector('[name="filter_apply"]').addEventListener('click', this._events.apply);
+		this._shared_domnode.querySelector('[name="filter_reset"]').addEventListener('click', this._events.reset);
 	}
 
 	/**
@@ -293,7 +306,8 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
-	 * Set browser location URL according to passed values. 'action' argument from already set URL is preserved.
+	 * Set browser location URL according to passed values. Argument 'action' from already set URL is preserved.
+	 * Create TABFILTER_EVENT_URLSET event with detail.target equal instance of CTabFilter.
 	 *
 	 * @param {URLSearchParams} search_params  Filter field values to be set in URL.
 	 */
@@ -304,5 +318,6 @@ class CTabFilter extends CBaseComponent {
 		url.query = search_params.toString();
 		url.formatArguments();
 		history.replaceState(history.state, '', url.getUrl());
+		this.fire(TABFILTER_EVENT_URLSET);
 	}
 }

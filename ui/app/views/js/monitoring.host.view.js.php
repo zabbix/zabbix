@@ -54,6 +54,14 @@
 			this.timeout = null;
 
 			this.filter = new CTabFilter($('#monitoringhostsfilter')[0], <?= json_encode($data['filter_options']) ?>);
+			this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
+				let url = new Curl('', false);
+
+				url.setArgument('action', 'host.view.refresh');
+				this.refresh_url = url.getUrl();
+				this.unscheduleRefresh();
+				this.start();
+			});
 		}
 
 		hostPage.prototype = {

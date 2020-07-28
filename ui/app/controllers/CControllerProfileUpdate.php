@@ -207,6 +207,7 @@ class CControllerProfileUpdate extends CController {
 				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX))->read();
 				$filter->expanded = ($value_int > 0);
 				$filter->update();
+
 				break;
 
 			default:

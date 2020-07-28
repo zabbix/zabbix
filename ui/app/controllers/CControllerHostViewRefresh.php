@@ -102,6 +102,10 @@ class CControllerHostViewRefresh extends CControllerHost {
 		}
 		else {
 			$this->getInputs($filter, array_keys($filter));
+			// Filter out empty tags.
+			$filter['tags'] = array_filter($filter['tags'], function ($tag) {
+				return $tag['tag'] !== '' && $tag['value'] !== '';
+			});
 			$prepared_data = $this->getData($filter);
 
 			$data = [
