@@ -78,7 +78,7 @@
  */
 $this->data['typeVisibility'] = [];
 
-if (!empty($this->data['interfaces'])) {
+if ($data['display_interfaces']) {
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interface_row');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interfaceid');
 	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'interface_row');

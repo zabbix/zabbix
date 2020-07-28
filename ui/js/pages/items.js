@@ -79,11 +79,24 @@ function organizeInterfaces(interfaceType) {
 			}
 			// any interface
 			else {
-				jQuery('#interfaceid option')
-					.prop('disabled', false)
-					.filter('[value="0"]').remove();
-				if (selectedInterfaceId) {
-					selectedInterfaceOption.prop('selected', true);
+				if (jQuery('#interfaceid option[data-interfacetype]').length > 0) {
+					jQuery('#interfaceid option')
+						.prop('disabled', false)
+						.filter('[value="0"]').remove();
+
+					if (selectedInterfaceId) {
+						selectedInterfaceOption.prop('selected', true);
+					}
+				}
+				else {
+					// Hide combobox and display warning text.
+					if (!jQuery('#interfaceid option[value="0"]').length) {
+						jQuery('#interfaceid').prepend('<option value="0"></option>');
+					}
+					jQuery('#interfaceid').hide().val(0);
+					jQuery('#interface_not_defined').html(t('No interface found')).show();
+
+					return;
 				}
 			}
 
