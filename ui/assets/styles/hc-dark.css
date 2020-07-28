@@ -120,6 +120,21 @@ svg a {
     fill: #f8f8f8;
     text-decoration: underline; }
 
+[data-indicator-count]:not([data-indicator-count='0'])::after {
+  content: attr(data-indicator-count);
+  margin-left: .4em;
+  color: #768d99;
+  font-size: 0.917em; }
+
+[data-indicator-status='enabled']::after {
+  content: '';
+  display: inline-block;
+  margin-left: .4em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #009900; }
+
 .scrollable {
   overflow-y: auto;
   overflow-x: hidden;
