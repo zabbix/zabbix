@@ -69,6 +69,7 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+.........T [ZBX-17989] fixed server version for pgsql.replication.status (afayantsev)
 ..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
 .......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
