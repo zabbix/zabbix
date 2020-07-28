@@ -855,7 +855,7 @@ class CHost extends CHostGeneral {
 		$macros = [];
 		foreach ($hosts as &$host) {
 			if (isset($host['macros'])) {
-				$macros[$host['hostid']] = $host['macros'];
+				$macros[$host['hostid']] = zbx_toArray($host['macros']);
 
 				unset($host['macros']);
 			}

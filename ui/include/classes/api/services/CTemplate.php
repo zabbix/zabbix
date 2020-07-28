@@ -518,7 +518,7 @@ class CTemplate extends CHostGeneral {
 		$macros = [];
 		foreach ($templates as &$template) {
 			if (isset($template['macros'])) {
-				$macros[$template['templateid']] = $template['macros'];
+				$macros[$template['templateid']] = zbx_toArray($template['macros']);
 
 				unset($template['macros']);
 			}
