@@ -918,9 +918,9 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_get_diag_stats                                           *
+ * Function: zbx_alerter_get_diag_stats                                       *
  *                                                                            *
- * Purpose: get alerter manager diagnostic statistics                             *
+ * Purpose: get alerter manager diagnostic statistics                         *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
