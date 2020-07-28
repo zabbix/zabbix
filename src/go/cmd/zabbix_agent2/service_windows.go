@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"golang.org/x/sys/windows/svc"
@@ -49,9 +50,14 @@ var (
 	isInteractive bool
 
 	eLog *eventlog.Log
+
+	winServiceWg sync.WaitGroup
+	fatalStop    sync.WaitGroup
+
+	fatalStopChan = make(chan bool)
 )
 
-func loadAdditionalFlags() {
+func loadOSDependentFlags() {
 	const (
 		svcInstallDefault     = false
 		svcInstallDescription = "Install Zabbix agent 2 as service"
@@ -95,10 +101,33 @@ func isWinService() bool {
 	return false
 }
 
+func closeOSSpecificItems() {
+	sendWinServiceFatalStopSig()
+	closeEventLog()
+}
+
 func openEventLog() (err error) {
 	if isWinService() {
 		eLog, err = eventlog.Open(serviceName)
 	}
+	return
+}
+
+func sendWinServiceFatalStopSig() {
+	fatalStop.Add(1)
+	select {
+	case fatalStopChan <- true:
+		fatalStop.Wait()
+	default:
+		fatalStop.Done()
+	}
+}
+
+func closeEventLog() {
+	if eLog != nil {
+		eLog.Close()
+	}
+
 	return
 }
 
@@ -170,7 +199,7 @@ func handleWindowsService(conf string) error {
 		if err != nil {
 			return err
 		}
-
+		closeEventLog()
 		os.Exit(0)
 	}
 
@@ -230,14 +259,12 @@ func resolveWindowsService(conf string) error {
 }
 
 func getAgentPath() (p string, err error) {
-	p, err = filepath.Abs(os.Args[0])
-	if err != nil {
+	if p, err = filepath.Abs(os.Args[0]); err != nil {
 		return
 	}
 
 	var i os.FileInfo
-	i, err = os.Stat(p)
-	if err != nil {
+	if i, err = os.Stat(p); err != nil {
 		if filepath.Ext(p) == "" {
 			p += ".exe"
 			i, err = os.Stat(p)
@@ -364,8 +391,7 @@ func svcStop() error {
 			return fmt.Errorf("failed to stop '%s' service", serviceName)
 		}
 		time.Sleep(300 * time.Millisecond)
-		status, err = s.Query()
-		if err != nil {
+		if status, err = s.Query(); err != nil {
 			return fmt.Errorf("failed to get service status: %s", err.Error())
 		}
 	}
@@ -373,13 +399,20 @@ func svcStop() error {
 	return nil
 }
 
+func confirmWinService() {
+	if !isInteractive {
+		winServiceWg.Done()
+	}
+}
+
 func closeWinService() {
 	if !isInteractive {
-		closeWg.Done()
+		winServiceWg.Done()
 	}
 }
 
 func runService() {
+	winServiceWg.Add(1)
 	err := svc.Run(serviceName, &winService{})
 	if err != nil {
 		fatalExit("", err)
@@ -390,22 +423,43 @@ type winService struct{}
 
 func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
 	changes <- svc.Status{State: svc.StartPending}
+	winServiceWg.Wait()
 	changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop}
 loop:
 	for {
-		c := <-r
-		switch c.Cmd {
-		case svc.Stop:
-			closeWg.Add(1)
-			break loop
+		if fatalExitListener(changes) {
+			changes <- svc.Status{State: svc.StopPending}
+			fatalStop.Done()
+			return
+		}
+		var c svc.ChangeRequest
+		select {
+		case c = <-r:
+			switch c.Cmd {
+			case svc.Stop, svc.Shutdown:
+				break loop
+			default:
+				log.Warningf("unsupported windows service command recieved")
+			}
 		default:
-			log.Warningf("unsupported windows service command recieved")
+			log.Warningf("waiting for stop")
 		}
 	}
 
+	winServiceWg.Add(1)
 	closeChan <- true
-	closeWg.Wait()
+	winServiceWg.Wait()
 	changes <- svc.Status{State: svc.StopPending}
-
 	return
+}
+
+func fatalExitListener(changes chan<- svc.Status) bool {
+	select {
+	case <-fatalStopChan:
+		log.Warningf("stop recived")
+		return true
+	default:
+		return false
+	}
+
 }

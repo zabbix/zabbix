@@ -21,9 +21,11 @@
 
 package main
 
-func loadAdditionalFlags() {}
+func loadOSDependentFlags() {}
 
 func openEventLog() error { return nil }
+
+func closeOSSpecificItems() {}
 
 func eventLogInfo(msg string) error { return nil }
 

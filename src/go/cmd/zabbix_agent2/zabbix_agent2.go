@@ -26,7 +26,6 @@ import (
 	"os"
 	"os/signal"
 	"strings"
-	"sync"
 	"syscall"
 
 	_ "zabbix.com/plugins"
@@ -52,7 +51,6 @@ var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
 var closeChan = make(chan bool)
-var closeWg sync.WaitGroup
 
 func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
 	if len(params) != 2 {
@@ -133,6 +131,7 @@ func run() (err error) {
 	if control, err = remotecontrol.New(agent.Options.ControlSocket); err != nil {
 		return
 	}
+	confirmWinService()
 	control.Start()
 
 loop:
@@ -225,7 +224,7 @@ func main() {
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
-	loadAdditionalFlags()
+	loadOSDependentFlags()
 
 	flag.Parse()
 
@@ -256,8 +255,7 @@ func main() {
 	}
 
 	if err := validateExclusiveFlags(); err != nil {
-		eerr := eventLogErr(err)
-		if eerr != nil {
+		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("", err)
@@ -265,8 +263,7 @@ func main() {
 
 	if err := conf.Load(confFlag, &agent.Options); err != nil {
 		if argConfig || !(argTest || argPrint) {
-			eerr := eventLogErr(err)
-			if eerr != nil {
+			if eerr := eventLogErr(err); eerr != nil {
 				err = fmt.Errorf("%s and %s", err, eerr)
 			}
 			fatalExit("", err)
@@ -278,16 +275,14 @@ func main() {
 	}
 
 	if err := agent.ValidateOptions(agent.Options); err != nil {
-		eerr := eventLogErr(err)
-		if eerr != nil {
+		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("cannot validate configuration", err)
 	}
 
 	if err := handleWindowsService(confFlag); err != nil {
-		eerr := eventLogErr(err)
-		if eerr != nil {
+		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("", err)
@@ -504,6 +499,7 @@ func main() {
 }
 
 func fatalExit(message string, err error) {
+	closeOSSpecificItems()
 	if len(message) == 0 {
 		message = err.Error()
 	} else {
