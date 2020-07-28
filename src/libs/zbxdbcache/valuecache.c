@@ -2884,29 +2884,29 @@ void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vc_get_items                                                 *
+ * Function: zbx_vc_get_item_stats                                            *
  *                                                                            *
  * Purpose: get statistics of cached items                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vc_get_items(zbx_vector_ptr_t *items)
+void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vc_item_t		*item;
-	zbx_vc_item_stats_t	*diag;
+	zbx_vc_item_stats_t	*item_stats;
 
 	vc_try_lock();
 
-	zbx_vector_ptr_reserve(items, vc_cache->items.num_data);
+	zbx_vector_ptr_reserve(stats, vc_cache->items.num_data);
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		diag = (zbx_vc_item_stats_t *)zbx_malloc(NULL, sizeof(zbx_vc_item_stats_t));
-		diag->itemid = item->itemid;
-		diag->values_num = item->values_total;
-		diag->hourly_num = item->last_hourly_num;
-		zbx_vector_ptr_append(items, diag);
+		item_stats = (zbx_vc_item_stats_t *)zbx_malloc(NULL, sizeof(zbx_vc_item_stats_t));
+		item_stats->itemid = item->itemid;
+		item_stats->values_num = item->values_total;
+		item_stats->hourly_num = item->last_hourly_num;
+		zbx_vector_ptr_append(stats, item_stats);
 	}
 
 	vc_try_unlock();

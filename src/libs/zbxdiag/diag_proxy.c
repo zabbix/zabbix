@@ -29,23 +29,24 @@
  *                                                                            *
  * Parameters: section - [IN] the section name                                *
  *             jp      - [IN] the request                                     *
- *             j       - [IN/OUT] the json to update                          *
+ *             json    - [IN/OUT] the json to update                          *
  *             error   - [OUT] the error message                              *
  *                                                                            *
  * Return value: SUCCEED - the information was retrieved successfully         *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *j,
+int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
 		char **error)
 {
 	int	ret = FAIL;
 
 	if (0 == strcmp(section, "historycache"))
-		ret = diag_add_historycache_info(jp, j, error);
+		ret = diag_add_historycache_info(jp, json, error);
+	else if (0 == strcmp(section, "preprocessing"))
+		ret = diag_add_preproc_info(jp, json, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
-
 
 	return ret;
 }

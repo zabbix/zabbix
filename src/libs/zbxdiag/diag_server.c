@@ -87,11 +87,9 @@ static void	diag_valuecache_add_items(struct zbx_json *json, const char *field, 
  *                                                                            *
  * Purpose: add requested value cache diagnostic information to json data     *
  *                                                                            *
- * Parameters: jp        - [IN] the request                                   *
- *             field_map - [IN] a map of supported statistic field names to   *
- *                               bitmasks                                     *
- *             json      - [IN/OUT] the json to update                        *
- *             error     - [OUT] error message                                *
+ * Parameters: jp    - [IN] the request                                       *
+ *             json  - [IN/OUT] the json to update                            *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
@@ -156,7 +154,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 			zbx_vector_ptr_create(&items);
 
 			time1 = zbx_time();
-			zbx_vc_get_items(&items);
+			zbx_vc_get_item_stats(&items);
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
@@ -179,7 +177,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 				{
 					*error = zbx_dsprintf(*error, "Unsupported top field: %s", map->name);
 					ret = FAIL;
-					break;
+					goto out;
 				}
 
 				limit = MIN((int)map->value, items.values_num);
@@ -195,7 +193,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 		zbx_json_close(json);
 	}
-
+out:
 	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)diag_map_free);
 	zbx_vector_ptr_destroy(&tops);
 
@@ -232,11 +230,9 @@ static void	diag_add_lld_items(struct zbx_json *json, const char *field, zbx_vec
  *                                                                            *
  * Purpose: add requested lld manager diagnostic information to json data     *
  *                                                                            *
- * Parameters: jp        - [IN] the request                                   *
- *             field_map - [IN] a map of supported statistic field names to   *
- *                               bitmasks                                     *
- *             json      - [IN/OUT] the json to update                        *
- *             error     - [OUT] error message                                *
+ * Parameters: jp    - [IN] the request                                       *
+ *             json  - [IN/OUT] the json to update                            *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
@@ -295,9 +291,7 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 
 					time1 = zbx_time();
 					if (FAIL == (ret = zbx_lld_get_top_items(map->value, &items, error)))
-					{
 						goto out;
-					}
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
@@ -394,11 +388,9 @@ static void	diag_add_alerting_sources(struct zbx_json *json, const char *field, 
  *                                                                            *
  * Purpose: add requested alert manager diagnostic information to json data   *
  *                                                                            *
- * Parameters: jp        - [IN] the request                                   *
- *             field_map - [IN] a map of supported statistic field names to   *
- *                               bitmasks                                     *
- *             json      - [IN/OUT] the json to update                        *
- *             error     - [OUT] error message                                *
+ * Parameters: jp    - [IN] the request                                       *
+ *             json  - [IN/OUT] the json to update                            *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
@@ -472,9 +464,7 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 
 					time1 = zbx_time();
 					if (FAIL == (ret = zbx_alerter_get_top_sources(map->value, &sources, error)))
-					{
 						goto out;
-					}
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
@@ -511,31 +501,30 @@ out:
  *                                                                            *
  * Parameters: section - [IN] the section name                                *
  *             jp      - [IN] the request                                     *
- *             j       - [IN/OUT] the json to update                          *
+ *             json    - [IN/OUT] the json to update                          *
  *             error   - [OUT] the error message                              *
  *                                                                            *
  * Return value: SUCCEED - the information was retrieved successfully         *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *j,
+int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, struct zbx_json *json,
 		char **error)
 {
 	int	ret = FAIL;
 
 	if (0 == strcmp(section, "historycache"))
-		ret = diag_add_historycache_info(jp, j, error);
+		ret = diag_add_historycache_info(jp, json, error);
 	else if (0 == strcmp(section, "valuecache"))
-		ret = diag_add_valuecache_info(jp, j, error);
+		ret = diag_add_valuecache_info(jp, json, error);
 	else if (0 == strcmp(section, "preprocessing"))
-		ret = diag_add_preproc_info(jp, j, error);
+		ret = diag_add_preproc_info(jp, json, error);
 	else if (0 == strcmp(section, "lld"))
-		ret = diag_add_lld_info(jp, j, error);
+		ret = diag_add_lld_info(jp, json, error);
 	else if (0 == strcmp(section, "alerting"))
-		ret = diag_add_alerting_info(jp, j, error);
+		ret = diag_add_alerting_info(jp, json, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
-
 
 	return ret;
 }

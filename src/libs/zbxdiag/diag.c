@@ -64,10 +64,10 @@ int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *fi
 	{
 		while (NULL != (pnext = zbx_json_next(&jp_stats, pnext)))
 		{
-			const zbx_diag_map_t	*stat;
-
 			if (NULL != zbx_json_decodevalue(pnext, name, sizeof(name), NULL))
 			{
+				const zbx_diag_map_t	*stat;
+
 				for (stat = field_map;; stat++)
 				{
 					if (NULL == stat->name)
@@ -123,31 +123,33 @@ out:
  *                                                                            *
  * Purpose: add memory statistics to the json data                            *
  *                                                                            *
- * Parameters: j     - [IN/OUT] the json to update                            *
+ * Parameters: json  - [IN/OUT] the json to update                            *
  *             name  - [IN] the memory object name                            *
  *             stats - [IN] the memory statistics                             *
  *                                                                            *
  ******************************************************************************/
-void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_mem_stats_t *stats)
+void	diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_mem_stats_t *stats)
 {
 	int	i;
 
 	if (NULL == stats)
 		return;
 
-	zbx_json_addobject(j, name);
-	zbx_json_addobject(j, "size");
-	zbx_json_adduint64(j, "free", stats->free_size);
-	zbx_json_adduint64(j, "used", stats->used_size);
-	zbx_json_close(j);
+	zbx_json_addobject(json, name);
 
-	zbx_json_addobject(j, "chunks");
-	zbx_json_adduint64(j, "free", stats->free_chunks);
-	zbx_json_adduint64(j, "used", stats->used_chunks);
-	zbx_json_adduint64(j, "min", stats->min_chunk_size);
-	zbx_json_adduint64(j, "max", stats->max_chunk_size);
+	zbx_json_addobject(json, "size");
+	zbx_json_adduint64(json, "free", stats->free_size);
+	zbx_json_adduint64(json, "used", stats->used_size);
+	zbx_json_close(json);
 
-	zbx_json_addarray(j, "buckets");
+	zbx_json_addobject(json, "chunks");
+	zbx_json_adduint64(json, "free", stats->free_chunks);
+	zbx_json_adduint64(json, "used", stats->used_chunks);
+	zbx_json_adduint64(json, "min", stats->min_chunk_size);
+	zbx_json_adduint64(json, "max", stats->max_chunk_size);
+
+	zbx_json_addarray(json, "buckets");
+
 	for (i = 0; i < MEM_BUCKET_COUNT; i++)
 	{
 		if (0 != stats->chunks_num[i])
@@ -156,26 +158,25 @@ void	diag_add_mem_stats(struct zbx_json *j, const char *name, const zbx_mem_stat
 
 			zbx_snprintf(buf, sizeof(buf), "%d%s", MEM_MIN_BUCKET_SIZE + 8 * i,
 					(MEM_BUCKET_COUNT - 1 == i ? "+" : ""));
-			zbx_json_addobject(j, NULL);
-			zbx_json_adduint64(j, buf, stats->chunks_num[i]);
-			zbx_json_close(j);
+			zbx_json_addobject(json, NULL);
+			zbx_json_adduint64(json, buf, stats->chunks_num[i]);
+			zbx_json_close(json);
 		}
 	}
 
-	zbx_json_close(j);
-	zbx_json_close(j);
-	zbx_json_close(j);
+	zbx_json_close(json);
+	zbx_json_close(json);
+	zbx_json_close(json);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: diag_historycache_item_compare_values_desc                       *
+ * Function: diag_compare_pair_second_desc                                    *
  *                                                                            *
- * Purpose: sort history cache item view by second value (number of values)   *
- *          in descending order                                               *
+ * Purpose: compare uint64 pairs by second value for descending sorting       *
  *                                                                            *
  ******************************************************************************/
-static int	diag_historycache_item_compare_values_desc(const void *d1, const void *d2)
+static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
 {
 	zbx_uint64_pair_t	*p1 = (zbx_uint64_pair_t *)d1;
 	zbx_uint64_pair_t	*p2 = (zbx_uint64_pair_t *)d2;
@@ -218,11 +219,9 @@ static void	diag_historycache_add_items(struct zbx_json *json, const char *field
  *                                                                            *
  * Purpose: add requested history cache diagnostic information to json data   *
  *                                                                            *
- * Parameters: jp        - [IN] the request                                   *
- *             field_map - [IN] a map of supported statistic field names to   *
- *                               bitmasks                                     *
- *             json      - [IN/OUT] the json to update                        *
- *             error     - [OUT] error message                                *
+ * Parameters: jp    - [IN] the request                                       *
+ *             json  - [IN/OUT] the json to update                            *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
@@ -305,7 +304,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
-					zbx_vector_uint64_pair_sort(&items, diag_historycache_item_compare_values_desc);
+					zbx_vector_uint64_pair_sort(&items, diag_compare_pair_second_desc);
 					limit = MIN((int)map->value, items.values_num);
 
 					diag_historycache_add_items(json, map->name, (zbx_uint64_pair_t *)items.values,
@@ -371,11 +370,9 @@ static void	diag_add_preproc_items(struct zbx_json *json, const char *field, zbx
  *                                                                            *
  * Purpose: add requested preprocessing diagnostic information to json data   *
  *                                                                            *
- * Parameters: jp        - [IN] the request                                   *
- *             field_map - [IN] a map of supported statistic field names to   *
- *                               bitmasks                                     *
- *             json      - [IN/OUT] the json to update                        *
- *             error     - [OUT] error message                                *
+ * Parameters: jp    - [IN] the request                                       *
+ *             json  - [IN/OUT] the json to update                            *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the information was added successfully             *
  *               FAIL    - otherwise                                          *
@@ -437,7 +434,6 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 					{
 						goto out;
 					}
-
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
@@ -484,10 +480,10 @@ int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info)
 	struct zbx_json_parse	jp_section;
 	char			section[ZBX_DIAG_SECTION_MAX + 1];
 	const char		*pnext = NULL;
-	struct zbx_json		j;
+	struct zbx_json		json;
 	int			ret = SUCCEED;
 
-	zbx_json_init(&j, 1024);
+	zbx_json_init(&json, 1024);
 
 	while (NULL != (pnext = zbx_json_pair_next(jp, pnext, section, sizeof(section))))
 	{
@@ -497,14 +493,14 @@ int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info)
 			goto out;
 		}
 
-		if (FAIL == (ret = diag_add_section_info(section, &jp_section, &j, info)))
+		if (FAIL == (ret = diag_add_section_info(section, &jp_section, &json, info)))
 			goto out;
 	}
 out:
 	if (SUCCEED == ret)
-		*info = zbx_strdup(*info, j.buffer);
+		*info = zbx_strdup(*info, json.buffer);
 
-	zbx_json_free(&j);
+	zbx_json_free(&json);
 
 	return ret;
 }

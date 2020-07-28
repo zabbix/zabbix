@@ -514,12 +514,12 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_process_debuginfo                                             *
+ * Function: tm_process_diaginfo                                              *
  *                                                                            *
- * Purpose: process debuginfo task                                            *
+ * Purpose: process diaginfo task                                             *
  *                                                                            *
  ******************************************************************************/
-static void	tm_process_debuginfo(zbx_uint64_t taskid, const char *data)
+static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
 {
 	zbx_tm_task_t		*task;
 	int			ret;
@@ -583,8 +583,8 @@ static int	tm_process_data(zbx_vector_uint64_t *taskids)
 
 		switch (data_type)
 		{
-			case ZBX_TM_DATA_TYPE_DEBUGINFO:
-				tm_process_debuginfo(taskid, row[2]);
+			case ZBX_TM_DATA_TYPE_DIAGINFO:
+				tm_process_diaginfo(taskid, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
 			default:

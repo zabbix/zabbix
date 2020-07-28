@@ -237,7 +237,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info)
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 			return zbx_trapper_item_test_run(&jp_data, 0, info);
-		case ZBX_TM_DATA_TYPE_DEBUGINFO:
+		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			return zbx_diag_get_info(&jp_data, info);
 	}
 
@@ -287,7 +287,7 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 			ZBX_FALLTHROUGH;
-		case ZBX_TM_DATA_TYPE_DEBUGINFO:
+		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			ret = tm_execute_data_json(data_type, row[1], &info);
 			break;
 		default:

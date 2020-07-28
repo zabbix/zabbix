@@ -119,6 +119,6 @@ void	zbx_vc_housekeeping_value_cache(void);
 
 void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, int *mode);
 void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem);
-void	zbx_vc_get_items(zbx_vector_ptr_t *items);
+void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats);
 
 #endif	/* ZABBIX_VALUECACHE_H */
