@@ -453,8 +453,12 @@ class CHost extends CHostGeneral {
 			zbx_db_search('hosts h', $options, $sqlParts);
 
 			if (zbx_db_search('interface hi', $options, $sqlParts)) {
-				$sqlParts['from']['interface'] = 'interface hi';
-				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
+				$sqlParts['left_join']['interface'] = [
+					'from' => 'interface hi',
+					'on' => 'h.hostid=hi.hostid'
+				];
+
+				$sqlParts['left_table'] = $this->tableName();
 			}
 		}
 

@@ -111,8 +111,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$table->addRow([
 		$name,
-		make_decoration($interface['ip'], $data['search']),
-		make_decoration($interface['dns'], $data['search']),
+		$interface ? make_decoration($interface['ip'], $data['search']) : '',
+		$interface ? make_decoration($interface['dns'], $data['search']) : '',
 		new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
