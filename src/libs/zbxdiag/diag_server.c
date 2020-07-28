@@ -525,13 +525,13 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 
 	if (0 == strcmp(section, "historycache"))
 		ret = diag_add_historycache_info(jp, j, error);
-	if (0 == strcmp(section, "valuecache"))
+	else if (0 == strcmp(section, "valuecache"))
 		ret = diag_add_valuecache_info(jp, j, error);
-	if (0 == strcmp(section, "preprocessing"))
+	else if (0 == strcmp(section, "preprocessing"))
 		ret = diag_add_preproc_info(jp, j, error);
-	if (0 == strcmp(section, "lld"))
+	else if (0 == strcmp(section, "lld"))
 		ret = diag_add_lld_info(jp, j, error);
-	if (0 == strcmp(section, "alerting"))
+	else if (0 == strcmp(section, "alerting"))
 		ret = diag_add_alerting_info(jp, j, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);

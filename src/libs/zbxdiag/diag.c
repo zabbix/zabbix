@@ -66,21 +66,22 @@ int	diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *fi
 		{
 			const zbx_diag_map_t	*stat;
 
-			zbx_json_decodevalue(pnext, name, sizeof(name), NULL);
-
-			for (stat = field_map;; stat++)
+			if (NULL != zbx_json_decodevalue(pnext, name, sizeof(name), NULL))
 			{
-				if (NULL == stat->name)
+				for (stat = field_map;; stat++)
 				{
-					*error = zbx_dsprintf(*error, "Unsupported statistics field: %s", name);
-					goto out;
+					if (NULL == stat->name)
+					{
+						*error = zbx_dsprintf(*error, "Unsupported statistics field: %s", name);
+						goto out;
+					}
+
+					if (0 == strcmp(name, stat->name))
+						break;
 				}
 
-				if (0 == strcmp(name, stat->name))
-					break;
+				*field_mask |= stat->value;
 			}
-
-			*field_mask |= stat->value;
 		}
 	}
 
