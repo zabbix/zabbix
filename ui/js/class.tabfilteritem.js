@@ -36,14 +36,13 @@ class CTabFilterItem extends CBaseComponent {
 		this._can_toggle = options.can_toggle;
 		this._data = options.data||{};
 		this._template = options.template;
+		this._expanded = options.expanded;
 
 		this.init();
 		this.registerEvents();
 	}
 
 	init() {
-		this._expanded = this.hasClass('active');
-
 		if (this._expanded) {
 			this.renderContentTemplate();
 

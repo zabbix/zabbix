@@ -37,43 +37,34 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	init(options) {
-		let item, template, container, containers, data_index = 0;
+		let item, index = 0;
+
+		if (options.expanded) {
+			options.data[options.selected].expanded = true;
+		}
 
 		this._shared_domnode = this._target.querySelector('.form-buttons');
-		containers = this._target.querySelector('.tabfilter-tabs-container');
 
 		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
 		};
 
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
-			template = options.data[data_index] ? options.data[data_index].template : null;
-			container = containers.querySelector('#'+title.getAttribute('data-target'));
-
-			if (!container) {
-				container = this.createTabContainer(title.getAttribute('data-target'));
-				containers.appendChild(container);
-			}
-
-			item = new CTabFilterItem(title, {
-				idx_namespace: this._idx_namespace,
-				index: data_index,
-				can_toggle: options.can_toggle,
-				container: container,
-				data: options.data[data_index],
-				template: this._templates[template]
-			});
-
-			item._parent = this;
-			this._items.push(item);
-			data_index++;
+			item = this.create(title, options.data[index]||{});
 
 			if (item._expanded) {
 				this._active_item = item;
 			}
+
+			index++;
 		}
 	}
 
+	/**
+	 * Register tab filter events, called once during initialization.
+	 *
+	 * @param {object} options  Tab filter initialization options.
+	 */
 	registerEvents(options) {
 		this._events = {
 			expand: (ev) => {
@@ -95,10 +86,6 @@ class CTabFilter extends CBaseComponent {
 						value_int: 0
 					});
 				}
-			},
-
-			afterTabContentRender: (ev) => {
-				this.afterTabContentRender(ev.detail.target, ev.detail.is_init);
 			},
 
 			tabSortChanged: (ev, ui) => {
@@ -162,14 +149,32 @@ class CTabFilter extends CBaseComponent {
 				});
 			},
 
-			updateFields: (ev) => {
-				let form = this._active_item._content_container.querySelector('form'),
-					query_string = new URLSearchParams(new FormData(form)).toString();
+			updateFields: () => {
+				var params = this.getActiveFilterParams();
 
 				this.profileUpdate('properties', {
 					'idx2[]': this._active_item._index,
-					'value_str': query_string
+					'value_str': params.toString()
+				}).then(() => {
+					this.setBrowserLocation(params);
 				});
+			},
+
+			create: (ev) => {
+				let title, item,
+					index = this._items.length;
+
+				title = document.createElement('li');
+				title.innerHTML = '<a data-target="tabfilter_' + index + '" role="button">' + t('Untitled') + '</a>';
+				title.classList.add('ui-sortable-handler');
+				this._target.querySelector('.ui-sortable').appendChild(title);
+				this._options.data[index] = JSON.parse(JSON.stringify(this._active_item._data));
+				this._options.data[index].name = t('Untitled');
+				item = this.create(title.querySelector('[data-target]'), this._options.data[index]);
+
+				item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
+				item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
+				item.select();
 			}
 		}
 
@@ -188,9 +193,51 @@ class CTabFilter extends CBaseComponent {
 			action.addEventListener('click', this._events[action.getAttribute('data-action')]);
 		}
 
-		this._shared_domnode.querySelector('[name="filter_set"]').addEventListener('click', this._events.updateFields);
+		this._shared_domnode.querySelector('[name="filter_update"]').addEventListener('click', this._events.updateFields);
+		this._shared_domnode.querySelector('[name="filter_new"]').addEventListener('click', this._events.create);
 	}
 
+	/**
+	 * Create new CTabFilterItem object with it container if it does not exists and append to _items array.
+	 *
+	 * @param {HTMLElement} title  HTML node element of tab label.
+	 * @param {object}      data   Filter item dynamic data for template.
+	 *
+	 * @return {CTabFilterItem}
+	 */
+	create(title, data) {
+		let item,
+			containers = this._target.querySelector('.tabfilter-tabs-container'),
+			container = containers.querySelector('#' + title.getAttribute('data-target'));
+
+		if (!container) {
+			container = document.createElement('div');
+			container.setAttribute('id', title.getAttribute('data-target'));
+			container.classList.add('display-none');
+			containers.appendChild(container);
+		}
+
+		item = new CTabFilterItem(title, {
+			idx_namespace: this._idx_namespace,
+			index: this._items.length,
+			expanded: data.expanded||false,
+			can_toggle: this._options.can_toggle,
+			container: container,
+			data: data,
+			template: this._templates[data.template]||null
+		});
+
+		item._parent = this;
+		this._items.push(item);
+
+		return item;
+	}
+
+	/**
+	 * Fire event TABFILTERITEM_EVENT_COLLAPSE on every expanded tab except passed one.
+	 *
+	 * @param {CTabFilterItem} except  Tab item object.
+	 */
 	collapseAllItemsExcept(except) {
 		for (const item of this._items) {
 			if (item !== except && item._expanded) {
@@ -199,15 +246,14 @@ class CTabFilter extends CBaseComponent {
 		}
 	}
 
-	createTabContainer(targetid) {
-		let container = document.createElement('div');
-
-		container.setAttribute('id', targetid);
-		container.classList.add('display-none');
-
-		return container;
-	}
-
+	/**
+	 * Updates filter values in user profile. Aborts any previous unfinished updates.
+	 *
+	 * @param {string} property  Filter property to be updated: 'selected', 'expanded', 'properties'.
+	 * @param {object} body      Key value pair of data to be passed to profile.update action.
+	 *
+	 * @return {Promise}
+	 */
 	profileUpdate(property, body) {
 		if (this._fetch && 'abort' in this._fetch && !this._fetch.aborted) {
 			this._fetch.abort();
@@ -225,5 +271,38 @@ class CTabFilter extends CBaseComponent {
 		}).catch((err) => {
 			// Catch DOMExeception: The user aborted a request.
 		});
+	}
+
+	/**
+	 * Get active filter parameters as URLSearchParams object, defining value of unchecked checkboxes equal to
+	 * 'unchecked-value' attribute value.
+	 *
+	 * @return {URLSearchParams}
+	 */
+	getActiveFilterParams() {
+		let form = this._active_item._content_container.querySelector('form'),
+			params = new URLSearchParams(new FormData(form));
+
+		for (const checkbox of form.querySelectorAll('input[type="checkbox"][unchecked-value]')) {
+			if (!checkbox.checked) {
+				params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'))
+			}
+		}
+
+		return params;
+	}
+
+	/**
+	 * Set browser location URL according to passed values. 'action' argument from already set URL is preserved.
+	 *
+	 * @param {URLSearchParams} search_params  Filter field values to be set in URL.
+	 */
+	setBrowserLocation(search_params) {
+		let url = new Curl('', false);
+
+		search_params.set('action', url.getArgument('action'));
+		url.query = search_params.toString();
+		url.formatArguments();
+		history.replaceState(history.state, '', url.getUrl());
 	}
 }

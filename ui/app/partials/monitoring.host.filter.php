@@ -179,8 +179,8 @@ $(function($) {
 		let is_sortable = $(this._target).closest('.ui-sortable').length > 0;
 
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="save_as"],[name="filter_set"]').hide()
-			.filter(is_sortable ? '[name="filter_set"]' : '[name="save_as"]').show();
+		$('[name="filter_new"],[name="filter_update"]').hide()
+			.filter(is_sortable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
 		// Host groups multiselect.
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({
@@ -200,6 +200,11 @@ $(function($) {
 					enrich_parent_groups: 1
 				}
 			}
+		});
+
+		// Show hosts in maintenance events.
+		$('[name="maintenance_status"]', container).click(function () {
+			$('[name="show_suppressed"]', container).prop('disabled', !this.checked);
 		});
 
 		// Tags table
@@ -222,17 +227,9 @@ $(function($) {
 		});
 		$('#tags_' + data.uniqid, container).dynamicRows({template: '#filter-tag-row-tmpl'});
 
-		// Show hosts in maintenance events.
-		$('[name="maintenance_status"]', container).click(function () {
-			$('[name="show_suppressed"]', container).prop('disabled', !this.checked);
-		});
-
-		for (key in data.filter) {
+		// Input, radio and single checkboxes.
+		['name', 'ip', 'dns', 'port', 'status', 'evaltype', 'maintenance_status', 'show_suppressed'].forEach((key) => {
 			var elm = $('[name="' + key + '"]');
-
-			if (!elm.length || typeof data.filter[key] === 'object') {
-				continue;
-			}
 
 			if (elm.is(':radio,:checkbox')) {
 				elm.filter('[value="' + data.filter[key] + '"]').attr('checked', true);
@@ -240,8 +237,9 @@ $(function($) {
 			else {
 				elm.val(data.filter[key]);
 			}
-		};
+		});
 
+		// Severities checkboxes.
 		data.filter.severities.forEach((value) => {
 			$('[name="severities[' + value + ']"]', container).attr('checked', true);
 		});
@@ -251,8 +249,8 @@ $(function($) {
 		let is_sortable = $(this._target).closest('.ui-sortable').length > 0;
 
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
-		$('[name="save_as"],[name="filter_set"]').hide()
-			.filter(is_sortable ? '[name="filter_set"]' : '[name="save_as"]').show();
+		$('[name="filter_new"],[name="filter_update"]').hide()
+			.filter(is_sortable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 	}
 
 	// Tab filter item events handlers.
