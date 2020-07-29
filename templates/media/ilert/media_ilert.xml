@@ -200,7 +200,7 @@
     delete params['.ILERT.ALERT.SOURCE.KEY'];&#13;
     &#13;
     var ilertApiBaseURL = &quot;https://api.ilert.com&quot;;&#13;
-    var reqURL = ilertApiBaseURL + &quot;/api/v1/events/zabbix-mt/&quot; + alertSourceKey&#13;
+    var reqURL = encodeURI(ilertApiBaseURL + &quot;/api/v1/events/zabbix-mt/&quot; + alertSourceKey)&#13;
 &#13;
     var incidentKey = &quot;zabbix-&quot; + params['EVENT.ID'];&#13;
     var incidentViewURL = ilertApiBaseURL + &quot;/api/v1/incidents/resolve-ik/&quot; + alertSourceKey + &quot;/&quot; + incidentKey;&#13;
