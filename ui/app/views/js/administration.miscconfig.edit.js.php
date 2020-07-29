@@ -52,6 +52,8 @@ $default_inventory_mode = $schema['fields']['default_inventory_mode']['default']
 						'title': <?= json_encode(_('Reset defaults')) ?>,
 						'focused': true,
 						'action': function() {
+							$('main').prev('.msg-bad').remove();
+
 							$('#refresh_unsupported').val("<?= $schema['fields']['refresh_unsupported']['default'] ?>");
 							$('#discovery_groupid').multiSelect('clean');
 							$('#default_inventory_mode input[value=<?= $default_inventory_mode ?>]')

@@ -82,6 +82,8 @@ $schema = DB::getSchema('config');
 						'title': <?= json_encode(_('Reset defaults')) ?>,
 						'focused': true,
 						'action': function() {
+							$('main').prev('.msg-bad').remove();
+
 							// events and alerts
 							jQuery('#hk_events_mode')
 								.prop('checked',

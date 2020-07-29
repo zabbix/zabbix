@@ -51,6 +51,8 @@ $schema = DB::getSchema('config');
 						'title': <?= json_encode(_('Reset defaults')) ?>,
 						'focused': true,
 						'action': function() {
+							$('main').prev('.msg-bad').remove();
+
 							var custom_color_enabled = <?=
 								($schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_ENABLED)
 									? 'true'

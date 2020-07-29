@@ -43,6 +43,8 @@ $schema = DB::getSchema('config');
 						'title': <?= json_encode(_('Reset defaults')) ?>,
 						'focused': true,
 						'action': function() {
+							$('main').prev('.msg-bad').remove();
+
 							$('#default_lang').val("<?= $schema['fields']['default_lang']['default'] ?>");
 							$('#default_theme').val("<?= $schema['fields']['default_theme']['default'] ?>");
 							$('#search_limit').val("<?= $schema['fields']['search_limit']['default'] ?>");
