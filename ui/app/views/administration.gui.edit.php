@@ -77,7 +77,7 @@ $gui_tab = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow((new CLabel(_('Max number of columns and rows in overview tables'), 'max_overview_table_size'))->setAsteriskMark(),
-		(new CNumericBox('max_overview_table_size', $data['max_overview_table_size'], 10))
+		(new CNumericBox('max_overview_table_size', $data['max_overview_table_size'], 6))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
