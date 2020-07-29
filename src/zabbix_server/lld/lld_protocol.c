@@ -360,7 +360,7 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
  * Parameters field - [IN] the sort field                                     *
  *            limit - [IN] the number of top records to retrieve              *
  *            items - [OUT] a vector of top itemid, values_num pairs          *
- *            error - [OUT] the error message                                 *                                                                           *
+ *            error - [OUT] the error message                                 *
  *                                                                            *
  * Return value: SUCCEED - the top n items were returned successfully         *
  *               FAIL - otherwise                                             *
