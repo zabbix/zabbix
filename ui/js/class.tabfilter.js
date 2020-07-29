@@ -69,6 +69,9 @@ class CTabFilter extends CBaseComponent {
 	 */
 	registerEvents(options) {
 		this._events = {
+			/**
+			 * Event handler on tab content expand.
+			 */
 			expand: (ev) => {
 				this._active_item = ev.detail.target;
 				this.collapseAllItemsExcept(this._active_item);
@@ -81,6 +84,9 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 
+			/**
+			 * Event handler on tab content collapse.
+			 */
 			collapse: (ev) => {
 				if (ev.detail.target === this._active_item) {
 					this._shared_domnode.classList.add('display-none');
@@ -90,6 +96,9 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 
+			/**
+			 * UI sortable update event handler. Updates tab sorting in profile.
+			 */
 			tabSortChanged: (ev, ui) => {
 				// Update order of this._items array.
 				var from, to, target = ui.item[0].querySelector('[data-target]');
@@ -111,6 +120,28 @@ class CTabFilter extends CBaseComponent {
 				});
 			},
 
+			/**
+			 * Delete tab filter item. Removed HTML elements and CTabFilterItem object. Update index of tabfilter items.
+			 */
+			deleteItem: (ev) => {
+				let item = ev.detail.target,
+					index = this._items.indexOf(item);
+
+				if (index > -1) {
+					this._active_item = this._items[index - 1];
+					this._active_item.select();
+					item._target.parentNode.remove();
+					delete this._items[index];
+					this._items.splice(index, 1);
+					this._items.forEach((item, index) => {
+						item._index = index;
+					});
+				}
+			},
+
+			/**
+			 * Action on 'chevron left' button press. Select previous active tab filter.
+			 */
 			selectPrevTab: (ev) => {
 				let index = this._items.indexOf(this._active_item);
 
@@ -119,6 +150,9 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 
+			/**
+			 * Action on 'chevron right' button press. Select next active tab filter.
+			 */
 			selectNextTab: (ev) => {
 				let index = this._items.indexOf(this._active_item);
 
@@ -127,20 +161,27 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 
+			/**
+			 * Action on 'chevron down' button press. Creates dropdown with list of existing tabs.
+			 */
 			toggleTabsList: (ev) => {
-				var dropdown = [{items: []}, {items: []}];
+				let items = [],
+					dropdown = [{
+						items: [{
+								label: t('Home'),
+								clickCallback: (ev) => this._items[0].select()
+							}]
+					}];
 
-				this._items.forEach((item, index) => {
-					// List only dynamic tabs in dropdown.
-					if (typeof item._template === 'undefined') {
-						return;
+				if (this._items.length > 2) {
+					for (const item of this._items.slice(1, -1)) {
+						items.push({
+							label: item._data.name,
+							clickCallback: (ev) => item.select()
+						});
 					}
-
-					dropdown[index ? 1 : 0].items.push({
-						label: index ? item._data.name : t('Home'),
-						clickCallback: (ev) => this._items[index].select()
-					})
-				});
+					dropdown.push({items: items});
+				}
 
 				$(this._target).menuPopup(dropdown, $(ev), {
 					position: {
@@ -151,6 +192,9 @@ class CTabFilter extends CBaseComponent {
 				});
 			},
 
+			/**
+			 * Action on 'Update' button press.
+			 */
 			update: () => {
 				var params = this.getActiveFilterParams();
 
@@ -162,27 +206,28 @@ class CTabFilter extends CBaseComponent {
 				});
 			},
 
+			/**
+			 * Action on 'Save as' button press, refresh whole page for simplisity.
+			 */
 			create: () => {
-				let title, item,
-					index = this._items.length;
+				let filter = this.getActiveFilterParams(),
+					url = new Curl('', false);
 
-				title = document.createElement('li');
-				title.innerHTML = '<a data-target="tabfilter_' + index + '" role="button">' + t('Untitled') + '</a>';
-				title.classList.add('ui-sortable-handler');
-				this._target.querySelector('.ui-sortable').appendChild(title);
-				this._options.data[index] = JSON.parse(JSON.stringify(this._active_item._data));
-				this._options.data[index].name = t('Untitled');
-				item = this.create(title.querySelector('[data-target]'), this._options.data[index]);
-
-				item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
-				item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
-				item.select();
+				filter.set('filter_name', t('Untitled'));
+				filter.set('action', url.getArgument('action'));
+				window.location.search = filter.toString();
 			},
 
+			/**
+			 * Action on 'Apply' button press.
+			 */
 			apply: () => {
 				this.setBrowserLocation(this.getActiveFilterParams());
 			},
 
+			/**
+			 * Action on 'Reset' button press.
+			 */
 			reset: () => {
 				this.setBrowserLocation(new URLSearchParams());
 				window.location.reload(true);
@@ -192,6 +237,7 @@ class CTabFilter extends CBaseComponent {
 		for (const item of this._items) {
 			item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
+			item.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteItem);
 		}
 
 		$('.ui-sortable', this._target).sortable({

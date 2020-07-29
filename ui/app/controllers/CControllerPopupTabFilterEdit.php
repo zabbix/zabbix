@@ -148,7 +148,7 @@ class CControllerPopupTabFilterEdit extends CController {
 	public function deleteTab(array $data) {
 		$filter = new CTabFilterProfile($data['idx']);
 		$filter->read();
-		unset($filter->tabfilters[$data['idx2']]);
+		$filter->deleteTab((int) $data['idx2']);
 		$filter->update();
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($data)]))->disableView());

@@ -23,6 +23,7 @@ const TABFILTERITEM_EVENT_COLLAPSE = 'collapse.tabfilter';
 const TABFILTERITEM_EVENT_EXPAND   = 'expand.tabfilter';
 const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expandbefore.tabfilter';
 const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
+const TABFILTERITEM_EVENT_DELETE = 'delete.tabfilter';
 
 class CTabFilterItem extends CBaseComponent {
 
@@ -85,7 +86,7 @@ class CTabFilterItem extends CBaseComponent {
 
 				this._content_container.classList.remove('display-none');
 
-				if ('name' in this._data && this._data.name.length) {
+				if (this._content_container.querySelector('[name="filter_name"]')) {
 					this.addActionIcons();
 				}
 			},
@@ -117,11 +118,21 @@ class CTabFilterItem extends CBaseComponent {
 
 	renderContentTemplate() {
 		if (this._template) {
-			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
+			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(
+				Object.assign({}, this._data, {
+					show_counter: +this._data.show_counter,
+					custom_time: +this._data.custom_time
+				})
+			);
 			this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_RENDER, {detail: this}));
 		}
 	}
 
+	/**
+	 * Open tab filter configuration poup.
+	 *
+	 * @param {HTMLElement} edit_elm  HTML element to broadcast popup update or delete event.
+	 */
 	openPropertiesForm(edit_elm) {
 		PopUp('popup.tabfilter.edit', {
 			'idx': this._idx_namespace,
@@ -134,32 +145,30 @@ class CTabFilterItem extends CBaseComponent {
 		}, 'tabfilter_dialogue', edit_elm);
 	}
 
-	updateProperties(data) {
-		this._data.show_counter = !!data.show_counter;
-		this._data.custom_time = !!data.custom_time;
-		this._data.name = data.name;
-
-		if (data.custom_time) {
-			this._data.from = data.tabfilter_from;
-			this._data.to = data.tabfilter_to;
-		}
-
-		if (data.show_counter) {
-			this.setCounter('');
-		}
-		else {
-			this.removeCounter();
-		}
-
-		this._target.text = data.name;
-	}
-
+	/**
+	 * Add gear icon and it events to tab filter this._target element.
+	 */
 	addActionIcons() {
 		let edit = document.createElement('a');
 
 		edit.classList.add('icon-edit');
 		edit.addEventListener('click', (ev) => this.openPropertiesForm(ev.target));
-		edit.addEventListener('popup.tabfilter', (ev) => this.updateProperties(ev.detail));
+		edit.addEventListener('popup.tabfilter', (ev) => {
+			let data = ev.detail;
+
+			if (data.from_action === 'update') {
+				this.update({
+					name: data.name,
+					show_counter: !!data.show_counter,
+					custom_time: !!data.custom_time,
+					from: data.tabfilter_from,
+					to: data.tabfilter_to
+				});
+			}
+			else {
+				this.delete();
+			}
+		});
 		this._target.parentNode.appendChild(edit);
 	}
 
@@ -173,5 +182,47 @@ class CTabFilterItem extends CBaseComponent {
 		if (!this._expanded) {
 			this._events.click();
 		}
+	}
+
+	delete() {
+		this._content_container.remove();
+		this.fire(TABFILTERITEM_EVENT_DELETE);
+	}
+
+	/**
+	 * Update tab filter configuration: name, show_counter, custom_time.
+	 *
+	 * @param {object} data  Updated tab properties object.
+	 */
+	update(data) {
+		var form = this._content_container.querySelector('form'),
+			fields = {
+				name: form.querySelector('[name="filter_name"]'),
+				show_counter: form.querySelector('[name="filter_show_counter"]'),
+				custom_time: form.querySelector('[name="filter_custom_time"]')
+			};
+
+		this._data.show_counter = data.show_counter;
+		this._data.custom_time = data.custom_time;
+		this._data.name = data.name;
+
+		if (data.custom_time) {
+			this._data.from = data.from;
+			this._data.to = data.to;
+		}
+
+		if (data.show_counter) {
+			this.setCounter('');
+		}
+		else {
+			this.removeCounter();
+		}
+
+		this._target.text = data.name;
+		Object.keys(fields).forEach((key) => {
+			if (fields[key]) {
+				fields[key].value = this._data[key];
+			}
+		});
 	}
 }

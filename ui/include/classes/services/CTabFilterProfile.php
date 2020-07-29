@@ -48,6 +48,7 @@ class CTabFilterProfile {
 	 * Tab filter properties:
 	 * @property string []['name']          Tab label.
 	 * @property bool   []['show_counter']  Show count of results within tab label when tab is collapsed.
+	 * @property bool   []['custom_time']   Use custom time range.
 	 * @property array  []['filter']        Array of filter fields.
 	 *
 	 * @var array
@@ -67,6 +68,28 @@ class CTabFilterProfile {
 		$this->filter_defaults = [];
 		$this->selected = 0;
 		$this->expanded = false;
+	}
+
+	/**
+	 * Create filter tab from controller input. Set default values.
+	 *
+	 * @param array $input  Controller input.
+	 */
+	public function createFilterTab(array $input): array {
+		$filter = CArrayHelper::renameKeys($input, [
+			'filter_name' => 'name',
+			'filter_show_counter' => 'show_counter',
+			'filter_custom_time' => 'custom_time',
+		]) + [
+			'name' => _('Untitled'),
+			'show_counter' => 0,
+			'custom_time' => 0,
+			'from' => ZBX_PERIOD_DEFAULT_FROM,
+			'to' => ZBX_PERIOD_DEFAULT_TO,
+			'filter' => array_intersect_key($input, $this->filter_defaults) + $this->filter_defaults
+		];
+
+		return $filter;
 	}
 
 	/**
@@ -143,6 +166,24 @@ class CTabFilterProfile {
 
 		if ($selected !== false) {
 			$this->selected = $selected;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Delete tab filter by index, do not allow to delete home tab (index equal zero). If deleted tab was selected
+	 * previous tab will be set as selected instead.
+	 *
+	 * @param int $index  Index of deleted tab filter, cannot be zero.
+	 */
+	public function deleteTab(int $index) {
+		if ($index > 0) {
+			unset($this->tabfilters[$index]);
+
+			if ($this->selected == $index) {
+				$this->selected = $index - 1;
+			}
 		}
 
 		return $this;
