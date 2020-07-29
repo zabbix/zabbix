@@ -420,7 +420,7 @@ func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes
 	changes <- svc.Status{State: svc.StartPending}
 	select {
 	case <-startChan:
-		changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop}
+		changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop | svc.AcceptShutdown}
 	case <-fatalStopChan:
 		changes <- svc.Status{State: svc.StopPending}
 		fatalStopWg.Done()
