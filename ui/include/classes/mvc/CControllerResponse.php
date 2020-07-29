@@ -35,6 +35,8 @@ abstract class CControllerResponse {
 			if ($this->getFormData() === null && CMessageHelper::getTitle() === null) {
 				redirect($this->getLocation());
 			}
+
+			CMessageHelper::initScheduleMessages();
 		}
 
 		(new CPageHeader(_('Loading...')))->display();
