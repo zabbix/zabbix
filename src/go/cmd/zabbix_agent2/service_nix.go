@@ -31,6 +31,8 @@ func eventLogInfo(msg string) error { return nil }
 
 func eventLogErr(err error) error { return nil }
 
+func confirmWinService() {}
+
 func validateExclusiveFlags() error { return nil }
 
 func handleWindowsService(conf string) error { return nil }

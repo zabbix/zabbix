@@ -54,7 +54,8 @@ var (
 	winServiceWg sync.WaitGroup
 	fatalStop    sync.WaitGroup
 
-	fatalStopChan = make(chan bool)
+	fatalStopChan chan bool
+	startChan     chan bool
 )
 
 func loadOSDependentFlags() {
@@ -401,7 +402,7 @@ func svcStop() error {
 
 func confirmWinService() {
 	if !isInteractive {
-		winServiceWg.Done()
+		startChan <- true
 	}
 }
 
@@ -412,7 +413,6 @@ func closeWinService() {
 }
 
 func runService() {
-	winServiceWg.Add(1)
 	err := svc.Run(serviceName, &winService{})
 	if err != nil {
 		fatalExit("", err)
@@ -422,28 +422,28 @@ func runService() {
 type winService struct{}
 
 func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
+	fatalStopChan = make(chan bool, 1)
+	startChan = make(chan bool)
 	changes <- svc.Status{State: svc.StartPending}
-	winServiceWg.Wait()
-	changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop}
+	select {
+	case <-startChan:
+		changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop}
+	case <-fatalStopChan:
+		changes <- svc.Status{State: svc.StopPending}
+		fatalStop.Done()
+		return
+	}
+
 loop:
 	for {
-		if fatalExitListener(changes) {
-			changes <- svc.Status{State: svc.StopPending}
-			fatalStop.Done()
-			return
-		}
-		var c svc.ChangeRequest
-		select {
-		case c = <-r:
-			switch c.Cmd {
-			case svc.Stop, svc.Shutdown:
-				break loop
-			default:
-				log.Warningf("unsupported windows service command recieved")
-			}
+		c := <-r
+		switch c.Cmd {
+		case svc.Stop, svc.Shutdown:
+			break loop
 		default:
-			log.Warningf("waiting for stop")
+			log.Warningf("unsupported windows service command recieved")
 		}
+
 	}
 
 	winServiceWg.Add(1)
@@ -451,15 +451,4 @@ loop:
 	winServiceWg.Wait()
 	changes <- svc.Status{State: svc.StopPending}
 	return
-}
-
-func fatalExitListener(changes chan<- svc.Status) bool {
-	select {
-	case <-fatalStopChan:
-		log.Warningf("stop recived")
-		return true
-	default:
-		return false
-	}
-
 }
