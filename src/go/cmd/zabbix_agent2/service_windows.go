@@ -52,7 +52,7 @@ var (
 	eLog *eventlog.Log
 
 	winServiceWg sync.WaitGroup
-	fatalStop    sync.WaitGroup
+	fatalStopWg  sync.WaitGroup
 
 	fatalStopChan chan bool
 	startChan     chan bool
@@ -115,12 +115,12 @@ func openEventLog() (err error) {
 }
 
 func sendWinServiceFatalStopSig() {
-	fatalStop.Add(1)
+	fatalStopWg.Add(1)
 	select {
 	case fatalStopChan <- true:
-		fatalStop.Wait()
+		fatalStopWg.Wait()
 	default:
-		fatalStop.Done()
+		fatalStopWg.Done()
 	}
 }
 
@@ -204,8 +204,7 @@ func handleWindowsService(conf string) error {
 		os.Exit(0)
 	}
 
-	isInteractive, err = isInteractiveSession()
-	if err != nil {
+	if isInteractive, err = isInteractiveSession(); err != nil {
 		return fmt.Errorf("can not determine if is interactive session: %s", err)
 	}
 
@@ -219,8 +218,7 @@ func handleWindowsService(conf string) error {
 func resolveWindowsService(conf string) error {
 	if svcMultipleAgentFlag {
 		if len(agent.Options.Hostname) == 0 {
-			err := setHostname()
-			if err != nil {
+			if err := setHostname(); err != nil {
 				return err
 			}
 		}
@@ -308,8 +306,7 @@ func svcInstall(conf string) error {
 	}
 	defer s.Close()
 
-	err = eventlog.InstallAsEventCreate(serviceName, eventlog.Error|eventlog.Warning|eventlog.Info)
-	if err != nil {
+	if err = eventlog.InstallAsEventCreate(serviceName, eventlog.Error|eventlog.Warning|eventlog.Info); err != nil {
 		err = fmt.Errorf("failed to report service into the event log: %s", err.Error())
 		derr := s.Delete()
 		if derr != nil {
@@ -334,13 +331,11 @@ func svcUninstall() error {
 	}
 	defer s.Close()
 
-	err = s.Delete()
-	if err != nil {
+	if err = s.Delete(); err != nil {
 		return fmt.Errorf("failed to delete service: %s", err.Error())
 	}
 
-	err = eventlog.Remove(serviceName)
-	if err != nil {
+	if err = eventlog.Remove(serviceName); err != nil {
 		return fmt.Errorf("failed to remove service from the event log: %s", err.Error())
 	}
 
@@ -360,8 +355,7 @@ func svcStart(conf string) error {
 	}
 	defer s.Close()
 
-	err = s.Start("-c", conf)
-	if err != nil {
+	if err = s.Start("-c", conf); err != nil {
 		return fmt.Errorf("failed to start service: %s", err.Error())
 	}
 
@@ -413,8 +407,7 @@ func closeWinService() {
 }
 
 func runService() {
-	err := svc.Run(serviceName, &winService{})
-	if err != nil {
+	if err := svc.Run(serviceName, &winService{}); err != nil {
 		fatalExit("", err)
 	}
 }
@@ -430,7 +423,7 @@ func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes
 		changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop}
 	case <-fatalStopChan:
 		changes <- svc.Status{State: svc.StopPending}
-		fatalStop.Done()
+		fatalStopWg.Done()
 		return
 	}
 
@@ -443,7 +436,6 @@ loop:
 		default:
 			log.Warningf("unsupported windows service command recieved")
 		}
-
 	}
 
 	winServiceWg.Add(1)
