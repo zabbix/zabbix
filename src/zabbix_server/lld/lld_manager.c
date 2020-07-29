@@ -46,37 +46,6 @@ extern int	CONFIG_LLDWORKER_FORKS;
  *
  */
 
-typedef struct zbx_lld_value
-{
-	char			*value;
-	char			*error;
-	zbx_timespec_t		ts;
-
-	zbx_uint64_t		lastlogsize;
-	int			mtime;
-	unsigned char		meta;
-
-	struct	zbx_lld_value	*next;
-}
-zbx_lld_data_t;
-
-/* queue of values for one LLD rule */
-typedef struct
-{
-	/* the LLD rule id */
-	zbx_uint64_t	itemid;
-
-	/* the number of queued values */
-	int		values_num;
-
-	/* the oldest value in queue */
-	zbx_lld_data_t	*tail;
-
-	/* the newest value in queue */
-	zbx_lld_data_t	*head;
-}
-zbx_lld_rule_t;
-
 typedef struct
 {
 	/* workers vector, created during manager initialization */
@@ -550,7 +519,7 @@ static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *
 	zbx_vector_ptr_sort(&view, lld_diag_item_compare_values_desc);
 	items_num = MIN(limit, view.values_num);
 
-	data_len = zbx_lld_serialize_top_items_result(&data, (zbx_uint64_pair_t **)view.values, items_num);
+	data_len = zbx_lld_serialize_top_items_result(&data, (zbx_lld_rule_t **)view.values, items_num);
 	zbx_ipc_client_send(client, ZBX_IPC_LLD_TOP_ITEMS_RESULT, data, data_len);
 
 	zbx_free(data);
