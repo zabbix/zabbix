@@ -523,6 +523,7 @@ static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *
 	zbx_ipc_client_send(client, ZBX_IPC_LLD_TOP_ITEMS_RESULT, data, data_len);
 
 	zbx_free(data);
+	zbx_vector_ptr_destroy(&view);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
