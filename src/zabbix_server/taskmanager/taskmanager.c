@@ -579,6 +579,13 @@ static int	tm_process_data(zbx_vector_uint64_t *taskids)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(taskid, row[0]);
+
+		if (SUCCEED == DBis_null(row[1]))
+		{
+			zbx_vector_uint64_append(&done_taskids, taskid);
+			continue;
+		}
+
 		data_type = atoi(row[1]);
 
 		switch (data_type)
