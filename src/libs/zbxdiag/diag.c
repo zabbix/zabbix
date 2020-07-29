@@ -431,9 +431,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 					zbx_vector_ptr_create(&items);
 					time1 = zbx_time();
 					if (FAIL == (ret = zbx_preprocessor_get_top_items(map->value, &items, error)))
-					{
 						goto out;
-					}
 					time2 = zbx_time();
 					time_total += time2 - time1;
 

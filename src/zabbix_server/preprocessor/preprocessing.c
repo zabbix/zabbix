@@ -1225,16 +1225,16 @@ int	zbx_preprocessor_get_diag_stats(int *values_num, int *values_preproc_num, ch
  ******************************************************************************/
 int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error)
 {
-	int			ret;
-	unsigned char		*data, *result;
-	zbx_uint32_t		data_len;
+	int		ret;
+	unsigned char	*data, *result;
+	zbx_uint32_t	data_len;
 
 	data_len = zbx_preprocessor_pack_top_items_request(&data, limit);
 
 	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_TOP_ITEMS,
 			SEC_PER_MIN, data, data_len, &result, error)))
 	{
-		goto  out;
+		goto out;
 	}
 
 	zbx_preprocessor_unpack_top_result(items, result);
