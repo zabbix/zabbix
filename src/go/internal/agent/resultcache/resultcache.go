@@ -61,11 +61,9 @@ const (
 type ResultCache interface {
 	Start()
 	Stop()
-
+	Upload(u Uploader)
 	// TODO: will be used once the runtime configuration reload is implemented
 	UpdateOptions(options *agent.AgentOptions)
-
-	Upload(u Uploader)
 }
 
 type AgentData struct {
