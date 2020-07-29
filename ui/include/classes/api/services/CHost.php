@@ -1343,13 +1343,13 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 
-		$hostids = zbx_toArray($data['hostids']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$this->checkPermissions($hostids, _('No permissions to referred object or it does not exist!'));
+		$this->checkPermissions($data['hostids'], _('No permissions to referred object or it does not exist!'));
 
 		if (isset($data['interfaces'])) {
 			$options = [
-				'hostids' => $hostids,
+				'hostids' => $data['hostids'],
 				'interfaces' => zbx_toArray($data['interfaces'])
 			];
 			API::HostInterface()->massRemove($options);
