@@ -664,7 +664,7 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 		item->hits += hits;
 		item->last_accessed = time(NULL);
 
-		hour = item->last_accessed % SEC_PER_HOUR;
+		hour = item->last_accessed / SEC_PER_HOUR;
 		if (hour != item->hour)
 		{
 			item->last_hourly_num = item->hourly_num;
