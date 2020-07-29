@@ -56,9 +56,9 @@ typedef struct
 	zbx_uint64_t	used_size;
 	zbx_uint64_t	min_chunk_size;
 	zbx_uint64_t	max_chunk_size;
-	int		chunks_num[MEM_BUCKET_COUNT];
-	int		free_chunks;
-	int		used_chunks;
+	unsigned int	chunks_num[MEM_BUCKET_COUNT];
+	unsigned int	free_chunks;
+	unsigned int	used_chunks;
 }
 zbx_mem_stats_t;
 

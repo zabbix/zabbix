@@ -21,7 +21,7 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "preproc.h"
-
+#include "zbxdiag.h"
 #include "diag.h"
 
 void	diag_map_free(zbx_diag_map_t *map)
