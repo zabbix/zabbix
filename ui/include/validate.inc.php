@@ -448,6 +448,7 @@ function validateTimeSelectorPeriod($from, $to) {
 	}
 
 	$ts = [];
+	$ts['now'] = time();
 	$range_time_parser = new CRangeTimeParser();
 
 	foreach (['from' => $from, 'to' => $to] as $field => $value) {
@@ -456,9 +457,8 @@ function validateTimeSelectorPeriod($from, $to) {
 	}
 
 	$period = $ts['to'] - $ts['from'] + 1;
-	$max_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MAX_PERIOD), true)
-		+ ZBX_MAX_PERIOD_ADDITIONAL_TIME
-	;
+	$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+	$max_period = $ts['now'] - $range_time_parser->getDateTime(true)->getTimestamp() + 1;
 
 	if ($period < ZBX_MIN_PERIOD) {
 		error(_n('Minimum time period to display is %1$s minute.',

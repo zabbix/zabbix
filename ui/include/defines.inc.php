@@ -38,13 +38,6 @@ define('ZBX_TEBIBYTE',	'1099511627776');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
 
-/**
- * Value to be added to CSettingsHelper::MAX_PERIOD for final calculation of acceptable max period. The value contains:
- * - 1 day (86400 seconds) for leap year;
- * - 1 hour (3600 seconds) for winter/summer time transfer;
- * - 1 second for correct displaying of the max_period border in graph.
- */
-define('ZBX_MAX_PERIOD_ADDITIONAL_TIME', 90001);
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_UINT64',		'18446744073709551615');
