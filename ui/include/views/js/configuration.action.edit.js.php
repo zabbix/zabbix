@@ -464,6 +464,9 @@
 			this.$notice.appendTo($wrapper);
 			this.$usergroups.appendTo($wrapper);
 			this.$users.appendTo($wrapper);
+			this.$mediatype_only.appendTo($wrapper);
+		}
+		else if (props.operation_type == operation_details.OPERATION_TYPE_ACK_MESSAGE) {
 			this.$mediatype_default.appendTo($wrapper);
 		}
 		else if (props.recovery_phase == operation_details.ACTION_OPERATION
