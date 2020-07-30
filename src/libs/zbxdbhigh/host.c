@@ -2978,20 +2978,88 @@ ZBX_PTR_VECTOR_IMPL(macros, zbx_macros_prototype_t *)
 
 typedef struct
 {
+	char		*community;
+	char		*securityname;
+	char		*authpassphrase;
+	char		*privpassphrase;
+	char		*contextname;
+	unsigned char	securitylevel;
+	unsigned char	authprotocol;
+	unsigned char	privprotocol;
+	unsigned char	version;
+	unsigned char	bulk;
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE		__UINT64_C(0x00000001)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK		__UINT64_C(0x00000002)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY	__UINT64_C(0x00000004)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME	__UINT64_C(0x00000008)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL	__UINT64_C(0x00000010)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS	__UINT64_C(0x00000020)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS	__UINT64_C(0x00000040)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL	__UINT64_C(0x00000080)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL	__UINT64_C(0x00000100)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT	__UINT64_C(0x00000200)
+#define ZBX_FLAG_HPINTERFACE_SNMP_UPDATE									\
+		(ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE | ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK |		\
+		ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY | ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME |		\
+		ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL | ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS |		\
+		ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS | ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL |	\
+		ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL | ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT)
+#define ZBX_FLAG_HPINTERFACE_SNMP_CREATE		__UINT64_C(0x00000400)
+	zbx_uint64_t	flags;
+
+}
+zbx_interface_snmp_t;
+
+typedef struct
+{
+	zbx_uint64_t	interfaceid;
+	unsigned char	main;
+	unsigned char	type;
+	unsigned char	useip;
+	char		*ip;
+	char		*dns;
+	char		*port;
+#define ZBX_FLAG_HPINTERFACE_UPDATE_MAIN	__UINT64_C(0x00000001)
+#define ZBX_FLAG_HPINTERFACE_UPDATE_TYPE	__UINT64_C(0x00000002)
+#define ZBX_FLAG_HPINTERFACE_UPDATE_USEIP	__UINT64_C(0x00000004)
+#define ZBX_FLAG_HPINTERFACE_UPDATE_IP		__UINT64_C(0x00000008)
+#define ZBX_FLAG_HPINTERFACE_UPDATE_DNS		__UINT64_C(0x00000010)
+#define ZBX_FLAG_HPINTERFACE_UPDATE_PORT	__UINT64_C(0x00000020)
+#define ZBX_FLAG_HPINTERFACE_UPDATE	\
+		(ZBX_FLAG_HPINTERFACE_UPDATE_MAIN | ZBX_FLAG_HPINTERFACE_UPDATE_TYPE | \
+		ZBX_FLAG_HPINTERFACE_UPDATE_USEIP | ZBX_FLAG_HPINTERFACE_UPDATE_IP | \
+		ZBX_FLAG_HPINTERFACE_UPDATE_DNS | ZBX_FLAG_HPINTERFACE_UPDATE_PORT)
+	zbx_uint64_t	flags;
+	union _data
+	{
+		zbx_interface_snmp_t	*snmp;
+	}
+	data;
+}
+zbx_interfaces_prototype_t;
+
+ZBX_PTR_VECTOR_DECL(interfaces, zbx_interfaces_prototype_t *)
+ZBX_PTR_VECTOR_IMPL(interfaces, zbx_interfaces_prototype_t *)
+
+typedef struct
+{
 	zbx_uint64_t		templateid;		/* link to parent template */
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		itemid;			/* discovery rule id */
 	zbx_vector_uint64_t	lnk_templateids;	/* list of templates which should be linked */
 	zbx_vector_ptr_t	group_prototypes;	/* list of group prototypes */
-	zbx_vector_macros_t	hostmacros;			/* list of user macros */
+	zbx_vector_macros_t	hostmacros;		/* list of user macros */
+	zbx_vector_interfaces_t	interfaces;		/* list of interfaces */
 	char			*host;
 	char			*name;
 	unsigned char		status;
-#define ZBX_FLAG_HPLINK_UPDATE_NAME	0x01
-#define ZBX_FLAG_HPLINK_UPDATE_STATUS	0x02
-#define	ZBX_FLAG_HPLINK_UPDATE_DISCOVER 0x04
+#define ZBX_FLAG_HPLINK_UPDATE_NAME			0x01
+#define ZBX_FLAG_HPLINK_UPDATE_STATUS			0x02
+#define ZBX_FLAG_HPLINK_UPDATE_DISCOVER			0x04
+#define ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES	0x08
 	unsigned char		flags;
 	unsigned char		discover;
+	unsigned char		custom_interfaces;
 }
 zbx_host_prototype_t;
 
@@ -3003,12 +3071,33 @@ static void	DBhost_macro_free(zbx_macros_prototype_t *hostmacro)
 	zbx_free(hostmacro);
 }
 
+static void	DBhost_interface_free(zbx_interfaces_prototype_t *interface)
+{
+	zbx_free(interface->ip);
+	zbx_free(interface->dns);
+	zbx_free(interface->port);
+
+	if (INTERFACE_TYPE_SNMP == interface->type)
+	{
+		zbx_free(interface->data.snmp->community);
+		zbx_free(interface->data.snmp->securityname);
+		zbx_free(interface->data.snmp->authpassphrase);
+		zbx_free(interface->data.snmp->privpassphrase);
+		zbx_free(interface->data.snmp->contextname);
+		zbx_free(interface->data.snmp);
+	}
+
+	zbx_free(interface);
+}
+
 static void	DBhost_prototype_clean(zbx_host_prototype_t *host_prototype)
 {
 	zbx_free(host_prototype->name);
 	zbx_free(host_prototype->host);
 	zbx_vector_macros_clear_ext(&host_prototype->hostmacros, DBhost_macro_free);
 	zbx_vector_macros_destroy(&host_prototype->hostmacros);
+	zbx_vector_interfaces_clear_ext(&host_prototype->interfaces, DBhost_interface_free);
+	zbx_vector_interfaces_destroy(&host_prototype->interfaces);
 	DBgroup_prototypes_clean(&host_prototype->group_prototypes);
 	zbx_vector_ptr_destroy(&host_prototype->group_prototypes);
 	zbx_vector_uint64_destroy(&host_prototype->lnk_templateids);
@@ -3070,7 +3159,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 	/* selects host prototypes from templates */
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hi.itemid,th.hostid,th.host,th.name,th.status,th.discover"
+			"select hi.itemid,th.hostid,th.host,th.name,th.status,th.discover,th.custom_interfaces"
 			" from items hi,items ti,host_discovery thd,hosts th"
 			" where hi.templateid=ti.itemid"
 				" and ti.itemid=thd.parent_itemid"
@@ -3092,11 +3181,13 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		zbx_vector_uint64_create(&host_prototype->lnk_templateids);
 		zbx_vector_ptr_create(&host_prototype->group_prototypes);
 		zbx_vector_macros_create(&host_prototype->hostmacros);
+		zbx_vector_interfaces_create(&host_prototype->interfaces);
 		host_prototype->host = zbx_strdup(NULL, row[2]);
 		host_prototype->name = zbx_strdup(NULL, row[3]);
 		host_prototype->status = (unsigned char)atoi(row[4]);
 		host_prototype->flags = 0;
 		host_prototype->discover = (unsigned char)atoi(row[5]);
+		host_prototype->custom_interfaces = (unsigned char)atoi(row[6]);
 
 		zbx_vector_ptr_append(host_prototypes, host_prototype);
 		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
@@ -3144,6 +3235,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_STATUS;
 					if (host_prototype->discover != (unsigned char)atoi(row[5]))
 						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_DISCOVER;
+					if (host_prototype->custom_interfaces != (unsigned char)atoi(row[6]))
+						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES;
 					break;
 				}
 			}
@@ -3473,6 +3566,75 @@ static int	DBhost_prototypes_macro_make(zbx_vector_macros_t *hostmacros, zbx_uin
 	return FAIL;
 }
 
+static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces, zbx_uint64_t interfaceid,
+		unsigned char ifmain, unsigned char type, unsigned char useip, const char *ip, const char *dns,
+		const char *port, unsigned char snmp_type, unsigned char bulk, const char *community,
+		const char *securityname, unsigned char securitylevel, const char *authpassphrase,
+		const char *privpassphrase, unsigned char authprotocol, unsigned char privprotocol,
+		const char *contextname)
+{
+	zbx_interfaces_prototype_t	*interface;
+	int				i;
+
+	for (i = 0; i < interfaces->values_num; i++)
+	{
+		interface = interfaces->values[i];
+
+		if (0 == interface->interfaceid)
+		{
+			interface->interfaceid = interfaceid;
+
+			if (interface->main != ifmain)
+				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_MAIN;
+
+			if (interface->type != type)
+				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_TYPE;
+
+			if (interface->useip != useip)
+				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_USEIP;
+
+			if (0 != strcmp(interface->ip, ip))
+				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_IP;
+
+			if (0 != strcmp(interface->dns, dns))
+				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_DNS;
+
+			if (0 != strcmp(interface->port, port))
+				interface->flags |= ZBX_FLAG_HPINTERFACE_UPDATE_PORT;
+
+			if (INTERFACE_TYPE_SNMP == interface->type)
+			{
+				zbx_interface_snmp_t *snmp = interface->data.snmp;
+
+				if (snmp->version != snmp_type)
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE;
+				if (snmp->bulk!= bulk)
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK;
+				if (0 != strcmp(snmp->community, community))
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY;
+				if (0 != strcmp(snmp->securityname, securityname))
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME;
+				if (snmp->securitylevel!= securitylevel)
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL;
+				if (0 != strcmp(snmp->authpassphrase, authpassphrase))
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS;
+				if (0 != strcmp(snmp->privpassphrase, privpassphrase))
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS;
+				if (snmp->authprotocol != authprotocol)
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL;
+				if (snmp->privprotocol != privprotocol)
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL;
+				if (0 != strcmp(snmp->contextname, contextname))
+					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT;
+			}
+
+			return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBhost_prototypes_macros_make                                    *
@@ -3611,25 +3773,213 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBhost_prototypes_interfaces_make                                *
+ *                                                                            *
+ * Parameters: host_prototypes  - [IN/OUT] list of host prototypes            *
+ *                                    should be sorted by templateid          *
+ *             del_interfaceids - [OUT] list of host interfaceids which       *
+ *                                    should be deleted                       *
+ *                                                                            *
+ * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
+		zbx_vector_uint64_t *del_interfaceids)
+{
+	DB_RESULT			result;
+	DB_ROW				row;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t		hostids;
+	zbx_uint64_t			hostid, interfaceid;
+	zbx_host_prototype_t		*host_prototype;
+	zbx_interfaces_prototype_t	*interface;
+	int				i;
+
+	zbx_vector_uint64_create(&hostids);
+
+	/* select list of interfaces which should be linked to host prototypes */
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		zbx_vector_uint64_append(&hostids, host_prototype->templateid);
+	}
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select i.hostid,i.main,i.type,i.useip,i.ip,i.dns,i.port,s.version,s.bulk,s.community,"
+				"s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,s.authprotocol,"
+				"s.privprotocol,s.contextname"
+			" from interface i"
+				" left join interface_snmp s"
+					" on i.interfaceid=s.interfaceid"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
+
+	result = DBselect("%s", sql);
+	host_prototype = NULL;
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		if (NULL == host_prototype || host_prototype->templateid != hostid)
+		{
+			if (FAIL == (i = zbx_vector_ptr_bsearch(host_prototypes, &hostid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+		}
+
+		interface = (zbx_interfaces_prototype_t *)zbx_malloc(NULL, sizeof(zbx_interfaces_prototype_t));
+		interface->interfaceid = 0;
+		ZBX_STR2UCHAR(interface->main, row[1]);
+		ZBX_STR2UCHAR(interface->type, row[2]);
+		ZBX_STR2UCHAR(interface->useip, row[3]);
+		interface->ip = zbx_strdup(NULL, row[4]);
+		interface->dns = zbx_strdup(NULL, row[5]);
+		interface->port = zbx_strdup(NULL, row[6]);
+
+		if (INTERFACE_TYPE_SNMP == interface->type)
+		{
+			zbx_interface_snmp_t	*snmp;
+
+			snmp = (zbx_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_interface_snmp_t));
+			ZBX_STR2UCHAR(snmp->version, row[7]);
+			ZBX_STR2UCHAR(snmp->bulk, row[8]);
+			snmp->community = zbx_strdup(NULL, row[9]);
+			snmp->securityname = zbx_strdup(NULL, row[10]);
+			ZBX_STR2UCHAR(snmp->securitylevel, row[11]);
+			snmp->authpassphrase = zbx_strdup(NULL, row[12]);
+			snmp->privpassphrase = zbx_strdup(NULL, row[13]);
+			ZBX_STR2UCHAR(snmp->authprotocol, row[14]);
+			ZBX_STR2UCHAR(snmp->privprotocol, row[15]);
+			snmp->contextname = zbx_strdup(NULL, row[16]);
+			interface->data.snmp = snmp;
+		}
+		else
+			interface->data.snmp = NULL;
+
+		zbx_vector_interfaces_append(&host_prototype->interfaces, interface);
+	}
+	DBfree_result(result);
+
+	/* select list of interfaces which already linked to host prototypes */
+
+	zbx_vector_uint64_clear(&hostids);
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		if (0 == host_prototype->hostid)
+			continue;
+
+		zbx_vector_uint64_append(&hostids, host_prototype->hostid);
+	}
+
+	if (0 != hostids.values_num)
+	{
+		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select hi.interfaceid,hi.hostid,hi.main,hi.type,hi.useip,hi.ip,hi.dns,hi.port,"
+					"s.version,s.bulk,s.community,s.securityname,s.securitylevel,s.authpassphrase,"
+					"s.privpassphrase,s.authprotocol,s.privprotocol,s.contextname"
+				" from interface hi"
+					" left join interface_snmp s"
+						" on hi.interfaceid=s.interfaceid"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(hostid, row[1]);
+
+			for (i = 0; i < host_prototypes->values_num; i++)
+			{
+				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+				if (host_prototype->hostid == hostid)
+				{
+					unsigned char	type;
+					int		ret;
+
+					ZBX_STR2UINT64(interfaceid, row[0]);
+					ZBX_STR2UINT64(type, row[3]);
+
+					if (INTERFACE_TYPE_SNMP == type)
+					{
+						ret = DBhost_prototypes_interface_make(&host_prototype->interfaces,
+								interfaceid, (unsigned char)atoi(row[2]), type,
+								(unsigned char)atoi(row[4]), row[5], row[6], row[7],
+								(unsigned char)atoi(row[8]),
+								(unsigned char)atoi(row[9]), row[10], row[11],
+								(unsigned char)atoi(row[12]), row[13], row[14],
+								(unsigned char)atoi(row[15]),
+								(unsigned char)atoi(row[16]), row[17]);
+					}
+					else
+					{
+						ret = DBhost_prototypes_interface_make(&host_prototype->interfaces,
+								interfaceid, (unsigned char)atoi(row[2]), type,
+								(unsigned char)atoi(row[4]), row[5], row[6], row[7], 0,
+								0, NULL, NULL, 0, NULL, NULL, 0, 0, NULL);
+					}
+
+					if (FAIL == ret)
+						zbx_vector_uint64_append(del_interfaceids, interfaceid);
+
+					break;
+				}
+			}
+
+			if (i == host_prototypes->values_num)
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_sort(del_interfaceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBhost_prototypes_save                                           *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_hosttemplateids,
-		zbx_vector_uint64_t *del_hostmacroids)
+		zbx_vector_uint64_t *del_hostmacroids, zbx_vector_uint64_t *del_interfaceids)
 {
-	char			*sql1 = NULL, *sql2 = NULL, *name_esc, *value_esc;
-	size_t			sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
-				sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0;
-	zbx_host_prototype_t	*host_prototype;
-	zbx_group_prototype_t	*group_prototype;
-	zbx_macros_prototype_t	*hostmacro;
-	zbx_uint64_t		hostid = 0, hosttemplateid = 0, group_prototypeid = 0, hostmacroid = 0;
-	int			i, j, new_hosts = 0, new_hosts_templates = 0, new_group_prototypes = 0,
-				upd_group_prototypes = 0, new_hostmacros = 0, upd_hostmacros = 0;
-	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_htemplates, db_insert_gproto,
-				db_insert_hmacro;
+	char				*sql1 = NULL, *sql2 = NULL, *name_esc, *value_esc;
+	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
+					sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0;
+	zbx_host_prototype_t		*host_prototype;
+	zbx_group_prototype_t		*group_prototype;
+	zbx_macros_prototype_t		*hostmacro;
+	zbx_interfaces_prototype_t	*interface;
+	zbx_uint64_t			hostid = 0, hosttemplateid = 0, group_prototypeid = 0, hostmacroid = 0,
+					interfaceid = 0;
+	int				i, j, new_hosts = 0, new_hosts_templates = 0, new_group_prototypes = 0,
+					upd_group_prototypes = 0, new_hostmacros = 0, upd_hostmacros = 0,
+					new_interfaces = 0, upd_interfaces = 0, new_snmp = 0, upd_snmp = 0;
+	zbx_db_insert_t			db_insert, db_insert_hdiscovery, db_insert_htemplates, db_insert_gproto,
+					db_insert_hmacro, db_insert_iface, db_insert_snmp;
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -3659,6 +4009,27 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			else if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE))
 				upd_hostmacros++;
 		}
+
+		for (j = 0; j < host_prototype->interfaces.values_num; j++)
+		{
+			interface = host_prototype->interfaces.values[j];
+
+			if (0 == interface->interfaceid)
+				new_interfaces++;
+			else if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE))
+				upd_interfaces++;
+
+			if (INTERFACE_TYPE_SNMP == interface->type)
+			{
+				if (0 == interface->interfaceid)
+					interface->data.snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_CREATE;
+
+				if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_CREATE))
+					new_snmp++;
+				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE))
+					upd_snmp++;
+			}
+		}
 	}
 
 	if (0 != new_hosts)
@@ -3666,7 +4037,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		hostid = DBget_maxid_num("hosts", new_hosts);
 
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "status", "flags", "templateid",
-				"discover", NULL);
+				"discover", "custom_interfaces", NULL);
 
 		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_itemid", NULL);
 	}
@@ -3701,6 +4072,13 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 	}
 
+	if (0 != del_interfaceids->values_num)
+	{
+		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from interface where");
+		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "interfaceid",
+				del_interfaceids->values, del_interfaceids->values_num);
+		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
+	}
 
 	if (0 != new_group_prototypes)
 	{
@@ -3718,6 +4096,21 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				"description", "type", NULL);
 	}
 
+	if (0 != new_interfaces)
+	{
+		interfaceid = DBget_maxid_num("interface", new_interfaces);
+
+		zbx_db_insert_prepare(&db_insert_iface, "interface", "interfaceid", "hostid", "main", "type",
+				"useip", "ip", "dns", "port", NULL);
+
+		if (0 != new_snmp)
+		{
+			zbx_db_insert_prepare(&db_insert_snmp, "interface_snmp", "interfaceid", "version", "bulk", "community",
+					"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
+					"privprotocol", "contextname", NULL);
+		}
+	}
+
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
 		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
@@ -3729,7 +4122,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			zbx_db_insert_add_values(&db_insert, host_prototype->hostid, host_prototype->host,
 					host_prototype->name, (int)host_prototype->status,
 					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid,
-					(int)host_prototype->discover);
+					(int)host_prototype->discover, (int)host_prototype->custom_interfaces);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
 		}
@@ -3752,6 +4145,11 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			{
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",discover=%d",
 						host_prototype->discover);
+			}
+			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES))
+			{
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, ",custom_interfaces=%d",
+						host_prototype->custom_interfaces);
 			}
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 					host_prototype->hostid);
@@ -3827,6 +4225,182 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			}
 		}
 
+		for (j = 0; j < host_prototype->interfaces.values_num; j++)
+		{
+			interface = host_prototype->interfaces.values[j];
+
+			if (0 == interface->interfaceid)
+			{
+				interface->interfaceid = interfaceid++;
+				zbx_db_insert_add_values(&db_insert_iface, interface->interfaceid, host_prototype->hostid,
+						(int)interface->main, (int)interface->type, (int)interface->useip,
+						interface->ip, interface->dns, interface->port);
+			}
+			else if (0 != (interface->flags & ZBX_FLAG_HPMACRO_UPDATE))
+			{
+				const char	*d = "";
+
+				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update interface set ");
+
+				if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_MAIN))
+				{
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%smain=%d", d,
+							interface->main);
+					d = ",";
+				}
+
+				if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_TYPE))
+				{
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%stype=%d", d,
+							interface->type);
+					d = ",";
+				}
+
+				if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_USEIP))
+				{
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%suseip=%d", d,
+							interface->useip);
+					d = ",";
+				}
+
+				if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_IP))
+				{
+					value_esc = DBdyn_escape_string(interface->ip);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sip='%s'", d, value_esc);
+					zbx_free(value_esc);
+					d = ",";
+				}
+
+				if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_DNS))
+				{
+					value_esc = DBdyn_escape_string(interface->dns);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdns='%s'", d,
+							value_esc);
+					zbx_free(value_esc);
+					d = ",";
+				}
+
+				if (0 != (interface->flags & ZBX_FLAG_HPINTERFACE_UPDATE_PORT))
+				{
+					value_esc = DBdyn_escape_string(interface->port);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sport='%s'", d,
+							value_esc);
+					zbx_free(value_esc);
+				}
+
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
+			}
+
+			if (INTERFACE_TYPE_SNMP == interface->type)
+			{
+				if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_CREATE))
+				{
+					zbx_db_insert_add_values(&db_insert_snmp, interface->interfaceid,
+							(int)interface->data.snmp->version,
+							(int)interface->data.snmp->bulk,
+							interface->data.snmp->community,
+							interface->data.snmp->securityname,
+							(int)interface->data.snmp->securitylevel,
+							interface->data.snmp->authpassphrase,
+							interface->data.snmp->privpassphrase,
+							(int)interface->data.snmp->authprotocol,
+							(int)interface->data.snmp->privprotocol,
+							interface->data.snmp->contextname);
+				}
+				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE))
+				{
+					zbx_interface_snmp_t	*snmp = interface->data.snmp;
+					const char		*d = "";
+
+					zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset,
+							"update interface_snmp set ");
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE))
+					{
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "version=%d",
+								(int)snmp->version);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK))
+					{
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sbulk=%d", d,
+								(int)snmp->bulk);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY))
+					{
+						value_esc = DBdyn_escape_string(snmp->community);
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%scommunity='%s'",
+								d, value_esc);
+						zbx_free(value_esc);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME))
+					{
+						value_esc = DBdyn_escape_string(snmp->securityname);
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+								"%ssecurityname='%s'", d, value_esc);
+						zbx_free(value_esc);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL))
+					{
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+								"%ssecuritylevel=%d", d, (int)snmp->securitylevel);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS))
+					{
+						value_esc = DBdyn_escape_string(snmp->authpassphrase);
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+								"%sauthpassphrase='%s'", d, value_esc);
+						zbx_free(value_esc);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS))
+					{
+						value_esc = DBdyn_escape_string(snmp->privpassphrase);
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+								"%sprivpassphrase='%s'", d, value_esc);
+						zbx_free(value_esc);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL))
+					{
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+								"%sauthprotocol=%d", d, (int)snmp->authprotocol);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL))
+					{
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+								"%sprivprotocol=%d", d, (int)snmp->privprotocol);
+						d = ",";
+					}
+
+					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT))
+					{
+						value_esc = DBdyn_escape_string(snmp->contextname);
+						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+								"%scontextname='%s'", d, value_esc);
+						zbx_free(value_esc);
+					}
+
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+							" where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
+				}
+			}
+		}
+
 		DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
@@ -3857,14 +4431,28 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_db_insert_clean(&db_insert_hmacro);
 	}
 
-	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes || 0 != upd_hostmacros)
+	if (0 != new_interfaces)
+	{
+		zbx_db_insert_execute(&db_insert_iface);
+		zbx_db_insert_clean(&db_insert_iface);
+
+		if (0 != new_snmp)
+		{
+			zbx_db_insert_execute(&db_insert_snmp);
+			zbx_db_insert_clean(&db_insert_snmp);
+		}
+	}
+
+	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes || 0 != upd_hostmacros ||
+			0 != upd_interfaces || 0 != upd_snmp)
 	{
 		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 		DBexecute("%s", sql1);
 		zbx_free(sql1);
 	}
 
-	if (0 != del_hosttemplateids->values_num || 0 != del_hostmacroids->values_num)
+	if (0 != del_hosttemplateids->values_num || 0 != del_hostmacroids->values_num ||
+			0 != del_interfaceids->values_num)
 	{
 		DBexecute("%s", sql2);
 		zbx_free(sql2);
@@ -3895,20 +4483,23 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
 
 	if (0 != host_prototypes.values_num)
 	{
-		zbx_vector_uint64_t	del_hosttemplateids, del_group_prototypeids, del_macroids;
+		zbx_vector_uint64_t	del_hosttemplateids, del_group_prototypeids, del_macroids, del_interfaceids;
 
 		zbx_vector_uint64_create(&del_hosttemplateids);
 		zbx_vector_uint64_create(&del_group_prototypeids);
 		zbx_vector_uint64_create(&del_macroids);
+		zbx_vector_uint64_create(&del_interfaceids);
 
 		DBhost_prototypes_templates_make(&host_prototypes, &del_hosttemplateids);
 		DBhost_prototypes_groups_make(&host_prototypes, &del_group_prototypeids);
 		DBhost_prototypes_macros_make(&host_prototypes, &del_macroids);
-		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids, &del_macroids);
+		DBhost_prototypes_interfaces_make(&host_prototypes, &del_interfaceids);
+		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids, &del_macroids, &del_interfaceids);
 		DBgroup_prototypes_delete(&del_group_prototypeids);
 
 		zbx_vector_uint64_destroy(&del_macroids);
 		zbx_vector_uint64_destroy(&del_group_prototypeids);
+		zbx_vector_uint64_destroy(&del_interfaceids);
 		zbx_vector_uint64_destroy(&del_hosttemplateids);
 	}
 
