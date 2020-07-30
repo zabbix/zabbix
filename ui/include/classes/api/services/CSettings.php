@@ -251,10 +251,10 @@ class CSettings extends CApiService {
 
 			if ($period_default > $max_period) {
 				$field = 'period_default';
-				$message = _('time filter default period exceeds the max period.');
+				$message = _('time filter default period exceeds the max period');
 				if (!$period_default_updated) {
 					$field = 'max_period';
-					$message = _('max period is less than time filter default period.');
+					$message = _('max period is less than time filter default period');
 				}
 
 				$error = _s('Incorrect value for field "%1$s": %2$s.', $field, $message);
