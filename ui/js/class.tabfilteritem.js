@@ -48,7 +48,7 @@ class CTabFilterItem extends CBaseComponent {
 		if (this._expanded) {
 			this.renderContentTemplate();
 
-			if (this._content_container.querySelector('[name="filter_name"]')) {
+			if (this._data.filter_configurable) {
 				this.addActionIcons();
 			}
 
@@ -90,7 +90,7 @@ class CTabFilterItem extends CBaseComponent {
 				this.setBrowserLocation(this.getFilterParams());
 				this._content_container.classList.remove('display-none');
 
-				if (this._content_container.querySelector('[name="filter_name"]')) {
+				if (this._data.filter_configurable) {
 					this.addActionIcons();
 				}
 			},

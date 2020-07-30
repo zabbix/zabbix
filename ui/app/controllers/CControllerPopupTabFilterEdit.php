@@ -124,8 +124,8 @@ class CControllerPopupTabFilterEdit extends CController {
 		if (array_key_exists($data['idx2'], $filter->tabfilters)) {
 			$properties = [
 				'filter_name' => $data['filter_name'],
-				'filter_show_counter' => (bool) $data['filter_show_counter'],
-				'filter_custom_time' => (bool) $data['filter_custom_time'],
+				'filter_show_counter' => $data['filter_show_counter'],
+				'filter_custom_time' => $data['filter_custom_time'],
 				'from' => $data['tabfilter_from'],
 				'to' => $data['tabfilter_to']
 			];
@@ -145,10 +145,10 @@ class CControllerPopupTabFilterEdit extends CController {
 	 * Delete tab filter with index idx2
 	 */
 	public function deleteTab(array $data) {
-		$filter = new CTabFilterProfile($data['idx'], []);
-		$filter->read();
-		$filter->deleteTab((int) $data['idx2']);
-		$filter->update();
+		(new CTabFilterProfile($data['idx'], []))
+			->read()
+			->deleteTab((int) $data['idx2'])
+			->update();
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($data)]))->disableView());
 	}

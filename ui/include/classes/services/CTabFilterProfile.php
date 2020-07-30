@@ -46,9 +46,9 @@ class CTabFilterProfile {
 	/**
 	 * Array of tabs filter arrays.
 	 * Tab filter properties:
-	 * @property string []['name']          Tab label.
-	 * @property bool   []['show_counter']  Show count of results within tab label when tab is collapsed.
-	 * @property bool   []['custom_time']   Use custom time range.
+	 * @property string []['filter_name']          Tab label.
+	 * @property int    []['filter_show_counter']  Show count of results within tab label when tab is collapsed.
+	 * @property int    []['filter_custom_time']   Use custom time range.
 	 *
 	 * @var array
 	 */

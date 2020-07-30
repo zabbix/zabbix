@@ -178,11 +178,9 @@ $(function($) {
 	let template = document.querySelector('[data-template="monitoring.host.filter"]');
 
 	function render(data, container) {
-		let is_sortable = $(this._target).closest('.ui-sortable').length > 0;
-
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
 		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(is_sortable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
 		// Host groups multiselect.
 		$('#groupids_' + data.uniqid, container).multiSelectHelper({
@@ -248,11 +246,9 @@ $(function($) {
 	}
 
 	function expand(data, container) {
-		let is_sortable = $(this._target).closest('.ui-sortable').length > 0;
-
 		// "Save as" can contain only home tab, also home tab cannot contain "Update" button.
 		$('[name="filter_new"],[name="filter_update"]').hide()
-			.filter(is_sortable ? '[name="filter_update"]' : '[name="filter_new"]').show();
+			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 	}
 
 	// Tab filter item events handlers.

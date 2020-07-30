@@ -126,7 +126,9 @@ class CTabFilter extends CDiv {
 	 * @param CTag|string $label    String or CTag as tab label element. Content node if it is not null will have
 	 *                              id attribute equal [data-target] attribute of $label.
 	 * @param CTag|null   $content  Tab content node or null is dynamic tab is added.
-	 * @param array       $data     Array of data used by tab.
+	 * @param array       $data     Array of data used by tab and additional flags:
+	 *                              bool 'filter_sortable'      tab will be sortable in frontend.
+	 *                              bool 'filter_configurable'  tab will have gear icon when activated.
 	 */
 	public function addTab($label, $content, array $data = []) {
 		$tab_index = count($this->labels);
@@ -141,7 +143,10 @@ class CTabFilter extends CDiv {
 				$label = (new CLink('&nbsp;'))
 					->setAttribute('data-target', $targetid)
 					->addClass('icon-home');
-				$data['sortable'] = false;
+				$data += [
+					'filter_sortable' => false,
+					'filter_configurable' => false
+				];
 			}
 			else {
 				$label = (new CLink($label))->setAttribute('data-target', $targetid);
@@ -154,7 +159,10 @@ class CTabFilter extends CDiv {
 
 		$this->labels[] = $label;
 		$this->contents[] = $content;
-		$this->options['data'][] = $data + ['sortable' => true];
+		$this->options['data'][] = $data + [
+			'filter_sortable' => true,
+			'filter_configurable' => true
+		];
 
 		return $this;
 	}
@@ -201,7 +209,7 @@ class CTabFilter extends CDiv {
 		$static = [];
 
 		foreach ($this->labels as $index => $label) {
-			if ($this->contents[$index] === null && $this->options['data'][$index]['sortable']) {
+			if ($this->contents[$index] === null && $this->options['data'][$index]['filter_sortable']) {
 				$sortable[$index] = $label;
 			}
 			else {

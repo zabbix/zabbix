@@ -185,7 +185,7 @@ class CControllerProfileUpdate extends CController {
 
 				$properties['tags'] = $tags;
 
-				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
+				(new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
 					->read()
 					->setTabFilter($idx2, $properties)
 					->update();
@@ -193,7 +193,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.monitoringhosts.taborder':
-				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
+				(new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
 					->read()
 					->sort($this->getInput('value_str'))
 					->update();
