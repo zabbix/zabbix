@@ -723,7 +723,7 @@ class CHost extends CHostGeneral {
 			DB::insert('hosts_groups', $groupsToAdd);
 
 			if (array_key_exists('tags', $host)) {
-				foreach ($host['tags'] as $tag) {
+				foreach (zbx_toArray($host['tags']) as $tag) {
 					$ins_tags[] = ['hostid' => $hostid] + $tag;
 				}
 			}
@@ -858,6 +858,10 @@ class CHost extends CHostGeneral {
 				$macros[$host['hostid']] = zbx_toArray($host['macros']);
 
 				unset($host['macros']);
+			}
+
+			if (array_key_exists('tags', $host)) {
+				$host['tags'] = zbx_toArray($host['tags']);
 			}
 		}
 		unset($host);

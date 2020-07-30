@@ -335,7 +335,7 @@ class CTemplate extends CHostGeneral {
 			$templateIds[] = $templateId;
 
 			if (array_key_exists('tags', $template)) {
-				foreach ($template['tags'] as $tag) {
+				foreach (zbx_toArray($template['tags']) as $tag) {
 					$ins_tags[] = ['hostid' => $templateId] + $tag;
 				}
 			}
@@ -521,6 +521,10 @@ class CTemplate extends CHostGeneral {
 				$macros[$template['templateid']] = zbx_toArray($template['macros']);
 
 				unset($template['macros']);
+			}
+
+			if (array_key_exists('tags', $template)) {
+				$template['tags'] = zbx_toArray($template['tags']);
 			}
 		}
 		unset($template);
