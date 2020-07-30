@@ -1011,6 +1011,10 @@ abstract class CHostGeneral extends CHostBase {
 
 		$ins_tags = [];
 		foreach ($hosts as $host) {
+			if (!array_key_exists('tags', $host)) {
+				continue;
+			}
+
 			foreach ($host['tags'] as $tag) {
 				$tag += ['value' => ''];
 
