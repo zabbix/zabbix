@@ -175,6 +175,9 @@ abstract class CController {
 	public function validateInput($validationRules) {
 		if (hasRequest('formdata')) {
 			$this->parseFormData();
+
+			// Replace window.history to avoid resubmission warning dialog.
+			zbx_add_post_js("history.replaceState({}, '');");
 		}
 
 		$validator = new CNewValidator($_REQUEST, $validationRules);
