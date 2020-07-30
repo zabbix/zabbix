@@ -121,8 +121,8 @@ func getFsStats(path string) (stats *FsStats, err error) {
 		Total: total,
 		Free:  totalFree,
 		Used:  totalUsed,
-		PFree: percent(totalFree) / percent(total) * 100,
-		PUsed: percent(totalUsed) / percent(total) * 100,
+		PFree: float64(totalFree) / float64(total) * 100,
+		PUsed: float64(totalUsed) / float64(total) * 100,
 	}
 	return
 }
