@@ -220,8 +220,9 @@ class CSettings extends CApiService {
 				'editable' => true
 			]);
 			if (!$db_hstgrp_exists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group with ID "%1$s" is not available.',
-				$settings['discovery_groupid']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host group with ID "%1$s" is not available.', $settings['discovery_groupid'])
+				);
 			}
 		}
 
@@ -231,8 +232,34 @@ class CSettings extends CApiService {
 				'usrgrpids' => $settings['alert_usrgrpid']
 			]);
 			if (!$db_usrgrp_exists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with ID "%1$s" is not available.',
-					$settings['alert_usrgrpid']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User group with ID "%1$s" is not available.', $settings['alert_usrgrpid'])
+				);
+			}
+		}
+
+		$period_default_updated = array_key_exists('period_default', $settings);
+		$max_period_updated = array_key_exists('max_period', $settings);
+		if ($period_default_updated || $max_period_updated) {
+			$period_default = $period_default_updated
+				? timeUnitToSeconds($settings['period_default'], true)
+				: timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT), true);
+
+			$max_period = $max_period_updated
+				? timeUnitToSeconds($settings['max_period'], true)
+				: timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MAX_PERIOD), true);
+
+			if ($period_default > $max_period) {
+				$field = 'period_default';
+				$message = _('time filter default period exceeds the max period.');
+				if (!$period_default_updated) {
+					$field = 'max_period';
+					$message = _('max period is less than time filter default period.');
+				}
+
+				$error = _s('Incorrect value for field "%1$s": %2$s.', $field, $message);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 
