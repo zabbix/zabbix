@@ -617,6 +617,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			'output' => [],
 			'triggerids' => array_keys($triggers),
 			'monitored' => true,
+			'skipDependent' => true,
 			'preservekeys' => true
 		]);
 
@@ -633,7 +634,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				}
 			}
 		}
-
 		unset($triggers, $monitored_triggers);
 	}
 
