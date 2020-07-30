@@ -34,7 +34,7 @@ class CControllerSystemWarning extends CController {
 	}
 
 	protected function doAction() {
-		CMessageHelper::initScheduleMessages();
+		CMessageHelper::restoreScheduleMessages();
 
 		$data = [
 			'theme' => getUserTheme(CWebUser::$data),

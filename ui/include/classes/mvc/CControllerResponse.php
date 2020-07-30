@@ -36,7 +36,7 @@ abstract class CControllerResponse {
 				redirect($this->getLocation());
 			}
 
-			CMessageHelper::initScheduleMessages();
+			CMessageHelper::restoreScheduleMessages();
 		}
 
 		(new CPageHeader(_('Loading...')))->display();

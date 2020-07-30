@@ -1649,7 +1649,7 @@ function filter_messages(): array {
 		$generic_exists = false;
 		foreach ($messages as $message) {
 			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR
-				&& ($message['source'] === 'sql' || $message['source'] === 'php')) {
+					&& ($message['source'] === 'sql' || $message['source'] === 'php')) {
 				if (!$generic_exists) {
 					CMessageHelper::addError(_('System error occurred. Please contact Zabbix administrator.'));
 					$generic_exists = true;
@@ -1841,7 +1841,7 @@ function get_prepared_messages(array $options = []): ?string {
 	// Process messages passed by the previous request.
 
 	if ($options['with_session_messages']) {
-		CMessageHelper::initScheduleMessages();
+		CMessageHelper::restoreScheduleMessages($messages_current);
 
 		if (CMessageHelper::getTitle() !== null) {
 			show_messages(

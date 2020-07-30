@@ -81,7 +81,6 @@ class CMessageHelper {
 	 * @param string $source
 	 */
 	public static function addError(string $message, string $source = ''): void {
-		self::$type = self::MESSAGE_TYPE_ERROR;
 		self::$messages[] = [
 			'type' => self::MESSAGE_TYPE_ERROR,
 			'message' => $message,
@@ -125,7 +124,7 @@ class CMessageHelper {
 	 *
 	 * @param $title
 	 */
-	public static function setSuccessTitle($title): void {
+	public static function setSuccessTitle(string $title): void {
 		self::$title = $title;
 	}
 
@@ -155,25 +154,62 @@ class CMessageHelper {
 	}
 
 	/**
-	 * Initialize schedule messages.
+	 * Restore schedule messages.
 	 */
-	public static function initScheduleMessages(): void {
+	public static function restoreScheduleMessages(array $current_messages = []): void {
 		if (self::$schedule_messages) {
-			if (array_key_exists('success', self::$schedule_messages)) {
+			if (array_key_exists('success', self::$schedule_messages) && self::$schedule_messages['success']) {
 				self::setSuccessTitle(self::$schedule_messages['success']);
 			}
 
-			if (array_key_exists('error', self::$schedule_messages)) {
+			if (array_key_exists('error', self::$schedule_messages) && self::$schedule_messages['error']) {
 				self::setErrorTitle(self::$schedule_messages['error']);
 			}
 
 			if (array_key_exists('messages', self::$schedule_messages)) {
 				foreach (self::$schedule_messages['messages'] as $message) {
+					if (!self::checkDuplicates($message, $current_messages)) {
+						continue;
+					}
+
 					self::addMessage($message);
 				}
 			}
 
 			self::$schedule_messages = [];
 		}
+	}
+
+	/**
+	 * Check duplicate from current message for schedule message.
+	 *
+	 * @param array $message
+	 * @param array $current_messages
+	 *
+	 * @return boolean
+	 */
+	protected static function checkDuplicates(array $message, array $current_messages): bool {
+		foreach ($current_messages as $known_messages) {
+			foreach ($known_messages['messages'] as $known_message) {
+				if (self::checkDuplicateMessage($message, $known_message)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check duplicate message array.
+	 *
+	 * @param array $message
+	 * @param array $known_message
+	 *
+	 * @return boolean
+	 */
+	protected static function checkDuplicateMessage(array $message, array $known_message): bool {
+		return $message['message'] === $known_message['message'] && $message['source'] === $known_message['source']
+			&& $message['type'] === $known_message['type'];
 	}
 }
