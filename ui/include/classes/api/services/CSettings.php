@@ -159,7 +159,7 @@ class CSettings extends CApiService {
 			'show_technical_errors' =>			['type' => API_INT32, 'in' => '0,1'],
 			'history_period' =>					['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY])],
 			'period_default' =>					['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR])],
-			'max_period' =>						['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])],
+			'max_period' =>						['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [12 * SEC_PER_MONTH, 10 * SEC_PER_YEAR])],
 			'severity_color_0' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			'severity_color_1' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			'severity_color_2' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
