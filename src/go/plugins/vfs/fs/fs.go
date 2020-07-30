@@ -141,9 +141,9 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 	case statModeUsed:
 		return stats.Used, nil
 	case statModePFree:
-		return fmt.Sprintf("%f", stats.PFree), nil
+		return stats.PFree, nil
 	case statModePUsed:
-		return fmt.Sprintf("%f", stats.PUsed), nil
+		return stats.PUsed, nil
 	}
 
 	return nil, errors.New("Invalid second parameter.")

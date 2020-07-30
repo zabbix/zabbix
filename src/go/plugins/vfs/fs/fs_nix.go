@@ -37,21 +37,33 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 		return nil, err
 	}
 
+	fsmap := make(map[string]*FsInfoNew)
 	for _, info := range allData {
 		bytes, err := getFsStats(*info.FsName)
 		if err != nil {
-			return nil, err
+			p.Debugf(`cannot discern stats for the mount: %s`, *info.FsName)
+			continue
 		}
 
 		inodes, err := getFsInode(*info.FsName)
 		if err != nil {
-			return nil, err
+			p.Debugf(`cannot discern inode for the mount: %s`, *info.FsName)
+			continue
 		}
 
 		if bytes.Total > 0 && inodes.Total > 0 {
-			info.Bytes = bytes
-			info.Inodes = inodes
-			data = append(data, &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes})
+			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes}
+		}
+	}
+
+	allData, err = p.getFsInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, info := range allData {
+		if fsInfo, ok := fsmap[*info.FsName]; ok {
+			data = append(data, fsInfo)
 		}
 	}
 
