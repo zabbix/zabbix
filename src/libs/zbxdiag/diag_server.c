@@ -291,7 +291,10 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 
 					time1 = zbx_time();
 					if (FAIL == (ret = zbx_lld_get_top_items(map->value, &items, error)))
+					{
+						zbx_vector_uint64_pair_destroy(&items);
 						goto out;
+					}
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
