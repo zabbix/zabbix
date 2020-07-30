@@ -191,25 +191,12 @@ class CMessageHelper {
 	protected static function checkDuplicates(array $message, array $current_messages): bool {
 		foreach ($current_messages as $known_messages) {
 			foreach ($known_messages['messages'] as $known_message) {
-				if (self::checkDuplicateMessage($message, $known_message)) {
+				if (count(array_diff_assoc($known_message, $message)) === 0) {
 					return false;
 				}
 			}
 		}
 
 		return true;
-	}
-
-	/**
-	 * Check duplicate message array.
-	 *
-	 * @param array $message
-	 * @param array $known_message
-	 *
-	 * @return boolean
-	 */
-	protected static function checkDuplicateMessage(array $message, array $known_message): bool {
-		return $message['message'] === $known_message['message'] && $message['source'] === $known_message['source']
-			&& $message['type'] === $known_message['type'];
 	}
 }
