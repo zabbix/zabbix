@@ -754,7 +754,7 @@ zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t
  * Function: zbx_alerter_deserialize_diag_stats                               *
  *                                                                            *
  ******************************************************************************/
-void	zbx_alerter_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *alerts_num)
+static void	zbx_alerter_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *alerts_num)
 {
 	(void)zbx_deserialize_value(data, alerts_num);
 }
