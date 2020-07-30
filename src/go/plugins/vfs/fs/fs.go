@@ -22,7 +22,6 @@ package vfsfs
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"zabbix.com/pkg/plugin"
 )
@@ -39,18 +38,12 @@ const (
 	statModePUsed
 )
 
-type percent float64
-
-func (p percent) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%f", p)), nil
-}
-
 type FsStats struct {
 	Total uint64  `json:"total"`
 	Free  uint64  `json:"free"`
 	Used  uint64  `json:"used"`
-	PFree percent `json:"pfree"`
-	PUsed percent `json:"pused"`
+	PFree float64 `json:"pfree"`
+	PUsed float64 `json:"pused"`
 }
 
 type FsInfo struct {

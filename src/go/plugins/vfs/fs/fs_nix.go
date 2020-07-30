@@ -111,15 +111,21 @@ func getFsStats(path string) (stats *FsStats, err error) {
 		return nil, err
 	}
 
+	var avialable uint64
+	if fs.Bavail > 0 {
+		avialable = fs.Bavail
+	}
+
 	total := fs.Blocks * uint64(fs.Bsize)
-	free := fs.Bavail * uint64(fs.Bsize)
-	used := total - free
+	free := avialable * uint64(fs.Bsize)
+	used := (fs.Blocks - fs.Bfree) * uint64(fs.Bsize)
+	pfree := 100.00 * float64(avialable) / float64(fs.Blocks-fs.Bfree+fs.Bavail)
 	stats = &FsStats{
 		Total: total,
 		Free:  free,
 		Used:  used,
-		PFree: percent(100*fs.Bavail) / percent(fs.Blocks-fs.Bfree+fs.Bavail),
-		PUsed: 100 - percent(100*fs.Bavail)/percent(fs.Blocks-fs.Bfree+fs.Bavail),
+		PFree: pfree,
+		PUsed: 100 - pfree,
 	}
 
 	return
@@ -139,8 +145,8 @@ func getFsInode(path string) (stats *FsStats, err error) {
 		Total: total,
 		Free:  free,
 		Used:  used,
-		PFree: 100 * percent(free) / percent(total),
-		PUsed: 100 * percent(total-free) / percent(total),
+		PFree: 100 * float64(free) / float64(total),
+		PUsed: 100 * float64(total-free) / float64(total),
 	}
 
 	return
