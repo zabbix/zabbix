@@ -330,7 +330,7 @@ class CTabFilter extends CBaseComponent {
 			body: new URLSearchParams(body)
 		}).then(() => {
 			this._fetch = null;
-		}).catch((err) => {
+		}).catch(() => {
 			// Catch DOMExeception: The user aborted a request.
 		});
 	}
@@ -348,7 +348,7 @@ class CTabFilter extends CBaseComponent {
 				return;
 			}
 
-			if (item._data.show_counter) {
+			if (item._data.filter_show_counter) {
 				item.setCounter(value);
 			}
 			else {

@@ -92,7 +92,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashbrd.navtree.item.selected':
 				case 'web.latest.toggle':
 				case 'web.latest.toggle_other':
-					$ret = $this->hasInput('idx2') && $this->hasInput('value_int');
+					$ret = $this->hasInput('value_int');
 					break;
 
 				case 'web.monitoringhosts.selected':
@@ -101,7 +101,7 @@ class CControllerProfileUpdate extends CController {
 					break;
 
 				case 'web.monitoringhosts.properties':
-					$ret = $this->hasInput('idx2') && $this->hasInput('value_str');
+					$ret = $this->hasInput('value_str');
 					break;
 
 				case 'web.monitoringhosts.taborder':
