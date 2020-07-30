@@ -204,7 +204,6 @@ class CTabFilter extends CBaseComponent {
 					'value_str': params.toString()
 				}).then(() => {
 					this._active_item.setBrowserLocation(params);
-					this.fire(TABFILTER_EVENT_URLSET);
 				});
 			},
 
@@ -225,7 +224,6 @@ class CTabFilter extends CBaseComponent {
 			 */
 			apply: () => {
 				this._active_item.setBrowserLocation(this._active_item.getFilterParams());
-				this.fire(TABFILTER_EVENT_URLSET);
 			},
 
 			/**
@@ -241,6 +239,7 @@ class CTabFilter extends CBaseComponent {
 			item.on(TABFILTERITEM_EVENT_EXPAND_BEFORE, this._events.expand);
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
 			item.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteItem);
+			item.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
 		}
 
 		$('.ui-sortable', this._target).sortable({
