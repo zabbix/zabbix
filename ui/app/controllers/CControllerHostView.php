@@ -28,6 +28,7 @@ class CControllerHostView extends CControllerHostViewRefresh {
 			->read()
 			->setInput($this->getInputAll());
 		$filter = $profile->getTabFilter($profile->selected);
+		$this->getInputs($filter, ['page', 'sort', 'sortorder']);
 		$filter_tabs = $profile->getTabsWithDefaults();
 
 		foreach ($filter_tabs as &$filter_tab) {
