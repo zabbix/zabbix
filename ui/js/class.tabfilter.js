@@ -211,12 +211,18 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Save as' button press, refresh whole page for simplisity.
 			 */
 			create: () => {
-				let filter = this._active_item.getFilterParams(),
+				let params = this._active_item.getFilterParams(),
 					url = new Curl('', false);
 
-				filter.set('filter_name', t('Untitled'));
-				filter.set('action', url.getArgument('action'));
-				window.location.search = filter.toString();
+					params.set('filter_name', t('Untitled'));
+
+				this.profileUpdate('properties', {
+					'idx2[]': this._items.length,
+					'value_str': params.toString()
+				}).then(() => {
+					params.set('action', url.getArgument('action'));
+					window.location.search = params.toString();
+				});
 			},
 
 			/**
