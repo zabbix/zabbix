@@ -103,7 +103,9 @@ func isWinService() bool {
 }
 
 func closeOSSpecificItems() {
-	sendWinServiceFatalStopSig()
+	if !isInteractive {
+		sendWinServiceFatalStopSig()
+	}
 	closeEventLog()
 }
 
@@ -196,8 +198,7 @@ func setHostname() error {
 func handleWindowsService(conf string) error {
 	var err error
 	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
-		err = resolveWindowsService(conf)
-		if err != nil {
+		if err = resolveWindowsService(conf); err != nil {
 			return err
 		}
 		closeEventLog()
