@@ -451,6 +451,7 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 					if (FAIL == (ret = zbx_alerter_get_top_mediatypes(map->value, &mediatypes,
 							error)))
 					{
+						zbx_vector_uint64_pair_destroy(&mediatypes);
 						goto out;
 					}
 					time2 = zbx_time();
@@ -467,7 +468,11 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 
 					time1 = zbx_time();
 					if (FAIL == (ret = zbx_alerter_get_top_sources(map->value, &sources, error)))
+					{
+						zbx_vector_ptr_clear_ext(&sources, zbx_ptr_free);
+						zbx_vector_ptr_destroy(&sources);
 						goto out;
+					}
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
