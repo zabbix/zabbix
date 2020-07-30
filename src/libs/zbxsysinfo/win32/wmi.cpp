@@ -145,7 +145,6 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 
 	if (WBEM_S_TIMEDOUT == hres)
 	{
-		ret = SYSINFO_RET_FAIL;
 		*error = zbx_strdup(*error, "WMI query timeout.");
 		goto out;
 	}
@@ -225,7 +224,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 		HRESULT			hres;
 		zbx_vector_wmi_prop_t	*inst_val = NULL;
 
-		hres = pEnumerator->Next((int)(1000 * timeout), 1, &pclsObj, &uReturn);
+		hres = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
 
 		if (WBEM_S_TIMEDOUT == hres)
 		{
@@ -281,27 +280,27 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_wmi_get_variant                                              *
- *                                                                            *
- * Purpose: retrieves WMI value and stores it in the provided memory location *
- *                                                                            *
- * Parameters: wmi_namespace - [IN] object path of the WMI namespace (UTF-8)  *
- *             wmi_query     - [IN] WQL query (UTF-8)                         *
- *             zbx_parse_wmi_t [IN] callback parsing function                 *
- *             timeout         [IN] query timeout in seconds                  *
- *             wmi_values    - [OUT] pointer to memory for the queried values *
- *             error         - [OUT] the error description                    *
- *                                                                            *
- * Return value: SYSINFO_RET_OK   - *vtProp contains the retrieved WMI value  *
- *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
- *                                                                            *
- * Comments: *vtProp must be initialized with VariantInit(),                  *
- *           wmi_* must not be NULL. The callers must convert value to the    *
- *           intended format using VariantChangeType()                        *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Function: zbx_wmi_get_variant                                               *
+ *                                                                             *
+ * Purpose: retrieves WMI value and stores it in the provided memory location  *
+ *                                                                             *
+ * Parameters: wmi_namespace  - [IN] object path of the WMI namespace (UTF-8)  *
+ *             wmi_query      - [IN] WQL query (UTF-8)                         *
+ *             parse_value_cb - [IN] callback parsing function                 *
+ *             timeout        - [IN] query timeout in seconds                  *
+ *             wmi_values     - [OUT] pointer to memory for the queried values *
+ *             error          - [OUT] the error description                    *
+ *                                                                             *
+ * Return value: SYSINFO_RET_OK   - *vtProp contains the retrieved WMI value   *
+ *               SYSINFO_RET_FAIL - retrieving WMI value failed                *
+ *                                                                             *
+ * Comments: *vtProp must be initialized with VariantInit(),                   *
+ *           wmi_* must not be NULL. The callers must convert value to the     *
+ *           intended format using VariantChangeType()                         *
+ *                                                                             *
+ *******************************************************************************/
 extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_query, zbx_parse_wmi_t parse_value_cb,
 		double timeout, zbx_vector_wmi_instance_t *wmi_values, char **error)
 {

@@ -158,7 +158,7 @@ static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, 
 {
 	double	time_left = CONFIG_TIMEOUT - (*time_previous_query_finished - time_first_query_started);
 
-	if (0 > time_left)
+	if (0 >= time_left)
 		return;
 
 	zbx_wmi_get(wmi_namespace, query, time_left, var);
@@ -181,7 +181,6 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int	ret = SYSINFO_RET_FAIL;
 	double	start_time = zbx_time();
 	double	time_previous_query_finished = start_time;
-	double	final_time_left = 0;
 
 	/* Emulates uname(2) (POSIX) since it is not provided natively by Windows by taking */
 	/* the relevant values from Win32_OperatingSystem and Win32_Processor WMI classes.  */
@@ -201,33 +200,31 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	get_wmi_check_timeout(wmi_namespace, "select AddressWidth from Win32_Processor", &proc_addresswidth, start_time,
 			&time_previous_query_finished);
 
-	if (NULL != proc_architecture)
-	{
-		switch (atoi(proc_architecture))
-		{
-			case 0: arch = "x86"; break;
-			case 6: arch = "ia64"; break;
-			case 9:
-				if (NULL != proc_addresswidth)
-				{
-					if (32 == atoi(proc_addresswidth))
-						arch = "x86";
-					else
-						arch = "x64";
-				}
-
-				break;
-		}
-	}
-
-	final_time_left = CONFIG_TIMEOUT - (time_previous_query_finished - start_time);
-
-	if (0 > final_time_left)
+	if (0 >= CONFIG_TIMEOUT - (time_previous_query_finished - start_time))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "WMI aggregate query timeout"));
 	}
 	else
 	{
+		if (NULL != proc_architecture)
+		{
+			switch (atoi(proc_architecture))
+			{
+				case 0: arch = "x86"; break;
+				case 6: arch = "ia64"; break;
+				case 9:
+					if (NULL != proc_addresswidth)
+					{
+						if (32 == atoi(proc_addresswidth))
+							arch = "x86";
+						else
+							arch = "x64";
+					}
+
+					break;
+			}
+		}
+
 		/* The comments indicate the relevant field in struct utsname (POSIX) that is used in uname(2). */
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "%s %s %s %s%s%s %s",
 				sysname,						/* sysname */
@@ -241,7 +238,6 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_STR_RESULT(result, os);
 
 		ret = SYSINFO_RET_OK;
-
 	}
 
 	zbx_free(os_csname);
