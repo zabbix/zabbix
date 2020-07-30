@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-30T08:29:58Z</date>
+   <date>2020-07-30T11:20:49Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -82,9 +82,9 @@ FROM v$asm_diskgroup ;</params>
                </applications>
             </item>
             <item>
-               <name>Oracle: Get CDB and No-CDB stats</name>
+               <name>Oracle: Get CDB and No-CDB info</name>
                <type>ODBC</type>
-               <key>db.odbc.get[get_cdb_stats,"{$ORACLE.DSN}"]</key>
+               <key>db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -96,7 +96,7 @@ DECODE(log_mode, 'MANUAL',2 ,'ARCHIVELOG',1,'NOARCHIVELOG',0,0) AS log_mode
 FROM v$database</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
-               <description>Get stats of CDB and  No-CDB databases on instansce.</description>
+               <description>Get info about CDB and  No-CDB databases on instansce.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -129,9 +129,9 @@ FROM v$instance;</params>
                </applications>
             </item>
             <item>
-               <name>Oracle: Get PDB stats</name>
+               <name>Oracle: Get PDB info</name>
                <type>ODBC</type>
-               <key>db.odbc.get[get_pdb_stats,"{$ORACLE.DSN}"]</key>
+               <key>db.odbc.get[get_pdb_info,"{$ORACLE.DSN}"]</key>
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
@@ -141,7 +141,7 @@ DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH
 FROM v$pdbs;</params>
                <username>{$ORACLE.USER}</username>
                <password>{$ORACLE.PASSWORD}</password>
-               <description>Get stats of PDB databases on instansce.</description>
+               <description>Get info about PDB databases on instansce.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -2220,6 +2220,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <key>oracle.db_force_logging["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <description>Indicates whether the database is under force logging mode (YES) or not (NO)</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#TYPE}</name>
@@ -2239,7 +2240,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[get_cdb_stats,"{$ORACLE.DSN}"]</key>
+                        <key>db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2248,6 +2249,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <key>oracle.db_log_mode["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <description>Archive log mode, 0 - 'NOARCHIVELOG', 1 - 'ARCHIVELOG', 2 - 'MANUAL'</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#TYPE}</name>
@@ -2267,7 +2269,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[get_cdb_stats,"{$ORACLE.DSN}"]</key>
+                        <key>db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2296,7 +2298,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[get_cdb_stats,"{$ORACLE.DSN}"]</key>
+                        <key>db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2326,6 +2328,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <key>oracle.db_role["{#DBNAME}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
+                     <description>Current role of the database, 1 - 'SNAPSHOT STANDBY', 2 - 'LOGICAL STANDBY', 3 - 'PHYSICAL STANDBY', 4 - 'PRIMARY ', 5 -'FAR SYNC'</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#TYPE}</name>
@@ -2345,7 +2348,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[get_cdb_stats,"{$ORACLE.DSN}"]</key>
+                        <key>db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2420,7 +2423,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>db.odbc.get[get_pdb_stats,"{$ORACLE.DSN}"]</key>
+                        <key>db.odbc.get[get_pdb_info,"{$ORACLE.DSN}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
