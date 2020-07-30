@@ -945,7 +945,7 @@ int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
  *                                                                            *
  * Parameters limit      - [IN] the number of top records to retrieve         *
  *            mediatypes - [OUT] a vector of top mediatypeid,alerts_num pairs *
- *            error      - [OUT] the error message                            *                                                                           *
+ *            error      - [OUT] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the top n mediatypes were returned successfully    *
  *               FAIL - otherwise                                             *
@@ -953,16 +953,16 @@ int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
  ******************************************************************************/
 int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error)
 {
-	int			ret;
-	unsigned char		*data, *result;
-	zbx_uint32_t		data_len;
+	int		ret;
+	unsigned char	*data, *result;
+	zbx_uint32_t	data_len;
 
 	data_len = zbx_alerter_serialize_top_request(&data, limit);
 
 	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_DIAG_TOP_MEDIATYPES,
 			SEC_PER_MIN, data, data_len, &result, error)))
 	{
-		goto  out;
+		goto out;
 	}
 
 	zbx_alerter_deserialize_top_mediatypes_result(result, mediatypes);
@@ -982,7 +982,7 @@ out:
  * Parameters limit   - [IN] the number of top records to retrieve            *
  *            sources - [OUT] a vector of top zbx_alerter_source_stats_t      *
  *                             structure                                      *
- *            error   - [OUT] the error message                               *                                                                           *
+ *            error   - [OUT] the error message                               *
  *                                                                            *
  * Return value: SUCCEED - the top n sources were returned successfully       *
  *               FAIL - otherwise                                             *
@@ -990,16 +990,16 @@ out:
  ******************************************************************************/
 int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **error)
 {
-	int			ret;
-	unsigned char		*data, *result;
-	zbx_uint32_t		data_len;
+	int		ret;
+	unsigned char	*data, *result;
+	zbx_uint32_t	data_len;
 
 	data_len = zbx_alerter_serialize_top_request(&data, limit);
 
 	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_DIAG_TOP_SOURCES,
 			SEC_PER_MIN, data, data_len, &result, error)))
 	{
-		goto  out;
+		goto out;
 	}
 
 	zbx_alerter_deserialize_top_sources_result(result, sources);

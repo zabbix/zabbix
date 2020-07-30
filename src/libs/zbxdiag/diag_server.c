@@ -207,7 +207,7 @@ out:
  * Purpose: add lld item top list to output json                              *
  *                                                                            *
  ******************************************************************************/
-static void	diag_add_lld_items(struct zbx_json *json, const char *field, zbx_vector_uint64_pair_t *items)
+static void	diag_add_lld_items(struct zbx_json *json, const char *field, const zbx_vector_uint64_pair_t *items)
 {
 	int	i;
 
@@ -335,7 +335,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	diag_add_alerting_mediatypes(struct zbx_json *json, const char *field,
-		zbx_vector_uint64_pair_t *mediatypes)
+		const zbx_vector_uint64_pair_t *mediatypes)
 {
 	int	i;
 
@@ -364,7 +364,7 @@ static void	diag_add_alerting_mediatypes(struct zbx_json *json, const char *fiel
  *                          zbx_am_source_stats_t structures                  *
  *                                                                            *
  ******************************************************************************/
-static void	diag_add_alerting_sources(struct zbx_json *json, const char *field, zbx_vector_ptr_t *sources)
+static void	diag_add_alerting_sources(struct zbx_json *json, const char *field, const zbx_vector_ptr_t *sources)
 {
 	int	i;
 
@@ -372,7 +372,7 @@ static void	diag_add_alerting_sources(struct zbx_json *json, const char *field, 
 
 	for (i = 0; i < sources->values_num; i++)
 	{
-		zbx_am_source_stats_t	*source= (zbx_am_source_stats_t *)sources->values[i];
+		const zbx_am_source_stats_t	*source = (const zbx_am_source_stats_t *)sources->values[i];
 
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, "source", source->source);

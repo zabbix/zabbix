@@ -368,16 +368,16 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
  ******************************************************************************/
 int	zbx_lld_get_top_items(int limit, zbx_vector_uint64_pair_t *items, char **error)
 {
-	int			ret;
-	unsigned char		*data, *result;
-	zbx_uint32_t		data_len;
+	int		ret;
+	unsigned char	*data, *result;
+	zbx_uint32_t	data_len;
 
 	data_len = zbx_lld_serialize_top_items_request(&data, limit);
 
 	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_LLD, ZBX_IPC_LLD_TOP_ITEMS, SEC_PER_MIN, data,
 			data_len, &result, error)))
 	{
-		goto  out;
+		goto out;
 	}
 
 	zbx_lld_deserialize_top_items_result(result, items);

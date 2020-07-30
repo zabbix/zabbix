@@ -195,7 +195,7 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
  * Purpose: add history cache items diagnostic statistics to json             *
  *                                                                            *
  ******************************************************************************/
-static void	diag_historycache_add_items(struct zbx_json *json, const char *field, zbx_uint64_pair_t *pairs,
+static void	diag_historycache_add_items(struct zbx_json *json, const char *field, const zbx_uint64_pair_t *pairs,
 		int pairs_num)
 {
 	int	i;
@@ -344,7 +344,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
  *             items - [IN] a top item list                                   *
  *                                                                            *
  ******************************************************************************/
-static void	diag_add_preproc_items(struct zbx_json *json, const char *field, zbx_vector_ptr_t *items)
+static void	diag_add_preproc_items(struct zbx_json *json, const char *field, const zbx_vector_ptr_t *items)
 {
 	int	i;
 
@@ -352,7 +352,7 @@ static void	diag_add_preproc_items(struct zbx_json *json, const char *field, zbx
 
 	for (i = 0; i < items->values_num; i++)
 	{
-		zbx_preproc_item_stats_t	*item = (zbx_preproc_item_stats_t *)items->values[i];
+		const zbx_preproc_item_stats_t	*item = (const zbx_preproc_item_stats_t *)items->values[i];
 
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, "itemid", item->itemid);
