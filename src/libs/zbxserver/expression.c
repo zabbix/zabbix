@@ -2443,28 +2443,31 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vector_ptr_best_match                                        *
+ * Function: zbx_vector_ptr_least_tag                                         *
  *                                                                            *
- * Purpose: find the index in the vector which value best matches the         *
- *          supplied comparison function                                      *
+ * Purpose: find the index of the least valued tag in the vector of tags      *
+ *                                                                            *
+ * Parameters: vector - [IN] vector of tags                                   *
+ *                                                                            *
+ * Return value: index of the least valued tag                                *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_vector_ptr_best_match(const zbx_vector_ptr_t *vector, zbx_compare_func_t compare_func)
+static int	zbx_vector_ptr_least_tag(const zbx_vector_ptr_t *vector)
 {
-	int	best_index = FAIL, index;
+	int	least_index = FAIL, index;
 
 	if (0 == vector->values_num)
-		return best_index;
+		return least_index;
 
-	best_index = 0;
+	least_index = 0;
 
 	for (index = 1; index < vector->values_num; index++)
 	{
-		if (0 > compare_func(&(vector->values[index]), &(vector->values[best_index])))
-			best_index = index;
+		if (0 > compare_tags(&(vector->values[index]), &(vector->values[least_index])))
+			least_index = index;
 	}
 
-	return best_index;
+	return least_index;
 }
 
 /******************************************************************************
@@ -2544,7 +2547,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 			{
 				int	best_match_index;
 
-				best_match_index = zbx_vector_ptr_best_match(&(event->tags), compare_tags);
+				best_match_index = zbx_vector_ptr_least_tag(&(event->tags));
 
 				if (FAIL != best_match_index)
 				{
