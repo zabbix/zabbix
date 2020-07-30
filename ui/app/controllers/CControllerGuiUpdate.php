@@ -34,7 +34,7 @@ class CControllerGuiUpdate extends CController {
 			'show_technical_errors' =>		'db config.show_technical_errors|in 0,1',
 			'history_period' =>				'required|db config.history_period|time_unit '.implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY]),
 			'period_default' =>				'required|db config.period_default|time_unit_year '.implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR]),
-			'max_period' =>					'required|db config.max_period|time_unit_year '.implode(':', [12 * SEC_PER_MONTH, 10 * SEC_PER_YEAR])
+			'max_period' =>					'required|db config.max_period|time_unit_year '.implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);
