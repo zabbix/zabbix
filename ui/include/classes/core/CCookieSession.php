@@ -138,28 +138,33 @@ class CCookieSession implements \SessionHandlerInterface {
 	protected function session_start(): bool {
 		$session_data = $this->parseData();
 
-		if (mb_strlen($session_data) === 0 || !$this->checkSign($session_data)) {
+		if (mb_strlen($session_data) === 0) {
 			return session_start();
 		}
 
-		$session_data = unserialize($session_data);
-
-		if (array_key_exists('sessionid', $session_data)) {
-			session_id($session_data['sessionid']);
+		$sessionid = $this->extractSessionId($session_data);
+		if ($sessionid) {
+			session_id($sessionid);
 		}
 
 		return session_start();
 	}
 
 	/**
-	 * Prepare data and check sign.
+	 * Extract session id from session data.
 	 *
-	 * @param string $data
+	 * @param string $session_data
 	 *
-	 * @return boolean
+	 * @return string|null
 	 */
-	protected function checkSign(string $data): bool {
-		return true;
+	protected function extractSessionId(string $session_data): ?string {
+		$session_data = unserialize($session_data);
+
+		if (array_key_exists('sessionid', $session_data)) {
+			return $session_data['sessionid'];
+		}
+
+		return null;
 	}
 
 	/**

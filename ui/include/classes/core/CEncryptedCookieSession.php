@@ -58,4 +58,40 @@ class CEncryptedCookieSession extends CCookieSession {
 
 		return base64_encode(serialize($data));
 	}
+
+	/**
+	 * @inheritDoc
+	 *
+	 * @return boolean
+	 */
+	protected function session_start(): bool {
+		$this->checkSessionKey();
+
+		$session_data = $this->parseData();
+
+		if (mb_strlen($session_data) === 0 || !$this->checkSign($session_data)) {
+			return session_start();
+		}
+
+		$sessionid = $this->extractSessionId($session_data);
+		if ($sessionid) {
+			session_id($sessionid);
+		}
+
+		return session_start();
+	}
+
+	/**
+	 * Check exist secret session key.
+	 *
+	 * @throws \Exception
+	 *
+	 * @return void
+	 */
+	private function checkSessionKey(): void {
+		$config = select_config();
+		if (!array_key_exists('session_key', $config) || (string) $config['session_key'] === '') {
+			throw new \Exception(_('Session secret not defined.'));
+		}
+	}
 }
