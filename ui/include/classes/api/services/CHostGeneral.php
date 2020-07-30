@@ -985,10 +985,12 @@ abstract class CHostGeneral extends CHostBase {
 	 */
 	protected function updateTags(array $hosts, $id_field) {
 		$hostids = [];
-		foreach ($hosts as $host) {
-			if (array_key_exists('tags', $host)) {
-				$hostids[] = $host[$id_field];
+		foreach ($hosts as $index => $host) {
+			if (!array_key_exists('tags', $host)) {
+				unset($host[$index]);
+				continue;
 			}
+			$hostids[] = $host[$id_field];
 		}
 
 		if (!$hostids) {
@@ -1011,10 +1013,6 @@ abstract class CHostGeneral extends CHostBase {
 
 		$ins_tags = [];
 		foreach ($hosts as $host) {
-			if (!array_key_exists('tags', $host)) {
-				continue;
-			}
-
 			foreach ($host['tags'] as $tag) {
 				$tag += ['value' => ''];
 
