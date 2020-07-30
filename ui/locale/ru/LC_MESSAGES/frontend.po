@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-17 19:58+0300\n"
-"PO-Revision-Date: 2020-07-09 07:42+0300\n"
+"POT-Creation-Date: 2020-07-24 19:53+0300\n"
+"PO-Revision-Date: 2020-07-21 08:51+0300\n"
 "Last-Translator: marinagen <marina.generalova@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1594273370.000000\n"
+"X-POOTLE-MTIME: 1595314311.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -96,7 +96,7 @@ msgstr[2] "отображено %1$d из %3$d%2$s проблем"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:115
 #, c-format
 msgid "%1$d problems selected."
-msgstr "Выбрано %1$d проблем"
+msgstr "Выбрано %1$d проблем."
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -1128,8 +1128,8 @@ msgstr "Группа элементов данных с applicationid \"%1$s\" �
 #: include/views/configuration.item.prototype.list.php:62
 #: include/views/configuration.item.prototype.massupdate.php:425
 #: include/views/configuration.template.edit.php:134
-#: include/views/configuration.template.list.php:150
-#: include/views/configuration.template.list.php:253
+#: include/views/configuration.template.list.php:151
+#: include/views/configuration.template.list.php:238
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:170
 msgid "Applications"
 msgstr "Группы элементов данных"
@@ -1204,7 +1204,7 @@ msgstr "Как простой текст"
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:236
 msgid "Assertions"
-msgstr ""
+msgstr "Утверждения"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1316,7 +1316,7 @@ msgstr "Август"
 
 #: app/views/administration.authentication.edit.php:208
 msgid "AuthN requests"
-msgstr ""
+msgstr "Запросы AuthN"
 
 #: app/views/administration.authentication.edit.php:250
 #: app/views/administration.authentication.edit.php:259
@@ -4108,7 +4108,7 @@ msgstr "Создать правило обнаружения"
 
 #: include/views/configuration.host.discovery.list.php:40
 msgid "Create discovery rule (select host first)"
-msgstr ""
+msgstr "Создать правило обнаружения (выберите узел сети)"
 
 #: app/views/popup.lldoperation.php:74
 #: include/views/configuration.host.prototype.edit.php:120
@@ -4668,7 +4668,7 @@ msgstr "Задерживается на"
 #: include/views/configuration.item.list.php:262
 #: include/views/configuration.item.prototype.list.php:196
 #: include/views/configuration.maintenance.list.php:121
-#: include/views/configuration.template.list.php:324
+#: include/views/configuration.template.list.php:309
 #: include/views/configuration.trigger.prototype.list.php:188
 #: include/views/configuration.triggers.list.php:342
 #: include/views/monitoring.screen.list.php:134
@@ -4683,11 +4683,11 @@ msgid "Delete all elements that are not present in the XML file?"
 msgstr "Удалить все элементы, которых нет в XML файле?"
 
 #: include/views/configuration.template.edit.php:448
-#: include/views/configuration.template.list.php:325
+#: include/views/configuration.template.list.php:310
 msgid "Delete and clear"
 msgstr "Удалить и очистить"
 
-#: include/views/configuration.template.list.php:326
+#: include/views/configuration.template.list.php:311
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Удалить и очистить выбранные шаблоны? (Внимание: все присоединенные к ним узлы сети будут очищены!)"
 
@@ -4897,7 +4897,7 @@ msgstr "Удалить выбранные фигуры?"
 msgid "Delete selected slide shows?"
 msgstr "Удалить выбранные слайд-шоу?"
 
-#: include/views/configuration.template.list.php:324
+#: include/views/configuration.template.list.php:309
 msgid "Delete selected templates?"
 msgstr "Удалить выбранные шаблоны?"
 
@@ -5265,8 +5265,8 @@ msgstr "Обнаруженные элементы данных"
 #: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
 #: include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:432
-#: include/views/configuration.template.list.php:155
-#: include/views/configuration.template.list.php:289
+#: include/views/configuration.template.list.php:156
+#: include/views/configuration.template.list.php:274
 #: include/views/inventory.host.view.php:191
 #: include/views/inventory.host.view.php:207
 msgid "Discovery"
@@ -5655,7 +5655,7 @@ msgstr "Изменить карту сети"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "Edit operation"
-msgstr ""
+msgstr "Редактировать операцию"
 
 #: include/views/monitoring.screen.php:106
 msgid "Edit screen"
@@ -6228,7 +6228,7 @@ msgstr "Расширенный круговой"
 #: app/views/administration.mediatype.list.php:164
 #: app/views/administration.valuemap.list.php:90
 #: include/views/configuration.host.list.php:470
-#: include/views/configuration.template.list.php:315
+#: include/views/configuration.template.list.php:300
 #: include/views/monitoring.screen.list.php:124
 #: include/views/monitoring.sysmap.list.php:97
 msgid "Export"
@@ -7007,8 +7007,8 @@ msgstr "График с таким же именем, но другого тип
 #: include/views/configuration.host.list.php:187
 #: include/views/configuration.host.list.php:424
 #: include/views/configuration.template.edit.php:200
-#: include/views/configuration.template.list.php:153
-#: include/views/configuration.template.list.php:277
+#: include/views/configuration.template.list.php:154
+#: include/views/configuration.template.list.php:262
 #: include/views/conf.import.php:41 include/views/inventory.host.view.php:153
 #: include/views/inventory.host.view.php:186
 #: include/views/inventory.host.view.php:206 jsLoader.php:290
@@ -7287,7 +7287,7 @@ msgstr "Сжатие истории и динамики изменений"
 
 #: items.php:870 items.php:1284
 msgid "History cleanup is not supported if compression is enabled"
-msgstr "При включенном сжатии очистка истории не поддерживается "
+msgstr "При включенном сжатии очистка истории не поддерживается"
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:491 httpconf.php:503
 #: items.php:893 items.php:901 items.php:1315 items.php:1329
@@ -7748,6 +7748,8 @@ msgstr "Узел сети с таким же видимым именем \"%1$s\
 #: include/views/configuration.host.massupdate.php:28
 #: include/views/configuration.httpconf.list.php:51
 #: include/views/configuration.maintenance.edit.php:224
+#: include/views/configuration.template.list.php:150
+#: include/views/configuration.template.list.php:230
 #: include/views/configuration.triggers.list.php:45
 #: include/views/conf.import.php:33
 #: include/views/monitoring.overview.items.php:112
@@ -10119,8 +10121,8 @@ msgstr "Элемент данных с ключом \"%1$s\" уже сущест
 #: include/views/configuration.item.list.php:29
 #: include/views/configuration.item.massupdate.php:26
 #: include/views/configuration.template.edit.php:158
-#: include/views/configuration.template.list.php:151
-#: include/views/configuration.template.list.php:261
+#: include/views/configuration.template.list.php:152
+#: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
 #: include/views/inventory.host.view.php:204 items.php:1690 queue.php:110
 msgid "Items"
@@ -10604,14 +10606,14 @@ msgstr "Связанная карта"
 #: include/views/configuration.template.edit.php:401
 #: include/views/configuration.template.edit.php:414
 #: include/views/configuration.template.list.php:99
-#: include/views/configuration.template.list.php:157
+#: include/views/configuration.template.list.php:158
 #: include/views/configuration.template.massupdate.php:158
 msgid "Linked templates"
 msgstr "Присоединенные шаблоны"
 
-#: include/views/configuration.template.list.php:158
-msgid "Linked to"
-msgstr "Присоединен к"
+#: include/views/configuration.template.list.php:159
+msgid "Linked to templates"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:682
 #: include/views/js/monitoring.sysmaps.js.php:693
@@ -10739,11 +10741,11 @@ msgstr "Выход из системы"
 
 #: app/views/administration.authentication.edit.php:214
 msgid "Logout requests"
-msgstr ""
+msgstr "Запросы выхода"
 
 #: app/views/administration.authentication.edit.php:220
 msgid "Logout responses"
-msgstr ""
+msgstr "Ответы при выходе"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -11053,7 +11055,7 @@ msgstr "Маска"
 #: include/views/configuration.host.list.php:478
 #: include/views/configuration.item.list.php:261
 #: include/views/configuration.item.prototype.list.php:195
-#: include/views/configuration.template.list.php:323
+#: include/views/configuration.template.list.php:308
 #: include/views/configuration.trigger.prototype.list.php:187
 #: include/views/configuration.triggers.list.php:341
 msgid "Mass update"
@@ -11194,7 +11196,7 @@ msgstr "Ошибка при тестировании способа оповещ
 
 #: app/views/js/popup.mediatypetest.edit.js.php:110
 msgid "Media type test log"
-msgstr ""
+msgstr "Журнал тестов способа оповещения"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:139
 msgid "Media type test successful."
@@ -11738,7 +11740,7 @@ msgstr "Имя"
 
 #: app/views/administration.authentication.edit.php:230
 msgid "Name ID"
-msgstr ""
+msgstr "ID имени"
 
 #: include/views/js/configuration.httpconf.edit.js.php:100
 msgid "Name of the form field should not exceed 255 characters."
@@ -12880,7 +12882,7 @@ msgstr "Только Супер Администраторы могут меня
 
 #: include/classes/api/services/CUserGroup.php:292
 msgid "Only Super Admins can update user groups."
-msgstr "Только Супер Администраторы могут обновлять группы пользователей. "
+msgstr "Только Супер Администраторы могут обновлять группы пользователей."
 
 #: include/classes/api/services/CDRule.php:481
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -13189,7 +13191,7 @@ msgstr "Переопределено"
 
 #: app/controllers/CControllerPopupLldOverride.php:130
 msgid "Override"
-msgstr ""
+msgstr "Замещение"
 
 #: app/views/administration.housekeeping.edit.php:127
 msgid "Override item history period"
@@ -14918,7 +14920,7 @@ msgstr "Вс"
 
 #: app/views/administration.authentication.edit.php:262
 msgid "SAML settings"
-msgstr ""
+msgstr "Настройка SAML"
 
 #: app/views/popup.discovery.check.php:91
 #: include/views/js/configuration.host.edit.js.php:108
@@ -14933,7 +14935,7 @@ msgstr "SLA"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "SLO service URL"
-msgstr ""
+msgstr "URL единого выхода"
 
 #: include/media.inc.php:26
 msgid "SMS"
@@ -15030,11 +15032,11 @@ msgstr "SNMPv3 агент"
 
 #: app/views/administration.authentication.edit.php:176
 msgid "SP entity ID"
-msgstr ""
+msgstr "ID объекта SP"
 
 #: app/views/administration.authentication.edit.php:184
 msgid "SP name ID format"
-msgstr ""
+msgstr "Формат ID объекта SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -15110,7 +15112,7 @@ msgstr "SSL/TLS"
 
 #: app/views/administration.authentication.edit.php:157
 msgid "SSO service URL"
-msgstr ""
+msgstr "URL единого входа"
 
 #: app/views/administration.mediatype.edit.php:77
 msgid "STARTTLS"
@@ -15253,8 +15255,8 @@ msgstr "Комплексный экран обновлен"
 #: app/views/search.php:134 app/views/search.php:228 app/views/search.php:274
 #: app/views/search.php:275 include/html.inc.php:413 include/menu.inc.php:47
 #: include/views/configuration.template.edit.php:310
-#: include/views/configuration.template.list.php:154
-#: include/views/configuration.template.list.php:285
+#: include/views/configuration.template.list.php:155
+#: include/views/configuration.template.list.php:270
 #: include/views/conf.import.php:43 include/views/inventory.host.view.php:160
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.constructor.list.php:28
@@ -15918,7 +15920,7 @@ msgstr "Управление боковой панелью"
 
 #: app/views/administration.authentication.edit.php:192
 msgid "Sign"
-msgstr ""
+msgstr "Подписывать"
 
 #: include/views/general.login.php:64 include/views/general.login.php:82
 msgid "Sign in"
@@ -15930,7 +15932,7 @@ msgstr "Вход с HTTP"
 
 #: include/views/general.login.php:49
 msgid "Sign in with Single Sign-On (SAML)"
-msgstr ""
+msgstr "Войти через систему единого входа (SAML)"
 
 #: include/menu.inc.php:240 include/menu.inc.php:243
 msgid "Sign out"
@@ -16627,7 +16629,7 @@ msgstr "Значение тега"
 #: include/views/configuration.maintenance.edit.php:240
 #: include/views/configuration.template.edit.php:417
 #: include/views/configuration.template.list.php:118
-#: include/views/configuration.template.list.php:159
+#: include/views/configuration.template.list.php:160
 #: include/views/configuration.template.massupdate.php:140
 #: include/views/configuration.template.massupdate.php:159
 #: include/views/configuration.trigger.prototype.edit.php:539
@@ -17524,8 +17526,8 @@ msgstr "Триггер обновлен"
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.list.php:191
 #: include/views/configuration.template.edit.php:179
-#: include/views/configuration.template.list.php:152
-#: include/views/configuration.template.list.php:269
+#: include/views/configuration.template.list.php:153
+#: include/views/configuration.template.list.php:254
 #: include/views/configuration.triggers.edit.php:28
 #: include/views/configuration.triggers.list.php:165
 #: include/views/configuration.triggers.massupdate.php:28
@@ -17765,11 +17767,11 @@ msgstr "Не удалось загрузить файл, так как \"file_up
 
 #: app/views/popup.acknowledge.edit.php:89
 msgid "Unacknowledge"
-msgstr ""
+msgstr "Отменить подтверждение"
 
 #: include/actions.inc.php:2078
 msgid "Unacknowledged"
-msgstr ""
+msgstr "Подтверждение отменено"
 
 #: app/views/administration.trigdisplay.edit.php:40
 msgid "Unacknowledged PROBLEM events"
@@ -17957,7 +17959,7 @@ msgstr "Неподдерживаемый формат импорта \"%1$s\"."
 
 #: app/controllers/CControllerActionOperationGet.php:53
 msgid "Unsupported operation."
-msgstr ""
+msgstr "Неподдерживаемая операция."
 
 #: include/classes/api/services/CAction.php:2770
 #, c-format
@@ -18407,7 +18409,7 @@ msgstr "Имя пользователя и пароль"
 
 #: app/views/administration.authentication.edit.php:168
 msgid "Username attribute"
-msgstr ""
+msgstr "Атрибут имени"
 
 #: app/controllers/CControllerPopupGeneric.php:240
 #: app/views/administration.user.edit.php:34
@@ -18894,8 +18896,8 @@ msgstr "Приносим свои извинения, достигнуто ма�
 #: app/views/search.php:228 app/views/search.php:285 app/views/search.php:289
 #: include/views/configuration.host.list.php:189
 #: include/views/configuration.host.list.php:440
-#: include/views/configuration.template.list.php:156
-#: include/views/configuration.template.list.php:297
+#: include/views/configuration.template.list.php:157
+#: include/views/configuration.template.list.php:282
 #: include/views/inventory.host.view.php:135
 #: include/views/inventory.host.view.php:196
 #: include/views/inventory.host.view.php:208 jsLoader.php:308

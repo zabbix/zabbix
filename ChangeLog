@@ -7,6 +7,12 @@ New features:
 ........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-17653] fixed new widget placeholder behavior and dashboard height calculation in edit mode (averza, kustalovs)
+..F....... [ZBX-16819] added link to hosts linked to each template in templates list (miks)
+...G...... [ZBX-18023] fixed format of agent2 version number (MVekslers)
+A......... [ZBX-18071] fixed slow SQL query when filtering items with latest data available (averza)
+..F....... [ZBX-17898] fixed JavaScript errors on pasting widgets (averza)
+........S. [ZBX-17569] fixed calculating items not allowing negative values be corrected in the preprocessing (arimdjonoks)
 ..F....... [ZBX-18036] fixed endpoint URL for Elasticsearch API requests (miks)
 ..F....... [ZBX-18068] fixed incorrect function call and redundant code (miks)
 ...G...... [ZBX-8081] fixed 'cmdline' parameter truncation on Solaris 11.3 and later (viktors, wiper)
@@ -63,6 +69,7 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5905] added "Template App Etcd by HTTP" (ychukina)
 
 Bug fixes:
+.........T [ZBX-17989] fixed server version for pgsql.replication.status (afayantsev)
 ..F....... [ZBX-18057] fixed security vulnerability CVE-2020-15803 (Stored XSS attack on URL widget) (Ivo, talbergs)
 A......... [ZBX-17931] fixed dependent discovery rule deletion when deleting master item (vmurzins)
 .......PS. [ZBX-17624] fixed misleading error message in case of not available datastorage for vmware.hv.datastore.read and vmware.hv.datastore.write metrics (MVekslers)
@@ -251,7 +258,7 @@ A.F....PS. [ZBXNEXT-2297] added user defined macros creation/edition for host pr
 .........T [ZBXCTR-1] added Telegram media type (ableev)
 .........T [ZBXNEXT-5824] added media "Redmine" (afayantsev)
 ..F.I..... [ZBXNEXT-5861] added {EVENT.DURATION} macro to subject of message templates (MVekslers)
-..F.....S. [ZBXNEXT-5848] Expand acknowledge message maximum size to more than 256 characters (arimdjonoks)
+A.F.....S. [ZBXNEXT-5848] increased acknowledge message maximum size to 2048 characters (arimdjonoks)
 ..F.I..... [ZBXNEXT-5702] improved UI performance for large installations (miks, talbergs)
 .........T [ZBXNEXT-5599] Added MS Teams media type (tuskov)
 .........T [ZBXNEXT-5715] Added Jira media type (tuskov)
@@ -1616,6 +1623,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.23
+
+4.0.23rc1 was released as 4.0.23 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.23rc1
