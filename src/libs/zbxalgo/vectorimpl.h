@@ -254,25 +254,6 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 	}													\
 }														\
 														\
-int	zbx_vector_ ## __id ## _best_match(const zbx_vector_ ## __id ## _t *vector,				\
-									zbx_compare_func_t compare_func)	\
-{														\
-	int	best_index = -1, index;										\
-														\
-	if (0 == vector->values_num)										\
-		return best_index;										\
-														\
-	best_index = 0;												\
-														\
-	for (index = 1; index < vector->values_num; index++)							\
-	{ 													\
-		if (0 > compare_func(&(vector->values[index]), &(vector->values[best_index])))			\
-			best_index = index;									\
-	}													\
-														\
-	return best_index;											\
-}														\
-														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size)				\
 {														\
 	if ((int)size > vector->values_alloc)									\

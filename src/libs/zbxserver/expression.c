@@ -2443,6 +2443,32 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_vector_ptr_best_match                                        *
+ *                                                                            *
+ * Purpose: find the index in the vector which value best matches the         *
+ *          supplied comparison function                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_vector_ptr_best_match(const zbx_vector_ptr_t *vector, zbx_compare_func_t compare_func)
+{
+	int	best_index = FAIL, index;
+
+	if (0 == vector->values_num)
+		return best_index;
+
+	best_index = 0;
+
+	for (index = 1; index < vector->values_num; index++)
+	{
+		if (0 > compare_func(&(vector->values[index]), &(vector->values[best_index])))
+			best_index = index;
+	}
+
+	return best_index;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_event_value                                                  *
  *                                                                            *
  * Purpose: request event value by macro                                      *
@@ -2520,7 +2546,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 
 				best_match_index = zbx_vector_ptr_best_match(&(event->tags), compare_tags);
 
-				if (-1 != best_match_index)
+				if (FAIL != best_match_index)
 				{
 					zbx_tag_t	*tag;
 
