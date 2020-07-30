@@ -123,14 +123,14 @@ class CControllerPopupTabFilterEdit extends CController {
 
 		if (array_key_exists($data['idx2'], $filter->tabfilters)) {
 			$properties = [
-				'name' => $data['name'],
-				'show_counter' => (bool) $data['show_counter'],
-				'custom_time' => (bool) $data['custom_time'],
+				'filter_name' => $data['filter_name'],
+				'filter_show_counter' => (bool) $data['filter_show_counter'],
+				'filter_custom_time' => (bool) $data['filter_custom_time'],
 				'from' => $data['tabfilter_from'],
 				'to' => $data['tabfilter_to']
 			];
 
-			if (!$properties['custom_time']) {
+			if (!$properties['filter_custom_time']) {
 				unset($properties['from'], $properties['to']);
 			}
 
