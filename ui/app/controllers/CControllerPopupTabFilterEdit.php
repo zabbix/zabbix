@@ -27,14 +27,14 @@ class CControllerPopupTabFilterEdit extends CController {
 
 	protected function checkInput() {
 		$rules = [
-			'idx' =>				'string|required',
-			'idx2' =>				'int32|required',
-			'form_action' =>		'string|in update,delete',
-			'name' =>				'string|not_empty',
-			'show_counter' =>		'in 0,1',
-			'custom_time' =>		'in 0,1',
-			'tabfilter_from' =>		'string',
-			'tabfilter_to' =>		'string',
+			'idx' =>					'string|required',
+			'idx2' =>					'int32|required',
+			'form_action' =>			'string|in update,delete',
+			'filter_name' =>			'string|not_empty',
+			'filter_show_counter' =>	'in 0,1',
+			'filter_custom_time' =>		'in 0,1',
+			'tabfilter_from' =>			'string',
+			'tabfilter_to' =>			'string',
 		];
 
 		$ret = $this->validateInput($rules) && $this->customValidation();
@@ -85,9 +85,9 @@ class CControllerPopupTabFilterEdit extends CController {
 			'form_action' => '',
 			'idx' => '',
 			'idx2' => '',
-			'name' => '',
-			'show_counter' => 0,
-			'custom_time' => 0,
+			'filter_name' => '',
+			'filter_show_counter' => 0,
+			'filter_custom_time' => 0,
 			'tabfilter_from' => '',
 			'tabfilter_to' => '',
 		];
@@ -119,8 +119,7 @@ class CControllerPopupTabFilterEdit extends CController {
 	 * @param array $data  Filter properties.
 	 */
 	public function updateTab(array $data) {
-		$filter = new CTabFilterProfile($data['idx']);
-		$filter->read();
+		$filter = (new CTabFilterProfile($data['idx'], []))->read();
 
 		if (array_key_exists($data['idx2'], $filter->tabfilters)) {
 			$properties = [
@@ -146,7 +145,7 @@ class CControllerPopupTabFilterEdit extends CController {
 	 * Delete tab filter with index idx2
 	 */
 	public function deleteTab(array $data) {
-		$filter = new CTabFilterProfile($data['idx']);
+		$filter = new CTabFilterProfile($data['idx'], []);
 		$filter->read();
 		$filter->deleteTab((int) $data['idx2']);
 		$filter->update();

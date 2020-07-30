@@ -158,8 +158,8 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.monitoringhosts.selected':
-				$filter = new CTabFilterProfile(CControllerHost::FILTER_IDX);
-				$filter->read();
+				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
+					->read();
 				$dynamictabs = count($filter->tabfilters);
 
 				if ($value_int >= 0 && $value_int < $dynamictabs) {
@@ -184,27 +184,25 @@ class CControllerProfileUpdate extends CController {
 				}
 
 				$properties['tags'] = $tags;
-				$properties['severities'] = array_key_exists('severities', $properties)
-					? array_values($properties['severities'])
-					: [];
 
-				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX))->read();
-				$filter->setFilterDefaults(CControllerHost::FILTER_FIELDS_DEFAULT);
-				$filter->setTabFilter($idx2, $properties);
-				$filter->update();
+				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
+					->read()
+					->setTabFilter($idx2, $properties)
+					->update();
 
 				break;
 
 			case 'web.monitoringhosts.taborder':
-				$filter = new CTabFilterProfile(CControllerHost::FILTER_IDX);
-				$filter->read();
-				$filter->sort($this->getInput('value_str'));
-				$filter->update();
+				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
+					->read()
+					->sort($this->getInput('value_str'))
+					->update();
 
 				break;
 
 			case 'web.monitoringhosts.expanded':
-				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX))->read();
+				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
+					->read();
 				$filter->expanded = ($value_int > 0);
 				$filter->update();
 

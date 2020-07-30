@@ -53,26 +53,26 @@
 			this.running = false;
 			this.timeout = null;
 
-			this.refresh_counters = this.createCountersRefresh();
+			this.refresh_counters = this.createCountersRefresh(1);
 			this.filter = new CTabFilter($('#monitoringhostsfilter')[0], <?= json_encode($data['filter_options']) ?>);
 			this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
 				let url = new Curl('', false);
 
 				url.setArgument('action', 'host.view.refresh');
 				this.refresh_url = url.getUrl();
-				this.unscheduleRefresh();
+				this.stop();
 				this.start();
 			});
 		}
 
 		hostPage.prototype = {
-			createCountersRefresh: function() {
+			createCountersRefresh: function(timeout) {
 				if (this.refresh_counters) {
 					clearTimeout(this.refresh_counters);
 					this.refresh_counters = null;
 				}
 
-				return setTimeout(() => this.getFiltersCounters(), this.refresh_interval);
+				return setTimeout(() => this.getFiltersCounters(), timeout);
 			},
 			getFiltersCounters: function() {
 				return $.post('zabbix.php', {
@@ -83,7 +83,7 @@
 							this.filter.updateCounters(json.filter_counters);
 						}
 					}).always(() => {
-						this.refresh_counters = this.createCountersRefresh();
+						this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
 					});
 			},
 			getCurrentForm: function() {

@@ -32,7 +32,7 @@ class CTabFilter extends CBaseComponent {
 		// NodeList of available templates (<script> DOM elements).
 		this._templates = {};
 		this._fetchpromise = null;
-		this._idx_namespace = 'web.monitoringhosts';
+		this._idx_namespace = options.idx;
 
 		this.init(options);
 		this.registerEvents(options);
@@ -169,17 +169,18 @@ class CTabFilter extends CBaseComponent {
 					dropdown = [{
 						items: [{
 								label: t('Home'),
-								clickCallback: (ev) => this._items[0].select()
+								clickCallback: () => this._items[0].select()
 							}]
 					}];
 
 				if (this._items.length > 2) {
 					for (const item of this._items.slice(1, -1)) {
 						items.push({
-							label: item._data.name,
-							clickCallback: (ev) => item.select()
+							label: item._data.filter_name,
+							clickCallback: () => item.select()
 						});
 					}
+
 					dropdown.push({items: items});
 				}
 
@@ -196,13 +197,14 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Update' button press.
 			 */
 			update: () => {
-				var params = this.getActiveFilterParams();
+				var params = this._active_item.getFilterParams();
 
 				this.profileUpdate('properties', {
 					'idx2[]': this._active_item._index,
 					'value_str': params.toString()
 				}).then(() => {
-					this.setBrowserLocation(params);
+					this._active_item.setBrowserLocation(params);
+					this.fire(TABFILTER_EVENT_URLSET);
 				});
 			},
 
@@ -210,7 +212,7 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Save as' button press, refresh whole page for simplisity.
 			 */
 			create: () => {
-				let filter = this.getActiveFilterParams(),
+				let filter = this._active_item.getFilterParams(),
 					url = new Curl('', false);
 
 				filter.set('filter_name', t('Untitled'));
@@ -222,14 +224,15 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Apply' button press.
 			 */
 			apply: () => {
-				this.setBrowserLocation(this.getActiveFilterParams());
+				this._active_item.setBrowserLocation(this._active_item.getFilterParams());
+				this.fire(TABFILTER_EVENT_URLSET);
 			},
 
 			/**
 			 * Action on 'Reset' button press.
 			 */
 			reset: () => {
-				this.setBrowserLocation(new URLSearchParams());
+				this._active_item.setBrowserLocation(new URLSearchParams());
 				window.location.reload(true);
 			}
 		}
@@ -283,7 +286,7 @@ class CTabFilter extends CBaseComponent {
 			can_toggle: this._options.can_toggle,
 			container: container,
 			data: data,
-			template: this._templates[data.template]||null
+			template: this._templates[data.tab_view]||null
 		});
 
 		item._parent = this;
@@ -330,41 +333,6 @@ class CTabFilter extends CBaseComponent {
 		}).catch((err) => {
 			// Catch DOMExeception: The user aborted a request.
 		});
-	}
-
-	/**
-	 * Get active filter parameters as URLSearchParams object, defining value of unchecked checkboxes equal to
-	 * 'unchecked-value' attribute value.
-	 *
-	 * @return {URLSearchParams}
-	 */
-	getActiveFilterParams() {
-		let form = this._active_item._content_container.querySelector('form'),
-			params = new URLSearchParams(new FormData(form));
-
-		for (const checkbox of form.querySelectorAll('input[type="checkbox"][unchecked-value]')) {
-			if (!checkbox.checked) {
-				params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'))
-			}
-		}
-
-		return params;
-	}
-
-	/**
-	 * Set browser location URL according to passed values. Argument 'action' from already set URL is preserved.
-	 * Create TABFILTER_EVENT_URLSET event with detail.target equal instance of CTabFilter.
-	 *
-	 * @param {URLSearchParams} search_params  Filter field values to be set in URL.
-	 */
-	setBrowserLocation(search_params) {
-		let url = new Curl('', false);
-
-		search_params.set('action', url.getArgument('action'));
-		url.query = search_params.toString();
-		url.formatArguments();
-		history.replaceState(history.state, '', url.getUrl());
-		this.fire(TABFILTER_EVENT_URLSET);
 	}
 
 	/**

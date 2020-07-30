@@ -26,18 +26,24 @@
 $form_list = (new CFormList())
 	->addVar('idx', $data['idx'])
 	->addVar('idx2', $data['idx2'])
-	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), (new CTextBox('name', $data['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('Show number of records'), (new CCheckBox('show_counter', 1))->setChecked($data['show_counter']))
-	->addRow(_('Set custom time period'), (new CCheckBox('custom_time', 1))->setChecked($data['custom_time']))
+	->addRow((new CLabel(_('Name'), 'filter_name'))->setAsteriskMark(),
+		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Show number of records'),
+		(new CCheckBox('filter_show_counter', 1))->setChecked($data['filter_show_counter'])
+	)
+	->addRow(_('Set custom time period'),
+		(new CCheckBox('filter_custom_time', 1))->setChecked($data['filter_custom_time'])
+	)
 	->addRow(_('From'),
 		(new CDateSelector('tabfilter_from', $data['tabfilter_from']))
 			->setDateFormat(ZBX_DATE_TIME)
-			->setEnabled((bool) $data['custom_time'])
+			->setEnabled((bool) $data['filter_custom_time'])
 	)
 	->addRow(_('To'),
 		(new CDateSelector('tabfilter_to', $data['tabfilter_to']))
 			->setDateFormat(ZBX_DATE_TIME)
-			->setEnabled((bool) $data['custom_time'])
+			->setEnabled((bool) $data['filter_custom_time'])
 	);
 
 $form = (new CForm())

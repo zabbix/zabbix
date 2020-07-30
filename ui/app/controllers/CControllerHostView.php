@@ -24,46 +24,33 @@ class CControllerHostView extends CControllerHostViewRefresh {
 
 	protected function doAction(): void {
 		$data['filter_defaults'] = static::FILTER_FIELDS_DEFAULT;
-		$profile = (new CTabFilterProfile(static::FILTER_IDX))->read();
-		$profile->setFilterDefaults($data['filter_defaults']);
+		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
+			->read()
+			->setInput($this->getInputAll());
 		$filter = $profile->getTabFilter($profile->selected);
 		$filter_tabs = $profile->getTabsWithDefaults();
 
-		$refresh_curl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.view.refresh')
-			->setArgument('name', $filter['name'])
-			->setArgument('groupids', $filter['groupids'])
-			->setArgument('ip', $filter['ip'])
-			->setArgument('dns', $filter['dns'])
-			->setArgument('status', $filter['status'])
-			->setArgument('evaltype', $filter['evaltype'])
-			->setArgument('tags', $filter['tags'])
-			->setArgument('severities', $filter['severities'])
-			->setArgument('show_suppressed', $filter['show_suppressed'])
-			->setArgument('maintenance_status', $filter['maintenance_status'])
-			->setArgument('sort', $filter['sort'])
-			->setArgument('sortorder', $filter['sortorder'])
-			->setArgument('page', $filter['page']);
-
-		$prepared_data = $this->getData($filter);
-
 		foreach ($filter_tabs as &$filter_tab) {
-			$filter_tab['filter'] += $this->getAdditionalData($filter_tab['filter']);
+			$filter_tab += $this->getAdditionalData($filter_tab);
 		}
 		unset($filter_tab);
 
+		$refresh_curl = (new CUrl('zabbix.php'));
+		$filter['action'] = 'host.view.refresh';
+		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
+
 		$data = [
+			'tabfilter_idx' => static::FILTER_IDX,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-
-			'filter_template' => 'monitoring.host.filter',
-			'filter_defaults' => $data['filter_defaults'],
+			'filter_view' => 'monitoring.host.filter',
+			'filter_defaults' => $profile->filter_defaults,
 			'from' => $filter['from'],
 			'to' => $filter['to'],
 			'filter_tabs' => $filter_tabs,
 			'tab_selected' => $profile->selected,
 			'tab_expanded' => $profile->expanded
-		] + $prepared_data;
+		] + $this->getData($filter);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Hosts'));

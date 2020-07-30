@@ -336,7 +336,7 @@ class CProfile {
 			$value_type => zbx_dbstr($value),
 			'type' => $type,
 			'idx2' => zbx_dbstr($idx2)
-		];
+		] + ['value_str' => zbx_dbstr('')];
 
 		return DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');
 	}

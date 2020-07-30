@@ -45,15 +45,14 @@ $widget = (new CWidget())
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CTabFilter())
 		->setId('monitoringhostsfilter')
+		->setIdx($data['tabfilter_idx'])
 		->setSelected((int) $data['tab_selected'])
 		->setExpanded((bool) $data['tab_expanded'])
-		->addTemplate(new CPartial($data['filter_template'], [
-			'filter' => $data['filter_defaults']
-		]));
+		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
 	foreach ($data['filter_tabs'] as $tab) {
-		$tab['template'] = $data['filter_template'];
-		$filter->addTemplatedTab($tab['name'], $tab);
+		$tab['tab_view'] = $data['filter_view'];
+		$filter->addTemplatedTab($tab['filter_name'], $tab);
 	}
 
 	$filter->addTimeselector($data['from'], $data['to']);

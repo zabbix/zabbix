@@ -19,7 +19,7 @@ class CTabFilter extends CDiv {
 	 * Tab options array.
 	 */
 	public $options = [
-		'sortable' => true,
+		'idx' => '',
 		'can_toggle' => true,
 		'selected' => 0,
 		'expanded' => false,
@@ -97,6 +97,7 @@ class CTabFilter extends CDiv {
 
 		return $this;
 	}
+
 	/**
 	 * Add template for browser side rendered tabs.
 	 *
@@ -104,6 +105,17 @@ class CTabFilter extends CDiv {
 	 */
 	public function addTemplate(CPartial $template) {
 		$this->templates[$template->getName()] = $template;
+
+		return $this;
+	}
+
+	/**
+	 * Set idx namespace used by tab filter.
+	 *
+	 * @param string $idx  Idx string without ending dot.
+	 */
+	public function setIdx(string $idx) {
+		$this->options['idx'] = $idx;
 
 		return $this;
 	}
@@ -130,7 +142,6 @@ class CTabFilter extends CDiv {
 					->setAttribute('data-target', $targetid)
 					->addClass('icon-home');
 				$data['sortable'] = false;
-				unset($data['name']);
 			}
 			else {
 				$label = (new CLink($label))->setAttribute('data-target', $targetid);
@@ -217,7 +228,7 @@ class CTabFilter extends CDiv {
 				->setAttribute('data-action', 'selectPrevTab')
 				->addClass('btn-iterator-page-previous'),
 			$home,
-			(new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER),
+			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
 			$static,
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
@@ -254,7 +265,7 @@ class CTabFilter extends CDiv {
 			if ($this->contents[$selected] === null) {
 				$tab_data = $this->options['data'][$selected];
 				$tab_data['render_html'] = true;
-				$this->contents[$selected] = (new CDiv([new CPartial($tab_data['template'], $tab_data)]))
+				$this->contents[$selected] = (new CDiv([new CPartial($tab_data['tab_view'], $tab_data)]))
 					->setId($this->labels[$selected]->getAttribute('data-target'));
 			}
 		}

@@ -20,19 +20,18 @@
 **/
 
 
-$fields = $data['filter'];
 $filter_tags_table = (new CTable())
 	->setId('tags_#{uniqid}')
 	->addRow(
 		(new CCol(
-			(new CRadioButtonList('evaltype', (int) $fields['evaltype']))
+			(new CRadioButtonList('evaltype', (int) $data['evaltype']))
 				->setId('evaltype_#{uniqid}')
 				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 				->setModern(true)
 		))->setColSpan(4)
 );
-$tags = array_values($fields['tags']);
+$tags = array_values($data['tags']);
 
 if (!$tags) {
 	$tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
@@ -70,7 +69,7 @@ $filter_tags_table->addRow(
 
 $left_column = (new CFormList())
 	->addRow(_('Name'),
-		(new CTextBox('name', $fields['name']))
+		(new CTextBox('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->removeId()
 	)
@@ -93,23 +92,23 @@ $left_column = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)->setId('groupids_#{uniqid}')
 	)
 	->addRow(_('IP'),
-		(new CTextBox('ip', $fields['ip']))
+		(new CTextBox('ip', $data['ip']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->removeId()
 	)
 	->addRow(_('DNS'),
-		(new CTextBox('dns', $fields['dns']))
+		(new CTextBox('dns', $data['dns']))
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 			->removeId()
 	)
 	->addRow(_('Port'),
-		(new CTextBox('port', $fields['port']))
+		(new CTextBox('port', $data['port']))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->removeId()
 	)
 	->addRow(_('Severity'),
 		(new CSeverityCheckBoxList('severities'))
-			->setChecked($fields['severities'])
+			->setChecked($data['severities'])
 			->setUniqid('#{uniqid}')
 			->setId('severities_#{uniqid}')
 	);
@@ -118,7 +117,7 @@ $right_column = (new CFormList())
 	->addRow(
 		_('Status'),
 		(new CHorList())
-			->addItem((new CRadioButtonList('status', (int) $fields['status']))
+			->addItem((new CRadioButtonList('status', (int) $data['status']))
 				->addValue(_('Any'), -1, 'status_1#{uniqid}')
 				->addValue(_('Enabled'), HOST_STATUS_MONITORED, 'status_2#{uniqid}')
 				->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED, 'status_3#{uniqid}')
@@ -129,7 +128,7 @@ $right_column = (new CFormList())
 	->addRow(_('Tags'), $filter_tags_table)
 	->addRow(_('Show hosts in maintenance'), [
 		(new CCheckBox('maintenance_status'))
-			->setChecked($fields['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
+			->setChecked($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 			->setId('maintenance_status_#{uniqid}')
 			->setUncheckedValue(HOST_MAINTENANCE_STATUS_OFF),
 		(new CDiv([
@@ -137,9 +136,9 @@ $right_column = (new CFormList())
 				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('show_suppressed'))
 				->setId('show_suppressed_#{uniqid}')
-				->setChecked($fields['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+				->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
-				->setEnabled($fields['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON),
+				->setEnabled($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON),
 		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 	]);
 
@@ -152,7 +151,10 @@ $template = (new CDiv())
 	]);
 $template = (new CForm('get'))
 	->cleanItems()
-	->addItem($template);
+	->addItem($template)
+	->addVar('filter_name', '#{filter_name}')
+	->addVar('filter_show_counter', '#{filter_show_counter}')
+	->addVar('filter_custom_time', '#{filter_custom_time}');
 
 if (array_key_exists('render_html', $data)) {
 	/**
@@ -187,7 +189,7 @@ $(function($) {
 			id: 'groupids_' + data.uniqid,
 			object_name: 'hostGroup',
 			name: 'groupids[]',
-			data: data.filter.groups_multiselect||[],
+			data: data.groups_multiselect||[],
 			popup: {
 				parameters: {
 					multiselect: '1',
@@ -212,11 +214,11 @@ $(function($) {
 			i = 0;
 		$('#tags_' + data.uniqid + ' tr.form_row', container).remove();
 
-		if (!data.filter.tags.length) {
-			data.filter.tags.push({tag: '', value: '', operator: <?= TAG_OPERATOR_LIKE ?>});
+		if (!data.tags.length) {
+			data.tags.push({tag: '', value: '', operator: <?= TAG_OPERATOR_LIKE ?>});
 		}
 
-		data.filter.tags.forEach(tag => {
+		data.tags.forEach(tag => {
 			var $row = $(tag_row.evaluate({rowNum: i++}));
 
 			$row.find('[name$="[tag]"]').val(tag.tag);
@@ -232,15 +234,15 @@ $(function($) {
 			var elm = $('[name="' + key + '"]', container);
 
 			if (elm.is(':radio,:checkbox')) {
-				elm.filter('[value="' + data.filter[key] + '"]').attr('checked', true);
+				elm.filter('[value="' + data[key] + '"]').attr('checked', true);
 			}
 			else {
-				elm.val(data.filter[key]);
+				elm.val(data[key]);
 			}
 		});
 
 		// Severities checkboxes.
-		data.filter.severities.forEach((value) => {
+		Object.keys(data.severities).forEach((value) => {
 			$('[name="severities[' + value + ']"]', container).attr('checked', true);
 		});
 	}

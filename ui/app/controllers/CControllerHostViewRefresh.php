@@ -45,8 +45,11 @@ class CControllerHostViewRefresh extends CControllerHost {
 			'sort' =>					'in name,status',
 			'sortorder' =>				'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
 			'page' =>					'ge 1',
-			'filter_set' =>				'in 1',
-			'filter_rst' =>				'in 1',
+			'from' =>					'string',
+			'to' =>						'string',
+			'filter_name' =>			'string',
+			'filter_custom_time' =>		'in 1,0',
+			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1'
 		];
 
@@ -90,12 +93,11 @@ class CControllerHostViewRefresh extends CControllerHost {
 		$filter = static::FILTER_FIELDS_DEFAULT;
 
 		if ($this->getInput('filter_counters', 0)) {
-			$profile = (new CTabFilterProfile(static::FILTER_IDX))->read();
-			$profile->setFilterDefaults(static::FILTER_FIELDS_DEFAULT);
+			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 			$show_counters = [];
 
 			foreach ($profile->getTabsWithDefaults() as $index => $tabfilter) {
-				$show_counters[$index] = $tabfilter['show_counter'] ? $this->getCount($tabfilter['filter']) : 0;
+				$show_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
 
 			$data['filter_counters'] = $show_counters;

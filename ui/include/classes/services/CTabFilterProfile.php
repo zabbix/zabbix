@@ -49,7 +49,6 @@ class CTabFilterProfile {
 	 * @property string []['name']          Tab label.
 	 * @property bool   []['show_counter']  Show count of results within tab label when tab is collapsed.
 	 * @property bool   []['custom_time']   Use custom time range.
-	 * @property array  []['filter']        Array of filter fields.
 	 *
 	 * @var array
 	 */
@@ -60,12 +59,16 @@ class CTabFilterProfile {
 	 *
 	 * @var array
 	 */
-	protected $filter_defaults;
+	public $filter_defaults;
 
-	public function __construct($idx) {
+	public function __construct($idx, array $filter_defaults) {
 		$this->namespace = $idx;
 		$this->tabfilters = [];
-		$this->filter_defaults = [];
+		$this->filter_defaults = $filter_defaults + [
+			'filter_name' => _('Untitled'),
+			'filter_show_counter' => 0,
+			'filter_custom_time' => 0,
+		];
 		$this->selected = 0;
 		$this->expanded = false;
 	}
@@ -76,31 +79,11 @@ class CTabFilterProfile {
 	 * @param array $input  Controller input.
 	 */
 	public function createFilterTab(array $input): array {
-		$filter = CArrayHelper::renameKeys($input, [
-			'filter_name' => 'name',
-			'filter_show_counter' => 'show_counter',
-			'filter_custom_time' => 'custom_time',
-		]) + [
-			'name' => _('Untitled'),
-			'show_counter' => 0,
-			'custom_time' => 0,
-			'from' => ZBX_PERIOD_DEFAULT_FROM,
-			'to' => ZBX_PERIOD_DEFAULT_TO,
-			'filter' => array_intersect_key($input, $this->filter_defaults) + $this->filter_defaults
-		];
+		$filter = array_intersect_key($input, $this->filter_defaults) + $this->filter_defaults;
+		$filter['filter_show_counter'] = (int) $filter['filter_show_counter'];
+		$filter['filter_custom_time'] = (int) $filter['filter_custom_time'];
 
 		return $filter;
-	}
-
-	/**
-	 * Set filter fields default values.
-	 *
-	 * @param array $defaults  Key value map of field defaults.
-	 */
-	public function setFilterDefaults(array $defaults) {
-		$this->filter_defaults = $defaults;
-
-		return $this;
 	}
 
 	/**
@@ -111,7 +94,8 @@ class CTabFilterProfile {
 	 */
 	public function setTabFilter($index, array $input) {
 		$input = array_intersect_key($input, $this->filter_defaults);
-		$this->tabfilters[$index]['filter'] = CArrayHelper::unsetEqualValues($input, $this->filter_defaults);
+		$this->tabfilters[$index] = CArrayHelper::unsetEqualValues($input, $this->filter_defaults);
+		$this->selected = $index;
 
 		return $this;
 	}
@@ -125,7 +109,7 @@ class CTabFilterProfile {
 	 */
 	public function getTabFilter($index): array {
 		return array_key_exists($index, $this->tabfilters)
-			? $this->tabfilters[$index]['filter'] + $this->filter_defaults
+			? $this->tabfilters[$index] + $this->filter_defaults
 			: $this->filter_defaults;
 	}
 
@@ -137,12 +121,38 @@ class CTabFilterProfile {
 	public function getTabsWithDefaults(): array {
 		$tabfilters = [];
 
+		if (!$this->tabfilters) {
+			$tabfilters[] = $this->createFilterTab([]);
+		}
+
 		foreach ($this->tabfilters as $tabfilter) {
-			$tabfilter['filter'] += $this->filter_defaults;
-			$tabfilters[] = $tabfilter;
+			$tabfilters[] = $tabfilter + $this->filter_defaults;
 		}
 
 		return $tabfilters;
+	}
+
+	/**
+	 * Update selected tab filter properties from $input array. If $input contains filter name will set tab filter
+	 * having this name or create new if tab with such name does not exists.
+	 *
+	 * @param array $input  Tab filter properties array.
+	 */
+	public function setInput(array $input) {
+		if (array_key_exists('filter_name', $input)) {
+			$name_index = array_search($input['filter_name'], array_column($this->tabfilters, 'filter_name'));
+
+			if ($name_index === false) {
+				$this->selected = count($this->tabfilters);
+				$this->tabfilters[] = $this->createFilterTab($input);
+			}
+			elseif ($this->selected != $name_index) {
+				$this->selected = $name_index;
+				$this->update();
+			}
+		}
+
+		return $this;
 	}
 
 	/**
@@ -203,6 +213,12 @@ class CTabFilterProfile {
 		}
 		unset($tabfilter);
 
+		if (!$this->tabfilters) {
+			$this->tabfilters[] = $this->createFilterTab([
+				'filter_name' => _('Home')
+			]);
+		}
+
 		return $this;
 	}
 
@@ -214,7 +230,7 @@ class CTabFilterProfile {
 
 		CProfile::updateArray($this->namespace.'.properties', array_map('json_encode', $tabfilters), PROFILE_TYPE_STR);
 		CProfile::update($this->namespace.'.selected', $this->selected, PROFILE_TYPE_INT);
-		CProfile::update($this->namespace.'.expanded', $this->expanded, PROFILE_TYPE_INT);
+		CProfile::update($this->namespace.'.expanded', (int) $this->expanded, PROFILE_TYPE_INT);
 
 		return $this;
 	}
@@ -229,7 +245,7 @@ class CTabFilterProfile {
 
 		if ($this->filter_defaults) {
 			foreach ($tabfilters as &$tabfilter) {
-				$tabfilter['filter'] = CArrayHelper::unsetEqualValues($tabfilter['filter'], $this->filter_defaults);
+				$tabfilter = CArrayHelper::unsetEqualValues($tabfilter, $this->filter_defaults);
 			}
 			unset($tabfilter);
 		}

@@ -24,6 +24,7 @@ const TABFILTERITEM_EVENT_EXPAND   = 'expand.tabfilter';
 const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expandbefore.tabfilter';
 const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
 const TABFILTERITEM_EVENT_DELETE = 'delete.tabfilter';
+const TABFILTERITEM_EVENT_URLSET = 'urlset.tabfilter';
 
 class CTabFilterItem extends CBaseComponent {
 
@@ -47,12 +48,14 @@ class CTabFilterItem extends CBaseComponent {
 		if (this._expanded) {
 			this.renderContentTemplate();
 
-			if ('name' in this._data && this._data.name.length) {
+			if (this._content_container.querySelector('[name="filter_name"]')) {
 				this.addActionIcons();
 			}
+
+			this.setBrowserLocation(this.getFilterParams());
 		}
 
-		if (this._data.show_counter) {
+		if (this._data.filter_show_counter) {
 			this.setCounter('-');
 		}
 	}
@@ -84,6 +87,7 @@ class CTabFilterItem extends CBaseComponent {
 					);
 				}
 
+				this.setBrowserLocation(this.getFilterParams());
 				this._content_container.classList.remove('display-none');
 
 				if (this._content_container.querySelector('[name="filter_name"]')) {
@@ -118,12 +122,7 @@ class CTabFilterItem extends CBaseComponent {
 
 	renderContentTemplate() {
 		if (this._template) {
-			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(
-				Object.assign({}, this._data, {
-					show_counter: +this._data.show_counter,
-					custom_time: +this._data.custom_time
-				})
-			);
+			this._content_container.innerHTML = (new Template(this._template.innerHTML)).evaluate(this._data);
 			this._template.dispatchEvent(new CustomEvent(TABFILTERITEM_EVENT_RENDER, {detail: this}));
 		}
 	}
@@ -137,9 +136,9 @@ class CTabFilterItem extends CBaseComponent {
 		PopUp('popup.tabfilter.edit', {
 			'idx': this._idx_namespace,
 			'idx2': this._index,
-			'name': this._data.name,
-			'show_counter': this._data.show_counter ? 1 : 0,
-			'custom_time': this._data.custom_time ? 1 : 0,
+			'filter_name': this._data.filter_name,
+			'filter_show_counter': this._data.filter_show_counter,
+			'filter_custom_time': this._data.filter_custom_time,
 			'tabfilter_from': this._data.from||'',
 			'tabfilter_to': this._data.to||''
 		}, 'tabfilter_dialogue', edit_elm);
@@ -156,14 +155,11 @@ class CTabFilterItem extends CBaseComponent {
 		edit.addEventListener('popup.tabfilter', (ev) => {
 			let data = ev.detail;
 
-			if (data.from_action === 'update') {
-				this.update({
-					name: data.name,
-					show_counter: !!data.show_counter,
-					custom_time: !!data.custom_time,
+			if (data.form_action === 'update') {
+				this.update(Object.assign(data, {
 					from: data.tabfilter_from,
 					to: data.tabfilter_to
-				});
+				}));
 			}
 			else {
 				this.delete();
@@ -197,32 +193,69 @@ class CTabFilterItem extends CBaseComponent {
 	update(data) {
 		var form = this._content_container.querySelector('form'),
 			fields = {
-				name: form.querySelector('[name="filter_name"]'),
-				show_counter: form.querySelector('[name="filter_show_counter"]'),
-				custom_time: form.querySelector('[name="filter_custom_time"]')
-			};
+				filter_name: form.querySelector('[name="filter_name"]'),
+				filter_show_counter: form.querySelector('[name="filter_show_counter"]'),
+				filter_custom_time: form.querySelector('[name="filter_custom_time"]')
+			},
+			search_params = this.getFilterParams();
 
-		this._data.show_counter = data.show_counter;
-		this._data.custom_time = data.custom_time;
-		this._data.name = data.name;
-
-		if (data.custom_time) {
+		if (data.filter_custom_time) {
 			this._data.from = data.from;
 			this._data.to = data.to;
 		}
 
-		if (data.show_counter) {
+		Object.keys(fields).forEach((key) => {
+			if (fields[key] instanceof HTMLElement) {
+				this._data[key] = data[key];
+				fields[key].value = data[key];
+			}
+
+			search_params.set(key, this._data[key]);
+		});
+
+		if (data.filter_show_counter) {
 			this.setCounter('');
 		}
 		else {
 			this.removeCounter();
 		}
 
-		this._target.text = data.name;
-		Object.keys(fields).forEach((key) => {
-			if (fields[key]) {
-				fields[key].value = this._data[key];
+		this._target.text = data.filter_name;
+		this.setBrowserLocation(search_params);
+	}
+
+	/**
+	 * Get filter parameters as URLSearchParams object, defining value of unchecked checkboxes equal to
+	 * 'unchecked-value' attribute value.
+	 *
+	 * @return {URLSearchParams}
+	 */
+	getFilterParams() {
+		let form = this._content_container.querySelector('form'),
+			params = new URLSearchParams(new FormData(form));
+
+		for (const checkbox of form.querySelectorAll('input[type="checkbox"][unchecked-value]')) {
+			if (!checkbox.checked) {
+				params.set(checkbox.getAttribute('name'), checkbox.getAttribute('unchecked-value'))
 			}
-		});
+		}
+
+		return params;
+	}
+
+	/**
+	 * Set browser location URL according to passed values. Argument 'action' from already set URL is preserved.
+	 * Create TABFILTER_EVENT_URLSET event with detail.target equal instance of CTabFilter.
+	 *
+	 * @param {URLSearchParams} search_params  Filter field values to be set in URL.
+	 */
+	setBrowserLocation(search_params) {
+		let url = new Curl('', false);
+
+		search_params.set('action', url.getArgument('action'));
+		url.query = search_params.toString();
+		url.formatArguments();
+		history.replaceState(history.state, '', url.getUrl());
+		this.fire(TABFILTERITEM_EVENT_URLSET);
 	}
 }
