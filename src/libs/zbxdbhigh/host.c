@@ -3566,6 +3566,34 @@ static int	DBhost_prototypes_macro_make(zbx_vector_macros_t *hostmacros, zbx_uin
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBhost_prototypes_interface_make                                 *
+ *                                                                            *
+ * Purpose: validate host interfaces value changes                            *
+ *                                                                            *
+ * Parameters: interfaces     - [IN/OUT] list of host interfaces              *
+ *             interfaceid    - [IN] interface id                             *
+ *             ifmain         - [IN] interface main                           *
+ *             type           - [IN] interface type                           *
+ *             useip          - [IN] interface useip                          *
+ *             ip             - [IN] interface ip                             *
+ *             dns            - [IN] interface dns                            *
+ *             port           - [IN] interface port                           *
+ *             snmp_type      - [IN] interface_snmp version                   *
+ *             bulk           - [IN] interface_snmp bulk                      *
+ *             community      - [IN] interface_snmp community                 *
+ *             securityname   - [IN] interface_snmp securityname              *
+ *             securitylevel  - [IN] interface_snmp securitylevel             *
+ *             authpassphrase - [IN] interface_snmp authpassphrase            *
+ *             privpassphrase - [IN] interface_snmp privpassphrase            *
+ *             authprotocol   - [IN] interface_snmp authprotocol              *
+ *             privprotocol   - [IN] interface_snmp privprotocol              *
+ *             contextname    - [IN] interface_snmp contextname               *
+ *                                                                            *
+ * Return value: SUCCEED - the host interface was found                       *
+ *               FAIL    - in the other case                                  *
+ ******************************************************************************/
 static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces, zbx_uint64_t interfaceid,
 		unsigned char ifmain, unsigned char type, unsigned char useip, const char *ip, const char *dns,
 		const char *port, unsigned char snmp_type, unsigned char bulk, const char *community,
@@ -3777,14 +3805,16 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
  *                                                                            *
  * Parameters: host_prototypes  - [IN/OUT] list of host prototypes            *
  *                                    should be sorted by templateid          *
- *             del_interfaceids - [OUT] list of host interfaceids which       *
+ *             del_interfaceids - [OUT] list of host interface ids which      *
+ *                                    should be deleted                       *
+ *             del_snmpids      - [OUT] list of host snmp interface ids which *
  *                                    should be deleted                       *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
-		zbx_vector_uint64_t *del_interfaceids)
+		zbx_vector_uint64_t *del_interfaceids, zbx_vector_uint64_t *del_snmpids)
 {
 	DB_RESULT			result;
 	DB_ROW				row;
@@ -3808,15 +3838,15 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.hostid,i.main,i.type,i.useip,i.ip,i.dns,i.port,s.version,s.bulk,s.community,"
+			"select hi.hostid,hi.main,hi.type,hi.useip,hi.ip,hi.dns,hi.port,s.version,s.bulk,s.community,"
 				"s.securityname,s.securitylevel,s.authpassphrase,s.privpassphrase,s.authprotocol,"
 				"s.privprotocol,s.contextname"
-			" from interface i"
+			" from interface hi"
 				" left join interface_snmp s"
-					" on i.interfaceid=s.interfaceid"
+					" on hi.interfaceid=s.interfaceid"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.hostid", hostids.values, hostids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hi.hostid");
 
 	result = DBselect("%s", sql);
 	host_prototype = NULL;
@@ -3897,8 +3927,8 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 					" left join interface_snmp s"
 						" on hi.interfaceid=s.interfaceid"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.hostid", hostids.values, hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hi.hostid");
 
 		result = DBselect("%s", sql);
 
@@ -3913,32 +3943,36 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 				if (host_prototype->hostid == hostid)
 				{
 					unsigned char	type;
-					int		ret;
 
 					ZBX_STR2UINT64(interfaceid, row[0]);
 					ZBX_STR2UINT64(type, row[3]);
 
 					if (INTERFACE_TYPE_SNMP == type)
 					{
-						ret = DBhost_prototypes_interface_make(&host_prototype->interfaces,
-								interfaceid, (unsigned char)atoi(row[2]), type,
+						if (FAIL == DBhost_prototypes_interface_make(
+								&host_prototype->interfaces, interfaceid,
+								(unsigned char)atoi(row[2]), type,
 								(unsigned char)atoi(row[4]), row[5], row[6], row[7],
 								(unsigned char)atoi(row[8]),
 								(unsigned char)atoi(row[9]), row[10], row[11],
 								(unsigned char)atoi(row[12]), row[13], row[14],
 								(unsigned char)atoi(row[15]),
-								(unsigned char)atoi(row[16]), row[17]);
+								(unsigned char)atoi(row[16]), row[17]))
+						{
+							zbx_vector_uint64_append(del_snmpids, interfaceid);
+						}
 					}
 					else
 					{
-						ret = DBhost_prototypes_interface_make(&host_prototype->interfaces,
-								interfaceid, (unsigned char)atoi(row[2]), type,
+						if (FAIL == DBhost_prototypes_interface_make(
+								&host_prototype->interfaces, interfaceid,
+								(unsigned char)atoi(row[2]), type,
 								(unsigned char)atoi(row[4]), row[5], row[6], row[7], 0,
-								0, NULL, NULL, 0, NULL, NULL, 0, 0, NULL);
+								0, NULL, NULL, 0, NULL, NULL, 0, 0, NULL))
+						{
+							zbx_vector_uint64_append(del_interfaceids, interfaceid);
+						}
 					}
-
-					if (FAIL == ret)
-						zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
 					break;
 				}
@@ -3958,13 +3992,107 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBhost_prototypes_interface_snmp_prepare_sql                     *
+ *                                                                            *
+ * Purpose: prepare sql for update record of interface_snmp table             *
+ *                                                                            *
+ * Parameters: interfaceid - [IN] snmp interface id;                          *
+ *             snmp        - [IN] snmp values for update                      *
+ *             sql         - [IN/OUT] sql string                              *
+ *             sql_alloc   - [IN/OUT] size of sql string                      *
+ *             sql_offset  - [IN/OUT] offset in sql string                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBhost_prototypes_interface_snmp_prepare_sql(const zbx_uint64_t interfaceid,
+		const zbx_interface_snmp_t *snmp, char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	const char	*d = "";
+	char		*esc;
+
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update interface_snmp set ");
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "version=%d", (int)snmp->version);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sbulk=%d", d, (int)snmp->bulk);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY))
+	{
+		esc = DBdyn_escape_string(snmp->community);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%scommunity='%s'", d, esc);
+		zbx_free(esc);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME))
+	{
+		esc = DBdyn_escape_string(snmp->securityname);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssecurityname='%s'", d, esc);
+		zbx_free(esc);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%ssecuritylevel=%d", d, (int)snmp->securitylevel);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS))
+	{
+		esc = DBdyn_escape_string(snmp->authpassphrase);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sauthpassphrase='%s'", d, esc);
+		zbx_free(esc);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS))
+	{
+		esc = DBdyn_escape_string(snmp->privpassphrase);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sprivpassphrase='%s'", d, esc);
+		zbx_free(esc);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sauthprotocol=%d", d, (int)snmp->authprotocol);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%sprivprotocol=%d", d, (int)snmp->privprotocol);
+		d = ",";
+	}
+
+	if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT))
+	{
+		esc = DBdyn_escape_string(snmp->contextname);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%scontextname='%s'", d, esc);
+		zbx_free(esc);
+	}
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBhost_prototypes_save                                           *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_hosttemplateids,
-		zbx_vector_uint64_t *del_hostmacroids, zbx_vector_uint64_t *del_interfaceids)
+		zbx_vector_uint64_t *del_hostmacroids, zbx_vector_uint64_t *del_interfaceids,
+		zbx_vector_uint64_t *del_snmpids)
 {
 	char				*sql1 = NULL, *sql2 = NULL, *name_esc, *value_esc;
 	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
@@ -4072,6 +4200,14 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 	}
 
+	if (0 != del_snmpids->values_num)
+	{
+		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from interface_snmp where");
+		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "interfaceid",
+				del_snmpids->values, del_snmpids->values_num);
+		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
+	}
+
 	if (0 != del_interfaceids->values_num)
 	{
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from interface where");
@@ -4102,13 +4238,13 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 		zbx_db_insert_prepare(&db_insert_iface, "interface", "interfaceid", "hostid", "main", "type",
 				"useip", "ip", "dns", "port", NULL);
+	}
 
-		if (0 != new_snmp)
-		{
-			zbx_db_insert_prepare(&db_insert_snmp, "interface_snmp", "interfaceid", "version", "bulk", "community",
-					"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
-					"privprotocol", "contextname", NULL);
-		}
+	if (0 != new_snmp)
+	{
+		zbx_db_insert_prepare(&db_insert_snmp, "interface_snmp", "interfaceid", "version", "bulk", "community",
+				"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
+				"privprotocol", "contextname", NULL);
 	}
 
 	for (i = 0; i < host_prototypes->values_num; i++)
@@ -4310,93 +4446,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				}
 				else if (0 != (interface->data.snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE))
 				{
-					zbx_interface_snmp_t	*snmp = interface->data.snmp;
-					const char		*d = "";
-
-					zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset,
-							"update interface_snmp set ");
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE))
-					{
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "version=%d",
-								(int)snmp->version);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_BULK))
-					{
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sbulk=%d", d,
-								(int)snmp->bulk);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_COMMUNITY))
-					{
-						value_esc = DBdyn_escape_string(snmp->community);
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%scommunity='%s'",
-								d, value_esc);
-						zbx_free(value_esc);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECNAME))
-					{
-						value_esc = DBdyn_escape_string(snmp->securityname);
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-								"%ssecurityname='%s'", d, value_esc);
-						zbx_free(value_esc);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_SECLEVEL))
-					{
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-								"%ssecuritylevel=%d", d, (int)snmp->securitylevel);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPASS))
-					{
-						value_esc = DBdyn_escape_string(snmp->authpassphrase);
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-								"%sauthpassphrase='%s'", d, value_esc);
-						zbx_free(value_esc);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPASS))
-					{
-						value_esc = DBdyn_escape_string(snmp->privpassphrase);
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-								"%sprivpassphrase='%s'", d, value_esc);
-						zbx_free(value_esc);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_AUTHPROTOCOL))
-					{
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-								"%sauthprotocol=%d", d, (int)snmp->authprotocol);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_PRIVPROTOCOL))
-					{
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-								"%sprivprotocol=%d", d, (int)snmp->privprotocol);
-						d = ",";
-					}
-
-					if (0 != (snmp->flags & ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_CONTEXT))
-					{
-						value_esc = DBdyn_escape_string(snmp->contextname);
-						zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-								"%scontextname='%s'", d, value_esc);
-						zbx_free(value_esc);
-					}
-
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-							" where interfaceid=" ZBX_FS_UI64 ";\n", interfaceid);
+					DBhost_prototypes_interface_snmp_prepare_sql(interface->interfaceid,
+							interface->data.snmp, &sql1, &sql1_alloc, &sql1_offset);
 				}
 			}
 		}
@@ -4435,12 +4486,12 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	{
 		zbx_db_insert_execute(&db_insert_iface);
 		zbx_db_insert_clean(&db_insert_iface);
+	}
 
-		if (0 != new_snmp)
-		{
-			zbx_db_insert_execute(&db_insert_snmp);
-			zbx_db_insert_clean(&db_insert_snmp);
-		}
+	if (0 != new_snmp)
+	{
+		zbx_db_insert_execute(&db_insert_snmp);
+		zbx_db_insert_clean(&db_insert_snmp);
 	}
 
 	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes || 0 != upd_hostmacros ||
@@ -4452,7 +4503,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	}
 
 	if (0 != del_hosttemplateids->values_num || 0 != del_hostmacroids->values_num ||
-			0 != del_interfaceids->values_num)
+			0 != del_interfaceids->values_num || 0 != del_snmpids->values_num)
 	{
 		DBexecute("%s", sql2);
 		zbx_free(sql2);
@@ -4483,22 +4534,26 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
 
 	if (0 != host_prototypes.values_num)
 	{
-		zbx_vector_uint64_t	del_hosttemplateids, del_group_prototypeids, del_macroids, del_interfaceids;
+		zbx_vector_uint64_t	del_hosttemplateids, del_group_prototypeids, del_macroids, del_interfaceids,
+					del_snmpids;
 
 		zbx_vector_uint64_create(&del_hosttemplateids);
 		zbx_vector_uint64_create(&del_group_prototypeids);
 		zbx_vector_uint64_create(&del_macroids);
 		zbx_vector_uint64_create(&del_interfaceids);
+		zbx_vector_uint64_create(&del_snmpids);
 
 		DBhost_prototypes_templates_make(&host_prototypes, &del_hosttemplateids);
 		DBhost_prototypes_groups_make(&host_prototypes, &del_group_prototypeids);
 		DBhost_prototypes_macros_make(&host_prototypes, &del_macroids);
-		DBhost_prototypes_interfaces_make(&host_prototypes, &del_interfaceids);
-		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids, &del_macroids, &del_interfaceids);
+		DBhost_prototypes_interfaces_make(&host_prototypes, &del_interfaceids, &del_snmpids);
+		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids, &del_macroids, &del_interfaceids,
+				&del_snmpids);
 		DBgroup_prototypes_delete(&del_group_prototypeids);
 
 		zbx_vector_uint64_destroy(&del_macroids);
 		zbx_vector_uint64_destroy(&del_group_prototypeids);
+		zbx_vector_uint64_destroy(&del_snmpids);
 		zbx_vector_uint64_destroy(&del_interfaceids);
 		zbx_vector_uint64_destroy(&del_hosttemplateids);
 	}

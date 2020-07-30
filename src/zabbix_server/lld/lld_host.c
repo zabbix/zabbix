@@ -708,7 +708,12 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		}
 
 		host->inventory_mode = inventory_mode_proto;
-		host->custom_interfaces = custom_iface;
+
+		if (host->custom_interfaces != custom_iface)
+		{
+			host->custom_interfaces = custom_iface;
+			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES;
+		}
 
 		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, NULL,
 				&discover_proto);
