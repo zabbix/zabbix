@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-30T11:20:49Z</date>
+   <date>2020-07-30T14:23:21Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -68,8 +68,8 @@ WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';</params>
                <value_type>TEXT</value_type>
                <params>SELECT
 name AS dg_name,
-ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024) AS size_byte,
-ROUND(usable_file_mb *1024 ) AS free_size_byte,
+ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024*1024) AS size_byte,
+ROUND(usable_file_mb*1024*1024 ) AS free_size_byte,
 ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent
 FROM v$asm_diskgroup ;</params>
                <username>{$ORACLE.USER}</username>
