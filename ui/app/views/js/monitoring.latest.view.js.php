@@ -151,7 +151,12 @@
 			.removeClass(collapsed ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>')
 			.addClass(collapsed ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
 
-		$('tr[data-' + group + '="' + group_id + '"]').toggle(!collapsed);
+		if (collapsed) {
+			$('tr[data-' + group + '="' + group_id + '"]').addClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+		}
+		else {
+			$('tr[data-' + group + '="' + group_id + '"]').removeClass('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+		}
 	};
 
 	latestPage.prototype.updateToggleAll = function() {
@@ -173,23 +178,6 @@
 
 	latestPage.prototype.hydrate = function() {
 		var self = this;
-
-		$('.app-list-toggle').each(function() {
-			var $toggle = $(this),
-				collapsed = $toggle.data('collapsed'),
-
-				group = 'applicationid',
-				group_id = $toggle.data(group);
-
-			if (group_id === undefined) {
-				group = 'hostid',
-				group_id = $toggle.data(group);
-			}
-
-			self.toggleAppGroup(group, group_id, collapsed);
-		});
-
-		this.updateToggleAll();
 
 		$('.app-list-toggle-all').on('click', function() {
 			// For Opera browser with large tables, which renders table layout while showing/hiding rows.

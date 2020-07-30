@@ -30,57 +30,8 @@ $form = (new CForm('GET', 'history.php'))
 
 $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
-// Latest data header.
-
-$col_toggle_all = (new CColHeader(
-	(new CSimpleButton())
-		->addClass(ZBX_STYLE_TREEVIEW)
-		->addClass('app-list-toggle-all')
-		->addItem(new CSpan())
-));
-
-$col_check_all = (new CColHeader(
-	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
-));
-
-$view_url = $data['view_curl']->getUrl();
-
-$col_host = make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url);
-$col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url);
-
-if ($data['filter']['show_details']) {
-	$table->setHeader([
-		$col_toggle_all->addStyle('width: 18px'),
-		$col_check_all->addStyle('width: 15px;'),
-		$col_host->addStyle('width: 13%'),
-		$col_name->addStyle('width: 21%'),
-		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
-		(new CColHeader(_('History')))->addStyle('width: 5%'),
-		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
-		(new CColHeader(_('Type')))->addStyle('width: 8%'),
-		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
-		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
-		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader())->addStyle('width: 5%'),
-		(new CColHeader(_('Info')))->addStyle('width: 35px')
-	]);
-
-	$table_columns = 12;
-}
-else {
-	$table->setHeader([
-		$col_toggle_all->addStyle('width: 18px'),
-		$col_check_all->addStyle('width: 15px'),
-		$col_host->addStyle('width: 17%'),
-		$col_name->addStyle('width: 40%'),
-		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
-		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
-		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader())->addStyle('width: 5%')
-	]);
-
-	$table_columns = 7;
-}
+$all_collapsed = true;
+$table_columns = $data['filter']['show_details'] ? 13 : 8;
 
 // Latest data rows.
 
@@ -134,23 +85,26 @@ foreach ($data['rows'] as $row_index => $row) {
 
 		$toggle_app = (new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
-			->addClass('app-list-toggle')
-			->addItem(new CSpan());
+			->addClass('app-list-toggle');
 
 		if ($row['applicationid']) {
+			$collapsed = (CProfile::get('web.latest.toggle', null, $row['applicationid']) !== null) ? 1 : 0;
 			$toggle_app
-				->setAttribute('data-collapsed',
-					(CProfile::get('web.latest.toggle', null, $row['applicationid']) !== null) ? 1 : 0
-				)
+				->setAttribute('data-collapsed', $collapsed)
 				->setAttribute('data-applicationid', $row['applicationid']);
 		}
 		else {
+			$collapsed = (CProfile::get('web.latest.toggle_other', null, $item['hostid']) !== null) ? 1 : 0;
 			$toggle_app
-				->setAttribute('data-collapsed',
-					(CProfile::get('web.latest.toggle_other', null, $item['hostid']) !== null) ? 1 : 0
-				)
+				->setAttribute('data-collapsed', $collapsed)
 				->setAttribute('data-hostid', $item['hostid']);
 		}
+
+		if (!$collapsed) {
+			$all_collapsed = false;
+		}
+
+		$toggle_app->addItem((new CSpan())->addClass($collapsed ? ZBX_STYLE_ARROW_RIGHT : ZBX_STYLE_ARROW_DOWN));
 
 		$table->addRow([$toggle_app, '', $col_host, $col_name]);
 
@@ -319,7 +273,60 @@ foreach ($data['rows'] as $row_index => $row) {
 		$table_row->setAttribute('data-hostid', $item['hostid']);
 	}
 
+	if ($collapsed) {
+		$table_row->addClass(ZBX_STYLE_DISPLAY_NONE);
+	}
+
 	$table->addRow($table_row);
+}
+
+// Latest data header.
+
+$col_toggle_all = (new CColHeader(
+	(new CSimpleButton())
+		->addClass(ZBX_STYLE_TREEVIEW)
+		->addClass('app-list-toggle-all')
+		->setAttribute('data-collapsed', $all_collapsed)
+		->addItem((new CSpan())->addClass(!$all_collapsed ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_RIGHT))
+));
+
+$col_check_all = (new CColHeader(
+	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
+));
+
+$view_url = $data['view_curl']->getUrl();
+
+$col_host = make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url);
+$col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url);
+
+if ($data['filter']['show_details']) {
+	$table->setHeader([
+		$col_toggle_all->addStyle('width: 18px'),
+		$col_check_all->addStyle('width: 15px;'),
+		$col_host->addStyle('width: 13%'),
+		$col_name->addStyle('width: 21%'),
+		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
+		(new CColHeader(_('History')))->addStyle('width: 5%'),
+		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
+		(new CColHeader(_('Type')))->addStyle('width: 8%'),
+		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
+		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
+		(new CColHeader())->addStyle('width: 5%'),
+		(new CColHeader(_('Info')))->addStyle('width: 35px')
+	]);
+}
+else {
+	$table->setHeader([
+		$col_toggle_all->addStyle('width: 18px'),
+		$col_check_all->addStyle('width: 15px'),
+		$col_host->addStyle('width: 17%'),
+		$col_name->addStyle('width: 40%'),
+		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
+		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
+		(new CColHeader())->addStyle('width: 5%')
+	]);
 }
 
 $form->addItem([
