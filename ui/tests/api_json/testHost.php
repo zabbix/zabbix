@@ -86,7 +86,7 @@ class testHost extends CAPITest {
 					'host' => 'new host 3',
 					'interfaces' => 'string'
 				],
-				'expected_error' => 'Incorrect interface specified for host "new host 3".'
+				'expected_error' => 'Incorrect arguments passed to function.'
 			],
 			[
 				'request' => [
@@ -94,7 +94,7 @@ class testHost extends CAPITest {
 					'host' => 'new host 4',
 					'interfaces' => 10
 				],
-				'expected_error' => 'Incorrect interface specified for host "new host 4".'
+				'expected_error' => 'Incorrect arguments passed to function.'
 			]
 		];
 	}
