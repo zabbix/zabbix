@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-27T08:22:24Z</date>
+   <date>2020-07-30T08:29:58Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -167,6 +167,8 @@ UNION
 UNION
  SELECT 'SESSION::Total', COUNT(*) AS VALUE
   FROM V$SESSION
+ UNION
+  SELECT 'SESSION::Long time locked' ,count(*) FROM V$SESSION s WHERE s.BLOCKING_SESSION IS NOT NULL AND s.BLOCKING_SESSION_STATUS='VALID' AND s.SECONDS_IN_WAIT &gt; {$ORACLE.SESSION.LOCK.MAX.TIME}
 UNION
  SELECT 'SESSION::Lock rate' ,(cnt_block / cnt_all)* 100 pct
  FROM ( SELECT COUNT(*) cnt_block FROM v$session WHERE blocking_session IS NOT NULL), ( SELECT COUNT(*) cnt_all FROM gv$session)
@@ -1350,7 +1352,7 @@ SELECT
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>The percentage of concurrency</description>
+               <description>The percentage of concurrency. Concurrency is a DB behaviour when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1370,7 +1372,7 @@ SELECT
                      <expression>{min(5m)} &gt; {$ORACLE.CONCURRENCY.MAX.WARN}</expression>
                      <name>Oracle: Too hight database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)</name>
                      <priority>WARNING</priority>
-                     <description>Concurrency rate is over {$ORACLE.CONCURRENCY.MAX.WARN}%. Can cause degradation in database performance.</description>
+                     <description>Concurrency rate is over {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but is a signal to search for it. In the case of high competition, an analysis of resource consumption should be carried out, the most "heavy" queries made in the database, possibly - session tracing. All this will help determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.</description>
                   </trigger>
                </triggers>
             </item>
@@ -1452,7 +1454,7 @@ SELECT
                <history>7d</history>
                <value_type>FLOAT</value_type>
                <units>%</units>
-               <description>The percentage of locked sessions.</description>
+               <description>The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource—either user objects such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.</description>
                <applications>
                   <application>
                      <name>Oracle</name>
@@ -1473,6 +1475,37 @@ SELECT
                      <name>Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)</name>
                      <priority>WARNING</priority>
                      <description>Number of locked sessions is over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.</description>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Oracle: Sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_long_time_locked</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Count of long time locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)</description>
+               <applications>
+                  <application>
+                     <name>Oracle</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$[?(@.METRIC=='SESSION::Long time locked')].VALUE.first()</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,"{$ORACLE.DSN}"]</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)} &gt; {$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</expression>
+                     <name>Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)</name>
+                     <priority>WARNING</priority>
+                     <description>Number of sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect database performance, therefore, if they are detected, you should first find the most difficult queries from the database point of view and analyze possible resource leaks.</description>
                   </trigger>
                </triggers>
             </item>
@@ -2392,7 +2425,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <trigger_prototypes>
                         <trigger_prototype>
                            <expression>{last()}=1</expression>
-                           <name>Oracle Database '{#DBNAME}': {#DBNAME} in mount mode</name>
+                           <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
                            <priority>WARNING</priority>
                            <description>The Oracle DB has a MOUNTED state.</description>
                         </trigger_prototype>
@@ -2680,6 +2713,16 @@ contents  FROM DBA_TABLESPACES;</params>
                <macro>{$ORACLE.REDO.MIN.WARN}</macro>
                <value>3</value>
                <description>Minimum number of REDO logs for trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SESSION.LOCK.MAX.TIME}</macro>
+               <value>600</value>
+               <description>Maximum wait seconds for count of long time locked sessions query.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</macro>
+               <value>3</value>
+               <description>Maximum number of long locked sessions usage for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$ORACLE.SESSIONS.LOCK.MAX.WARN}</macro>
