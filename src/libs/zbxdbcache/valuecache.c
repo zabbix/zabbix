@@ -2856,6 +2856,13 @@ void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, in
 
 	*values_num = 0;
 
+	if (ZBX_VC_DISABLED == vc_state)
+	{
+		*items_num = 0;
+		*mode = -1;
+		return;
+	}
+
 	vc_try_lock();
 
 	*items_num = vc_cache->items.num_data;
@@ -2877,6 +2884,12 @@ void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, in
  ******************************************************************************/
 void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem)
 {
+	if (ZBX_VC_DISABLED == vc_state)
+	{
+		memset(mem, 0, sizeof(zbx_mem_stats_t));
+		return;
+	}
+
 	vc_try_lock();
 	zbx_mem_get_stats(vc_mem, mem);
 	vc_try_unlock();
@@ -2894,6 +2907,9 @@ void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
 	zbx_hashset_iter_t	iter;
 	zbx_vc_item_t		*item;
 	zbx_vc_item_stats_t	*item_stats;
+
+	if (ZBX_VC_DISABLED == vc_state)
+		return;
 
 	vc_try_lock();
 
