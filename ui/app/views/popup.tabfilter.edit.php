@@ -26,6 +26,7 @@
 $form_list = (new CFormList())
 	->addVar('idx', $data['idx'])
 	->addVar('idx2', $data['idx2'])
+	->addVar('support_custom_time', $data['support_custom_time'])
 	->addRow((new CLabel(_('Name'), 'filter_name'))->setAsteriskMark(),
 		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
@@ -33,7 +34,9 @@ $form_list = (new CFormList())
 		(new CCheckBox('filter_show_counter', 1))->setChecked($data['filter_show_counter'])
 	)
 	->addRow(_('Set custom time period'),
-		(new CCheckBox('filter_custom_time', 1))->setChecked($data['filter_custom_time'])
+		(new CCheckBox('filter_custom_time', 1))
+			->setChecked($data['filter_custom_time'])
+			->setEnabled((bool) $data['support_custom_time'])
 	)
 	->addRow(_('From'),
 		(new CDateSelector('tabfilter_from', $data['tabfilter_from']))

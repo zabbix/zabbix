@@ -23,7 +23,7 @@
  * @var CView $this
  */
 ?>
-$('#custom_time').on('click', function () {
+$('.overlay-dialogue-body #filter_custom_time').on('click', function () {
 	let $calendars = $(this).closest('form').find('.calendar-control');
 
 	$('input,button', $calendars).prop('disabled', $(this).is(':not(:checked)'));
@@ -32,8 +32,8 @@ $('#custom_time').on('click', function () {
 function tabFilterFormAction(form_action, overlay) {
 	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action'));
+		$action_intput = $('<input/>', {type: 'hidden', name: 'form_action', value: form_action}).appendTo($form);
 
-	$('<input/>', {type: 'hidden', name: 'form_action', value: form_action}).appendTo($form);
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), $form.serialize(), 'json')
 		.done((response) => {
@@ -41,6 +41,7 @@ function tabFilterFormAction(form_action, overlay) {
 
 			if ('errors' in response) {
 				$(response.errors).insertBefore($form);
+				$action_intput.remove();
 			}
 			else {
 				overlayDialogueDestroy(overlay.dialogueid);

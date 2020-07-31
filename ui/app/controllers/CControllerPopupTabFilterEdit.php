@@ -35,6 +35,7 @@ class CControllerPopupTabFilterEdit extends CController {
 			'filter_custom_time' =>		'in 0,1',
 			'tabfilter_from' =>			'string',
 			'tabfilter_to' =>			'string',
+			'support_custom_time' =>	'in 0,1'
 		];
 
 		$ret = $this->validateInput($rules) && $this->customValidation();
@@ -59,7 +60,7 @@ class CControllerPopupTabFilterEdit extends CController {
 		$rules = [];
 		$input = $this->getInputAll();
 
-		if ($this->getInput('custom_time', 0) && $this->getInput('form_action', '') === 'update') {
+		if ($this->getInput('filter_custom_time', 0) && $this->getInput('form_action', '') === 'update') {
 			$rules = [
 				'tabfilter_from' =>		'range_time|required',
 				'tabfilter_to' =>		'range_time|required',
@@ -81,7 +82,7 @@ class CControllerPopupTabFilterEdit extends CController {
 	}
 
 	protected function doAction() {
-		$data = $this->getInputAll() + [
+		$data = [
 			'form_action' => '',
 			'idx' => '',
 			'idx2' => '',
@@ -90,7 +91,17 @@ class CControllerPopupTabFilterEdit extends CController {
 			'filter_custom_time' => 0,
 			'tabfilter_from' => '',
 			'tabfilter_to' => '',
+			'support_custom_time' => 0
 		];
+		$this->getInputs($data, array_keys($data));
+
+		if (!$this->getInput('support_custom_time', 0)) {
+			$data = [
+				'filter_custom_time' => 0,
+				'tabfilter_from' => '',
+				'tabfilter_to' => '',
+			] + $data;
+		}
 
 		if ($data['form_action'] === 'update') {
 			$this->updateTab($data);
@@ -124,8 +135,8 @@ class CControllerPopupTabFilterEdit extends CController {
 		if (array_key_exists($data['idx2'], $filter->tabfilters)) {
 			$properties = [
 				'filter_name' => $data['filter_name'],
-				'filter_show_counter' => $data['filter_show_counter'],
-				'filter_custom_time' => $data['filter_custom_time'],
+				'filter_show_counter' => (int) $data['filter_show_counter'],
+				'filter_custom_time' => (int) $data['filter_custom_time'],
 				'from' => $data['tabfilter_from'],
 				'to' => $data['tabfilter_to']
 			];

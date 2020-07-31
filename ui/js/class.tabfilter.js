@@ -33,6 +33,7 @@ class CTabFilter extends CBaseComponent {
 		this._templates = {};
 		this._fetchpromise = null;
 		this._idx_namespace = options.idx;
+		this._timeselector = null;
 
 		this.init(options);
 		this.registerEvents(options);
@@ -76,11 +77,22 @@ class CTabFilter extends CBaseComponent {
 				this._active_item = ev.detail.target;
 				this.collapseAllItemsExcept(this._active_item);
 
-				if (!ev.detail.target._expanded && (!this._active_item || !this._active_item._expanded)) {
-					this._shared_domnode.classList.remove('display-none');
-					this.profileUpdate('selected', {
-						value_int: this._active_item._index
-					});
+				if (!this._active_item || !this._active_item._expanded) {
+					if (this._active_item == this._timeselector) {
+						this._shared_domnode.classList.add('display-none');
+					}
+					else {
+						this._shared_domnode.classList.remove('display-none');
+						this.profileUpdate('selected', {
+							value_int: this._active_item._index
+						});
+					}
+
+					if (this._active_item != this._timeselector) {
+						this._timeselector.setDisabled(
+							!this._options.support_custom_time || this._active_item.hasCustomTime()
+						);
+					}
 				}
 			},
 
@@ -136,6 +148,17 @@ class CTabFilter extends CBaseComponent {
 					this._items.forEach((item, index) => {
 						item._index = index;
 					});
+				}
+			},
+
+			/**
+			 * Item properties updated event handler, is called when tab properties popup were closed pressing 'Update'.
+			 */
+			updateItem: (ev) => {
+				if (this._active_item != this._timeselector) {
+					this._timeselector.setDisabled(
+						!this._options.support_custom_time || this._active_item.hasCustomTime()
+					);
 				}
 			},
 
@@ -214,7 +237,7 @@ class CTabFilter extends CBaseComponent {
 				let params = this._active_item.getFilterParams(),
 					url = new Curl('', false);
 
-					params.set('filter_name', t('Untitled'));
+				params.set('filter_name', t('Untitled'));
 
 				this.profileUpdate('properties', {
 					'idx2[]': this._items.length,
@@ -246,6 +269,7 @@ class CTabFilter extends CBaseComponent {
 			item.on(TABFILTERITEM_EVENT_COLLAPSE, this._events.collapse);
 			item.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteItem);
 			item.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
+			item.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateItem);
 		}
 
 		$('.ui-sortable', this._target).sortable({
@@ -291,11 +315,16 @@ class CTabFilter extends CBaseComponent {
 			can_toggle: this._options.can_toggle,
 			container: container,
 			data: data,
-			template: this._templates[data.tab_view]||null
+			template: this._templates[data.tab_view]||null,
+			support_custom_time: this._options.support_custom_time
 		});
 
 		item._parent = this;
 		this._items.push(item);
+
+		if (title.getAttribute('data-target') === 'tabfilter_timeselector') {
+			this._timeselector = item;
+		}
 
 		return item;
 	}

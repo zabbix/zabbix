@@ -23,6 +23,7 @@ class CTabFilter extends CDiv {
 		'can_toggle' => true,
 		'selected' => 0,
 		'expanded' => false,
+		'support_custom_time' => true,
 		'data' => [],
 	];
 
@@ -90,10 +91,22 @@ class CTabFilter extends CDiv {
 	/**
 	 * Update expanded or collapsed state of selected tab.
 	 *
-	 * @param bool $value  Expanede when true, collapsed otherwise.
+	 * @param bool $value  Expanded when true, collapsed otherwise.
 	 */
 	public function setExpanded(bool $value) {
 		$this->options['expanded'] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * Set status of custom time range support, when disabled will not allow to set customt time range for all
+	 * tab filter tabs.
+	 *
+	 * @param bool $value  Supported when true.
+	 */
+	public function setSupportCustomTime(bool $value) {
+		$this->options['support_custom_time'] = $value;
 
 		return $this;
 	}
@@ -247,6 +260,10 @@ class CTabFilter extends CDiv {
 		];
 
 		if ($timeselector) {
+			$tab = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
+			$timeselector->addClass((
+				$this->options['support_custom_time'] && !$tab['filter_custom_time']) ? null : ZBX_STYLE_DISABLED
+			);
 			$nav = array_merge($nav, [
 				$timeselector,
 				(new CSimpleButton())
