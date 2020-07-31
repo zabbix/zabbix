@@ -400,6 +400,54 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override with empty history'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Item prototype',
+										'History storage period' => [
+											'ophistory_history_mode' => 'Storage period',
+											'ophistory_history' => ''
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "History storage period": a time unit is expected.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'fields' => [
+								'Name' => 'Override with empty history'
+							],
+							'Operations' => [
+								[
+									'fields' => [
+										'Object' => 'Item prototype',
+										'Trend storage period' => [
+											'optrends_trends_mode' => 'Storage period',
+											'optrends_trends' => ''
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Trend storage period": a time unit is expected.'
+						]
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'overrides' => [
 						[
@@ -611,6 +659,20 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								'Name' => ''
 							],
 							'error' => 'Incorrect value for field "Name": cannot be empty.'
+						]
+					]
+				]
+			],
+						[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'fields' => [
+								'Name' => 'Override for update 1'
+							],
+							'error' => 'Override with name "Override for update 1" already exists.'
 						]
 					]
 				]
@@ -1068,6 +1130,54 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			],
 			[
 				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'fields' => [
+										'History storage period' => [
+											'ophistory_history_mode' => 'Storage period',
+											'ophistory_history' => ''
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "History storage period": a time unit is expected.'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'overrides' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'name' => 'Override for update 1',
+							'Operations' => [
+								[
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'fields' => [
+										'Trend storage period' => [
+											'optrends_trends_mode' => 'Storage period',
+											'optrends_trends' => ''
+										]
+									]
+								]
+							],
+							'error' => 'Incorrect value for field "Trend storage period": a time unit is expected.'
+						]
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'overrides' => [
 						[
@@ -1510,8 +1620,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				}
 			}
 		}
-
-		return $override_overlay;
 	}
 
 	/**
@@ -1525,7 +1633,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$operation_container = $override_overlay->getField('Operations')->asTable();
 
 		// Add Operations to override.
-		foreach(CTestArrayHelper::get($override, 'Operations', []) as $i =>$operation){
+		foreach(CTestArrayHelper::get($override, 'Operations', []) as $i => $operation){
 
 			$operation_action = CTestArrayHelper::get($operation, 'action', USER_ACTION_ADD);
 			unset($operation['action']);
@@ -1612,8 +1720,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		}
 		// Submit Override.
 		$override_overlay->submit();
-
-		return $override_overlay;
 	}
 
 	/**
@@ -1733,7 +1839,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					);
 
 					// Close Operation dialog.
-					$operation_overlay->submit();
+					$operation_overlay->submit()->waitUntilNotPresent();
 				}
 			}
 
