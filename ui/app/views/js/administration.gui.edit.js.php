@@ -22,8 +22,6 @@
 /**
  * @var CView $this
  */
-
-$schema = DB::getSchema('config');
 ?>
 
 <script type="text/javascript">
@@ -45,23 +43,23 @@ $schema = DB::getSchema('config');
 						'action': function() {
 							$('main').prev('.msg-bad').remove();
 
-							$('#default_lang').val("<?= $schema['fields']['default_lang']['default'] ?>");
-							$('#default_theme').val("<?= $schema['fields']['default_theme']['default'] ?>");
-							$('#search_limit').val("<?= $schema['fields']['search_limit']['default'] ?>");
+							$('#default_lang').val("<?= DB::getDefault('config', 'default_lang') ?>");
+							$('#default_theme').val("<?= DB::getDefault('config', 'default_theme') ?>");
+							$('#search_limit').val("<?= DB::getDefault('config', 'search_limit') ?>");
 							$('#max_overview_table_size').val(
-								"<?= $schema['fields']['max_overview_table_size']['default'] ?>"
+								"<?= DB::getDefault('config', 'max_overview_table_size') ?>"
 							);
-							$('#max_in_table').val("<?= $schema['fields']['max_in_table']['default'] ?>");
+							$('#max_in_table').val("<?= DB::getDefault('config', 'max_in_table') ?>");
 							$('#server_check_interval').prop('checked',
-								<?= ($schema['fields']['server_check_interval']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'server_check_interval') == 0) ? 'false' : 'true' ?>
 							);
-							$('#work_period').val("<?= $schema['fields']['work_period']['default'] ?>");
+							$('#work_period').val("<?= DB::getDefault('config', 'work_period') ?>");
 							$('#show_technical_errors').prop('checked',
-								<?= ($schema['fields']['show_technical_errors']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'show_technical_errors') == 0) ? 'false' : 'true' ?>
 							);
-							$('#history_period').val("<?= $schema['fields']['history_period']['default'] ?>");
-							$('#period_default').val("<?= $schema['fields']['period_default']['default'] ?>");
-							$('#max_period').val("<?= $schema['fields']['max_period']['default'] ?>");
+							$('#history_period').val("<?= DB::getDefault('config', 'history_period') ?>");
+							$('#period_default').val("<?= DB::getDefault('config', 'period_default') ?>");
+							$('#max_period').val("<?= DB::getDefault('config', 'max_period') ?>");
 						}
 					}
 				]

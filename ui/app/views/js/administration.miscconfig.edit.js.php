@@ -23,8 +23,7 @@
  * @var CView $this
  */
 
-$schema = DB::getSchema('config');
-$default_inventory_mode = $schema['fields']['default_inventory_mode']['default'];
+$default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 ?>
 
 <script type="text/javascript">
@@ -54,32 +53,34 @@ $default_inventory_mode = $schema['fields']['default_inventory_mode']['default']
 						'action': function() {
 							$('main').prev('.msg-bad').remove();
 
-							$('#refresh_unsupported').val("<?= $schema['fields']['refresh_unsupported']['default'] ?>");
+							$('#refresh_unsupported').val("<?= DB::getDefault('config', 'refresh_unsupported') ?>");
 							$('#discovery_groupid').multiSelect('clean');
 							$('#default_inventory_mode input[value=<?= $default_inventory_mode ?>]')
 								.prop('checked', true);
 							$('#alert_usrgrpid').multiSelect('clean');
 							$('#snmptrap_logging').prop('checked',
-								<?= ($schema['fields']['snmptrap_logging']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'snmptrap_logging') == 0) ? 'false' : 'true' ?>
 							);
-							$('#login_attempts').val("<?= $schema['fields']['login_attempts']['default'] ?>");
-							$('#login_block').val("<?= $schema['fields']['login_block']['default'] ?>");
+							$('#login_attempts').val("<?= DB::getDefault('config', 'login_attempts') ?>");
+							$('#login_block').val("<?= DB::getDefault('config', 'login_block') ?>");
 							$('#validate_uri_schemes').prop('checked',
-								<?= ($schema['fields']['validate_uri_schemes']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'validate_uri_schemes') == 0) ? 'false' : 'true' ?>
 							);
-							$('#uri_valid_schemes').val("<?= $schema['fields']['uri_valid_schemes']['default'] ?>");
-							$('#x_frame_options').val("<?= $schema['fields']['x_frame_options']['default'] ?>");
+							$('#uri_valid_schemes').val("<?= DB::getDefault('config', 'uri_valid_schemes') ?>");
+							$('#x_frame_options').val("<?= DB::getDefault('config', 'x_frame_options') ?>");
 							$('#iframe_sandboxing_enabled').prop('checked',
-								<?= ($schema['fields']['iframe_sandboxing_enabled']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'iframe_sandboxing_enabled') == 0) ? 'false' : 'true' ?>
 							);
 							$('#iframe_sandboxing_exceptions').val(
-								"<?= $schema['fields']['iframe_sandboxing_exceptions']['default'] ?>"
+								"<?= DB::getDefault('config', 'iframe_sandboxing_exceptions') ?>"
 							);
-							$('#socket_timeout').val("<?= $schema['fields']['socket_timeout']['default'] ?>");
-							$('#connect_timeout').val("<?= $schema['fields']['connect_timeout']['default'] ?>");
-							$('#media_type_test_timeout').val("<?= $schema['fields']['media_type_test_timeout']['default'] ?>");
-							$('#script_timeout').val("<?= $schema['fields']['script_timeout']['default'] ?>");
-							$('#item_test_timeout').val("<?= $schema['fields']['item_test_timeout']['default'] ?>");
+							$('#socket_timeout').val("<?= DB::getDefault('config', 'socket_timeout') ?>");
+							$('#connect_timeout').val("<?= DB::getDefault('config', 'connect_timeout') ?>");
+							$('#media_type_test_timeout').val(
+								"<?= DB::getDefault('config', 'media_type_test_timeout') ?>"
+							);
+							$('#script_timeout').val("<?= DB::getDefault('config', 'script_timeout') ?>");
+							$('#item_test_timeout').val("<?= DB::getDefault('config', 'item_test_timeout') ?>");
 						}
 					}
 				]

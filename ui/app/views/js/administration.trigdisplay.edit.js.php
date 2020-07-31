@@ -22,8 +22,6 @@
 /**
  * @var CView $this
  */
-
-$schema = DB::getSchema('config');
 ?>
 
 <script type="text/javascript">
@@ -54,7 +52,7 @@ $schema = DB::getSchema('config');
 							$('main').prev('.msg-bad').remove();
 
 							var custom_color_enabled = <?=
-								($schema['fields']['custom_color']['default'] == EVENT_CUSTOM_COLOR_ENABLED)
+								(DB::getDefault('config', 'custom_color') == EVENT_CUSTOM_COLOR_ENABLED)
 									? 'true'
 									: 'false'
 								?>;
@@ -65,66 +63,66 @@ $schema = DB::getSchema('config');
 
 							// Unacknowledged problem events
 							$('#problem_unack_color')
-								.val("<?= $schema['fields']['problem_unack_color']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'problem_unack_color') ?>")
 								.prop('disabled', !custom_color_enabled)
 								.change();
 							$('#problem_unack_style').prop('checked',
-								<?= ($schema['fields']['problem_unack_style']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'problem_unack_style') == 0) ? 'false' : 'true' ?>
 							);
 
 							// Acknowledged problem events
 							$('#problem_ack_color')
-								.val("<?= $schema['fields']['problem_ack_color']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'problem_ack_color') ?>")
 								.prop('disabled', !custom_color_enabled)
 								.change();
 							$('#problem_ack_style').prop('checked',
-								<?= ($schema['fields']['problem_ack_style']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'problem_ack_style') == 0) ? 'false' : 'true' ?>
 							);
 
 							// Unacknowledged resolved events
 							$('#ok_unack_color')
-								.val("<?= $schema['fields']['ok_unack_color']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'ok_unack_color') ?>")
 								.prop('disabled', !custom_color_enabled)
 								.change();
 							$('#ok_unack_style').prop('checked',
-								<?= ($schema['fields']['ok_unack_style']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'ok_unack_style') == 0) ? 'false' : 'true' ?>
 							);
 
 							// Acknowledged resolved events
 							$('#ok_ack_color')
-								.val("<?= $schema['fields']['ok_ack_color']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'ok_ack_color') ?>")
 								.prop('disabled', !custom_color_enabled)
 								.change();
 							$('#ok_ack_style').prop('checked',
-								<?= ($schema['fields']['ok_ack_style']['default'] == 0) ? 'false' : 'true' ?>
+								<?= (DB::getDefault('config', 'ok_ack_style') == 0) ? 'false' : 'true' ?>
 							);
 
-							$('#ok_period').val("<?= $schema['fields']['ok_period']['default'] ?>");
-							$('#blink_period').val("<?= $schema['fields']['blink_period']['default'] ?>");
+							$('#ok_period').val("<?= DB::getDefault('config', 'ok_period') ?>");
+							$('#blink_period').val("<?= DB::getDefault('config', 'blink_period') ?>");
 
-							$('#severity_name_0').val("<?= $schema['fields']['severity_name_0']['default'] ?>");
-							$('#severity_name_1').val("<?= $schema['fields']['severity_name_1']['default'] ?>");
-							$('#severity_name_2').val("<?= $schema['fields']['severity_name_2']['default'] ?>");
-							$('#severity_name_3').val("<?= $schema['fields']['severity_name_3']['default'] ?>");
-							$('#severity_name_4').val("<?= $schema['fields']['severity_name_4']['default'] ?>");
-							$('#severity_name_5').val("<?= $schema['fields']['severity_name_5']['default'] ?>");
+							$('#severity_name_0').val("<?= DB::getDefault('config', 'severity_name_0') ?>");
+							$('#severity_name_1').val("<?= DB::getDefault('config', 'severity_name_1') ?>");
+							$('#severity_name_2').val("<?= DB::getDefault('config', 'severity_name_2') ?>");
+							$('#severity_name_3').val("<?= DB::getDefault('config', 'severity_name_3') ?>");
+							$('#severity_name_4').val("<?= DB::getDefault('config', 'severity_name_4') ?>");
+							$('#severity_name_5').val("<?= DB::getDefault('config', 'severity_name_5') ?>");
 							$('#severity_color_0')
-								.val("<?= $schema['fields']['severity_color_0']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'severity_color_0') ?>")
 								.change();
 							$('#severity_color_1')
-								.val("<?= $schema['fields']['severity_color_1']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'severity_color_1') ?>")
 								.change();
 							$('#severity_color_2')
-								.val("<?= $schema['fields']['severity_color_2']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'severity_color_2') ?>")
 								.change();
 							$('#severity_color_3')
-								.val("<?= $schema['fields']['severity_color_3']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'severity_color_3') ?>")
 								.change();
 							$('#severity_color_4')
-								.val("<?= $schema['fields']['severity_color_4']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'severity_color_4') ?>")
 								.change();
 							$('#severity_color_5')
-								.val("<?= $schema['fields']['severity_color_5']['default'] ?>")
+								.val("<?= DB::getDefault('config', 'severity_color_5') ?>")
 								.change();
 						}
 					}

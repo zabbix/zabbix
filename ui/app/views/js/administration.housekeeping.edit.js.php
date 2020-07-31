@@ -22,8 +22,6 @@
 /**
  * @var CView $this
  */
-
-$schema = DB::getSchema('config');
 ?>
 
 <script type="text/javascript">
@@ -87,71 +85,71 @@ $schema = DB::getSchema('config');
 							// events and alerts
 							jQuery('#hk_events_mode')
 								.prop('checked',
-									<?= ($schema['fields']['hk_events_mode']['default'] == 1) ? 'true' : 'false' ?>
+									<?= (DB::getDefault('config', 'hk_events_mode') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
 							jQuery('#hk_events_trigger')
-								.val("<?= $schema['fields']['hk_events_trigger']['default'] ?>");
+								.val("<?= DB::getDefault('config', 'hk_events_trigger') ?>");
 							jQuery('#hk_events_internal')
-								.val("<?= $schema['fields']['hk_events_internal']['default'] ?>");
+								.val("<?= DB::getDefault('config', 'hk_events_internal') ?>");
 							jQuery('#hk_events_discovery')
-								.val("<?= $schema['fields']['hk_events_discovery']['default'] ?>");
+								.val("<?= DB::getDefault('config', 'hk_events_discovery') ?>");
 							jQuery('#hk_events_autoreg')
-								.val("<?= $schema['fields']['hk_events_autoreg']['default'] ?>");
+								.val("<?= DB::getDefault('config', 'hk_events_autoreg') ?>");
 
 							// Services
 							jQuery('#hk_services_mode')
 								.prop('checked',
-									<?= ($schema['fields']['hk_services_mode']['default'] == 1) ? 'true' : 'false' ?>
+									<?= (DB::getDefault('config', 'hk_services_mode') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
-							jQuery('#hk_services').val("<?= $schema['fields']['hk_services']['default'] ?>");
+							jQuery('#hk_services').val("<?= DB::getDefault('config', 'hk_services') ?>");
 
 							// audit
 							jQuery('#hk_audit_mode')
 								.prop('checked',
-									<?= ($schema['fields']['hk_audit_mode']['default'] == 1) ? 'true' : 'false' ?>
+									<?= (DB::getDefault('config', 'hk_audit_mode') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
-							jQuery('#hk_audit').val("<?= $schema['fields']['hk_audit']['default'] ?>");
+							jQuery('#hk_audit').val("<?= DB::getDefault('config', 'hk_audit') ?>");
 
 							// user sessions
 							jQuery('#hk_sessions_mode')
 								.prop('checked',
-									<?= ($schema['fields']['hk_sessions_mode']['default'] == 1) ? 'true' : 'false' ?>
+									<?= (DB::getDefault('config', 'hk_sessions_mode') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
-							jQuery('#hk_sessions').val("<?= $schema['fields']['hk_sessions']['default'] ?>");
+							jQuery('#hk_sessions').val("<?= DB::getDefault('config', 'hk_sessions') ?>");
 
 							// history
 							jQuery('#hk_history_mode').prop('checked',
-								<?= ($schema['fields']['hk_history_mode']['default'] == 1) ? 'true' : 'false' ?>
+								<?= (DB::getDefault('config', 'hk_history_mode') == 1) ? 'true' : 'false' ?>
 							);
 							jQuery('#hk_history_global')
 								.prop('checked',
-									<?= ($schema['fields']['hk_history_global']['default'] == 1) ? 'true' : 'false' ?>
+									<?= (DB::getDefault('config', 'hk_history_global') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
-							jQuery('#hk_history').val("<?= $schema['fields']['hk_history']['default'] ?>");
+							jQuery('#hk_history').val("<?= DB::getDefault('config', 'hk_history') ?>");
 
 							// trends
 							jQuery('#hk_trends_mode').prop('checked',
-								<?= ($schema['fields']['hk_trends_mode']['default'] == 1) ? 'true' : 'false' ?>
+								<?= (DB::getDefault('config', 'hk_trends_mode') == 1) ? 'true' : 'false' ?>
 							);
 							jQuery('#hk_trends_global')
 								.prop('checked',
-									<?= ($schema['fields']['hk_trends_global']['default'] == 1) ? 'true' : 'false' ?>
+									<?= (DB::getDefault('config', 'hk_trends_global') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
-							jQuery('#hk_trends').val("<?= $schema['fields']['hk_trends']['default'] ?>");
+							jQuery('#hk_trends').val("<?= DB::getDefault('config', 'hk_trends') ?>");
 
 							// history and trends compression
 							jQuery('#compression_status')
 								.prop('checked',
-									<?= ($schema['fields']['compression_status']['default'] == 1) ? 'true' : 'false' ?>
+									<?= (DB::getDefault('config', 'compression_status') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
-							jQuery('#compress_older').val("<?= $schema['fields']['compress_older']['default'] ?>");
+							jQuery('#compress_older').val("<?= DB::getDefault('config', 'compress_older') ?>");
 						}
 					}
 				]
