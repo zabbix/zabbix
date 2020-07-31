@@ -231,9 +231,27 @@ class CTabFilter extends CBaseComponent {
 			 */
 			create: () => {
 				let params = this._active_item.getFilterParams(),
-					url = new Curl('', false);
+					url = new Curl('', false),
+					title = t('Untitled'),
+					regex = new RegExp(title + ' \\((\\d+)\\)'),
+					match,
+					index = 0;
 
-				params.set('filter_name', t('Untitled'));
+				for (const item of this._items) {
+					match = (item._data.filter_name||'').match(regex);
+
+					index = Math.max(
+						item._data.filter_name === title ? 1 : 0,
+						match ? (+match[1]) + 1 : 0,
+						index
+					);
+				}
+
+				if (index) {
+					title += ' (' + index + ')';
+				}
+
+				params.set('filter_name', title);
 
 				this.profileUpdate('properties', {
 					'idx2[]': this._items.length,
