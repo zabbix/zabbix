@@ -26,6 +26,13 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		var $form = $('form');
+		$form.on('submit', function() {
+			$form.trimValues(['#severity_name_0', '#severity_name_1', '#severity_name_2', '#severity_name_3',
+				'#severity_name_4', '#severity_name_5'
+			]);
+		});
+
 		$("input[name=custom_color]").on('change', function() {
 			var checked = $(this).is(':checked');
 			$(".js-event-color-picker").each(function() {
@@ -34,6 +41,7 @@
 				$("input", $field).prop('disabled', !checked);
 			});
 		});
+
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
@@ -49,7 +57,9 @@
 						'title': <?= json_encode(_('Reset defaults')) ?>,
 						'focused': true,
 						'action': function() {
-							$('main').prev('.msg-bad').remove();
+							$('main')
+								.prev('.msg-bad')
+								.remove();
 
 							var custom_color_enabled = <?=
 								(DB::getDefault('config', 'custom_color') == EVENT_CUSTOM_COLOR_ENABLED)
@@ -61,7 +71,7 @@
 								.prop('checked', custom_color_enabled)
 								.change();
 
-							// Unacknowledged problem events
+							// unacknowledged problem events
 							$('#problem_unack_color')
 								.val("<?= DB::getDefault('config', 'problem_unack_color') ?>")
 								.prop('disabled', !custom_color_enabled)
@@ -70,7 +80,7 @@
 								<?= (DB::getDefault('config', 'problem_unack_style') == 0) ? 'false' : 'true' ?>
 							);
 
-							// Acknowledged problem events
+							// acknowledged problem events
 							$('#problem_ack_color')
 								.val("<?= DB::getDefault('config', 'problem_ack_color') ?>")
 								.prop('disabled', !custom_color_enabled)
@@ -79,7 +89,7 @@
 								<?= (DB::getDefault('config', 'problem_ack_style') == 0) ? 'false' : 'true' ?>
 							);
 
-							// Unacknowledged resolved events
+							// unacknowledged resolved events
 							$('#ok_unack_color')
 								.val("<?= DB::getDefault('config', 'ok_unack_color') ?>")
 								.prop('disabled', !custom_color_enabled)
@@ -88,7 +98,7 @@
 								<?= (DB::getDefault('config', 'ok_unack_style') == 0) ? 'false' : 'true' ?>
 							);
 
-							// Acknowledged resolved events
+							// acknowledged resolved events
 							$('#ok_ack_color')
 								.val("<?= DB::getDefault('config', 'ok_ack_color') ?>")
 								.prop('disabled', !custom_color_enabled)
@@ -128,13 +138,6 @@
 					}
 				]
 			}, this);
-		});
-
-		var $form = $('form');
-		$form.on('submit', function() {
-			$form.trimValues(['#severity_name_0', '#severity_name_1', '#severity_name_2', '#severity_name_3',
-				'#severity_name_4', '#severity_name_5'
-			]);
 		});
 	});
 </script>

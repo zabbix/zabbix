@@ -100,12 +100,16 @@ class CControllerTimeSelectorUpdate extends CController {
 			$value[$field] = $this->getInput($field);
 			$this->range_time_parser->parse($value[$field]);
 			$date_type[$field] = $this->range_time_parser->getTimeType();
-			$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			$ts[$field] = $this->range_time_parser
+				->getDateTime($field === 'from')
+				->getTimestamp();
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;
 		$this->range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-		$max_period = $ts['now'] - $this->range_time_parser->getDateTime(true)->getTimestamp() + 1;
+		$max_period = 1 + $ts['now'] - $this->range_time_parser
+			->getDateTime(true)
+			->getTimestamp();
 
 		switch ($method) {
 			case 'decrement':
@@ -220,7 +224,9 @@ class CControllerTimeSelectorUpdate extends CController {
 				$this->data['error'][$field] = _('Invalid date.');
 			}
 			else {
-				$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
+				$ts[$field] = $this->range_time_parser
+					->getDateTime($field === 'from')
+					->getTimestamp();
 			}
 		}
 
@@ -235,7 +241,9 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		$period = $ts['to'] - $ts['from'] + 1;
 		$this->range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-		$max_period = $ts['now'] - $this->range_time_parser->getDateTime(true)->getTimestamp() + 1;
+		$max_period = 1 + $ts['now'] - $this->range_time_parser
+			->getDateTime(true)
+			->getTimestamp();
 
 		if ($period < ZBX_MIN_PERIOD) {
 			$this->data['error']['from'] = _n('Minimum time period to display is %1$s minute.',

@@ -51,7 +51,9 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 						'title': <?= json_encode(_('Reset defaults')) ?>,
 						'focused': true,
 						'action': function() {
-							$('main').prev('.msg-bad').remove();
+							$('main')
+								.prev('.msg-bad')
+								.remove();
 
 							$('#refresh_unsupported').val("<?= DB::getDefault('config', 'refresh_unsupported') ?>");
 							$('#discovery_groupid').multiSelect('clean');
@@ -61,19 +63,29 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 							$('#snmptrap_logging').prop('checked',
 								<?= (DB::getDefault('config', 'snmptrap_logging') == 0) ? 'false' : 'true' ?>
 							);
+
+							// authorization
 							$('#login_attempts').val("<?= DB::getDefault('config', 'login_attempts') ?>");
 							$('#login_block').val("<?= DB::getDefault('config', 'login_block') ?>");
-							$('#validate_uri_schemes').prop('checked',
-								<?= (DB::getDefault('config', 'validate_uri_schemes') == 0) ? 'false' : 'true' ?>
-							);
+
+							// security
+							$('#validate_uri_schemes')
+								.prop('checked',
+									<?= (DB::getDefault('config', 'validate_uri_schemes') == 0) ? 'false' : 'true' ?>
+								)
+								.change();
 							$('#uri_valid_schemes').val("<?= DB::getDefault('config', 'uri_valid_schemes') ?>");
 							$('#x_frame_options').val("<?= DB::getDefault('config', 'x_frame_options') ?>");
-							$('#iframe_sandboxing_enabled').prop('checked',
-								<?= (DB::getDefault('config', 'iframe_sandboxing_enabled') == 0) ? 'false' : 'true' ?>
-							);
+							$('#iframe_sandboxing_enabled')
+								.prop('checked',
+									<?= (DB::getDefault('config', 'iframe_sandboxing_enabled') == 0) ? 'false' : 'true' ?>
+								)
+								.change();
 							$('#iframe_sandboxing_exceptions').val(
 								"<?= DB::getDefault('config', 'iframe_sandboxing_exceptions') ?>"
 							);
+
+							// communication with Zabbix server
 							$('#socket_timeout').val("<?= DB::getDefault('config', 'socket_timeout') ?>");
 							$('#connect_timeout').val("<?= DB::getDefault('config', 'connect_timeout') ?>");
 							$('#media_type_test_timeout').val(

@@ -41,7 +41,9 @@
 						'title': <?= json_encode(_('Reset defaults')) ?>,
 						'focused': true,
 						'action': function() {
-							$('main').prev('.msg-bad').remove();
+							$('main')
+								.prev('.msg-bad')
+								.remove();
 
 							$('#default_lang').val("<?= DB::getDefault('config', 'default_lang') ?>");
 							$('#default_theme').val("<?= DB::getDefault('config', 'default_theme') ?>");

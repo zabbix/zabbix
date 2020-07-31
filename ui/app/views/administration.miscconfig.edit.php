@@ -189,4 +189,6 @@ $form = (new CForm())
 			))
 	);
 
-$widget->addItem($form)->show();
+$widget
+	->addItem($form)
+	->show();
