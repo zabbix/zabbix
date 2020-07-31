@@ -103,19 +103,19 @@ $gui_tab = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Max history display period'), 'history_period'))->setAsteriskMark(),
-		(new CTextBox('history_period', $data['history_period']))
+		(new CTextBox('history_period', $data['history_period'], false, DB::getFieldLength('config', 'history_period')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Time filter default period'), 'period_default'))->setAsteriskMark(),
-		(new CTextBox('period_default', $data['period_default']))
+		(new CTextBox('period_default', $data['period_default'], false, DB::getFieldLength('config', 'period_default')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Max period'), 'max_period'))->setAsteriskMark(),
-		(new CTextBox('max_period', $data['max_period']))
+		(new CTextBox('max_period', $data['max_period'], false, DB::getFieldLength('config', 'max_period')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	);

@@ -32,7 +32,9 @@ $widget = (new CWidget())
 
 $from_list = (new CFormList())
 	->addRow((new CLabel(_('Refresh unsupported items'), 'refresh_unsupported'))->setAsteriskMark(),
-		(new CTextBox('refresh_unsupported', $data['refresh_unsupported']))
+		(new CTextBox('refresh_unsupported', $data['refresh_unsupported'], false,
+			DB::getFieldLength('config', 'refresh_unsupported')
+		))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -93,7 +95,7 @@ $from_list = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Login blocking interval'), 'login_block'))->setAsteriskMark(),
-		(new CTextBox('login_block', $data['login_block']))
+		(new CTextBox('login_block', $data['login_block'], false, DB::getFieldLength('config', 'login_block')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
@@ -105,13 +107,17 @@ $from_list = (new CFormList())
 			->setChecked($data['validate_uri_schemes'] == 1)
 	)
 	->addRow((new CLabel(_('Valid URI schemes'), 'uri_valid_schemes')),
-		(new CTextBox('uri_valid_schemes', $data['uri_valid_schemes']))
+		(new CTextBox('uri_valid_schemes', $data['uri_valid_schemes'], false,
+			DB::getFieldLength('config', 'uri_valid_schemes')
+		))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setEnabled($data['validate_uri_schemes'] == 1)
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('X-Frame-Options HTTP header'), 'x_frame_options'))->setAsteriskMark(),
-		(new CTextBox('x_frame_options', $data['x_frame_options']))
+		(new CTextBox('x_frame_options', $data['x_frame_options'], false,
+			DB::getFieldLength('config', 'x_frame_options')
+		))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
 	)
@@ -121,7 +127,9 @@ $from_list = (new CFormList())
 			->setChecked($data['iframe_sandboxing_enabled'] == 1)
 	)
 	->addRow((new CLabel(_('Iframe sandboxing exceptions'), 'iframe_sandboxing_exceptions')),
-		(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions']))
+		(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
+			DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
+		))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setEnabled($data['iframe_sandboxing_enabled'] == 1)
 			->setAriaRequired()
@@ -130,31 +138,37 @@ $from_list = (new CFormList())
 	->addRow(new CTag('h4', true, _('Communication with Zabbix server')))
 	->addRow(
 		(new CLabel(_('Network timeout'), 'socket_timeout'))->setAsteriskMark(),
-		(new CTextBox('socket_timeout', $data['socket_timeout']))
+		(new CTextBox('socket_timeout', $data['socket_timeout'], false, DB::getFieldLength('config', 'socket_timeout')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Connection timeout'), 'connect_timeout'))->setAsteriskMark(),
-		(new CTextBox('connect_timeout', $data['connect_timeout']))
+		(new CTextBox('connect_timeout', $data['connect_timeout'], false,
+			DB::getFieldLength('config', 'connect_timeout')
+		))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Network timeout for media type test'), 'media_type_test_timeout'))->setAsteriskMark(),
-		(new CTextBox('media_type_test_timeout', $data['media_type_test_timeout']))
+		(new CTextBox('media_type_test_timeout', $data['media_type_test_timeout'], false,
+			DB::getFieldLength('config', 'media_type_test_timeout')
+		))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Network timeout for script execution'), 'script_timeout'))->setAsteriskMark(),
-		(new CTextBox('script_timeout', $data['script_timeout']))
+		(new CTextBox('script_timeout', $data['script_timeout'], false, DB::getFieldLength('config', 'script_timeout')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Network timeout for item test'), 'item_test_timeout'))->setAsteriskMark(),
-		(new CTextBox('item_test_timeout', $data['item_test_timeout']))
+		(new CTextBox('item_test_timeout', $data['item_test_timeout'], false,
+			DB::getFieldLength('config', 'item_test_timeout')
+		))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	);
