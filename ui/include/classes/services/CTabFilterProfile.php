@@ -80,8 +80,6 @@ class CTabFilterProfile {
 	 */
 	public function createFilterTab(array $input): array {
 		$filter = array_intersect_key($input, $this->filter_defaults) + $this->filter_defaults;
-		$filter['filter_show_counter'] = (int) $filter['filter_show_counter'];
-		$filter['filter_custom_time'] = (int) $filter['filter_custom_time'];
 
 		return $filter;
 	}
@@ -248,6 +246,14 @@ class CTabFilterProfile {
 				$tabfilter = CArrayHelper::unsetEqualValues($tabfilter, $this->filter_defaults) + [
 					'filter_name' => $tabfilter['filter_name']
 				];
+
+				if (array_key_exists('filter_show_counter', $tabfilter)) {
+					$tabfilter['filter_show_counter'] = (int) $tabfilter['filter_show_counter'];
+				}
+
+				if (array_key_exists('filter_custom_time', $tabfilter)) {
+					$tabfilter['filter_custom_time'] = (int) $tabfilter['filter_custom_time'];
+				}
 			}
 			unset($tabfilter);
 		}
