@@ -70,6 +70,8 @@ class CTabFilterItem extends CBaseComponent {
 					return;
 				}
 
+				this._target.focus();
+
 				if (!this._expanded) {
 					this.fire(TABFILTERITEM_EVENT_EXPAND_BEFORE);
 					this.fire(TABFILTERITEM_EVENT_EXPAND);

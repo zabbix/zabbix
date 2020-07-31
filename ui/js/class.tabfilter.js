@@ -59,6 +59,10 @@ class CTabFilter extends CBaseComponent {
 				this._active_item = item;
 			}
 
+			if (item.hasClass('active')) {
+				item._target.focus();
+			}
+
 			index++;
 		}
 	}
@@ -275,6 +279,21 @@ class CTabFilter extends CBaseComponent {
 			reset: () => {
 				this._active_item.setBrowserLocation(new URLSearchParams());
 				window.location.reload(true);
+			},
+
+			/**
+			 * Keydown handler for keyboard navigation support.
+			 */
+			keydown: (ev) => {
+				if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') {
+					return;
+				}
+
+				if (ev.path.indexOf(this._target.querySelector('nav')) > -1) {
+					this._events[(ev.key == 'ArrowRight') ? 'selectNextTab' : 'selectPrevTab']();
+
+					cancelEvent(ev);
+				}
 			}
 		}
 
@@ -300,6 +319,8 @@ class CTabFilter extends CBaseComponent {
 		this._shared_domnode.querySelector('[name="filter_new"]').addEventListener('click', this._events.create);
 		this._shared_domnode.querySelector('[name="filter_apply"]').addEventListener('click', this._events.apply);
 		this._shared_domnode.querySelector('[name="filter_reset"]').addEventListener('click', this._events.reset);
+
+		this.on('keydown', this._events.keydown);
 	}
 
 	/**
