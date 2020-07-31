@@ -1630,6 +1630,12 @@ Changes for 4.0.24rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-18000] added red label for disabled media types in user profile (rlataria)
+A......... [ZBX-18075] fixed runtime error when creating a host via API (agriscenko)
+..F....... [ZBX-15927] removed problem calculation for dependent triggers when master trigger is in problem state (kustalovs)
+..F....... [ZBX-18063] fixed usage of unsupported parameter in API call (miks)
+..F....... [ZBX-18060] fixed inaccessible user be displayed as accessible in slide show properties screen (miks)
+.......PS. [ZBX-17252] fixed building of Zabbix daemons with link time optimization (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.23
