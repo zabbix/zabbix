@@ -210,6 +210,9 @@ func prepareDiskCache(options *agent.AgentOptions, addresses []string) (err erro
 	if err != nil {
 		return err
 	}
+
+	defer stmt.Close()
+
 	if _, err = stmt.Exec(); err != nil {
 		return err
 	}
@@ -222,6 +225,7 @@ func prepareDiskCache(options *agent.AgentOptions, addresses []string) (err erro
 	if err != nil {
 		return err
 	}
+
 	for rows.Next() {
 		if err = rows.Scan(&id, &address); err != nil {
 			rows.Close()
@@ -256,6 +260,9 @@ addressCheck:
 		if err != nil {
 			return err
 		}
+
+		defer stmt.Close()
+
 		if _, err = stmt.Exec(addr); err != nil {
 			return err
 		}
@@ -275,6 +282,9 @@ addressCheck:
 		if err != nil {
 			return err
 		}
+
+		defer stmt.Close()
+
 		if _, err = stmt.Exec(); err != nil {
 			return err
 		}
@@ -286,6 +296,9 @@ addressCheck:
 		if err != nil {
 			return err
 		}
+
+		defer stmt.Close()
+
 		if _, err = stmt.Exec(); err != nil {
 			return err
 		}
