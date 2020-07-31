@@ -811,4 +811,23 @@ void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int fiel
 int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
 int	zbx_db_check_instanceid(void);
+
+/* tags */
+typedef struct
+{
+	zbx_uint64_t	tagid;
+	char		*tag;
+	char		*value;
+#define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000001)
+#define ZBX_FLAG_DB_TAG_REMOVE			__UINT64_C(0x80000000)
+#define ZBX_FLAG_DB_TAG_UPDATE	\
+					(ZBX_FLAG_DB_TAG_UPDATE_VALUE)
+	zbx_uint64_t	flags;
+}
+zbx_db_tag_t;
+
+void	zbx_db_tag_free(zbx_db_tag_t *tag);
+
+ZBX_PTR_VECTOR_DECL(dbtag, zbx_db_tag_t *);
+
 #endif
