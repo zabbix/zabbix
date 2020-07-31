@@ -440,9 +440,17 @@
 
 		const $mediatype_default_select = this.$mediatype_default.find('select');
 		const $mediatype_only_select = this.$mediatype_only.find('select');
-		conf.mediatypes.forEach(({mediatypeid, name}) => {
-			$mediatype_default_select.append($('<option />', {text: name, value: mediatypeid}));
-			$mediatype_only_select.append($('<option />', {text: name, value: mediatypeid}));
+		conf.mediatypes.forEach(({mediatypeid, name, status}) => {
+			$mediatype_default_select.append($('<option />', {
+				text: name,
+				value: mediatypeid,
+				class: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
+			}));
+			$mediatype_only_select.append($('<option />', {
+				text: name,
+				value: mediatypeid,
+				class: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
+			}));
 		});
 
 		$mediatype_default_select.val(conf.mediatypeid);
@@ -1469,4 +1477,6 @@
 	window.operation_details.ITEM_AUTHTYPE_PUBLICKEY                   = <?= ITEM_AUTHTYPE_PUBLICKEY ?>;
 	window.operation_details.EVENT_SOURCE_TRIGGERS                     = <?= EVENT_SOURCE_TRIGGERS ?>;
 	window.operation_details.PAGE_TYPE_TEXT_RETURN_JSON                = <?= PAGE_TYPE_TEXT_RETURN_JSON ?>;
+	window.operation_details.MEDIA_TYPE_DISABLED                       = <?= MEDIA_TYPE_STATUS_DISABLED ?>;
+	window.operation_details.ZBX_STYLE_RED                             = '<?= ZBX_STYLE_RED ?>';
 </script>
