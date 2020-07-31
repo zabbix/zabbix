@@ -48,6 +48,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		->setIdx($data['tabfilter_idx'])
 		->setSelected((int) $data['tab_selected'])
 		->setExpanded((bool) $data['tab_expanded'])
+		->setSupportCustomTime(false)
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
 	foreach ($data['filter_tabs'] as $tab) {
