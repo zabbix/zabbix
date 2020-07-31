@@ -1,10 +1,12 @@
 # PostgreSQL plugin
 
 This plugin provides a native solution for monitoring PostgreSQL servers by Zabbix (in-memory data structure store).
-The plugin can monitor several remote or local PostgreSQL instances simultaneously via Zabbix agent 2. The plugin keeps connections in the open state to reduce network congestion, latency, CPU, and memory usage. It can be used in conjunction with the official "Template DB PostgreSQL Agent 2" monitoring template (it is also possible to edit or extend the default template as needed or create a new one for your specific needs).
+The plugin can monitor several remote or local PostgreSQL instances simultaneously via Zabbix agent 2. The plugin keeps connections in the open state to reduce network congestion, latency, CPU, and memory usage. It can be used in conjunction with the official [Template DB PostgreSQL Agent 2](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/postgresql_agent2) monitoring template (it is also possible to edit or extend the default template as needed or create a new one for your specific needs).
 
 ## Requirements
 
+- PostgreSQL, version 10, 11, 12
+- Zabbix, version 5.0
 - Zabbix Agent 2
 - Go >= 1.12 (required only to build from source)
 
@@ -39,18 +41,16 @@ The plugin uses username and password set in the Agent's configuration file for 
 
 #### Named sessions
 
-Named sessions allow you to define specific parameters for each PostgreSQL instance. Currently, only 5 parameters are supported: host, port, username, password and databasename.
+Named sessions allow you to define specific parameters for each PostgreSQL instance. Currently, only 4 parameters are supported: uri, username, password and databasename.
 
 *Example:*  
 If you have two instances: "Postgres1" and "Postgres2", the following options have to be added to the agent configuration:
 
-    Plugins.Postgres.Sessions.Postgres1.Host=127.0.0.1
-    Plugins.Postgres.Sessions.Postgres1.Port=5433
+    Plugins.Postgres.Sessions.Postgres1.Uri=tcp://127.0.0.1:5433
     Plugins.Postgres.Sessions.Postgres1.User=<UsernameForPostgres1>
     Plugins.Postgres.Sessions.Postgres1.Password=<PasswordForPostgres1>
     Plugins.Postgres.Sessions.Postgres1.Database=<DatabaseForPostgres1>
-    Plugins.Postgres.Sessions.Postgres2.Host=127.0.0.7
-    Plugins.Postgres.Sessions.Postgres2.Port=5434
+    Plugins.Postgres.Sessions.Postgres2.Uri=tcp://127.0.0.7:5434
     Plugins.Postgres.Sessions.Postgres2.User=<UsernameForPostgres2>
     Plugins.Postgres.Sessions.Postgres2.Password=<PasswordForPostgres2>
     Plugins.Postgres.Sessions.Postgres2.Database=<DatabaseForPostgres2>
@@ -62,11 +62,11 @@ Now, these names can be used in keys instead of URIs:
 
 ### Parameters priority
 
-There are 3 levels of parameters overwriting:
+There are 4 levels of parameters overwriting:
 
-1. Hardcoded default values →
-2. 1st level config params (Plugins.Postgres.\<parameter\>) →
-3. Named sessions (Plugins.Postgres.Sessions.\<sessionName\>.\<parameter\>) →
+1. Hardcoded default values → 1st level config params
+2. (Plugins.Postgres.\<parameter\>) → Named sessions
+3. (Plugins.Postgres.Sessions.\<sessionName\>.\<parameter\>) → Items' key params.
 
 ## Supported keys
 
