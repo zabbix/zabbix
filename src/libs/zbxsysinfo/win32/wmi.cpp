@@ -141,7 +141,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	zbx_vector_wmi_prop_t	*inst_val;
 	zbx_wmi_prop_t		prop;
 
-	hres = pEnumerator->Next((int)(1000 * timeout), 1, &pclsObj, &uReturn);
+	hres = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
 
 	if (WBEM_S_TIMEDOUT == hres)
 	{
