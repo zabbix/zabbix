@@ -27,15 +27,6 @@
 #include "zbxregexp.h"
 #include "proxy.h"
 
-typedef enum
-{
-	OPERATION_OBJECT_ITEM_PROTOTYPE = 0,
-	OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-	OPERATION_OBJECT_GRAPH_PROTOTYPE,
-	OPERATION_OBJECT_HOST_PROTOTYPE
-}
-zbx_operation_object_t;
-
 #define OVERRIDE_STOP_TRUE	1
 
 /* lld rule filter condition (item_condition table record) */
@@ -911,7 +902,7 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 
 			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
-			if (OPERATION_OBJECT_ITEM_PROTOTYPE != override_operation->operationtype)
+			if (ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM != override_operation->operationtype)
 				continue;
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
@@ -980,7 +971,7 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 
 			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
-			if (OPERATION_OBJECT_TRIGGER_PROTOTYPE != override_operation->operationtype)
+			if (ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER != override_operation->operationtype)
 				continue;
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
@@ -1046,7 +1037,7 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 
 			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
-			if (OPERATION_OBJECT_HOST_PROTOTYPE != override_operation->operationtype)
+			if (ZBX_LLD_OVERRIDE_OP_OBJECT_HOST != override_operation->operationtype)
 				continue;
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",
@@ -1111,7 +1102,7 @@ void	lld_override_graph(const zbx_vector_ptr_t *overrides, const char *name,	uns
 
 			override_operation = (const lld_override_operation_t *)override->override_operations.values[j];
 
-			if (OPERATION_OBJECT_GRAPH_PROTOTYPE != override_operation->operationtype)
+			if (ZBX_LLD_OVERRIDE_OP_OBJECT_GRAPH != override_operation->operationtype)
 				continue;
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s() operationid:" ZBX_FS_UI64 " cond.value:'%s' name: '%s'",

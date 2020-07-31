@@ -2984,7 +2984,7 @@ typedef struct
 	zbx_vector_uint64_t	lnk_templateids;	/* list of templates which should be linked */
 	zbx_vector_ptr_t	group_prototypes;	/* list of group prototypes */
 	zbx_vector_macros_t	hostmacros;		/* list of user macros */
-	zbx_vector_dbtag_t	tags;			/* list of host prototype tags */
+	zbx_vector_db_tag_t	tags;			/* list of host prototype tags */
 	char			*host;
 	char			*name;
 	unsigned char		status;
@@ -3010,8 +3010,8 @@ static void	DBhost_prototype_clean(zbx_host_prototype_t *host_prototype)
 	zbx_free(host_prototype->host);
 	zbx_vector_macros_clear_ext(&host_prototype->hostmacros, DBhost_macro_free);
 	zbx_vector_macros_destroy(&host_prototype->hostmacros);
-	zbx_vector_dbtag_clear_ext(&host_prototype->tags, zbx_db_tag_free);
-	zbx_vector_dbtag_destroy(&host_prototype->tags);
+	zbx_vector_db_tag_clear_ext(&host_prototype->tags, zbx_db_tag_free);
+	zbx_vector_db_tag_destroy(&host_prototype->tags);
 	DBgroup_prototypes_clean(&host_prototype->group_prototypes);
 	zbx_vector_ptr_destroy(&host_prototype->group_prototypes);
 	zbx_vector_uint64_destroy(&host_prototype->lnk_templateids);
@@ -3095,7 +3095,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		zbx_vector_uint64_create(&host_prototype->lnk_templateids);
 		zbx_vector_ptr_create(&host_prototype->group_prototypes);
 		zbx_vector_macros_create(&host_prototype->hostmacros);
-		zbx_vector_dbtag_create(&host_prototype->tags);
+		zbx_vector_db_tag_create(&host_prototype->tags);
 		host_prototype->host = zbx_strdup(NULL, row[2]);
 		host_prototype->name = zbx_strdup(NULL, row[3]);
 		host_prototype->status = (unsigned char)atoi(row[4]);
@@ -3627,7 +3627,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
  * Return value: SUCCEED - the host tag was updated                           *
  *               FAIL    - otherwise                                          *
  ******************************************************************************/
-static int	DBhost_prototypes_tag_update(zbx_vector_dbtag_t *tags, zbx_uint64_t tagid, const char *name,
+static int	DBhost_prototypes_tag_update(zbx_vector_db_tag_t *tags, zbx_uint64_t tagid, const char *name,
 		const char *value)
 {
 	zbx_db_tag_t	*tag;
@@ -3719,7 +3719,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 		tag->tag = zbx_strdup(NULL, row[1]);
 		tag->value = zbx_strdup(NULL, row[2]);
 
-		zbx_vector_dbtag_append(&host_prototype->tags, tag);
+		zbx_vector_db_tag_append(&host_prototype->tags, tag);
 	}
 	DBfree_result(result);
 

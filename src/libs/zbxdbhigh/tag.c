@@ -29,4 +29,4 @@ void	zbx_db_tag_free(zbx_db_tag_t *tag)
 	zbx_free(tag);
 }
 
-ZBX_PTR_VECTOR_IMPL(dbtag, zbx_db_tag_t *);
+ZBX_PTR_VECTOR_IMPL(db_tag, zbx_db_tag_t *);

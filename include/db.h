@@ -828,6 +828,41 @@ zbx_db_tag_t;
 
 void	zbx_db_tag_free(zbx_db_tag_t *tag);
 
-ZBX_PTR_VECTOR_DECL(dbtag, zbx_db_tag_t *);
+ZBX_PTR_VECTOR_DECL(db_tag, zbx_db_tag_t *);
+
+typedef enum
+{
+	ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM = 0,
+	ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER,
+	ZBX_LLD_OVERRIDE_OP_OBJECT_GRAPH,
+	ZBX_LLD_OVERRIDE_OP_OBJECT_HOST
+}
+zbx_lld_override_op_object_t;
+
+typedef struct
+{
+	zbx_uint64_t		override_operationid;
+	zbx_uint64_t		overrideid;
+	char			*value;
+	char			*delay;
+	char			*history;
+	char			*trends;
+	zbx_vector_db_tag_t	tags;
+	zbx_vector_uint64_t	templateids;
+	unsigned char		operationtype;
+	unsigned char		operator;
+	unsigned char		status;
+	unsigned char		severity;
+	unsigned char		inventory_mode;
+	unsigned char		discover;
+}
+zbx_lld_override_operation_t;
+
+void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation);
+
+void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
+		zbx_vector_ptr_t *ops);
+
+
 
 #endif
