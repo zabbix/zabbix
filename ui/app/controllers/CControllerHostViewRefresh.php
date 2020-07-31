@@ -45,8 +45,6 @@ class CControllerHostViewRefresh extends CControllerHost {
 			'sort' =>					'in name,status',
 			'sortorder' =>				'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
 			'page' =>					'ge 1',
-			'from' =>					'string',
-			'to' =>						'string',
 			'filter_name' =>			'string',
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',

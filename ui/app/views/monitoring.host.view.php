@@ -56,7 +56,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 		$filter->addTemplatedTab($tab['filter_name'], $tab);
 	}
 
-	$filter->addTimeselector($data['from'], $data['to']);
+	$filter->addTimeselector($data['timerange']);
 	// Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
 	$data['filter_options'] = $filter->options;
 

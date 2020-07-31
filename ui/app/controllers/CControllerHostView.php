@@ -46,8 +46,12 @@ class CControllerHostView extends CControllerHostViewRefresh {
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'filter_view' => 'monitoring.host.filter',
 			'filter_defaults' => $profile->filter_defaults,
-			'from' => $filter['from'],
-			'to' => $filter['to'],
+			'timerange' => [
+				'idx' => '',
+				'idx2' => '',
+				'from' => ZBX_PERIOD_DEFAULT_FROM,
+				'to' => ZBX_PERIOD_DEFAULT_TO,
+			],
 			'filter_tabs' => $filter_tabs,
 			'tab_selected' => $profile->selected,
 			'tab_expanded' => $profile->expanded

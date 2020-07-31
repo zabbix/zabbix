@@ -183,19 +183,24 @@ class CTabFilter extends CDiv {
 	/**
 	 * Add time range selector tab. Time range selcetor have static [data-target] equal 'tabfilter_timeselector'.
 	 *
-	 * @param string $from         Time range start.
-	 * @param string $to           Time range end.
+	 * @param array  $timerange    Time range data array, array keys: from, to, idx, idx2
 	 * @param string $date_format  Date selector format.
 	 */
-	public function addTimeselector($from, $to, $date_format = ZBX_FULL_DATE_TIME) {
+	public function addTimeselector(array $timerange, $date_format = ZBX_FULL_DATE_TIME) {
 		$data = [
 			'format' => $date_format,
-			'label' => relativeDateToText($from, $to),
-			'from' => $from,
-			'to' => $to
+			'label' => relativeDateToText($timerange['from'], $timerange['to']),
+			'from' => $timerange['from'],
+			'to' => $timerange['to']
 		];
 
 		$content = (new CDiv(new CPartial('timeselector.filter', $data)))->setId(static::CSS_ID_PREFIX.'timeselector');
+		$this
+			->addClass('filter-space')
+			->setAttribute('data-disable-initial-check', 1)
+			->setAttribute('data-accessible', 1)
+			->setAttribute('data-profile-idx', $timerange['idx'])
+			->setAttribute('data-profile-idx2', $timerange['idx2']);
 
 		return $this->addTab($data['label'], $content);
 	}
@@ -261,19 +266,19 @@ class CTabFilter extends CDiv {
 
 		if ($timeselector) {
 			$tab = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
-			$timeselector->addClass((
-				$this->options['support_custom_time'] && !$tab['filter_custom_time']) ? null : ZBX_STYLE_DISABLED
-			);
+			$enabled = ($this->options['support_custom_time'] && !$tab['filter_custom_time']);
+			$timeselector->addClass($enabled ? null : ZBX_STYLE_DISABLED);
+
 			$nav = array_merge($nav, [
-				$timeselector,
+				$timeselector->addClass(ZBX_STYLE_BTN_TIME),
 				(new CSimpleButton())
-					->setEnabled(false)
+					->setEnabled($enabled)
 					->addClass(ZBX_STYLE_BTN_TIME_LEFT),
 				(new CSimpleButton(_('Zoom out')))
-					->setEnabled(false)
+					->setEnabled($enabled)
 					->addClass(ZBX_STYLE_BTN_TIME_OUT),
 				(new CSimpleButton())
-					->setEnabled(false)
+					->setEnabled($enabled)
 					->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
 			]);
 		}

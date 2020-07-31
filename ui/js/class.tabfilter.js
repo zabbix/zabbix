@@ -89,9 +89,7 @@ class CTabFilter extends CBaseComponent {
 					}
 
 					if (this._active_item != this._timeselector) {
-						this._timeselector.setDisabled(
-							!this._options.support_custom_time || this._active_item.hasCustomTime()
-						);
+						this.updateTimeselector();
 					}
 				}
 			},
@@ -156,9 +154,7 @@ class CTabFilter extends CBaseComponent {
 			 */
 			updateItem: (ev) => {
 				if (this._active_item != this._timeselector) {
-					this._timeselector.setDisabled(
-						!this._options.support_custom_time || this._active_item.hasCustomTime()
-					);
+					this.updateTimeselector();
 				}
 			},
 
@@ -338,6 +334,25 @@ class CTabFilter extends CBaseComponent {
 		for (const item of this._items) {
 			if (item !== except && item._expanded) {
 				item.fire(TABFILTERITEM_EVENT_COLLAPSE)
+			}
+		}
+	}
+
+	/**
+	 * Update timeselector tab and timeselector buttons accessibility according active item.
+	 */
+	updateTimeselector() {
+		let disabled = !this._options.support_custom_time || this._active_item.hasCustomTime(),
+			buttons = this._target.querySelectorAll('button.btn-time-left,button.btn-time-out,button.btn-time-right');
+
+		this._timeselector.setDisabled(disabled);
+
+		for (const button of buttons) {
+			if (disabled) {
+				button.setAttribute('disabled', 'disabled');
+			}
+			else {
+				button.removeAttribute('disabled');
 			}
 		}
 	}
