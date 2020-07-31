@@ -1998,6 +1998,19 @@ static void	lld_tag_make(zbx_vector_dbtag_t *tags, zbx_uint64_t tagid, const cha
 	zbx_vector_dbtag_append(tags, tag);
 }
 
+static int	lld_tag_validate(const zbx_vector_dbtag_t *tags, const zbx_db_tag_t *tag)
+{
+	int	i;
+
+	for (i = 0; i < tags->values_num; i++)
+	{
+		if (0 == strcmp(tags->values[i]->tag, tag->tag) && 0 == strcmp(tags->values[i]->value, tag->value))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_tags_make                                                    *
@@ -2037,7 +2050,10 @@ static void	lld_tags_make(const zbx_vector_dbtag_t *tags, zbx_vector_ptr_t *host
 			substitute_lld_macros(&tag->tag, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 			substitute_lld_macros(&tag->value, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 
-			zbx_vector_dbtag_append(&host->tags, tag);
+			if (SUCCEED == lld_tag_validate(&host->tags, tag))
+				zbx_vector_dbtag_append(&host->tags, tag);
+			else
+				zbx_db_tag_free(tag);
 		}
 
 		if (0 != host->hostid)
