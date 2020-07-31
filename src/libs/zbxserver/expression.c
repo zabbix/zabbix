@@ -2833,7 +2833,7 @@ static const char	*zbx_dobject_status2str(int st)
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error, int maxerrlen)
+static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char *tz, char *error, int maxerrlen)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2889,7 +2889,7 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error
 	else
 	{
 		*replace_to = zbx_strdup(*replace_to, event->trigger.opdata);
-		substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
+		substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tz, replace_to,
 				MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 	}
 
@@ -3062,7 +3062,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_OPDATA))
 				{
-					resolve_opdata(c_event, &replace_to, error, maxerrlen);
+					resolve_opdata(c_event, &replace_to, tz, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_ACK_MESSAGE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_MESSAGE))
 				{
