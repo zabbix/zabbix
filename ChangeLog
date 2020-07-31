@@ -163,12 +163,25 @@ A.F....... [ZBXNEXT-3035] fixed lld override validation and visualization; fixed
 Changes for 5.0.3rc1
 
 New features:
+.........T [ZBXNEXT-6010] added template "Template DB Oracle by ODBC" (ychukina)
 .........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
 .......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
 .......PS. [ZBXNEXT-5903] added vmware datacenters discovery (asestakovs)
 ........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+..F....... [ZBX-18000] added red label for disabled media types in user profile (rlataria)
+..F....... [ZBX-17996] fixed ip/dns field width in host interface (rlataria)
+A......... [ZBX-18075] fixed runtime error when creating a host via API (agriscenko)
+...G...... [ZBX-17814] fixed memory leaks in the agent persistent buffer (arimdjonoks)
+..F....... [ZBX-17973] fixed saving widget refresh rate in user profile (kustalovs)
+..F....... [ZBX-15927] removed problem calculation for dependent triggers when master trigger is in problem state (kustalovs)
+..F....... [ZBX-17933] fixed runtime error in maps (agriscenko)
+..F....... [ZBX-18063] fixed usage of unsupported parameter in API call (miks)
+..F....... [ZBX-18126] fixed incorrect labels in action operations dialog (miks)
+..F....... [ZBX-18060] fixed inaccessible user be displayed as accessible in slide show properties screen (miks)
+..F....PS. [ZBX-18147] fixed wrong character set detection logic for Oracle DB (yurii)
+.........T [ZBX-18115] added {$MSSQL.INSTANCE} macro and changed queries and item preprocessing for support MS SQL instance name (mchudinov)
 ..F....... [ZBX-17653] fixed new widget placeholder behavior and dashboard height calculation in edit mode (averza, kustalovs)
 ..F....... [ZBX-16819] added link to hosts linked to each template in templates list (miks)
 ...G...... [ZBX-18023] fixed format of agent2 version number (MVekslers)
