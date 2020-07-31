@@ -41,7 +41,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	];
 
 	/**
-	 * Attach MessageBehavior to the test.details
+	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
@@ -61,9 +61,9 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 			'max_overview_table_size' => 6,
 			'max_in_table' => 5,
 			'work_period' => 255,
-//			'history_period' =>
-//			'period_default' =>
-//			'max_period' =>
+			'history_period' => 32,
+			'period_default' => 32,
+			'max_period' => 32
 		];
 		foreach ($limits as $id => $limit) {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
@@ -75,6 +75,18 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 				' because locales for them are not installed on the web server.',
 			$this->query('class:red')->one()->getText()
 		);
+	}
+
+	public function testFormAdministrationGeneralGUI_SimpleUpdate() {
+		$sqlHash = 'SELECT * FROM config ORDER BY configid';
+		$oldHash = CDBHelper::getHash($sqlHash);
+
+		$this->page->login()->open('zabbix.php?action=gui.edit');
+		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->assertEquals($oldHash, CDBHelper::getHash($sqlHash));
 	}
 
 	/**
@@ -226,7 +238,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Limit for search and filter results' => '999999',
 						'Max number of columns and rows in overview tables' => '999999',
 						'Max count of elements to show inside table cell' => '99999',
-						'Working time' => '7-7,23:59-24:00',
+						// TODO
+//						'Working time' => '{$WORKING_HOURS}',
 						// Maximal valid time in years.
 						'Time filter default period' => '10y',
 						'Max period' => '10y'
@@ -300,7 +313,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Max number of columns and rows in overview tables' => '4',
-						'Working time' => '0-7,09:00-18:00',
+						'Working time' => 'test',
 						'Max history display period' => '23h',
 						'Time filter default period' => '59s',
 						'Max period' => '364d'
@@ -327,10 +340,138 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Incorrect value for field "period_default": time filter default period exceeds the max period.'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-7 09:00-24:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '0-7,09:00-24:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-5,09:00-18:00,6-7,10:00-16:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-8,09:00-24:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-7,09:00-25:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+						'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-7,24:00-00:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-7,14:00-13:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-7,25:00-26:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-7,13:60-14:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '1-0'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '09:00-24:00'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Working time' => '{WORKING_HOURS}'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Working time' => '1-5,09:00-18:00;5-7,12:00-16:00'
+					],
+					'message' => 'Configuration updated'
+				]
 			]
 		];
 	}
-
 
 	/**
 	 * @dataProvider getCheckFormData
