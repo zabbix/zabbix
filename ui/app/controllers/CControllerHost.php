@@ -217,7 +217,7 @@ abstract class CControllerHost extends CController {
 		// Sort for paging so we know which IDs go to which page.
 		CArrayHelper::sort($hosts, [['field' => $filter['sort'], 'order' => $filter['sortorder']]]);
 
-		$view_curl = (new CUrl('zabbix.php'))->setArgument('action', 'host.view');
+		$view_curl = (new CUrl())->setArgument('action', 'host.view');
 
 		// Split result array and create paging.
 		$paging = CPagerHelper::paginate($filter['page'], $hosts, $filter['sortorder'], $view_curl);

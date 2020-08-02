@@ -108,9 +108,13 @@ class CControllerHostViewRefresh extends CControllerHost {
 			});
 			$prepared_data = $this->getData($filter);
 
+			$view_url = (new CUrl())
+				->setArgument('action', 'host.view')
+				->removeArgument('page');
+
 			$data = [
 				'filter' => $filter,
-				'view_curl' => (new CUrl('zabbix.php'))->setArgument('action', 'host.view'),
+				'view_curl' => $view_url,
 				'sort' => $filter['sort'],
 				'sortorder' => $filter['sortorder']
 			] + $prepared_data;

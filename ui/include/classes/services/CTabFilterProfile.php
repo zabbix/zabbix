@@ -144,9 +144,13 @@ class CTabFilterProfile {
 				$this->selected = count($this->tabfilters);
 				$this->tabfilters[] = $this->createFilterTab($input);
 			}
-			elseif ($this->selected != $name_index) {
-				$this->selected = $name_index;
-				$this->update();
+			else {
+				if ($this->selected != $name_index) {
+					$this->selected = $name_index;
+					$this->update();
+				}
+
+				$this->tabfilters[$name_index] = $input + $this->filter_defaults;
 			}
 		}
 
