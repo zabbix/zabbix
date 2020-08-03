@@ -155,7 +155,7 @@ class CSettings extends CApiService {
 			'search_limit' =>					['type' => API_INT32, 'in' => '1:999999'],
 			'max_in_table' =>					['type' => API_INT32, 'in' => '1:99999'],
 			'server_check_interval' =>			['type' => API_INT32, 'in' => '0,'.SERVER_CHECK_INTERVAL],
-			'work_period' =>					['type' => API_TIME_PERIOD],
+			'work_period' =>					['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO],
 			'show_technical_errors' =>			['type' => API_INT32, 'in' => '0,1'],
 			'history_period' =>					['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY])],
 			'period_default' =>					['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR])],
