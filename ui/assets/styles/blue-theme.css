@@ -2413,6 +2413,9 @@ button {
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
+  [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, [disabled].btn-widget-expand, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle, [disabled].btn-dashbrd-conf, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, [disabled].btn-widget-expand:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:hover, [disabled].btn-dashbrd-conf:hover, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, [disabled].btn-widget-expand:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:focus, [disabled].btn-dashbrd-conf:focus, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, [disabled].btn-widget-expand:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:active, [disabled].btn-dashbrd-conf:active {
+    background-color: transparent;
+    opacity: .25; }
 
 .btn-conf, .btn-kiosk, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
@@ -2732,10 +2735,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 1px solid #dfe4e7;
   border-bottom: 0;
   background-color: #ffffff;
-  /*
-   * For floating headers to appear over other widgets.
-   * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-   */
   z-index: 3; }
   .dashbrd-grid-widget-head h4 {
     flex-grow: 1;
@@ -2776,10 +2775,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-widget-content .msg-good,
   .dashbrd-grid-widget-content .msg-warning {
     margin: 0 10px; }
-
-.widget-placeholder .dashbrd-grid-widget-container .dashbrd-grid-widget-content {
-  margin-top: 0;
-  height: 100%; }
 
 .dashbrd-grid-widget-mask {
   position: absolute;

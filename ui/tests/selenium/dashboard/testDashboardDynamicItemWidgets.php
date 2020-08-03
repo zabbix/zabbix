@@ -23,7 +23,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 /**
  * @backup profiles
  */
-class testDynamicItemWidgets extends CWebTest {
+class testDashboardDynamicItemWidgets extends CWebTest {
 
 	public static function getWidgetsData() {
 		return [
@@ -279,7 +279,7 @@ class testDynamicItemWidgets extends CWebTest {
 	 *
 	 * @dataProvider getWidgetsData
 	 */
-	public function testDynamicItemWidgets_Layout($data) {
+	public function testDashboardDynamicItemWidgets_Layout($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=105');
 		$dashboard = CDashboardElement::find()->one();
 

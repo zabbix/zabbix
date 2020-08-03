@@ -98,6 +98,6 @@ func checkMetrics(s scheduler.Scheduler) {
 	}
 
 	for _, metric := range metrics {
-		_ = checkMetric(s, metric)
+		checkMetric(s, metric)
 	}
 }

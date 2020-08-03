@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  * @backup widget
  * @backup profiles
  */
-class testGraphPrototypeWidget extends CWebTest {
+class testDashboardGraphPrototypeWidget extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -174,7 +174,7 @@ class testGraphPrototypeWidget extends CWebTest {
 	 *
 	 * @dataProvider getWidgetData
 	 */
-	public function testGraphPrototypeWidget_Create($data) {
+	public function testDashboardGraphPrototypeWidget_Create($data) {
 		$this->checkGraphPrototypeWidget($data);
 	}
 
@@ -185,42 +185,42 @@ class testGraphPrototypeWidget extends CWebTest {
 	 *
 	 * @dataProvider getWidgetData
 	 */
-	public function testGraphPrototypeWidget_Update($data) {
+	public function testDashboardGraphPrototypeWidget_Update($data) {
 		$this->checkGraphPrototypeWidget($data, true);
 	}
 
 	/**
 	 * Test for checking Graph prototype widget update without any changes.
 	 */
-	public function testGraphPrototypeWidget_SimpleUpdate() {
+	public function testDashboardGraphPrototypeWidget_SimpleUpdate() {
 		$this->checkDataUnchanged('Apply', true);
 	}
 
 	/**
 	 * Test for checking Graph prototype creation cancelling.
 	 */
-	public function testGraphPrototypeWidget_CancelCreate() {
+	public function testDashboardGraphPrototypeWidget_CancelCreate() {
 		$this->checkDataUnchanged('Cancel', false, true);
 	}
 
 	/**
 	 * Test for checking Graph prototype cancelling form changes.
 	 */
-	public function testGraphPrototypeWidget_CancelChanges() {
+	public function testDashboardGraphPrototypeWidget_CancelChanges() {
 		$this->checkDataUnchanged('Cancel', true, true);
 	}
 
 	/**
 	 * Test for checking Graph prototype widget cancelling without making any changes.
 	 */
-	public function testGraphPrototypeWidget_CancelNoChanges() {
+	public function testDashboardGraphPrototypeWidget_CancelNoChanges() {
 		$this->checkDataUnchanged('Cancel', true);
 	}
 
 	/**
 	 * Test for checking delete of Graph prototype widget.
 	 */
-	public function testGraphPrototypeWidget_Delete() {
+	public function testDashboardGraphPrototypeWidget_Delete() {
 		$name = 'Graph prototype widget for delete';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID);
@@ -245,7 +245,7 @@ class testGraphPrototypeWidget extends CWebTest {
 	/**
 	 * Test for comparing widgets form screenshot.
 	 */
-	public function testGraphPrototypeWidget_FormScreenshot() {
+	public function testDashboardGraphPrototypeWidget_FormScreenshot() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::SCREENSHOT_DASHBOARD_ID);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -328,7 +328,7 @@ class testGraphPrototypeWidget extends CWebTest {
 	 * @backup widget
 	 * @dataProvider getWidgetScreenshotData
 	 */
-	public function testGraphPrototypeWidget_GridScreenshots($data) {
+	public function testDashboardGraphPrototypeWidget_GridScreenshots($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::SCREENSHOT_DASHBOARD_ID);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
