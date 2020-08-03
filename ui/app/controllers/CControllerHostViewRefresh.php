@@ -113,6 +113,7 @@ class CControllerHostViewRefresh extends CControllerHost {
 				->removeArgument('page');
 
 			$data = [
+				'config' => select_config(),
 				'filter' => $filter,
 				'view_curl' => $view_url,
 				'sort' => $filter['sort'],
