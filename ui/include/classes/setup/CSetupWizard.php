@@ -429,7 +429,7 @@ class CSetupWizard extends CForm {
 		$error = false;
 
 		// Create session secret key.
-		if (!$this->dbConnect() || !CEncryptHelper::generateKey()) {
+		if (!$this->dbConnect() || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
 			$this->STEP_FAILED = true;
 			$this->setConfig('step', 2);
 			return $this->stage2();

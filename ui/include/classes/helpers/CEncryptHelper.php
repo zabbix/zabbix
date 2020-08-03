@@ -43,17 +43,20 @@ class CEncryptHelper {
 	 *
 	 * @static
 	 *
-	 * @return string
-	 *
-	 * @throws Exception
+	 * @return string|null
 	 */
-	private static function getKey(): string {
+	private static function getKey(): ?string {
 		if (!self::$key) {
 			$config = select_config();
 			// This if contain copy in CEncryptedCookieSession class.
 			if (!array_key_exists('session_key', $config) || (string) $config['session_key'] === '') {
-				self::generateKey();
-				return self::getKey();
+				self::$key = self::generateKey();
+
+				if (!self::updateKey(self::$key)) {
+					return null;
+				}
+
+				return self::$key;
 			}
 
 			self::$key = $config['session_key'];
@@ -92,14 +95,27 @@ class CEncryptHelper {
 	}
 
 	/**
-	 * Create secret session key.
+	 * Generate random 16 bytes key.
 	 *
 	 * @static
 	 *
+	 * @return string
+	 */
+	public static function generateKey(): string {
+		return bin2hex(openssl_random_pseudo_bytes(16));
+	}
+
+	/**
+	 * Update secret session key.
+	 *
+	 * @static
+	 *
+	 * @param string $key
+	 *
 	 * @return boolean
 	 */
-	public static function generateKey(): bool {
-		$sql = sprintf("update config set session_key='%s' where configid=1", bin2hex(openssl_random_pseudo_bytes(16)));
+	public static function updateKey(string $key): bool {
+		$sql = sprintf("update config set session_key='%s' where configid=1", $key);
 		if (!DBexecute($sql)) {
 			return false;
 		}
