@@ -143,27 +143,6 @@ function granted2update_group($userGroupIds) {
 }
 
 /**
- * Get user details by user id.
- *
- * @param string $userid
- *
- * @return array
- */
-function getUserFullnameByUserid($userid) {
-	$user = ['id' => $userid, 'name' => _('Inaccessible user')];
-
-	$users = API::User()->get([
-		'output' => ['name', 'surname', 'alias'],
-		'userids' => $userid
-	]);
-	if ($users) {
-		$user['name'] = getUserFullname($users[0]);
-	}
-
-	return $user;
-}
-
-/**
  * Gets user full name in format "alias (name surname)". If both name and surname exist, returns translated string.
  *
  * @param array  $userData

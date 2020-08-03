@@ -72,10 +72,10 @@ class CControllerDashboardPropertiesEdit extends CController {
 				$user = null;
 			}
 			elseif ($this->hasInput('userid')) {
-				$user = getUserFullnameByUserid($this->getInput('userid'));
+				$user = CControllerDashboardView::getOwnerData($this->getInput('userid'));
 			}
 			elseif (array_key_exists('userid', $dashboard)) {
-				$user = getUserFullnameByUserid($dashboard['userid']);
+				$user = CControllerDashboardView::getOwnerData($dashboard['userid']);
 			}
 			elseif (array_key_exists('owner', $dashboard)) {
 				$user = $dashboard['owner'];

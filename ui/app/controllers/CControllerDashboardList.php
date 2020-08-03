@@ -34,10 +34,11 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 			'sort' =>			'in name',
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>		'in 1',
+			'page' =>			'ge 1',
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'filter_userid' =>	'string'
+			'filter_show' =>	'in '.DASHBOARD_FILTER_SHOW_ALL.','.DASHBOARD_FILTER_SHOW_MY
 		];
 
 		$ret = $this->validateInput($fields);
@@ -65,16 +66,18 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.dashbrd.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.dashbrd.filter_userid', $this->getInput('filter_userid', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.dashbrd.filter_show', $this->getInput('filter_show', DASHBOARD_FILTER_SHOW_ALL),
+				PROFILE_TYPE_INT
+			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.dashbrd.filter_name');
-			CProfile::delete('web.dashbrd.filter_userid');
+			CProfile::delete('web.dashbrd.filter_show');
 		}
 
 		$filter = [
 			'name' => CProfile::get('web.dashbrd.filter_name', ''),
-			'userid' => CProfile::get('web.dashbrd.filter_userid', -1)
+			'show' => CProfile::get('web.dashbrd.filter_show', DASHBOARD_FILTER_SHOW_ALL)
 		];
 
 		$config = select_config();
@@ -91,33 +94,17 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		// list of dashboards
 		$data['dashboards'] = API::Dashboard()->get([
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
+			'selectUsers' => ['userid'],
+			'selectUserGroups' => ['usrgrpid'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'filter' => [
-				'userid' => ($filter['userid'] == -1) ? null : CWebUser::$data['userid']
+				'userid' => ($filter['show'] == DASHBOARD_FILTER_SHOW_ALL) ? null : CWebUser::$data['userid']
 			],
-			'selectUsers' => ['userid', 'permission'],
-			'selectUserGroups' => ['usrgrpid', 'permission'],
 			'limit' => $config['search_limit'] + 1,
 			'preservekeys' => true
 		]);
-
-		$owners = [];
-		foreach ($data['dashboards'] as $dashboard) {
-			if (!array_key_exists($dashboard['userid'], $owners)) {
-				if ($dashboard['userid'] === CWebUser::$data['userid']) {
-					$owners[$dashboard['userid']] = _('me');
-				}
-				else {
-					$owner = getUserFullnameByUserid($dashboard['userid']);
-					$owners[$dashboard['userid']] = $owner['name'];
-				}
-			}
-		}
-		$data['owners'] = $owners;
-
-		// sorting & paging
 		order_result($data['dashboards'], $sort_field, $sort_order);
 
 		// pager
@@ -128,6 +115,22 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		);
 
 		if ($data['dashboards']) {
+			foreach ($data['dashboards'] as $idx => &$dashboard) {
+				$tags = [];
+
+				if ($dashboard['userid'] == CWebUser::$data['userid']) {
+					$tags[] = ['tag' => _('My'), 'value' => '', 'class' => ZBX_STYLE_GREEN_BG];
+				}
+
+				if ($dashboard['private'] == PUBLIC_SHARING || count($dashboard['users']) > 0
+						|| count($dashboard['userGroups']) > 0) {
+					$tags[] = ['tag' => _('Shared'), 'value' => '', 'class' => ZBX_STYLE_YELLOW_BG];
+				}
+
+				$dashboard['tags'] = $tags;
+			}
+			unset($dashboard);
+
 			$this->prepareEditableFlag($data['dashboards']);
 		}
 

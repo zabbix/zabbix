@@ -207,7 +207,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				if ($dashboards) {
 					$this->prepareEditableFlag($dashboards);
 					$dashboard = array_shift($dashboards);
-					$dashboard['owner'] = getUserFullnameByUserid($dashboard['userid']);
+					$dashboard['owner'] = self::getOwnerData($dashboard['userid']);
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
@@ -234,8 +234,29 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'name' => _('New dashboard'),
 			'editable' => true,
 			'widgets' => [],
-			'owner' => getUserFullnameByUserid(CWebUser::$data['userid'])
+			'owner' => self::getOwnerData(CWebUser::$data['userid'])
 		];
+	}
+
+	/**
+	 * Get owner details.
+	 *
+	 * @param string $userid
+	 *
+	 * @return array
+	 */
+	public static function getOwnerData($userid) {
+		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
+
+		$users = API::User()->get([
+			'output' => ['name', 'surname', 'alias'],
+			'userids' => $userid
+		]);
+		if ($users) {
+			$owner['name'] = getUserFullname($users[0]);
+		}
+
+		return $owner;
 	}
 
 	/**

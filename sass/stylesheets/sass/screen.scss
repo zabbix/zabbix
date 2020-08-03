@@ -2767,22 +2767,6 @@ $form-icon-btn: (
 	}
 }
 
-.icon-dashboard-shared {
-	position: relative;
-	margin-left: 5px;
-
-	&:after {
-		content: '';
-		display: inline-block;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 18px;
-		height: 14px;
-		background: url($sprite-path) no-repeat -338px -10px;
-	}
-}
-
 // Installation.
 .setup-container {
 	background-color: $ui-bg-color;
@@ -5225,6 +5209,11 @@ a.link-action {
 	&:last-child {
 		margin: 0;
 	}
+
+	&.green-bg,
+	&.yellow-bg {
+		color: darken($font-color, 45%);
+	}
 }
 
 .green-bg {
@@ -5233,6 +5222,10 @@ a.link-action {
 
 .red-bg {
 	background-color: $alt-red;
+}
+
+.yellow-bg {
+	background-color: $alt-yellow;
 }
 
 // Severity statuses.

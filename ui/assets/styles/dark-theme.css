@@ -2552,19 +2552,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     height: 14px;
     background: url("../img/icon-sprite.svg?20200407") no-repeat -47px -659px; }
 
-.icon-dashboard-shared {
-  position: relative;
-  margin-left: 5px; }
-  .icon-dashboard-shared:after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 18px;
-    height: 14px;
-    background: url("../img/icon-sprite.svg?20200407") no-repeat -337px -10px; }
-
 .setup-container {
   background-color: #2b2b2b;
   width: 766px;
@@ -4115,12 +4102,17 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
+  .tag.green-bg, .tag.yellow-bg {
+    color: #7f7f7f; }
 
 .green-bg {
   background-color: #59db8f; }
 
 .red-bg {
   background-color: #e45959; }
+
+.yellow-bg {
+  background-color: #ffc859; }
 
 td[class] + td.na-bg,
 td[class] + td.normal-bg,
@@ -5638,3 +5630,6 @@ table.preprocessing-test-results .rel-container {
     color: #f2f2f2; }
 .host-avail-widget .host-avail-total {
   color: #f2f2f2; }
+
+.tag.green-bg, .tag.yellow-bg {
+  color: #7f7f7f; }

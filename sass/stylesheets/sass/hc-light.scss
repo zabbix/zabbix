@@ -457,12 +457,6 @@ $icon-widget-btn: (
 	background: url($sprite-path) no-repeat -165px -762px !important;
 }
 
-.icon-dashboard-shared {
-	&:after {
-		background: url($sprite-path) no-repeat -418px -10px;
-	}
-}
-
 // Colors and general.
 button {
 	&:focus {
@@ -628,6 +622,14 @@ a.link-action {
 .filter-trigger {
 	.arrow-down {
 		border-top-color: #ffffff !important;
+	}
+}
+
+.tag {
+	&.green-bg,
+	&.yellow-bg {
+		background-color: $ui-bg-selected-color;
+		color: $white;
 	}
 }
 
