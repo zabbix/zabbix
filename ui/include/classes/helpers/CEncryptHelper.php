@@ -52,7 +52,8 @@ class CEncryptHelper {
 			$config = select_config();
 			// This if contain copy in CEncryptedCookieSession class.
 			if (!array_key_exists('session_key', $config) || (string) $config['session_key'] === '') {
-				throw new \Exception(_('Session secret not defined.'));
+				self::generateKey();
+				return self::getKey();
 			}
 
 			self::$key = $config['session_key'];
@@ -88,5 +89,21 @@ class CEncryptHelper {
 		$key = self::getKey();
 
 		return openssl_encrypt($data, self::SIGN_ALGO, $key);
+	}
+
+	/**
+	 * Create secret session key.
+	 *
+	 * @static
+	 *
+	 * @return boolean
+	 */
+	public static function generateKey(): bool {
+		$sql = sprintf("update config set session_key='%s' where configid=1", bin2hex(openssl_random_pseudo_bytes(16)));
+		if (!DBexecute($sql)) {
+			return false;
+		}
+
+		return true;
 	}
 }

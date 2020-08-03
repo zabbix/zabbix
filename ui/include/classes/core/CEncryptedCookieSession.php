@@ -65,7 +65,9 @@ class CEncryptedCookieSession extends CCookieSession {
 	 * @return boolean
 	 */
 	protected function session_start(): bool {
-		$this->checkSessionKey();
+		if (!$this->checkSessionKey()) {
+			CEncryptHelper::generateKey();
+		}
 
 		$session_data = $this->parseData();
 
@@ -86,12 +88,14 @@ class CEncryptedCookieSession extends CCookieSession {
 	 *
 	 * @throws \Exception
 	 *
-	 * @return void
+	 * @return boolean
 	 */
-	private function checkSessionKey(): void {
+	private function checkSessionKey(): bool {
 		$config = select_config();
 		if (!array_key_exists('session_key', $config) || (string) $config['session_key'] === '') {
-			throw new \Exception(_('Session secret not defined.'));
+			return false;
 		}
+
+		return true;
 	}
 }

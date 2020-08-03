@@ -429,8 +429,7 @@ class CSetupWizard extends CForm {
 		$error = false;
 
 		// Create session secret key.
-		$sql = sprintf("update config set session_key='%s' where configid=1", bin2hex(openssl_random_pseudo_bytes(16)));
-		if (!$this->dbConnect() || !DBexecute($sql)) {
+		if (!$this->dbConnect() || !CEncryptHelper::generateKey()) {
 			$this->STEP_FAILED = true;
 			$this->setConfig('step', 2);
 			return $this->stage2();
