@@ -34,11 +34,12 @@ FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
 FIELD		|lang		|t_varchar(7)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|refresh	|t_varchar(32)	|'30s'	|NOT NULL	|0
 FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
-FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|0
+FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
+FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|alias
 
 TABLE|maintenances|maintenanceid|ZBX_DATA
@@ -637,6 +638,7 @@ FIELD		|saml_encrypt_nameid	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_encrypt_assertions|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_case_sensitive	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_lang		|t_varchar(5)	|'en_GB'|NOT NULL	|ZBX_NODATA
+FIELD		|default_timezone	|t_varchar(50)	|'system'|NOT NULL	|ZBX_NODATA
 FIELD		|login_attempts	|t_integer	|'5'	|NOT NULL	|ZBX_NODATA
 FIELD		|login_block	|t_varchar(32)	|'30s'	|NOT NULL	|ZBX_NODATA
 FIELD		|show_technical_errors	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -1846,4 +1848,4 @@ FIELD	|inventory_mode			|t_integer	|'0'	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5010021	|5010021
+ROW		|5010023	|5010023

@@ -22,7 +22,16 @@
 /**
  * @var CView $this
  */
-$filter = (new CFilter(new CUrl('applications.php')))
+
+$this->addJsFile('multiselect.js');
+
+$checkbox_hash = 'application'.crc32(json_encode([$data['ms_groups'], $data['ms_hosts']]));
+if ($data['uncheck']) {
+	uncheckTableRows($checkbox_hash);
+}
+
+$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'application.list')))
+	->addVar('action', 'application.list')
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
@@ -30,15 +39,15 @@ $filter = (new CFilter(new CUrl('applications.php')))
 			->addRow(
 				(new CLabel(_('Host groups'), 'filter_groups__ms')),
 				(new CMultiSelect([
-					'name' => 'filter_groups[]',
+					'name' => 'filter_groupids[]',
 					'object_name' => 'hostGroup',
-					'data' => $data['filter']['groups'],
+					'data' => $data['ms_groups'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_groups_',
+							'dstfld1' => 'filter_groupids_',
 							'with_hosts_and_templates' => 1,
 							'editable' => 1,
 							'enrich_parent_groups' => 1
@@ -51,10 +60,10 @@ $filter = (new CFilter(new CUrl('applications.php')))
 				(new CMultiSelect([
 					'name' => 'filter_hostids[]',
 					'object_name' => 'host_templates',
-					'data' => $data['filter']['hosts'],
+					'data' => $data['ms_hosts'],
 					'popup' => [
 						'filter_preselect_fields' => [
-							'hostgroups' => 'filter_groups_'
+							'hostgroups' => 'filter_groupids_'
 						],
 						'parameters' => [
 							'srctbl' => 'host_templates',
@@ -68,19 +77,18 @@ $filter = (new CFilter(new CUrl('applications.php')))
 			)
 	]);
 
-// create form
 $form = (new CForm())->setName('application_form');
 
-// create table
-$applicationTable = (new CTableInfo())
+$application_table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_applications'))
-				->onClick("checkAll('".$form->getName()."', 'all_applications', 'applications');")
+				->onClick("checkAll('".$form->getName()."', 'all_applications', 'applicationids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		($this->data['hostid'] > 0) ? null : _('Host'),
-		make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder'],
-			(new CUrl('applications.php'))->getUrl()
+		($data['hostid'] > 0) ? null : _('Host'),
+		make_sorting_header(_('Application'), 'name', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'application.list')
+				->getUrl()
 		),
 		_('Items'),
 		$data['showInfoColumn'] ? _('Info') : null
@@ -91,7 +99,7 @@ $current_time = time();
 foreach ($data['applications'] as $application) {
 	$info_icons = [];
 
-	// inherited app, display the template list
+	// Inherited app, display the template list.
 	if ($application['templateids']) {
 		$name = makeApplicationTemplatePrefix($application['applicationid'], $data['parent_templates']);
 		$name[] = $application['name'];
@@ -105,24 +113,26 @@ foreach ($data['applications'] as $application) {
 		$name[] = NAME_DELIMITER.$application['name'];
 
 		if ($application['applicationDiscovery']['ts_delete'] != 0) {
-			$info_icons[] = getApplicationLifetimeIndicator(
-				$current_time, $application['applicationDiscovery']['ts_delete']
+			$info_icons[] = getApplicationLifetimeIndicator($current_time,
+				$application['applicationDiscovery']['ts_delete']
 			);
 		}
 	}
 	else {
-		$name = new CLink($application['name'],
-			'applications.php?form=update&applicationid='.$application['applicationid'].
-				'&hostid='.$application['hostid']
+		$name = new CLink($application['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'application.edit')
+				->setArgument('applicationid', $application['applicationid'])
+				->setArgument('hostid', $application['hostid'])
+				->getUrl()
 		);
 	}
 
-	$checkBox = new CCheckBox('applications['.$application['applicationid'].']', $application['applicationid']);
+	$checkBox = new CCheckBox('applicationids['.$application['applicationid'].']', $application['applicationid']);
 	$checkBox->setEnabled(!$application['discoveryRule']);
 
-	$applicationTable->addRow([
+	$application_table->addRow([
 		$checkBox,
-		($this->data['hostid'] > 0) ? null : $application['host']['name'],
+		($data['hostid'] > 0) ? null : $application['host']['name'],
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(
@@ -138,17 +148,17 @@ foreach ($data['applications'] as $application) {
 	]);
 }
 
-// append table to form
+// Append table to form.
 $form->addItem([
-	$applicationTable,
-	$this->data['paging'],
-	new CActionButtonList('action', 'applications',
+	$application_table,
+	$data['paging'],
+	new CActionButtonList('action', 'applicationids',
 		[
-			'application.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected applications?')],
-			'application.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected applications?')],
-			'application.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected applications?')]
+			'application.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected applications?')],
+			'application.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected applications?')],
+			'application.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected applications?')]
 		],
-		$this->data['hostid']
+		$checkbox_hash
 	)
 ]);
 
@@ -158,8 +168,8 @@ $form->addItem([
 	->setControls(
 		(new CTag('nav', true, ($data['hostid'] == 0)
 			? (new CButton('form', _('Create application (select host first)')))->setEnabled(false)
-			: new CRedirectButton(_('Create application'), (new CUrl('applications.php'))
-				->setArgument('form', 'create')
+			: new CRedirectButton(_('Create application'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'application.edit')
 				->setArgument('hostid', $data['hostid'])
 				->getUrl()
 			)

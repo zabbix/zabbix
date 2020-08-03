@@ -43,7 +43,7 @@ class CSettings extends CApiService {
 		'severity_name_5', 'custom_color', 'ok_period', 'blink_period', 'problem_unack_color', 'problem_ack_color',
 		'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style',
 		'ok_ack_style', 'refresh_unsupported', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid',
-		'snmptrap_logging', 'default_lang', 'login_attempts', 'login_block', 'validate_uri_schemes',
+		'snmptrap_logging', 'default_lang', 'default_timezone', 'login_attempts', 'login_block', 'validate_uri_schemes',
 		'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 		'max_overview_table_size', 'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout',
 		'item_test_timeout'
@@ -94,7 +94,7 @@ class CSettings extends CApiService {
 		$upd_config = [];
 
 		// strings
-		$field_names = ['default_theme', 'work_period', 'history_period', 'period_default', 'max_period',
+		$field_names = ['default_theme', 'default_timezone', 'work_period', 'history_period', 'period_default', 'max_period',
 			'severity_color_0', 'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4',
 			'severity_color_5', 'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3',
 			'severity_name_4', 'severity_name_5', 'ok_period', 'blink_period', 'problem_unack_color',
@@ -152,6 +152,7 @@ class CSettings extends CApiService {
 	protected function validateUpdate(array $settings): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'default_theme' =>					['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(APP::getThemes()))],
+			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', DateTimeZone::listIdentifiers())],
 			'search_limit' =>					['type' => API_INT32, 'in' => '1:999999'],
 			'max_in_table' =>					['type' => API_INT32, 'in' => '1:99999'],
 			'server_check_interval' =>			['type' => API_INT32, 'in' => '0,'.SERVER_CHECK_INTERVAL],

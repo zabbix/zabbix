@@ -656,6 +656,9 @@ class CPieGraphDraw extends CGraphDraw {
 		$this->calculateTopPadding();
 
 		$this->selectData();
+		if (hasErrorMesssages()) {
+			show_messages();
+		}
 
 		$this->shiftYLegend = 20;
 		$this->shiftXleft = 10;

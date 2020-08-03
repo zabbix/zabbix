@@ -897,7 +897,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
 					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
 					"compression_status", "compression_availability", "compress_older",
-					"instanceid"};	/* sync with zbx_dbsync_compare_config() */
+					"instanceid", "default_timezone"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -1057,6 +1057,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
 	}
 #endif
+	DCstrpool_replace(found, &config->config->default_timezone, row[33]);
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */
@@ -2057,7 +2058,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 		if (0 != (macros & 0x01))
 		{
 			addr = zbx_strdup(NULL, interface->ip);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				DCstrpool_replace(1, &interface->ip, addr);
@@ -2067,7 +2068,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 		if (0 != (macros & 0x02))
 		{
 			addr = zbx_strdup(NULL, interface->dns);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL,
 					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			if (SUCCEED == is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				DCstrpool_replace(1, &interface->dns, addr);
@@ -10899,6 +10900,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT))
 		cfg->autoreg_tls_accept = config->config->autoreg_tls_accept;
 
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE))
+		cfg->default_timezone = zbx_strdup(NULL, config->config->default_timezone);
+
 	UNLOCK_CACHE;
 
 	cfg->flags = flags;
@@ -10928,6 +10932,9 @@ void	zbx_config_clean(zbx_config_t *cfg)
 
 	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
 		zbx_free(cfg->db.extension);
+
+	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE))
+		zbx_free(cfg->default_timezone);
 }
 
 /******************************************************************************

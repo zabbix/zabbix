@@ -290,8 +290,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			// Check that it is no logner possible to add same type of message template.
 			$templates_list->invalidate();
 			if ($i === $last) {
-				$this->assertFalse($templates_list->query('button:Add')->one()->isEnabled());
-				$this->assertEquals('Add (message type limit reached)', $templates_list->query('button:Add')->one()->getText());
+				$this->assertFalse($templates_list->query('button:Add (message type limit reached)')->one()->isEnabled());
 			}
 			else {
 				$templates_list->query('button:Add')->one()->click();

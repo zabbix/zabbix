@@ -27,6 +27,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
+		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -35,6 +37,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'password1' =>			'string',
 			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
+			'timezone' =>			'db users.timezone|in '.implode(',', $timezones),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
@@ -70,7 +73,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$users = API::User()->get([
 			'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-				'rows_per_page', 'url'
+				'rows_per_page', 'url', 'timezone'
 			],
 			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
 				? ['mediatypeid', 'period', 'sendto', 'severity', 'active']
@@ -102,6 +105,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'password1' => '',
 			'password2' => '',
 			'lang' => $this->user['lang'],
+			'timezone' => $this->user['timezone'],
 			'theme' => $this->user['theme'],
 			'autologin' => $this->user['autologin'],
 			'autologout' => $this->user['autologout'],
@@ -118,8 +122,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 		}
 
 		// Overwrite with input variables.
-		$this->getInputs($data, ['password1', 'password2', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-			'rows_per_page', 'url', 'form_refresh'
+		$this->getInputs($data, ['password1', 'password2', 'lang', 'timezone', 'theme', 'autologin', 'autologout',
+			'refresh', 'rows_per_page', 'url', 'form_refresh'
 		]);
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {

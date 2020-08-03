@@ -110,6 +110,7 @@ require_once dirname(__FILE__).'/testFormItemTestHost.php';
 require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryPreprocessing.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
@@ -144,6 +145,7 @@ require_once dirname(__FILE__).'/testLanguage.php';
 require_once dirname(__FILE__).'/testMultiselect.php';
 require_once dirname(__FILE__).'/testTagBasedPermissions.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
+require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testTriggerDependencies.php';
 require_once dirname(__FILE__).'/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
@@ -151,12 +153,12 @@ require_once dirname(__FILE__).'/testUrlUserPermissions.php';
 require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
-require_once dirname(__FILE__).'/dashboard/testCopyWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testGraphPrototypeWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDynamicItemWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testGraphWidget.php';
-require_once dirname(__FILE__).'/dashboard/testHostAvailabilityWidget.php';
-require_once dirname(__FILE__).'/dashboard/testProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -254,6 +256,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormItemTestTemplate');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
+		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormLowLevelDiscoveryPreprocessing');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
@@ -288,6 +291,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testMultiselect');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testTemplateInheritance');
+		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testTriggerDependencies');
 		$suite->addTestSuite('testTriggerExpressions');
 		$suite->addTestSuite('testUrlParameters');
@@ -295,12 +299,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testCopyWidgets');
-		$suite->addTestSuite('testGraphPrototypeWidget');
-		$suite->addTestSuite('testDynamicItemWidgets');
-		$suite->addTestSuite('testGraphWidget');
-		$suite->addTestSuite('testHostAvailabilityWidget');
-		$suite->addTestSuite('testProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardCopyWidgets');
+		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
+		$suite->addTestSuite('testDashboardDynamicItemWidgets');
+		$suite->addTestSuite('testDashboardGraphWidget');
+		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
+		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 
 		return $suite;
 	}

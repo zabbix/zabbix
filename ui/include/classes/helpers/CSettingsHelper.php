@@ -31,6 +31,7 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const DEFAULT_INVENTORY_MODE = 'default_inventory_mode';
 	public const DEFAULT_LANG = 'default_lang';
 	public const DEFAULT_THEME = 'default_theme';
+	public const DEFAULT_TIMEZONE = 'default_timezone';
 	public const DISCOVERY_GROUPID = 'discovery_groupid';
 	public const HISTORY_PERIOD = 'history_period';
 	public const IFRAME_SANDBOXING_ENABLED = 'iframe_sandboxing_enabled';
