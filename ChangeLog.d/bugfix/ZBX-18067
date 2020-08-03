@@ -1,1 +1,1 @@
-..F....... [ZBX-18067] fixed displaying of dynamic graph widgets for the selected host (kustalovs)
+..F....... [ZBX-18067] fixed using outdated dynamic host when editing dynamic widgets on dashboard (kustalovs)
