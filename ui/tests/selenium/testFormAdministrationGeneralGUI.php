@@ -331,6 +331,22 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
+						'Max history display period' => '99999999999999999999999999999999',
+						'Time filter default period' => '99999999999999999999999999999999',
+						'Max period' => '99999999999999999999999999999999'
+					],
+					'message' => 'Cannot update configuration',
+					'details' => [
+						'Incorrect value for field "history_period": value must be one of 86400-604800',
+						'Incorrect value for field "period_default": value must be one of 60-315360000.',
+						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
 						'Time filter default period' => '10y',
 						'Max period' => '5y'
 					],
