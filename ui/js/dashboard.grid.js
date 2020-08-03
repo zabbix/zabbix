@@ -1801,8 +1801,6 @@
 		child['uniqueid'] = generateUniqueId($obj, data);
 		child['div'] = makeWidgetDiv($obj, data, child);
 
-		updateWidgetDynamic($obj, data, child);
-
 		iterator['content_body'].append(child['div']);
 		iterator['children'].push(child);
 
@@ -2143,8 +2141,8 @@
 		if (typeof widget['fields'] !== 'undefined' && Object.keys(widget['fields']).length != 0) {
 			ajax_data['fields'] = JSON.stringify(widget['fields']);
 		}
-		if (widget['dynamic_hostid'] !== null) {
-			ajax_data['dynamic_hostid'] = widget['dynamic_hostid'];
+		if (data.dashboard.dynamic_hostid !== null) {
+			ajax_data['dynamic_hostid'] = data.dashboard.dynamic_hostid;
 		}
 
 		startPreloader(widget);
@@ -2406,7 +2404,6 @@
 
 					applyWidgetConfiguration($obj, data, widget, configuration);
 					doAction('afterUpdateWidgetConfig', $obj, data, null);
-					updateWidgetDynamic($obj, data, widget);
 
 					if (widget['iterator']) {
 						updateWidgetContent($obj, data, widget, {
@@ -3047,18 +3044,6 @@
 		}
 	}
 
-	function updateWidgetDynamic($obj, data, widget) {
-		// This function may be called for widget that is not in data['widgets'] array yet.
-		if (typeof widget['fields']['dynamic'] !== 'undefined') {
-			if (widget['fields']['dynamic'] == 1 && data['dashboard']['dynamic_hostid'] !== null) {
-				widget['dynamic_hostid'] = data['dashboard']['dynamic_hostid'];
-			}
-			else {
-				delete widget['dynamic_hostid'];
-			}
-		}
-	}
-
 	function generateUniqueId($obj, data) {
 		var ref = false;
 
@@ -3374,13 +3359,6 @@
 
 			$.each(data['widgets'], function(index, widget) {
 				if (widget.fields.dynamic && widget.fields.dynamic == 1) {
-					if (host !== null) {
-						widget.dynamic_hostid = host.id;
-					}
-					else {
-						delete widget.dynamic_hostid;
-					}
-
 					updateWidgetContent($this, data, widget);
 				}
 			});
@@ -3465,8 +3443,6 @@
 				widget_local['uniqueid'] = generateUniqueId($this, data);
 				widget_local['div'] = makeWidgetDiv($this, data, widget_local);
 				widget_local['div'].data('widget-index', data['widgets'].length);
-
-				updateWidgetDynamic($this, data, widget_local);
 
 				data['widgets'].push(widget_local);
 				$this.append(widget_local['div']);
