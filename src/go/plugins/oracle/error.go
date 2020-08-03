@@ -17,18 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package oracle
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"strings"
+)
+
+type zabbixError struct {
+	err string
+}
+
+func (e zabbixError) Error() string {
+	errText := e.err
+	if errText[len(errText)-1:] != "." {
+		errText += "."
+	}
+
+	return strings.Title(errText)
+}
+
+var (
+	errorInvalidParams     = zabbixError{"invalid parameters"}
+	errorTooManyParameters = zabbixError{"too many parameters"}
+	errorCannotFetchData   = zabbixError{"cannot fetch data"}
+	errorCannotParseData   = zabbixError{"cannot parse data"}
+	errorCannotMarshalJSON = zabbixError{"cannot marshal JSON"}
+	errorUnsupportedMetric = zabbixError{"unsupported metric"}
+	errorEmptyResult       = zabbixError{"empty result"}
+	errorUnknownSession    = zabbixError{"unknown session"}
 )

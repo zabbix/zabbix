@@ -17,18 +17,47 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package oracle
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+	"fmt"
 )
+
+const keyPDBDiscovery = "oracle.pdb.discovery"
+
+const PDBDiscoveryMaxParams = 0
+
+// PDBDiscoveryHandler TODO: add description.
+func PDBDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+	var lld string
+
+	if len(params) > PDBDiscoveryMaxParams {
+		return nil, errorTooManyParameters
+	}
+
+	row, err := conn.QueryRow(ctx, `
+		SELECT
+			JSON_ARRAYAGG(
+				JSON_OBJECT(
+					'{#DBNAME}' VALUE NAME
+				)
+			) LLD
+		FROM
+			V$PDBS
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+	}
+
+	err = row.Scan(&lld)
+	if err != nil {
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+	}
+
+	if lld == "" {
+		lld = "[]"
+	}
+
+	return lld, nil
+}

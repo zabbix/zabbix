@@ -17,18 +17,41 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package oracle
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+	"fmt"
 )
+
+const keySysParams = "oracle.sys.params"
+
+const sysParamsMaxParams = 0
+
+// sysParamsHandler TODO: add description.
+func sysParamsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+	var sysparams string
+
+	if len(params) > sysParamsMaxParams {
+		return nil, errorTooManyParameters
+	}
+
+	row, err := conn.QueryRow(ctx, `
+		SELECT
+			JSON_OBJECTAGG(v.NAME VALUE v.VALUE)
+		FROM
+			V$SYSTEM_PARAMETER v
+		WHERE
+			NAME IN ('sessions', 'processes', 'db_files')
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+	}
+
+	err = row.Scan(&sysparams)
+	if err != nil {
+		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
+	}
+
+	return sysparams, nil
+}

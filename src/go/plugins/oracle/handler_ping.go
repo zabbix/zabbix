@@ -17,18 +17,40 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package oracle
 
 import (
-	_ "zabbix.com/plugins/log"
-	_ "zabbix.com/plugins/memcached"
-	_ "zabbix.com/plugins/net/tcp"
-	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
-	_ "zabbix.com/plugins/redis"
-	_ "zabbix.com/plugins/systemrun"
-	_ "zabbix.com/plugins/web"
-	_ "zabbix.com/plugins/zabbix/async"
-	_ "zabbix.com/plugins/zabbix/stats"
-	_ "zabbix.com/plugins/zabbix/sync"
+	"context"
+	"fmt"
 )
+
+const (
+	pingFailed = 0
+	pingOk     = 1
+)
+
+const keyPing = "oracle.ping"
+
+const pingMaxParams = 0
+
+// pingHandler queries 'SELECT 1 FROM DUAL' and returns pingOk if a connection is alive or pingFailed otherwise.
+func pingHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+	var res int
+
+	if len(params) > pingMaxParams {
+		return nil, errorTooManyParameters
+	}
+
+	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d FROM DUAL", pingOk))
+	if err != nil {
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+	}
+
+	err = row.Scan(&res)
+
+	if err != nil || res != pingOk {
+		return pingFailed, nil
+	}
+
+	return pingOk, nil
+}
