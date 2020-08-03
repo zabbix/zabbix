@@ -828,7 +828,7 @@ zbx_db_tag_t;
 
 void	zbx_db_tag_free(zbx_db_tag_t *tag);
 
-ZBX_PTR_VECTOR_DECL(db_tag, zbx_db_tag_t *);
+ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *);
 
 typedef enum
 {
@@ -847,7 +847,7 @@ typedef struct
 	char			*delay;
 	char			*history;
 	char			*trends;
-	zbx_vector_db_tag_t	tags;
+	zbx_vector_db_tag_ptr_t	tags;
 	zbx_vector_uint64_t	templateids;
 	unsigned char		operationtype;
 	unsigned char		operator;

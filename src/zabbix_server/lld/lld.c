@@ -823,7 +823,7 @@ void	lld_override_item(const zbx_vector_ptr_t *overrides, const char *name, cons
 }
 
 void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, unsigned char *severity,
-		zbx_vector_db_tag_t *override_tags, unsigned char *status, unsigned char *discover)
+		zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status, unsigned char *discover)
 {
 	int	i, j, k;
 
@@ -861,7 +861,7 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 				*severity = override_operation->severity;
 
 			for (k = 0; k < override_operation->tags.values_num; k++)
-				zbx_vector_db_tag_append(override_tags, override_operation->tags.values[k]);
+				zbx_vector_db_tag_ptr_append(override_tags, override_operation->tags.values[k]);
 
 			if (NULL != status)
 			{
@@ -889,7 +889,7 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 }
 
 void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_vector_uint64_t *lnk_templateids,
-		char *inventory_mode, zbx_vector_db_tag_t *override_tags, unsigned char *status,
+		char *inventory_mode, zbx_vector_db_tag_ptr_t *override_tags, unsigned char *status,
 		unsigned char *discover)
 {
 	int	i, j, k;
@@ -931,7 +931,7 @@ void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_
 				*inventory_mode = override_operation->inventory_mode;
 
 			for (k = 0; k < override_operation->tags.values_num; k++)
-				zbx_vector_db_tag_append(override_tags, override_operation->tags.values[k]);
+				zbx_vector_db_tag_ptr_append(override_tags, override_operation->tags.values[k]);
 
 			if (NULL != status)
 			{

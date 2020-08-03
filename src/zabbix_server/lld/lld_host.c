@@ -143,7 +143,7 @@ typedef struct
 	zbx_vector_uint64_t	del_templateids;	/* templates which should be unlinked */
 	zbx_vector_ptr_t	new_hostmacros;		/* host macros which should be added, deleted or updated */
 	zbx_vector_ptr_t	interfaces;
-	zbx_vector_db_tag_t	tags;
+	zbx_vector_db_tag_ptr_t	tags;
 	char			*host_proto;
 	char			*host;
 	char			*host_orig;
@@ -189,8 +189,8 @@ static void	lld_host_free(zbx_lld_host_t *host)
 	zbx_vector_uint64_destroy(&host->del_templateids);
 	zbx_vector_ptr_clear_ext(&host->new_hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
 	zbx_vector_ptr_destroy(&host->new_hostmacros);
-	zbx_vector_db_tag_clear_ext(&host->tags, zbx_db_tag_free);
-	zbx_vector_db_tag_destroy(&host->tags);
+	zbx_vector_db_tag_ptr_clear_ext(&host->tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&host->tags);
 	zbx_vector_ptr_clear_ext(&host->interfaces, (zbx_clean_func_t)lld_interface_free);
 	zbx_vector_ptr_destroy(&host->interfaces);
 	zbx_free(host->host_proto);
@@ -251,7 +251,7 @@ typedef struct
 }
 zbx_lld_group_rights_t;
 
-static void	lld_host_add_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_t *tags,
+static void	lld_host_add_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
 		const zbx_vector_ptr_t *lld_macros);
 
 /******************************************************************************
@@ -345,7 +345,7 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		zbx_vector_uint64_create(&host->lnk_templateids);
 		zbx_vector_uint64_create(&host->del_templateids);
 		zbx_vector_ptr_create(&host->new_hostmacros);
-		zbx_vector_db_tag_create(&host->tags);
+		zbx_vector_db_tag_ptr_create(&host->tags);
 		zbx_vector_ptr_create(&host->interfaces);
 
 		zbx_vector_ptr_append(hosts, host);
@@ -636,7 +636,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	char			*buffer = NULL;
 	int			i;
 	zbx_lld_host_t		*host;
-	zbx_vector_db_tag_t	tags;
+	zbx_vector_db_tag_ptr_t	tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -655,7 +655,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			break;
 	}
 
-	zbx_vector_db_tag_create(&tags);
+	zbx_vector_db_tag_ptr_create(&tags);
 
 	if (i == hosts->values_num)	/* no host found */
 	{
@@ -694,7 +694,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			zbx_vector_uint64_create(&host->new_groupids);
 			zbx_vector_uint64_create(&host->del_templateids);
 			zbx_vector_ptr_create(&host->new_hostmacros);
-			zbx_vector_db_tag_create(&host->tags);
+			zbx_vector_db_tag_ptr_create(&host->tags);
 			zbx_vector_ptr_create(&host->interfaces);
 			host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
 
@@ -737,7 +737,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	host->jp_row = &lld_row->jp_row;
 	lld_host_add_tags(host, &tags, lld_macros);
 out:
-	zbx_vector_db_tag_destroy(&tags);
+	zbx_vector_db_tag_ptr_destroy(&tags);
 
 	zbx_free(buffer);
 
@@ -1944,7 +1944,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
  *             tags          - [OUT] list of host tags                        *
  *                                                                            *
  ******************************************************************************/
-static void	lld_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_t *tags)
+static void	lld_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr_t *tags)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1965,7 +1965,7 @@ static void	lld_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_t *tags)
 		tag->tag = zbx_strdup(NULL, row[0]);
 		tag->value = zbx_strdup(NULL, row[1]);
 
-		zbx_vector_db_tag_append(tags, tag);
+		zbx_vector_db_tag_ptr_append(tags, tag);
 	}
 	DBfree_result(result);
 
@@ -1978,7 +1978,7 @@ static void	lld_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_t *tags)
  * Function: lld_tag_make                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	lld_tag_make(zbx_vector_db_tag_t *tags, zbx_uint64_t tagid, const char *name, const char *value)
+static void	lld_tag_make(zbx_vector_db_tag_ptr_t *tags, zbx_uint64_t tagid, const char *name, const char *value)
 {
 	zbx_db_tag_t	*tag;
 	int		i;
@@ -2004,10 +2004,10 @@ static void	lld_tag_make(zbx_vector_db_tag_t *tags, zbx_uint64_t tagid, const ch
 	tag->value = NULL;
 	tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
 
-	zbx_vector_db_tag_append(tags, tag);
+	zbx_vector_db_tag_ptr_append(tags, tag);
 }
 
-static int	lld_tag_validate(const zbx_vector_db_tag_t *tags, const zbx_db_tag_t *tag)
+static int	lld_tag_validate(const zbx_vector_db_tag_ptr_t *tags, const zbx_db_tag_t *tag)
 {
 	int	i;
 
@@ -2027,12 +2027,12 @@ static int	lld_tag_validate(const zbx_vector_db_tag_t *tags, const zbx_db_tag_t 
  * Purpose: Add tags to a host                                                *
  *                                                                            *
  ******************************************************************************/
-static void	lld_host_add_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_t *tags,
+static void	lld_host_add_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
 		const zbx_vector_ptr_t *lld_macros)
 {
 	int	i;
 
-	zbx_vector_db_tag_reserve(&host->tags, host->tags.values_num + tags->values_num);
+	zbx_vector_db_tag_ptr_reserve(&host->tags, host->tags.values_num + tags->values_num);
 
 	for (i = 0; i < tags->values_num; i++)
 	{
@@ -2048,7 +2048,7 @@ static void	lld_host_add_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_t *t
 		substitute_lld_macros(&tag->value, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 
 		if (SUCCEED == lld_tag_validate(&host->tags, tag))
-			zbx_vector_db_tag_append(&host->tags, tag);
+			zbx_vector_db_tag_ptr_append(&host->tags, tag);
 		else
 			zbx_db_tag_free(tag);
 	}
@@ -2059,7 +2059,7 @@ static void	lld_host_add_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_t *t
  * Function: lld_tags_make                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	lld_tags_make(const zbx_vector_db_tag_t *tags, zbx_vector_ptr_t *hosts,
+static void	lld_tags_make(const zbx_vector_db_tag_ptr_t *tags, zbx_vector_ptr_t *hosts,
 		const zbx_vector_ptr_t *lld_macros)
 {
 	DB_RESULT		result;
@@ -3809,7 +3809,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	hosts, group_prototypes, groups, interfaces, masterhostmacros, hostmacros;
-	zbx_vector_db_tag_t	tags;
+	zbx_vector_db_tag_ptr_t	tags;
 	zbx_vector_uint64_t	groupids;		/* list of host groups which should be added */
 	zbx_vector_uint64_t	del_hostgroupids;	/* list of host groups which should be deleted */
 	zbx_uint64_t		proxy_hostid;
@@ -3859,7 +3859,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_vector_ptr_create(&interfaces);
 	zbx_vector_ptr_create(&masterhostmacros);
 	zbx_vector_ptr_create(&hostmacros);
-	zbx_vector_db_tag_create(&tags);
+	zbx_vector_db_tag_ptr_create(&tags);
 
 	lld_interfaces_get(lld_ruleid, &interfaces);
 	lld_masterhostmacros_get(lld_ruleid, &masterhostmacros);
@@ -3941,7 +3941,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		lld_hosts_remove(&hosts, lifetime, lastcheck);
 		lld_groups_remove(&groups, lifetime, lastcheck);
 
-		zbx_vector_db_tag_clear_ext(&tags, zbx_db_tag_free);
+		zbx_vector_db_tag_ptr_clear_ext(&tags, zbx_db_tag_free);
 		zbx_vector_ptr_clear_ext(&hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
 		zbx_vector_ptr_clear_ext(&groups, (zbx_clean_func_t)lld_group_free);
 		zbx_vector_ptr_clear_ext(&group_prototypes, (zbx_clean_func_t)lld_group_prototype_free);
@@ -3955,8 +3955,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_vector_ptr_clear_ext(&masterhostmacros, (zbx_clean_func_t)lld_hostmacro_free);
 	zbx_vector_ptr_clear_ext(&interfaces, (zbx_clean_func_t)lld_interface_free);
 
-	zbx_vector_db_tag_clear_ext(&tags, zbx_db_tag_free);
-	zbx_vector_db_tag_destroy(&tags);
+	zbx_vector_db_tag_ptr_clear_ext(&tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&tags);
 	zbx_vector_ptr_destroy(&hostmacros);
 	zbx_vector_ptr_destroy(&masterhostmacros);
 	zbx_vector_ptr_destroy(&interfaces);

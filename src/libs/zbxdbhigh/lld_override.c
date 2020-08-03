@@ -24,8 +24,8 @@
 
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)
 {
-	zbx_vector_db_tag_clear_ext(&override_operation->tags, zbx_db_tag_free);
-	zbx_vector_db_tag_destroy(&override_operation->tags);
+	zbx_vector_db_tag_ptr_clear_ext(&override_operation->tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&override_operation->tags);
 
 	zbx_vector_uint64_destroy(&override_operation->templateids);
 
@@ -97,7 +97,7 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 		tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
 		tag->tag = zbx_strdup(NULL, row[1]);
 		tag->value = zbx_strdup(NULL, row[2]);
-		zbx_vector_db_tag_append(&op->tags, tag);
+		zbx_vector_db_tag_ptr_append(&op->tags, tag);
 	}
 	DBfree_result(result);
 
@@ -230,7 +230,7 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 
 		ZBX_STR2UINT64(override_operation->overrideid, row[0]);
 
-		zbx_vector_db_tag_create(&override_operation->tags);
+		zbx_vector_db_tag_ptr_create(&override_operation->tags);
 		zbx_vector_uint64_create(&override_operation->templateids);
 
 		ZBX_STR2UINT64(override_operation->override_operationid, row[1]);

@@ -68,7 +68,7 @@ typedef struct
 	zbx_vector_ptr_t	dependencies;
 	zbx_vector_ptr_t	dependents;
 	zbx_vector_ptr_t	tags;
-	zbx_vector_db_tag_t	override_tags;
+	zbx_vector_db_tag_ptr_t	override_tags;
 #define ZBX_FLAG_LLD_TRIGGER_UNSET			__UINT64_C(0x0000)
 #define ZBX_FLAG_LLD_TRIGGER_DISCOVERED			__UINT64_C(0x0001)
 #define ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION		__UINT64_C(0x0002)
@@ -256,7 +256,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 {
 	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)lld_tag_free);
-	zbx_vector_db_tag_destroy(&trigger->override_tags);
+	zbx_vector_db_tag_ptr_destroy(&trigger->override_tags);
 	zbx_vector_ptr_destroy(&trigger->tags);
 	zbx_vector_ptr_destroy(&trigger->dependents);
 	zbx_vector_ptr_clear_ext(&trigger->dependencies, zbx_ptr_free);
@@ -452,7 +452,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		zbx_vector_ptr_create(&trigger->dependencies);
 		zbx_vector_ptr_create(&trigger->dependents);
 		zbx_vector_ptr_create(&trigger->tags);
-		zbx_vector_db_tag_create(&trigger->override_tags);
+		zbx_vector_db_tag_ptr_create(&trigger->override_tags);
 
 		zbx_vector_ptr_append(triggers, trigger);
 	}
@@ -1325,14 +1325,14 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger->status = trigger_prototype->status;
 		trigger->priority = trigger_prototype->priority;
 
-		zbx_vector_db_tag_create(&trigger->override_tags);
+		zbx_vector_db_tag_ptr_create(&trigger->override_tags);
 
 		lld_override_trigger(&lld_row->overrides, trigger->description, &trigger->priority,
 				&trigger->override_tags, &trigger->status, &discover);
 
 		if (ZBX_PROTOTYPE_NO_DISCOVER == discover)
 		{
-			zbx_vector_db_tag_destroy(&trigger->override_tags);
+			zbx_vector_db_tag_ptr_destroy(&trigger->override_tags);
 			zbx_free(trigger->description);
 			zbx_free(trigger);
 			goto out;
@@ -1700,7 +1700,7 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 	if (NULL == (trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links)))
 		goto out;
 
-	zbx_vector_db_tag_sort(&trigger->override_tags, db_tag_compare_func);
+	zbx_vector_db_tag_ptr_sort(&trigger->override_tags, db_tag_compare_func);
 
 	for (i = 0; i < trigger_prototype->tags.values_num + trigger->override_tags.values_num; i++)
 	{
@@ -2089,7 +2089,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			zbx_vector_ptr_create(&db_trigger->dependencies);
 			zbx_vector_ptr_create(&db_trigger->dependents);
 			zbx_vector_ptr_create(&db_trigger->tags);
-			zbx_vector_db_tag_create(&db_trigger->override_tags);
+			zbx_vector_db_tag_ptr_create(&db_trigger->override_tags);
 
 			zbx_vector_ptr_append(&db_triggers, db_trigger);
 		}
