@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.0
+For Zabbix version: 5.0  
 The template is developed for monitoring DBMS Oracle Database single instance via ODBC.
 
 This template was tested on:
@@ -58,12 +58,15 @@ DSN = $ORACLE.DSN
 isql $TNS_NAME $DB_USER $DB_PASSWORD
 ```
 
-5. If result succesful (fix the mistakes in odbc.ini if not), configure zabbix-server for Oracle ENV Usage or zabbix-proxy if you use proxy for Oracle DB monitoring
+5. Сonfigure zabbix-serve or zabbix-proxy for Oracle ENV Usage. Edit or add new file:
+
    Edit or add new file
 
    /etc/sysconfig/zabbix-server # for server
+
    /etc/sysconfig/zabbix-proxy # for proxy
-   Add
+
+   Then, add:
    ```
    export ORACLE_HOME=/usr/lib/oracle/19.6/client64
    export PATH=$PATH:$ORACLE_HOME/bin
@@ -218,7 +221,7 @@ There are no template links in this template.
 |Zabbix_raw_items |Oracle: Get CDB and No-CDB info |<p>Get info about CDB and  No-CDB databases on instansce.</p> |ODBC |db.odbc.get[get_cdb_info,"{$ORACLE.DSN}"]<p>**Expression**:</p>`SELECT name as DBNAME, DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode, DECODE(database_role, 'SNAPSHOT STANDBY', 1, 'LOGICAL STANDBY', 2, 'PHYSICAL STANDBY', 3, 'PRIMARY', 4, 'FAR SYNC', 5, 0) AS ROLE, DECODE(force_logging, 'YES',1,'NO',0,0) AS force_logging, DECODE(log_mode, 'MANUAL',2 ,'ARCHIVELOG',1,'NOARCHIVELOG',0,0) AS log_mode FROM v$database ` |
 |Zabbix_raw_items |Oracle: Get PDB info |<p>Get info about PDB databases on instansce.</p> |ODBC |db.odbc.get[get_pdb_info,"{$ORACLE.DSN}"]<p>**Expression**:</p>`SELECT name as DBNAME, DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode FROM v$pdbs; ` |
 |Zabbix_raw_items |Oracle: Get archive log info | |ODBC |db.odbc.get[get_archivelog_stat,"{$ORACLE.DSN}"]<p>**Expression**:</p>`SELECT d.dest_name, DECODE (d.status, 'VALID',3, 'DEFERRED', 2, 'ERROR', 1, 0) AS status, d.log_sequence, d.error FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG'; ` |
-|Zabbix_raw_items |Oracle: Get ASM stats |<p>Get ASM disk groups stats.</p> |ODBC |db.odbc.get[get_asm_stat,"{$ORACLE.DSN}"]<p>**Expression**:</p>`SELECT name AS dg_name, ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024) AS size_byte, ROUND(usable_file_mb *1024 ) AS free_size_byte, ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent FROM v$asm_diskgroup ; ` |
+|Zabbix_raw_items |Oracle: Get ASM stats |<p>Get ASM disk groups stats.</p> |ODBC |db.odbc.get[get_asm_stat,"{$ORACLE.DSN}"]<p>**Expression**:</p>`SELECT name AS dg_name, ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024*1024) AS size_byte, ROUND(usable_file_mb*1024*1024 ) AS free_size_byte, ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent FROM v$asm_diskgroup ; ` |
 
 ## Triggers
 
