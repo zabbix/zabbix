@@ -2071,6 +2071,9 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->calcDimentions();
 
 		$this->selectData();
+		if (hasErrorMesssages()) {
+			show_messages();
+		}
 
 		$this->calcVerticalScale();
 		$this->calcPercentile();
