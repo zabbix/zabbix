@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  * @backup widget
  * @backup profiles
  */
-class testHostAvailabilityWidget extends CWebTest {
+class testDashboardHostAvailabilityWidget extends CWebTest {
 
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -266,7 +266,7 @@ class testHostAvailabilityWidget extends CWebTest {
 	/**
 	 * @dataProvider getCreateWidgetData
 	 */
-	public function testHostAvailabilityWidget_Create($data) {
+	public function testDashboardHostAvailabilityWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -454,7 +454,7 @@ class testHostAvailabilityWidget extends CWebTest {
 	 * @backup widget
 	 * @dataProvider getUpdateWidgetData
 	 */
-	public function testHostAvailabilityWidget_Update($data) {
+	public function testDashboardHostAvailabilityWidget_Update($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference HA widget')->edit();
@@ -477,7 +477,7 @@ class testHostAvailabilityWidget extends CWebTest {
 		$this->checkWidgetContent($data, $header);
 	}
 
-	public function testHostAvailabilityWidget_SimpleUpdate() {
+	public function testDashboardHostAvailabilityWidget_SimpleUpdate() {
 		$initial_values = CDBHelper::getHash($this->sql);
 
 		// Open a dashboard widget and then save it without applying any changes
@@ -532,7 +532,7 @@ class testHostAvailabilityWidget extends CWebTest {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testHostAvailabilityWidget_Cancel($data) {
+	public function testDashboardHostAvailabilityWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
@@ -587,7 +587,7 @@ class testHostAvailabilityWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testHostAvailabilityWidget_Delete() {
+	public function testDashboardHostAvailabilityWidget_Delete() {
 		$name = 'Reference HA widget to delete';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');

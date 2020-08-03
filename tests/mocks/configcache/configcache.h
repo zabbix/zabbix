@@ -17,19 +17,40 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package tcpudp
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
 
-import (
-	"errors"
+#include "zbxserver.h"
+#include "common.h"
+#include "zbxalgo.h"
+#include "dbcache.h"
+#include "mutexs.h"
 
-	"zabbix.com/pkg/plugin"
-)
+#define ZBX_DBCONFIG_IMPL
+#include "dbconfig.h"
 
-func exportSystemTcpListen(port uint16) (result interface{}, err error) {
-	return nil, errors.New("Not supported.")
+#include "configcache_mock.h"
+
+#ifndef ZABBIX_CONFIGCACHE_H
+#define ZABBIX_CONFIGCACHE_H
+
+typedef struct
+{
+	ZBX_DC_CONFIG		dc;
+	zbx_vector_ptr_t	host_macros;
+	zbx_vector_ptr_t	global_macros;
+	zbx_vector_ptr_t	hosts;
+
+	zbx_uint64_t		initialized;
+
 }
+zbx_mock_config_t;
 
-func init() {
-	plugin.RegisterMetrics(&impl, "TCP",
-		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.")
-}
+#define ZBX_MOCK_CONFIG_USERMACROS	0x0001
+#define ZBX_MOCK_CONFIG_HOSTS		0x0002
+
+void	free_string(const char *str);
+
+#endif

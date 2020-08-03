@@ -156,12 +156,31 @@ class CElementQuery implements IWaitable {
 		}
 
 		if ($locator === null) {
-			$parts = explode(':', $type, 2);
-			if (count($parts) !== 2) {
-				throw new Exception('Element selector "'.$type.'" is not well formatted.');
+			if (!is_array($type)) {
+				$parts = explode(':', $type, 2);
+				if (count($parts) !== 2) {
+					throw new Exception('Element selector "'.$selector.'" is not well formatted.');
+				}
+
+				list($type, $locator) = $parts;
+			}
+			else {
+				$selectors = [];
+				foreach ($type as $selector) {
+					$selectors[] = './/'.CXPathHelper::fromSelector($selector);
+				}
+
+				$type = 'xpath';
+				$locator = implode('|', $selectors);
+			}
+		}
+		else if (is_array($locator)) {
+			foreach ($locator as $selector) {
+				$selectors[] = './/'.CXPathHelper::fromSelector($type, $selector);
 			}
 
-			list($type, $locator) = $parts;
+			$type = 'xpath';
+			$locator = implode('|', $selectors);
 		}
 
 		$mapping = [
@@ -170,7 +189,7 @@ class CElementQuery implements IWaitable {
 			'tag' => 'tagName',
 			'link' => 'linkText',
 			'button' => function () use ($locator) {
-				return WebDriverBy::xpath('.//button[contains(text(),'.CXPathHelper::escapeQuotes($locator).')]');
+				return WebDriverBy::xpath('.//button[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
 			}
 		];
 
@@ -484,7 +503,8 @@ class CElementQuery implements IWaitable {
 	public static function getInputElement($target, $prefix = './', $class = null) {
 		$classes = [
 			'CElement'					=> [
-				'/input[@name][not(@type) or @type="text" or @type="password"]',
+				// TODO: change after DEV-1630 (1) is resolved.
+				'/input[@name][not(@type) or @type="text" or @type="password"][not(@style) or not(contains(@style,"display: none"))]',
 				'/textarea[@name]'
 			],
 			'CDropdownElement'			=> '/select[@name]',
@@ -501,8 +521,9 @@ class CElementQuery implements IWaitable {
 				'/ul[contains(@class, "checkbox-list")]',
 				'/ul[contains(@class, "list-check-radio")]'
 			],
-			'CTableElement'				=> [
+			'CMultifieldTableElement'	=> [
 				'/table',
+				'/div/table', // TODO: remove after fix DEV-1071.
 				'/*[contains(@class, "table-forms-separator")]/table'
 			],
 			'CCompositeInputElement'	=> [

@@ -119,6 +119,16 @@ zbx_vmware_datastore_t;
 int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
 
+typedef struct
+{
+	char			*name;
+	char			*id;
+}
+zbx_vmware_datacenter_t;
+
+int	vmware_dc_name_compare(const void *d1, const void *d2);
+ZBX_PTR_VECTOR_DECL(vmware_datacenter, zbx_vmware_datacenter_t *)
+
 #define ZBX_VMWARE_DEV_TYPE_NIC		1
 #define ZBX_VMWARE_DEV_TYPE_DISK	2
 typedef struct
@@ -210,6 +220,7 @@ typedef struct
 	zbx_vector_ptr_t		events;			/* vector of pointers to zbx_vmware_event_t structures */
 	int				max_query_metrics;	/* max count of Datastore perfCounters in one request */
 	zbx_vector_vmware_datastore_t	datastores;
+	zbx_vector_vmware_datacenter_t	datacenters;
 }
 zbx_vmware_data_t;
 
