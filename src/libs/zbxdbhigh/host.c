@@ -3381,8 +3381,9 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
  *                                                                            *
  * Parameters: host_prototypes        - [IN/OUT] list of host prototypes      *
  *                                      should be sorted by templateid        *
- *             del_group_prototypeids - [OUT] list of group_prototypeid which *
- *                                      should be deleted                     *
+ *             del_group_prototypeids - [OUT] sorted list of                  *
+ *                                      group_prototypeid which should be     *
+ *                                      deleted                               *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
@@ -3668,7 +3669,7 @@ static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces,
  *                                                                            *
  * Parameters: host_prototypes - [IN/OUT] list of host prototypes             *
  *                                   should be sorted by templateid           *
- *             del_macroids    - [OUT] list of host macroids which            *
+ *             del_macroids    - [OUT] sorted list of host macroids which     *
  *                                   should be deleted                        *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
@@ -3804,10 +3805,11 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
  *                                                                            *
  * Parameters: host_prototypes       - [IN/OUT] list of host prototypes       *
  *                                         should be sorted by templateid     *
- *             del_interfaceids      - [OUT] list of host interface ids which *
- *                                         should be deleted                  *
- *             del_snmp_interfaceids - [OUT] list of host snmp interface ids  *
- *                                         which should be deleted            *
+ *             del_interfaceids      - [OUT] sorted list of host interface    *
+ *                                         ids which should be deleted        *
+ *             del_snmp_interfaceids - [OUT] sorted list of host snmp         *
+ *                                         interface ids which should be      *
+ *                                         deleted                            *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
@@ -3984,6 +3986,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 	}
 
 	zbx_vector_uint64_sort(del_interfaceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(del_snmp_interfaceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
