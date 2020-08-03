@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/behaviors/MessageBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup config
@@ -238,8 +238,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Limit for search and filter results' => '999999',
 						'Max number of columns and rows in overview tables' => '999999',
 						'Max count of elements to show inside table cell' => '99999',
-						// TODO
-//						'Working time' => '{$WORKING_HOURS}',
+						'Working time' => '{$WORKING_HOURS}',
 						// Maximal valid time in years.
 						'Time filter default period' => '10y',
 						'Max period' => '10y'
@@ -481,10 +480,12 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default);
+		// Fill form with new data.
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
+		// Check saved configuration.
 		$this->page->open('zabbix.php?action=gui.edit');
 		$form->invalidate();
 		$values = CTestArrayHelper::get($data, 'expected') === TEST_GOOD
