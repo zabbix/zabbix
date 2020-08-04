@@ -47,7 +47,7 @@ var (
 	svcStopFlag          bool
 	svcMultipleAgentFlag bool
 
-	isInteractive bool
+	winServiceRun bool
 
 	eLog *eventlog.Log
 
@@ -103,7 +103,7 @@ func isWinService() bool {
 }
 
 func closeOSSpecificItems() {
-	if !isInteractive {
+	if winServiceRun {
 		sendWinServiceFatalStopSig()
 	}
 	closeEventLog()
@@ -205,13 +205,7 @@ func handleWindowsService(conf string) error {
 		os.Exit(0)
 	}
 
-	if isInteractive, err = isInteractiveSession(); err != nil {
-		return fmt.Errorf("can not determine if is interactive session: %s", err)
-	}
-
-	if !isInteractive {
-		go runService()
-	}
+	go runService()
 
 	return nil
 }
@@ -396,20 +390,23 @@ func svcStop() error {
 }
 
 func confirmWinService() {
-	if !isInteractive {
+	if winServiceRun {
 		startChan <- true
 	}
 }
 
 func closeWinService() {
-	if !isInteractive {
+	if winServiceRun {
 		winServiceWg.Done()
+		<-closeChan
 	}
 }
 
 func runService() {
+	winServiceRun = true
 	if err := svc.Run(serviceName, &winService{}); err != nil {
-		fatalExit("", err)
+		winServiceRun = false
+		return
 	}
 }
 
@@ -443,5 +440,6 @@ loop:
 	closeChan <- true
 	winServiceWg.Wait()
 	changes <- svc.Status{State: svc.StopPending}
+	closeChan <- true
 	return
 }
