@@ -3183,10 +3183,10 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		zbx_vector_interfaces_create(&host_prototype->interfaces);
 		host_prototype->host = zbx_strdup(NULL, row[2]);
 		host_prototype->name = zbx_strdup(NULL, row[3]);
-		host_prototype->status = (unsigned char)atoi(row[4]);
+		ZBX_STR2UCHAR(host_prototype->status, row[4]);
 		host_prototype->flags = 0;
-		host_prototype->discover = (unsigned char)atoi(row[5]);
-		host_prototype->custom_interfaces = (unsigned char)atoi(row[6]);
+		ZBX_STR2UCHAR(host_prototype->discover, row[5]);
+		ZBX_STR2UCHAR(host_prototype->custom_interfaces, row[6]);
 
 		zbx_vector_ptr_append(host_prototypes, host_prototype);
 		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
