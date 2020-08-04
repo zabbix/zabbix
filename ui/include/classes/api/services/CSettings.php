@@ -94,13 +94,13 @@ class CSettings extends CApiService {
 		$upd_config = [];
 
 		// strings
-		$field_names = ['default_theme', 'default_timezone', 'work_period', 'history_period', 'period_default', 'max_period',
+		$field_names = ['default_theme', 'work_period', 'history_period', 'period_default', 'max_period',
 			'severity_color_0', 'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4',
 			'severity_color_5', 'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3',
 			'severity_name_4', 'severity_name_5', 'ok_period', 'blink_period', 'problem_unack_color',
-			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'refresh_unsupported', 'default_lang', 'login_block',
-			'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_exceptions', 'connect_timeout', 'socket_timeout',
-			'media_type_test_timeout', 'script_timeout', 'item_test_timeout'
+			'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'refresh_unsupported', 'default_lang',
+			'default_timezone', 'login_block', 'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_exceptions',
+			'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout', 'item_test_timeout'
 		];
 		foreach ($field_names as $field_name) {
 			if (array_key_exists($field_name, $settings) && $settings[$field_name] !== $db_settings[$field_name]) {
@@ -152,7 +152,6 @@ class CSettings extends CApiService {
 	protected function validateUpdate(array $settings): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'default_theme' =>					['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(APP::getThemes()))],
-			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', DateTimeZone::listIdentifiers())],
 			'search_limit' =>					['type' => API_INT32, 'in' => '1:999999'],
 			'max_in_table' =>					['type' => API_INT32, 'in' => '1:99999'],
 			'server_check_interval' =>			['type' => API_INT32, 'in' => '0,'.SERVER_CHECK_INTERVAL],
@@ -190,6 +189,7 @@ class CSettings extends CApiService {
 			'alert_usrgrpid' =>					['type' => API_ID, 'flags' => API_ALLOW_NULL],
 			'snmptrap_logging' =>				['type' => API_INT32, 'in' => '0,1'],
 			'default_lang' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'default_lang')],
+			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', DateTimeZone::listIdentifiers())],
 			'login_attempts' =>					['type' => API_INT32, 'in' => '1:32'],
 			'login_block' =>					['type' => API_TIME_UNIT, 'in' => implode(':', [30, SEC_PER_HOUR])],
 			'validate_uri_schemes' =>			['type' => API_INT32, 'in' => '0,1'],
