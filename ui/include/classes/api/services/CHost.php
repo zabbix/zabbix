@@ -575,7 +575,7 @@ class CHost extends CHostGeneral {
 
 		// Return count or grouped counts via direct SQL count.
 		if ($options['countOutput'] && !$this->requiresPostSqlFiltering($options)) {
-			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $options['limit']);
+			$res = DBselect(self::createSelectQueryFromParts($sqlParts), $options['limit']);
 			while ($host = DBfetch($res)) {
 				if ($options['groupCount']) {
 					$result[] = $host;
@@ -588,7 +588,7 @@ class CHost extends CHostGeneral {
 			return $result;
 		}
 
-		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'hostid');
+		$result = zbx_toHash($this->customFetch(self::createSelectQueryFromParts($sqlParts), $options), 'hostid');
 
 		// Return count for post SQL filtered result sets.
 		if ($options['countOutput']) {

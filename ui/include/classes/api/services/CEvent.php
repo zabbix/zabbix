@@ -475,7 +475,7 @@ class CEvent extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($event = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -1061,7 +1061,7 @@ class CEvent extends CApiService {
 				]);
 				$sqlParts['order'][] = 'a.clock DESC';
 
-				$acknowledges = DBFetchArrayAssoc(DBselect($this->createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
+				$acknowledges = DBFetchArrayAssoc(DBselect(self::createSelectQueryFromParts($sqlParts)), 'acknowledgeid');
 
 				// if the user data is requested via extended output or specified fields, join the users table
 				$userFields = ['alias', 'name', 'surname'];

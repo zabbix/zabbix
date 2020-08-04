@@ -373,7 +373,7 @@ class CApiService {
 	protected function createSelectQuery($tableName, array $options) {
 		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias(), $options);
 
-		return $this->createSelectQueryFromParts($sqlParts);
+		return self::createSelectQueryFromParts($sqlParts);
 	}
 
 	/**
@@ -417,7 +417,7 @@ class CApiService {
 	 *
 	 * @return string			The resulting SQL query
 	 */
-	protected function createSelectQueryFromParts(array $sqlParts) {
+	protected static function createSelectQueryFromParts(array $sqlParts) {
 		$sql_left_join = '';
 		if (array_key_exists('left_join', $sqlParts)) {
 			foreach ($sqlParts['left_join'] as $join) {
