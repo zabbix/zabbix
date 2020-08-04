@@ -1,4 +1,5 @@
-<?php
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -18,25 +19,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+package tcpudp
 
-class CControllerPopupActionAcknowledge extends CControllerPopupOperationCommon {
+import (
+	"errors"
 
-	protected function getCheckInputs() {
-		return [
-			'type' =>			'required|in '.ACTION_ACKNOWLEDGE_OPERATION,
-			'source' =>			'required|in '.EVENT_SOURCE_TRIGGERS,
-			'operationtype' =>	'in '.implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]),
-			'actionid' =>		'string',
-			'update' =>			'in 1',
-			'validate' =>		'in 1',
-			'operation' =>		'array'
-		];
-	}
+	"zabbix.com/pkg/plugin"
+)
 
-	protected function getFormDetails() {
-		return [
-			'param' => 'add_ack_operation',
-			'input_name' => 'new_ack_operation'
-		];
-	}
+func exportSystemTcpListen(port uint16) (result interface{}, err error) {
+	return nil, errors.New("Not supported.")
+}
+
+func init() {
+	plugin.RegisterMetrics(&impl, "TCP",
+		"net.tcp.port", "Checks if it is possible to make TCP connection to specified port.",
+		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
+		"net.tcp.service.perf", "Checks performance of TCP service.")
 }

@@ -150,9 +150,10 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 	/* copy the remaining part */
 	zbx_strcpy_alloc(&tmp_exp, &exp_alloc, &exp_offset, e);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __func__, exp->exp);
+	exp->exp = tmp_exp;
+	tmp_exp = NULL;
 
-	exp->exp = zbx_dc_expand_user_macros_in_expression(tmp_exp, &dc_item->host.hostid, 1);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __func__, exp->exp);
 
 	ret = SUCCEED;
 out:
@@ -344,17 +345,6 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_DBL, __func__, value);
-
-	if (ITEM_VALUE_TYPE_UINT64 == dc_item->value_type && 0 > value)
-	{
-		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
-
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [%s] is not suitable for value type [%s].",
-				zbx_print_double(buffer, sizeof(buffer), value),
-				zbx_item_value_type_string((zbx_item_value_type_t)dc_item->value_type)));
-		ret = NOTSUPPORTED;
-		goto clean;
-	}
 
 	SET_DBL_RESULT(result, value);
 clean:

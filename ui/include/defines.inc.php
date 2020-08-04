@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.2rc1');
-define('ZABBIX_API_VERSION',	'5.0.2');
+define('ZABBIX_VERSION',		'5.0.3rc1');
+define('ZABBIX_API_VERSION',	'5.0.3');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -145,10 +145,14 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
-// Default db and field character set
+// Default db and field character set (MYSQL & POSTGRESQL)
 define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
 define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+
+// Default db defines for Oracle DB
 define('ORACLE_MAX_STRING_SIZE', 4000);
+define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
+define('ORACLE_CESU8_CHARSET', 'UTF8');
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
@@ -1373,7 +1377,8 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
-define('ZBX_MACRO_SECRET_MASK', '******'); // Placeholder for masked macro value.
+
+define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Layout
 define('ZBX_LAYOUT_NORMAL',     0);
@@ -1675,6 +1680,7 @@ define('ZBX_STYLE_HEADER_CONTROLS', 'header-controls');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
+define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');

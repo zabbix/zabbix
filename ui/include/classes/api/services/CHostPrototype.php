@@ -171,7 +171,7 @@ class CHostPrototype extends CHostBase {
 				' FROM items i,host_discovery hd,hosts h'.
 				' WHERE i.itemid=hd.parent_itemid'.
 					' AND hd.hostid=h.hostid'.
-					' AND '.implode(' OR ', $sql_where),
+					' AND ('.implode(' OR ', $sql_where).')',
 				1
 		));
 

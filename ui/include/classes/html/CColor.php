@@ -28,18 +28,21 @@ class CColor extends CDiv {
 	private $is_enabled = true;
 	private $is_required = false;
 	private $append_color_picker_js = true;
+	private $input_id;
 
 	/**
 	 * Creates a color picker form element.
 	 *
-	 * @param string $name	Color picker field name.
-	 * @param string $value Color value in HEX RGB format.
+	 * @param string $name        Color picker field name.
+	 * @param string $value       Color value in HEX RGB format.
+	 * @param string $input_id    (optional) Color input field id.
 	 */
-	public function __construct($name, $value) {
+	public function __construct($name, $value, $input_id = null) {
 		parent::__construct();
 
 		$this->name = $name;
 		$this->value = $value;
+		$this->input_id = $input_id;
 	}
 
 	/**
@@ -92,13 +95,17 @@ class CColor extends CDiv {
 	public function toString($destroy = true) {
 		$this->cleanItems();
 
-		$this->addItem(
-			(new CTextBox($this->name, $this->value))
-				->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
-				->setAttribute('maxlength', self::MAX_LENGTH)
-				->setEnabled($this->is_enabled)
-				->setAriaRequired($this->is_required)
-		);
+		$input = (new CTextBox($this->name, $this->value))
+			->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
+			->setAttribute('maxlength', self::MAX_LENGTH)
+			->setEnabled($this->is_enabled)
+			->setAriaRequired($this->is_required);
+
+		if ($this->input_id !== null) {
+			$input->setId($this->input_id);
+		}
+
+		$this->addItem($input);
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
