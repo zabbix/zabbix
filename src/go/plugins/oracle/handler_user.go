@@ -21,44 +21,48 @@ package oracle
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 )
 
-const keyDatabasesDiscovery = "oracle.db.discovery"
+const keyUser = "oracle.user.info"
 
-const databasesDiscoveryMaxParams = 0
+const userMaxParams = 1
 
-// databasesDiscoveryHandler TODO: add description.
-func databasesDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	var lld string
+// UserHandler TODO: add description.
+func UserHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+	var userinfo string
+	username := conn.WhoAmI()
 
-	if len(params) > databasesDiscoveryMaxParams {
+	if len(params) > userMaxParams {
 		return nil, errorTooManyParameters
+	}
+
+	if len(params) == 1 {
+		username = params[0]
 	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(
-					'{#DBNAME}' VALUE NAME, 
-					'{#TYPE}'   VALUE DECODE(CDB, 'YES', 'CDB', 'No-CDB')
-				)
-			) LLD
+			JSON_OBJECT('exp_passwd_days_before' VALUE 
+				ROUND(DECODE(SIGN(NVL(EXPIRY_DATE, SYSDATE + 999) - SYSDATE), -1, 0, NVL(EXPIRY_DATE, SYSDATE + 999) - SYSDATE))
+			)
 		FROM
-			V$DATABASE
-	`)
+			DBA_USERS	
+		WHERE 
+			USERNAME = UPPER(:1)
+	`, username)
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
-	err = row.Scan(&lld)
+	err = row.Scan(&userinfo)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("%w (%s)", errorEmptyResult, err.Error())
+		}
+		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
 	}
 
-	if lld == "" {
-		lld = "[]"
-	}
-
-	return lld, nil
+	return userinfo, nil
 }

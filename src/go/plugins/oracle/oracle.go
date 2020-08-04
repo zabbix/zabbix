@@ -143,18 +143,22 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		handleMetric = pingHandler
 	case keyProc:
 		handleMetric = ProcHandler
+	case keyRedoLog:
+		handleMetric = RedoLogHandler
 	case keySGA:
 		handleMetric = SGAHandler
 	case keySessions:
 		handleMetric = sessionsHandler
 	case keySysMetrics:
-		handleMetric = sysMetricsHandler
+		handleMetric = sysMetricsHandler // oracle.sys.metrics[<commonParams>[,duration]]
 	case keySysParams:
 		handleMetric = sysParamsHandler
 	case keyTablespaces:
 		handleMetric = tablespacesHandler
 	case keyTablespacesDiscovery:
 		handleMetric = tablespacesDiscoveryHandler
+	case keyUser:
+		handleMetric = UserHandler
 
 	default:
 		return nil, errorUnsupportedMetric
@@ -239,10 +243,12 @@ func init() {
 		keyPGA, "Returns PGA statistics.",
 		keyPing, "Tests if connection is alive or not.",
 		keyProc, "Returns processes statistics.",
+		keyRedoLog, "Returns log file information from the control file.",
 		keySGA, "Returns SGA statistics.",
 		keySessions, "Returns sessions statistics.",
 		keySysMetrics, "Returns a set of system metric values.",
 		keySysParams, "Returns a set of system parameter values.",
 		keyTablespaces, "Returns tablespaces statistics.",
-		keyTablespacesDiscovery, "Returns list of tablespaces in LLD format.")
+		keyTablespacesDiscovery, "Returns list of tablespaces in LLD format.",
+		keyUser, "Returns user information.")
 }

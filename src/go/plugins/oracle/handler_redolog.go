@@ -24,41 +24,34 @@ import (
 	"fmt"
 )
 
-const keyDatabasesDiscovery = "oracle.db.discovery"
+const keyRedoLog = "oracle.redolog.info"
 
-const databasesDiscoveryMaxParams = 0
+const redoLogMaxParams = 0
 
-// databasesDiscoveryHandler TODO: add description.
-func databasesDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	var lld string
+// RedoLogHandler TODO: add description.
+func RedoLogHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
+	var redolog string
 
-	if len(params) > databasesDiscoveryMaxParams {
+	if len(params) > redoLogMaxParams {
 		return nil, errorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
 		SELECT
-			JSON_ARRAYAGG(
-				JSON_OBJECT(
-					'{#DBNAME}' VALUE NAME, 
-					'{#TYPE}'   VALUE DECODE(CDB, 'YES', 'CDB', 'No-CDB')
-				)
-			) LLD
+			JSON_OBJECT('available' VALUE COUNT(*))
 		FROM
-			V$DATABASE
+			V$LOG	
+		WHERE 
+			STATUS IN ('INACTIVE', 'UNUSED')
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
-	err = row.Scan(&lld)
+	err = row.Scan(&redolog)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
 	}
 
-	if lld == "" {
-		lld = "[]"
-	}
-
-	return lld, nil
+	return redolog, nil
 }

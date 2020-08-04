@@ -37,6 +37,7 @@ type OraClient interface {
 	QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error)
 	QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error)
 	QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error)
+	WhoAmI() string
 }
 
 type OraConn struct {
@@ -46,6 +47,7 @@ type OraConn struct {
 	lastTimeAccess time.Time
 	ctx            context.Context
 	queryStorage   *yarn.Yarn
+	username       string
 }
 
 var errorTimeout = "timeout exceeded"
@@ -89,6 +91,10 @@ func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string, args 
 	}
 
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
+}
+
+func (conn *OraConn) WhoAmI() string {
+	return conn.username
 }
 
 // updateAccessTime updates the last time a connection was accessed.
@@ -214,6 +220,7 @@ func (c *ConnManager) create(uri URI) (*OraConn, error) {
 		lastTimeAccess: time.Now(),
 		ctx:            ctx,
 		queryStorage:   &c.queryStorage,
+		username:       uri.User(),
 	}
 
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())

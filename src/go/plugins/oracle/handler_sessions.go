@@ -22,18 +22,31 @@ package oracle
 import (
 	"context"
 	"fmt"
+	"strconv"
 )
 
 const keySessions = "oracle.sessions.stats"
 
-const sessionsMaxParams = 0
+const sessionsMaxParams = 1
 
 // sessionsHandler TODO: add description.
 func sessionsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	var sessions string
+	var (
+		sessions string
+		err      error
+	)
+
+	lockMaxTime := 600
 
 	if len(params) > sessionsMaxParams {
 		return nil, errorTooManyParameters
+	}
+
+	if len(params) == 1 {
+		lockMaxTime, err = strconv.Atoi(params[0])
+		if err != nil {
+			return nil, errorInvalidParams
+		}
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -59,7 +72,7 @@ func sessionsHandler(ctx context.Context, conn OraClient, params []string) (inte
 					DISTINCT *
 				FROM
 					TABLE(sys.ODCIVARCHAR2LIST('inactive_user', 'active_user', 'active_background')), 
-					TABLE(sys.ODCINUMBERLIST(0, 0, 0)) 
+					TABLE(sys.ODCINUMBERLIST(0, 0, 0))
 				)
 			GROUP BY
 				METRIC
@@ -71,8 +84,63 @@ func sessionsHandler(ctx context.Context, conn OraClient, params []string) (inte
 				COUNT(*) AS VALUE
 			FROM
 				V$SESSION 
+				
+			UNION
+			
+			SELECT
+				'long_time_locked' AS METRIC, 
+				COUNT(*) AS VALUE
+			FROM
+				V$SESSION
+			WHERE
+				BLOCKING_SESSION IS NOT NULL
+				AND BLOCKING_SESSION_STATUS = 'VALID'
+				AND SECONDS_IN_WAIT > :1
+
+			UNION
+			
+			SELECT
+				'lock_rate' ,
+				(cnt_block / cnt_all)* 100 pct
+			FROM
+				(
+				SELECT
+					COUNT(*) cnt_block
+				FROM
+					v$session
+				WHERE
+					blocking_session IS NOT NULL),
+				(
+				SELECT
+					COUNT(*) cnt_all
+				FROM
+					gv$session)
+			UNION
+			SELECT
+				'concurrency_rate',
+				NVL(ROUND(SUM(duty_act.CNT * 100 / num_cores.val)), 0)
+			FROM
+				(
+					SELECT
+						DECODE(SESSION_STATE, 'ON CPU', 'CPU', WAIT_CLASS) WAIT_CLASS, ROUND(COUNT(*) / (60 * 15), 1) CNT
+					FROM
+						V$ACTIVE_SESSION_HISTORY sh
+					WHERE
+						sh.SAMPLE_TIME >= SYSDATE - 15 / 1440
+						AND DECODE(SESSION_STATE, 'ON CPU', 'CPU', WAIT_CLASS) IN ('Concurrency')
+					GROUP BY
+						DECODE(SESSION_STATE, 'ON CPU', 'CPU', WAIT_CLASS)
+				) duty_act,
+				(
+					SELECT
+						SUM(VALUE) VAL
+					FROM
+						V$OSSTAT
+					WHERE
+						STAT_NAME = 'NUM_CPU_CORES'
+				) num_cores
 			) v
-	`)
+	`, lockMaxTime)
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}

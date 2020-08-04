@@ -29,13 +29,13 @@ const keySysMetrics = "oracle.sys.metrics"
 const sysMetricsMaxParams = 1
 
 const (
-	delta60sec = "2"
-	delta15sec = "3"
+	duration60sec = "2"
+	duration15sec = "3"
 )
 
 // sysMetricsHandler TODO: add description.
 func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	var groupId = delta60sec
+	var groupId = duration60sec
 
 	if len(params) > sysMetricsMaxParams {
 		return nil, errorTooManyParameters
@@ -44,9 +44,9 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 	if len(params) == 1 {
 		switch params[0] {
 		case "15":
-			groupId = delta15sec
+			groupId = duration15sec
 		case "60":
-			groupId = delta60sec
+			groupId = duration60sec
 		default:
 			return nil, errorInvalidParams
 		}
@@ -55,7 +55,7 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 	rows, err := conn.Query(ctx, `
 		SELECT
 			METRIC_NAME AS METRIC,
-			VALUE
+			ROUND(VALUE, 3) AS VALUE
 		FROM
 			V$SYSMETRIC
 		WHERE

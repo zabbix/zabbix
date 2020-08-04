@@ -57,7 +57,7 @@ type PluginOptions struct {
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]*Session `conf:"optional"`
 
-	// TODO: description
+	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
 	CustomQueriesPath string `conf:"optional"`
 }
 
