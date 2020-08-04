@@ -44,7 +44,7 @@ func ASMDiskGroupsDiscovery(ctx context.Context, conn OraClient, params []string
 				)
 			) LLD
 		FROM
-			V_$ASM_DISKGROUP
+			V$ASM_DISKGROUP
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
