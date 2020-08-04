@@ -3007,7 +3007,7 @@ typedef struct
 #define ZBX_FLAG_HPINTERFACE_SNMP_CREATE		__UINT64_C(0x00000400)
 	zbx_uint64_t	flags;
 }
-zbx_interface_snmp_t;
+zbx_interface_prototype_snmp_t;
 
 typedef struct
 {
@@ -3031,7 +3031,7 @@ typedef struct
 	zbx_uint64_t	flags;
 	union _data
 	{
-		zbx_interface_snmp_t	*snmp;
+		zbx_interface_prototype_snmp_t	*snmp;
 	}
 	data;
 }
@@ -3632,7 +3632,7 @@ static int	DBhost_prototypes_interface_make(zbx_vector_interfaces_t *interfaces,
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
-				zbx_interface_snmp_t *snmp = interface->data.snmp;
+				zbx_interface_prototype_snmp_t *snmp = interface->data.snmp;
 
 				if (snmp->version != snmp_type)
 					snmp->flags |= ZBX_FLAG_HPINTERFACE_SNMP_UPDATE_TYPE;
@@ -3879,9 +3879,10 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
-			zbx_interface_snmp_t	*snmp;
+			zbx_interface_prototype_snmp_t	*snmp;
 
-			snmp = (zbx_interface_snmp_t *)zbx_malloc(NULL, sizeof(zbx_interface_snmp_t));
+			snmp = (zbx_interface_prototype_snmp_t *)zbx_malloc(NULL,
+					sizeof(zbx_interface_prototype_snmp_t));
 			ZBX_STR2UCHAR(snmp->version, row[7]);
 			ZBX_STR2UCHAR(snmp->bulk, row[8]);
 			snmp->community = zbx_strdup(NULL, row[9]);
@@ -3952,13 +3953,22 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 					{
 						if (FAIL == DBhost_prototypes_interface_make(
 								&host_prototype->interfaces, interfaceid,
-								(unsigned char)atoi(row[2]), type,
-								(unsigned char)atoi(row[4]), row[5], row[6], row[7],
-								(unsigned char)atoi(row[8]),
-								(unsigned char)atoi(row[9]), row[10], row[11],
-								(unsigned char)atoi(row[12]), row[13], row[14],
-								(unsigned char)atoi(row[15]),
-								(unsigned char)atoi(row[16]), row[17]))
+								(unsigned char)atoi(row[2]),	/* main */
+								type,
+								(unsigned char)atoi(row[4]),	/* useip */
+								row[5],				/* ip */
+								row[6],				/* dns */
+								row[7],				/* port */
+								(unsigned char)atoi(row[8]),	/* version */
+								(unsigned char)atoi(row[9]),	/* bulk */
+								row[10],			/* community */
+								row[11],			/* securityname */
+								(unsigned char)atoi(row[12]),	/* securitylevel */
+								row[13],			/* authpassphrase */
+								row[14],			/* privpassphrase */
+								(unsigned char)atoi(row[15]),	/* authprotocol */
+								(unsigned char)atoi(row[16]),	/* privprotocol */
+								row[17]))			/* contextname */
 						{
 							zbx_vector_uint64_append(del_snmp_interfaceids, interfaceid);
 						}
@@ -3967,9 +3977,13 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 					{
 						if (FAIL == DBhost_prototypes_interface_make(
 								&host_prototype->interfaces, interfaceid,
-								(unsigned char)atoi(row[2]), type,
-								(unsigned char)atoi(row[4]), row[5], row[6], row[7], 0,
-								0, NULL, NULL, 0, NULL, NULL, 0, 0, NULL))
+								(unsigned char)atoi(row[2]),	/* main */
+								type,
+								(unsigned char)atoi(row[4]),	/* useip */
+								row[5],				/* ip */
+								row[6],				/* dns */
+								row[7],				/* port */
+								0, 0, NULL, NULL, 0, NULL, NULL, 0, 0, NULL))
 						{
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 						}
@@ -4006,7 +4020,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
  *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_interface_snmp_prepare_sql(const zbx_uint64_t interfaceid,
-		const zbx_interface_snmp_t *snmp, char **sql, size_t *sql_alloc, size_t *sql_offset)
+		const zbx_interface_prototype_snmp_t *snmp, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	const char	*d = "";
 	char		*esc;
