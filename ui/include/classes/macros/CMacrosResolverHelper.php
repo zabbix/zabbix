@@ -468,6 +468,23 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve macros in item description.
+	 *
+	 * @static
+	 *
+	 * @param array  $items
+	 * @param string $items[n]['itemid']
+	 * @param string $items[n]['hostid']
+	 *
+	 * @return array
+	 */
+	public static function resolveItemDescriptions(array $items) {
+		self::init();
+
+		return self::$macrosResolver->resolveItemDescriptions($items);
+	}
+
+	/**
 	 * Resolve function parameter macros to "parameter_expanded" field.
 	 *
 	 * @static
