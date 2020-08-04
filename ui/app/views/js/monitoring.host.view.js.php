@@ -78,10 +78,10 @@
 				return this.bindDataEvents(deferred);
 			},
 			setLoading: function() {
-				this.getCurrentForm().addClass('in-progress delayed-15s');
+				this.getCurrentForm().addClass('is-loading is-loading-fadein delayed-15s');
 			},
 			clearLoading: function() {
-				this.getCurrentForm().removeClass('in-progress delayed-15s');
+				this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
 			},
 			doRefresh: function(body) {
 				this.getCurrentForm().replaceWith(body);

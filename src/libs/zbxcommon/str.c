@@ -1188,12 +1188,12 @@ char	*zbx_age2str(int age)
 	return buffer;
 }
 
-char	*zbx_date2str(time_t date)
+char	*zbx_date2str(time_t date, const char *tz)
 {
 	static char	buffer[11];
 	struct tm	*tm;
 
-	tm = localtime(&date);
+	tm = zbx_localtime(&date, tz);
 	zbx_snprintf(buffer, sizeof(buffer), "%.4d.%.2d.%.2d",
 			tm->tm_year + 1900,
 			tm->tm_mon + 1,
@@ -1202,12 +1202,12 @@ char	*zbx_date2str(time_t date)
 	return buffer;
 }
 
-char	*zbx_time2str(time_t time)
+char	*zbx_time2str(time_t time, const char *tz)
 {
 	static char	buffer[9];
 	struct tm	*tm;
 
-	tm = localtime(&time);
+	tm = zbx_localtime(&time, tz);
 	zbx_snprintf(buffer, sizeof(buffer), "%.2d:%.2d:%.2d",
 			tm->tm_hour,
 			tm->tm_min,

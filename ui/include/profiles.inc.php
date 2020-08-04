@@ -254,6 +254,9 @@ function update_config($config) {
 		if (array_key_exists('default_lang', $config)) {
 			$msg[] = _s('Default language "%1$s".', $config['default_lang']);
 		}
+		if (array_key_exists('default_timezone', $config)) {
+			$msg[] = _s('Default time zone "%1$s".', $config['default_timezone']);
+		}
 		if (array_key_exists('default_theme', $config)) {
 			$msg[] = _s('Default theme "%1$s".', $config['default_theme']);
 		}

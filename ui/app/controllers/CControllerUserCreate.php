@@ -24,6 +24,8 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
+		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -35,8 +37,9 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'password2' =>		'required|string',
 			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>	'required|array_id|not_empty',
-			'user_medias' =>	'array',
+			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
+			'timezone' =>		'db users.timezone|in '.implode(',', $timezones),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
 			'autologout' =>		'db users.autologout|not_empty',
@@ -80,7 +83,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$user = [];
 
 		$this->getInputs($user, ['alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
-			'rows_per_page', 'lang', 'type'
+			'rows_per_page', 'lang', 'type', 'timezone'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups'), 'usrgrpid');
 
@@ -88,10 +91,10 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['user_medias'] = [];
+		$user['medias'] = [];
 
-		foreach ($this->getInput('user_medias', []) as $media) {
-			$user['user_medias'][] = [
+		foreach ($this->getInput('medias', []) as $media) {
+			$user['medias'][] = [
 				'mediatypeid' => $media['mediatypeid'],
 				'sendto' => $media['sendto'],
 				'active' => $media['active'],

@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.2.0alpha1');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		5010004);
+define('ZABBIX_DB_VERSION',		5010006);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -145,10 +145,14 @@ define('ZBX_DB_MAX_ID', '9223372036854775807');
 // maximum number of records for create() or update() API calls
 define('ZBX_DB_MAX_INSERTS', 10000);
 
-// Default db and field character set
+// Default db and field character set (MYSQL & POSTGRESQL)
 define('ZBX_DB_DEFAULT_CHARSET', 'UTF8');
 define('ZBX_DB_MYSQL_DEFAULT_COLLATION', 'utf8_bin');
+
+// Default db defines for Oracle DB
 define('ORACLE_MAX_STRING_SIZE', 4000);
+define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
+define('ORACLE_CESU8_CHARSET', 'UTF8');
 
 define('ZBX_SHOW_TECHNICAL_ERRORS', false);
 
@@ -1502,6 +1506,12 @@ define('LANG_DEFAULT', 'default');
 
 // the default language
 define('ZBX_DEFAULT_LANG', 'en_GB');
+
+// user default time zone
+define('TIMEZONE_DEFAULT', 'default');
+
+// the default time zone
+define('ZBX_DEFAULT_TIMEZONE', 'system');
 
 // user default theme
 define('THEME_DEFAULT', 'default');

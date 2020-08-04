@@ -398,7 +398,8 @@ foreach ($data['hosts'] as $host) {
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Applications'),
-				(new CUrl('applications.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'application.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 			),

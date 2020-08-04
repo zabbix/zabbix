@@ -134,12 +134,14 @@ else {
 	);
 }
 
-// Append languages & themes to form list.
+// Append languages, timezones & themes to form list.
 $lang_combobox = (new CComboBox('lang', $data['lang']))->addItem(LANG_DEFAULT, _('System default'));
+$timezone_combobox = (new CComboBox('timezone', $data['timezone']))->addItem(TIMEZONE_DEFAULT, _('System default'));
 $theme_combobox = (new CComboBox('theme', $data['theme']))->addItem(THEME_DEFAULT, _('System default'));
 
 if ($data['action'] === 'user.edit' && $data['db_user']['alias'] === ZBX_GUEST_USER) {
 	$lang_combobox->setEnabled(false);
+	$timezone_combobox->setEnabled(false);
 	$theme_combobox->setEnabled(false);
 }
 else {
@@ -154,7 +156,7 @@ else {
 		 * Checking if this locale exists in the system. The only way of doing it is to try and set one
 		 * trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC.
 		 */
-		$locale_available = ($localeid === 'en_GB' || setlocale(LC_MONETARY, zbx_locale_variants($localeid)));
+		$locale_available = setlocale(LC_MONETARY, zbx_locale_variants($localeid));
 
 		$lang_combobox->addItem($localeid, $locale['name'], null, $locale_available);
 
@@ -177,11 +179,14 @@ else {
 		$lang_combobox = [$lang_combobox, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')];
 	}
 
+	$timezones = DateTimeZone::listIdentifiers();
+	$timezone_combobox->addItems(array_combine($timezones, $timezones));
 	$theme_combobox->addItems(APP::getThemes());
 }
 
 $user_form_list
 	->addRow(_('Language'), $lang_combobox)
+	->addRow(_('Time zone'), $timezone_combobox)
 	->addRow(_('Theme'), $theme_combobox);
 
 // Append auto-login & auto-logout to form list.
@@ -222,13 +227,13 @@ $tabs->addTab('userTab', _('User'), $user_form_list);
 // Media tab.
 if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 	$media_form_list = new CFormList('userMediaFormList');
-	$user_form->addVar('user_medias', $data['user_medias']);
+	$user_form->addVar('medias', $data['medias']);
 
 	$media_table_info = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), ('Status'), _('Action')]);
 
-	foreach ($data['user_medias'] as $index => $media) {
+	foreach ($data['medias'] as $index => $media) {
 		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
 			$status = (new CLink(_('Enabled'), '#'))
 				->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
@@ -292,7 +297,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 							->onClick('javascript: removeMedia('.$index.');')
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
-			]))->setId('user_medias_'.$index)
+			]))->setId('medias_'.$index)
 		);
 	}
 

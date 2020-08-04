@@ -74,8 +74,8 @@ class CHistoryManager {
 				'SELECT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-				' GROUP BY itemid'.
-					($period ? ' HAVING MAX(clock)>'.$period : '')
+					($period ? ' AND clock>'.$period : '').
+				' GROUP BY itemid'
 			), 'itemid');
 
 			$results += array_intersect_key($items, array_flip($type_results));
@@ -868,39 +868,41 @@ class CHistoryManager {
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 
-			if ($width !== null) {
-				foreach ($data['group_by_itemid']['buckets'] as $item) {
-					if (!is_array($item['group_by_script']) || !array_key_exists('buckets', $item['group_by_script'])
-							|| !is_array($item['group_by_script']['buckets'])) {
-						continue;
-					}
+			if (array_key_exists('group_by_itemid', $data)) {
+				if ($width !== null) {
+					foreach ($data['group_by_itemid']['buckets'] as $item) {
+						if (!is_array($item['group_by_script']) || !array_key_exists('buckets', $item['group_by_script'])
+								|| !is_array($item['group_by_script']['buckets'])) {
+							continue;
+						}
 
-					$results[$item['key']]['source'] = 'history';
-					foreach ($item['group_by_script']['buckets'] as $point) {
-						$results[$item['key']]['data'][] = [
-							'itemid' => $item['key'],
-							'i' => $point['key'],
-							'count' => $point['doc_count'],
-							'min' => $point['min_value']['value'],
-							'avg' => $point['avg_value']['value'],
-							'max' => $point['max_value']['value'],
-							// Field value_as_string is used to get value as seconds instead of milliseconds.
-							'clock' => $point['max_clock']['value_as_string']
-						];
+						$results[$item['key']]['source'] = 'history';
+						foreach ($item['group_by_script']['buckets'] as $point) {
+							$results[$item['key']]['data'][] = [
+								'itemid' => $item['key'],
+								'i' => $point['key'],
+								'count' => $point['doc_count'],
+								'min' => $point['min_value']['value'],
+								'avg' => $point['avg_value']['value'],
+								'max' => $point['max_value']['value'],
+								// Field value_as_string is used to get value as seconds instead of milliseconds.
+								'clock' => $point['max_clock']['value_as_string']
+							];
+						}
 					}
 				}
-			}
-			else {
-				foreach ($data['group_by_itemid']['buckets'] as $item) {
-					$results[$item['key']]['source'] = 'history';
-					$results[$item['key']]['data'][] = [
-						'itemid' => $item['key'],
-						'min' => $item['min_value']['value'],
-						'avg' => $item['avg_value']['value'],
-						'max' => $item['max_value']['value'],
-						// Field value_as_string is used to get value as seconds instead of milliseconds.
-						'clock' => $item['max_clock']['value_as_string']
-					];
+				else {
+					foreach ($data['group_by_itemid']['buckets'] as $item) {
+						$results[$item['key']]['source'] = 'history';
+						$results[$item['key']]['data'][] = [
+							'itemid' => $item['key'],
+							'min' => $item['min_value']['value'],
+							'avg' => $item['avg_value']['value'],
+							'max' => $item['max_value']['value'],
+							// Field value_as_string is used to get value as seconds instead of milliseconds.
+							'clock' => $item['max_clock']['value_as_string']
+						];
+					}
 				}
 			}
 		}

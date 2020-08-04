@@ -1009,8 +1009,8 @@ class testFormAction extends CLegacyWebTest {
 
 		if ($new_operation_operationtype == 'Send message') {
 			$this->zbxTestTextPresent([
-				'Send to User groups', 'User group', 'Action',
-				'Send to Users'
+				'Send to user groups', 'User group', 'Action',
+				'Send to users'
 			]);
 			$this->zbxTestAssertVisibleXpath('//tr[@id=\'operation-message-user-groups-footer\']//button[@class=\'btn-link\']');
 			$this->zbxTestAssertElementText('//tr[@id=\'operation-message-user-groups-footer\']//button[@class=\'btn-link\']', 'Add');
