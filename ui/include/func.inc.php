@@ -1548,7 +1548,8 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		else {
 			echo (new CView('general.warning', $data))->getOutput();
 		}
-		exit;
+		session_write_close();
+		exit();
 	}
 }
 
