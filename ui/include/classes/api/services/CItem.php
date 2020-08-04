@@ -1193,8 +1193,8 @@ class CItem extends CItemGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($this->outputIsRequested('state', $options['output'])
-				|| $this->outputIsRequested('error', $options['output'])
+		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
+				|| $this->outputIsRequested('error', $options['output'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
 				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
 			$sqlParts['left_join'][] = ['alias' => 'ir', 'table' => 'item_rtdata', 'using' => 'itemid'];
