@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -20,10 +20,18 @@
 
 
 /**
- * @var CView $this
+ * Class for converting array with export data to YAML format.
  */
+class CYamlExportWriter extends CExportWriter {
 
-header('Content-Type: text/xml; charset=utf-8');
-header('Content-Disposition: attachment; filename="'.$data['page']['file'].'"');
-
-echo $data['main_block'];
+	/**
+	 * Converts array with export data to YAML format.
+	 *
+	 * @param array $array
+	 *
+	 * @return string
+	 */
+	public function write(array $array): string {
+		return yaml_emit($array, YAML_UTF8_ENCODING, YAML_LN_BREAK);
+	}
+}

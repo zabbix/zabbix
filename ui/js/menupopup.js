@@ -918,20 +918,41 @@ function getMenuPopupDropdown(options, trigger_elem) {
 	var items = [];
 
 	jQuery.each(options.items, function(i, item) {
-		items.push({
+		var row = {
 			label: item.label,
-			url: item.url || 'javascript:void(0);',
-			class: item.class,
-			clickCallback: () => {
+			url: item.url || 'javascript:void(0);'
+		};
+
+		if (item.class) {
+			row.class = item.class;
+		}
+
+		if (options.toggle_class) {
+			row.clickCallback = () => {
 				jQuery(trigger_elem)
 					.removeClass()
-					.addClass(['btn-alt', 'btn-dropdown-toggle', item.class].join(' '));
+					.addClass(['btn-alt', options.toggle_class, item.class].join(' '));
 
 				jQuery('input[type=hidden]', jQuery(trigger_elem).parent())
 					.val(item.value)
 					.trigger('change');
 			}
-		});
+		}
+		else if (options.submit_form) {
+			row.url = 'javascript:void(0);';
+			row.clickCallback = () => {
+				var $_form = trigger_elem.closest('form');
+
+				if (!$_form.data("action")) {
+					$_form.data("action", $_form.attr("action"));
+				}
+
+				$_form.attr("action", item.url);
+				$_form.submit();
+			}
+		}
+
+		items.push(row);
 	});
 
 	return [{

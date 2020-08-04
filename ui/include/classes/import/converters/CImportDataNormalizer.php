@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -20,18 +20,21 @@
 
 
 /**
- * Convert array keys to numeric.
+ * Class to normalize incoming data.
  */
-class CArrayKeysImportConverter extends CConverter {
+class CImportDataNormalizer {
 
 	protected $rules;
+
+	const EOL_LF = 0x01;
 
 	public function __construct(array $schema) {
 		$this->rules = $schema;
 	}
 
-	public function convert($data) {
+	public function normalize($data) {
 		$data['zabbix_export'] = $this->normalizeArrayKeys($data['zabbix_export'], $this->rules);
+		$data['zabbix_export'] = $this->normalizeStrings($data['zabbix_export']);
 
 		return $data;
 	}
@@ -40,9 +43,9 @@ class CArrayKeysImportConverter extends CConverter {
 	 * Convert array keys to numeric.
 	 *
 	 * @param mixed $data   Import data.
-	 * @param array $rules  XML rules.
+	 * @param array $rules  Schema rules.
 	 *
-	 * @return array
+	 * @return mixed
 	 */
 	protected function normalizeArrayKeys($data, array $rules) {
 		if (!is_array($data)) {
@@ -68,6 +71,24 @@ class CArrayKeysImportConverter extends CConverter {
 			}
 
 			$data = array_values($data);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Add CR to string type fields.
+	 *
+	 * @param mixed $data   Import data.
+	 *
+	 * @return mixed
+	 */
+	protected function normalizeStrings($data) {
+		if ($this->rules['type'] & XML_STRING) {
+			$data = str_replace("\r\n", "\n", $data);
+			$data = (array_key_exists('flags', $this->rules) && $this->rules['flags'] & self::EOL_LF)
+				? $data
+				: str_replace("\n", "\r\n", $data);
 		}
 
 		return $data;

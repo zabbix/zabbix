@@ -29,7 +29,6 @@ class CButtonDropdown extends CButton {
 	/**
 	 * Button style names.
 	 */
-	public const ZBX_STYLE_BTN_TOGGLE = 'btn-dropdown-toggle';
 	public const ZBX_STYLE_BTN_VALUE = 'dropdown-value';
 
 	/**
@@ -54,7 +53,7 @@ class CButtonDropdown extends CButton {
 
 		$this->setId(uniqid('btn-dropdown-'));
 		$this->addClass(ZBX_STYLE_BTN_ALT);
-		$this->addClass(self::ZBX_STYLE_BTN_TOGGLE);
+		$this->addClass(ZBX_STYLE_BTN_TOGGLE);
 		$this->dropdown_items = $items;
 
 		if ($value !== null) {
@@ -74,7 +73,10 @@ class CButtonDropdown extends CButton {
 				->setId(zbx_formatDomId($name.'[btn]'))
 				->setMenuPopup([
 					'type' => 'dropdown',
-					'data' => ['items' => $this->dropdown_items]
+					'data' => [
+						'items' => $this->dropdown_items,
+						'toggle_class' => ZBX_STYLE_BTN_TOGGLE
+					]
 				]))
 			->addItem((new CInput('hidden', $name, $this->getAttribute('value')))
 				->addClass(self::ZBX_STYLE_BTN_VALUE)

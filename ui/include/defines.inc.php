@@ -1271,16 +1271,6 @@ define('SERVER_CHECK_INTERVAL', 10);
 
 define('DATE_TIME_FORMAT_SECONDS_XML', 'Y-m-d\TH:i:s\Z');
 
-// XML export|import tags
-define('XML_TAG_MACRO',				'macro');
-define('XML_TAG_HOST',				'host');
-define('XML_TAG_HOSTINVENTORY',		'host_inventory');
-define('XML_TAG_ITEM',				'item');
-define('XML_TAG_TRIGGER',			'trigger');
-define('XML_TAG_GRAPH',				'graph');
-define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
-define('XML_TAG_DEPENDENCY',		'dependency');
-
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
 // XML import flags
@@ -1587,6 +1577,9 @@ define('ZBX_STYLE_ARROW_UP', 'arrow-up');
 define('ZBX_STYLE_BLUE', 'blue');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
+define('ZBX_STYLE_BTN_TOGGLE_CHEVRON', 'btn-toggle-chevron');
+define('ZBX_STYLE_BTN_SPLIT', 'btn-split');
+define('ZBX_STYLE_BTN_TOGGLE', 'btn-dropdown-toggle');
 define('ZBX_STYLE_BTN_BACK_MAP', 'btn-back-map');
 define('ZBX_STYLE_BTN_BACK_MAP_CONTAINER', 'btn-back-map-container');
 define('ZBX_STYLE_BTN_BACK_MAP_CONTENT', 'btn-back-map-content');
