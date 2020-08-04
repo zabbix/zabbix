@@ -896,9 +896,12 @@ class CMacrosResolverGeneral {
 
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
-				$value = null;
+				$value = UNRESOLVED_MACRO_STRING;
 
 				$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
+				if (!array_key_exists($function['itemid'], $history)) {
+					return $macro_values;
+				}
 
 				switch ($m) {
 					case 'ITEM.LOG.DATE':
