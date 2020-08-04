@@ -900,7 +900,7 @@ class CMacrosResolverGeneral {
 
 				$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
 				if (!array_key_exists($function['itemid'], $history)) {
-					return $macro_values;
+					continue;
 				}
 
 				switch ($m) {
