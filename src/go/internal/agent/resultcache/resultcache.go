@@ -61,8 +61,9 @@ const (
 type ResultCache interface {
 	Start()
 	Stop()
-	UpdateOptions(options *agent.AgentOptions)
 	Upload(u Uploader)
+	// TODO: will be used once the runtime configuration reload is implemented
+	UpdateOptions(options *agent.AgentOptions)
 }
 
 type AgentData struct {
@@ -116,6 +117,7 @@ func (c *cacheData) Write(result *plugin.Result) {
 	c.input <- result
 }
 
+// TODO: will be used once the runtime configuration reload is implemented
 func (c *cacheData) UpdateOptions(options *agent.AgentOptions) {
 	c.input <- options
 }
