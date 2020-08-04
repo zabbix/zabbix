@@ -42,22 +42,22 @@ abstract class CControllerUserEditGeneral extends CController {
 	 */
 	protected function setUserMedias(array $data) {
 		if ($this->hasInput('new_media')) {
-			$data['user_medias'][] = $this->getInput('new_media');
+			$data['medias'][] = $this->getInput('new_media');
 		}
 		elseif ($this->hasInput('enable_media')) {
-			if (array_key_exists($this->getInput('enable_media'), $data['user_medias'])) {
-				$data['user_medias'][$this->getInput('enable_media')]['active'] = MEDIA_STATUS_ACTIVE;
+			if (array_key_exists($this->getInput('enable_media'), $data['medias'])) {
+				$data['medias'][$this->getInput('enable_media')]['active'] = MEDIA_STATUS_ACTIVE;
 			}
 		}
 		elseif ($this->hasInput('disable_media')) {
-			if (array_key_exists($this->getInput('disable_media'), $data['user_medias'])) {
-				$data['user_medias'][$this->getInput('disable_media')]['active'] = MEDIA_STATUS_DISABLED;
+			if (array_key_exists($this->getInput('disable_media'), $data['medias'])) {
+				$data['medias'][$this->getInput('disable_media')]['active'] = MEDIA_STATUS_DISABLED;
 			}
 		}
 
 		$mediatypeids = [];
 
-		foreach ($data['user_medias'] as $media) {
+		foreach ($data['medias'] as $media) {
 			$mediatypeids[$media['mediatypeid']] = true;
 		}
 
@@ -67,7 +67,7 @@ abstract class CControllerUserEditGeneral extends CController {
 			'preservekeys' => true
 		]);
 
-		foreach ($data['user_medias'] as &$media) {
+		foreach ($data['medias'] as &$media) {
 			$media['name'] = $mediatypes[$media['mediatypeid']]['name'];
 			$media['mediatype'] = $mediatypes[$media['mediatypeid']]['type'];
 			$media['send_to_sort_field'] = is_array($media['sendto'])
@@ -76,9 +76,9 @@ abstract class CControllerUserEditGeneral extends CController {
 		}
 		unset($media);
 
-		CArrayHelper::sort($data['user_medias'], ['name', 'send_to_sort_field']);
+		CArrayHelper::sort($data['medias'], ['name', 'send_to_sort_field']);
 
-		foreach ($data['user_medias'] as &$media) {
+		foreach ($data['medias'] as &$media) {
 			unset($media['send_to_sort_field']);
 		}
 		unset($media);

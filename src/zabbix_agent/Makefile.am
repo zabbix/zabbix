@@ -30,7 +30,9 @@ libzbxagent_a_SOURCES = \
 	vmstats.c \
 	vmstats.h \
 	zbxconf.c \
-	zbxconf.h
+	zbxconf.h \
+	zbxkstat.c \
+	zbxkstat.h
 
 libzbxagent_a_CFLAGS = \
 	-DZABBIX_DAEMON

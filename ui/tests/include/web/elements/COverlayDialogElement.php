@@ -51,40 +51,26 @@ class COverlayDialogElement extends CElement {
 	/**
 	 * Set context (host / hostgroup) of overlay dialog.
 	 *
-	 * @param array $context
+	 * This code should be different from older versions of Zabbix (< 5.0).
+	 *
+	 * @param array    $context
+	 * @param integer  $mode    multiselect fill mode, or null if default
 	 */
-	public function setDataContext($context) {
+	public function setDataContext($context, $mode = null) {
 		if (!$context) {
 			return $this;
 		}
 
-		if (!is_array($context)) {
-			// Assuming that we are looking for a single multiselect...
-			$this->query('xpath:./div[@class="overlay-dialogue-controls"]//./div[@class="multiselect-control"]')
-					->asMultiselect()->one()->fill($context);
-			$this->waitUntilReady();
+		// Assuming that we are looking for a single multiselect...
+		$element = $this->query('xpath:./div[@class="overlay-dialogue-controls"]//./div[@class="multiselect-control"]')
+				->asMultiselect()->one();
 
-			return $this;
+		if ($mode !== null) {
+			$element->setFillMode($mode);
 		}
 
-		$form = $this->query('xpath:./div[@class="overlay-dialogue-controls"]')->asForm(['normalized' => true])
-				->waitUntilPresent()->one();
-		$fields = $form->getFields();
-
-		foreach ($context as $name => $value) {
-			if (is_array($value) && array_key_exists('name', $value) && array_key_exists('value', $value)) {
-				$name = $value['name'];
-				$value = $value['value'];
-			}
-
-			if ($fields->exists($name)) {
-				$fields->get($name)->fill($value);
-				$this->waitUntilReady();
-			}
-			else {
-				throw new Exception('Cannot set overlay dialog context for \"'.$name.'\" to \"'.$value.'\".');
-			}
-		}
+		$element->fill($context);
+		$this->waitUntilReady();
 
 		return $this;
 	}

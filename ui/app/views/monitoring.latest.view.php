@@ -112,8 +112,9 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	);
 }
 
-$widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip([
-	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'paging'
+$widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip(['filter',
+	'sort_field', 'sort_order', 'view_curl', 'rows', 'hosts', 'applications', 'applications_size', 'items', 'history',
+	'paging'
 ]))));
 
 $widget->show();

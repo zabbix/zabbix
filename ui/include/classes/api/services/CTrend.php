@@ -135,30 +135,27 @@ class CTrend extends CApiService {
 
 			$result = [];
 
-			foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $value_type) {
+			foreach ($options['itemids'] as $value_type => $items) {
 				if ($sql_limit !== null && $sql_limit <= 0) {
 					break;
 				}
 
 				$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
+				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
 
-				if ($options['itemids'][$value_type]) {
-					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($options['itemids'][$value_type]));
+				$res = DBselect(
+					'SELECT '.implode(',', $sql_fields).
+					' FROM '.$sql_from.' t'.
+					' WHERE '.implode(' AND ', $sql_where),
+					$sql_limit
+				);
 
-					$res = DBselect(
-						'SELECT '.implode(',', $sql_fields).
-						' FROM '.$sql_from.' t'.
-						' WHERE '.implode(' AND ', $sql_where),
-						$sql_limit
-					);
+				while ($row = DBfetch($res)) {
+					$result[] = $row;
+				}
 
-					while ($row = DBfetch($res)) {
-						$result[] = $row;
-					}
-
-					if ($sql_limit !== null) {
-						$sql_limit -= count($result);
-					}
+				if ($sql_limit !== null) {
+					$sql_limit -= count($result);
 				}
 			}
 
@@ -167,20 +164,18 @@ class CTrend extends CApiService {
 		else {
 			$result = 0;
 
-			foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $value_type) {
-				if ($options['itemids'][$value_type]) {
-					$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
-					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($options['itemids'][$value_type]));
+			foreach ($options['itemids'] as $value_type => $items) {
+				$sql_from = ($value_type == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
+				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($items));
 
-					$res = DBselect(
-						'SELECT COUNT(*) AS rowscount'.
-						' FROM '.$sql_from.' t'.
-						' WHERE '.implode(' AND ', $sql_where)
-					);
+				$res = DBselect(
+					'SELECT COUNT(*) AS rowscount'.
+					' FROM '.$sql_from.' t'.
+					' WHERE '.implode(' AND ', $sql_where)
+				);
 
-					if ($row = DBfetch($res)) {
-						$result += $row['rowscount'];
-					}
+				if ($row = DBfetch($res)) {
+					$result += $row['rowscount'];
 				}
 			}
 		}
@@ -262,6 +257,10 @@ class CTrend extends CApiService {
 		}
 
 		foreach (CHistoryManager::getElasticsearchEndpoints($value_types) as $type => $endpoint) {
+			if (!array_key_exists($type, $options['itemids'])) {
+				continue;
+			}
+
 			$itemids = array_keys($options['itemids'][$type]);
 
 			if (!$itemids) {

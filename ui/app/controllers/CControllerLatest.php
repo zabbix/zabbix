@@ -39,180 +39,260 @@ abstract class CControllerLatest extends CController {
 	protected function prepareData(array $filter, $sort_field, $sort_order) {
 		$config = select_config();
 
-		$applications = [];
-		$items = [];
-		$child_groups = [];
-		$history = null;
-
-		// multiselect host groups
 		$multiselect_hostgroup_data = [];
+		$multiselect_host_data = [];
+
+		// Sorting options for hosts, applications and items.
+
+		$host_sort_options = [
+			'field' => 'name',
+			'order' => ($sort_field === 'host') ? $sort_order : 'ASC'
+		];
+		$application_sort_options = [
+			'field' => 'name',
+			'order' => ($sort_field === 'name') ? $sort_order : 'ASC'
+		];
+		$item_sort_options = [
+			'field' => 'name',
+			'order' => ($sort_field === 'name') ? $sort_order : 'ASC'
+		];
+
+		// Select groups for subsequent selection of hosts, applications and items.
+
 		if ($filter['groupids']) {
-			$filter_groups = API::HostGroup()->get([
+			$groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groupids'],
 				'preservekeys' => true
 			]);
 
-			if ($filter_groups) {
-				foreach ($filter_groups as $group) {
+			if ($groups) {
+				$subgroup_names = [];
+
+				foreach ($groups as $group) {
+					$subgroup_names[] = $group['name'].'/';
+
 					$multiselect_hostgroup_data[] = [
 						'id' => $group['groupid'],
 						'name' => $group['name']
 					];
-
-					$child_groups[] = $group['name'].'/';
 				}
+
+				$groups += API::HostGroup()->get([
+					'output' => ['groupid'],
+					'search' => ['name' => $subgroup_names],
+					'startSearch' => true,
+					'searchByAny' => true,
+					'preservekeys' => true
+				]);
 			}
-			else {
-				$filter['groupids'] = [];
-			}
+
+			$groupids = array_keys($groups);
+		}
+		else {
+			$groupids = null;
 		}
 
-		$groupids = null;
+		// Select hosts for subsequent selection of applications and items.
 
-		if ($child_groups) {
-			$filter_groups += API::HostGroup()->get([
-				'output' => [],
-				'search' => ['name' => $child_groups],
-				'startSearch' => true,
-				'searchByAny' => true,
+		if ($filter['hostids']) {
+			$hosts = API::Host()->get([
+				'output' => ['hostid', 'name', 'status'],
+				'groupids' => $groupids,
+				'hostids' => $filter['hostids'],
+				'with_monitored_items' => true,
 				'preservekeys' => true
 			]);
 
-			$groupids = array_keys($filter_groups);
+			$hostids = array_keys($hosts);
+		}
+		else {
+			$hosts = null;
+			$hostids = null;
 		}
 
-		$hosts = API::Host()->get([
-			'output' => ['name', 'hostid', 'status'],
-			'hostids' => $filter['hostids'],
+		// Select applications for subsequent selection of items.
+
+		if ($filter['application'] !== '') {
+			$applications = API::Application()->get([
+				'output' => ['applicationid', 'name'],
+				'groupids' => $groupids,
+				'hostids' => $hostids,
+				'templated' => false,
+				'search' => ['name' => $filter['application']],
+				'preservekeys' => true
+			]);
+
+			$applicationids = array_keys($applications);
+		}
+		else {
+			$applications = null;
+			$applicationids = null;
+		}
+
+		// Select unlimited items based on filter, requesting minimum data.
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'value_type'],
 			'groupids' => $groupids,
-			'with_monitored_items' => true,
-			'sortfield' => 'host',
-			'limit' => $config['search_limit'] + 1,
+			'hostids' => $hostids,
+			'applicationids' => $applicationids,
+			'webitems' => true,
+			'templated' => false,
+			'filter' => [
+				'status' => [ITEM_STATUS_ACTIVE]
+			],
+			'search' => ($filter['select'] === '') ? null : [
+				'name' => $filter['select']
+			],
 			'preservekeys' => true
 		]);
 
-		if ($hosts) {
-			foreach ($hosts as &$host) {
-				$host['item_cnt'] = 0;
-			}
-			unset($host);
-
-			$sort_fields = ($sort_field === 'host') ? [['field' => 'name', 'order' => $sort_order]] : ['name'];
-			CArrayHelper::sort($hosts, $sort_fields);
-
-			$applications = null;
-
-			// If an application filter is set, fetch the applications and then use them to filter items.
-			if ($filter['application'] !== '') {
-				$applications = API::Application()->get([
-					'output' => ['applicationid', 'hostid', 'name'],
-					'hostids' => array_keys($hosts),
-					'search' => ['name' => $filter['application']],
+		if ($items) {
+			if ($hosts === null) {
+				$hosts = API::Host()->get([
+					'output' => ['hostid', 'name', 'status'],
+					'groupids' => $groupids,
+					'hostids' => array_keys(array_flip(array_column($items, 'hostid'))),
+					'with_monitored_items' => true,
 					'preservekeys' => true
 				]);
 			}
 
+			CArrayHelper::sort($hosts, [$host_sort_options]);
+			$hostids = array_keys($hosts);
+
+			$items_of_hosts = [];
+
+			foreach ($items as $itemid => $item) {
+				$items_of_hosts[$item['hostid']][$itemid] = $item;
+			}
+
+			uksort($items_of_hosts, function($hostid_1, $hostid_2) use ($hostids) {
+				return (array_search($hostid_1, $hostids, true) <=> array_search($hostid_2, $hostids, true));
+			});
+
+			$select_items = [];
+
+			foreach ($items_of_hosts as $host_items) {
+				$select_items += $filter['show_without_data']
+					? $host_items
+					: Manager::History()->getItemsHavingValues($host_items, ZBX_HISTORY_PERIOD);
+
+				if (count($select_items) > $config['search_limit']) {
+					break;
+				}
+			}
+
+			// Select limited set of items, requesting extended data.
 			$items = API::Item()->get([
-				'hostids' => array_keys($hosts),
-				'output' => ['itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
-					'error', 'trends', 'history', 'delay', 'key_', 'flags', 'description'
+				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+					'value_type', 'units', 'valuemapid', 'description', 'state', 'error'
 				],
 				'selectApplications' => ['applicationid'],
-				'selectItemDiscovery' => ['ts_delete'],
-				'applicationids' => ($applications !== null) ? zbx_objectValues($applications, 'applicationid') : null,
+				'groupids' => $groupids,
+				'hostids' => $hostids,
+				'applicationids' => $applicationids,
+				'itemids' => array_keys($select_items),
 				'webitems' => true,
-				'filter' => [
-					'status' => [ITEM_STATUS_ACTIVE]
-				],
-				'limit' => $config['search_limit'] + 1,
 				'preservekeys' => true
 			]);
 
-			/*
-			 * If the applications haven't been loaded when filtering, load them based on the retrieved items to avoid
-			 * fetching applications from hosts that may not be displayed.
-			 */
 			if ($applications === null) {
 				$applications = API::Application()->get([
-					'output' => ['applicationid', 'hostid', 'name'],
-					'hostids' => array_keys(array_flip(zbx_objectValues($items, 'hostid'))),
-					'search' => ['name' => $filter['application']],
+					'output' => ['applicationid', 'name'],
+					'groupids' => $groupids,
+					'hostids' => $hostids,
+					'itemids' => array_keys($items),
+					'templated' => false,
 					'preservekeys' => true
 				]);
 			}
-		}
 
-		if ($items) {
-			// macros
-			$items = CMacrosResolverHelper::resolveItemKeys($items);
-			$items = CMacrosResolverHelper::resolveItemNames($items);
-			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
+			CArrayHelper::sort($applications, [$application_sort_options]);
+			$applicationids = array_keys($applications);
 
-			// Filter items by name.
-			foreach ($items as $key => $item) {
-				if ($filter['select'] !== '') {
-					$haystack = mb_strtolower($item['name_expanded']);
-					$needle = mb_strtolower($filter['select']);
+			$applications_size = [];
+			$items_grouped = [];
 
-					if (mb_strpos($haystack, $needle) === false) {
-						unset($items[$key]);
+			foreach ($items as $itemid => $item) {
+				if (!array_key_exists($item['hostid'], $applications_size)) {
+					$applications_size[$item['hostid']] = [];
+				}
+
+				$item_applicationids = $item['applications']
+					? array_column($item['applications'], 'applicationid')
+					: [0];
+
+				foreach ($item_applicationids as $applicationid) {
+					if ($applicationid != 0 && !array_key_exists($applicationid, $applications)) {
+						continue;
+					}
+
+					$items_grouped[$item['hostid']][$applicationid][$itemid] = $item;
+
+					if (array_key_exists($applicationid, $applications_size[$item['hostid']])) {
+						$applications_size[$item['hostid']][$applicationid]++;
+					}
+					else {
+						$applications_size[$item['hostid']][$applicationid] = 1;
 					}
 				}
 			}
 
-			if ($items) {
-				// Get history.
-				$history = Manager::History()->getLastValues($items, 2, ZBX_HISTORY_PERIOD);
+			$items = [];
+			$rows = [];
 
-				// Filter items without history.
-				if (!$filter['show_without_data']) {
-					foreach ($items as $key => $item) {
-						if (!array_key_exists($item['itemid'], $history)) {
-							unset($items[$key]);
+			uksort($items_grouped, function($hostid_1, $hostid_2) use ($hostids) {
+				return (array_search($hostid_1, $hostids, true) <=> array_search($hostid_2, $hostids, true));
+			});
+
+			foreach ($items_grouped as $host_items_grouped) {
+				uksort($host_items_grouped, function($id_1, $id_2) use ($applicationids, $application_sort_options) {
+					if ($id_1 == 0 || $id_2 == 0) {
+						return bccomp($id_1, $id_2) * (($application_sort_options['order'] === 'ASC') ? -1 : 1);
+					}
+
+					return (array_search($id_1, $applicationids, true) <=> array_search($id_2, $applicationids, true));
+				});
+
+				foreach ($host_items_grouped as $applicationid => $application_items) {
+					CArrayHelper::sort($application_items, [$item_sort_options]);
+
+					foreach ($application_items as $itemid => $item) {
+						unset($item['applications']);
+
+						$items[$itemid] = $item;
+						$rows[] = [
+							'itemid' => $itemid,
+							'applicationid' => $applicationid
+						];
+
+						if (count($rows) > $config['search_limit']) {
+							break 3;
 						}
 					}
 				}
 			}
 
-			if ($items) {
-				// Add item last update date for sorting.
-				foreach ($items as &$item) {
-					if (array_key_exists($item['itemid'], $history)) {
-						$item['lastclock'] = $history[$item['itemid']][0]['clock'];
-					}
-				}
-				unset($item);
+			// Resolve macros.
 
-				// sort
-				if ($sort_field === 'name') {
-					$sort_fields = [['field' => 'name_expanded', 'order' => $sort_order], 'itemid'];
-				}
-				elseif ($sort_field === 'lastclock') {
-					$sort_fields = [['field' => 'lastclock', 'order' => $sort_order], 'name_expanded', 'itemid'];
-				}
-				else {
-					$sort_fields = ['name_expanded', 'itemid'];
-				}
-				CArrayHelper::sort($items, $sort_fields);
+			$items = CMacrosResolverHelper::resolveItemKeys($items);
+			$items = CMacrosResolverHelper::resolveItemNames($items);
+			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
-				if ($applications) {
-					foreach ($applications as &$application) {
-						$application['hostname'] = $hosts[$application['hostid']]['name'];
-						$application['item_cnt'] = 0;
-					}
-					unset($application);
+			// Choosing max history period for already filtered items having data.
+			$history_period = $filter['show_without_data'] ? ZBX_HISTORY_PERIOD : null;
 
-					// Order by application name and applicationid by default.
-					$sort_fields = ($sort_field === 'host') ? [['field' => 'hostname', 'order' => $sort_order]] : [];
-					array_push($sort_fields, 'name', 'applicationid');
-					CArrayHelper::sort($applications, $sort_fields);
-				}
-			}
+			$history = Manager::History()->getLastValues($items, 2, $history_period);
+		}
+		else {
+			$rows = [];
+			$hosts = [];
+			$applications = [];
+			$applications_size = [];
+			$history = [];
 		}
 
-		// multiselect hosts
-		$multiselect_host_data = [];
 		if ($filter['hostids']) {
 			$filter_hosts = API::Host()->get([
 				'output' => ['hostid', 'name'],
@@ -228,9 +308,11 @@ abstract class CControllerLatest extends CController {
 		}
 
 		return [
+			'rows' => $rows,
 			'hosts' => $hosts,
-			'items' => $items,
 			'applications' => $applications,
+			'applications_size' => $applications_size,
+			'items' => $items,
 			'history' => $history,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
 			'multiselect_host_data' => $multiselect_host_data

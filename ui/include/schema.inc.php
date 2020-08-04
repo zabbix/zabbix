@@ -53,8 +53,8 @@ return [
 			'lang' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 5,
-				'default' => 'en_GB',
+				'length' => 7,
+				'default' => 'default',
 			],
 			'refresh' => [
 				'null' => false,
@@ -95,6 +95,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => 50,
+			],
+			'timezone' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 50,
+				'default' => 'default',
 			],
 		],
 	],
@@ -2980,6 +2986,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+			'default_lang' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 5,
+				'default' => 'en_GB',
+			],
+			'default_timezone' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 50,
+				'default' => 'system',
 			],
 			'session_key' => [
 				'null' => false,

@@ -95,7 +95,12 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 }
 check_fields($fields);
 
-$_REQUEST['items'] = getRequest('items', []);
+$gitems = [];
+foreach (getRequest('items', []) as $gitem) {
+	$gitems[] = json_decode($gitem, true);
+}
+
+$_REQUEST['items'] = $gitems;
 $_REQUEST['show_3d'] = getRequest('show_3d', 0);
 $_REQUEST['show_legend'] = getRequest('show_legend', 0);
 
@@ -177,11 +182,9 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$items = getRequest('items', []);
-
 	// remove passing "gitemid" to API if new items added via pop-up
-	foreach ($items as &$item) {
-		if (!$item['gitemid']) {
+	foreach ($gitems as &$item) {
+		if (array_key_exists('gitemid', $item) && !$item['gitemid']) {
 			unset($item['gitemid']);
 		}
 	}
@@ -204,7 +207,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'show_3d' => getRequest('show_3d', 0),
 		'percent_left' => getRequest('percent_left', 0),
 		'percent_right' => getRequest('percent_right', 0),
-		'gitems' => $items
+		'gitems' => $gitems
 	];
 
 	DBstart();
@@ -447,7 +450,6 @@ $filter['groups'] = $filter['groups']
 	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
 		'groupids' => $filter['groups'],
-		'with_hosts_and_templates' => true,
 		'editable' => true,
 		'preservekeys' => true
 	]), ['groupid' => 'id'])
@@ -586,7 +588,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
 		$data['visible'] = getRequest('visible');
-		$data['items'] = getRequest('items', []);
+		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
 		$data['templates'] = [];
 

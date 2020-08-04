@@ -26,6 +26,9 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
+		$locales[] = LANG_DEFAULT;
+		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -33,8 +36,9 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			'userid' =>			'fatal|required|db users.userid',
 			'password1' =>		'string',
 			'password2' =>		'string',
-			'user_medias' =>	'array',
+			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
+			'timezone' =>		'db users.timezone|in '.implode(',', $timezones),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
 			'autologout' =>		'db users.autologout|not_empty',
@@ -82,7 +86,9 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 	protected function doAction() {
 		$user = [];
 
-		$this->getInputs($user, ['lang', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page', 'url']);
+		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page',
+			'url'
+		]);
 		$user['userid'] = CWebUser::$data['userid'];
 
 		if ($this->getInput('password1', '') !== ''
@@ -91,10 +97,10 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		}
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$user['user_medias'] = [];
+			$user['medias'] = [];
 
-			foreach ($this->getInput('user_medias', []) as $media) {
-				$user['user_medias'][] = [
+			foreach ($this->getInput('medias', []) as $media) {
+				$user['medias'][] = [
 					'mediatypeid' => $media['mediatypeid'],
 					'sendto' => $media['sendto'],
 					'active' => $media['active'],

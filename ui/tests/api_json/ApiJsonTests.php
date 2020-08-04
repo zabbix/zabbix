@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/testAuditLog.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testCorrelation.php';
 require_once dirname(__FILE__).'/testDRule.php';
+require_once dirname(__FILE__).'/testGraphPrototype.php';
 require_once dirname(__FILE__).'/testHistory.php';
 require_once dirname(__FILE__).'/testHost.php';
 require_once dirname(__FILE__).'/testHostInventory.php';
@@ -37,6 +38,7 @@ require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testTriggers.php';
+require_once dirname(__FILE__).'/testTriggerPermissions.php';
 require_once dirname(__FILE__).'/testTaskCreate.php';
 require_once dirname(__FILE__).'/testTemplateImport.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
@@ -60,6 +62,7 @@ class ApiJsonTests {
 //		$suite->addTestSuite('testDependentItems'); TODO: To be fix later
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
+		$suite->addTestSuite('testGraphPrototype');
 		$suite->addTestSuite('testHistory');
 		$suite->addTestSuite('testHost');
 		$suite->addTestSuite('testHostInventory');
@@ -71,6 +74,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testTriggers');
+		$suite->addTestSuite('testTriggerPermissions');
 		$suite->addTestSuite('testTaskCreate');
 		$suite->addTestSuite('testTemplateImport');
 		$suite->addTestSuite('testUserGroup');

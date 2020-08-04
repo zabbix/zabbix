@@ -24,8 +24,8 @@ require_once __DIR__.'/include/config.inc.php';
 $config = select_config();
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
-$request = CSession::getValue('request');
-CSession::unsetValue(['request']);
+$request = CSessionHelper::get('request');
+CSessionHelper::unset(['request']);
 
 if (hasRequest('request')) {
 	$request = getRequest('request');
@@ -38,12 +38,12 @@ if (hasRequest('request')) {
 
 	if ($request !== '') {
 		$redirect_to->setArgument('request', $request);
-		CSession::setValue('request', $request);
+		CSessionHelper::set('request', $request);
 	}
 }
 
 if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
-	CSession::unsetValue(['request']);
+	CSessionHelper::unset(['request']);
 
 	redirect($redirect_to->toString());
 }
