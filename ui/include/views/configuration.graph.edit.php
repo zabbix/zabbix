@@ -332,48 +332,34 @@ else {
 	);
 }
 
-$cols_attributes = [
-	['style' => 'width: 26px;'],
-	['style' => 'width: 20px;'],
-	['style' => 'width: ' . (($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 285 : 365) . 'px;']
-];
-if (in_array($this->data['graphtype'], [GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED])) {
-	$cols_attributes[] = ['style' => 'width: 85px;'];
-}
-$cols_attributes[] = ['style' => 'width: 85px;'];
-if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
-	$cols_attributes[] = ['style' => 'width: 85px;'];
-}
-if (in_array($this->data['graphtype'], [GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED])) {
-	$cols_attributes[] = ['style' => 'width: 85px;'];
-}
-$cols_attributes[] = ['style' => 'width: 105px;'];
-if (!$readonly) {
-	$cols_attributes[] = ['style' => 'width: 55px;'];
-}
-
 // Append items to form list.
 $items_table = (new CTable())
 	->setId('itemsTable')
-	->setColgroup($cols_attributes)
-	->setHeader([
-		(new CColHeader()),
-		(new CColHeader()),
-		(new CColHeader(_('Name'))),
+	->setColumns([
+		(new CTableColumn())->addClass('table-col-handle'),
+		(new CTableColumn())->addClass('table-col-no'),
+		(new CTableColumn(_('Name')))->addClass(($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
+			? 'table-col-name-normal'
+			: 'table-col-name'
+		),
 		in_array($this->data['graphtype'], [GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED])
-			? new CColHeader(_('Type'))
+			? (new CTableColumn(_('Type')))->addClass('table-col-type')
 			: null,
-		(new CColHeader(_('Function'))),
+		(new CTableColumn(_('Function')))->addClass('table-col-function'),
 		($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
-			? (new CColHeader(_('Draw style')))
-				->addClass(ZBX_STYLE_NOWRAP)
+			? (new CTableColumn(
+				(new CColHeader(_('Draw style')))->addClass(ZBX_STYLE_NOWRAP)
+			))
+				->addClass('table-col-draw-style')
 			: null,
 		in_array($this->data['graphtype'], [GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED])
-			? (new CColHeader(_('Y axis side')))
-				->addClass(ZBX_STYLE_NOWRAP)
+			? (new CTableColumn(
+				(new CColHeader(_('Y axis side')))->addClass(ZBX_STYLE_NOWRAP)
+			))
+				->addClass('table-col-y-axis-side')
 			: null,
-		(new CColHeader(_('Colour'))),
-		$readonly ? null : (new CColHeader(_('Action')))
+		(new CTableColumn(_('Colour')))->addClass('table-col-colour'),
+		$readonly ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
 	]);
 
 $popup_options_add = [

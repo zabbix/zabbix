@@ -74,35 +74,48 @@ class CTable extends CTag {
 	}
 
 	/**
-	 * Set attributes for table columns styling via colgroup html element. If this method was called, an element
-	 * colgroup will be added to the begining of table element.
+	 * Setup table column styles by colgroup and setup table headers.
+	 * Note: should not be used together with setHeader() function.
 	 *
-	 * @param array $cols_attributes  Html attributes for columns.
+	 * @param array $columns  Array with CTableColumn elements.
 	 *
 	 * @return CTable
 	 */
-	public function setColgroup(array $cols_attributes): self {
+	public function setColumns(array $columns = []): self {
+		$headers = [];
 		$cols = [];
-		foreach ($cols_attributes as $attributes) {
-			$col = new CTag('col');
-			foreach ($attributes as $attr_name => $attr_value) {
-				$col->setAttribute($attr_name, $attr_value);
+
+		foreach ($columns as $col) {
+			if ($col instanceof CTableColumn) {
+				$headers[] = $col->getHeader();
+				$cols[] = $col;
 			}
-			$cols[] = $col;
 		}
+
 		$this->colgroup = new CTag('colgroup', true, $cols);
+		$this->setHeader($headers);
 
 		return $this;
 	}
 
+	/**
+	 * Setup table header row.
+	 * Note: should not be used together with setColumns() function.
+	 *
+	 * @param mixed $value  Table header row or array with table header cells.
+	 *
+	 * @return CTable
+	 */
 	public function setHeader($value = null) {
 		if (!($value instanceof CRow)) {
 			$value = new CRowHeader($value);
 		}
+
 		$this->colnum = $value->itemsCount();
 
 		$value = new CTag('thead', true, $value);
 		$this->header = $value->toString();
+
 		return $this;
 	}
 
