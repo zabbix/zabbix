@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.0  
+For Zabbix version: 5.0
 The template is developed for monitoring DBMS Oracle Database single instance via ODBC.
 
 This template was tested on:
@@ -60,6 +60,7 @@ isql $TNS_NAME $DB_USER $DB_PASSWORD
 
 5. Сonfigure Zabbix server or Zabbix proxy for Oracle ENV Usage. Edit or add a new file:
 
+   Edit or add new file
 
    /etc/sysconfig/zabbix-server # for server
 
@@ -94,13 +95,12 @@ No specific Zabbix configuration is required.
 |{$ORACLE.ASM.USED.PCT.MAX.WARN} |<p>Maximum percentage of used ASM disk group for warning trigger expression.</p> |`90` |
 |{$ORACLE.CONCURRENCY.MAX.WARN} |<p>Maximum percentage of sessions concurrency usage for trigger expression.</p> |`80` |
 |{$ORACLE.DB.FILE.MAX.WARN} |<p>Maximum percentage of database files for trigger expression.</p> |`80` |
-|{$ORACLE.DBNAME.MATCHES} |<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p> |`.*` |
-|{$ORACLE.DBNAME.NOT_MATCHES} |<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p> |`PDB\$SEED` |
+|{$ORACLE.DBNAME.MATCHES} |<p>This macro is used in database discovery. It can be overridden on a host or linked template level.</p> |`.*` |
+|{$ORACLE.DBNAME.NOT_MATCHES} |<p>This macro is used in database discovery. It can be overridden on a host or linked template level.</p> |`PDB\$SEED` |
 |{$ORACLE.DSN} |<p>System data source name</p> |`<Put your DSN here>` |
 |{$ORACLE.EXPIRE.PASSWORD.MIN.WARN} |<p>Number of days of warning before password expires (for trigger expression).</p> |`7` |
 |{$ORACLE.PASSWORD} |<p>Oracle user password.</p> |`<Put your password here>` |
-|{$ORACLE.PGA.USE.MAX.WARN} |<p>Maximum percentage of PGA usage alert treshold (for trigger expression).
-</p> |`90` |
+|{$ORACLE.PGA.USE.MAX.WARN} |<p>Maximum percentage of PGA usage alert treshold (for trigger expression).</p> |`90` |
 |{$ORACLE.PORT} |<p>Oracle DB TCP port.</p> |`1521` |
 |{$ORACLE.PROCESSES.MAX.WARN} |<p>Maximum percentage of active processes alert treshold (for trigger expression).</p> |`80` |
 |{$ORACLE.REDO.MIN.WARN} |<p>Minimum number of REDO logs alert treshold (for trigger expression).</p> |`3` |
@@ -250,13 +250,13 @@ There are no template links in this template.
 |Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog |<p>Force Logging mode  - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all transactions to the REDO.</p> |`{TEMPLATE_NAME:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Template DB Oracle by ODBC:oracle.db_log_mode["{#DBNAME}"].last()} = 1` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status in mount mode |<p>The Oracle DB has a MOUNTED state.</p> |`{TEMPLATE_NAME:oracle.pdb_open_mode["{#DBNAME}"].last()}=1` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE}) |<p>Oracle DB open status has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.pdb_open_mode["{#DBNAME}"].diff()}=1` |INFO |<p>Manual close: YES</p> |
-|Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace Usage is is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m)</p> |
+|Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</p> |
 |Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}` |HIGH | |
 |Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE |<p>The tablespase is in the offline state.</p> |`{TEMPLATE_NAME:oracle.tbs_status["{#TABLESPACE}"].last()}=2` |WARNING | |
 |Oracle TBS '{#TABLESPACE}': Tablespace status has changed (new value received: {ITEM.VALUE}) |<p>Oracle tablespace status has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.tbs_status["{#TABLESPACE}"].diff()}=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</p> |
 |Archivelog '{#DEST_NAME}': Log Archive is not valid |<p>ARL destination not in 3 - Valid or 2 - Deferred.</p> |`{TEMPLATE_NAME:oracle.archivelog_log_status["{#DEST_NAME}"].last()}<2` |HIGH | |
-|ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m) | |`{TEMPLATE_NAME:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- ASM '{#DG_NAME}': Disk group usage is is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</p> |
-|ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m) | |`{TEMPLATE_NAME:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.HIGH}` |HIGH | |
+|ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m) |<p>Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}</p> |`{TEMPLATE_NAME:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</p> |
+|ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m) |<p>Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}</p> |`{TEMPLATE_NAME:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.HIGH}` |HIGH | |
 
 ## Feedback
 
