@@ -56,6 +56,20 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		'max_period' => '2y'
 	];
 
+	private $custom = [
+		'Default language' => 'English (en_US)',
+		'Default theme' => 'Dark',
+		'Limit for search and filter results' => '50',
+		'Max number of columns and rows in overview tables' => '25',
+		'Max count of elements to show inside table cell' => '100',
+		'Show warning if Zabbix server is down' => false,
+		'Working time' => '1-3,03:15-22:45',
+		'Show technical errors' => true,
+		'Max history display period' => '24h',
+		'Time filter default period' => '1h',
+		'Max period' => '2y'
+	];
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -842,7 +856,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
 		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
 		// Reset form in case of previous test case.
-		$this->resetConfiguration($form, $this->default);
+		$this->resetConfiguration($form, $this->default, 'Reset defaults');
 		// Fill form with new data.
 		$form->fill($data['fields']);
 		$form->submit();
@@ -866,48 +880,60 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		}
 	}
 
-	public function testFormAdministrationGeneralGUI_ResetButton() {
-		$custom = [
-			'Default language' => 'English (en_US)',
-			'Default theme' => 'Dark',
-			'Limit for search and filter results' => '50',
-			'Max number of columns and rows in overview tables' => '25',
-			'Max count of elements to show inside table cell' => '100',
-			'Show warning if Zabbix server is down' => false,
-			'Working time' => '1-3,03:15-22:45',
-			'Show technical errors' => true,
-			'Max history display period' => '24h',
-			'Time filter default period' => '1h',
-			'Max period' => '2y'
+	public function getResetButtonData() {
+		return [
+			[
+				[
+					'action' => 'Reset defaults',
+				]
+			],
+			[
+				[
+					'action' => 'Cancel',
+				]
+			]
 		];
+	}
 
+	/**
+	 * @dataProvider getResetButtonData
+	 */
+	public function testFormAdministrationGeneralGUI_ResetButton($data) {
 		$this->page->login()->open('zabbix.php?action=gui.edit');
 		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
 		// Reset form in case of some previous scenario.
-		$this->resetConfiguration($form, $this->default);
+		$this->resetConfiguration($form, $this->default, 'Reset defaults');
 		$default_sql = CDBHelper::getRow('SELECT * FROM config');
 		// Fill form with custom data.
-		$form->fill($custom);
+		$form->fill($this->custom);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-		// Check custom data in  form.
+		$custom_sql = CDBHelper::getRow('SELECT * FROM config');
+		// Check custom data in form.
 		$this->page->refresh();
 		$form->invalidate();
-		$form->checkValue($custom);
-		// Reset form after customly filled data and check that values are reset to default.
-		$this->resetConfiguration($form, $this->default);
-		$reset_sql = CDBHelper::getRow('SELECT * FROM config');
-		$this->assertEquals($default_sql, $reset_sql);
+		$form->checkValue($this->custom);
+		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
+		$this->resetConfiguration($form, $this->default, $data['action'],  $this->custom);
+		$sql = ($data['action'] === 'Reset defaults') ? $default_sql : $custom_sql;
+		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
 	}
 
-	private function resetConfiguration($form, $default) {
+	private function resetConfiguration($form, $default, $action, $custom = null) {
 		$form->query('button:Reset defaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button:Reset defaults')->one()->click();
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-		$this->page->refresh();
-		$form->invalidate();
-		// Check reset form.
-		$form->checkValue($default);
+		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
+		switch ($action) {
+			case 'Reset defaults':
+				$form->submit();
+				$this->assertMessage(TEST_GOOD, 'Configuration updated');
+				$this->page->refresh();
+				$form->invalidate();
+				// Check reset form.
+				$form->checkValue($default);
+				break;
+			case 'Cancel':
+				$form->checkValue($custom);
+				break;
+		}
 	}
 }
