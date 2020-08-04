@@ -15,7 +15,7 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
 
-1. Create an Oracle DB user for monitoring.
+1. Create an Oracle DB user for monitoring:
  ```
  CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
  -- Grant access to the zabbix_mon user.
@@ -39,12 +39,12 @@ This template was tested on:
  GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
  GRANT SELECT ON DBA_USERS TO zabbix_mon;
  ```
-**Note! Be sure that ODBC connects to Oracle with session parameter NLS_NUMERIC_CHARACTERS= '.,' It is important for correct display float numbers in Zabbix.**
+**Note! Make sure that ODBC connects to Oracle with session parameter NLS_NUMERIC_CHARACTERS= '.,' It is important for displaying float numbers in Zabbix correctly.**
 
 2. Install the ODBC driver on the Zabbix server or the Zabbix proxy.
   See Oracle documentation for instructions: https://www.oracle.com/database/technologies/releasenote-odbc-ic.html.
 
-3. Add new record to odbc.ini
+3. Add a new record to odbc.ini:
 ```
 [$ORACLE.DSN]
 Driver = Oracle 19 ODBC driver
@@ -53,14 +53,13 @@ DSN = $ORACLE.DSN
 ```
 **Note! Credentials in the odbc.ini do not work for Oracle.**
 
-4. Check the connection via isql
+4. Check the connection via isql:
 ```
 isql $TNS_NAME $DB_USER $DB_PASSWORD
 ```
 
-5. Сonfigure zabbix-serve or zabbix-proxy for Oracle ENV Usage. Edit or add new file:
+5. Сonfigure Zabbix server or Zabbix proxy for Oracle ENV Usage. Edit or add a new file:
 
-   Edit or add new file
 
    /etc/sysconfig/zabbix-server # for server
 
@@ -74,9 +73,9 @@ isql $TNS_NAME $DB_USER $DB_PASSWORD
    export TNS_ADMIN=$ORACLE_HOME/network/admin
    ```
 
-6. Restart Zabbix-server or zabbix-proxy service
+6. Restart Zabbix server or Zabbix proxy.
 
-7. Set the user name and password in host macros ({$ORACLE.USER} and {$ORACLE.PASSWORD}).
+7. Set the username and password in host macros ({$ORACLE.USER} and {$ORACLE.PASSWORD}).
 
 8. Set the {$ORACLE.DSN} in host macros.
 
@@ -98,21 +97,22 @@ No specific Zabbix configuration is required.
 |{$ORACLE.DBNAME.MATCHES} |<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p> |`.*` |
 |{$ORACLE.DBNAME.NOT_MATCHES} |<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p> |`PDB\$SEED` |
 |{$ORACLE.DSN} |<p>System data source name</p> |`<Put your DSN here>` |
-|{$ORACLE.EXPIRE.PASSWORD.MIN.WARN} |<p>The number of days before password expired for trigger expression.</p> |`7` |
+|{$ORACLE.EXPIRE.PASSWORD.MIN.WARN} |<p>Number of days of warning before password expires (for trigger expression).</p> |`7` |
 |{$ORACLE.PASSWORD} |<p>Oracle user password.</p> |`<Put your password here>` |
-|{$ORACLE.PGA.USE.MAX.WARN} |<p>Maximum percentage of PGA usage for trigger expression.</p> |`90` |
+|{$ORACLE.PGA.USE.MAX.WARN} |<p>Maximum percentage of PGA usage alert treshold (for trigger expression).
+</p> |`90` |
 |{$ORACLE.PORT} |<p>Oracle DB TCP port.</p> |`1521` |
-|{$ORACLE.PROCESSES.MAX.WARN} |<p>Maximum percentage of active processes for trigger expression.</p> |`80` |
-|{$ORACLE.REDO.MIN.WARN} |<p>Minimum number of REDO logs for trigger expression.</p> |`3` |
-|{$ORACLE.SESSION.LOCK.MAX.TIME} |<p>Maximum wait seconds for count of long time locked sessions query.</p> |`600` |
-|{$ORACLE.SESSION.LONG.LOCK.MAX.WARN} |<p>Maximum number of long locked sessions usage for trigger expression.</p> |`3` |
-|{$ORACLE.SESSIONS.LOCK.MAX.WARN} |<p>Maximum percentage of locked sessions usage for trigger expression.</p> |`20` |
-|{$ORACLE.SESSIONS.MAX.WARN} |<p>Maximum percentage of active sessions for trigger expression.</p> |`80` |
-|{$ORACLE.SHARED.FREE.MIN.WARN} |<p>Minimum percent of free shared pool for trigger expression.</p> |`5` |
-|{$ORACLE.TABLESPACE.NAME.MATCHES} |<p>This macro is used in tablespace discovery. It can be overridden on the host or linked template level.</p> |`.*` |
-|{$ORACLE.TABLESPACE.NAME.NOT_MATCHES} |<p>This macro is used in tablespace discovery. It can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
-|{$ORACLE.TBS.USED.PCT.MAX.HIGH} |<p>Maximum percentage of used tablespace for high trigger expression.</p> |`90` |
-|{$ORACLE.TBS.USED.PCT.MAX.WARN} |<p>Maximum percentage of used tablespace for warning trigger expression.</p> |`80` |
+|{$ORACLE.PROCESSES.MAX.WARN} |<p>Maximum percentage of active processes alert treshold (for trigger expression).</p> |`80` |
+|{$ORACLE.REDO.MIN.WARN} |<p>Minimum number of REDO logs alert treshold (for trigger expression).</p> |`3` |
+|{$ORACLE.SESSION.LOCK.MAX.TIME} |<p>Maximum session lock duration in seconds for count the session as a prolongely locked query.</p> |`600` |
+|{$ORACLE.SESSION.LONG.LOCK.MAX.WARN} |<p>Maximum number of the prolongely locked sessions alert treshold (for trigger expression).</p> |`3` |
+|{$ORACLE.SESSIONS.LOCK.MAX.WARN} |<p>Maximum percentage of locked sessions alert treshold (for trigger expression).</p> |`20` |
+|{$ORACLE.SESSIONS.MAX.WARN} |<p>Maximum percentage of active sessions alert treshold (for trigger expression).</p> |`80` |
+|{$ORACLE.SHARED.FREE.MIN.WARN} |<p>Minimum percentage of free shared pool alert treshold (for trigger expression).</p> |`5` |
+|{$ORACLE.TABLESPACE.NAME.MATCHES} |<p>This macro is used in tablespace discovery. It can be overridden on a host or linked template level.</p> |`.*` |
+|{$ORACLE.TABLESPACE.NAME.NOT_MATCHES} |<p>This macro is used in tablespace discovery. It can be overridden on a host or linked template level.</p> |`CHANGE_IF_NEEDED` |
+|{$ORACLE.TBS.USED.PCT.MAX.HIGH} |<p>Maximum percentage of used tablespace high severity alert treshold (for trigger expression).</p> |`90` |
+|{$ORACLE.TBS.USED.PCT.MAX.WARN} |<p>Maximum percentage of used tablespace warning severity alert treshold (for trigger expression).</p> |`80` |
 |{$ORACLE.USER} |<p>Oracle username.</p> |`<Put your username here>` |
 
 ## Template links
@@ -166,7 +166,7 @@ There are no template links in this template.
 |Oracle |Oracle: Active background sessions |<p>The number of active background sessions.</p> |DEPENDENT |oracle.session_active_background<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SESSION::Active Background')].VALUE.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |Oracle |Oracle: Inactive user sessions |<p>The number of inactive user sessions.</p> |DEPENDENT |oracle.session_inactive_user<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SESSION::Inactive User')].VALUE.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |Oracle |Oracle: Sessions lock rate |<p>The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource—either user objects such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.</p> |DEPENDENT |oracle.session_lock_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SESSION::Lock rate')].VALUE.first()`</p> |
-|Oracle |Oracle: Sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s |<p>Count of long time locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)</p> |DEPENDENT |oracle.session_long_time_locked<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SESSION::Long time locked')].VALUE.first()`</p> |
+|Oracle |Oracle: Sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s |<p>Count of the prolongely locked sessions. (You can change maximum session lock duration in seconds for query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default 600 sec)</p> |DEPENDENT |oracle.session_long_time_locked<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SESSION::Long time locked')].VALUE.first()`</p> |
 |Oracle |Oracle: Sessions concurrency |<p>The percentage of concurrency. Concurrency is a DB behaviour when different transactions request to change the same resource - in case of modifying data transactions sequentially block temporarily the right to change data, the rest of the transactions are waiting for access. In the case when access for resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.</p> |DEPENDENT |oracle.session_concurrency_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SESSION::Concurrency rate')].VALUE.first()`</p> |
 |Oracle |Oracle: User '{$ORACLE.USER}' expire password |<p>The number of days before zabbix account password expired.</p> |DEPENDENT |oracle.user_expire_password<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='USER::Expire password')].VALUE.first()`</p> |
 |Oracle |Oracle: Active serial sessions |<p>The number of active serial sessions.</p> |DEPENDENT |oracle.active_serial_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SYS::Active Serial Sessions')].VALUE.first()`</p> |
@@ -231,32 +231,32 @@ There are no template links in this template.
 |Oracle: LISTENER process is not running | |`{TEMPLATE_NAME:proc.num[,,,"tnslsnr LISTENER"].max(#3)}=0` |DISASTER | |
 |Oracle: Version has changed (new version value received: {ITEM.VALUE}) |<p>Oracle DB version has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.version.diff()}=1 and {TEMPLATE_NAME:oracle.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Oracle: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:oracle.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
-|Oracle: Failed to fetch info data (or no data for 5m) |<p>Zabbix has not received data for items for the last 5 minutes. The database might be unavailable for connecting</p> |`{TEMPLATE_NAME:oracle.uptime.nodata(5m)}=1` |WARNING |<p>**Depends on**:</p><p>- Oracle: Port {$ORACLE.PORT} is unavailable</p> |
+|Oracle: Failed to fetch info data (or no data for 5m) |<p>Zabbix has not received data for items for the last 5 minutes. The database might be unavailable for connecting.</p> |`{TEMPLATE_NAME:oracle.uptime.nodata(5m)}=1` |WARNING |<p>**Depends on**:</p><p>- Oracle: Port {$ORACLE.PORT} is unavailable</p> |
 |Oracle: Instance name has changed (new name received: {ITEM.VALUE}) |<p>Oracle DB Instance name has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.instance_name.diff()}=1 and {TEMPLATE_NAME:oracle.instance_name.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE}) |<p>Oracle DB Instance hostname has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.instance_hostname.diff()}=1 and {TEMPLATE_NAME:oracle.instance_hostname.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min) |<p>Active process are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available Process number</p> |`{TEMPLATE_NAME:oracle.processes_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.processes_limit.last()} > {$ORACLE.PROCESSES.MAX.WARN}` |WARNING | |
-|Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min) |<p>Number of datafiles more than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.</p> |`{TEMPLATE_NAME:oracle.db_files_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.db_files_limit.last()} > {$ORACLE.DB.FILE.MAX.WARN}` |WARNING | |
-|Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m) |<p>The shared pool free memory percent less than {$ORACLE.SHARED.FREE.MIN.WARN}% in the last 5 minutes.</p> |`{TEMPLATE_NAME:oracle.shared_pool_free.max(5m)}<{$ORACLE.SHARED.FREE.MIN.WARN}` |WARNING | |
-|Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min) |<p>Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions</p> |`{TEMPLATE_NAME:oracle.session_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.session_limit.last()} > {$ORACLE.SESSIONS.MAX.WARN}` |WARNING | |
+|Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min) |<p>Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.</p> |`{TEMPLATE_NAME:oracle.processes_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.processes_limit.last()} > {$ORACLE.PROCESSES.MAX.WARN}` |WARNING | |
+|Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min) |<p>Number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.</p> |`{TEMPLATE_NAME:oracle.db_files_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.db_files_limit.last()} > {$ORACLE.DB.FILE.MAX.WARN}` |WARNING | |
+|Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m) |<p>The shared pool free memory percent has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% in the last 5 minutes.</p> |`{TEMPLATE_NAME:oracle.shared_pool_free.max(5m)}<{$ORACLE.SHARED.FREE.MIN.WARN}` |WARNING | |
+|Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min) |<p>Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.</p> |`{TEMPLATE_NAME:oracle.session_count.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.session_limit.last()} > {$ORACLE.SESSIONS.MAX.WARN}` |WARNING | |
 |Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min) |<p>Number of locked sessions is over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.</p> |`{TEMPLATE_NAME:oracle.session_lock_rate.min(5m)} > {$ORACLE.SESSIONS.LOCK.MAX.WARN}` |WARNING | |
 |Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min) |<p>Number of sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect database performance, therefore, if they are detected, you should first find the most difficult queries from the database point of view and analyze possible resource leaks.</p> |`{TEMPLATE_NAME:oracle.session_long_time_locked.min(5m)} > {$ORACLE.SESSION.LONG.LOCK.MAX.WARN}` |WARNING | |
 |Oracle: Too hight database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min) |<p>Concurrency rate is over {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but is a signal to search for it. In the case of high competition, an analysis of resource consumption should be carried out, the most "heavy" queries made in the database, possibly - session tracing. All this will help determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.</p> |`{TEMPLATE_NAME:oracle.session_concurrency_rate.min(5m)} > {$ORACLE.CONCURRENCY.MAX.WARN}` |WARNING | |
-|Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days) |<p>Password for zabbix user in database will expire soon.</p> |`{TEMPLATE_NAME:oracle.user_expire_password.last()}  < {$ORACLE.EXPIRE.PASSWORD.MIN.WARN}` |WARNING | |
-|Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min) |<p>Total PGA inuse is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.</p> |`{TEMPLATE_NAME:oracle.total_pga_used.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.pga_target.last()} > {$ORACLE.PGA.USE.MAX.WARN}` |WARNING | |
+|Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days) |<p>Password for zabbix user in the database will expire soon.</p> |`{TEMPLATE_NAME:oracle.user_expire_password.last()}  < {$ORACLE.EXPIRE.PASSWORD.MIN.WARN}` |WARNING | |
+|Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min) |<p>Total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.</p> |`{TEMPLATE_NAME:oracle.total_pga_used.min(5m)} * 100 / {Template DB Oracle by ODBC:oracle.pga_target.last()} > {$ORACLE.PGA.USE.MAX.WARN}` |WARNING | |
 |Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min) |<p>Number of available for log switching inactive/unused REDOs is low (Database down risk)</p> |`{TEMPLATE_NAME:oracle.redo_logs_available.max(5m)} < {$ORACLE.REDO.MIN.WARN}` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status in mount mode |<p>The Oracle DB has a MOUNTED state.</p> |`{TEMPLATE_NAME:oracle.db_open_mode["{#DBNAME}"].last()}=1` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE}) |<p>Oracle DB open status has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.db_open_mode["{#DBNAME}"].diff()}=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Oracle Database '{#DBNAME}': Open status in mount mode</p> |
 |Oracle Database '{#DBNAME}': Role has changed (new value received: {ITEM.VALUE}) |<p>Oracle DB role has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.db_role["{#DBNAME}"].diff()}=1` |INFO |<p>Manual close: YES</p> |
-|Oracle Database '{#DBNAME}': Force logging is deactivate for DB with active Archivelog |<p>Force Logging mode  - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all transactions to  the REDO.</p> |`{TEMPLATE_NAME:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Template DB Oracle by ODBC:oracle.db_log_mode["{#DBNAME}"].last()} = 1` |WARNING | |
+|Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog |<p>Force Logging mode  - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all transactions to the REDO.</p> |`{TEMPLATE_NAME:oracle.db_force_logging["{#DBNAME}"].last()} = 0 and {Template DB Oracle by ODBC:oracle.db_log_mode["{#DBNAME}"].last()} = 1` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status in mount mode |<p>The Oracle DB has a MOUNTED state.</p> |`{TEMPLATE_NAME:oracle.pdb_open_mode["{#DBNAME}"].last()}=1` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE}) |<p>Oracle DB open status has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.pdb_open_mode["{#DBNAME}"].diff()}=1` |INFO |<p>Manual close: YES</p> |
-|Oracle TBS '{#TABLESPACE}': Tablespace usage is is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m) | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace Usage is is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m)</p> |
-|Oracle TBS '{#TABLESPACE}': Tablespace Usage is is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m) | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}` |HIGH | |
-|Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE |<p>The tablespase is in offline state.</p> |`{TEMPLATE_NAME:oracle.tbs_status["{#TABLESPACE}"].last()}=2` |WARNING | |
+|Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace Usage is is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m)</p> |
+|Oracle TBS '{#TABLESPACE}': Tablespace Usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m). | |`{TEMPLATE_NAME:oracle.tbs_used_pct["{#TABLESPACE}"].min(5m)}>{$ORACLE.TBS.USED.PCT.MAX.HIGH}` |HIGH | |
+|Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE |<p>The tablespase is in the offline state.</p> |`{TEMPLATE_NAME:oracle.tbs_status["{#TABLESPACE}"].last()}=2` |WARNING | |
 |Oracle TBS '{#TABLESPACE}': Tablespace status has changed (new value received: {ITEM.VALUE}) |<p>Oracle tablespace status has changed. Ack to close.</p> |`{TEMPLATE_NAME:oracle.tbs_status["{#TABLESPACE}"].diff()}=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespase is OFFLINE</p> |
 |Archivelog '{#DEST_NAME}': Log Archive is not valid |<p>ARL destination not in 3 - Valid or 2 - Deferred.</p> |`{TEMPLATE_NAME:oracle.archivelog_log_status["{#DEST_NAME}"].last()}<2` |HIGH | |
-|ASM '{#DG_NAME}': Disk group usage is is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m) | |`{TEMPLATE_NAME:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- ASM '{#DG_NAME}': Disk group usage is is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</p> |
-|ASM '{#DG_NAME}': Disk group usage is is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m) | |`{TEMPLATE_NAME:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.HIGH}` |HIGH | |
+|ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m) | |`{TEMPLATE_NAME:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- ASM '{#DG_NAME}': Disk group usage is is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</p> |
+|ASM '{#DG_NAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m) | |`{TEMPLATE_NAME:oracle.asm_used_pct["{#DG_NAME}"].min(5m)}>{$ORACLE.ASM.USED.PCT.MAX.HIGH}` |HIGH | |
 
 ## Feedback
 
