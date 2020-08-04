@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../traits/FilterTrait.php';
  * @backup widget
  * @backup profiles
  */
-class testProblemsBySeverityWidget extends CWebTest {
+class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 	use FilterTrait;
 
@@ -474,7 +474,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 	/**
 	 * @dataProvider getCreateWidgetData
 	 */
-	public function testProblemsBySeverityWidget_Create($data) {
+	public function testDashboardProblemsBySeverityWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -1222,7 +1222,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 	 * @backup widget
 	 * @dataProvider getUpdateWidgetData
 	 */
-	public function testProblemsBySeverityWidget_Update($data) {
+	public function testDashboardProblemsBySeverityWidget_Update($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
@@ -1259,7 +1259,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-	public function testProblemsBySeverityWidget_SimpleUpdate() {
+	public function testDashboardProblemsBySeverityWidget_SimpleUpdate() {
 		$initial_values = CDBHelper::getHash($this->sql);
 
 		// Open a dashboard widget and then save it without applying any changes
@@ -1315,7 +1315,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 	/**
 	 * @dataProvider getCancelActionsData
 	 */
-	public function testProblemsBySeverityWidget_Cancel($data) {
+	public function testDashboardProblemsBySeverityWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
@@ -1366,7 +1366,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testProblemsBySeverityWidget_Delete() {
+	public function testDashboardProblemsBySeverityWidget_Delete() {
 		foreach (['Reference PBS widget to delete', 'Totals reference PBS widget to delete'] as $name) {
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 			$dashboard = CDashboardElement::find()->one()->edit();

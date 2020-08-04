@@ -103,10 +103,12 @@ class CFormParametersBehavior extends CBehavior {
 	public function assertValues($data) {
 		$rows = [];
 		foreach ($data as $values) {
-			$rows[] = [
-				'name' => CTestArrayHelper::get($values, 'name', ''),
-				'value' => CTestArrayHelper::get($values, 'value', ''),
-			];
+			$row = [];
+			foreach ($this->table_mapping as $mapping) {
+				$row[$mapping['name']] = CTestArrayHelper::get($values, $mapping['name'], '');
+			}
+
+			$rows[] = $row;
 		}
 
 		$this->test->assertEquals($rows, $this->getValues(),

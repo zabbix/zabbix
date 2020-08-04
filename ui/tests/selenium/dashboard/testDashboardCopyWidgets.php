@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  * @backup widget
  * @backup profiles
  */
-class testCopyWidgets extends CWebTest {
+class testDashboardCopyWidgets extends CWebTest {
 
 	const DASHBOARD_ID = 130;
 	const PASTE_DASHBOARD_ID = 131;
@@ -42,21 +42,21 @@ class testCopyWidgets extends CWebTest {
 	/**
 	 * @dataProvider getCopyWidgetsData
 	 */
-	public function testCopyWidgets_SameDashboard($data) {
+	public function testDashboardCopyWidgets_SameDashboard($data) {
 		$this->copyWidgets($data);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsData
 	 */
-	public function testCopyWidgets_OtherDashboard($data) {
+	public function testDashboardCopyWidgets_OtherDashboard($data) {
 		$this->copyWidgets($data, true);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsData
 	 */
-	public function testCopyWidgets_ReplaceWidget($data) {
+	public function testDashboardCopyWidgets_ReplaceWidget($data) {
 		$this->copyWidgets($data, true, true);
 	}
 

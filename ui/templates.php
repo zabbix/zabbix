@@ -1137,7 +1137,7 @@ else {
 	if ($linked_hostids) {
 		$editable_hosts = API::Host()->get([
 			'output' => ['hostid'],
-			'hostsids' => array_keys($linked_hostids),
+			'hostids' => array_keys($linked_hostids),
 			'editable' => true,
 			'preservekeys' => true
 		]);
