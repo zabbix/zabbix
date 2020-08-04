@@ -235,9 +235,14 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['from']['interface'] = 'interface hi';
+			$sqlParts['left_join']['interface'] = [
+				'from' => 'interface hi',
+				'on' => 'h.hostid=hi.hostid'
+			];
+
+			$sqlParts['left_table'] = $this->tableName();
+
 			$sqlParts['where'][] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
-			$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 		}
 
 		// itemids
@@ -484,8 +489,12 @@ class CHost extends CHostGeneral {
 			$this->dbFilter('hosts h', $options, $sqlParts);
 
 			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
-				$sqlParts['from']['interface'] = 'interface hi';
-				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
+				$sqlParts['left_join']['interface'] = [
+					'from' => 'interface hi',
+					'on' => 'h.hostid=hi.hostid'
+				];
+
+				$sqlParts['left_table'] = $this->tableName();
 			}
 		}
 
