@@ -905,13 +905,13 @@ class CMacrosResolverGeneral {
 
 				switch ($m) {
 					case 'ITEM.LOG.DATE':
-						$value = date('Y-m-d', $history[$function['itemid']][0]['timestamp']);
+						$value = date('Y.m.d', $history[$function['itemid']][0]['timestamp']);
 						break;
 					case 'ITEM.LOG.TIME':
 						$value = date('H:i:s', $history[$function['itemid']][0]['timestamp']);;
 						break;
 					case 'ITEM.LOG.AGE':
-						$value = $history[$function['itemid']][0]['timestamp'];
+						$value = zbx_date2age($history[$function['itemid']][0]['timestamp']);
 						break;
 					case 'ITEM.LOG.SOURCE':
 						$value = $history[$function['itemid']][0]['source'];
