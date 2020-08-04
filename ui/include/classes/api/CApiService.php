@@ -417,10 +417,19 @@ class CApiService {
 	 *
 	 * @return string
 	 */
-	private static function dbDistinct(array $sql_parts) : string {
+	private static function dbDistinct(array $sql_parts) {
 		$count = count($sql_parts['from']);
-		if (array_key_exists('left_join', $sql_parts)) {
-			$count += count($sql_parts['left_join']);
+
+		if ($count == 1 && array_key_exists('left_join', $sql_parts)) {
+			foreach ($sql_parts['left_join'] as $left_join) {
+				$r_table = DB::getSchema($left_join['table']);
+
+				// Increase count when table linked by non-unique column.
+				if ($left_join['using'] !== $r_table['key']) {
+					$count++;
+					break;
+				}
+			}
 		}
 
 		return ($count > 1 ? ' DISTINCT' : '');
@@ -436,14 +445,20 @@ class CApiService {
 	protected static function createSelectQueryFromParts(array $sqlParts) {
 		$sql_left_join = '';
 		if (array_key_exists('left_join', $sqlParts)) {
-			foreach ($sqlParts['left_join'] as $join) {
-				$sql_left_join .= ' LEFT JOIN '.$join['from'].' ON '.$join['on'];
+			$l_table = DB::getSchema($sqlParts['left_table']['table']);
+
+			foreach ($sqlParts['left_join'] as $left_join) {
+				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'];
+				$sql_left_join .= ($l_table['key'] === $left_join['using'])
+					? ' USING ('.$left_join['using'].')'
+					: ' ON '.$sqlParts['left_table']['alias'].'.'.$l_table['key'].
+						'='.$left_join['alias'].'.'.$left_join['using'];
 			}
 
 			// Moving a left table to the end.
-			$left_table = $sqlParts['from'][$sqlParts['left_table']];
-			unset($sqlParts['from'][$sqlParts['left_table']]);
-			$sqlParts['from'][$sqlParts['left_table']] = $left_table;
+			$table_id = $sqlParts['left_table']['table'].' '.$sqlParts['left_table']['alias'];
+			unset($sqlParts['from'][array_search($table_id, $sqlParts['from'])]);
+			$sqlParts['from'][] = $table_id;
 		}
 
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
