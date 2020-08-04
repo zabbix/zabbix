@@ -3041,8 +3041,8 @@ static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int 
  *                                                                            *
  * Function: lld_interfaces_get                                               *
  *                                                                            *
- * Purpose: retrieves either list of interfaces from the lld rule's host or   *
- *          list of custom interfaces defined for the host prototype          *
+ * Purpose: retrieves either the list of interfaces from the lld rule's host  *
+ *          or the list of custom interfaces defined for the host prototype   *
  *                                                                            *
  ******************************************************************************/
 static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, unsigned char custom_interfaces)
