@@ -31,7 +31,7 @@ $('.overlay-dialogue-body #filter_custom_time').on('click', function () {
 
 function tabFilterFormAction(form_action, overlay) {
 	var $form = overlay.$dialogue.find('form'),
-		url = new Curl($form.attr('action'));
+		url = new Curl($form.attr('action')),
 		$action_intput = $('<input/>', {type: 'hidden', name: 'form_action', value: form_action}).appendTo($form);
 
 	overlay.setLoading();
