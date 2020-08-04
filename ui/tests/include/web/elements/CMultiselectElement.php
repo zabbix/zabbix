@@ -23,6 +23,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 use Facebook\WebDriver\Remote\RemoteWebElement;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 /**
  * Multiselect element.
@@ -55,7 +56,7 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Set default fill mode.
 	 *
-	 * @param integer $mode    MODE_SELECT or MODE_TYPE
+	 * @param integer $mode    MODE_SELECT, MODE_SELECT_MULTIPLE or MODE_TYPE
 	 */
 	public static function setDefaultFillMode($mode) {
 		self::$default_mode = $mode;
@@ -64,7 +65,7 @@ class CMultiselectElement extends CElement {
 	/**
 	 * Set fill mode.
 	 *
-	 * @param integer $mode    MODE_SELECT or MODE_TYPE
+	 * @param integer $mode    MODE_SELECT, MODE_SELECT_MULTIPLE or MODE_TYPE
 	 *
 	 * @return $this
 	 */
@@ -211,7 +212,7 @@ class CMultiselectElement extends CElement {
 		$this->getControls()->first()->click();
 
 		return COverlayDialogElement::find()->waitUntilPresent()
-				->all()->last()->waitUntilReady()->setDataContext($context);
+				->all()->last()->waitUntilReady()->setDataContext($context, $this->mode);
 	}
 
 	/**
@@ -275,44 +276,54 @@ class CMultiselectElement extends CElement {
 
 		$this->clear();
 
-		if ($context === null && is_array($labels)) {
-			if (array_key_exists('values', $labels)) {
-				if (array_key_exists('context', $labels)) {
-					$context = $labels['context'];
-				}
+		// TODO: for loop and try/catch block should be removed after DEV-1535 is fixed.
+		for ($i = 0; $i < 2; $i++) {
+			try {
+				if ($context === null && is_array($labels)) {
+					if (array_key_exists('values', $labels)) {
+						if (array_key_exists('context', $labels)) {
+							$context = $labels['context'];
+						}
 
-				$labels = $labels['values'];
-			}
-			else {
-				foreach ($labels as $label) {
-					if (is_array($label) && array_key_exists('values', $label)) {
-						$context = (array_key_exists('context', $label)) ? $label['context'] : null;
-						$label = $label['values'];
-					}
-
-					if ($this->mode === self::MODE_SELECT) {
-						throw new Exception('Cannot select multiple items in single select mode.');
-					}
-					elseif ($this->mode === self::MODE_SELECT_MULTIPLE) {
-						$this->selectMultiple($label, $context);
+						$labels = $labels['values'];
 					}
 					else {
-						$this->type($label);
+						foreach ($labels as $label) {
+							if (is_array($label) && array_key_exists('values', $label)) {
+								$context = (array_key_exists('context', $label)) ? $label['context'] : null;
+								$label = $label['values'];
+							}
+
+							if ($this->mode === self::MODE_SELECT) {
+								throw new Exception('Cannot select multiple items in single select mode.');
+							}
+							elseif ($this->mode === self::MODE_SELECT_MULTIPLE) {
+								$this->selectMultiple($label, $context);
+							}
+							else {
+								$this->type($label);
+							}
+						}
+
+						return $this;
 					}
 				}
 
-				return $this;
+				if ($this->mode === self::MODE_SELECT) {
+					return $this->select($labels, $context);
+				}
+				elseif ($this->mode === self::MODE_SELECT_MULTIPLE) {
+					return $this->selectMultiple($labels, $context);
+				}
+
+				return $this->type($labels);
+			}
+			catch (StaleElementReferenceException $exception) {
+				if ($i === 1) {
+					throw $exception;
+				}
 			}
 		}
-
-		if ($this->mode === self::MODE_SELECT) {
-			return $this->select($labels, $context);
-		}
-		elseif ($this->mode === self::MODE_SELECT_MULTIPLE) {
-			return $this->selectMultiple($labels, $context);
-		}
-
-		return $this->type($labels);
 	}
 
 	/**

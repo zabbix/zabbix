@@ -25,35 +25,44 @@
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
+$this->addJsFile('multiselect.js');
 
-$filter = (new CFormList())
-	->addRow(_('User'), [
-		(new CTextBox('alias', $data['alias']))
-			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('select_user', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
+$this->includeJsFile('reports.auditlog.list.js.php');
+
+$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action'])));
+
+$filter_form = (new CFormList())
+	->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
+		(new CMultiSelect([
+			'name' => 'filter_userids[]',
+			'object_name' => 'users',
+			'data' => $data['userids'],
+			'placeholder' => '',
+			'popup' => [
+				'parameters' => [
 					'srctbl' => 'users',
-					'srcfld1' => 'alias',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'alias'
-				]).', null, this);'
-			)
+					'srcfld1' => 'userid',
+					'srcfld2' => 'fullname',
+					'dstfrm' => $filter->getName(),
+					'dstfld1' => 'filter_userids_'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	])
-	->addRow(_('Action'), new CComboBox('auditlog_action', $data['auditlog_action'], null, $data['actions']))
-	->addRow(_('Resource'), new CComboBox('resourcetype', $data['resourcetype'], null, $data['resources']));
+	->addRow(_('Resource'), new CComboBox('filter_resourcetype', $data['resourcetype'], null, $data['resources']))
+	->addRow(_('Resource ID'), (new CTextBox('filter_resourceid', $data['resourceid']))
+		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+	)
+	->addRow(_('Action'), new CComboBox('filter_action', $data['auditlog_action'], null, $data['actions']));
 
 $widget = (new CWidget())
 	->setTitle(_('Audit log'))
-	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', $data['action'])))
+	->addItem($filter
 		->addVar('action', $data['action'])
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
-		->addFilterTab(_('Filter'), [$filter])
+		->addFilterTab(_('Filter'), [$filter_form])
 );
 
 $table = (new CTableInfo())

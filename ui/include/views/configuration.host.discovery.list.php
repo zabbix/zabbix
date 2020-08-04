@@ -289,7 +289,7 @@ $discoveryForm->addItem([
 			'discoveryrule.massdisable' => ['name' => _('Disable'),
 				'confirm' =>_('Disable selected discovery rules?')
 			],
-			'discoveryrule.masscheck_now' => ['name' => _('Execute now')],
+			'discoveryrule.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
 			'discoveryrule.massdelete' => ['name' => _('Delete'),
 				'confirm' =>_('Delete selected discovery rules?')
 			]

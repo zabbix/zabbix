@@ -26,58 +26,42 @@ class CUserMacroParser extends CParser {
 	const STATE_UNQUOTED = 2;
 	const STATE_QUOTED = 3;
 	const STATE_END_OF_MACRO = 4;
+	public const REGEX_PREFIX = 'regex:';
 
 	private $macro = '';
 	private $context = null;
 	private $context_quoted = false;
-	private $error = '';
+	private $regex = null;
 
-	/**
-	 * Returns an error message depending on input parameters.
-	 *
-	 * @param string $source
-	 * @param int $pos
-	 *
-	 * @return string
-	 */
-	private function errorMessage($source, $pos) {
-		if (!isset($source[$pos])) {
-			return ($pos == 0) ? _('macro is empty') : _('unexpected end of macro');
-		}
-
-		for ($p = $pos, $chunk = '', $maxChunkSize = 50; isset($source[$p]); $p++) {
-			if (0x80 != (0xc0 & ord($source[$p])) && $maxChunkSize-- == 0) {
-				break;
-			}
-			$chunk .= $source[$p];
-		}
-
-		if (isset($source[$p])) {
-			$chunk .= ' ...';
-		}
-
-		return _s('incorrect syntax near "%1$s"', $chunk);
+	public function __construct() {
+		$this->error_msgs['empty'] = _('macro is empty');
+		$this->error_msgs['unexpected_end'] = _('unexpected end of macro');
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
 		$this->macro = '';
 		$this->context = null;
 		$this->context_quoted = false;
-		$this->error = '';
+		$this->errorClear();
+		$this->regex = null;
+		$has_regex = false;
 
 		$p = $pos;
 
 		if (!isset($source[$p]) || $source[$p] != '{') {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
 		if (!isset($source[$p]) || $source[$p] != '$') {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
@@ -87,7 +71,7 @@ class CUserMacroParser extends CParser {
 			;
 
 		if ($p == $pos + 2 || !isset($source[$p])) {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
@@ -100,7 +84,7 @@ class CUserMacroParser extends CParser {
 			$this->match = substr($source, $pos, $this->length);
 
 			if (isset($source[$p])) {
-				$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+				$this->errorPos(substr($source, $pos), $p - $pos);
 
 				return self::PARSE_SUCCESS_CONT;
 			}
@@ -110,11 +94,16 @@ class CUserMacroParser extends CParser {
 
 		if ($source[$p] != ':') {
 			$this->macro = '';
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
 		}
 		$p++;
+
+		if (preg_match("/^\s*".self::REGEX_PREFIX."/", substr($source, $p)) === 1) {
+			$has_regex = true;
+			$p += strpos(substr($source, $p), self::REGEX_PREFIX) + strlen(self::REGEX_PREFIX);
+		}
 
 		$this->context = '';
 		$this->context_quoted = false;
@@ -187,16 +176,21 @@ class CUserMacroParser extends CParser {
 			$this->macro = '';
 			$this->context = null;
 			$this->context_quoted = false;
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_FAIL;
+		}
+
+		if ($has_regex) {
+			$this->regex = $this->context;
+			$this->context = null;
 		}
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
 		if (isset($source[$p])) {
-			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			$this->errorPos(substr($source, $pos), $p - $pos);
 
 			return self::PARSE_SUCCESS_CONT;
 		}
@@ -211,7 +205,7 @@ class CUserMacroParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private function isMacroChar($c) {
+	private function isMacroChar(string $c): bool {
 		return (($c >= 'A' && $c <= 'Z') || $c == '.' || $c == '_' || ($c >= '0' && $c <= '9'));
 	}
 
@@ -222,7 +216,7 @@ class CUserMacroParser extends CParser {
 	 *
 	 * @return string
 	 */
-	private function unquoteContext($context) {
+	private function unquoteContext(string $context): string {
 		$unquoted = '';
 
 		for ($p = 1; isset($context[$p]); $p++) {
@@ -241,25 +235,27 @@ class CUserMacroParser extends CParser {
 	 *
 	 * @return string
 	 */
-	public function getMacro() {
+	public function getMacro(): string {
 		return $this->macro;
 	}
 
 	/**
 	 * Returns parsed macro context.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getContext() {
-		return $this->context_quoted ? $this->unquoteContext($this->context) : $this->context;
+	public function getContext(): ?string {
+		return ($this->context !== null && $this->context_quoted)
+			? $this->unquoteContext($this->context)
+			: $this->context;
 	}
 
 	/**
-	 * Returns the error message if macro is invalid.
+	 * Returns parsed regex string.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
-	public function getError() {
-		return $this->error;
+	public function getRegex(): ?string {
+		return ($this->regex !== null && $this->context_quoted) ? $this->unquoteContext($this->regex) : $this->regex;
 	}
 }
