@@ -41,10 +41,33 @@ func CDBHandler(ctx context.Context, conn OraClient, params []string) (interface
 			JSON_ARRAYAGG(
 				JSON_OBJECT(NAME VALUE
 					JSON_OBJECT(
-						'open_mode'     VALUE DECODE(OPEN_MODE, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0),
-						'role'          VALUE DECODE(DATABASE_ROLE, 'SNAPSHOT STANDBY', 1, 'LOGICAL STANDBY', 2, 'PHYSICAL STANDBY', 3, 'PRIMARY', 4, 'FAR SYNC', 5, 0),
-						'force_logging' VALUE DECODE(FORCE_LOGGING, 'YES', 1, 'NO' , 0, 0),
-						'log_mode'      VALUE DECODE(LOG_MODE, 'MANUAL', 2, 'ARCHIVELOG', 1, 'NOARCHIVELOG', 0, 0)
+						'open_mode' 	VALUE 
+							DECODE(OPEN_MODE, 
+								'MOUNTED',              1, 
+								'READ ONLY',            2, 
+								'READ WRITE',           3, 
+								'READ ONLY WITH APPLY', 4, 
+								'MIGRATE', 5, 
+							0),
+						'role' 			VALUE 
+							DECODE(DATABASE_ROLE,
+								'SNAPSHOT STANDBY', 1, 
+								'LOGICAL STANDBY',  2, 
+								'PHYSICAL STANDBY', 3, 
+								'PRIMARY',          4, 
+								'FAR SYNC', 5, 
+							0),
+						'force_logging' VALUE 
+							DECODE(FORCE_LOGGING, 
+								'YES', 1, 
+								'NO' , 0, 
+							0),
+						'log_mode'      VALUE 
+							DECODE(LOG_MODE, 
+								'NOARCHIVELOG', 0,
+								'ARCHIVELOG', 1, 
+ 								'MANUAL', 2,
+							0)
 					)
 				)
 			)		

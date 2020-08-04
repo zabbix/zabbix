@@ -41,7 +41,14 @@ func PDBHandler(ctx context.Context, conn OraClient, params []string) (interface
 			JSON_ARRAYAGG(
 				JSON_OBJECT(NAME VALUE
 					JSON_OBJECT(
-						'open_mode' VALUE DECODE(OPEN_MODE, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0)
+						'open_mode' VALUE 
+							DECODE(OPEN_MODE, 
+								'MOUNTED',              1, 
+								'READ ONLY',            2, 
+								'READ WRITE',           3, 
+								'READ ONLY WITH APPLY', 4, 
+								'MIGRATE',              5, 
+							0)
 					)
 				)
 			)		

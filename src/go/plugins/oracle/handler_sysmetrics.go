@@ -35,7 +35,7 @@ const (
 
 // sysMetricsHandler TODO: add description.
 func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
-	var groupId = duration60sec
+	var groupID = duration60sec
 
 	if len(params) > sysMetricsMaxParams {
 		return nil, errorTooManyParameters
@@ -44,9 +44,9 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 	if len(params) == 1 {
 		switch params[0] {
 		case "15":
-			groupId = duration15sec
+			groupID = duration15sec
 		case "60":
-			groupId = duration60sec
+			groupID = duration60sec
 		default:
 			return nil, errorInvalidParams
 		}
@@ -60,12 +60,13 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 			V$SYSMETRIC
 		WHERE
 			GROUP_ID = :1
-	`, groupId)
+	`, groupID)
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
 	var metric, value string
+
 	res := make(map[string]string)
 
 	for rows.Next() {
@@ -73,6 +74,7 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 		if err != nil {
 			return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
 		}
+
 		res[metric] = value
 	}
 

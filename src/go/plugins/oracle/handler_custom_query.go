@@ -37,6 +37,7 @@ func customQueryHandler(ctx context.Context, conn OraClient, params []string) (i
 
 	queryName := params[0]
 	queryArgs := make([]interface{}, len(params[1:]))
+
 	for i, v := range params[1:] {
 		queryArgs[i] = v
 	}

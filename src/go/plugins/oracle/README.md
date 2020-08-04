@@ -50,7 +50,7 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* tcp://localhost:1521  
 *Limits:*
 - Must match the URI format.
-- The only supported schemas are "tcp" and "oracle".
+- The only supported schema is "tcp".
 - Embedded credentials are forbidden (will be ignored).
   
 *Examples:*
@@ -119,6 +119,8 @@ There are 4 levels of parameters overwriting:
 
 ## Supported keys
 The common parameters for all keys are: [connString][,user][,password][,service]
+
+**oracle.diskgroups.stats[\<commonParams\>]** — Returns ASM disk groups statistics.  
 
 **oracle.diskgroups.discovery[\<commonParams\>]** — Returns list of ASM disk groups in LLD format.  
 

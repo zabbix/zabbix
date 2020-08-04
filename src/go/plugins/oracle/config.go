@@ -21,6 +21,7 @@ package oracle
 
 import (
 	"fmt"
+
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/plugin"
 )

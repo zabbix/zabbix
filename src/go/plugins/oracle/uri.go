@@ -112,10 +112,8 @@ func parseURI(uri string) (res *URI, err error) {
 
 		if len(port) == 0 {
 			port = DefaultPort
-		} else {
-			if _, err := strconv.ParseUint(port, 10, 16); err != nil {
-				return nil, errors.New("port must be integer and must be between 0 and 65535")
-			}
+		} else if _, err := strconv.ParseUint(port, 10, 16); err != nil {
+			return nil, errors.New("port must be integer and must be between 0 and 65535")
 		}
 
 		res.port = port

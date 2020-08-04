@@ -32,6 +32,7 @@ const userMaxParams = 1
 // UserHandler TODO: add description.
 func UserHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var userinfo string
+
 	username := conn.WhoAmI()
 
 	if len(params) > userMaxParams {
@@ -61,6 +62,7 @@ func UserHandler(ctx context.Context, conn OraClient, params []string) (interfac
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("%w (%s)", errorEmptyResult, err.Error())
 		}
+
 		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
 	}
 

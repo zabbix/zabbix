@@ -24,7 +24,7 @@ import (
 	"fmt"
 )
 
-const keyASMDiskGroups = "oracle.diskgroups.stat"
+const keyASMDiskGroups = "oracle.diskgroups.stats"
 
 const ASMDiskGroupsInfoMaxParams = 0
 
@@ -41,9 +41,13 @@ func ASMDiskGroupsHandler(ctx context.Context, conn OraClient, params []string) 
 			JSON_ARRAYAGG(
 				JSON_OBJECT(NAME VALUE
 					JSON_OBJECT(
-						'total_bytes' VALUE ROUND(TOTAL_MB / DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3) * 1024 * 1024),
-						'free_bytes'  VALUE ROUND(USABLE_FILE_MB * 1024 * 1024),
-						'used_pct'  VALUE ROUND(100 - (USABLE_FILE_MB / (TOTAL_MB / DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3))) * 100, 2)
+						'total_bytes' VALUE 
+							ROUND(TOTAL_MB / DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3) * 1024 * 1024),
+						'free_bytes'  VALUE 
+							ROUND(USABLE_FILE_MB * 1024 * 1024),
+						'used_pct'    VALUE 
+							ROUND(100 - (USABLE_FILE_MB / (TOTAL_MB / 
+							DECODE(TYPE, 'EXTERN', 1, 'NORMAL', 2, 'HIGH', 3))) * 100, 2)
 				    )
 				)
 			)

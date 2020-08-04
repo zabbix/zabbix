@@ -41,9 +41,9 @@ func archiveHandler(ctx context.Context, conn OraClient, params []string) (inter
 			JSON_ARRAYAGG(
 				JSON_OBJECT(d.DEST_NAME VALUE
 					JSON_OBJECT(
-						'status'      VALUE DECODE (d.STATUS, 'VALID', 3, 'DEFERRED', 2, 'ERROR', 1, 0),
+						'status'       VALUE DECODE (d.STATUS, 'VALID', 3, 'DEFERRED', 2, 'ERROR', 1, 0),
 						'log_sequence' VALUE d.LOG_SEQUENCE,
-						'error'       VALUE d.ERROR
+						'error'        VALUE d.ERROR
 					)
 				)
 			)		

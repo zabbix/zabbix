@@ -24,10 +24,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/godror/godror"
-	"github.com/omeid/go-yarn"
 	"sync"
 	"time"
+
+	"github.com/godror/godror"
+	"github.com/omeid/go-yarn"
 
 	"zabbix.com/pkg/log"
 )

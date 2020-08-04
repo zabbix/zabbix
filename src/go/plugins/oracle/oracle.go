@@ -22,10 +22,11 @@ package oracle
 import (
 	"context"
 	"errors"
-	"github.com/godror/godror"
-	"github.com/omeid/go-yarn"
 	"net/http"
 	"time"
+
+	"github.com/godror/godror"
+	"github.com/omeid/go-yarn"
 
 	"zabbix.com/pkg/plugin"
 )
@@ -45,9 +46,6 @@ type Plugin struct {
 	connMgr *ConnManager
 	options PluginOptions
 }
-
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(ctx context.Context, conn OraClient, params []string) (res interface{}, err error)
 
 // impl is the pointer to the plugin implementation.
 var impl Plugin
@@ -91,13 +89,11 @@ func whereToConnect(params []string, sessions map[string]*Session, defaultURI st
 	}
 
 	return newURIWithCreds(uri, user, password, serviceName)
-
 }
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (result interface{}, err error) {
 	var (
-		handleMetric  handlerFunc
 		handlerParams []string
 		zbxErr        zabbixError
 	)
@@ -112,55 +108,8 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		handlerParams = params[commonParamsNum:]
 	}
 
-	switch key {
-	case keyASMDiskGroups:
-		handleMetric = ASMDiskGroupsHandler
-	case keyASMDiskGroupsDiscovery:
-		handleMetric = ASMDiskGroupsDiscovery
-	case keyArchive:
-		handleMetric = archiveHandler
-	case keyArchiveDiscovery:
-		handleMetric = archiveDiscoveryHandler
-	case keyCDB:
-		handleMetric = CDBHandler
-	case keyCustomQuery:
-		handleMetric = customQueryHandler // oracle.custom.query[<commonParams>,queryName[,args...]]
-	case keyDataFiles:
-		handleMetric = DataFileHandler
-	case keyDatabasesDiscovery:
-		handleMetric = databasesDiscoveryHandler
-	case keyFRA:
-		handleMetric = FRAHandler
-	case keyInstance:
-		handleMetric = instanceHandler
-	case keyPDB:
-		handleMetric = PDBHandler
-	case keyPDBDiscovery:
-		handleMetric = PDBDiscoveryHandler
-	case keyPGA:
-		handleMetric = PGAHandler
-	case keyPing:
-		handleMetric = pingHandler
-	case keyProc:
-		handleMetric = ProcHandler
-	case keyRedoLog:
-		handleMetric = RedoLogHandler
-	case keySGA:
-		handleMetric = SGAHandler
-	case keySessions:
-		handleMetric = sessionsHandler
-	case keySysMetrics:
-		handleMetric = sysMetricsHandler // oracle.sys.metrics[<commonParams>[,duration]]
-	case keySysParams:
-		handleMetric = sysParamsHandler
-	case keyTablespaces:
-		handleMetric = tablespacesHandler
-	case keyTablespacesDiscovery:
-		handleMetric = tablespacesDiscoveryHandler
-	case keyUser:
-		handleMetric = UserHandler
-
-	default:
+	handleMetric := getHandleFunc(key)
+	if handleMetric == nil {
 		return nil, errorUnsupportedMetric
 	}
 
@@ -224,31 +173,4 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, pluginName,
-		keyASMDiskGroups, "Returns ASM disk groups statistics.",
-		keyASMDiskGroupsDiscovery, "Returns list of ASM disk groups in LLD format.",
-		keyArchive, "Returns archive logs statistics.",
-		keyArchiveDiscovery, "Returns list of archive logs in LLD format.",
-		keyCDB, "Returns CDBs info.",
-		keyCustomQuery, "Returns result of custom query.",
-		keyDataFiles, "Returns data files statistics.",
-		keyDatabasesDiscovery, "Returns list of databases in LLD format.",
-		keyFRA, "Returns FRA statistics.",
-		keyInstance, "Returns instance stats.",
-		keyPDB, "Returns PDBs info.",
-		keyPDBDiscovery, "Returns list of PDBs in LLD format.",
-		keyPGA, "Returns PGA statistics.",
-		keyPing, "Tests if connection is alive or not.",
-		keyProc, "Returns processes statistics.",
-		keyRedoLog, "Returns log file information from the control file.",
-		keySGA, "Returns SGA statistics.",
-		keySessions, "Returns sessions statistics.",
-		keySysMetrics, "Returns a set of system metric values.",
-		keySysParams, "Returns a set of system parameter values.",
-		keyTablespaces, "Returns tablespaces statistics.",
-		keyTablespacesDiscovery, "Returns list of tablespaces in LLD format.",
-		keyUser, "Returns user information.")
 }
