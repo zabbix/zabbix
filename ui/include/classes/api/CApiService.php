@@ -411,6 +411,22 @@ class CApiService {
 	}
 
 	/**
+	 * Returns DISTINCT modifier for sql statements with multiple joins.
+	 *
+	 * @param array $sql_parts  An SQL parts array.
+	 *
+	 * @return string
+	 */
+	private static function dbDistinct(array $sql_parts) : string {
+		$count = count($sql_parts['from']);
+		if (array_key_exists('left_join', $sql_parts)) {
+			$count += count($sql_parts['left_join']);
+		}
+
+		return ($count > 1 ? ' DISTINCT' : '');
+	}
+
+	/**
 	 * Creates a SELECT SQL query from the given SQL parts array.
 	 *
 	 * @param array $sqlParts	An SQL parts array
@@ -436,7 +452,7 @@ class CApiService {
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
-		return 'SELECT'.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+		return 'SELECT'.self::dbDistinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
 				$sql_left_join.
 				$sqlWhere.
