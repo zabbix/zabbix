@@ -1072,8 +1072,6 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
  * @return array
  */
 function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
-	$config = select_config();
-
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1088,7 +1086,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $config['search_limit'],
+			'limit' => (ZBX_MAX_TABLE_COLUMNS ** 2),
 			'preservekeys' => true
 		]);
 	}
@@ -1099,7 +1097,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'groupids' => $groupids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $config['search_limit'],
+			'limit' => (ZBX_MAX_TABLE_COLUMNS ** 2),
 			'preservekeys' => true
 		]);
 	}
@@ -1123,7 +1121,6 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
-	$config = select_config();
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
@@ -1140,7 +1137,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => $config['search_limit']
+			'limit' => ZBX_MAX_TABLE_COLUMNS
 		]);
 	}
 	else {
@@ -1152,7 +1149,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'groupids' => $groupids,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => $config['search_limit']
+			'limit' => ZBX_MAX_TABLE_COLUMNS
 		]);
 	}
 
