@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/traits/MacrosTrait.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -86,7 +86,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 			$this->zbxTestAssertElementValue('macros_'.$i.'_macro',
 					$globalMacros[$i]['macro']);
 
-			if ($globalMacros[$i]['type'] === '1') {
+			if (intval($globalMacros[$i]['type']) === ZBX_MACRO_TYPE_SECRET) {
 				$globalMacros[$i]['value'] = '******';
 			}
 			$this->zbxTestAssertElementValue('macros_'.$i.'_value',
@@ -167,9 +167,9 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentId('macros_'.$i.'_description');
 			$this->zbxTestAssertElementPresentId('macros_'.$i.'_remove');
 
-			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_macro']", "maxlength", $this->macroMaxLength);
-			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_macro']", "placeholder", $this->macroPlaceholder);
-			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_macro']", "class", $this->macroClass);
+			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_macro"]', "maxlength", $this->macroMaxLength);
+			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_macro"]', "placeholder", $this->macroPlaceholder);
+			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_macro"]', "class", $this->macroClass);
 
 			$macro_name = $this->query('id:macros_'.$i.'_macro')->one()->getAttribute('value');
 			if ($macro_name !== '' && $this->getValueField($macro_name)->isSecret()) {
@@ -177,12 +177,12 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 			}
 			else {
 				$element = 'textarea';
-				$this->zbxTestAssertAttribute("//".$element."[@id='macros_${i}_value']", "placeholder", $this->valuePlaceholder);
+				$this->zbxTestAssertAttribute('//'.$element.'[@id="macros_'.$i.'_value"]', 'placeholder', $this->valuePlaceholder);
 			}
-			$this->zbxTestAssertAttribute("//".$element."[@id='macros_${i}_value']", "maxlength", $this->valueMaxLength);
+			$this->zbxTestAssertAttribute('//'.$element.'[@id="macros_'.$i.'_value"]', "maxlength", $this->valueMaxLength);
 
-			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_description']", "maxlength", $this->descriptionMaxLength);
-			$this->zbxTestAssertAttribute("//textarea[@id='macros_${i}_description']", "placeholder", $this->descriptionPlaceholder);
+			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_description"]', "maxlength", $this->descriptionMaxLength);
+			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_description"]', "placeholder", $this->descriptionPlaceholder);
 		}
 	}
 
@@ -616,6 +616,71 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$this->verifyHash();
 	}
 
+	public function getSecretMacrosLayoutData() {
+		return [
+			[
+				[
+					'macro' => '{$X_SECRET_2_TEXT}',
+					'type' => 'Secret text',
+					'chenge_type' => true
+				]
+			],
+			[
+				[
+					'macro' => '{$X_TEXT_2_SECRET}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'macro' => '{$X_SECRET_2_SECRET}',
+					'type' => 'Secret text'
+				]
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider getSecretMacrosLayoutData
+	 */
+	public function testFormAdministrationGeneralMacros_CheckSecretMacrosLayout($data) {
+		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
+
+		$value_field = $this->getValueField($data['macro']);
+		$change_button = $value_field->getNewValueButton();
+		$revert_button = $value_field->getRevertButton();
+
+		if ($data['type'] === 'Secret text') {
+			$this->assertFalse($value_field->isTextareaPresent());
+
+			$this->assertTrue($change_button->isValid());
+			$this->assertFalse($revert_button->isClickable());
+			// Change value text or type and check that New value button is not displayed and Revert button appeared.
+			if (CTestArrayHelper::get($data, 'change_type', false)) {
+				$value_field->changeInputType('Text');
+			}
+			else {
+				$change_button->click();
+			}
+			$value_field->invalidate();
+
+			$this->assertFalse($change_button->isEnabled());
+			$this->assertTrue($revert_button->isClickable());
+		}
+		else {
+			$this->assertTrue($value_field->isTextareaPresent());
+			$this->assertFalse($change_button->isValid());
+			$this->assertFalse($revert_button->isValid());
+
+			// Change value type to "Secret text" and check that new value and revert buttons were not added.
+			$value_field->changeInputType('Secret text');
+			$value_field->invalidate();
+
+			$this->assertFalse($value_field->getNewValueButton()->isValid());
+			$this->assertFalse($value_field->getRevertButton()->isValid());
+		}
+	}
+
 	public function getCreateSecretMacrosData() {
 		return [
 			[
@@ -623,7 +688,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 					'macro_fields' => [
 						'macro' => '{$Z_NEW_SECRET_MACRO}',
 						'value' => [
-							'value' => 'secret value',
+							'text' => 'secret value',
 							'type' => 'Secret text'
 						],
 						'description' => 'secret description'
@@ -635,7 +700,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 					'macro_fields' => [
 						'macro' => '{$Z_NEW_TEXT_MACRO}',
 						'value' => [
-							'value' => 'plain text value',
+							'text' => 'plain text value',
 							'type' => 'Secret text'
 						],
 						'description' => 'plain text description'
@@ -656,7 +721,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		// Check that value field is filled correctly.
 		$value_field = $this->query('xpath://div[contains(@class, "macro-value")]')->all()->last()->asInputGroup();
 		$this->assertEquals($data['macro_fields']['value']['type'], $value_field->getInputType());
-		$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
+		$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		// Check that textarea input element is not available for secret text macros.
 		if ($value_field->isSecret()) {
 			$this->assertFalse($value_field->isTextareaPresent());
@@ -667,7 +732,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 			$value_field->changeInputType('Text');
 			$this->assertFalse($value_field->isSecret());
 			$this->assertTrue($value_field->isTextareaPresent());
-			$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
+			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		}
 
 		$this->query('button:Update')->one()->click();
@@ -675,7 +740,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
 			$this->assertFalse($value_field->isSecret());
-			$this->assertEquals($data['macro_fields']['value']['value'], $value_field->getValue());
+			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 			$this->assertFalse($value_field->getNewValueButton()->isValid());
 			$this->assertFalse($value_field->getRevertButton()->isValid());
 		}
@@ -699,8 +764,8 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$this->query('button:Update')->one()->click();
 		// Check macro value, type and description in DB.
 		$sql = 'SELECT value, description, type FROM globalmacro WHERE macro='.zbx_dbstr($data['macro_fields']['macro']);
-		$type = (CTestArrayHelper::get($data, 'back_to_text', false)) ? 0 : 1;
-		$this->assertEquals([$data['macro_fields']['value']['value'], $data['macro_fields']['description'], $type],
+		$type = (CTestArrayHelper::get($data, 'back_to_text', false)) ? ZBX_MACRO_TYPE_TEXT : ZBX_MACRO_TYPE_SECRET;
+		$this->assertEquals([$data['macro_fields']['value']['text'], $data['macro_fields']['description'], $type],
 				array_values(CDBHelper::getRow($sql)));
 	}
 
@@ -712,7 +777,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 					'index' => 9,
 					'macro' => '{$X_SECRET_2_SECRET}',
 					'value' => [
-						'value' => 'This text is updated and should stay secret'
+						'text' => 'This text is updated and should stay secret'
 					]
 				]
 			],
@@ -722,7 +787,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 					'index' => 10,
 					'macro' => '{$X_SECRET_2_TEXT}',
 					'value' => [
-						'value' => 'This text is updated and should become visible',
+						'text' => 'This text is updated and should become visible',
 						'type' => 'Text'
 					]
 				]
@@ -733,7 +798,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 					'index' => 11,
 					'macro' => '{$X_TEXT_2_SECRET}',
 					'value' => [
-						'value' => 'This text is updated and should become secret',
+						'text' => 'This text is updated and should become secret',
 						'type' => 'Secret text'
 					]
 				]
@@ -756,10 +821,10 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		}
 		else {
 			$this->assertFalse($value_field->isSecret());
-			$this->assertEquals($data['value']['value'], $value_field->getValue());
+			$this->assertEquals($data['value']['text'], $value_field->getValue());
 		}
 		$sql = 'SELECT value FROM globalmacro WHERE macro='.zbx_dbstr($data['macro']);
-		$this->assertEquals($data['value']['value'], CDBHelper::getValue($sql));
+		$this->assertEquals($data['value']['text'], CDBHelper::getValue($sql));
 	}
 
 	public function getRevertSecretMacrosData() {

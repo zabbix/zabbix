@@ -416,6 +416,51 @@ class testFormHostMacros extends testFormMacros {
 		$this->checkChangeRemoveInheritedMacro('hosts', 'host');
 	}
 
+	public function getSecretMacrosLayoutData() {
+		return [
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text'
+				]
+			],
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text',
+					'chenge_type' => true
+				]
+			],
+			[
+				[
+					'macro' => '{$TEXT_HOST_MACRO}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_TEXT_2_SECRET}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_SECRET_2_SECRET}',
+					'type' => 'Secret text'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getSecretMacrosLayoutData
+	 */
+	public function testFormHostMacros_CheckSecretMacrosLayout($data) {
+		$this->checkSecretMacrosLayout($data, 'hosts.php?form=update&hostid=99011', 'hosts');
+	}
+
 	public function getCreateSecretMacrosData() {
 		return [
 			[
@@ -425,7 +470,7 @@ class testFormHostMacros extends testFormMacros {
 						'index' => 0,
 						'macro' => '{$SECRET_MACRO}',
 						'value' => [
-							'value' => 'host secret value',
+							'text' => 'host secret value',
 							'type' => 'Secret text'
 						],
 						'description' => 'secret description'
@@ -438,7 +483,7 @@ class testFormHostMacros extends testFormMacros {
 					'macro_fields' => [
 						'macro' => '{$TEXT_MACRO}',
 						'value' => [
-							'value' => 'host plain text value',
+							'text' => 'host plain text value',
 							'type' => 'Secret text'
 						],
 						'description' => 'plain text description'
@@ -451,7 +496,7 @@ class testFormHostMacros extends testFormMacros {
 					'macro_fields' => [
 						'macro' => '{$SECRET_EMPTY_MACRO}',
 						'value' => [
-							'value' => '',
+							'text' => '',
 							'type' => 'Secret text'
 						],
 						'description' => 'secret empty value'
@@ -505,7 +550,7 @@ class testFormHostMacros extends testFormMacros {
 					'index' => 2,
 					'macro' => '{$SECRET_HOST_MACRO_UPDATE}',
 					'value' => [
-						'value' => 'Updated secret value'
+						'text' => 'Updated secret value'
 					]
 				]
 			],
@@ -515,7 +560,7 @@ class testFormHostMacros extends testFormMacros {
 					'index' => 3,
 					'macro' => '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}',
 					'value' => [
-						'value' => 'New text value',
+						'text' => 'New text value',
 						'type' => 'Text'
 					]
 				]
@@ -526,7 +571,7 @@ class testFormHostMacros extends testFormMacros {
 					'index' => 4,
 					'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
 					'value' => [
-						'value' => 'New secret value',
+						'text' => 'New secret value',
 						'type' => 'Secret text'
 					]
 				]

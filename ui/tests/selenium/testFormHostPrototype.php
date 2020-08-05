@@ -73,7 +73,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Get host prototype macros from macros tab.
 		$actual_macros = $this->getMacros();
-		for ($i = 0; $i < count($actual_macros); $i++) {
+		$macros_count = count($actual_macros);
+		for ($i = 0; $i < $macros_count; $i++) {
 			$type = CDBHelper::getValue('SELECT type FROM hostmacro where macro='.CDBHelper::escape($actual_macros[$i]['macro']));
 			$actual_macros[$i]['type'] = $type;
 		}

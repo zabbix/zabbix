@@ -420,6 +420,51 @@ class testFormHostPrototypeMacros extends testFormMacros {
 		$this->checkChangeRemoveInheritedMacro('hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
+	public function getSecretMacrosLayoutData() {
+		return [
+			[
+				[
+					'macro' => '{$PROTOTYPE_SECRET_2_SECRET}',
+					'type' => 'Secret text'
+				]
+			],
+			[
+				[
+					'macro' => '{$PROTOTYPE_SECRET_2_SECRET}',
+					'type' => 'Secret text',
+					'chenge_type' => true
+				]
+			],
+			[
+				[
+					'macro' => '{$PROTOTYPE_TEXT_2_SECRET}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_TEXT_2_SECRET}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_SECRET_2_SECRET}',
+					'type' => 'Secret text'
+				]
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider getSecretMacrosLayoutData
+	 */
+	public function testFormHostPrototypeMacros_CheckSecretMacrosLayout($data) {
+		$this->checkSecretMacrosLayout($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'hostPrototype');
+	}
+
 	public function getCreateSecretMacrosData() {
 		return [
 			[
@@ -427,7 +472,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					'macro_fields' => [
 						'macro' => '{$Z_SECRET_MACRO}',
 						'value' => [
-							'value' => 'secret value',
+							'text' => 'secret value',
 							'type' => 'Secret text'
 						],
 						'description' => 'secret description'
@@ -440,7 +485,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					'macro_fields' => [
 						'macro' => '{$Z_TEXT_MACRO}',
 						'value' => [
-							'value' => 'plain text value',
+							'text' => 'plain text value',
 							'type' => 'Secret text'
 						],
 						'description' => 'plain text description'
@@ -453,7 +498,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					'macro_fields' => [
 						'macro' => '{$Z_SECRET_EMPTY_MACRO}',
 						'value' => [
-							'value' => '',
+							'text' => '',
 							'type' => 'Secret text'
 						],
 						'description' => 'secret empty value'
@@ -478,7 +523,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					'index' => 0,
 					'macro' => '{$PROTOTYPE_SECRET_2_SECRET}',
 					'value' => [
-						'value' => 'Updated secret value'
+						'text' => 'Updated secret value'
 					]
 				]
 			],
@@ -488,7 +533,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					'index' => 1,
 					'macro' => '{$PROTOTYPE_SECRET_2_TEXT}',
 					'value' => [
-						'value' => 'Updated text value',
+						'text' => 'Updated text value',
 						'type' => 'Text'
 					]
 				]
@@ -499,7 +544,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					'index' => 2,
 					'macro' => '{$PROTOTYPE_TEXT_2_SECRET}',
 					'value' => [
-						'value' => 'Updated new secret value',
+						'text' => 'Updated new secret value',
 						'type' => 'Secret text'
 					]
 				]

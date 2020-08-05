@@ -137,7 +137,7 @@ trait MacrosTrait {
 	 * @return CElement
 	 */
 	public function getValueField($macro) {
-		return $value_field = $this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
+		return $this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
 				']/../..//div[contains(@class, "macro-value")]')->asInputGroup()->waitUntilVisible()->one();
 	}
 }

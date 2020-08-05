@@ -26,14 +26,8 @@ require_once dirname(__FILE__).'/../CElement.php';
  */
 class CInputGroupElement extends CElement {
 
-	protected $textarea_xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]';
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function find() {
-		return (new CElementQuery('xpath:.//div[contains(@class, "input-group")]'))->asInputGroup();
-	}
+	protected $type_secret = 'Secret text';
+	protected $type_text = 'Text';
 
 	/**
 	 * Get value of InputGroup element.
@@ -41,10 +35,8 @@ class CInputGroupElement extends CElement {
 	 * @return string
 	 */
 	public function getValue() {
-		$input = ($this->query($this->textarea_xpath)->one(false)->isValid()) ? $this->query($this->textarea_xpath)->one() :
-				$this->query('xpath:.//input[@type="password"]')->one();
-
-		return $input->getValue();
+		return $this->query('xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]')
+				->one()->getValue();
 	}
 
 	/**
@@ -95,7 +87,7 @@ class CInputGroupElement extends CElement {
 	 */
 	public function getInputType() {
 		$xpath = 'xpath:.//button['.CXPathHelper::fromClass('icon-text').']';
-		$type = ($this->query($xpath)->one(false)->isValid()) ? 'Text' : 'Secret text';
+		$type = ($this->query($xpath)->one(false)->isValid()) ? $this->type_text : $this->type_secret;
 
 		return $type;
 	}
@@ -109,25 +101,24 @@ class CInputGroupElement extends CElement {
 	 */
 	public function fill($input) {
 		if (!is_array($input)) {
-			$xpath = ($this->query('xpath:.//input[@type="password"]')->one(false)->isValid()) ?
-					'xpath:.//input[@type="password"]' : $this->textarea_xpath;
+			$xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]';
 			$this->query($xpath)->one()->fill($input);
 
 			return $this;
 		}
-		if (array_key_exists('type', $input)) {
+
+		if (array_key_exists('type', $input) && $this->getInputType() !== $input['type']) {
 			$this->changeInputType($input['type']);
 		}
 
-		$type = CTestArrayHelper::get($input, 'type', $this->getInputType());
-		if (array_key_exists('value', $input)) {
+		if (array_key_exists('text', $input)) {
 			$change_button = $this->query('button:Set new value')->one(false);
 			if ($change_button->isValid()) {
 				$change_button->click();
 			}
 
-			$xpath = ($type === 'Text') ? $this->textarea_xpath : 'xpath:.//input[@type="password"]';
-			$this->query($xpath)->one()->fill($input['value']);
+			$xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]';
+			$this->query($xpath)->one()->fill($input['text']);
 		}
 
 		return $this;
@@ -139,6 +130,6 @@ class CInputGroupElement extends CElement {
 	 * @return boolean
 	 */
 	public function isTextareaPresent() {
-		return $this->query($this->textarea_xpath)->one(false)->isValid();
+		return $this->query('xpath:.//textarea[contains(@class, "textarea-flexible")]')->one(false)->isValid();
 	}
 }
