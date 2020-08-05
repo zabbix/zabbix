@@ -41,11 +41,11 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 			JSON_ARRAYAGG(
 				JSON_OBJECT(TABLESPACE_NAME VALUE 
 					JSON_OBJECT(
-						'type'       VALUE TYPE, 
+						'contents'   VALUE CONTENTS, 
 						'used_bytes' VALUE USED_BYTES, 
 						'max_bytes'  VALUE MAX_BYTES, 
 						'free_bytes' VALUE FREE_BYTES, 
-						'used_pct'   VALUE USED_PCT, 
+						'used_pct'   VALUE TRIM(TO_CHAR(USED_PCT, '0.99')), 
 						'status'     VALUE STATUS 
 					) 
 				) 
@@ -54,7 +54,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 			(
 			SELECT
 				df.TABLESPACE_NAME AS TABLESPACE_NAME, 
-				df.TYPE AS TYPE, 
+				df.CONTENTS AS CONTENTS, 
 				SUM(df.BYTES) AS USED_BYTES, 
 				SUM(df.MAX_BYTES) AS MAX_BYTES, 
 				SUM(f.FREE) AS FREE_BYTES, 
@@ -64,7 +64,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 				(
 				SELECT
 					ddf.FILE_ID, 
-					dt.CONTENTS AS TYPE, 
+					dt.CONTENTS, 
 					dt.STATUS, 
 					ddf.FILE_NAME, 
 					ddf.TABLESPACE_NAME, 
@@ -88,11 +88,11 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 			WHERE
 				df.FILE_ID = f.FILE_ID (+)
 			GROUP BY
-				df.TABLESPACE_NAME, df.TYPE, df.STATUS
+				df.TABLESPACE_NAME, df.CONTENTS, df.STATUS
 		UNION ALL
 			SELECT
 				Y.NAME AS TABLESPACE_NAME, 
-				Y.TYPE AS TYPE, 
+				Y.CONTENTS AS CONTENTS, 
 				SUM(Y.BYTES) AS BYTES, 
 				SUM(Y.MAX_BYTES) AS MAX_BYTES, 
 				MAX(NVL(Y.FREE_BYTES, 0)) AS FREE, 
@@ -102,7 +102,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 				(
 				SELECT
 					dtf.TABLESPACE_NAME AS NAME, 
-					dt.CONTENTS AS TYPE, 
+					dt.CONTENTS, 
 					dt.STATUS AS TBS_STATUS, 
 					dtf.STATUS AS STATUS, 
 					dtf.BYTES AS BYTES, 
@@ -147,7 +147,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 				WHERE
 					dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME ) Y
 			GROUP BY
-				Y.NAME, Y.TYPE, Y.TBS_STATUS
+				Y.NAME, Y.CONTENTS, Y.TBS_STATUS
 			ORDER BY
 				TABLESPACE_NAME 
 			)

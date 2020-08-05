@@ -165,7 +165,7 @@ args (optional) — One or more arguments to pass to a query.
 lockMaxTime (optional) — maximum seconds in the current wait condition for counting long time locked sessions. 
 Default: 600 seconds.    
 
-**oracle.sys.metrics[\<commonParams\>[,duration]]** — Returns a set of system metric values.
+**oracle.sys.metrics[\<commonParams\>[,duration]]** — Returns a set of system metric values.  
 *Params:*  
 duration (optional) — capturing interval (in seconds) of system metric values. Possible values:  
 60 — long duration (default).  
@@ -177,10 +177,10 @@ duration (optional) — capturing interval (in seconds) of system metric values.
 
 **oracle.ts.discovery[\<commonParams\>]** — Returns list of tablespaces in LLD format.
 
-**oracle.user.info[\<commonParams\>[,username]]** — Returns user information.
+**oracle.user.info[\<commonParams\>[,username]]** — Returns user information.  
 *Params:*  
 username (optional) — username for which information is needed. Default: current user.        
 
 ## Troubleshooting
-The plugin uses Zabbix Agent's logs. You can increase a debug level of Zabbix Agent if you need more information about 
+The plugin uses Zabbix Agent's logs. You can increase a debug level of Zabbix Agent if you need more details about 
 what is happening.

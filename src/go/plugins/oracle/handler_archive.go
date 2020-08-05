@@ -41,15 +41,18 @@ func archiveHandler(ctx context.Context, conn OraClient, params []string) (inter
 			JSON_ARRAYAGG(
 				JSON_OBJECT(d.DEST_NAME VALUE
 					JSON_OBJECT(
-						'status'       VALUE DECODE (d.STATUS, 'VALID', 3, 'DEFERRED', 2, 'ERROR', 1, 0),
+						'status'       VALUE DECODE(d.STATUS, 'VALID', 3, 'DEFERRED', 2, 'ERROR', 1, 0),
 						'log_sequence' VALUE d.LOG_SEQUENCE,
-						'error'        VALUE d.ERROR
+						'error'        VALUE NVL(TO_CHAR(d.ERROR), ' ')
 					)
 				)
 			)		
 		FROM
 			V$ARCHIVE_DEST d,
 			V$DATABASE db
+		WHERE 
+			d.STATUS != 'INACTIVE' 
+			AND db.LOG_MODE = 'ARCHIVELOG'
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())

@@ -101,24 +101,24 @@ func sessionsHandler(ctx context.Context, conn OraClient, params []string) (inte
 			
 			SELECT
 				'lock_rate' ,
-				(cnt_block / cnt_all)* 100 pct
+				(CNT_BLOCK / CNT_ALL) * 100 pct
 			FROM
 				(
 				SELECT
-					COUNT(*) cnt_block
+					COUNT(*) CNT_BLOCK
 				FROM
-					v$session
+					V$SESSION
 				WHERE
-					blocking_session IS NOT NULL),
+					BLOCKING_SESSION IS NOT NULL),
 				(
 				SELECT
-					COUNT(*) cnt_all
+					COUNT(*) CNT_ALL
 				FROM
-					gv$session)
+					GV$SESSION)
 			UNION
 			SELECT
 				'concurrency_rate',
-				NVL(ROUND(SUM(duty_act.CNT * 100 / num_cores.val)), 0)
+				NVL(ROUND(SUM(duty_act.CNT * 100 / num_cores.VAL)), 0)
 			FROM
 				(
 					SELECT
