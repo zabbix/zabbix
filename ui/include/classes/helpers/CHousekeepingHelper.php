@@ -58,9 +58,13 @@ class CHousekeepingHelper extends CConfigGeneralHelper {
 	/**
 	 * @inheritdoc
 	 */
-	protected static function loadParams(): void {
+	protected static function loadParams(bool $is_global = false, ?string $param = null): void {
 		if (!self::$params) {
-			self::$params = API::getApiService('housekeeping')->get(['output' => 'extend']);
+			self::$params = API::Housekeeping()->get(['output' => 'extend']);
+
+			if (self::$params === false) {
+				throw new Exception(_('Unable to load housekeeping API parameters.'));
+			}
 		}
 	}
 }

@@ -27,7 +27,7 @@
  * @return string
  */
 function getUserTheme($userData) {
-	if (null !== CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME)) {
+	if (null !== CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_THEME)) {
 		$css = CSettingsHelper::get(CSettingsHelper::DEFAULT_THEME);
 	}
 	if (isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT) {

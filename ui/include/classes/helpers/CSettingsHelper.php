@@ -89,9 +89,37 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	/**
 	 * @inheritdoc
 	 */
-	protected static function loadParams(): void {
+	protected static function loadParams(bool $is_global = false, ?string $param = null): void {
 		if (!self::$params) {
-			self::$params = API::getApiService('settings')->get(['output' => 'extend']);
+			self::$params = $is_global
+				? API::Settings()->getGlobal(['output' => 'extend'])
+				: API::Settings()->get(['output' => 'extend']);
+
+			if (self::$params === false) {
+				throw new Exception(_('Unable to load settings API parameters.'));
+			}
 		}
+		else if (!$is_global && $param && !array_key_exists($param, self::$params)) {
+			self::$params = API::Settings()->get(['output' => 'extend']);
+
+			if (self::$params === false) {
+				throw new Exception(_('Unable to load settings API parameters.'));
+			}
+		}
+	}
+
+	/**
+	 * Get value by global parameter name of API object (load parameters if need).
+	 *
+	 * @static
+	 *
+	 * @param string  $name  API object global parameter name.
+	 *
+	 * @return string|null Parameter value. If parameter not exists, return null.
+	 */
+	public static function getGlobal(string $name): ?string {
+		self::loadParams(true);
+
+		return array_key_exists($name, self::$params) ? self::$params[$name] : null;
 	}
 }

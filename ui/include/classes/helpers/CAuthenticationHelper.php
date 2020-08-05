@@ -65,9 +65,13 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	/**
 	 * @inheritdoc
 	 */
-	protected static function loadParams(): void {
+	protected static function loadParams(bool $is_global = false, ?string $param = null): void {
 		if (!self::$params) {
-			self::$params = API::getApiService('authentication')->get(['output' => 'extend']);
+			self::$params = API::Authentication()->get(['output' => 'extend']);
+
+			if (self::$params === false) {
+				throw new Exception(_('Unable to load authentication API parameters.'));
+			}
 		}
 	}
 }

@@ -1093,12 +1093,12 @@ function getTriggerSeverityCss() {
 	$css = '';
 
 	$severities = [
-		ZBX_STYLE_NA_BG => CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_0),
-		ZBX_STYLE_INFO_BG => CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_1),
-		ZBX_STYLE_WARNING_BG => CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_2),
-		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_3),
-		ZBX_STYLE_HIGH_BG => CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_4),
-		ZBX_STYLE_DISASTER_BG => CSettingsHelper::get(CSettingsHelper::SEVERITY_COLOR_5)
+		ZBX_STYLE_NA_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_0),
+		ZBX_STYLE_INFO_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_1),
+		ZBX_STYLE_WARNING_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_2),
+		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_3),
+		ZBX_STYLE_HIGH_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_4),
+		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_5)
 	];
 
 	foreach ($severities as $class => $color) {
@@ -1117,7 +1117,7 @@ function getTriggerSeverityCss() {
 function getTriggerStatusCss() {
 	$css = '';
 
-	if (CSettingsHelper::get(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
+	if (CSettingsHelper::getGlobal(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
 		$event_statuses = [
 			ZBX_STYLE_PROBLEM_UNACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_COLOR),
 			ZBX_STYLE_PROBLEM_ACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_COLOR),

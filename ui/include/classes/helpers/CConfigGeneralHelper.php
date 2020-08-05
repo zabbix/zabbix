@@ -29,7 +29,7 @@ abstract class CConfigGeneralHelper {
 	 *
 	 * @static
 	 */
-	abstract protected static function loadParams(): void;
+	abstract protected static function loadParams(bool $is_global = false, ?string $param = null): void;
 
 	/**
 	 * Get value by parameter name of API object (load parameters if need).
@@ -41,7 +41,7 @@ abstract class CConfigGeneralHelper {
 	 * @return string|null Parameter value. If parameter not exists, return null.
 	 */
 	public static function get(string $name): ?string {
-		static::loadParams();
+		static::loadParams(false, $name);
 
 		return array_key_exists($name, static::$params) ? static::$params[$name] : null;
 	}
@@ -67,11 +67,11 @@ abstract class CConfigGeneralHelper {
 	 * @param string $name   API object parameter name.
 	 * @param string $value  API object parameter value.
 	 */
-	public static function set(string $key, string $value): void {
-		static::loadParams();
+	public static function set(string $name, string $value): void {
+		static::loadParams(false, $name);
 
-		if (array_key_exists($key, static::$params)) {
-			static::$params[$key] = $value;
+		if (array_key_exists($name, static::$params)) {
+			static::$params[$name] = $value;
 		}
 	}
 }

@@ -82,6 +82,43 @@ class CSettings extends CApiService {
 	}
 
 	/**
+	 * Get global settings parameters.
+	 *
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array
+	 */
+	public function getGlobal(array $options): array {
+		$output_fields = ['default_theme', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
+			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
+			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
+			'x_frame_options'
+		];
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $output_fields;
+		}
+
+		$db_settings = [];
+
+		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
+		while ($row = DBfetch($result)) {
+			$db_settings[] = $row;
+		}
+		$db_settings = $this->unsetExtraFields($db_settings, ['configid'], []);
+
+		return $db_settings[0];
+	}
+
+	/**
 	 * Update settings parameters.
 	 *
 	 * @param array $settings
