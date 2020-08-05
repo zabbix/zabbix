@@ -754,17 +754,15 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 }
 
 #if defined(HAVE_LIBPERFSTAT)
-static ZBX_CPU_UTIL_PCT_AIX	*increment_address_in_collector(ZBX_CPUS_UTIL_DATA_AIX *p, int cpu_nr)
+static ZBX_CPU_UTIL_PCT_AIX	*increment_address_in_collector(ZBX_CPUS_UTIL_DATA_AIX *p)
 {
-	/* cpu_nr = 0 means 'total for all CPUs'. Other 'cpu_nr' values mean individual CPUs */
-
 	if (0 != p->h_count && p->row_num == ++p->h_latest)
 		p->h_latest = 0;
 
 	if (p->row_num > p->h_count)
 		p->h_count++;
 
-	return p->counters + p->h_latest * p->column_num + cpu_nr;
+	return p->counters + p->h_latest * p->column_num;
 }
 
 /* ZBX_PCT_MULTIPLIER value has been chosen to not lose precision (see FLT_EPSILON) and on the other hand */
@@ -783,23 +781,27 @@ static double	convert_uint64_to_pct(zbx_uint64_t num)
 
 #undef ZBX_PCT_MULTIPLIER
 
-static void	insert_total_phys_util_into_collector(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util,
-		float user_pct, float kern_pct, float idle_pct, float wait_pct)
+static void	insert_phys_util_into_collector(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util,
+		const ZBX_CPU_UTIL_PCT_AIX *util_data, int util_data_count)
 {
 	ZBX_CPU_UTIL_PCT_AIX	*p;
+	int			i;
 
 	LOCK_CPUSTATS;
 
-	p = increment_address_in_collector(cpus_phys_util, 0);
-
-	p->status = SYSINFO_RET_OK;
+	p = increment_address_in_collector(cpus_phys_util);
 
 	if (1 == cpus_phys_util->h_count)	/* initial data element */
 	{
-		p->user_pct = convert_pct_to_uint64(user_pct);
-		p->kern_pct = convert_pct_to_uint64(kern_pct);
-		p->idle_pct = convert_pct_to_uint64(idle_pct);
-		p->wait_pct = convert_pct_to_uint64(wait_pct);
+		for (i = 0; i < util_data_count; i++)
+		{
+			p->status = util_data[i].status;
+			p->user_pct = util_data[i].user_pct;
+			p->kern_pct = util_data[i].kern_pct;
+			p->idle_pct = util_data[i].idle_pct;
+			p->wait_pct = util_data[i].wait_pct;
+			p++;
+		}
 	}
 	else
 	{
@@ -810,45 +812,63 @@ static void	insert_total_phys_util_into_collector(ZBX_CPUS_UTIL_DATA_AIX *cpus_p
 		/* pointer to previous data element */
 		ZBX_CPU_UTIL_PCT_AIX	*prev = cpus_phys_util->counters + prev_idx * cpus_phys_util->column_num;
 
-		p->user_pct = prev->user_pct + convert_pct_to_uint64(user_pct);
-		p->kern_pct = prev->kern_pct + convert_pct_to_uint64(kern_pct);
-		p->idle_pct = prev->idle_pct + convert_pct_to_uint64(idle_pct);
-		p->wait_pct = prev->wait_pct + convert_pct_to_uint64(wait_pct);
+		for (i = 0; i < util_data_count; i++)
+		{
+			p->status = util_data[i].status;
+			p->user_pct = prev->user_pct + util_data[i].user_pct;
+			p->kern_pct = prev->kern_pct + util_data[i].kern_pct;
+			p->idle_pct = prev->idle_pct + util_data[i].idle_pct;
+			p->wait_pct = prev->wait_pct + util_data[i].wait_pct;
+			p++;
+			prev++;
+		}
 	}
 
 	UNLOCK_CPUSTATS;
 }
 
-static void	insert_error_status_into_collector(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util, int cpu_nr)
+static void	insert_error_status_into_collector(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util, int cpu_start_nr,
+		int cpu_end_nr)
 {
 	ZBX_CPU_UTIL_PCT_AIX	*p;
+	int			i;
 
 	LOCK_CPUSTATS;
 
-	p = increment_address_in_collector(cpus_phys_util, cpu_nr);
+	p = increment_address_in_collector(cpus_phys_util);
 
-	p->status = SYSINFO_RET_FAIL;
+	for (i = cpu_start_nr; i <= cpu_end_nr; i++)
+		(p + i)->status = SYSINFO_RET_FAIL;
 
 	UNLOCK_CPUSTATS;
 }
 
 static void	update_cpustats_physical(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util)
 {
-	static int			old_available = 0;
+	static int			initialized = 0, old_cpu_count, old_stats_count;
 	static perfstat_cpu_total_t	old_cpu_total;
+	static perfstat_cpu_t		*old_cpu_stats = NULL, *new_cpu_stats = NULL, *tmp_cpu_stats;
+	static perfstat_id_t		cpu_id;
+	static perfstat_cpu_util_t	*cpu_util = NULL;
+	static ZBX_CPU_UTIL_PCT_AIX	*util_data = NULL;	/* array for passing utilization data into collector */
+	/* maximum number of CPUs the collector has been configured to handle */
+	int				max_cpu_count = cpus_phys_util->column_num - 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != old_available)
+	if (0 != initialized)
 	{
 		perfstat_cpu_total_t	new_cpu_total;
-		perfstat_cpu_util_t	cpu_util;
 		perfstat_rawdata_t	rawdata;
+		int			new_cpu_count, new_stats_count, i, count_changed = 0;
+
+		/* get total utilization for all CPUs */
 
 		if (-1 == perfstat_cpu_total(NULL, &new_cpu_total, sizeof(perfstat_cpu_total_t), 1))
 		{
-			zbx_error("perfstat_cpu_total() failed: %s", zbx_strerror(errno));
-			insert_error_status_into_collector(cpus_phys_util, 0);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfstat_cpu_total() failed: %s", __func__,
+					zbx_strerror(errno));
+			insert_error_status_into_collector(cpus_phys_util, 0, max_cpu_count);
 			goto exit;
 		}
 
@@ -859,29 +879,165 @@ static void	update_cpustats_physical(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util)
 		rawdata.prev_elems = 1;
 		rawdata.cur_elems = 1;
 
-		if (-1 == perfstat_cpu_util(&rawdata, &cpu_util, sizeof(perfstat_cpu_util_t), 1))
+		if (-1 == perfstat_cpu_util(&rawdata, cpu_util, sizeof(perfstat_cpu_util_t), 1))
 		{
-			/* the only documented error is "EINVAL One of the parameters is not valid." */
-			zbx_error("perfstat_cpu_util() failed: %s", zbx_strerror(errno));
-			insert_error_status_into_collector(cpus_phys_util, 0);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfstat_cpu_util() failed: %s", __func__,
+					zbx_strerror(errno));
+			insert_error_status_into_collector(cpus_phys_util, 0, max_cpu_count);
 			goto exit;
 		}
 
-		insert_total_phys_util_into_collector(cpus_phys_util, cpu_util.user_pct, cpu_util.kern_pct,
-				cpu_util.idle_pct, cpu_util.wait_pct);
+		util_data[0].status = SYSINFO_RET_OK;
+		util_data[0].user_pct = convert_pct_to_uint64(cpu_util[0].user_pct);
+		util_data[0].kern_pct = convert_pct_to_uint64(cpu_util[0].kern_pct);
+		util_data[0].idle_pct = convert_pct_to_uint64(cpu_util[0].idle_pct);
+		util_data[0].wait_pct = convert_pct_to_uint64(cpu_util[0].wait_pct);
 
+		/* get utilization for individual CPUs in one batch */
+
+		if (-1 == (new_cpu_count = perfstat_cpu(NULL, NULL, sizeof(perfstat_cpu_t), 0)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfstat_cpu() failed: %s", __func__,
+					zbx_strerror(errno));
+			insert_error_status_into_collector(cpus_phys_util, 0, max_cpu_count);
+			goto exit;
+		}
+
+		if (max_cpu_count < new_cpu_count)
+		{
+			zbx_error("number of CPUs has increased. Restart agent to adjust configuration.");
+			exit(EXIT_FAILURE);
+		}
+
+		if (old_cpu_count != new_cpu_count)
+		{
+			old_cpu_count = new_cpu_count;
+			zabbix_log(LOG_LEVEL_WARNING, "number of CPUs has changed from %d to %d,"
+					" skipping this measurement.", old_cpu_count, new_cpu_count);
+			insert_error_status_into_collector(cpus_phys_util, 0, max_cpu_count);
+			count_changed = 1;
+		}
+
+		if (-1 == (new_stats_count = perfstat_cpu(&cpu_id, new_cpu_stats, sizeof(perfstat_cpu_t),
+				max_cpu_count)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfstat_cpu() failed: %s", __func__,
+					zbx_strerror(errno));
+			insert_error_status_into_collector(cpus_phys_util, 0, max_cpu_count);
+			goto exit;
+		}
+
+		if (old_stats_count != new_stats_count)
+		{
+			old_stats_count = new_stats_count;
+			zabbix_log(LOG_LEVEL_WARNING, "number of CPU statistics has changed from %d to %d,"
+					" skipping this measurement.", old_stats_count, new_stats_count);
+			insert_error_status_into_collector(cpus_phys_util, 0, max_cpu_count);
+			count_changed = 1;
+		}
+
+		if (0 == count_changed)
+		{
+			rawdata.type = UTIL_CPU;
+			rawdata.prevstat = old_cpu_stats;
+			rawdata.curstat = new_cpu_stats;
+			rawdata.sizeof_data = sizeof(perfstat_cpu_t);
+			rawdata.prev_elems = old_stats_count;
+			rawdata.cur_elems = new_stats_count;
+
+			if (-1 == perfstat_cpu_util(&rawdata, cpu_util, sizeof(perfstat_cpu_util_t), new_stats_count))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfstat_cpu_util() failed: %s", __func__,
+						zbx_strerror(errno));
+				insert_error_status_into_collector(cpus_phys_util, 0, max_cpu_count);
+				goto copy_to_old;
+			}
+
+			for (i = 0; i < new_stats_count; i++)
+			{
+				util_data[i + 1].status = SYSINFO_RET_OK;
+
+				/* It was observed that perfstat_cpu_util() can return 'NaNQ' as percents */
+				/* of utilization and physical counters do not change in this case. */
+
+				if (0 == isnan(cpu_util[i].user_pct) && 0 == isnan(cpu_util[i].kern_pct) &&
+						0 == isnan(cpu_util[i].idle_pct) && 0 == isnan(cpu_util[i].wait_pct))
+				{
+					util_data[i + 1].user_pct = convert_pct_to_uint64(cpu_util[i].user_pct);
+					util_data[i + 1].kern_pct = convert_pct_to_uint64(cpu_util[i].kern_pct);
+					util_data[i + 1].idle_pct = convert_pct_to_uint64(cpu_util[i].idle_pct);
+					util_data[i + 1].wait_pct = convert_pct_to_uint64(cpu_util[i].wait_pct);
+				}
+				else if (old_cpu_stats[i].puser == new_cpu_stats[i].puser &&
+						old_cpu_stats[i].psys == new_cpu_stats[i].psys &&
+						old_cpu_stats[i].pidle == new_cpu_stats[i].pidle &&
+						old_cpu_stats[i].pwait == new_cpu_stats[i].pwait)
+				{
+					util_data[i + 1].user_pct = convert_pct_to_uint64(0);
+					util_data[i + 1].kern_pct = convert_pct_to_uint64(0);
+					util_data[i + 1].idle_pct = convert_pct_to_uint64(100);
+					util_data[i + 1].wait_pct = convert_pct_to_uint64(0);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "%s(): unexpected case:"
+							" i=%d name=%s puser=%llu psys=%llu pidle=%llu pwait=%llu"
+							" user_pct=%f kern_pct=%f idle_pct=%f wait_pct=%f",
+							__func__, i, new_cpu_stats[i].name,
+							new_cpu_stats[i].puser, new_cpu_stats[i].psys,
+							new_cpu_stats[i].pidle, new_cpu_stats[i].pwait,
+							cpu_util[i].user_pct, cpu_util[i].kern_pct,
+							cpu_util[i].idle_pct, cpu_util[i].wait_pct);
+					insert_error_status_into_collector(cpus_phys_util, 0, max_cpu_count);
+					goto copy_to_old;
+				}
+			}
+
+			insert_phys_util_into_collector(cpus_phys_util, util_data, new_stats_count + 1);
+		}
+copy_to_old:
 		old_cpu_total = new_cpu_total;
+
+		/* swap pointers to old and new data to avoid copying from new to old */
+		tmp_cpu_stats = old_cpu_stats;
+		old_cpu_stats = new_cpu_stats;
+		new_cpu_stats = tmp_cpu_stats;
 	}
 	else	/* the first call */
 	{
 		if (-1 == perfstat_cpu_total(NULL, &old_cpu_total, sizeof(perfstat_cpu_total_t), 1))
 		{
 			zbx_error("the first call of perfstat_cpu_total() failed: %s", zbx_strerror(errno));
-			insert_error_status_into_collector(cpus_phys_util, 0);
-			goto exit;
+			exit(EXIT_FAILURE);
 		}
 
-		old_available = 1;
+		if (-1 == (old_cpu_count = perfstat_cpu(NULL, NULL, sizeof(perfstat_cpu_t), 0)))
+		{
+			zbx_error("the first call of perfstat_cpu() failed: %s", zbx_strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+
+		if (max_cpu_count < old_cpu_count)
+		{
+			zbx_error("number of CPUs has increased. Restart agent to adjust configuration.");
+			exit(EXIT_FAILURE);
+		}
+
+		old_cpu_stats = (perfstat_cpu_t *)zbx_calloc(old_cpu_stats, max_cpu_count, sizeof(perfstat_cpu_t));
+		new_cpu_stats = (perfstat_cpu_t *)zbx_calloc(new_cpu_stats, max_cpu_count, sizeof(perfstat_cpu_t));
+		cpu_util = (perfstat_cpu_util_t *)zbx_calloc(cpu_util, max_cpu_count, sizeof(perfstat_cpu_util_t));
+		util_data = (ZBX_CPU_UTIL_PCT_AIX *)zbx_malloc(util_data,
+				sizeof(ZBX_CPU_UTIL_PCT_AIX) * (max_cpu_count + 1));
+		zbx_strlcpy(cpu_id.name, FIRST_CPU, sizeof(cpu_id.name));
+
+		if (-1 == (old_stats_count = perfstat_cpu(&cpu_id, old_cpu_stats, sizeof(perfstat_cpu_t),
+				max_cpu_count)))
+		{
+			zbx_error("perfstat_cpu() for getting all CPU statistics failed: %s", zbx_strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+
+		initialized = 1;
 	}
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1023,13 +1179,6 @@ int	get_cpustat_physical(AGENT_RESULT *result, int cpu_num, int state, int mode)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (ZBX_CPUNUM_ALL != cpu_num)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "physical utilization for individual CPUs is not yet"
-				" implemented. Only total for all CPUs is available."));
-		return SYSINFO_RET_FAIL;
-	}
-
 	if (0 == p->h_count)
 	{
 		SET_DBL_RESULT(result, 0);
@@ -1038,7 +1187,10 @@ int	get_cpustat_physical(AGENT_RESULT *result, int cpu_num, int state, int mode)
 
 	LOCK_CPUSTATS;
 
-	offset = p->h_latest * p->column_num;	/* total for all CPUs is in column 0 */
+	if (ZBX_CPUNUM_ALL == cpu_num)
+		offset = p->h_latest * p->column_num;	/* total for all CPUs is in column 0 */
+	else
+		offset = p->h_latest * p->column_num + cpu_num + 1;
 
 	if (SYSINFO_RET_FAIL == p->counters[offset].status)
 	{
@@ -1081,7 +1233,10 @@ int	get_cpustat_physical(AGENT_RESULT *result, int cpu_num, int state, int mode)
 				p->h_latest - time_interval + p->row_num;
 
 		/* offset to data element a time interval back */
-		prev_offset = prev_idx * p->column_num;
+		if (ZBX_CPUNUM_ALL == cpu_num)
+			prev_offset = prev_idx * p->column_num;
+		else
+			prev_offset = prev_idx * p->column_num + cpu_num + 1;
 
 		if (SYSINFO_RET_FAIL == p->counters[prev_offset].status)
 		{
