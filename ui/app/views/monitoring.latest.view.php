@@ -113,8 +113,8 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 }
 
 $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data, array_flip(['filter',
-	'sort_field', 'sort_order', 'view_curl', 'rows', 'hosts', 'applications', 'applications_size', 'applications_index',
-	'items', 'history', 'paging'
+	'sort_field', 'sort_order', 'view_curl', 'paging', 'rows', 'hosts', 'applications', 'applications_size',
+	'applications_index', 'items', 'history', 'collapsed_index', 'collapsed_all'
 ]))));
 
 $widget->show();

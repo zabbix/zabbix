@@ -326,4 +326,29 @@ abstract class CControllerLatest extends CController {
 			'multiselect_host_data' => $multiselect_host_data
 		];
 	}
+
+	protected function addCollapsedDataFromProfile(array &$prepared_data) {
+		$collapsed_index = [];
+		$collapsed_all = true;
+
+		foreach ($prepared_data['rows'] as $row) {
+			$hostid = $prepared_data['items'][$row['itemid']]['hostid'];
+			$applicationid = $row['applicationid'];
+
+			if (array_key_exists($hostid, $collapsed_index)
+					&& array_key_exists($applicationid, $collapsed_index[$hostid])) {
+				continue;
+			}
+
+			$collapsed = $applicationid
+				? (CProfile::get('web.latest.toggle', null, $applicationid) !== null)
+				: (CProfile::get('web.latest.toggle_other', null, $hostid) !== null);
+
+			$collapsed_index[$hostid][$applicationid] = $collapsed;
+			$collapsed_all = $collapsed_all && $collapsed;
+		}
+
+		$prepared_data['collapsed_index'] = $collapsed_index;
+		$prepared_data['collapsed_all'] = $collapsed_all;
+	}
 }

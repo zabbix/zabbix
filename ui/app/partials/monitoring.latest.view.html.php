@@ -32,16 +32,18 @@ $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
 // Latest data header.
 
-$col_toggle_all = (new CColHeader(
+$col_toggle_all = new CColHeader(
 	(new CSimpleButton())
 		->addClass(ZBX_STYLE_TREEVIEW)
-		->addClass('app-list-toggle-all')
-		->addItem(new CSpan())
-));
+		->addClass('js-toggle-all')
+		->addItem(
+			(new CSpan())->addClass($data['collapsed_all'] ? ZBX_STYLE_ARROW_RIGHT : ZBX_STYLE_ARROW_DOWN)
+		)
+);
 
-$col_check_all = (new CColHeader(
+$col_check_all = new CColHeader(
 	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
-));
+);
 
 $view_url = $data['view_curl']->getUrl();
 
@@ -65,7 +67,7 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 
-	$table_columns = 12;
+	$table_columns = 13;
 }
 else {
 	$table->setHeader([
@@ -79,7 +81,7 @@ else {
 		(new CColHeader())->addStyle('width: 5%')
 	]);
 
-	$table_columns = 7;
+	$table_columns = 8;
 }
 
 // Latest data rows.
@@ -96,6 +98,8 @@ $last_row_index = $data['rows'] ? array_slice(array_keys($data['rows']), -1)[0] 
 
 foreach ($data['rows'] as $row_index => $row) {
 	$item = $data['items'][$row['itemid']];
+
+	$is_collapsed = $data['collapsed_index'][$item['hostid']][$row['applicationid']];
 
 	// Secondary header for the next host or application.
 
@@ -134,22 +138,16 @@ foreach ($data['rows'] as $row_index => $row) {
 
 		$toggle_app = (new CSimpleButton())
 			->addClass(ZBX_STYLE_TREEVIEW)
-			->addClass('app-list-toggle')
-			->addItem(new CSpan());
+			->addClass('js-toggle')
+			->addItem(
+				(new CSpan())->addClass($is_collapsed ? ZBX_STYLE_ARROW_RIGHT : ZBX_STYLE_ARROW_DOWN)
+			);
 
 		if ($row['applicationid']) {
-			$toggle_app
-				->setAttribute('data-collapsed',
-					(CProfile::get('web.latest.toggle', null, $row['applicationid']) !== null) ? 1 : 0
-				)
-				->setAttribute('data-applicationid', $row['applicationid']);
+			$toggle_app->setAttribute('data-applicationid', $row['applicationid']);
 		}
 		else {
-			$toggle_app
-				->setAttribute('data-collapsed',
-					(CProfile::get('web.latest.toggle_other', null, $item['hostid']) !== null) ? 1 : 0
-				)
-				->setAttribute('data-hostid', $item['hostid']);
+			$toggle_app->setAttribute('data-hostid', $item['hostid']);
 		}
 
 		$table->addRow([$toggle_app, '', $col_host, $col_name]);
@@ -317,6 +315,10 @@ foreach ($data['rows'] as $row_index => $row) {
 	}
 	else {
 		$table_row->setAttribute('data-hostid', $item['hostid']);
+	}
+
+	if ($is_collapsed) {
+		$table_row->addClass(ZBX_STYLE_DISPLAY_NONE);
 	}
 
 	$table->addRow($table_row);

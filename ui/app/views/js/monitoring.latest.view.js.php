@@ -142,69 +142,56 @@
 		this.unscheduleRefresh();
 	};
 
-	latestPage.prototype.toggleAppGroup = function(group, group_id, collapsed) {
-		var $toggle = $('.app-list-toggle[data-' + group + '="' + group_id + '"]');
-
-		$toggle.data('collapsed', collapsed ? 1 : 0);
-
-		$('span', $toggle)
+	latestPage.prototype.toggleChevronCollapsed = function($chevron, collapsed) {
+		$chevron
 			.removeClass(collapsed ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>')
 			.addClass(collapsed ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
+	};
 
-		$('tr[data-' + group + '="' + group_id + '"]').toggle(!collapsed);
+	latestPage.prototype.isChevronCollapsed = function($chevron) {
+		return $chevron.hasClass('<?= ZBX_STYLE_ARROW_RIGHT ?>');
+	};
+
+	latestPage.prototype.toggleAppGroup = function(group, group_id, collapsed) {
+		var $chevron = $('.js-toggle[data-' + group + '="' + group_id + '"] span'),
+			$rows = $('tr[data-' + group + '="' + group_id + '"]');
+
+		this.toggleChevronCollapsed($chevron, collapsed);
+
+		$rows.toggleClass('<?= ZBX_STYLE_DISPLAY_NONE ?>', collapsed);
 	};
 
 	latestPage.prototype.updateToggleAll = function() {
-		var $toggle_all = $('.app-list-toggle-all'),
-			has_open_groups = false;
+		var self = this,
 
-		$('.app-list-toggle').each(function() {
-			if (!$(this).data('collapsed')) {
-				has_open_groups = true;
-			}
+			$chevron_all = $('.js-toggle-all span'),
+			collapsed_all = true;
+
+		$('.js-toggle span').each(function() {
+			collapsed_all = collapsed_all && self.isChevronCollapsed($(this));
 		});
 
-		$toggle_all.data('collapsed', has_open_groups ? 0 : 1);
-
-		$('span', $toggle_all)
-			.removeClass(has_open_groups ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>')
-			.addClass(has_open_groups ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>');
+		this.toggleChevronCollapsed($chevron_all, collapsed_all);
 	};
 
 	latestPage.prototype.hydrate = function() {
 		var self = this;
 
-		$('.app-list-toggle').each(function() {
-			var $toggle = $(this),
-				collapsed = $toggle.data('collapsed'),
-
-				group = 'applicationid',
-				group_id = $toggle.data(group);
-
-			if (group_id === undefined) {
-				group = 'hostid',
-				group_id = $toggle.data(group);
-			}
-
-			self.toggleAppGroup(group, group_id, collapsed);
-		});
-
-		this.updateToggleAll();
-
-		$('.app-list-toggle-all').on('click', function() {
+		$('.js-toggle-all').on('click', function() {
 			// For Opera browser with large tables, which renders table layout while showing/hiding rows.
 			$(this).closest('table').fadeTo(0, 0);
 
 			var $toggle_all = $(this),
-				collapsed_all = $toggle_all.data('collapsed') ? 0 : 1,
+				collapsed_all = !self.isChevronCollapsed($toggle_all.find('span')),
+
 				updates = {
 					applicationid: [],
 					hostid: []
 				};
 
-			$('.app-list-toggle').each(function() {
+			$('.js-toggle').each(function() {
 				var $toggle = $(this),
-					collapsed = $toggle.data('collapsed');
+					collapsed = self.isChevronCollapsed($toggle.find('span'));
 
 				if (collapsed == collapsed_all) {
 					return;
@@ -223,8 +210,6 @@
 				self.toggleAppGroup(group, group_id, collapsed_all);
 			});
 
-			$toggle_all.data('collapsed', collapsed_all);
-
 			self.updateToggleAll();
 
 			// For Opera browser with large tables, which renders table layout while showing/hiding rows.
@@ -238,9 +223,9 @@
 			}
 		});
 
-		$('.app-list-toggle').on('click', function() {
+		$('.js-toggle').on('click', function() {
 			var $toggle = $(this),
-				collapsed = $toggle.data('collapsed') ? 0 : 1,
+				collapsed = !self.isChevronCollapsed($toggle.find('span')),
 
 				group = 'applicationid',
 				group_id = $toggle.data(group);
