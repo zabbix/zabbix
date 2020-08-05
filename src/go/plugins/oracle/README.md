@@ -57,7 +57,7 @@ The Zabbix Agent's configuration file is used to configure plugins.
 - tcp://127.0.0.1:1521
 - tcp://localhost 
 
-**Plugins.Oracle.Service** — a service name to be used for connection (SID isn't supported).  
+**Plugins.Oracle.Service** — A service name to be used for connection (SID isn't supported).  
 *Default value:* XE
 
 **Plugins.Oracle.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
@@ -78,9 +78,12 @@ The Zabbix Agent's configuration file is used to configure plugins.
 ### Authentication
 The plugin can authenticate using credentials specified as key's parameters or within named sessions.
 Embedded URI credentials (userinfo) will be ignored. So, you can't pass them like this:   
-```oracle.ping[tcp://user:password@127.0.0.1/XE].```  
-The right way is:  
-```oracle.ping[tcp://127.0.0.1,user,password,XE]``` 
+
+    oracle.ping[tcp://user:password@127.0.0.1/XE] — WRONG  
+
+The right way is:
+  
+    oracle.ping[tcp://127.0.0.1,user,password,XE]
 
 #### Using named sessions
 Named sessions allow you to define specific parameters for each Oracle instance. Currently, there are only supported
@@ -115,7 +118,7 @@ There are 4 levels of parameters overwriting:
 1. Hardcoded default values →
 2. 1st level config params (Plugins.Oracle.\<parameter\>) →
 3. Named sessions (Plugins.Oracle.Sessions.\<sessionName\>.\<parameter\>) →
-4. Items' key params.
+4. Item keys params.
 
 ## Supported keys
 The common parameters for all keys are: [connString][,user][,password][,service]
@@ -132,8 +135,8 @@ The common parameters for all keys are: [connString][,user][,password][,service]
 
 **oracle.custom.query[\<commonParams\>,queryName[,args...]]** — Returns result of custom query.  
 *Params:*  
-queryName (required) — Name of custom query (must be equal to a name of an sql file without an extension).  
-args (optional) — One or more arguments to pass to a query.
+queryName (required) — name of custom query (must be equal to a name of an sql file without an extension).  
+args (optional) — one or more arguments to pass to a query.
 
 **oracle.datafiles.stats[\<commonParams\>]** — Returns data files statistics.  
 
@@ -180,6 +183,41 @@ duration (optional) — capturing interval (in seconds) of system metric values.
 **oracle.user.info[\<commonParams\>[,username]]** — Returns user information.  
 *Params:*  
 username (optional) — username for which information is needed. Default: current user.        
+
+## Custom queries
+It's possible to extend functionality of the plugin using user-defined queries. To do that you should place all your
+queries in a directory specified in Plugins.Oracle.CustomQueriesPath (there is no default path) as *.sql files.
+For example, you have a tree like this:
+
+    /etc/zabbix/oracle/sql/  
+    ├── long_tx.sql
+    ├── payment.sql    
+    └── top_proc.sql
+     
+You should set Plugins.Oracle.CustomQueriesPath=/etc/zabbix/oracle/sql     
+     
+So, when the queries are in place, you can execute them:
+  
+    oracle.custom.query[<commonParams>,top_proc]  
+    oracle.custom.query[<commonParams>,long_tx,600]
+          
+You can pass as many parameters to a query as you need.   
+The syntax for placeholder parameters uses ":#", where "#" is an index number of parameter.   
+E.g: 
+```
+/* payment.sql */
+
+SELECT 
+    ammount 
+FROM 
+    payment 
+WHERE
+    user = :1
+    AND service_id = :2
+    AND date = :3
+``` 
+
+    oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
 
 ## Troubleshooting
 The plugin uses Zabbix Agent's logs. You can increase a debug level of Zabbix Agent if you need more details about 
