@@ -115,7 +115,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		);
 
 		if ($data['dashboards']) {
-			foreach ($data['dashboards'] as $idx => &$dashboard) {
+			foreach ($data['dashboards'] as &$dashboard) {
 				$tags = [];
 
 				if ($dashboard['userid'] == CWebUser::$data['userid']) {
