@@ -743,11 +743,10 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 				$value = getTagString($tag, $tag_name_format);
 
 				if ($value !== '') {
-					$span = (new CSpan($value))
+					$tags[$element[$key]][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint(getTagString($tag));
 
-					$tags[$element[$key]][] = $span;
 					$tags_shown++;
 
 					if ($tags_shown >= $list_tag_count) {
