@@ -86,9 +86,22 @@ $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
 	->setArgument('dashboardid', '');
 
-$tags = makeTags($data['dashboards'], true, 'dashboardid');
-
 foreach ($data['dashboards'] as $dashboard) {
+	$tags = [];
+
+	if ($dashboard['userid'] == CWebUser::$data['userid']) {
+		$tags[] = (new CSpan(_('My')))
+			->addClass(ZBX_STYLE_TAG)
+			->addClass(ZBX_STYLE_GREEN_BG);
+	}
+
+	if ($dashboard['private'] == PUBLIC_SHARING || count($dashboard['users']) > 0
+			|| count($dashboard['userGroups']) > 0) {
+		$tags[] = (new CSpan(_('Shared')))
+			->addClass(ZBX_STYLE_TAG)
+			->addClass(ZBX_STYLE_YELLOW_BG);
+	}
+
 	$table->addRow([
 		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
 			->setEnabled($dashboard['editable']),
@@ -98,7 +111,7 @@ foreach ($data['dashboards'] as $dashboard) {
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
 			),
-			(new CDiv($tags[$dashboard['dashboardid']]))->addStyle('float: right')
+			$tags ? (new CDiv($tags))->addStyle('float: right') : null
 		]
 	]);
 }

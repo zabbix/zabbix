@@ -678,14 +678,12 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  * @param array  $list[]['tags']
  * @param string $list[]['tags'][]['tag']
  * @param string $list[]['tags'][]['value']
- * @param string $list[]['tags'][]['class']  Custom background class of tag.
  * @param bool   $html
  * @param string $key                        Name of tag source ID. Possible values:
  *                                            - 'eventid' - for events and problems (default);
  *                                            - 'hostid' - for hosts;
  *                                            - 'templateid' - for templates;
- *                                            - 'triggerid' - for triggers;
- *                                            - 'dashboardid' - for dashboards.
+ *                                            - 'triggerid' - for triggers.
  * @param int    $list_tag_count             Maximum number of tags to display.
  * @param array  $filter_tags                An array of tag filtering data.
  * @param string $filter_tags[]['tag']
@@ -748,10 +746,6 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 					$span = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint(getTagString($tag));
-
-					if (array_key_exists('class', $tag)) {
-						$span->addClass($tag['class']);
-					}
 
 					$tags[$element[$key]][] = $span;
 					$tags_shown++;

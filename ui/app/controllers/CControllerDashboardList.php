@@ -115,22 +115,6 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		);
 
 		if ($data['dashboards']) {
-			foreach ($data['dashboards'] as &$dashboard) {
-				$tags = [];
-
-				if ($dashboard['userid'] == CWebUser::$data['userid']) {
-					$tags[] = ['tag' => _('My'), 'value' => '', 'class' => ZBX_STYLE_GREEN_BG];
-				}
-
-				if ($dashboard['private'] == PUBLIC_SHARING || count($dashboard['users']) > 0
-						|| count($dashboard['userGroups']) > 0) {
-					$tags[] = ['tag' => _('Shared'), 'value' => '', 'class' => ZBX_STYLE_YELLOW_BG];
-				}
-
-				$dashboard['tags'] = $tags;
-			}
-			unset($dashboard);
-
 			$this->prepareEditableFlag($data['dashboards']);
 		}
 
