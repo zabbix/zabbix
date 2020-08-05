@@ -46,6 +46,7 @@
 								.remove();
 
 							$('#default_lang').val("<?= DB::getDefault('config', 'default_lang') ?>");
+							$('#default_timezone').val("<?= DB::getDefault('config', 'default_timezone') ?>");
 							$('#default_theme').val("<?= DB::getDefault('config', 'default_theme') ?>");
 							$('#search_limit').val("<?= DB::getDefault('config', 'search_limit') ?>");
 							$('#max_overview_table_size').val(
