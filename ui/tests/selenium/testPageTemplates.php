@@ -143,6 +143,12 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
 	}
 
+	public function testPageTemplates_FilterReset() {
+		$this->zbxTestLogin('templates.php');
+		$this->query('button:Reset')->one()->click();
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	}
+
 	public static function getFilterByTagsData() {
 		return [
 			// "And" and "And/Or" checks.
@@ -251,25 +257,25 @@ class testPageTemplates extends CLegacyWebTest {
 		$hosts = ['Simple form test host'];
 
 		$this->page->login()->open('templates.php?groupid=0');
-		// Reset filter from possible previous scenario.
-		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$filter->query('button:Reset')->one()->click();
+		// Reset Templates filter from possible previous scenario.
+		$this->resetFilter();
 		// Click on Hosts link in Temlate row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
 		// Check that Hosts page is opened.
 		$this->assertPageHeader('Hosts');
-		$filter->invalidate();
+		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table->invalidate();
 		// Check that correct Hosts are filtered.
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
 		$this->assertTableDataColumn($hosts);
 		$this->assertRowCount(count($hosts));
+		// Reset Hosts filter after scenario.
+		$this->resetFilter();
 	}
 
-	public function testPageTemplates_FilterReset() {
-		$this->zbxTestLogin('templates.php');
-		$this->query('button:Reset')->one()->click();
-		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
+	private function resetFilter() {
+		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
 	}
 }

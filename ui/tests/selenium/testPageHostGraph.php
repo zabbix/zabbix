@@ -67,7 +67,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		$breadcrumbs = [
 			'hosts.php' => 'All hosts',
 			'hosts.php?form=update&hostid='.$hostid => $host_name,
-			'applications.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Applications',
+			'zabbix.php?action=application.list&filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Applications',
 			'items.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Items',
 			'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Triggers',
 			'graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid => 'Graphs',

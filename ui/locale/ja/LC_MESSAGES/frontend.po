@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-24 19:54+0300\n"
-"PO-Revision-Date: 2020-07-20 08:13+0300\n"
+"POT-Creation-Date: 2020-07-31 19:55+0300\n"
+"PO-Revision-Date: 2020-07-30 07:19+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1595225614.000000\n"
+"X-POOTLE-MTIME: 1596086383.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -621,7 +621,7 @@ msgstr "設定有効期間の終了日時"
 #: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:174
 #: app/views/popup.lldoverride.php:192
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
-#: app/views/popup.media.php:116 app/views/popup.mediatype.message.php:92
+#: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
 #: include/classes/widgets/CWidgetHelper.php:483 include/forms.inc.php:1445
 #: include/forms.inc.php:1964 include/views/configuration.action.edit.php:131
@@ -2017,7 +2017,7 @@ msgstr[0] "グループを削除できません"
 msgid "Cannot delete host"
 msgstr "ホストを削除できません"
 
-#: include/classes/api/services/CHost.php:1409
+#: include/classes/api/services/CHost.php:1414
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2041,7 +2041,7 @@ msgstr "アイコンのマッピングを削除できません"
 msgid "Cannot delete image"
 msgstr "イメージを削除できません"
 
-#: include/classes/api/services/CHost.php:1214
+#: include/classes/api/services/CHost.php:1219
 msgid "Cannot delete inventory."
 msgstr "インベントリを削除できません。"
 
@@ -2448,7 +2448,7 @@ msgstr "ツリーをフォーマットできません。サービスのリンク
 msgid "Cannot format tree."
 msgstr "ツリーをフォーマットできません。"
 
-#: include/classes/api/services/CTemplate.php:901
+#: include/classes/api/services/CTemplate.php:914
 msgid "Cannot have empty visible template name."
 msgstr "テンプレート表示名に空白は設定できません。"
 
@@ -2462,12 +2462,12 @@ msgstr[0] "テンプレート\"%1$s\"をインポートできません。リン�
 msgid "Cannot insert trigger expression"
 msgstr "トリガー条件式を追加できません"
 
-#: include/classes/api/services/CHost.php:1192
+#: include/classes/api/services/CHost.php:1197
 msgid "Cannot link template"
 msgstr "テンプレートをリンクできません"
 
-#: include/classes/api/services/CTemplate.php:988
-#: include/classes/api/services/CTemplate.php:1002
+#: include/classes/api/services/CTemplate.php:1001
+#: include/classes/api/services/CTemplate.php:1015
 msgid "Cannot link template."
 msgstr "テンプレートをリンクできません。"
 
@@ -2482,19 +2482,19 @@ msgstr[0] "%1$sにあるモジュールをロードできません。"
 msgid "Cannot logout."
 msgstr "ログアウトできません。"
 
-#: include/classes/api/services/CHost.php:1050
+#: include/classes/api/services/CHost.php:1055
 msgid "Cannot mass update host name."
 msgstr "ホスト名を一括更新できません。"
 
-#: include/classes/api/services/CTemplate.php:1126
+#: include/classes/api/services/CTemplate.php:1139
 msgid "Cannot mass update template name."
 msgstr "テンプレート名を一括更新できません。"
 
-#: include/classes/api/services/CHost.php:1036
+#: include/classes/api/services/CHost.php:1041
 msgid "Cannot mass update visible host name."
 msgstr "ホストの表示名を一括更新できません。"
 
-#: include/classes/api/services/CTemplate.php:1091
+#: include/classes/api/services/CTemplate.php:1104
 msgid "Cannot mass update visible template name."
 msgstr "テンプレートの表示名を一括更新できません。"
 
@@ -2616,9 +2616,9 @@ msgstr "アイテムプロトタイプ\"%1$s\"内のアプリケーションプ�
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"に\"templateid\"を設定できません。"
 
-#: include/classes/api/services/CHost.php:1101
-#: include/classes/api/services/CHost.php:2025
-#: include/classes/api/services/CHost.php:2171
+#: include/classes/api/services/CHost.php:1106
+#: include/classes/api/services/CHost.php:2042
+#: include/classes/api/services/CHost.php:2203
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "無効の状態のインベントリのフィールドは設定できません。"
 
@@ -2653,12 +2653,12 @@ msgstr "Webシナリオのリンク削除と削除が行えません。"
 msgid "Cannot unlink and clear applications."
 msgstr "アプリケーションのリンク削除と削除が行えません。"
 
-#: include/classes/api/services/CHost.php:1167
+#: include/classes/api/services/CHost.php:1172
 msgid "Cannot unlink template"
 msgstr "テンプレートのリンクを削除できません"
 
-#: include/classes/api/services/CTemplate.php:953
-#: include/classes/api/services/CTemplate.php:976
+#: include/classes/api/services/CTemplate.php:966
+#: include/classes/api/services/CTemplate.php:989
 msgid "Cannot unlink template."
 msgstr "テンプレートのリンクを削除できません。"
 
@@ -2708,7 +2708,7 @@ msgstr "トリガー\"%2$s\"の\"%1$s\"を更新できません。"
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "トリガーのプロトタイプ\"%2$s\"の\"%1$s\"を更新できません。"
 
-#: include/classes/api/services/CHost.php:2148
+#: include/classes/api/services/CHost.php:2180
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "ディスカバリされたホスト\"%1$s\"の\"%2$s\"を更新できません。"
@@ -2823,7 +2823,7 @@ msgstr "ディスカバリされたホスト\"%1$s\"のグループを更新で�
 msgid "Cannot update host"
 msgstr "ホストを更新できません"
 
-#: include/classes/api/services/CHost.php:998
+#: include/classes/api/services/CHost.php:1003
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "ホストの暗号化設定が更新できません。両方向の接続設定を指定する必要があります。"
 
@@ -2941,8 +2941,8 @@ msgstr "テンプレートのアプリケーションを更新できません。
 msgid "Cannot update templates"
 msgstr "テンプレートを更新できません"
 
-#: include/classes/api/services/CTemplate.php:852
-#: include/classes/api/services/CTemplate.php:1187
+#: include/classes/api/services/CTemplate.php:865
+#: include/classes/api/services/CTemplate.php:1200
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "ディスカバリされたホスト\"%1$s\"のテンプレートを更新できません。"
@@ -4223,11 +4223,8 @@ msgstr "DD.MM.YY"
 msgid "DES"
 msgstr "DES"
 
-#: app/views/administration.proxy.edit.php:54
 #: app/views/monitoring.host.view.php:127 app/views/search.php:32
 #: include/views/configuration.host.list.php:135
-#: include/views/inventory.host.view.php:93
-#: include/views/js/configuration.host.edit.js.php:55
 msgid "DNS"
 msgstr "DNS"
 
@@ -4843,7 +4840,7 @@ msgstr "トリガーを削除しますか？"
 msgid "Delete web scenario?"
 msgstr "Webシナリオを削除しますか？"
 
-#: include/classes/api/services/CHost.php:1561
+#: include/classes/api/services/CHost.php:1566
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "削除: ホスト\"%1$s\"。"
@@ -4853,7 +4850,7 @@ msgstr "削除: ホスト\"%1$s\"。"
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "削除: \"%2$s\"のホストのプロトタイプ\"%1$s\"。"
 
-#: include/classes/api/services/CTemplate.php:782
+#: include/classes/api/services/CTemplate.php:795
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "削除: テンプレート\"%1$s\"。"
@@ -5421,14 +5418,14 @@ msgstr "トリガー\"%1$s\"の依存関係が重複しています。"
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "トリガープロトタイプ\"%1$s\"の依存関係が重複しています。"
 
-#: include/classes/api/services/CHost.php:1961
-#: include/classes/api/services/CHost.php:2201
+#: include/classes/api/services/CHost.php:1978
+#: include/classes/api/services/CHost.php:2233
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr "ホストが重複しています。同じホスト名\"%1$s\"を持つホスト設定がすでに存在しています。"
 
-#: include/classes/api/services/CHost.php:1968
-#: include/classes/api/services/CHost.php:2221
+#: include/classes/api/services/CHost.php:1985
+#: include/classes/api/services/CHost.php:2253
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr "ホストが重複しています。同じホストの表示名\"%1$s\"を持つホストがすでに存在しています。"
@@ -5645,7 +5642,7 @@ msgstr "アクション\"%1$s\"のフィルター条件タイプが空白です�
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:576
-#: include/classes/api/services/CHost.php:1373
+#: include/classes/api/services/CHost.php:1378
 #: include/classes/api/services/CHostPrototype.php:954
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CMaintenance.php:533
@@ -5661,7 +5658,7 @@ msgstr "アクション\"%1$s\"のフィルター条件タイプが空白です�
 #: include/classes/api/services/CService.php:366
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
-#: include/classes/api/services/CTemplate.php:588
+#: include/classes/api/services/CTemplate.php:601
 #: include/classes/api/services/CTrigger.php:678
 #: include/classes/api/services/CTrigger.php:802
 #: include/classes/api/services/CUserMacro.php:613
@@ -5841,7 +5838,7 @@ msgstr "トラッピングの有効化"
 #: app/views/administration.usergroup.list.php:142
 #: app/views/administration.user.list.php:196
 #: app/views/administration.user.list.php:200
-#: app/views/monitoring.host.view.php:142 app/views/popup.media.php:78
+#: app/views/monitoring.host.view.php:142 app/views/popup.media.php:85
 #: app/views/popup.triggerwizard.php:132 include/discovery.inc.php:107
 #: include/html.inc.php:315 include/httptest.inc.php:46
 #: include/items.inc.php:138 include/items.inc.php:141
@@ -6207,7 +6204,7 @@ msgstr "URLを解析できませんでした。"
 msgid "Failed to update dashboard"
 msgstr "ダッシュボードの更新に失敗しました"
 
-#: include/classes/api/services/CTemplate.php:537
+#: include/classes/api/services/CTemplate.php:550
 msgid "Failed to update template."
 msgstr "テンプレートの更新の失敗。"
 
@@ -6255,8 +6252,8 @@ msgstr "フィールド\"%1$s\"はNULLに設定できません。"
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
 #: include/classes/api/services/CHostGroup.php:949
-#: include/classes/api/services/CHost.php:959
-#: include/classes/api/services/CTemplate.php:880
+#: include/classes/api/services/CHost.php:964
+#: include/classes/api/services/CTemplate.php:893
 #: include/classes/api/services/CTriggerGeneral.php:237
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
@@ -6309,7 +6306,7 @@ msgstr "メディアタイプ\"%2$s\"のためのフィールド\"%1$s\"を指�
 msgid "Field \"%1$s\" must be missing."
 msgstr "フィールド\"%1$s\"が入力されていません。"
 
-#: include/classes/api/services/CTemplate.php:426
+#: include/classes/api/services/CTemplate.php:435
 msgid "Field \"host\" is mandatory."
 msgstr "フィールド\"host\"は必須です。"
 
@@ -7258,17 +7255,17 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "ホスト"
 
-#: include/classes/api/services/CHost.php:1063
-#: include/classes/api/services/CTemplate.php:458
+#: include/classes/api/services/CHost.php:1068
+#: include/classes/api/services/CTemplate.php:467
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "ホスト\"%1$s\"はすでに存在しています。"
 
 #: include/classes/api/services/CHostGroup.php:1495
-#: include/classes/api/services/CHost.php:1022
-#: include/classes/api/services/CHost.php:1944
-#: include/classes/api/services/CHost.php:2125
+#: include/classes/api/services/CHost.php:1027
+#: include/classes/api/services/CHost.php:1949
+#: include/classes/api/services/CHost.php:2143
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "ホスト\"%1$s\"にホストグループを設定してください。"
@@ -7553,7 +7550,7 @@ msgstr "ホストのサブネットマスク"
 msgid "Host time"
 msgstr "ホスト時間"
 
-#: include/classes/api/services/CHost.php:888
+#: include/classes/api/services/CHost.php:893
 msgid "Host update failed."
 msgstr "ホストの更新に失敗しました"
 
@@ -7566,17 +7563,17 @@ msgstr "ホストを更新しました"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "ID \"%1$s\"のホストは使用できません。"
 
-#: include/classes/api/services/CHost.php:2056
-#: include/classes/api/services/CHost.php:2282
-#: include/classes/api/services/CTemplate.php:1152
+#: include/classes/api/services/CHost.php:2073
+#: include/classes/api/services/CHost.php:2314
+#: include/classes/api/services/CTemplate.php:1165
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "同じホスト名\"%1$s\"を持つホストがすでに存在します。"
 
-#: include/classes/api/services/CHost.php:2062
-#: include/classes/api/services/CHost.php:2289
-#: include/classes/api/services/CTemplate.php:484
-#: include/classes/api/services/CTemplate.php:1117
+#: include/classes/api/services/CHost.php:2079
+#: include/classes/api/services/CHost.php:2321
+#: include/classes/api/services/CTemplate.php:493
+#: include/classes/api/services/CTemplate.php:1130
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "同じホストの表示名\"%1$s\"を持つホストがすでに存在します。"
@@ -7670,12 +7667,9 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: app/views/administration.proxy.edit.php:53
 #: app/views/monitoring.host.view.php:123
 #: app/views/reports.auditlog.list.php:72 app/views/search.php:31
 #: include/views/configuration.host.list.php:138
-#: include/views/inventory.host.view.php:92
-#: include/views/js/configuration.host.edit.js.php:54
 msgid "IP"
 msgstr "IPアドレス"
 
@@ -8308,9 +8302,9 @@ msgstr "インターフェースのbulkの値が正しくありません。"
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のSLAの値の計算が正しくありません。"
 
-#: include/classes/api/services/CHost.php:1045
-#: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:2195
+#: include/classes/api/services/CHost.php:1050
+#: include/classes/api/services/CHost.php:1937
+#: include/classes/api/services/CHost.php:2227
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr "ホスト名\"%1$s\"に不正な文字列が使用されています。"
@@ -8321,8 +8315,8 @@ msgstr "ホスト名\"%1$s\"に不正な文字列が使用されています。"
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "プロキシ名\"%1$s\"に使用されている文字列が正しくありません。"
 
-#: include/classes/api/services/CTemplate.php:436
-#: include/classes/api/services/CTemplate.php:1162
+#: include/classes/api/services/CTemplate.php:445
+#: include/classes/api/services/CTemplate.php:1175
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "テンプレート名\"%1$s\"に使用されている文字列が正しくありません。"
@@ -8481,9 +8475,9 @@ msgstr "イメージのインデックスが正しくありません。"
 #: include/classes/api/services/CAction.php:2911
 #: include/classes/api/services/CAction.php:2923
 #: include/classes/api/services/CAction.php:2935
-#: include/classes/api/services/CHost.php:1028
-#: include/classes/api/services/CHost.php:1926
-#: include/classes/api/services/CHost.php:2112
+#: include/classes/api/services/CHost.php:1033
+#: include/classes/api/services/CHost.php:1931
+#: include/classes/api/services/CHost.php:2129
 #: include/classes/api/services/CImage.php:435
 #: include/classes/api/services/CImage.php:476
 #: include/classes/api/services/CProxy.php:619
@@ -8491,8 +8485,8 @@ msgstr "イメージのインデックスが正しくありません。"
 #: include/classes/api/services/CProxy.php:729
 #: include/classes/api/services/CProxy.php:751
 #: include/classes/api/services/CScreen.php:426
-#: include/classes/api/services/CTemplate.php:431
-#: include/classes/api/services/CTemplate.php:568
+#: include/classes/api/services/CTemplate.php:440
+#: include/classes/api/services/CTemplate.php:581
 #: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "入力されたパラメータが正しくありません。"
@@ -8507,8 +8501,8 @@ msgstr "インターフェースのDNSパラメータ\"%1$s\"が正しくあり�
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr "インターフェースのポート\"%1$s\"が正しくありません。"
 
-#: include/classes/api/services/CHost.php:2031
-#: include/classes/api/services/CHost.php:2177
+#: include/classes/api/services/CHost.php:2048
+#: include/classes/api/services/CHost.php:2209
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr "インベントリのフィールド\"%1$s\"が正しくありません。"
@@ -8680,8 +8674,8 @@ msgstr "サービス\"%1$s\"のソート順序が正しくありません。"
 msgid "Incorrect source value."
 msgstr "ソースの値が正しくありません。"
 
-#: include/classes/api/services/CHost.php:2003
-#: include/classes/api/services/CHost.php:2143
+#: include/classes/api/services/CHost.php:2020
+#: include/classes/api/services/CHost.php:2175
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のステータスが正しくありません。"
@@ -8958,19 +8952,21 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/api/services/CEvent.php:771
 #: include/classes/api/services/CEvent.php:812
 #: include/classes/api/services/CEvent.php:869
-#: include/classes/api/services/CHost.php:986
-#: include/classes/api/services/CHost.php:1828
-#: include/classes/api/services/CHost.php:1834
-#: include/classes/api/services/CHost.php:1849
-#: include/classes/api/services/CHost.php:1855
+#: include/classes/api/services/CHost.php:991
+#: include/classes/api/services/CHost.php:1833
+#: include/classes/api/services/CHost.php:1839
+#: include/classes/api/services/CHost.php:1854
 #: include/classes/api/services/CHost.php:1860
-#: include/classes/api/services/CHost.php:1866
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1880
-#: include/classes/api/services/CHost.php:1889
-#: include/classes/api/services/CHost.php:1895
-#: include/classes/api/services/CHost.php:1997
-#: include/classes/api/services/CHost.php:2137
+#: include/classes/api/services/CHost.php:1865
+#: include/classes/api/services/CHost.php:1871
+#: include/classes/api/services/CHost.php:1879
+#: include/classes/api/services/CHost.php:1885
+#: include/classes/api/services/CHost.php:1894
+#: include/classes/api/services/CHost.php:1900
+#: include/classes/api/services/CHost.php:1958
+#: include/classes/api/services/CHost.php:2014
+#: include/classes/api/services/CHost.php:2152
+#: include/classes/api/services/CHost.php:2169
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:209
@@ -9063,6 +9059,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/classes/api/services/CProxy.php:797
 #: include/classes/api/services/CScreen.php:394
 #: include/classes/api/services/CScreen.php:400
+#: include/classes/api/services/CTemplate.php:400
 #: include/classes/api/services/CTriggerGeneral.php:242
 #: include/classes/api/services/CTriggerGeneral.php:248
 #: include/classes/api/services/CTriggerGeneral.php:258
@@ -9706,7 +9703,7 @@ msgstr "ユーザーセッションの保存期間が正しくありません：
 msgid "Inventory"
 msgstr "インベントリ"
 
-#: include/classes/api/services/CHost.php:1233
+#: include/classes/api/services/CHost.php:1238
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のインベントリを無効にしました。"
@@ -10464,7 +10461,7 @@ msgstr "テンプレートとのリンク"
 
 #: include/views/configuration.template.list.php:159
 msgid "Linked to templates"
-msgstr ""
+msgstr "テンプレートへのリンク"
 
 #: include/views/js/monitoring.sysmaps.js.php:682
 #: include/views/js/monitoring.sysmaps.js.php:693
@@ -10989,9 +10986,9 @@ msgctxt "May short"
 msgid "May"
 msgstr "5月"
 
-#: app/controllers/CControllerPopupMedia.php:170
+#: app/controllers/CControllerPopupMedia.php:168
 #: app/views/administration.user.edit.php:304
-#: app/views/administration.user.edit.php:319 app/views/popup.media.php:58
+#: app/views/administration.user.edit.php:319 app/views/popup.media.php:65
 msgid "Media"
 msgstr "メディア"
 
@@ -11964,8 +11961,8 @@ msgstr "インターフェースが見つかりません。"
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr "プロキシ\"%1$s\"にインターフェースが設定されていません。"
 
-#: include/classes/api/services/CHost.php:2010
-#: include/classes/api/services/CHost.php:2188
+#: include/classes/api/services/CHost.php:2027
+#: include/classes/api/services/CHost.php:2220
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"にインターフェースが設定されていません。"
@@ -12099,10 +12096,10 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CHostInterface.php:313
 #: include/classes/api/services/CHostInterface.php:587
 #: include/classes/api/services/CHostInterface.php:851
-#: include/classes/api/services/CHost.php:1342
-#: include/classes/api/services/CHost.php:1377
-#: include/classes/api/services/CHost.php:1986
-#: include/classes/api/services/CHost.php:2118
+#: include/classes/api/services/CHost.php:1347
+#: include/classes/api/services/CHost.php:1382
+#: include/classes/api/services/CHost.php:2003
+#: include/classes/api/services/CHost.php:2135
 #: include/classes/api/services/CHostPrototype.php:422
 #: include/classes/api/services/CHostPrototype.php:468
 #: include/classes/api/services/CHostPrototype.php:489
@@ -12158,8 +12155,8 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CService.php:988
 #: include/classes/api/services/CService.php:1012
 #: include/classes/api/services/CTask.php:136
-#: include/classes/api/services/CTemplate.php:820
-#: include/classes/api/services/CTemplate.php:842
+#: include/classes/api/services/CTemplate.php:833
+#: include/classes/api/services/CTemplate.php:855
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
@@ -14223,7 +14220,7 @@ msgstr "リモートコマンド"
 #: app/views/monitoring.problem.view.php:213
 #: app/views/monitoring.problem.view.php:260
 #: app/views/popup.lldoperation.php:146 app/views/popup.lldoverride.php:133
-#: app/views/popup.media.php:45 app/views/popup.media.php:99
+#: app/views/popup.media.php:45 app/views/popup.media.php:106
 #: include/classes/widgets/CWidgetHelper.php:471
 #: include/classes/widgets/CWidgetHelper.php:515 include/forms.inc.php:1425
 #: include/forms.inc.php:1933 include/views/configuration.action.edit.php:94
@@ -15325,22 +15322,22 @@ msgstr "ユーザーにメッセージを送信"
 msgid "Send only to"
 msgstr "次のメディアのみ使用"
 
-#: app/views/administration.user.edit.php:234 app/views/popup.media.php:61
-#: app/views/popup.media.php:68 app/views/popup.mediatypetest.edit.php:61
+#: app/views/administration.user.edit.php:234 app/views/popup.media.php:68
+#: app/views/popup.media.php:75 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "送信先"
-
-#: app/partials/popup.operations.php:75
-msgid "Send to User groups"
-msgstr "ユーザーグループに送信"
-
-#: app/partials/popup.operations.php:95
-msgid "Send to Users"
-msgstr "ユーザーに送信"
 
 #: jsLoader.php:212
 msgid "Send to back"
 msgstr "再後面へ"
+
+#: app/partials/popup.operations.php:75
+msgid "Send to user groups"
+msgstr ""
+
+#: app/partials/popup.operations.php:95
+msgid "Send to users"
+msgstr ""
 
 #: include/actions.inc.php:2127
 #: include/views/administration.auditacts.list.php:76
@@ -16515,8 +16512,8 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "テンプレート"
 
-#: include/classes/api/services/CHost.php:1074
-#: include/classes/api/services/CTemplate.php:448
+#: include/classes/api/services/CHost.php:1079
+#: include/classes/api/services/CTemplate.php:457
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -16524,7 +16521,7 @@ msgstr "テンプレート\"%1$s\"はすでに存在します。"
 
 #: include/classes/api/services/CHostGroup.php:1500
 #: include/classes/api/services/CTemplate.php:391
-#: include/classes/api/services/CTemplate.php:1084
+#: include/classes/api/services/CTemplate.php:1097
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "テンプレート\"%1$s\"にホストグループを設定してください。"
@@ -16588,17 +16585,17 @@ msgstr "テンプレートを更新しました"
 msgid "Template value"
 msgstr "テンプレート値"
 
-#: include/classes/api/services/CHost.php:2077
-#: include/classes/api/services/CHost.php:2307
-#: include/classes/api/services/CTemplate.php:1139
+#: include/classes/api/services/CHost.php:2094
+#: include/classes/api/services/CHost.php:2339
+#: include/classes/api/services/CTemplate.php:1152
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "同じ名前\"%1$s\"を持つテンプレートがすでに存在します。"
 
-#: include/classes/api/services/CHost.php:2083
-#: include/classes/api/services/CHost.php:2315
-#: include/classes/api/services/CTemplate.php:471
-#: include/classes/api/services/CTemplate.php:1104
+#: include/classes/api/services/CHost.php:2100
+#: include/classes/api/services/CHost.php:2347
+#: include/classes/api/services/CTemplate.php:480
+#: include/classes/api/services/CTemplate.php:1117
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "同じ表示名\"%1$s\"を持つテンプレートがすでに存在します。"
@@ -17414,7 +17411,7 @@ msgstr "2つのマップ要素を選択する必要があります"
 #: app/views/popup.condition.common.php:53
 #: app/views/popup.condition.common.php:161
 #: app/views/popup.condition.common.php:633 app/views/popup.generic.php:126
-#: app/views/popup.lldoperation.php:108 app/views/popup.media.php:59
+#: app/views/popup.lldoperation.php:108 app/views/popup.media.php:66
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:116
 #: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:50
@@ -17845,7 +17842,7 @@ msgstr "Up"
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
-#: app/views/popup.media.php:116 app/views/popup.mediatype.message.php:92
+#: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
 #: include/views/configuration.correlation.edit.php:164
@@ -17956,7 +17953,7 @@ msgstr "bulkリクエストを使用"
 msgid "Use custom event status colours"
 msgstr "イベントのステータスの文字色を変更"
 
-#: app/views/administration.user.edit.php:234 app/views/popup.media.php:77
+#: app/views/administration.user.edit.php:234 app/views/popup.media.php:84
 msgid "Use if severity"
 msgstr "指定した深刻度のときに使用"
 
@@ -18676,7 +18673,7 @@ msgstr "バイト単位もしくはトータルからのパーセンテージで
 msgid "Visible name"
 msgstr "表示名"
 
-#: include/classes/api/services/CHost.php:2213
+#: include/classes/api/services/CHost.php:2245
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "ホスト名を設定しない場合、表示名は必須項目です。"
 
@@ -18807,7 +18804,7 @@ msgstr "ようこそ"
 msgid "Welcome to"
 msgstr "ようこそ"
 
-#: app/views/administration.user.edit.php:234 app/views/popup.media.php:72
+#: app/views/administration.user.edit.php:234 app/views/popup.media.php:79
 msgid "When active"
 msgstr "有効な時間帯"
 
@@ -18912,8 +18909,8 @@ msgstr "%1$sにあるモジュールのModule.phpのクラス名が間違って�
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "サービス\"%1$s\"の依存関係のフィールドが正しくありません。"
 
-#: include/classes/api/services/CHost.php:1920
-#: include/classes/api/services/CHost.php:2106
+#: include/classes/api/services/CHost.php:1925
+#: include/classes/api/services/CHost.php:2123
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のフィールドが正しくありません。"
@@ -19147,8 +19144,8 @@ msgstr "アクションのグローバルスクリプト\"%1$s\"のターゲッ�
 
 #: include/classes/api/services/CAuditLog.php:75
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:915
-#: include/classes/api/services/CHost.php:977
+#: include/classes/api/services/CHost.php:920
+#: include/classes/api/services/CHost.php:982
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:526
@@ -19162,11 +19159,11 @@ msgstr "アクションのグローバルスクリプト\"%1$s\"のターゲッ�
 #: include/classes/api/services/CScript.php:318
 #: include/classes/api/services/CScript.php:560
 #: include/classes/api/services/CTask.php:104
-#: include/classes/api/services/CTemplate.php:411
-#: include/classes/api/services/CTemplate.php:563
-#: include/classes/api/services/CTemplate.php:600
-#: include/classes/api/services/CTemplate.php:1076
-#: include/classes/api/services/CTemplate.php:1182
+#: include/classes/api/services/CTemplate.php:420
+#: include/classes/api/services/CTemplate.php:576
+#: include/classes/api/services/CTemplate.php:613
+#: include/classes/api/services/CTemplate.php:1089
+#: include/classes/api/services/CTemplate.php:1195
 #: include/classes/api/services/CUserMacro.php:252
 #: include/classes/api/services/CUserMacro.php:347
 #: include/classes/api/services/CUserMacro.php:442
@@ -19485,7 +19482,7 @@ msgstr "配列か文字列で指定してください"
 msgid "an empty string is expected"
 msgstr "空の文字列で指定してください"
 
-#: include/classes/api/services/CHost.php:1861
+#: include/classes/api/services/CHost.php:1866
 #: include/classes/validators/CApiInputValidator.php:1007
 msgid "an even number of hexadecimal characters is expected"
 msgstr "16進文字列で指定してください"
@@ -19613,8 +19610,8 @@ msgstr "変更できません"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:540
 #: include/classes/api/services/CEvent.php:812
-#: include/classes/api/services/CHost.php:1849
-#: include/classes/api/services/CHost.php:1855
+#: include/classes/api/services/CHost.php:1854
+#: include/classes/api/services/CHost.php:1860
 #: include/classes/api/services/CItemGeneral.php:440
 #: include/classes/api/services/CItemGeneral.php:467
 #: include/classes/api/services/CItemGeneral.php:473
@@ -19979,8 +19976,7 @@ msgstr "条件タイプが正しくありません"
 msgid "incorrect element count"
 msgstr "要素の数が正しくありません"
 
-#: include/classes/parsers/CItemKey.php:80
-#: include/classes/parsers/CUserMacroParser.php:61
+#: include/classes/parsers/CParser.php:117
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
 msgstr "間違った書式が\"%1$s\"付近に見つかりました"
@@ -20065,7 +20061,7 @@ msgstr "アイテムが無効"
 msgid "item pattern"
 msgstr "アイテムパターン"
 
-#: include/classes/parsers/CItemKey.php:120
+#: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "キーが設定されていません"
 
@@ -20126,7 +20122,7 @@ msgstr "m/d"
 msgid "m-d H:i"
 msgstr "m/d H:i"
 
-#: include/classes/parsers/CUserMacroParser.php:47
+#: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr "マクロが設定されていません"
 
@@ -20192,7 +20188,7 @@ msgstr "最小"
 msgid "min() - Minimum value for period T"
 msgstr "min() - 期間Tでの最小値"
 
-#: include/classes/api/services/CHost.php:1867
+#: include/classes/api/services/CHost.php:1872
 #: include/classes/validators/CApiInputValidator.php:1001
 #, c-format
 msgid "minimum length is %1$s characters"
@@ -20443,10 +20439,10 @@ msgid "short description"
 msgstr "説明"
 
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1880
-#: include/classes/api/services/CHost.php:1889
-#: include/classes/api/services/CHost.php:1895
+#: include/classes/api/services/CHost.php:1879
+#: include/classes/api/services/CHost.php:1885
+#: include/classes/api/services/CHost.php:1894
+#: include/classes/api/services/CHost.php:1900
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:454
@@ -20549,7 +20545,10 @@ msgstr "テンプレートID\"%1$s\"が%2$s回使用されています"
 #: include/classes/api/services/CDiscoveryRule.php:1592
 #: include/classes/api/services/CDiscoveryRule.php:1949
 #: include/classes/api/services/CDiscoveryRule.php:1957
+#: include/classes/api/services/CHost.php:1959
+#: include/classes/api/services/CHost.php:2153
 #: include/classes/api/services/CHttpTest.php:742
+#: include/classes/api/services/CTemplate.php:401
 #: include/classes/validators/CApiInputValidator.php:930
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
@@ -20633,11 +20632,11 @@ msgstr "定数 \"%1$s\" が間違っています"
 msgid "unexpected constant value \"%1$s\""
 msgstr "定数値 \"%1$s\" が間違っています"
 
-#: include/classes/parsers/CItemKey.php:172
+#: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
 msgstr "キーの末尾が間違っています"
 
-#: include/classes/parsers/CUserMacroParser.php:47
+#: include/classes/parsers/CUserMacroParser.php:38
 msgid "unexpected end of macro"
 msgstr "マクロの末尾が間違っています"
 
@@ -20667,8 +20666,8 @@ msgstr "テキスト\"%1$s\"が間違っています"
 
 #: include/classes/api/services/CEvent.php:761
 #: include/classes/api/services/CEvent.php:870
-#: include/classes/api/services/CHost.php:1829
-#: include/classes/api/services/CHost.php:1835
+#: include/classes/api/services/CHost.php:1834
+#: include/classes/api/services/CHost.php:1840
 #: include/classes/api/services/CItemGeneral.php:1239
 #: include/classes/api/services/CItemGeneral.php:1559
 #: include/classes/api/services/CItemGeneral.php:1585
@@ -20776,9 +20775,9 @@ msgstr "値が長すぎます"
 #: include/classes/api/services/CDiscoveryRule.php:1675
 #: include/classes/api/services/CDiscoveryRule.php:1696
 #: include/classes/api/services/CEvent.php:772
-#: include/classes/api/services/CHost.php:987
-#: include/classes/api/services/CHost.php:1998
-#: include/classes/api/services/CHost.php:2138
+#: include/classes/api/services/CHost.php:992
+#: include/classes/api/services/CHost.php:2015
+#: include/classes/api/services/CHost.php:2170
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681

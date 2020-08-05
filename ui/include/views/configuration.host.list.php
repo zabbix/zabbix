@@ -477,13 +477,12 @@ $form->addItem([
 		[
 			'host.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
 			'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
-			'host.export' => ['name' => _('Export'), 'redirect' =>
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'export.hosts.xml')
-					->setArgument('backurl', (new CUrl('hosts.php'))
-						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
-						->getUrl())
-					->getUrl()
+			'host.export' => [
+				'content' => new CButtonExport('export.hosts',
+					(new CUrl('hosts.php'))
+						->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+						->getUrl()
+				)
 			],
 			'host.massupdateform' => ['name' => _('Mass update')],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]

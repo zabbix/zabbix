@@ -660,6 +660,14 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		if ($expected != $value && $raise_exception) {
+			if (!is_scalar($value)) {
+				$value = json_encode($value);
+			}
+
+			if (!is_scalar($expected)) {
+				$expected = json_encode($expected);
+			}
+
 			throw new Exception('Element value '.$value.' doesn\'t match expected '.$expected.'.');
 		}
 

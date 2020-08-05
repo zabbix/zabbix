@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/MessageBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup users
@@ -176,7 +176,7 @@ class testLanguage extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->checkLanguage($data['message'], $data['page_title'], $data['body_lang'], $data['defaultdb_lang']);
-		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias="user-zabbix"'));
+		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE alias='.zbx_dbstr('user-zabbix')));
 
 
 		// After logout, login menu has system language.
@@ -249,7 +249,8 @@ class testLanguage extends CWebTest {
 	 * @dataProvider getCreateUserData
 	 */
 	public function testLanguage_CreateUser($data) {
-		$this->page->login()->open('zabbix.php?action=user.edit');
+		$this->userLogin('Admin', 'zabbix');
+		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 		$form->submit();
