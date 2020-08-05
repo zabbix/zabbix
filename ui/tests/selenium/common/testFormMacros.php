@@ -399,12 +399,12 @@ abstract class testFormMacros extends CWebTest {
 
 		// Check that macro values have type plain text by default.
 		if (CTestArrayHelper::get($data, 'check_default_type', false)){
-			$this->assertEquals('Text', $this->query('xpath://div[contains(@class,"macro-value")]')
+			$this->assertEquals('Text', $this->query('xpath://div[contains(@class, "macro-value")]')
 					->one()->asInputGroup()->getInputType());
 		}
 
 		$this->fillMacros([$data['macro_fields']]);
-		$value_field = $this->query('xpath://div[contains(@class,"macro-value")]')->all()->last()->asInputGroup();
+		$value_field = $this->query('xpath://div[contains(@class, "macro-value")]')->all()->last()->asInputGroup();
 
 		// Check that macro type is set correctly.
 		$this->assertEquals($data['macro_fields']['value']['type'], $value_field->getInputType());

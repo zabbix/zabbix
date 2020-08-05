@@ -636,7 +636,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 					'macro' => '{$X_SECRET_2_SECRET}',
 					'type' => 'Secret text'
 				]
-			],
+			]
 		];
 	}
 

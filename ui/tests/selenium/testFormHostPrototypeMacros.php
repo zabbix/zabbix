@@ -454,7 +454,7 @@ class testFormHostPrototypeMacros extends testFormMacros {
 					'macro' => '{$X_SECRET_2_SECRET}',
 					'type' => 'Secret text'
 				]
-			],
+			]
 		];
 	}
 
