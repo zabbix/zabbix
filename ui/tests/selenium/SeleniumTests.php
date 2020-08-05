@@ -82,7 +82,6 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralMacro.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralTriggerSeverities.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralValuemap.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralInstallation.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
@@ -228,7 +227,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
-		$suite->addTestSuite('testFormAdministrationGeneralTriggerSeverities');
 		$suite->addTestSuite('testFormAdministrationGeneralValuemap');
 		$suite->addTestSuite('testFormAdministrationGeneralInstallation');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
