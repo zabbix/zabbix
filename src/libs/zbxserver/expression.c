@@ -45,33 +45,34 @@ zbx_libxml_error_t;
 /* for various value getters grouped by their scope:                */
 
 /* DBget_item_value(), get_interface_value() */
-#define ZBX_REQUEST_HOST_IP		1
-#define ZBX_REQUEST_HOST_DNS		2
-#define ZBX_REQUEST_HOST_CONN		3
-#define ZBX_REQUEST_HOST_PORT		4
+#define ZBX_REQUEST_HOST_IP			1
+#define ZBX_REQUEST_HOST_DNS			2
+#define ZBX_REQUEST_HOST_CONN			3
+#define ZBX_REQUEST_HOST_PORT			4
 
 /* DBget_item_value() */
-#define ZBX_REQUEST_HOST_ID		101
-#define ZBX_REQUEST_HOST_HOST		102
-#define ZBX_REQUEST_HOST_NAME		103
-#define ZBX_REQUEST_HOST_DESCRIPTION	104
-#define ZBX_REQUEST_ITEM_ID		105
-#define ZBX_REQUEST_ITEM_NAME		106
-#define ZBX_REQUEST_ITEM_NAME_ORIG	107
-#define ZBX_REQUEST_ITEM_KEY		108
-#define ZBX_REQUEST_ITEM_KEY_ORIG	109
-#define ZBX_REQUEST_ITEM_DESCRIPTION	110
-#define ZBX_REQUEST_PROXY_NAME		111
-#define ZBX_REQUEST_PROXY_DESCRIPTION	112
+#define ZBX_REQUEST_HOST_ID			101
+#define ZBX_REQUEST_HOST_HOST			102
+#define ZBX_REQUEST_HOST_NAME			103
+#define ZBX_REQUEST_HOST_DESCRIPTION		104
+#define ZBX_REQUEST_ITEM_ID			105
+#define ZBX_REQUEST_ITEM_NAME			106
+#define ZBX_REQUEST_ITEM_NAME_ORIG		107
+#define ZBX_REQUEST_ITEM_KEY			108
+#define ZBX_REQUEST_ITEM_KEY_ORIG		109
+#define ZBX_REQUEST_ITEM_DESCRIPTION		110
+#define ZBX_REQUEST_ITEM_DESCRIPTION_ORIG	111
+#define ZBX_REQUEST_PROXY_NAME			112
+#define ZBX_REQUEST_PROXY_DESCRIPTION		113
 
 /* DBget_history_log_value() */
-#define ZBX_REQUEST_ITEM_LOG_DATE	201
-#define ZBX_REQUEST_ITEM_LOG_TIME	202
-#define ZBX_REQUEST_ITEM_LOG_AGE	203
-#define ZBX_REQUEST_ITEM_LOG_SOURCE	204
-#define ZBX_REQUEST_ITEM_LOG_SEVERITY	205
-#define ZBX_REQUEST_ITEM_LOG_NSEVERITY	206
-#define ZBX_REQUEST_ITEM_LOG_EVENTID	207
+#define ZBX_REQUEST_ITEM_LOG_DATE		201
+#define ZBX_REQUEST_ITEM_LOG_TIME		202
+#define ZBX_REQUEST_ITEM_LOG_AGE		203
+#define ZBX_REQUEST_ITEM_LOG_SOURCE		204
+#define ZBX_REQUEST_ITEM_LOG_SEVERITY		205
+#define ZBX_REQUEST_ITEM_LOG_NSEVERITY		206
+#define ZBX_REQUEST_ITEM_LOG_EVENTID		207
 
 static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
@@ -902,8 +903,8 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
  *                                                                            *
  * Function: zbx_substitute_item_name_macros                                  *
  *                                                                            *
- * Purpose: substitute key macros and use it to substitute item name macros if*
- *          item name is specified                                            *
+ * Purpose: substitute key macros and use it to substitute item name macros   *
+ *          if item name is specified                                         *
  *                                                                            *
  * Parameters: dc_item    - [IN] item information used in substitution        *
  *             name       - [IN] optional item name to substitute             *
@@ -1008,6 +1009,14 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 				DCconfig_clean_items(&dc_item, &errcode, 1);
 				break;
+			case ZBX_REQUEST_ITEM_DESCRIPTION:
+				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
+
+				if (SUCCEED == errcode)
+					ret = zbx_substitute_item_name_macros(&dc_item, row[5], replace_to);
+
+				DCconfig_clean_items(&dc_item, &errcode, 1);
+				break;
 			case ZBX_REQUEST_ITEM_NAME_ORIG:
 				*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
@@ -1016,7 +1025,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				*replace_to = zbx_strdup(*replace_to, row[4]);
 				ret = SUCCEED;
 				break;
-			case ZBX_REQUEST_ITEM_DESCRIPTION:
+			case ZBX_REQUEST_ITEM_DESCRIPTION_ORIG:
 				*replace_to = zbx_strdup(*replace_to, row[5]);
 				ret = SUCCEED;
 				break;
@@ -1876,6 +1885,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ITEM_STATE			"{ITEM.STATE}"
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"			/* deprecated */
 #define MVAR_ITEM_DESCRIPTION		"{ITEM.DESCRIPTION}"
+#define MVAR_ITEM_DESCRIPTION_ORIG	"{ITEM.DESCRIPTION.ORIG}"
 #define MVAR_ITEM_LOG_DATE		"{ITEM.LOG.DATE}"
 #define MVAR_ITEM_LOG_TIME		"{ITEM.LOG.TIME}"
 #define MVAR_ITEM_LOG_AGE		"{ITEM.LOG.AGE}"
@@ -1907,6 +1917,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_TRIGGER_EVENTS_PROBLEM_UNACK	"{TRIGGER.EVENTS.PROBLEM.UNACK}"
 
 #define MVAR_LLDRULE_DESCRIPTION		"{LLDRULE.DESCRIPTION}"
+#define MVAR_LLDRULE_DESCRIPTION_ORIG		"{LLDRULE.DESCRIPTION.ORIG}"
 #define MVAR_LLDRULE_ID				"{LLDRULE.ID}"
 #define MVAR_LLDRULE_KEY			"{LLDRULE.KEY}"
 #define MVAR_LLDRULE_KEY_ORIG			"{LLDRULE.KEY.ORIG}"
@@ -2054,7 +2065,7 @@ static const char	*ex_macros[] =
 	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
 	MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_HOST_NAME, MVAR_HOST_DESCRIPTION, MVAR_PROXY_NAME, MVAR_PROXY_DESCRIPTION,
 	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS, MVAR_HOST_ID,
-	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION,
+	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION, MVAR_ITEM_DESCRIPTION_ORIG,
 	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
 	MVAR_ITEM_LASTVALUE,
 	MVAR_ITEM_STATE,
@@ -3121,6 +3132,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_DESCRIPTION);
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_DESCRIPTION_ORIG))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_ITEM_DESCRIPTION_ORIG);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_ID))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -3416,6 +3432,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_DESCRIPTION);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_DESCRIPTION_ORIG))
+				{
+					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
+							N_functionid, ZBX_REQUEST_ITEM_DESCRIPTION_ORIG);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_ID))
 				{
@@ -3849,6 +3870,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					ret = DBget_item_value(c_event->objectid, &replace_to,
 							ZBX_REQUEST_ITEM_DESCRIPTION);
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_DESCRIPTION_ORIG))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to,
+							ZBX_REQUEST_ITEM_DESCRIPTION_ORIG);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_ID))
 				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, c_event->objectid);
@@ -3980,6 +4006,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = DBget_item_value(c_event->objectid, &replace_to,
 							ZBX_REQUEST_ITEM_DESCRIPTION);
+				}
+				else if (0 == strcmp(m, MVAR_LLDRULE_DESCRIPTION_ORIG))
+				{
+					ret = DBget_item_value(c_event->objectid, &replace_to,
+							ZBX_REQUEST_ITEM_DESCRIPTION_ORIG);
 				}
 				else if (0 == strcmp(m, MVAR_LLDRULE_ID))
 				{
