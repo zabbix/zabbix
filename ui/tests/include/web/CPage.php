@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CElementQuery.php';
 require_once dirname(__FILE__).'/CommandExecutor.php';
+require_once dirname(__FILE__).'/../../../include/classes/helpers/CEncryptHelper.php';
+require_once dirname(__FILE__).'/../../../include/profiles.inc.php';
 
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Chrome\ChromeOptions;
@@ -177,10 +179,19 @@ class CPage {
 			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
 		}
 
-		if (self::$cookie === null || $sessionid !== self::$cookie['value']) {
+		$cookie_sessionid = '';
+		if (self::$cookie !== null) {
+			$cookie = unserialize(base64_decode(self::$cookie));
+			$cookie_sessionid = $cookie['sessionid'];
+		}
+
+		if (self::$cookie === null || $sessionid !== $cookie_sessionid) {
+			$data = ['sessionid' => $sessionid];
+			$data['sign'] = CEncryptHelper::sign(serialize($data));
+
 			self::$cookie = [
-				'name' => 'zbx_sessionid',
-				'value' => $sessionid,
+				'name' => ZBX_SESSION_NAME,
+				'value' => base64_encode(serialize($data)),
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
 			];
