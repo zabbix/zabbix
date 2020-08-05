@@ -52,7 +52,7 @@ func customQueryHandler(ctx context.Context, conn OraClient, params []string) (i
 
 	columns, err := rows.Columns()
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
 	values := make([]interface{}, len(columns))
@@ -67,7 +67,7 @@ func customQueryHandler(ctx context.Context, conn OraClient, params []string) (i
 	for rows.Next() {
 		err = rows.Scan(valuePointers...)
 		if err != nil {
-			return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
+			return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 		}
 
 		for i, value := range values {

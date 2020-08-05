@@ -48,7 +48,7 @@ func ProcHandler(ctx context.Context, conn OraClient, params []string) (interfac
 
 	err = row.Scan(&proc)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
 	return proc, nil

@@ -40,7 +40,6 @@ var (
 	errorInvalidParams     = zabbixError{"invalid parameters"}
 	errorTooManyParameters = zabbixError{"too many parameters"}
 	errorCannotFetchData   = zabbixError{"cannot fetch data"}
-	errorCannotParseData   = zabbixError{"cannot parse data"}
 	errorCannotMarshalJSON = zabbixError{"cannot marshal JSON"}
 	errorUnsupportedMetric = zabbixError{"unsupported metric"}
 	errorEmptyResult       = zabbixError{"empty result"}

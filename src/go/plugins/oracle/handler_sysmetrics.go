@@ -72,12 +72,13 @@ func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (in
 	for rows.Next() {
 		err = rows.Scan(&metric, &value)
 		if err != nil {
-			return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
+			return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 		}
 
 		res[metric] = value
 	}
 
+	// Manually marshall JSON due to get around the problem with VARCHAR2 limit (ORA-40478, maximum: 4000)
 	jsonRes, err := json.Marshal(res)
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotMarshalJSON, err.Error())

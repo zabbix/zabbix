@@ -63,7 +63,7 @@ func UserHandler(ctx context.Context, conn OraClient, params []string) (interfac
 			return nil, fmt.Errorf("%w (%s)", errorEmptyResult, err.Error())
 		}
 
-		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
 	return userinfo, nil

@@ -60,7 +60,7 @@ func archiveHandler(ctx context.Context, conn OraClient, params []string) (inter
 
 	err = row.Scan(&archiveLogs)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
 	if archiveLogs == "" {

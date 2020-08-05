@@ -107,7 +107,7 @@ func SGAHandler(ctx context.Context, conn OraClient, params []string) (interface
 
 	err = row.Scan(&SGA)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
+		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}
 
 	return SGA, nil
