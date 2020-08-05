@@ -1147,7 +1147,7 @@ function getDataOverviewItems(?array $groupids = null, ?array &$hostids = null, 
  *
  * @return array
  */
-function getDataOverviewHosts(?array $groupids, array $hostids, ?array $itemids, ?string $application = ''): array {
+function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
