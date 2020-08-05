@@ -419,6 +419,53 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_localtime                                                    *
+ *                                                                            *
+ * Purpose: get broken-down representation of the time in specified time zone *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
+ *             tz   - [IN] time zone                                          *
+ *                                                                            *
+ * Return value: broken-down representation of the time in specified time zone*
+ *                                                                            *
+ ******************************************************************************/
+struct tm	*zbx_localtime(const time_t *time, const char *tz)
+{
+#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
+		!defined(_WINDOWS) && !defined(__MINGW32__)
+	char		*old_tz;
+	struct tm	*tm;
+
+	if (NULL == tz || 0 == strcmp(tz, "system"))
+		return localtime(time);
+
+	if (NULL != (old_tz = getenv("TZ")))
+		old_tz = zbx_strdup(NULL, old_tz);
+
+	setenv("TZ", tz, 1);
+
+	tzset();
+	tm = localtime(time);
+
+	if (NULL != old_tz)
+	{
+		setenv("TZ", old_tz, 1);
+		zbx_free(old_tz);
+	}
+	else
+		unsetenv("TZ");
+
+	tzset();
+
+	return tm;
+#else
+	ZBX_UNUSED(tz);
+	return localtime(time);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_utc_time                                                     *
  *                                                                            *
  * Purpose: get UTC time from time from broken down time elements             *
@@ -947,14 +994,14 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
  * Comments:   !!! Don't forget to sync code with PHP !!!                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_time_period(const char *period, time_t time, int *res)
+int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res)
 {
 	int			res_total = FAIL;
 	const char		*next;
 	struct tm		*tm;
 	zbx_time_period_t	tp;
 
-	tm = localtime(&time);
+	tm = zbx_localtime(&time, tz);
 
 	next = strchr(period, ';');
 	while  (SUCCEED == time_period_parse(&tp, period, (NULL == next ? (int)strlen(period) : (int)(next - period))))

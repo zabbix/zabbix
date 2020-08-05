@@ -96,6 +96,12 @@ return [
 				'length' => 10,
 				'default' => 50,
 			],
+			'timezone' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 50,
+				'default' => 'default',
+			],
 		],
 	],
 	'maintenances' => [
@@ -2986,6 +2992,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 5,
 				'default' => 'en_GB',
+			],
+			'default_timezone' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 50,
+				'default' => 'system',
 			],
 		],
 	],

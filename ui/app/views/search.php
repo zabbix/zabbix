@@ -57,7 +57,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$httptest_count = CViewHelper::showNum($host['httpTests']);
 
 	$applications_link = $host['editable']
-		? [new CLink(_('Applications'), (new CUrl('applications.php'))
+		? [new CLink(_('Applications'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'application.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 		), $app_count]
@@ -239,11 +240,15 @@ if ($data['admin']) {
 		$httptest_count = CViewHelper::showNum($template['httpTests']);
 
 		$template_cell = $template['editable']
-			? [new CLink($visible_name,'templates.php?form=update&'.'&templateid='.$templateid)]
+			? [new CLink($visible_name, (new CUrl('templates.php'))
+				->setArgument('form', 'update')
+				->setArgument('templateid', $templateid)
+			)]
 			: [new CSpan($visible_name)];
 
 		$applications_link = $template['editable']
-			? [new CLink(_('Applications'), (new CUrl('applications.php'))
+			? [new CLink(_('Applications'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'application.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 			), $app_count]

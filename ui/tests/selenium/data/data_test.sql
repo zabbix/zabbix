@@ -1424,6 +1424,11 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 9, 7);
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'no-access-to-the-frontend', '$2y$10$cExfysPEJsHzIoCkoUVH..XM0OSIwIQPE1sob2UgXDcH1Iyw8Wtny', 0, 0, 'en_GB', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 12, 8);
 
+-- testTimezone
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (9, 'test-timezone', '$2y$10$TUIJdrXgEUaoCmbOdhiLhe8kWc3M.EE.paOv0rC7bgSP2til3643O', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
+INSERT INTO usrgrp (usrgrpid, name) VALUES (92, 'Test timezone');
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (105, 92, 9);
+
 -- testUrlUserPermissions
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page, url) VALUES (4, 'admin-zabbix', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50, 'toptriggers.php');
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 7, 4);
@@ -2197,6 +2202,8 @@ INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, desc
 INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status,debug_mode) VALUES (16,'LDAP user group',2,0,0);
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (10,10,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
+INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (91, 'http-auth-admin', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_GB', 30, 2, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (92, 7, 91);
 
 -- testHostAvailabilityWidget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (101, 'Dashboard for Host availability widget', 1, 1);

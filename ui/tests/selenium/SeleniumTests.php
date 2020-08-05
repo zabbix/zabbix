@@ -145,6 +145,7 @@ require_once dirname(__FILE__).'/testLanguage.php';
 require_once dirname(__FILE__).'/testMultiselect.php';
 require_once dirname(__FILE__).'/testTagBasedPermissions.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
+require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testTriggerDependencies.php';
 require_once dirname(__FILE__).'/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
@@ -290,6 +291,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testMultiselect');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testTemplateInheritance');
+		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testTriggerDependencies');
 		$suite->addTestSuite('testTriggerExpressions');
 		$suite->addTestSuite('testUrlParameters');

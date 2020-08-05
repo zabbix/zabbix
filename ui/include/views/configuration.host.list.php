@@ -106,7 +106,8 @@ $filter
 							'dstfrm' => $filter->getName(),
 							'dstfld1' => 'filter_groups_',
 							'real_hosts' => 1,
-							'editable' => 1
+							'editable' => 1,
+							'enrich_parent_groups' => 1
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -406,7 +407,8 @@ foreach ($data['hosts'] as $host) {
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Applications'),
-				(new CUrl('applications.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'application.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 			),

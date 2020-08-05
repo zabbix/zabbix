@@ -28,6 +28,7 @@ class CControllerGuiEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'default_lang' =>			'db config.default_lang',
+			'default_timezone' =>		'db config.default_timezone',
 			'default_theme' =>			'db config.default_theme',
 			'search_limit' =>			'db config.search_limit',
 			'max_in_table' =>			'db config.max_in_table',
@@ -51,6 +52,7 @@ class CControllerGuiEdit extends CController {
 		$config = select_config();
 		$data = [
 			'default_lang' => $this->getInput('default_lang', $config['default_lang']),
+			'default_timezone' => $this->getInput('default_timezone', $config['default_timezone']),
 			'default_theme' => $this->getInput('default_theme', $config['default_theme']),
 			'search_limit' => $this->getInput('search_limit', $config['search_limit']),
 			'max_in_table' => $this->getInput('max_in_table', $config['max_in_table']),

@@ -20,6 +20,7 @@
 package tcpudp
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"math"
@@ -170,6 +171,109 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
+func telnetRead(rw *bufio.ReadWriter) (byte, error) {
+	b, err := rw.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+
+	return b, nil
+}
+
+func telnetWrite(b byte, rw *bufio.ReadWriter) error {
+	err := rw.WriteByte(b)
+	if err != nil {
+		return fmt.Errorf("buffer write [%x] error: %s", b, err.Error())
+	}
+	return nil
+}
+
+func loginReceived(buf []byte) bool {
+	return strings.HasSuffix(strings.TrimRight(string(buf), " "), ":")
+}
+
+func (p *Plugin) validateTelnet(conn net.Conn) error {
+	var err error
+	var buf []byte
+
+	cmdIAC := byte(255)
+	cmdWILL := byte(251)
+	cmdWONT := byte(252)
+	cmdDO := byte(253)
+	cmdDONT := byte(254)
+	optSGA := byte(3)
+	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
+	for {
+		if loginReceived(buf) {
+			return nil
+		}
+
+		var c, c1, c2, c3 byte
+		c1, err = telnetRead(rw)
+		if err != nil {
+			return fmt.Errorf("c1 network read error: %s", err.Error())
+		}
+
+		if cmdIAC == c1 {
+			c2, err = telnetRead(rw)
+			if nil != err {
+				return fmt.Errorf("c2 read error: %s", err.Error())
+			}
+
+			switch c2 {
+			case cmdWILL, cmdWONT, cmdDO, cmdDONT:
+				c3, err = telnetRead(rw)
+				if nil != err {
+					return fmt.Errorf("c3 read error: %s", err.Error())
+				}
+
+				c = cmdIAC
+				err := telnetWrite(c, rw)
+				if err != nil {
+					return err
+				}
+
+				if c2 == cmdWONT {
+					c = cmdDONT
+				} else if c2 == cmdDONT {
+					c = cmdWONT
+				} else if c3 == optSGA {
+					if c2 == cmdDO {
+						c = cmdWILL
+					} else {
+						c = cmdDO
+					}
+				} else {
+					if c2 == cmdDO {
+						c = cmdWONT
+					} else {
+						c = cmdDONT
+					}
+				}
+
+				err = telnetWrite(c, rw)
+				if err != nil {
+					return err
+				}
+				err = telnetWrite(c3, rw)
+				if err != nil {
+					return err
+				}
+				err = rw.Flush()
+				if err != nil {
+					return fmt.Errorf("buffer flush error: %s", err.Error())
+				}
+			case cmdIAC:
+				buf = append(buf, c1)
+			default:
+				return fmt.Errorf("malformed telnet response")
+			}
+		} else {
+			buf = append(buf, c1)
+		}
+	}
+}
+
 func removeScheme(in string) (scheme string, host string, err error) {
 	parts := strings.Split(in, "://")
 	switch len(parts) {
@@ -270,10 +374,19 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 		return p.validateLdap(l, address)
 	}
 
+	if service == "telnet" {
+		err := p.validateTelnet(conn)
+		if err != nil {
+			log.Debugf("TCP telnet network error: %s", err.Error())
+			return tcpExpectFail
+		}
+
+		return 1
+	}
+
 	var sendToClose string
 	var checkResult int
 	buf := make([]byte, 2048)
-
 	for {
 		if _, err = conn.Read(buf); err == nil {
 			switch service {
@@ -392,7 +505,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				err = errors.New(errorInvalidThirdParam)
 				return
 			}
-		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "https", "ldap":
+		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "https", "ldap", "telnet":
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return

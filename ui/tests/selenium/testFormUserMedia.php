@@ -356,7 +356,7 @@ class testFormUserMedia extends CWebTest {
 		$user_form->selectTab('Media');
 
 		// Edit selected media
-		$edit_row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
+		$edit_row = $this->query('xpath://tr[@id="medias_0"]')->asTableRow()->one();
 		$original_period = $edit_row->getColumn('When active')->getText();
 		$edit_row->query('button:Edit')->one()->click();
 		$this->setMediaValues($data);
@@ -574,7 +574,7 @@ class testFormUserMedia extends CWebTest {
 			$row = $media_field->getRow(0);
 		}
 		else {
-			$row = $this->query('xpath://tr[@id="user_medias_0"]')->asTableRow()->one();
+			$row = $this->query('xpath://tr[@id="medias_0"]')->asTableRow()->one();
 		}
 		$this->assertEquals($row->getColumn('Type')->getText(), $data['fields']['Type']);
 

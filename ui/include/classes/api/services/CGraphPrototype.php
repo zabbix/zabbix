@@ -184,6 +184,7 @@ class CGraphPrototype extends CGraphGeneral {
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = dbConditionInt('i.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('i.flags', (array) ZBX_FLAG_DISCOVERY_PROTOTYPE);
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 

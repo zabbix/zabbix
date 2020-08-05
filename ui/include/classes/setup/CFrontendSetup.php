@@ -64,7 +64,6 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpUploadMaxFilesize();
 		$result[] = $this->checkPhpMaxExecutionTime();
 		$result[] = $this->checkPhpMaxInputTime();
-		$result[] = $this->checkPhpTimeZone();
 		$result[] = $this->checkPhpDatabases();
 		$result[] = $this->checkPhpBcmath();
 		$result[] = $this->checkPhpMbstring();
@@ -216,23 +215,6 @@ class CFrontendSetup {
 			'error' => _s('Minimum required limit on input parse time for PHP scripts is %1$s (configuration option "max_input_time").',
 				self::MIN_PHP_MAX_INPUT_TIME
 			)
-		];
-	}
-
-	/**
-	 * Checks for PHP timezone.
-	 *
-	 * @return array
-	 */
-	public function checkPhpTimeZone() {
-		$current = ini_get('date.timezone');
-
-		return [
-			'name' => _s('PHP option "%1$s"', 'date.timezone'),
-			'current' => $current ? $current : _('unknown'),
-			'required' => null,
-			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _('Time zone for PHP is not set (configuration parameter "date.timezone").')
 		];
 	}
 
