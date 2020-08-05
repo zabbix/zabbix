@@ -5210,9 +5210,12 @@ a.link-action {
 		margin: 0;
 	}
 
-	&.green-bg,
+	&.green-bg {
+		color: darken($alt-green, 45%);
+	}
+
 	&.yellow-bg {
-		color: darken($font-color, 45%);
+		color: darken($alt-yellow, 45%);
 	}
 }
 

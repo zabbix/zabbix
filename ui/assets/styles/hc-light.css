@@ -4055,8 +4055,10 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
-  .tag.green-bg, .tag.yellow-bg {
-    color: black; }
+  .tag.green-bg {
+    color: #0e4123; }
+  .tag.yellow-bg {
+    color: #734d00; }
 
 .green-bg {
   background-color: #59db8f; }

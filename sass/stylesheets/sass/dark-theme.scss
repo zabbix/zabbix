@@ -404,10 +404,3 @@ $multiselect-selected-bg-color: #696969;
 		color: $font-color;
 	}
 }
-
-.tag {
-	&.green-bg,
-	&.yellow-bg {
-		color: darken($font-color, 45%);
-	}
-}
