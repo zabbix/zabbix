@@ -8,6 +8,7 @@ import (
 // handlerFunc defines an interface must be implemented by handlers.
 type handlerFunc func(ctx context.Context, conn OraClient, params []string) (res interface{}, err error)
 
+// TODO: description
 func getHandleFunc(key string) handlerFunc {
 	switch key {
 	case keyASMDiskGroups:

@@ -22,6 +22,7 @@ package oracle
 import (
 	"context"
 	"fmt"
+	"strings"
 )
 
 const keyTablespaces = "oracle.ts.stats"
@@ -45,7 +46,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 						'used_bytes' VALUE USED_BYTES, 
 						'max_bytes'  VALUE MAX_BYTES, 
 						'free_bytes' VALUE FREE_BYTES, 
-						'used_pct'   VALUE TRIM(TO_CHAR(USED_PCT, '0.99')), 
+						'used_pct'   VALUE USED_PCT, 
 						'status'     VALUE STATUS 
 					) 
 				) 
@@ -160,6 +161,10 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotParseData, err.Error())
 	}
+
+	// Add leading zeros for floats like ".03".
+	// There should be a better way to do that, but I haven't come up with it ¯\_(ツ)_/¯
+	tablespaces = strings.ReplaceAll(tablespaces, "\":.", "\":0.")
 
 	return tablespaces, nil
 }

@@ -94,6 +94,7 @@ func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string, args 
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
 }
 
+// TODO: description
 func (conn *OraConn) WhoAmI() string {
 	return conn.username
 }
