@@ -50,7 +50,6 @@ func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params []strin
 			d.STATUS != 'INACTIVE'
 			AND db.LOG_MODE = 'ARCHIVELOG'
 	`)
-
 	if err != nil {
 		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 	}

@@ -41,7 +41,7 @@ func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params []s
 			JSON_ARRAYAGG(
 				JSON_OBJECT(
 					'{#TABLESPACE}' VALUE TABLESPACE_NAME, 
-					'{#TYPE}'       VALUE CONTENTS
+					'{#CONTENTS}'   VALUE CONTENTS
 				)
 			) LLD
 		FROM
