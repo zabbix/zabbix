@@ -103,6 +103,20 @@ static int	DBpatch_5010006(void)
 	return DBadd_field("users", &field);
 }
 
+static int	DBpatch_5010007(void)
+{
+	const ZBX_FIELD field = {"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hostmacro", &field, NULL);
+}
+
+static int	DBpatch_5010008(void)
+{
+	const ZBX_FIELD field = {"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("globalmacro", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -116,5 +130,7 @@ DBPATCH_ADD(5010003, 0, 1)
 DBPATCH_ADD(5010004, 0, 1)
 DBPATCH_ADD(5010005, 0, 1)
 DBPATCH_ADD(5010006, 0, 1)
+DBPATCH_ADD(5010007, 0, 1)
+DBPATCH_ADD(5010008, 0, 1)
 
 DBPATCH_END()
