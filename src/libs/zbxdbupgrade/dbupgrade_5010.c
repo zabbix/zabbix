@@ -103,6 +103,25 @@ static int	DBpatch_5010006(void)
 	return DBadd_field("users", &field);
 }
 
+static int DBpatch_5010007(void)
+{
+	const ZBX_FIELD	old_field = {"value_str", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("profiles", &field, &old_field);
+}
+
+static int DBpatch_5010008(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.hostsmon.filter.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5010)
@@ -116,5 +135,7 @@ DBPATCH_ADD(5010003, 0, 1)
 DBPATCH_ADD(5010004, 0, 1)
 DBPATCH_ADD(5010005, 0, 1)
 DBPATCH_ADD(5010006, 0, 1)
+DBPATCH_ADD(5010007, 0, 1)
+DBPATCH_ADD(5010008, 0, 1)
 
 DBPATCH_END()
