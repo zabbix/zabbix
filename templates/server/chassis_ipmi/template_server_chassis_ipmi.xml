@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-03-24T13:00:11Z</date>
+   <date>2020-08-06T06:08:54Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -22,7 +22,7 @@ Known Issues:&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398023-discussion-thread-for-official-zabbix-template-ipmi&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.37</description>
          <groups>
             <group>
                <name>Templates/Server hardware</name>
@@ -120,6 +120,7 @@ Template tooling version used: 0.35</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <master_item>
                   <key>ipmi.get</key>
                </master_item>
@@ -268,6 +269,7 @@ Template tooling version used: 0.35</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>IPMI: {#SENSOR_ID}</name>
@@ -327,6 +329,86 @@ Template tooling version used: 0.35</description>
                      <path>$.threshold.upper.non_recover</path>
                   </lld_macro_path>
                </lld_macro_paths>
+               <overrides>
+                  <override>
+                     <name>trigger SENSOR_LO_WARN</name>
+                     <step>1</step>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>{#SENSOR_LO_WARN}</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>trigger SENSOR_LO_CRIT</name>
+                     <step>2</step>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>{#SENSOR_LO_CRIT}</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>trigger SENSOR_LO_DISAST</name>
+                     <step>3</step>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>{#SENSOR_LO_DISAST}</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>trigger SENSOR_HI_WARN</name>
+                     <step>4</step>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>{#SENSOR_HI_WARN}</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>trigger SENSOR_HI_CRIT</name>
+                     <step>5</step>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>{#SENSOR_HI_CRIT}</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+                  <override>
+                     <name>trigger SENSOR_HI_DISAST</name>
+                     <step>6</step>
+                     <operations>
+                        <operation>
+                           <operationobject>TRIGGER_PROTOTYPE</operationobject>
+                           <operator>LIKE</operator>
+                           <value>{#SENSOR_HI_DISAST}</value>
+                           <status>ENABLED</status>
+                           <discover>NO_DISCOVER</discover>
+                        </operation>
+                     </operations>
+                  </override>
+               </overrides>
             </discovery_rule>
          </discovery_rules>
          <macros>
