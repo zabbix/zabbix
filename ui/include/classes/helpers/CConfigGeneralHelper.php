@@ -30,7 +30,7 @@ abstract class CConfigGeneralHelper {
 	 * @static
 	 *
 	 * @param string|null $param      API object parameter name.
-	 * @param bool        $is_global  Set to "true" to allow to load parameters via getglobal API method.
+	 * @param bool        $is_global  Set to "true" to allow parameters loading via getglobal API method.
 	 */
 	abstract protected static function loadParams(?string $param = null, bool $is_global = false): void;
 
