@@ -165,7 +165,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			->getUrl()
 		);
 
-		if (array_key_exists('scripts', $page)) {
+		if (array_key_exists('scripts', $page) && $page['scripts']) {
 			$pageHeader->addJsFile((new CUrl('jsLoader.php'))
 				->setArgument('ver', ZABBIX_VERSION)
 				->setArgument('lang', CWebUser::$data['lang'])
