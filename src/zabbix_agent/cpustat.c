@@ -803,6 +803,12 @@ static void	insert_phys_util_into_collector(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_ut
 			p->wait_pct = util_data[i].wait_pct;
 			p++;
 		}
+
+		for (i = util_data_count; i < cpus_phys_util->column_num; i++)
+		{
+			p->status = SYSINFO_RET_FAIL;
+			p++;
+		}
 	}
 	else
 	{
@@ -822,6 +828,12 @@ static void	insert_phys_util_into_collector(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_ut
 			p->wait_pct = prev->wait_pct + util_data[i].wait_pct;
 			p++;
 			prev++;
+		}
+
+		for (i = util_data_count; i < cpus_phys_util->column_num; i++)
+		{
+			p->status = SYSINFO_RET_FAIL;
+			p++;
 		}
 	}
 
@@ -1158,6 +1170,12 @@ int	get_cpustat_physical(AGENT_RESULT *result, int cpu_num, int state, int mode)
 {
 	ZBX_CPUS_UTIL_DATA_AIX	*p = &collector->cpus_phys_util;
 	int			time_interval, offset;
+
+	if (ZBX_CPUNUM_ALL != cpu_num && p->column_num - 2 < cpu_num)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain CPU information."));
+		return SYSINFO_RET_FAIL;
+	}
 
 	switch (mode)
 	{
