@@ -161,6 +161,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	public function testInheritanceHostPrototype_CreateHostLinkTemplate($data) {
 		$this->zbxTestLogin('hosts.php?form=create');
 		$this->zbxTestInputTypeWait('host', $data['host']);
+		$this->query('xpath://ul[@id="hostlist"]//button[text()="Add"]')->asPopupButton()->one()->fill('Agent');
 		$this->zbxTestClickButtonMultiselect('groups_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait($data['group']);
