@@ -931,6 +931,8 @@ static void	update_cpustats_physical(ZBX_CPUS_UTIL_DATA_AIX *cpus_phys_util)
 			count_changed = 1;
 		}
 
+		zbx_strlcpy(cpu_id.name, FIRST_CPU, sizeof(cpu_id.name));
+
 		if (-1 == (new_stats_count = perfstat_cpu(&cpu_id, new_cpu_stats, sizeof(perfstat_cpu_t),
 				max_cpu_count)))
 		{
