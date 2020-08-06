@@ -95,28 +95,32 @@ func loadOSDependentFlags() {
 	flag.BoolVar(&svcMultipleAgentFlag, "m", svcMultipleDefault, svcMultipleDescription+" (shorthand)")
 }
 
-func isWinService() bool {
+func isWinLauncher() bool {
 	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcMultipleAgentFlag {
 		return true
 	}
 	return false
 }
 
+func setServiceRun(forground bool) {
+	winServiceRun = !forground
+}
+
 func closeOSSpecificItems() {
 	if winServiceRun {
-		sendWinServiceFatalStopSig()
+		sendFatalStopSig()
 	}
 	closeEventLog()
 }
 
 func openEventLog() (err error) {
-	if isWinService() {
+	if isWinLauncher() {
 		eLog, err = eventlog.Open(serviceName)
 	}
 	return
 }
 
-func sendWinServiceFatalStopSig() {
+func sendFatalStopSig() {
 	fatalStopWg.Add(1)
 	select {
 	case fatalStopChan <- true:
@@ -135,14 +139,14 @@ func closeEventLog() {
 }
 
 func eventLogInfo(msg string) (err error) {
-	if isWinService() {
+	if isWinLauncher() {
 		return eLog.Info(1, msg)
 	}
 	return nil
 }
 
 func eventLogErr(err error) error {
-	if isWinService() {
+	if isWinLauncher() {
 		return eLog.Error(3, err.Error())
 	}
 	return nil
@@ -161,7 +165,7 @@ func validateExclusiveFlags() error {
 		}
 	}
 
-	if svcMultipleAgentFlag && count == 0 {
+	if svcMultipleAgentFlag && count == 0 || svcMultipleAgentFlag && !winServiceRun {
 		return errors.New("multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information")
 	}
 
@@ -196,9 +200,17 @@ func setHostname() error {
 }
 
 func handleWindowsService(conf string) error {
-	var err error
+	if svcMultipleAgentFlag {
+		if len(agent.Options.Hostname) == 0 {
+			if err := setHostname(); err != nil {
+				return err
+			}
+		}
+		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.Options.Hostname)
+	}
+
 	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
-		if err = resolveWindowsService(conf); err != nil {
+		if err := resolveWindowsService(conf); err != nil {
 			return err
 		}
 		closeEventLog()
@@ -211,15 +223,6 @@ func handleWindowsService(conf string) error {
 }
 
 func resolveWindowsService(conf string) error {
-	if svcMultipleAgentFlag {
-		if len(agent.Options.Hostname) == 0 {
-			if err := setHostname(); err != nil {
-				return err
-			}
-		}
-		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.Options.Hostname)
-	}
-
 	var msg string
 	switch true {
 	case svcInstallFlag:
@@ -295,7 +298,7 @@ func svcInstall(conf string) error {
 	}
 
 	s, err = m.CreateService(serviceName, exepath, mgr.Config{StartType: mgr.StartAutomatic, DisplayName: serviceName,
-		Description: "Provides system monitoring", BinaryPathName: fmt.Sprintf("%s -c %s", exepath, conf)}, "-c", conf)
+		Description: "Provides system monitoring", BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf)}, "-c", conf, "-f=false")
 	if err != nil {
 		return fmt.Errorf("failed to create service: %s", err.Error())
 	}
@@ -350,7 +353,7 @@ func svcStart(conf string) error {
 	}
 	defer s.Close()
 
-	if err = s.Start("-c", conf); err != nil {
+	if err = s.Start("-c", conf, "-f=false"); err != nil {
 		return fmt.Errorf("failed to start service: %s", err.Error())
 	}
 
@@ -389,13 +392,13 @@ func svcStop() error {
 	return nil
 }
 
-func confirmWinService() {
+func confirmService() {
 	if winServiceRun {
 		startChan <- true
 	}
 }
 
-func closeWinService() {
+func waitServiceClose() {
 	if winServiceRun {
 		winServiceWg.Done()
 		<-closeChan
@@ -403,9 +406,8 @@ func closeWinService() {
 }
 
 func runService() {
-	winServiceRun = true
 	if err := svc.Run(serviceName, &winService{}); err != nil {
-		winServiceRun = false
+		//TODO: Log and stop service if started  and agent
 		return
 	}
 }

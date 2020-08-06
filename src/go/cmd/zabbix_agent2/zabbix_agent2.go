@@ -131,7 +131,7 @@ func run() (err error) {
 	if control, err = remotecontrol.New(agent.Options.ControlSocket); err != nil {
 		return
 	}
-	confirmWinService()
+	confirmService()
 	control.Start()
 
 loop:
@@ -227,6 +227,7 @@ func main() {
 	loadOSDependentFlags()
 
 	flag.Parse()
+	setServiceRun(foregroundFlag)
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
@@ -495,7 +496,7 @@ func main() {
 	if foregroundFlag && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
 	}
-	closeWinService()
+	waitServiceClose()
 }
 
 func fatalExit(message string, err error) {
