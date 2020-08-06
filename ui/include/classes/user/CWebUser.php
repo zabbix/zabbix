@@ -94,24 +94,14 @@ class CWebUser {
 
 	public static function checkAuthentication(string $sessionid): bool {
 		try {
-			if ($sessionid !== null) {
-				self::$data = API::User()->checkAuthentication([
-					'sessionid' => $sessionid,
-					'extend' => self::$extend_session
-				]);
-			}
+			self::$data = API::User()->checkAuthentication([
+				'sessionid' => $sessionid,
+				'extend' => self::$extend_session
+			]);
 
-			if ($sessionid === null || empty(self::$data)) {
-				self::$data = API::User()->login([
-					'user' => ZBX_GUEST_USER,
-					'password' => '',
-					'userData' => true
-				]);
-
-				if (empty(self::$data)) {
-					CMessageHelper::clear();
-					throw new Exception();
-				}
+			if (empty(self::$data)) {
+				CMessageHelper::clear();
+				throw new Exception();
 			}
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
