@@ -37,25 +37,25 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Trigger data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_trigger');
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_trigger']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_trigger']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_trigger']", "value", '365d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_trigger'][@disabled]");
 
 		$this->zbxTestTextPresent('Internal data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_internal');
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_internal']", "value", '1d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_internal'][@disabled]");
 
 		$this->zbxTestTextPresent('Network discovery data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_discovery');
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_discovery']", "value", '1d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_discovery'][@disabled]");
 
 		$this->zbxTestTextPresent('Autoregistration data storage period');
 		$this->zbxTestAssertElementPresentId('hk_events_autoreg');
-		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_events_autoreg']", "value", '1d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_events_autoreg'][@disabled]");
 
@@ -74,7 +74,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertElementPresentId('hk_services');
-		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_services']", "value", '365d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_services'][@disabled]");
 
@@ -90,7 +90,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertElementPresentId('hk_audit');
-		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_audit']", "value", '365d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_audit'][@disabled]");
 
@@ -106,7 +106,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertVisibleId('hk_sessions');
-		$this->zbxTestAssertAttribute("//input[@id='hk_sessions']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_sessions']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_sessions']", "value", '365d');
 		$this->zbxTestAssertElementNotPresentXpath("//input[@id='hk_sessions'][@disabled]");
 
@@ -126,7 +126,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertVisibleId('hk_history');
-		$this->zbxTestAssertAttribute("//input[@id='hk_history']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_history']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_history']", "value", '90d');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_history'][@disabled]");
 
@@ -150,7 +150,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Data storage period');
 		$this->zbxTestAssertVisibleId('hk_trends');
-		$this->zbxTestAssertAttribute("//input[@id='hk_trends']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='hk_trends']", "maxlength", 32);
 		$this->zbxTestAssertAttribute("//input[@id='hk_trends']", "value", '365d');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='hk_trends'][@disabled]");
 

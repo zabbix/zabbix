@@ -28,7 +28,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 	private $default = [
 		'Default language' => 'English (en_GB)',
-//		'Default time zone' => 'System',
+		'Default time zone' => 'System',
 		'Default theme' => 'Blue',
 		'Limit for search and filter results' => '1000',
 		'Max number of columns and rows in overview tables' => '50',
@@ -43,7 +43,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 	private $db_default = [
 		'default_lang' => 'en_GB',
-//		'default_timezone' => 'system',
+		'default_timezone' => 'system',
 		'default_theme' => 'blue-theme',
 		'search_limit' => 1000,
 		'max_overview_table_size' => 50,
