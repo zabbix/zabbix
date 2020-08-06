@@ -316,7 +316,6 @@ class CTemplate extends CHostGeneral {
 			$templates[$key]['groups'] = zbx_toArray($template['groups']);
 		}
 
-		$ins_tags = [];
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
 			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
@@ -333,12 +332,6 @@ class CTemplate extends CHostGeneral {
 			$templateId = reset($newTemplateIds);
 
 			$templateIds[] = $templateId;
-
-			if (array_key_exists('tags', $template)) {
-				foreach (zbx_toArray($template['tags']) as $tag) {
-					$ins_tags[] = ['hostid' => $templateId] + $tag;
-				}
-			}
 
 			foreach ($template['groups'] as $group) {
 				$hostGroupId = get_dbid('hosts_groups', 'hostgroupid');
@@ -367,9 +360,7 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		if ($ins_tags) {
-			DB::insert('host_tag', $ins_tags);
-		}
+		$this->createTags(array_column($templates, 'tags', 'templateid'));
 
 		return ['templateids' => $templateIds];
 	}
@@ -522,10 +513,6 @@ class CTemplate extends CHostGeneral {
 
 				unset($template['macros']);
 			}
-
-			if (array_key_exists('tags', $template)) {
-				$template['tags'] = zbx_toArray($template['tags']);
-			}
 		}
 		unset($template);
 
@@ -551,7 +538,7 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		$this->updateTags($templates, 'templateid');
+		$this->updateTags(array_column($templates, 'tags', 'templateid'));
 
 		return ['templateids' => zbx_objectValues($templates, 'templateid')];
 	}

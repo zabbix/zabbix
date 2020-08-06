@@ -48,6 +48,7 @@ $fields = [
 	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
 	'group_hostid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
+	'tags' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -91,6 +92,7 @@ if (getRequest('parent_discoveryid')) {
 			'selectTemplates' => ['templateid', 'name'],
 			'selectParentHost' => ['hostid'],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
+			'selectTags' => ['tag', 'value'],
 			'editable' => true
 		]);
 		$hostPrototype = reset($hostPrototype);
@@ -101,6 +103,14 @@ if (getRequest('parent_discoveryid')) {
 }
 else {
 	access_deny();
+}
+
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	// remove empty new tag lines
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+	}
 }
 
 // Remove inherited macros data (actions: 'add', 'update' and 'form').
@@ -171,6 +181,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
+		'tags' => $tags,
 		'macros' => $macros,
 		'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', []))
 	];
@@ -336,6 +347,7 @@ if (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => (getRequest('hostid') && $hostPrototype['templateid']),
 		'groups' => [],
+		'tags' => $tags,
 		// Parent discovery rules.
 		'templates' => []
 	];
@@ -417,6 +429,8 @@ if (hasRequest('form')) {
 					];
 				}
 			}
+
+			$data['tags'] = $data['host_prototype']['tags'];
 		}
 		else {
 			// Set default values for new host prototype.
@@ -439,6 +453,14 @@ if (hasRequest('form')) {
 			'editable' => true,
 			'preservekeys' => true
 		]);
+	}
+
+	// tags
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+	else {
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
 	$macros = $data['host_prototype']['macros'];
@@ -489,6 +511,7 @@ else {
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectTemplates' => ['templateid', 'name'],
+		'selectTags' => ['tag', 'value'],
 		'editable' => true,
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
@@ -546,6 +569,8 @@ else {
 			'preservekeys' => true
 		]);
 	}
+
+	$data['tags'] = makeTags($data['hostPrototypes'], true, 'hostid');
 
 	// render view
 	echo (new CView('configuration.host.prototype.list', $data))->getOutput();
