@@ -211,7 +211,7 @@ class CNewValidator {
 						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])
 								|| $this->input[$field] < $params) {
 							$this->addError($fatal,
-								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								_s('Incorrect value for field "%1$s": %2$s.', $field, _s('value must be no less than "%1$s"', $params))
 							);
 
 							return false;
@@ -227,7 +227,7 @@ class CNewValidator {
 						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])
 								|| $this->input[$field] > $params) {
 							$this->addError($fatal,
-								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								_s('Incorrect value for field "%1$s": %2$s.', $field, _s('value must be no greater than "%1$s"', $params))
 							);
 
 							return false;
