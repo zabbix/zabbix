@@ -116,7 +116,7 @@ class CPage {
 		$this->resetViewport();
 
 		if (self::$cookie !== null) {
-			$session_id = $this->driver->manage()->getCookieNamed('zbx_sessionid');
+			$session_id = $this->driver->manage()->getCookieNamed('zbx_session');
 
 			if ($session_id === null || !array_key_exists('value', $session_id)
 					|| $session_id['value'] !== self::$cookie['value']) {
@@ -190,7 +190,7 @@ class CPage {
 			$data['sign'] = CEncryptHelper::sign(serialize($data));
 
 			self::$cookie = [
-				'name' => ZBX_SESSION_NAME,
+				'name' => 'zbx_session',
 				'value' => base64_encode(serialize($data)),
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
@@ -210,7 +210,7 @@ class CPage {
 	public function logout() {
 		try {
 			$session = (self::$cookie === null)
-					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_sessionid'), 'value')
+					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_session'), 'value')
 					: self::$cookie['value'];
 
 			if ($session !== null) {
