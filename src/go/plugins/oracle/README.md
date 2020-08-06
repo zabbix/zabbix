@@ -1,7 +1,7 @@
 # Oracle Database plugin
 Provides native Zabbix solution for monitoring Oracle Database. It can monitor several 
-Oracle instances simultaneously, remotes or locals to the Zabbix Agent.
-The plugin keeps connections in the opened state to reduce network congestion, latency, CPU and 
+Oracle instances simultaneously, remote or local to the Zabbix Agent.
+The plugin keeps connections in the open state to reduce network congestion, latency, CPU and 
 memory usage. Best for use in conjunction with the official  [Template DB Oracle Agent 2](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2). You can extend it or create your 
 template for your specific needs. 
 
@@ -44,7 +44,7 @@ GRANT SELECT ON DBA_USERS TO zabbix_mon;
 * Make sure a TNS Listener and an Oracle instance are available for connection.  
 
 ## Configuration
-The Zabbix Agent's configuration file is used to configure plugins.
+The Zabbix agent 2 configuration file is used to configure plugins.
 
 **Plugins.Oracle.Uri** — Uri to connect.  
 *Default value:* tcp://localhost:1521  
@@ -57,7 +57,7 @@ The Zabbix Agent's configuration file is used to configure plugins.
 - tcp://127.0.0.1:1521
 - tcp://localhost 
 
-**Plugins.Oracle.Service** — A service name to be used for connection (SID isn't supported).  
+**Plugins.Oracle.Service** — A service name to be used for connection (SID is not supported).  
 *Default value:* XE
 
 **Plugins.Oracle.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
@@ -72,26 +72,26 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Oracle.CustomQueriesPath** — Full pathname of a directory containing *.sql files with custom queries.  
+**Plugins.Oracle.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
 *Default value:* — (the feature is disabled by default)
 
 ### Authentication
-The plugin can authenticate using credentials specified as key's parameters or within named sessions.
-Embedded URI credentials (userinfo) will be ignored. So, you can't pass them like this:   
+The plugin can authenticate using credentials specified as key parameters or within named sessions.
+Embedded URI credentials (userinfo) will be ignored. So, you can't pass the credentials by this:   
 
     oracle.ping[tcp://user:password@127.0.0.1/XE] — WRONG  
 
-The right way is:
+The correct way is:
   
     oracle.ping[tcp://127.0.0.1,user,password,XE]
 
 #### Using named sessions
-Named sessions allow you to define specific parameters for each Oracle instance. Currently, there are only supported
-parameters: Uri, User, Password and Service. It's a bit more secure way to store credentials than using either 
-item's keys or macros.  
+Named sessions allow you to define specific parameters for each Oracle instance. Currently, there are only four supported
+parameters: Uri, User, Password and Service. It's a bit more secure way to store credentials compared to 
+item keys or macros.  
 
 E.g: suppose you have two instances: "Oracle12" and "Oracle19". 
-You should add the following options to your agent's config:   
+You should add the following options to the agent configuration file:   
 
     Plugins.Oracle.Sessions.Oracle12.Uri=tcp://192.168.1.1:1521
     Plugins.Oracle.Sessions.Oracle12.User=<UserForOracle12>
@@ -103,7 +103,7 @@ You should add the following options to your agent's config:
     Plugins.Oracle.Sessions.Oracle19.Password=<PasswordForOracle19>
     Plugins.Oracle.Sessions.Oracle19.Service=orcl
     
-You can omit either a Uri or a Service if they are already specified as the 1st level parameters:
+You can omit either a Uri or a Service if they are already specified as 1st level parameters:
 
     Plugins.Oracle.Uri=tcp://192.168.1.1:1521
     Plugins.Oracle.Service=orcl
@@ -116,9 +116,9 @@ Then you will be able to use these names as connStrings in keys instead of URIs,
 ### Parameters priority
 There are 4 levels of parameters overwriting:
 1. Hardcoded default values →
-2. 1st level config params (Plugins.Oracle.\<parameter\>) →
+2. 1st level config parameters (Plugins.Oracle.\<parameter\>) →
 3. Named sessions (Plugins.Oracle.Sessions.\<sessionName\>.\<parameter\>) →
-4. Item keys params.
+4. Item keys parameters.
 
 ## Supported keys
 The common parameters for all keys are: [connString][,user][,password][,service]
@@ -133,9 +133,9 @@ The common parameters for all keys are: [connString][,user][,password][,service]
 
 **oracle.cdb.info[\<commonParams\>]** — Returns CDBs info.  
 
-**oracle.custom.query[\<commonParams\>,queryName[,args...]]** — Returns result of custom query.  
-*Params:*  
-queryName (required) — name of custom query (must be equal to a name of an sql file without an extension).  
+**oracle.custom.query[\<commonParams\>,queryName[,args...]]** — Returns result of a custom query.  
+*Parameters:*  
+queryName (required) — name of a custom query (must be equal to a name of an sql file without an extension).  
 args (optional) — one or more arguments to pass to a query.
 
 **oracle.datafiles.stats[\<commonParams\>]** — Returns data files statistics.  
@@ -164,12 +164,12 @@ args (optional) — one or more arguments to pass to a query.
 **oracle.sga.stats[\<commonParams\>]** — Returns SGA statistics.  
 
 **oracle.sessions.stats[\<commonParams\>,[lockMaxTime]]** — Returns sessions statistics.
-*Params:*    
-lockMaxTime (optional) — maximum seconds in the current wait condition for counting long time locked sessions. 
+*Parameters:*    
+lockMaxTime (optional) — Maximum session lock duration in seconds to count the session as a prolongedly locked.
 Default: 600 seconds.    
 
 **oracle.sys.metrics[\<commonParams\>[,duration]]** — Returns a set of system metric values.  
-*Params:*  
+*Parameters:*  
 duration (optional) — capturing interval (in seconds) of system metric values. Possible values:  
 60 — long duration (default).  
 15 — short duration.  
@@ -181,13 +181,13 @@ duration (optional) — capturing interval (in seconds) of system metric values.
 **oracle.ts.discovery[\<commonParams\>]** — Returns list of tablespaces in LLD format.
 
 **oracle.user.info[\<commonParams\>[,username]]** — Returns user information.  
-*Params:*  
-username (optional) — username for which information is needed. Default: current user.        
+*Parameters:*  
+username (optional) — a username for which the information is needed. Default: current user.        
 
 ## Custom queries
 It's possible to extend functionality of the plugin using user-defined queries. To do that you should place all your
-queries in a directory specified in Plugins.Oracle.CustomQueriesPath (there is no default path) as *.sql files.
-For example, you have a tree like this:
+queries in a directory specified in Plugins.Oracle.CustomQueriesPath (there is no default path) as *.sql* files.
+For example, you have a tree:
 
     /etc/zabbix/oracle/sql/  
     ├── long_tx.sql
@@ -202,7 +202,7 @@ So, when the queries are in place, you can execute them:
     oracle.custom.query[<commonParams>,long_tx,600]
           
 You can pass as many parameters to a query as you need.   
-The syntax for placeholder parameters uses ":#", where "#" is an index number of parameter.   
+The syntax for placeholder parameters uses ":#", where "#" is an index number of a parameter.   
 E.g: 
 ```
 /* payment.sql */
@@ -220,5 +220,5 @@ WHERE
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
 
 ## Troubleshooting
-The plugin uses Zabbix Agent's logs. You can increase a debug level of Zabbix Agent if you need more details about 
+The plugin uses Zabbix agent's logs. You can increase a debug level of Zabbix agent if you need more details about 
 what is happening.
