@@ -75,7 +75,12 @@ class CScreenHttpTest extends CScreenBase {
 
 		foreach ($httptests as &$httptest) {
 			$httptest['host'] = reset($httptest['hosts']);
-			$httptest['hostname'] = $httptest['host']['name'];
+			$httptest['hostname'] = (new CLinkAction($httptest['host']['name']))
+				->setMenuPopup(CMenuPopupHelper::getHost($httptest['host']['hostid']));
+
+			if ($httptest['host']['status'] == HOST_STATUS_NOT_MONITORED) {
+				$httptest['hostname']->addClass(ZBX_STYLE_RED);
+			}
 			unset($httptest['hosts']);
 		}
 		unset($httptest);
@@ -140,9 +145,7 @@ class CScreenHttpTest extends CScreenBase {
 			}
 
 			$table->addRow(new CRow([
-				($httptest['host']['status'] == HOST_STATUS_NOT_MONITORED)
-					? (new CSpan($httptest['hostname']))->addClass(ZBX_STYLE_RED)
-					: $httptest['hostname'],
+				$httptest['hostname'],
 				new CLink($httptest['name'], 'httpdetails.php?httptestid='.$httptest['httptestid']),
 				$httptest['steps'],
 				$lastcheck,
