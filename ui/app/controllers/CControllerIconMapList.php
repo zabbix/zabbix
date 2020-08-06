@@ -27,7 +27,7 @@ class CControllerIconMapList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			// Empty validation rules only to init CMessages.
+			// Empty validation rules only to init CMessageHelper.
 		];
 
 		$ret = $this->validateInput($fields);
