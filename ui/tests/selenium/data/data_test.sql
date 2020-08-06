@@ -2808,3 +2808,5 @@ INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, 
 INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_operationid, templateid) values (300, 403, 99137);
 
 INSERT INTO lld_override_optrends (lld_override_operationid, trends) values (400, 0);
+
+UPDATE config SET session_key='caf1c06dcf802728c4cfc24d645e1e73' WHERE configid = 1;
