@@ -724,7 +724,8 @@ read_again:
 		{
 			zbx_snprintf(ps_id.name, sizeof(ps_id.name), "cpu%d", pcpus->cpu[idx].cpu_num);
 
-			if (-1 == perfstat_cpu(&ps_id, &ps_cpu, sizeof(ps_cpu), 1))
+			/* perfstat_cpu can return -1 for error or 0 when no data is copied */
+			if (1 != perfstat_cpu(&ps_id, &ps_cpu, sizeof(ps_cpu), 1))
 			{
 				update_cpu_counters(&pcpus->cpu[idx], NULL);
 				continue;
