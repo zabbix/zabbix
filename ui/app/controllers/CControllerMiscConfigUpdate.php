@@ -51,7 +51,10 @@ class CControllerMiscConfigUpdate extends CController {
 						->setArgument('action', 'miscconfig.edit')
 					);
 
-					$response->setFormData($this->getInputAll() + ['discovery_groupid' => '0']);
+					$response->setFormData($this->getInputAll() + [
+						'discovery_groupid' => '0',
+						'alert_usrgrpid' => '0'
+					]);
 					$response->setMessageError(_('Cannot update configuration'));
 
 					$this->setResponse($response);
