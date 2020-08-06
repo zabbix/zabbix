@@ -30,15 +30,10 @@ func getMetrics() []string {
 		"system.hw.chassis", "Chassis information.",
 		"system.hw.devices", "Listing of PCI or USB devices.",
 		"system.sw.packages", "Listing of installed packages.",
-		"net.tcp.service", "Checks if service is running and accepting TCP connections.",
-		"net.tcp.service.perf", "Checks performance of TCP service.",
 		"system.users.num", "Number of users logged in.",
 		"system.swap.size", "Swap space size in bytes or in percentage from total.",
 		"vfs.dir.count", "Directory entry count.",
 		"vfs.dir.size", "Directory size (in bytes).",
-		"vfs.fs.inode", "Number or percentage of inodes.",
-		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
-		"vfs.fs.get", "List of mounted filesystems with statistics.",
 		"vm.memory.size", "Memory size in bytes or in percentage from total.",
 	}
 }

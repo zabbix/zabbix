@@ -326,8 +326,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				'popup.preproctest.edit', 'popup.triggerexpr', 'popup.httpstep', 'popup.testtriggerexpr',
 				'popup.triggerwizard'
 			],
-			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.action.recovery',
-				'popup.action.acknowledge', 'popup.action.operation', 'popup.condition.operations',
+			medium_popup_actions = ['popup.maintenance.period', 'popup.condition.actions', 'popup.condition.operations',
 				'popup.condition.event.corr', 'popup.discovery.check', 'popup.mediatypetest.edit',
 				'popup.mediatype.message'
 			],
@@ -656,7 +655,7 @@ function addSelectedValues(object, parentid) {
  */
 function add_media(formname, media, mediatypeid, sendto, period, active, severity) {
 	var form = window.document.forms[formname];
-	var media_name = (media > -1) ? 'user_medias[' + media + ']' : 'new_media';
+	var media_name = (media > -1) ? 'medias[' + media + ']' : 'new_media';
 
 	window.create_var(form, media_name + '[mediatypeid]', mediatypeid);
 	if (typeof sendto === "object") {

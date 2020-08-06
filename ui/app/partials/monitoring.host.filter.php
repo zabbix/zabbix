@@ -114,16 +114,13 @@ $left_column = (new CFormList())
 	);
 
 $right_column = (new CFormList())
-	->addRow(
-		_('Status'),
-		(new CHorList())
-			->addItem((new CRadioButtonList('status', (int) $data['status']))
-				->addValue(_('Any'), -1, 'status_1#{uniqid}')
-				->addValue(_('Enabled'), HOST_STATUS_MONITORED, 'status_2#{uniqid}')
-				->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED, 'status_3#{uniqid}')
-				->setId('status_#{uniqid}')
-				->setModern(true)
-			)
+	->addRow(_('Status'),
+		(new CRadioButtonList('status', (int) $data['status']))
+			->addValue(_('Any'), -1, 'status_1#{uniqid}')
+			->addValue(_('Enabled'), HOST_STATUS_MONITORED, 'status_2#{uniqid}')
+			->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED, 'status_3#{uniqid}')
+			->setId('status_#{uniqid}')
+			->setModern(true)
 	)
 	->addRow(_('Tags'), $filter_tags_table)
 	->addRow(_('Show hosts in maintenance'), [

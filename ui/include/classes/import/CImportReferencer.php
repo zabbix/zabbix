@@ -1101,7 +1101,7 @@ class CImportReferencer {
 					' FROM hosts h,host_discovery hd,items i'.
 					' WHERE h.hostid=hd.hostid'.
 						' AND hd.parent_itemid=i.itemid'.
-						' AND '.implode(' OR ', $sqlWhere)
+						' AND ('.implode(' OR ', $sqlWhere).')'
 				);
 				while ($data = DBfetch($query)) {
 					$this->hostPrototypesRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
@@ -1176,7 +1176,7 @@ class CImportReferencer {
 					'SELECT ht.hostid,hs.httptestid,hs.name,hs.httpstepid'.
 					' FROM httptest ht,httpstep hs'.
 					' WHERE ht.httptestid=hs.httptestid'.
-						' AND '.implode(' OR ', $sql_where)
+						' AND ('.implode(' OR ', $sql_where).')'
 				);
 				while ($db_httpstep = DBfetch($db_httpsteps)) {
 					$this->httpstepsRefs[$db_httpstep['hostid']][$db_httpstep['httptestid']][$db_httpstep['name']] =

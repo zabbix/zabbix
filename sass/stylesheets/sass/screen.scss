@@ -344,6 +344,12 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 	}
 }
 
+form {
+	&.is-loading {
+		position: relative;
+	}
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -2544,16 +2550,18 @@ $icon-widget-btn: (
 	opacity: .5;
 	transition: opacity .2s ease-out;
 
-	&:hover {
-		@extend %btn-widget-hover-active;
-	}
-
-	&:focus {
-		@extend %btn-widget-hover-active;
-	}
-
+	&:hover,
+	&:focus,
 	&:active {
 		@extend %btn-widget-hover-active;
+	}
+
+	&[disabled],
+	&[disabled]:hover,
+	&[disabled]:focus,
+	&[disabled]:active {
+		background-color: transparent;
+		opacity: .25;
 	}
 }
 
@@ -2836,10 +2844,8 @@ $form-icon-btn: (
 }
 
 .setup-title {
+	margin: 109px 0 16px 0;
 	color: $font-alt-color;
-	height: 345px;
-	display: table-cell;
-	vertical-align: middle;
 	font-size: $font-setup-title;
 	line-height: $setup-title-line-height;
 
@@ -3044,10 +3050,8 @@ $form-icon-btn: (
 	border-bottom: 0;
 	background-color: $ui-bg-color;
 
-	/*
-	 * For floating headers to appear over other widgets.
-	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-	 */
+	// For floating headers to appear over other widgets.
+	// Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
 	z-index: 3;
 
 	h4 {
@@ -3124,15 +3128,6 @@ $form-icon-btn: (
 	}
 }
 
-.widget-placeholder {
-	.dashbrd-grid-widget-container {
-		.dashbrd-grid-widget-content {
-			margin-top: 0;
-			height: 100%;
-		}
-	}
-}
-
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	top: .25rem;
@@ -3162,6 +3157,7 @@ $form-icon-btn: (
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+				z-index: 5;
 			}
 		}
 	}
@@ -3326,6 +3322,8 @@ $form-icon-btn: (
 	}
 
 	&.dashbrd-grid-iterator-focus {
+		z-index: 5;
+
 		.dashbrd-grid-iterator-head {
 			margin-top: -2rem;
 			height: 2rem;
@@ -4101,10 +4099,11 @@ $form-icon-btn: (
 		@extend %webkit-scrollbar;
 	}
 
-	.hintbox-description {
+	.hintbox-wrap {
 		overflow: auto;
 		max-height: 240px;
 		max-width: 800px;
+		overflow-wrap: break-word;
 		@extend %webkit-scrollbar;
 	}
 
@@ -5554,7 +5553,7 @@ a.overlay-close-btn {
 			animation: fadein 2s ease-in .5s normal forwards, is-loading-kf .6s infinite linear;
 		}
 
-		.delayed-15s {
+		&.delayed-15s {
 			&::before,
 			&::after {
 				animation-delay: 15s;
@@ -5795,10 +5794,6 @@ main {
 
 	&.is-loading {
 		min-height: 64px;
-
-		img {
-			opacity: 0;
-		}
 	}
 }
 
@@ -7057,6 +7052,80 @@ table.preprocessing-test-results {
 	}
 }
 
+.btn-split {
+	display: inline-block;
+	position: relative;
+	margin-right: 10px;
+
+	li {
+		display: inline-block;
+
+		button {
+			margin: 0 -1px 0 0;
+			border-radius: 0;
+		}
+
+		&:first-child button {
+			border-radius: 2px 0 0 2px;
+		}
+
+		&:last-child button {
+			border-radius: 0 2px 2px 0;
+		}
+
+		&:only-child button {
+			border-radius: 2px;
+		}
+	}
+}
+
+.btn-toggle-chevron {
+	position: relative;
+
+	&[aria-expanded="true"] {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		right: 8px;
+		top: calc(50% - 3px);
+		width: 5px;
+		height: 5px;
+		border-top: 1px solid $btn-alt-font-color;
+		border-right: 1px solid $btn-alt-font-color;
+		transform: rotate(135deg) translate(-1px,1px);
+		transition: transform .3s;
+	}
+
+	&[disabled] {
+		&::after {
+			border-top-color: $btn-disabled-font-color;
+			border-right-color: $btn-disabled-font-color;
+		}
+	}
+
+	&:enabled {
+		&:active,
+		&[aria-expanded="true"] {
+			&::after {
+				transform: rotate(315deg) translate(-1px,1px);
+			}
+		}
+
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+			&::after {
+				border-top-color:  $btn-font-color;
+				border-right-color: $btn-font-color;
+			}
+		}
+	}
+}
+
 .btn-dropdown-toggle {
 	white-space: nowrap;
 	overflow: hidden;
@@ -7074,12 +7143,17 @@ table.preprocessing-test-results {
 			height: 22px;
 			content: '';
 		}
+
+		&::after {
+			top: 6px;
+			right: 2px;
+		}
 	}
 
 	&::after {
 		position: absolute;
-		top: 6px;
-		right: 2px;
+		top: 7px;
+		right: 6px;
 		width: 10px;
 		height: 10px;
 		content: '';

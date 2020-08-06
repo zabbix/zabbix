@@ -16,6 +16,8 @@ This template was tested on:
 
 ## Setup
 
+> See [Zabbix template operation](https://www.zabbix.com/documentation/current/manual/config/templates_out_of_the_box/http) for basic instructions.
+
 Create a user to monitor the service:
 
 ```
@@ -40,7 +42,7 @@ Login and password are also set in macros:
 
 - {$CLICKHOUSE.USER}
 - {$CLICKHOUSE.PASSWORD}
-If you don't need authentication - remove headers from HTTP-Agent type items 
+If you don't need authentication - remove headers from HTTP-Agent type items
 
 
 ## Zabbix configuration

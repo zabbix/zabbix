@@ -57,6 +57,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.fs.size[/,free]`,
 		`vfs.fs.inode[/,free]`,
 		`vfs.fs.discovery`,
+		`vfs.fs.get`,
 		`vfs.dev.write[sda,operations]`,
 		`net.tcp.listen[80]`,
 		`net.udp.listen[68]`,
@@ -97,6 +98,6 @@ func checkMetrics(s scheduler.Scheduler) {
 	}
 
 	for _, metric := range metrics {
-		_ = checkMetric(s, metric)
+		checkMetric(s, metric)
 	}
 }

@@ -121,13 +121,12 @@ foreach ($data['screens'] as $screen) {
 $buttons = [];
 
 if (!$data['templateid']) {
-	$buttons['screen.export'] = ['name' => _('Export'), 'redirect' =>
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'export.screens.xml')
-			->setArgument('backurl', (new CUrl('screenconf.php'))
-				->setArgument('page', $data['page'] == 1 ? null : $data['page'])
-				->getUrl())
-			->getUrl()
+	$buttons['screen.export'] = [
+		'content' => new CButtonExport('export.screens',
+			(new CUrl('screenconf.php'))
+				->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+				->getUrl()
+		)
 	];
 }
 

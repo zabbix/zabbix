@@ -20,16 +20,21 @@
 package tcpudp
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"math"
 	"net"
+	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/go-ldap/ldap"
 	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/web"
 )
 
 const (
@@ -166,6 +171,184 @@ func (p *Plugin) validateImap(buf []byte) int {
 	return tcpExpectFail
 }
 
+func telnetRead(rw *bufio.ReadWriter) (byte, error) {
+	b, err := rw.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+
+	return b, nil
+}
+
+func telnetWrite(b byte, rw *bufio.ReadWriter) error {
+	err := rw.WriteByte(b)
+	if err != nil {
+		return fmt.Errorf("buffer write [%x] error: %s", b, err.Error())
+	}
+	return nil
+}
+
+func loginReceived(buf []byte) bool {
+	return strings.HasSuffix(strings.TrimRight(string(buf), " "), ":")
+}
+
+func (p *Plugin) validateTelnet(conn net.Conn) error {
+	var err error
+	var buf []byte
+
+	cmdIAC := byte(255)
+	cmdWILL := byte(251)
+	cmdWONT := byte(252)
+	cmdDO := byte(253)
+	cmdDONT := byte(254)
+	optSGA := byte(3)
+	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
+	for {
+		if loginReceived(buf) {
+			return nil
+		}
+
+		var c, c1, c2, c3 byte
+		c1, err = telnetRead(rw)
+		if err != nil {
+			return fmt.Errorf("c1 network read error: %s", err.Error())
+		}
+
+		if cmdIAC == c1 {
+			c2, err = telnetRead(rw)
+			if nil != err {
+				return fmt.Errorf("c2 read error: %s", err.Error())
+			}
+
+			switch c2 {
+			case cmdWILL, cmdWONT, cmdDO, cmdDONT:
+				c3, err = telnetRead(rw)
+				if nil != err {
+					return fmt.Errorf("c3 read error: %s", err.Error())
+				}
+
+				c = cmdIAC
+				err := telnetWrite(c, rw)
+				if err != nil {
+					return err
+				}
+
+				if c2 == cmdWONT {
+					c = cmdDONT
+				} else if c2 == cmdDONT {
+					c = cmdWONT
+				} else if c3 == optSGA {
+					if c2 == cmdDO {
+						c = cmdWILL
+					} else {
+						c = cmdDO
+					}
+				} else {
+					if c2 == cmdDO {
+						c = cmdWONT
+					} else {
+						c = cmdDONT
+					}
+				}
+
+				err = telnetWrite(c, rw)
+				if err != nil {
+					return err
+				}
+				err = telnetWrite(c3, rw)
+				if err != nil {
+					return err
+				}
+				err = rw.Flush()
+				if err != nil {
+					return fmt.Errorf("buffer flush error: %s", err.Error())
+				}
+			case cmdIAC:
+				buf = append(buf, c1)
+			default:
+				return fmt.Errorf("malformed telnet response")
+			}
+		} else {
+			buf = append(buf, c1)
+		}
+	}
+}
+
+func removeScheme(in string) (scheme string, host string, err error) {
+	parts := strings.Split(in, "://")
+	switch len(parts) {
+	case 1:
+		return "", in, nil
+	case 2:
+		return parts[0], parts[1], nil
+	default:
+		return "", in, errors.New("malformed url")
+	}
+}
+
+func encloseIPv6(in string) string {
+	parsedIP := net.ParseIP(in)
+	if parsedIP != nil {
+		ipv6 := parsedIP.To16()
+		if ipv6 != nil {
+			out := ipv6.String()
+			return fmt.Sprintf("[%s]", out)
+		}
+	}
+
+	return in
+}
+
+func (p *Plugin) httpsExpect(ip string, port string) int {
+	scheme, host, err := removeScheme(ip)
+	if err != nil {
+		log.Debugf("https error: cannot parse the url [%s]: %s", ip, err.Error())
+		return 0
+	}
+	if scheme != "" && scheme != "https" {
+		log.Debugf("https error: incorrect scheme '%s' in url [%s]", scheme, ip)
+		return 0
+	}
+
+	rawURL := fmt.Sprintf("%s://%s", "https", encloseIPv6(host))
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		log.Debugf("https error: cannot parse the combined url [%s]: %s", rawURL, err.Error())
+		return 0
+	}
+
+	// does NOT return an error on >=400 status codes same as C agent
+	_, err = web.Get(fmt.Sprintf("%s://%s:%s%s", u.Scheme, u.Hostname(), port, u.Path),
+		time.Second*p.options.Timeout, false)
+	if err != nil {
+		log.Debugf("https network error: cannot connect to [%s]: %s", u, err.Error())
+		return 0
+	}
+
+	return 1
+}
+
+func (p *Plugin) validateLdap(conn *ldap.Conn, address string) (result int) {
+	res, err := conn.Search(&ldap.SearchRequest{Scope: ldap.ScopeBaseObject, Filter: "(objectClass=*)",
+		Attributes: []string{"namingContexts"}})
+	if err != nil {
+		log.Debugf("TCP expect search error: searching failed for [%s]: %s", address, err.Error())
+		return
+	}
+
+	if len(res.Entries) < 1 {
+		log.Debugf("TCP expect response error: empty search result for [%s]", address)
+		return
+	}
+
+	if len(res.Entries[0].Attributes) < 1 {
+		log.Debugf("TCP expect response error: no attributes in first entry for [%s]", address)
+		return
+	}
+
+	return 1
+}
+
 func (p *Plugin) tcpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
@@ -184,10 +367,26 @@ func (p *Plugin) tcpExpect(service string, address string) (result int) {
 		return
 	}
 
+	if service == "ldap" {
+		l := ldap.NewConn(conn, false)
+		l.Start()
+		defer l.Close()
+		return p.validateLdap(l, address)
+	}
+
+	if service == "telnet" {
+		err := p.validateTelnet(conn)
+		if err != nil {
+			log.Debugf("TCP telnet network error: %s", err.Error())
+			return tcpExpectFail
+		}
+
+		return 1
+	}
+
 	var sendToClose string
 	var checkResult int
 	buf := make([]byte, 2048)
-
 	for {
 		if _, err = conn.Read(buf); err == nil {
 			switch service {
@@ -245,12 +444,19 @@ func (p *Plugin) exportNetService(params []string) int {
 	if len(params) == 3 && params[2] != "" {
 		port = params[2]
 	} else {
-		if service != "pop" {
-			port = service
-		} else {
+		switch service {
+		case "pop":
 			port = "pop3"
+		case "https":
+			port = "443"
+		default:
+			port = service
 		}
 	}
+	if service == "https" {
+		return p.httpsExpect(ip, port)
+	}
+
 	return p.tcpExpect(service, net.JoinHostPort(ip, port))
 }
 
@@ -299,7 +505,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				err = errors.New(errorInvalidThirdParam)
 				return
 			}
-		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http":
+		case "ssh", "smtp", "ftp", "pop", "nntp", "imap", "http", "https", "ldap", "telnet":
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return

@@ -26,6 +26,9 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
+		$locales[] = LANG_DEFAULT;
+		$timezones = DateTimeZone::listIdentifiers();
+		$timezones[] = TIMEZONE_DEFAULT;
 		$themes = array_keys(APP::getThemes());
 		$themes[] = THEME_DEFAULT;
 
@@ -37,8 +40,9 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'user_groups' =>	'required|array_id|not_empty',
 			'password1' =>		'string',
 			'password2' =>		'string',
-			'user_medias' =>	'array',
+			'medias' =>			'array',
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
+			'timezone' =>		'db users.timezone|in '.implode(',', $timezones),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
 			'autologout' =>		'db users.autologout|not_empty',
@@ -90,8 +94,8 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	protected function doAction() {
 		$user = [];
 
-		$this->getInputs($user, ['userid', 'alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout',
-			'refresh', 'rows_per_page', 'url', 'type'
+		$this->getInputs($user, ['userid', 'alias', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
+			'autologout', 'refresh', 'rows_per_page', 'url', 'type'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
 
@@ -99,10 +103,10 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['user_medias'] = [];
+		$user['medias'] = [];
 
-		foreach ($this->getInput('user_medias', []) as $media) {
-			$user['user_medias'][] = [
+		foreach ($this->getInput('medias', []) as $media) {
+			$user['medias'][] = [
 				'mediatypeid' => $media['mediatypeid'],
 				'sendto' => $media['sendto'],
 				'active' => $media['active'],

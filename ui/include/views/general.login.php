@@ -38,7 +38,8 @@ if ($data['error']) {
 }
 
 $guest = $data['guest_login_url']
-	? (new CListItem(['or ', new CLink('sign in as guest', $data['guest_login_url'])]))->addClass(ZBX_STYLE_SIGN_IN_TXT)
+	? (new CListItem([_('or'), ' ', new CLink(_('sign in as guest'), $data['guest_login_url'])]))
+		->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
 
 $http_login_link = $data['http_login_url']
@@ -93,7 +94,7 @@ global $ZBX_SERVER_NAME;
 			CBrandHelper::isRebranded() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
 			CBrandHelper::isRebranded()
 				? null
-				: (new CLink(_('Support'), getSupportUrl()))
+				: (new CLink(_('Support'), getSupportUrl(CWebUser::getLang())))
 					->setTarget('_blank')
 					->addClass(ZBX_STYLE_GREY)
 					->addClass(ZBX_STYLE_LINK_ALT)
