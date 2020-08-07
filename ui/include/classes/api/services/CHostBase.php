@@ -277,16 +277,16 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Creates new tags.
 	 *
-	 * @param array $create_tags
-	 * @param array $create_tags[<hostid>]
-	 * @param array $create_tags[<hostid>][]['tag']
-	 * @param array $create_tags[<hostid>][]['value']
+	 * @param array  $create_tags
+	 * @param int    $create_tags[<hostid>]
+	 * @param string $create_tags[<hostid>][]['tag']
+	 * @param string $create_tags[<hostid>][]['value']
 	 */
 	protected function createTags(array $create_tags): void {
 		$create = [];
 
 		foreach ($create_tags as $hostid => $tags) {
-			foreach (zbx_toArray($tags) as $tag) {
+			foreach ($tags as $tag) {
 				$create[] = ['hostid' => $hostid] + $tag;
 			}
 		}
@@ -299,10 +299,10 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Updates tags by deleting existing tags if they are not among the input tags, and adding missing ones.
 	 *
-	 * @param array $host_tags
-	 * @param array $host_tags[<hostid>]
-	 * @param array $host_tags[<hostid>][]['tag']
-	 * @param array $host_tags[<hostid>][]['value']
+	 * @param array  $host_tags
+	 * @param int    $host_tags[<hostid>]
+	 * @param string $host_tags[<hostid>][]['tag']
+	 * @param string $host_tags[<hostid>][]['value']
 	 */
 	protected function updateTags(array $host_tags): void {
 		if (!$host_tags) {

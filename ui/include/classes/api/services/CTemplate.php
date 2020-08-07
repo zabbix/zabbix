@@ -346,6 +346,10 @@ class CTemplate extends CHostGeneral {
 				}
 			}
 
+			if (array_key_exists('tags', $template) && $template['tags']) {
+				$this->createTags([$templateId => zbx_toArray($template['tags'])]);
+			}
+
 			$template['templateid'] = $templateId;
 
 			$result = $this->massAdd([
@@ -359,8 +363,6 @@ class CTemplate extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create template.'));
 			}
 		}
-
-		$this->createTags(array_column($templates, 'tags', 'templateid'));
 
 		return ['templateids' => $templateIds];
 	}

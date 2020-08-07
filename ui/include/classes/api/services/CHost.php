@@ -721,6 +721,10 @@ class CHost extends CHostGeneral {
 			}
 			DB::insert('hosts_groups', $groupsToAdd);
 
+			if (array_key_exists('tags', $host) && $host['tags']) {
+				$this->createTags([$hostid => zbx_toArray($host['tags'])]);
+			}
+
 			$options = [
 				'hosts' => $host
 			];
@@ -761,8 +765,6 @@ class CHost extends CHostGeneral {
 				DB::insert('host_inventory', [$hostInventory], false);
 			}
 		}
-
-		$this->createTags(array_column($hosts, 'tags', 'hostid'));
 
 		return ['hostids' => $hostids];
 	}
