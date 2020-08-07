@@ -487,8 +487,6 @@
 	}
 
 	function initSortable() {
-		let header_cells = $('#itemsTable th');
-
 		$('#itemsTable').sortable({
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
@@ -500,10 +498,10 @@
 			opacity: 0.6,
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
-				ui = ui.clone();
-				ui.children().each(function(i) {
-					$(this).width(header_cells.eq(i).width());
-				});
+				for (let td of ui.find('>td')) {
+					let $td = $(td);
+					$td.attr('width', $td.width())
+				}
 
 				// when dragging element on safari, it jumps out of the table
 				if (SF) {
@@ -512,6 +510,9 @@
 				}
 
 				return ui;
+			},
+			stop: function(e, ui) {
+				ui.item.find('>td').removeAttr('width');
 			},
 			start: function(e, ui) {
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
