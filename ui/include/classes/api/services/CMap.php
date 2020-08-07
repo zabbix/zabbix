@@ -219,7 +219,7 @@ class CMap extends CMapElement {
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sysmaps = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		$sysmaps = DBselect(self::createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 
 		while ($sysmap = DBfetch($sysmaps)) {
 			$result[$sysmap['sysmapid']] = $sysmap;
