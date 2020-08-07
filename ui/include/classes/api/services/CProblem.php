@@ -287,8 +287,7 @@ class CProblem extends CApiService {
 
 		// recent
 		if ($options['recent'] !== null && $options['recent']) {
-			$config = select_config();
-			$ok_events_from = time() - timeUnitToSeconds($config['ok_period']);
+			$ok_events_from = time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD));
 
 			$sqlParts['where'][] = '(p.r_eventid IS NULL OR p.r_clock>'.$ok_events_from.')';
 		}

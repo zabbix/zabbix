@@ -1523,7 +1523,6 @@ function getTriggerMassupdateFormData() {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'g_triggerid' => getRequest('g_triggerid', []),
 		'priority' => getRequest('priority', 0),
-		'config' => select_config(),
 		'hostid' => getRequest('hostid', 0)
 	];
 

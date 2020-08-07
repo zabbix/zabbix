@@ -913,13 +913,10 @@ class CUserGroup extends CApiService {
 		}
 
 		// Check if user group are used in config.
-		$config = select_config();
-
-		if (array_key_exists($config['alert_usrgrpid'], $db_usrgrps)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'User group "%1$s" is used in configuration for database down messages.',
-				$db_usrgrps[$config['alert_usrgrpid']]['name']
-			));
+		if (array_key_exists(CSettingsHelper::get(CSettingsHelper::ALERT_USRGRPID), $db_usrgrps)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User group "%1$s" is used in configuration for database down messages.', $db_usrgrps[CSettingsHelper::get(CSettingsHelper::ALERT_USRGRPID)]['name'])
+			);
 		}
 
 		$this->checkUsersWithoutGroups($usrgrps);

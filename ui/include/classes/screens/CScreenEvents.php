@@ -27,8 +27,6 @@ class CScreenEvents extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$config = select_config();
-
 		$table = (new CTableInfo())->setHeader([_('Time'), _('Recovery time'), _('Host'), _('Description'), _('Value'),
 			_('Severity')
 		]);
@@ -136,7 +134,7 @@ class CScreenEvents extends CScreenBase {
 					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 				),
 				$statusSpan,
-				getSeverityCell($event['severity'], $config)
+				getSeverityCell($event['severity'])
 			]);
 		}
 

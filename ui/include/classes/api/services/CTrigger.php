@@ -419,10 +419,10 @@ class CTrigger extends CTriggerGeneral {
 
 		// only_true
 		if ($options['only_true'] !== null) {
-			$config = select_config();
 			$sqlParts['where']['ot'] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
 				' OR ((t.value='.TRIGGER_VALUE_FALSE.')'.
-					' AND (t.lastchange>'.(time() - timeUnitToSeconds($config['ok_period'])).
+					' AND (t.lastchange>'.
+					(time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD))).
 				'))'.
 			')';
 		}

@@ -570,7 +570,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		return new CZabbixClient('localhost', self::getConfigurationValue($component, 'ListenPort', 10051),
-				ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 	}
 

@@ -235,9 +235,14 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['from']['interface'] = 'interface hi';
+			$sqlParts['left_join']['interface'] = [
+				'from' => 'interface hi',
+				'on' => 'h.hostid=hi.hostid'
+			];
+
+			$sqlParts['left_table'] = $this->tableName();
+
 			$sqlParts['where'][] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
-			$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 		}
 
 		// itemids
@@ -453,8 +458,12 @@ class CHost extends CHostGeneral {
 			zbx_db_search('hosts h', $options, $sqlParts);
 
 			if (zbx_db_search('interface hi', $options, $sqlParts)) {
-				$sqlParts['from']['interface'] = 'interface hi';
-				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
+				$sqlParts['left_join']['interface'] = [
+					'from' => 'interface hi',
+					'on' => 'h.hostid=hi.hostid'
+				];
+
+				$sqlParts['left_table'] = $this->tableName();
 			}
 		}
 
@@ -480,8 +489,12 @@ class CHost extends CHostGeneral {
 			$this->dbFilter('hosts h', $options, $sqlParts);
 
 			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
-				$sqlParts['from']['interface'] = 'interface hi';
-				$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
+				$sqlParts['left_join']['interface'] = [
+					'from' => 'interface hi',
+					'on' => 'h.hostid=hi.hostid'
+				];
+
+				$sqlParts['left_table'] = $this->tableName();
 			}
 		}
 
@@ -2039,8 +2052,9 @@ class CHost extends CHostGeneral {
 		$host_names = [];
 
 		foreach ($hosts as $host) {
-			if (!array_key_exists('interfaces', $host) || !is_array($host['interfaces']) || !$host['interfaces']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
+			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
+					&& !is_array($host['interfaces'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (array_key_exists('status', $host)) {
@@ -2231,10 +2245,9 @@ class CHost extends CHostGeneral {
 			$update_discovered_validator->setObjectName($host_name);
 			$this->checkPartialValidator($host, $update_discovered_validator, $db_host);
 
-			if (array_key_exists('interfaces', $host)) {
-				if (!is_array($host['interfaces']) || !$host['interfaces']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%1$s".', $host['host']));
-				}
+			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
+					&& !is_array($host['interfaces'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if (array_key_exists('host', $host)) {

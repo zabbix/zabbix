@@ -94,7 +94,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 	protected function doAction() {
 		$db_defaults = DB::getDefaults('users');
-		$config = select_config();
 
 		$data = [
 			'userid' => 0,
@@ -114,14 +113,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'medias' => [],
 			'new_media' => [],
 			'type' => $db_defaults['type'],
-			'config' => [
-				'severity_name_0' => $config['severity_name_0'],
-				'severity_name_1' => $config['severity_name_1'],
-				'severity_name_2' => $config['severity_name_2'],
-				'severity_name_3' => $config['severity_name_3'],
-				'severity_name_4' => $config['severity_name_4'],
-				'severity_name_5' => $config['severity_name_5']
-			],
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),

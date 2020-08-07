@@ -909,7 +909,7 @@ static int	housekeeping_cleanup(void)
 	/* assemble list of tables included in the housekeeping procedure */
 	for (table = hk_cleanup_tables; NULL != table->name; table++)
 	{
-		if (ZBX_HK_MODE_REGULAR != *table->poption_mode || ZBX_HK_OPTION_ENABLED == *table->poption_global)
+		if (ZBX_HK_MODE_REGULAR != *table->poption_mode)
 			continue;
 
 		table_name_esc = DBdyn_escape_string(table->name);

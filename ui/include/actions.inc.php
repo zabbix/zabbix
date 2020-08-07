@@ -94,12 +94,10 @@ function discovery_object2str($object = null) {
  * @param array $actions							array of actions
  * @param array $action['filter']					array containing arrays of action conditions and other data
  * @param array $action['filter']['conditions']		array of action conditions
- * @param array $config								array containing configuration parameters for getting trigger
- *													severity names
  *
  * @return array									returns an array of actions condition string values
  */
-function actionConditionValueToString(array $actions, array $config) {
+function actionConditionValueToString(array $actions) {
 	$result = [];
 
 	$groupIds = [];
@@ -158,7 +156,7 @@ function actionConditionValueToString(array $actions, array $config) {
 					break;
 
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-					$result[$i][$j] = getSeverityName($condition['value'], $config);
+					$result[$i][$j] = getSeverityName($condition['value']);
 					break;
 
 				case CONDITION_TYPE_DRULE:
@@ -1663,14 +1661,13 @@ function getEventUpdates(array $event) {
  * @param array  $actions['actions']     Actions icon data.
  * @param array  $mediatypes             Mediatypes with maxattempts value and name.
  * @param array  $users                  User name, surname and alias.
- * @param array  $config                 Zabbix config.
  *
  * @return CCol|string
  */
-function makeEventActionsIcons($eventid, $actions, $mediatypes, $users, $config) {
+function makeEventActionsIcons($eventid, $actions, $mediatypes, $users) {
 	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
-	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users, $config);
-	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $users, $mediatypes, $config);
+	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users);
+	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $users, $mediatypes);
 
 	$action_icons = [];
 	if ($messages_icon !== null) {
@@ -1747,11 +1744,10 @@ function makeEventMessagesIcon(array $data, array $users) {
  * @param string $data['current_severity']              Current severity.
  * @param int    $data['count']                         Total number of severity changes.
  * @param array  $users                                 User name, surname and alias.
- * @param array  $config                                Zabbix config.
  *
  * @return CSpan|null
  */
-function makeEventSeverityChangesIcon(array $data, array $users, array $config) {
+function makeEventSeverityChangesIcon(array $data, array $users) {
 	$total = $data['count'];
 
 	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Severity changes')]);
@@ -1763,8 +1759,8 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 		$severity['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		// severity changes
-		$old_severity_name = getSeverityName($severity['old_severity'], $config);
-		$new_severity_name = getSeverityName($severity['new_severity'], $config);
+		$old_severity_name = getSeverityName($severity['old_severity']);
+		$new_severity_name = getSeverityName($severity['new_severity']);
 
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']),
@@ -1824,11 +1820,10 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
  * @param array  $users                             User name, surname and alias.
  * @param array  $mediatypes                        Mediatypes with maxattempts value and name.
  * @param string $mediatypes[]['name']              Mediatype name.
- * @param array  $config                            Zabbix config.
  *
  * @return CSpan|null
  */
-function makeEventActionsIcon(array $data, array $users, array $mediatypes, array $config) {
+function makeEventActionsIcon(array $data, array $users, array $mediatypes) {
 	// Number of meaningful actions.
 	$total = $data['count'];
 	// Number of all action entries.
@@ -1860,7 +1855,7 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
-			makeActionTableIcon($action, $config),
+			makeActionTableIcon($action),
 			$message,
 			makeActionTableStatus($action),
 			makeActionTableInfo($action, $mediatypes)
@@ -1913,11 +1908,10 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
  * @param string $data['actions'][]['acknowledgeid']  Problem update action that was reason for alert (only for ZBX_EVENT_HISTORY_ALERT).
  * @param array  $users                               User name, surname and alias.
  * @param array  $mediatypes                          Mediatypes with maxattempts value.
- * @param array  $config                              Zabbix config.
  *
  * @return CTableInfo
  */
-function makeEventDetailsActionsTable(array $data, array $users, array $mediatypes, array $config) {
+function makeEventDetailsActionsTable(array $data, array $users, array $mediatypes) {
 	$table = (new CTableInfo())->setHeader([
 		_('Step'), _('Time'), _('User/Recipient'), _('Action'), _('Message/Command'), _('Status'), _('Info')
 	]);
@@ -1947,7 +1941,7 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 			$esc_step,
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeEventDetailsTableUser($action, $users),
-			makeActionTableIcon($action, $config),
+			makeActionTableIcon($action),
 			$message,
 			makeActionTableStatus($action),
 			makeActionTableInfo($action, $mediatypes)
@@ -1964,11 +1958,10 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
  * @param string $actions[]['clock']        Time, when action was performed.
  * @param string $actions[]['message']      Message sent by alert, or written by manual update, or remote command text.
  * @param array  $users                     User name, surname and alias.
- * @param array  $config                    Zabbix config.
  *
  * @return CTable
  */
-function makeEventHistoryTable(array $actions, array $users, array $config) {
+function makeEventHistoryTable(array $actions, array $users) {
 	$table = (new CTable())
 		->addStyle('width: 100%;')
 		->setHeader([_('Time'), _('User'), _('User action'), _('Message')]);
@@ -1980,7 +1973,7 @@ function makeEventHistoryTable(array $actions, array $users, array $config) {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $action['clock']),
 			makeActionTableUser($action, $users),
-			makeActionTableIcon($action, $config),
+			makeActionTableIcon($action),
 			(new CCol(zbx_nl2br($action['message'])))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK)
 		]);
 	}
@@ -2048,11 +2041,10 @@ function makeEventDetailsTableUser(array $action, array $users) {
  * @param int    $action['old_severity']  Severity before problem update. (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE)
  * @param int    $action['new_severity']  Severity after problem update. (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE)
  * @param int    $action['alerttype']     Type of alert. (only for ZBX_EVENT_HISTORY_ALERT)
- * @param array  $config                  Zabbix config.
  *
  * @return CSpan
  */
-function makeActionTableIcon(array $action, array $config) {
+function makeActionTableIcon(array $action) {
 	switch ($action['action_type']) {
 		case ZBX_EVENT_HISTORY_PROBLEM_EVENT:
 			return makeActionIcon(['icon' => ZBX_STYLE_PROBLEM_GENERATED, 'title' => _('Problem created')]);
@@ -2087,8 +2079,8 @@ function makeActionTableIcon(array $action, array $config) {
 					? ZBX_STYLE_ACTION_ICON_SEV_UP
 					: ZBX_STYLE_ACTION_ICON_SEV_DOWN;
 
-				$old_severity_name = getSeverityName($action['old_severity'], $config);
-				$new_severity_name = getSeverityName($action['new_severity'], $config);
+				$old_severity_name = getSeverityName($action['old_severity']);
+				$new_severity_name = getSeverityName($action['new_severity']);
 				$hint = $old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name;
 
 				$action_icons[] = makeActionIcon(['icon' => $action_type, 'hint' => $hint]);
