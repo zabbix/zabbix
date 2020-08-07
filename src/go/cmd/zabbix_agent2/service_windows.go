@@ -217,7 +217,9 @@ func handleWindowsService(conf string) error {
 		os.Exit(0)
 	}
 
-	go runService()
+	if winServiceRun {
+		go runService()
+	}
 
 	return nil
 }
@@ -407,13 +409,14 @@ func waitServiceClose() {
 
 func sendServiceStop() {
 	if winServiceRun {
+		winServiceWg.Add(1)
 		stopChan <- true
 	}
 }
 
 func runService() {
 	if err := svc.Run(serviceName, &winService{}); err != nil {
-		//TODO: Log and stop service if started  and agent
+		fatalExit("use foreground option to run Zabbix agent as console application", err)
 		return
 	}
 }
@@ -444,7 +447,6 @@ loop:
 				closeChan <- true
 				winServiceWg.Wait()
 				changes <- svc.Status{State: svc.Stopped}
-				log.Warningf("win service stopped")
 				closeChan <- true
 				break loop
 			default:
@@ -452,7 +454,6 @@ loop:
 			}
 		case <-stopChan:
 			changes <- svc.Status{State: svc.StopPending}
-			winServiceWg.Add(1)
 			winServiceWg.Wait()
 			changes <- svc.Status{State: svc.Stopped}
 			closeChan <- true
