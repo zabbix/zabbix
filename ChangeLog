@@ -1819,6 +1819,8 @@ Changes for 4.0.24rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-17468] fixed excess audit log record being added on host status update (talbergs)
+A......... [ZBX-18076] fixed PHP notice and multiple undefined index errors in hostinterface API (miks)
 ..F....... [ZBX-18000] added red label for disabled media types in user profile (rlataria)
 A......... [ZBX-18075] fixed runtime error when creating a host via API (agriscenko)
 ..F....... [ZBX-15927] removed problem calculation for dependent triggers when master trigger is in problem state (kustalovs)
