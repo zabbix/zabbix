@@ -43,22 +43,29 @@ $table->setHeader([
 	(new CColHeader(_('Web')))
 ]);
 
+$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
+
 foreach ($data['hosts'] as $hostid => $host) {
 	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 
 	$interface = null;
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		$host_interfaces = array_filter($host['interfaces'], function($host_interface) use($interface_type) {
-			return $host_interface['type'] == $interface_type;
-		});
-		if ($host_interfaces) {
-			$interface = reset($host_interfaces);
-			break;
+	if ($host['interfaces']) {
+		foreach ($interface_types as $interface_type) {
+			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
+				return ($host_interface['type'] == $interface_type);
+			});
+			if ($host_interfaces) {
+				$interface = reset($host_interfaces);
+				break;
+			}
 		}
 	}
 
-	$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-	$host_interface .= $interface['port'] ? NAME_DELIMITER.$interface['port'] : '';
+	$host_interface = '';
+	if ($interface !== null) {
+		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
+		$host_interface .= $interface['port'] ? NAME_DELIMITER.$interface['port'] : '';
+	}
 
 	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
 

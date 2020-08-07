@@ -63,9 +63,77 @@ class testHost extends CAPITest {
 		];
 	}
 
+	public static function host_create() {
+		return [
+			[
+				'request' => [
+					'groups' => ['5'],
+					'host' => 'new host 1'
+				],
+				'expected_error' => "Incorrect value for field \"groups\": the parameter \"groupid\" is missing."
+			],
+			[
+				'request' => [
+					'groups' => [
+						'groupid' => 4
+					],
+					'host' => 'new host 2'
+				],
+				'expected_error' => null
+			],
+			[
+				'request' => [
+					'groups' => [
+						'groupid' => 4
+					],
+					'host' => 'new host 3',
+					'interfaces' => []
+				],
+				'expected_error' => null
+			],
+			[
+				'request' => [
+					'groups' => [
+						'groupid' => 4
+					],
+					'host' => 'new host 4',
+					'interfaces' => ''
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			[
+				'request' => [
+					'groups' => [
+						'groupid' => 4
+					],
+					'host' => 'new host 5',
+					'interfaces' => 'string'
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			[
+				'request' => [
+					'groups' => [
+						'groupid' => 4
+					],
+					'host' => 'new host 6',
+					'interfaces' => 10
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			]
+		];
+	}
+
 	/**
-	* @dataProvider host_delete
-	*/
+	 * @dataProvider host_create
+	 */
+	public function testHost_Create($request, $expected_error) {
+		$this->call('host.create', $request, $expected_error);
+	}
+
+	/**
+	 * @dataProvider host_delete
+	 */
 	public function testHost_Delete($hostids, $expected_error) {
 		$result = $this->call('host.delete', $hostids, $expected_error);
 

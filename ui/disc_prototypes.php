@@ -1204,6 +1204,16 @@ if (isset($_REQUEST['form'])) {
 	$data['preprocessing_types'] = CItemPrototype::$supported_preprocessing_types;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
+	$data['display_interfaces'] = $data['hostid']
+		? (bool) API::Host()->get([
+			'countOutput' => true,
+			'hostids' => $data['hostid'],
+			'filter' => [
+				'status' => [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]
+			]
+		])
+		: false;
+
 	$history_in_seconds = timeUnitToSeconds($data['history']);
 	if (!getRequest('form_refresh') && $history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
 		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_OFF);
