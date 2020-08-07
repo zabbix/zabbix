@@ -1471,6 +1471,9 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
 	}
 
+	$data['display_interfaces'] = ($data['host']['status'] == HOST_STATUS_MONITORED
+			|| $data['host']['status'] == HOST_STATUS_NOT_MONITORED);
+
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
 		['field' => 'main', 'order' => ZBX_SORT_DOWN]
@@ -1537,7 +1540,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	unset($step);
 
 	$data['displayApplications'] = true;
-	$data['displayInterfaces'] = true;
+	$data['display_interfaces'] = true;
 	$data['displayMasteritems'] = true;
 
 	if ($data['headers']) {
@@ -1567,7 +1570,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 	if ($hostCount > 1) {
 		$data['displayApplications'] = false;
-		$data['displayInterfaces'] = false;
+		$data['display_interfaces'] = false;
 		$data['displayMasteritems'] = false;
 	}
 	else {
@@ -1579,7 +1582,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		$templateCount = count($templates);
 
 		if ($templateCount != 0) {
-			$data['displayInterfaces'] = false;
+			$data['display_interfaces'] = false;
 
 			if ($templateCount == 1 && $data['hostid'] == 0) {
 				// If selected from filter without 'hostid'.
@@ -1597,7 +1600,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 			}
 		}
 
-		if ($hostCount == 1 && $data['displayInterfaces']) {
+		if ($hostCount == 1 && $data['display_interfaces']) {
 			$data['hosts'] = reset($data['hosts']);
 
 			// Sort interfaces to be listed starting with one selected as 'main'.

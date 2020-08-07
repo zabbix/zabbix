@@ -754,6 +754,8 @@ if (hasRequest('form')) {
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
+	$data['display_interfaces'] = ($host['status'] == HOST_STATUS_MONITORED
+			|| $host['status'] == HOST_STATUS_NOT_MONITORED);
 
 	if (!hasRequest('form_refresh')) {
 		foreach ($data['preprocessing'] as &$step) {

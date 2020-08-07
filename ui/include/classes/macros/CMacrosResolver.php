@@ -2339,19 +2339,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					case 'HOST.IP':
 					case 'IPADDRESS': // deprecated
-						if ($host) {
+						if ($host && $host['interface']) {
 							$matched_macro['value'] = $host['interface']['ip'];
 						}
 						break;
 
 					case 'HOST.DNS':
-						if ($host) {
+						if ($host && $host['interface']) {
 							$matched_macro['value'] = $host['interface']['dns'];
 						}
 						break;
 
 					case 'HOST.CONN':
-						if ($host) {
+						if ($host && $host['interface']) {
 							$matched_macro['value'] = $host['interface']['conn'];
 						}
 						break;

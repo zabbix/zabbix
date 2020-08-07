@@ -419,7 +419,7 @@ $form_list
 	);
 
 // Append interface(s) to form list.
-if ($data['interfaces']) {
+if ($data['display_interfaces']) {
 	if ($discovered_item) {
 		if ($data['interfaceid'] != 0) {
 			$data['interfaces'] = zbx_toHash($data['interfaces'], 'interfaceid');
