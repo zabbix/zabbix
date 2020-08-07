@@ -110,7 +110,8 @@ abstract class CControllerLatest extends CController {
 
 		$applications = [];
 
-		$items = [];
+		$select_hosts = [];
+		$select_items = [];
 
 		foreach ($hosts as $hostid => $host) {
 			if ($filter['application'] !== '') {
@@ -126,7 +127,6 @@ abstract class CControllerLatest extends CController {
 				$applications += $host_applications;
 			}
 			else {
-				$host_applications = null;
 				$host_applicationids = null;
 			}
 
@@ -144,23 +144,25 @@ abstract class CControllerLatest extends CController {
 				'preservekeys' => true
 			]);
 
-			$items += $filter['show_without_data']
+			$select_hosts[$hostid] = true;
+
+			$select_items += $filter['show_without_data']
 				? $host_items
 				: Manager::History()->getItemsHavingValues($host_items, ZBX_HISTORY_PERIOD);
 
-			if (count($items) > $config['search_limit']) {
+			if (count($select_items) > $config['search_limit']) {
 				break;
 			}
 		}
 
-		if ($items) {
+		if ($select_items) {
 			// Select items, requesting extended data.
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'units', 'valuemapid', 'description', 'state', 'error'
 				],
 				'selectApplications' => ['applicationid'],
-				'itemids' => array_keys($items),
+				'itemids' => array_keys($select_items),
 				'webitems' => true,
 				'preservekeys' => true
 			]);
@@ -168,7 +170,7 @@ abstract class CControllerLatest extends CController {
 			if ($filter['application'] === '') {
 				$applications = API::Application()->get([
 					'output' => ['applicationid', 'name'],
-					'itemids' => array_keys($items),
+					'hostids' => array_keys($select_hosts),
 					'templated' => false,
 					'preservekeys' => true
 				]);
@@ -245,6 +247,7 @@ abstract class CControllerLatest extends CController {
 			$hosts = [];
 			$applications = [];
 			$applications_size = [];
+			$items = [];
 		}
 
 		if ($filter['hostids']) {
