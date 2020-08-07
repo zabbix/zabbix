@@ -1664,7 +1664,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($items as $key => $item) {
-			$items[$key]['description'] = strtr($items[$key]['description'], $macro_values[$key]);
+			if (array_key_exists($key, $macro_values)) {
+				$items[$key]['description'] = strtr($items[$key]['description'], $macro_values[$key]);
+			}
 		}
 
 		return $items;
