@@ -1,6 +1,7 @@
 Changes for 5.0.3rc1
 
 New features:
+...G...... [ZBXNEXT-6100] add native linux vfs.fs.size[fs,<mode>] metric support to agent2 (esneiders)
 .........T [ZBXNEXT-6010] added template "Template DB Oracle by ODBC" (ychukina)
 .........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
 .......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
@@ -8,6 +9,17 @@ New features:
 ........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+...G...... [ZBX-18214] added collecting of physical CPU utilization data on IBM AIX and modified system.cpu.util[] (Andris)
+...G...... [ZBX-17974] implement timeouts for WMI queries (arimdjonoks)
+..F....... [ZBX-18149] fixed discovered hosts showing links to host prototypes which should not possible (Ivo)
+..F....... [ZBX-18132] added OpenSSL extension check in frontend setup and SAML authentication form (Ivo)
+........S. [ZBX-18169] fixed housekeeper not deleting history and trends for deleted items if storage period is not overridden (vso)
+A.F....... [ZBX-17468] fixed excess audit log record being added on host status update (talbergs)
+...G...... [ZBX-16998] improved agent binary compatibility by removing __thread attribute when not building agent2 (wiper)
+...G...... [ZBX-17815] fixed connection timeout when persistent buffer enabled (asestakovs)
+..F....... [ZBX-18106] fixed map navigation tree widget copying (miks)
+A.F....... [ZBX-18012] fixed undefined index error in history manager and added error message in charts when Elasticsearch requests fails (miks)
+A......... [ZBX-18076] fixed PHP notice in hostinterface API (miks)
 ..F....... [ZBX-18000] added red label for disabled media types in user profile (rlataria)
 ..F....... [ZBX-17996] fixed ip/dns field width in host interface (rlataria)
 A......... [ZBX-18075] fixed runtime error when creating a host via API (agriscenko)

@@ -1,1 +1,0 @@
-........S. [ZBX-18169] fixed housekeeper not deleting history and trends for deleted items if storage period is not overridden (vso)
