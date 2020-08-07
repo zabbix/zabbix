@@ -1,0 +1,1 @@
+...G...... [ZBX-18214] added collecting of physical CPU utilization data on IBM AIX and modified system.cpu.util[] (Andris)
