@@ -148,7 +148,7 @@ class CHousekeeping extends CApiService {
 			'hk_sessions' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_history_mode' =>		['type' => API_INT32, 'in' => '0,1'],
 			'hk_history_global' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_history' =>				['type' => API_TIME_UNIT, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_history' =>				['type' => API_TIME_UNIT, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
 			'hk_trends_mode' =>			['type' => API_INT32, 'in' => '0,1'],
 			'hk_trends_global' =>		['type' => API_INT32, 'in' => '0,1'],
 			'hk_trends' =>				['type' => API_TIME_UNIT, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
