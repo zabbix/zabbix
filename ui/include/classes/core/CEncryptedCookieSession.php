@@ -66,7 +66,7 @@ class CEncryptedCookieSession extends CCookieSession {
 	 */
 	protected function session_start(): bool {
 		if (!$this->checkSessionKey()) {
-			CEncryptHelper::generateKey();
+			CEncryptHelper::updateKey(CEncryptHelper::generateKey());
 		}
 
 		$session_data = $this->parseData();
@@ -92,7 +92,7 @@ class CEncryptedCookieSession extends CCookieSession {
 	 */
 	private function checkSessionKey(): bool {
 		$config = select_config();
-		if (!array_key_exists('session_key', $config) || (string) $config['session_key'] === '') {
+		if ($config['session_key'] === '') {
 			return false;
 		}
 

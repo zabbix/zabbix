@@ -49,7 +49,7 @@ class CEncryptHelper {
 		if (!self::$key) {
 			$config = select_config();
 			// This if contain copy in CEncryptedCookieSession class.
-			if (!array_key_exists('session_key', $config) || (string) $config['session_key'] === '') {
+			if ($config['session_key'] === '') {
 				self::$key = self::generateKey();
 
 				if (!self::updateKey(self::$key)) {
@@ -115,11 +115,10 @@ class CEncryptHelper {
 	 * @return boolean
 	 */
 	public static function updateKey(string $key): bool {
-		$sql = sprintf("update config set session_key='%s' where configid=1", $key);
-		if (!DBexecute($sql)) {
-			return false;
-		}
-
-		return true;
+		return DBexecute(
+			'UPDATE config'.
+			' SET session_key='.zbx_dbstr($key).
+			' WHERE '.dbConditionInt('configid', [1])
+		);
 	}
 }
