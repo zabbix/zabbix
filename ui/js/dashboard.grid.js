@@ -3853,7 +3853,7 @@
 		},
 
 		/**
-		 * Function to store copied widget into storage handler.
+		 * Function to store copied widget into storage buffer.
 		 *
 		 * @param {object} widget  Widget object copied.
 		 *
@@ -3861,6 +3861,11 @@
 		 */
 		copyWidget: function(widget) {
 			return this.each(function() {
+				var $this = $(this),
+					data = $this.data('dashboardGrid');
+
+				doAction('onWidgetCopy', $this, data, widget);
+
 				var w = {
 					type: widget.type,
 					pos: {

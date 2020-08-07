@@ -815,7 +815,7 @@ else {
 	// Select LLD rules.
 	$options = [
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['hostid', 'name', 'status'],
+		'selectHosts' => ['hostid', 'name', 'status', 'flags'],
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
