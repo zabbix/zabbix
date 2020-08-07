@@ -181,7 +181,7 @@ class CPage {
 
 		$cookie_sessionid = '';
 		if (self::$cookie !== null) {
-			$cookie = unserialize(base64_decode(self::$cookie));
+			$cookie = unserialize(base64_decode(self::$cookie['value']));
 			$cookie_sessionid = $cookie['sessionid'];
 		}
 
