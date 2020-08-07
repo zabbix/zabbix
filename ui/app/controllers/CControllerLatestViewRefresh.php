@@ -85,7 +85,13 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order,
 			'view_curl' => $view_curl,
-			'paging' => $paging
+			'paging' => $paging,
+			'config' => [
+				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
+				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
+			]
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

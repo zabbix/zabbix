@@ -80,7 +80,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			$problems_div->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
 				->addClass(getSeverityStatusStyle($severity))
-				->setAttribute('title', getSeverityName($severity, $data['config']))
+				->setAttribute('title', getSeverityName($severity))
 			);
 		}
 	}

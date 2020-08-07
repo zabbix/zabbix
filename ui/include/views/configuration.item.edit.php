@@ -664,8 +664,8 @@ $form_list->addRow(_('Custom intervals'),
 
 // Append history storage to form list.
 $keep_history_hint = null;
-if ($data['config']['hk_history_global']
-		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
+if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MONITORED
+			|| $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
 		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'housekeeping.edit')
@@ -700,8 +700,8 @@ $form_list->addRow((new CLabel(_('History storage period'), 'history'))->setAste
 
 // Append trend storage to form list.
 $keep_trend_hint = null;
-if ($data['config']['hk_trends_global']
-		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
+if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONITORED
+			|| $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
 		? (new CLink(_x('global housekeeping settings', 'item_form'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'housekeeping.edit')

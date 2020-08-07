@@ -75,8 +75,6 @@ else {
 
 // Latest data rows.
 
-$config = select_config();
-
 $simple_interval_parser = new CSimpleIntervalParser();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
@@ -155,9 +153,9 @@ foreach ($data['rows'] as $row) {
 
 	// Other row data preparation.
 
-	if ($config['hk_history_global']) {
-		$keep_history = timeUnitToSeconds($config['hk_history']);
-		$item_history = $config['hk_history'];
+	if ($data['config']['hk_history_global']) {
+		$keep_history = timeUnitToSeconds($data['config']['hk_history']);
+		$item_history = $data['config']['hk_history'];
 	}
 	elseif ($simple_interval_parser->parse($item['history']) == CParser::PARSE_SUCCESS) {
 		$keep_history = timeUnitToSeconds($item['history']);
@@ -169,9 +167,9 @@ foreach ($data['rows'] as $row) {
 	}
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		if ($config['hk_trends_global']) {
-			$keep_trends = timeUnitToSeconds($config['hk_trends']);
-			$item_trends = $config['hk_trends'];
+		if ($data['config']['hk_trends_global']) {
+			$keep_trends = timeUnitToSeconds($data['config']['hk_trends']);
+			$item_trends = $data['config']['hk_trends'];
 		}
 		elseif ($simple_interval_parser->parse($item['trends']) == CParser::PARSE_SUCCESS) {
 			$keep_trends = timeUnitToSeconds($item['trends']);

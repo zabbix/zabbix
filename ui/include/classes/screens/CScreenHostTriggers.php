@@ -160,8 +160,6 @@ class CScreenHostTriggers extends CScreenBase {
 	 * @param string  $filter['sortorder']  Sort order.
 	 */
 	protected function getProblemsListTable(array $filter) {
-		$config = select_config();
-
 		// If no hostids and groupids defined show recent problems.
 		if ($filter['hostids'] === null && $filter['groupids'] === null) {
 			$filter['show'] = TRIGGERS_OPTION_RECENT_PROBLEM;
@@ -176,7 +174,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'sort_order' => ZBX_SORT_DOWN
 		];
 
-		$data = CScreenProblem::getData($filter, $config, true, true);
+		$data = CScreenProblem::getData($filter, true, true);
 
 		$header = [
 			'hostname' => _('Host'),
@@ -193,16 +191,13 @@ class CScreenHostTriggers extends CScreenBase {
 				(new CDiv())->addClass(($sort_order === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP)
 			];
 
-			$data = CScreenProblem::sortData($data, $config, $sort_field === 'hostname' ? 'host' : $sort_field,
+			$data = CScreenProblem::sortData($data, $sort_field === 'hostname' ? 'host' : $sort_field,
 				$sort_order
 			);
 		}
 
-		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
-			min($filter['limit'], count($data['problems'])),
-			(count($data['problems']) > $config['search_limit']) ? '+' : '',
-			min($config['search_limit'], count($data['problems']))
-		);
+		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown', min($filter['limit'], count($data['problems'])), (count($data['problems']) > $search_limit) ? '+' : '', min($search_limit, count($data['problems'])));
 		$data['problems'] = array_slice($data['problems'], 0, $filter['limit'], true);
 		$data = CScreenProblem::makeData($data, $filter, true, true);
 
@@ -275,9 +270,7 @@ class CScreenHostTriggers extends CScreenBase {
 				zbx_date2age($problem['clock']),
 				makeInformationList($info_icons),
 				$problem_update_link,
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'],
-					$config
-				)
+				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'])
 			]);
 		}
 

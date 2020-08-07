@@ -126,7 +126,6 @@ class ZBase {
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
 		require_once 'include/validate.inc.php';
-		require_once 'include/profiles.inc.php';
 		require_once 'include/locales.inc.php';
 		require_once 'include/db.inc.php';
 
@@ -171,12 +170,11 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initDB();
 
-				$config = select_config();
-				$this->initLocales($config['default_lang']);
+				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
 
 				$this->authenticateUser();
 
-				if (CWebUser::$data['lang'] !== $config['default_lang']) {
+				if (CWebUser::$data['lang'] !== CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)) {
 					$this->initLocales(CWebUser::$data['lang']);
 				}
 
@@ -568,7 +566,11 @@ class ZBase {
 				'javascript' => [
 					'files' => []
 				],
-				'web_layout_mode' => ZBX_LAYOUT_NORMAL
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL,
+				'config' => [
+					'server_check_interval' => CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL),
+					'x_frame_options' => CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS)
+				]
 			];
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {

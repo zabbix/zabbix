@@ -864,9 +864,8 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = false;
-	$config = select_config();
 
-	if ($config['compression_status']) {
+	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
 		$error_message = _('History cleanup is not supported if compression is enabled');
 	}
 	else {
@@ -1278,9 +1277,8 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
 	$result = false;
-	$config = select_config();
 
-	if ($config['compression_status']) {
+	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
 		$error_message = _('History cleanup is not supported if compression is enabled');
 	}
 	else {
@@ -1447,7 +1445,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 
 	$data = getItemFormData($item);
 	$data['inventory_link'] = getRequest('inventory_link');
-	$data['config'] = select_config();
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
 	$data['preprocessing_types'] = CItem::$supported_preprocessing_types;
@@ -1482,6 +1479,14 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
 	}
+
+	$data['config'] = [
+		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS),
+		'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL),
+		'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+		'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
+	];
 
 	// render view
 	if (!$has_errors) {
@@ -1715,7 +1720,6 @@ else {
 		'form' => getRequest('form'),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => select_config(),
 		'hostid' => $hostid,
 		'is_template' => true
 	];
@@ -1734,7 +1738,7 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
 		'sortfield' => $sortField,
-		'limit' => $data['config']['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	$preFilter = count($options, COUNT_RECURSIVE);
 
@@ -2040,6 +2044,10 @@ else {
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
+
+	$data['config'] = [
+		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
+	];
 
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();
