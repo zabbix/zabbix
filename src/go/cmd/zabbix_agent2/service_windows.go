@@ -432,6 +432,8 @@ func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes
 		changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop | svc.AcceptShutdown}
 	case <-fatalStopChan:
 		changes <- svc.Status{State: svc.Stopped}
+		// This is needed to make sure that windows will receive the status stopped before zabbix agent 2 process ends
+		<-time.After(time.Millisecond * 500)
 		fatalStopWg.Done()
 		return
 	}
@@ -447,6 +449,8 @@ loop:
 				closeChan <- true
 				winServiceWg.Wait()
 				changes <- svc.Status{State: svc.Stopped}
+				// This is needed to make sure that windows will receive the status stopped before zabbix agent 2 process ends
+				<-time.After(time.Millisecond * 500)
 				closeChan <- true
 				break loop
 			default:
@@ -456,6 +460,8 @@ loop:
 			changes <- svc.Status{State: svc.StopPending}
 			winServiceWg.Wait()
 			changes <- svc.Status{State: svc.Stopped}
+			// This is needed to make sure that windows will receive the status stopped before zabbix agent 2 process ends
+			<-time.After(time.Millisecond * 500)
 			closeChan <- true
 			break loop
 		}
