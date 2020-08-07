@@ -40,3 +40,5 @@ func validateExclusiveFlags() error { return nil }
 func handleWindowsService(conf string) error { return nil }
 
 func waitServiceClose() {}
+
+func sendServiceStop() {}

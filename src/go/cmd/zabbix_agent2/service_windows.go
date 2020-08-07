@@ -165,7 +165,7 @@ func validateExclusiveFlags() error {
 		}
 	}
 
-	if svcMultipleAgentFlag && count == 0 || svcMultipleAgentFlag && !winServiceRun {
+	if svcMultipleAgentFlag && count == 0 && !winServiceRun {
 		return errors.New("multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information")
 	}
 
@@ -405,6 +405,12 @@ func waitServiceClose() {
 	}
 }
 
+func sendServiceStop() {
+	if winServiceRun {
+		stopChan <- true
+	}
+}
+
 func runService() {
 	if err := svc.Run(serviceName, &winService{}); err != nil {
 		//TODO: Log and stop service if started  and agent
@@ -422,26 +428,37 @@ func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes
 	case <-startChan:
 		changes <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop | svc.AcceptShutdown}
 	case <-fatalStopChan:
-		changes <- svc.Status{State: svc.StopPending}
+		changes <- svc.Status{State: svc.Stopped}
 		fatalStopWg.Done()
 		return
 	}
 
 loop:
 	for {
-		c := <-r
-		switch c.Cmd {
-		case svc.Stop, svc.Shutdown:
+		select {
+		case c := <-r:
+			switch c.Cmd {
+			case svc.Stop, svc.Shutdown:
+				changes <- svc.Status{State: svc.StopPending}
+				winServiceWg.Add(1)
+				closeChan <- true
+				winServiceWg.Wait()
+				changes <- svc.Status{State: svc.Stopped}
+				log.Warningf("win service stopped")
+				closeChan <- true
+				break loop
+			default:
+				log.Warningf("unsupported windows service command recieved")
+			}
+		case <-stopChan:
+			changes <- svc.Status{State: svc.StopPending}
+			winServiceWg.Add(1)
+			winServiceWg.Wait()
+			changes <- svc.Status{State: svc.Stopped}
+			closeChan <- true
 			break loop
-		default:
-			log.Warningf("unsupported windows service command recieved")
 		}
 	}
 
-	winServiceWg.Add(1)
-	closeChan <- true
-	winServiceWg.Wait()
-	changes <- svc.Status{State: svc.StopPending}
-	closeChan <- true
 	return
 }

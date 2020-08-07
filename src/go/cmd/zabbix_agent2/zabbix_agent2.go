@@ -51,6 +51,7 @@ var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
 var closeChan = make(chan bool)
+var stopChan = make(chan bool)
 
 func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
 	if len(params) != 2 {
@@ -140,6 +141,7 @@ loop:
 		case sig := <-sigs:
 			switch sig {
 			case syscall.SIGINT, syscall.SIGTERM:
+				sendServiceStop()
 				break loop
 			}
 		case client := <-control.Client():
@@ -148,6 +150,7 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
+			sendServiceStop()
 			client.Close()
 		case serviceStop := <-closeChan:
 			if serviceStop {
