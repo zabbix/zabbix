@@ -1640,7 +1640,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @return array  $items
 	 */
-	public function resolveItemDescriptions(array $items, $test = null): array {
+	public function resolveItemDescriptions(array $items): array {
 		$types = ['usermacros' => true];
 		$macro_values = [];
 		$usermacros = [];
@@ -1653,11 +1653,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		if ($test === null) {
-			$test = $this->getUserMacros($usermacros);
-		}
-
-		foreach ($test as $key => $usermacros_data) {
+		foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
 			$macro_values[$key] = array_key_exists($key, $macro_values)
 				? array_merge($macro_values[$key], $usermacros_data['macros'])
 				: $usermacros_data['macros'];
