@@ -1,0 +1,1 @@
+...G...... [ZBX-16998] improved agent binary compatibility by removing __thread attribute when not building agent2 (wiper)
