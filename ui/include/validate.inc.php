@@ -372,7 +372,7 @@ function invalid_url($msg = null) {
 
 	// Rollback reset messages.
 	foreach ($messages_backup as $message) {
-		CMessageHelper::addMessage($messages);
+		CMessageHelper::addMessage($message);
 	}
 
 	unset_all();
