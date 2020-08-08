@@ -61,24 +61,20 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select o.lld_override_operationid,ot.tag,ot.value"
-			" from lld_override_operation o"
-			" left join lld_override_optag ot"
-				" on o.lld_override_operationid=ot.lld_override_operationid"
-			" where");
+			" from lld_override_operation o,lld_override_optag ot"
+			" where o.lld_override_operationid=ot.lld_override_operationid"
+			" and");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
 	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and operationobject in (%d,%d)",
 			ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER, ZBX_LLD_OVERRIDE_OP_OBJECT_HOST);
-	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_overrideid,o.lld_override_operationid");
+	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
 	result = DBselect("%s", *sql);
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	override_operationid;
 		zbx_db_tag_t	*tag;
-
-		if (SUCCEED == DBis_null(row[2]))
-			continue;
 
 		ZBX_STR2UINT64(override_operationid, row[0]);
 		if (NULL == op || op->override_operationid != override_operationid)
@@ -129,23 +125,19 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
 
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset,
 			"select o.lld_override_operationid,ot.templateid"
-			" from lld_override_operation o"
-			" left join lld_override_optemplate ot"
-				" on o.lld_override_operationid=ot.lld_override_operationid"
-			" where");
+			" from lld_override_operation o,lld_override_optemplate ot"
+			" where o.lld_override_operationid=ot.lld_override_operationid"
+			" and");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
 	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and operationobject=%d",
 			ZBX_LLD_OVERRIDE_OP_OBJECT_HOST);
-	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_overrideid,o.lld_override_operationid");
+	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
 	result = DBselect("%s", *sql);
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	templateid, override_operationid;
-
-		if (SUCCEED == DBis_null(row[1]))
-			continue;
 
 		ZBX_STR2UINT64(override_operationid, row[0]);
 		if (NULL == op || op->override_operationid != override_operationid)
@@ -220,7 +212,7 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 			" where");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
-	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_overrideid");
+	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
 	result = DBselect("%s", *sql);
 	while (NULL != (row = DBfetch(result)))

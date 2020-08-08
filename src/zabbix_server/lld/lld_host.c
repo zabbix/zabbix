@@ -251,8 +251,79 @@ typedef struct
 }
 zbx_lld_group_rights_t;
 
-static void	lld_host_add_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
-		const zbx_vector_ptr_t *lld_macros);
+static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
+		const zbx_vector_ptr_t *lld_macros, char **info);
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_hosts_get_tags                                               *
+ *                                                                            *
+ * Purpose: retrieves tags of the existing hosts                              *
+ *                                                                            *
+ * Parameters: hosts - [IN/OUT] list of hosts                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
+{
+	zbx_vector_uint64_t	hostids;
+	int			i;
+	zbx_lld_host_t		*host;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		hostid;
+	zbx_db_tag_t		*tag;
+
+	zbx_vector_ptr_sort(hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_uint64_create(&hostids);
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+		zbx_vector_uint64_append(&hostids, host->hostid);
+	}
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hosttagid,hostid,tag,value from host_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
+
+	result = DBselect("%s", sql);
+
+	i = 0;
+	host = (zbx_lld_host_t *)hosts->values[i];
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[1]);
+		while (hostid != host->hostid)
+		{
+			if (++i == hosts->values_num)
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out;
+			}
+			host = (zbx_lld_host_t *)hosts->values[i];
+		}
+
+		tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+		ZBX_STR2UINT64(tag->tagid, row[0]);
+		tag->tag = zbx_strdup(NULL, row[2]);
+		tag->value = zbx_strdup(NULL, row[3]);
+		tag->flags = 0;
+		zbx_vector_db_tag_ptr_append(&host->tags, tag);
+	}
+out:
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+		zbx_vector_db_tag_ptr_sort(&host->tags, zbx_db_tag_compare_func);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&hostids);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -269,10 +340,10 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
 		const char *tls_subject, const char *tls_psk_identity, const char *tls_psk)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_lld_host_t	*host;
-	zbx_uint64_t	db_proxy_hostid;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_lld_host_t		*host;
+	zbx_uint64_t		db_proxy_hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -631,12 +702,13 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
-		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros)
+		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros,
+		char **info)
 {
 	char			*buffer = NULL;
 	int			i;
 	zbx_lld_host_t		*host;
-	zbx_vector_db_tag_ptr_t	tags;
+	zbx_vector_db_tag_ptr_t	tmp_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -655,7 +727,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 			break;
 	}
 
-	zbx_vector_db_tag_ptr_create(&tags);
+	zbx_vector_db_tag_ptr_create(&tmp_tags);
 
 	if (i == hosts->values_num)	/* no host found */
 	{
@@ -675,8 +747,8 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 		zbx_vector_uint64_create(&host->lnk_templateids);
 
-		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, &tags,
-				&host->status, &discover_proto);
+		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode,
+				&tmp_tags, &host->status, &discover_proto);
 
 		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
 		{
@@ -715,7 +787,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 		host->inventory_mode = inventory_mode_proto;
 
-		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, &tags,
+		lld_override_host(&lld_row->overrides, host->host, &host->lnk_templateids, &host->inventory_mode, &tmp_tags,
 				NULL, &discover_proto);
 
 		/* host visible name */
@@ -735,9 +807,14 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	}
 
 	host->jp_row = &lld_row->jp_row;
-	lld_host_add_tags(host, &tags, lld_macros);
+
+	if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+	{
+		zbx_vector_db_tag_ptr_append_array(&tmp_tags, tags->values, tags->values_num);
+		lld_host_update_tags(host, &tmp_tags, lld_macros, info);
+	}
 out:
-	zbx_vector_db_tag_ptr_destroy(&tags);
+	zbx_vector_db_tag_ptr_destroy(&tmp_tags);
 
 	zbx_free(buffer);
 
@@ -1944,7 +2021,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
  *             tags          - [OUT] list of host tags                        *
  *                                                                            *
  ******************************************************************************/
-static void	lld_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr_t *tags)
+static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr_t *tags)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1972,49 +2049,36 @@ static void	lld_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr_t *ta
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 /******************************************************************************
  *                                                                            *
- * Function: lld_tag_make                                                     *
+ * Function: lld_tag_validate_field                                           *
+ *                                                                            *
+ * Purpose: validate host tag field                                           *
+ *                                                                            *
+ * Parameters: name      - [IN] the field name (tag, value)                   *
+ *             field     - [IN] the field value                               *
+ *             field_len - [IN] the field length                              *
+ *             info      - [OUT] error information                            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_tag_make(zbx_vector_db_tag_ptr_t *tags, zbx_uint64_t tagid, const char *name, const char *value)
+static int	lld_tag_validate_field(const char *name, const char *field, size_t field_len, char **info)
 {
-	zbx_db_tag_t	*tag;
-	int		i;
-
-	for (i = 0; i < tags->values_num; i++)
+	if (SUCCEED != zbx_is_utf8(field))
 	{
-		tag = tags->values[i];
+		char	*field_utf8;
 
-		/* check for existing tag */
-		if (0 == tag->tagid && 0 == strcmp(tag->tag, name))
-		{
-			tag->tagid = tagid;
-			if (0 != strcmp(tag->value, value))
-				tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_VALUE;
-			return;
-		}
+		field_utf8 = zbx_strdup(NULL, field);
+		zbx_replace_invalid_utf8(field_utf8);
+		*info = zbx_strdcatf(*info, "Cannot create host tag: %s \"%s\" has invalid UTF-8 sequence.\n",
+				name, field_utf8);
+		zbx_free(field_utf8);
+		return FAIL;
 	}
 
-	/* existing tag not disovered anymore, remove */
-	tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
-	tag->tagid = tagid;
-	tag->tag = NULL;
-	tag->value = NULL;
-	tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
-
-	zbx_vector_db_tag_ptr_append(tags, tag);
-}
-
-static int	lld_tag_validate(const zbx_vector_db_tag_ptr_t *tags, const zbx_db_tag_t *tag)
-{
-	int	i;
-
-	for (i = 0; i < tags->values_num; i++)
+	if (zbx_strlen_utf8(field) > field_len)
 	{
-		if (0 == strcmp(tags->values[i]->tag, tag->tag) && 0 == strcmp(tags->values[i]->value, tag->value))
-			return FAIL;
+		*info = zbx_strdcatf(*info, "Cannot create host tag: %s \"%128s...\" is too long.\n", name, field);
+		return FAIL;
 	}
 
 	return SUCCEED;
@@ -2022,101 +2086,153 @@ static int	lld_tag_validate(const zbx_vector_db_tag_ptr_t *tags, const zbx_db_ta
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_host_add_tags                                                *
+ * Function: lld_tag_validate                                                 *
  *                                                                            *
- * Purpose: Add tags to a host                                                *
+ * Purpose: validate host tag                                                 *
+ *                                                                            *
+ * Parameters: tags     - [IN] the current host tags                          *
+ *             tags_num - [IN] the number of host tags                        *
+ *             name     - [IN] the new tag name                               *
+ *             value    - [IN] the new tag value                              *
+ *             info     - [OUT] error information                             *
  *                                                                            *
  ******************************************************************************/
-static void	lld_host_add_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
-		const zbx_vector_ptr_t *lld_macros)
+static int	lld_tag_validate(zbx_db_tag_t **tags, int tags_num, const char *name, const char *value, char **info)
 {
 	int	i;
 
-	zbx_vector_db_tag_ptr_reserve(&host->tags, host->tags.values_num + tags->values_num);
-
-	for (i = 0; i < tags->values_num; i++)
+	if ('\0' == *name)
 	{
-		zbx_db_tag_t	*tag;
-
-		tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
-
-		tag->tagid = 0;
-		tag->tag = zbx_strdup(NULL, tags->values[i]->tag);
-		tag->value = zbx_strdup(NULL, tags->values[i]->value);
-		tag->flags = 0;
-		substitute_lld_macros(&tag->tag, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
-		substitute_lld_macros(&tag->value, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
-
-		if (SUCCEED == lld_tag_validate(&host->tags, tag))
-			zbx_vector_db_tag_ptr_append(&host->tags, tag);
-		else
-			zbx_db_tag_free(tag);
+		*info = zbx_strdcatf(*info, "Cannot create host tag: empty tag name.\n");
+		return FAIL;
 	}
+
+	if (SUCCEED != lld_tag_validate_field("name", name, TAG_NAME_LEN, info))
+		return FAIL;
+
+	if (SUCCEED != lld_tag_validate_field("value", value, TAG_VALUE_LEN, info))
+		return FAIL;
+
+	for (i = 0; i < tags_num; i++)
+	{
+		if (0 == strcmp(tags[i]->tag, name) && 0 == strcmp(tags[i]->value, value))
+		{
+			*info = zbx_strdcatf(*info, "Cannot create host tag: tag \"%s\",\"%s\" already exists.\n",
+					name, value);
+
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_tags_make                                                    *
+ * Function: lld_host_update_tags                                             *
+ *                                                                            *
+ * Purpose: update host tags                                                  *
+ *                                                                            *
+ * Parameters: host       - [IN] a host with existing tags, sorted by tag +   *
+ *                               value.                                       *
+ *                        - [OUT] a host with updated tags, sorted by tagid   *
+ *             tags       - [IN] the new tags, sorted by tag + value          *
+ *             lld_macros - [IN] a vector of LLD macros                       *
+ *             info       - [OUT] error information                           *
+ *                                                                            *
+ * Comments: No database changes are made if host tags are equal to the new   *
+ *           tags. Otherwise the tags are updated starting with the first not *
+ *           matching tag. If there are more host tags than new tags then the *
+ *           extra host tags are marked for removal. If there are more new    *
+ *           tags than host tags, then new tags are appended to the host tags.*
  *                                                                            *
  ******************************************************************************/
-static void	lld_tags_make(const zbx_vector_db_tag_ptr_t *tags, zbx_vector_ptr_t *hosts,
-		const zbx_vector_ptr_t *lld_macros)
+static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
+		const zbx_vector_ptr_t *lld_macros, char **info)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
 	int			i;
-	zbx_vector_uint64_t	hostids;
-	zbx_uint64_t		tagid, hostid;
-	zbx_lld_host_t		*host;
+	zbx_db_tag_t		*host_tag, *proto_tag;
+	zbx_vector_db_tag_ptr_t	new_tags;
+	char			*tag = NULL, *value = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zbx_vector_db_tag_ptr_create(&new_tags);
 
-	zbx_vector_uint64_create(&hostids);
-
-	for (i = 0; i < hosts->values_num; i++)
+	for (i = 0; i < tags->values_num; i++)
 	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-		lld_host_add_tags((zbx_lld_host_t *)hosts->values[i], tags, lld_macros);
+		proto_tag = (zbx_db_tag_t *)tags->values[i];
 
-		if (0 != host->hostid)
-			zbx_vector_uint64_append(&hostids, host->hostid);
+		tag = zbx_strdup(tag, proto_tag->tag);
+		value = zbx_strdup(value, proto_tag->value);
+		substitute_lld_macros(&tag, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
+		substitute_lld_macros(&value, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
+
+		if (SUCCEED != lld_tag_validate(new_tags.values, new_tags.values_num, tag, value, info))
+			continue;
+
+		proto_tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+		proto_tag->tagid = 0;
+		proto_tag->flags = 0;
+		proto_tag->tag = tag;
+		proto_tag->value = value;
+		zbx_vector_db_tag_ptr_append(&new_tags, proto_tag);
+
+		tag = NULL;
+		value = NULL;
 	}
 
-	if (0 != hostids.values_num)
+	zbx_vector_db_tag_ptr_sort(&new_tags, zbx_db_tag_compare_func);
+
+	zbx_vector_db_tag_ptr_reserve(&host->tags, host->tags.values_num + tags->values_num);
+
+	/* update host tags or flag them for removal */
+	for (i = 0; i < host->tags.values_num; i++)
 	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hosttagid,hostid,tag,value"
-				" from host_tag"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
-
-		result = DBselect("%s", sql);
-
-		zbx_free(sql);
-
-		while (NULL != (row = DBfetch(result)))
+		host_tag = (zbx_db_tag_t *)host->tags.values[i];
+		if (i < new_tags.values_num)
 		{
-			ZBX_STR2UINT64(hostid, row[1]);
+			proto_tag = (zbx_db_tag_t *)new_tags.values[i];
 
-			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (0 != strcmp(host_tag->tag, proto_tag->tag))
 			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
+				host_tag->tag = zbx_strdup(host_tag->tag, proto_tag->tag);
+				host_tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG;
 			}
 
-			host = (zbx_lld_host_t *)hosts->values[i];
-			ZBX_STR2UINT64(tagid, row[0]);
-			lld_tag_make(&host->tags, tagid, row[2], row[3]);
+			if (0 != strcmp(host_tag->value, proto_tag->value))
+			{
+				host_tag->value = zbx_strdup(host_tag->value, proto_tag->value);
+				host_tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_VALUE;
+			}
 		}
-		DBfree_result(result);
+		else
+			host_tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
 	}
 
-	zbx_vector_uint64_destroy(&hostids);
+	/* add missing tags */
+	if (i < new_tags.values_num)
+	{
+		int	j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+		/* set uninitialized properties of new tags that will be moved to host */
+		for (j = i; j < new_tags.values_num; j++)
+		{
+			proto_tag = (zbx_db_tag_t *)new_tags.values[j];
+			proto_tag->tagid = 0;
+			proto_tag->flags = 0;
+		}
+
+		zbx_vector_db_tag_ptr_append_array(&host->tags, new_tags.values + i, new_tags.values_num - i);
+		new_tags.values_num = i;
+	}
+
+	zbx_free(tag);
+	zbx_free(value);
+
+	/* sort existing tags by their ids for update operations */
+	zbx_vector_db_tag_ptr_sort(&host->tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zbx_vector_db_tag_ptr_clear_ext(&new_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&new_tags);
 }
 
 /******************************************************************************
@@ -2861,12 +2977,24 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			}
 			else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 			{
-				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update host_tag set ");
+				char	delim = ' ';
+
+				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update host_tag set");
+
+				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+				{
+					value_esc = DBdyn_escape_string(tag->tag);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%ctag='%s'", delim,
+							value_esc);
+					zbx_free(value_esc);
+					delim = ',';
+				}
 
 				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
 				{
 					value_esc = DBdyn_escape_string(tag->value);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "value='%s'", value_esc);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%cvalue='%s'", delim,
+							value_esc);
 					zbx_free(value_esc);
 				}
 
@@ -3895,19 +4023,22 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 				ipmi_password, tls_connect, tls_accept, tls_issuer, tls_subject,
 				tls_psk_identity, tls_psk);
 
-		lld_simple_groups_get(parent_hostid, &groupids);
+		if (0 != hosts.values_num)
+			lld_hosts_get_tags(&hosts);
+		lld_proto_tags_get(parent_hostid, &tags);
 
+		lld_simple_groups_get(parent_hostid, &groupids);
 		lld_group_prototypes_get(parent_hostid, &group_prototypes);
 		lld_groups_get(parent_hostid, &groups);
+
 		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);
-		lld_tags_get(parent_hostid, &tags);
 
 		for (i = 0; i < lld_rows->values_num; i++)
 		{
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
-					status, discover, lld_row, lld_macro_paths)))
+					status, discover, &tags, lld_row, lld_macro_paths, error)))
 			{
 				continue;
 			}
@@ -3927,8 +4058,6 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		lld_templates_make(parent_hostid, &hosts);
 
 		lld_hostmacros_make(&hostmacros, &hosts, lld_macro_paths);
-
-		lld_tags_make(&tags, &hosts, lld_macro_paths);
 
 		lld_groups_save(&groups, &group_prototypes);
 		lld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,

@@ -1667,18 +1667,6 @@ static void	lld_trigger_dependencies_make(const zbx_vector_ptr_t *trigger_protot
 	zbx_vector_ptr_sort(triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-static int	db_tag_compare_func(const void *d1, const void *d2)
-{
-	const zbx_db_tag_t	*tag1 = *(const zbx_db_tag_t **)d1;
-	const zbx_db_tag_t	*tag2 = *(const zbx_db_tag_t **)d2;
-	int			ret;
-
-	if (0 != (ret = strcmp(tag1->tag, tag2->tag)))
-		return ret;
-
-	return strcmp(tag1->value, tag2->value);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: lld_trigger_tag_make                                             *
@@ -1700,7 +1688,7 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 	if (NULL == (trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links)))
 		goto out;
 
-	zbx_vector_db_tag_ptr_sort(&trigger->override_tags, db_tag_compare_func);
+	zbx_vector_db_tag_ptr_sort(&trigger->override_tags, zbx_db_tag_compare_func);
 
 	for (i = 0; i < trigger_prototype->tags.values_num + trigger->override_tags.values_num; i++)
 	{
