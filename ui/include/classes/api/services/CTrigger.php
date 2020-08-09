@@ -523,10 +523,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$this->validateCreate($triggers);
 		$this->createReal($triggers);
-
-		foreach ($triggers as $trigger) {
-			$this->inherit($trigger);
-		}
+		$this->inherit($triggers);
 
 		// clear all dependencies on inherited triggers
 		$this->deleteDependencies($triggers);
@@ -559,7 +556,6 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	public function update(array $triggers) {
 		$triggers = zbx_toArray($triggers);
-		$db_triggers = [];
 
 		$this->validateUpdate($triggers, $db_triggers);
 
@@ -584,10 +580,9 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		$this->updateReal($triggers, $db_triggers);
+		$this->inherit($triggers);
 
 		foreach ($triggers as $trigger) {
-			$this->inherit($trigger);
-
 			// replace dependencies
 			if (array_key_exists('dependencies', $trigger)) {
 				$this->deleteDependencies($trigger);
