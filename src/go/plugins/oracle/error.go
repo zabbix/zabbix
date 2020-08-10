@@ -27,6 +27,9 @@ type zabbixError struct {
 	err string
 }
 
+// Error stringifies an error according to Zabbix requirements:
+// * the first letter must be capitalized;
+// * an error text should be trailed by a dot.
 func (e zabbixError) Error() string {
 	errText := e.err
 	if errText[len(errText)-1:] != "." {

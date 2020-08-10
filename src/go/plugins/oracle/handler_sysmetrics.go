@@ -33,7 +33,6 @@ const (
 	duration15sec = "3"
 )
 
-// sysMetricsHandler TODO: add description.
 func sysMetricsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var groupID = duration60sec
 

@@ -30,7 +30,7 @@ import (
 const keyCustomQuery = "oracle.custom.query"
 const customQueryMinParams = 1
 
-// customQueryHandler TODO: add description.
+// customQueryHandler executes custom user queries
 func customQueryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	if len(params) < customQueryMinParams {
 		return nil, errorInvalidParams

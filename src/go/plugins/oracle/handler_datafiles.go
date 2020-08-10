@@ -28,7 +28,6 @@ const keyDataFiles = "oracle.datafiles.stats"
 
 const datafilesMaxParams = 0
 
-// DataFileHandler TODO: add description.
 func DataFileHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var datafiles string
 

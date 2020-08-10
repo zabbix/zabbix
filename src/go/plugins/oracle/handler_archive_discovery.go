@@ -28,7 +28,6 @@ const keyArchiveDiscovery = "oracle.archive.discovery"
 
 const archiveDiscoveryMaxParams = 0
 
-// archiveDiscoveryHandler TODO: add description.
 func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var lld string
 

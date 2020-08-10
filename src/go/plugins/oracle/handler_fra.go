@@ -28,7 +28,6 @@ const keyFRA = "oracle.fra.stats"
 
 const FRAMaxParams = 0
 
-// FRAHandler TODO: add description.
 func FRAHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var FRA string
 

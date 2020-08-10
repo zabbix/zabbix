@@ -29,7 +29,6 @@ const keyUser = "oracle.user.info"
 
 const userMaxParams = 1
 
-// UserHandler TODO: add description.
 func UserHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var userinfo string
 

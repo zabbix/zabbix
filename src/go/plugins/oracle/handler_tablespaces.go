@@ -29,7 +29,6 @@ const keyTablespaces = "oracle.ts.stats"
 
 const tablespacesMaxParams = 0
 
-// tablespacesHandler TODO: add description.
 func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var tablespaces string
 

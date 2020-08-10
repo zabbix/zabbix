@@ -29,7 +29,6 @@ const keySessions = "oracle.sessions.stats"
 
 const sessionsMaxParams = 1
 
-// sessionsHandler TODO: add description.
 func sessionsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var (
 		sessions string

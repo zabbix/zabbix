@@ -28,7 +28,6 @@ const keyTablespacesDiscovery = "oracle.ts.discovery"
 
 const tablespacesDiscoveryMaxParams = 0
 
-// tablespacesDiscoveryHandler TODO: add description.
 func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var lld string
 

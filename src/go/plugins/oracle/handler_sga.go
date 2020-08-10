@@ -28,7 +28,6 @@ const keySGA = "oracle.sga.stats"
 
 const SGAMaxParams = 0
 
-// SGAHandler TODO: add description.
 func SGAHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var SGA string
 

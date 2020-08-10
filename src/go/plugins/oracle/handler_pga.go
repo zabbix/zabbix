@@ -28,7 +28,6 @@ const keyPGA = "oracle.pga.stats"
 
 const PGAMaxParams = 0
 
-// PGAHandler TODO: add description.
 func PGAHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var PGA string
 

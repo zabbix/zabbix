@@ -28,7 +28,6 @@ const keyDatabasesDiscovery = "oracle.db.discovery"
 
 const databasesDiscoveryMaxParams = 0
 
-// databasesDiscoveryHandler TODO: add description.
 func databasesDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var lld string
 

@@ -54,7 +54,7 @@ type OraConn struct {
 var errorTimeout = "timeout exceeded"
 var errorQueryNotFound = "query %q not found"
 
-// TODO: description
+// Query wraps DB.QueryContext.
 func (conn *OraConn) Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
 	rows, err = conn.client.QueryContext(ctx, query, args...)
 
@@ -65,7 +65,7 @@ func (conn *OraConn) Query(ctx context.Context, query string, args ...interface{
 	return
 }
 
-// TODO: description
+// Query executes a query from queryStorage by its name and returns multiple rows.
 func (conn *OraConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		return conn.Query(ctx, sql, args...)
@@ -74,7 +74,7 @@ func (conn *OraConn) QueryByName(ctx context.Context, queryName string, args ...
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
 }
 
-// TODO: description
+// Query wraps DB.QueryRowContext.
 func (conn *OraConn) QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error) {
 	row = conn.client.QueryRowContext(ctx, query, args...)
 
@@ -85,7 +85,7 @@ func (conn *OraConn) QueryRow(ctx context.Context, query string, args ...interfa
 	return
 }
 
-// TODO: description
+// Query executes a query from queryStorage by its name and returns a singe row.
 func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		return conn.QueryRow(ctx, sql, args...)
@@ -94,7 +94,7 @@ func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string, args 
 	return nil, fmt.Errorf(errorQueryNotFound, queryName)
 }
 
-// TODO: description
+// WhoAmI returns a current username.
 func (conn *OraConn) WhoAmI() string {
 	return conn.username
 }

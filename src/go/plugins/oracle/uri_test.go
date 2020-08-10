@@ -182,7 +182,7 @@ func TestURI_Password(t *testing.T) {
 	}
 }
 
-func TestURI_URI(t *testing.T) {
+func TestURI_String(t *testing.T) {
 	type fields struct {
 		scheme      string
 		host        string
@@ -219,8 +219,8 @@ func TestURI_URI(t *testing.T) {
 				user:        tt.fields.user,
 				password:    tt.fields.password,
 			}
-			if got := u.URI(); got != tt.want {
-				t.Errorf("URI.URI() = %v, want %v", got, tt.want)
+			if got := u.String(); got != tt.want {
+				t.Errorf("URI.String() = %v, want %v", got, tt.want)
 			}
 		})
 	}

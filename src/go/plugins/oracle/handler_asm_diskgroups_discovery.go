@@ -28,7 +28,6 @@ const keyASMDiskGroupsDiscovery = "oracle.diskgroups.discovery"
 
 const ASMDiskGroupsMaxParams = 0
 
-// ASMDiskGroupsDiscovery TODO: add description.
 func ASMDiskGroupsDiscovery(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var lld string
 

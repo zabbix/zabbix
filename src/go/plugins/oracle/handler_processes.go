@@ -28,7 +28,6 @@ const keyProc = "oracle.proc.stats"
 
 const procMaxParams = 0
 
-// ProcHandler TODO: add description.
 func ProcHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var proc string
 

@@ -28,7 +28,6 @@ const keyPDBDiscovery = "oracle.pdb.discovery"
 
 const PDBDiscoveryMaxParams = 0
 
-// PDBDiscoveryHandler TODO: add description.
 func PDBDiscoveryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var lld string
 

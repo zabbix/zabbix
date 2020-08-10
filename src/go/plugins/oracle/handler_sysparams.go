@@ -28,7 +28,6 @@ const keySysParams = "oracle.sys.params"
 
 const sysParamsMaxParams = 0
 
-// sysParamsHandler TODO: add description.
 func sysParamsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var sysparams string
 

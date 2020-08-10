@@ -28,7 +28,6 @@ const keyInstance = "oracle.instance.info"
 
 const instanceMaxParams = 0
 
-// instanceHandler TODO: add description.
 func instanceHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var instanceStats string
 

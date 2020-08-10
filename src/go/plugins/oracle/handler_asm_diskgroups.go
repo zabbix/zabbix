@@ -28,7 +28,6 @@ const keyASMDiskGroups = "oracle.diskgroups.stats"
 
 const ASMDiskGroupsInfoMaxParams = 0
 
-// ASMDiskGroupsHandler TODO: add description.
 func ASMDiskGroupsHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var diskGroups string
 

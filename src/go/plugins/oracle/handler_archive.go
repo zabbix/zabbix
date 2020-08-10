@@ -28,7 +28,6 @@ const keyArchive = "oracle.archive.info"
 
 const archiveMaxParams = 0
 
-// archiveHandler TODO: add description.
 func archiveHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var archiveLogs string
 

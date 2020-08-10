@@ -28,7 +28,6 @@ const keyRedoLog = "oracle.redolog.info"
 
 const redoLogMaxParams = 0
 
-// RedoLogHandler TODO: add description.
 func RedoLogHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var redolog string
 

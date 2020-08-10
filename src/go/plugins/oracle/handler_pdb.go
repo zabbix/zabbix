@@ -28,7 +28,6 @@ const keyPDB = "oracle.pdb.info"
 
 const PDBMaxParams = 0
 
-// PDBHandler TODO: add description.
 func PDBHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var PDBInfo string
 

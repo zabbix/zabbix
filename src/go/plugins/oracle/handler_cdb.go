@@ -28,7 +28,6 @@ const keyCDB = "oracle.cdb.info"
 
 const CDBMaxParams = 0
 
-// CDBHandler TODO: add description.
 func CDBHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	var CDBInfo string
 

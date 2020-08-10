@@ -40,6 +40,7 @@ func (u *URI) Scheme() string {
 	return u.scheme
 }
 
+// Addr combines host and port into a network address of the form "host:port".
 func (u *URI) Addr() string {
 	return net.JoinHostPort(u.host, u.port)
 }
@@ -64,7 +65,8 @@ func (u *URI) User() string {
 	return u.user
 }
 
-func (u *URI) URI() string {
+// String reassembles the URI into a valid URI string.
+func (u *URI) String() string {
 	uri := &url.URL{
 		Scheme: u.scheme,
 		Host:   net.JoinHostPort(u.host, u.port),
@@ -78,6 +80,7 @@ func (u *URI) URI() string {
 	return uri.String()
 }
 
+// newURIWithCreds calls parseURI with given credentials.
 func newURIWithCreds(uri, user, password, serviceName string) (res *URI, err error) {
 	res, err = parseURI(uri)
 
@@ -136,7 +139,7 @@ func validateURI(uri string) (err error) {
 	return
 }
 
-// isLooksLikeURI returns true if s is URI or false if not
+// isLooksLikeURI returns true if s is URI or false if not.
 func isLooksLikeURI(s string) bool {
 	return strings.Contains(s, "tcp://") || strings.Contains(s, "oracle://")
 }
