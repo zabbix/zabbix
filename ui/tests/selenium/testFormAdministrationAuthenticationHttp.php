@@ -537,12 +537,15 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			}
 
 			// Check user data in DB after login.
-			$session = $this->webDriver->manage()->getCookieNamed(ZBX_SESSION_NAME);
+			$session_cookie = $this->webDriver->manage()->getCookieNamed(ZBX_SESSION_NAME);
+			$session_cookie = unserialize(base64_decode($session_cookie));
+			$session = $session_cookie['sessionid'];
+
 			$user_data = CDBHelper::getRow(
 				'SELECT u.alias'.
 				' FROM users u,sessions s'.
 				' WHERE u.userid=s.userid'.
-					' AND sessionid='.zbx_dbstr($session['value'])
+					' AND sessionid='.zbx_dbstr($session)
 			);
 			if (array_key_exists('user_case_sensitive', $data)) {
 				$this->assertEquals($user_data['alias'], $data['user_case_sensitive']);
