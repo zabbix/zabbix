@@ -26,6 +26,8 @@ This guide will provide instructions on setting up a media type, a user and an a
 
 The configuration consists of a _media type_ in Zabbix which will invoke a webhook to send alerts to iLert through the iLert Event API.
 To utilize the media type, we will create a Zabbix user to represent iLert. We will then create an alert action to notify the user via this media type whenever a problem is detected.
+
+> Note: only trigger events are currently supported
 ​
 
 ## Create Global Macro
