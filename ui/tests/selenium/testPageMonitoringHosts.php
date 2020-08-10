@@ -62,10 +62,6 @@ class testPageMonitoringHosts extends CWebTest {
 					break;
 				case 'Status':
 					$this->assertEquals($form->getField($field)->getLabels()->asText(), $status_elements);
-//					foreach ($status_elements as $status) {
-//						$this->assertTrue((($form->getFieldContainer($field))->
-//						query('xpath://li/label[text() = "'.$status.'"]'))->one()->isPresent());
-//			}
 					break;
 				case 'Tags':
 					$tags_container = $form->getFieldContainer($field);
@@ -79,6 +75,7 @@ class testPageMonitoringHosts extends CWebTest {
 					break;
 				case 'Show hosts in maintenance':
 					$this->assertTrue($form->getField($field)->getLabel('Show suppressed problems')->isPresent());
+					$this->assertTrue($form->query('class:second-column-label')->one()->isPresent());
 					break;
 			}
 		}
@@ -506,7 +503,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
-		$this->assertDisplayingText($start_rows_count);
+		$this->assertRowCount($start_rows_count);
 		$start_contents = $this->getTableResult($start_rows_count);
 
 		// Filter hosts
@@ -516,19 +513,28 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// Check that filtered count mathces expected.
 		$this->assertEquals(count($filtered_contents), $table->getRows()->count());
-		$this->assertDisplayingText(count($filtered_contents));
+		$this->assertRowCount(count($filtered_contents));
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$form->query('button:Reset')->one()->click();
 		$reset_rows_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_rows_count);
-		$this->assertDisplayingText($reset_rows_count);
+		$this->assertRowCount($reset_rows_count);
 		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count));
 	}
-
-	private function assertDisplayingText($count) {
-		$this->assertEquals('Displaying '.$count.' of '.$count.' found',
-		$this->query('xpath://div[@class="table-stats"]')->one()->getText());
+	
+	public function testPageMonitoringHosts_ShowSuppresedProb() {
+		$this->page->login()->open('zabbix.php?action=host.view');
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$form->fill(['Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']]);
+		$form->submit();
+		$this->page->waitUntilReady();
+		$before_show_count = $table->getRows()->count();
+		$form->query('name:filter_show_suppressed')->one()->click();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertEquals($table->getRows()->count(), $before_show_count + 1);
 	}
 
 	private function getTableResult($rows_count) {
