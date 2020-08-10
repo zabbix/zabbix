@@ -575,6 +575,17 @@ static void	diag_prepare_default_request(struct zbx_json *j, int section)
 		diag_add_section_request(j, "alerting", "media.alerts", "source.alerts", NULL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_get_simple_values                                           *
+ *                                                                            *
+ * Purpose: extract simple values in format <key1>:<value1> <key2>:<value2>...*
+ *          from the specified json location                                  *
+ *                                                                            *
+ * Parameters: jp  - [IN] the json location                                   *
+ *             msg - [OUT] the extracted values                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	diag_get_simple_values(const struct zbx_json_parse *jp, char **msg)
 {
 	const char		*pnext = NULL;
@@ -601,9 +612,21 @@ static void	diag_get_simple_values(const struct zbx_json_parse *jp, char **msg)
 	zbx_free(value);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_log_memory_info                                             *
+ *                                                                            *
+ * Purpose: log shared memory information                                     *
+ *                                                                            *
+ * Parameters: jp    - [IN] the section json                                  *
+ *             field - [OUT] the memory field name                            *
+ *             path  - [OUT] the json path to the memory data                 *
+ *                                                                            *
+ ******************************************************************************/
 static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, const char *path)
 {
 	struct zbx_json_parse	jp_memory, jp_size, jp_chunks;
+	char			*msg = NULL;
 
 	if (FAIL == zbx_json_open_path(jp, path, &jp_memory))
 		return;
@@ -611,8 +634,6 @@ static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, c
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s:", field);
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_memory, "size", &jp_size))
 	{
-		char	*msg = NULL;
-
 		diag_get_simple_values(&jp_size, &msg);
 		zabbix_log(LOG_LEVEL_INFORMATION, "  size: %s", msg);
 		zbx_free(msg);
@@ -620,7 +641,6 @@ static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, c
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_memory, "chunks", &jp_chunks))
 	{
-		char			*msg = NULL;
 		struct zbx_json_parse	jp_buckets, jp_bucket;
 
 		diag_get_simple_values(&jp_chunks, &msg);
@@ -644,9 +664,19 @@ static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, c
 			}
 		}
 	}
-
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_log_top_view                                                *
+ *                                                                            *
+ * Purpose: log top view                                                      *
+ *                                                                            *
+ * Parameters: jp    - [IN] the section json                                  *
+ *             field - [OUT] the top field name                               *
+ *             path  - [OUT] the json path to the top view                    *
+ *                                                                            *
+ ******************************************************************************/
 static void	diag_log_top_view(struct zbx_json_parse *jp, const char *field, const char *path)
 {
 	struct zbx_json_parse	jp_top, jp_row;
@@ -667,9 +697,15 @@ static void	diag_log_top_view(struct zbx_json_parse *jp, const char *field, cons
 			zbx_free(msg);
 		}
 	}
-
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_log_history_cache                                           *
+ *                                                                            *
+ * Purpose: log history cache diagnostic information                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	diag_log_history_cache(struct zbx_json_parse *jp)
 {
 	char	*msg = NULL;
@@ -678,6 +714,7 @@ static void	diag_log_history_cache(struct zbx_json_parse *jp)
 
 	diag_get_simple_values(jp, &msg);
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+	zbx_free(msg);
 
 	diag_log_memory_info(jp, "memory.data", "$.memory.data");
 	diag_log_memory_info(jp, "memory.index", "$.memory.index");
@@ -685,10 +722,15 @@ static void	diag_log_history_cache(struct zbx_json_parse *jp)
 	diag_log_top_view(jp, "top.values", "$.top.values");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "==");
-
-	zbx_free(msg);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_log_value_cache                                             *
+ *                                                                            *
+ * Purpose: log value cache diagnostic information                            *
+ *                                                                            *
+ ******************************************************************************/
 static void	diag_log_value_cache(struct zbx_json_parse *jp)
 {
 	char	*msg = NULL;
@@ -697,6 +739,7 @@ static void	diag_log_value_cache(struct zbx_json_parse *jp)
 
 	diag_get_simple_values(jp, &msg);
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+	zbx_free(msg);
 
 	diag_log_memory_info(jp, "memory", "$.memory");
 
@@ -704,10 +747,15 @@ static void	diag_log_value_cache(struct zbx_json_parse *jp)
 	diag_log_top_view(jp, "top.request.values", "$.top['request.values']");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "==");
-
-	zbx_free(msg);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_log_preprocessing                                           *
+ *                                                                            *
+ * Purpose: log preprocessing diagnostic information                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	diag_log_preprocessing(struct zbx_json_parse *jp)
 {
 	char	*msg = NULL;
@@ -716,13 +764,20 @@ static void	diag_log_preprocessing(struct zbx_json_parse *jp)
 
 	diag_get_simple_values(jp, &msg);
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+	zbx_free(msg);
 
 	diag_log_top_view(jp, "top.values", "$.top.values");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "==");
-
-	zbx_free(msg);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_log_lld                                                     *
+ *                                                                            *
+ * Purpose: log LLD diagnostic information                                    *
+ *                                                                            *
+ ******************************************************************************/
 
 static void	diag_log_lld(struct zbx_json_parse *jp)
 {
@@ -732,14 +787,20 @@ static void	diag_log_lld(struct zbx_json_parse *jp)
 
 	diag_get_simple_values(jp, &msg);
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+	zbx_free(msg);
 
 	diag_log_top_view(jp, "top.values", "$.top.values");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "==");
-
-	zbx_free(msg);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_log_alerting                                                *
+ *                                                                            *
+ * Purpose: log alerting diagnostic information                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	diag_log_alerting(struct zbx_json_parse *jp)
 {
 	char	*msg = NULL;
@@ -748,13 +809,12 @@ static void	diag_log_alerting(struct zbx_json_parse *jp)
 
 	diag_get_simple_values(jp, &msg);
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+	zbx_free(msg);
 
 	diag_log_top_view(jp, "media.alerts", "$.top['media.alerts']");
 	diag_log_top_view(jp, "source.alerts", "$.top['source.alerts']");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "==");
-
-	zbx_free(msg);
 }
 
 /******************************************************************************
