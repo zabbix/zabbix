@@ -75,8 +75,7 @@ if (!CSessionHelper::has('step')) {
 if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
 	// on the last step of the setup we always have a guest user logged in;
 	// when he presses the "Finish" button he must be redirected to the login screen
-	if (CWebUser::isGuest() && CSessionHelper::get('step') == 6 && hasRequest('finish')) {
-		CSessionHelper::clear();
+	if (CWebUser::isGuest() && hasRequest('finish')) {
 		redirect('index.php');
 	}
 	// the guest user can also view the last step of the setup
