@@ -66,7 +66,7 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 			" and");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
-	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and operationobject in (%d,%d)",
+	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and o.operationobject in (%d,%d)",
 			ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER, ZBX_LLD_OVERRIDE_OP_OBJECT_HOST);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
@@ -130,7 +130,7 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
 			" and");
 	DBadd_condition_alloc(sql, sql_alloc, &sql_offset, "o.lld_overrideid", overrideids->values,
 			overrideids->values_num);
-	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and operationobject=%d",
+	zbx_snprintf_alloc(sql, sql_alloc, &sql_offset, " and o.operationobject=%d",
 			ZBX_LLD_OVERRIDE_OP_OBJECT_HOST);
 	zbx_strcpy_alloc(sql, sql_alloc, &sql_offset, " order by o.lld_override_operationid");
 
