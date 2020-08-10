@@ -2157,6 +2157,7 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 
 	zbx_vector_db_tag_ptr_create(&new_tags);
 
+	/* create vector of new tags with expanded lld macros */
 	for (i = 0; i < tags->values_num; i++)
 	{
 		proto_tag = (zbx_db_tag_t *)tags->values[i];
@@ -2170,8 +2171,6 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 			continue;
 
 		proto_tag = (zbx_db_tag_t *)zbx_malloc(NULL, sizeof(zbx_db_tag_t));
-		proto_tag->tagid = 0;
-		proto_tag->flags = 0;
 		proto_tag->tag = tag;
 		proto_tag->value = value;
 		zbx_vector_db_tag_ptr_append(&new_tags, proto_tag);
@@ -2182,7 +2181,7 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 
 	zbx_vector_db_tag_ptr_sort(&new_tags, zbx_db_tag_compare_func);
 
-	zbx_vector_db_tag_ptr_reserve(&host->tags, host->tags.values_num + tags->values_num);
+	zbx_vector_db_tag_ptr_reserve(&host->tags, new_tags.values_num);
 
 	/* update host tags or flag them for removal */
 	for (i = 0; i < host->tags.values_num; i++)
