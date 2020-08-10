@@ -51,12 +51,9 @@ var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
 
-func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
-	if len(params) != 2 {
-		return errors.New("No 'loglevel' parameter specified")
-	}
-	switch params[1] {
-	case "increase":
+func processLoglevelCommand(c *remotecontrol.Client, cmd string) (err error) {
+	switch cmd {
+	case "log_level_increase":
 		if log.IncreaseLogLevel() {
 			message := fmt.Sprintf("Increased log level to %s", log.Level())
 			log.Infof(message)
@@ -65,7 +62,7 @@ func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error
 			err = fmt.Errorf("Cannot increase log level above %s", log.Level())
 			log.Infof(err.Error())
 		}
-	case "decrease":
+	case "log_level_decrease":
 		if log.DecreaseLogLevel() {
 			message := fmt.Sprintf("Decreased log level to %s", log.Level())
 			log.Infof(message)
@@ -75,7 +72,7 @@ func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error
 			log.Infof(err.Error())
 		}
 	default:
-		return errors.New("Invalid 'loglevel' parameter")
+		return errors.New("Invalid log level parameter")
 	}
 	return
 }
@@ -92,8 +89,8 @@ func processVersionCommand(c *remotecontrol.Client, params []string) (err error)
 
 func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
 	help := `Remote control interface, available commands:
-	loglevel increase - Increase log level
-	loglevel decrease - Decrease log level
+	log_level_increase - Increase log level
+	log_level_decrease - Decrease log level
 	metrics - List available metrics
 	version - Display Agent version
 	help - Display this help message`
@@ -106,8 +103,8 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		return errors.New("Empty command")
 	}
 	switch params[0] {
-	case "loglevel":
-		err = processLoglevelCommand(c, params)
+	case "log_level_increase", "log_level_decrease":
+		err = processLoglevelCommand(c, params[0])
 	case "help":
 		err = processHelpCommand(c, params)
 	case "metrics":
