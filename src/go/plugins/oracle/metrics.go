@@ -2,6 +2,7 @@ package oracle
 
 import (
 	"context"
+
 	"zabbix.com/pkg/plugin"
 )
 
@@ -9,7 +10,7 @@ import (
 type handlerFunc func(ctx context.Context, conn OraClient, params []string) (res interface{}, err error)
 
 // TODO: description
-func getHandleFunc(key string) handlerFunc {
+func getHandlerFunc(key string) handlerFunc {
 	switch key {
 	case keyASMDiskGroups:
 		return ASMDiskGroupsHandler
@@ -70,7 +71,7 @@ func init() {
 		keyArchive, "Returns archive logs statistics.",
 		keyArchiveDiscovery, "Returns list of archive logs in LLD format.",
 		keyCDB, "Returns CDBs info.",
-		keyCustomQuery, "Returns result of custom query.",
+		keyCustomQuery, "Returns result of a custom query.",
 		keyDataFiles, "Returns data files statistics.",
 		keyDatabasesDiscovery, "Returns list of databases in LLD format.",
 		keyFRA, "Returns FRA statistics.",

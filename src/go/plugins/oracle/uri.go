@@ -69,7 +69,10 @@ func (u *URI) URI() string {
 		Scheme: u.scheme,
 		Host:   net.JoinHostPort(u.host, u.port),
 		Path:   u.serviceName,
-		User:   url.UserPassword(u.user, u.password),
+	}
+
+	if u.user != "" && u.password != "" {
+		uri.User = url.UserPassword(u.user, u.password)
 	}
 
 	return uri.String()

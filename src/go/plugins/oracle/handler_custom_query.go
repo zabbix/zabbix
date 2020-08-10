@@ -21,6 +21,7 @@ package oracle
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -67,6 +68,10 @@ func customQueryHandler(ctx context.Context, conn OraClient, params []string) (i
 	for rows.Next() {
 		err = rows.Scan(valuePointers...)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil, fmt.Errorf("%w (%s)", errorEmptyResult, err.Error())
+			}
+
 			return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
 		}
 

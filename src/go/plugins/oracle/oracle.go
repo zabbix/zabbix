@@ -52,7 +52,6 @@ var impl Plugin
 
 // whereToConnect builds a URI based on key's parameters and a configuration file.
 func whereToConnect(params []string, sessions map[string]*Session, defaultURI string) (u *URI, err error) {
-	// TODO: rework it!
 	user := ""
 	if len(params) > 1 {
 		user = params[1]
@@ -108,7 +107,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		handlerParams = params[commonParamsNum:]
 	}
 
-	handleMetric := getHandleFunc(key)
+	handleMetric := getHandlerFunc(key)
 	if handleMetric == nil {
 		return nil, errorUnsupportedMetric
 	}
