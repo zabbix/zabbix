@@ -144,7 +144,7 @@ class CAuthentication extends CApiService {
 			'http_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_configured' =>			['type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
 			'ldap_host' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_host')],
-			'ldap_port' =>					['type' => API_INT32],
+			'ldap_port' =>					['type' => API_INT32, 'in' => '0:65535'],
 			'ldap_base_dn' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_base_dn')],
 			'ldap_search_attribute' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_search_attribute')],
 			'ldap_bind_dn' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_bind_dn')],
