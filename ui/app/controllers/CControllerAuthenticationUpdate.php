@@ -184,7 +184,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 
 		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-			$this->response->setMessageError($openssl_status['error']);
+			CMessageHelper::setErrorTitle($openssl_status['error']);
 
 			return false;
 		}
