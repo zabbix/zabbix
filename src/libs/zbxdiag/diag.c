@@ -23,6 +23,7 @@
 #include "preproc.h"
 #include "zbxdiag.h"
 #include "diag.h"
+#include "log.h"
 
 void	diag_map_free(zbx_diag_map_t *map)
 {
@@ -505,3 +506,309 @@ out:
 
 	return ret;
 }
+
+#define ZBX_DIAG_DEFAULT_TOP_LIMIT	25
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_add_section_request                                         *
+ *                                                                            *
+ * Purpose: add default diagnostic section request                            *
+ *                                                                            *
+ * Parameters: j       - [OUT] the request json                               *
+ *             section - [IN] the section name                                *
+ *             ...     - [IN] null terminated list of top field names         *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_add_section_request(struct zbx_json *j, const char *section, ...)
+{
+	va_list		args;
+	const char	*field;
+
+	zbx_json_addobject(j, section);
+	zbx_json_addarray(j, "stats");
+	zbx_json_addstring(j, NULL, "all", ZBX_JSON_TYPE_STRING);
+	zbx_json_close(j);
+
+	zbx_json_addobject(j, "top");
+
+	va_start(args, section);
+
+	while (NULL != (field = va_arg(args, const char *)))
+		zbx_json_adduint64(j, field, ZBX_DIAG_DEFAULT_TOP_LIMIT);
+
+	va_end(args);
+
+	zbx_json_close(j);
+	zbx_json_close(j);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diag_prepare_default_request                                     *
+ *                                                                            *
+ * Purpose: prepare default diagnostic request for all sections               *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_prepare_default_request(struct zbx_json *j, int section)
+{
+	unsigned int	flags;
+
+	if (0 == section)
+		flags = 0xffffffff;
+	else
+		flags = 1 << section;
+
+	if (0 != (flags & (1 << ZBX_DIAGINFO_HISTORYCACHE)))
+		diag_add_section_request(j, "historycache", "values", NULL);
+
+	if (0 != (flags & (1 << ZBX_DIAGINFO_VALUECACHE)))
+		diag_add_section_request(j, "valuecache", "values", "request.values", NULL);
+
+	if (0 != (flags & (1 << ZBX_DIAGINFO_PREPROCESSING)))
+		diag_add_section_request(j, "preprocessing", "values", NULL);
+
+	if (0 != (flags & (1 << ZBX_DIAGINFO_LLD)))
+		diag_add_section_request(j, "lld", "values", NULL);
+
+	if (0 != (flags & (1 << ZBX_DIAGINFO_ALERTING)))
+		diag_add_section_request(j, "alerting", "media.alerts", "source.alerts", NULL);
+}
+
+static void	diag_get_simple_values(const struct zbx_json_parse *jp, char **msg)
+{
+	const char		*pnext = NULL;
+	char			key[MAX_STRING_LEN], *value = NULL;
+	struct zbx_json_parse	jp_value;
+	size_t			value_alloc = 0, msg_alloc = 0, msg_offset = 0;
+	zbx_json_type_t		type;
+
+
+	while (NULL != (pnext = zbx_json_pair_next(jp, pnext, key, sizeof(key))))
+	{
+		if (FAIL == zbx_json_brackets_open(pnext, &jp_value))
+		{
+			zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, &type);
+
+			if (0 != msg_offset)
+				zbx_chrcpy_alloc(msg, &msg_alloc, &msg_offset, ' ');
+
+			zbx_snprintf_alloc(msg, &msg_alloc, &msg_offset, "%s:%s", key,
+					(ZBX_JSON_TYPE_NULL != type ? value: "null"));
+		}
+	}
+
+	zbx_free(value);
+}
+
+static void	diag_log_memory_info(struct zbx_json_parse *jp, const char *field, const char *path)
+{
+	struct zbx_json_parse	jp_memory, jp_size, jp_chunks;
+
+	if (FAIL == zbx_json_open_path(jp, path, &jp_memory))
+		return;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s:", field);
+	if (SUCCEED == zbx_json_brackets_by_name(&jp_memory, "size", &jp_size))
+	{
+		char	*msg = NULL;
+
+		diag_get_simple_values(&jp_size, &msg);
+		zabbix_log(LOG_LEVEL_INFORMATION, "  size: %s", msg);
+		zbx_free(msg);
+	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(&jp_memory, "chunks", &jp_chunks))
+	{
+		char			*msg = NULL;
+		struct zbx_json_parse	jp_buckets, jp_bucket;
+
+		diag_get_simple_values(&jp_chunks, &msg);
+		zabbix_log(LOG_LEVEL_INFORMATION, "  chunks: %s", msg);
+		zbx_free(msg);
+
+		if (SUCCEED == zbx_json_brackets_by_name(&jp_chunks, "buckets", &jp_buckets))
+		{
+			const char	*pnext;
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "  buckets:");
+
+			for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp_buckets, pnext));)
+			{
+				if (SUCCEED == zbx_json_brackets_open(pnext, &jp_bucket))
+				{
+					diag_get_simple_values(&jp_bucket, &msg);
+					zabbix_log(LOG_LEVEL_INFORMATION, "    %s", msg);
+					zbx_free(msg);
+				}
+			}
+		}
+	}
+
+}
+
+static void	diag_log_top_view(struct zbx_json_parse *jp, const char *field, const char *path)
+{
+	struct zbx_json_parse	jp_top, jp_row;
+	const char		*pnext;
+	char			*msg = NULL;
+
+	if (FAIL == zbx_json_open_path(jp, path, &jp_top))
+		return;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s:", field);
+
+	for (pnext = NULL; NULL != (pnext = zbx_json_next(&jp_top, pnext));)
+	{
+		if (SUCCEED == zbx_json_brackets_open(pnext, &jp_row))
+		{
+			diag_get_simple_values(&jp_row, &msg);
+			zabbix_log(LOG_LEVEL_INFORMATION, "  %s", msg);
+			zbx_free(msg);
+		}
+	}
+
+}
+
+static void	diag_log_history_cache(struct zbx_json_parse *jp)
+{
+	char	*msg = NULL;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "== historycache diagnostic information ==");
+
+	diag_get_simple_values(jp, &msg);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+
+	diag_log_memory_info(jp, "memory.data", "$.memory.data");
+	diag_log_memory_info(jp, "memory.index", "$.memory.index");
+
+	diag_log_top_view(jp, "top.values", "$.top.values");
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "==");
+
+	zbx_free(msg);
+}
+
+static void	diag_log_value_cache(struct zbx_json_parse *jp)
+{
+	char	*msg = NULL;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "== valuecache diagnostic information ==");
+
+	diag_get_simple_values(jp, &msg);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+
+	diag_log_memory_info(jp, "memory", "$.memory");
+
+	diag_log_top_view(jp, "top.values", "$.top.values");
+	diag_log_top_view(jp, "top.request.values", "$.top['request.values']");
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "==");
+
+	zbx_free(msg);
+}
+
+static void	diag_log_preprocessing(struct zbx_json_parse *jp)
+{
+	char	*msg = NULL;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "== preprocessing diagnostic information ==");
+
+	diag_get_simple_values(jp, &msg);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+
+	diag_log_top_view(jp, "top.values", "$.top.values");
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "==");
+
+	zbx_free(msg);
+}
+
+static void	diag_log_lld(struct zbx_json_parse *jp)
+{
+	char	*msg = NULL;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "== LLD diagnostic information ==");
+
+	diag_get_simple_values(jp, &msg);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+
+	diag_log_top_view(jp, "top.values", "$.top.values");
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "==");
+
+	zbx_free(msg);
+}
+
+static void	diag_log_alerting(struct zbx_json_parse *jp)
+{
+	char	*msg = NULL;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "== alerting diagnostic information ==");
+
+	diag_get_simple_values(jp, &msg);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
+
+	diag_log_top_view(jp, "media.alerts", "$.top['media.alerts']");
+	diag_log_top_view(jp, "source.alerts", "$.top['source.alerts']");
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "==");
+
+	zbx_free(msg);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_diag_log_info                                                *
+ *                                                                            *
+ * Purpose: log diagnostic information                                        *
+ *                                                                            *
+ * Parameters: section - [IN] the section to log (0 for all)                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_diag_log_info(int section)
+{
+	struct zbx_json		j;
+	struct zbx_json_parse	jp;
+	char			*info = NULL;
+
+	zbx_json_init(&j, 1024);
+
+	diag_prepare_default_request(&j, section);
+	zbx_json_open(j.buffer, &jp);
+
+	if (SUCCEED == zbx_diag_get_info(&jp, &info))
+	{
+		char			section[ZBX_DIAG_SECTION_MAX + 1];
+		struct zbx_json_parse	jp_section;
+		const char		*pnext = NULL;
+
+		zbx_json_open(info, &jp);
+
+		while (NULL != (pnext = zbx_json_pair_next(&jp, pnext, section, sizeof(section))))
+		{
+			if (FAIL == zbx_json_brackets_open(pnext, &jp_section))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (0 == strcmp(section, "historycache"))
+				diag_log_history_cache(&jp_section);
+			else if (0 == strcmp(section, "valuecache"))
+				diag_log_value_cache(&jp_section);
+			else if (0 == strcmp(section, "preprocessing"))
+				diag_log_preprocessing(&jp_section);
+			else if (0 == strcmp(section, "lld"))
+				diag_log_lld(&jp_section);
+			else if (0 == strcmp(section, "alerting"))
+				diag_log_alerting(&jp_section);
+		}
+	}
+	else
+		zabbix_log(LOG_LEVEL_INFORMATION, "cannot obtain diagnostic information: %s", info);
+
+	zbx_free(info);
+	zbx_json_free(&j);
+}
+
