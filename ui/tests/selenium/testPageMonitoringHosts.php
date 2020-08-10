@@ -522,7 +522,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->assertRowCount($reset_rows_count);
 		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count));
 	}
-	
+
 	public function testPageMonitoringHosts_ShowSuppresedProb() {
 		$this->page->login()->open('zabbix.php?action=host.view');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
