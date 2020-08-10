@@ -3615,45 +3615,6 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: DBhost_prototypes_tag_update                                     *
- *                                                                            *
- * Purpose: update prototype tags with existing tags                          *
- *                                                                            *
- * Parameters: tags  - [IN/OUT] list of tags                                  *
- *             tagid - [IN] the tag id                                        *
- *             tag   - [IN] the tag name                                      *
- *             value - [IN] the tag value                                     *
- *                                                                            *
- * Return value: SUCCEED - the host tag was updated                           *
- *               FAIL    - otherwise                                          *
- ******************************************************************************/
-static int	DBhost_prototypes_tag_update(zbx_vector_db_tag_ptr_t *tags, zbx_uint64_t tagid, const char *name,
-		const char *value)
-{
-	zbx_db_tag_t	*tag;
-	int		i;
-
-	for (i = 0; i < tags->values_num; i++)
-	{
-		tag = tags->values[i];
-
-		/* check for tag with matching name */
-		if (0 == tag->tagid && 0 == strcmp(tag->tag, name))
-		{
-			tag->tagid = tagid;
-
-			if (0 != strcmp(tag->value, value))
-				tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_VALUE;
-
-			return SUCCEED;
-		}
-	}
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBhost_prototypes_tags_make                                      *
  *                                                                            *
  * Parameters: host_prototypes - [IN/OUT] list of host prototypes             *
@@ -3678,7 +3639,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 
 	zbx_vector_uint64_create(&hostids);
 
-	/* select list of tags prototypes which should be linked to host prototypes */
+	/* get template host prototype tags that must be added to host prototypes */
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -3723,7 +3684,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 	}
 	DBfree_result(result);
 
-	/* select list of tags prototypes which already linked to host prototypes */
+	/* get tags of existing host prototypes */
 
 	zbx_vector_uint64_clear(&hostids);
 
@@ -3737,8 +3698,11 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 		zbx_vector_uint64_append(&hostids, host_prototype->hostid);
 	}
 
+	/* replace existing tags with the new tags */
 	if (0 != hostids.values_num)
 	{
+		int	tag_index;
+
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		sql_offset = 0;
@@ -3746,33 +3710,44 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 				"select hosttagid,hostid,tag,value from host_tag where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
-
 		result = DBselect("%s", sql);
+
+		host_prototype = NULL;
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			ZBX_STR2UINT64(tagid, row[0]);
 			ZBX_STR2UINT64(hostid, row[1]);
 
-			for (i = 0; i < host_prototypes->values_num; i++)
+			if (NULL == host_prototype || host_prototype->hostid != hostid)
 			{
-				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+				tag_index = 0;
 
-				if (host_prototype->hostid == hostid)
+				for (i = 0; i < host_prototypes->values_num; i++)
 				{
-					ZBX_STR2UINT64(tagid, row[0]);
+					host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
-					if (FAIL == DBhost_prototypes_tag_update(&host_prototype->tags, tagid, row[2],
-							row[3]))
-					{
-						zbx_vector_uint64_append(del_tagids, tagid);
-					}
+					if (host_prototype->hostid == hostid)
+						break;
+				}
 
-					break;
+				if (host_prototype->hostid != hostid)
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
 				}
 			}
 
-			if (i == host_prototypes->values_num)
-				THIS_SHOULD_NEVER_HAPPEN;
+			if (tag_index < host_prototype->tags.values_num)
+			{
+				host_prototype->tags.values[tag_index]->tagid = tagid;
+				host_prototype->tags.values[tag_index]->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG |
+						ZBX_FLAG_DB_TAG_UPDATE_VALUE;
+			}
+			else
+				zbx_vector_uint64_append(del_tagids, tagid);
+
+			tag_index++;
 		}
 		DBfree_result(result);
 	}
@@ -4035,12 +4010,24 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			}
 			else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 			{
-				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update host_tag set ");
+				char	delim = ' ';
+
+				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update host_tag set");
+
+				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+				{
+					value_esc = DBdyn_escape_string(tag->tag);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%ctag='%s'", delim,
+							value_esc);
+					zbx_free(value_esc);
+					delim = ',';
+				}
 
 				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
 				{
 					value_esc = DBdyn_escape_string(tag->value);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "value='%s'", value_esc);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%cvalue='%s'", delim,
+							value_esc);
 					zbx_free(value_esc);
 				}
 
