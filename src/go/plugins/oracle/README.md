@@ -165,7 +165,7 @@ args (optional) — one or more arguments to pass to a query.
 
 **oracle.sessions.stats[\<commonParams\>,[lockMaxTime]]** — Returns sessions statistics.
 *Parameters:*    
-lockMaxTime (optional) — Maximum session lock duration in seconds to count the session as a prolongedly locked.
+lockMaxTime (optional) — maximum session lock duration in seconds to count the session as a prolongedly locked.
 Default: 600 seconds.    
 
 **oracle.sys.metrics[\<commonParams\>[,duration]]** — Returns a set of system metric values.  
@@ -186,7 +186,7 @@ username (optional) — a username for which the information is needed. Default:
 
 ## Custom queries
 It's possible to extend functionality of the plugin using user-defined queries. To do that you should place all your
-queries in a directory specified in Plugins.Oracle.CustomQueriesPath (there is no default path) as *.sql* files.
+queries in a directory specified in Plugins.Oracle.CustomQueriesPath (there is no default path) as *.sql files.
 For example, you have a tree:
 
     /etc/zabbix/oracle/sql/  
@@ -221,4 +221,6 @@ WHERE
 
 ## Troubleshooting
 The plugin uses Zabbix agent's logs. You can increase a debug level of Zabbix agent if you need more details about 
-what is happening.
+what is happening.  
+The environment variable DPI_DEBUG_LEVEL can be used to selectively turn on the printing of various logging messages
+from ODPI-C. See [ODPI-C Debugging](ODPI-C Debugging.)
