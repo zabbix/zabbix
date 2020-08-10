@@ -550,15 +550,8 @@ static void	diag_add_section_request(struct zbx_json *j, const char *section, ..
  * Purpose: prepare default diagnostic request for all sections               *
  *                                                                            *
  ******************************************************************************/
-static void	diag_prepare_default_request(struct zbx_json *j, int section)
+static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 {
-	unsigned int	flags;
-
-	if (0 == section)
-		flags = 0xffffffff;
-	else
-		flags = 1 << section;
-
 	if (0 != (flags & (1 << ZBX_DIAGINFO_HISTORYCACHE)))
 		diag_add_section_request(j, "historycache", "values", NULL);
 
@@ -823,10 +816,10 @@ static void	diag_log_alerting(struct zbx_json_parse *jp)
  *                                                                            *
  * Purpose: log diagnostic information                                        *
  *                                                                            *
- * Parameters: section - [IN] the section to log (0 for all)                  *
+ * Parameters: flags - [IN] flags describing section to log                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_diag_log_info(int section)
+void	zbx_diag_log_info(unsigned int flags)
 {
 	struct zbx_json		j;
 	struct zbx_json_parse	jp;
@@ -834,7 +827,7 @@ void	zbx_diag_log_info(int section)
 
 	zbx_json_init(&j, 1024);
 
-	diag_prepare_default_request(&j, section);
+	diag_prepare_default_request(&j, flags);
 	zbx_json_open(j.buffer, &jp);
 
 	if (SUCCEED == zbx_diag_get_info(&jp, &info))

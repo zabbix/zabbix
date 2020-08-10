@@ -957,7 +957,19 @@ int	main(int argc, char **argv)
 static void	zbx_main_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_DIAGINFO == ZBX_RTC_GET_MSG(flags))
-		zbx_diaginfo_scope = ZBX_RTC_GET_SCOPE(flags);
+	{
+		int	scope = ZBX_RTC_GET_SCOPE(flags);
+
+		if (0 == scope)
+		{
+			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) | (1 << ZBX_DIAGINFO_VALUECACHE) |
+					(1 << ZBX_DIAGINFO_PREPROCESSING) | (1 << ZBX_DIAGINFO_LLD) |
+					(1 << ZBX_DIAGINFO_ALERTING);
+		}
+		else
+			zbx_diaginfo_scope = 1 << scope;
+	}
+
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)

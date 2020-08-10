@@ -25,6 +25,6 @@
 #include "zbxjson.h"
 
 int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
-void	zbx_diag_log_info(int section);
+void	zbx_diag_log_info(unsigned int flags);
 
 #endif

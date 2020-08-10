@@ -58,6 +58,7 @@
 #include "zbxipcservice.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
+#include "zbxdiag.h"
 
 
 #ifdef HAVE_OPENIPMI
@@ -295,6 +296,8 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
+
+volatile sig_atomic_t	zbx_diaginfo_scope = -1;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -960,11 +963,25 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
+static void	zbx_main_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_DIAGINFO == ZBX_RTC_GET_MSG(flags))
+	{
+		int	scope = ZBX_RTC_GET_SCOPE(flags);
+
+		if (0 == scope)
+			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) |	(1 << ZBX_DIAGINFO_PREPROCESSING);
+		else
+			zbx_diaginfo_scope = 1 << scope;
+	}
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	char		*error = NULL;
 	int		i, db_type;
+	pid_t		pid;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1238,14 +1255,27 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	while (-1 == wait(&i))	/* wait for any child to exit */
+	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
+
+	while (0 >= (pid = waitpid(-1, &i, WNOHANG)))	/* wait for any child to exit */
 	{
-		if (EINTR != errno)
+		if (-1 == pid)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			break;
+			if (EINTR != errno)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+				break;
+			}
 		}
+		else if (-1 != zbx_diaginfo_scope)
+		{
+			zbx_diag_log_info(zbx_diaginfo_scope);
+			zbx_diaginfo_scope = -1;
+		}
+
+		sleep(1);
 	}
+
 
 	/* all exiting child processes should be caught by signal handlers */
 	THIS_SHOULD_NEVER_HAPPEN;
