@@ -32,7 +32,7 @@ class CSessionHelper {
 	 * @return boolean
 	 */
 	public static function clear(): bool {
-		return session_unset();
+		return session_destroy();
 	}
 
 	/**

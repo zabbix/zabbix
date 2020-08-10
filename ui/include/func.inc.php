@@ -1501,8 +1501,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
 			$redirect_to = (new CUrl('index_http.php'))->setArgument('request', $url->toString());
 			redirect($redirect_to->toString());
-
-			exit;
 		}
 
 		$url = urlencode($url->toString());

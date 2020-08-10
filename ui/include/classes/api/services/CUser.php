@@ -1279,6 +1279,10 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
+
+		CSessionHelper::clear();
+		new CEncryptedCookieSession();
+
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
@@ -1548,7 +1552,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function createSession($db_user): array {
+	private static function createSession(array $db_user): array {
 		$db_user['sessionid'] = CSessionHelper::getId();
 
 		DB::insert('sessions', [[

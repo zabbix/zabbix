@@ -100,8 +100,16 @@ class CWebUser {
 			]);
 
 			if (empty(self::$data)) {
-				CMessageHelper::clear();
-				throw new Exception();
+				self::$data = API::User()->login([
+					'user' => ZBX_GUEST_USER,
+					'password' => '',
+					'userData' => true
+				]);
+
+				if (empty(self::$data)) {
+					CMessageHelper::clear();
+					throw new Exception();
+				}
 			}
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
