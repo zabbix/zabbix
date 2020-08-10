@@ -1451,6 +1451,7 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 		if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &op->overrideid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
+			zbx_lld_override_operation_free(op);
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
