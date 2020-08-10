@@ -72,22 +72,23 @@ func processLoglevelCommand(c *remotecontrol.Client, cmd string) (err error) {
 			log.Infof(err.Error())
 		}
 	default:
+		//Should never happen
 		return errors.New("Invalid log level parameter")
 	}
 	return
 }
 
-func processMetricsCommand(c *remotecontrol.Client, params []string) (err error) {
+func processMetricsCommand(c *remotecontrol.Client) (err error) {
 	data := manager.Query("metrics")
 	return c.Reply(data)
 }
 
-func processVersionCommand(c *remotecontrol.Client, params []string) (err error) {
+func processVersionCommand(c *remotecontrol.Client) (err error) {
 	data := version.Long()
 	return c.Reply(data)
 }
 
-func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
+func processHelpCommand(c *remotecontrol.Client) (err error) {
 	help := `Remote control interface, available commands:
 	log_level_increase - Increase log level
 	log_level_decrease - Decrease log level
@@ -99,18 +100,23 @@ func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
 
 func processRemoteCommand(c *remotecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
-	if len(params) == 0 {
+	switch len(params) {
+	case 0:
 		return errors.New("Empty command")
+	case 2:
+		return errors.New("Too many commands")
+	default:
 	}
+
 	switch params[0] {
 	case "log_level_increase", "log_level_decrease":
 		err = processLoglevelCommand(c, params[0])
 	case "help":
-		err = processHelpCommand(c, params)
+		err = processHelpCommand(c)
 	case "metrics":
-		err = processMetricsCommand(c, params)
+		err = processMetricsCommand(c)
 	case "version":
-		err = processVersionCommand(c, params)
+		err = processVersionCommand(c)
 	default:
 		return errors.New("Unknown command")
 	}
