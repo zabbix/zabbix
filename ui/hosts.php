@@ -837,7 +837,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($create) {
-			if (!API::Host()->create($host)) {
+			$hostIds = API::Host()->create($host);
+
+			if ($hostIds) {
+				$hostId = reset($hostIds['hostids']);
+			}
+			else {
 				throw new Exception();
 			}
 		}
