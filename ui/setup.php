@@ -87,7 +87,6 @@ if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
 }
 // if a super admin or a non-logged in user presses the "Finish" or "Login" button - redirect him to the login screen
 elseif (hasRequest('cancel') || hasRequest('finish')) {
-	CSessionHelper::clear();
 	redirect('index.php');
 }
 

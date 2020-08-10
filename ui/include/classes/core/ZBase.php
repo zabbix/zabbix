@@ -216,17 +216,20 @@ class ZBase {
 				break;
 
 			case self::EXEC_MODE_SETUP:
-				new CCookieSession();
-
 				try {
 					// try to load config file, if it exists we need to init db and authenticate user to check permissions
 					$this->loadConfigFile();
 					$this->initDB();
+
+					new CEncryptedCookieSession();
+
 					$this->authenticateUser();
 					$this->initComponents();
 					$this->initLocales(CWebUser::$data['lang']);
 				}
-				catch (ConfigFileException $e) {}
+				catch (ConfigFileException $e) {
+					new CCookieSession();
+				}
 				break;
 		}
 	}
