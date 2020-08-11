@@ -107,6 +107,7 @@ abstract class CControllerLatest extends CController {
 
 		CArrayHelper::sort($hosts, [$host_sort_options]);
 		$hostids = array_keys($hosts);
+		$hostids_index = array_flip($hostids);
 
 		$applications = [];
 
@@ -171,13 +172,13 @@ abstract class CControllerLatest extends CController {
 				$applications = API::Application()->get([
 					'output' => ['applicationid', 'name'],
 					'hostids' => array_keys($select_hosts),
-					'templated' => false,
 					'preservekeys' => true
 				]);
 			}
 
 			CArrayHelper::sort($applications, [$application_sort_options]);
 			$applicationids = array_keys($applications);
+			$applicationids_index = array_flip($applicationids);
 
 			$applications_size = [];
 			$items_grouped = [];
@@ -207,21 +208,23 @@ abstract class CControllerLatest extends CController {
 				}
 			}
 
-			$items = [];
 			$rows = [];
+			$items = [];
 
-			uksort($items_grouped, function($hostid_1, $hostid_2) use ($hostids) {
-				return (array_search($hostid_1, $hostids, true) <=> array_search($hostid_2, $hostids, true));
+			uksort($items_grouped, function($hostid_1, $hostid_2) use ($hostids_index) {
+				return ($hostids_index[$hostid_1] <=> $hostids_index[$hostid_2]);
 			});
 
 			foreach ($items_grouped as $host_items_grouped) {
-				uksort($host_items_grouped, function($id_1, $id_2) use ($applicationids, $application_sort_options) {
-					if ($id_1 == 0 || $id_2 == 0) {
-						return bccomp($id_1, $id_2) * (($application_sort_options['order'] === 'ASC') ? -1 : 1);
-					}
+				uksort($host_items_grouped,
+					function($id_1, $id_2) use ($applicationids_index, $application_sort_options) {
+						if ($id_1 == 0 || $id_2 == 0) {
+							return bccomp($id_1, $id_2) * (($application_sort_options['order'] === 'ASC') ? -1 : 1);
+						}
 
-					return (array_search($id_1, $applicationids, true) <=> array_search($id_2, $applicationids, true));
-				});
+						return ($applicationids_index[$id_1] <=> $applicationids_index[$id_2]);
+					}
+				);
 
 				foreach ($host_items_grouped as $applicationid => $application_items) {
 					CArrayHelper::sort($application_items, [$item_sort_options]);
@@ -229,11 +232,12 @@ abstract class CControllerLatest extends CController {
 					foreach ($application_items as $itemid => $item) {
 						unset($item['applications']);
 
-						$items[$itemid] = $item;
 						$rows[] = [
 							'itemid' => $itemid,
 							'applicationid' => $applicationid
 						];
+
+						$items[$itemid] = $item;
 
 						if (count($rows) > $config['search_limit']) {
 							break 3;
