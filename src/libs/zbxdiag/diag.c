@@ -250,7 +250,7 @@ int	diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json 
 	{
 		int	i;
 
-		zbx_json_addobject(json, "historycache");
+		zbx_json_addobject(json,  ZBX_DIAG_HISTORYCACHE);
 
 		if (0 != (fields & ZBX_DIAG_HISTORYCACHE_SIMPLE))
 		{
@@ -396,7 +396,7 @@ int	diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json
 
 	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
-		zbx_json_addobject(json, "preprocessing");
+		zbx_json_addobject(json,  ZBX_DIAG_PREPROCESSING);
 
 		if (0 != (fields & ZBX_DIAG_PREPROC_SIMPLE))
 		{
@@ -553,19 +553,19 @@ static void	diag_add_section_request(struct zbx_json *j, const char *section, ..
 static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 {
 	if (0 != (flags & (1 << ZBX_DIAGINFO_HISTORYCACHE)))
-		diag_add_section_request(j, "historycache", "values", NULL);
+		diag_add_section_request(j,  ZBX_DIAG_HISTORYCACHE, "values", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_VALUECACHE)))
-		diag_add_section_request(j, "valuecache", "values", "request.values", NULL);
+		diag_add_section_request(j,  ZBX_DIAG_VALUECACHE, "values", "request.values", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_PREPROCESSING)))
-		diag_add_section_request(j, "preprocessing", "values", NULL);
+		diag_add_section_request(j,  ZBX_DIAG_PREPROCESSING, "values", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_LLD)))
-		diag_add_section_request(j, "lld", "values", NULL);
+		diag_add_section_request(j,  ZBX_DIAG_LLD, "values", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_ALERTING)))
-		diag_add_section_request(j, "alerting", "media.alerts", "source.alerts", NULL);
+		diag_add_section_request(j,  ZBX_DIAG_ALERTING, "media.alerts", "source.alerts", NULL);
 }
 
 /******************************************************************************
@@ -703,7 +703,7 @@ static void	diag_log_history_cache(struct zbx_json_parse *jp)
 {
 	char	*msg = NULL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "== historycache diagnostic information ==");
+	zabbix_log(LOG_LEVEL_INFORMATION, "== history cache diagnostic information ==");
 
 	diag_get_simple_values(jp, &msg);
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
@@ -728,7 +728,7 @@ static void	diag_log_value_cache(struct zbx_json_parse *jp)
 {
 	char	*msg = NULL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "== valuecache diagnostic information ==");
+	zabbix_log(LOG_LEVEL_INFORMATION, "== value cache diagnostic information ==");
 
 	diag_get_simple_values(jp, &msg);
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s", msg);
@@ -846,15 +846,15 @@ void	zbx_diag_log_info(unsigned int flags)
 				continue;
 			}
 
-			if (0 == strcmp(section, "historycache"))
+			if (0 == strcmp(section,  ZBX_DIAG_HISTORYCACHE))
 				diag_log_history_cache(&jp_section);
-			else if (0 == strcmp(section, "valuecache"))
+			else if (0 == strcmp(section,  ZBX_DIAG_VALUECACHE))
 				diag_log_value_cache(&jp_section);
-			else if (0 == strcmp(section, "preprocessing"))
+			else if (0 == strcmp(section,  ZBX_DIAG_PREPROCESSING))
 				diag_log_preprocessing(&jp_section);
-			else if (0 == strcmp(section, "lld"))
+			else if (0 == strcmp(section,  ZBX_DIAG_LLD))
 				diag_log_lld(&jp_section);
-			else if (0 == strcmp(section, "alerting"))
+			else if (0 == strcmp(section,  ZBX_DIAG_ALERTING))
 				diag_log_alerting(&jp_section);
 		}
 	}

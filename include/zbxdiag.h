@@ -24,6 +24,24 @@
 #include "common.h"
 #include "zbxjson.h"
 
+typedef enum
+{
+	ZBX_DIAGINFO_UNDEFINED = -1,
+	ZBX_DIAGINFO_ALL,
+	ZBX_DIAGINFO_HISTORYCACHE,
+	ZBX_DIAGINFO_VALUECACHE,
+	ZBX_DIAGINFO_PREPROCESSING,
+	ZBX_DIAGINFO_LLD,
+	ZBX_DIAGINFO_ALERTING
+}
+zbx_diaginfo_section_t;
+
+#define ZBX_DIAG_HISTORYCACHE	"historycache"
+#define ZBX_DIAG_VALUECACHE	"valuecache"
+#define ZBX_DIAG_PREPROCESSING	"preprocessing"
+#define ZBX_DIAG_LLD		"lld"
+#define ZBX_DIAG_ALERTING	"alerting"
+
 int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info);
 void	zbx_diag_log_info(unsigned int flags);
 

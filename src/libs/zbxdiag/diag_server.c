@@ -23,6 +23,7 @@
 #include "../../libs/zbxdbcache/valuecache.h"
 #include "zbxlld.h"
 #include "zbxalert.h"
+#include "zbxdiag.h"
 
 #include "diag.h"
 
@@ -114,7 +115,7 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
-		zbx_json_addobject(json, "valuecache");
+		zbx_json_addobject(json,  ZBX_DIAG_VALUECACHE);
 
 		if (0 != (fields & ZBX_DIAG_VALUECACHE_SIMPLE))
 		{
@@ -255,7 +256,7 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 
 	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
-		zbx_json_addobject(json, "lld");
+		zbx_json_addobject(json,  ZBX_DIAG_LLD);
 
 		if (0 != (fields & ZBX_DIAG_LLD_SIMPLE))
 		{
@@ -415,7 +416,7 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 
 	if (SUCCEED == (ret = diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
-		zbx_json_addobject(json, "alerting");
+		zbx_json_addobject(json,  ZBX_DIAG_ALERTING);
 
 		if (0 != (fields & ZBX_DIAG_ALERTING_SIMPLE))
 		{
@@ -521,18 +522,19 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 {
 	int	ret = FAIL;
 
-	if (0 == strcmp(section, "historycache"))
+	if (0 == strcmp(section, ZBX_DIAG_HISTORYCACHE))
 		ret = diag_add_historycache_info(jp, json, error);
-	else if (0 == strcmp(section, "valuecache"))
+	else if (0 == strcmp(section, ZBX_DIAG_VALUECACHE))
 		ret = diag_add_valuecache_info(jp, json, error);
-	else if (0 == strcmp(section, "preprocessing"))
+	else if (0 == strcmp(section,  ZBX_DIAG_PREPROCESSING))
 		ret = diag_add_preproc_info(jp, json, error);
-	else if (0 == strcmp(section, "lld"))
+	else if (0 == strcmp(section,  ZBX_DIAG_LLD))
 		ret = diag_add_lld_info(jp, json, error);
-	else if (0 == strcmp(section, "alerting"))
+	else if (0 == strcmp(section,  ZBX_DIAG_ALERTING))
 		ret = diag_add_alerting_info(jp, json, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
 
 	return ret;
 }
+

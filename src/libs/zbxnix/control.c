@@ -18,6 +18,7 @@
 **/
 
 #include "control.h"
+#include "zbxdiag.h"
 
 static int	parse_log_level_options(const char *opt, size_t len, unsigned int *scope, unsigned int *data)
 {
@@ -177,21 +178,21 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		{
 			const char	*section = opt + ZBX_CONST_STRLEN(ZBX_DIAGINFO) + 1;
 
-			if (0 == strcmp(section, "historycache"))
+			if (0 == strcmp(section,  ZBX_DIAG_HISTORYCACHE))
 			{
 				scope = ZBX_DIAGINFO_HISTORYCACHE;
 			}
-			else if (0 == strcmp(section, "preprocessing"))
+			else if (0 == strcmp(section,  ZBX_DIAG_PREPROCESSING))
 			{
 				scope = ZBX_DIAGINFO_PREPROCESSING;
 			}
 			else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)))
 			{
-				if (0 == strcmp(section, "valuecache"))
+				if (0 == strcmp(section,  ZBX_DIAG_VALUECACHE))
 					scope = ZBX_DIAGINFO_VALUECACHE;
-				else if (0 == strcmp(section, "lld"))
+				else if (0 == strcmp(section,  ZBX_DIAG_LLD))
 					scope = ZBX_DIAGINFO_LLD;
-				else if (0 == strcmp(section, "alerting"))
+				else if (0 == strcmp(section,  ZBX_DIAG_ALERTING))
 					scope = ZBX_DIAGINFO_ALERTING;
 			}
 

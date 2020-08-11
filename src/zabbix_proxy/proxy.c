@@ -297,7 +297,7 @@ char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_DISABLED;
 
-volatile sig_atomic_t	zbx_diaginfo_scope = -1;
+volatile sig_atomic_t	zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -969,7 +969,7 @@ static void	zbx_main_sigusr_handler(int flags)
 	{
 		int	scope = ZBX_RTC_GET_SCOPE(flags);
 
-		if (0 == scope)
+		if (ZBX_DIAGINFO_ALL == scope)
 			zbx_diaginfo_scope = (1 << ZBX_DIAGINFO_HISTORYCACHE) |	(1 << ZBX_DIAGINFO_PREPROCESSING);
 		else
 			zbx_diaginfo_scope = 1 << scope;
@@ -1267,10 +1267,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			}
 		}
-		else if (-1 != zbx_diaginfo_scope)
+		else if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
 		{
 			zbx_diag_log_info(zbx_diaginfo_scope);
-			zbx_diaginfo_scope = -1;
+			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 		}
 
 		sleep(1);

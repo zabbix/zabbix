@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "zbxdiag.h"
 
 #include "diag.h"
 
@@ -41,9 +42,9 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 {
 	int	ret = FAIL;
 
-	if (0 == strcmp(section, "historycache"))
+	if (0 == strcmp(section, ZBX_DIAG_HISTORYCACHE))
 		ret = diag_add_historycache_info(jp, json, error);
-	else if (0 == strcmp(section, "preprocessing"))
+	else if (0 == strcmp(section, ZBX_DIAG_PREPROCESSING))
 		ret = diag_add_preproc_info(jp, json, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
