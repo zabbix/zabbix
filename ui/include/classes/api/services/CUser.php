@@ -1338,6 +1338,10 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
+
+		CSessionHelper::clear();
+		new CEncryptedCookieSession();
+
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
