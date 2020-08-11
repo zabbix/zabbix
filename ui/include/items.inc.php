@@ -1073,23 +1073,36 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
-	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-	if ($application !== '') {
-		$applicationids = array_keys(API::Application()->get([
+function getDataOverviewItems(?array $groupids = null, ?array &$hostids = null, ?string $application = ''): array {
+	$applicationids = ($application !== '')
+		? array_keys(API::Application()->get([
 			'output' => [],
 			'hostids' => $hostids,
 			'groupids' => $groupids,
 			'search' => ['name' => $application],
 			'preservekeys' => true
-		]));
+		]))
+		: null;
 
+	if ($hostids === null) {
+		$db_hosts = API::Host()->get([
+			'output' => [],
+			'groupids' => $groupids,
+			'applicationids' => $applicationids,
+			'monitored_hosts' => true,
+			'with_monitored_items' => true,
+			'preservekeys' => true,
+			'limit' => (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE)
+		]);
+		$hostids = array_keys($db_hosts);
+	}
+
+	if ($application !== '') {
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $limit,
 			'preservekeys' => true
 		]);
 	}
@@ -1100,7 +1113,6 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'groupids' => $groupids,
 			'monitored' => true,
 			'webitems' => true,
-			'limit' => $limit,
 			'preservekeys' => true
 		]);
 	}
@@ -1124,11 +1136,12 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
-	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
-			'hostids' => $hostids ? $hostids : null,
+			'hostids' => $hostids,
 			'groupids' => $groupids ? $groupids : null,
 			'search' => ['name' => $application],
 			'preservekeys' => true
@@ -1193,7 +1206,7 @@ function getDataOverviewLeft(?array $groupids, ?array $hostids, string $applicat
 	}
 	$db_items = array_intersect_key($db_items, array_flip($itemids));
 
-	$db_hosts = getDataOverviewHosts(null, null, $itemids);
+	$db_hosts = getDataOverviewHosts(null, $hostids, $itemids);
 	$db_hosts_ctn = count($db_hosts);
 	$db_hosts = array_slice($db_hosts, 0, (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE), true);
 
