@@ -208,14 +208,15 @@ abstract class CControllerLatest extends CController {
 				}
 			}
 
-			$rows = [];
+			$applications_index = [];
 			$items = [];
+			$rows = [];
 
 			uksort($items_grouped, function($hostid_1, $hostid_2) use ($hostids_index) {
 				return ($hostids_index[$hostid_1] <=> $hostids_index[$hostid_2]);
 			});
 
-			foreach ($items_grouped as $host_items_grouped) {
+			foreach ($items_grouped as $hostid => $host_items_grouped) {
 				uksort($host_items_grouped,
 					function($id_1, $id_2) use ($applicationids_index, $application_sort_options) {
 						if ($id_1 == 0 || $id_2 == 0) {
@@ -229,15 +230,19 @@ abstract class CControllerLatest extends CController {
 				foreach ($host_items_grouped as $applicationid => $application_items) {
 					CArrayHelper::sort($application_items, [$item_sort_options]);
 
+					$applications_index[$hostid][$applicationid] = [
+						'start' => count($rows)
+					];
+
 					foreach ($application_items as $itemid => $item) {
 						unset($item['applications']);
 
+						$applications_index[$hostid][$applicationid]['end'] = count($rows);
+						$items[$itemid] = $item;
 						$rows[] = [
 							'itemid' => $itemid,
 							'applicationid' => $applicationid
 						];
-
-						$items[$itemid] = $item;
 
 						if (count($rows) > $config['search_limit']) {
 							break 3;
@@ -251,6 +256,7 @@ abstract class CControllerLatest extends CController {
 			$hosts = [];
 			$applications = [];
 			$applications_size = [];
+			$applications_index = [];
 			$items = [];
 		}
 
@@ -273,6 +279,7 @@ abstract class CControllerLatest extends CController {
 			'hosts' => $hosts,
 			'applications' => $applications,
 			'applications_size' => $applications_size,
+			'applications_index' => $applications_index,
 			'items' => $items,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
 			'multiselect_host_data' => $multiselect_host_data
@@ -303,5 +310,35 @@ abstract class CControllerLatest extends CController {
 
 		$prepared_data['items'] = $items;
 		$prepared_data['history'] = $history;
+	}
+
+	/**
+	 * Add collapsed data from user profile.
+	 *
+	 * @param array $prepared_data  Data returned by prepareData method.
+	 */
+	protected function addCollapsedDataFromProfile(array &$prepared_data) {
+		$collapsed_index = [];
+		$collapsed_all = true;
+
+		foreach ($prepared_data['rows'] as $row) {
+			$hostid = $prepared_data['items'][$row['itemid']]['hostid'];
+			$applicationid = $row['applicationid'];
+
+			if (array_key_exists($hostid, $collapsed_index)
+					&& array_key_exists($applicationid, $collapsed_index[$hostid])) {
+				continue;
+			}
+
+			$collapsed = $applicationid
+				? (CProfile::get('web.latest.toggle', null, $applicationid) !== null)
+				: (CProfile::get('web.latest.toggle_other', null, $hostid) !== null);
+
+			$collapsed_index[$hostid][$applicationid] = $collapsed;
+			$collapsed_all = $collapsed_all && $collapsed;
+		}
+
+		$prepared_data['collapsed_index'] = $collapsed_index;
+		$prepared_data['collapsed_all'] = $collapsed_all;
 	}
 }
