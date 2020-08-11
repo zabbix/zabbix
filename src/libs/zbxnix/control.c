@@ -168,7 +168,8 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 		return FAIL;
 #endif
 	}
-	else if (0 == strncmp(opt, ZBX_DIAGINFO, ZBX_CONST_STRLEN(ZBX_DIAGINFO)))
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
+			0 == strncmp(opt, ZBX_DIAGINFO, ZBX_CONST_STRLEN(ZBX_DIAGINFO)))
 	{
 		command = ZBX_RTC_DIAGINFO;
 		data = 0;
