@@ -51,30 +51,29 @@ var manager *scheduler.Manager
 var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
 
-func processLoglevelCommand(c *remotecontrol.Client, cmd string) (err error) {
-	switch cmd {
-	case "log_level_increase":
-		if log.IncreaseLogLevel() {
-			message := fmt.Sprintf("Increased log level to %s", log.Level())
-			log.Infof(message)
-			err = c.Reply(message)
-		} else {
-			err = fmt.Errorf("Cannot increase log level above %s", log.Level())
-			log.Infof(err.Error())
-		}
-	case "log_level_decrease":
-		if log.DecreaseLogLevel() {
-			message := fmt.Sprintf("Decreased log level to %s", log.Level())
-			log.Infof(message)
-			err = c.Reply(message)
-		} else {
-			err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
-			log.Infof(err.Error())
-		}
-	default:
-		//Should never happen
-		return errors.New("Invalid log level parameter")
+func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
+	if log.IncreaseLogLevel() {
+		message := fmt.Sprintf("Increased log level to %s", log.Level())
+		log.Infof(message)
+		err = c.Reply(message)
+		return
 	}
+	err = fmt.Errorf("Cannot increase log level above %s", log.Level())
+	log.Infof(err.Error())
+
+	return
+}
+
+func processLoglevelDecreaseCommand(c *remotecontrol.Client) (err error) {
+	if log.DecreaseLogLevel() {
+		message := fmt.Sprintf("Decreased log level to %s", log.Level())
+		log.Infof(message)
+		err = c.Reply(message)
+		return
+	}
+	err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
+	log.Infof(err.Error())
+
 	return
 }
 
@@ -109,8 +108,10 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 	}
 
 	switch params[0] {
-	case "log_level_increase", "log_level_decrease":
-		err = processLoglevelCommand(c, params[0])
+	case "log_level_increase":
+		err = processLoglevelIncreaseCommand(c)
+	case "log_level_decrease":
+		err = processLoglevelDecreaseCommand(c)
 	case "help":
 		err = processHelpCommand(c)
 	case "metrics":
