@@ -981,7 +981,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_socket_t	listen_sock;
 	char		*error = NULL;
 	int		i, db_type;
-	pid_t		pid;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1257,25 +1256,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_set_sigusr_handler(zbx_main_sigusr_handler);
 
-	while (0 >= (pid = waitpid(-1, &i, WNOHANG)))	/* wait for any child to exit */
+	while (-1 == wait(&i))	/* wait for any child to exit */
 	{
-		if (-1 == pid)
+		if (EINTR != errno)
 		{
-			if (EINTR != errno)
-			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-				break;
-			}
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			break;
 		}
-		else if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
+
+		/* check if the wait was interrupted because of diaginfo remote command */
+		if (ZBX_DIAGINFO_UNDEFINED != zbx_diaginfo_scope)
 		{
 			zbx_diag_log_info(zbx_diaginfo_scope);
 			zbx_diaginfo_scope = ZBX_DIAGINFO_UNDEFINED;
 		}
-
-		sleep(1);
 	}
-
 
 	/* all exiting child processes should be caught by signal handlers */
 	THIS_SHOULD_NEVER_HAPPEN;
