@@ -12,7 +12,7 @@ require (
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mediocregopher/radix/v3 v3.5.0
-	github.com/memcachier/mc/v3 v3.0.0
+	github.com/memcachier/mc/v3 v3.0.1
 	github.com/natefinch/npipe v0.0.0-20160621034901-c1b8fa8bdcce
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/sys v0.0.0-20200428200454-593003d681fa
