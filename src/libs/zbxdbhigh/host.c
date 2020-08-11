@@ -3778,9 +3778,12 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	zbx_uint64_t		hostid = 0, hosttemplateid = 0, group_prototypeid = 0, hostmacroid = 0;
 	int			i, j, new_hosts = 0, new_hosts_templates = 0, new_group_prototypes = 0,
 				upd_group_prototypes = 0, new_hostmacros = 0, upd_hostmacros = 0,
-				new_tags = 0, upd_tags = 0;
+				new_tags = 0;
 	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_htemplates, db_insert_gproto,
 				db_insert_hmacro, db_insert_tag;
+	zbx_vector_db_tag_ptr_t	upd_tags;
+
+	zbx_vector_db_tag_ptr_create(&upd_tags);
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -3818,7 +3821,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			if (0 == tag->tagid)
 				new_tags++;
 			else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
-				upd_tags++;
+				zbx_vector_db_tag_ptr_append(&upd_tags, tag);
 		}
 	}
 
@@ -3833,7 +3836,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	}
 
 	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes || 0 != upd_hostmacros ||
-			0 != upd_tags)
+			0 != upd_tags.values_num)
 	{
 		sql1 = (char *)zbx_malloc(sql1, sql1_alloc);
 		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
@@ -4008,35 +4011,43 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				zbx_db_insert_add_values(&db_insert_tag, __UINT64_C(0), host_prototype->hostid,
 						tag->tag, tag->value);
 			}
-			else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
-			{
-				char	delim = ' ';
-
-				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update host_tag set");
-
-				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
-				{
-					value_esc = DBdyn_escape_string(tag->tag);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%ctag='%s'", delim,
-							value_esc);
-					zbx_free(value_esc);
-					delim = ',';
-				}
-
-				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
-				{
-					value_esc = DBdyn_escape_string(tag->value);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%cvalue='%s'", delim,
-							value_esc);
-					zbx_free(value_esc);
-				}
-
-				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-						" where hosttagid=" ZBX_FS_UI64 ";\n", tag->tagid);
-			}
 		}
 
 		DBexecute_overflowed_sql(&sql1, &sql1_alloc, &sql1_offset);
+	}
+
+	if (0 != upd_tags.values_num)
+	{
+		zbx_vector_db_tag_ptr_sort(&upd_tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		for (i = 0; i < upd_tags.values_num; i++)
+		{
+			char	delim = ' ';
+
+			tag = upd_tags.values[i];
+
+			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update host_tag set");
+
+			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+			{
+				value_esc = DBdyn_escape_string(tag->tag);
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%ctag='%s'", delim,
+						value_esc);
+				zbx_free(value_esc);
+				delim = ',';
+			}
+
+			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+			{
+				value_esc = DBdyn_escape_string(tag->value);
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%cvalue='%s'", delim,
+						value_esc);
+				zbx_free(value_esc);
+			}
+
+			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+					" where hosttagid=" ZBX_FS_UI64 ";\n", tag->tagid);
+		}
 	}
 
 	if (0 != new_hosts)
@@ -4089,6 +4100,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		DBexecute("%s", sql2);
 		zbx_free(sql2);
 	}
+
+	zbx_vector_db_tag_ptr_destroy(&upd_tags);
 }
 
 /******************************************************************************
