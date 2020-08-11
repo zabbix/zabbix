@@ -37,6 +37,13 @@ A.F.....S. [ZBXNEXT-5847] added logging of global script executions into audit l
 .........T [ZBXNEXT-5880] added component version item to server and proxy remote monitoring templates (vjaceslavs)
 
 Bug fixes:
+..F....... [ZBX-18204] fixed lost password in ssh remote command operation form data (talbergs)
+........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
+........S. [ZBX-18014] added ODBC empty query check (viktors)
+..F....... [ZBX-18160] fixed fatal error in items.php and host_discovery.php (rlataria)
+A......... [ZBX-13383] improved performance of the trigger and trigger prototype inheritance (Sasha)
+..F....... [ZBX-18092] reimplemented item folding based on application names and improved summary for each application in latest data view (averza, miks)
+A......... [ZBX-13789] improved performance of "Problems" widget with MySQL backend by removing DISTINCT modifier from SQL statements with tables joined by primary keys (Sasha)
 ...G...... [ZBX-18214] added collecting of physical CPU utilization data on IBM AIX and modified system.cpu.util[] (Andris)
 ...G...... [ZBX-17974] implement timeouts for WMI queries (arimdjonoks)
 ..F....... [ZBX-18149] fixed discovered hosts showing links to host prototypes which should not possible (Ivo)
