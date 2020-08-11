@@ -569,8 +569,12 @@ class CIntegrationTest extends CAPITest {
 			throw new Exception('There is no client available for Zabbix Agent.');
 		}
 
+		$settings = $this->call('settings.get', [
+			'output' => ['socket_timeout']
+		]);
+
 		return new CZabbixClient('localhost', self::getConfigurationValue($component, 'ListenPort', 10051),
-				ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT
+			timeUnitToSeconds($settings['result'][0]['socket_timeout']), ZBX_SOCKET_BYTES_LIMIT
 		);
 	}
 

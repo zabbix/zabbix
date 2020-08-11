@@ -41,7 +41,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOTIF_INDIC)
 			->addClass(getSeverityStyle($severity)),
-		new CTag('h4', true, getSeverityName($severity, $data['config'])),
+		new CTag('h4', true, getSeverityName($severity)),
 		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
 	]);
 }
@@ -137,7 +137,6 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			'groups' => $data['filter']['groups'],
 			'hosts' => $data['filter']['hosts']
 		],
-		'config' => $data['config'],
 		'profileIdx' => $data['profileIdx'],
 		'active_tab' => $data['active_tab']
 	]));

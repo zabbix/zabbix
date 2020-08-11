@@ -130,7 +130,9 @@ class CControllerPopupMediatypeTestSend extends CController {
 		}
 
 		$params['mediatypeid'] = $this->getInput('mediatypeid');
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_MEDIA_TYPE_TEST_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
 		$result = $server->testMediaType($params, CWebUser::getSessionCookie());
 		$debug = $server->getDebug();
 

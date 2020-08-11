@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -19,36 +19,21 @@
 **/
 
 
-class CControllerWorkingTimeEdit extends CController {
+/**
+ * Converter for converting import data from 5.0 to 5.2.
+ */
+class C50ImportConverter extends CConverter {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+	/**
+	 * Convert import data from 5.0 to 5.2 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert($data): array {
+		$data['zabbix_export']['version'] = '5.2';
 
-	protected function checkInput() {
-		$fields = [
-			'work_period' => 'db config.work_period'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
-	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
-	}
-
-	protected function doAction() {
-		$config = select_config();
-		$data = ['work_period' => $this->getInput('work_period', $config['work_period'])];
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of working time'));
-		$this->setResponse($response);
+		return $data;
 	}
 }

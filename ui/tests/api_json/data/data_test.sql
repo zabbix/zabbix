@@ -242,7 +242,7 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VA
 INSERT INTO hosts (hostid, host, status, description) VALUES (99003, 'Api active proxy in action', 5, '');
 INSERT INTO hosts (hostid, host, status, description) VALUES (99004, 'Api active proxy with host', 5, '');
 INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99005, 99004,'API Host monitored with proxy', 'API Host monitored with proxy', 0, '');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99003,99004,1,1,1,'127.0.0.1','','10050');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99003,99005,1,1,1,'127.0.0.1','','10050');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90, 'API action with proxy', 1, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (90, 90, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (90, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);

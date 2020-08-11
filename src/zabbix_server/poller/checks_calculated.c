@@ -87,7 +87,7 @@ static int	calcitem_add_function(expression_t *exp, char *host, char *key, char 
 static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *error, int max_error_len)
 {
 	char	*e, *buf = NULL, *tmp_exp;
-	size_t	exp_alloc = 128, exp_offset = 0, f_pos, par_l, par_r;
+	size_t	exp_alloc = 128, exp_offset = 0, f_pos, par_l = 0, par_r = 0;
 	int	ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, dc_item->params);

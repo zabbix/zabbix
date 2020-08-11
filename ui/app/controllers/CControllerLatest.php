@@ -37,8 +37,6 @@ abstract class CControllerLatest extends CController {
 	 * @param string $sort_order                  Sorting order.
 	 */
 	protected function prepareData(array $filter, $sort_field, $sort_order) {
-		$config = select_config();
-
 		$multiselect_hostgroup_data = [];
 		$multiselect_host_data = [];
 
@@ -172,13 +170,14 @@ abstract class CControllerLatest extends CController {
 			});
 
 			$select_items = [];
+			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 
 			foreach ($items_of_hosts as $host_items) {
 				$select_items += $filter['show_without_data']
 					? $host_items
-					: Manager::History()->getItemsHavingValues($host_items, ZBX_HISTORY_PERIOD);
+					: Manager::History()->getItemsHavingValues($host_items, $history_period);
 
-				if (count($select_items) > $config['search_limit']) {
+				if (count($select_items) > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)) {
 					break;
 				}
 			}
@@ -239,6 +238,7 @@ abstract class CControllerLatest extends CController {
 				}
 			}
 
+			$applications_index = [];
 			$items = [];
 			$rows = [];
 
@@ -246,7 +246,7 @@ abstract class CControllerLatest extends CController {
 				return (array_search($hostid_1, $hostids, true) <=> array_search($hostid_2, $hostids, true));
 			});
 
-			foreach ($items_grouped as $host_items_grouped) {
+			foreach ($items_grouped as $hostid => $host_items_grouped) {
 				uksort($host_items_grouped, function($id_1, $id_2) use ($applicationids, $application_sort_options) {
 					if ($id_1 == 0 || $id_2 == 0) {
 						return bccomp($id_1, $id_2) * (($application_sort_options['order'] === 'ASC') ? -1 : 1);
@@ -258,16 +258,21 @@ abstract class CControllerLatest extends CController {
 				foreach ($host_items_grouped as $applicationid => $application_items) {
 					CArrayHelper::sort($application_items, [$item_sort_options]);
 
+					$applications_index[$hostid][$applicationid] = [
+						'start' => count($rows)
+					];
+
 					foreach ($application_items as $itemid => $item) {
 						unset($item['applications']);
 
+						$applications_index[$hostid][$applicationid]['end'] = count($rows);
 						$items[$itemid] = $item;
 						$rows[] = [
 							'itemid' => $itemid,
 							'applicationid' => $applicationid
 						];
 
-						if (count($rows) > $config['search_limit']) {
+						if (count($rows) > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)) {
 							break 3;
 						}
 					}
@@ -281,7 +286,7 @@ abstract class CControllerLatest extends CController {
 			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
 			// Choosing max history period for already filtered items having data.
-			$history_period = $filter['show_without_data'] ? ZBX_HISTORY_PERIOD : null;
+			$history_period = $filter['show_without_data'] ? $history_period : null;
 
 			$history = Manager::History()->getLastValues($items, 2, $history_period);
 		}
@@ -290,6 +295,7 @@ abstract class CControllerLatest extends CController {
 			$hosts = [];
 			$applications = [];
 			$applications_size = [];
+			$applications_index = [];
 			$history = [];
 		}
 
@@ -312,10 +318,36 @@ abstract class CControllerLatest extends CController {
 			'hosts' => $hosts,
 			'applications' => $applications,
 			'applications_size' => $applications_size,
+			'applications_index' => $applications_index,
 			'items' => $items,
 			'history' => $history,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
 			'multiselect_host_data' => $multiselect_host_data
 		];
+	}
+
+	protected function addCollapsedDataFromProfile(array &$prepared_data) {
+		$collapsed_index = [];
+		$collapsed_all = true;
+
+		foreach ($prepared_data['rows'] as $row) {
+			$hostid = $prepared_data['items'][$row['itemid']]['hostid'];
+			$applicationid = $row['applicationid'];
+
+			if (array_key_exists($hostid, $collapsed_index)
+					&& array_key_exists($applicationid, $collapsed_index[$hostid])) {
+				continue;
+			}
+
+			$collapsed = $applicationid
+				? (CProfile::get('web.latest.toggle', null, $applicationid) !== null)
+				: (CProfile::get('web.latest.toggle_other', null, $hostid) !== null);
+
+			$collapsed_index[$hostid][$applicationid] = $collapsed;
+			$collapsed_all = $collapsed_all && $collapsed;
+		}
+
+		$prepared_data['collapsed_index'] = $collapsed_index;
+		$prepared_data['collapsed_all'] = $collapsed_all;
 	}
 }

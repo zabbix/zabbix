@@ -412,7 +412,6 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		mem_size = 0, byte_value = 0;
 	double			pct_size = 0.0, pct_value = 0.0;
 	size_t			*p_value;
-	zbx_sysinfo_proc_t	*proc = NULL;
 
 	if (5 < request->nparam)
 	{
@@ -575,7 +574,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct passwd		*usrinfo;
 	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
-	zbx_sysinfo_proc_t	*proc;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
 	int			zoneflag;
@@ -698,6 +696,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 			proccount++;
 		}
+
 		zbx_sysinfo_proc_clear(&proc);
 	}
 

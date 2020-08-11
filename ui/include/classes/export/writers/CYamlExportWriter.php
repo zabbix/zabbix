@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -20,28 +20,18 @@
 
 
 /**
- * @var CView $this
+ * Class for converting array with export data to YAML format.
  */
+class CYamlExportWriter extends CExportWriter {
 
-$widget = (new CWidget())
-	->setTitle(_('Working time'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
-
-$table = (new CTabView())
-	->addTab('workingTime', _('Working time'),
-		(new CFormList())
-			->addRow((new CLabel(_('Working time'), 'work_period'))->setAsteriskMark(),
-				(new CTextBox('work_period', $data['work_period']))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired()
-					->setAttribute('autofocus', 'autofocus')
-			)
-	)
-	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
-
-$form = (new CForm())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'workingtime.update')->getUrl())
-	->addItem($table);
-
-$widget->addItem($form)->show();
+	/**
+	 * Converts array with export data to YAML format.
+	 *
+	 * @param array $array
+	 *
+	 * @return string
+	 */
+	public function write(array $array): string {
+		return yaml_emit($array, YAML_UTF8_ENCODING, YAML_LN_BREAK);
+	}
+}

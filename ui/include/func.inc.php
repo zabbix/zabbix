@@ -1514,9 +1514,9 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	else {
 		// url to redirect the user to after he logs in
 		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
-		$config = select_config();
 
-		if ($config['http_login_form'] == ZBX_AUTH_FORM_HTTP && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
+				&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
 				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
 			$redirect_to = (new CUrl('index_http.php'))->setArgument('request', $url->toString());
 			redirect($redirect_to->toString());
@@ -1655,14 +1655,16 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 }
 
 /**
- * Filters messages that can be displayed to user based on defines (see ZBX_SHOW_TECHNICAL_ERRORS) and user settings.
+ * Filters messages that can be displayed to user based on CSettingsHelper::SHOW_TECHNICAL_ERRORS and user settings.
  *
  * @param array $messages	List of messages to filter.
  *
  * @return array
  */
 function filter_messages(array $messages = []) {
-	if (!ZBX_SHOW_TECHNICAL_ERRORS && CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+	if (!CSettingsHelper::getGlobal(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
+			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN
+			&& !CWebUser::getDebugMode()) {
 		$filtered_messages = [];
 		$generic_exists = false;
 
@@ -2022,7 +2024,9 @@ function get_status() {
 		'has_status' => false
 	];
 
-	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+	);
 	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
 
 	if ($status['is_running'] === false) {
@@ -2487,13 +2491,16 @@ function getTimeSelectorPeriod(array $options) {
 	$profileIdx2 = array_key_exists('profileIdx2', $options) ? $options['profileIdx2'] : null;
 
 	if ($profileIdx === null) {
-		$options['from'] = ZBX_PERIOD_DEFAULT_FROM;
-		$options['to'] = ZBX_PERIOD_DEFAULT_TO;
+		$options['from'] = 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT);
+		$options['to'] = 'now';
 	}
 	elseif (!array_key_exists('from', $options) || !array_key_exists('to', $options)
 			|| $options['from'] === null || $options['to'] === null) {
-		$options['from'] = CProfile::get($profileIdx.'.from', ZBX_PERIOD_DEFAULT_FROM, $profileIdx2);
-		$options['to'] = CProfile::get($profileIdx.'.to', ZBX_PERIOD_DEFAULT_TO, $profileIdx2);
+		$options['from'] = CProfile::get($profileIdx.'.from',
+			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT),
+			$profileIdx2
+		);
+		$options['to'] = CProfile::get($profileIdx.'.to', 'now', $profileIdx2);
 	}
 
 	$range_time_parser = new CRangeTimeParser();

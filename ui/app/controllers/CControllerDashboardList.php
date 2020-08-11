@@ -59,8 +59,6 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		CProfile::update('web.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		$config = select_config();
-
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sort_field,
@@ -68,9 +66,10 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		];
 
 		// list of dashboards
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['dashboards'] = API::Dashboard()->get([
 			'output' => ['dashboardid', 'name'],
-			'limit' => $config['search_limit'] + 1,
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 

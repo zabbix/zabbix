@@ -35,8 +35,6 @@ class CServiceTree extends CTree {
 	 * @return CCol
 	 */
 	protected function makeCol($rowId, $colName) {
-		$config = select_config();
-
 		switch ($colName) {
 			case 'status':
 				if (zbx_is_int($this->tree[$rowId][$colName]) && $this->tree[$rowId]['id'] > 0) {
@@ -47,7 +45,7 @@ class CServiceTree extends CTree {
 						return (new CCol(_('OK')))->addClass(ZBX_STYLE_GREEN);
 					}
 					else {
-						return (new CCol(getSeverityName($status, $config)))->addClass(getSeverityStyle($status));
+						return (new CCol(getSeverityName($status)))->addClass(getSeverityStyle($status));
 					}
 				}
 				break;

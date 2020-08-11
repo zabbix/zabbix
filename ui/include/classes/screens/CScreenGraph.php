@@ -170,8 +170,8 @@ class CScreenGraph extends CScreenBase {
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$src
-				->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
-				->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
+				->setArgument('from', 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT))
+				->setArgument('to', 'now');
 		}
 		else {
 			$src

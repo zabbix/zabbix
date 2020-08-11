@@ -389,7 +389,7 @@ class CItem extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!$options['countOutput']) {
 				$result[$item['itemid']] = $item;
@@ -1164,7 +1164,9 @@ class CItem extends CItemGeneral {
 			$requestedOutput['prevvalue'] = true;
 		}
 		if ($requestedOutput) {
-			$history = Manager::History()->getLastValues($result, 2, ZBX_HISTORY_PERIOD);
+			$history = Manager::History()->getLastValues($result, 2, timeUnitToSeconds(CSettingsHelper::get(
+				CSettingsHelper::HISTORY_PERIOD
+			)));
 			foreach ($result as &$item) {
 				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
 				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
@@ -1193,12 +1195,12 @@ class CItem extends CItemGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($this->outputIsRequested('state', $options['output'])
-				|| $this->outputIsRequested('error', $options['output'])
+		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
+				|| $this->outputIsRequested('error', $options['output'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
 				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-			$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
-			$sqlParts['left_table'] = $tableName;
+			$sqlParts['left_join'][] = ['alias' => 'ir', 'table' => 'item_rtdata', 'using' => 'itemid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		if (!$options['countOutput']) {

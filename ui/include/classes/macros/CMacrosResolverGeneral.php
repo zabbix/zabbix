@@ -782,7 +782,9 @@ class CMacrosResolverGeneral {
 						// break; is not missing here
 
 					case 'ITEM.LASTVALUE':
-						$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
+						$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
+							CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+						));
 
 						if (array_key_exists($function['itemid'], $history)) {
 							$clock = $history[$function['itemid']][0]['clock'];
