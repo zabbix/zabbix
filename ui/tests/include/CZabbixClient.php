@@ -24,6 +24,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/classes/server/CZabbixServer.php';
 require_once dirname(__FILE__).'/../../include/classes/helpers/CSettingsHelper.php';
+require_once dirname(__FILE__).'/../../include/classes/helpers/CConfigGeneralHelper.php';
 
 /**
  * Client for Zabbix Server/Proxy protocol.
