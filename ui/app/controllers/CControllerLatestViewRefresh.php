@@ -79,6 +79,7 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 
 		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['rows'], ZBX_SORT_UP, $view_curl);
 
+		$this->extendData($prepared_data, $filter['show_without_data']);
 		$this->addCollapsedDataFromProfile($prepared_data);
 
 		// display
