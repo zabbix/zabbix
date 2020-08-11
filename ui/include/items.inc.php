@@ -1109,9 +1109,6 @@ function getDataOverviewItems(?array $groupids = null, ?array &$hostids = null, 
 			'applicationids' => $applicationids,
 			'monitored' => true,
 			'webitems' => true,
-			'sortfield' => 'name',
-			'sortorder' => ZBX_SORT_UP,
-			'limit' => (ZBX_MAX_TABLE_COLUMNS ** 2),
 			'preservekeys' => true
 		]);
 	}
@@ -1122,9 +1119,6 @@ function getDataOverviewItems(?array $groupids = null, ?array &$hostids = null, 
 			'groupids' => $groupids,
 			'monitored' => true,
 			'webitems' => true,
-			'sortfield' => 'name',
-			'sortorder' => ZBX_SORT_UP,
-			'limit' => (ZBX_MAX_TABLE_COLUMNS ** 2),
 			'preservekeys' => true
 		]);
 	}
