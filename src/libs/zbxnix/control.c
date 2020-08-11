@@ -172,27 +172,27 @@ int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 	{
 		command = ZBX_RTC_DIAGINFO;
 		data = 0;
-		scope = 0;
+		scope = ZBX_DIAGINFO_ALL;
 
 		if ('=' == opt[ZBX_CONST_STRLEN(ZBX_DIAGINFO)])
 		{
 			const char	*section = opt + ZBX_CONST_STRLEN(ZBX_DIAGINFO) + 1;
 
-			if (0 == strcmp(section,  ZBX_DIAG_HISTORYCACHE))
+			if (0 == strcmp(section, ZBX_DIAG_HISTORYCACHE))
 			{
 				scope = ZBX_DIAGINFO_HISTORYCACHE;
 			}
-			else if (0 == strcmp(section,  ZBX_DIAG_PREPROCESSING))
+			else if (0 == strcmp(section, ZBX_DIAG_PREPROCESSING))
 			{
 				scope = ZBX_DIAGINFO_PREPROCESSING;
 			}
 			else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER)))
 			{
-				if (0 == strcmp(section,  ZBX_DIAG_VALUECACHE))
+				if (0 == strcmp(section, ZBX_DIAG_VALUECACHE))
 					scope = ZBX_DIAGINFO_VALUECACHE;
-				else if (0 == strcmp(section,  ZBX_DIAG_LLD))
+				else if (0 == strcmp(section, ZBX_DIAG_LLD))
 					scope = ZBX_DIAGINFO_LLD;
-				else if (0 == strcmp(section,  ZBX_DIAG_ALERTING))
+				else if (0 == strcmp(section, ZBX_DIAG_ALERTING))
 					scope = ZBX_DIAGINFO_ALERTING;
 			}
 
