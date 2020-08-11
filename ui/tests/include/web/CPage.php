@@ -189,11 +189,12 @@ class CPage {
 			$data = ['sessionid' => $sessionid];
 			$data['sign'] = CEncryptHelper::sign(serialize($data));
 
+			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
 				'name' => 'zbx_session',
 				'value' => base64_encode(serialize($data)),
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
-				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
+				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 
 			$this->driver->get(PHPUNIT_URL);
