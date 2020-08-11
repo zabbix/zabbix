@@ -10,6 +10,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-18204] fixed lost password in ssh remote command operation form data (talbergs)
+A......... [ZBX-18046] improved error message generation performance of user macro and item key parser (vmurzins)
 ........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
 ........S. [ZBX-18014] added ODBC empty query check (viktors)
 ..F....... [ZBX-18160] fixed fatal error in items.php and host_discovery.php (rlataria)
@@ -1660,6 +1661,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.24rc1
 
 Bug fixes:
+A......... [ZBX-18046] improved error message generation performance of user macro and item key parser (vmurzins)
 ........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
 ........S. [ZBX-18014] added ODBC empty query check (viktors)
 ..F....... [ZBX-18160] fixed fatal error in items.php and host_discovery.php (rlataria)
