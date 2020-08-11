@@ -515,6 +515,7 @@ class ZBase {
 				'theme' => ZBX_DEFAULT_THEME
 			]))->getOutput();
 
+			session_write_close();
 			exit();
 		}
 	}
