@@ -161,7 +161,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		$hostTemplates,
 		$status,
 		$discover,
-		$data['tags']
+		$data['tags'][$hostPrototype['hostid']]
 	]);
 }
 
