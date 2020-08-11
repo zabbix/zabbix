@@ -440,9 +440,17 @@
 
 		const $mediatype_default_select = this.$mediatype_default.find('select');
 		const $mediatype_only_select = this.$mediatype_only.find('select');
-		conf.mediatypes.forEach(({mediatypeid, name}) => {
-			$mediatype_default_select.append($('<option />', {text: name, value: mediatypeid}));
-			$mediatype_only_select.append($('<option />', {text: name, value: mediatypeid}));
+		conf.mediatypes.forEach(({mediatypeid, name, status}) => {
+			$mediatype_default_select.append($('<option />', {
+				text: name,
+				value: mediatypeid,
+				class: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
+			}));
+			$mediatype_only_select.append($('<option />', {
+				text: name,
+				value: mediatypeid,
+				class: (status == operation_details.MEDIA_TYPE_DISABLED) ? operation_details.ZBX_STYLE_RED : null
+			}));
 		});
 
 		$mediatype_default_select.val(conf.mediatypeid);
@@ -464,6 +472,9 @@
 			this.$notice.appendTo($wrapper);
 			this.$usergroups.appendTo($wrapper);
 			this.$users.appendTo($wrapper);
+			this.$mediatype_only.appendTo($wrapper);
+		}
+		else if (props.operation_type == operation_details.OPERATION_TYPE_ACK_MESSAGE) {
 			this.$mediatype_default.appendTo($wrapper);
 		}
 		else if (props.recovery_phase == operation_details.ACTION_OPERATION
@@ -616,6 +627,7 @@
 		this.$authtype_select = this.$authtype.find('select');
 		this.$privatekey_input = this.$privatekey.find('input');
 		this.$publickey_input = this.$pubkey.find('input');
+		this.$password_input = this.$password.find('input');
 		this.$passphrase_input = this.$passphrase.find('input');
 
 		this.$authtype_select.on('change', ({target}) => {
@@ -633,9 +645,16 @@
 	 */
 	OperationViewCommandTypeSSH.prototype.viewAuthTypePublicKey = function() {
 		this.$password.hide();
+		this.$password_input.prop('disabled', true);
+
 		this.$passphrase.show();
+		this.$passphrase_input.prop('disabled', false);
+
 		this.$privatekey.show();
+		this.$privatekey_input.prop('disabled', false);
+
 		this.$pubkey.show();
+		this.$publickey_input.prop('disabled', false);
 	};
 
 	/**
@@ -643,9 +662,16 @@
 	 */
 	OperationViewCommandTypeSSH.prototype.viewAuthTypePassword = function() {
 		this.$password.show();
+		this.$password_input.prop('disabled', false);
+
 		this.$passphrase.hide();
+		this.$passphrase_input.prop('disabled', true);
+
 		this.$privatekey.hide();
+		this.$privatekey_input.prop('disabled', true);
+
 		this.$pubkey.hide();
+		this.$publickey_input.prop('disabled', true);
 	};
 
 	/**
@@ -658,6 +684,7 @@
 		this.$privatekey_input.val(conf.privatekey);
 		this.$publickey_input.val(conf.publickey);
 		this.$passphrase_input.val(conf.password);
+		this.$password_input.val(conf.password);
 	};
 
 	/**
@@ -1466,4 +1493,6 @@
 	window.operation_details.ITEM_AUTHTYPE_PUBLICKEY                   = <?= ITEM_AUTHTYPE_PUBLICKEY ?>;
 	window.operation_details.EVENT_SOURCE_TRIGGERS                     = <?= EVENT_SOURCE_TRIGGERS ?>;
 	window.operation_details.PAGE_TYPE_TEXT_RETURN_JSON                = <?= PAGE_TYPE_TEXT_RETURN_JSON ?>;
+	window.operation_details.MEDIA_TYPE_DISABLED                       = <?= MEDIA_TYPE_STATUS_DISABLED ?>;
+	window.operation_details.ZBX_STYLE_RED                             = '<?= ZBX_STYLE_RED ?>';
 </script>

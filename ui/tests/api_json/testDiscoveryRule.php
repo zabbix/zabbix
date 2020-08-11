@@ -4979,7 +4979,7 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array $request_lld_override['filter']      (optional)
 	 * @param array $request_lld_override['operations']  (optional)
 	 */
-	private function assertLLDOverride(array $db_lld_override, array $request_lld_override) {
+	private function assertLLDOverride(array $db_lld_override, array $request_lld_override, bool $debug = false) {
 		$this->assertEquals($db_lld_override['name'], $request_lld_override['name']);
 		$this->assertEquals($db_lld_override['step'], $request_lld_override['step'], 'Override step value.');
 
@@ -4989,7 +4989,7 @@ class testDiscoveryRule extends CAPITest {
 		$this->assertEquals($db_lld_override['stop'], $stop, 'Override stop value.');
 
 		if (array_key_exists('filter', $request_lld_override)) {
-			$this->assertLLDOverrideFilter($db_lld_override, $request_lld_override['filter']);
+			$this->assertLLDOverrideFilter($db_lld_override, $request_lld_override['filter'], $debug);
 		}
 		else {
 			$this->assertEmpty($db_lld_override['formula']);
@@ -5033,7 +5033,7 @@ class testDiscoveryRule extends CAPITest {
 	 * @param array $filter['conditions'][]['formulaid']        (optional) if evaltype is CONDITION_EVAL_TYPE_EXPRESSION
 	 * @param array $filter['conditions'][]['operator']         (optional)
 	 */
-	private function assertLLDOverrideFilter(array $db_lld_override, array $filter) {
+	private function assertLLDOverrideFilter(array $db_lld_override, array $filter, bool $debug = false) {
 		$db_lld_conditions = CDBHelper::getAll('SELECT * from lld_override_condition WHERE '.
 			dbConditionId('lld_overrideid', (array) $db_lld_override['lld_overrideid'])
 		);
@@ -5050,6 +5050,9 @@ class testDiscoveryRule extends CAPITest {
 				array_column($db_lld_conditions, 'lld_override_conditionid')
 			);
 			$formula = CConditionHelper::replaceLetterIds($filter['formula'], $conditionid_by_formulaid);
+if ($debug) {
+	file_put_contents('/tmp/testDiscoveryRuleOverrides.txt', var_export(['time' => (new DateTime())->format('r'), 'db_lld_conditions' => $db_lld_conditions, 'formula1' => $filter['formula'], 'formula' => $formula], true), FILE_APPEND);
+}
 			$this->assertEquals($db_lld_override['formula'], $formula);
 		}
 
@@ -5482,8 +5485,9 @@ class testDiscoveryRule extends CAPITest {
 				return $a['lld_overrideid'] <=> $b['lld_overrideid'];
 			});
 
+file_put_contents('/tmp/testDiscoveryRuleOverrides.txt', var_export(['time' => (new DateTime())->format('r'), 'request_lld_overrides' => $request_lld_overrides, 'db_lld_overrides' => $db_lld_overrides], true), FILE_APPEND);
 			foreach ($request_lld_overrides as $override_num => $request_lld_override) {
-				$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override);
+				$this->assertLLDOverride($db_lld_overrides[$override_num], $request_lld_override, true);
 			}
 		}
 	}
