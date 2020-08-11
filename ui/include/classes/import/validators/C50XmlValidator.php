@@ -768,12 +768,6 @@ class C50XmlValidator {
 											'value' =>					['type' => XML_STRING, 'default' => ''],
 											'description' =>			['type' => XML_STRING, 'default' => '']
 										]]
-									]],
-									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY, 'rules' => [
-											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING, 'default' => '']
-										]]
 									]]
 								]]
 							]],
@@ -1380,12 +1374,6 @@ class C50XmlValidator {
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET]],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
 											'description' =>			['type' => XML_STRING, 'default' => '']
-										]]
-									]],
-									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY, 'rules' => [
-											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
 									]]
 								]]
