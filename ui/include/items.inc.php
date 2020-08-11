@@ -1096,14 +1096,6 @@ function getDataOverviewItems(?array $groupids = null, ?array &$hostids = null, 
 	}
 
 	if ($application !== '') {
-		$applicationids = array_keys(API::Application()->get([
-			'output' => [],
-			'hostids' => $hostids,
-			'groupids' => $groupids,
-			'search' => ['name' => $application],
-			'preservekeys' => true
-		]));
-
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'applicationids' => $applicationids,
