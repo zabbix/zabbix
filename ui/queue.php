@@ -47,6 +47,7 @@ CProfile::update('web.queue.config', $config, PROFILE_TYPE_INT);
 
 // fetch data
 $zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+	timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 	timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 );
 $queueRequests = [

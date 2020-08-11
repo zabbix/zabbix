@@ -2025,6 +2025,7 @@ function get_status() {
 	];
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 	);
 	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
@@ -2033,7 +2034,9 @@ function get_status() {
 		return $status;
 	}
 
-	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
+	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+		timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)), 15, ZBX_SOCKET_BYTES_LIMIT
+	);
 	$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
 	$status['has_status'] = (bool) $server_status;
 
