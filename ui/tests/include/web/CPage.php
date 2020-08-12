@@ -22,7 +22,6 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/CElementQuery.php';
 require_once dirname(__FILE__).'/CommandExecutor.php';
-require_once dirname(__FILE__).'/../../../include/classes/helpers/CEncryptHelper.php';
 
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Chrome\ChromeOptions;
@@ -186,7 +185,9 @@ class CPage {
 
 		if (self::$cookie === null || $sessionid !== $cookie_sessionid) {
 			$data = ['sessionid' => $sessionid];
-			$data['sign'] = CEncryptHelper::sign(serialize($data));
+
+			$config = CDBHelper::getRow('select session_key from config where configid=1');
+			$data['sign'] = openssl_encrypt(serialize($data), 'aes-256-ecb', $config['session_key']);
 
 			$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 			self::$cookie = [
