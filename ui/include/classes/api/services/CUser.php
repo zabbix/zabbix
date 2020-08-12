@@ -1394,7 +1394,7 @@ class CUser extends CApiService {
 
 		// If session not log in.
 		if (!$db_sessions) {
-			// When new session return empty array to avoid error messages.
+			// After created new session return empty array.
 			return [];
 		}
 
