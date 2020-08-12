@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-20T00:00:00Z</date>
+    <date>2020-08-12T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Discord</name>
