@@ -169,11 +169,10 @@ class CHttpTestManager {
 			while ($checkitem = DBfetch($dbCheckItems)) {
 				$itemids[] = $checkitem['itemid'];
 
-				if (isset($httptest['name'])) {
+				if (isset($httptest['name']) && $db_httptest['name'] != $httptest['name']) {
 					$updateFields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
 					$updateFields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
 				}
-
 				if (isset($httptest['status'])) {
 					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httptest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 				}
@@ -1266,11 +1265,11 @@ class CHttpTestManager {
 	protected function getTestName($type, $testName) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'Download speed for scenario ' . $testName . '.';
+				return 'Download speed for scenario "' . $testName . '".';
 			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-				return 'Failed step of scenario ' . $testName . '.';
+				return 'Failed step of scenario "' . $testName . '".';
 			case HTTPSTEP_ITEM_TYPE_LASTERROR:
-				return 'Last error message of scenario ' . $testName . '.';
+				return 'Last error message of scenario "' . $testName . '".';
 		}
 
 		return false;
@@ -1310,11 +1309,11 @@ class CHttpTestManager {
 	protected function getStepName($type, $testName, $stepName) {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'Download speed for step ' . $stepName . ' of scenario ' . $testName . '.';
+				return 'Download speed for step "' . $stepName . '" of scenario "' . $testName . '".';
 			case HTTPSTEP_ITEM_TYPE_TIME:
-				return 'Response time for step ' . $stepName . ' of scenario ' . $testName . '.';
+				return 'Response time for step "' . $stepName . '" of scenario "' . $testName . '".';
 			case HTTPSTEP_ITEM_TYPE_RSPCODE:
-				return 'Response code for step ' . $stepName . ' of scenario ' . $testName . '.';
+				return 'Response code for step "' . $stepName . '" of scenario "' . $testName . '".';
 		}
 
 		return false;
