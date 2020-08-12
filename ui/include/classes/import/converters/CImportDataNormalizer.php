@@ -33,22 +33,25 @@ class CImportDataNormalizer {
 	}
 
 	public function normalize($data) {
-		$data['zabbix_export'] = $this->normalizeArrayKeys($data['zabbix_export'], $this->rules);
-		$data['zabbix_export'] = $this->normalizeStrings($data['zabbix_export']);
+		$data['zabbix_export'] = $this->convert($data['zabbix_export'], $this->rules);
 
 		return $data;
 	}
 
 	/**
-	 * Convert array keys to numeric.
+	 * Convert array keys to numeric and normalize strings.
 	 *
 	 * @param mixed $data   Import data.
 	 * @param array $rules  Schema rules.
 	 *
 	 * @return mixed
 	 */
-	protected function normalizeArrayKeys($data, array $rules) {
+	protected function convert($data, array $rules) {
 		if (!is_array($data)) {
+			if ($rules['type'] & XML_STRING) {
+				$data = $this->normalizeStrings($data, $rules);
+			}
+
 			return $data;
 		}
 
@@ -59,7 +62,7 @@ class CImportDataNormalizer {
 				}
 
 				if (array_key_exists($tag, $data)) {
-					$data[$tag] = $this->normalizeArrayKeys($data[$tag], $tag_rules);
+					$data[$tag] = $this->convert($data[$tag], $tag_rules);
 				}
 			}
 		}
@@ -67,7 +70,7 @@ class CImportDataNormalizer {
 			$prefix = $rules['prefix'];
 
 			foreach ($data as $tag => $value) {
-				$data[$tag] = $this->normalizeArrayKeys($value, $rules['rules'][$prefix]);
+				$data[$tag] = $this->convert($value, $rules['rules'][$prefix]);
 			}
 
 			$data = array_values($data);
@@ -80,16 +83,15 @@ class CImportDataNormalizer {
 	 * Add CR to string type fields.
 	 *
 	 * @param mixed $data   Import data.
+	 * @param array $rules  Schema rules.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
-	protected function normalizeStrings($data) {
-		if ($this->rules['type'] & XML_STRING) {
-			$data = str_replace("\r\n", "\n", $data);
-			$data = (array_key_exists('flags', $this->rules) && $this->rules['flags'] & self::EOL_LF)
-				? $data
-				: str_replace("\n", "\r\n", $data);
-		}
+	protected function normalizeStrings($data, array $rules): string {
+		$data = str_replace("\r\n", "\n", $data);
+		$data = (array_key_exists('flags', $rules) && $rules['flags'] & self::EOL_LF)
+			? $data
+			: str_replace("\n", "\r\n", $data);
 
 		return $data;
 	}
