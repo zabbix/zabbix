@@ -161,7 +161,7 @@ class CHttpTestManager {
 			$updateFields = [];
 			$itemids = [];
 			$dbCheckItems = DBselect(
-				'SELECT i.itemid,hi.type'.
+				'SELECT i.itemid,i.name,i.key_,hi.type'.
 				' FROM items i,httptestitem hi'.
 				' WHERE hi.httptestid='.zbx_dbstr($httptest['httptestid']).
 					' AND hi.itemid=i.itemid'
@@ -169,9 +169,16 @@ class CHttpTestManager {
 			while ($checkitem = DBfetch($dbCheckItems)) {
 				$itemids[] = $checkitem['itemid'];
 
-				if (isset($httptest['name']) && $db_httptest['name'] != $httptest['name']) {
-					$updateFields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
-					$updateFields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
+				if (isset($httptest['name'])) {
+					$new_item_name = $this->getTestName($checkitem['type'], $httptest['name']);
+					$new_item_key_ = $this->getTestKey($checkitem['type'], $httptest['name']);
+
+					if ($new_item_name != $checkitem['name']) {
+						$updateFields['name'] = $new_item_name;
+					}
+					if ($new_item_key_ != $checkitem['key_']) {
+						$updateFields['key_'] = $new_item_key_;
+					}
 				}
 				if (isset($httptest['status'])) {
 					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httptest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
