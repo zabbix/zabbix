@@ -118,11 +118,9 @@ function getUserGuiAccess(string $userid): int {
  * @return int
  */
 function getUserAuthenticationType($gui_access) {
-	$config = select_config();
-
 	switch ($gui_access) {
 		case GROUP_GUI_ACCESS_SYSTEM:
-			return $config['authentication_type'];
+			return CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
 
 		case GROUP_GUI_ACCESS_INTERNAL:
 			return ZBX_AUTH_INTERNAL;
@@ -131,7 +129,7 @@ function getUserAuthenticationType($gui_access) {
 			return ZBX_AUTH_LDAP;
 
 		default:
-			return $config['authentication_type'];
+			return CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
 	}
 }
 

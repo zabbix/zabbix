@@ -864,9 +864,8 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = false;
-	$config = select_config();
 
-	if ($config['compression_status']) {
+	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
 		$error_message = _('History cleanup is not supported if compression is enabled');
 	}
 	else {
@@ -1278,9 +1277,8 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
 	$result = false;
-	$config = select_config();
 
-	if ($config['compression_status']) {
+	if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
 		$error_message = _('History cleanup is not supported if compression is enabled');
 	}
 	else {
@@ -1297,7 +1295,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 
 		if ($items) {
 			// Check items belong only to hosts.
-			$hosts_status = array_column(array_column(array_column($items, 'hosts'), 0), 'status');
+			$hosts_status = array_unique(array_column(array_column(array_column($items, 'hosts'), 0), 'status'));
 			if (in_array(HOST_STATUS_TEMPLATE, $hosts_status)) {
 				$result = false;
 			}
@@ -1447,7 +1445,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 
 	$data = getItemFormData($item);
 	$data['inventory_link'] = getRequest('inventory_link');
-	$data['config'] = select_config();
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
 	$data['preprocessing_types'] = CItem::$supported_preprocessing_types;
@@ -1471,6 +1468,9 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
 	}
 
+	$data['display_interfaces'] = ($data['host']['status'] == HOST_STATUS_MONITORED
+			|| $data['host']['status'] == HOST_STATUS_NOT_MONITORED);
+
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
 		['field' => 'main', 'order' => ZBX_SORT_DOWN]
@@ -1479,6 +1479,14 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['inventory_link'] = $item['inventory_link'];
 	}
+
+	$data['config'] = [
+		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS),
+		'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL),
+		'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+		'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
+	];
 
 	// render view
 	if (!$has_errors) {
@@ -1537,7 +1545,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	unset($step);
 
 	$data['displayApplications'] = true;
-	$data['displayInterfaces'] = true;
+	$data['display_interfaces'] = true;
 	$data['displayMasteritems'] = true;
 
 	if ($data['headers']) {
@@ -1567,7 +1575,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 	if ($hostCount > 1) {
 		$data['displayApplications'] = false;
-		$data['displayInterfaces'] = false;
+		$data['display_interfaces'] = false;
 		$data['displayMasteritems'] = false;
 	}
 	else {
@@ -1579,7 +1587,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		$templateCount = count($templates);
 
 		if ($templateCount != 0) {
-			$data['displayInterfaces'] = false;
+			$data['display_interfaces'] = false;
 
 			if ($templateCount == 1 && $data['hostid'] == 0) {
 				// If selected from filter without 'hostid'.
@@ -1597,7 +1605,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 			}
 		}
 
-		if ($hostCount == 1 && $data['displayInterfaces']) {
+		if ($hostCount == 1 && $data['display_interfaces']) {
 			$data['hosts'] = reset($data['hosts']);
 
 			// Sort interfaces to be listed starting with one selected as 'main'.
@@ -1712,7 +1720,6 @@ else {
 		'form' => getRequest('form'),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => select_config(),
 		'hostid' => $hostid,
 		'is_template' => true
 	];
@@ -1731,7 +1738,7 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
 		'sortfield' => $sortField,
-		'limit' => $data['config']['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	$preFilter = count($options, COUNT_RECURSIVE);
 
@@ -2005,7 +2012,7 @@ else {
 
 	// Set is_template false, when one of hosts is not template.
 	if ($data['items']) {
-		$hosts_status = array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status');
+		$hosts_status = array_unique(array_column(array_column(array_column($data['items'], 'hosts'), 0), 'status'));
 		foreach ($hosts_status as $value) {
 			if ($value != HOST_STATUS_TEMPLATE) {
 				$data['is_template'] = false;
@@ -2037,6 +2044,10 @@ else {
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
+
+	$data['config'] = [
+		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
+	];
 
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();

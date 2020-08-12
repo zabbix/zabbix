@@ -106,9 +106,6 @@ $hostList
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	zbx_add_post_js('window.hostInterfaceManager = new HostInterfaceManager('.json_encode($data['interfaces']).');');
 	zbx_add_post_js('hostInterfaceManager.render();');
-	if (!$data['interfaces']) {
-		zbx_add_post_js('hostInterfaceManager.addAgent();');
-	}
 
 	$interface_header = renderInterfaceHeaders();
 
@@ -132,7 +129,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->addClass(ZBX_STYLE_HOST_INTERFACE_CONTAINER)
 		->setAttribute('data-type', 'ipmi');
 
-	$hostList->addRow((new CLabel(_('Interfaces')))->setAsteriskMark(),
+	$hostList->addRow(new CLabel(_('Interfaces')),
 		[
 			new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]),
 			new CDiv(

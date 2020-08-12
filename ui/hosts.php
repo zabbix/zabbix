@@ -55,9 +55,7 @@ $fields = [
 	'status' =>					[T_ZBX_INT, O_OPT, null,
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-									'isset({add}) || isset({update})'
-								],
+	'interfaces' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
 	'mass_update_tags' =>		[T_ZBX_INT, O_OPT, null,
@@ -839,7 +837,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($create) {
-			if (!API::Host()->create($host)) {
+			$hostIds = API::Host()->create($host);
+
+			if ($hostIds) {
+				$hostId = reset($hostIds['hostids']);
+			}
+			else {
 				throw new Exception();
 			}
 		}
@@ -1013,8 +1016,6 @@ elseif (hasRequest('hosts') && hasRequest('action') && str_in_array(getRequest('
 /*
  * Display
  */
-$config = select_config();
-
 if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || hasRequest('masssave'))) {
 	$data = [
 		'hosts' => getRequest('hosts'),
@@ -1120,7 +1121,7 @@ elseif (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 
 		// Host inventory
-		'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
+		'inventory_mode' => getRequest('inventory_mode', CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE)),
 		'host_inventory' => getRequest('host_inventory', []),
 		'inventory_items' => [],
 
@@ -1469,6 +1470,7 @@ else {
 	}
 
 	// Select hosts.
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$hosts = API::Host()->get([
 		'output' => ['hostid', $sortField],
 		'evaltype' => $filter['evaltype'],
@@ -1477,7 +1479,7 @@ else {
 		'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1,
+		'limit' => $limit,
 		'search' => [
 			'name' => ($filter['host'] === '') ? null : $filter['host'],
 			'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
@@ -1612,7 +1614,6 @@ else {
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
-		'config' => $config,
 		'templates' => $templates,
 		'maintenances' => $db_maintenances,
 		'writable_templates' => $writable_templates,
@@ -1620,7 +1621,10 @@ else {
 		'proxies_ms' => $proxies_ms,
 		'profileIdx' => 'web.hosts.filter',
 		'active_tab' => CProfile::get('web.hosts.filter.active', 1),
-		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+		'config' => [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		]
 	];
 
 	$hostView = new CView('configuration.host.list', $data);

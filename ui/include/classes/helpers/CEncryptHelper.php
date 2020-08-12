@@ -47,9 +47,8 @@ class CEncryptHelper {
 	 */
 	private static function getKey(): ?string {
 		if (!self::$key) {
-			$config = select_config();
 			// This if contain copy in CEncryptedCookieSession class.
-			if ($config['session_key'] === '') {
+			if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
 				self::$key = self::generateKey();
 
 				if (!self::updateKey(self::$key)) {
@@ -59,7 +58,7 @@ class CEncryptHelper {
 				return self::$key;
 			}
 
-			self::$key = $config['session_key'];
+			self::$key = CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY);
 		}
 
 		return self::$key;

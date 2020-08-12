@@ -312,8 +312,6 @@ if (hasRequest('action') && hasRequest('group_hostid') && !$result) {
 	uncheckTableRows($discoveryRule['itemid'], zbx_objectValues($host_prototypes, 'hostid'));
 }
 
-$config = select_config();
-
 /*
  * Display
  */
@@ -329,7 +327,9 @@ if (hasRequest('form')) {
 			'discover' => getRequest('discover', DB::getDefault('hosts', 'discover')),
 			'templates' => [],
 			'add_templates' => [],
-			'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
+			'inventory_mode' => getRequest('inventory_mode',
+				CSettingsHelper::get(CSettingsHelper::DEFAULT_INVENTORY_MODE)
+			),
 			'groupPrototypes' => getRequest('group_prototypes', []),
 			'macros' => $macros
 		],
@@ -485,13 +485,14 @@ else {
 	];
 
 	// get items
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['hostPrototypes'] = API::HostPrototype()->get([
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectTemplates' => ['templateid', 'name'],
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => $limit
 	]);
 
 	order_result($data['hostPrototypes'], $sortField, $sortOrder);

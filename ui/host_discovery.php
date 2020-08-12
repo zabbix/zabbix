@@ -754,6 +754,8 @@ if (hasRequest('form')) {
 	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::$supported_preprocessing_types;
+	$data['display_interfaces'] = ($host['status'] == HOST_STATUS_MONITORED
+			|| $host['status'] == HOST_STATUS_NOT_MONITORED);
 
 	if (!hasRequest('form_refresh')) {
 		foreach ($data['preprocessing'] as &$step) {
@@ -801,8 +803,6 @@ if (hasRequest('form')) {
 	}
 }
 else {
-	$config = select_config();
-
 	$data = [
 		'filter' => $filter,
 		'hostid' => (count($filter_hostids) == 1) ? reset($filter_hostids) : 0,
@@ -826,7 +826,7 @@ else {
 		'filter' => [],
 		'search' => [],
 		'sortfield' => $sort_field,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	if ($filter_groupids) {
@@ -908,7 +908,9 @@ else {
 
 	// Set is_template false, when one of hosts is not template.
 	if ($data['discoveries']) {
-		$hosts_status = array_column(array_column(array_column($data['discoveries'], 'hosts'), 0), 'status');
+		$hosts_status = array_unique(
+			array_column(array_column(array_column($data['discoveries'], 'hosts'), 0), 'status')
+		);
 		foreach ($hosts_status as $value) {
 			if ($value != HOST_STATUS_TEMPLATE) {
 				$data['is_template'] = false;

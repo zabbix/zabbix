@@ -91,8 +91,7 @@ class CEncryptedCookieSession extends CCookieSession {
 	 * @return boolean
 	 */
 	private function checkSessionKey(): bool {
-		$config = select_config();
-		if ($config['session_key'] === '') {
+		if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
 			return false;
 		}
 

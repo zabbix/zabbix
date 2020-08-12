@@ -40,10 +40,9 @@ $fields = [
 ];
 check_fields($fields);
 
-$config = select_config();
-
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
-	if ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED && $config['saml_slo_url'] !== ''
+	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED
+			&& CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL) !== ''
 			&& CSessionHelper::has('saml_data')) {
 		redirect('index_sso.php?slo');
 	}
@@ -64,8 +63,9 @@ if ($request) {
 		: '';
 }
 
-if (!hasRequest('form') && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
-		&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP && !hasRequest('enter')) {
+if (!hasRequest('form') && CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
+		&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
+		&& !hasRequest('enter')) {
 	redirect('index_http.php');
 }
 
@@ -89,10 +89,10 @@ if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 $messages = get_and_clear_messages();
 
 echo (new CView('general.login', [
-	'http_login_url' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+	'http_login_url' => (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED)
 		? (new CUrl('index_http.php'))->setArgument('request', getRequest('request'))
 		: '',
-	'saml_login_url' => ($config['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED)
+	'saml_login_url' => (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED)
 		? (new CUrl('index_sso.php'))->setArgument('request', getRequest('request'))
 		: '',
 	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',

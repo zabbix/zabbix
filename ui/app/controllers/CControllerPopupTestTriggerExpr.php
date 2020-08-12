@@ -205,7 +205,10 @@ class CControllerPopupTestTriggerExpr extends CController {
 
 			global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-			$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
+			$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
+			);
 			$response = $zabbix_server->expressionsEvaluate($data, CSessionHelper::getId());
 
 			if ($zabbix_server->getError()) {

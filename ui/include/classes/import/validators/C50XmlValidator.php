@@ -457,7 +457,7 @@ class C50XmlValidator {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-									'params' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::EOL_LF],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
@@ -598,7 +598,7 @@ class C50XmlValidator {
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-											'params' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::EOL_LF],
+											'params' =>					['type' => XML_STRING | XML_REQUIRED],
 											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
@@ -811,7 +811,7 @@ class C50XmlValidator {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'params' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::EOL_LF],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
@@ -1068,7 +1068,7 @@ class C50XmlValidator {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-									'params' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::EOL_LF],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
@@ -1207,7 +1207,7 @@ class C50XmlValidator {
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-											'params' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::EOL_LF],
+											'params' =>					['type' => XML_STRING | XML_REQUIRED],
 											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
@@ -1418,7 +1418,7 @@ class C50XmlValidator {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'params' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::EOL_LF],
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
@@ -2259,7 +2259,7 @@ class C50XmlValidator {
 		switch ($data['type']) {
 			case CXmlConstantName::SCRIPT:
 			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
-				return ['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF, 'default' => '', 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']];
+				return ['type' => XML_STRING, 'default' => '', 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']];
 
 			case CXmlConstantName::WEBHOOK:
 			case CXmlConstantValue::MEDIA_TYPE_WEBHOOK:

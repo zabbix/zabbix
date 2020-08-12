@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2020 Zabbix SIA
@@ -20,28 +20,20 @@
 
 
 /**
- * @var CView $this
+ * Converter for converting import data from 5.0 to 5.2.
  */
+class C50ImportConverter extends CConverter {
 
-$widget = (new CWidget())
-	->setTitle(_('Working time'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	/**
+	 * Convert import data from 5.0 to 5.2 version.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function convert($data): array {
+		$data['zabbix_export']['version'] = '5.2';
 
-$table = (new CTabView())
-	->addTab('workingTime', _('Working time'),
-		(new CFormList())
-			->addRow((new CLabel(_('Working time'), 'work_period'))->setAsteriskMark(),
-				(new CTextBox('work_period', $data['work_period']))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired()
-					->setAttribute('autofocus', 'autofocus')
-			)
-	)
-	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
-
-$form = (new CForm())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'workingtime.update')->getUrl())
-	->addItem($table);
-
-$widget->addItem($form)->show();
+		return $data;
+	}
+}

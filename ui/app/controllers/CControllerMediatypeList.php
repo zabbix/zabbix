@@ -70,8 +70,6 @@ class CControllerMediatypeList extends CController {
 			'status' => CProfile::get('web.media_types.filter_status', -1)
 		];
 
-		$config = select_config();
-
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
@@ -82,6 +80,7 @@ class CControllerMediatypeList extends CController {
 		];
 
 		// get media types
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['mediatypes'] = API::Mediatype()->get([
 			'output' => ['mediatypeid', 'name', 'type', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'status'
@@ -92,7 +91,7 @@ class CControllerMediatypeList extends CController {
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
-			'limit' => $config['search_limit'] + 1,
+			'limit' => $limit,
 			'editable' => true,
 			'preservekeys' => true
 		]);

@@ -129,11 +129,10 @@ class CWebUser {
 	 * @static
 	 */
 	public static function setDefault(): void {
-		$config = select_config();
 		self::$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
-			'lang' => $config['default_lang'],
+			'lang' => CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG),
 			'type' => 0,
 			'debug_mode' => false
 		];

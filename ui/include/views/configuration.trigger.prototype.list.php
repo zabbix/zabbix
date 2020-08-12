@@ -162,7 +162,7 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	$triggersTable->addRow([
 		$checkBox,
-		getSeverityCell($trigger['priority'], $this->data['config']),
+		getSeverityCell($trigger['priority']),
 		$description,
 		$trigger['opdata'],
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),

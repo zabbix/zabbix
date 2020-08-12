@@ -211,7 +211,7 @@ class CNewValidator {
 						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])
 								|| $this->input[$field] < $params) {
 							$this->addError($fatal,
-								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								_s('Incorrect value for field "%1$s": %2$s.', $field, _s('value must be no less than "%1$s"', $params))
 							);
 
 							return false;
@@ -227,7 +227,7 @@ class CNewValidator {
 						if (!is_string($this->input[$field]) || !self::is_int32($this->input[$field])
 								|| $this->input[$field] > $params) {
 							$this->addError($fatal,
-								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								_s('Incorrect value for field "%1$s": %2$s.', $field, _s('value must be no greater than "%1$s"', $params))
 							);
 
 							return false;
@@ -285,6 +285,21 @@ class CNewValidator {
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time period is expected'))
 						);
 						return false;
+					}
+					break;
+
+				/*
+				 * 'time_unit' => true
+				 */
+				case 'time_unit':
+					if (array_key_exists($field, $this->input)) {
+						$result = $this->isTimeUnit($this->input[$field], $params);
+						if (!$result['is_valid']) {
+							$this->addError($fatal,
+								_s('Incorrect value for field "%1$s": %2$s.', $field, $result['error'])
+							);
+							return false;
+						}
 					}
 					break;
 
@@ -449,6 +464,67 @@ class CNewValidator {
 		}
 
 		return is_string($value) && $this->time_periods_parser->parse($value) == CParser::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Validate a configuration value. Use simple interval parser to parse the string, convert to seconds and check
+	 * if the value is in between given min and max values. In some cases it's possible to enter 0, or even 0s or 0d.
+	 * If the value is incorrect, set an error.
+	 *
+	 * @param string $value                  Value to parse and validate.
+	 * @param bool   $options['with_year']   Set to "true" to allow month and year unit support.
+	 * @param bool   $options['allow_zero']  Set to "true" to allow value to be zero.
+	 * @param string $options['min']         Lower bound.
+	 * @param string $options['max']         Upper bound.
+	 *
+	 * @return array  An array with parameter 'is_valid' containing validation result. If validation fails, additionally
+	 *                returned parameter 'error' containing error message.
+	 */
+	private function isTimeUnit($value, $params) {
+		$simple_interval_parser = new CSimpleIntervalParser(
+			array_key_exists('with_year', $params) ? ['with_year' => true] : []
+		);
+		$value = (string) $value;
+
+		if ($simple_interval_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			if (!$params) {
+				return ['is_valid' => true];
+			}
+
+			if ($value[0] !== '{') {
+				$value = timeUnitToSeconds($value,
+					array_key_exists('with_year', $params) ? $params['with_year'] : false
+				);
+
+				if (array_key_exists('ranges', $params)) {
+					$in_range = false;
+					$message_ranges = [];
+
+					foreach ($params['ranges'] as $range) {
+						if ($range['from'] <= $value && $value <= $range['to']) {
+							$in_range = true;
+							break;
+						}
+
+						$message_ranges[] = ($range['from'] == $range['to'])
+							?  $range['from']
+							:  $range['from'].'-'.$range['to'];
+					}
+
+					if (!$in_range) {
+						return [
+							'is_valid' => false,
+							'error' => _s('value must be one of %1$s', implode(', ', $message_ranges))
+						];
+					}
+				}
+			}
+		}
+		else {
+			return ['is_valid' => false, 'error' => _('a time unit is expected')];
+		}
+
+		return ['is_valid' => true];
 	}
 
 	private function isRangeTime($value) {

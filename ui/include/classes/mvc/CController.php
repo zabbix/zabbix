@@ -212,14 +212,21 @@ abstract class CController {
 		}
 
 		$ts = [];
+		$ts['now'] = time();
 		$range_time_parser = new CRangeTimeParser();
 
 		foreach (['from', 'to'] as $field) {
 			$range_time_parser->parse($this->getInput($field));
-			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			$ts[$field] = $range_time_parser
+				->getDateTime($field === 'from')
+				->getTimestamp();
 		}
 
 		$period = $ts['to'] - $ts['from'] + 1;
+		$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+		$max_period = 1 + $ts['now'] - $range_time_parser
+			->getDateTime(true)
+			->getTimestamp();
 
 		if ($period < ZBX_MIN_PERIOD) {
 			info(_n('Minimum time period to display is %1$s minute.',
@@ -228,9 +235,9 @@ abstract class CController {
 
 			return false;
 		}
-		elseif ($period > ZBX_MAX_PERIOD) {
+		elseif ($period > $max_period) {
 			info(_n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) (ZBX_MAX_PERIOD / SEC_PER_DAY)
+				'Maximum time period to display is %1$s days.', (int) ($max_period / SEC_PER_DAY)
 			));
 
 			return false;
