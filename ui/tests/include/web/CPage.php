@@ -23,7 +23,6 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/CElementQuery.php';
 require_once dirname(__FILE__).'/CommandExecutor.php';
 require_once dirname(__FILE__).'/../../../include/classes/helpers/CEncryptHelper.php';
-require_once dirname(__FILE__).'/../../../include/profiles.inc.php';
 
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Chrome\ChromeOptions;
