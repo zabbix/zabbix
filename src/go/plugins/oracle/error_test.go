@@ -36,6 +36,11 @@ func Test_zabbixError_Error(t *testing.T) {
 			zabbixError{"foobar"},
 			"Foobar.",
 		},
+		{
+			"ZabbixError stringify",
+			zabbixError{"foo bar"},
+			"Foo bar.",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
