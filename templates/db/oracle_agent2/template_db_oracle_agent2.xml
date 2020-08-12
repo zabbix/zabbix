@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-08-05T12:58:05Z</date>
+   <date>2020-08-12T12:45:32Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -2276,12 +2276,36 @@
                <description>Scanning tablespaces in DBMS.</description>
                <item_prototypes>
                   <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Currently allocated bytes for tablespace (sum of the current size of datafiles).</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$..{#TABLESPACE}.used_bytes.first()</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Oracle TBS '{#TABLESPACE}': Tablespace free, bytes</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_free_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
+                     <description>Free bytes of allocated space.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2298,12 +2322,13 @@
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace max size, bytes</name>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
                      <units>B</units>
+                     <description>Maximum size of tablespace.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2366,28 +2391,6 @@
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
-                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage, bytes</name>
-                     <type>DEPENDENT</type>
-                     <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <units>B</units>
-                     <application_prototypes>
-                        <application_prototype>
-                           <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
-                        </application_prototype>
-                     </application_prototypes>
-                     <preprocessing>
-                        <step>
-                           <type>JSONPATH</type>
-                           <params>$..{#TABLESPACE}.used_bytes.first()</params>
-                        </step>
-                     </preprocessing>
-                     <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
                      <name>Oracle TBS '{#TABLESPACE}': Tablespace usage percent</name>
                      <type>DEPENDENT</type>
                      <key>oracle.tbs_used_pct["{#TABLESPACE}"]</key>
@@ -2395,6 +2398,7 @@
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
+                     <description>Allocated bytes/Max bytes*100</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle {#CONTENTS} Tablespaces. {#TABLESPACE}</name>
@@ -2438,7 +2442,7 @@
                            <color>1A7C11</color>
                            <item>
                               <host>Template DB Oracle by Zabbix Agent 2</host>
-                              <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                              <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
                            </item>
                         </graph_item>
                         <graph_item>
