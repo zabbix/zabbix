@@ -187,7 +187,7 @@ function itemGetValueTest(overlay) {
 			overlay.unsetLoading();
 		},
 		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good, .msg-warning').remove();
 
 			if (typeof ret.messages !== 'undefined') {
 				jQuery($body).prepend(ret.messages);
@@ -273,7 +273,7 @@ function itemCompleteTest(overlay) {
 			overlay.unsetLoading();
 		},
 		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good, .msg-warning').remove();
 
 			if (typeof ret.messages !== 'undefined') {
 				jQuery($body).prepend(ret.messages);
