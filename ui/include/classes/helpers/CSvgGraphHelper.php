@@ -338,12 +338,11 @@ class CSvgGraphHelper {
 			 *
 			 * Do the same with trends.
 			 */
-			$config = select_config();
 			$to_resolve = [];
 
-			if ($config['hk_history_global']) {
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['history'] = timeUnitToSeconds($config['hk_history']);
+					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 				}
 				unset($metric);
 			}
@@ -351,9 +350,9 @@ class CSvgGraphHelper {
 				$to_resolve[] = 'history';
 			}
 
-			if ($config['hk_trends_global']) {
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['trends'] = timeUnitToSeconds($config['hk_trends']);
+					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
 				}
 				unset($metric);
 			}
@@ -368,7 +367,7 @@ class CSvgGraphHelper {
 
 				foreach ($metrics as $num => &$metric) {
 					// Convert its values to seconds.
-					if (!$config['hk_history_global']) {
+					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 						if ($simple_interval_parser->parse($metric['history']) != CParser::PARSE_SUCCESS) {
 							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
 								_('invalid history storage period')
@@ -380,7 +379,7 @@ class CSvgGraphHelper {
 						}
 					}
 
-					if (!$config['hk_trends_global']) {
+					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 						if ($simple_interval_parser->parse($metric['trends']) != CParser::PARSE_SUCCESS) {
 							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
 								_('invalid trend storage period')

@@ -41,7 +41,8 @@ class CXmlValidator {
 			'4.0' => 'C40XmlValidator',
 			'4.2' => 'C42XmlValidator',
 			'4.4' => 'C44XmlValidator',
-			'5.0' => 'C50XmlValidator'
+			'5.0' => 'C50XmlValidator',
+			'5.2' => 'C52XmlValidator'
 		];
 	}
 

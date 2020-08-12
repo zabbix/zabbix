@@ -341,8 +341,6 @@ else {
 		$filter_groupids = getSubGroups($filter_groupids);
 	}
 
-	$config = select_config();
-
 	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
@@ -361,7 +359,7 @@ else {
 		'editable' => true,
 		'sortfield' => $sortField,
 		'sortorder' => $sortOrder,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 
 	$data['maintenances'] = API::Maintenance()->get($options);

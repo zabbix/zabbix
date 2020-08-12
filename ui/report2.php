@@ -144,8 +144,6 @@ $timeselector_options = [
 ];
 updateTimeSelectorPeriod($timeselector_options);
 
-$config = select_config();
-
 /*
  * Header
  */
@@ -347,6 +345,7 @@ else {
 
 		if ($templated_triggers_all) {
 			// Select monitored host triggers, derived from templates and belonging to the requested groups.
+			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 			$triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'expression', 'value'],
 				'selectHosts' => ['name'],
@@ -354,7 +353,7 @@ else {
 				'monitored' => true,
 				'groupids' => ($data['filter']['hostgroupid'] == 0) ? null : array_keys($hostgroupids),
 				'filter' => ['templateid' => array_keys($templated_triggers_all)],
-				'limit' => $config['search_limit'] + 1
+				'limit' => $limit
 			]);
 		}
 		else {
@@ -407,6 +406,7 @@ else {
 		// Select monitored host triggers, derived from templates and belonging to the requested groups.
 		$groups = enrichParentGroups($data['filter']['groups']);
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'description', 'expression', 'value'],
 			'selectHosts' => ['name'],
@@ -414,7 +414,7 @@ else {
 			'hostids' => $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null,
 			'expandDescription' => true,
 			'monitored' => true,
-			'limit' => $config['search_limit'] + 1
+			'limit' => $limit
 		]);
 
 		$filter_column

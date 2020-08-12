@@ -123,7 +123,7 @@ foreach ($data['users'] as $user) {
 		$online = (new CCol(_('No')))->addClass(ZBX_STYLE_RED);
 	}
 
-	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
+	$blocked = ($user['attempt_failed'] >= $data['config']['login_attempts'])
 		? (new CLink(_('Blocked'), 'zabbix.php?action=user.unblock&userids[]='.$userid))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)

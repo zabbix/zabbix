@@ -442,7 +442,7 @@ class CMacrosResolverGeneral {
 	/**
 	 * Returns the list of the item key parameters.
 	 *
-	 * @param string $params_raw
+	 * @param array $params_raw
 	 *
 	 * @return array
 	 */
@@ -782,7 +782,9 @@ class CMacrosResolverGeneral {
 						// break; is not missing here
 
 					case 'ITEM.LASTVALUE':
-						$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
+						$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
+							CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+						));
 
 						if (array_key_exists($function['itemid'], $history)) {
 							$clock = $history[$function['itemid']][0]['clock'];
@@ -864,6 +866,74 @@ class CMacrosResolverGeneral {
 								->addClass('hint-item')
 								->setAttribute('data-hintbox', '1')
 						]);
+					}
+
+					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
+				}
+			}
+		}
+
+		return $macro_values;
+	}
+
+	protected function getItemLogMacros(array $macros, array $macro_values) {
+		if (!$macros) {
+			return $macro_values;
+		}
+
+		$functions = DBfetchArray(DBselect(
+			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type,i.units,i.valuemapid'.
+			' FROM functions f'.
+				' JOIN items i ON f.itemid=i.itemid'.
+				' JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE '.dbConditionInt('f.functionid', array_keys($macros)).
+			' AND i.value_type='.ITEM_VALUE_TYPE_LOG
+		));
+
+		if (!$functions) {
+			return $macro_values;
+		}
+
+		$functions = CMacrosResolverHelper::resolveItemNames($functions);
+
+		foreach ($functions as $function) {
+			foreach ($macros[$function['functionid']] as $m => $tokens) {
+				$value = UNRESOLVED_MACRO_STRING;
+
+				$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
+				if (!array_key_exists($function['itemid'], $history)) {
+					continue;
+				}
+
+				switch ($m) {
+					case 'ITEM.LOG.DATE':
+						$value = date('Y.m.d', $history[$function['itemid']][0]['timestamp']);
+						break;
+					case 'ITEM.LOG.TIME':
+						$value = date('H:i:s', $history[$function['itemid']][0]['timestamp']);;
+						break;
+					case 'ITEM.LOG.AGE':
+						$value = zbx_date2age($history[$function['itemid']][0]['timestamp']);
+						break;
+					case 'ITEM.LOG.SOURCE':
+						$value = $history[$function['itemid']][0]['source'];
+						break;
+					case 'ITEM.LOG.SEVERITY':
+						$value = getSeverityName($history[$function['itemid']][0]['severity'], select_config());
+						break;
+					case 'ITEM.LOG.NSEVERITY':
+						$value = $history[$function['itemid']][0]['severity'];
+						break;
+					case 'ITEM.LOG.EVENTID':
+						$value = $history[$function['itemid']][0]['logeventid'];
+						break;
+				}
+
+				foreach ($tokens as $token) {
+					$macro_value = UNRESOLVED_MACRO_STRING;
+
+					if ($value !== null) {
+						$macro_value = formatHistoryValue($value, $function);
 					}
 
 					$macro_values[$function['triggerid']][$token['token']] = $macro_value;

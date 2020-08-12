@@ -76,15 +76,14 @@ class CControllerModuleList extends CController {
 		];
 
 		// data prepare
-		$config = select_config();
-
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$db_modules = API::Module()->get([
 			'output' => ['id', 'relative_path', 'status'],
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
 			'sortfield' => 'relative_path',
-			'limit' => $config['search_limit'] + 1,
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 

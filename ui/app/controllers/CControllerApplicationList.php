@@ -161,13 +161,12 @@ class CControllerApplicationList extends CController {
 	 */
 	private function fetchApplications(array $filter_hostids, array $filter_groupids, string $sort_field,
 			string $sort_order): array {
-		$config = select_config();
-
 		if ($filter_groupids) {
 			$filter_groupids = getSubGroups($filter_groupids);
 		}
 
 		// Get applications.
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$applications = API::Application()->get([
 			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
 			'selectHost' => ['hostid', 'name'],
@@ -178,7 +177,7 @@ class CControllerApplicationList extends CController {
 			'groupids' => $filter_groupids ? $filter_groupids : null,
 			'editable' => true,
 			'sortfield' => $sort_field,
-			'limit' => $config['search_limit'] + 1
+			'limit' => $limit
 		]);
 
 		CArrayHelper::sort($applications, [['field' => $sort_field, 'order' => $sort_order]]);

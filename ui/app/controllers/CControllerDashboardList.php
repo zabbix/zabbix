@@ -80,8 +80,6 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 			'show' => CProfile::get('web.dashbrd.filter_show', DASHBOARD_FILTER_SHOW_ALL)
 		];
 
-		$config = select_config();
-
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sort_field,
@@ -92,6 +90,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		];
 
 		// list of dashboards
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['dashboards'] = API::Dashboard()->get([
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
 			'selectUsers' => ['userid'],
@@ -102,7 +101,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 			'filter' => [
 				'userid' => ($filter['show'] == DASHBOARD_FILTER_SHOW_ALL) ? null : CWebUser::$data['userid']
 			],
-			'limit' => $config['search_limit'] + 1,
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 		order_result($data['dashboards'], $sort_field, $sort_order);
