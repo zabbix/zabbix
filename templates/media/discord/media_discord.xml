@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-04-20T00:00:00Z</date>
+    <date>2020-08-12T00:00:00Z</date>
     <media_types>
         <media_type>
             <name>Discord</name>
@@ -133,9 +133,6 @@ try {&#13;
 &#13;
     if (!params.discord_endpoint) {&#13;
         throw 'Cannot get discord_endpoint';&#13;
-    }&#13;
-    else if (!params.discord_endpoint.startsWith('https://discordapp.com/api/webhooks')) {&#13;
-        throw 'Invalid Discord webhook URL: ' + params.discord_endpoint;&#13;
     }&#13;
     else {&#13;
         params.discord_endpoint = params.discord_endpoint.replace('/api/', '/api/v1000/') + '?wait=True';&#13;
