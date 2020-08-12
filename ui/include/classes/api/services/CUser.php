@@ -1394,7 +1394,8 @@ class CUser extends CApiService {
 
 		// If session not log in.
 		if (!$db_sessions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+			// When new session return empty array to avoid error messages.
+			return [];
 		}
 
 		$db_session = $db_sessions[0];
