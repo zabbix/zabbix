@@ -1,6 +1,10 @@
 Changes for 5.0.3rc1
 
 New features:
+...G...... [ZBXNEXT-6080] add telnet support for net.tcp.service/.perf key and enable it on linux/darwin (esneiders)
+...G...... [ZBXNEXT-6101] add native linux vfs.fs.inode[fs,<mode>] metric support to agent2 (esneiders)
+...G...... [ZBXNEXT-6102] add native linux vfs.fs.get metric support to agent2 (esneiders)
+...G...... [ZBXNEXT-6103] add native linux vfs.fs.discovery metric support to agent2 (esneiders)
 ...G...... [ZBXNEXT-6100] add native linux vfs.fs.size[fs,<mode>] metric support to agent2 (esneiders)
 .........T [ZBXNEXT-6010] added template "Template DB Oracle by ODBC" (ychukina)
 .........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
@@ -9,6 +13,7 @@ New features:
 ........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+.........T [ZBX-17785] fixed dbstat query for postgresql v12 (afayantsev)
 ..F....... [ZBX-18204] fixed lost password in ssh remote command operation form data (talbergs)
 A......... [ZBX-18046] improved error message generation performance of user macro and item key parser (vmurzins)
 ........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
