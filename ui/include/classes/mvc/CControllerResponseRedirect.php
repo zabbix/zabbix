@@ -21,10 +21,6 @@
 
 class CControllerResponseRedirect extends CControllerResponse {
 
-	protected $messageOk;
-
-	protected $messageError;
-
 	protected $formData = [];
 
 	public function __construct($location) {
