@@ -420,51 +420,6 @@ class testFormHostPrototypeMacros extends testFormMacros {
 		$this->checkChangeRemoveInheritedMacro('hostPrototype', 'host', self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
-	public function getSecretMacrosLayoutData() {
-		return [
-			[
-				[
-					'macro' => '{$PROTOTYPE_SECRET_2_SECRET}',
-					'type' => 'Secret text'
-				]
-			],
-			[
-				[
-					'macro' => '{$PROTOTYPE_SECRET_2_SECRET}',
-					'type' => 'Secret text',
-					'chenge_type' => true
-				]
-			],
-			[
-				[
-					'macro' => '{$PROTOTYPE_TEXT_2_SECRET}',
-					'type' => 'Text'
-				]
-			],
-			[
-				[
-					'global' => true,
-					'macro' => '{$X_TEXT_2_SECRET}',
-					'type' => 'Text'
-				]
-			],
-			[
-				[
-					'global' => true,
-					'macro' => '{$X_SECRET_2_SECRET}',
-					'type' => 'Secret text'
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider getSecretMacrosLayoutData
-	 */
-	public function testFormHostPrototypeMacros_CheckSecretMacrosLayout($data) {
-		$this->checkSecretMacrosLayout($data, 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99206', 'hostPrototype');
-	}
-
 	public function getCreateSecretMacrosData() {
 		return [
 			[

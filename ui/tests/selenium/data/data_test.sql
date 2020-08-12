@@ -2841,8 +2841,6 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VAL
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99520, 99137, '{$TEXT_TEMPLATE_MACRO_2_SECRET}', 'Text template macro value', 'Text template macro that is going to become secret', 0);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99521, 99137, '{$SECRET_TEMPLATE_MACRO_UPDATE}', 'Secret template macro value', 'Secret template macro that is going to stay secret', 1);
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99522, 99137, '{$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'Value 2 B resolved', 'Template macro to be resolved', 0);
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99523, 50000, '{$SECRET_TEMPLATE_MACRO}', 'some secret value', '', 1);
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type) VALUES (99524, 50000, '{$TEXT_TEMPLATE_MACRO}', 'some text value', '', 0);
 INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99113, 2, 99137, 'Macro value: {$X_SECRET_TEMPLATE_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
 
 -- testFormAdministrationGeneralMacros

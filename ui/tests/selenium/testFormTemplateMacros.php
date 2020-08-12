@@ -416,51 +416,6 @@ class testFormTemplateMacros extends testFormMacros {
 		$this->checkChangeRemoveInheritedMacro('templates', 'template');
 	}
 
-	public function getSecretMacrosLayoutData() {
-		return [
-			[
-				[
-					'macro' => '{$SECRET_TEMPLATE_MACRO}',
-					'type' => 'Secret text'
-				]
-			],
-			[
-				[
-					'macro' => '{$SECRET_TEMPLATE_MACRO}',
-					'type' => 'Secret text',
-					'chenge_type' => true
-				]
-			],
-			[
-				[
-					'macro' => '{$TEXT_TEMPLATE_MACRO}',
-					'type' => 'Text'
-				]
-			],
-			[
-				[
-					'global' => true,
-					'macro' => '{$X_TEXT_2_SECRET}',
-					'type' => 'Text'
-				]
-			],
-			[
-				[
-					'global' => true,
-					'macro' => '{$X_SECRET_2_SECRET}',
-					'type' => 'Secret text'
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider getSecretMacrosLayoutData
-	 */
-	public function testFormTemplateMacros_CheckSecretMacrosLayout($data) {
-		$this->checkSecretMacrosLayout($data, 'templates.php?form=update&templateid=50000', 'templates');
-	}
-
 	public function getCreateSecretMacrosData() {
 		return [
 			[

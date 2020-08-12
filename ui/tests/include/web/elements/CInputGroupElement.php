@@ -26,8 +26,8 @@ require_once dirname(__FILE__).'/../CElement.php';
  */
 class CInputGroupElement extends CElement {
 
-	protected $type_secret = 'Secret text';
-	protected $type_text = 'Text';
+	const TYPE_SECRET = 'Secret text';
+	const TYPE_TEXT = 'Text';
 
 	/**
 	 * Get value of InputGroup element.
@@ -37,15 +37,6 @@ class CInputGroupElement extends CElement {
 	public function getValue() {
 		return $this->query('xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]')
 				->one()->getValue();
-	}
-
-	/**
-	 * Check is InputGroup element type is set to secret text.
-	 *
-	 * @return boolean
-	 */
-	public function isSecret() {
-		return $this->query('xpath:.//input[@type="password"]')->one(false)->isValid();
 	}
 
 	/**
@@ -87,7 +78,7 @@ class CInputGroupElement extends CElement {
 	 */
 	public function getInputType() {
 		$xpath = 'xpath:.//button['.CXPathHelper::fromClass('icon-text').']';
-		$type = ($this->query($xpath)->one(false)->isValid()) ? $this->type_text : $this->type_secret;
+		$type = ($this->query($xpath)->exists()) ? self::TYPE_TEXT : self::TYPE_SECRET;
 
 		return $type;
 	}
@@ -122,14 +113,5 @@ class CInputGroupElement extends CElement {
 		}
 
 		return $this;
-	}
-
-	/**
-	 * Function checks if textarea element is present in the InputGroup element
-	 *
-	 * @return boolean
-	 */
-	public function isTextareaPresent() {
-		return $this->query('xpath:.//textarea[contains(@class, "textarea-flexible")]')->one(false)->isValid();
 	}
 }

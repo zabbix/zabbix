@@ -492,6 +492,15 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
+	 * Check that the corresponding element exists.
+	 *
+	 * @return boolean
+	 */
+	public function exists() {
+		return $this->one(false)->isValid();
+	}
+
+	/**
 	 * Get input element from container.
 	 *
 	 * @param CElement     $target    container element

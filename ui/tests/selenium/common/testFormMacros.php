@@ -31,6 +31,8 @@ abstract class testFormMacros extends CWebTest {
 	use MacrosTrait;
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
+	const TYPE_SECRET = 'Secret text';
+	const TYPE_TEXT = 'Text';
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);
@@ -304,7 +306,7 @@ abstract class testFormMacros extends CWebTest {
 			$macro_value = $this->getValueField($macro['macro']);
 			$macro['value'] = $macro_value->getValue();
 			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
-			$macro['type'] = ($macro_value->isSecret()) ? ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
+			$macro['type'] = ($macro_value->getInputType() === self::TYPE_SECRET) ? ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
 
 			$macros['frontend'][] = $macro;
 		}
@@ -338,13 +340,15 @@ abstract class testFormMacros extends CWebTest {
 			$change_button = $value_field->getNewValueButton();
 			$revert_button = $value_field->getRevertButton();
 
-			if ($data['type'] === 'Text') {
+			if ($data['type'] === self::TYPE_TEXT) {
 				$this->assertTrue($value_field->query('xpath:./textarea')->one()->isAttributePresent('readonly'));
+				$this->assertEquals(255, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isValid());
 				$this->assertFalse($revert_button->isValid());
 			}
 			else {
 				$this->assertFalse($value_field->query('xpath:.//input')->one()->isEnabled());
+				$this->assertEquals(255, $value_field->query('xpath:.//input')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isEnabled());
 				$this->assertFalse($revert_button->isClickable());
 			}
@@ -354,15 +358,17 @@ abstract class testFormMacros extends CWebTest {
 			$value_field = $this->getValueField($data['macro']);
 			$change_button = $value_field->getNewValueButton();
 			$revert_button = $value_field->getRevertButton();
+			$textarea_xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]';
 
-			if ($data['type'] === 'Secret text') {
-				$this->assertFalse($value_field->isTextareaPresent());
+			if ($data['type'] === self::TYPE_SECRET) {
+				$this->assertFalse($value_field->query($textarea_xpath)->exists());
+				$this->assertEquals(255, $value_field->query('xpath:.//input')->one()->getAttribute('maxlength'));
 
 				$this->assertTrue($change_button->isValid());
 				$this->assertFalse($revert_button->isClickable());
 				// Change value text or type and check that New value button is not displayed and Revert button appeared.
 				if (CTestArrayHelper::get($data, 'change_type', false)) {
-					$value_field->changeInputType('Text');
+					$value_field->changeInputType(self::TYPE_TEXT);
 				}
 				else {
 					$change_button->click();
@@ -373,12 +379,13 @@ abstract class testFormMacros extends CWebTest {
 				$this->assertTrue($revert_button->isClickable());
 			}
 			else {
-				$this->assertTrue($value_field->isTextareaPresent());
+				$this->assertTrue($value_field->query($textarea_xpath)->exists());
+				$this->assertEquals(255, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isValid());
 				$this->assertFalse($revert_button->isValid());
 
 				// Change value type to "Secret text" and check that new value and revert buttons were not added.
-				$value_field->changeInputType('Secret text');
+				$value_field->changeInputType(self::TYPE_SECRET);
 				$value_field->invalidate();
 
 				$this->assertFalse($value_field->getNewValueButton()->isValid());
@@ -399,7 +406,7 @@ abstract class testFormMacros extends CWebTest {
 
 		// Check that macro values have type plain text by default.
 		if (CTestArrayHelper::get($data, 'check_default_type', false)){
-			$this->assertEquals('Text', $this->query('xpath://div[contains(@class, "macro-value")]')
+			$this->assertEquals(self::TYPE_TEXT, $this->query('xpath://div[contains(@class, "macro-value")]')
 					->one()->asInputGroup()->getInputType());
 		}
 
@@ -416,11 +423,11 @@ abstract class testFormMacros extends CWebTest {
 		$this->checkInheritedTab($data['macro_fields'], true);
 		// Check that macro value is hidden but is still accessible after swithing back to instance macros list.
 		$value_field = $this->getValueField($data['macro_fields']['macro']);
-		$this->assertTrue($value_field->isSecret());
+		$this->assertEquals(self::TYPE_SECRET, $value_field->getInputType());
 
 		// Change macro type back to text (is needed) before saving the changes.
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
-			$value_field->changeInputType('Text');
+			$value_field->changeInputType(self::TYPE_TEXT);
 		}
 
 		$this->query('button:Update')->one()->click();
@@ -458,20 +465,20 @@ abstract class testFormMacros extends CWebTest {
 
 		// Check that new values are correct in Inherited and host prototype macros tab before saving the values.
 		$value_field = $this->getValueField($data['macro']);
-		$secret = (CTestArrayHelper::get($data['value'], 'type', 'Secret text') === 'Secret text') ? true : false;
+		$secret = (CTestArrayHelper::get($data['value'], 'type', self::TYPE_SECRET) === self::TYPE_SECRET) ? true : false;
 		$this->checkInheritedTab($data, $secret);
 
 		$this->query('button:Update')->one()->click();
 		$this->openMacrosTab($url, $source);
 
 		$value_field = $this->getValueField($data['macro']);
-		if (CTestArrayHelper::get($data['value'], 'type', 'Secret text') === 'Secret text') {
-			$this->assertTrue($value_field->isSecret());
+		if (CTestArrayHelper::get($data['value'], 'type', self::TYPE_SECRET) === self::TYPE_SECRET) {
+			$this->assertEquals(self::TYPE_SECRET, $value_field->getInputType());
 			$this->assertEquals('******', $value_field->getValue());
 			$this->checkInheritedTab($data, true, false);
 		}
 		else {
-			$this->assertFalse($value_field->isSecret());
+			$this->assertEquals(self::TYPE_TEXT, $value_field->getInputType());
 			$this->assertEquals($data['value']['text'], $value_field->getValue());
 			$this->checkInheritedTab($data, false);
 		}
@@ -504,7 +511,7 @@ abstract class testFormMacros extends CWebTest {
 		$value_field->fill('New_macro_value');
 
 		if (CTestArrayHelper::get($data, 'set_to_text', false)) {
-			$value_field->changeInputType('Text');
+			$value_field->changeInputType(self::TYPE_TEXT);
 			$this->assertEquals('New_macro_value', $value_field->getValue());
 		}
 
@@ -530,12 +537,12 @@ abstract class testFormMacros extends CWebTest {
 		$this->query('link:Items')->one()->click();
 		$this->page->waitUntilReady();
 
-		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->one(false)->isValid());
+		$this->assertTrue($this->query('link', 'Macro value: '.$macro['value'])->exists());
 
 		$this->openMacrosTab($url, $source);
 
 		$value_field = $this->getValueField($macro['macro']);
-		$value_field->changeInputType('Secret text');
+		$value_field->changeInputType(self::TYPE_SECRET);
 
 		$this->query('button:Update')->one()->click();
 		$this->openMacrosTab($url, $source);
@@ -543,7 +550,7 @@ abstract class testFormMacros extends CWebTest {
 		$this->query('link:Items')->one()->click();
 		$this->page->waitUntilReady();
 
-		$this->assertTrue($this->query('link', 'Macro value: ******')->one(false)->isValid());
+		$this->assertTrue($this->query('link', 'Macro value: ******')->exists());
 	}
 
 	/**
@@ -560,12 +567,12 @@ abstract class testFormMacros extends CWebTest {
 		$value_field = $this->getValueField($data['macro']);
 
 		if ($secret) {
-			$this->assertTrue($value_field->isSecret());
+			$this->assertEquals(self::TYPE_SECRET, $value_field->getInputType());
 			$expected_value = ($available) ? $data['value']['text'] : '******';
 			$this->assertEquals($expected_value, $value_field->getValue());
 		}
 		else {
-			$this->assertFalse($value_field->isSecret());
+			$this->assertEquals(self::TYPE_TEXT, $value_field->getInputType());
 			$this->assertEquals($data['value']['text'], $value_field->getValue());
 		}
 		// Switch back to the list of instance macros.

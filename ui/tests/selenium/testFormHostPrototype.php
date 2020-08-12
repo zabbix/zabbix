@@ -74,9 +74,16 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Get host prototype macros from macros tab.
 		$actual_macros = $this->getMacros();
 		$macros_count = count($actual_macros);
+		$macro_types = CDBHelper::getAll('SELECT macro, type FROM hostmacro');
+
+		// Add Type from DB to array with actual macros
+		$types = [];
+		foreach ($macro_types as $macro_type) {
+			$types[$macro_type['macro']] = $macro_type['type'];
+		}
+
 		for ($i = 0; $i < $macros_count; $i++) {
-			$type = CDBHelper::getValue('SELECT type FROM hostmacro where macro='.CDBHelper::escape($actual_macros[$i]['macro']));
-			$actual_macros[$i]['type'] = $type;
+			$actual_macros[$i]['type'] = $types[$actual_macros[$i]['macro']];
 		}
 
 		$this->assertEquals($expected_macros, $actual_macros);
@@ -110,7 +117,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
 			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
 			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
-			$macro['type'] = ($this->getValueField($macro['macro'])->isSecret()) ? '1' : '0';
+			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';
 
 			$macros['frontend'][] = $macro;
 		}
