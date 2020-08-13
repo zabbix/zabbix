@@ -1394,15 +1394,8 @@ class CUser extends CApiService {
 
 		// If session not created.
 		if (!$db_sessions) {
-			// After created new session return user default array.
-			return [
-				'alias' => ZBX_GUEST_USER,
-				'userid' => 0,
-				'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
-				'type' => 0,
-				'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
-				'debug_mode' => false
-			];
+			// After created new session return empty array.
+			return [];
 		}
 
 		$db_session = $db_sessions[0];
