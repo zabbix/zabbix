@@ -104,6 +104,21 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get interface ID by host ID and interface reference name.
+	 *
+	 * @param string $hostid  Host ID.
+	 * @param string $name    Interface reference name.
+	 *
+	 * @return string|bool
+	 */
+	public function resolveInterface($hostid, $name) {
+		return (array_key_exists($hostid, $this->interfacesCache)
+				&& array_key_exists($name, $this->interfacesCache[$hostid]))
+			? $this->interfacesCache[$hostid][$name]
+			: false;
+	}
+
+	/**
 	 * Get template id by host.
 	 *
 	 * @param string $host

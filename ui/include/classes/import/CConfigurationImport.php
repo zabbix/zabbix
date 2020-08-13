@@ -751,7 +751,14 @@ class CConfigurationImport {
 				}
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
+					if ($interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref'])) {
+						$item['interfaceid'] = $interfaceid;
+					}
+					else {
+						throw new Exception(_s('Cannot find interface "%1$s" used for item "%2$s" on "%3$s".',
+							$item['interface_ref'], $item['name'], $host
+						));
+					}
 				}
 
 				if (isset($item['valuemap']) && $item['valuemap']) {
