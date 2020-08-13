@@ -529,7 +529,7 @@ class CPage {
 
 		return $this;
 	}
-	
+
 	/**
 	 * Allows to login with user credentials.
 	 *
