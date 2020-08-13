@@ -1698,10 +1698,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				: $usermacros_data['macros'];
 		}
 
-		foreach ($items as $key => $item) {
-			if (array_key_exists($key, $macro_values)) {
-				$items[$key]['description'] = strtr($items[$key]['description'], $macro_values[$key]);
-			}
+		foreach ($macro_values as $key => $macro_value) {
+			$items[$key]['description'] = strtr($items[$key]['description'], $macro_value);
 		}
 
 		return $items;
