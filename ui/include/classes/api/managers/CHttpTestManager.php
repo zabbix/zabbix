@@ -1246,8 +1246,8 @@ class CHttpTestManager {
 	/**
 	 * Get item key for test item.
 	 *
-	 * @param int    $type
-	 * @param string $test_name
+	 * @param  int    $type
+	 * @param  string $test_name
 	 *
 	 * @return string
 	 */
@@ -1267,8 +1267,8 @@ class CHttpTestManager {
 	/**
 	 * Get item name for test item.
 	 *
-	 * @param int    $type
-	 * @param string $test_name
+	 * @param  int    $type
+	 * @param  string $test_name
 	 *
 	 * @return string
 	 */
@@ -1288,9 +1288,9 @@ class CHttpTestManager {
 	/**
 	 * Get item key for step item.
 	 *
-	 * @param int    $type
-	 * @param string $test_name
-	 * @param string $step_name
+	 * @param  int    $type
+	 * @param  string $test_name
+	 * @param  string $step_name
 	 *
 	 * @return string
 	 */
@@ -1310,9 +1310,9 @@ class CHttpTestManager {
 	/**
 	 * Get item name for step item.
 	 *
-	 * @param int    $type
-	 * @param string $test_name
-	 * @param string $step_name
+	 * @param  int    $type
+	 * @param  string $test_name
+	 * @param  string $step_name
 	 *
 	 * @return string
 	 */
