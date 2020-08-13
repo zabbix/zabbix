@@ -3101,6 +3101,12 @@ return [
 				'length' => 32,
 				'default' => '60s',
 			],
+			'session_key' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
+			],
 		],
 	],
 	'triggers' => [

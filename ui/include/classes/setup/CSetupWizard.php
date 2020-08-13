@@ -65,11 +65,11 @@ class CSetupWizard extends CForm {
 	}
 
 	function getConfig($name, $default = null) {
-		return CSession::keyExists($name) ? CSession::getValue($name) : $default;
+		return CSessionHelper::has($name) ? CSessionHelper::get($name) : $default;
 	}
 
 	function setConfig($name, $value) {
-		CSession::setValue($name, $value);
+		CSessionHelper::set($name, $value);
 	}
 
 	function getStep() {
@@ -97,12 +97,12 @@ class CSetupWizard extends CForm {
 	}
 
 	protected function bodyToString($destroy = true) {
+		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
+
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
 			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
 			->addItem($this->getList());
-
-		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
 
 		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$cancel_button = (new CSubmit('cancel', _('Cancel')))
@@ -350,9 +350,8 @@ class CSetupWizard extends CForm {
 		}
 
 		if ($this->STEP_FAILED) {
-			global $ZBX_MESSAGES;
-
-			$message_box = makeMessageBox(false, $ZBX_MESSAGES, _('Cannot connect to the database.'), false, true);
+			$message_box = makeMessageBox(false, CMessageHelper::getMessages(), _('Cannot connect to the database.'),
+				false, true);
 		}
 		else {
 			$message_box = null;
@@ -502,6 +501,14 @@ class CSetupWizard extends CForm {
 		];
 
 		$error = false;
+
+		// Create session secret key.
+		if (!$this->dbConnect() || !CEncryptHelper::updateKey(CEncryptHelper::generateKey())) {
+			$this->STEP_FAILED = true;
+			$this->setConfig('step', 2);
+			return $this->stage2();
+		}
+		$this->dbClose();
 
 		if (!$config->save()) {
 			$error = true;

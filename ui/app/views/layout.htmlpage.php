@@ -102,9 +102,6 @@ echo get_prepared_messages(['with_current_messages' => true]);
 
 echo $data['main_block'];
 
-// Display unexpected messages (if any) generated while processing the output.
-echo get_prepared_messages(['with_current_messages' => true]);
-
 makeServerStatusOutput()->show();
 
 local_showFooter($data);
