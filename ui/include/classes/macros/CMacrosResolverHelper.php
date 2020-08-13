@@ -473,8 +473,8 @@ class CMacrosResolverHelper {
 	 * @static
 	 *
 	 * @param array  $items
-	 * @param string $items[n]['itemid']
 	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['description']
 	 *
 	 * @return array
 	 */
