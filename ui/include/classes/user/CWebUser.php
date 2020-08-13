@@ -132,8 +132,9 @@ class CWebUser {
 		self::$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
-			'lang' => CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG),
+			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
 			'type' => 0,
+			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
 			'debug_mode' => false
 		];
 	}
