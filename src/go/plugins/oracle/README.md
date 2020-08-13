@@ -22,24 +22,26 @@ template for your specific needs.
 CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
 -- Grant access to the zabbix_mon user.
 GRANT CONNECT, CREATE SESSION TO zabbix_mon;
-GRANT SELECT ON V_$instance TO zabbix_mon;
-GRANT SELECT ON V_$database TO zabbix_mon;
-GRANT SELECT ON v_$sysmetric TO zabbix_mon;
-GRANT SELECT ON v$recovery_file_dest TO zabbix_mon;
-GRANT SELECT ON v$active_session_history TO zabbix_mon;
-GRANT SELECT ON v$osstat TO zabbix_mon;
-GRANT SELECT ON v$restore_point TO zabbix_mon;
-GRANT SELECT ON v$process TO zabbix_mon;
-GRANT SELECT ON v$datafile TO zabbix_mon;
-GRANT SELECT ON v$pgastat TO zabbix_mon;
-GRANT SELECT ON v$sgastat TO zabbix_mon;
-GRANT SELECT ON v$log TO zabbix_mon;
-GRANT SELECT ON v$archive_dest TO zabbix_mon;
-GRANT SELECT ON v$asm_diskgroup TO zabbix_mon;
-GRANT SELECT ON sys.dba_data_files TO zabbix_mon;
-GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
 GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
+GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
 GRANT SELECT ON DBA_USERS TO zabbix_mon;
+GRANT SELECT ON SYS.DBA_DATA_FILES TO zabbix_mon;
+GRANT SELECT ON V$ACTIVE_SESSION_HISTORY TO zabbix_mon;
+GRANT SELECT ON V$ARCHIVE_DEST TO zabbix_mon;
+GRANT SELECT ON V$ASM_DISKGROUP TO zabbix_mon;
+GRANT SELECT ON V$DATABASE TO zabbix_mon;
+GRANT SELECT ON V$DATAFILE TO zabbix_mon;
+GRANT SELECT ON V$INSTANCE TO zabbix_mon;
+GRANT SELECT ON V$LOG TO zabbix_mon;
+GRANT SELECT ON V$OSSTAT TO zabbix_mon;
+GRANT SELECT ON V$PGASTAT TO zabbix_mon;
+GRANT SELECT ON V$PROCESS TO zabbix_mon;
+GRANT SELECT ON V$RECOVERY_FILE_DEST TO zabbix_mon;
+GRANT SELECT ON V$RESTORE_POINT TO zabbix_mon;
+GRANT SELECT ON V$SESSION TO zabbix_mon;
+GRANT SELECT ON V$SGASTAT TO zabbix_mon;
+GRANT SELECT ON V$SYSMETRIC TO zabbix_mon;
+GRANT SELECT ON V$SYSTEM_PARAMETER TO zabbix_mon;
 ```
 * Make sure a TNS Listener and an Oracle instance are available for connection.  
 

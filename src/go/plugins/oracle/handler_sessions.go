@@ -113,7 +113,7 @@ func sessionsHandler(ctx context.Context, conn OraClient, params []string) (inte
 				SELECT
 					COUNT(*) CNT_ALL
 				FROM
-					GV$SESSION)
+					V$SESSION)
 			UNION
 			SELECT
 				'concurrency_rate',
