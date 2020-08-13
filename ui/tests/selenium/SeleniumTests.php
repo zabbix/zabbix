@@ -37,6 +37,7 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralValuemap.php';
 require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
+require_once dirname(__FILE__).'/testPageDashboardList.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
@@ -176,6 +177,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationScripts');
 		$suite->addTestSuite('testPageAvailabilityReport');
 		$suite->addTestSuite('testPageDashboard');
+		$suite->addTestSuite('testPageDashboardList');
 		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageGraphPrototypes');
