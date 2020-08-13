@@ -170,14 +170,14 @@ class CHttpTestManager {
 				$itemids[] = $checkitem['itemid'];
 
 				if (isset($httptest['name'])) {
-					$new_item_name = $this->getTestName($checkitem['type'], $httptest['name']);
-					$new_item_key_ = $this->getTestKey($checkitem['type'], $httptest['name']);
-
-					if ($new_item_name != $checkitem['name']) {
-						$updateFields['name'] = $new_item_name;
+					$updateFields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
+					if ($updateFields['name'] === $checkitem['name']) {
+						unset($updateFields['name']);
 					}
-					if ($new_item_key_ != $checkitem['key_']) {
-						$updateFields['key_'] = $new_item_key_;
+
+					$updateFields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
+					if ($updateFields['key_'] === $checkitem['key_']) {
+						unset($updateFields['key_']);
 					}
 				}
 				if (isset($httptest['status'])) {
@@ -1143,7 +1143,7 @@ class CHttpTestManager {
 			$itemids = [];
 			$stepitemsUpdate = $updateFields = [];
 			$dbStepItems = DBselect(
-				'SELECT i.itemid,i.key_,hi.type'.
+				'SELECT i.itemid,i.name,i.key_,hi.type'.
 				' FROM items i,httpstepitem hi'.
 				' WHERE hi.httpstepid='.zbx_dbstr($webstep['httpstepid']).
 					' AND hi.itemid=i.itemid'
@@ -1163,11 +1163,14 @@ class CHttpTestManager {
 					}
 
 					$updateFields['name'] = $this->getStepName($stepitem['type'], $httpTest['name'], $webstep['name']);
+					if ($updateFields['name'] === $stepitem['name']) {
+						unset($updateFields['name']);
+					}
+
 					$updateFields['key_'] = $this->getStepKey($stepitem['type'], $httpTest['name'], $webstep['name']);
-				}
-				if (isset($dbKeys[$updateFields['key_']])) {
-					unset($updateFields['name']);
-					unset($updateFields['key_']);
+					if (isset($dbKeys[$updateFields['key_']])) {
+						unset($updateFields['key_']);
+					}
 				}
 				if (isset($httpTest['status'])) {
 					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httpTest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
