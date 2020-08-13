@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.0
+For Zabbix version: 5.0  
 The template is developed for monitoring DBMS Oracle Database single instance via ODBC.
 
 This template was tested on:
@@ -58,7 +58,7 @@ DSN = $ORACLE.DSN
 isql $TNS_NAME $DB_USER $DB_PASSWORD
 ```
 
-5. Сonfigure Zabbix server or Zabbix proxy for Oracle ENV Usage. Edit or add a new file:
+5. Configure Zabbix server or Zabbix proxy for Oracle ENV Usage. Edit or add a new file:
 
    Edit or add new file
 

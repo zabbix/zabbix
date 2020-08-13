@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-30T14:23:21Z</date>
+   <date>2020-08-11T18:28:56Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -748,7 +748,7 @@ SELECT
                <key>oracle.fra_space_used</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Amount of disk space (in bytes) used by fast recovery area files created in current and all previous fast recovery areas.</description>
                <applications>
                   <application>
@@ -1515,7 +1515,7 @@ SELECT
                <key>oracle.sga_buffer_cache</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The size of the cache of standard blocks.</description>
                <applications>
                   <application>
@@ -1540,7 +1540,7 @@ SELECT
                <key>oracle.sga_fixed</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The fixed SGA is an internal housekeeping area.</description>
                <applications>
                   <application>
@@ -1565,7 +1565,7 @@ SELECT
                <key>oracle.sga_java_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the java pool.</description>
                <applications>
                   <application>
@@ -1590,7 +1590,7 @@ SELECT
                <key>oracle.sga_large_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the large pool.</description>
                <applications>
                   <application>
@@ -1615,7 +1615,7 @@ SELECT
                <key>oracle.sga_log_buffer</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>The number of bytes allocated for the redo log buffer.</description>
                <applications>
                   <application>
@@ -1640,7 +1640,7 @@ SELECT
                <key>oracle.sga_shared_pool</key>
                <delay>0</delay>
                <history>7d</history>
-               <units>Bytes</units>
+               <units>B</units>
                <description>Memory is allocated from the shared pool.</description>
                <applications>
                   <application>
@@ -2408,7 +2408,7 @@ FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mo
                      <description>1 - 'MOUNTED', 2 - 'READ WRITE', 3 - 'READ ONLY', 4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode)</description>
                      <application_prototypes>
                         <application_prototype>
-                           <name>Oracle {#TYPE}</name>
+                           <name>Oracle PDB</name>
                         </application_prototype>
                      </application_prototypes>
                      <valuemap>
