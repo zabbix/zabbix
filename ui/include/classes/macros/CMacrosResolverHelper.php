@@ -472,13 +472,13 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array  $items
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['description']
+	 * @param  array   $items
+	 * @param  string  $items[n]['hostid']
+	 * @param  string  $items[n]['description']
 	 *
-	 * @return array
+	 * @return array   $items
 	 */
-	public static function resolveItemDescriptions(array $items) {
+	public static function resolveItemDescriptions(array $items): array {
 		self::init();
 
 		return self::$macrosResolver->resolveItemDescriptions($items);
