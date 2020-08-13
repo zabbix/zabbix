@@ -1247,86 +1247,86 @@ class CHttpTestManager {
 	 * Get item key for test item.
 	 *
 	 * @param int    $type
-	 * @param string $testName
+	 * @param string $test_name
 	 *
-	 * @return bool|string
+	 * @return null|string
 	 */
-	protected function getTestKey($type, $testName) {
+	protected function getTestKey(int $type, string $test_name): ?string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'web.test.in['.quoteItemKeyParam($testName).',,bps]';
+				return 'web.test.in['.quoteItemKeyParam($test_name).',,bps]';
 			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-				return 'web.test.fail['.quoteItemKeyParam($testName).']';
+				return 'web.test.fail['.quoteItemKeyParam($test_name).']';
 			case HTTPSTEP_ITEM_TYPE_LASTERROR:
-				return 'web.test.error['.quoteItemKeyParam($testName).']';
+				return 'web.test.error['.quoteItemKeyParam($test_name).']';
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
 	 * Get item name for test item.
 	 *
 	 * @param int    $type
-	 * @param string $testName
+	 * @param string $test_name
 	 *
-	 * @return bool|string
+	 * @return null|string
 	 */
-	protected function getTestName($type, $testName) {
+	protected function getTestName(int $type, string $test_name): ?string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'Download speed for scenario "' . $testName . '".';
+				return 'Download speed for scenario "' . $test_name . '".';
 			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-				return 'Failed step of scenario "' . $testName . '".';
+				return 'Failed step of scenario "' . $test_name . '".';
 			case HTTPSTEP_ITEM_TYPE_LASTERROR:
-				return 'Last error message of scenario "' . $testName . '".';
+				return 'Last error message of scenario "' . $test_name . '".';
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
 	 * Get item key for step item.
 	 *
 	 * @param int    $type
-	 * @param string $testName
-	 * @param string $stepName
+	 * @param string $test_name
+	 * @param string $step_name
 	 *
-	 * @return bool|string
+	 * @return null|string
 	 */
-	protected function getStepKey($type, $testName, $stepName) {
+	protected function getStepKey(int $type, string $test_name, string $step_name): ?string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'web.test.in['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).',bps]';
+				return 'web.test.in['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).',bps]';
 			case HTTPSTEP_ITEM_TYPE_TIME:
-				return 'web.test.time['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).',resp]';
+				return 'web.test.time['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).',resp]';
 			case HTTPSTEP_ITEM_TYPE_RSPCODE:
-				return 'web.test.rspcode['.quoteItemKeyParam($testName).','.quoteItemKeyParam($stepName).']';
+				return 'web.test.rspcode['.quoteItemKeyParam($test_name).','.quoteItemKeyParam($step_name).']';
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
 	 * Get item name for step item.
 	 *
 	 * @param int    $type
-	 * @param string $testName
-	 * @param string $stepName
+	 * @param string $test_name
+	 * @param string $step_name
 	 *
-	 * @return bool|string
+	 * @return null|string
 	 */
-	protected function getStepName($type, $testName, $stepName) {
+	protected function getStepName(int $type, string $test_name, string $step_name): ?string {
 		switch ($type) {
 			case HTTPSTEP_ITEM_TYPE_IN:
-				return 'Download speed for step "' . $stepName . '" of scenario "' . $testName . '".';
+				return 'Download speed for step "' . $step_name . '" of scenario "' . $test_name . '".';
 			case HTTPSTEP_ITEM_TYPE_TIME:
-				return 'Response time for step "' . $stepName . '" of scenario "' . $testName . '".';
+				return 'Response time for step "' . $step_name . '" of scenario "' . $test_name . '".';
 			case HTTPSTEP_ITEM_TYPE_RSPCODE:
-				return 'Response code for step "' . $stepName . '" of scenario "' . $testName . '".';
+				return 'Response code for step "' . $step_name . '" of scenario "' . $test_name . '".';
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
