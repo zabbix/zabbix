@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/classes/parsers/CConditionFormula
 require_once dirname(__FILE__).'/../../include/classes/helpers/CConditionHelper.php';
 
 /**
+ * @backup items
  */
 class testDiscoveryRule extends CAPITest {
 	public static function discoveryrule_create_data_invalid() {
