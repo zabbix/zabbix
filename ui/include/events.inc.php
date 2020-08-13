@@ -100,12 +100,11 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 		return 0;
 	}
 
-	$config = select_config();
 	$options = [
 		'output' => ['triggerid'],
 		'monitored' => 1,
 		'skipDependent' => 1,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	if (!is_null($value_trigger)) {
 		$options['filter'] = ['value' => $value_trigger];
@@ -148,7 +147,6 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @return CTableInfo
  */
 function make_event_details(array $event) {
-	$config = select_config();
 	$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	$table = (new CTableInfo())
@@ -162,7 +160,7 @@ function make_event_details(array $event) {
 		])
 		->addRow([
 			_('Severity'),
-			getSeverityCell($event['severity'], $config)
+			getSeverityCell($event['severity'])
 		])
 		->addRow([
 			_('Time'),
@@ -238,8 +236,6 @@ function make_event_details(array $event) {
 }
 
 function make_small_eventlist(array $startEvent) {
-	$config = select_config();
-
 	$table = (new CTableInfo())
 		->setHeader([
 			_('Time'),
@@ -301,14 +297,6 @@ function make_small_eventlist(array $startEvent) {
 		])
 		: [];
 
-	$severity_config = [
-		'severity_name_0' => $config['severity_name_0'],
-		'severity_name_1' => $config['severity_name_1'],
-		'severity_name_2' => $config['severity_name_2'],
-		'severity_name_3' => $config['severity_name_3'],
-		'severity_name_4' => $config['severity_name_4'],
-		'severity_name_5' => $config['severity_name_5']
-	];
 	$actions = getEventsActionsIconsData($events, $triggers, $r_events);
 	$users = API::User()->get([
 		'output' => ['alias', 'name', 'surname'],
@@ -374,7 +362,7 @@ function make_small_eventlist(array $startEvent) {
 			zbx_date2age($event['clock']),
 			$duration,
 			$problem_update_link,
-			makeEventActionsIcons($event['eventid'], $actions['data'], $mediatypes, $users, $severity_config)
+			makeEventActionsIcons($event['eventid'], $actions['data'], $mediatypes, $users)
 		]);
 	}
 

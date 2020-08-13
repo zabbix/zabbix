@@ -1410,31 +1410,7 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: get_history_log_value                                            *
- *                                                                            *
- * Purpose: retrieve a particular attribute of a log value                    *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	get_history_log_value(const char *expression, char **replace_to, int N_functionid,
-		int request, int clock, int ns, const char *tz)
-{
-	zbx_uint64_t	itemid;
-	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED == get_N_itemid(expression, N_functionid, &itemid))
-		ret = DBget_history_log_value(itemid, replace_to, request, clock, ns, tz);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -1886,13 +1862,14 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"			/* deprecated */
 #define MVAR_ITEM_DESCRIPTION		"{ITEM.DESCRIPTION}"
 #define MVAR_ITEM_DESCRIPTION_ORIG	"{ITEM.DESCRIPTION.ORIG}"
-#define MVAR_ITEM_LOG_DATE		"{ITEM.LOG.DATE}"
-#define MVAR_ITEM_LOG_TIME		"{ITEM.LOG.TIME}"
-#define MVAR_ITEM_LOG_AGE		"{ITEM.LOG.AGE}"
-#define MVAR_ITEM_LOG_SOURCE		"{ITEM.LOG.SOURCE}"
-#define MVAR_ITEM_LOG_SEVERITY		"{ITEM.LOG.SEVERITY}"
-#define MVAR_ITEM_LOG_NSEVERITY		"{ITEM.LOG.NSEVERITY}"
-#define MVAR_ITEM_LOG_EVENTID		"{ITEM.LOG.EVENTID}"
+#define MVAR_ITEM_LOG			"{ITEM.LOG."
+#define MVAR_ITEM_LOG_DATE		MVAR_ITEM_LOG "DATE}"
+#define MVAR_ITEM_LOG_TIME		MVAR_ITEM_LOG "TIME}"
+#define MVAR_ITEM_LOG_AGE		MVAR_ITEM_LOG "AGE}"
+#define MVAR_ITEM_LOG_SOURCE		MVAR_ITEM_LOG "SOURCE}"
+#define MVAR_ITEM_LOG_SEVERITY		MVAR_ITEM_LOG "SEVERITY}"
+#define MVAR_ITEM_LOG_NSEVERITY		MVAR_ITEM_LOG "NSEVERITY}"
+#define MVAR_ITEM_LOG_EVENTID		MVAR_ITEM_LOG "EVENTID}"
 
 #define MVAR_TRIGGER_DESCRIPTION		"{TRIGGER.DESCRIPTION}"
 #define MVAR_TRIGGER_COMMENT			"{TRIGGER.COMMENT}"		/* deprecated */
@@ -2550,6 +2527,59 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_history_log_value                                            *
+ *                                                                            *
+ * Purpose: retrieve a particular attribute of a log value                    *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_history_log_value(const char *m, const char *expression, char **replace_to, int N_functionid,
+		int clock, int ns, const char *tz)
+{
+	zbx_uint64_t	itemid;
+	int		ret, request;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
+	{
+		request = ZBX_REQUEST_ITEM_LOG_AGE;
+	}
+	else if (0 == strcmp(m, MVAR_ITEM_LOG_DATE))
+	{
+		request = ZBX_REQUEST_ITEM_LOG_DATE;
+	}
+	else if (0 == strcmp(m, MVAR_ITEM_LOG_EVENTID))
+	{
+		request = ZBX_REQUEST_ITEM_LOG_EVENTID;
+	}
+	else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
+	{
+		request = ZBX_REQUEST_ITEM_LOG_NSEVERITY;
+	}
+	else if (0 == strcmp(m, MVAR_ITEM_LOG_SEVERITY))
+	{
+		request = ZBX_REQUEST_ITEM_LOG_SEVERITY;
+	}
+	else if (0 == strcmp(m, MVAR_ITEM_LOG_SOURCE))
+	{
+		request = ZBX_REQUEST_ITEM_LOG_SOURCE;
+	}
+	else	/* MVAR_ITEM_LOG_TIME */
+		request = ZBX_REQUEST_ITEM_LOG_TIME;
+
+	if (SUCCEED == (ret = get_N_itemid(expression, N_functionid, &itemid)))
+		ret = DBget_history_log_value(itemid, replace_to, request, clock, ns, tz);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_indexed_macro                                                 *
  *                                                                            *
  * Purpose: check if a token contains indexed macro                           *
@@ -2814,7 +2844,7 @@ static const char	*zbx_dobject_status2str(int st)
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error, int maxerrlen)
+static void	resolve_opdata(const DB_EVENT *event, char **replace_to, const char *tz, char *error, int maxerrlen)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2870,7 +2900,7 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error
 	else
 	{
 		*replace_to = zbx_strdup(*replace_to, event->trigger.opdata);
-		substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
+		substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, tz, replace_to,
 				MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 	}
 
@@ -3043,7 +3073,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_OPDATA))
 				{
-					resolve_opdata(c_event, &replace_to, error, maxerrlen);
+					resolve_opdata(c_event, &replace_to, tz, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_ACK_MESSAGE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_MESSAGE))
 				{
@@ -3157,48 +3187,6 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					ret = DBitem_lastvalue(c_event->trigger.expression, &replace_to, N_functionid,
 							raw_value);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
-				{
-					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_LOG_AGE, c_event->clock,
-							c_event->ns, NULL);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_LOG_DATE))
-				{
-					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_LOG_DATE, c_event->clock,
-							c_event->ns, tz);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_LOG_EVENTID))
-				{
-					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_LOG_EVENTID, c_event->clock,
-							c_event->ns, NULL);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
-				{
-					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_LOG_NSEVERITY, c_event->clock,
-							c_event->ns, NULL);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_LOG_SEVERITY))
-				{
-					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_LOG_SEVERITY, c_event->clock,
-							c_event->ns, NULL);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_LOG_SOURCE))
-				{
-					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_LOG_SOURCE, c_event->clock,
-							c_event->ns, NULL);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
-				{
-					ret = get_history_log_value(c_event->trigger.expression, &replace_to,
-							N_functionid, ZBX_REQUEST_ITEM_LOG_TIME, c_event->clock,
-							c_event->ns, tz);
-				}
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
 				{
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
@@ -3213,6 +3201,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = DBitem_value(c_event->trigger.expression, &replace_to, N_functionid,
 							c_event->clock, c_event->ns, raw_value);
+				}
+				else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
+				{
+					ret = get_history_log_value(m, c_event->trigger.expression, &replace_to,
+							N_functionid, c_event->clock, c_event->ns, tz);
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
@@ -4127,6 +4120,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
 				}
+				else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
+				{
+					ret = get_history_log_value(m, event->trigger.expression, &replace_to,
+							N_functionid, event->clock, event->ns, tz);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
 					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
@@ -4216,6 +4214,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
+				}
+				else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
+				{
+					ret = get_history_log_value(m, event->trigger.expression, &replace_to,
+							N_functionid, event->clock, event->ns, tz);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 				{
@@ -4586,6 +4589,11 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
+				}
+				else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
+				{
+					ret = get_history_log_value(m, event->trigger.expression, &replace_to,
+							N_functionid, event->clock, event->ns, tz);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
 				{

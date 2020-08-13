@@ -222,7 +222,7 @@ class CHistory extends CApiService {
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
-		$db_res = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
+		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {

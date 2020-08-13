@@ -360,7 +360,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'host' => [],
 			'interface' => [],
 			'item' => [],
-			'references' => []
+			'references' => [],
+			'log' => []
 		];
 		$usermacros = [];
 		$macro_values = [];
@@ -369,7 +370,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+				]
 			],
 			'macro_funcs_n' => [
 				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
@@ -414,6 +418,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 
+				foreach ($matched_macros['macros_n']['log'] as $token => $data) {
+					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+					if (array_key_exists($data['f_num'], $functionids)) {
+						$macros['log'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+					}
+				}
+
 				foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
 					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
@@ -447,6 +459,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 			$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 			$macro_values = $this->getItemMacros($macros['item'], $macro_values);
+			$macro_values = $this->getItemLogMacros($macros['log'], $macro_values);
 
 			if ($usermacros) {
 				// Get hosts for triggers.
@@ -513,7 +526,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macros = [
 			'host' => [],
 			'interface' => [],
-			'item' => []
+			'item' => [],
+			'log' => [],
 		];
 		$usermacros = [];
 		$macro_values = [];
@@ -522,7 +536,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+				]
 			],
 			'macro_funcs_n' => [
 				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
@@ -565,6 +582,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
+			foreach ($matched_macros['macros_n']['log'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['log'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
+			}
+
 			foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
 				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
@@ -586,6 +611,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options);
+		$macro_values = $this->getItemLogMacros($macros['log'], $macro_values);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -669,7 +695,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'host' => [],
 			'interface' => [],
 			'item' => [],
-			'event' => []
+			'event' => [],
+			'log' => []
 		];
 		$usermacros = [];
 		$macro_values = [];
@@ -682,7 +709,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+				]
 			],
 			'macro_funcs_n' => [
 				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
@@ -731,6 +761,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		foreach ($matched_macros['macros_n']['log'] as $token => $data) {
+			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+			if (array_key_exists($data['f_num'], $functionids)) {
+				$macros['log'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+			}
+		}
+
 		foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
 			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
@@ -751,6 +789,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 		$macro_values = $this->getItemMacros($macros['item'], $macro_values);
+		$macro_values = $this->getItemLogMacros($macros['log'], $macro_values);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -2380,19 +2419,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					case 'HOST.IP':
 					case 'IPADDRESS': // deprecated
-						if ($host) {
+						if ($host && $host['interface']) {
 							$matched_macro['value'] = $host['interface']['ip'];
 						}
 						break;
 
 					case 'HOST.DNS':
-						if ($host) {
+						if ($host && $host['interface']) {
 							$matched_macro['value'] = $host['interface']['dns'];
 						}
 						break;
 
 					case 'HOST.CONN':
-						if ($host) {
+						if ($host && $host['interface']) {
 							$matched_macro['value'] = $host['interface']['conn'];
 						}
 						break;

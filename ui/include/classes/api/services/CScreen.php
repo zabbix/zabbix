@@ -164,7 +164,7 @@ class CScreen extends CApiService {
 		$screenids = [];
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 		while ($screen = DBfetch($res)) {
 			$screenids[$screen['screenid']] = true;
 			$result[$screen['screenid']] = $screen;

@@ -242,18 +242,8 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$item['usrgrpid'].']', $item['usrgrpid'])
 				: null;
 
-			if ($data['multiselect']) {
-				$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
-						zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');';
-			}
-			else {
-				$values = [
-					$options['dstfld1'] => $item[$options['srcfld1']],
-					$options['dstfld2'] => $item[$options['srcfld2']]
-				];
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-						zbx_jsvalue($values).', '.$options['parentid'].');';
-			}
+			$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
+				zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');';
 
 			$name = (new CLink($item['name'], 'javascript: void(0);'))
 						->setId('spanid'.$item['usrgrpid'])
@@ -318,7 +308,7 @@ switch ($data['popup_type']) {
 			$table->addRow([
 				$check_box,
 				$description,
-				getSeverityCell($trigger['priority'], $options['config']),
+				getSeverityCell($trigger['priority']),
 				(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 					->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 			]);
@@ -644,7 +634,7 @@ if ($data['multiselect'] && $form !== null) {
 }
 
 // Types require results returned as array.
-$types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
+$types = ['users', 'usrgrp', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
 	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
 ];
 

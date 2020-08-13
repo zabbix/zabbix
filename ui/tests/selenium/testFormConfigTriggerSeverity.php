@@ -111,11 +111,11 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 	}
 
 	public function testFormTriggerSeverity_Layout() {
-		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
-		$this->zbxTestCheckTitle('Configuration of trigger severities');
-		$this->zbxTestCheckHeader('Trigger severities');
+		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
+		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
+		$this->zbxTestCheckHeader('Trigger displaying options');
 
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger severities');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger displaying options');
 
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
 		$this->zbxTestAssertElementPresentId('severity_name_0');
@@ -148,9 +148,9 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 	 * @dataProvider providerTriggerSeverity
 	 */
 	public function testFormTriggerSeverity_Update($data, $resultSave, $DBvalues) {
-		$this->zbxTestLogin('zabbix.php?action=trigseverity.edit');
-		$this->zbxTestCheckTitle('Configuration of trigger severities');
-		$this->zbxTestCheckHeader('Trigger severities');
+		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
+		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
+		$this->zbxTestCheckHeader('Trigger displaying options');
 
 		foreach ($data as $field => $value) {
 			$this->zbxTestInputType($field, $value);

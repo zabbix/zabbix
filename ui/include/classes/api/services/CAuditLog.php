@@ -91,7 +91,7 @@ class CAuditLog extends CApiService {
 			AUDIT_RESOURCE_MACRO, AUDIT_RESOURCE_TEMPLATE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, AUDIT_RESOURCE_ICON_MAP,
 			AUDIT_RESOURCE_DASHBOARD, AUDIT_RESOURCE_CORRELATION, AUDIT_RESOURCE_GRAPH_PROTOTYPE,
 			AUDIT_RESOURCE_ITEM_PROTOTYPE, AUDIT_RESOURCE_HOST_PROTOTYPE, AUDIT_RESOURCE_AUTOREGISTRATION,
-			AUDIT_RESOURCE_MODULE
+			AUDIT_RESOURCE_MODULE, AUDIT_RESOURCE_SETTINGS, AUDIT_RESOURCE_HOUSEKEEPING, AUDIT_RESOURCE_AUTHENTICATION
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -167,7 +167,7 @@ class CAuditLog extends CApiService {
 		$sql_parts = $this->applyQueryFilterOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
-		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($audit = DBfetch($res)) {
 			if (!$options['countOutput']) {

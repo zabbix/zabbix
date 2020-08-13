@@ -47,8 +47,29 @@ $widget = (new CWidget())
 		->setAttribute('aria-label', _('Content controls'))
 	);
 
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
+	$widget
+		->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list')))
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			),
+			(new CFormList())->addRow(_('Show'),
+				(new CRadioButtonList('filter_show', (int) $data['filter']['show']))
+					->addValue(_('All'), DASHBOARD_FILTER_SHOW_ALL)
+					->addValue(_('Created by me'), DASHBOARD_FILTER_SHOW_MY)
+					->setModern(true)
+			)
+		])
+		->addVar('action', 'dashboard.list')
+	);
+}
+
 $form = (new CForm())->setName('dashboardForm');
 
+// Create dashboard table.
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
@@ -58,8 +79,7 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
-				->getUrl()
-		)
+				->getUrl())
 	]);
 
 $url = (new CUrl('zabbix.php'))
@@ -67,14 +87,32 @@ $url = (new CUrl('zabbix.php'))
 	->setArgument('dashboardid', '');
 
 foreach ($data['dashboards'] as $dashboard) {
+	$tags = [];
+
+	if ($dashboard['userid'] == CWebUser::$data['userid']) {
+		$tags[] = (new CSpan(_('My')))
+			->addClass(ZBX_STYLE_TAG)
+			->addClass(ZBX_STYLE_GREEN_BG);
+	}
+
+	if ($dashboard['private'] == PUBLIC_SHARING || count($dashboard['users']) > 0
+			|| count($dashboard['userGroups']) > 0) {
+		$tags[] = (new CSpan(_('Shared')))
+			->addClass(ZBX_STYLE_TAG)
+			->addClass(ZBX_STYLE_YELLOW_BG);
+	}
+
 	$table->addRow([
 		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
 			->setEnabled($dashboard['editable']),
-		new CLink($dashboard['name'],
-			$url
-				->setArgument('dashboardid', $dashboard['dashboardid'])
-				->getUrl()
-		)
+		[
+			new CLink($dashboard['name'],
+				$url
+					->setArgument('dashboardid', $dashboard['dashboardid'])
+					->getUrl()
+			),
+			$tags ? (new CDiv($tags))->addStyle('float: right') : null
+		]
 	]);
 }
 

@@ -56,9 +56,10 @@ class CValidationRule {
 							$is_empty = false;
 							$rule = [];
 
-							if (!$this->parseString($buffer, $pos, $rule)		// string
+							if (!$this->parseString($buffer, $pos, $rule)				// string
 									&& !$this->parseRangeTime($buffer, $pos, $rule)		// range time
 									&& !$this->parseTimePeriods($buffer, $pos, $rule)	// time periods
+									&& !$this->parseTimeUnit($buffer, $pos, $rule)		// time unit
 									&& !$this->parseRgb($buffer, $pos, $rule)			// rgb
 									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
@@ -185,6 +186,62 @@ class CValidationRule {
 
 		$pos += 12;
 		$rules['time_periods'] = true;
+
+		return true;
+	}
+
+	/**
+	 * time_unit
+	 *
+	 * 'time_unit' =>  ['<value1>', ..., '<valueN>']
+	 */
+	private function parseTimeUnit($buffer, &$pos, &$rules): bool {
+		$TIME_UNIT_LENGTH = mb_strlen('time_unit');
+		$TIME_UNIT_YEAR_LENGTH = mb_strlen('time_unit_year');
+
+		$values = [];
+		$ranges_string = '';
+		$ranges = [];
+
+		if (strncmp(substr($buffer, $pos), 'time_unit_year', $TIME_UNIT_YEAR_LENGTH) === 0) {
+			$pos += $TIME_UNIT_YEAR_LENGTH;
+			$values['with_year'] = true;
+		}
+		else if (strncmp(substr($buffer, $pos), 'time_unit', $TIME_UNIT_LENGTH) === 0) {
+			$pos += $TIME_UNIT_LENGTH;
+		}
+		else {
+			return false;
+		}
+
+		while (isset($buffer[$pos]) && $buffer[$pos] === ' ') {
+			$pos++;
+		}
+
+		while (isset($buffer[$pos]) && $buffer[$pos] !== '|') {
+			$ranges_string .= $buffer[$pos];
+			$pos++;
+		}
+
+		foreach (explode(',', $ranges_string) as $range_string) {
+			if (strpos($range_string, ':') !== false) {
+				[$from, $to] = explode(':', $range_string);
+			}
+			else {
+				$from = $range_string;
+				$to = $range_string;
+			}
+
+			if (ctype_digit($from) && ctype_digit($to)) {
+				$ranges[] = ['from' => $from, 'to' => $to];
+			}
+		}
+
+		if ($ranges) {
+			$values['ranges'] = $ranges;
+		}
+
+		$rules['time_unit'] = $values;
 
 		return true;
 	}
