@@ -29,6 +29,57 @@ extern char	*CONFIG_SSL_CA_LOCATION;
 extern char	*CONFIG_SSL_CERT_LOCATION;
 extern char	*CONFIG_SSL_KEY_LOCATION;
 
+size_t	zbx_curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	size_t			r_size = size * nmemb;
+	zbx_http_response_t	*response;
+
+	response = (zbx_http_response_t*)userdata;
+	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
+
+	return r_size;
+}
+
+size_t	zbx_curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	ZBX_UNUSED(ptr);
+	ZBX_UNUSED(userdata);
+
+	return size * nmemb;
+}
+
+int	zbx_http_prepare_callbacks(CURL *easyhandle, char **error, zbx_http_response_t *header,
+		zbx_http_response_t *body, void *header_cb, void *body_cb)
+{
+	CURLcode	err;
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, header_cb)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set header function: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERDATA, header)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set header callback: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, body_cb)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set write function: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, body)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set write callback: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		char **error)

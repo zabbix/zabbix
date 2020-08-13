@@ -43,7 +43,7 @@ typedef struct
 	size_t	allocated;
 	size_t	offset;
 }
-zbx_http_response_t;
+http_response_t;
 
 #endif
 
@@ -129,10 +129,10 @@ static int	check_common_params(const char *host, const char *path, char **error)
 #ifdef HAVE_LIBCURL
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	size_t			r_size = size * nmemb;
-	zbx_http_response_t	*response;
+	size_t		r_size = size * nmemb;
+	http_response_t	*response;
 
-	response = (zbx_http_response_t*)userdata;
+	response = (http_response_t*)userdata;
 	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
 
 	return r_size;
@@ -149,7 +149,7 @@ static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdat
 static int	curl_page_get(char *url, char **buffer, char **error)
 {
 	CURLcode		err;
-	zbx_http_response_t	page = {0};
+	http_response_t		page = {0};
 	CURL			*easyhandle;
 	int			ret = SYSINFO_RET_FAIL;
 
