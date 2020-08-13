@@ -30,9 +30,6 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 	use MacrosTrait;
 
-	const TYPE_SECRET = 'Secret text';
-	const TYPE_TEXT = 'Text';
-
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
 	private $macroClass = 'textarea-flexible macro';
@@ -175,7 +172,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_macro"]', "class", $this->macroClass);
 
 			$macro_name = $this->query('id:macros_'.$i.'_macro')->one()->getAttribute('value');
-			if ($macro_name !== '' && $this->getValueField($macro_name)->getInputType() === self::TYPE_SECRET) {
+			if ($macro_name !== '' && $this->getValueField($macro_name)->getInputType() === CInputGroupElement::TYPE_SECRET) {
 				$element = 'input';
 			}
 			else {
@@ -662,14 +659,14 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		// Check that textarea input element is not available for secret text macros.
 		$textarea_xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]';
-		if ($value_field->getInputType() === self::TYPE_SECRET) {
+		if ($value_field->getInputType() === CInputGroupElement::TYPE_SECRET) {
 			$this->assertFalse($value_field->query($textarea_xpath)->exists());
 		}
 
 		// If needed, change value type back to "Text" and verify that value is accessible.
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
-			$value_field->changeInputType(self::TYPE_TEXT);
-			$this->assertEquals(self::TYPE_TEXT, $value_field->getInputType());
+			$value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
+			$this->assertEquals(CInputGroupElement::TYPE_TEXT, $value_field->getInputType());
 			$this->assertTrue($value_field->query($textarea_xpath)->exists());
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		}
@@ -678,7 +675,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$value_field = $this->getValueField($data['macro_fields']['macro']);
 
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
-			$this->assertEquals(self::TYPE_TEXT, $value_field->getInputType());
+			$this->assertEquals(CInputGroupElement::TYPE_TEXT, $value_field->getInputType());
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 			$this->assertFalse($value_field->getNewValueButton()->isValid());
 			$this->assertFalse($value_field->getRevertButton()->isValid());
@@ -754,12 +751,12 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$this->query('button:Update')->one()->click();
 
 		$value_field = $this->getValueField($data['macro']);
-		if (CTestArrayHelper::get($data['value'], 'type', self::TYPE_SECRET) === self::TYPE_SECRET) {
-			$this->assertEquals(self::TYPE_SECRET, $value_field->getInputType());
+		if (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) === CInputGroupElement::TYPE_SECRET) {
+			$this->assertEquals(CInputGroupElement::TYPE_SECRET, $value_field->getInputType());
 			$this->assertEquals('******', $value_field->getValue());
 		}
 		else {
-			$this->assertEquals(self::TYPE_TEXT, $value_field->getInputType());
+			$this->assertEquals(CInputGroupElement::TYPE_TEXT, $value_field->getInputType());
 			$this->assertEquals($data['value']['text'], $value_field->getValue());
 		}
 		$sql = 'SELECT value FROM globalmacro WHERE macro='.zbx_dbstr($data['macro']);
@@ -808,7 +805,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		$value_field->fill('New_macro_value');
 
 		if (CTestArrayHelper::get($data, 'set_to_text', false)) {
-			$value_field->changeInputType(self::TYPE_TEXT);
+			$value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
 			$this->assertEquals('New_macro_value', $value_field->getValue());
 		}
 
@@ -834,7 +831,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 		// Change macro type.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$value_field = $this->getValueField($macro['macro']);
-		$value_field->changeInputType(self::TYPE_SECRET);
+		$value_field->changeInputType(CInputGroupElement::TYPE_SECRET);
 		$this->query('button:Update')->one()->click();
 
 		// Open list of items and check that macro value is hidden.
