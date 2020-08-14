@@ -21,8 +21,9 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 	"strconv"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keySessions = "oracle.sessions.stats"
@@ -38,13 +39,13 @@ func sessionsHandler(ctx context.Context, conn OraClient, params []string) (inte
 	lockMaxTime := 600
 
 	if len(params) > sessionsMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	if len(params) == 1 {
 		lockMaxTime, err = strconv.Atoi(params[0])
 		if err != nil {
-			return nil, errorInvalidParams
+			return nil, zbxerr.ErrorInvalidParams
 		}
 	}
 
@@ -141,12 +142,12 @@ func sessionsHandler(ctx context.Context, conn OraClient, params []string) (inte
 			) v
 	`, lockMaxTime)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&sessions)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return sessions, nil

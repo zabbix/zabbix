@@ -29,8 +29,8 @@ import (
 
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
-
 	"zabbix.com/pkg/log"
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 type OraClient interface {
@@ -252,6 +252,14 @@ func (c *ConnManager) GetConnection(uri URI) (conn *OraConn, err error) {
 
 	if conn == nil {
 		conn, err = c.create(uri)
+	}
+
+	if err != nil {
+		if oraErr, isOraErr := godror.AsOraErr(err); isOraErr {
+			err = zbxerr.ErrorConnectionFailed.Wrap(oraErr)
+		} else {
+			err = zbxerr.ErrorConnectionFailed.Wrap(err)
+		}
 	}
 
 	return

@@ -23,8 +23,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"strings"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyCustomQuery = "oracle.custom.query"
@@ -33,7 +34,7 @@ const customQueryMinParams = 1
 // customQueryHandler executes custom user queries
 func customQueryHandler(ctx context.Context, conn OraClient, params []string) (interface{}, error) {
 	if len(params) < customQueryMinParams {
-		return nil, errorInvalidParams
+		return nil, zbxerr.ErrorInvalidParams
 	}
 
 	queryName := params[0]
@@ -45,7 +46,7 @@ func customQueryHandler(ctx context.Context, conn OraClient, params []string) (i
 
 	rows, err := conn.QueryByName(ctx, queryName, queryArgs...)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	// JSON marshaling
@@ -53,7 +54,7 @@ func customQueryHandler(ctx context.Context, conn OraClient, params []string) (i
 
 	columns, err := rows.Columns()
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	values := make([]interface{}, len(columns))
@@ -69,10 +70,10 @@ func customQueryHandler(ctx context.Context, conn OraClient, params []string) (i
 		err = rows.Scan(valuePointers...)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				return nil, fmt.Errorf("%w (%s)", errorEmptyResult, err.Error())
+				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 			}
 
-			return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 		}
 
 		for i, value := range values {

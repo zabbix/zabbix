@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyRedoLog = "oracle.redolog.info"
@@ -32,7 +33,7 @@ func RedoLogHandler(ctx context.Context, conn OraClient, params []string) (inter
 	var redolog string
 
 	if len(params) > redoLogMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -44,12 +45,12 @@ func RedoLogHandler(ctx context.Context, conn OraClient, params []string) (inter
 			STATUS IN ('INACTIVE', 'UNUSED')
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&redolog)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return redolog, nil

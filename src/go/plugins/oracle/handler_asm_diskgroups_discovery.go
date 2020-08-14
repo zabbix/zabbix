@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyASMDiskGroupsDiscovery = "oracle.diskgroups.discovery"
@@ -32,7 +33,7 @@ func ASMDiskGroupsDiscovery(ctx context.Context, conn OraClient, params []string
 	var lld string
 
 	if len(params) > ASMDiskGroupsMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -46,12 +47,12 @@ func ASMDiskGroupsDiscovery(ctx context.Context, conn OraClient, params []string
 			V$ASM_DISKGROUP
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&lld)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	if lld == "" {

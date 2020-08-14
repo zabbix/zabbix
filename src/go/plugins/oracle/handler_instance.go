@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyInstance = "oracle.instance.info"
@@ -32,7 +33,7 @@ func instanceHandler(ctx context.Context, conn OraClient, params []string) (inte
 	var instanceStats string
 
 	if len(params) > instanceMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -50,12 +51,12 @@ func instanceHandler(ctx context.Context, conn OraClient, params []string) (inte
 			V$INSTANCE
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&instanceStats)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return instanceStats, nil

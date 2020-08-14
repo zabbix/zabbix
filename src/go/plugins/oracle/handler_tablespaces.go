@@ -21,8 +21,9 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 	"strings"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyTablespaces = "oracle.ts.stats"
@@ -33,7 +34,7 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 	var tablespaces string
 
 	if len(params) > tablespacesMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -153,12 +154,12 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 			)
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&tablespaces)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	// Add leading zeros for floats like ".03".

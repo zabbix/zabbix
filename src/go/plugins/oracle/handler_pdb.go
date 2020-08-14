@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyPDB = "oracle.pdb.info"
@@ -32,7 +33,7 @@ func PDBHandler(ctx context.Context, conn OraClient, params []string) (interface
 	var PDBInfo string
 
 	if len(params) > PDBMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -55,12 +56,12 @@ func PDBHandler(ctx context.Context, conn OraClient, params []string) (interface
 			V$PDBS
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&PDBInfo)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	if PDBInfo == "" {

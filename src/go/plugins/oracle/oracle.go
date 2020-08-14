@@ -21,11 +21,11 @@ package oracle
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"time"
 
-	"github.com/godror/godror"
+	"zabbix.com/plugins/oracle/zbxerr"
+
 	"github.com/omeid/go-yarn"
 
 	"zabbix.com/pkg/plugin"
@@ -76,7 +76,7 @@ func whereToConnect(params []string, sessions map[string]*Session, defaultURI st
 			uri = params[0]
 		} else {
 			if _, ok := sessions[params[0]]; !ok {
-				return nil, errorUnknownSession
+				return nil, zbxerr.ErrorUnknownSession
 			}
 
 			// Use a pre-defined session
@@ -94,7 +94,6 @@ func whereToConnect(params []string, sessions map[string]*Session, defaultURI st
 func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (result interface{}, err error) {
 	var (
 		handlerParams []string
-		zbxErr        zabbixError
 	)
 
 	uri, err := whereToConnect(params, p.options.Sessions, p.options.URI)
@@ -109,7 +108,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 
 	handleMetric := getHandlerFunc(key)
 	if handleMetric == nil {
-		return nil, errorUnsupportedMetric
+		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
 	conn, err := p.connMgr.GetConnection(*uri)
@@ -120,14 +119,9 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 			return pingFailed, nil
 		}
 
-		if oraErr, isOraErr := godror.AsOraErr(err); isOraErr {
-			p.Errf(oraErr.Error())
-			return nil, zabbixError{oraErr.Error()}
-		}
-
 		p.Errf(err.Error())
 
-		return nil, zabbixError{err.Error()}
+		return nil, err
 	}
 
 	ctx, cancel := context.WithTimeout(conn.ctx, conn.callTimeout)
@@ -136,18 +130,10 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 	result, err = handleMetric(ctx, conn, handlerParams)
 
 	if err != nil {
-		if oraErr, isOraErr := godror.AsOraErr(err); isOraErr {
-			p.Errf(oraErr.Error())
-		} else {
-			p.Errf(err.Error())
-		}
-
-		if errors.As(err, &zbxErr) {
-			return nil, zbxErr
-		}
+		p.Errf(err.Error())
 	}
 
-	return result, nil
+	return
 }
 
 // Start implements the Runner interface and performs initialization when plugin is activated.

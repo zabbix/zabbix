@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyTablespacesDiscovery = "oracle.ts.discovery"
@@ -32,7 +33,7 @@ func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params []s
 	var lld string
 
 	if len(params) > tablespacesDiscoveryMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -47,12 +48,12 @@ func tablespacesDiscoveryHandler(ctx context.Context, conn OraClient, params []s
 			DBA_TABLESPACES
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&lld)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return lld, nil

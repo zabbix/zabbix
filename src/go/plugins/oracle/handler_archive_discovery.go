@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyArchiveDiscovery = "oracle.archive.discovery"
@@ -32,7 +33,7 @@ func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params []strin
 	var lld string
 
 	if len(params) > archiveDiscoveryMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -50,12 +51,12 @@ func archiveDiscoveryHandler(ctx context.Context, conn OraClient, params []strin
 			AND db.LOG_MODE = 'ARCHIVELOG'
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&lld)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	if lld == "" {

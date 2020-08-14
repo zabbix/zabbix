@@ -22,6 +22,8 @@ package oracle
 import (
 	"context"
 	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const (
@@ -38,12 +40,12 @@ func pingHandler(ctx context.Context, conn OraClient, params []string) (interfac
 	var res int
 
 	if len(params) > pingMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d FROM DUAL", pingOk))
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&res)

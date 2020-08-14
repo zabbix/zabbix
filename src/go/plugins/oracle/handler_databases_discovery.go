@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyDatabasesDiscovery = "oracle.db.discovery"
@@ -32,7 +33,7 @@ func databasesDiscoveryHandler(ctx context.Context, conn OraClient, params []str
 	var lld string
 
 	if len(params) > databasesDiscoveryMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -47,12 +48,12 @@ func databasesDiscoveryHandler(ctx context.Context, conn OraClient, params []str
 			V$DATABASE
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&lld)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	if lld == "" {

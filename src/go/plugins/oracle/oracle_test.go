@@ -23,12 +23,15 @@ package oracle
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
 	"runtime"
 	"strings"
 	"testing"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 
 	"github.com/omeid/go-yarn"
 
@@ -95,21 +98,21 @@ func TestPlugin_Export(t *testing.T) {
 			p:          &impl,
 			args:       args{"unknown.metric", nil, nil},
 			wantResult: nil,
-			wantErr:    errorUnsupportedMetric,
+			wantErr:    zbxerr.ErrorUnsupportedMetric,
 		},
 		{
 			name:       "Too many parameters",
 			p:          &impl,
 			args:       args{keyPing, []string{Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv, "excess_param"}, nil},
 			wantResult: nil,
-			wantErr:    errorTooManyParameters,
+			wantErr:    zbxerr.ErrorTooManyParameters,
 		},
 		{
 			name:       "Should fail if unknown session given",
 			p:          &impl,
 			args:       args{"foo", []string{"fakeSession"}, nil},
 			wantResult: nil,
-			wantErr:    errorUnknownSession,
+			wantErr:    zbxerr.ErrorUnknownSession,
 		},
 		{
 			name:       "pingHandler should return pingOk if connection is alive",
@@ -136,7 +139,7 @@ func TestPlugin_Export(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
-			if err != tt.wantErr {
+			if err != nil && err.Error() != tt.wantErr.Error() {
 				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -173,7 +176,7 @@ func TestHandlers(t *testing.T) {
 		}
 	}
 
-	// Test errorCannotFetchData
+	// Test for ErrorCannotFetchData
 	for _, conn := range impl.connMgr.connections {
 		conn.client.Close()
 	}
@@ -184,19 +187,22 @@ func TestHandlers(t *testing.T) {
 		}
 
 		_, err := impl.Export(metric, []string{Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv}, nil)
-		if err != errorCannotFetchData {
-			t.Errorf("Plugin.%s() should fail if server is not working", getHandlerName(metric))
+		if errors.Unwrap(err) != zbxerr.ErrorCannotFetchData {
+			t.Errorf("Plugin.%s() should return %q if server is not working, got: %q",
+				getHandlerName(metric), zbxerr.ErrorCannotFetchData, errors.Unwrap(err))
 			continue
 		}
+
 	}
 
+	// Test for ErrorTooManyParameters
 	for metric, _ := range plugin.Metrics {
 		if metric == keyCustomQuery {
 			continue
 		}
 
 		_, err := impl.Export(metric, []string{Config.ora_uri, Config.ora_user, Config.ora_pwd, Config.ora_srv, "excess_param", "excess_param", "excess_param"}, nil)
-		if err != errorTooManyParameters {
+		if err != zbxerr.ErrorTooManyParameters {
 			t.Errorf("Plugin.%s() should fail if too many parameters passed", getHandlerName(metric))
 			continue
 		}

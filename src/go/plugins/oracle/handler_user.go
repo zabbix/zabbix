@@ -22,7 +22,8 @@ package oracle
 import (
 	"context"
 	"database/sql"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyUser = "oracle.user.info"
@@ -35,7 +36,7 @@ func UserHandler(ctx context.Context, conn OraClient, params []string) (interfac
 	username := conn.WhoAmI()
 
 	if len(params) > userMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	if len(params) == 1 {
@@ -53,16 +54,16 @@ func UserHandler(ctx context.Context, conn OraClient, params []string) (interfac
 			USERNAME = UPPER(:1)
 	`, username)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&userinfo)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("%w (%s)", errorEmptyResult, err.Error())
+			return nil, zbxerr.ErrorEmptyResult.Wrap(err)
 		}
 
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return userinfo, nil

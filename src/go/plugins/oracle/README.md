@@ -48,6 +48,24 @@ GRANT SELECT ON V$SYSTEM_PARAMETER TO zabbix_mon;
 ## Configuration
 The Zabbix agent 2 configuration file is used to configure plugins.
 
+**Plugins.Oracle.CallTimeout** — The maximum time in seconds for waiting when a request has to be done.  
+*Default value:* equals the global Timeout configuration parameter.  
+*Limits:* 1-30
+
+**Plugins.Oracle.ConnectTimeout** — The maximum time in seconds for waiting when a connection has to be established.  
+*Default value:* equals the global Timeout configuration parameter.  
+*Limits:* 1-30
+
+**Plugins.Oracle.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
+*Default value:* — (the feature is disabled by default)
+
+**Plugins.Oracle.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
+*Default value:* 300 sec.  
+*Limits:* 60-900
+
+**Plugins.Oracle.Service** — A service name to be used for connection (SID is not supported).  
+*Default value:* XE
+
 **Plugins.Oracle.Uri** — Uri to connect.  
 *Default value:* tcp://localhost:1521  
 *Limits:*
@@ -58,24 +76,6 @@ The Zabbix agent 2 configuration file is used to configure plugins.
 *Examples:*
 - tcp://127.0.0.1:1521
 - tcp://localhost 
-
-**Plugins.Oracle.Service** — A service name to be used for connection (SID is not supported).  
-*Default value:* XE
-
-**Plugins.Oracle.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
-*Default value:* 300 sec.  
-*Limits:* 60-900
-
-**Plugins.Oracle.ConnectTimeout** — The maximum time in seconds for waiting when a connection has to be established.  
-*Default value:* equals the global Timeout configuration parameter.  
-*Limits:* 1-30
-
-**Plugins.Oracle.CallTimeout** — The maximum time in seconds for waiting when a request has to be done.  
-*Default value:* equals the global Timeout configuration parameter.  
-*Limits:* 1-30
-
-**Plugins.Oracle.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
-*Default value:* — (the feature is disabled by default)
 
 ### Authentication
 The plugin can authenticate using credentials specified as key parameters or within named sessions.

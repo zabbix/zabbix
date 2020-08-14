@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyCDB = "oracle.cdb.info"
@@ -32,7 +33,7 @@ func CDBHandler(ctx context.Context, conn OraClient, params []string) (interface
 	var CDBInfo string
 
 	if len(params) > CDBMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -74,12 +75,12 @@ func CDBHandler(ctx context.Context, conn OraClient, params []string) (interface
 			V$DATABASE
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&CDBInfo)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	if CDBInfo == "" {

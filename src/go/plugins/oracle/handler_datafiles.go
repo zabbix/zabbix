@@ -21,7 +21,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
+
+	"zabbix.com/plugins/oracle/zbxerr"
 )
 
 const keyDataFiles = "oracle.datafiles.stats"
@@ -32,7 +33,7 @@ func DataFileHandler(ctx context.Context, conn OraClient, params []string) (inte
 	var datafiles string
 
 	if len(params) > datafilesMaxParams {
-		return nil, errorTooManyParameters
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	row, err := conn.QueryRow(ctx, `
@@ -42,12 +43,12 @@ func DataFileHandler(ctx context.Context, conn OraClient, params []string) (inte
 			V$DATAFILE
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	err = row.Scan(&datafiles)
 	if err != nil {
-		return nil, fmt.Errorf("%w (%s)", errorCannotFetchData, err.Error())
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
 	return datafiles, nil
