@@ -49,7 +49,7 @@ size_t	zbx_curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 }
 
 int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header,
-		zbx_http_response_t *body, void *header_cb, void *body_cb, char **error)
+		zbx_http_response_t *body, void *header_cb, void *body_cb, char *errbuf, char **error)
 {
 	CURLcode	err;
 
@@ -74,6 +74,12 @@ int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header,
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, body)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set write callback: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set error buffer: %s", curl_easy_strerror(err));
 		return FAIL;
 	}
 
@@ -267,8 +273,7 @@ char	*zbx_http_get_header(char **headers)
 	return NULL;
 }
 
-int	zbx_http_get(const char *url, const char *header, const char *ssl_cert_file, const char *ssl_key_file,
-		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host)
+int	zbx_http_get(const char *url, const char *header)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -285,22 +290,13 @@ int	zbx_http_get(const char *url, const char *header, const char *ssl_cert_file,
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &response_header, &body, zbx_curl_ignore_cb,
-			zbx_curl_write_cb, &error))
+			zbx_curl_write_cb, errbuf, &error))
 	{
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, ssl_key_password, verify_peer,
-			verify_host, &error))
-	{
+	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, "", "", "", 1, 1, &error))
 		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
-	{
-		error = zbx_dsprintf(NULL, "Cannot set error buffer: %s", curl_easy_strerror(err));
-		goto clean;
-	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, "")))
 	{
@@ -314,9 +310,8 @@ int	zbx_http_get(const char *url, const char *header, const char *ssl_cert_file,
 		goto clean;
 	}
 
-	headers_slist = curl_slist_append(headers_slist, header);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER,
+			(headers_slist = curl_slist_append(headers_slist, header)))))
 	{
 		error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
 		goto clean;
@@ -339,6 +334,13 @@ int	zbx_http_get(const char *url, const char *header, const char *ssl_cert_file,
 	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &response_code)))
 	{
 		error = zbx_dsprintf(NULL, "Cannot get the response code: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (200 != response_code && 204 != response_code)
+	{
+		zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the successful status codes",
+				response_code);
 		goto clean;
 	}
 

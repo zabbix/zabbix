@@ -218,15 +218,10 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_write_cb, curl_body_cb, &error))
+	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_write_cb, curl_body_cb, errbuf,
+			&error))
 	{
 		SET_MSG_RESULT(result, error);
-		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set error buffer: %s", curl_easy_strerror(err)));
 		goto clean;
 	}
 
