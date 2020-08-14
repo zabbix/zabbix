@@ -126,7 +126,7 @@
 		</exec>
 	</target>
 
-	<target name="drop-db-postgresql">
+	<target name="create-db-postgresql">
 		<!-- Drop PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -136,9 +136,6 @@
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="-c 'drop database if exists ${dbname}'"/>
 		</exec>
-	</target>
-
-	<target name="create-db-postgresql" depends="drop-db-postgresql">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -174,6 +171,18 @@
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
+		</exec>
+	</target>
+
+	<target name="drop-db-postgresql">
+		<!-- Drop PostgreSQL database -->
+		<exec executable="psql" failonerror="on">
+			<env key="PGPASSWORD" value="${dbpassword}"/>
+			<arg line="-q"/>
+			<arg line="-h '${dbhost}'"/>
+			<arg line="-U '${dbuser}'"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="-c 'drop database if exists ${dbname}'"/>
 		</exec>
 	</target>
 
@@ -266,7 +275,7 @@
 		</exec>
 	</target>
 
-	<target name="drop-db-mysql">
+	<target name="create-db-mysql">
 		<!-- Drop MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
@@ -274,9 +283,6 @@
 			<arg line="--password=${dbpassword}"/>
 			<arg line="--execute='drop database if exists ${dbname}'"/>
 		</exec>
-	</target>
-
-	<target name="create-db-mysql" depends="drop-db-mysql">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
@@ -301,6 +307,16 @@
 			<arg line="--user=${dbuser}"/>
 			<arg line="--password=${dbpassword}"/>
 			<arg line="${dbname}"/>
+		</exec>
+	</target>
+
+	<target name="drop-db-mysql">
+		<!-- Drop MySQL database -->
+		<exec executable="mysql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--user=${dbuser}"/>
+			<arg line="--password=${dbpassword}"/>
+			<arg line="--execute='drop database if exists ${dbname}'"/>
 		</exec>
 	</target>
 
