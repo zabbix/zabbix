@@ -45,7 +45,9 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host, char **error);
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		char **error);
-char	*zbx_http_get_header(char **headers);
+char	*zbx_http_parse_header(char **headers);
+
+int	zbx_http_get(const char *url, const char *header, char **out, char **error);
 #endif
 
 #endif

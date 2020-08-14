@@ -139,7 +139,7 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 	if (retrieve_mode != ZBX_RETRIEVE_MODE_CONTENT)
 		zbx_json_addobject(&json, "header");
 
-	while (NULL != (line = zbx_http_get_header(&headers)))
+	while (NULL != (line = zbx_http_parse_header(&headers)))
 	{
 		if (0 == json_content && 0 == strncmp(line, "Content-Type:",
 				ZBX_CONST_STRLEN("Content-Type:")) &&
@@ -278,7 +278,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	headers = item->headers;
-	while (NULL != (line = zbx_http_get_header(&headers)))
+	while (NULL != (line = zbx_http_parse_header(&headers)))
 	{
 		headers_slist = curl_slist_append(headers_slist, line);
 
@@ -384,7 +384,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 				zbx_json_addobject(&json, "header");
 				headers = header.data;
-				while (NULL != (line = zbx_http_get_header(&headers)))
+				while (NULL != (line = zbx_http_parse_header(&headers)))
 				{
 					http_add_json_header(&json, line);
 					zbx_free(line);
