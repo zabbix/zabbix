@@ -93,13 +93,13 @@ foreach ($data['dashboards'] as $dashboard) {
 		$tags[] = (new CSpan(_('My')))
 			->addClass(ZBX_STYLE_TAG)
 			->addClass(ZBX_STYLE_GREEN_BG);
-	}
 
-	if ($dashboard['private'] == PUBLIC_SHARING || count($dashboard['users']) > 0
-			|| count($dashboard['userGroups']) > 0) {
-		$tags[] = (new CSpan(_('Shared')))
-			->addClass(ZBX_STYLE_TAG)
-			->addClass(ZBX_STYLE_YELLOW_BG);
+		if ($dashboard['private'] == PUBLIC_SHARING || count($dashboard['users']) > 0
+				|| count($dashboard['userGroups']) > 0) {
+			$tags[] = (new CSpan(_('Shared')))
+				->addClass(ZBX_STYLE_TAG)
+				->addClass(ZBX_STYLE_YELLOW_BG);
+		}
 	}
 
 	$table->addRow([
