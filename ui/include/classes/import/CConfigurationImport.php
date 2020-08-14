@@ -959,7 +959,14 @@ class CConfigurationImport {
 				$item['hostid'] = $hostId;
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
+					if ($interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref'])) {
+						$item['interfaceid'] = $interfaceid;
+					}
+					else {
+						throw new Exception(_s('Cannot find interface "%1$s" used for discovery rule "%2$s" on "%3$s".',
+							$item['interface_ref'], $item['name'], $host
+						));
+					}
 				}
 
 				unset($item['item_prototypes']);
@@ -1115,7 +1122,18 @@ class CConfigurationImport {
 					}
 
 					if (array_key_exists('interface_ref', $prototype) && $prototype['interface_ref']) {
-						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostId][$prototype['interface_ref']];
+						if ($interfaceid = $this->referencer->resolveInterface($hostId, $prototype['interface_ref'])) {
+							$prototype['interfaceid'] = $interfaceid;
+						}
+						else {
+							throw new Exception(_s(
+								'Cannot find interface "%1$s" used for item prototype "%2$s" of discovery rule "%3$s" on "%4$s".',
+								$prototype['interface_ref'],
+								$prototype['name'],
+								$item['name'],
+								$host
+							));
+						}
 					}
 
 					if ($prototype['valuemap']) {
@@ -1247,24 +1265,6 @@ class CConfigurationImport {
 						$hostPrototype['ruleid'] = $itemId;
 						$hostPrototypesToCreate[] = $hostPrototype;
 					}
-				}
-
-				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					$item['interfaceid'] = $this->referencer->interfacesCache[$hostId][$item['interface_ref']];
-				}
-				unset($item['item_prototypes']);
-				unset($item['trigger_prototypes']);
-				unset($item['graph_prototypes']);
-				unset($item['host_prototypes']);
-
-				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
-
-				if ($itemsId) {
-					$item['itemid'] = $itemsId;
-					$itemsToUpdate[] = $item;
-				}
-				else {
-					$itemsToCreate[] = $item;
 				}
 			}
 		}
