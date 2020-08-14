@@ -856,7 +856,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
 		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'request' => [
+			'itemids' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -1341,7 +1343,9 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
 	$result = (bool) API::Task()->create([
 		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('group_itemid')
+		'request' => [
+			'itemids' => getRequest('group_itemid')
+		]
 	]);
 
 	if ($result) {

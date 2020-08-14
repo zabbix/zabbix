@@ -376,7 +376,9 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 elseif (hasRequest('check_now') && hasRequest('itemid')) {
 	$result = (bool) API::Task()->create([
 		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('itemid')
+		'request' => [
+			'itemids' => getRequest('itemid')
+		]
 	]);
 
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
@@ -697,7 +699,9 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
 	$result = (bool) API::Task()->create([
 		'type' => ZBX_TM_TASK_CHECK_NOW,
-		'itemids' => getRequest('g_hostdruleid')
+		'request' => [
+			'itemids' => getRequest('g_hostdruleid')
+		]
 	]);
 
 	if ($result) {
