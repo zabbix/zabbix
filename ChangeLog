@@ -1,6 +1,7 @@
 Changes for 5.2.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-5965] reworked session to cookie (ashubin, MVekslers, rlataria)
 ..F.....S. [ZBXNEXT-6073] added item log macros support in trigger names, operational data, descriptions, event tags, event values and trigger URL (rlataria, vso)
 A.F.I..... [ZBXNEXT-82] reworked part of parameters from definitions file to configurable parameters using frontend; added new API for settings, authentication, housekeepeing (vmaksimovs)
 A.F....... [ZBXNEXT-2156] implemented ability to create hosts without interfaces (miks, talbergs)
@@ -9,6 +10,8 @@ A.F.I...S. [ZBXNEXT-250] added support of global and per-user time zones for fro
 A.F.....S. [ZBXNEXT-3362] added ability to set the default system language (agriscenko)
 
 Bug fixes:
+.........T [ZBX-18249] fixed Oracle ODBC Template issues (ychukina)
+..F....... [ZBXNEXT-6052] added filter and showing additional details in the list of dashboards (Ivo, kustalovs)
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
