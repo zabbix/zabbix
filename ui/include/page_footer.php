@@ -44,6 +44,10 @@ if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 // Display unexpected messages (if any) generated while processing the output.
 echo get_prepared_messages(['with_current_messages' => true]);
 
+if (defined('ZBX_PAGE_INVALID_URL')) {
+	echo '<main></main>';
+}
+
 if ($page['type'] == PAGE_TYPE_HTML) {
 	makeServerStatusOutput()->show();
 
