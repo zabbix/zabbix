@@ -62,7 +62,7 @@
 
 	latestPage.prototype.doRefresh = function(body) {
 		this.getCurrentForm().replaceWith(body);
-		this.hydrate();
+		this.liveData();
 		chkbxRange.init();
 	};
 
@@ -174,7 +174,22 @@
 		this.toggleChevronCollapsed($chevron_all, collapsed_all);
 	};
 
-	latestPage.prototype.hydrate = function() {
+	latestPage.prototype.liveFilter = function() {
+		var $filter_hostids = $('#filter_hostids_');
+
+		$filter_hostids.on('change', function() {
+			var $filter_show_without_data = $('#filter_show_without_data'),
+				no_hosts_selected = !$(this).multiSelect('getData').length;
+
+			if (no_hosts_selected) {
+				$filter_show_without_data.prop('checked', true);
+			}
+
+			$filter_show_without_data.prop('disabled', no_hosts_selected);
+		});
+	};
+
+	latestPage.prototype.liveData = function() {
 		var self = this;
 
 		$('.js-toggle-all').on('click', function() {
@@ -247,8 +262,9 @@
 		});
 	};
 
-	jQuery(function($) {
+	$(function() {
 		window.latest_page = new latestPage();
-		window.latest_page.hydrate();
+		window.latest_page.liveFilter();
+		window.latest_page.liveData();
 	});
 </script>
