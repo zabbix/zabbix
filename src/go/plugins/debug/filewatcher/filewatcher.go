@@ -99,7 +99,7 @@ type fileWatcher struct {
 type eventFilter struct {
 }
 
-func (w *eventFilter) Convert(v interface{}) (value *string, err error) {
+func (w *eventFilter) Process(v interface{}) (value *string, err error) {
 	if b, ok := v.([]byte); !ok {
 		if err, ok = v.(error); !ok {
 			err = fmt.Errorf("unexpected input type %T", v)
@@ -111,24 +111,16 @@ func (w *eventFilter) Convert(v interface{}) (value *string, err error) {
 	}
 }
 
-func (w *fileWatcher) URI() (uri string) {
-	return w.path
-}
-
-func (w *fileWatcher) Subscribe() (err error) {
+func (w *fileWatcher) Initialize() (err error) {
 	return w.watcher.Add(w.path)
 }
 
-func (w *fileWatcher) Unsubscribe() {
+func (w *fileWatcher) Release() {
 	_ = w.watcher.Remove(w.path)
 }
 
 func (w *fileWatcher) NewFilter(key string) (filter watch.EventFilter, err error) {
 	return &eventFilter{}, nil
-}
-
-func (p *Plugin) EventSourceByURI(uri string) (es watch.EventSource, err error) {
-	return &fileWatcher{path: uri, watcher: p.watcher}, nil
 }
 
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
