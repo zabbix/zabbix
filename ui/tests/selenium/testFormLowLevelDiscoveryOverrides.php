@@ -1825,11 +1825,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				}
 
 				// Compare Conditions from table with data.
+				$actual_conditions = [];
 				for ($n = 0; $n < $operation_count - 1; $n++) {
-					$this->assertEquals($condition_text[$n],
-							$operation_container->getRow($n)->getColumn('Condition')->getText()
-					);
+					$actual_conditions[] = $operation_container->getRow($n)->getColumn('Condition')->getText();
 				}
+
+				$this->assertEquals($condition_text, $actual_conditions);
 
 				foreach($override['Operations'] as $i => $operation) {
 					$operation_container->getRow($i)->query('button:Edit')->one()->click();

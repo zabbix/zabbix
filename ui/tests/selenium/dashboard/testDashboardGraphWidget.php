@@ -1856,7 +1856,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$this->fillForm($data, $form);
 		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
-		$this->query('id:overlay-bg')->waitUntilNotVisible();
+		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 
 		// Check valuse in updated widget.
@@ -1876,7 +1876,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
-		$this->query('id:overlay-bg')->waitUntilNotVisible();
+		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget($name);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));

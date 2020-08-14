@@ -26,7 +26,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	// SQL query to get message_template and media_type tables to compare hash values.
-	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_message mtm ON mt.mediatypeid=mtm.mediatypeid';
+	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_message mtm ON mt.mediatypeid=mtm.mediatypeid '.
+			' ORDER BY mediatypeid';
 
 	public function testFormAdministrationMediaTypeMessageTemplates_Layout() {
 		// Open a new media type configuration form and switch to Message templates tab.
@@ -278,6 +279,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				$this->assertFalse($form->query('id:subject')->one(false)->isValid());
 			}
 			$form->submit();
+			COverlayDialogElement::ensureNotPresent();
 			$templates_list->waitUntilReady()->invalidate();
 
 			// Check that the number of rows has increased after adding previously checked message template.

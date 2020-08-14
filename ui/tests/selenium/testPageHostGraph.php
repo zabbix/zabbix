@@ -432,6 +432,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		if (array_key_exists('targets', $data)) {
 			$this->zbxTestClickButtonMultiselect('copy_targetids');
 			$this->zbxTestLaunchOverlayDialog($data['target_type']);
+			COverlayDialogElement::find()->one()->waitUntilReady();
 
 			// Select hosts or templates.
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
@@ -439,7 +440,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
 				$this->zbxTestLaunchOverlayDialog('Host groups');
 				COverlayDialogElement::find()->all()->last()->query('link', $data['group'])->waitUntilVisible()->one()->click();
-				$this->query('id:overlay-bg')->waitUntilNotVisible();
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				foreach ($data['targets'] as $target) {
 					$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($target));
 					$this->zbxTestCheckboxSelect('item_'.$hostid);

@@ -177,12 +177,13 @@ class CPage {
 			DBexecute('insert into sessions (sessionid, userid) values ('.zbx_dbstr($sessionid).', '.$user_id.')');
 		}
 
+		$path = parse_url(PHPUNIT_URL, PHP_URL_PATH);
 		if (self::$cookie === null || $sessionid !== self::$cookie['value']) {
 			self::$cookie = [
 				'name' => 'zbx_sessionid',
 				'value' => $sessionid,
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
-				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
+				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 
 			$this->driver->get(PHPUNIT_URL);
