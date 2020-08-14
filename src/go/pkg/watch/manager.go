@@ -102,6 +102,9 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 		m.clients[clientid] = client
 	}
 
+	// temporary event source error cache
+	failedEventSources := make(map[EventSource]error)
+
 	now := time.Now()
 	for _, r := range requests {
 		var sub map[Subscriber]*eventWriter
@@ -127,10 +130,18 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 		if es, err := m.eventProvider.EventSourceByKey(r.Key); err == nil {
 			// initialize new event source
 			if sub, ok = m.subscriptions[es]; !ok {
-				if err := es.Initialize(); err == nil {
-					sub = make(map[Subscriber]*eventWriter)
-					m.subscriptions[es] = sub
-				} else {
+				// reuse event source initialization error if the initialization did already
+				// fail for this batch
+				if err, ok = failedEventSources[es]; !ok {
+					if err = es.Initialize(); err == nil {
+						sub = make(map[Subscriber]*eventWriter)
+						m.subscriptions[es] = sub
+					} else {
+						// cache initialization error
+						failedEventSources[es] = err
+					}
+				}
+				if err != nil {
 					output.Write(&plugin.Result{Itemid: r.Itemid, Ts: now, Error: err})
 				}
 			}
