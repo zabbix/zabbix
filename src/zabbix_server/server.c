@@ -230,6 +230,7 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
 char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
@@ -727,6 +728,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"DBSocket",			&CONFIG_DBSOCKET,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBPort",			&CONFIG_DBPORT,				TYPE_INT,
@@ -951,6 +954,73 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
+int	init_database_credentials_from_vault(char **error)
+{
+	char			*out, username_tmp[MAX_STRING_LEN], password_tmp[MAX_STRING_LEN];
+	struct zbx_json_parse	jp, jp_data;
+	int			ret = FAIL;
+
+	if (NULL == CONFIG_VAULTDBPATH)
+		return SUCCEED;
+
+	if (SUCCEED != zbx_http_get("http://127.0.0.1:8200/v1/kv/hello",
+			"X-Vault-Token: s.e1fe6jBbp1rlfJa0l50FBWNK", &out, error))
+		return FAIL;
+
+	if (SUCCEED != zbx_json_open(out, &jp))
+	{
+		*error = zbx_dsprintf(*error, "cannot parse credentials from vault: %s", zbx_json_strerror());
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, "data", &jp_data))
+	{
+		*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
+				ZBX_PROTO_TAG_DATA);
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_USERNAME, username_tmp, sizeof(username_tmp), NULL))
+	{
+		*error = zbx_dsprintf(*error, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_USERNAME);
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PASSWORD, password_tmp, sizeof(password_tmp), NULL))
+	{
+		*error = zbx_dsprintf(*error, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_PASSWORD);
+		goto fail;
+	}
+
+	if (NULL != CONFIG_DBUSER)
+	{
+		*error = zbx_dsprintf(*error,
+				"cannot retrieve database user name, both DBName and VaultDBPath are defined");
+		goto fail;
+	}
+
+	if (NULL != CONFIG_DBPASSWORD)
+	{
+		*error = zbx_dsprintf(*error,
+				"cannot retrieve database password, both DBPassword and VaultDBPath are defined");
+		goto fail;
+	}
+
+	CONFIG_DBUSER = zbx_strdup(NULL, username_tmp);		/* TODO encrypt */
+	CONFIG_DBPASSWORD = zbx_strdup(NULL, password_tmp);	/* TODO encrypt */
+
+	ret = SUCCEED;
+fail:
+	memset(username_tmp, 0, sizeof(username_tmp));
+	memset(password_tmp, 0, sizeof(password_tmp));
+
+	if (NULL != out)
+		memset(out, 0, strlen(out));
+	zbx_free(out);
+
+	return ret;
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
@@ -1058,6 +1128,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != init_database_credentials_from_vault(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
