@@ -129,8 +129,10 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 
 	for itemid, item := range client.Items {
 		if !item.Updated.Equal(now) {
-			if sub, ok := m.subscriptions[item.Key]; ok {
-				delete(sub, Source{Clientid: client.ID, Itemid: itemid})
+			if es, err := m.eventProvider.EventSourceByKey(item.Key); err == nil {
+				if sub, ok := m.subscriptions[es.URI()]; ok {
+					delete(sub, Source{Clientid: client.ID, Itemid: itemid})
+				}
 			}
 			delete(client.Items, itemid)
 		}
@@ -138,7 +140,7 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 
 	for uri, sub := range m.subscriptions {
 		if len(sub) == 0 {
-			if es, err := m.eventProvider.EventSourceByURI(uri); err != nil {
+			if es, err := m.eventProvider.EventSourceByURI(uri); err == nil {
 				es.Unsubscribe()
 			}
 			delete(m.subscriptions, uri)
