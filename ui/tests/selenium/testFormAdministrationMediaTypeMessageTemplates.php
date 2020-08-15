@@ -26,8 +26,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	// SQL query to get message_template and media_type tables to compare hash values.
-	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_message mtm ON mt.mediatypeid=mtm.mediatypeid '.
-			' ORDER BY mediatypeid';
+	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_message mtm ON mt.mediatypeid=mtm.mediatypeid'.
+			' ORDER BY mt.mediatypeid';
 
 	public function testFormAdministrationMediaTypeMessageTemplates_Layout() {
 		// Open a new media type configuration form and switch to Message templates tab.
