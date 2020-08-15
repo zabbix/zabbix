@@ -9817,6 +9817,17 @@ char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids
 	return str;
 }
 
+char	*zbx_dc_expand_user_macros(const char *params, zbx_uint64_t hostid)
+{
+	char	*resolved_params;
+
+	RDLOCK_CACHE;
+	resolved_params = dc_expand_user_macros(params, &hostid, 1);
+	UNLOCK_CACHE;
+
+	return resolved_params;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: dc_expand_user_macros_in_expression                              *

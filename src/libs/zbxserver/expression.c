@@ -1013,7 +1013,10 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
-					ret = zbx_substitute_item_name_macros(&dc_item, row[5], replace_to);
+				{
+					*replace_to = zbx_dc_expand_user_macros(row[5], dc_item.host.hostid);
+					ret = SUCCEED;
+				}
 
 				DCconfig_clean_items(&dc_item, &errcode, 1);
 				break;
