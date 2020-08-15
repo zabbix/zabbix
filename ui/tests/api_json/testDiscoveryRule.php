@@ -5386,6 +5386,13 @@ class testDiscoveryRule extends CAPITest {
 			return $a['step'] <=> $b['step'];
 		});
 
+		foreach ($expected_overrides as &$override) {
+			usort($override['filter']['conditions'], function ($a, $b) {
+				return $a['formulaid'] <=> $b['formulaid'];
+			});;
+		}
+		unset($override);
+
 		$db_lld_ruleids = array_column(CDBHelper::getAll(
 			'SELECT itemid FROM items WHERE flags=1 AND '.dbConditionId('hostid', $hostids).' ORDER BY itemid'
 		), 'itemid');
@@ -5401,6 +5408,14 @@ class testDiscoveryRule extends CAPITest {
 			usort($lld_rule['overrides'], function ($a, $b) {
 				return $a['step'] <=> $b['step'];
 			});
+
+			foreach ($lld_rule['overrides'] as &$override) {
+				usort($override['filter']['conditions'], function ($a, $b) {
+					return $a['formulaid'] <=> $b['formulaid'];
+				});;
+			}
+			unset($override);
+
 			$this->assertSame($expected_overrides, $lld_rule['overrides']);
 		}
 	}
