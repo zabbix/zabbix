@@ -226,21 +226,24 @@ class CMultiselectElement extends CElement {
 		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one();
 		$id = CXPathHelper::escapeQuotes($this->query('class:multiselect')->one()->getAttribute('id'));
 		foreach ($text as $value) {
-			$input->overwrite($value)->fireEvent();
+			$input->overwrite($value)->fireEvent('keyup');
 
-			if (!$value) {
+			if ($value === null || $value === '') {
 				continue;
+			}
+
+			if ($input->getValue() !== $value) {
+				$input->overwrite($value)->fireEvent('keyup');
 			}
 
 			$content = CXPathHelper::escapeQuotes($value);
 
 			try {
+				$prefix = '//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li';
 				$element = $this->query('xpath', implode('|', [
-					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
-					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@data-label,'.$content.')]'.
-							'/span[contains(@class, "suggest-found") and text()='.$content.']',
-					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]'.
-							'/span[text()='.$content.']'
+					$prefix.'[@data-label='.$content.']',
+					$prefix.'[contains(@data-label,'.$content.')]/span[contains(@class, "suggest-found") and text()='.$content.']',
+					$prefix.'[contains(@class, "suggest-new")]/span[text()='.$content.']'
 				]))->waitUntilPresent();
 			}
 			catch (NoSuchElementException $exception) {

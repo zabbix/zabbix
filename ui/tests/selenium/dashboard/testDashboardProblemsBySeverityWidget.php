@@ -1268,7 +1268,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		$dashboard->edit();
 		$form = $dashboard->getWidget('Reference widget')->edit();
 		$form->submit();
-		$this->query('id:overlay-bg')->waitUntilNotVisible();
+		COverlayDialogElement::ensureNotPresent();
 
 		$widget = $dashboard->getWidget('Reference widget');
 		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
@@ -1404,7 +1404,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			$this->setTags($data['tags']);
 		}
 		$form->submit();
-		$this->query('id:overlay-bg')->waitUntilNotVisible();
+		COverlayDialogElement::ensureNotPresent();
 		$widget = $dashboard->getWidget($header);
 		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
