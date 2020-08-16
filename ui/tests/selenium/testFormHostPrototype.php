@@ -479,6 +479,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('macros', $data)) {
 			$this->zbxTestTabSwitch('Macros');
+			$this->page->waitUntilReady();
 			$this->fillMacros($data['macros']);
 		}
 
