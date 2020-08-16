@@ -5,15 +5,9 @@ This guide describes how to integrate your Zabbix 4.4 installation with Opsgenie
 
 ## In Opsgenie
 
-1\. From the **Settings** menu, select **Integration list** and push **Add** on Rest API HTTPS over JSON.
+1\. Create an **API Key** according by original instruction https://docs.opsgenie.com/docs/api-integration, please.
 
-[![](images/tn_1.png?raw=true)](images/1.png)
-
-2\. Copy the **API Key** for your new integration and push **Save Integration** at the bottom of frame.
-
-[![](images/tn_2.png?raw=true)](images/2.png)
-
-*   You can make finer adjustments later.
+2\. Copy the **API Key** of your new integration to use it in Zabbix.
 
 ## In Zabbix
 
