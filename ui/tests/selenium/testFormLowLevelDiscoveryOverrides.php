@@ -1823,12 +1823,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							$fields['Condition']['operator'].' '.
 							$fields['Condition']['value'];
 				}
+				sort($condition_text);
 
 				// Compare Conditions from table with data.
 				$actual_conditions = [];
 				for ($n = 0; $n < $operation_count - 1; $n++) {
 					$actual_conditions[] = $operation_container->getRow($n)->getColumn('Condition')->getText();
 				}
+				sort($actual_conditions);
 
 				$this->assertEquals($condition_text, $actual_conditions);
 

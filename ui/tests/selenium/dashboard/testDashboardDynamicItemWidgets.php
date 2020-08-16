@@ -294,6 +294,9 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			}
 			$this->page->waitUntilReady();
 		}
+		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+		// Not possible to catch when widget header is fully loaded, waiting for the widget content to load is not enough.
+		sleep(1);
 
 		$this->assertWidgetContent($data['widgets']);
 		// Check that after page refresh widgets remain the same.
