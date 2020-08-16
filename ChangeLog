@@ -22,6 +22,7 @@ Changes for 5.0.3rc2
 New features:
 
 Bug fixes:
+A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.3rc1
