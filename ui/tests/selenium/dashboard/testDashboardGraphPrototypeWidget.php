@@ -362,17 +362,19 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 		$form = $update
 			? $dashboard->getWidget(self::$previous_widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
+		COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if (array_key_exists('show_header', $data)) {
 			$form->query('xpath:.//input[@id="show_header"]')->asCheckbox()->one()->fill($data['show_header']);
 		}
 
 		$form->fill($data['fields']);
+		// After changing "Source", the overlay is reloaded.
+		COverlayDialogElement::find()->one()->waitUntilReady();
 
-		$type = array_key_exists('Item prototype', $data['fields'])
-						? 'Item prototype' : 'Graph prototype';
+		$type = array_key_exists('Item prototype', $data['fields']) ? 'Item prototype' : 'Graph prototype';
 
-		if (!array_key_exists('Graph prototype', $data['fields']) && !array_key_exists('Item prototype', $data['fields'])){
+		if (!array_key_exists('Graph prototype', $data['fields']) && !array_key_exists('Item prototype', $data['fields'])) {
 			$form->query('xpath:.//div[@id="graphid" | @id="itemid"]')->asMultiselect()->one()->clear();
 		}
 
@@ -381,6 +383,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				COverlayDialogElement::ensureNotPresent();
 				// Introduce name for finding saved widget in DB.
 				$db_name = CTestArrayHelper::get($data, 'fields.Name', $update ? self::$previous_widget_name : '');
 

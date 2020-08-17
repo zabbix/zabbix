@@ -1,6 +1,18 @@
+Changes for 5.0.3rc2
+
+Bug fixes:
+..F....... [ZBX-18261] fixed Latest data performance by allowing to filter items with data only if hosts are selected as well (averza)
+A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.3rc1
 
 New features:
+...G...... [ZBXNEXT-6080] add telnet support for net.tcp.service/.perf key and enable it on linux/darwin (esneiders)
+...G...... [ZBXNEXT-6101] add native linux vfs.fs.inode[fs,<mode>] metric support to agent2 (esneiders)
+...G...... [ZBXNEXT-6102] add native linux vfs.fs.get metric support to agent2 (esneiders)
+...G...... [ZBXNEXT-6103] add native linux vfs.fs.discovery metric support to agent2 (esneiders)
+...G...... [ZBXNEXT-6100] add native linux vfs.fs.size[fs,<mode>] metric support to agent2 (esneiders)
 .........T [ZBXNEXT-6010] added template "Template DB Oracle by ODBC" (ychukina)
 .........T [ZBXCTR-12] SIGNL4 update to close alerts in SIGNL4 when closed in Zabbix (rons4)
 .......PS. [ZBXNEXT-6004] added host info to vmware event message log (asestakovs)
@@ -8,6 +20,26 @@ New features:
 ........S. [ZBXNEXT-6042] optimized trigger, calculated item processing by resolving user macros during configuration cache synchronization (wiper)
 
 Bug fixes:
+.........T [ZBX-17785] fixed dbstat query for postgresql v12 (afayantsev)
+..F....... [ZBX-18204] fixed lost password in ssh remote command operation form data (talbergs)
+A......... [ZBX-18046] improved error message generation performance of user macro and item key parser (vmurzins)
+........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
+........S. [ZBX-18014] added ODBC empty query check (viktors)
+..F....... [ZBX-18160] fixed fatal error in items.php and host_discovery.php (rlataria)
+A......... [ZBX-13383] improved performance of the trigger and trigger prototype inheritance (Sasha)
+..F....... [ZBX-18092] reimplemented item folding based on application names and improved summary for each application in latest data view (averza, miks)
+A......... [ZBX-13789] improved performance of "Problems" widget with MySQL backend by removing DISTINCT modifier from SQL statements with tables joined by primary keys (Sasha)
+...G...... [ZBX-18214] added collecting of physical CPU utilization data on IBM AIX and modified system.cpu.util[] (Andris)
+...G...... [ZBX-17974] implement timeouts for WMI queries (arimdjonoks)
+..F....... [ZBX-18149] fixed discovered hosts showing links to host prototypes which should not possible (Ivo)
+..F....... [ZBX-18132] added OpenSSL extension check in frontend setup and SAML authentication form (Ivo)
+........S. [ZBX-18169] fixed housekeeper not deleting history and trends for deleted items if storage period is not overridden (vso)
+A.F....... [ZBX-17468] fixed excess audit log record being added on host status update (talbergs)
+...G...... [ZBX-16998] improved agent binary compatibility by removing __thread attribute when not building agent2 (wiper)
+...G...... [ZBX-17815] fixed connection timeout when persistent buffer enabled (asestakovs)
+..F....... [ZBX-18106] fixed map navigation tree widget copying (miks)
+A.F....... [ZBX-18012] fixed undefined index error in history manager and added error message in charts when Elasticsearch requests fails (miks)
+A......... [ZBX-18076] fixed PHP notice in hostinterface API (miks)
 ..F....... [ZBX-18000] added red label for disabled media types in user profile (rlataria)
 ..F....... [ZBX-17996] fixed ip/dns field width in host interface (rlataria)
 A......... [ZBX-18075] fixed runtime error when creating a host via API (agriscenko)
@@ -1638,11 +1670,24 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.24rc1
-
-New features:
+Changes for 4.0.24rc2
 
 Bug fixes:
+A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.24rc1
+
+Bug fixes:
+A......... [ZBX-18046] improved error message generation performance of user macro and item key parser (vmurzins)
+........S. [ZBX-18105] fixed use on uninitialised variable (viktors)
+........S. [ZBX-18014] added ODBC empty query check (viktors)
+..F....... [ZBX-18160] fixed fatal error in items.php and host_discovery.php (rlataria)
+A......... [ZBX-13383] improved performance of the trigger and trigger prototype inheritance (Sasha)
+...G...... [ZBX-17974] implement timeouts for WMI queries (arimdjonoks)
+A......... [ZBX-13789] improved performance of "Problems" widget with MySQL backend by removing DISTINCT modifier from SQL statements with tables joined by primary keys (Sasha)
+A.F....... [ZBX-17468] fixed excess audit log record being added on host status update (talbergs)
+A......... [ZBX-18076] fixed PHP notice and multiple undefined index errors in hostinterface API (miks)
 ..F....... [ZBX-18000] added red label for disabled media types in user profile (rlataria)
 A......... [ZBX-18075] fixed runtime error when creating a host via API (agriscenko)
 ..F....... [ZBX-15927] removed problem calculation for dependent triggers when master trigger is in problem state (kustalovs)
