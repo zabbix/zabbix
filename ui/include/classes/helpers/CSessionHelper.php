@@ -117,6 +117,6 @@ class CSessionHelper {
 	 */
 	public static function regenerateId(): void {
 		session_regenerate_id(false);
-		CSessionHelper::set('sessionid', CSessionHelper::getId());
+		self::set('sessionid', self::getId());
 	}
 }
