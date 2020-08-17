@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-17T18:49:13Z</date>
+    <date>2020-08-17T20:15:00Z</date>
     <media_types>
         <media_type>
             <name>TOPdesk</name>
@@ -26,10 +26,6 @@
                 <parameter>
                     <name>event_source</name>
                     <value>{EVENT.SOURCE}</value>
-                </parameter>
-                <parameter>
-                    <name>event_tags_json</name>
-                    <value>{EVENT.TAGSJSON}</value>
                 </parameter>
                 <parameter>
                     <name>event_update_status</name>
@@ -72,6 +68,10 @@
                     <value>&lt;put your TOPdesk API URL&gt;</value>
                 </parameter>
                 <parameter>
+                    <name>topdesk_issue_key</name>
+                    <value>{EVENT.TAGS.__zbx_tpd_issuekey}</value>
+                </parameter>
+                <parameter>
                     <name>topdesk_password</name>
                     <value>&lt;put your TOPdesk application password&gt;</value>
                 </parameter>
@@ -110,28 +110,6 @@
     setProxy: function (HTTPProxy) {&#13;
         if (typeof HTTPProxy !== 'undefined' &amp;&amp; HTTPProxy.trim() !== '') {&#13;
             Media.HTTPProxy = HTTPProxy;&#13;
-        }&#13;
-    },&#13;
-&#13;
-    setTags: function(event_tags_json) {&#13;
-        if (typeof event_tags_json !== 'undefined' &amp;&amp; event_tags_json !== ''&#13;
-                &amp;&amp; event_tags_json !== '{EVENT.TAGSJSON}') {&#13;
-&#13;
-            try {&#13;
-                var tags = JSON.parse(event_tags_json),&#13;
-                    label;&#13;
-&#13;
-                tags.forEach(function (tag) {&#13;
-                    if (typeof tag.tag === 'string') {&#13;
-                        label = (tag.tag + (typeof tag.value !== 'undefined'&#13;
-                                &amp;&amp; tag.value !== '' ? (':' + tag.value) : '')).replace(/\s/g, '_');&#13;
-                        Media.labels.push(label);&#13;
-                    }&#13;
-                });&#13;
-            }&#13;
-            catch (error) {&#13;
-                Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Failed to parse &quot;event_tags_json&quot; param');&#13;
-            }&#13;
         }&#13;
     },&#13;
 &#13;
@@ -296,7 +274,6 @@ try {&#13;
     Media.setParams(media);&#13;
     Media.params.token = 'Basic ' + btoa(Media.params.user + ':' + Media.params.password);&#13;
     Media.setProxy(params.HTTPProxy);&#13;
-    Media.setTags(params.event_tags_json);&#13;
 &#13;
     // Create an issue.&#13;
     // Numeric value of the event that triggered an action (1 for problem, 0 for recovering).&#13;
@@ -334,13 +311,9 @@ try {&#13;
         Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket updating.');&#13;
         fields.action = params.alert_message.replace(/\n/g, '&lt;br&gt;');&#13;
 &#13;
-        resp = Media.request('get', 'tas/api/incidents?external_number=' + params.event_id + '&amp;fields=id');&#13;
-        if (typeof resp.response !== 'object' || typeof resp.response[0].id === 'undefined') {&#13;
-            throw 'Cannot get ' + Media.name + ' issue ID. Check debug log for more information.';&#13;
-        }&#13;
-&#13;
-        resp = Media.request('put', 'tas/api/incidents/id/' + resp.response[0].id, fields);&#13;
-        if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined') {&#13;
+        resp = Media.request('put', 'tas/api/incidents/number/' + Media.params.issue_key, fields);&#13;
+        if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined'&#13;
+                || resp.response.number !== Media.params.issue_key) {&#13;
             throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';&#13;
         }&#13;
     }&#13;
