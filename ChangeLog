@@ -22,6 +22,7 @@ Changes for 5.0.3rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-18261] fixed Latest data performance by allowing to filter items with data only if hosts are selected as well (averza)
 A......... [ZBX-13789] fixed SQL errors with Oracle backend due to incorrect use of the USING statement (Sasha)
 
 --------------------------------------------------------------------------------
