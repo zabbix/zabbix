@@ -181,7 +181,7 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 	}
 }
 
-// Notify function notifies manger about a new event from an event source.
+// Notify method notifies manger about a new event from an event source.
 // Manager checks subscriptions, runs filters and writes the results to the corresponding
 // output sinks.
 func (m *Manager) Notify(es EventSource, data interface{}) {
@@ -195,8 +195,25 @@ func (m *Manager) Notify(es EventSource, data interface{}) {
 				outputs[writer.output] = true
 			}
 		}
-		for output := range outputs {
-			output.Flush()
+	}
+}
+
+// Flush method flushes all outputs that are subscribed to the specified event source.
+func (m *Manager) Flush(es EventSource) {
+	if sub, ok := m.subscriptions[es]; ok {
+		// outputs to be flushed after subcriptions have been processed
+		outputs := make([]plugin.ResultWriter, 0, len(sub))
+		for _, writer := range sub {
+			var i int
+			for i = range outputs {
+				if writer.output == outputs[i] {
+					break
+				}
+			}
+			if i == len(outputs) {
+				outputs = append(outputs, writer.output)
+				writer.output.Flush()
+			}
 		}
 	}
 }

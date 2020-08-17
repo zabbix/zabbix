@@ -67,6 +67,7 @@ func (t *trapListener) run() {
 		if b, err := ioutil.ReadAll(conn); err == nil {
 			t.manager.Lock()
 			t.manager.Notify(t, b)
+			t.manager.Flush(t)
 			t.manager.Unlock()
 		}
 		conn.Close()
