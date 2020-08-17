@@ -167,6 +167,11 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		$user = $this->serviceFactory->getObject('user')->checkAuthentication(['sessionid' => $auth]);
+
+		if (!$user) {
+			throw new APIException(ZBX_API_ERROR_PERMISSIONS, _('Not authorised.'));
+		}
+
 		if (array_key_exists('debug_mode', $user)) {
 			$this->debug = $user['debug_mode'];
 		}
