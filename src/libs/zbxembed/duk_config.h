@@ -747,9 +747,6 @@
 #if defined(DUK_F_OLD_SOLARIS)
 /* Old Solaris with no endian.h, stdint.h */
 #define DUK_F_NO_STDINT_H
-#if !defined(DUK_USE_BYTEORDER)
-#define DUK_USE_BYTEORDER 3
-#endif
 #else  /* DUK_F_OLD_SOLARIS */
 #include <ast/endian.h>
 #endif  /* DUK_F_OLD_SOLARIS */
