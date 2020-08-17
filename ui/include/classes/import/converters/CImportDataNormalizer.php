@@ -82,12 +82,12 @@ class CImportDataNormalizer {
 	/**
 	 * Add CR to string type fields.
 	 *
-	 * @param mixed $data   Import data.
+	 * @param string $data  Import data.
 	 * @param array $rules  Schema rules.
 	 *
 	 * @return string
 	 */
-	protected function normalizeStrings($data, array $rules): string {
+	protected function normalizeStrings(string $data, array $rules): string {
 		$data = str_replace("\r\n", "\n", $data);
 		$data = (array_key_exists('flags', $rules) && $rules['flags'] & self::EOL_LF)
 			? $data
