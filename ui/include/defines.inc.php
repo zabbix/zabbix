@@ -20,19 +20,16 @@
 
 define('ZABBIX_VERSION',		'5.2.0alpha1');
 define('ZABBIX_API_VERSION',	'5.2.0');
-define('ZABBIX_EXPORT_VERSION',	'5.0');
-define('ZABBIX_DB_VERSION',		5010008);
+define('ZABBIX_EXPORT_VERSION',	'5.2');
+define('ZABBIX_DB_VERSION',		5010026);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
 
-define('ZBX_LOGIN_ATTEMPTS',	5);
-define('ZBX_LOGIN_BLOCK',		30); // sec
-
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
 
-define('ZBX_SESSION_NAME', 'zbx_sessionid'); // Session cookie name for Zabbix front-end.
+define('ZBX_SESSION_NAME', 'zbx_session'); // Session cookie name for Zabbix front-end.
 
 define('ZBX_KIBIBYTE',	'1024');
 define('ZBX_MEBIBYTE',	'1048576');
@@ -40,9 +37,7 @@ define('ZBX_GIBIBYTE',	'1073741824');
 define('ZBX_TEBIBYTE',	'1099511627776');
 
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-// The maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400 + 3600 + 1.
-// Both dates are included to the period, so one second is needed to cover the case from "now" till "now-2y".
-define('ZBX_MAX_PERIOD',		63162001);
+
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_UINT64',		'18446744073709551615');
@@ -53,22 +48,14 @@ define('ZBX_FLOAT_MIN', PHP_FLOAT_MIN);
 define('ZBX_FLOAT_MAX', PHP_FLOAT_MAX);
 
 define('ZBX_MAX_DATE',			ZBX_MAX_INT32); // 19 Jan 2038 05:14:07
-define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
-define('ZBX_PERIOD_DEFAULT_TO',		'now');
 define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
 define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
-// Applied to tables with variable count of columns. Columns above this limit will be truncated.
-define('ZBX_MAX_TABLE_COLUMNS', 50);
 define('ZBX_MAX_GRAPHS_PER_PAGE', 20);
 
 // Date and time format separators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
 define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
-
-// the maximum period to display history data for the latest data and item overview pages in seconds
-// by default set to 86400 seconds (24 hours)
-define('ZBX_HISTORY_PERIOD', 86400);
 
 define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
 define('ZBX_HISTORY_SOURCE_SQL',		'sql');
@@ -154,8 +141,6 @@ define('ORACLE_MAX_STRING_SIZE', 4000);
 define('ORACLE_UTF8_CHARSET', 'AL32UTF8');
 define('ORACLE_CESU8_CHARSET', 'UTF8');
 
-define('ZBX_SHOW_TECHNICAL_ERRORS', false);
-
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_JS',					3); // javascript
@@ -188,10 +173,6 @@ define('P_NZERO',				0x0020);
 define('P_NO_TRIM',				0x0040);
 define('P_ALLOW_USER_MACRO',	0x0080);
 define('P_ALLOW_LLD_MACRO',		0x0100);
-define('ZBX_URI_VALID_SCHEMES', 'http,https,ftp,file,mailto,tel,ssh');
-
-// Validate URI against schemes whitelist defined in ZBX_URI_VALID_SCHEMES.
-define('VALIDATE_URI_SCHEMES', true);
 
 //	misc parameters
 define('IMAGE_FORMAT_PNG',	'PNG');
@@ -227,7 +208,7 @@ define('AUDIT_ACTION_DISABLE',	6);
 define('AUDIT_ACTION_EXECUTE',	7);
 
 define('AUDIT_RESOURCE_USER',				0);
-define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2);
+define('AUDIT_RESOURCE_ZABBIX_CONFIG',		2); // Currently not used but need for compatibility with old audit records.
 define('AUDIT_RESOURCE_MEDIA_TYPE',			3);
 define('AUDIT_RESOURCE_HOST',				4);
 define('AUDIT_RESOURCE_ACTION',				5);
@@ -261,6 +242,9 @@ define('AUDIT_RESOURCE_ITEM_PROTOTYPE',		36);
 define('AUDIT_RESOURCE_HOST_PROTOTYPE',		37);
 define('AUDIT_RESOURCE_AUTOREGISTRATION',	38);
 define('AUDIT_RESOURCE_MODULE',				39);
+define('AUDIT_RESOURCE_SETTINGS',			40);
+define('AUDIT_RESOURCE_HOUSEKEEPING',		41);
+define('AUDIT_RESOURCE_AUTHENTICATION',		42);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -812,6 +796,8 @@ define('DASHBOARD_MAX_COLUMNS',		24);
 define('DASHBOARD_MAX_ROWS',		64);
 define('DASHBOARD_WIDGET_MIN_ROWS',	2);
 define('DASHBOARD_WIDGET_MAX_ROWS',	32);
+define('DASHBOARD_FILTER_SHOW_ALL',	0);
+define('DASHBOARD_FILTER_SHOW_MY',	1);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
@@ -1260,10 +1246,6 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', true);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
-define('ZBX_SOCKET_TIMEOUT',			3);		// Socket timeout limit.
-define('ZBX_CONNECT_TIMEOUT',			3);		// Zabbix server connect timeout limit.
-define('ZBX_MEDIA_TYPE_TEST_TIMEOUT',	65);	// Timeout limit set for media type test.
-define('ZBX_SCRIPT_TIMEOUT',			60);	// Timeout limit set for scripts.
 define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 16); // socket response size limit
 
 // value is also used in servercheck.js file
@@ -1537,9 +1519,6 @@ define('ZBX_MONITORED_BY_PROXY', 2);
 define('QUEUE_OVERVIEW', 0);
 define('QUEUE_OVERVIEW_BY_PROXY', 1);
 define('QUEUE_DETAILS', 2);
-
-// item count to display in the details queue
-define('QUEUE_DETAIL_ITEM_COUNT', 500);
 
 // target types to copy items/triggers/graphs
 define('COPY_TYPE_TO_HOST_GROUP',	0);
@@ -1842,6 +1821,7 @@ define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_WIDGET_URL', 'widget-url');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
+define('ZBX_STYLE_YELLOW_BG', 'yellow-bg');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
 define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
@@ -1940,23 +1920,3 @@ define('PROBLEMS_TAG_NAME_NONE',      2);
 define('OPERATIONAL_DATA_SHOW_NONE',         0);
 define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
 define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
-
-/**
- * The sandbox attribute enables an extra set of restrictions for the content in the iframe. Default is set to empty
- * string, which means all restrictions are applied. To disable, set to FALSE. To set a specific set of restrictions,
- * write a custom string.
- * https://www.w3.org/TR/2010/WD-html5-20100624/the-iframe-element.html#attr-iframe-sandbox
- */
-define('ZBX_IFRAME_SANDBOX', '');
-
-// HTTP headers
-/*
- * Value of HTTP X-Frame-options header.
- *
- * Supported options:
- *  - SAMEORIGIN (string) - compatible with rfc7034.
- *  - DENY (string) - compatible with rfc7034.
- *  - a list (string) of comma-separated hostnames. If hostname is not between allowed, the SAMEORIGIN option is used.
- *  - null - disable X-Frame-options header.
- */
-define('X_FRAME_OPTIONS', 'SAMEORIGIN');

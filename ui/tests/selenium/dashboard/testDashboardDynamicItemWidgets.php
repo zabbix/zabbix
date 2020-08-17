@@ -73,7 +73,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I2)']
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
 					]
 				]
 			],
@@ -127,7 +127,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I2)']
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
 					]
 				]
 			],
@@ -294,6 +294,9 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			}
 			$this->page->waitUntilReady();
 		}
+		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+		// Not possible to catch when widget header is fully loaded, waiting for the widget content to load is not enough.
+		sleep(1);
 
 		$this->assertWidgetContent($data['widgets']);
 		// Check that after page refresh widgets remain the same.

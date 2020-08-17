@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.gui.edit.js.php');
+
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
@@ -81,6 +83,13 @@ $gui_tab = (new CFormList())
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
+	->addRow(
+		(new CLabel(_('Max number of columns and rows in overview tables'), 'max_overview_table_size'))
+			->setAsteriskMark(),
+		(new CNumericBox('max_overview_table_size', $data['max_overview_table_size'], 6))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
 	->addRow((new CLabel(_('Max count of elements to show inside table cell'), 'max_in_table'))->setAsteriskMark(),
 		(new CNumericBox('max_in_table', $data['max_in_table'], 5))
 			->setAriaRequired()
@@ -90,11 +99,42 @@ $gui_tab = (new CFormList())
 		(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))
 			->setUncheckedValue('0')
 			->setChecked($data['server_check_interval'] == SERVER_CHECK_INTERVAL)
+	)
+	->addRow((new CLabel(_('Working time'), 'work_period'))->setAsteriskMark(),
+		(new CTextBox('work_period', $data['work_period']))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(_('Show technical errors'),
+		(new CCheckBox('show_technical_errors'))
+			->setUncheckedValue('0')
+			->setChecked($data['show_technical_errors'] == 1)
+	)
+	->addRow(
+		(new CLabel(_('Max history display period'), 'history_period'))->setAsteriskMark(),
+		(new CTextBox('history_period', $data['history_period'], false, DB::getFieldLength('config', 'history_period')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Time filter default period'), 'period_default'))->setAsteriskMark(),
+		(new CTextBox('period_default', $data['period_default'], false, DB::getFieldLength('config', 'period_default')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Max period'), 'max_period'))->setAsteriskMark(),
+		(new CTextBox('max_period', $data['max_period'], false, DB::getFieldLength('config', 'max_period')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
 	);
 
 $gui_view = (new CTabView())
 	->addTab('gui', _('GUI'), $gui_tab)
-	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
+	->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		[new CButton('resetDefaults', _('Reset defaults'))]
+	));
 
 $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)

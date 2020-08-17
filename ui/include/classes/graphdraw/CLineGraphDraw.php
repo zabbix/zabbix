@@ -200,7 +200,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->itemsHost = null;
 
-		$config = select_config();
 		$items = [];
 
 		for ($i = 0; $i < $this->num; $i++) {
@@ -218,15 +217,15 @@ class CLineGraphDraw extends CGraphDraw {
 			$to_resolve = [];
 
 			// Override item history setting with housekeeping settings, if they are enabled in config.
-			if ($config['hk_history_global']) {
-				$item['history'] = timeUnitToSeconds($config['hk_history']);
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+				$item['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 			}
 			else {
 				$to_resolve[] = 'history';
 			}
 
-			if ($config['hk_trends_global']) {
-				$item['trends'] = timeUnitToSeconds($config['hk_trends']);
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
+				$item['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
 			}
 			else {
 				$to_resolve[] = 'trends';
@@ -238,7 +237,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 				$simple_interval_parser = new CSimpleIntervalParser();
 
-				if (!$config['hk_history_global']) {
+				if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 					if ($simple_interval_parser->parse($item['history']) != CParser::PARSE_SUCCESS) {
 						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'history',
 							_('invalid history storage period')
@@ -248,7 +247,7 @@ class CLineGraphDraw extends CGraphDraw {
 					$item['history'] = timeUnitToSeconds($item['history']);
 				}
 
-				if (!$config['hk_trends_global']) {
+				if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 					if ($simple_interval_parser->parse($item['trends']) != CParser::PARSE_SUCCESS) {
 						show_error_message(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
 							_('invalid trend storage period')
@@ -1243,10 +1242,10 @@ class CLineGraphDraw extends CGraphDraw {
 			return;
 		}
 
-		$config = select_config();
-		$config = CMacrosResolverHelper::resolveTimeUnitMacros([$config], ['work_period'])[0];
+		$config = [CSettingsHelper::WORK_PERIOD => CSettingsHelper::get(CSettingsHelper::WORK_PERIOD)];
+		$config = CMacrosResolverHelper::resolveTimeUnitMacros([$config], [CSettingsHelper::WORK_PERIOD])[0];
 
-		$periods = parse_period($config['work_period']);
+		$periods = parse_period($config[CSettingsHelper::WORK_PERIOD]);
 		if (!$periods) {
 			return;
 		}

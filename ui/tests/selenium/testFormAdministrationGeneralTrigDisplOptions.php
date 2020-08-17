@@ -20,12 +20,18 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup config
+ */
 class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 
 	public static function allValues() {
 		return CDBHelper::getDataProvider(
 			'SELECT custom_color,problem_unack_color,problem_unack_style,problem_ack_color,problem_ack_style,'.
-				'ok_unack_color,ok_unack_style,ok_ack_color,ok_ack_style,ok_period,blink_period'.
+				'ok_unack_color,ok_unack_style,ok_ack_color,ok_ack_style,ok_period,blink_period,'.
+				'severity_name_0,severity_color_0,severity_name_1,severity_color_1,'.
+				'severity_name_2,severity_color_2,severity_name_3,severity_color_3,severity_name_4,'.
+				'severity_color_4,severity_name_5,severity_color_5'.
 			' FROM config'
 		);
 	}
@@ -36,6 +42,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 	public function testFormAdministrationGeneralTrigDisplOptions_Layout($allValues) {
 		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
 		$this->zbxTestCheckHeader('Trigger displaying options');
+		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestTextPresent(
 			[
 				'Trigger displaying options',
@@ -69,6 +76,54 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//input[@id='problem_ack_color'][@disabled]");
 		$this->zbxTestAssertElementPresentXpath("//input[@id='ok_unack_color'][@disabled]");
 		$this->zbxTestAssertElementPresentXpath("//input[@id='ok_ack_color'][@disabled]");
+
+		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
+		$this->zbxTestTextPresent(['Info', 'Custom severity names affect all locales and require manual translation!']);
+
+		$this->zbxTestAssertElementPresentId('severity_name_0');
+		$this->zbxTestAssertElementPresentId('severity_name_1');
+		$this->zbxTestAssertElementPresentId('severity_name_2');
+		$this->zbxTestAssertElementPresentId('severity_name_3');
+		$this->zbxTestAssertElementPresentId('severity_name_4');
+		$this->zbxTestAssertElementPresentId('severity_name_5');
+		$this->zbxTestAssertElementPresentId('severity_color_0');
+		$this->zbxTestAssertElementPresentId('severity_color_1');
+		$this->zbxTestAssertElementPresentId('severity_color_2');
+		$this->zbxTestAssertElementPresentId('severity_color_3');
+		$this->zbxTestAssertElementPresentId('severity_color_4');
+		$this->zbxTestAssertElementPresentId('severity_color_5');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_0');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_1');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_2');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_3');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_4');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_5');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_0']", "maxlength", '32');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_0']", "size", '20');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_1']", "maxlength", '32');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_1']", "size", '20');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_2']", "maxlength", '32');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_2']", "size", '20');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_3']", "maxlength", '32');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_3']", "size", '20');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_4']", "maxlength", '32');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_4']", "size", '20');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_5']", "maxlength", '32');
+		$this->zbxTestAssertAttribute("//input[@id='severity_name_5']", "size", '20');
+
+		// checking values in this report
+		$this->zbxTestAssertElementValue('severity_name_0', $allValues['severity_name_0']);
+		$this->zbxTestAssertElementValue('severity_name_1', $allValues['severity_name_1']);
+		$this->zbxTestAssertElementValue('severity_name_2', $allValues['severity_name_2']);
+		$this->zbxTestAssertElementValue('severity_name_3', $allValues['severity_name_3']);
+		$this->zbxTestAssertElementValue('severity_name_4', $allValues['severity_name_4']);
+		$this->zbxTestAssertElementValue('severity_name_5', $allValues['severity_name_5']);
+		$this->zbxTestAssertElementValue('severity_color_0', $allValues['severity_color_0']);
+		$this->zbxTestAssertElementValue('severity_color_1', $allValues['severity_color_1']);
+		$this->zbxTestAssertElementValue('severity_color_2', $allValues['severity_color_2']);
+		$this->zbxTestAssertElementValue('severity_color_3', $allValues['severity_color_3']);
+		$this->zbxTestAssertElementValue('severity_color_4', $allValues['severity_color_4']);
+		$this->zbxTestAssertElementValue('severity_color_5', $allValues['severity_color_5']);
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_UpdateTrigDisplOptions() {
@@ -117,43 +172,48 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		return [
 			[[
 				'expected' => TEST_BAD,
+				'period' => '',
+				'error_msg' => 'Incorrect value for field "ok_period": cannot be empty.'
+			]],
+			[[
+				'expected' => TEST_BAD,
 				'period' => ' ',
-				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => 's',
-				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1.5',
-				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '{$BAD}',
-				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1441m',
-				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
+				'error_msg' => 'Incorrect value for field "ok_period": value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '2d',
-				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
+				'error_msg' => 'Incorrect value for field "ok_period": value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '86401',
-				'error_msg' => 'Invalid displaying of OK triggers: value must be one of 0-86400.'
+				'error_msg' => 'Incorrect value for field "ok_period": value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1y',
-				'error_msg' => 'Invalid displaying of OK triggers: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "ok_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_GOOD,
@@ -205,43 +265,48 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		return [
 			[[
 				'expected' => TEST_BAD,
+				'period' => '',
+				'error_msg' => 'Incorrect value for field "blink_period": cannot be empty.'
+			]],
+			[[
+				'expected' => TEST_BAD,
 				'period' => ' ',
-				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => 's',
-				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1.5',
-				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '{$BAD}',
-				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1441m',
-				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
+				'error_msg' => 'Incorrect value for field "blink_period": value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '2d',
-				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
+				'error_msg' => 'Incorrect value for field "blink_period": value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '86401',
-				'error_msg' => 'Invalid blinking on trigger status change: value must be one of 0-86400.'
+				'error_msg' => 'Incorrect value for field "blink_period": value must be one of 0-86400.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'period' => '1y',
-				'error_msg' => 'Invalid blinking on trigger status change: a time unit is expected.'
+				'error_msg' => 'Incorrect value for field "blink_period": a time unit is expected.'
 			]],
 			[[
 				'expected' => TEST_GOOD,
@@ -296,7 +361,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger displaying options');
 
 		// hash calculation for the DB fields that should be changed in this report
-		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['custom_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
+		$sql_hash = 'SELECT '.CDBHelper::getTableFields('config', ['custom_color', 'problem_unack_style', 'problem_ack_style',
+				'ok_unack_style', 'ok_ack_style', 'ok_period', 'blink_period']).' FROM config ORDER BY configid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestClick('resetDefaults');
@@ -315,5 +381,131 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 
 		// hash calculation for the DB fields that should be changed in this report
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
+	}
+
+	public function testFormAdministrationGeneralTrigDisplOptions_ChangeTriggerSeverities() {
+
+		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
+		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
+		$this->zbxTestCheckHeader('Trigger displaying options');
+		$this->zbxTestTextPresent('Custom severity names affect all locales and require manual translation!');
+
+		$this->zbxTestInputType('severity_name_0', 'Not classified2');
+		$this->zbxTestInputType('severity_name_1', 'Information2');
+		$this->zbxTestInputType('severity_name_2', 'Warning2');
+		$this->zbxTestInputType('severity_name_3', 'Average2');
+		$this->zbxTestInputType('severity_name_4', 'High2');
+		$this->zbxTestInputType('severity_name_5', 'Disaster2');
+
+		$this->zbxTestClick('lbl_severity_color_5');
+		$this->zbxTestClickXpath('//div[@title="#FF0000"]');
+
+		$this->zbxTestClick('lbl_severity_color_4');
+		$this->zbxTestClickXpath('//div[@title="#CC6600"]');
+
+		$this->zbxTestClick('lbl_severity_color_3');
+		$this->zbxTestClickXpath('//div[@title="#E57373"]');
+
+		$this->zbxTestClick('lbl_severity_color_2');
+		$this->zbxTestClickXpath('//div[@title="#FFA000"]');
+
+		$this->zbxTestClick('lbl_severity_color_1');
+		$this->zbxTestClickXpath('//div[@title="#0097A7"]');
+
+		$this->zbxTestClick('lbl_severity_color_0');
+		$this->zbxTestClickXpath('//div[@title="#A5A5A5"]');
+
+		$this->zbxTestClickWait('update');
+		$this->zbxTestTextPresent('Configuration updated');
+
+		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified2');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_0"');
+
+		$sql = 'SELECT severity_name_1 FROM config WHERE severity_name_1='.zbx_dbstr('Information2');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_1"');
+
+		$sql = 'SELECT severity_name_2 FROM config WHERE severity_name_2='.zbx_dbstr('Warning2');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_2"');
+
+		$sql = 'SELECT severity_name_3 FROM config WHERE severity_name_3='.zbx_dbstr('Average2');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_3"');
+
+		$sql = 'SELECT severity_name_4 FROM config WHERE severity_name_4='.zbx_dbstr('High2');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_4"');
+
+		$sql = 'SELECT severity_name_5 FROM config WHERE severity_name_5='.zbx_dbstr('Disaster2');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_5"');
+
+		// checking severity colors in the DB
+
+		$sql = 'SELECT severity_color_0 FROM config where severity_color_0='.zbx_dbstr('A5A5A5');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_0"');
+
+		$sql = 'SELECT severity_color_1 FROM config WHERE severity_color_1='.zbx_dbstr('0097A7');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_1"');
+
+		$sql = 'SELECT severity_color_2 FROM config WHERE severity_color_2='.zbx_dbstr('FFA000');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_2"');
+
+		$sql = 'SELECT severity_color_3 FROM config WHERE severity_color_3='.zbx_dbstr('E57373');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_3"');
+
+		$sql = 'SELECT severity_color_4 FROM config WHERE severity_color_4='.zbx_dbstr('CC6600');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_4"');
+
+		$sql = 'SELECT severity_color_5 FROM config WHERE severity_color_5='.zbx_dbstr('FF0000');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_5"');
+	}
+
+	public function testFormAdministrationGeneralTrigDisplOptions_ResetDefaults() {
+
+		$this->zbxTestLogin('zabbix.php?action=trigdisplay.edit');
+		$this->zbxTestCheckHeader('Trigger displaying options');
+		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
+		$this->zbxTestTextPresent(['Custom severity names affect all locales and require manual translation!']);
+		$this->zbxTestClick('resetDefaults');
+		$this->zbxTestClickXpath("//div[contains(@class, 'overlay-dialogue modal')]//button[text()='Reset defaults']");
+		$this->zbxTestClickWait('update');
+		$this->zbxTestTextPresent('Configuration updated');
+
+		// checking that values were reset in the DB
+		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_0"');
+
+		$sql = 'SELECT severity_name_1 FROM config WHERE severity_name_1='.zbx_dbstr('Information');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_1"');
+
+		$sql = 'SELECT severity_name_2 FROM config WHERE severity_name_2='.zbx_dbstr('Warning');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_2"');
+
+		$sql = 'SELECT severity_name_3 FROM config WHERE severity_name_3='.zbx_dbstr('Average');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_3"');
+
+		$sql = 'SELECT severity_name_4 FROM config WHERE severity_name_4='.zbx_dbstr('High');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_4"');
+
+		$sql = 'SELECT severity_name_5 FROM config WHERE severity_name_5='.zbx_dbstr('Disaster');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_5"');
+
+		$sql = 'SELECT severity_color_0 FROM config WHERE severity_color_0='.zbx_dbstr('97AAB3');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_0"');
+
+		$sql = 'SELECT severity_color_1 FROM config WHERE severity_color_1='.zbx_dbstr('7499FF');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_2"');
+
+		$sql = 'SELECT severity_color_2 FROM config WHERE severity_color_2='.zbx_dbstr('FFC859');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_3"');
+
+		$sql = 'SELECT severity_color_3 FROM config WHERE severity_color_3='.zbx_dbstr('FFA059');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_3"');
+
+		$sql = 'SELECT severity_color_4 FROM config WHERE severity_color_4='.zbx_dbstr('E97659');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_4"');
+
+		$sql = 'SELECT severity_color_5 FROM config WHERE severity_color_5='.zbx_dbstr('E45959');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_5"');
+
+// TODO: can also check that trigger severities have NOT been reset after clicking Cancel in the "Reset confirmation" dialog box after clicking "Reset defaults" button
+
 	}
 }

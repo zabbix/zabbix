@@ -185,11 +185,7 @@ class CRouter {
 		'system.warning'				=> ['CControllerSystemWarning',						'layout.warning',		'system.warning'],
 		'timeselector.update'			=> ['CControllerTimeSelectorUpdate',				'layout.json',			null],
 		'trigdisplay.edit'				=> ['CControllerTrigDisplayEdit',					'layout.htmlpage',		'administration.trigdisplay.edit'],
-		'trigdisplay.reset'				=> ['CControllerTrigDisplayReset',					null,					null],
 		'trigdisplay.update'			=> ['CControllerTrigDisplayUpdate',					null,					null],
-		'trigseverity.edit'				=> ['CControllerTrigSeverityEdit',					'layout.htmlpage',		'administration.trigseverity.edit'],
-		'trigseverity.reset'			=> ['CControllerTrigSeverityReset',					null,					null],
-		'trigseverity.update'			=> ['CControllerTrigSeverityUpdate',				null,					null],
 		'user.create'					=> ['CControllerUserCreate',						null,					null],
 		'user.delete'					=> ['CControllerUserDelete',						null,					null],
 		'user.edit'						=> ['CControllerUserEdit',							'layout.htmlpage',		'administration.user.edit'],
@@ -235,8 +231,6 @@ class CRouter {
 		'widget.trigover.view'			=> ['CControllerWidgetTrigOverView',				'layout.widget',		'monitoring.widget.trigover.view'],
 		'widget.url.view'				=> ['CControllerWidgetUrlView',						'layout.widget',		'monitoring.widget.url.view'],
 		'widget.web.view'				=> ['CControllerWidgetWebView',						'layout.widget',		'monitoring.widget.web.view'],
-		'workingtime.edit'				=> ['CControllerWorkingTimeEdit',					'layout.htmlpage',		'administration.workingtime.edit'],
-		'workingtime.update'			=> ['CControllerWorkingTimeUpdate',					null,					null],
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],

@@ -29,8 +29,7 @@ class CControllerNotificationsGet extends CController {
 
 		$this->notifications = [];
 		$this->settings = getMessageSettings();
-		$config = select_config();
-		$ok_timeout = (int) timeUnitToSeconds($config['ok_period']);
+		$ok_timeout = (int) timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD));
 		$timeout = (int) timeUnitToSeconds($this->settings['timeout']);
 		$this->settings['timeout'] = $timeout;
 		$this->settings['ok_timeout'] = min([$timeout, $ok_timeout]);

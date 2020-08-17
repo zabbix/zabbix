@@ -63,10 +63,10 @@ class CControllerMediatypeDelete extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Media type deleted', 'Media types deleted', $deleted));
+			CMessageHelper::setSuccessTitle(_n('Media type deleted', 'Media types deleted', $deleted));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete media type', 'Cannot delete media types', $deleted));
+			CMessageHelper::setErrorTitle(_n('Cannot delete media type', 'Cannot delete media types', $deleted));
 		}
 		$this->setResponse($response);
 	}
