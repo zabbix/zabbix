@@ -1,1 +1,1 @@
-........S. [ZBXNEXT-4647] added server side changes for digest authentication for HTTP Agent (arimdjonoks)
+A.F.....S. [ZBXNEXT-4647,ZBXNEXT-6096] added support of digest authentication for HTTP Agent (agriscenko, arimdjonoks)
