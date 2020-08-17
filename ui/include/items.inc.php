@@ -1071,16 +1071,22 @@ function getDataOverviewCellData(array &$db_hosts, array &$db_items, array &$ite
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array &$hostids = null, ?string $application = ''): array {
-	$applicationids = ($application !== '')
-		? array_keys(API::Application()->get([
-			'output' => [],
+function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
+	if ($application !== '') {
+		$db_applications = API::Application()->get([
+			'output' => ['hostid'],
 			'hostids' => $hostids,
 			'groupids' => $groupids,
 			'search' => ['name' => $application],
 			'preservekeys' => true
-		]))
-		: null;
+		]);
+
+		$applicationids = array_keys($db_applications);
+		$hostids = array_keys(array_flip(array_column($db_applications, 'hostid')));
+	}
+	else {
+		$applicationids = null;
+	}
 
 	if ($hostids === null) {
 		$db_hosts = API::Host()->get([
@@ -1122,7 +1128,7 @@ function getDataOverviewItems(?array $groupids = null, ?array &$hostids = null, 
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
-	return $db_items;
+	return [$db_items, $hostids];
 }
 
 /**
@@ -1181,7 +1187,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
  * @return array
  */
 function getDataOverviewLeft(?array $groupids, ?array $hostids, string $application = ''): array {
-	$db_items = getDataOverviewItems($groupids, $hostids, $application);
+	list($db_items, $hostids) = getDataOverviewItems($groupids, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
 		if (!array_key_exists($db_item['name'], $items_by_name)) {
@@ -1222,7 +1228,7 @@ function getDataOverviewTop(?array $groupids, ?array $hostids, string $applicati
 	$hidden_db_hosts_cnt = count(array_splice($hostids, ZBX_MAX_TABLE_COLUMNS));
 	$db_hosts = array_intersect_key($db_hosts, array_flip($hostids));
 
-	$db_items = getDataOverviewItems(null, $hostids, $application);
+	list($db_items, $hostids) = getDataOverviewItems(null, $hostids, $application);
 	$items_by_name = [];
 	foreach ($db_items as $itemid => $db_item) {
 		if (!array_key_exists($db_item['name'], $items_by_name)) {
