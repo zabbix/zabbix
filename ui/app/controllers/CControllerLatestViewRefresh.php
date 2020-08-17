@@ -47,6 +47,13 @@ class CControllerLatestViewRefresh extends CControllerLatest {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			// Hosts must have been selected as well if filtering items with data only.
+			if (!$this->getInput('filter_hostids', []) && !$this->getInput('filter_show_without_data', 0)) {
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
