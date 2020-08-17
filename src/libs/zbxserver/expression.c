@@ -2448,23 +2448,38 @@ static void	get_current_event_value(const char *macro, const DB_EVENT *event, ch
  * Purpose: find the index of the least valued tag in the vector of tags      *
  *                                                                            *
  * Parameters: vector - [IN] vector of tags                                   *
+ *                      [IN] name of tag to search                            *
  *                                                                            *
- * Return value: index of the least valued tag                                *
+ * Return value: index of the least valued tag that matches the tagname       *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_vector_ptr_least_tag(const zbx_vector_ptr_t *vector)
+static int	zbx_vector_ptr_least_tag(const zbx_vector_ptr_t *vector, const char *name)
 {
-	int	least_index = FAIL, index;
+	int	least_index = FAIL, index, least_index_equals_name, current_index_equals_name;
 
 	if (0 == vector->values_num)
 		return least_index;
 
 	least_index = 0;
+	least_index_equals_name = 0;
+
+	if (0 == strcmp(name, ((const zbx_tag_t *)(vector->values[least_index]))->tag))
+		least_index_equals_name = 1;
 
 	for (index = 1; index < vector->values_num; index++)
 	{
-		if (0 > compare_tags(&(vector->values[index]), &(vector->values[least_index])))
+		current_index_equals_name = 0 == strcmp(name, ((const zbx_tag_t *)(vector->values[index]))->tag);
+
+		if (1 == current_index_equals_name && 1 == least_index_equals_name)
+		{
+			if (0 > compare_tags(&(vector->values[index]), &(vector->values[least_index])))
+				least_index = index;
+		}
+		else if (1 == current_index_equals_name)
+		{
 			least_index = index;
+			least_index_equals_name = 1;
+		}
 	}
 
 	return least_index;
@@ -2547,7 +2562,7 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 			{
 				int	best_match_index;
 
-				best_match_index = zbx_vector_ptr_least_tag(&(event->tags));
+				best_match_index = zbx_vector_ptr_least_tag(&(event->tags), name);
 
 				if (FAIL != best_match_index)
 				{
