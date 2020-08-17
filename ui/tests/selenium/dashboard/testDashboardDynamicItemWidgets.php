@@ -297,6 +297,10 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		// Not possible to catch when widget header is fully loaded, waiting for the widget content to load is not enough.
 		sleep(1);
+		// Show hidden headings of graph prototype.
+		$this->page->getDriver()->executeScript('var elements = document.getElementsByClassName("dashbrd-grid-iterator");'.
+				' for (var i = 0; i < elements.length; i++) elements[i].className+=" dashbrd-grid-iterator-focus";'
+		);
 
 		$this->assertWidgetContent($data['widgets']);
 		// Check that after page refresh widgets remain the same.
