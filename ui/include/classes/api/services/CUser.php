@@ -1174,6 +1174,10 @@ class CUser extends CApiService {
 
 		$sessionid = self::$userData['sessionid'];
 
+		if (!$sessionid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
+		}
+
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => [
@@ -1289,8 +1293,7 @@ class CUser extends CApiService {
 		// Start session.
 		unset($db_user['passwd']);
 
-		CSessionHelper::clear();
-		new CEncryptedCookieSession();
+		CSessionHelper::regenerateId();
 
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
@@ -1348,8 +1351,7 @@ class CUser extends CApiService {
 
 		unset($db_user['passwd']);
 
-		CSessionHelper::clear();
-		new CEncryptedCookieSession();
+		CSessionHelper::regenerateId();
 
 		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
