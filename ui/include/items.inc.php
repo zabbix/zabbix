@@ -1096,7 +1096,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => ZBX_MAX_TABLE_COLUMNS
+			'limit' => ZBX_MAX_TABLE_COLUMNS + 1
 		]);
 		$hostids = array_keys($db_hosts);
 	}
@@ -1156,7 +1156,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => ZBX_MAX_TABLE_COLUMNS
+			'limit' => ZBX_MAX_TABLE_COLUMNS + 1
 		]);
 	}
 	else {
@@ -1168,7 +1168,7 @@ function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids
 			'groupids' => $groupids,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => ZBX_MAX_TABLE_COLUMNS
+			'limit' => ZBX_MAX_TABLE_COLUMNS + 1
 		]);
 	}
 
