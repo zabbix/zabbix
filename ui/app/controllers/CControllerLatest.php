@@ -157,7 +157,6 @@ abstract class CControllerLatest extends CController {
 		}
 
 		if ($select_items) {
-			// Select items, requesting extended data.
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 					'value_type', 'units', 'valuemapid', 'description', 'state', 'error'
