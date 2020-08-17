@@ -564,6 +564,7 @@ abstract class testFormMacros extends CWebTest {
 	public function checkInheritedTab($data, $secret, $available = true) {
 		// Switch to the list of inherited and instance macros.
 		$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
+		$this->query('class:is-loading')->waitUntilNotPresent();
 		$value_field = $this->getValueField($data['macro']);
 
 		if ($secret) {
@@ -577,6 +578,7 @@ abstract class testFormMacros extends CWebTest {
 		}
 		// Switch back to the list of instance macros.
 		$this->query('xpath://label[@for="show_inherited_macros_0"]')->waitUntilPresent()->one()->click();
+		$this->query('class:is-loading')->waitUntilNotPresent();
 	}
 
 	/**
