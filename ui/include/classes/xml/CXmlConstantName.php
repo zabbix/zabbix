@@ -109,6 +109,7 @@ class CXmlConstantName {
 	const BASIC = 'BASIC';
 	const NTLM = 'NTLM';
 	const KERBEROS = 'KERBEROS';
+	const DIGEST = 'DIGEST';
 
 	const ALIAS = 'ALIAS';
 	const ASSET_TAG = 'ASSET_TAG';

@@ -323,7 +323,7 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
-		$this->zbxTestDropdownHasOptions('authentication', ['None',	'Basic', 'NTLM', 'Kerberos']);
+		$this->zbxTestDropdownHasOptions('authentication', ['None', 'Basic', 'NTLM', 'Kerberos', 'Digest']);
 
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelect('authentication', $data['authentication']);

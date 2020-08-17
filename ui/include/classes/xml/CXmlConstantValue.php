@@ -110,6 +110,7 @@ class CXmlConstantValue {
 	const BASIC = HTTPTEST_AUTH_BASIC;
 	const NTLM = HTTPTEST_AUTH_NTLM;
 	const KERBEROS = HTTPTEST_AUTH_KERBEROS;
+	const DIGEST = HTTPTEST_AUTH_DIGEST;
 
 	const ALIAS = 4;
 	const ASSET_TAG = 11;
