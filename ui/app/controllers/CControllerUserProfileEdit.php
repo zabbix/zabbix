@@ -95,7 +95,6 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 	 * Set user medias if user is at least admin and set messages in data.
 	 */
 	protected function doAction() {
-		$config = select_config();
 
 		$data = [
 			'userid' => CWebUser::$data['userid'],
@@ -114,14 +113,6 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'rows_per_page' => $this->user['rows_per_page'],
 			'url' => $this->user['url'],
 			'messages' => $this->getInput('messages', []) + getMessageSettings(),
-			'config' => [
-				'severity_name_0' => $config['severity_name_0'],
-				'severity_name_1' => $config['severity_name_1'],
-				'severity_name_2' => $config['severity_name_2'],
-				'severity_name_3' => $config['severity_name_3'],
-				'severity_name_4' => $config['severity_name_4'],
-				'severity_name_5' => $config['severity_name_5']
-			],
 			'form_refresh' => 0,
 			'action' => $this->getAction()
 		];

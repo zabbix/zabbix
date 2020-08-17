@@ -26,7 +26,7 @@ class CControllerSystemWarning extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		return $this->validateInput([]);
 	}
 
 	protected function checkPermissions() {
@@ -34,15 +34,14 @@ class CControllerSystemWarning extends CController {
 	}
 
 	protected function doAction() {
+		CMessageHelper::restoreScheduleMessages();
+
 		$data = [
 			'theme' => getUserTheme(CWebUser::$data),
 			'messages' => []
 		];
 
-		if (CSession::keyExists('messages')) {
-			$data['messages'] = CSession::getValue('messages');
-			CSession::unsetValue(['messages']);
-		}
+		$data['messages'] = CMessageHelper::getMessages();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

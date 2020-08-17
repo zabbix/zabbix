@@ -82,9 +82,7 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralMacro.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralTriggerSeverities.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralValuemap.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralWorkperiod.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralInstallation.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates.php';
@@ -111,6 +109,7 @@ require_once dirname(__FILE__).'/testFormItemTestHost.php';
 require_once dirname(__FILE__).'/testFormItemTestTemplate.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryPreprocessing.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
@@ -153,12 +152,12 @@ require_once dirname(__FILE__).'/testUrlUserPermissions.php';
 require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
-require_once dirname(__FILE__).'/dashboard/testCopyWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testGraphPrototypeWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDynamicItemWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testGraphWidget.php';
-require_once dirname(__FILE__).'/dashboard/testHostAvailabilityWidget.php';
-require_once dirname(__FILE__).'/dashboard/testProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -228,9 +227,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
-		$suite->addTestSuite('testFormAdministrationGeneralTriggerSeverities');
 		$suite->addTestSuite('testFormAdministrationGeneralValuemap');
-		$suite->addTestSuite('testFormAdministrationGeneralWorkperiod');
 		$suite->addTestSuite('testFormAdministrationGeneralInstallation');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
@@ -257,6 +254,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormItemTestTemplate');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
+		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormLowLevelDiscoveryPreprocessing');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
@@ -299,12 +297,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testCopyWidgets');
-		$suite->addTestSuite('testGraphPrototypeWidget');
-		$suite->addTestSuite('testDynamicItemWidgets');
-		$suite->addTestSuite('testGraphWidget');
-		$suite->addTestSuite('testHostAvailabilityWidget');
-		$suite->addTestSuite('testProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardCopyWidgets');
+		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
+		$suite->addTestSuite('testDashboardDynamicItemWidgets');
+		$suite->addTestSuite('testDashboardGraphWidget');
+		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
+		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 
 		return $suite;
 	}

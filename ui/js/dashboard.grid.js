@@ -3170,6 +3170,10 @@
 					// Prevent from asking to navigate away from the current page.
 					data['options']['updated'] = false;
 
+					if ('system-message-ok' in response) {
+						postMessageOk(response['system-message-ok']);
+					}
+
 					/*
 					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
 					 * It allows to use back browser button more user-friendly.
@@ -3853,7 +3857,7 @@
 		},
 
 		/**
-		 * Function to store copied widget into storage handler.
+		 * Function to store copied widget into storage buffer.
 		 *
 		 * @param {object} widget  Widget object copied.
 		 *
@@ -3861,6 +3865,11 @@
 		 */
 		copyWidget: function(widget) {
 			return this.each(function() {
+				var $this = $(this),
+					data = $this.data('dashboardGrid');
+
+				doAction('onWidgetCopy', $this, data, widget);
+
 				var w = {
 					type: widget.type,
 					pos: {

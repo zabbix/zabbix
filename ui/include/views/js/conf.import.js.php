@@ -28,7 +28,7 @@
 	jQuery(function($) {
 		$('#import').click(function() {
 			if ($('.deleteMissing:checked').length > 0) {
-				return confirm(<?= json_encode(_('Delete all elements that are not present in the XML file?')) ?>);
+				return confirm(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>);
 			}
 		});
 	});

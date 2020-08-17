@@ -67,8 +67,6 @@ class CControllerScriptList extends CController {
 			'name' => CProfile::get('web.scripts.filter_name', '')
 		];
 
-		$config = select_config();
-
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
@@ -79,13 +77,14 @@ class CControllerScriptList extends CController {
 		];
 
 		// list of scripts
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['scripts'] = API::Script()->get([
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'editable' => true,
-			'limit' => $config['search_limit'] + 1
+			'limit' => $limit
 		]);
 
 		// data sort and pager

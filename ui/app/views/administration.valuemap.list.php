@@ -87,14 +87,13 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'valuemapids', [
-		'valuemap.export' => ['name' => _('Export'), 'redirect' =>
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'export.valuemaps.xml')
-				->setArgument('backurl', (new CUrl('zabbix.php'))
+		'valuemap.export' => [
+			'content' => new CButtonExport('export.valuemaps',
+				(new CUrl('zabbix.php'))
 					->setArgument('action', 'valuemap.list')
-					->setArgument('page', $data['page'] == 1 ? null : $data['page'])
-					->getUrl())
-				->getUrl()
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->getUrl()
+			)
 		],
 		'valuemap.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected value maps?')]
 	])

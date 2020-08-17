@@ -200,16 +200,28 @@ $table = (new CTableInfo())
 
 $current_time = time();
 
+$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
+
 foreach ($data['hosts'] as $host) {
 	// Select an interface from the list with highest priority.
 	$interface = null;
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
-		$host_interfaces = array_filter($host['interfaces'], function($host_interface) use($interface_type) {
-			return $host_interface['type'] == $interface_type;
-		});
-		if ($host_interfaces) {
-			$interface = reset($host_interfaces);
-			break;
+	if ($host['interfaces']) {
+		foreach ($interface_types as $interface_type) {
+			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
+				return ($host_interface['type'] == $interface_type);
+			});
+			if ($host_interfaces) {
+				$interface = reset($host_interfaces);
+				break;
+			}
+		}
+	}
+
+	$host_interface = '';
+	if ($interface !== null) {
+		$host_interface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
+		if (array_key_exists('port', $interface) && $interface['port'] !== '') {
+			$host_interface .= NAME_DELIMITER.$interface['port'];
 		}
 	}
 
@@ -235,9 +247,6 @@ foreach ($data['hosts'] as $host) {
 	);
 
 	$maintenance_icon = false;
-	$hostInterface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-	$hostInterface .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
-
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
@@ -445,7 +454,7 @@ foreach ($data['hosts'] as $host) {
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],
-		$hostInterface,
+		$host_interface,
 		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
 				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY)
 			? ($host['proxy_hostid'] != 0)
@@ -468,13 +477,12 @@ $form->addItem([
 		[
 			'host.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
 			'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
-			'host.export' => ['name' => _('Export'), 'redirect' =>
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'export.hosts.xml')
-					->setArgument('backurl', (new CUrl('hosts.php'))
-						->setArgument('page', $data['page'] == 1 ? null : $data['page'])
-						->getUrl())
-					->getUrl()
+			'host.export' => [
+				'content' => new CButtonExport('export.hosts',
+					(new CUrl('hosts.php'))
+						->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+						->getUrl()
+				)
 			],
 			'host.massupdateform' => ['name' => _('Mass update')],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]

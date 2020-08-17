@@ -72,10 +72,10 @@ class CControllerApplicationEnable extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Item enabled', 'Items enabled', $updated));
+			CMessageHelper::setSuccessTitle(_n('Item enabled', 'Items enabled', $updated));
 		}
 		else {
-			$response->setMessageError(_n('Cannot enable item', 'Cannot enable items', $updated));
+			CMessageHelper::setErrorTitle(_n('Cannot enable item', 'Cannot enable items', $updated));
 		}
 
 		$this->setResponse($response);

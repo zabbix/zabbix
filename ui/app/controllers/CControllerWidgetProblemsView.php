@@ -35,8 +35,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		$config = select_config();
-
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
 			'groupids' => getSubGroups($fields['groupids']),
@@ -49,15 +47,15 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged'],
 			'show_opdata' => $fields['show_opdata']
-		], $config, true, true);
+		], true, true);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
-		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
+		$data = CScreenProblem::sortData($data, $sortfield, $sortorder);
 
 		if (count($data['problems']) > $fields['show_lines']) {
 			$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
 				min($fields['show_lines'], count($data['problems'])),
-				(count($data['problems']) > $config['search_limit']) ? '+' : '',
-				min($config['search_limit'], count($data['problems']))
+				(count($data['problems']) > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)) ? '+' : '',
+				min(CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT), count($data['problems']))
 			);
 		}
 		else {
@@ -94,23 +92,17 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'tag_priority' => $fields['tag_priority'],
 				'show_opdata' => $fields['show_opdata']
 			],
-			'config' => [
-				'problem_unack_style' => $config['problem_unack_style'],
-				'problem_ack_style' => $config['problem_ack_style'],
-				'blink_period' => timeUnitToSeconds($config['blink_period']),
-				'severity_name_0' => $config['severity_name_0'],
-				'severity_name_1' => $config['severity_name_1'],
-				'severity_name_2' => $config['severity_name_2'],
-				'severity_name_3' => $config['severity_name_3'],
-				'severity_name_4' => $config['severity_name_4'],
-				'severity_name_5' => $config['severity_name_5']
-			],
 			'data' => $data,
 			'info' => $info,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
+			],
+			'config' => [
+				'problem_ack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_STYLE),
+				'problem_unack_style' => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_STYLE),
+				'blink_period' => CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD)
 			]
 		]));
 	}

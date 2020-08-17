@@ -414,8 +414,6 @@ if (hasRequest('action') && hasRequest('g_actionid') && !$result) {
  */
 show_messages();
 
-$config = select_config();
-
 if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
@@ -423,8 +421,7 @@ if (hasRequest('form')) {
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
 		'new_recovery_operation' => getRequest('new_recovery_operation'),
-		'new_ack_operation' => $new_ack_operation,
-		'config' => $config
+		'new_ack_operation' => $new_ack_operation
 	];
 
 	if ($data['actionid']) {
@@ -579,11 +576,11 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'config' => $config,
 		'profileIdx' => 'web.actionconf.filter',
 		'active_tab' => CProfile::get('web.actionconf.filter.active', 1)
 	];
 
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$data['actions'] = API::Action()->get([
 		'output' => API_OUTPUT_EXTEND,
 		'search' => [
@@ -597,7 +594,7 @@ else {
 		'selectOperations' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => $limit
 	]);
 
 	// pager
