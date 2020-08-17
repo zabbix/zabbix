@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-13T12:37:37Z</date>
+    <date>2020-08-17T18:49:13Z</date>
     <media_types>
         <media_type>
             <name>TOPdesk</name>
@@ -95,6 +95,7 @@
             <script>var Media = {&#13;
     params: {},&#13;
     name: '',&#13;
+    labels: [],&#13;
     HTTPProxy: '',&#13;
 &#13;
     setParams: function (params) {&#13;
@@ -109,6 +110,28 @@
     setProxy: function (HTTPProxy) {&#13;
         if (typeof HTTPProxy !== 'undefined' &amp;&amp; HTTPProxy.trim() !== '') {&#13;
             Media.HTTPProxy = HTTPProxy;&#13;
+        }&#13;
+    },&#13;
+&#13;
+    setTags: function(event_tags_json) {&#13;
+        if (typeof event_tags_json !== 'undefined' &amp;&amp; event_tags_json !== ''&#13;
+                &amp;&amp; event_tags_json !== '{EVENT.TAGSJSON}') {&#13;
+&#13;
+            try {&#13;
+                var tags = JSON.parse(event_tags_json),&#13;
+                    label;&#13;
+&#13;
+                tags.forEach(function (tag) {&#13;
+                    if (typeof tag.tag === 'string') {&#13;
+                        label = (tag.tag + (typeof tag.value !== 'undefined'&#13;
+                                &amp;&amp; tag.value !== '' ? (':' + tag.value) : '')).replace(/\s/g, '_');&#13;
+                        Media.labels.push(label);&#13;
+                    }&#13;
+                });&#13;
+            }&#13;
+            catch (error) {&#13;
+                Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Failed to parse &quot;event_tags_json&quot; param');&#13;
+            }&#13;
         }&#13;
     },&#13;
 &#13;
@@ -273,14 +296,15 @@ try {&#13;
     Media.setParams(media);&#13;
     Media.params.token = 'Basic ' + btoa(Media.params.user + ':' + Media.params.password);&#13;
     Media.setProxy(params.HTTPProxy);&#13;
+    Media.setTags(params.event_tags_json);&#13;
 &#13;
     // Create an issue.&#13;
     // Numeric value of the event that triggered an action (1 for problem, 0 for recovering).&#13;
     // Numeric value of of the problem update status. Possible values:&#13;
     // 0 - Webhook was called because of problem/recovery event, 1 - Update operation.&#13;
     if ((params.event_source == 0 &amp;&amp; params.event_value == 1 &amp;&amp; params.event_update_status == 0)&#13;
-        || (params.event_source == 3 &amp;&amp; params.event_value == 1)&#13;
-        || params.event_source == 1 || params.event_source == 2) {&#13;
+            || (params.event_source == 3 &amp;&amp; params.event_value == 1)&#13;
+            || params.event_source == 1 || params.event_source == 2) {&#13;
         Zabbix.Log(4, '[ ' + Media.name + ' Webhook ] Request of the ticket creating.');&#13;
         fields.caller = {dynamicName: 'Zabbix'};&#13;
         fields.briefDescription = params.alert_subject;&#13;
@@ -288,13 +312,10 @@ try {&#13;
         fields.priority = {name: priority};&#13;
         fields.processingStatus = {name: Media.params.status};&#13;
         fields.externalNumber = params.event_id;&#13;
+        fields.request += '&lt;br&gt;' + params.zbxurl;&#13;
 &#13;
         if (params.event_source === '0') {&#13;
-            fields.request += '&lt;br&gt;' +&#13;
-                params.zbxurl + 'tr_events.php?triggerid=' + params.trigger_id + '&amp;eventid=' + params.event_id;&#13;
-        }&#13;
-        else {&#13;
-            fields.request += '&lt;br&gt;' + params.zbxurl;&#13;
+            fields.request += 'tr_events.php?triggerid=' + params.trigger_id + '&amp;eventid=' + params.event_id;&#13;
         }&#13;
 &#13;
         resp = Media.request('post', 'tas/api/incidents', fields);&#13;
@@ -320,7 +341,6 @@ try {&#13;
 &#13;
         resp = Media.request('put', 'tas/api/incidents/id/' + resp.response[0].id, fields);&#13;
         if (typeof resp.response !== 'object' || typeof resp.response.id === 'undefined') {&#13;
-            Zabbix.Log(4, JSON.stringify(resp));&#13;
             throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';&#13;
         }&#13;
     }&#13;
@@ -350,7 +370,8 @@ Problem name: {EVENT.NAME}&#13;
 Host: {HOST.NAME}&#13;
 Severity: {EVENT.SEVERITY}&#13;
 Operational data: {EVENT.OPDATA}&#13;
-Original problem ID: {EVENT.ID}</message>
+Original problem ID: {EVENT.ID}&#13;
+{TRIGGER.URL}</message>
                 </message_template>
                 <message_template>
                     <event_source>TRIGGERS</event_source>
@@ -396,26 +417,6 @@ Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
                     <message>Host name: {HOST.HOST}&#13;
 Host IP: {HOST.IP}&#13;
 Agent port: {HOST.PORT}</message>
-                </message_template>
-                <message_template>
-                    <event_source>INTERNAL</event_source>
-                    <operation_mode>PROBLEM</operation_mode>
-                    <subject>Internal problem: {EVENT.NAME}</subject>
-                    <message>Internal problem started at {EVENT.TIME} on {EVENT.DATE}&#13;
-Problem name: {EVENT.NAME}&#13;
-Host: {HOST.NAME}&#13;
-Operational data: {EVENT.OPDATA}&#13;
-Original problem ID: {EVENT.ID}</message>
-                </message_template>
-                <message_template>
-                    <event_source>INTERNAL</event_source>
-                    <operation_mode>RECOVERY</operation_mode>
-                    <subject>Internal problem: {EVENT.NAME}</subject>
-                    <message>Internal problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&#13;
-Problem name: {EVENT.NAME}&#13;
-Host: {HOST.NAME}&#13;
-Operational data: {EVENT.OPDATA}&#13;
-Original problem ID: {EVENT.ID}</message>
                 </message_template>
             </message_templates>
         </media_type>
