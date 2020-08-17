@@ -175,11 +175,11 @@
 	};
 
 	latestPage.prototype.liveFilter = function() {
-		var $filter_hostids = $('#filter_hostids_');
+		var $filter_hostids = $('#filter_hostids_'),
+			$filter_show_without_data = $('#filter_show_without_data');
 
 		$filter_hostids.on('change', function() {
-			var $filter_show_without_data = $('#filter_show_without_data'),
-				no_hosts_selected = !$(this).multiSelect('getData').length;
+			var no_hosts_selected = !$(this).multiSelect('getData').length;
 
 			if (no_hosts_selected) {
 				$filter_show_without_data.prop('checked', true);
