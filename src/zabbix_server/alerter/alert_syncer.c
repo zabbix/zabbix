@@ -462,7 +462,7 @@ static int	am_db_compare_tags(const void *d1, const void *d2)
 	return strcmp(tag1->value, tag2->value);
 }
 
-typedef struct zbx_event_tags
+typedef struct
 {
 	zbx_uint64_t		eventid;
 	zbx_vector_ptr_t	tags;
@@ -560,10 +560,10 @@ static void	am_db_update_event_tags(zbx_hashset_t *events_tags, zbx_uint64_t eve
 	if (NULL == event_tags)
 	{
 		zbx_vector_ptr_create(&(local_event_tags.tags));
-		event_tags = (zbx_event_tags_t*)zbx_hashset_insert(events_tags, &local_event_tags, sizeof(local_event_tags));
+		event_tags = (zbx_event_tags_t*)zbx_hashset_insert(events_tags, &local_event_tags,
+				sizeof(local_event_tags));
+		event_tags->need_to_add_problem_tag = need_to_add_problem_tag;
 	}
-
-	event_tags->need_to_add_problem_tag = need_to_add_problem_tag;
 
 	while (NULL != (pnext = zbx_json_pair_next(&jp_tags, pnext, key, sizeof(key))))
 	{
@@ -621,6 +621,8 @@ static void	am_db_validate_tags_for_update(zbx_hashset_t *update_events_tags, zb
 	zbx_hashset_iter_t	iter;
 	zbx_event_tags_t	*local_event_tags;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_hashset_iter_reset(update_events_tags, &iter);
 
 	while (NULL != (local_event_tags = (zbx_event_tags_t *)zbx_hashset_iter_next(&iter)))
@@ -650,7 +652,8 @@ static void	am_db_validate_tags_for_update(zbx_hashset_t *update_events_tags, zb
 		for (i = 0; i < local_event_tags->tags.values_num; i++)
 		{
 			tag = (zbx_tag_t *)(local_event_tags->tags).values[i];
-			zbx_db_insert_add_values(db_event, __UINT64_C(0), local_event_tags->eventid, tag->tag, tag->value);
+			zbx_db_insert_add_values(db_event, __UINT64_C(0), local_event_tags->eventid, tag->tag,
+					tag->value);
 
 			if (0 != local_event_tags->need_to_add_problem_tag)
 			{
@@ -659,6 +662,8 @@ static void	am_db_validate_tags_for_update(zbx_hashset_t *update_events_tags, zb
 			}
 		}
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
