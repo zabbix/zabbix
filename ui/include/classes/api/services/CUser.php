@@ -1288,7 +1288,11 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user = self::createSession($user['user'], $db_user);
+
+		CSessionHelper::clear();
+		new CEncryptedCookieSession();
+
+		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1343,7 +1347,11 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
-		$db_user = self::createSession($alias, $db_user);
+
+		CSessionHelper::clear();
+		new CEncryptedCookieSession();
+
+		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1360,7 +1368,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function checkAuthentication(array $session) {
+	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
 			'extend' =>	['type' => API_BOOLEAN, 'default' => true]
@@ -1384,8 +1392,10 @@ class CUser extends CApiService {
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
 
+		// If session not created.
 		if (!$db_sessions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+			// After created new session return empty array.
+			return [];
 		}
 
 		$db_session = $db_sessions[0];
@@ -1397,6 +1407,7 @@ class CUser extends CApiService {
 			'userids' => $db_session['userid']
 		]);
 
+		// If user not exists.
 		if (!$db_users) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
@@ -1550,13 +1561,12 @@ class CUser extends CApiService {
 	/**
 	 * Initialize session for user. Returns user data array with valid sessionid.
 	 *
-	 * @param string $alias    User alias value.
 	 * @param array  $db_user  User data from database.
 	 *
 	 * @return array
 	 */
-	private static function createSession($alias, $db_user) {
-		$db_user['sessionid'] = md5(microtime().$alias.mt_rand());
+	private static function createSession(array $db_user): array {
+		$db_user['sessionid'] = CSessionHelper::getId();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],

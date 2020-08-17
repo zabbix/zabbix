@@ -66,20 +66,19 @@ switch ($data['method']) {
 		break;
 
 	case 'zabbix.status':
-		CSession::start();
-		if (!CSession::keyExists('serverCheckResult')
-				|| (CSession::getValue('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
+		if (!CSessionHelper::has('serverCheckResult')
+				|| (CSessionHelper::get('serverCheckTime') + SERVER_CHECK_INTERVAL) <= time()) {
 			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
 			);
-			CSession::setValue('serverCheckResult', $zabbixServer->isRunning(CWebUser::getSessionCookie()));
-			CSession::setValue('serverCheckTime', time());
+			CSessionHelper::set('serverCheckResult', $zabbixServer->isRunning(CSessionHelper::getId()));
+			CSessionHelper::set('serverCheckTime', time());
 		}
 
 		$result = [
-			'result' => (bool) CSession::getValue('serverCheckResult'),
-			'message' => CSession::getValue('serverCheckResult')
+			'result' => (bool) CSessionHelper::get('serverCheckResult'),
+			'message' => CSessionHelper::get('serverCheckResult')
 				? ''
 				: _('Zabbix server is not running: the information displayed may not be current.')
 		];

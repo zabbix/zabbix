@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-15T09:12:15Z</date>
+   <date>2020-08-13T07:38:24Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1414,7 +1414,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                      <name>DB {#DBNAME}: Get bloating tables</name>
                      <key>pgsql.db.bloating_tables["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]</key>
                      <history>7d</history>
-                     <description>Number оf bloating tables</description>
+                     <description>Number of bloating tables</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>PostgreSQL: DB {#DBNAME}</name>
@@ -2118,6 +2118,7 @@ https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</d
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>DB {#DBNAME}: Locks</name>

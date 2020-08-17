@@ -5209,6 +5209,14 @@ a.link-action {
 	&:last-child {
 		margin: 0;
 	}
+
+	&.green-bg {
+		color: darken($alt-green, 45%);
+	}
+
+	&.yellow-bg {
+		color: darken($alt-yellow, 45%);
+	}
 }
 
 .green-bg {
@@ -5217,6 +5225,10 @@ a.link-action {
 
 .red-bg {
 	background-color: $alt-red;
+}
+
+.yellow-bg {
+	background-color: $alt-yellow;
 }
 
 // Severity statuses.

@@ -263,7 +263,7 @@ $saml_tab = (new CFormList('list_saml'))
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update'))),
 				[(new CSubmitButton(_('Test'), 'ldap_test', 1))
-					->addStyle(($data['form_refresh'] && get_cookie('tab', 0) == 2) ? '' : 'display: none')
+					->addStyle(($data['form_refresh'] && CCookieHelper::get('tab') == 2) ? '' : 'display: none')
 					->setEnabled($data['ldap_enabled'])
 				]
 			))

@@ -209,7 +209,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), 0
 			);
-			$response = $zabbix_server->expressionsEvaluate($data, CWebUser::getSessionCookie());
+			$response = $zabbix_server->expressionsEvaluate($data, CSessionHelper::getId());
 
 			if ($zabbix_server->getError()) {
 				error($zabbix_server->getError());
