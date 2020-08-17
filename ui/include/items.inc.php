@@ -1098,7 +1098,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'preservekeys' => true,
-			'limit' => (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE)
+			'limit' => (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1
 		]);
 		$hostids = array_keys($db_hosts);
 	}
@@ -1142,7 +1142,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverviewHosts(?array $groupids, ?array $hostids, ?array $itemids, ?string $application = ''): array {
-	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1;
 
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
