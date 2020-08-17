@@ -348,6 +348,9 @@ int	zbx_http_get(const char *url, const char *header, char **out, char **error)
 	body.data = NULL;
 	ret = SUCCEED;
 clean:
+	if (NULL != headers_slist)
+		zbx_guaranteed_memset(headers_slist->data, 0, strlen(headers_slist->data));
+
 	curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
 	curl_easy_cleanup(easyhandle);
 	zbx_free(body.data);

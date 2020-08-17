@@ -230,6 +230,8 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+char	*CONFIG_VAULTTOKEN		= NULL;
+char	*CONFIG_VAULTURL		= NULL;
 char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
@@ -518,6 +520,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
+
+	if (NULL == CONFIG_VAULTURL)
+		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
 }
 
 /******************************************************************************
@@ -727,6 +732,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"DBUser",			&CONFIG_DBUSER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -956,16 +965,30 @@ int	main(int argc, char **argv)
 
 int	init_database_credentials_from_vault(char **error)
 {
-	char			*out, username_tmp[MAX_STRING_LEN], password_tmp[MAX_STRING_LEN];
+	char			*out = NULL, tmp[MAX_STRING_LEN], tmp1[MAX_STRING_LEN];
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 
 	if (NULL == CONFIG_VAULTDBPATH)
 		return SUCCEED;
 
-	if (SUCCEED != zbx_http_get("http://127.0.0.1:8200/v1/kv/hello",
-			"X-Vault-Token: s.e1fe6jBbp1rlfJa0l50FBWNK", &out, error))
+	if (NULL == CONFIG_VAULTTOKEN)
+	{
+		*error = zbx_dsprintf(*error, "cannot retrieve database credentials from vault,"
+				" VaultToken must be defined");
 		return FAIL;
+	}
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s%s", CONFIG_VAULTURL, CONFIG_VAULTDBPATH);
+	zbx_snprintf(tmp1, sizeof(tmp1), "X-Vault-Token: %s", CONFIG_VAULTTOKEN);
+
+	ret = zbx_http_get(tmp, tmp1, &out, error);
+
+	zbx_guaranteed_memset(tmp, 0, strlen(tmp));
+	zbx_guaranteed_memset(tmp1, 0, strlen(tmp1));
+
+	if (SUCCEED != ret)
+		goto fail;
 
 	if (SUCCEED != zbx_json_open(out, &jp))
 	{
@@ -975,18 +998,18 @@ int	init_database_credentials_from_vault(char **error)
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, "data", &jp_data))
 	{
-		*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
+		*error = zbx_dsprintf(*error, "cannot find the \"%s\" array in the received JSON object.",
 				ZBX_PROTO_TAG_DATA);
 		goto fail;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_USERNAME, username_tmp, sizeof(username_tmp), NULL))
+	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_USERNAME, tmp, sizeof(tmp), NULL))
 	{
 		*error = zbx_dsprintf(*error, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_USERNAME);
 		goto fail;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PASSWORD, password_tmp, sizeof(password_tmp), NULL))
+	if (SUCCEED != zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PASSWORD, tmp1, sizeof(tmp1), NULL))
 	{
 		*error = zbx_dsprintf(*error, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_PASSWORD);
 		goto fail;
@@ -1006,16 +1029,16 @@ int	init_database_credentials_from_vault(char **error)
 		goto fail;
 	}
 
-	CONFIG_DBUSER = zbx_strdup(NULL, username_tmp);		/* TODO encrypt */
-	CONFIG_DBPASSWORD = zbx_strdup(NULL, password_tmp);	/* TODO encrypt */
+	CONFIG_DBUSER = zbx_strdup(NULL, tmp);		/* TODO encrypt */
+	CONFIG_DBPASSWORD = zbx_strdup(NULL, tmp1);	/* TODO encrypt */
 
 	ret = SUCCEED;
 fail:
-	memset(username_tmp, 0, sizeof(username_tmp));
-	memset(password_tmp, 0, sizeof(password_tmp));
+	zbx_guaranteed_memset(tmp, 0, strlen(tmp));
+	zbx_guaranteed_memset(tmp1, 0, strlen(tmp1));
 
 	if (NULL != out)
-		memset(out, 0, strlen(out));
+		zbx_guaranteed_memset(out, 0, strlen(out));
 	zbx_free(out);
 
 	return ret;
