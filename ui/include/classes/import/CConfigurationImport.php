@@ -738,8 +738,10 @@ class CConfigurationImport {
 					$applicationsIds = [];
 
 					foreach ($item['applications'] as $application) {
-						if ($applicationId = $this->referencer->resolveApplication($hostId, $application['name'])) {
-							$applicationsIds[] = $applicationId;
+						$applicationid = $this->referencer->resolveApplication($hostId, $application['name']);
+
+						if ($applicationid) {
+							$applicationsIds[] = $applicationid;
 						}
 						else {
 							throw new Exception(_s('Item "%1$s" on "%2$s": application "%3$s" does not exist.',
@@ -751,7 +753,9 @@ class CConfigurationImport {
 				}
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					if ($interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref'])) {
+					$interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref']);
+
+					if ($interfaceid) {
 						$item['interfaceid'] = $interfaceid;
 					}
 					else {
@@ -959,7 +963,9 @@ class CConfigurationImport {
 				$item['hostid'] = $hostId;
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
-					if ($interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref'])) {
+					$interfaceid = $this->referencer->resolveInterface($hostId, $item['interface_ref']);
+
+					if ($interfaceid) {
 						$item['interfaceid'] = $interfaceid;
 					}
 					else {
@@ -1122,7 +1128,9 @@ class CConfigurationImport {
 					}
 
 					if (array_key_exists('interface_ref', $prototype) && $prototype['interface_ref']) {
-						if ($interfaceid = $this->referencer->resolveInterface($hostId, $prototype['interface_ref'])) {
+						$interfaceid = $this->referencer->resolveInterface($hostId, $prototype['interface_ref']);
+
+						if ($interfaceid) {
 							$prototype['interfaceid'] = $interfaceid;
 						}
 						else {
