@@ -746,6 +746,8 @@ void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_
 
 #define ZBX_MACRO_VALUE_TEXT	0
 #define ZBX_MACRO_VALUE_SECRET	1
+#define ZBX_MACRO_VALUE_VAULT	1
+
 
 #define ZBX_MACRO_SECRET_MASK	"******"
 

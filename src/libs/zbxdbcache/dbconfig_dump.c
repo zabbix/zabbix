@@ -318,6 +318,28 @@ static void	DCdump_htmpls(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static void	DCdump_kvs_paths(void)
+{
+	zbx_dc_kvs_path_t	*kvs_path;
+	zbx_dc_kv_t		*kvs;
+	zbx_hashset_iter_t	iter;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	for (i = 0; i < config->kvs_paths.values_num; i++)
+	{
+		kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "kvs_path:'%s'", kvs_path->path);
+
+		zbx_hashset_iter_reset(&kvs_path->kvs, &iter);
+		while (NULL != (kvs = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter))) /* TODO remove value from dump */
+			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s' value:'%s' refcount:%d", kvs->key, kvs->value, kvs->refcount);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 static void	DCdump_gmacros(void)
 {
 	ZBX_DC_GMACRO		*gmacro;
@@ -1281,6 +1303,7 @@ void	DCdump_configuration(void)
 	DCdump_ipmihosts();
 	DCdump_host_inventories();
 	DCdump_htmpls();
+	DCdump_kvs_paths();
 	DCdump_gmacros();
 	DCdump_hmacros();
 	DCdump_interfaces();

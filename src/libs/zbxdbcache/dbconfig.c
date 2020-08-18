@@ -858,6 +858,113 @@ static int	config_hmacro_context_compare(const void *d1, const void *d2)
 	return strcmp(m1->context, m2->context);
 }
 
+static int	dc_compare_kvs_path(const void *d1, const void *d2)
+{
+	const zbx_dc_kvs_path_t	*ptr1 = *((const zbx_dc_kvs_path_t **)d1);
+	const zbx_dc_kvs_path_t	*ptr2 = *((const zbx_dc_kvs_path_t **)d2);
+
+	return strcmp(ptr1->path, ptr2->path);
+}
+
+static int	parse_vault_macro_value(const char *value, char **path, char **key)
+{
+	char	*ptr;
+
+	if (NULL == (ptr = strchr(value, ':')))
+		return FAIL;
+
+	zbx_free(*path);
+
+	*path = zbx_malloc(NULL, ptr - value + 1);
+	if (0 != ptr - value)
+		memcpy(*path, value, ptr - value);
+	(*path)[ptr - value] = '\0';
+
+	*key = zbx_strdup(*key, ptr + 1);
+
+	return SUCCEED;
+}
+
+static zbx_hash_t	dc_kv_hash(const void *data)
+{
+	zbx_dc_kv_t	*kv = (zbx_dc_kv_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(kv->key, strlen(kv->key), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	dc_kv_compare(const void *d1, const void *d2)
+{
+	return strcmp(((zbx_dc_kv_t *)d1)->key, ((zbx_dc_kv_t *)d2)->key);
+}
+
+static zbx_dc_kv_t	*config_kvs_path_add(const char *path, const char *key)
+{
+	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
+	zbx_dc_kv_t		*kv, kv_local;
+	int			i;
+
+	kvs_path_local.path = path;
+
+	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
+	{
+		kvs_path = (zbx_dc_kvs_path_t *)__config_mem_malloc_func(NULL, sizeof(zbx_dc_kvs_path_t));
+		DCstrpool_replace(0, &kvs_path->path, path);
+		zbx_vector_ptr_append(&config->kvs_paths, kvs_path);
+
+		zbx_hashset_create_ext(&kvs_path->kvs, 0, dc_kv_hash, dc_kv_compare, NULL,
+				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func);
+		DCstrpool_replace(0, &kv_local.key, key);
+		kv_local.value = NULL;
+		kv_local.refcount = 0;
+		kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
+	}
+	else
+	{
+		kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+		kv_local.key = key;
+
+		if (NULL == (kv = (zbx_dc_kv_t *)zbx_hashset_search(&kvs_path->kvs, &kv_local)))
+		{
+			DCstrpool_replace(0, &kv_local.key, key);
+			kv_local.value = NULL;
+			kv_local.refcount = 0;
+
+			kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
+		}
+	}
+
+	kv->refcount++;
+
+	return kv;
+}
+
+static void	config_kvs_path_remove(const char *path, zbx_dc_kv_t *kv)
+{
+	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
+	int			i;
+
+	if (0 != --kv->refcount)
+		return;
+
+	zbx_strpool_release(kv->key);
+	if (NULL != kv->value)
+		zbx_strpool_release(kv->value);
+
+	kvs_path_local.path = path;
+
+	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+	kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+
+	zbx_hashset_remove_direct(&kvs_path->kvs, kv);
+
+	if (0 == kvs_path->kvs.num_data)
+		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: set_hk_opt                                                       *
@@ -1801,11 +1908,11 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
-	unsigned char		tag, context_op;
+	unsigned char		tag, context_op, type;
 	ZBX_DC_GMACRO		*gmacro;
 	int			found, context_existed, update_index, ret, i;
 	zbx_uint64_t		globalmacroid;
-	char			*macro = NULL, *context = NULL;
+	char			*macro = NULL, *context = NULL, *path = NULL, *key = NULL;
 	zbx_vector_ptr_t	indexes;
 	ZBX_DC_GMACRO_M		*gmacro_m;
 
@@ -1820,10 +1927,17 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(globalmacroid, row[0]);
+		ZBX_STR2UCHAR(type, row[3]);
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(row[1], &macro, &context, NULL, &context_op))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\"", row[1]);
+			continue;
+		}
+
+		if (ZBX_MACRO_VALUE_VAULT == type && FAIL == (parse_vault_macro_value(row[2], &path, &key)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" value \"%s\"", row[1], row[2]);
 			continue;
 		}
 
@@ -1844,8 +1958,24 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			update_index = 1;
 		}
 
+		if (0 != found && NULL != gmacro->kv)
+		{
+			char	*path_old = NULL, *key_old = NULL;
+			parse_vault_macro_value(gmacro->value, &path_old, &key_old);
+
+			config_kvs_path_remove(path_old, gmacro->kv);
+
+			zbx_free(key_old);
+			zbx_free(path_old);
+		}
+
+		if (ZBX_MACRO_VALUE_VAULT == type)
+			gmacro->kv = config_kvs_path_add(path, key);
+		else
+			gmacro->kv = NULL;
+
 		/* store new information in macro structure */
-		ZBX_STR2UCHAR(gmacro->type, row[3]);
+		gmacro->type = type;
 		gmacro->context_op = context_op;
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
@@ -1880,6 +2010,12 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		if (NULL == (gmacro = (ZBX_DC_GMACRO *)zbx_hashset_search(&config->gmacros, &rowid)))
 			continue;
 
+		if (NULL != gmacro->kv)
+		{
+			parse_vault_macro_value(gmacro->value, &path, &key);
+			config_kvs_path_remove(path, gmacro->kv);
+		}
+
 		gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
 		zbx_vector_ptr_append(&indexes, gmacro_m);
 
@@ -1908,6 +2044,8 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			zbx_vector_ptr_sort(&gmacro_m->gmacros, config_gmacro_context_compare);
 	}
 
+	zbx_free(key);
+	zbx_free(path);
 	zbx_free(context);
 	zbx_free(macro);
 	zbx_vector_ptr_destroy(&indexes);
@@ -6142,6 +6280,8 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->corr_operations, 0);
 	CREATE_HASHSET(config->hostgroups, 0);
 	zbx_vector_ptr_create_ext(&config->hostgroups_name, __config_mem_malloc_func, __config_mem_realloc_func,
+			__config_mem_free_func);
+	zbx_vector_ptr_create_ext(&config->kvs_paths, __config_mem_malloc_func, __config_mem_realloc_func,
 			__config_mem_free_func);
 
 	CREATE_HASHSET(config->preprocops, 0);
