@@ -32,8 +32,12 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			29164 => [
-				'hostids' => [],
-				'macros' => []
+				'hostids' => [
+					0 => 10084
+				],
+				'macros' => [
+					'{$UNKNOWN_MACRO}' => '{$UNKNOWN_MACRO}'
+				]
 			]
 		];
 
@@ -76,7 +80,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 						'hostid' => 10084,
 						'name' => 'TEST2',
 						'key_' => 'test_test_test2',
-						'description' => 'aaaaaaaaaaa'
+						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
 					]
 				],
 				'expected_item' => [
@@ -85,7 +89,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 						'hostid' => 10084,
 						'name' => 'TEST2',
 						'key_' => 'test_test_test2',
-						'description' => 'aaaaaaaaaaa'
+						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
 					]
 				]
 			]
