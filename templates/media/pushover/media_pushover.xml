@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-07-03T09:57:01Z</date>
+    <date>2020-08-18T11:11:56Z</date>
     <media_types>
         <media_type>
             <name>Pushover</name>
@@ -131,7 +131,7 @@
         params.event_nseverity = '6';&#13;
     }&#13;
 &#13;
-    priority = params['priority_' + severities[params.event_nseverity].name] || severities[7].name;&#13;
+    priority = params['priority_' + severities[params.event_nseverity].name] || params.priority_default;&#13;
 &#13;
     if (isNaN(priority) || priority &lt; -2 || priority &gt; 2) {&#13;
         throw '&quot;priority&quot; should be -2..2';&#13;
