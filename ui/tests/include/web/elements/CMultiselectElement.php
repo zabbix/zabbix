@@ -232,25 +232,26 @@ class CMultiselectElement extends CElement {
 				continue;
 			}
 
-			if ($input->getValue() !== $value) {
-				$input->overwrite($value)->fireEvent('keyup');
-			}
-
 			$content = CXPathHelper::escapeQuotes($value);
+			$prefix = '//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li';
+			$query = $this->query('xpath', implode('|', [
+				$prefix.'[@data-label='.$content.']',
+				$prefix.'[contains(@data-label,'.$content.')]/span[contains(@class, "suggest-found") and text()='.$content.']',
+				$prefix.'[contains(@class, "suggest-new")]/span[text()='.$content.']'
+			]));
 
-			try {
-				$prefix = '//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li';
-				$element = $this->query('xpath', implode('|', [
-					$prefix.'[@data-label='.$content.']',
-					$prefix.'[contains(@data-label,'.$content.')]/span[contains(@class, "suggest-found") and text()='.$content.']',
-					$prefix.'[contains(@class, "suggest-new")]/span[text()='.$content.']'
-				]))->waitUntilPresent();
-			}
-			catch (NoSuchElementException $exception) {
-				throw new Exception('Cannot find value with label "'.$value.'" in multiselect element.');
+			for ($i = 0; $i < 2; $i++) {
+				try {
+					$query->waitUntilPresent();
+				}
+				catch (NoSuchElementException $exception) {
+					if ($i === 1) {
+						throw new Exception('Cannot find value with label "'.$value.'" in multiselect element.');
+					}
+				}
 			}
 
-			$element->one()->click();
+			$query->one()->click();
 		}
 
 		return $this;
