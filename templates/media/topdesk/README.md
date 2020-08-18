@@ -22,7 +22,7 @@ When configuring alert action, add this user in the _Send to users_ field (in Op
 
 3\. Add the macro {$ZABBIX.URL} with Zabbix frontend URL (for example http://192.168.7.123:8081)
 
-[![](images/tn_3.png?raw=true)](images/3.png)
+[![](images/tn_1.png?raw=true)](images/1.png)
 
 4\. Click the **Update** button to save the global macros.
 
@@ -32,13 +32,13 @@ When configuring alert action, add this user in the _Send to users_ field (in Op
 
 2\. Under Administration, go to the **Media types** page and click the **Import** button.
 
-[![](images/tn_5.png?raw=true)](images/5.png)
+[![](images/tn_2.png?raw=true)](images/2.png)
 
 3\. Select Import file [media_topdesk.xml](media_topdesk.xml) and click the **Import** button at the bottom to import the TOPdesk media type.
 
 4\. Change the values of the variables topdesk_api (URL), topdesk_password, topdesk_user. The topdesk_status is the default status for creating a new TOPdesk ticket.
 
-[![](images/tn_7.png?raw=true)](images/7.png)
+[![](images/tn_3.png?raw=true)](images/3.png)
 
 For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook).
 
@@ -54,17 +54,17 @@ For more information about the Zabbix Webhook configuration, please see the [doc
 
 4\. Click the **Select** button next to **Groups**.
 
-[![](images/tn_8.png?raw=true)](images/8.png)
+[![](images/tn_5.png?raw=true)](images/5.png)
 
 *   Please note, that in order to be notified about problems on a host, this user must have at least read permissions for the host.
 
 5\. Click on the **Media** tab and, inside of the **Media** box, click the **Add** button.
 
-[![](images/tn_9.png?raw=true)](images/9.png)
+[![](images/tn_6.png?raw=true)](images/6.png)
 
 6\. In the new window that appears, configure the media for the user as follows:
 
-[![](images/tn_10.png?raw=true)](images/10.png)
+[![](images/tn_7.png?raw=true)](images/7.png)
 
 *   For the **Type**, select **TOPdesk** (the new media type that was created).
 *   For **Send to**: enter any text, as this value is not used, but is required.
