@@ -55,7 +55,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 	public function dataProviderInput() {
 		return [
 			[
-				'item' => [
+				[
 					30896 => [
 						'itemid' => 30896,
 						'hostid' => 10084,
@@ -64,7 +64,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 						'description' => 'aaaaaaaaaaa {$TEST} bbbbbbbbbbbb {$TEST}'
 					]
 				],
-				'expected_item' => [
+				[
 					30896 => [
 						'itemid' => 30896,
 						'hostid' => 10084,
@@ -75,7 +75,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'item' => [
+				[
 					29164 => [
 						'itemid' => 29164,
 						'hostid' => 10084,
@@ -84,7 +84,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
 					]
 				],
-				'expected_item' => [
+				[
 					29164 => [
 						'itemid' => 29164,
 						'hostid' => 10084,
@@ -95,6 +95,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 				]
 			]
 		];
+
 	}
 
 	/**
