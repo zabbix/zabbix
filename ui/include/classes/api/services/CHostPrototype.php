@@ -1370,14 +1370,14 @@ class CHostPrototype extends CHostBase {
 
 		// adding tags
 		if ($options['selectTags'] !== null && $options['selectTags'] !== API_OUTPUT_COUNT) {
-			$tags = DB::select('host_tag', [
+			$tags = API::getApiService()->select('host_tag', [
 				'output' => $this->outputExtend($options['selectTags'], ['hostid', 'hosttagid']),
 				'filter' => ['hostid' => $hostPrototypeIds],
 				'preservekeys' => true
 			]);
 
 			$relation_map = $this->createRelationMap($tags, 'hostid', 'hosttagid');
-			$tags = $this->unsetExtraFields($tags, ['hostid', 'hosttagid'], $options['selectTags']);
+			$tags = $this->unsetExtraFields($tags, ['hostid', 'hosttagid'], []);
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
