@@ -55,43 +55,35 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 	public function dataProviderInput() {
 		return [
 			[
-				[
-					30896 => [
-						'itemid' => 30896,
-						'hostid' => 10084,
-						'name' => 'TEST',
-						'key_' => 'test_test_test',
-						'description' => 'aaaaaaaaaaa {$TEST} bbbbbbbbbbbb {$TEST}'
-					]
+				30896 => [
+					'itemid' => 30896,
+					'hostid' => 10084,
+					'name' => 'TEST',
+					'key_' => 'test_test_test',
+					'description' => 'aaaaaaaaaaa {$TEST} bbbbbbbbbbbb {$TEST}'
 				],
-				[
-					30896 => [
-						'itemid' => 30896,
-						'hostid' => 10084,
-						'name' => 'TEST',
-						'key_' => 'test_test_test',
-						'description' => 'aaaaaaaaaaa test123 bbbbbbbbbbbb test123'
-					]
+				30896 => [
+					'itemid' => 30896,
+					'hostid' => 10084,
+					'name' => 'TEST',
+					'key_' => 'test_test_test',
+					'description' => 'aaaaaaaaaaa test123 bbbbbbbbbbbb test123'
 				]
 			],
 			[
-				[
-					29164 => [
-						'itemid' => 29164,
-						'hostid' => 10084,
-						'name' => 'TEST2',
-						'key_' => 'test_test_test2',
-						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
-					]
+				29164 => [
+					'itemid' => 29164,
+					'hostid' => 10084,
+					'name' => 'TEST2',
+					'key_' => 'test_test_test2',
+					'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
 				],
-				[
-					29164 => [
-						'itemid' => 29164,
-						'hostid' => 10084,
-						'name' => 'TEST2',
-						'key_' => 'test_test_test2',
-						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
-					]
+				29164 => [
+					'itemid' => 29164,
+					'hostid' => 10084,
+					'name' => 'TEST2',
+					'key_' => 'test_test_test2',
+					'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
 				]
 			]
 		];
