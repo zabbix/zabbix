@@ -32,7 +32,7 @@ class CImportDataNormalizer {
 		$this->rules = $schema;
 	}
 
-	public function normalize($data) {
+	public function normalize(array $data): array {
 		$data['zabbix_export'] = $this->convert($data['zabbix_export'], $this->rules);
 
 		return $data;
