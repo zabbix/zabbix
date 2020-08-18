@@ -1,90 +1,28 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2001-2020 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 
 class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
-	public function testResolveItemDescriptions() {
-		$items = [
-			30896 => [
-				'itemid' => 30896,
-				'type' => 0,
-				'hostid' => 10084,
-				'name' => 'TEST',
-				'key_' => 'test_test_test',
-				'delay' => '1m',
-				'history' => '90d',
-				'trends' => '365d',
-				'status' => 0,
-				'value_type' => 3,
-				'units' => '',
-				'valuemapid' => 0,
-				'description' => 'aaaaaaaaaaa {$TEST} bbbbbbbbbbbb {$TEST}',
-				'state' => 0,
-				'error' => '',
-				'key_expanded' => 'test_test_test',
-				'name_expanded' => 'TEST'
-			],
-			29164 => [
-				'itemid' => 29164,
-				'type' => 0,
-				'hostid' => 10084,
-				'name' => 'TEST2',
-				'key_' => 'test_test_test2',
-				'delay' => '1m',
-				'history' => '90d',
-				'trends' => '365d',
-				'status' => 0,
-				'value_type' => 3,
-				'units' => '',
-				'valuemapid' => 0,
-				'description' => 'aaaaaaaaaaa',
-				'state' => 0,
-				'error' => '',
-				'key_expanded' => 'test_test_test2',
-				'name_expanded' => 'TEST2'
-			]
-		];
 
-		$_items = [
-			30896 => [
-				'itemid' => 30896,
-				'type' => 0,
-				'hostid' => 10084,
-				'name' => 'TEST',
-				'key_' => 'test_test_test',
-				'delay' => '1m',
-				'history' => '90d',
-				'trends' => '365d',
-				'status' => 0,
-				'value_type' => 3,
-				'units' => '',
-				'valuemapid' => 0,
-				'description' => 'aaaaaaaaaaa test123 bbbbbbbbbbbb test123',
-				'state' => 0,
-				'error' => '',
-				'key_expanded' => 'test_test_test',
-				'name_expanded' => 'TEST'
-			],
-			29164 => [
-				'itemid' => 29164,
-				'type' => 0,
-				'hostid' => 10084,
-				'name' => 'TEST2',
-				'key_' => 'test_test_test2',
-				'delay' => '1m',
-				'history' => '90d',
-				'trends' => '365d',
-				'status' => 0,
-				'value_type' => 3,
-				'units' => '',
-				'valuemapid' => 0,
-				'description' => 'aaaaaaaaaaa',
-				'state' => 0,
-				'error' => '',
-				'key_expanded' => 'test_test_test2',
-				'name_expanded' => 'TEST2'
-			]
-		];
-
-		$test = [
+	public function setUp() {
+		$get_user_macros = [
 			30896 => [
 				'hostids' => [
 					0 => 10084
@@ -101,11 +39,65 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 
 		/** @var $stub CMacrosResolver */
 		$stub = $this->createMock(CMacrosResolver::class);
-		$stub->method('getUserMacros')
-			->willReturn($test);
+		$stub = $this->getMockBuilder(CMacrosResolver::class)
+			->setMethods(['getUserMacros'])
+			->getMock();
 
+		$stub->method('getUserMacros')
+			->willReturn($get_user_macros);
+	}
+
+	public function dataProviderInput() {
+		return [
+			[
+				'item' => [
+					30896 => [
+						'itemid' => 30896,
+						'hostid' => 10084,
+						'name' => 'TEST',
+						'key_' => 'test_test_test',
+						'description' => 'aaaaaaaaaaa {$TEST} bbbbbbbbbbbb {$TEST}'
+					]
+				],
+				'expected_item' => [
+					30896 => [
+						'itemid' => 30896,
+						'hostid' => 10084,
+						'name' => 'TEST',
+						'key_' => 'test_test_test',
+						'description' => 'aaaaaaaaaaa test123 bbbbbbbbbbbb test123'
+					]
+				]
+			],
+			[
+				'item' => [
+					29164 => [
+						'itemid' => 29164,
+						'hostid' => 10084,
+						'name' => 'TEST2',
+						'key_' => 'test_test_test2',
+						'description' => 'aaaaaaaaaaa'
+					]
+				],
+				'expected_item' => [
+					29164 => [
+						'itemid' => 29164,
+						'hostid' => 10084,
+						'name' => 'TEST2',
+						'key_' => 'test_test_test2',
+						'description' => 'aaaaaaaaaaa'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderInput
+	 */
+	public function testResolveItemDescriptions($items, $expected_items) {
 		$resolved = $stub->resolveItemDescriptions($items);
 
-		$this->assertEquals($resolved, $_items);
+		$this->assertEquals($resolved, $expected_items);
 	}
 }
