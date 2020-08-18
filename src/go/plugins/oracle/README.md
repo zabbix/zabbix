@@ -87,6 +87,8 @@ The correct way is:
   
     oracle.ping[tcp://127.0.0.1,user,password,XE]
 
+Note: lowercase user names are not supported.
+
 #### Using named sessions
 Named sessions allow you to define specific parameters for each Oracle instance. Currently, there are only four supported
 parameters: Uri, User, Password and Service. It's a bit more secure way to store credentials compared to 
@@ -184,7 +186,8 @@ duration (optional) — capturing interval (in seconds) of system metric values.
 
 **oracle.user.info[\<commonParams\>[,username]]** — Returns user information.  
 *Parameters:*  
-username (optional) — a username for which the information is needed. Default: current user.        
+username (optional) — a username for which the information is needed. Lowercase user names are not supported.
+Default: current user.        
 
 ## Custom queries
 It's possible to extend functionality of the plugin using user-defined queries. To do that you should place all your
