@@ -1673,11 +1673,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in item description.
 	 *
-	 * @param  array   $items
-	 * @param  string  $items[n]['hostid']
-	 * @param  string  $items[n]['description']
+	 * @param array  $items
+	 * @param string $items[n]['hostid']
+	 * @param string $items[n]['description']
 	 *
-	 * @return array   $items
+	 * @return array
 	 */
 	public function resolveItemDescriptions(array $items): array {
 		$types = ['usermacros' => true];
