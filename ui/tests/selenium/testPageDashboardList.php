@@ -202,13 +202,13 @@ class testPageDashboardList extends CWebTest {
 
 	public function testPageDashboardList_DeleteSingleDashboard() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
-		$dash_name = 'Dashboard for Share testing';
+		$dashboard_name = 'Dashboard for Share testing';
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Delete single Dashboard.
 		$before_rows_count = $table->getRows()->count();
 		$this->assertRowCount($before_rows_count);
-		$table->query('xpath://a[text()="'.$dash_name.'"]/ancestor::td/preceding-sibling::td/input')
+		$table->query('xpath://a[text()="'.$dashboard_name.'"]/ancestor::td/preceding-sibling::td/input')
 				->asCheckbox()->one()->check();
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
@@ -218,7 +218,7 @@ class testPageDashboardList extends CWebTest {
 		$this->assertRowCount($after_rows_count);
 
 		// Check database.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE name='.zbx_dbstr($dash_name)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE name='.zbx_dbstr($dashboard_name)));
 	}
 
 	public function testPageDashboardList_DeleteAllDashboards() {
