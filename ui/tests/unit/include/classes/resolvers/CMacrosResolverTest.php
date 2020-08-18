@@ -21,6 +21,8 @@
 
 class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 
+	private $stub;
+
 	public function setUp() {
 		$get_user_macros = [
 			30896 => [
@@ -42,12 +44,11 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 		];
 
 		/** @var $stub CMacrosResolver */
-		$stub = $this->createMock(CMacrosResolver::class);
-		$stub = $this->getMockBuilder(CMacrosResolver::class)
+		$this->stub = $this->getMockBuilder(CMacrosResolver::class)
 			->setMethods(['getUserMacros'])
 			->getMock();
 
-		$stub->method('getUserMacros')
+		$this->stub->method('getUserMacros')
 			->willReturn($get_user_macros);
 	}
 
@@ -100,7 +101,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider dataProviderInput
 	 */
 	public function testResolveItemDescriptions($items, $expected_items) {
-		$resolved = $stub->resolveItemDescriptions($items);
+		$resolved = $this->stub->resolveItemDescriptions($items);
 
 		$this->assertEquals($resolved, $expected_items);
 	}
