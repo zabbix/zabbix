@@ -5,15 +5,16 @@ This guide describes how to integrate your Zabbix installation with TOPdesk usin
 
 ## In TOPdesk
 
-1\. Create an **application password** according by original instruction https://developers.topdesk.com/tutorial.html#show-collapse-usage-createAppPassword, please.
+1\. Please create an **application password** according to the original instruction https://developers.topdesk.com/tutorial.html#show-collapse-usage-createAppPassword.
 
 2\. Copy the **application password** of your new integration to use it in Zabbix.
 
 ## In Zabbix
 
-The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to TOPdesk through the TOPdesk Rest API. To utilize the media type, we will create a Zabbix user to represent TOPdesk. We will then create an alert action to notify the user via this media type whenever there is a problem detected.
+The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to TOPdesk through the TOPdesk Rest API. To utilize the media type, create a Zabbix user to represent TOPdesk. 
+When configuring alert action, add this user in the _Send to users_ field (in Operation details) - this will tell Zabbix to use TOPdesk webhook when sending notifications from this action.
 
-## Create Global Macro
+## Create a global macro
 
 1\. Go to the **Administration** tab.
 
@@ -72,7 +73,7 @@ For more information about the Zabbix Webhook configuration, please see the [doc
 
 7\. Click the **Add** button at the bottom of the user page to save the user.
 
-8\. Use the TOPdesk User in any actions of your choice. Text from "Action Operations" will be sent to "TOPdesk First Line Call Request" field when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "TOPdesk First Line Call Action" field when the problem is resolved or updated.
+8\. Use the TOPdesk User in any action of your choice. Text from "Action Operations" will be sent to "TOPdesk First Line Call Request" field when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "TOPdesk First Line Call Action" field when the problem is resolved or updated.
 
 ## Internal alerts
 To receive notifications about internal problem and recovery events in TOPdesk: in the internal action configuration mark the Custom message checkbox and specify custom message templates for problem and recovery operations. 
