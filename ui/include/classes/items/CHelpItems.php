@@ -81,6 +81,10 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
+					'key' => 'modbus.get[<endpoint>,<slaveid>,<function>,<address>,<count>,<type>,<endianess>,<offset>]',
+					'description' => _('Reads modbus data. Returns various types')
+				],
+				[
 					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 					'description' => _('Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up')
 				],
@@ -397,6 +401,10 @@ class CHelpItems {
 				[
 					'key' => 'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>]',
 					'description' => _('Count of matched lines in log file monitoring with log rotation support. Returns integer')
+				],
+				[
+					'key' => 'modbus.get[<endpoint>,<slaveid>,<function>,<address>,<count>,<type>,<endianess>,<offset>]',
+					'description' => _('Reads modbus data. Returns various types')
 				],
 				[
 					'key' => 'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
