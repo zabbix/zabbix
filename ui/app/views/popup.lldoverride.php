@@ -157,7 +157,7 @@ $filter_table->setFooter(new CCol(
 $overrides_popup_form_list->addRow(_('Filters'),
 	(new CDiv([$override_evaltype, $filter_table]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;width: 100%;')
 );
 
 // operations
