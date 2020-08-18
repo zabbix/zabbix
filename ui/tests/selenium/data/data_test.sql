@@ -2287,6 +2287,8 @@ INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, wid
 
 -- Dashboard for sharing testing
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (121, 'Dashboard for Share testing', 9, 0);
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (122, 'Dashboard for Admin share testing', 1, 1);
+INSERT INTO dashboard_user (dashboard_userid, dashboardid, userid, permission) VALUES (1, 122, 9, 2);
 
 -- Dashboard for graph widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (103, 'Dashboard for graph widgets', 1, 1);

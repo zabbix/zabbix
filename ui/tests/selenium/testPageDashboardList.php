@@ -23,11 +23,7 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
- * @backup dashboard
- *
- * @backup dashboard_user
- *
- * @backup dashboard_usrgrp
+ * @backup dashboard, dashboard_user, dashboard_usrgrp
  */
 class testPageDashboardList extends CWebTest {
 
@@ -64,9 +60,8 @@ class testPageDashboardList extends CWebTest {
 		};
 
 		// Check filter buttons.
-		$form = $this->query('name:zbx_filter')->one()->asForm();
 		foreach (['Apply', 'Reset'] as $button) {
-			$this->assertTrue($form->query('button', $button)->one()->isPresent());
+			$this->assertTrue($filter_form->query('button', $button)->one()->isPresent());
 		}
 
 		// Check dashboard list button.
@@ -83,17 +78,9 @@ class testPageDashboardList extends CWebTest {
 			[
 				[
 					'field' => [
-						'Name' => 'Problem'
-					],
-					'result_count' => 2
-				]
-			],
-			[
-				[
-					'field' => [
 						'Show' => 'All'
 					],
-					'result_count' => 13
+					'result_count' => 14
 				]
 			],
 			[
@@ -101,7 +88,7 @@ class testPageDashboardList extends CWebTest {
 					'field' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 12
+					'result_count' => 13
 				]
 			],
 			[
@@ -133,7 +120,7 @@ class testPageDashboardList extends CWebTest {
 			[
 				[
 					'field' => [
-						'Name' => 'Dashboard for Share testing'
+						'Name' => 'Dashboard for Dynamic item'
 					],
 					'result_count' => 1
 				]
@@ -172,15 +159,15 @@ class testPageDashboardList extends CWebTest {
 	}
 
 	/**
-	 * Check that My and Sharing tags displays corectly in Dashboard Lists.
+	 * Check that My and Sharing tags displays corectly in Dashboard Lists for Admin.
 	 */
 	public function testPageDashboardList_CheckOwners() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$dashboards = CDBHelper::getAll('SELECT name, userid, private, dashboardid FROM dashboard');
-		$dashboard_usrgrp = CDBHelper::getAll('SELECT dashboardid FROM dashboard_usrgrp');
-		$dashboard_users = CDBHelper::getAll('SELECT dashboardid FROM dashboard_user');
+		$dashboards_usrgrps = CDBHelper::getAll('SELECT dashboardid, usrgrpid FROM dashboard_usrgrp');
+		$dashboards_users = CDBHelper::getAll('SELECT dashboardid FROM dashboard_user');
 
 		// Checking that dashboard, owned by Admin, has My tag near its name.
 		$dash_owner = [];
@@ -190,38 +177,22 @@ class testPageDashboardList extends CWebTest {
 				$this->assertEquals('My', $table->query('xpath://a[text()="'.$dashboard['name'].'"]'
 					. '/following-sibling::div/span[@class="tag green-bg"]')->one()->getText());
 			}
-		}
-
-		// Checking that dashboard with status Public, has Shared tag near its name.
-		$dash_private = [];
-		foreach ($dashboards as $dashboard) {
-			$dash_private[$dashboard['name']] = $dashboard['private'];
-			if ($dashboard['private'] == 0) {
+			if ($dashboard['private'] == 0 && $dashboard['userid'] == 1) {
 				$this->assertEquals('Shared', $table->query('xpath://a[text()="'.$dashboard['name'].'"]'
 					. '/following-sibling::div/span[@class="tag yellow-bg"]')->one()->getText());
 			}
-		}
 
-		// Checking that dashboard that shared with any group, has Shared tag near its name.
-		$group_dashboardids = array_column($dashboard_usrgrp, 'dashboardid');
-		$dash_group = [];
-		foreach ($dashboards as $dashboard) {
-			$dash_group[$dashboard['name']] = $dashboard['dashboardid'];
-			foreach ($group_dashboardids as $group_dashid) {
-				if ($group_dashid == $dashboard['dashboardid']) {
+			// Checking that Admin dashboards, shared with groups, has Shared tag	.
+			foreach ($dashboards_usrgrps as $dashboard_usrgrp) {
+				if ($dashboard_usrgrp['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1) {
 					$this->assertEquals('Shared', $table->query('xpath://a[text()="'.$dashboard['name'].'"]'
 					. '/following-sibling::div/span[@class="tag yellow-bg"]')->one()->getText());
 				}
 			}
-		}
 
-		// Checking that dashboard that shared with any user, has Shared tag near its name.
-		$user_dashboardids = array_column($dashboard_users, 'dashboardid');
-		$dash_users = [];
-		foreach ($dashboards as $dashboard) {
-			$dash_users[$dashboard['name']] = $dashboard['dashboardid'];
-			foreach ($user_dashboardids as $user_dashid) {
-				if ($user_dashid == $dashboard['dashboardid']) {
+			// Checking that Admin dashboards, shared with users, has Shared tag.
+			foreach ($dashboards_users as $dashboard_user) {
+				if ($dashboard_user['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1 ) {
 					$this->assertEquals('Shared', $table->query('xpath://a[text()="'.$dashboard['name'].'"]'
 					. '/following-sibling::div/span[@class="tag yellow-bg"]')->one()->getText());
 				}
