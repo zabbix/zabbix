@@ -415,4 +415,182 @@ class testFormHostMacros extends testFormMacros {
 	public function testFormHostMacros_ChangeRemoveInheritedMacro() {
 		$this->checkChangeRemoveInheritedMacro('hosts', 'host');
 	}
+
+	public function getSecretMacrosLayoutData() {
+		return [
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text'
+				]
+			],
+			[
+				[
+					'macro' => '{$SECRET_HOST_MACRO}',
+					'type' => 'Secret text',
+					'chenge_type' => true
+				]
+			],
+			[
+				[
+					'macro' => '{$TEXT_HOST_MACRO}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_TEXT_2_SECRET}',
+					'type' => 'Text'
+				]
+			],
+			[
+				[
+					'global' => true,
+					'macro' => '{$X_SECRET_2_SECRET}',
+					'type' => 'Secret text'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getSecretMacrosLayoutData
+	 */
+	public function testFormHostMacros_CheckSecretMacrosLayout($data) {
+		$this->checkSecretMacrosLayout($data, 'hosts.php?form=update&hostid=99011', 'hosts');
+	}
+
+	public function getCreateSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'action' => USER_ACTION_UPDATE,
+						'index' => 0,
+						'macro' => '{$SECRET_MACRO}',
+						'value' => [
+							'text' => 'host secret value',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret description'
+					],
+					'check_default_type' => true
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$TEXT_MACRO}',
+						'value' => [
+							'text' => 'host plain text value',
+							'type' => 'Secret text'
+						],
+						'description' => 'plain text description'
+					],
+					'back_to_text' => true
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$SECRET_EMPTY_MACRO}',
+						'value' => [
+							'text' => '',
+							'type' => 'Secret text'
+						],
+						'description' => 'secret empty value'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateSecretMacrosData
+	 */
+	public function testFormHostMacros_CreateSecretMacros($data) {
+		$this->createSecretMacros($data, 'hosts.php?form=update&hostid=99134', 'hosts');
+	}
+
+	public function getRevertSecretMacrosData() {
+		return [
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$SECRET_HOST_MACRO_REVERT}',
+						'value' => 'Secret host value'
+					]
+				]
+			],
+			[
+				[
+					'macro_fields' => [
+						'macro' => '{$SECRET_HOST_MACRO_2_TEXT_REVERT}',
+						'value' => 'Secret host value 2'
+					],
+					'set_to_text' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getRevertSecretMacrosData
+	 */
+	public function testFormHostMacros_RevertSecretMacroChanges($data) {
+		$this->revertSecretMacroChanges($data, 'hosts.php?form=update&hostid=99135', 'hosts');
+	}
+
+	public function getUpdateSecretMacrosData() {
+		return [
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 2,
+					'macro' => '{$SECRET_HOST_MACRO_UPDATE}',
+					'value' => [
+						'text' => 'Updated secret value'
+					]
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 3,
+					'macro' => '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}',
+					'value' => [
+						'text' => 'New text value',
+						'type' => 'Text'
+					]
+				]
+			],
+			[
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 4,
+					'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
+					'value' => [
+						'text' => 'New secret value',
+						'type' => 'Secret text'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateSecretMacrosData
+	 */
+	public function testFormHostMacros_UpdateSecretMacros($data) {
+		$this->updateSecretMacros($data, 'hosts.php?form=update&hostid=99135', 'hosts');
+	}
+
+	public function testFormHostMacros_ResolveSecretMacro() {
+		$macro = [
+			'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
+			'value' => 'Value 2 B resolved'
+		];
+		$this->resolveSecretMacro($macro, 'hosts.php?form=update&hostid=99135', 'hosts', 'host');
+	}
 }
