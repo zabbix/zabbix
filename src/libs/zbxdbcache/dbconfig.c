@@ -938,13 +938,16 @@ static zbx_dc_kv_t	*config_kvs_path_add(const char *path, const char *key)
 	return kv;
 }
 
-static void	config_kvs_path_remove(const char *path, zbx_dc_kv_t *kv)
+static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 {
 	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
 	int			i;
+	char			*path = NULL, *key = NULL;
 
 	if (0 != --kv->refcount)
 		return;
+
+	parse_vault_macro_value(value, &path, &key);
 
 	zbx_strpool_release(kv->key);
 	if (NULL != kv->value)
@@ -955,7 +958,7 @@ static void	config_kvs_path_remove(const char *path, zbx_dc_kv_t *kv)
 	if (FAIL == (i = zbx_vector_ptr_search(&config->kvs_paths, &kvs_path_local, dc_compare_kvs_path)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return;
+		goto clean;
 	}
 	kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
 
@@ -963,6 +966,9 @@ static void	config_kvs_path_remove(const char *path, zbx_dc_kv_t *kv)
 
 	if (0 == kvs_path->kvs.num_data)
 		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
+clean:
+	zbx_free(key);
+	zbx_free(path);
 }
 
 /******************************************************************************
@@ -1959,15 +1965,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 		}
 
 		if (0 != found && NULL != gmacro->kv)
-		{
-			char	*path_old = NULL, *key_old = NULL;
-			parse_vault_macro_value(gmacro->value, &path_old, &key_old);
-
-			config_kvs_path_remove(path_old, gmacro->kv);
-
-			zbx_free(key_old);
-			zbx_free(path_old);
-		}
+			config_kvs_path_remove(gmacro->value, gmacro->kv);
 
 		if (ZBX_MACRO_VALUE_VAULT == type)
 			gmacro->kv = config_kvs_path_add(path, key);
@@ -2011,10 +2009,7 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			continue;
 
 		if (NULL != gmacro->kv)
-		{
-			parse_vault_macro_value(gmacro->value, &path, &key);
-			config_kvs_path_remove(path, gmacro->kv);
-		}
+			config_kvs_path_remove(gmacro->value, gmacro->kv);
 
 		gmacro_m = config_gmacro_remove_index(&config->gmacros_m, gmacro);
 		zbx_vector_ptr_append(&indexes, gmacro_m);
