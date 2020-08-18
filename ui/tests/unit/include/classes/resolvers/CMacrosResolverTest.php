@@ -24,21 +24,13 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 	private $stub;
 
 	public function setUp() {
-		$get_user_macros = [
+		$user_macros = [
 			30896 => [
 				'hostids' => [
 					0 => 10084
 				],
 				'macros' => [
 					'{$TEST}' => 'test123'
-				]
-			],
-			29164 => [
-				'hostids' => [
-					0 => 10084
-				],
-				'macros' => [
-					'{$UNKNOWN_MACRO}' => '{$UNKNOWN_MACRO}'
 				]
 			]
 		];
@@ -49,7 +41,7 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 			->getMock();
 
 		$this->stub->method('getUserMacros')
-			->willReturn($get_user_macros);
+			->willReturn($user_macros);
 	}
 
 	public function dataProviderInput() {
@@ -71,15 +63,15 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				29164 => [
-					'itemid' => 29164,
+				30896 => [
+					'itemid' => 30896,
 					'hostid' => 10084,
 					'name' => 'TEST2',
 					'key_' => 'test_test_test2',
 					'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
 				],
-				29164 => [
-					'itemid' => 29164,
+				30896 => [
+					'itemid' => 30896,
 					'hostid' => 10084,
 					'name' => 'TEST2',
 					'key_' => 'test_test_test2',
@@ -87,7 +79,6 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 				]
 			]
 		];
-
 	}
 
 	/**
