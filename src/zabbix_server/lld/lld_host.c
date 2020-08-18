@@ -2250,7 +2250,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				upd_interfaces++;
 			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
 				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
-			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
+
+			if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_REMOVE))
 				zbx_vector_uint64_append(&del_snmp_ids, interface->interfaceid);
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
@@ -3291,11 +3292,16 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 				snmp->flags = 0x00;
 				new_interface->data.snmp = snmp;
 
-				substitute_lld_macros(&snmp->community, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-				substitute_lld_macros(&snmp->securityname, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-				substitute_lld_macros(&snmp->authpassphrase, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-				substitute_lld_macros(&snmp->privpassphrase, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-				substitute_lld_macros(&snmp->contextname, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+				substitute_lld_macros(&snmp->community, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
+				substitute_lld_macros(&snmp->securityname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
+				substitute_lld_macros(&snmp->authpassphrase, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
+				substitute_lld_macros(&snmp->privpassphrase, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
+				substitute_lld_macros(&snmp->contextname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+						NULL, 0);
 			}
 			else
 				new_interface->data.snmp = NULL;

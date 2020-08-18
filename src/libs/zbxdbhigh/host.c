@@ -3570,7 +3570,7 @@ static int	DBhost_prototypes_macro_make(zbx_vector_macros_t *hostmacros, zbx_uin
  *                                                                            *
  * Function: DBhost_prototypes_interface_make                                 *
  *                                                                            *
- * Purpose: validate host interfaces value changes                            *
+ * Purpose: fill empty value in interfaces with input parameters              *
  *                                                                            *
  * Parameters: interfaces     - [IN/OUT] list of host interfaces              *
  *             interfaceid    - [IN] interface id                             *
@@ -3803,6 +3803,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
  *                                                                            *
  * Function: DBhost_prototypes_interfaces_make                                *
  *                                                                            *
+ * Purpose: prepare interfaces to be added, updated or removed from DB        *
  * Parameters: host_prototypes       - [IN/OUT] list of host prototypes       *
  *                                         should be sorted by templateid     *
  *             del_interfaceids      - [OUT] sorted list of host interface    *
@@ -3822,7 +3823,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t		hostids;
-	zbx_uint64_t			hostid, interfaceid;
+	zbx_uint64_t			hostid;
 	zbx_host_prototype_t		*host_prototype;
 	zbx_interfaces_prototype_t	*interface;
 	int				i;
@@ -3910,6 +3911,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 	{
 		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
+		/* host prototype is not saved yet */
 		if (0 == host_prototype->hostid)
 			continue;
 
@@ -3945,6 +3947,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 				if (host_prototype->hostid == hostid)
 				{
 					unsigned char	type;
+					uint64_t	interfaceid;
 
 					ZBX_STR2UINT64(interfaceid, row[0]);
 					ZBX_STR2UINT64(type, row[3]);
@@ -3993,6 +3996,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 				}
 			}
 
+			/* no interfaces found for this host prototype, but there must be at least one */
 			if (i == host_prototypes->values_num)
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -4013,7 +4017,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
  * Purpose: prepare sql for update record of interface_snmp table             *
  *                                                                            *
  * Parameters: interfaceid - [IN] snmp interface id;                          *
- *             snmp        - [IN] snmp values for update                      *
+ *             snmp        - [IN] snmp interface prototypes for update        *
  *             sql         - [IN/OUT] sql string                              *
  *             sql_alloc   - [IN/OUT] size of sql string                      *
  *             sql_offset  - [IN/OUT] offset in sql string                    *
@@ -4103,8 +4107,14 @@ static void	DBhost_prototypes_interface_snmp_prepare_sql(const zbx_uint64_t inte
  *                                                                            *
  * Function: DBhost_prototypes_save                                           *
  *                                                                            *
- * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
+ * Purpose: auxiliary function for DBcopy_template_host_prototypes()          *
  *                                                                            *
+ * Parameters: host_prototypes      - [IN] vector of host prototypes          *
+ *             del_hosttemplateids  - [IN] host template ids for delate       *
+ *             del_hostmacroids     - [IN] host macro ids fordelete           *
+ *             del_interfaceids     - [IN] interface ids for delete           *
+ *             del_snmpids          - [IN] SNMP interface ids for delete      *
+ *                                                                            *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_hosttemplateids,
 		zbx_vector_uint64_t *del_hostmacroids, zbx_vector_uint64_t *del_interfaceids,
