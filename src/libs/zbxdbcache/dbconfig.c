@@ -9837,7 +9837,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t hostid)
 	char	*resolved_text;
 
 	RDLOCK_CACHE;
-	resolved_params = dc_expand_user_macros(text, &hostid, 1);
+	resolved_text = dc_expand_user_macros(text, &hostid, 1);
 	UNLOCK_CACHE;
 
 	return resolved_text;
