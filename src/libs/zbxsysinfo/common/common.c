@@ -92,6 +92,8 @@ ZBX_METRIC	parameters_common[] =
 
 	{"zabbix.stats",	CF_HAVEPARAMS,	ZABBIX_STATS,		"127.0.0.1,10051"},
 
+	{"modbus.get",		CF_HAVEPARAMS,	MODBUS_GET,		"tcp://127.0.0.1"},
+
 	{NULL}
 };
 

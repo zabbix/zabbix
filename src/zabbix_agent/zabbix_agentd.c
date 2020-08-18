@@ -295,6 +295,8 @@ char	*opt = NULL;
 void	zbx_co_uninitialize();
 #endif
 
+zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 void	zbx_free_service_resources(int ret);
 
@@ -1041,6 +1043,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			exit(EXIT_FAILURE);
 		}
 	}
+
+	if (SUCCEED != zbx_mutex_create(&modbus_lock, ZBX_MUTEX_MODBUS, &error))
+		exit(EXIT_FAILURE);
 
 	if (SUCCEED != init_collector_data(&error))
 	{
