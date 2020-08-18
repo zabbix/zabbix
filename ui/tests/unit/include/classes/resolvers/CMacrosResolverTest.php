@@ -47,35 +47,43 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 	public function dataProviderInput() {
 		return [
 			[
-				30896 => [
-					'itemid' => 30896,
-					'hostid' => 10084,
-					'name' => 'TEST',
-					'key_' => 'test_test_test',
-					'description' => 'aaaaaaaaaaa {$TEST} bbbbbbbbbbbb {$TEST}'
+				'item' => [
+					30896 => [
+						'itemid' => 30896,
+						'hostid' => 10084,
+						'name' => 'TEST',
+						'key_' => 'test_test_test',
+						'description' => 'aaaaaaaaaaa {$TEST} bbbbbbbbbbbb {$TEST}'
+					]
 				],
-				30896 => [
-					'itemid' => 30896,
-					'hostid' => 10084,
-					'name' => 'TEST',
-					'key_' => 'test_test_test',
-					'description' => 'aaaaaaaaaaa test123 bbbbbbbbbbbb test123'
+				'expected_item' => [
+					30896 => [
+						'itemid' => 30896,
+						'hostid' => 10084,
+						'name' => 'TEST',
+						'key_' => 'test_test_test',
+						'description' => 'aaaaaaaaaaa test123 bbbbbbbbbbbb test123'
+					]
 				]
 			],
 			[
-				30896 => [
-					'itemid' => 30896,
-					'hostid' => 10084,
-					'name' => 'TEST2',
-					'key_' => 'test_test_test2',
-					'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
+				'item' => [
+					30896 => [
+						'itemid' => 30896,
+						'hostid' => 10084,
+						'name' => 'TEST2',
+						'key_' => 'test_test_test2',
+						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
+					]
 				],
-				30896 => [
-					'itemid' => 30896,
-					'hostid' => 10084,
-					'name' => 'TEST2',
-					'key_' => 'test_test_test2',
-					'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
+				'expected_item' => [
+					30896 => [
+						'itemid' => 30896,
+						'hostid' => 10084,
+						'name' => 'TEST2',
+						'key_' => 'test_test_test2',
+						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
+					]
 				]
 			]
 		];
@@ -84,9 +92,9 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider dataProviderInput
 	 */
-	public function testResolveItemDescriptions($items, $expected_items) {
-		$resolved = $this->stub->resolveItemDescriptions($items);
+	public function testResolveItemDescriptions($item, $expected_item) {
+		$resolved = $this->stub->resolveItemDescriptions($item);
 
-		$this->assertEquals($resolved, $expected_items);
+		$this->assertEquals($resolved, $expected_item);
 	}
 }
