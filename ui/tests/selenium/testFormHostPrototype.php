@@ -68,8 +68,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
 		// Compare host prototype's macros from DB and frontend.
-		$expected_macros = CDBHelper::getAll('SELECT macro, value, description '
-			. 'FROM hostmacro WHERE hostid ='.self::HOST_PROTOTYPE_ID);
+		$expected_macros = CDBHelper::getAll(
+			'SELECT macro,value,description FROM hostmacro WHERE hostid='.self::HOST_PROTOTYPE_ID.' ORDER BY macro'
+		);
 		$this->assertEquals($expected_macros, $this->getMacros());
 
 		// Check global macros.
@@ -478,6 +479,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('macros', $data)) {
 			$this->zbxTestTabSwitch('Macros');
+			$this->page->waitUntilReady();
 			$this->fillMacros($data['macros']);
 		}
 

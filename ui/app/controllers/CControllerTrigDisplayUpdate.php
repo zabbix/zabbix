@@ -56,7 +56,7 @@ class CControllerTrigDisplayUpdate extends CController {
 			);
 
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update configuration'));
+			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 
 			$this->setResponse($response);
 		}
@@ -105,10 +105,10 @@ class CControllerTrigDisplayUpdate extends CController {
 		);
 
 		if ($result) {
-			$response->setMessageOk(_('Configuration updated'));
+			CMessageHelper::setSuccessTitle(_('Configuration updated'));
 		}
 		else {
-			$response->setMessageError(_('Cannot update configuration'));
+			CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 			$response->setFormData($this->getInputAll());
 		}
 

@@ -72,10 +72,10 @@ class CControllerApplicationDisable extends CController {
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('Item disabled', 'Items disabled', $updated));
+			CMessageHelper::setSuccessTitle(_n('Item disabled', 'Items disabled', $updated));
 		}
 		else {
-			$response->setMessageError(_n('Cannot disable item', 'Cannot disable items', $updated));
+			CMessageHelper::setErrorTitle(_n('Cannot disable item', 'Cannot disable items', $updated));
 		}
 
 		$this->setResponse($response);

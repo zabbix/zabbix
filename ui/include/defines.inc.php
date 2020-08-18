@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'5.2.0alpha1');
 define('ZABBIX_API_VERSION',	'5.2.0');
 define('ZABBIX_EXPORT_VERSION',	'5.2');
-define('ZABBIX_DB_VERSION',		5010023);
+define('ZABBIX_DB_VERSION',		5010024);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2020');
@@ -29,7 +29,7 @@ define('ZABBIX_COPYRIGHT_TO',	'2020');
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
 
-define('ZBX_SESSION_NAME', 'zbx_sessionid'); // Session cookie name for Zabbix front-end.
+define('ZBX_SESSION_NAME', 'zbx_session'); // Session cookie name for Zabbix front-end.
 
 define('ZBX_KIBIBYTE',	'1024');
 define('ZBX_MEBIBYTE',	'1048576');
@@ -796,6 +796,8 @@ define('DASHBOARD_MAX_COLUMNS',		24);
 define('DASHBOARD_MAX_ROWS',		64);
 define('DASHBOARD_WIDGET_MIN_ROWS',	2);
 define('DASHBOARD_WIDGET_MAX_ROWS',	32);
+define('DASHBOARD_FILTER_SHOW_ALL',	0);
+define('DASHBOARD_FILTER_SHOW_MY',	1);
 
 // alignments
 define('HALIGN_DEFAULT',	0);
@@ -1819,6 +1821,7 @@ define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_WIDGET_URL', 'widget-url');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
+define('ZBX_STYLE_YELLOW_BG', 'yellow-bg');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
 define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
