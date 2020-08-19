@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-17 19:58+0300\n"
+"POT-Creation-Date: 2020-08-11 09:35+0300\n"
 "PO-Revision-Date: 2019-12-09 09:51+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -110,7 +110,7 @@ msgstr "%1$s (år %2$s)"
 msgid "%1$s - thrown by module located at %2$s."
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:109
+#: app/partials/monitoring.latest.view.html.php:133
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -644,7 +644,7 @@ msgstr "Aktiv til"
 #: app/views/popup.lldoverride.php:150 app/views/popup.lldoverride.php:174
 #: app/views/popup.lldoverride.php:192
 #: app/views/popup.maintenance.period.php:174 app/views/popup.media.php:52
-#: app/views/popup.media.php:116 app/views/popup.mediatype.message.php:92
+#: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:108 app/views/popup.triggerwizard.php:142
 #: include/classes/widgets/CWidgetHelper.php:483 include/forms.inc.php:1445
 #: include/forms.inc.php:1964 include/views/configuration.action.edit.php:131
@@ -848,7 +848,7 @@ msgid "Age less than %1$s"
 msgstr ""
 
 #: app/views/administration.script.list.php:87 app/views/popup.generic.php:610
-#: include/hosts.inc.php:1434 include/items.inc.php:345
+#: include/hosts.inc.php:1407 include/items.inc.php:345
 #: include/views/configuration.httpconf.edit.php:104
 #: include/views/js/configuration.host.edit.js.php:163
 msgid "Agent"
@@ -1111,8 +1111,8 @@ msgstr "Applikasjon med applikasjonsid \"%1$s\" eksisterer ikke."
 #: include/views/configuration.item.prototype.list.php:62
 #: include/views/configuration.item.prototype.massupdate.php:425
 #: include/views/configuration.template.edit.php:134
-#: include/views/configuration.template.list.php:150
-#: include/views/configuration.template.list.php:253
+#: include/views/configuration.template.list.php:151
+#: include/views/configuration.template.list.php:238
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:170
 msgid "Applications"
 msgstr "Applikasjoner"
@@ -1236,7 +1236,7 @@ msgstr ""
 msgid "At least one maintenance period must be created."
 msgstr "Minst en vedlikeholdsperiode må opprettes."
 
-#: include/classes/setup/CFrontendSetup.php:258
+#: include/classes/setup/CFrontendSetup.php:259
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr ""
 
@@ -1325,7 +1325,7 @@ msgstr ""
 msgid "Authentication method"
 msgstr "Autentiserings metode"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:305
+#: app/controllers/CControllerAuthenticationUpdate.php:315
 msgid "Authentication method changed"
 msgstr ""
 
@@ -1339,7 +1339,7 @@ msgstr "Autentisering passordfrase"
 msgid "Authentication protocol"
 msgstr "Autentiseringsprotokoll"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:304
+#: app/controllers/CControllerAuthenticationUpdate.php:314
 msgid "Authentication settings updated"
 msgstr ""
 
@@ -1369,7 +1369,7 @@ msgstr "Auto-avlogging"
 
 #: app/partials/popup.operations.php:341
 #: app/views/administration.miscconfig.edit.php:55
-#: app/views/popup.lldoperation.php:278 include/hosts.inc.php:1371
+#: app/views/popup.lldoperation.php:278 include/hosts.inc.php:1344
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.host.massupdate.php:206
 #: include/views/configuration.host.prototype.edit.php:322
@@ -1683,8 +1683,8 @@ msgstr "Kan ikke legge til korrelasjon"
 msgid "Cannot add correlation condition"
 msgstr "Kan ikke legge til korrelasjonsbetingelse"
 
-#: include/classes/api/services/CTrigger.php:963
-#: include/classes/api/services/CTriggerPrototype.php:791
+#: include/classes/api/services/CTrigger.php:958
+#: include/classes/api/services/CTriggerPrototype.php:784
 msgid "Cannot add dependency from a host to a template."
 msgstr "Kan ikke legge til avhengighet fra en vert til en mal."
 
@@ -1934,7 +1934,7 @@ msgstr[1] "Kan ikke kopiere utløsere"
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "Kan ikke kopiere utløseren \"%1$s:%2$s\", fordi den har flere verter i uttrykket."
 
-#: include/classes/api/services/CHostPrototype.php:256
+#: include/classes/api/services/CHostPrototype.php:252
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
 msgstr "Kan ikke opprette en vertsprototype på en oppdaget vert \"%1$s\"."
@@ -1943,16 +1943,16 @@ msgstr "Kan ikke opprette en vertsprototype på en oppdaget vert \"%1$s\"."
 msgid "Cannot create another database connection."
 msgstr "Kan ikke opprette en annen databaseforbindelse."
 
-#: include/classes/api/services/CTrigger.php:997
-#: include/classes/api/services/CTriggerPrototype.php:822
+#: include/classes/api/services/CTrigger.php:992
+#: include/classes/api/services/CTriggerPrototype.php:815
 msgid "Cannot create circular dependencies."
 msgstr "Kan ikke opprette sirkulære avhengigheter."
 
-#: include/classes/api/services/CTrigger.php:969
+#: include/classes/api/services/CTrigger.php:964
 msgid "Cannot create dependency on trigger itself."
 msgstr "Kan ikke opprette avhengighet av utløseren selv."
 
-#: include/classes/api/services/CTriggerPrototype.php:761
+#: include/classes/api/services/CTriggerPrototype.php:754
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "Kan ikke opprette avhengighet av selve utløserprototypen."
 
@@ -2006,8 +2006,8 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] "Kan ikke slette dashbordet"
 msgstr[1] "Kan ikke slette dashbordene"
 
-#: include/classes/api/services/CTrigger.php:867
-#: include/classes/api/services/CTriggerPrototype.php:588
+#: include/classes/api/services/CTrigger.php:862
+#: include/classes/api/services/CTriggerPrototype.php:581
 msgid "Cannot delete dependency"
 msgstr "Kan ikke slette avhengighet"
 
@@ -2046,11 +2046,11 @@ msgid_plural "Cannot delete groups"
 msgstr[0] "Kan ikke slette gruppen"
 msgstr[1] "Kan ikke slette gruppene"
 
-#: hosts.php:971 hosts.php:992
+#: hosts.php:959 hosts.php:980
 msgid "Cannot delete host"
 msgstr "Kan ikke slette verten"
 
-#: include/classes/api/services/CHost.php:1409
+#: include/classes/api/services/CHost.php:1424
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -2076,7 +2076,7 @@ msgstr "Kan ikke slette ikonet kart"
 msgid "Cannot delete image"
 msgstr "Kan ikke slette bilde"
 
-#: include/classes/api/services/CHost.php:1214
+#: include/classes/api/services/CHost.php:1211
 msgid "Cannot delete inventory."
 msgstr "Kan ikke slette beholdning."
 
@@ -2176,7 +2176,7 @@ msgstr ""
 msgid "Cannot delete templated graph."
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:1158
+#: include/classes/api/services/CHostPrototype.php:1154
 msgid "Cannot delete templated host prototype."
 msgstr "Kan ikke slette templated host prototype."
 
@@ -2192,12 +2192,12 @@ msgstr "Kan ikke slette templert element."
 msgid "Cannot delete templated items."
 msgstr "Kan ikke slette templerte elementer."
 
-#: include/classes/api/services/CTrigger.php:660
+#: include/classes/api/services/CTrigger.php:655
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Kan ikke slette templated trigger \"%1$s:%2$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:541
+#: include/classes/api/services/CTriggerPrototype.php:534
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
 msgstr ""
@@ -2263,8 +2263,8 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Kan ikke deaktivere oppdagelsesregel"
 msgstr[1] "Kan ikke deaktivere oppdagelsesregler"
 
-#: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:206
-#: hosts.php:1023
+#: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
+#: hosts.php:1012
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "Kan ikke deaktivere verten"
@@ -2327,8 +2327,8 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Kan ikke aktivere oppdagelsesregel"
 msgstr[1] "Kan ikke aktivere oppdagelsesregler"
 
-#: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:205
-#: hosts.php:1022
+#: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
+#: hosts.php:1011
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "Kan ikke aktivere vert"
@@ -2509,7 +2509,7 @@ msgstr "Kan ikke formatere treet. Kontroller logikkstrukturen i servicelinkene."
 msgid "Cannot format tree."
 msgstr "Kan ikke formatere tre."
 
-#: include/classes/api/services/CTemplate.php:901
+#: include/classes/api/services/CTemplate.php:914
 msgid "Cannot have empty visible template name."
 msgstr "Kan ikke ha tomt synlig malnavn."
 
@@ -2524,12 +2524,12 @@ msgstr[1] "Kan ikke importere mal \"%1$s\", koblete maler \"%2$s\" eksisterer ik
 msgid "Cannot insert trigger expression"
 msgstr "Kan ikke sette inn trigger-uttrykk"
 
-#: include/classes/api/services/CHost.php:1192
+#: include/classes/api/services/CHost.php:1189
 msgid "Cannot link template"
 msgstr "Kan ikke koble til mal"
 
-#: include/classes/api/services/CTemplate.php:988
-#: include/classes/api/services/CTemplate.php:1002
+#: include/classes/api/services/CTemplate.php:1001
+#: include/classes/api/services/CTemplate.php:1015
 msgid "Cannot link template."
 msgstr "Kan ikke koble til mal."
 
@@ -2545,19 +2545,19 @@ msgstr[1] ""
 msgid "Cannot logout."
 msgstr "Kan ikke logge ut."
 
-#: include/classes/api/services/CHost.php:1050
+#: include/classes/api/services/CHost.php:1055
 msgid "Cannot mass update host name."
 msgstr "Kan ikke masse oppdatere vertsnavn."
 
-#: include/classes/api/services/CTemplate.php:1126
+#: include/classes/api/services/CTemplate.php:1139
 msgid "Cannot mass update template name."
 msgstr "Kan ikke masseoppdatere malnavn."
 
-#: include/classes/api/services/CHost.php:1036
+#: include/classes/api/services/CHost.php:1041
 msgid "Cannot mass update visible host name."
 msgstr "Kan ikke masse oppdatere synlig vertsnavn."
 
-#: include/classes/api/services/CTemplate.php:1091
+#: include/classes/api/services/CTemplate.php:1104
 msgid "Cannot mass update visible template name."
 msgstr "Kan ikke masse oppdatere synlig malnavn."
 
@@ -2659,12 +2659,12 @@ msgstr "Kan ikke angi \"%1$s\" for elementet \"%2$s\"."
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Kan ikke angi \"%1$s\" for malskjermbildet \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:500
+#: include/classes/api/services/CTriggerGeneral.php:829
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
 msgstr "Kan ikke angi \"%1$s\" for utløseren \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:509
+#: include/classes/api/services/CTriggerGeneral.php:838
 #, c-format
 msgid "Cannot set \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "Kan ikke angi \"%1$s\" for utløserprototype \"%2$s\"."
@@ -2679,9 +2679,9 @@ msgstr "Kan ikke angi \"templateid\" -felt for applikasjonsprototype i prototype
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Kan ikke angi \"templateid\" for skjermbildet \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1101
-#: include/classes/api/services/CHost.php:2025
-#: include/classes/api/services/CHost.php:2171
+#: include/classes/api/services/CHost.php:1106
+#: include/classes/api/services/CHost.php:2052
+#: include/classes/api/services/CHost.php:2213
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Kan ikke angi lagerfelt for funksjonshemmede inventar."
 
@@ -2694,7 +2694,7 @@ msgstr "Kan ikke sette ressurs-ID for skjermelement."
 msgid "Cannot support notification audio for this device."
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:298
+#: include/classes/api/services/CHostInterface.php:296
 msgid "Cannot switch host for interface."
 msgstr "Kan ikke bytte vert for grensesnitt."
 
@@ -2717,12 +2717,12 @@ msgstr "Kan ikke oppheve og slette webscenarier."
 msgid "Cannot unlink and clear applications."
 msgstr "Kan ikke fjerne og fjerne programmer."
 
-#: include/classes/api/services/CHost.php:1167
+#: include/classes/api/services/CHost.php:1164
 msgid "Cannot unlink template"
 msgstr "Kan ikke koble fra mal"
 
-#: include/classes/api/services/CTemplate.php:953
-#: include/classes/api/services/CTemplate.php:976
+#: include/classes/api/services/CTemplate.php:966
+#: include/classes/api/services/CTemplate.php:989
 msgid "Cannot unlink template."
 msgstr "Kan ikke koble fra mal."
 
@@ -2752,27 +2752,27 @@ msgstr "Kan ikke oppdatere \"%1$s\" for graf prototype \"%2$s\"."
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
 msgstr "Kan ikke oppdatere \"%1$s\" for elementet \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:673
+#: include/classes/api/services/CTriggerGeneral.php:1002
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
 msgstr "Kan ikke oppdatere \"%1$s\" for templated trigger \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:682
+#: include/classes/api/services/CTriggerGeneral.php:1011
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Kan ikke oppdatere \"%1$s\" for templated trigger prototype \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:672
+#: include/classes/api/services/CTriggerGeneral.php:1001
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "Kan ikke oppdatere \"%1$s\" for utløser \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:681
+#: include/classes/api/services/CTriggerGeneral.php:1010
 #, c-format
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "Kan ikke oppdatere \"%1$s\" for utløserprototype \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:2148
+#: include/classes/api/services/CHost.php:2190
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere \"%2$s\" for en oppdaget vert \"%1$s\"."
@@ -2782,9 +2782,9 @@ msgstr "Kan ikke oppdatere \"%2$s\" for en oppdaget vert \"%1$s\"."
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
 msgstr "Kan ikke oppdatere \"%2$s\" for et oppdaget element \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:736
-#: include/classes/api/services/CTrigger.php:703
-#: include/classes/api/services/CTrigger.php:827
+#: include/classes/api/services/CTriggerGeneral.php:1065
+#: include/classes/api/services/CTrigger.php:698
+#: include/classes/api/services/CTrigger.php:822
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
 msgstr "Kan ikke oppdatere \"%2$s\" for en oppdaget utløser \"%1$s\"."
@@ -2825,7 +2825,7 @@ msgstr "Kan ikke oppdatere handling"
 msgid "Cannot update application"
 msgstr "Kan ikke oppdatere programmet"
 
-#: app/controllers/CControllerAuthenticationUpdate.php:309
+#: app/controllers/CControllerAuthenticationUpdate.php:319
 msgid "Cannot update authentication"
 msgstr ""
 
@@ -2888,7 +2888,7 @@ msgstr "Kan ikke oppdatere grupper for oppdaget vert \"%1$s\"."
 msgid "Cannot update host"
 msgstr "Kan ikke oppdatere verten"
 
-#: include/classes/api/services/CHost.php:998
+#: include/classes/api/services/CHost.php:1003
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr "Kan ikke oppdatere verts kryptering innstillinger. Tilkoblingsinnstillinger for begge retninger bør angis."
 
@@ -2912,7 +2912,7 @@ msgstr "Kan ikke oppdatere ikonkart"
 msgid "Cannot update image"
 msgstr "Kan ikke oppdatere bildet"
 
-#: include/classes/api/services/CHostInterface.php:377
+#: include/classes/api/services/CHostInterface.php:375
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere grensesnitt for oppdaget vert \"%1$s\"."
@@ -3008,8 +3008,8 @@ msgstr "Kan ikke oppdatere templiserte applikasjoner."
 msgid "Cannot update templates"
 msgstr ""
 
-#: include/classes/api/services/CTemplate.php:852
-#: include/classes/api/services/CTemplate.php:1187
+#: include/classes/api/services/CTemplate.php:865
+#: include/classes/api/services/CTemplate.php:1200
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Kan ikke oppdatere maler på oppdaget vert \"%1$s\"."
@@ -3019,7 +3019,7 @@ msgstr "Kan ikke oppdatere maler på oppdaget vert \"%1$s\"."
 msgid "Cannot update trigger"
 msgstr "Kan ikke oppdatere utløseren"
 
-#: include/classes/api/services/CTriggerGeneral.php:1654
+#: include/classes/api/services/CTriggerGeneral.php:1980
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
 msgstr "Kan ikke oppdatere utløseren \"%1$s\":%2$s."
@@ -3030,7 +3030,7 @@ msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "Kan ikke oppdatere utløserprototypen"
 msgstr[1] "Kan ikke oppdatere utløserprototyper"
 
-#: include/classes/api/services/CTriggerGeneral.php:1510
+#: include/classes/api/services/CTriggerGeneral.php:1836
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
 msgstr "Kan ikke oppdatere utløserprototypen \"%1$s\":%2$s."
@@ -3101,8 +3101,8 @@ msgstr ""
 msgid "Certificate"
 msgstr "Sertifikat"
 
-#: app/partials/monitoring.latest.view.html.php:55
-#: app/partials/monitoring.latest.view.html.php:69 include/items.inc.php:1755
+#: app/partials/monitoring.latest.view.html.php:65
+#: app/partials/monitoring.latest.view.html.php:80 include/items.inc.php:1755
 #: include/items.inc.php:1759
 msgctxt "noun"
 msgid "Change"
@@ -3562,7 +3562,7 @@ msgstr "Konfigurasjon av handlinger"
 msgid "Configuration of applications"
 msgstr "Konfigurasjon av applikasjoner"
 
-#: app/controllers/CControllerAuthenticationEdit.php:151
+#: app/controllers/CControllerAuthenticationEdit.php:155
 msgid "Configuration of authentication"
 msgstr ""
 
@@ -3722,7 +3722,7 @@ msgstr "Bekreftelsestekst"
 msgid "Congratulations! You have successfully installed Zabbix frontend."
 msgstr "Gratulerer! Du har installert Zabbix frontend."
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1466
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1439
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:719
 msgid "Connect to"
@@ -4282,15 +4282,12 @@ msgstr "DD.MM.ÅÅ"
 msgid "DES"
 msgstr "DES"
 
-#: app/views/administration.proxy.edit.php:54
 #: app/views/monitoring.host.view.php:127 app/views/search.php:32
 #: include/views/configuration.host.list.php:135
-#: include/views/inventory.host.view.php:93
-#: include/views/js/configuration.host.edit.js.php:55
 msgid "DNS"
 msgstr "DNS"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1461
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1434
 #: include/views/configuration.discovery.edit.php:106
 #: include/views/configuration.discovery.edit.php:119
 #: include/views/inventory.host.view.php:79
@@ -4363,8 +4360,8 @@ msgstr "Stiplede linje"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Data cachestatistikk. Cache - en av verdiene (moduser: alle, float, uint, str, logg, tekst), historie (modus: pfree, totalt, brukt, gratis), trend (moduser: pfree, totalt, brukt, gratis), tekst (moduser: pfree, totalt, brukt, gratis)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2213
-#: include/classes/graphdraw/CPieGraphDraw.php:770
+#: include/classes/graphdraw/CLineGraphDraw.php:2216
+#: include/classes/graphdraw/CPieGraphDraw.php:773
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Data fra %1$s. Generert i %2$s sek."
@@ -4502,7 +4499,7 @@ msgstr "Desember"
 
 #: app/views/administration.iconmap.edit.php:106
 #: include/classes/widgets/forms/CWidgetForm.php:49 include/hosts.inc.php:31
-#: include/hosts.inc.php:1476 include/views/configuration.action.edit.php:242
+#: include/hosts.inc.php:1449 include/views/configuration.action.edit.php:242
 #: include/views/inventory.host.view.php:79
 #: include/views/js/monitoring.sysmaps.js.php:142
 #: include/views/js/monitoring.sysmaps.js.php:243
@@ -4581,7 +4578,7 @@ msgstr "Forsinket av"
 #: include/views/configuration.correlation.list.php:132
 #: include/views/configuration.discovery.list.php:103
 #: include/views/configuration.graph.list.php:225
-#: include/views/configuration.host.discovery.list.php:293
+#: include/views/configuration.host.discovery.list.php:295
 #: include/views/configuration.hostgroups.list.php:169
 #: include/views/configuration.host.list.php:479
 #: include/views/configuration.host.prototype.list.php:178
@@ -4589,7 +4586,7 @@ msgstr "Forsinket av"
 #: include/views/configuration.item.list.php:262
 #: include/views/configuration.item.prototype.list.php:196
 #: include/views/configuration.maintenance.list.php:121
-#: include/views/configuration.template.list.php:324
+#: include/views/configuration.template.list.php:309
 #: include/views/configuration.trigger.prototype.list.php:188
 #: include/views/configuration.triggers.list.php:342
 #: include/views/monitoring.screen.list.php:134
@@ -4604,11 +4601,11 @@ msgid "Delete all elements that are not present in the XML file?"
 msgstr "Slett alle elementene som ikke er til stede i XML-filen?"
 
 #: include/views/configuration.template.edit.php:448
-#: include/views/configuration.template.list.php:325
+#: include/views/configuration.template.list.php:310
 msgid "Delete and clear"
 msgstr "Slett og fjern"
 
-#: include/views/configuration.template.list.php:326
+#: include/views/configuration.template.list.php:311
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Slett og fjern valgte maler? (Advarsel: alle tilknyttede verter blir ryddet!)"
 
@@ -4721,7 +4718,7 @@ msgid "Delete selected dashboards?"
 msgstr "Slett valgte dashboards?"
 
 #: include/views/configuration.discovery.list.php:103
-#: include/views/configuration.host.discovery.list.php:294
+#: include/views/configuration.host.discovery.list.php:296
 msgid "Delete selected discovery rules?"
 msgstr "Slett valgte registreringsregler?"
 
@@ -4818,7 +4815,7 @@ msgstr "Slett valgte former?"
 msgid "Delete selected slide shows?"
 msgstr "Slett valgte lysbildefremvisninger?"
 
-#: include/views/configuration.template.list.php:324
+#: include/views/configuration.template.list.php:309
 msgid "Delete selected templates?"
 msgstr "Slett valgte maler?"
 
@@ -4882,17 +4879,17 @@ msgstr "Slett utløseren?"
 msgid "Delete web scenario?"
 msgstr "Slett webscenario?"
 
-#: include/classes/api/services/CHost.php:1561
+#: include/classes/api/services/CHost.php:1576
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Slettet: Host \"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:1026
+#: include/classes/api/services/CHostPrototype.php:1022
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Slettet: Vertsprototype \"%1$s\" på \"%2$s\"."
 
-#: include/classes/api/services/CTemplate.php:782
+#: include/classes/api/services/CTemplate.php:795
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Slettet: Mal \"%1$s\"."
@@ -5013,7 +5010,7 @@ msgstr ""
 #: include/views/configuration.application.list.php:148
 #: include/views/configuration.correlation.list.php:131
 #: include/views/configuration.discovery.list.php:102
-#: include/views/configuration.host.discovery.list.php:289
+#: include/views/configuration.host.discovery.list.php:291
 #: include/views/configuration.host.list.php:469
 #: include/views/configuration.httpconf.list.php:191
 #: include/views/configuration.item.list.php:257
@@ -5063,7 +5060,7 @@ msgid "Disable selected correlations?"
 msgstr "Deaktiver valgte korrelasjoner?"
 
 #: include/views/configuration.discovery.list.php:102
-#: include/views/configuration.host.discovery.list.php:290
+#: include/views/configuration.host.discovery.list.php:292
 msgid "Disable selected discovery rules?"
 msgstr "Deaktivere utvalgte oppdagelsesregler?"
 
@@ -5109,7 +5106,7 @@ msgstr "Deaktiver valgte webscenarier?"
 #: app/views/administration.user.list.php:197
 #: app/views/administration.user.list.php:199
 #: app/views/monitoring.host.view.php:143 app/views/popup.lldoperation.php:276
-#: include/discovery.inc.php:108 include/hosts.inc.php:1369
+#: include/discovery.inc.php:108 include/hosts.inc.php:1342
 #: include/html.inc.php:319 include/httptest.inc.php:47
 #: include/items.inc.php:138 include/items.inc.php:141
 #: include/items.inc.php:185 include/maps.inc.php:320
@@ -5185,8 +5182,8 @@ msgstr ""
 #: include/forms.inc.php:684 include/menu.inc.php:85 include/menu.inc.php:116
 #: include/views/configuration.host.list.php:188
 #: include/views/configuration.host.list.php:432
-#: include/views/configuration.template.list.php:155
-#: include/views/configuration.template.list.php:289
+#: include/views/configuration.template.list.php:156
+#: include/views/configuration.template.list.php:274
 #: include/views/inventory.host.view.php:191
 #: include/views/inventory.host.view.php:207
 msgid "Discovery"
@@ -5318,7 +5315,7 @@ msgstr "Disk skrive statistikk. Returnerer heltall med type i sektorer, operasjo
 msgid "Display OK triggers for"
 msgstr "Vis OK utløsere for"
 
-#: app/partials/monitoring.latest.view.html.php:278
+#: app/partials/monitoring.latest.view.html.php:332
 msgid "Display graph"
 msgstr "Vis grafen"
 
@@ -5326,7 +5323,7 @@ msgstr "Vis grafen"
 msgid "Display problems"
 msgstr "Vis problemer"
 
-#: app/partials/monitoring.latest.view.html.php:277
+#: app/partials/monitoring.latest.view.html.php:331
 msgid "Display stacked graph"
 msgstr "Vis stablet graf"
 
@@ -5452,24 +5449,24 @@ msgstr "Dupliser \"navn\" verdi \"%1$s\" for kart."
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
 msgstr "Dupliser \"navn\" verdi \"%1$s\" for skjerm."
 
-#: include/classes/api/services/CTrigger.php:1139
+#: include/classes/api/services/CTrigger.php:1134
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dupliserer avhengigheter i utløseren \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:992
+#: include/classes/api/services/CTriggerPrototype.php:985
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "Dupliserer avhengigheter i triggerprototypen \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1961
-#: include/classes/api/services/CHost.php:2201
+#: include/classes/api/services/CHost.php:1988
+#: include/classes/api/services/CHost.php:2243
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%1$s\" already exists in data."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1968
-#: include/classes/api/services/CHost.php:2221
+#: include/classes/api/services/CHost.php:1995
+#: include/classes/api/services/CHost.php:2263
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%1$s\" already exists in data."
 msgstr ""
@@ -5479,12 +5476,12 @@ msgstr ""
 msgid "Duplicate severity name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:507
+#: include/classes/api/services/CTriggerGeneral.php:836
 #, c-format
 msgid "Duplicate trigger prototype with name \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CTriggerGeneral.php:498
+#: include/classes/api/services/CTriggerGeneral.php:827
 #, c-format
 msgid "Duplicate trigger with name \"%1$s\"."
 msgstr ""
@@ -5606,8 +5603,8 @@ msgstr "Effektiv verdi"
 msgid "Elasticsearch error: %1$s."
 msgstr ""
 
-#: include/classes/api/managers/CHistoryManager.php:1229
-#: include/classes/api/managers/CHistoryManager.php:1238
+#: include/classes/api/managers/CHistoryManager.php:1231
+#: include/classes/api/managers/CHistoryManager.php:1240
 #, c-format
 msgid "Elasticsearch url is not set for type: %1$s."
 msgstr ""
@@ -5685,9 +5682,9 @@ msgstr ""
 #: include/classes/api/services/CCorrelation.php:693
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
-#: include/classes/api/services/CHostInterface.php:576
-#: include/classes/api/services/CHost.php:1373
-#: include/classes/api/services/CHostPrototype.php:954
+#: include/classes/api/services/CHostInterface.php:574
+#: include/classes/api/services/CHost.php:1388
+#: include/classes/api/services/CHostPrototype.php:950
 #: include/classes/api/services/CImage.php:423
 #: include/classes/api/services/CMaintenance.php:533
 #: include/classes/api/services/CMap.php:555
@@ -5702,9 +5699,9 @@ msgstr ""
 #: include/classes/api/services/CService.php:366
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
-#: include/classes/api/services/CTemplate.php:588
-#: include/classes/api/services/CTrigger.php:678
-#: include/classes/api/services/CTrigger.php:802
+#: include/classes/api/services/CTemplate.php:601
+#: include/classes/api/services/CTrigger.php:673
+#: include/classes/api/services/CTrigger.php:797
 #: include/classes/api/services/CUserMacro.php:613
 msgid "Empty input parameter."
 msgstr "Tom inngangsparameter."
@@ -5749,7 +5746,7 @@ msgstr "Tom skjerm-ID."
 #: include/views/configuration.application.list.php:147
 #: include/views/configuration.correlation.list.php:130
 #: include/views/configuration.discovery.list.php:101
-#: include/views/configuration.host.discovery.list.php:286
+#: include/views/configuration.host.discovery.list.php:288
 #: include/views/configuration.host.list.php:468
 #: include/views/configuration.httpconf.list.php:190
 #: include/views/configuration.item.list.php:256
@@ -5765,7 +5762,7 @@ msgstr ""
 msgid "Enable LDAP authentication"
 msgstr ""
 
-#: app/views/administration.authentication.edit.php:144
+#: app/views/administration.authentication.edit.php:142
 msgid "Enable SAML authentication"
 msgstr ""
 
@@ -5824,7 +5821,7 @@ msgid "Enable selected correlations?"
 msgstr "Aktiver valgte korrelasjoner?"
 
 #: include/views/configuration.discovery.list.php:101
-#: include/views/configuration.host.discovery.list.php:287
+#: include/views/configuration.host.discovery.list.php:289
 msgid "Enable selected discovery rules?"
 msgstr "Aktiver valgte registreringsregler?"
 
@@ -5882,7 +5879,7 @@ msgstr ""
 #: app/views/administration.usergroup.list.php:142
 #: app/views/administration.user.list.php:196
 #: app/views/administration.user.list.php:200
-#: app/views/monitoring.host.view.php:142 app/views/popup.media.php:78
+#: app/views/monitoring.host.view.php:142 app/views/popup.media.php:85
 #: app/views/popup.triggerwizard.php:132 include/discovery.inc.php:107
 #: include/html.inc.php:315 include/httptest.inc.php:46
 #: include/items.inc.php:138 include/items.inc.php:141
@@ -5959,7 +5956,7 @@ msgstr ""
 msgid "Error"
 msgstr "Feil"
 
-#: include/db.inc.php:517
+#: include/db.inc.php:508
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Feil i søkeforespørsel for tabell \"%1$s\"."
@@ -6080,7 +6077,7 @@ msgid "Execute WMI query and return the first selected object. Returns integer, 
 msgstr "Utfør WMI-spørring og returner det første valgte objektet. Returnerer heltall, flyt, streng eller tekst (avhengig av forespørselen)"
 
 #: include/views/configuration.host.discovery.edit.php:782
-#: include/views/configuration.host.discovery.list.php:292
+#: include/views/configuration.host.discovery.list.php:294
 #: include/views/configuration.item.edit.php:878
 #: include/views/configuration.item.list.php:258
 msgid "Execute now"
@@ -6146,7 +6143,7 @@ msgstr "eksploderte"
 #: app/views/administration.mediatype.list.php:164
 #: app/views/administration.valuemap.list.php:90
 #: include/views/configuration.host.list.php:470
-#: include/views/configuration.template.list.php:315
+#: include/views/configuration.template.list.php:300
 #: include/views/monitoring.screen.list.php:124
 #: include/views/monitoring.sysmap.list.php:97
 msgid "Export"
@@ -6250,7 +6247,7 @@ msgstr "Kunne ikke analysere nettadressen."
 msgid "Failed to update dashboard"
 msgstr "Kunne ikke oppdatere oversikten"
 
-#: include/classes/api/services/CTemplate.php:537
+#: include/classes/api/services/CTemplate.php:550
 msgid "Failed to update template."
 msgstr "Kunne ikke oppdatere mal."
 
@@ -6298,9 +6295,9 @@ msgstr "Feltet \"%1$s\" kan ikke settes til NULL."
 #: include/classes/api/services/CDRule.php:521
 #: include/classes/api/services/CDRule.php:531
 #: include/classes/api/services/CHostGroup.php:949
-#: include/classes/api/services/CHost.php:959
-#: include/classes/api/services/CTemplate.php:880
-#: include/classes/api/services/CTriggerGeneral.php:237
+#: include/classes/api/services/CHost.php:961
+#: include/classes/api/services/CTemplate.php:893
+#: include/classes/api/services/CTriggerGeneral.php:508
 #: include/classes/validators/CNewValidator.php:262
 #: include/validate.inc.php:286
 #, c-format
@@ -6352,7 +6349,7 @@ msgstr "Felt \"%1$s\" kreves for medietype \"%2$s\"."
 msgid "Field \"%1$s\" must be missing."
 msgstr "Felt \"%1$s\" må mangle."
 
-#: include/classes/api/services/CTemplate.php:426
+#: include/classes/api/services/CTemplate.php:435
 msgid "Field \"host\" is mandatory."
 msgstr "Felt \"vert\" er obligatorisk."
 
@@ -6729,7 +6726,7 @@ msgid "Gradient line"
 msgstr "Gradient linje"
 
 #: app/controllers/CControllerAuditLogList.php:191
-#: app/partials/monitoring.latest.view.html.php:200
+#: app/partials/monitoring.latest.view.html.php:241
 #: app/views/monitoring.charts.view.php:52
 #: include/classes/macros/CMacrosResolverGeneral.php:847
 #: include/classes/screens/CScreenProblem.php:1310
@@ -6924,8 +6921,8 @@ msgstr "Graf med samme navn, men det finnes annen type."
 #: include/views/configuration.host.list.php:187
 #: include/views/configuration.host.list.php:424
 #: include/views/configuration.template.edit.php:200
-#: include/views/configuration.template.list.php:153
-#: include/views/configuration.template.list.php:277
+#: include/views/configuration.template.list.php:154
+#: include/views/configuration.template.list.php:262
 #: include/views/conf.import.php:41 include/views/inventory.host.view.php:153
 #: include/views/inventory.host.view.php:186
 #: include/views/inventory.host.view.php:206 jsLoader.php:290
@@ -7002,7 +6999,7 @@ msgstr "Gruppe for oppdagede verter \"%1$s\"."
 msgid "Group name"
 msgstr "Gruppe navn"
 
-#: include/classes/api/services/CHostPrototype.php:1116
+#: include/classes/api/services/CHostPrototype.php:1112
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Gruppeprototype kan ikke baseres på en oppdaget vertsgruppe \"%1$s\"."
@@ -7181,8 +7178,8 @@ msgstr ""
 msgid "Highlight whole row"
 msgstr ""
 
-#: app/partials/monitoring.latest.view.html.php:50
-#: app/partials/monitoring.latest.view.html.php:200
+#: app/partials/monitoring.latest.view.html.php:60
+#: app/partials/monitoring.latest.view.html.php:241
 #: app/views/administration.housekeeping.edit.php:121
 #: app/views/monitoring.problem.view.php:100
 #: app/views/popup.acknowledge.edit.php:42 history.php:27
@@ -7254,7 +7251,7 @@ msgid "Horizontal align"
 msgstr "Horisontal justering"
 
 #: app/controllers/CControllerAuditLogList.php:188
-#: app/partials/monitoring.latest.view.html.php:41
+#: app/partials/monitoring.latest.view.html.php:50
 #: app/partials/popup.operations.php:161
 #: app/views/monitoring.charts.view.php:82
 #: app/views/monitoring.dashboard.view.php:62
@@ -7299,17 +7296,17 @@ msgid_plural "Hosts"
 msgstr[0] "Vert"
 msgstr[1] "Verter"
 
-#: include/classes/api/services/CHost.php:1063
-#: include/classes/api/services/CTemplate.php:458
+#: include/classes/api/services/CHost.php:1068
+#: include/classes/api/services/CTemplate.php:467
 #: include/classes/import/importers/CHostImporter.php:67
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Verten \"%1$s\" eksisterer allerede."
 
 #: include/classes/api/services/CHostGroup.php:1495
-#: include/classes/api/services/CHost.php:1022
-#: include/classes/api/services/CHost.php:1944
-#: include/classes/api/services/CHost.php:2125
+#: include/classes/api/services/CHost.php:1027
+#: include/classes/api/services/CHost.php:1959
+#: include/classes/api/services/CHost.php:2153
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "Verten \"%1$s\" kan ikke være uten vertsgruppe."
@@ -7353,19 +7350,19 @@ msgstr "Verten kan ikke ha mer enn ett standardgrensesnitt av samme type."
 msgid "Host count"
 msgstr "Vert antall"
 
-#: hosts.php:971 hosts.php:992
+#: hosts.php:959 hosts.php:980
 msgid "Host deleted"
 msgstr "Verten slettet"
 
-#: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:203
-#: hosts.php:1020
+#: app/controllers/CControllerProxyHostDisable.php:77 hostgroups.php:194
+#: hosts.php:1009
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Vert deaktivert"
 msgstr[1] "Verter deaktivert"
 
-#: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:202
-#: hosts.php:1019
+#: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
+#: hosts.php:1008
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] "Verten aktivert"
@@ -7530,12 +7527,12 @@ msgstr "Vertsnettverk"
 msgid "Host prototype"
 msgstr ""
 
-#: include/classes/api/services/CHostPrototype.php:834
+#: include/classes/api/services/CHostPrototype.php:830
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Vertsprototypen \"%1$s\" eksisterer allerede på \"%2$s\", arvet fra en annen mal."
 
-#: include/classes/api/services/CHostPrototype.php:822
+#: include/classes/api/services/CHostPrototype.php:818
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Vertsprototypen \"%1$s\" eksisterer allerede på \"%2$s\"."
@@ -7558,18 +7555,18 @@ msgid_plural "Host prototypes updated"
 msgstr[0] "Vertsprototype oppdatert"
 msgstr[1] "Vertsprototyper oppdatert"
 
-#: include/classes/api/services/CHostPrototype.php:180
+#: include/classes/api/services/CHostPrototype.php:176
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Vertsprototype med vertsnavn \"%1$s\" finnes allerede i oppdagelsesregelen \"%2$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:181
+#: include/classes/api/services/CHostPrototype.php:177
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Vertsprototype med synlig navn \"%1$s\" finnes allerede i oppdagelsesregelen \"%2$s\"."
 
 #: include/html.inc.php:507
-#: include/views/configuration.host.discovery.list.php:267
+#: include/views/configuration.host.discovery.list.php:268
 #: include/views/configuration.host.edit.php:440
 #: include/views/configuration.host.prototype.edit.php:35
 #: include/views/configuration.host.prototype.list.php:27
@@ -7597,7 +7594,7 @@ msgstr "Vertsundernettmaske"
 msgid "Host time"
 msgstr "Vert tid"
 
-#: include/classes/api/services/CHost.php:888
+#: include/classes/api/services/CHost.php:890
 msgid "Host update failed."
 msgstr "Vertsoppdatering mislyktes."
 
@@ -7610,17 +7607,17 @@ msgstr "Vert oppdatert"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "Vert med ID \"%1$s\" er ikke tilgjengelig."
 
-#: include/classes/api/services/CHost.php:2056
-#: include/classes/api/services/CHost.php:2282
-#: include/classes/api/services/CTemplate.php:1152
+#: include/classes/api/services/CHost.php:2083
+#: include/classes/api/services/CHost.php:2324
+#: include/classes/api/services/CTemplate.php:1165
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Vert med samme navn \"%1$s\" eksisterer allerede."
 
-#: include/classes/api/services/CHost.php:2062
-#: include/classes/api/services/CHost.php:2289
-#: include/classes/api/services/CTemplate.php:484
-#: include/classes/api/services/CTemplate.php:1117
+#: include/classes/api/services/CHost.php:2089
+#: include/classes/api/services/CHost.php:2331
+#: include/classes/api/services/CTemplate.php:493
+#: include/classes/api/services/CTemplate.php:1130
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Vert med samme synlige navn \"%1$s\" eksisterer allerede."
@@ -7660,6 +7657,8 @@ msgstr "Vert med samme synlige navn \"%1$s\" eksisterer allerede."
 #: include/views/configuration.host.massupdate.php:28
 #: include/views/configuration.httpconf.list.php:51
 #: include/views/configuration.maintenance.edit.php:224
+#: include/views/configuration.template.list.php:150
+#: include/views/configuration.template.list.php:230
 #: include/views/configuration.triggers.list.php:45
 #: include/views/conf.import.php:33
 #: include/views/monitoring.overview.items.php:112
@@ -7712,16 +7711,13 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: app/views/administration.proxy.edit.php:53
 #: app/views/monitoring.host.view.php:123
 #: app/views/reports.auditlog.list.php:72 app/views/search.php:31
 #: include/views/configuration.host.list.php:138
-#: include/views/inventory.host.view.php:92
-#: include/views/js/configuration.host.edit.js.php:54
 msgid "IP"
 msgstr "IP"
 
-#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1456
+#: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1429
 #: include/maps.inc.php:46 include/views/configuration.discovery.edit.php:95
 #: include/views/configuration.discovery.edit.php:107
 #: include/views/configuration.discovery.edit.php:120
@@ -7729,7 +7725,7 @@ msgstr "IP"
 msgid "IP address"
 msgstr "IP-adresse"
 
-#: include/classes/api/services/CHostInterface.php:325
+#: include/classes/api/services/CHostInterface.php:323
 msgid "IP and DNS cannot be empty for host interface."
 msgstr "IP og DNS kan ikke være tom for vertsgrensesnittet."
 
@@ -7749,7 +7745,7 @@ msgstr "IP-området \"%1$s\" overstiger \"%2$s\" adresse grense"
 #: app/views/administration.script.list.php:80
 #: app/views/monitoring.widget.hostavail.view.php:30
 #: include/classes/widgets/views/widget.hostavail.form.view.php:47
-#: include/hosts.inc.php:471 include/hosts.inc.php:1437
+#: include/hosts.inc.php:471 include/hosts.inc.php:1410
 #: include/items.inc.php:348 include/views/configuration.host.edit.php:596
 #: include/views/configuration.host.massupdate.php:306
 #: include/views/configuration.host.prototype.edit.php:298
@@ -8022,8 +8018,8 @@ msgstr ""
 msgid "Inaccessible map"
 msgstr "Utilgjengelig kart"
 
-#: include/graphs.inc.php:274 include/hosts.inc.php:658
-#: include/hosts.inc.php:829 include/httptest.inc.php:217
+#: include/graphs.inc.php:274 include/hosts.inc.php:631
+#: include/hosts.inc.php:802 include/httptest.inc.php:217
 #: include/items.inc.php:889 include/triggers.inc.php:2351
 msgid "Inaccessible template"
 msgstr ""
@@ -8288,18 +8284,19 @@ msgstr "Feil argumenter passert for å fungere"
 #: include/classes/api/services/CDRule.php:341
 #: include/classes/api/services/CDRule.php:535
 #: include/classes/api/services/CEvent.php:749
-#: include/classes/api/services/CHostInterface.php:288
-#: include/classes/api/services/CHostInterface.php:320
-#: include/classes/api/services/CHostInterface.php:393
-#: include/classes/api/services/CHostInterface.php:454
-#: include/classes/api/services/CHostInterface.php:625
+#: include/classes/api/services/CHostInterface.php:286
+#: include/classes/api/services/CHostInterface.php:318
+#: include/classes/api/services/CHostInterface.php:391
+#: include/classes/api/services/CHostInterface.php:452
+#: include/classes/api/services/CHostInterface.php:623
 #: include/classes/api/services/CHostInterface.php:1032
 #: include/classes/api/services/CHostInterface.php:1047
 #: include/classes/api/services/CHostInterface.php:1083
 #: include/classes/api/services/CHostInterface.php:1101
 #: include/classes/api/services/CHostInterface.php:1118
-#: include/classes/api/services/CHostPrototype.php:461
-#: include/classes/api/services/CHostPrototype.php:482
+#: include/classes/api/services/CHost.php:1352
+#: include/classes/api/services/CHostPrototype.php:457
+#: include/classes/api/services/CHostPrototype.php:478
 #: include/classes/api/services/CItemGeneral.php:250
 #: include/classes/api/services/CItemGeneral.php:1194
 #: include/classes/api/services/CItemGeneral.php:1227
@@ -8350,9 +8347,9 @@ msgstr "Feil masseverdi for grensesnitt."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Feil beregne SLA-verdien for tjenesten \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1045
-#: include/classes/api/services/CHost.php:1932
-#: include/classes/api/services/CHost.php:2195
+#: include/classes/api/services/CHost.php:1050
+#: include/classes/api/services/CHost.php:1947
+#: include/classes/api/services/CHost.php:2237
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
 msgstr ""
@@ -8363,8 +8360,8 @@ msgstr ""
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Feil tegn brukt til proxy navn \"%1$s\"."
 
-#: include/classes/api/services/CTemplate.php:436
-#: include/classes/api/services/CTemplate.php:1162
+#: include/classes/api/services/CTemplate.php:445
+#: include/classes/api/services/CTemplate.php:1175
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "Feil tegn brukt til malnavn \"%1$s\"."
@@ -8523,9 +8520,9 @@ msgstr "Feil bildeindeks."
 #: include/classes/api/services/CAction.php:2911
 #: include/classes/api/services/CAction.php:2923
 #: include/classes/api/services/CAction.php:2935
-#: include/classes/api/services/CHost.php:1028
-#: include/classes/api/services/CHost.php:1926
-#: include/classes/api/services/CHost.php:2112
+#: include/classes/api/services/CHost.php:1033
+#: include/classes/api/services/CHost.php:1941
+#: include/classes/api/services/CHost.php:2139
 #: include/classes/api/services/CImage.php:435
 #: include/classes/api/services/CImage.php:476
 #: include/classes/api/services/CProxy.php:619
@@ -8533,8 +8530,8 @@ msgstr "Feil bildeindeks."
 #: include/classes/api/services/CProxy.php:729
 #: include/classes/api/services/CProxy.php:751
 #: include/classes/api/services/CScreen.php:426
-#: include/classes/api/services/CTemplate.php:431
-#: include/classes/api/services/CTemplate.php:568
+#: include/classes/api/services/CTemplate.php:440
+#: include/classes/api/services/CTemplate.php:581
 #: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "Feil innspillingsparametere."
@@ -8549,8 +8546,8 @@ msgstr ""
 msgid "Incorrect interface port \"%1$s\" provided."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2031
-#: include/classes/api/services/CHost.php:2177
+#: include/classes/api/services/CHost.php:2058
+#: include/classes/api/services/CHost.php:2219
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
@@ -8568,7 +8565,7 @@ msgstr "Feil element ID \"%1$s\" angitt for skjermelement."
 msgid "Incorrect item for axis value."
 msgstr "Feil element for akseverdi."
 
-#: include/classes/api/services/CTriggerGeneral.php:1424
+#: include/classes/api/services/CTriggerGeneral.php:1750
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Feil varenøkkel \"%1$s\" gitt for utløserkonsept på \"%2$s\"."
@@ -8722,8 +8719,8 @@ msgstr "Feil sorteringsrekkefølge for service \"%1$s\"."
 msgid "Incorrect source value."
 msgstr "Feil kildeverdi."
 
-#: include/classes/api/services/CHost.php:2003
-#: include/classes/api/services/CHost.php:2143
+#: include/classes/api/services/CHost.php:2030
+#: include/classes/api/services/CHost.php:2185
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Feil status for verten \"%1$s\"."
@@ -8759,13 +8756,13 @@ msgstr "Feil utløsersuttrykk"
 msgid "Incorrect trigger expression."
 msgstr "Feil utløsersuttrykk."
 
-#: include/classes/api/services/CTriggerGeneral.php:1214
+#: include/classes/api/services/CTriggerGeneral.php:1540
 #: include/triggers.inc.php:659
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Feil utløsersuttrykk. Verten \"%1$s\" eksisterer ikke, eller du har ikke tilgang til denne verten."
 
-#: include/classes/api/services/CTriggerGeneral.php:1215
+#: include/classes/api/services/CTriggerGeneral.php:1541
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Feil utløsersuttrykk. Trigger-uttrykselementer bør ikke tilhøre en mal og en vert samtidig."
 
@@ -8777,12 +8774,12 @@ msgstr "Feil utløsersuttrykk. Trigger-uttrykselementer bør ikke tilhøre en ma
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "Feil utløsingsfunksjon \"%1$s\" gitt i uttrykk."
 
-#: include/classes/api/services/CTriggerGeneral.php:1221
+#: include/classes/api/services/CTriggerGeneral.php:1547
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Feil utløse prototypeuttrykk. Verten \"%1$s\" eksisterer ikke, eller du har ikke tilgang til denne verten."
 
-#: include/classes/api/services/CTriggerGeneral.php:1222
+#: include/classes/api/services/CTriggerGeneral.php:1548
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr "Feil utløse prototypeuttrykk. Trigger prototype uttrykk elementer bør ikke tilhøre en mal og en vert samtidig."
 
@@ -8935,7 +8932,7 @@ msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:103
 #: app/controllers/CControllerAuthenticationUpdate.php:135
-#: app/controllers/CControllerAuthenticationUpdate.php:193
+#: app/controllers/CControllerAuthenticationUpdate.php:201
 #: app/controllers/CControllerPopupHttpStep.php:94
 #: app/controllers/CControllerPopupItemTestEdit.php:89
 #: app/controllers/CControllerPopupItemTestGetValue.php:102
@@ -9000,19 +8997,21 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:771
 #: include/classes/api/services/CEvent.php:812
 #: include/classes/api/services/CEvent.php:869
-#: include/classes/api/services/CHost.php:986
-#: include/classes/api/services/CHost.php:1828
-#: include/classes/api/services/CHost.php:1834
+#: include/classes/api/services/CHost.php:991
+#: include/classes/api/services/CHost.php:1843
 #: include/classes/api/services/CHost.php:1849
-#: include/classes/api/services/CHost.php:1855
-#: include/classes/api/services/CHost.php:1860
-#: include/classes/api/services/CHost.php:1866
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1880
+#: include/classes/api/services/CHost.php:1864
+#: include/classes/api/services/CHost.php:1870
+#: include/classes/api/services/CHost.php:1875
+#: include/classes/api/services/CHost.php:1881
 #: include/classes/api/services/CHost.php:1889
 #: include/classes/api/services/CHost.php:1895
-#: include/classes/api/services/CHost.php:1997
-#: include/classes/api/services/CHost.php:2137
+#: include/classes/api/services/CHost.php:1904
+#: include/classes/api/services/CHost.php:1910
+#: include/classes/api/services/CHost.php:1968
+#: include/classes/api/services/CHost.php:2024
+#: include/classes/api/services/CHost.php:2162
+#: include/classes/api/services/CHost.php:2179
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:209
@@ -9105,23 +9104,24 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:797
 #: include/classes/api/services/CScreen.php:394
 #: include/classes/api/services/CScreen.php:400
-#: include/classes/api/services/CTriggerGeneral.php:242
-#: include/classes/api/services/CTriggerGeneral.php:248
-#: include/classes/api/services/CTriggerGeneral.php:258
-#: include/classes/api/services/CTriggerGeneral.php:562
-#: include/classes/api/services/CTriggerGeneral.php:570
-#: include/classes/api/services/CTriggerGeneral.php:588
-#: include/classes/api/services/CTriggerGeneral.php:595
-#: include/classes/api/services/CTriggerGeneral.php:602
-#: include/classes/api/services/CTriggerGeneral.php:608
-#: include/classes/api/services/CTriggerGeneral.php:616
-#: include/classes/api/services/CTriggerGeneral.php:813
-#: include/classes/api/services/CTriggerGeneral.php:822
-#: include/classes/api/services/CTriggerGeneral.php:830
-#: include/classes/api/services/CTriggerGeneral.php:840
-#: include/classes/api/services/CTriggerGeneral.php:848
-#: include/classes/api/services/CTriggerGeneral.php:854
-#: include/classes/api/services/CTriggerGeneral.php:862
+#: include/classes/api/services/CTemplate.php:400
+#: include/classes/api/services/CTriggerGeneral.php:513
+#: include/classes/api/services/CTriggerGeneral.php:519
+#: include/classes/api/services/CTriggerGeneral.php:529
+#: include/classes/api/services/CTriggerGeneral.php:891
+#: include/classes/api/services/CTriggerGeneral.php:899
+#: include/classes/api/services/CTriggerGeneral.php:917
+#: include/classes/api/services/CTriggerGeneral.php:924
+#: include/classes/api/services/CTriggerGeneral.php:931
+#: include/classes/api/services/CTriggerGeneral.php:937
+#: include/classes/api/services/CTriggerGeneral.php:945
+#: include/classes/api/services/CTriggerGeneral.php:1142
+#: include/classes/api/services/CTriggerGeneral.php:1151
+#: include/classes/api/services/CTriggerGeneral.php:1159
+#: include/classes/api/services/CTriggerGeneral.php:1169
+#: include/classes/api/services/CTriggerGeneral.php:1177
+#: include/classes/api/services/CTriggerGeneral.php:1183
+#: include/classes/api/services/CTriggerGeneral.php:1191
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:535
 #: include/classes/graphdraw/CLineGraphDraw.php:117
@@ -9202,7 +9202,7 @@ msgid "Infinity"
 msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:169
-#: app/partials/monitoring.latest.view.html.php:57
+#: app/partials/monitoring.latest.view.html.php:67
 #: app/views/monitoring.widget.actionlog.view.php:39
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/actions.inc.php:1838 include/actions.inc.php:1922
@@ -9297,18 +9297,18 @@ msgstr "Grensesnittet er knyttet til elementet \"%1$s\" på \"%2$s\"."
 msgid "Interface type"
 msgstr ""
 
-#: include/classes/api/services/CHostInterface.php:329
+#: include/classes/api/services/CHostInterface.php:327
 #, c-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
 msgstr "Grensesnitt med DNS \"%1$s\" kan ikke ha tom IP-adresse."
 
-#: include/classes/api/services/CHostInterface.php:335
-#: include/classes/api/services/CHostInterface.php:342
+#: include/classes/api/services/CHostInterface.php:333
+#: include/classes/api/services/CHostInterface.php:340
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
 msgstr "Grensesnitt med IP \"%1$s\" kan ikke ha tomt DNS-navn mens du har \"Bruk DNS\" -egenskap på \"%2$s\"."
 
-#: include/classes/api/services/CHostInterface.php:348
+#: include/classes/api/services/CHostInterface.php:346
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "Grensesnitt med IP \"%1$s\" kan ikke ha tomt DNS-navn."
@@ -9344,14 +9344,14 @@ msgstr "Intern datalagringsperiode"
 #: include/classes/api/helpers/CApiHostHelper.php:90
 #: include/classes/api/services/CGraphGeneral.php:498
 #: include/classes/api/services/CGraphGeneral.php:640
-#: include/classes/api/services/CTriggerGeneral.php:300
-#: include/classes/api/services/CTriggerGeneral.php:445
-#: include/classes/api/services/CTriggerGeneral.php:517
-#: include/classes/api/services/CTriggerGeneral.php:690
-#: include/classes/api/services/CTriggerGeneral.php:927
-#: include/classes/api/services/CTriggerGeneral.php:1038
-#: include/classes/api/services/CTriggerGeneral.php:1227
-#: include/classes/api/services/CTriggerGeneral.php:1589
+#: include/classes/api/services/CTriggerGeneral.php:629
+#: include/classes/api/services/CTriggerGeneral.php:774
+#: include/classes/api/services/CTriggerGeneral.php:846
+#: include/classes/api/services/CTriggerGeneral.php:1019
+#: include/classes/api/services/CTriggerGeneral.php:1256
+#: include/classes/api/services/CTriggerGeneral.php:1365
+#: include/classes/api/services/CTriggerGeneral.php:1553
+#: include/classes/api/services/CTriggerGeneral.php:1915
 #: include/classes/core/CJsonRpc.php:208
 #: include/classes/import/validators/CXmlValidatorGeneral.php:159
 #: include/classes/widgets/fields/CWidgetField.php:103
@@ -9377,7 +9377,7 @@ msgstr ""
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: app/partials/monitoring.latest.view.html.php:49
+#: app/partials/monitoring.latest.view.html.php:59
 #: app/views/popup.lldoperation.php:109 include/forms.inc.php:699
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.edit.php:492
@@ -9748,7 +9748,7 @@ msgstr "Ugyldig brukers økt datalagringsperiode: %1$s."
 msgid "Inventory"
 msgstr "Inventar"
 
-#: include/classes/api/services/CHost.php:1233
+#: include/classes/api/services/CHost.php:1230
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "Inventar deaktivert for verten \"%1$s\"."
@@ -9805,7 +9805,7 @@ msgstr "Italiensk (it_IT)"
 msgid "Item"
 msgstr "artikkel"
 
-#: include/classes/api/services/CHostPrototype.php:1060
+#: include/classes/api/services/CHostPrototype.php:1056
 #: include/classes/api/services/CItem.php:51
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -10027,8 +10027,8 @@ msgstr "Element med nøkkel \"%1$s\" eksisterer allerede på \"%2$s\"."
 #: include/views/configuration.item.list.php:29
 #: include/views/configuration.item.massupdate.php:26
 #: include/views/configuration.template.edit.php:158
-#: include/views/configuration.template.list.php:151
-#: include/views/configuration.template.list.php:261
+#: include/views/configuration.template.list.php:152
+#: include/views/configuration.template.list.php:246
 #: include/views/conf.import.php:38 include/views/inventory.host.view.php:176
 #: include/views/inventory.host.view.php:204 items.php:1690 queue.php:110
 msgid "Items"
@@ -10052,7 +10052,7 @@ msgstr "Elementer oppdatert"
 
 #: app/views/monitoring.widget.hostavail.view.php:29
 #: include/classes/widgets/views/widget.hostavail.form.view.php:46
-#: include/hosts.inc.php:468 include/hosts.inc.php:1436
+#: include/hosts.inc.php:468 include/hosts.inc.php:1409
 #: include/items.inc.php:347
 #: include/views/js/configuration.host.edit.js.php:165
 msgid "JMX"
@@ -10213,7 +10213,7 @@ msgstr "LDAP-vert"
 msgid "LDAP is not configured"
 msgstr ""
 
-#: app/controllers/CControllerAuthenticationUpdate.php:229
+#: app/controllers/CControllerAuthenticationUpdate.php:238
 msgid "LDAP login successful"
 msgstr "LDAP-innlogging er vellykket"
 
@@ -10329,8 +10329,8 @@ msgstr "Siste endring"
 msgid "Last change (descending)"
 msgstr "Siste endring (synkende)"
 
-#: app/partials/monitoring.latest.view.html.php:53
-#: app/partials/monitoring.latest.view.html.php:67
+#: app/partials/monitoring.latest.view.html.php:63
+#: app/partials/monitoring.latest.view.html.php:78
 #: include/classes/screens/CScreenHttpTest.php:110
 msgid "Last check"
 msgstr "Siste sjekk"
@@ -10359,8 +10359,8 @@ msgstr "Siste av"
 msgid "Last seen (age)"
 msgstr "Sist sett (alder)"
 
-#: app/partials/monitoring.latest.view.html.php:54
-#: app/partials/monitoring.latest.view.html.php:68
+#: app/partials/monitoring.latest.view.html.php:64
+#: app/partials/monitoring.latest.view.html.php:79
 msgid "Last value"
 msgstr "Siste verdi"
 
@@ -10368,7 +10368,7 @@ msgstr "Siste verdi"
 msgid "Last week graph"
 msgstr "Forrige uke graf"
 
-#: app/controllers/CControllerLatestView.php:137
+#: app/controllers/CControllerLatestView.php:139
 #: app/partials/monitoring.host.view.html.php:39
 #: app/partials/monitoring.host.view.html.php:107
 #: app/views/monitoring.latest.view.php:35 app/views/search.php:33
@@ -10507,14 +10507,14 @@ msgstr "Koblet kart"
 #: include/views/configuration.template.edit.php:401
 #: include/views/configuration.template.edit.php:414
 #: include/views/configuration.template.list.php:99
-#: include/views/configuration.template.list.php:157
+#: include/views/configuration.template.list.php:158
 #: include/views/configuration.template.massupdate.php:158
 msgid "Linked templates"
 msgstr "Lenkede maler"
 
-#: include/views/configuration.template.list.php:158
-msgid "Linked to"
-msgstr "Knyttet til"
+#: include/views/configuration.template.list.php:159
+msgid "Linked to templates"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:682
 #: include/views/js/monitoring.sysmaps.js.php:693
@@ -10821,7 +10821,7 @@ msgstr "Obligatorisk parameter mangler."
 
 #: app/partials/popup.operations.php:340
 #: app/views/administration.miscconfig.edit.php:54
-#: app/views/popup.lldoperation.php:277 include/hosts.inc.php:1370
+#: app/views/popup.lldoperation.php:277 include/hosts.inc.php:1343
 #: include/views/configuration.host.edit.php:639
 #: include/views/configuration.host.massupdate.php:205
 #: include/views/configuration.host.prototype.edit.php:321
@@ -10957,7 +10957,7 @@ msgstr "Maske"
 #: include/views/configuration.host.list.php:478
 #: include/views/configuration.item.list.php:261
 #: include/views/configuration.item.prototype.list.php:195
-#: include/views/configuration.template.list.php:323
+#: include/views/configuration.template.list.php:308
 #: include/views/configuration.trigger.prototype.list.php:187
 #: include/views/configuration.triggers.list.php:341
 msgid "Mass update"
@@ -11041,9 +11041,9 @@ msgctxt "May short"
 msgid "May"
 msgstr "Kan"
 
-#: app/controllers/CControllerPopupMedia.php:170
+#: app/controllers/CControllerPopupMedia.php:168
 #: app/views/administration.user.edit.php:296
-#: app/views/administration.user.edit.php:311 app/views/popup.media.php:58
+#: app/views/administration.user.edit.php:311 app/views/popup.media.php:65
 msgid "Media"
 msgstr "Media"
 
@@ -11215,32 +11215,32 @@ msgstr "Midten"
 msgid "Min"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:124
+#: include/classes/setup/CFrontendSetup.php:125
 #, c-format
 msgid "Minimum required PHP memory limit is %1$s (configuration option \"memory_limit\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:162
+#: include/classes/setup/CFrontendSetup.php:163
 #, c-format
 msgid "Minimum required PHP upload filesize is %1$s (configuration option \"upload_max_filesize\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:106
+#: include/classes/setup/CFrontendSetup.php:107
 #, c-format
 msgid "Minimum required PHP version is %1$s."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:193
+#: include/classes/setup/CFrontendSetup.php:194
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:216
+#: include/classes/setup/CFrontendSetup.php:217
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %1$s (configuration option \"max_input_time\")."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:143
+#: include/classes/setup/CFrontendSetup.php:144
 #, c-format
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr ""
@@ -11500,7 +11500,7 @@ msgstr "NTLM"
 #: app/partials/common.filter.trigger.php:109
 #: app/partials/configuration.tags.tab.php:39
 #: app/partials/monitoring.host.view.html.php:33
-#: app/partials/monitoring.latest.view.html.php:42
+#: app/partials/monitoring.latest.view.html.php:51
 #: app/partials/popup.operations.php:367
 #: app/views/administration.iconmap.edit.php:40
 #: app/views/administration.iconmap.list.php:39
@@ -12024,8 +12024,8 @@ msgstr "Ingen grensesnitt funnet."
 msgid "No interface provided for proxy \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:2010
-#: include/classes/api/services/CHost.php:2188
+#: include/classes/api/services/CHost.php:2037
+#: include/classes/api/services/CHost.php:2230
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
 msgstr ""
@@ -12155,20 +12155,20 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: include/classes/api/services/CHostGroup.php:1211
 #: include/classes/api/services/CHostGroup.php:1333
 #: include/classes/api/services/CHostGroup.php:1353
-#: include/classes/api/services/CHostInterface.php:293
-#: include/classes/api/services/CHostInterface.php:313
-#: include/classes/api/services/CHostInterface.php:587
+#: include/classes/api/services/CHostInterface.php:291
+#: include/classes/api/services/CHostInterface.php:311
+#: include/classes/api/services/CHostInterface.php:585
 #: include/classes/api/services/CHostInterface.php:851
-#: include/classes/api/services/CHost.php:1342
-#: include/classes/api/services/CHost.php:1377
-#: include/classes/api/services/CHost.php:1986
-#: include/classes/api/services/CHost.php:2118
-#: include/classes/api/services/CHostPrototype.php:422
-#: include/classes/api/services/CHostPrototype.php:468
-#: include/classes/api/services/CHostPrototype.php:489
-#: include/classes/api/services/CHostPrototype.php:1085
-#: include/classes/api/services/CHostPrototype.php:1107
-#: include/classes/api/services/CHostPrototype.php:1141
+#: include/classes/api/services/CHost.php:1357
+#: include/classes/api/services/CHost.php:1392
+#: include/classes/api/services/CHost.php:2013
+#: include/classes/api/services/CHost.php:2145
+#: include/classes/api/services/CHostPrototype.php:418
+#: include/classes/api/services/CHostPrototype.php:464
+#: include/classes/api/services/CHostPrototype.php:485
+#: include/classes/api/services/CHostPrototype.php:1081
+#: include/classes/api/services/CHostPrototype.php:1103
+#: include/classes/api/services/CHostPrototype.php:1137
 #: include/classes/api/services/CHttpTest.php:446
 #: include/classes/api/services/CHttpTest.php:539
 #: include/classes/api/services/CHttpTest.php:626
@@ -12218,20 +12218,20 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: include/classes/api/services/CService.php:988
 #: include/classes/api/services/CService.php:1012
 #: include/classes/api/services/CTask.php:136
-#: include/classes/api/services/CTemplate.php:820
-#: include/classes/api/services/CTemplate.php:842
+#: include/classes/api/services/CTemplate.php:833
+#: include/classes/api/services/CTemplate.php:855
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
 #: include/classes/api/services/CTemplateScreen.php:756
-#: include/classes/api/services/CTriggerGeneral.php:752
-#: include/classes/api/services/CTrigger.php:652
-#: include/classes/api/services/CTrigger.php:696
-#: include/classes/api/services/CTrigger.php:732
-#: include/classes/api/services/CTrigger.php:820
-#: include/classes/api/services/CTriggerPrototype.php:533
-#: include/classes/api/services/CTriggerPrototype.php:711
-#: include/classes/api/services/CTriggerPrototype.php:729
+#: include/classes/api/services/CTriggerGeneral.php:1081
+#: include/classes/api/services/CTrigger.php:647
+#: include/classes/api/services/CTrigger.php:691
+#: include/classes/api/services/CTrigger.php:727
+#: include/classes/api/services/CTrigger.php:815
+#: include/classes/api/services/CTriggerPrototype.php:526
+#: include/classes/api/services/CTriggerPrototype.php:704
+#: include/classes/api/services/CTriggerPrototype.php:722
 #: include/classes/api/services/CUserGroup.php:329
 #: include/classes/api/services/CUserGroup.php:876
 #: include/classes/api/services/CUserMacro.php:372
@@ -12374,8 +12374,8 @@ msgstr "Ikke Ack"
 msgid "Not all results are displayed. Please provide more specific search criteria."
 msgstr ""
 
-#: include/classes/api/services/CTrigger.php:1042
-#: include/classes/api/services/CTriggerPrototype.php:870
+#: include/classes/api/services/CTrigger.php:1037
+#: include/classes/api/services/CTriggerPrototype.php:863
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
 msgstr ""
@@ -13117,158 +13117,166 @@ msgstr "Oversikt"
 msgid "Owner"
 msgstr "Eier"
 
-#: include/classes/setup/CFrontendSetup.php:547
+#: include/classes/setup/CFrontendSetup.php:548
 msgid "PHP LDAP"
 msgstr "PHP LDAP"
 
-#: include/classes/setup/CFrontendSetup.php:551
+#: include/classes/setup/CFrontendSetup.php:552
 #: include/classes/validators/CLdapAuthValidator.php:69
 msgid "PHP LDAP extension missing."
 msgstr "PHP LDAP-utvidelse mangler."
 
-#: include/classes/setup/CFrontendSetup.php:307
+#: include/classes/setup/CFrontendSetup.php:565
+msgid "PHP OpenSSL"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:569
+msgid "PHP OpenSSL extension missing."
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:308
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:312
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "PHP bcmath forlengelse mangler (PHP konfigurasjons parameter --enable-bcmath)."
 
-#: include/classes/setup/CFrontendSetup.php:574
+#: include/classes/setup/CFrontendSetup.php:592
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:578
+#: include/classes/setup/CFrontendSetup.php:596
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "PHP ctype forlengelse mangler (PHP konfigurasjons parameter --enable-ctype)."
 
-#: include/classes/setup/CFrontendSetup.php:254
+#: include/classes/setup/CFrontendSetup.php:255
 msgid "PHP databases support"
 msgstr "PHP databaser støtter"
 
-#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:388
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:473
+#: include/classes/setup/CFrontendSetup.php:474
 msgid "PHP gd FreeType support"
 msgstr "PHP gd FreeType-støtte"
 
-#: include/classes/setup/CFrontendSetup.php:477
+#: include/classes/setup/CFrontendSetup.php:478
 msgid "PHP gd FreeType support missing."
 msgstr "PHP gd FreeType-støtte mangler."
 
-#: include/classes/setup/CFrontendSetup.php:454
+#: include/classes/setup/CFrontendSetup.php:455
 msgid "PHP gd GIF image support missing."
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:450
+#: include/classes/setup/CFrontendSetup.php:451
 msgid "PHP gd GIF support"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:437
+#: include/classes/setup/CFrontendSetup.php:438
 msgid "PHP gd JPEG image support missing."
 msgstr "PHP gd JPEG bildestøtte mangler."
 
-#: include/classes/setup/CFrontendSetup.php:433
+#: include/classes/setup/CFrontendSetup.php:434
 msgid "PHP gd JPEG support"
 msgstr "PHP gd JPEG-støtte"
 
-#: include/classes/setup/CFrontendSetup.php:414
+#: include/classes/setup/CFrontendSetup.php:415
 msgid "PHP gd PNG image support missing."
 msgstr "PHP gd PNG-bildestøtte mangler."
 
-#: include/classes/setup/CFrontendSetup.php:410
+#: include/classes/setup/CFrontendSetup.php:411
 msgid "PHP gd PNG support"
 msgstr "PHP Gd PNG-støtte"
 
-#: include/classes/setup/CFrontendSetup.php:391
+#: include/classes/setup/CFrontendSetup.php:392
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr "PHP gd forlengelse mangler (PHP konfigurasjonsparameter - med-gd)."
 
-#: include/classes/setup/CFrontendSetup.php:625
+#: include/classes/setup/CFrontendSetup.php:643
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:629
+#: include/classes/setup/CFrontendSetup.php:647
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr "PHP gettext-utvidelse mangler (PHP-konfigurasjonsparameter - med-gettekst). Oversettelser vil ikke være tilgjengelige."
 
-#: include/classes/setup/CFrontendSetup.php:496
+#: include/classes/setup/CFrontendSetup.php:497
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:500
+#: include/classes/setup/CFrontendSetup.php:501
 msgid "PHP libxml extension missing."
 msgstr "PHP libxml forlengelse mangler."
 
-#: include/classes/setup/CFrontendSetup.php:324
+#: include/classes/setup/CFrontendSetup.php:325
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:329
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr "PHP mbstring-utvidelse mangler (PHP-konfigurasjonsparameter --enbar-mbstring)."
 
-#: include/classes/setup/CFrontendSetup.php:120
-#: include/classes/setup/CFrontendSetup.php:139
-#: include/classes/setup/CFrontendSetup.php:158
-#: include/classes/setup/CFrontendSetup.php:189
-#: include/classes/setup/CFrontendSetup.php:212
-#: include/classes/setup/CFrontendSetup.php:231
-#: include/classes/setup/CFrontendSetup.php:345
-#: include/classes/setup/CFrontendSetup.php:608
-#: include/classes/setup/CFrontendSetup.php:642
+#: include/classes/setup/CFrontendSetup.php:121
+#: include/classes/setup/CFrontendSetup.php:140
+#: include/classes/setup/CFrontendSetup.php:159
+#: include/classes/setup/CFrontendSetup.php:190
+#: include/classes/setup/CFrontendSetup.php:213
+#: include/classes/setup/CFrontendSetup.php:232
+#: include/classes/setup/CFrontendSetup.php:346
+#: include/classes/setup/CFrontendSetup.php:626
+#: include/classes/setup/CFrontendSetup.php:660
 #, c-format
 msgid "PHP option \"%1$s\""
 msgstr "PHP-alternativet \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:646
+#: include/classes/setup/CFrontendSetup.php:664
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
 msgstr "PHP-alternativet \"%1$s\" må settes til \"%2$s\""
 
-#: include/classes/setup/CFrontendSetup.php:591
+#: include/classes/setup/CFrontendSetup.php:609
 msgid "PHP session"
 msgstr "PHP-økt"
 
-#: include/classes/setup/CFrontendSetup.php:612
+#: include/classes/setup/CFrontendSetup.php:630
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr "PHP-økt automatisk start må være deaktivert (PHP-direktivet \"session.auto_start\")."
 
-#: include/classes/setup/CFrontendSetup.php:595
+#: include/classes/setup/CFrontendSetup.php:613
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr "PHP-øktutvidelse mangler (PHP-konfigurasjonsparameter - opptaks-økt)."
 
-#: include/classes/setup/CFrontendSetup.php:362
+#: include/classes/setup/CFrontendSetup.php:363
 msgid "PHP sockets"
 msgstr "PHP-stikkontakter"
 
-#: include/classes/setup/CFrontendSetup.php:366
+#: include/classes/setup/CFrontendSetup.php:367
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr "PHP-stikkontakter mangler (PHP-konfigurasjonsparameter - stikkontakter)."
 
-#: include/classes/setup/CFrontendSetup.php:349
+#: include/classes/setup/CFrontendSetup.php:350
 msgid "PHP string function overloading must be disabled."
 msgstr "Overføring av PHP-strengfunksjon må være deaktivert."
 
-#: include/classes/setup/CFrontendSetup.php:102
+#: include/classes/setup/CFrontendSetup.php:103
 msgid "PHP version"
 msgstr "PHP versjon"
 
-#: include/classes/setup/CFrontendSetup.php:530
+#: include/classes/setup/CFrontendSetup.php:531
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:534
+#: include/classes/setup/CFrontendSetup.php:535
 msgid "PHP xmlreader extension missing."
 msgstr "PHP xmlreader-utvidelsen mangler."
 
-#: include/classes/setup/CFrontendSetup.php:513
+#: include/classes/setup/CFrontendSetup.php:514
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:517
+#: include/classes/setup/CFrontendSetup.php:518
 msgid "PHP xmlwriter extension missing."
 msgstr "PHP xmlwriter-utvidelsen mangler."
 
@@ -13617,7 +13625,7 @@ msgstr "Fyller vertsinvesteringsfelt"
 #: app/views/administration.proxy.edit.php:47
 #: app/views/monitoring.host.view.php:131
 #: app/views/popup.itemtestedit.view.php:124
-#: include/classes/setup/CSetupWizard.php:332 include/hosts.inc.php:1471
+#: include/classes/setup/CSetupWizard.php:332 include/hosts.inc.php:1444
 #: include/views/configuration.host.list.php:141
 #: include/views/inventory.host.view.php:79 setup.php:56
 msgid "Port"
@@ -14277,7 +14285,7 @@ msgstr "Fjernkommando"
 #: app/views/monitoring.problem.view.php:213
 #: app/views/monitoring.problem.view.php:260
 #: app/views/popup.lldoperation.php:146 app/views/popup.lldoverride.php:133
-#: app/views/popup.media.php:45 app/views/popup.media.php:99
+#: app/views/popup.media.php:45 app/views/popup.media.php:106
 #: include/classes/widgets/CWidgetHelper.php:471
 #: include/classes/widgets/CWidgetHelper.php:515 include/forms.inc.php:1425
 #: include/forms.inc.php:1933 include/views/configuration.action.edit.php:94
@@ -14856,7 +14864,7 @@ msgstr "SMTP-serverport"
 
 #: app/views/monitoring.widget.hostavail.view.php:28
 #: include/classes/widgets/views/widget.hostavail.form.view.php:45
-#: include/hosts.inc.php:465 include/hosts.inc.php:1435
+#: include/hosts.inc.php:465 include/hosts.inc.php:1408
 #: include/items.inc.php:346
 #: include/views/js/configuration.host.edit.js.php:164
 msgid "SNMP"
@@ -15145,8 +15153,8 @@ msgstr "Skjerm oppdatert"
 #: app/views/search.php:134 app/views/search.php:228 app/views/search.php:274
 #: app/views/search.php:275 include/html.inc.php:413 include/menu.inc.php:47
 #: include/views/configuration.template.edit.php:310
-#: include/views/configuration.template.list.php:154
-#: include/views/configuration.template.list.php:285
+#: include/views/configuration.template.list.php:155
+#: include/views/configuration.template.list.php:270
 #: include/views/conf.import.php:43 include/views/inventory.host.view.php:160
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.constructor.list.php:28
@@ -15380,22 +15388,22 @@ msgstr "Send melding til brukere"
 msgid "Send only to"
 msgstr "Send bare til"
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:61
-#: app/views/popup.media.php:68 app/views/popup.mediatypetest.edit.php:61
+#: app/views/administration.user.edit.php:226 app/views/popup.media.php:68
+#: app/views/popup.media.php:75 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
 msgstr "Send til"
-
-#: app/partials/popup.operations.php:75
-msgid "Send to User groups"
-msgstr "Send til Brukergruppe"
-
-#: app/partials/popup.operations.php:95
-msgid "Send to Users"
-msgstr "Send til brukere"
 
 #: jsLoader.php:212
 msgid "Send to back"
 msgstr "Plasser i bakgrunnen"
+
+#: app/partials/popup.operations.php:75
+msgid "Send to user groups"
+msgstr ""
+
+#: app/partials/popup.operations.php:95
+msgid "Send to users"
+msgstr ""
 
 #: include/actions.inc.php:2127
 #: include/views/administration.auditacts.list.php:76
@@ -16003,7 +16011,7 @@ msgstr "Programvare E"
 msgid "Software architecture information. Returns string"
 msgstr "Programvarearkitekturinformasjon. Returnerer streng"
 
-#: include/classes/api/managers/CHistoryManager.php:1125
+#: include/classes/api/managers/CHistoryManager.php:1127
 msgid "Some of the history for this item may be compressed, deletion is not available."
 msgstr ""
 
@@ -16021,7 +16029,7 @@ msgstr "Sorteringsrekkefølge (0-> 999)"
 msgid "Sort triggers by"
 msgstr "Sorter triggere av"
 
-#: include/classes/api/CApiService.php:550
+#: include/classes/api/CApiService.php:581
 #, c-format
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Sortering etter felt \"%1$s\" er ikke tillatt."
@@ -16413,13 +16421,13 @@ msgstr "TELNET agent"
 msgid "TLS certificate authority file"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:668
+#: include/classes/setup/CFrontendSetup.php:686
 #: include/classes/setup/CSetupWizard.php:269
 #: include/classes/setup/CSetupWizard.php:374
 msgid "TLS certificate file"
 msgstr ""
 
-#: include/classes/setup/CFrontendSetup.php:672
+#: include/classes/setup/CFrontendSetup.php:690
 msgid "TLS certificate files must be read-only"
 msgstr ""
 
@@ -16467,7 +16475,7 @@ msgstr "Tabellen \"%1$s\" har ikke et felt som heter \"%2$s\"."
 msgid "Tag"
 msgstr "Tagg"
 
-#: include/classes/api/services/CTriggerGeneral.php:268
+#: include/classes/api/services/CTriggerGeneral.php:539
 #, c-format
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
 msgstr "Merket \"%1$s\" med verdi \"%2$s\" eksisterer allerede."
@@ -16518,7 +16526,7 @@ msgstr "Merkverdien"
 #: include/views/configuration.maintenance.edit.php:240
 #: include/views/configuration.template.edit.php:417
 #: include/views/configuration.template.list.php:118
-#: include/views/configuration.template.list.php:159
+#: include/views/configuration.template.list.php:160
 #: include/views/configuration.template.massupdate.php:140
 #: include/views/configuration.template.massupdate.php:159
 #: include/views/configuration.trigger.prototype.edit.php:539
@@ -16563,8 +16571,8 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "Mal"
 
-#: include/classes/api/services/CHost.php:1074
-#: include/classes/api/services/CTemplate.php:448
+#: include/classes/api/services/CHost.php:1079
+#: include/classes/api/services/CTemplate.php:457
 #: include/classes/import/importers/CTemplateImporter.php:78
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -16572,7 +16580,7 @@ msgstr "Mal \"%1$s\" eksisterer allerede."
 
 #: include/classes/api/services/CHostGroup.php:1500
 #: include/classes/api/services/CTemplate.php:391
-#: include/classes/api/services/CTemplate.php:1084
+#: include/classes/api/services/CTemplate.php:1097
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Mal \"%1$s\" kan ikke være uten vertsgruppe."
@@ -16636,17 +16644,17 @@ msgstr "Mal oppdatert"
 msgid "Template value"
 msgstr "Mal verdi"
 
-#: include/classes/api/services/CHost.php:2077
-#: include/classes/api/services/CHost.php:2307
-#: include/classes/api/services/CTemplate.php:1139
+#: include/classes/api/services/CHost.php:2104
+#: include/classes/api/services/CHost.php:2349
+#: include/classes/api/services/CTemplate.php:1152
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Mal med samme navn \"%1$s\" eksisterer allerede."
 
-#: include/classes/api/services/CHost.php:2083
-#: include/classes/api/services/CHost.php:2315
-#: include/classes/api/services/CTemplate.php:471
-#: include/classes/api/services/CTemplate.php:1104
+#: include/classes/api/services/CHost.php:2110
+#: include/classes/api/services/CHost.php:2357
+#: include/classes/api/services/CTemplate.php:480
+#: include/classes/api/services/CTemplate.php:1117
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Mal med det samme synlige navnet \"%1$s\" eksisterer allerede."
@@ -17022,7 +17030,7 @@ msgstr "Time shift"
 msgid "Time type"
 msgstr "Tidstype"
 
-#: include/classes/setup/CFrontendSetup.php:235
+#: include/classes/setup/CFrontendSetup.php:236
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr "Tidssone for PHP er ikke angitt (konfigurasjonsparameter \"date.timezone\")."
 
@@ -17162,7 +17170,7 @@ msgstr "Trend datalagringsperiode \"%1$s\"."
 msgid "Trend storage period"
 msgstr "Trend lagringsperiode"
 
-#: app/partials/monitoring.latest.view.html.php:51
+#: app/partials/monitoring.latest.view.html.php:61
 #: app/views/administration.housekeeping.edit.php:139
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:278 include/forms.inc.php:694
@@ -17188,12 +17196,13 @@ msgstr "Trender"
 msgid "Trigger"
 msgstr "Utløser"
 
-#: include/classes/api/services/CTriggerGeneral.php:291
+#: include/classes/api/services/CTriggerGeneral.php:588
+#: include/classes/api/services/CTriggerGeneral.php:620
 #, c-format
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Trigger \"%1$s\" eksisterer allerede på \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1581
+#: include/classes/api/services/CTriggerGeneral.php:1907
 #, c-format
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Trigger \"%1$s\" tilhører maler med forskjellige koblinger."
@@ -17215,7 +17224,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr "Utløser lagt til"
 
-#: include/classes/api/services/CTrigger.php:1085
+#: include/classes/api/services/CTrigger.php:1080
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Trigger kan ikke være avhengig av en trigger som er arvet fra den."
 
@@ -17259,7 +17268,7 @@ msgstr[1] "Utløsere aktivert"
 msgid "Trigger event and alert data storage period \"%1$s\"."
 msgstr "Trigger hendelse og varsling av datalagringsperiode \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:455
+#: include/classes/api/services/CTriggerGeneral.php:784
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Trigger-uttrykk må inneholde minst én vert: nøkkelreferanse."
 
@@ -17305,17 +17314,18 @@ msgstr "Utløser oversikt"
 msgid "Trigger prototype"
 msgstr "Utløser prototype"
 
-#: include/classes/api/services/CTriggerGeneral.php:296
+#: include/classes/api/services/CTriggerGeneral.php:589
+#: include/classes/api/services/CTriggerGeneral.php:625
 #, c-format
 msgid "Trigger prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "Trigger prototype \"%1$s\" eksisterer allerede på \"%2$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:1585
+#: include/classes/api/services/CTriggerGeneral.php:1911
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "Trigger prototype \"%1$s\" tilhører maler med forskjellige koblinger."
 
-#: include/classes/api/services/CTriggerGeneral.php:1504
+#: include/classes/api/services/CTriggerGeneral.php:1830
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Trigger prototype \"%1$s\" inneholder element prototyper fra flere funn regler."
@@ -17325,7 +17335,7 @@ msgstr "Trigger prototype \"%1$s\" inneholder element prototyper fra flere funn 
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger prototype \"%1$s\" avhenger av utløseren \"%2$s\", som ikke eksisterer."
 
-#: include/classes/api/services/CTriggerGeneral.php:1499
+#: include/classes/api/services/CTriggerGeneral.php:1825
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "Trigger prototype \"%1$s\" må inneholde minst én prototype."
@@ -17334,7 +17344,7 @@ msgstr "Trigger prototype \"%1$s\" må inneholde minst én prototype."
 msgid "Trigger prototype added"
 msgstr "Trigger prototype lagt til"
 
-#: include/classes/api/services/CTriggerPrototype.php:927
+#: include/classes/api/services/CTriggerPrototype.php:920
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "Trigger prototype kan ikke være avhengig av en trigger som er arvet fra den."
 
@@ -17366,7 +17376,7 @@ msgstr "Trigger prototyper slettet"
 msgid "Trigger prototypes updated"
 msgstr "Trigger prototyper oppdatert"
 
-#: include/classes/api/services/CTriggerGeneral.php:467
+#: include/classes/api/services/CTriggerGeneral.php:796
 msgid "Trigger recovery expression must contain at least one host:key reference."
 msgstr "Trigger gjenopprettingsuttrykk må inneholde minst én vert: nøkkelreferanse."
 
@@ -17409,8 +17419,8 @@ msgstr "Utløser oppdatert"
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.list.php:191
 #: include/views/configuration.template.edit.php:179
-#: include/views/configuration.template.list.php:152
-#: include/views/configuration.template.list.php:269
+#: include/views/configuration.template.list.php:153
+#: include/views/configuration.template.list.php:254
 #: include/views/configuration.triggers.edit.php:28
 #: include/views/configuration.triggers.list.php:165
 #: include/views/configuration.triggers.massupdate.php:28
@@ -17455,7 +17465,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:264
 #: app/controllers/CControllerPopupGeneric.php:327
-#: app/partials/monitoring.latest.view.html.php:52
+#: app/partials/monitoring.latest.view.html.php:62
 #: app/partials/popup.operations.php:185
 #: app/views/administration.image.list.php:36
 #: app/views/administration.mediatype.edit.php:55
@@ -17468,14 +17478,14 @@ msgstr ""
 #: app/views/popup.condition.common.php:53
 #: app/views/popup.condition.common.php:161
 #: app/views/popup.condition.common.php:633 app/views/popup.generic.php:126
-#: app/views/popup.lldoperation.php:108 app/views/popup.media.php:59
+#: app/views/popup.lldoperation.php:108 app/views/popup.media.php:66
 #: app/views/popup.triggerwizard.php:47 app/views/popup.triggerwizard.php:116
 #: include/classes/screens/CScreenActions.php:113
 #: include/classes/widgets/CWidgetHelper.php:50
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
 #: include/forms.inc.php:178 include/hosts.inc.php:99
-#: include/hosts.inc.php:1451
+#: include/hosts.inc.php:1424
 #: include/views/administration.auditacts.list.php:64
 #: include/views/configuration.discovery.edit.php:74
 #: include/views/configuration.graph.edit.php:343
@@ -17899,7 +17909,7 @@ msgstr "Opp"
 #: app/views/popup.acknowledge.edit.php:112
 #: app/views/popup.discovery.check.php:127 app/views/popup.httpstep.php:181
 #: app/views/popup.lldoperation.php:286 app/views/popup.lldoverride.php:192
-#: app/views/popup.media.php:116 app/views/popup.mediatype.message.php:92
+#: app/views/popup.media.php:123 app/views/popup.mediatype.message.php:92
 #: app/views/popup.triggerwizard.php:142
 #: include/views/configuration.action.edit.php:480
 #: include/views/configuration.application.edit.php:54
@@ -17961,7 +17971,7 @@ msgstr ""
 msgid "Update problem"
 msgstr ""
 
-#: include/hosts.inc.php:554
+#: include/classes/api/services/CHost.php:1325
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "Oppdatert status for verten \"%1$s\"."
@@ -18011,7 +18021,7 @@ msgstr "Bruk bulkforespørsler"
 msgid "Use custom event status colours"
 msgstr ""
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:77
+#: app/views/administration.user.edit.php:226 app/views/popup.media.php:84
 msgid "Use if severity"
 msgstr "Bruk om alvorlighetsgrad"
 
@@ -18736,7 +18746,7 @@ msgstr "Virtuell plassstørrelse i byte eller i prosent fra totalt. Returnerer h
 msgid "Visible name"
 msgstr "Synlig navn"
 
-#: include/classes/api/services/CHost.php:2213
+#: include/classes/api/services/CHost.php:2255
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Synlig navn kan ikke være tomt hvis vertsnavnet mangler."
 
@@ -18773,8 +18783,8 @@ msgstr "Vi beklager, det maksimalt antall elementer som skal huskes, er nådd."
 #: app/views/search.php:228 app/views/search.php:285 app/views/search.php:289
 #: include/views/configuration.host.list.php:189
 #: include/views/configuration.host.list.php:440
-#: include/views/configuration.template.list.php:156
-#: include/views/configuration.template.list.php:297
+#: include/views/configuration.template.list.php:157
+#: include/views/configuration.template.list.php:282
 #: include/views/inventory.host.view.php:135
 #: include/views/inventory.host.view.php:196
 #: include/views/inventory.host.view.php:208 jsLoader.php:308
@@ -18869,7 +18879,7 @@ msgstr "Velkommen"
 msgid "Welcome to"
 msgstr "Velkommen til"
 
-#: app/views/administration.user.edit.php:226 app/views/popup.media.php:72
+#: app/views/administration.user.edit.php:226 app/views/popup.media.php:79
 msgid "When active"
 msgstr "Når aktiv"
 
@@ -18974,8 +18984,8 @@ msgstr ""
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "Feil felt for avhengighet for tjenesten \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1920
-#: include/classes/api/services/CHost.php:2106
+#: include/classes/api/services/CHost.php:1935
+#: include/classes/api/services/CHost.php:2133
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Feil felt for verten \"%1$s\"."
@@ -19001,13 +19011,13 @@ msgstr "Feil felt for tjeneste \"%1$s\"."
 msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "Feil felt for tid for service \"%1$s\"."
 
-#: include/classes/api/services/CTriggerGeneral.php:508
-#: include/classes/api/services/CTriggerGeneral.php:680
+#: include/classes/api/services/CTriggerGeneral.php:837
+#: include/classes/api/services/CTriggerGeneral.php:1009
 msgid "Wrong fields for trigger prototype."
 msgstr "Feil felt for utløserprototype."
 
-#: include/classes/api/services/CTriggerGeneral.php:499
-#: include/classes/api/services/CTriggerGeneral.php:671
+#: include/classes/api/services/CTriggerGeneral.php:828
+#: include/classes/api/services/CTriggerGeneral.php:1000
 msgid "Wrong fields for trigger."
 msgstr "Feil felt for trigger."
 
@@ -19015,8 +19025,8 @@ msgstr "Feil felt for trigger."
 #: include/classes/api/services/CMap.php:969
 #: include/classes/api/services/CMap.php:1440
 #: include/classes/api/services/CScreenItem.php:958
-#: include/classes/api/services/CTriggerGeneral.php:537
-#: include/classes/api/services/CTriggerGeneral.php:705
+#: include/classes/api/services/CTriggerGeneral.php:866
+#: include/classes/api/services/CTriggerGeneral.php:1034
 msgid "Wrong value for url field."
 msgstr "Feil verdi for URL-feltet."
 
@@ -19207,8 +19217,8 @@ msgstr ""
 
 #: include/classes/api/services/CAuditLog.php:75
 #: include/classes/api/services/CCorrelation.php:474
-#: include/classes/api/services/CHost.php:915
-#: include/classes/api/services/CHost.php:977
+#: include/classes/api/services/CHost.php:917
+#: include/classes/api/services/CHost.php:982
 #: include/classes/api/services/CIconMap.php:178
 #: include/classes/api/services/CIconMap.php:249
 #: include/classes/api/services/CMaintenance.php:526
@@ -19222,11 +19232,11 @@ msgstr ""
 #: include/classes/api/services/CScript.php:318
 #: include/classes/api/services/CScript.php:560
 #: include/classes/api/services/CTask.php:104
-#: include/classes/api/services/CTemplate.php:411
-#: include/classes/api/services/CTemplate.php:563
-#: include/classes/api/services/CTemplate.php:600
-#: include/classes/api/services/CTemplate.php:1076
-#: include/classes/api/services/CTemplate.php:1182
+#: include/classes/api/services/CTemplate.php:420
+#: include/classes/api/services/CTemplate.php:576
+#: include/classes/api/services/CTemplate.php:613
+#: include/classes/api/services/CTemplate.php:1089
+#: include/classes/api/services/CTemplate.php:1195
 #: include/classes/api/services/CUserMacro.php:252
 #: include/classes/api/services/CUserMacro.php:347
 #: include/classes/api/services/CUserMacro.php:442
@@ -19385,8 +19395,8 @@ msgstr ""
 msgid "a boolean is expected"
 msgstr "en boolean verdi forventes"
 
-#: include/classes/api/services/CTriggerGeneral.php:242
-#: include/classes/api/services/CTriggerGeneral.php:258
+#: include/classes/api/services/CTriggerGeneral.php:513
+#: include/classes/api/services/CTriggerGeneral.php:529
 #: include/classes/api/services/CUser.php:663
 #: include/classes/import/validators/CXmlValidatorGeneral.php:201
 #: include/classes/validators/CActionCondValidator.php:185
@@ -19542,7 +19552,7 @@ msgstr "en matrise eller en tegnstreng forventes"
 msgid "an empty string is expected"
 msgstr "en tom streng forventes"
 
-#: include/classes/api/services/CHost.php:1861
+#: include/classes/api/services/CHost.php:1876
 #: include/classes/validators/CApiInputValidator.php:1007
 msgid "an even number of hexadecimal characters is expected"
 msgstr "et jevnt antall heksadesimale tegn forventes"
@@ -19635,7 +19645,7 @@ msgid "cannot be changed"
 msgstr "kan ikke endres"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:135
-#: app/controllers/CControllerAuthenticationUpdate.php:193
+#: app/controllers/CControllerAuthenticationUpdate.php:201
 #: app/controllers/CControllerPopupItemTestGetValue.php:114
 #: app/controllers/CControllerPopupItemTestGetValue.php:120
 #: app/controllers/CControllerPopupItemTestSend.php:154
@@ -19670,8 +19680,8 @@ msgstr "kan ikke endres"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:540
 #: include/classes/api/services/CEvent.php:812
-#: include/classes/api/services/CHost.php:1849
-#: include/classes/api/services/CHost.php:1855
+#: include/classes/api/services/CHost.php:1864
+#: include/classes/api/services/CHost.php:1870
 #: include/classes/api/services/CItemGeneral.php:440
 #: include/classes/api/services/CItemGeneral.php:467
 #: include/classes/api/services/CItemGeneral.php:473
@@ -19698,11 +19708,11 @@ msgstr "kan ikke endres"
 #: include/classes/api/services/CMediatype.php:793
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
-#: include/classes/api/services/CTriggerGeneral.php:248
-#: include/classes/api/services/CTriggerGeneral.php:570
-#: include/classes/api/services/CTriggerGeneral.php:602
-#: include/classes/api/services/CTriggerGeneral.php:830
-#: include/classes/api/services/CTriggerGeneral.php:848
+#: include/classes/api/services/CTriggerGeneral.php:519
+#: include/classes/api/services/CTriggerGeneral.php:899
+#: include/classes/api/services/CTriggerGeneral.php:931
+#: include/classes/api/services/CTriggerGeneral.php:1159
+#: include/classes/api/services/CTriggerGeneral.php:1177
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/api/services/CUser.php:535
 #: include/classes/api/services/CUser.php:674
@@ -19884,6 +19894,11 @@ msgstr "oppdagelse"
 msgid "discovery rule is disabled"
 msgstr ""
 
+#: app/partials/monitoring.latest.view.html.php:126
+#, c-format
+msgid "displaying %1$s to %2$s of %3$s Items"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:61 include/actions.inc.php:27
 #: include/correlation.inc.php:34
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:164
@@ -20037,8 +20052,7 @@ msgstr ""
 msgid "incorrect element count"
 msgstr "Feil elementtelling"
 
-#: include/classes/parsers/CItemKey.php:80
-#: include/classes/parsers/CUserMacroParser.php:61
+#: include/classes/parsers/CParser.php:117
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
 msgstr "feil syntaks nær \"%1$s\""
@@ -20123,7 +20137,7 @@ msgstr ""
 msgid "item pattern"
 msgstr ""
 
-#: include/classes/parsers/CItemKey.php:120
+#: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "nøkkelen er tom"
 
@@ -20184,7 +20198,7 @@ msgstr "m-d"
 msgid "m-d H:i"
 msgstr "m-d H:i"
 
-#: include/classes/parsers/CUserMacroParser.php:47
+#: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr "makro er tom"
 
@@ -20250,7 +20264,7 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1867
+#: include/classes/api/services/CHost.php:1882
 #: include/classes/validators/CApiInputValidator.php:1001
 #, c-format
 msgid "minimum length is %1$s characters"
@@ -20303,7 +20317,7 @@ msgstr "navn"
 msgid "new"
 msgstr "ny"
 
-#: disc_prototypes.php:1298 disc_prototypes.php:1322 hosts.php:1385
+#: disc_prototypes.php:1298 disc_prototypes.php:1322 hosts.php:1374
 #: include/views/configuration.item.massupdate.php:425 templates.php:957
 msgctxt "new element in multiselect"
 msgid "new"
@@ -20349,43 +20363,45 @@ msgid "of"
 msgstr "av"
 
 #: app/views/administration.user.edit.php:261
-#: include/classes/setup/CFrontendSetup.php:255
-#: include/classes/setup/CFrontendSetup.php:308
-#: include/classes/setup/CFrontendSetup.php:325
-#: include/classes/setup/CFrontendSetup.php:346
+#: include/classes/setup/CFrontendSetup.php:256
+#: include/classes/setup/CFrontendSetup.php:309
+#: include/classes/setup/CFrontendSetup.php:326
 #: include/classes/setup/CFrontendSetup.php:347
-#: include/classes/setup/CFrontendSetup.php:363
-#: include/classes/setup/CFrontendSetup.php:411
-#: include/classes/setup/CFrontendSetup.php:434
-#: include/classes/setup/CFrontendSetup.php:451
-#: include/classes/setup/CFrontendSetup.php:474
-#: include/classes/setup/CFrontendSetup.php:514
-#: include/classes/setup/CFrontendSetup.php:531
-#: include/classes/setup/CFrontendSetup.php:548
-#: include/classes/setup/CFrontendSetup.php:575
-#: include/classes/setup/CFrontendSetup.php:592
-#: include/classes/setup/CFrontendSetup.php:609
+#: include/classes/setup/CFrontendSetup.php:348
+#: include/classes/setup/CFrontendSetup.php:364
+#: include/classes/setup/CFrontendSetup.php:412
+#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:452
+#: include/classes/setup/CFrontendSetup.php:475
+#: include/classes/setup/CFrontendSetup.php:515
+#: include/classes/setup/CFrontendSetup.php:532
+#: include/classes/setup/CFrontendSetup.php:549
+#: include/classes/setup/CFrontendSetup.php:566
+#: include/classes/setup/CFrontendSetup.php:593
 #: include/classes/setup/CFrontendSetup.php:610
-#: include/classes/setup/CFrontendSetup.php:626
+#: include/classes/setup/CFrontendSetup.php:627
+#: include/classes/setup/CFrontendSetup.php:628
+#: include/classes/setup/CFrontendSetup.php:644
 msgid "off"
 msgstr "av"
 
 #: app/views/administration.user.edit.php:261
-#: include/classes/setup/CFrontendSetup.php:308
-#: include/classes/setup/CFrontendSetup.php:325
-#: include/classes/setup/CFrontendSetup.php:346
-#: include/classes/setup/CFrontendSetup.php:363
-#: include/classes/setup/CFrontendSetup.php:411
-#: include/classes/setup/CFrontendSetup.php:434
-#: include/classes/setup/CFrontendSetup.php:451
-#: include/classes/setup/CFrontendSetup.php:474
-#: include/classes/setup/CFrontendSetup.php:514
-#: include/classes/setup/CFrontendSetup.php:531
-#: include/classes/setup/CFrontendSetup.php:548
-#: include/classes/setup/CFrontendSetup.php:575
-#: include/classes/setup/CFrontendSetup.php:592
-#: include/classes/setup/CFrontendSetup.php:609
-#: include/classes/setup/CFrontendSetup.php:626
+#: include/classes/setup/CFrontendSetup.php:309
+#: include/classes/setup/CFrontendSetup.php:326
+#: include/classes/setup/CFrontendSetup.php:347
+#: include/classes/setup/CFrontendSetup.php:364
+#: include/classes/setup/CFrontendSetup.php:412
+#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:452
+#: include/classes/setup/CFrontendSetup.php:475
+#: include/classes/setup/CFrontendSetup.php:515
+#: include/classes/setup/CFrontendSetup.php:532
+#: include/classes/setup/CFrontendSetup.php:549
+#: include/classes/setup/CFrontendSetup.php:566
+#: include/classes/setup/CFrontendSetup.php:593
+#: include/classes/setup/CFrontendSetup.php:610
+#: include/classes/setup/CFrontendSetup.php:627
+#: include/classes/setup/CFrontendSetup.php:644
 #: include/views/monitoring.hostscreen.php:37
 msgid "on"
 msgstr "på"
@@ -20497,10 +20513,10 @@ msgid "short description"
 msgstr "Kort beskrivelse"
 
 #: include/classes/api/services/CAutoregistration.php:158
-#: include/classes/api/services/CHost.php:1874
-#: include/classes/api/services/CHost.php:1880
 #: include/classes/api/services/CHost.php:1889
 #: include/classes/api/services/CHost.php:1895
+#: include/classes/api/services/CHost.php:1904
+#: include/classes/api/services/CHost.php:1910
 #: include/classes/api/services/CHttpTest.php:957
 #: include/classes/api/services/CHttpTest.php:1053
 #: include/classes/api/services/CItemGeneral.php:454
@@ -20515,10 +20531,10 @@ msgstr "Kort beskrivelse"
 #: include/classes/api/services/CMediatype.php:786
 #: include/classes/api/services/CProxy.php:664
 #: include/classes/api/services/CProxy.php:790
-#: include/classes/api/services/CTriggerGeneral.php:562
-#: include/classes/api/services/CTriggerGeneral.php:588
-#: include/classes/api/services/CTriggerGeneral.php:822
-#: include/classes/api/services/CTriggerGeneral.php:840
+#: include/classes/api/services/CTriggerGeneral.php:891
+#: include/classes/api/services/CTriggerGeneral.php:917
+#: include/classes/api/services/CTriggerGeneral.php:1151
+#: include/classes/api/services/CTriggerGeneral.php:1169
 #: include/classes/validators/CActionCondValidator.php:145
 msgid "should be empty"
 msgstr "bør være tom"
@@ -20599,7 +20615,10 @@ msgstr "mal ID \"%1$s\" er passert %2$s ganger"
 #: include/classes/api/services/CDiscoveryRule.php:1592
 #: include/classes/api/services/CDiscoveryRule.php:1949
 #: include/classes/api/services/CDiscoveryRule.php:1957
+#: include/classes/api/services/CHost.php:1969
+#: include/classes/api/services/CHost.php:2163
 #: include/classes/api/services/CHttpTest.php:742
+#: include/classes/api/services/CTemplate.php:401
 #: include/classes/validators/CApiInputValidator.php:930
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
@@ -20651,11 +20670,11 @@ msgstr "avtrekker"
 msgid "trigger does not allow manual closing"
 msgstr "utløser tillater ikke manuell lukking"
 
-#: include/classes/api/services/CTriggerGeneral.php:1511
+#: include/classes/api/services/CTriggerGeneral.php:1837
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "utløser prototype kan ikke flyttes til en annen mal eller vert"
 
-#: include/classes/api/services/CTriggerGeneral.php:1656
+#: include/classes/api/services/CTriggerGeneral.php:1982
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "Utløseren med koblinger kan ikke flyttes til en annen mal eller vert"
 
@@ -20683,11 +20702,11 @@ msgstr ""
 msgid "unexpected constant value \"%1$s\""
 msgstr ""
 
-#: include/classes/parsers/CItemKey.php:172
+#: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
 msgstr "uventet slutt på nøkkelen"
 
-#: include/classes/parsers/CUserMacroParser.php:47
+#: include/classes/parsers/CUserMacroParser.php:38
 msgid "unexpected end of macro"
 msgstr "uventet slutten av makroen"
 
@@ -20717,26 +20736,26 @@ msgstr "uventet tekst \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:761
 #: include/classes/api/services/CEvent.php:870
-#: include/classes/api/services/CHost.php:1829
-#: include/classes/api/services/CHost.php:1835
+#: include/classes/api/services/CHost.php:1844
+#: include/classes/api/services/CHost.php:1850
 #: include/classes/api/services/CItemGeneral.php:1239
 #: include/classes/api/services/CItemGeneral.php:1559
 #: include/classes/api/services/CItemGeneral.php:1585
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
-#: include/classes/api/services/CTriggerGeneral.php:596
-#: include/classes/api/services/CTriggerGeneral.php:609
-#: include/classes/api/services/CTriggerGeneral.php:617
-#: include/classes/api/services/CTriggerGeneral.php:814
-#: include/classes/api/services/CTriggerGeneral.php:855
-#: include/classes/api/services/CTriggerGeneral.php:863
+#: include/classes/api/services/CTriggerGeneral.php:925
+#: include/classes/api/services/CTriggerGeneral.php:938
+#: include/classes/api/services/CTriggerGeneral.php:946
+#: include/classes/api/services/CTriggerGeneral.php:1143
+#: include/classes/api/services/CTriggerGeneral.php:1184
+#: include/classes/api/services/CTriggerGeneral.php:1192
 #, c-format
 msgid "unexpected value \"%1$s\""
 msgstr "uventet verdi \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:232
-#: include/classes/setup/CFrontendSetup.php:382
-#: include/classes/setup/CFrontendSetup.php:491
+#: include/classes/setup/CFrontendSetup.php:233
+#: include/classes/setup/CFrontendSetup.php:383
+#: include/classes/setup/CFrontendSetup.php:492
 msgid "unknown"
 msgstr "ukjent"
 
@@ -20827,9 +20846,9 @@ msgstr "verdien er for lang"
 #: include/classes/api/services/CDiscoveryRule.php:1675
 #: include/classes/api/services/CDiscoveryRule.php:1696
 #: include/classes/api/services/CEvent.php:772
-#: include/classes/api/services/CHost.php:987
-#: include/classes/api/services/CHost.php:1998
-#: include/classes/api/services/CHost.php:2138
+#: include/classes/api/services/CHost.php:992
+#: include/classes/api/services/CHost.php:2025
+#: include/classes/api/services/CHost.php:2180
 #: include/classes/api/services/CMapElement.php:86
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681

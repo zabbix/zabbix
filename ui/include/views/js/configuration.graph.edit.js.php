@@ -290,7 +290,6 @@
 		'graphtype' =>  $data['graphtype'],
 		'readonly' => $readonly,
 		'hostid' => $data['hostid'],
-		'groupid' => $data['groupid'],
 		'is_template' => $data['is_template'],
 		'normal_only' => $data['normal_only'],
 		'parent_discoveryid' => $data['parent_discoveryid'],

@@ -68,9 +68,26 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
 		// Compare host prototype's macros from DB and frontend.
-		$expected_macros = CDBHelper::getAll('SELECT macro, value, description '
-			. 'FROM hostmacro WHERE hostid ='.self::HOST_PROTOTYPE_ID);
-		$this->assertEquals($expected_macros, $this->getMacros());
+		$expected_macros = CDBHelper::getAll(
+			'SELECT macro,value,description,type FROM hostmacro WHERE hostid='.self::HOST_PROTOTYPE_ID.' ORDER BY macro'
+		);
+
+		// Get host prototype macros from macros tab.
+		$actual_macros = $this->getMacros();
+		$macros_count = count($actual_macros);
+		$macro_types = CDBHelper::getAll('SELECT macro, type FROM hostmacro');
+
+		// Add Type from DB to array with actual macros
+		$types = [];
+		foreach ($macro_types as $macro_type) {
+			$types[$macro_type['macro']] = $macro_type['type'];
+		}
+
+		for ($i = 0; $i < $macros_count; $i++) {
+			$actual_macros[$i]['type'] = $types[$actual_macros[$i]['macro']];
+		}
+
+		$this->assertEquals($expected_macros, $actual_macros);
 
 		// Check global macros.
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
@@ -79,11 +96,18 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Create two macros arrays: from DB and from Frontend form.
 		$macros = [
 			'database' => array_merge(
-					CDBHelper::getAll('SELECT macro, value, description FROM globalmacro'),
+					CDBHelper::getAll('SELECT macro, value, description, type FROM globalmacro'),
 					$expected_macros
 				),
 			'frontend' => []
 		];
+
+		// If the macro is expected to have type "Secret text", replace the value from db with the secret macro pattern.
+		for ($i = 0; $i < count($macros['database']); $i++) {
+			if ($macros['database'][$i]['type'] === '1') {
+				$macros['database'][$i]['value'] = '******';
+			}
+		}
 
 		// Write macros rows from Frontend to array.
 		$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
@@ -92,8 +116,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$macro = [];
 			$row = $table->getRow($i);
 			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
-			$macro['value'] = $row->query('xpath:./td[2]/div/textarea')->one()->getValue();
+			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
 			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
+			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';
 
 			$macros['frontend'][] = $macro;
 		}
@@ -478,6 +503,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('macros', $data)) {
 			$this->zbxTestTabSwitch('Macros');
+			$this->page->waitUntilReady();
 			$this->fillMacros($data['macros']);
 		}
 
