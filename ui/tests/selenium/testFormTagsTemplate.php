@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/behaviors/CFormParametersBehavior.php';
 /**
  * @backup hosts
  */
-class testFormTemplateTags extends CWebTest {
+class testFormTagsTemplate extends CWebTest {
 
 	/**
 	 * The name of the template for cloning in the test data set.
@@ -183,7 +183,7 @@ class testFormTemplateTags extends CWebTest {
 	 * @dataProvider getCreateData
 	 *
 	 */
-	public function testFormTemplateTags_Create($data) {
+	public function testFormTagsTemplate_Create($data) {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
 
@@ -291,7 +291,7 @@ class testFormTemplateTags extends CWebTest {
 	 * @dataProvider getUpdateData
 	 *
 	 */
-	public function testFormTemplateTags_Update($data) {
+	public function testFormTagsTemplate_Update($data) {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
 		$data['fields']['Template name'] = $this->update_template;
@@ -331,11 +331,11 @@ class testFormTemplateTags extends CWebTest {
 		}
 	}
 
-	public function testFormTemplateTags_Clone() {
+	public function testFormTagsTemplate_Clone() {
 		$this->executeCloning('Clone');
 	}
 
-	public function testFormTemplateTags_FullClone() {
+	public function testFormTagsTemplate_FullClone() {
 		$this->executeCloning('Full clone');
 	}
 

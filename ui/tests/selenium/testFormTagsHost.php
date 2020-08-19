@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/behaviors/CFormParametersBehavior.php';
 /**
  * @backup hosts
  */
-class testFormHostTags extends CWebTest {
+class testFormTagsHost extends CWebTest {
 
 	/**
 	 * The name of the host for cloning in the test data set.
@@ -167,7 +167,7 @@ class testFormHostTags extends CWebTest {
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testFormHostTags_Create($data) {
+	public function testFormTagsHost_Create($data) {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
 
@@ -277,7 +277,7 @@ class testFormHostTags extends CWebTest {
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormHostTags_Update($data) {
+	public function testFormTagsHost_Update($data) {
 		$sql_hosts = "SELECT * FROM hosts ORDER BY hostid";
 		$old_hash = CDBHelper::getHash($sql_hosts);
 		$data['host_name'] = $this->update_host;
@@ -312,11 +312,11 @@ class testFormHostTags extends CWebTest {
 		}
 	}
 
-	public function testFormHostTags_Clone() {
+	public function testFormTagsHost_Clone() {
 		$this->executeCloning('Clone');
 	}
 
-	public function testFormHostTags_FullClone() {
+	public function testFormTagsHost_FullClone() {
 		$this->executeCloning('Full clone');
 	}
 
