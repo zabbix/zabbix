@@ -95,19 +95,6 @@ class CControllerProfileUpdate extends CController {
 					$ret = $this->hasInput('value_int');
 					break;
 
-				case 'web.monitoringhosts.selected':
-				case 'web.monitoringhosts.expanded':
-					$ret = $this->hasInput('value_int');
-					break;
-
-				case 'web.monitoringhosts.properties':
-					$ret = $this->hasInput('value_str');
-					break;
-
-				case 'web.monitoringhosts.taborder':
-					$ret = $this->hasInput('value_str');
-					break;
-
 				default:
 					$ret = false;
 			}
@@ -155,57 +142,6 @@ class CControllerProfileUpdate extends CController {
 
 			case 'web.sidebar.mode':
 				CViewHelper::saveSidebarMode($value_int);
-				break;
-
-			case 'web.monitoringhosts.selected':
-				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
-					->read();
-				$dynamictabs = count($filter->tabfilters);
-
-				if ($value_int >= 0 && $value_int < $dynamictabs) {
-					$filter->selected = (int) $value_int;
-					$filter->expanded = true;
-					$filter->update();
-				}
-
-				break;
-
-			case 'web.monitoringhosts.properties':
-				$idx2 = $this->getInput('idx2');
-				$idx2 = reset($idx2);
-				$properties = [];
-				parse_str($this->getInput('value_str'), $properties);
-				$tags = [];
-
-				foreach ($properties['tags'] as $tag) {
-					if ($tag['tag'] !== '' && $tag['value'] !== '') {
-						$tags[] = $tag;
-					}
-				}
-
-				$properties['tags'] = $tags;
-
-				(new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
-					->read()
-					->setTabFilter($idx2, $properties)
-					->update();
-
-				break;
-
-			case 'web.monitoringhosts.taborder':
-				(new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
-					->read()
-					->sort($this->getInput('value_str'))
-					->update();
-
-				break;
-
-			case 'web.monitoringhosts.expanded':
-				$filter = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))
-					->read();
-				$filter->expanded = ($value_int > 0);
-				$filter->update();
-
 				break;
 
 			default:

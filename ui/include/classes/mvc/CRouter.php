@@ -162,6 +162,7 @@ class CRouter {
 		'problem.view'					=> ['CControllerProblemView',						'layout.htmlpage',		'monitoring.problem.view'],
 		'problem.view.csv'				=> ['CControllerProblemView',						'layout.csv',			'monitoring.problem.view'],
 		'profile.update'				=> ['CControllerProfileUpdate',						'layout.json',			null],
+		'tabfilter.profile.update'		=> ['CControllerTabFilterProfileUpdate',			'layout.json',			null],
 		'proxy.create'					=> ['CControllerProxyCreate',						null,					null],
 		'proxy.delete'					=> ['CControllerProxyDelete',						null,					null],
 		'proxy.edit'					=> ['CControllerProxyEdit',							'layout.htmlpage',		'administration.proxy.edit'],
