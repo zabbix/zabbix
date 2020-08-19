@@ -1,0 +1,1 @@
+A......... [ZBX-18230] fixed import data normalizer to convert strings recursively and process some of the custom extended rules and validations (Ivo)
