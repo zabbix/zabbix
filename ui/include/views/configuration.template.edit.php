@@ -411,14 +411,14 @@ $tmplList
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
-$divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
+$divTabs->addTab('tmplTab', _('Linked templates'), $tmplList, 'linked-template');
 
 // tags
 $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly']
-]));
+]), 'tags');
 
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
@@ -432,7 +432,8 @@ $divTabs->addTab('macroTab', _('Macros'),
 		->addRow(null, new CPartial($tmpl, [
 			'macros' => $data['macros'],
 			'readonly' => $data['readonly']
-		]), 'macros_container')
+		]), 'macros_container'),
+	'macros'
 );
 
 // footer

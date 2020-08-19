@@ -48,6 +48,7 @@ if ($data['form_refresh'] == 0) {
 
 // Create form.
 $user_form = (new CForm())
+	->setId('userForm')
 	->setName('user_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])

@@ -30,6 +30,7 @@ class CTabView extends CDiv {
 	protected $headers = [];
 	protected $footer = null;
 	protected $selectedTab = null;
+	protected $indicators = [];
 
 	/**
 	 * Script for tab change event.
@@ -91,10 +92,14 @@ class CTabView extends CDiv {
 		return $this;
 	}
 
-	public function addTab($id, $header, $body) {
+	public function addTab($id, $header, $body, $indicator_type = false) {
 		$this->headers[$id] = $header;
 		$this->tabs[$id] = new CDiv($body);
 		$this->tabs[$id]->setId(zbx_formatDomId($id));
+
+		if ($indicator_type) {
+			$this->indicators[$id] = $indicator_type;
+		}
 		return $this;
 	}
 
@@ -128,6 +133,11 @@ class CTabView extends CDiv {
 			foreach ($this->headers as $id => $header) {
 				$tabLink = (new CLink($header, '#'.$id))
 					->setId('tab_'.$id);
+
+				if (array_key_exists($id, $this->indicators)) {
+					$tabLink->setAttribute('js-indicator', $this->indicators[$id]);
+				}
+
 				$headersList->addItem($tabLink);
 			}
 
@@ -135,6 +145,7 @@ class CTabView extends CDiv {
 			$this->addItem($this->tabs);
 
 			zbx_add_post_js($this->makeJavascript());
+			zbx_add_post_js('new TabIndicators();');
 		}
 
 		$this->addItem($this->footer);

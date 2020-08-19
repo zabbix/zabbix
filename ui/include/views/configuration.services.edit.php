@@ -31,6 +31,7 @@ $widget = (new CWidget())->setTitle(_('Services'));
 
 // create form
 $servicesForm = (new CForm())
+	->setId('servicesForm')
 	->setName('servicesForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])

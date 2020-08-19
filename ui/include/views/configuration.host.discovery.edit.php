@@ -30,6 +30,7 @@ $widget = (new CWidget())
 	));
 
 $form = (new CForm())
+	->setId('hostDiscoveryForm')
 	->setName('itemForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
