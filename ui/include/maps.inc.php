@@ -617,6 +617,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			'output' => [],
 			'triggerids' => array_keys($triggers),
 			'monitored' => true,
+			'skipDependent' => true,
 			'preservekeys' => true
 		]);
 
@@ -633,7 +634,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				}
 			}
 		}
-
 		unset($triggers, $monitored_triggers);
 	}
 
@@ -712,11 +712,10 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		}
 	}
 
-	$config = select_config();
-
 	$info = [];
 	foreach ($selements as $selementId => $selement) {
 		$i = [
+			'elementtype' => $selement['elementtype'],
 			'disabled' => 0,
 			'maintenance' => 0,
 			'problem' => 0,
@@ -816,7 +815,9 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				}
 			}
 
-			$i['latelyChanged'] |= ((time() - $lately_changed) < timeUnitToSeconds($config['blink_period']));
+			$i['latelyChanged'] |= ((time() - $lately_changed) < timeUnitToSeconds(CSettingsHelper::get(
+				CSettingsHelper::BLINK_PERIOD
+			)));
 		}
 
 		if ($critical_problem) {
@@ -835,7 +836,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			$selement['iconid_disabled'] = $selement['iconid_off'];
 		}
 
-		$i['elementtype'] = $selement['elementtype'];
 		$i['iconid_off'] = $selement['iconid_off'];
 		$i['iconid_on'] = $selement['iconid_on'];
 		$i['iconid_maintenance'] = $selement['iconid_maintenance'];
@@ -1549,20 +1549,22 @@ function getMapLinkTriggerInfo($sysmap, $options) {
  * @return string
  */
 function getSelementLabelColor($is_problem, $is_ack) {
-	static $config = null;
 	static $schema = null;
 
-	if ($config === null) {
-		$config = select_config();
+	if ($schema === null) {
 		$schema = DB::getSchema('config');
 	}
 
-	$ack_unack = $is_ack ? 'ack' : 'unack';
-	$ok_problem = $is_problem ? 'problem' : 'ok';
-
-	if ($config['custom_color'] === '1') {
-		return $config[$ok_problem . '_' . $ack_unack . '_color'];
+	if ($is_problem) {
+		$param = $is_ack ? CSettingsHelper::PROBLEM_ACK_COLOR : CSettingsHelper::PROBLEM_UNACK_COLOR;
+	}
+	else {
+		$param = $is_ack ? CSettingsHelper::OK_ACK_COLOR : CSettingsHelper::OK_UNACK_COLOR;
 	}
 
-	return $schema['fields'][$ok_problem . '_' . $ack_unack . '_color']['default'];
+	if (CSettingsHelper::get(CSettingsHelper::CUSTOM_COLOR) === '1') {
+		return CSettingsHelper::get($param);
+	}
+
+	return $schema['fields'][$param]['default'];
 }

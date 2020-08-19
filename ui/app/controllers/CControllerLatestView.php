@@ -87,12 +87,16 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::delete('web.latest.filter.show_details');
 		}
 
+		// Force-check "Show items without data" if there are no hosts selected.
+		$filter_hostids = CProfile::getArray('web.latest.filter.hostids');
+		$filter_show_without_data = $filter_hostids ? CProfile::get('web.latest.filter.show_without_data', 1) : 1;
+
 		$filter = [
 			'groupids' => CProfile::getArray('web.latest.filter.groupids'),
-			'hostids' => CProfile::getArray('web.latest.filter.hostids'),
+			'hostids' => $filter_hostids,
 			'application' => CProfile::get('web.latest.filter.application', ''),
 			'select' => CProfile::get('web.latest.filter.select', ''),
-			'show_without_data' => CProfile::get('web.latest.filter.show_without_data', 1),
+			'show_without_data' => $filter_show_without_data,
 			'show_details' => CProfile::get('web.latest.filter.show_details', 0)
 		];
 
@@ -121,6 +125,9 @@ class CControllerLatestView extends CControllerLatest {
 
 		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['rows'], ZBX_SORT_UP, $view_curl);
 
+		$this->extendData($prepared_data, $filter['show_without_data']);
+		$this->addCollapsedDataFromProfile($prepared_data);
+
 		// display
 		$data = [
 			'filter' => $filter,
@@ -130,7 +137,13 @@ class CControllerLatestView extends CControllerLatest {
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'active_tab' => CProfile::get('web.latest.filter.active', 1),
-			'paging' => $paging
+			'paging' => $paging,
+			'config' => [
+				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
+				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
+				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
+			]
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

@@ -33,6 +33,7 @@ class CFrontendSetup {
 	const MIN_PHP_MAX_INPUT_TIME = 300;
 	const MIN_PHP_GD_VERSION = '2.0';
 	const MIN_PHP_LIBXML_VERSION = '2.6.15';
+	const MIN_PHP_LIBYAML_VERION = '2.0.2'; // See https://pecl.php.net/package/yaml
 	const REQUIRED_PHP_ARG_SEPARATOR_OUTPUT = '&';
 
 	/**
@@ -64,7 +65,6 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpUploadMaxFilesize();
 		$result[] = $this->checkPhpMaxExecutionTime();
 		$result[] = $this->checkPhpMaxInputTime();
-		$result[] = $this->checkPhpTimeZone();
 		$result[] = $this->checkPhpDatabases();
 		$result[] = $this->checkPhpBcmath();
 		$result[] = $this->checkPhpMbstring();
@@ -77,10 +77,12 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpGdJpeg();
 		$result[] = $this->checkPhpGdGif();
 		$result[] = $this->checkPhpGdFreeType();
+		$result[] = $this->checkPhpLibYAML();
 		$result[] = $this->checkPhpLibxml();
 		$result[] = $this->checkPhpXmlWriter();
 		$result[] = $this->checkPhpXmlReader();
 		$result[] = $this->checkPhpLdapModule();
+		$result[] = $this->checkPhpOpenSsl();
 		$result[] = $this->checkPhpCtype();
 		$result[] = $this->checkPhpSession();
 		$result[] = $this->checkPhpSessionAutoStart();
@@ -216,23 +218,6 @@ class CFrontendSetup {
 			'error' => _s('Minimum required limit on input parse time for PHP scripts is %1$s (configuration option "max_input_time").',
 				self::MIN_PHP_MAX_INPUT_TIME
 			)
-		];
-	}
-
-	/**
-	 * Checks for PHP timezone.
-	 *
-	 * @return array
-	 */
-	public function checkPhpTimeZone() {
-		$current = ini_get('date.timezone');
-
-		return [
-			'name' => _s('PHP option "%1$s"', 'date.timezone'),
-			'current' => $current ? $current : _('unknown'),
-			'required' => null,
-			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _('Time zone for PHP is not set (configuration parameter "date.timezone").')
 		];
 	}
 
@@ -479,6 +464,27 @@ class CFrontendSetup {
 	}
 
 	/**
+	 * Checks for PHP LibYAML extension.
+	 *
+	 * @return array
+	 */
+	public function checkPhpLibYAML(): array {
+		if (!$current = phpversion('yaml')) {
+			$current = _('unknown');
+		}
+
+		$check = version_compare($current, self::MIN_PHP_LIBYAML_VERION, '>=');
+
+		return [
+			'name' => _('PHP LibYAML'),
+			'current' => $current,
+			'required' => self::MIN_PHP_LIBYAML_VERION,
+			'result' => $check ? self::CHECK_OK : self::CHECK_FATAL,
+			'error' => _('PHP LibYAML extension missing.')
+		];
+	}
+
+	/**
 	 * Checks for PHP libxml extension.
 	 *
 	 * @return array
@@ -549,6 +555,23 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
 			'error' => _('PHP LDAP extension missing.')
+		];
+	}
+
+	/**
+	 * Checks for PHP OpenSSL extension.
+	 *
+	 * @return array
+	 */
+	public function checkPhpOpenSsl() {
+		$current = extension_loaded('openssl');
+
+		return [
+			'name' => _('PHP OpenSSL'),
+			'current' => $current ? _('on') : _('off'),
+			'required' => null,
+			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
+			'error' => _('PHP OpenSSL extension missing.')
 		];
 	}
 

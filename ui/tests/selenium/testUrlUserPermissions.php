@@ -378,7 +378,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'applications.php',
+				'url' => 'zabbix.php?action=application.list',
 				'title' =>	'Configuration of applications',
 				'header' => 'Applications',
 				'users' => [
@@ -594,24 +594,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'zabbix.php?action=valuemap.list',
 				'title' =>	'Configuration of value mapping',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => false
-				]
-			]],
-			[[
-				'url' => 'zabbix.php?action=workingtime.edit',
-				'title' =>	'Configuration of working time',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => false
-				]
-			]],
-			[[
-				'url' => 'zabbix.php?action=trigseverity.edit',
-				'title' =>	'Configuration of trigger severities',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

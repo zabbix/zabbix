@@ -108,6 +108,7 @@ class CFrontendApiWrapper extends CApiWrapper {
 	protected function requiresAuthentication($api, $method) {
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkAuthentication')
-			|| ($api === 'apiinfo' && $method === 'version'));
+			|| ($api === 'apiinfo' && $method === 'version')
+			|| ($api === 'settings' && $method === 'getGlobal'));
 	}
 }

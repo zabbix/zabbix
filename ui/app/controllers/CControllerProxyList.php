@@ -71,20 +71,16 @@ class CControllerProxyList extends CController {
 			'status' => CProfile::get('web.proxies.filter_status', -1)
 		];
 
-		$config = select_config();
-
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'filter' => $filter,
-			'config' => [
-				'max_in_table' => $config['max_in_table']
-			],
 			'profileIdx' => 'web.proxies.filter',
 			'active_tab' => CProfile::get('web.proxies.filter.active', 1)
 		];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', $sortField],
 			'search' => [
@@ -94,7 +90,7 @@ class CControllerProxyList extends CController {
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
 			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1,
+			'limit' => $limit,
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -119,15 +115,18 @@ class CControllerProxyList extends CController {
 
 		foreach ($data['proxies'] as &$proxy) {
 			order_result($proxy['hosts'], 'name');
-			$proxy['hosts'] = array_slice($proxy['hosts'], 0, $data['config']['max_in_table'] + 1);
+			$proxy['hosts'] = array_slice($proxy['hosts'], 0, CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1);
 		}
 		unset($proxy);
 
 		if ($data['proxies']) {
 			global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-			$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
+			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SOCKET_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+			);
+			$server_status = $server->getStatus(CSessionHelper::getId());
 
 			if ($server_status !== false) {
 				$defaults = [
@@ -170,6 +169,8 @@ class CControllerProxyList extends CController {
 				}
 			}
 		}
+
+		$data['config'] = ['max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of proxies'));

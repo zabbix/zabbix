@@ -530,8 +530,6 @@ if (hasRequest('action') && getRequest('action') !== 'triggerprototype.massupdat
 	uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($triggerPrototypes, 'triggerid'));
 }
 
-$config = select_config();
-
 /*
  * Display
  */
@@ -546,7 +544,6 @@ if ((getRequest('action') === 'triggerprototype.massupdateform' || hasRequest('m
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = getTriggerFormData([
-		'config' => $config,
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
@@ -598,7 +595,6 @@ else {
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => $config,
 		'dependencyTriggers' => []
 	];
 
@@ -608,7 +604,7 @@ else {
 		'output' => ['triggerid', $sortField],
 		'discoveryids' => $data['parent_discoveryid'],
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 	];
 	$data['triggers'] = API::TriggerPrototype()->get($options);
 

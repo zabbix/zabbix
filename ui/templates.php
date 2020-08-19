@@ -201,7 +201,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		$msg = [
 			'type' => 'error',
 			'message' => _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'),
-			'src' => ''
+			'source' => ''
 		];
 
 		echo makeMessageBox(false, [$msg], null, true, false)->addClass(ZBX_STYLE_MSG_WARNING);
@@ -1032,8 +1032,6 @@ else {
 		];
 	}
 
-	$config = select_config();
-
 	$filter['templates'] = $filter['templates']
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
@@ -1058,6 +1056,7 @@ else {
 	}
 
 	// Select templates.
+	$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 	$templates = API::Template()->get([
 		'output' => ['templateid', $sortField],
 		'evaltype' => $filter['evaltype'],
@@ -1069,7 +1068,7 @@ else {
 		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => $limit
 	]);
 
 	order_result($templates, $sortField, $sortOrder);
@@ -1091,9 +1090,9 @@ else {
 
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
-		'selectHosts' => ['hostid', 'name', 'status'],
-		'selectTemplates' => ['templateid', 'name', 'status'],
-		'selectParentTemplates' => ['templateid', 'name', 'status'],
+		'selectHosts' => ['hostid'],
+		'selectTemplates' => ['templateid', 'name'],
+		'selectParentTemplates' => ['templateid', 'name'],
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
@@ -1109,38 +1108,35 @@ else {
 
 	order_result($templates, $sortField, $sortOrder);
 
-	// Select writable templates:
-	$linked_template_ids = [];
-	$writable_templates = [];
-	$linked_hosts_ids = [];
-	$writable_hosts = [];
-	foreach ($templates as $template) {
-		$linked_template_ids = array_merge(
-			$linked_template_ids,
-			zbx_objectValues($template['parentTemplates'], 'templateid'),
-			zbx_objectValues($template['templates'], 'templateid'),
-			zbx_objectValues($template['hosts'], 'hostid')
-		);
+	// Select editable templates:
+	$linked_templateids = [];
+	$editable_templates = [];
+	$linked_hostids = [];
+	$editable_hosts = [];
+	foreach ($templates as &$template) {
+		order_result($template['templates'], 'name');
+		order_result($template['parentTemplates'], 'name');
 
-		$linked_hosts_ids = array_merge(
-			$linked_hosts_ids,
-			zbx_objectValues($template['hosts'], 'hostid')
-		);
+		$linked_templateids += array_flip(array_column($template['parentTemplates'], 'templateid'));
+		$linked_templateids += array_flip(array_column($template['templates'], 'templateid'));
+
+		$template['hosts'] = array_flip(array_column($template['hosts'], 'hostid'));
+		$linked_hostids += $template['hosts'];
 	}
-	if ($linked_template_ids) {
-		$linked_template_ids = array_unique($linked_template_ids);
-		$writable_templates = API::Template()->get([
+	unset($template);
+
+	if ($linked_templateids) {
+		$editable_templates = API::Template()->get([
 			'output' => ['templateid'],
-			'templateids' => $linked_template_ids,
+			'templateids' => array_keys($linked_templateids),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 	}
-	if ($linked_hosts_ids) {
-		$linked_hosts_ids = array_unique($linked_hosts_ids);
-		$writable_hosts = API::Host()->get([
+	if ($linked_hostids) {
+		$editable_hosts = API::Host()->get([
 			'output' => ['hostid'],
-			'hostsids' => $linked_hosts_ids,
+			'hostids' => array_keys($linked_hostids),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -1153,14 +1149,14 @@ else {
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
-		'config' => [
-			'max_in_table' => $config['max_in_table']
-		],
-		'writable_templates' => $writable_templates,
-		'writable_hosts' => $writable_hosts,
+		'editable_templates' => $editable_templates,
+		'editable_hosts' => $editable_hosts,
 		'profileIdx' => 'web.templates.filter',
 		'active_tab' => CProfile::get('web.templates.filter.active', 1),
-		'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
+		'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+		'config' => [
+			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+		]
 	];
 
 	$view = new CView('configuration.template.list', $data);

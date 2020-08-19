@@ -136,7 +136,8 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			$schema = (new CImportValidatorFactory('xml'))
+			// Parameter in CImportValidatorFactory is irrelavant here, since export does not validate data.
+			$schema = (new CImportValidatorFactory(CExportWriterFactory::YAML))
 				->getObject(ZABBIX_EXPORT_VERSION)
 				->getSchema();
 
@@ -174,7 +175,7 @@ class CConfigurationExport {
 			}
 
 			if ($this->data['maps']) {
-				$this->builder->buildMaps($this->data['maps']);
+				$this->builder->buildMaps($schema['rules']['maps'], $this->data['maps']);
 			}
 
 			if ($this->data['mediaTypes']) {
@@ -1442,10 +1443,14 @@ class CConfigurationExport {
 						break;
 				}
 
-				$selement['iconid_off'] = $selement['iconid_off'] > 0 ? $images[$selement['iconid_off']] : '';
-				$selement['iconid_on'] = $selement['iconid_on'] > 0 ? $images[$selement['iconid_on']] : '';
-				$selement['iconid_disabled'] = $selement['iconid_disabled'] > 0 ? $images[$selement['iconid_disabled']] : '';
-				$selement['iconid_maintenance'] = $selement['iconid_maintenance'] > 0 ? $images[$selement['iconid_maintenance']] : '';
+				$selement['iconid_off'] = ($selement['iconid_off'] > 0) ? $images[$selement['iconid_off']] : [];
+				$selement['iconid_on'] = ($selement['iconid_on'] > 0) ? $images[$selement['iconid_on']] : [];
+				$selement['iconid_disabled'] = ($selement['iconid_disabled'] > 0)
+					? $images[$selement['iconid_disabled']]
+					: [];
+				$selement['iconid_maintenance'] = ($selement['iconid_maintenance'] > 0)
+					? $images[$selement['iconid_maintenance']]
+					: [];
 			}
 			unset($selement);
 

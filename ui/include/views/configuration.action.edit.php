@@ -58,7 +58,7 @@ $condition_table = (new CTable(_('No conditions defined.')))
 $i = 0;
 
 if ($data['action']['filter']['conditions']) {
-	$actionConditionStringValues = actionConditionValueToString([$data['action']], $data['config']);
+	$actionConditionStringValues = actionConditionValueToString([$data['action']]);
 
 	foreach ($data['action']['filter']['conditions'] as $cIdx => $condition) {
 		if (!isset($condition['conditiontype'])) {

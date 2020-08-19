@@ -115,10 +115,9 @@ class CControllerMapView extends CController {
 			'editable' => true
 		]);
 
-		$config = select_config();
 		$severities_dropdown = [];
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_name = getSeverityName($severity, $config);
+			$severity_name = getSeverityName($severity);
 
 			$severities_dropdown[$severity] = ($severity == $map['severity_min'])
 				? $severity_name.' ('._('default').')'

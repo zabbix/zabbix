@@ -24,22 +24,9 @@ class CWebUser {
 	public static $data = null;
 
 	/**
-	 * Flag used to ignore setting authentication cookie performed checkAuthentication.
-	 */
-	static $set_cookie = true;
-
-	/**
 	 * Flag used to not to extend session lifetime in checkAuthentication.
 	 */
 	static $extend_session = true;
-
-	/**
-	 * Disable automatic cookie setting.
-	 * First checkAuthentication call (performed in initialization phase) will not be sending cookies.
-	 */
-	public static function disableSessionCookie() {
-		self::$set_cookie = false;
-	}
 
 	/**
 	 * Disable automatic session extension.
@@ -51,17 +38,15 @@ class CWebUser {
 	/**
 	 * Tries to login a user and populates self::$data on success.
 	 *
-	 * @param string $login			user login
-	 * @param string $password		user password
+	 * @param string $login     user login
+	 * @param string $password  user password
 	 *
 	 * @throws Exception if user cannot be logged in
 	 *
 	 * @return bool
 	 */
-	public static function login($login, $password) {
+	public static function login(string $login, string $password): bool {
 		try {
-			self::setDefault();
-
 			self::$data = API::User()->login([
 				'user' => $login,
 				'password' => $password,
@@ -87,13 +72,6 @@ class CWebUser {
 				$result &= CProfile::flush();
 			}
 
-			// remove guest session after successful login
-			$result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie(ZBX_SESSION_NAME)));
-
-			if ($result) {
-				self::setSessionCookie(self::$data['sessionid']);
-			}
-
 			return $result;
 		}
 		catch (Exception $e) {
@@ -105,26 +83,23 @@ class CWebUser {
 	/**
 	 * Log-out the current user.
 	 */
-	public static function logout() {
-		self::$data['sessionid'] = self::getSessionCookie();
+	public static function logout(): void {
+		self::$data['sessionid'] = CSessionHelper::getId();
 
 		if (API::User()->logout([])) {
 			self::$data = null;
-			CSession::destroy();
-			zbx_unsetcookie(ZBX_SESSION_NAME);
+			session_destroy();
 		}
 	}
 
-	public static function checkAuthentication($sessionId) {
+	public static function checkAuthentication(string $sessionid): bool {
 		try {
-			if ($sessionId !== null) {
-				self::$data = API::User()->checkAuthentication([
-					'sessionid' => $sessionId,
-					'extend' => self::$extend_session
-				]);
-			}
+			self::$data = API::User()->checkAuthentication([
+				'sessionid' => $sessionid,
+				'extend' => self::$extend_session
+			]);
 
-			if ($sessionId === null || empty(self::$data)) {
+			if (empty(self::$data)) {
 				self::$data = API::User()->login([
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
@@ -132,50 +107,20 @@ class CWebUser {
 				]);
 
 				if (empty(self::$data)) {
-					clear_messages(1);
+					CMessageHelper::clear();
 					throw new Exception();
 				}
-				$sessionId = self::$data['sessionid'];
 			}
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				throw new Exception();
 			}
 
-			if (self::$set_cookie) {
-				self::setSessionCookie($sessionId);
-			}
-			else {
-				self::$set_cookie = true;
-			}
-
-			return $sessionId;
+			return true;
 		}
 		catch (Exception $e) {
-			self::setDefault();
-
 			return false;
 		}
-	}
-
-	/**
-	 * Shorthand method for setting current session ID in cookies.
-	 *
-	 * @param string $sessionId		Session ID string
-	 */
-	public static function setSessionCookie($sessionId) {
-		$autoLogin = self::isGuest() ? false : (bool) self::$data['autologin'];
-
-		zbx_setcookie(ZBX_SESSION_NAME, $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
-	}
-
-	/**
-	 * Retrieves current session ID from cookie named as defined in ZBX_SESSION_NAME.
-	 *
-	 * @return string
-	 */
-	public static function getSessionCookie() {
-		return get_cookie(ZBX_SESSION_NAME);
 	}
 
 	/**
@@ -184,12 +129,12 @@ class CWebUser {
 	 * @static
 	 */
 	public static function setDefault(): void {
-		$config = select_config();
 		self::$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
-			'lang' => $config['default_lang'],
+			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
 			'type' => 0,
+			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
 			'debug_mode' => false
 		];
 	}

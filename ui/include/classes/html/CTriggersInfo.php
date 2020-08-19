@@ -39,8 +39,6 @@ class CTriggersInfo extends CTable {
 	protected function bodyToString() {
 		$this->cleanItems();
 
-		$config = select_config();
-
 		// array of triggers (not classified, information, warning, average, high, disaster) in problem state
 		$triggersProblemState = [];
 
@@ -73,14 +71,13 @@ class CTriggersInfo extends CTable {
 			}
 		}
 
-		$severityCells = [getSeverityCell(null, $config, $triggersOkState.SPACE._('Ok'), true)];
+		$severityCells = [getSeverityCell(null, $triggersOkState.SPACE._('Ok'), true)];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityCount = isset($triggersProblemState[$severity]) ? $triggersProblemState[$severity] : 0;
 
 			$severityCells[] = getSeverityCell($severity,
-				$config,
-				$severityCount.SPACE.getSeverityName($severity, $config),
+				$severityCount.SPACE.getSeverityName($severity),
 				!$severityCount
 			);
 		}

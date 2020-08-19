@@ -168,7 +168,7 @@ class CUser extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		while ($user = DBfetch($res)) {
 			unset($user['passwd']);
@@ -261,6 +261,7 @@ class CUser extends CApiService {
 		}
 
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['alias']], 'fields' => [
@@ -272,6 +273,7 @@ class CUser extends CApiService {
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
+			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
@@ -344,7 +346,9 @@ class CUser extends CApiService {
 			$upd_user = [];
 
 			// strings
-			$field_names = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme'];
+			$field_names = ['alias', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme',
+				'timezone'
+			];
 			foreach ($field_names as $field_name) {
 				if (array_key_exists($field_name, $user) && $user[$field_name] !== $db_user[$field_name]) {
 					$upd_user[$field_name] = $user[$field_name];
@@ -386,6 +390,7 @@ class CUser extends CApiService {
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', DateTimeZone::listIdentifiers());
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias']], 'fields' => [
@@ -398,6 +403,7 @@ class CUser extends CApiService {
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,90:'.SEC_PER_DAY],
 			'lang' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => $locales, 'length' => DB::getFieldLength('users', 'lang')],
+			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
 			'refresh' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0:'.SEC_PER_HOUR],
@@ -434,7 +440,7 @@ class CUser extends CApiService {
 		// 'passwd' can't be received by the user.get method
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-				'theme', 'type', 'refresh', 'rows_per_page'
+				'theme', 'type', 'refresh', 'rows_per_page', 'timezone'
 			],
 			'userids' => array_keys($db_users),
 			'preservekeys' => true
@@ -606,10 +612,10 @@ class CUser extends CApiService {
 	 * @return bool
 	 */
 	private static function hasInternalAuth($user, $db_usrgrps) {
-		$config = select_config();
-		$system_gui_access = ($config['authentication_type'] == ZBX_AUTH_INTERNAL)
-			? GROUP_GUI_ACCESS_INTERNAL
-			: GROUP_GUI_ACCESS_LDAP;
+		$system_gui_access =
+			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
+				? GROUP_GUI_ACCESS_INTERNAL
+				: GROUP_GUI_ACCESS_LDAP;
 
 		foreach($user['usrgrps'] as $usrgrp) {
 			$gui_access = (int) $db_usrgrps[$usrgrp['usrgrpid']]['gui_access'];
@@ -1124,13 +1130,20 @@ class CUser extends CApiService {
 	 * @return bool
 	 */
 	protected function ldapLogin(array $user) {
-		$config = select_config();
 		$cnf = [];
+		$auth_params = [
+			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
+			CAuthenticationHelper::LDAP_CONFIGURED,
+			CAuthenticationHelper::LDAP_HOST,
+			CAuthenticationHelper::LDAP_PORT,
+			CAuthenticationHelper::LDAP_BASE_DN,
+			CAuthenticationHelper::LDAP_BIND_DN,
+			CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE,
+			CAuthenticationHelper::LDAP_BIND_PASSWORD
+		];
 
-		foreach ($config as $id => $value) {
-			if (strpos($id, 'ldap_') !== false) {
-				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
-			}
+		foreach ($auth_params as $param) {
+			$cnf[str_replace('ldap_', '', $param)] = CAuthenticationHelper::get($param);
 		}
 
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
@@ -1160,6 +1173,10 @@ class CUser extends CApiService {
 		}
 
 		$sessionid = self::$userData['sessionid'];
+
+		if (!$sessionid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
+		}
 
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid'],
@@ -1205,20 +1222,21 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$config = select_config();
 		$group_to_auth_map = [
-			GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
+			GROUP_GUI_ACCESS_SYSTEM => CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE),
 			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
-			GROUP_GUI_ACCESS_DISABLED => $config['authentication_type']
+			GROUP_GUI_ACCESS_DISABLED => CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		];
 
-		$db_user = $this->findByAlias($user['user'], ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
-			$config['authentication_type'], true
+		$db_user = $this->findByAlias($user['user'],
+			(CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), true
 		);
 
-		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-			$sec_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
+		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
+			$sec_left = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
+				- (time() - $db_user['attempt_clock']);
 
 			if ($sec_left > 0) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -1262,9 +1280,10 @@ class CUser extends CApiService {
 				$db_user['userip']
 			);
 
-			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS && $db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
+			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS
+					&& $db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', ZBX_LOGIN_BLOCK)
+					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK)))
 				);
 			}
 
@@ -1273,7 +1292,10 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
-		$db_user = self::createSession($user['user'], $db_user);
+
+		CSessionHelper::regenerateId();
+
+		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1328,7 +1350,10 @@ class CUser extends CApiService {
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
 		unset($db_user['passwd']);
-		$db_user = self::createSession($alias, $db_user);
+
+		CSessionHelper::regenerateId();
+
+		$db_user = self::createSession($db_user);
 		self::$userData = $db_user;
 
 		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
@@ -1345,7 +1370,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function checkAuthentication(array $session) {
+	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
 			'extend' =>	['type' => API_BOOLEAN, 'default' => true]
@@ -1369,19 +1394,22 @@ class CUser extends CApiService {
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
 
+		// If session not created.
 		if (!$db_sessions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+			// After created new session return empty array.
+			return [];
 		}
 
 		$db_session = $db_sessions[0];
 
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page'
+				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone'
 			],
 			'userids' => $db_session['userid']
 		]);
 
+		// If user not exists.
 		if (!$db_users) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
@@ -1395,9 +1423,14 @@ class CUser extends CApiService {
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
 
-		$config = select_config();
 		if ($db_user['lang'] === LANG_DEFAULT) {
-			$db_user['lang'] = $config['default_lang'];
+			$db_user['lang'] = CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG);
+		}
+		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
+			$db_user['timezone'] = CSettingsHelper::get(CSettingsHelper::DEFAULT_TIMEZONE);
+		}
+		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
+			date_default_timezone_set($db_user['timezone']);
 		}
 
 		$autologout = timeUnitToSeconds($db_user['autologout']);
@@ -1530,13 +1563,12 @@ class CUser extends CApiService {
 	/**
 	 * Initialize session for user. Returns user data array with valid sessionid.
 	 *
-	 * @param string $alias    User alias value.
 	 * @param array  $db_user  User data from database.
 	 *
 	 * @return array
 	 */
-	private static function createSession($alias, $db_user) {
-		$db_user['sessionid'] = md5(microtime().$alias.mt_rand());
+	private static function createSession(array $db_user): array {
+		$db_user['sessionid'] = CSessionHelper::getId();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
@@ -1576,7 +1608,7 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_DISABLED => $default_auth
 		];
 		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
+			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd', 'timezone'
 		];
 
 		if ($case_sensitive) {
@@ -1628,9 +1660,14 @@ class CUser extends CApiService {
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
 
-		$config = select_config();
 		if ($db_user['lang'] === LANG_DEFAULT) {
-			$db_user['lang'] = $config['default_lang'];
+			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
+		}
+		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
+			$db_user['timezone'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_TIMEZONE);
+		}
+		if ($db_user['timezone'] !== ZBX_DEFAULT_TIMEZONE) {
+			date_default_timezone_set($db_user['timezone']);
 		}
 
 		return $db_user;

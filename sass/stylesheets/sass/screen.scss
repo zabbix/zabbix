@@ -5210,6 +5210,14 @@ a.link-action {
 	&:last-child {
 		margin: 0;
 	}
+
+	&.green-bg {
+		color: darken($alt-green, 45%);
+	}
+
+	&.yellow-bg {
+		color: darken($alt-yellow, 45%);
+	}
 }
 
 .green-bg {
@@ -5218,6 +5226,10 @@ a.link-action {
 
 .red-bg {
 	background-color: $alt-red;
+}
+
+.yellow-bg {
+	background-color: $alt-yellow;
 }
 
 // Severity statuses.
@@ -7052,6 +7064,80 @@ table.preprocessing-test-results {
 	}
 }
 
+.btn-split {
+	display: inline-block;
+	position: relative;
+	margin-right: 10px;
+
+	li {
+		display: inline-block;
+
+		button {
+			margin: 0 -1px 0 0;
+			border-radius: 0;
+		}
+
+		&:first-child button {
+			border-radius: 2px 0 0 2px;
+		}
+
+		&:last-child button {
+			border-radius: 0 2px 2px 0;
+		}
+
+		&:only-child button {
+			border-radius: 2px;
+		}
+	}
+}
+
+.btn-toggle-chevron {
+	position: relative;
+
+	&[aria-expanded="true"] {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		right: 8px;
+		top: calc(50% - 3px);
+		width: 5px;
+		height: 5px;
+		border-top: 1px solid $btn-alt-font-color;
+		border-right: 1px solid $btn-alt-font-color;
+		transform: rotate(135deg) translate(-1px,1px);
+		transition: transform .3s;
+	}
+
+	&[disabled] {
+		&::after {
+			border-top-color: $btn-disabled-font-color;
+			border-right-color: $btn-disabled-font-color;
+		}
+	}
+
+	&:enabled {
+		&:active,
+		&[aria-expanded="true"] {
+			&::after {
+				transform: rotate(315deg) translate(-1px,1px);
+			}
+		}
+
+		&:hover,
+		&:focus,
+		&:active,
+		&[aria-expanded="true"] {
+			&::after {
+				border-top-color:  $btn-font-color;
+				border-right-color: $btn-font-color;
+			}
+		}
+	}
+}
+
 .btn-dropdown-toggle {
 	white-space: nowrap;
 	overflow: hidden;
@@ -7069,12 +7155,17 @@ table.preprocessing-test-results {
 			height: 22px;
 			content: '';
 		}
+
+		&::after {
+			top: 6px;
+			right: 2px;
+		}
 	}
 
 	&::after {
 		position: absolute;
-		top: 6px;
-		right: 2px;
+		top: 7px;
+		right: 6px;
 		width: 10px;
 		height: 10px;
 		content: '';

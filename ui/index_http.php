@@ -20,10 +20,8 @@
 
 
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
-CWebUser::disableSessionCookie();
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$config = select_config();
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
 $request = getRequest('request', '');
@@ -39,10 +37,8 @@ if ($request !== '') {
 	$redirect_to->setArgument('request', $request);
 }
 
-if ($config['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED) {
+if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) != ZBX_AUTH_HTTP_ENABLED) {
 	redirect($redirect_to->toString());
-
-	exit;
 }
 
 $http_user = '';
@@ -57,7 +53,7 @@ if ($http_user) {
 	$parser = new CADNameAttributeParser(['strict' => true]);
 
 	if ($parser->parse($http_user) === CParser::PARSE_SUCCESS) {
-		$strip_domain = explode(',', $config['http_strip_domains']);
+		$strip_domain = explode(',', CAuthenticationHelper::get(CAuthenticationHelper::HTTP_STRIP_DOMAINS));
 		$strip_domain = array_map('trim', $strip_domain);
 
 		if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
@@ -67,15 +63,13 @@ if ($http_user) {
 
 	try {
 		$user = API::getApiService('user')->loginByAlias($http_user,
-			($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE), $config['authentication_type']
+			(CAuthenticationHelper::get(CAuthenticationHelper::HTTP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
 		if ($user) {
-			CWebUser::setSessionCookie($user['sessionid']);
 			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
 			redirect(reset($redirect));
-
-			exit;
 		}
 	}
 	catch (APIException $e) {
@@ -88,10 +82,12 @@ else {
 
 echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
-	'messages' => zbx_objectValues(clear_messages(), 'message'),
+	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
 		(new CButton('login', _('Login')))->onClick('document.location = '.
 			json_encode($redirect_to->getUrl()).';')
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();
+
+session_write_close();
