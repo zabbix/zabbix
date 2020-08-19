@@ -2215,24 +2215,29 @@ static void	DCsync_kvs_path(void)
 			zbx_vector_ptr_pair_append(&diff, pair);
 		}
 
-		START_SYNC;
-		for (j = 0; j < diff.values_num; j++)
+		if (0 != diff.values_num)
 		{
-			zbx_kv_t	*kv;
+			START_SYNC;
 
-			dc_kv = (zbx_dc_kv_t *)diff.values[j].first;
-			kv = (zbx_kv_t *)diff.values[j].second;
-
-			if (NULL != kv)
+			for (j = 0; j < diff.values_num; j++)
 			{
-				DCstrpool_replace(dc_kv->value != NULL ? 1 : 0, &dc_kv->value, kv->value);
-				continue;
+				zbx_kv_t	*kv;
+
+				dc_kv = (zbx_dc_kv_t *)diff.values[j].first;
+				kv = (zbx_kv_t *)diff.values[j].second;
+
+				if (NULL != kv)
+				{
+					DCstrpool_replace(dc_kv->value != NULL ? 1 : 0, &dc_kv->value, kv->value);
+					continue;
+				}
+
+				zbx_strpool_release(dc_kv->value);
+				dc_kv->value = NULL;
 			}
 
-			zbx_strpool_release(dc_kv->value);
-			dc_kv->value = NULL;
+			FINISH_SYNC;
 		}
-		FINISH_SYNC;
 
 		zbx_vector_ptr_pair_clear(&diff);
 		zbx_kvs_from_vault_destroy(&kvs);
