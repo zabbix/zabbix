@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-17T17:32:34Z</date>
+    <date>2020-08-19T20:06:41Z</date>
     <media_types>
         <media_type>
             <name>Opsgenie</name>
@@ -144,7 +144,11 @@
         }&#13;
     },&#13;
 &#13;
-    request: function (method, query, data) {&#13;
+    request: function (method, query, data, allow_404) {&#13;
+        if (typeof(allow_404) === 'undefined') {&#13;
+            allow_404 = false;&#13;
+        }&#13;
+&#13;
         ['api', 'token'].forEach(function (field) {&#13;
             if (typeof Media.params !== 'object' || typeof Media.params[field] === 'undefined'&#13;
                     || Media.params[field] === '') {&#13;
@@ -197,7 +201,8 @@
             }&#13;
         }&#13;
 &#13;
-        if (request.Status() &lt; 200 || request.Status() &gt;= 300) {&#13;
+        if ((request.Status() &lt; 200 || request.Status() &gt;= 300)&#13;
+                &amp;&amp; (!allow_404 || request.Status() !== 404)) {&#13;
             var message = 'Request failed with status code ' + request.Status();&#13;
 &#13;
             if (response !== null) {&#13;
@@ -219,6 +224,20 @@
             status: request.Status(),&#13;
             response: response&#13;
         };&#13;
+    },&#13;
+&#13;
+    getAlertId: function (requestId) {&#13;
+        do {&#13;
+            resp = Media.request('get', 'requests/' + requestId, undefined, true);&#13;
+        }&#13;
+        while (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined'&#13;
+                || resp.response.data.success === false);&#13;
+&#13;
+        if (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined') {&#13;
+            throw 'Cannot get ' + Media.name + ' issue ID. Check debug log for more information.';&#13;
+        }&#13;
+&#13;
+        return resp;&#13;
     }&#13;
 };&#13;
 &#13;
@@ -351,21 +370,15 @@ try {&#13;
             throw 'Cannot create ' + Media.name + ' issue. Check debug log for more information.';&#13;
         }&#13;
 &#13;
-        if (resp.status == 202) {&#13;
-            do {&#13;
-                resp = Media.request('get', 'requests/' + resp.response.requestId);&#13;
-            }&#13;
-            while (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined'&#13;
-                    || resp.response.data.success === false);&#13;
-&#13;
-            if (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined') {&#13;
-                throw 'Cannot get ' + Media.name + ' issue ID. Check debug log for more information.';&#13;
-            }&#13;
-&#13;
+        if (resp.status === 202) {&#13;
+            resp = Media.getAlertId(resp.response.requestId);&#13;
             if (params.event_source == 0 &amp;&amp; params.event_value == 1 &amp;&amp; params.event_update_status == 0) {&#13;
                 result.tags.__zbx_ops_issuekey = resp.response.data.alertId;&#13;
                 result.tags.__zbx_ops_issuelink = Media.params.web + 'alert/detail/' + resp.response.data.alertId;&#13;
             }&#13;
+        }&#13;
+        else {&#13;
+            throw Media.name + ' response code is unexpected. Check debug log for more information.';&#13;
         }&#13;
     }&#13;
     // Update a created issue.&#13;
@@ -378,17 +391,11 @@ try {&#13;
             throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';&#13;
         }&#13;
 &#13;
-        if (resp.status == 202) {&#13;
-            do {&#13;
-                resp = Media.request('get', 'requests/' + resp.response.requestId);&#13;
-            }&#13;
-            while (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined'&#13;
-                    || resp.response.data.success === false);&#13;
-&#13;
-            if (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined') {&#13;
-                throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';&#13;
-            }&#13;
-&#13;
+        if (resp.status === 202) {&#13;
+            resp = Media.getAlertId(resp.response.requestId);&#13;
+        }&#13;
+        else {&#13;
+            throw Media.name + ' response code is unexpected. Check debug log for more information.';&#13;
         }&#13;
     }&#13;
 &#13;
