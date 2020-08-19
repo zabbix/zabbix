@@ -56,10 +56,10 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 			SELECT
 				df.TABLESPACE_NAME AS TABLESPACE_NAME, 
 				df.CONTENTS AS CONTENTS, 
-				SUM(df.BYTES) AS USED_BYTES, 
-				SUM(df.MAX_BYTES) AS MAX_BYTES, 
-				SUM(f.FREE) AS FREE_BYTES, 
-				ROUND(SUM(df.BYTES) / SUM(df.max_bytes) * 100, 2) AS USED_PCT, 
+				NVL(SUM(df.BYTES), 0) AS USED_BYTES, 
+				NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES, 
+				NVL(SUM(f.FREE), 0) AS FREE_BYTES,
+				ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT, 
 				DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
 			FROM
 				(
@@ -94,10 +94,10 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params []string) (i
 			SELECT
 				Y.NAME AS TABLESPACE_NAME, 
 				Y.CONTENTS AS CONTENTS, 
-				SUM(Y.BYTES) AS BYTES, 
-				SUM(Y.MAX_BYTES) AS MAX_BYTES, 
-				MAX(NVL(Y.FREE_BYTES, 0)) AS FREE, 
-				ROUND(SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100, 2) AS USED_PCT, 
+				NVL(SUM(Y.BYTES), 0) AS BYTES, 
+				NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES, 
+				NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
+				ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT, 
 				DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
 			FROM
 				(
