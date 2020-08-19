@@ -222,12 +222,25 @@ static int	DBpatch_5010023(void)
 	return DBadd_field("config", &field);
 }
 
-
 static int	DBpatch_5010024(void)
 {
 	const ZBX_FIELD	field = {"session_key", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_5010025(void)
+{
+	const ZBX_FIELD field = {"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hostmacro", &field, NULL);
+}
+
+static int	DBpatch_5010026(void)
+{
+	const ZBX_FIELD field = {"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("globalmacro", &field, NULL);
 }
 
 #endif
@@ -261,5 +274,7 @@ DBPATCH_ADD(5010021, 0, 1)
 DBPATCH_ADD(5010022, 0, 1)
 DBPATCH_ADD(5010023, 0, 1)
 DBPATCH_ADD(5010024, 0, 1)
+DBPATCH_ADD(5010025, 0, 1)
+DBPATCH_ADD(5010026, 0, 1)
 
 DBPATCH_END()
