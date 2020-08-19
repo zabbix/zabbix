@@ -26,15 +26,15 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 	public function setUp() {
 		$user_macros = [
 			30896 => [
-				'hostids' => [
-					0 => 10084
-				],
+				'hostids' => [10084],
 				'macros' => [
-					'{$TEST}' => 'test123'
+					'{$TMG.PROXY.CHECK.URL1}' => 'http://zabbix.com',
+					'{$CITY}' => 'Tokyo'
 				]
 			]
 		];
 
+		// Such mocking approach allows to mock protected class methods, but still will not work with private methods.
 		/** @var $stub CMacrosResolver */
 		$this->stub = $this->getMockBuilder(CMacrosResolver::class)
 			->setMethods(['getUserMacros'])
@@ -46,43 +46,31 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 
 	public function dataProviderInput() {
 		return [
-			[
+			'expand valid user macro' => [
 				'item' => [
 					30896 => [
-						'itemid' => 30896,
 						'hostid' => 10084,
-						'name' => 'TEST',
-						'key_' => 'test_test_test',
-						'description' => 'aaaaaaaaaaa {$TEST} bbbbbbbbbbbb {$TEST}'
+						'description' => 'Response from {$TMG.PROXY.CHECK.URL1} through proxy in {$CITY}'
 					]
 				],
 				'expected_item' => [
 					30896 => [
-						'itemid' => 30896,
 						'hostid' => 10084,
-						'name' => 'TEST',
-						'key_' => 'test_test_test',
-						'description' => 'aaaaaaaaaaa test123 bbbbbbbbbbbb test123'
+						'description' => 'Response from http://zabbix.com through proxy in Tokyo'
 					]
 				]
 			],
-			[
+			'leave unknown macros unresolved' => [
 				'item' => [
 					30896 => [
-						'itemid' => 30896,
 						'hostid' => 10084,
-						'name' => 'TEST2',
-						'key_' => 'test_test_test2',
-						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
+						'description' => 'Number of packages in {$UNKNOWN_MACRO}'
 					]
 				],
 				'expected_item' => [
 					30896 => [
-						'itemid' => 30896,
 						'hostid' => 10084,
-						'name' => 'TEST2',
-						'key_' => 'test_test_test2',
-						'description' => 'aaaaaaaaaaa {$UNKNOWN_MACRO}'
+						'description' => 'Number of packages in {$UNKNOWN_MACRO}'
 					]
 				]
 			]
@@ -93,8 +81,8 @@ class CMacrosResolverTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider dataProviderInput
 	 */
 	public function testResolveItemDescriptions($item, $expected_item) {
-		$resolved = $this->stub->resolveItemDescriptions($item);
+		$resolved_item = $this->stub->resolveItemDescriptions($item);
 
-		$this->assertEquals($resolved, $expected_item);
+		$this->assertEquals($resolved_item, $expected_item);
 	}
 }
