@@ -9878,8 +9878,18 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 
 static void	dc_get_global_macro_value(const ZBX_DC_GMACRO *macro, char **value)
 {
-	if (ZBX_MACRO_ENV_NONSECURE == macro_env && ZBX_MACRO_VALUE_SECRET == macro->type)
+	if (ZBX_MACRO_ENV_NONSECURE == macro_env && (ZBX_MACRO_VALUE_SECRET == macro->type ||
+			ZBX_MACRO_VALUE_VAULT == macro->type))
+	{
 		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+	}
+	else if (ZBX_MACRO_VALUE_VAULT == macro->type)
+	{
+		if (NULL == macro->kv->value)
+			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+		else
+			*value = zbx_strdup(*value, macro->kv->value);
+	}
 	else
 		*value = zbx_strdup(*value, macro->value);
 }
