@@ -34,7 +34,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 	private $macroPlaceholder = '{$MACRO}';
 	private $macroClass = 'textarea-flexible macro';
 
-	private $valueMaxLength = 255;
+	private $valueMaxLength = 2048;
 	private $valuePlaceholder = 'value';
 
 	private $descriptionMaxLength = 65535;
