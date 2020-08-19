@@ -65,7 +65,14 @@ class CConfigurationExportBuilder {
 		foreach ($data as $row) {
 			$store = [];
 			foreach ($rules as $tag => $val) {
-				$is_required = $val['type'] & XML_REQUIRED;
+				if (array_key_exists('ex_rules', $val)) {
+					$val = call_user_func($val['ex_rules'], $row);
+				}
+
+				$is_required = (($val['type'] & XML_REQUIRED)
+						|| (array_key_exists('ex_required', $val) && call_user_func($val['ex_required'], $row))
+				);
+
 				$is_string = $val['type'] & XML_STRING;
 				$is_array = $val['type'] & XML_ARRAY;
 				$is_indexed_array = $val['type'] & XML_INDEXED_ARRAY;
@@ -92,19 +99,8 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
-				if (($is_indexed_array || $is_array || array_key_exists('ex_rules', $val)) && $has_data) {
-					if (array_key_exists('ex_rules', $val)) {
-						$ex_rules = call_user_func($val['ex_rules'], $row);
-						$temp_store = $this->build($ex_rules, $row[$tag], $tag);
-
-						$is_required = array_key_exists('ex_required', $val)
-							? call_user_func($val['ex_required'], $row)
-							: false;
-					}
-					else {
-						$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
-					}
-
+				if (($is_indexed_array || $is_array) && $has_data) {
+					$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
 					if ($is_required || $temp_store) {
 						$store[$tag] = $temp_store;
 					}
