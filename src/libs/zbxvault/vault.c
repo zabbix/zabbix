@@ -32,13 +32,6 @@ extern char	*CONFIG_VAULTDBPATH;
 extern char	*CONFIG_DBUSER;
 extern char	*CONFIG_DBPASSWORD;
 
-typedef struct
-{
-	char	*key;
-	char	*value;
-}
-zbx_kv_t;
-
 static zbx_hash_t	kv_hash(const void *data)
 {
 	zbx_kv_t	*kv = (zbx_kv_t *)data;

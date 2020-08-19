@@ -21,7 +21,17 @@
 #define ZABBIX_ZBXVAULT_H
 
 #include "common.h"
+#include "zbxalgo.h"
+
+typedef struct
+{
+	char	*key;
+	char	*value;
+}
+zbx_kv_t;
 
 int	init_database_credentials_from_vault(char **error);
+int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error);
+void	zbx_kvs_from_vault_destroy(zbx_hashset_t *kvs);
 
 #endif

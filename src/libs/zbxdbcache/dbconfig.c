@@ -38,6 +38,7 @@
 #include "dbsync.h"
 #include "proxy.h"
 #include "actions.h"
+#include "zbxvault.h"
 
 int	sync_in_progress = 0;
 
@@ -2170,20 +2171,74 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 static void	DCsync_kvs_path(void)
 {
-	zbx_dc_kvs_path_t	*kvs_path;
-	zbx_dc_kv_t		*kvs;
+	zbx_dc_kvs_path_t	*dc_kvs_path;
+	zbx_dc_kv_t		*dc_kv;
 	zbx_hashset_iter_t	iter;
-	int			i;
+	int			i, j;
+	zbx_vector_ptr_pair_t	diff;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_pair_create(&diff);
 
 	for (i = 0; i < config->kvs_paths.values_num; i++)
 	{
-		kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+		zbx_hashset_t	kvs;
+		char		*error = NULL;
 
+		dc_kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
+
+		if (FAIL == zbx_kvs_from_vault_create(dc_kvs_path->path, &kvs, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path, error);
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_hashset_iter_reset(&dc_kvs_path->kvs, &iter);
+		while (NULL != (dc_kv = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
+		{
+			zbx_kv_t	*kv, kv_local;
+			zbx_ptr_pair_t	pair;
+
+			kv_local.key = (char *)dc_kv->key;
+			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+			{
+				if (0 == zbx_strcmp_null(dc_kv->value, kv->value))
+					continue;
+			}
+			else if (NULL == dc_kv->value)
+				continue;
+
+			pair.first = dc_kv;
+			pair.second = kv;
+			zbx_vector_ptr_pair_append(&diff, pair);
+		}
+
+		START_SYNC;
+		for (j = 0; j < diff.values_num; j++)
+		{
+			zbx_kv_t	*kv;
+
+			dc_kv = (zbx_dc_kv_t *)diff.values[j].first;
+			kv = (zbx_kv_t *)diff.values[j].second;
+
+			if (NULL != kv)
+			{
+				DCstrpool_replace(dc_kv->value != NULL ? 1 : 0, &dc_kv->value, kv->value);
+				continue;
+			}
+
+			zbx_strpool_release(dc_kv->value);
+			dc_kv->value = NULL;
+		}
+		FINISH_SYNC;
+
+		zbx_vector_ptr_pair_clear(&diff);
+		zbx_kvs_from_vault_destroy(&kvs);
 	}
-
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+	zbx_vector_ptr_pair_destroy(&diff);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 }
 
@@ -5351,6 +5406,8 @@ void	DCsync_configuration(unsigned char mode)
 	DCsync_host_tags(&host_tag_sync);
 	host_tag_sec2 = zbx_time() - sec;
 	FINISH_SYNC;
+
+	DCsync_kvs_path();
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 
