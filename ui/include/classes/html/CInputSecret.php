@@ -46,6 +46,8 @@ class CInputSecret extends CInput {
 	 * @param bool   $add_post_js  Add initialization javascript, default true.
 	 */
 	public function __construct(string $name, string $value = null, $add_post_js = true) {
+		parent::__construct('text', $name, $value);
+
 		$this->add_post_js = $add_post_js;
 		$this->setAttribute('name', $name);
 		$this->setId(uniqid('input-secret-'));
@@ -69,13 +71,19 @@ class CInputSecret extends CInput {
 			->setId($this->getId())
 			->addClass(self::ZBX_STYLE_CLASS);
 		$name = $this->getAttribute('name');
+		$value = $this->getAttribute('value');
+		$maxlength = $this->getAttribute('maxlength');
 
-		if ($this->getAttribute('value') !== null) {
-			$node->addItem((new CPassBox($name, $this->getAttribute('value')))->setAttribute('autocomplete', 'off'));
+		if ($value !== null) {
+			$passbox = ($maxlength !== null) ? new CPassBox($name, $value, $maxlength) : new CPassBox($name, $value);
+			$node->addItem($passbox->setAttribute('autocomplete', 'off'));
 		}
 		else {
+			$passbox = ($maxlength !== null)
+				? new CPassBox($name, ZBX_SECRET_MASK, $maxlength)
+				: new CPassBox($name, ZBX_SECRET_MASK);
 			$node->addItem([
-				(new CPassBox($name, ZBX_SECRET_MASK))
+				$passbox
 					->setAttribute('disabled', 'disabled')
 					->setAttribute('autocomplete', 'off'),
 				(new CButton(null, _('Set new value')))
