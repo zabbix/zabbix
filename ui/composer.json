@@ -1,0 +1,6 @@
+{
+	"require": {
+		"symfony/yaml": "v5.1.3",
+		"onelogin/php-saml": "3.4.1"
+	}
+}

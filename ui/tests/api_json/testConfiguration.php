@@ -555,20 +555,20 @@ class testConfiguration extends CAPITest {
 				'format' => 'xml',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 							<zabbix_export><version>3.2</version><date>2016-12-09T07:12:45Z</date>' ,
-				// can be different error message text
+				// Can be different error message text.
 				'error_contains' => 'Cannot read XML:'
 			]],
 			// JSON format.
 			[[
 				'format' => 'json',
 				'source' => '',
-				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: No error.'
+				// Can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: No error.'
 				'error_contains' => 'Cannot read JSON: '
 			]],
 			[[
 				'format' => 'json',
 				'source' => 'test',
-				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: boolean expected.'
+				// Can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: boolean expected.'
 				'error_contains' => 'Cannot read JSON: '
 			]],
 			[[
@@ -589,19 +589,19 @@ class testConfiguration extends CAPITest {
 			[[
 				'format' => 'json',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}',
-				// can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: unexpected end of data.'
+				// Can be different error message text 'Cannot read JSON: Syntax error.' or 'Cannot read JSON: unexpected end of data.'
 				'error_contains' => 'Cannot read JSON: '
 			]],
 			// YAML format.
 			[[
 				'format' => 'yaml',
 				'source' => '',
-				'error_contains' => 'Cannot read YAML: Invalid file content.'
+				'error' => 'Cannot read YAML: File is empty.'
 			]],
 			[[
 				'format' => 'yaml',
 				'source' => 'æų',
-				'error_contains' => 'Cannot read YAML: Invalid file content.'
+				'error' => 'Cannot read YAML: Invalid YAML file contents.'
 			]],
 			[[
 				'format' => 'yaml',
@@ -626,18 +626,18 @@ class testConfiguration extends CAPITest {
 			[[
 				'format' => 'yaml',
 				'source' => '---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T11:38:33Z',
-				'error_contains' => 'Cannot read YAML: scanning error encountered during parsing'
+				'error' => 'A colon cannot be used in an unquoted mapping value at line 1 (near "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T11:38:33Z").'
 			]],
 			[[
 				'format' => 'yaml',
 				'source' => '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<zabbix_export><version>5.0</version><date>2020-08-03T12:36:11Z</date></zabbix_export>\n',
-				'error' => 'Cannot read YAML: Invalid file content.'
+				'error' => 'Cannot read YAML: Invalid YAML file contents.'
 			]],
 			[[
 				'format' => 'yaml',
 				'source' => '{\"zabbix_export\":{\"version\":\"5.0\",\"date\":\"2020-08-03T12:36:39Z\"}}',
-				'error' => 'Cannot read YAML: scanning error encountered during parsing: found unexpected \':\' (line 1, column 19), context while scanning a plain scalar (line 1, column 2).'
-			]],
+				'error' => 'Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}") at line 1 (near "{\"zabbix_export\":{\"version\":\"5.0\",\"date\":\"2020-08-03T12:36:39Z\"}}").'
+			]]
 		];
 	}
 
@@ -657,7 +657,7 @@ class testConfiguration extends CAPITest {
 			true
 		);
 
-		// condition for different error message text
+		// Condition for different error message text.
 		if (array_key_exists('error_contains', $data)) {
 			$this->assertContains($data['error_contains'], $result['error']['data']);
 		}
@@ -840,8 +840,7 @@ class testConfiguration extends CAPITest {
 			[
 				'format' => 'json',
 				'parameter' => 'valueMaps',
-				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"API valueMap json import as non Super Admin",'
-							. '"mappings":[{"value":"1","newvalue":"Up"}]}]}}',
+				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"API valueMap json import as non Super Admin", "mappings":[{"value":"1","newvalue":"Up"}]}]}}',
 				'sql' => 'select * from valuemaps where name=\'API valueMap json import as non Super Admin\'',
 				'expected_error' => 'Only super admins can create value maps.'
 			]

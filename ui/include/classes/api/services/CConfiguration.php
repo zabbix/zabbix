@@ -48,28 +48,18 @@ class CConfiguration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		switch ($params['format']) {
-			case CExportWriterFactory::YAML:
-				$lib_yaml = (new CFrontendSetup())->checkPhpLibYAML();
+		if ($params['format'] === CExportWriterFactory::XML) {
+			$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
 
-				if ($lib_yaml['result'] == CFrontendSetup::CHECK_FATAL) {
-					self::exception(ZBX_API_ERROR_INTERNAL, $lib_yaml['error']);
-				}
-				break;
+			if ($lib_xml['result'] == CFrontendSetup::CHECK_FATAL) {
+				self::exception(ZBX_API_ERROR_INTERNAL, $lib_xml['error']);
+			}
 
-			case CExportWriterFactory::XML:
-				$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
+			$xml_writer = (new CFrontendSetup())->checkPhpXmlWriter();
 
-				if ($lib_xml['result'] == CFrontendSetup::CHECK_FATAL) {
-					self::exception(ZBX_API_ERROR_INTERNAL, $lib_xml['error']);
-				}
-
-				$xml_writer = (new CFrontendSetup())->checkPhpXmlWriter();
-
-				if ($xml_writer['result'] == CFrontendSetup::CHECK_FATAL) {
-					self::exception(ZBX_API_ERROR_INTERNAL, $xml_writer['error']);
-				}
-				break;
+			if ($xml_writer['result'] == CFrontendSetup::CHECK_FATAL) {
+				self::exception(ZBX_API_ERROR_INTERNAL, $xml_writer['error']);
+			}
 		}
 
 		$export = new CConfigurationExport($params['options']);
@@ -172,28 +162,18 @@ class CConfiguration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		switch ($params['format']) {
-			case CImportReaderFactory::YAML:
-				$lib_yaml = (new CFrontendSetup())->checkPhpLibYAML();
+		if ($params['format'] === CImportReaderFactory::XML) {
+			$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
 
-				if ($lib_yaml['result'] == CFrontendSetup::CHECK_FATAL) {
-					self::exception(ZBX_API_ERROR_INTERNAL, $lib_yaml['error']);
-				}
-				break;
+			if ($lib_xml['result'] == CFrontendSetup::CHECK_FATAL) {
+				self::exception(ZBX_API_ERROR_INTERNAL, $lib_xml['error']);
+			}
 
-			case CImportReaderFactory::XML:
-				$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
+			$xml_reader = (new CFrontendSetup())->checkPhpXmlReader();
 
-				if ($lib_xml['result'] == CFrontendSetup::CHECK_FATAL) {
-					self::exception(ZBX_API_ERROR_INTERNAL, $lib_xml['error']);
-				}
-
-				$xml_reader = (new CFrontendSetup())->checkPhpXmlReader();
-
-				if ($xml_reader['result'] == CFrontendSetup::CHECK_FATAL) {
-					self::exception(ZBX_API_ERROR_INTERNAL, $xml_reader['error']);
-				}
-				break;
+			if ($xml_reader['result'] == CFrontendSetup::CHECK_FATAL) {
+				self::exception(ZBX_API_ERROR_INTERNAL, $xml_reader['error']);
+			}
 		}
 
 		$importReader = CImportReaderFactory::getReader($params['format']);
