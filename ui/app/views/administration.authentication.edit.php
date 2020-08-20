@@ -23,6 +23,7 @@
  * @var CView $this
  */
 
+$this->addJsFile('class.tab-indicators.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 // Authentication general fields and HTTP authentication fields.
@@ -258,9 +259,9 @@ $saml_tab = (new CFormList('list_saml'))
 		->addItem((new CTabView())
 			->setSelected($data['form_refresh'] ? null : 0)
 			->addTab('auth', _('Authentication'), $auth_tab)
-			->addTab('http', _('HTTP settings'), $http_tab)
-			->addTab('ldap', _('LDAP settings'), $ldap_tab)
-			->addTab('saml', _('SAML settings'), $saml_tab)
+			->addTab('http', _('HTTP settings'), $http_tab, 'http')
+			->addTab('ldap', _('LDAP settings'), $ldap_tab, 'ldap')
+			->addTab('saml', _('SAML settings'), $saml_tab, 'saml')
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update'))),
 				[(new CSubmitButton(_('Test'), 'ldap_test', 1))

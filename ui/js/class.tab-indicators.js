@@ -45,20 +45,23 @@
 class TabIndicators {
 
 	constructor() {
-		try {
+		// try {
 			this.form = this.getForm();
 			this.activateIndicators();
-		} catch (error) {
-			return false;
-		}
+		// } catch (error) {
+		// 	return false;
+		// }
 	}
 
 	getForm() {
 		const TEMPLATE = document.querySelector('#templatesForm');
+		const AUTHENTICATION = document.querySelector('#authenticationForm');
 
 		switch (true) {
 			case !!TEMPLATE:
 				return TEMPLATE;
+			case !!AUTHENTICATION:
+				return AUTHENTICATION;
 			default:
 				throw 'Form not found.';
 		}
@@ -67,28 +70,34 @@ class TabIndicators {
 	activateIndicators() {
 		const tabs = this.form.querySelectorAll('#tabs a');
 
-		Object.values(tabs).map((value) => {
-			this.addAttribute(value);
+		Object.values(tabs).map((elem) => {
+			const callback = this.getIndicatorCallback(elem);
+
+			this.addAttribute(elem, callback?.getType(), callback?.getValue());
+
+			callback?.initObserver(elem);
 		});
 	}
 
-	addAttribute(elem) {
-		const callback_name = elem.getAttribute('js-indicator')?.split('-')?.map((value) => value[0].toUpperCase() + value.slice(1))?.join('');
-		const callback = TabIndicatorFactory.createTabIndicator(callback_name);
-
-		const type = callback?.getType();
-
+	addAttribute(elem, type, value) {
 		if (type instanceof TabIndicatorStatus) {
-			elem.setAttribute('data-indicator-status', callback.event() ? 'enabled' : 'disabled');
+			elem.setAttribute('data-indicator-status', value ? 'enabled' : 'disabled');
 		}
 
 		if (type instanceof TabIndicatorNumber) {
-			elem.setAttribute('data-indicator-count', callback.event());
-
-			setInterval(() => {
-				elem.setAttribute('data-indicator-count', callback.event());
-			}, 5000);
+			elem.setAttribute('data-indicator-count', value);
 		}
+	}
+
+	getIndicatorCallback(elem) {
+		const callback_name = elem
+			.getAttribute('js-indicator')
+			?.split('-')
+			?.map((value) => value[0].toUpperCase() + value.slice(1))
+			?.join('');
+
+		return TabIndicatorFactory
+			.createTabIndicator(callback_name)
 	}
 }
 
@@ -102,11 +111,21 @@ class TabIndicatorFactory {
 				return new LinkedTemplateTabIndicator;
 			case 'Tags':
 				return new TagsTabIndicator;
+			case 'Http':
+				return new HttpTabIndicator;
+			case 'Ldap':
+				return new LdapTabIndicator;
+			case 'Saml':
+				return new SamlTabIndicator;
 		}
 
 		return null;
 	}
 }
+
+class TabIndicatorNumber {}
+
+class TabIndicatorStatus {}
 
 class TabIndicatorCallback {
 
@@ -114,14 +133,14 @@ class TabIndicatorCallback {
 		return this.TYPE;
 	}
 
-	event() { // FIXME: rename
-		return false;
+	getValue() {
+		throw 'Fatal error: can not call abstract class.';
+	}
+
+	initObserver(elem) {
+		throw 'Fatal error: can not call abstract class.';
 	}
 }
-
-class TabIndicatorNumber {}
-
-class TabIndicatorStatus {}
 
 class MacrosTabIndicator extends TabIndicatorCallback {
 
@@ -130,8 +149,32 @@ class MacrosTabIndicator extends TabIndicatorCallback {
 		this.TYPE = new TabIndicatorNumber;
 	}
 
-	event() {
+	getValue() {
 		return document.querySelectorAll('#tbl_macros tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])').length;
+	}
+
+	initObserver(elem) {
+		const targetNode = document.querySelector('#tbl_macros');
+		const observerOptions = {
+			childList: true,
+			attributes: true,
+			attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
+			subtree: true
+		};
+
+		const observerCallback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+					case 'attributes':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		const observer = new MutationObserver(observerCallback);
+		observer.observe(targetNode, observerOptions);
 	}
 }
 
@@ -142,7 +185,11 @@ class LinkedTemplateTabIndicator extends TabIndicatorCallback {
 		this.TYPE = new TabIndicatorStatus;
 	}
 
-	event() {
+	getValue() {
+		return true;
+	}
+
+	initObserver(elem) {
 		return true;
 	}
 }
@@ -154,7 +201,93 @@ class TagsTabIndicator extends TabIndicatorCallback {
 		this.TYPE = new TabIndicatorNumber;
 	}
 
-	event() {
+	getValue() {
 		return document.querySelectorAll('#tags-table tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])').length;
+	}
+
+	initObserver(elem) {
+		const targetNode = document.querySelector('#tags-table');
+		const observerOptions = {
+			childList: true,
+			attributes: true,
+			attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
+			subtree: true
+		};
+
+		const observerCallback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+					case 'attributes':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		const observer = new MutationObserver(observerCallback);
+		observer.observe(targetNode, observerOptions);
+	}
+}
+
+class HttpTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document.querySelector('#http_auth_enabled').checked;
+	}
+
+	initObserver(elem) {
+		document
+			.querySelector('#http_auth_enabled')
+			?.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+	}
+}
+
+class LdapTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document.querySelector('#ldap_configured')?.checked;
+	}
+
+	initObserver(elem) {
+		document
+			.querySelector('#ldap_configured')
+			?.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+	}
+}
+
+class SamlTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document
+			.querySelector('#saml_auth_enabled')
+			?.checked;
+	}
+
+	initObserver(elem) {
+		document
+			.querySelector('#saml_auth_enabled')
+			?.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
 	}
 }
