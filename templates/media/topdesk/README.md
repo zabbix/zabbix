@@ -11,69 +11,18 @@ This guide describes how to integrate your Zabbix installation with TOPdesk usin
 
 ## In Zabbix
 
-The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to TOPdesk through the TOPdesk Rest API. To utilize the media type, create a Zabbix user to represent TOPdesk. 
-When configuring alert action, add this user in the _Send to users_ field (in Operation details) - this will tell Zabbix to use TOPdesk webhook when sending notifications from this action.
+The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to TOPdesk through the TOPdesk Rest API.
 
-## Create a global macro
+1\. Create a [global macro](https://www.zabbix.com/documentation/current/manual/config/macros/user_macros) {$ZABBIX.URL} with Zabbix frontend URL (for example http://192.168.7.123:8081)
 
-1\. Go to the **Administration** tab.
+2\. [Import](https://www.zabbix.com/documentation/current/manual/web_interface/frontend_sections/administration/mediatypes) the TOPdesk media type from file [media_topdesk.xml](media_topdesk.xml).
 
-2\. Under Administration, go to the **General** page and choose **Macros** from a drop-down list.
-
-3\. Add the macro {$ZABBIX.URL} with Zabbix frontend URL (for example http://192.168.7.123:8081)
-
-[![](images/tn_1.png?raw=true)](images/1.png)
-
-4\. Click the **Update** button to save the global macros.
-
-## Create the TOPdesk media type
-
-1\. Go to the **Administration** tab.
-
-2\. Under Administration, go to the **Media types** page and click the **Import** button.
-
-[![](images/tn_2.png?raw=true)](images/2.png)
-
-3\. Select Import file [media_topdesk.xml](media_topdesk.xml) and click the **Import** button at the bottom to import the TOPdesk media type.
-
-4\. Change the values of the variables topdesk_api (URL), topdesk_password, topdesk_user. The topdesk_status is the default status for creating a new TOPdesk ticket.
-
-[![](images/tn_3.png?raw=true)](images/3.png)
+3\. Change in the imported media the values of the variables topdesk_api (URL), topdesk_password, topdesk_user. The topdesk_status is the default status for creating a new TOPdesk ticket.
 
 For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/current/manual/config/notifications/media/webhook).
 
-## Create the TOPdesk user for alerting
-
-1\. Go to the **Administration** tab.
-
-2\. Under Administration, go to the **Users** page and click the **Create user** button.
-
-[![](images/tn_4.png?raw=true)](images/4.png)
-
-3\. Fill in the details of this new user, and call it “TOPdesk User”. The default settings for TOPdesk User should suffice as this user will not be logging into Zabbix.
-
-4\. Click the **Select** button next to **Groups**.
-
-[![](images/tn_5.png?raw=true)](images/5.png)
-
-*   Please note, that in order to be notified about problems on a host, this user must have at least read permissions for the host.
-
-5\. Click on the **Media** tab and, inside of the **Media** box, click the **Add** button.
-
-[![](images/tn_6.png?raw=true)](images/6.png)
-
-6\. In the new window that appears, configure the media for the user as follows:
-
-[![](images/tn_7.png?raw=true)](images/7.png)
-
-*   For the **Type**, select **TOPdesk** (the new media type that was created).
-*   For **Send to**: enter any text, as this value is not used, but is required.
-*   Make sure the **Enabled** box is checked.
-*   Click the **Add** button when done.
-
-7\. Click the **Add** button at the bottom of the user page to save the user.
-
-8\. Use the TOPdesk User in any action of your choice. Text from "Action Operations" will be sent to "TOPdesk First Line Call Request" field when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "TOPdesk First Line Call Action" field when the problem is resolved or updated.
+To utilize the media type, we recommend creating a dedicated [Zabbix user](https://www.zabbix.com/documentation/current/manual/web_interface/frontend_sections/administration/users) to represent TOPdesk. The default settings for TOPdesk User should suffice as this user will not be logging into Zabbix. Please note, that in order to be notified about problems on a host, this user must have at least read permissions for the host.  
+When configuring alert action, add this user in the _Send to users_ field (in Operation details) - this will tell Zabbix to use TOPdesk webhook when sending notifications from this action. Use the TOPdesk User in any action of your choice. Text from "Action Operations" will be sent to "TOPdesk First Line Call Request" field when the problem happens. Text from "Action Recovery Operations" and "Action Update Operations" will be sent to "TOPdesk First Line Call Action" field when the problem is resolved or updated.
 
 ## Internal alerts
 To receive notifications about internal problem and recovery events in TOPdesk: in the internal action configuration mark the Custom message checkbox and specify custom message templates for problem and recovery operations. 
