@@ -92,19 +92,8 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
-				if (($is_indexed_array || $is_array || array_key_exists('ex_rules', $val)) && $has_data) {
-					if (array_key_exists('ex_rules', $val)) {
-						$ex_rules = call_user_func($val['ex_rules'], $row);
-						$temp_store = $this->build($ex_rules, $row[$tag], $tag);
-
-						$is_required = array_key_exists('ex_required', $val)
-							? call_user_func($val['ex_required'], $row)
-							: false;
-					}
-					else {
-						$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
-					}
-
+				if (($is_indexed_array || $is_array) && $has_data) {
+					$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
 					if ($is_required || $temp_store) {
 						$store[$tag] = $temp_store;
 					}
