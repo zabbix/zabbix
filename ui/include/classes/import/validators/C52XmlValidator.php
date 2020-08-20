@@ -1727,7 +1727,7 @@ class C52XmlValidator {
 						'selement' =>				['type' => XML_ARRAY, 'rules' => [
 							// The tag 'elementtype' should be validated before the 'elements' because it is used in 'ex_required' and 'ex_validate' methods.
 							'elementtype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'elements' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements'], 'ex_rules' => [$this, 'getMapElementsExtendedRules']],
+							'elements' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements'], 'ex_rules' => [$this, 'getMapElementsExtendedRules'], 'export' => [$this, 'mapSelementElementExport']],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],
@@ -2452,5 +2452,42 @@ class C52XmlValidator {
 	 */
 	public function scriptParameterExport(array $data) {
 		return explode("\n", substr($data['parameters'], 0, -1));
+	}
+
+	/**
+	 * Function prepares map element for export builder.
+	 *
+	 * @param array $data  Export data.
+	 *
+	 * @throws Exception on invalid input.
+	 *
+	 * @return array
+	 */
+	public function mapSelementElementExport(array $data): array {
+		$element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP, SYSMAP_ELEMENT_TYPE_TRIGGER,
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP
+		];
+
+		if (!array_key_exists('elementtype', $data) || !in_array($data['elementtype'], $element_types)) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
+				'elementtype', _s('value must be one of %1$s', str_replace(',', ', ', $rule['in']))
+			));
+		}
+
+		if (!array_key_exists('elements', $data) || !is_array($data['elements'])) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'parameters', _('an array is expected')));
+		}
+
+		return ($data['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+			? array_map(function($trigger) {
+					if (array_key_exists('expression', $trigger)) {
+						$trigger['expression'] = str_replace("\r\n", "\n", $trigger['expression']);
+					}
+					if (array_key_exists('recovery_expression', $trigger)) {
+						$trigger['recovery_expression'] = str_replace("\r\n", "\n", $trigger['recovery_expression']);
+					}
+					return $trigger;
+				}, $data['elements'])
+			: $data['elements'];
 	}
 }
