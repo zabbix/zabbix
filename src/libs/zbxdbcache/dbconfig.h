@@ -447,6 +447,7 @@ typedef struct
 	const char	*macro;
 	const char	*context;
 	const char	*value;
+	zbx_dc_kv_t	*kv;
 	unsigned char	type;
 	unsigned char	context_op;
 }

@@ -56,9 +56,9 @@ static void	kv_clean(void *data)
 
 int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error)
 {
-	char			*out = NULL, tmp[MAX_STRING_LEN], header[MAX_STRING_LEN], *string = NULL;
+	char			*out = NULL, tmp[MAX_STRING_LEN], header[MAX_STRING_LEN], *string = NULL, *left, *right;
 	const char		*pnext = NULL;
-	struct zbx_json_parse	jp, jp_data;
+	struct zbx_json_parse	jp, jp_data, jp_data_data;
 	int			ret = FAIL, ret_get;
 	size_t			string_alloc = 0;
 
@@ -68,7 +68,11 @@ int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error
 		return FAIL;
 	}
 
-	zbx_snprintf(tmp, sizeof(tmp), "%s%s", CONFIG_VAULTURL, path);
+	zbx_strsplit(path, '/', &left, &right);
+	zbx_snprintf(tmp, sizeof(tmp), "%s/v1/%s/data/%s", CONFIG_VAULTURL, left, right);
+	zbx_free(right);
+	zbx_free(left);
+
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", CONFIG_VAULTTOKEN);
 
 	ret_get = zbx_http_get(tmp, header, &out, error);
@@ -85,15 +89,22 @@ int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, "data", &jp_data))
 	{
-		*error = zbx_dsprintf(*error, "cannot find the \"%s\" array in the received JSON object.",
+		*error = zbx_dsprintf(*error, "cannot find the \"%s\" object in the received JSON object.",
 				ZBX_PROTO_TAG_DATA);
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "data", &jp_data_data))
+	{
+		*error = zbx_dsprintf(*error, "cannot find the \"%s\" object in the received \"%s\" JSON object.",
+				ZBX_PROTO_TAG_DATA, ZBX_PROTO_TAG_DATA);
 		goto fail;
 	}
 
 	zbx_hashset_create_ext(kvs, 100, kv_hash, kv_compare, kv_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 				ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	while (NULL != (pnext = zbx_json_pair_next(&jp_data, pnext, tmp, sizeof(tmp))))
+	while (NULL != (pnext = zbx_json_pair_next(&jp_data_data, pnext, tmp, sizeof(tmp))))
 	{
 		zbx_kv_t	kv_local;
 

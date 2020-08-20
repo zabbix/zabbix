@@ -2053,11 +2053,11 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
-	unsigned char		tag, context_op;
+	unsigned char		tag, context_op, type;
 	ZBX_DC_HMACRO		*hmacro;
 	int			found, context_existed, update_index, ret, i;
 	zbx_uint64_t		hostmacroid, hostid;
-	char			*macro = NULL, *context = NULL;
+	char			*macro = NULL, *context = NULL, *path = NULL, *key = NULL;
 	zbx_vector_ptr_t	indexes;
 	ZBX_DC_HMACRO_HM	*hmacro_hm;
 
@@ -2073,10 +2073,17 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(hostmacroid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
+		ZBX_STR2UCHAR(type, row[4]);
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL, &context_op))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\"", row[1], row[2]);
+			continue;
+		}
+
+		if (ZBX_MACRO_VALUE_VAULT == type && FAIL == (parse_vault_macro_value(row[3], &path, &key)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" value \"%s\"", row[1], row[2], row[3]);
 			continue;
 		}
 
@@ -2097,9 +2104,18 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 			update_index = 1;
 		}
 
+
+		if (0 != found && NULL != hmacro->kv)
+			config_kvs_path_remove(hmacro->value, hmacro->kv);
+
+		if (ZBX_MACRO_VALUE_VAULT == type)
+			hmacro->kv = config_kvs_path_add(path, key);
+		else
+			hmacro->kv = NULL;
+
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
-		ZBX_STR2UCHAR(hmacro->type, row[4]);
+		hmacro->type = type;
 		hmacro->context_op = context_op;
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
@@ -2134,6 +2150,9 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		if (NULL == (hmacro = (ZBX_DC_HMACRO *)zbx_hashset_search(&config->hmacros, &rowid)))
 			continue;
 
+		if (NULL != hmacro->kv)
+			config_kvs_path_remove(hmacro->value, hmacro->kv);
+
 		hmacro_hm = config_hmacro_remove_index(&config->hmacros_hm, hmacro);
 		zbx_vector_ptr_append(&indexes, hmacro_hm);
 
@@ -2162,6 +2181,8 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 			zbx_vector_ptr_sort(&hmacro_hm->hmacros, config_hmacro_context_compare);
 	}
 
+	zbx_free(key);
+	zbx_free(path);
 	zbx_free(context);
 	zbx_free(macro);
 	zbx_vector_ptr_destroy(&indexes);
@@ -9794,8 +9815,18 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 
 static void	dc_get_host_macro_value(const ZBX_DC_HMACRO *macro, char **value)
 {
-	if (ZBX_MACRO_ENV_NONSECURE == macro_env && ZBX_MACRO_VALUE_SECRET == macro->type)
+	if (ZBX_MACRO_ENV_NONSECURE == macro_env && (ZBX_MACRO_VALUE_SECRET == macro->type ||
+			ZBX_MACRO_VALUE_VAULT == macro->type))
+	{
 		*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+	}
+	else if (ZBX_MACRO_VALUE_VAULT == macro->type)
+	{
+		if (NULL == macro->kv->value)
+			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+		else
+			*value = zbx_strdup(*value, macro->kv->value);
+	}
 	else
 		*value = zbx_strdup(*value, macro->value);
 }
