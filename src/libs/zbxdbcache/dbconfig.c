@@ -2193,7 +2193,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCsync_kvs_path(void)
+static void	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -2212,7 +2212,18 @@ static void	DCsync_kvs_path(void)
 
 		dc_kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
 
-		if (FAIL == zbx_kvs_from_vault_create(dc_kvs_path->path, &kvs, &error))
+		if (NULL != jp_kvs_paths)
+		{
+			if (FAIL == zbx_kvs_from_json_create(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
+						dc_kvs_path->path, error);
+				zbx_free(error);
+				continue;
+			}
+
+		}
+		else if (FAIL == zbx_kvs_from_vault_create(dc_kvs_path->path, &kvs, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path, error);
 			zbx_free(error);
@@ -5310,7 +5321,7 @@ static void	dc_hostgroups_update_cache(void)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode)
+void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths)
 {
 	int		i, flags;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec, csec2,
@@ -5436,7 +5447,7 @@ void	DCsync_configuration(unsigned char mode)
 	host_tag_sec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
-	DCsync_kvs_path();
+	DCsync_kvs_path(jp_kvs_paths);
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 

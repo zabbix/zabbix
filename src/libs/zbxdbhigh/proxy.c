@@ -1988,7 +1988,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 	char			buf[ZBX_TABLENAME_LEN_MAX];
 	const char		*p = NULL;
-	struct zbx_json_parse	jp_obj;
+	struct zbx_json_parse	jp_obj, jp_kvs_paths, *jp_kvs_paths_ptr = NULL;
 	char			*error = NULL;
 	int			i, ret = SUCCEED;
 
@@ -2010,6 +2010,13 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 			error = zbx_strdup(error, zbx_json_strerror());
 			ret = FAIL;
 			break;
+		}
+
+		if (0 == strcmp(buf, "macro.secrets"))
+		{
+			jp_kvs_paths = jp_obj;
+			jp_kvs_paths_ptr = &jp_kvs_paths;
+			continue;
 		}
 
 		if (NULL == (table = DBget_table(buf)))
@@ -2077,7 +2084,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	else
 	{
-		DCsync_configuration(ZBX_DBSYNC_UPDATE);
+		DCsync_configuration(ZBX_DBSYNC_UPDATE, jp_kvs_paths_ptr);
 		DCupdate_hosts_availability();
 	}
 

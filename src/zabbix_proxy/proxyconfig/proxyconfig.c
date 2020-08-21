@@ -154,7 +154,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	DCsync_configuration(ZBX_DBSYNC_INIT);
+	DCsync_configuration(ZBX_DBSYNC_INIT, NULL);
 
 	while (ZBX_IS_RUNNING())
 	{

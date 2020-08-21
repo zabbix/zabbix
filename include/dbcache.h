@@ -654,7 +654,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 /* update sync, get changed data */
 #define ZBX_DBSYNC_UPDATE	1
 
-void	DCsync_configuration(unsigned char mode);
+void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 

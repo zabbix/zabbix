@@ -82,6 +82,29 @@ static void	get_kvs_from_json(const struct zbx_json_parse *jp_kvs, zbx_hashset_t
 	}
 }
 
+int	zbx_kvs_from_json_create(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
+		char **error)
+{
+	const char		*p;
+	struct zbx_json_parse	jp_kvs;
+
+	if (NULL != (p = zbx_json_pair_by_name(jp_kvs_paths, path)))
+	{
+		if (FAIL == zbx_json_brackets_open(p, &jp_kvs))
+		{
+			*error = zbx_strdup(*error, zbx_json_strerror());
+			return FAIL;
+		}
+
+		zbx_hashset_create_ext(kvs, 100, kv_hash, kv_compare, kv_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+				ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+		get_kvs_from_json(&jp_kvs, kvs);
+	}
+
+	return SUCCEED;
+
+}
+
 int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error)
 {
 	char			*out = NULL, tmp[MAX_STRING_LEN], header[MAX_STRING_LEN], *left, *right;
