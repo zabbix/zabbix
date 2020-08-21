@@ -916,6 +916,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$custom_sql = CDBHelper::getRow('SELECT * FROM config');
 		// Check custom data in form.
 		$this->page->refresh();
+		$this->page->waitUntilReady();
 		$form->invalidate();
 		$form->checkValue($this->custom);
 		// Reset form after customly filled data and check that values are reset to default or reset is cancelled.
@@ -924,6 +925,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals($sql, CDBHelper::getRow('SELECT * FROM config'));
 	}
 
+	/**
+	 * FUnction for configuration resetting.
+	 *
+	 * @param element  $form      Settings configuration form
+	 * @param array    $default   Default form values
+	 * @param string   $action    Reset defaults or Cancel
+	 * @param array    $custom    Custom values for filling into settings form
+	 */
 	private function resetConfiguration($form, $default, $action, $custom = null) {
 		$form->query('button:Reset defaults')->one()->click();
 		COverlayDialogElement::find()->waitUntilPresent()->one()->query('button', $action)->one()->click();
@@ -932,6 +941,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 				$form->submit();
 				$this->assertMessage(TEST_GOOD, 'Configuration updated');
 				$this->page->refresh();
+				$this->page->waitUntilReady();
 				$form->invalidate();
 				// Check reset form.
 				$form->checkValue($default);
