@@ -179,10 +179,10 @@ class testPageDashboardList extends CWebTest {
 			}
 
 			// Checking that Admin dashboards, shared with groups, has Shared tag.
-			$this->checkDashboardData($dashboards_usrgrps, $dashboard, $table);
+			$this->assertDashboardOwner($dashboards_usrgrps, $dashboard, $table);
 
 			// Checking that Admin dashboards, shared with users, has Shared tag.
-			$this->checkDashboardData($dashboards_users, $dashboard, $table);
+			$this->assertDashboardOwner($dashboards_users, $dashboard, $table);
 		}
 	}
 
@@ -235,13 +235,13 @@ class testPageDashboardList extends CWebTest {
 	/**
 	 * Allows to check values in different tables from database.
 	 *
-	 * @param string $dbtable     Table where to find row
+	 * @param string $ids		  Dashboard ids where to find particular dashboard id
 	 * @param string $dashboard	  Dashboard table from database
-	 * @param string $table       Table where to find row
+	 * @param string $table       Frontend table
 	 */
-	private function assertDashboardOwner($dbtable, $dashboard, $table) {
-		foreach ($dbtable as $dbcolumn) {
-			if ($dbcolumn['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1 ) {
+	private function assertDashboardOwner($ids, $dashboard, $table) {
+		foreach ($ids as $id) {
+			if ($id['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1 ) {
 					$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
 			}
 		}
