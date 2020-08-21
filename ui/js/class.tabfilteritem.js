@@ -25,7 +25,7 @@ const TABFILTERITEM_EVENT_EXPAND_BEFORE = 'expandbefore.tabfilter';
 const TABFILTERITEM_EVENT_RENDER = 'render.tabfilter';
 const TABFILTERITEM_EVENT_DELETE = 'delete.tabfilter';
 const TABFILTERITEM_EVENT_URLSET = 'urlset.tabfilter';
-const TABFILTERITEM_EVENT_UPDATE = 'update.tabfilter'
+const TABFILTERITEM_EVENT_UPDATE = 'update.tabfilter';
 
 class CTabFilterItem extends CBaseComponent {
 
@@ -42,6 +42,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._expanded = options.expanded;
 		this._support_custom_time = options.support_custom_time;
 		this._template_rendered = false;
+		this._unsaved = false;
 
 		this.init();
 		this.registerEvents();
@@ -151,18 +152,10 @@ class CTabFilterItem extends CBaseComponent {
 	 * Open tab filter configuration poup.
 	 *
 	 * @param {HTMLElement} edit_elm  HTML element to broadcast popup update or delete event.
+	 * @param {object}      params    Object of params to be passed to ajax call when opening popup.
 	 */
-	openPropertiesForm(edit_elm) {
-		PopUp('popup.tabfilter.edit', {
-			idx: this._idx_namespace,
-			idx2: this._index,
-			filter_name: this._data.filter_name,
-			filter_show_counter: this._data.filter_show_counter,
-			filter_custom_time: this._data.filter_custom_time,
-			tabfilter_from: this._data.from||'',
-			tabfilter_to: this._data.to||'',
-			support_custom_time: +this._support_custom_time
-		}, 'tabfilter_dialogue', edit_elm);
+	openPropertiesForm(edit_elm, params) {
+		return PopUp('popup.tabfilter.edit', params, 'tabfilter_dialogue', edit_elm);
 	}
 
 	/**
@@ -172,21 +165,16 @@ class CTabFilterItem extends CBaseComponent {
 		let edit = document.createElement('a');
 
 		edit.classList.add('icon-edit');
-		edit.addEventListener('click', (ev) => this.openPropertiesForm(ev.target));
-		edit.addEventListener('popup.tabfilter', (ev) => {
-			let data = ev.detail;
-
-			if (data.form_action === 'update') {
-				this.update(Object.assign(data, {
-					from: data.tabfilter_from,
-					to: data.tabfilter_to
-				}));
-				this.fire(TABFILTERITEM_EVENT_UPDATE);
-			}
-			else {
-				this.delete();
-			}
-		});
+		edit.addEventListener('click', (ev) => this.openPropertiesForm(ev.target, {
+			idx: this._idx_namespace,
+			idx2: this._index,
+			filter_name: this._data.filter_name,
+			filter_show_counter: this._data.filter_show_counter,
+			filter_custom_time: this._data.filter_custom_time,
+			tabfilter_from: this._data.from||'',
+			tabfilter_to: this._data.to||'',
+			support_custom_time: +this._support_custom_time
+		}));
 		this._target.parentNode.appendChild(edit);
 	}
 
@@ -301,5 +289,28 @@ class CTabFilterItem extends CBaseComponent {
 		url.formatArguments();
 		history.replaceState(history.state, '', url.getUrl());
 		this.fire(TABFILTERITEM_EVENT_URLSET);
+	}
+
+	/**
+	 * Checks difference between original form values and to be posted values.
+	 * Updates this._unsaved according to check results
+	 *
+	 * @param {URLSearchParams} search_params  Filter field values to compare against.
+	 */
+	setUnsavedState() {
+		let search_params = this.getFilterParams(),
+			src_query = new URLSearchParams(this._src_url),
+			unmodified = true;
+
+		src_query.sort();
+		search_params.sort();
+		// TODO: check and remove method
+
+		src_query.forEach((value, key) => {
+			unmodified = unmodified && (search_params.get(key) == value);
+		});
+
+		this._unsaved = !unmodified;
+		this.toggleClass('unsaved', this._unsaved);
 	}
 }

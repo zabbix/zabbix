@@ -35,7 +35,8 @@ class CControllerPopupTabFilterEdit extends CController {
 			'filter_custom_time' =>		'in 0,1',
 			'tabfilter_from' =>			'string',
 			'tabfilter_to' =>			'string',
-			'support_custom_time' =>	'in 0,1'
+			'support_custom_time' =>	'in 0,1',
+			'create' =>					'in 0,1'
 		];
 
 		$ret = $this->validateInput($rules) && $this->customValidation();
@@ -91,7 +92,8 @@ class CControllerPopupTabFilterEdit extends CController {
 			'filter_custom_time' => 0,
 			'tabfilter_from' => '',
 			'tabfilter_to' => '',
-			'support_custom_time' => 0
+			'support_custom_time' => 0,
+			'create' => 0
 		];
 		$this->getInputs($data, array_keys($data));
 
@@ -131,23 +133,27 @@ class CControllerPopupTabFilterEdit extends CController {
 	 */
 	public function updateTab(array $data) {
 		$filter = (new CTabFilterProfile($data['idx'], []))->read();
+		$properties = [
+			'filter_name' => $data['filter_name'],
+			'filter_show_counter' => (int) $data['filter_show_counter'],
+			'filter_custom_time' => (int) $data['filter_custom_time'],
+			'from' => $data['tabfilter_from'],
+			'to' => $data['tabfilter_to']
+		];
+
+		if (!$properties['filter_custom_time']) {
+			unset($properties['from'], $properties['to']);
+		}
 
 		if (array_key_exists($data['idx2'], $filter->tabfilters)) {
-			$properties = [
-				'filter_name' => $data['filter_name'],
-				'filter_show_counter' => (int) $data['filter_show_counter'],
-				'filter_custom_time' => (int) $data['filter_custom_time'],
-				'from' => $data['tabfilter_from'],
-				'to' => $data['tabfilter_to']
-			];
-
-			if (!$properties['filter_custom_time']) {
-				unset($properties['from'], $properties['to']);
-			}
-
-			$filter->tabfilters[$data['idx2']] = $properties + $filter->tabfilters[$data['idx2']];
-			$filter->update();
+			$properties = $properties + $filter->tabfilters[$data['idx2']];
 		}
+		else {
+			$data['idx2'] = count($filter->tabfilters);
+		}
+
+		$filter->tabfilters[$data['idx2']] = $properties;
+		$filter->update();
 
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($data)]))->disableView());
 	}

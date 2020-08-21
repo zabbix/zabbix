@@ -163,6 +163,29 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			/**
+			 * Event handler for 'Save as' button
+			 */
+			popupUpdateAction: (ev) => {
+				var item = this.create(this._active_item._target.cloneNode(), {});
+
+				if (ev.detail.form_action === 'update') {
+					item.update(Object.assign(ev.detail, {
+						from: ev.detail.tabfilter_from,
+						to: ev.detail.tabfilter_to
+					}));
+					var params = item.getFilterParams();
+
+					this.profileUpdate('properties', {
+						'idx2': ev.detail.idx2,
+						'value_str': params.toString()
+					}).then(() => {
+						item.setBrowserLocation(params);
+						window.location.reload(true);
+					});
+				}
+			},
+
+			/**
 			 * Action on 'chevron left' button press. Select previous active tab filter.
 			 */
 			selectPrevTab: (ev) => {
@@ -219,11 +242,11 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * Action on 'Update' button press.
 			 */
-			update: () => {
+			buttonUpdateAction: () => {
 				var params = this._active_item.getFilterParams();
 
 				this.profileUpdate('properties', {
-					'idx2[]': this._active_item._index,
+					'idx2': this._active_item._index,
 					'value_str': params.toString()
 				}).then(() => {
 					this._active_item.setBrowserLocation(params);
@@ -231,52 +254,29 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			/**
-			 * Action on 'Save as' button press, refresh whole page for simplisity.
+			 * Action on 'Save as' button press, open properties popup.
 			 */
-			create: () => {
-				let params = this._active_item.getFilterParams(),
-					url = new Curl('', false),
-					title = t('Untitled'),
-					regex = new RegExp(title + ' \\((\\d+)\\)'),
-					match,
-					index = 0;
+			buttonSaveasAction: (ev) => {
+				let params = this._active_item.getFilterParams();
 
-				for (const item of this._items) {
-					match = (item._data.filter_name||'').match(regex);
-
-					index = Math.max(
-						item._data.filter_name === title ? 1 : 0,
-						match ? (+match[1]) + 1 : 0,
-						index
-					);
-				}
-
-				if (index) {
-					title += ' (' + index + ')';
-				}
-
-				params.set('filter_name', title);
-
-				this.profileUpdate('properties', {
-					'idx2[]': this._items.length,
-					'value_str': params.toString()
-				}).then(() => {
-					params.set('action', url.getArgument('action'));
-					window.location.search = params.toString();
+				this._active_item.openPropertiesForm(ev.target, {
+					'idx': this._active_item._idx_namespace,
+					'idx2': this._items.length
 				});
 			},
 
 			/**
 			 * Action on 'Apply' button press.
 			 */
-			apply: () => {
+			buttonApplyAction: () => {
+				this._active_item.setUnsavedState();
 				this._active_item.setBrowserLocation(this._active_item.getFilterParams());
 			},
 
 			/**
 			 * Action on 'Reset' button press.
 			 */
-			reset: () => {
+			buttonResetAction: () => {
 				this._active_item.setBrowserLocation(new URLSearchParams());
 				window.location.reload(true);
 			},
@@ -315,12 +315,13 @@ class CTabFilter extends CBaseComponent {
 			action.addEventListener('click', this._events[action.getAttribute('data-action')]);
 		}
 
-		this._shared_domnode.querySelector('[name="filter_update"]').addEventListener('click', this._events.update);
-		this._shared_domnode.querySelector('[name="filter_new"]').addEventListener('click', this._events.create);
-		this._shared_domnode.querySelector('[name="filter_apply"]').addEventListener('click', this._events.apply);
-		this._shared_domnode.querySelector('[name="filter_reset"]').addEventListener('click', this._events.reset);
+		this._shared_domnode.querySelector('[name="filter_update"]').addEventListener('click', this._events.buttonUpdateAction);
+		this._shared_domnode.querySelector('[name="filter_new"]').addEventListener('click', this._events.buttonSaveasAction);
+		this._shared_domnode.querySelector('[name="filter_apply"]').addEventListener('click', this._events.buttonApplyAction);
+		this._shared_domnode.querySelector('[name="filter_reset"]').addEventListener('click', this._events.buttonResetAction);
 
 		this.on('keydown', this._events.keydown);
+		this.on('popup.tabfilter', this._events.popupUpdateAction);
 	}
 
 	/**
@@ -412,14 +413,14 @@ class CTabFilter extends CBaseComponent {
 		body.idx = this._idx_namespace + '.' + property;
 		this._fetch = new AbortController();
 
-		return fetch('zabbix.php?action=profile.update', {
+		return fetch('zabbix.php?action=tabfilter.profile.update', {
 			method: 'POST',
 			signal: this._fetch.signal,
 			body: new URLSearchParams(body)
 		}).then(() => {
 			this._fetch = null;
 		}).catch(() => {
-			// Catch DOMExeception: The user aborted a request.
+			// User aborted a request.
 		});
 	}
 

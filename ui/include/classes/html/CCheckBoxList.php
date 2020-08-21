@@ -53,6 +53,17 @@ class CCheckBoxList extends CList {
 	}
 
 	/**
+	 * Set uinqueid, it is used as suffix for generated check box ids.
+	 *
+	 * @param string $uniqid  Unique id string.
+	 */
+	public function setUniqid(string $uniqid) {
+		$this->uniqid = $uniqid;
+
+		return $this;
+	}
+
+	/**
 	 * @param array $values
 	 *
 	 * @return CCheckBoxList

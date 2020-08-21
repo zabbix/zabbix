@@ -41,17 +41,6 @@ class CSeverityCheckBoxList extends CCheckBoxList {
 	}
 
 	/**
-	 * Set uinqueid, it is used as suffix for generated check box ids.
-	 *
-	 * @param string $uniqid  Unique id string.
-	 */
-	public function setUniqid(string $uniqid) {
-		$this->uniqid = $uniqid;
-
-		return $this;
-	}
-
-	/**
 	 * Generate array with data for severities options ordered for showing by rows.
 	 *
 	 * @return array

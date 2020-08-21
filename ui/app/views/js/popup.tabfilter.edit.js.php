@@ -45,7 +45,7 @@ function tabFilterFormAction(form_action, overlay) {
 			}
 			else {
 				overlayDialogueDestroy(overlay.dialogueid);
-				overlay.element.dispatchEvent(new CustomEvent('popup.tabfilter', {detail: response}));
+				overlay.element.dispatchEvent(new CustomEvent('popup.tabfilter', {detail: response, bubbles: true}));
 			}
 		})
 		.always(() => {

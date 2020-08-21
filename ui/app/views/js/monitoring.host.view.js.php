@@ -53,7 +53,7 @@
 			this.running = false;
 			this.timeout = null;
 			this.refresh_counters = this.createCountersRefresh(1);
-			this.filter = new CTabFilter($('#monitoringhostsfilter')[0], <?= json_encode($data['filter_options']) ?>);
+			this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], <?= json_encode($data['filter_options']) ?>);
 			this.filter.on(TABFILTER_EVENT_URLSET, (ev) => {
 				let url = new Curl('', false);
 
