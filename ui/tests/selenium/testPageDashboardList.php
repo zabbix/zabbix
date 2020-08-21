@@ -166,35 +166,29 @@ class testPageDashboardList extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$dashboards = CDBHelper::getAll('SELECT name, userid, private, dashboardid FROM dashboard');
-		$dashboards_usrgrps = CDBHelper::getAll('SELECT dashboardid, usrgrpid FROM dashboard_usrgrp');
+		$dashboards_usrgrps = CDBHelper::getAll('SELECT dashboardid FROM dashboard_usrgrp');
 		$dashboards_users = CDBHelper::getAll('SELECT dashboardid FROM dashboard_user');
 
 		// Checking that dashboard, owned by Admin, has My tag near its name.
-		$dash_owner = [];
 		foreach ($dashboards as $dashboard) {
-			$dash_owner[$dashboard['name']] = $dashboard['userid'];
 			if ($dashboard['userid'] == 1) {
-				$this->assertEquals('My', $table->query('xpath://a[text()="'.$dashboard['name'].'"]'
-					. '/following-sibling::div/span[@class="tag green-bg"]')->one()->getText());
+				$this->assertEquals('My', $this->getTagText($table, $dashboard['name'], 'green'));
 			}
 			if ($dashboard['private'] == 0 && $dashboard['userid'] == 1) {
-				$this->assertEquals('Shared', $table->query('xpath://a[text()="'.$dashboard['name'].'"]'
-					. '/following-sibling::div/span[@class="tag yellow-bg"]')->one()->getText());
+				$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
 			}
 
 			// Checking that Admin dashboards, shared with groups, has Shared tag	.
 			foreach ($dashboards_usrgrps as $dashboard_usrgrp) {
 				if ($dashboard_usrgrp['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1) {
-					$this->assertEquals('Shared', $table->query('xpath://a[text()="'.$dashboard['name'].'"]'
-					. '/following-sibling::div/span[@class="tag yellow-bg"]')->one()->getText());
+					$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
 				}
 			}
 
 			// Checking that Admin dashboards, shared with users, has Shared tag.
 			foreach ($dashboards_users as $dashboard_user) {
 				if ($dashboard_user['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1 ) {
-					$this->assertEquals('Shared', $table->query('xpath://a[text()="'.$dashboard['name'].'"]'
-					. '/following-sibling::div/span[@class="tag yellow-bg"]')->one()->getText());
+					$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
 				}
 			}
 		}
@@ -208,8 +202,7 @@ class testPageDashboardList extends CWebTest {
 		// Delete single Dashboard.
 		$before_rows_count = $table->getRows()->count();
 		$this->assertRowCount($before_rows_count);
-		$table->query('xpath://a[text()="'.$dashboard_name.'"]/ancestor::td/preceding-sibling::td/input')
-				->asCheckbox()->one()->check();
+		$table->findRow('Name', $dashboard_name, true)->select();
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -232,5 +225,11 @@ class testPageDashboardList extends CWebTest {
 
 		// Check database.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard'));
+	}
+	
+	private function getTagText($table, $name, $color) {
+		$row = $table->findRow('Name', $name, true);
+		
+		return $row->query('xpath://span[@class="tag '.$color.'-bg"]')->one()->getText();
 	}
 }
