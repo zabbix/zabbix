@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerProblemView extends CController {
+class CControllerProblemView extends CControllerProblem {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -27,37 +27,38 @@ class CControllerProblemView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'action' =>					'string',
+			'show' =>					'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM.','.TRIGGERS_OPTION_ALL,
+			'groupids' =>				'array_id',
+			'hostids' =>				'array_id',
+			'application' =>			'string',
+			'triggerids' =>				'array_id',
+			'name' =>					'string',
+			'severities' =>				'array',
+			'age_state' =>				'in 1',
+			'age' =>					'int32',
+			'inventory' =>				'array',
+			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
+			'tags' =>					'array',
+			'show_tags' =>				'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
+			'show_suppressed' =>		'in 1',
+			'unacknowledged' =>			'in 1',
+			'compact_view' =>			'in 1',
+			'show_timeline' =>			'in 1',
+			'details' =>				'in 1',
+			'highlight_row' =>			'in 1',
+			'show_opdata' =>			'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
+			'tag_name_format' =>		'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
+			'tag_priority' =>			'string',
+			'from' =>					'range_time',
+			'to' =>						'range_time',
 			'sort' =>					'in clock,host,severity,name',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>				'in 1',
 			'page' =>					'ge 1',
-			'filter_set' =>				'in 1',
-			'filter_rst' =>				'in 1',
-			'filter_show' =>			'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM.','.TRIGGERS_OPTION_ALL,
-			'filter_groupids' =>		'array_id',
-			'filter_hostids' =>			'array_id',
-			'filter_application' =>		'string',
-			'filter_triggerids' =>		'array_id',
+			'uncheck' =>				'in 1',
 			'filter_name' =>			'string',
-			'filter_severities' =>		'array',
-			'filter_age_state' =>		'in 1',
-			'filter_age' =>				'int32',
-			'filter_inventory' =>		'array',
-			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
-			'filter_tags' =>			'array',
-			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
-			'filter_show_suppressed' =>	'in 1',
-			'filter_unacknowledged' =>	'in 1',
-			'filter_compact_view' =>	'in 1',
-			'filter_show_timeline' =>	'in 1',
-			'filter_details' =>			'in 1',
-			'filter_highlight_row' =>	'in 1',
-			'filter_show_opdata' =>		'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
-			'filter_tag_name_format' =>	'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
-			'filter_tag_priority' =>	'string',
-			'from' =>					'range_time',
-			'to' =>						'range_time'
+			'filter_custom_time' =>		'in 1,0',
+			'filter_show_counter' =>	'in 1,0',
+			'filter_counters' =>		'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
@@ -96,7 +97,7 @@ class CControllerProblemView extends CController {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function __doAction() {
 		$sortField = $this->getInput('sort', CProfile::get('web.problem.sort', 'clock'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.problem.sortorder', ZBX_SORT_DOWN));
 		$active_tab = CProfile::get('web.problem.filter.active', 1);
@@ -226,11 +227,11 @@ class CControllerProblemView extends CController {
 		$filter_hostids = CProfile::getArray('web.problem.filter.hostids', []);
 		$filter_triggerids = CProfile::getArray('web.problem.filter.triggerids', []);
 
-		$groups = [];
+		// $groups = [];
 
-		if ($filter_groupids) {
-			$filter_groupids = getSubGroups($filter_groupids, $groups);
-		}
+		// if ($filter_groupids) {
+		// 	$filter_groupids = getSubGroups($filter_groupids, $groups);
+		// }
 
 		$filter_triggers = $filter_triggerids
 			? CArrayHelper::renameObjectsKeys(API::Trigger()->get([
@@ -252,10 +253,10 @@ class CControllerProblemView extends CController {
 		}
 		unset($filter_trigger);
 
-		$inventories = [];
-		foreach (getHostInventories() as $inventory) {
-			$inventories[$inventory['db_field']] = $inventory['title'];
-		}
+		// $inventories = [];
+		// foreach (getHostInventories() as $inventory) {
+		// 	$inventories[$inventory['db_field']] = $inventory['title'];
+		// }
 
 		$filter_inventory = [];
 		foreach (CProfile::getArray('web.problem.filter.inventory.field', []) as $i => $field) {
@@ -286,7 +287,7 @@ class CControllerProblemView extends CController {
 			'filter' => [
 				'show' => CProfile::get('web.problem.filter.show', TRIGGERS_OPTION_RECENT_PROBLEM),
 				'groupids' => $filter_groupids,
-				'groups' => $groups,
+				//'groups' => $groups,
 				'hostids' => $filter_hostids,
 				'hosts' => $filter_hostids
 					? CArrayHelper::renameObjectsKeys(API::Host()->get([
@@ -301,7 +302,7 @@ class CControllerProblemView extends CController {
 				'severities' => CProfile::getArray('web.problem.filter.severities', []),
 				'age_state' => CProfile::get('web.problem.filter.age_state', 0),
 				'age' => CProfile::get('web.problem.filter.age', 14),
-				'inventories' => $inventories,
+				//'inventories' => $inventories,
 				'inventory' => $filter_inventory,
 				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 				'tags' => $filter_tags,
@@ -336,6 +337,53 @@ class CControllerProblemView extends CController {
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));
+		if ($data['action'] === 'problem.view.csv') {
+			$response->setFileName('zbx_problems_export.csv');
+		}
+
+		$this->setResponse($response);
+	}
+
+	protected function doAction() {
+		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
+			->read()
+			->setInput($this->getInputAll());
+		$filter = $profile->getTabFilter($profile->selected);
+		$this->getInputs($filter, ['page', 'sort', 'sortorder']);
+		$filter_tabs = $profile->getTabsWithDefaults();
+
+		foreach ($filter_tabs as &$filter_tab) {
+			$filter_tab += $this->getAdditionalData($filter_tab);
+		}
+		unset($filter_tab);
+
+		$data = [
+			'tabfilter_idx' => static::FILTER_IDX,
+			'filter_view' => 'monitoring.problem.filter',
+			'filter_defaults' => $profile->filter_defaults,
+			'timerange' => [
+				'idx' => static::FILTER_IDX,
+				'idx2' => '',
+				'from' => ZBX_PERIOD_DEFAULT_FROM,
+				'to' => ZBX_PERIOD_DEFAULT_TO,
+			],
+			'filter_tabs' => $filter_tabs,
+			'tab_selected' => $profile->selected,
+			'tab_expanded' => $profile->expanded,
+			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
+
+
+			'action' => $this->getAction(),
+			'sort' => $filter['sort'],
+			'sortorder' => $filter['sortorder'],
+			'uncheck' => $this->hasInput('uncheck'),
+			'page' => $this->getInput('page', 1),
+			'filter' => $filter,
+		] + $this->getData($filter);
+
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Problems'));
+
 		if ($data['action'] === 'problem.view.csv') {
 			$response->setFileName('zbx_problems_export.csv');
 		}
