@@ -124,6 +124,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	 */
 	public function getCheckFormData() {
 		return [
+			// Minimal valid values. In period fields minimal valid time in seconds with 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -137,7 +138,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Show warning if Zabbix server is down' => false,
 						'Working time' => '1-1,00:00-00:01',
 						'Show technical errors' => true,
-						// Minimal valid time in seconds with 's'.
 						'Max history display period' => '86400s',
 						'Time filter default period' => '60s',
 						'Max period' => '31536000s'
@@ -155,16 +155,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'history_period' => '86400s',
 						'period_default' => '60s',
 						'max_period' => '31536000s'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields minimal valid time in seconds without 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Working time' => '1-5,09:00-18:00;5-7,12:00-16:00',
-						// Minimal valid time in seconds without 's'.
 						'Max history display period' => '86400',
 						'Time filter default period' => '60',
 						'Max period' => '31536000'
@@ -174,15 +173,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'history_period' => '86400',
 						'period_default' => '60',
 						'max_period' => '31536000'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields minimal valid time in minutes.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Minimal valid time in minutes.
 						'Max history display period' => '1440m',
 						'Time filter default period' => '1m',
 						'Max period' => '525600m'
@@ -191,84 +189,78 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'history_period' => '1440m',
 						'period_default' => '1m',
 						'max_period' => '525600m'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields minimal valid time in hours.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Minimal valid time in hours.
 						'Max history display period' => '24h',
 						'Max period' => '8760h'
 					],
 					'db' => [
 						'history_period' => '24h',
 						'max_period' => '8760h'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields minimal valid time in days.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Minimal valid time in days.
 						'Max history display period' => '1d',
 						'Max period' => '365d'
 					],
 					'db' => [
 						'history_period' => '1d',
 						'max_period' => '365d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields minimal valid time in weeks.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Minimal valid time in weeks.
 						'Max period' => '53w'
 					],
 					'db' => [
 						'max_period' => '53w'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields minimal valid time in Months.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Minimal valid time in Months.
 						'Max period' => '13M'
 					],
 					'db' => [
 						'max_period' => '13M'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields minimal valid time in years.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Minimal valid time in years.
 						'Max period' => '1y'
 					],
 					'db' => [
 						'max_period' => '1y'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields maximal valid time in seconds with 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Maximal valid time in seconds with 's'.
 						'Max history display period' => '604800s',
 						'Time filter default period' => '315360000s',
 						'Max period' => '315360000s'
@@ -277,17 +269,16 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'history_period' => '604800s',
 						'period_default' => '315360000s',
 						'max_period' => '315360000s'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields maximal valid time in seconds without 's'.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
 						'Default time zone' => 'Europe/Riga',
 						'Default theme' => 'High-contrast dark',
-						// Maximal valid time in seconds without 's'.
 						'Max history display period' => '604800',
 						'Time filter default period' => '315360000',
 						'Max period' => '315360000'
@@ -298,15 +289,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'history_period' => '604800',
 						'period_default' => '315360000',
 						'max_period' => '315360000'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields maximal valid time in minutes.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Maximal valid time in minutes.
 						'Max history display period' => '10080m',
 						'Time filter default period' => '5256000m',
 						'Max period' => '5256000m'
@@ -315,15 +305,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'history_period' => '10080m',
 						'period_default' => '5256000m',
 						'max_period' => '5256000m'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields maximal valid time in days.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Maximal valid time in days.
 						'Max history display period' => '7d',
 						'Time filter default period' => '3650d',
 						'Max period' => '3650d'
@@ -332,15 +321,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'history_period' => '7d',
 						'period_default' => '3650d',
 						'max_period' => '3650d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields maximal valid time in weeks.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Maximal valid time in weeks.
 						'Max history display period' => '7d',
 						'Time filter default period' => '3650d',
 						'Max period' => '3650d'
@@ -349,25 +337,24 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'history_period' => '7d',
 						'period_default' => '3650d',
 						'max_period' => '3650d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// In period fields maximal valid time in Months.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						// Maximal valid time in Months.
 						'Time filter default period' => '121M',
 						'Max period' => '121M'
 					],
 					'db' => [
 						'period_default' => '121M',
 						'max_period' => '121M'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// Maximal valid values. In period fields time in years.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -378,7 +365,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Max number of columns and rows in overview tables' => '999999',
 						'Max count of elements to show inside table cell' => '99999',
 						'Working time' => '{$WORKING_HOURS}',
-						// Maximal valid time in years.
 						'Time filter default period' => '10y',
 						'Max period' => '10y'
 					],
@@ -391,10 +377,10 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'work_period' => '{$WORKING_HOURS}',
 						'period_default' => '10y',
 						'max_period' => '10y'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
+			// Zero values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -407,7 +393,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Time filter default period' => '0',
 						'Max period' => '0'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "search_limit": value must be no less than "1".',
 						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
@@ -419,6 +404,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// Empty values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -431,7 +417,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Time filter default period' => '',
 						'Max period' => ''
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "search_limit": value must be no less than "1".',
 						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
@@ -443,37 +428,81 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// Invalid sting values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Limit for search and filter results' => 'text',
+						'Max number of columns and rows in overview tables' => 'text',
+						'Max count of elements to show inside table cell' => 'text',
+						'Working time' => 'text',
+						'Max history display period' => 'text',
+						'Time filter default period' => 'text',
+						'Max period' => 'text'
+					],
+					'details' => [
+						'Incorrect value for field "search_limit": value must be no less than "1".',
+						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
+						'Incorrect value for field "max_in_table": value must be no less than "1".',
+						'Incorrect value for field "work_period": a time period is expected.',
+						'Incorrect value for field "history_period": a time unit is expected.',
+						'Incorrect value for field "period_default": a time unit is expected.',
+						'Incorrect value for field "max_period": a time unit is expected.'
+					]
+				]
+			],
+			// Invalid special symbol values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' =>  [
+						'Limit for search and filter results' => '!@#$%^&*()_+',
+						'Max number of columns and rows in overview tables' => '!@#$%^&*()_+',
+						'Max count of elements to show inside table cell' => '!@#$%^&*()_+',
+						'Working time' => '!@#$%^&*()_+',
+						'Max history display period' => '!@#$%^&*()_+',
+						'Time filter default period' => '!@#$%^&*()_+',
+						'Max period' => '!@#$%^&*()_+'
+					],
+					'details' => [
+						'Incorrect value for field "search_limit": value must be no less than "1".',
+						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
+						'Incorrect value for field "max_in_table": value must be no less than "1".',
+						'Incorrect value for field "work_period": a time period is expected.',
+						'Incorrect value for field "history_period": a time unit is expected.',
+						'Incorrect value for field "period_default": a time unit is expected.',
+						'Incorrect value for field "max_period": a time unit is expected.'
+					]
+				]
+			],
+			// Invalid values. In period fields minimal invalid time in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Max number of columns and rows in overview tables' => '4',
-						'Working time' => 'test',
-						// Minimal invalid time in seconds with "s".
 						'Max history display period' => '86399s',
 						'Time filter default period' => '59s',
 						'Max period' => '31535999s'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
-						'Incorrect value for field "work_period": a time period is expected.',
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
 						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
 					]
 				]
 			],
+			// In period fields minimal invalid time in seconds without "s".
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Minimal invalid time in seconds without "s".
 						'Max history display period' => '86399',
 						'Time filter default period' => '59',
 						'Max period' => '31535999'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -481,16 +510,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields minimal invalid time in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Minimal invalid time in minutes.
 						'Max history display period' => '1439m',
 						'Time filter default period' => '0m',
 						'Max period' => '525599m'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -498,16 +526,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields minimal invalid time in hours.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Minimal invalid time in hours.
 						'Max history display period' => '23h',
 						'Time filter default period' => '0h',
 						'Max period' => '8759h'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -515,16 +542,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields minimal invalid time in weeks.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Minimal invalid time in weeks.
 						'Max history display period' => '0w',
 						'Time filter default period' => '0w',
 						'Max period' => '52w'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -532,16 +558,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields minimal invalid time in Month.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Minimal invalid time in Month.
 						'Max history display period' => '0M',
 						'Time filter default period' => '0M',
 						'Max period' => '12M'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": a time unit is expected.',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -549,31 +574,29 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields minimal invalid time in years.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Minimal invalid time in years.
 						'Time filter default period' => '0y',
 						'Max period' => '0y'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
 						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
 					]
 				]
 			],
+			// In period fields maximal invalid time in seconds without 's'.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Maximal invalid time in seconds without 's'.
 						'Max history display period' => '604801',
 						'Time filter default period' => '315360001',
 						'Max period' => '315360001'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -581,16 +604,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields maximal invalid time in seconds with 's'.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Maximal invalid time in seconds with 's'.
 						'Max history display period' => '604801s',
 						'Time filter default period' => '315360001s',
 						'Max period' => '315360001s'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -598,16 +620,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields maximal invalid time in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Maximal invalid time in minutes.
 						'Max history display period' => '10081m',
 						'Time filter default period' => '5256001m',
 						'Max period' => '5256001m'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -615,17 +636,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields maximal invalid time in hours.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-
-						// Maximal invalid time in hours.
 						'Max history display period' => '169h',
 						'Time filter default period' => '87601h',
 						'Max period' => '87601h'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -633,16 +652,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields maximal invalid time in days.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Maximal invalid time in days.
 						'Max history display period' => '8d',
 						'Time filter default period' => '3651d',
 						'Max period' => '3651d'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -650,16 +668,15 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields maximal invalid time in weeks.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Maximal invalid time in weeks.
 						'Max history display period' => '2w',
 						'Time filter default period' => '522w',
 						'Max period' => '522w'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -667,36 +684,35 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// In period fields maximal invalid time in months.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Maximal invalid time in months.
 						'Time filter default period' => '122M',
 						'Max period' => '122M'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
 						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
 					]
 				]
 			],
+			// In period fields maximal invalid time in years.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						// Maximal invalid time in years.
 						'Time filter default period' => '11y',
 						'Max period' => '11y'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
 						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
 					]
 				]
 			],
+			// In period fields maximal invalid time values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -705,7 +721,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Time filter default period' => '99999999999999999999999999999999',
 						'Max period' => '99999999999999999999999999999999'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "history_period": value must be one of 86400-604800',
 						'Incorrect value for field "period_default": value must be one of 60-315360000.',
@@ -713,6 +728,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					]
 				]
 			],
+			// Default period value larger than Max period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -720,19 +736,18 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 						'Time filter default period' => '10y',
 						'Max period' => '5y'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => [
 						'Incorrect value for field "period_default": time filter default period exceeds the max period.'
 					]
 				]
 			],
+			// Working time field values validation.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Working time' => '1-7 09:00-24:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -742,7 +757,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '0-7,09:00-24:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -752,7 +766,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '1-5,09:00-18:00,6-7,10:00-16:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -762,7 +775,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '1-8,09:00-24:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -772,7 +784,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '1-7,09:00-25:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -782,7 +793,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '1-7,24:00-00:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -792,7 +802,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '1-7,14:00-13:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -802,7 +811,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '1-7,25:00-26:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -812,7 +820,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '1-7,13:60-14:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -822,7 +829,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '1-0'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -832,7 +838,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '09:00-24:00'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			],
@@ -842,7 +847,6 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 					'fields' =>  [
 						'Working time' => '{WORKING_HOURS}'
 					],
-					'message' => 'Cannot update configuration',
 					'details' => 'Incorrect value for field "work_period": a time period is expected.'
 				]
 			]
@@ -861,13 +865,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
+		$message = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
+			? 'Configuration updated'
+			: 'Cannot update configuration';
+		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
 		// Check saved configuration in frontend.
 		$this->page->open('zabbix.php?action=gui.edit');
 		$form->invalidate();
-		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD
-			? $data['fields']
-			: $this->default;
+		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default;
 		$form->checkValue($values);
 		// Check saved configuration in database.
 		$sql = CDBHelper::getRow('SELECT * FROM config');
