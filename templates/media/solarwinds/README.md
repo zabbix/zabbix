@@ -15,7 +15,7 @@ As an example, this macro can be used to populate SolarWinds's custom field with
 3\. Open the newly added **SolarWinds** media type and replace all *&lt;PLACEHOLDERS&gt;* with your values.<br>
 The following parameters are required:<br>
 **samanage_url** - actual URL of your SolarWinds instance,<br>
-**samanage_token** - API token (for [SolarWinds tutorial](https://help.samanage.com/s/article/Tutorial-Tokens-Authentication-for-API-Integration-1536721557657) for more information).<br>
+**samanage_token** - API token (see [SolarWinds tutorial](https://help.samanage.com/s/article/Tutorial-Tokens-Authentication-for-API-Integration-1536721557657) for more information).<br>
 
 4\. You can add the following parameters to customize SolarWinds ticket:
 
@@ -29,13 +29,13 @@ Possible values of `<severity>`:
   - high
   - disaster
 
-- `sw_field_<fieldname>`: add this to fill default SolarWinds field, where `<fieldname>` is the name of the field. The parameter can contain a simple value or JSON string.<br>
-Name of field and value should be consistent with [SolarWinds API specification](https://documentation.solarwinds.com/en/Success_Center/swsd/Content/APIdocumentation/Incidents.htm).<br>
+- `sw_field_<fieldname>`: add this to fill default SolarWinds fields, where `<fieldname>` is a name of a field. The parameter can contain a simple value or a JSON string.<br>
+Name of the field and value should be consistent with [SolarWinds API specification](https://documentation.solarwinds.com/en/Success_Center/swsd/Content/APIdocumentation/Incidents.htm).<br>
 _Example:_<br>
 [![](images/2.png?raw=true)](images/2.png)<br>
-Be careful to use user macro as value, because special symbols like quotes can make your JSON invalid.<br>
+Be careful to use user macro as a value, because special symbols such as quotes can make your JSON invalid.<br>
 
-- `sw_customfield_<fieldname>`: add this to fill preconfigured SolarWinds custom field. `<fieldname>` is the name of the field and can contain whitespaces.<br>
+- `sw_customfield_<fieldname>`: add this to fill preconfigured SolarWinds custom field. `<fieldname>` is a name of a field and may contain whitespaces.<br>
 _Example:_<br>
 [![](images/3.png?raw=true)](images/3.png)<br>
 
