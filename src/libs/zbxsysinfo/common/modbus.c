@@ -151,7 +151,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		zbx_strsplit(endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP), ':',
 				&endpoint->conn_info.tcp.ip, &tmp);
 
-		///!!!TODO - accept ipv6 and dns here
+		/* TODO - accept ipv6 and dns here */
 		if (SUCCEED == (ret = is_ip4(endpoint->conn_info.tcp.ip)))
 		{
 			if (NULL != tmp)
@@ -293,7 +293,7 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		modbus_set_response_timeout(mdb_ctx, &tv);
 
 	}
-#else //HAVE_LIBMODBUS_3_1 at the moment
+#else /* HAVE_LIBMODBUS_3_1 at the moment */
 	if (0 !=  modbus_set_response_timeout(mdb_ctx, CONFIG_TIMEOUT, 0))
 	{
 		*error = zbx_dsprintf(*error, "modbus_set_response_timeout() failed: %s", modbus_strerror(errno));
@@ -465,7 +465,7 @@ out:
 	return ret;
 
 }
-#endif //HAVE_LIBMODBUS
+#endif /* HAVE_LIBMODBUS */
 
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -672,7 +672,7 @@ err:
 	ZBX_UNUSED(request);
 	ZBX_UNUSED(result);
 	return SYSINFO_RET_FAIL;
-#endif // HAVE_LIBMODBUS
+#endif /* HAVE_LIBMODBUS */
 }
 
 /******************************************************************************
