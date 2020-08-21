@@ -32,6 +32,7 @@
 #include "../zbxcrypto/tls_tcp_active.h"
 #include "zbxlld.h"
 #include "events.h"
+#include "zbxvault.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -130,6 +131,13 @@ static const char	*availability_tag_available[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_AV
 static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
 					ZBX_PROTO_TAG_SNMP_ERROR, ZBX_PROTO_TAG_IPMI_ERROR,
 					ZBX_PROTO_TAG_JMX_ERROR};
+
+typedef struct
+{
+	char		*path;
+	zbx_hashset_t	keys;
+}
+keys_path_t;
 
 /******************************************************************************
  *                                                                            *
@@ -731,6 +739,35 @@ skip_data:
 	return ret;
 }
 
+static int	compare_keys_path(const void *d1, const void *d2)
+{
+	const keys_path_t	*ptr1 = *((const keys_path_t **)d1);
+	const keys_path_t	*ptr2 = *((const keys_path_t **)d2);
+
+	return strcmp(ptr1->path, ptr2->path);
+}
+
+static int	compare_keys(const void *d1, const void *d2)
+{
+	return strcmp((const char *)d1, (const char *)d2);
+}
+
+static void	key_path_free(void *data)
+{
+	zbx_hashset_iter_t	iter;
+	char			**ptr;
+	keys_path_t		*keys_path = (keys_path_t *)data;
+
+	zbx_hashset_iter_reset(&keys_path->keys, &iter);
+	while (NULL != (ptr = (char **)zbx_hashset_iter_next(&iter)))
+		zbx_free(*ptr);
+	zbx_hashset_destroy(&keys_path->keys);
+
+	zbx_free(keys_path->path);
+	zbx_free(keys_path);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: get_proxyconfig_table                                            *
@@ -739,16 +776,28 @@ skip_data:
  *                                                                            *
  ******************************************************************************/
 static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
-		zbx_vector_uint64_t *hosts, zbx_vector_uint64_t *httptests)
+		const zbx_vector_uint64_t *hosts, const zbx_vector_uint64_t *httptests, zbx_vector_ptr_t *keys_paths)
 {
-	char		*sql = NULL;
-	size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		f, ret = SUCCEED;
-	DB_RESULT	result;
-	DB_ROW		row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			f, ret = SUCCEED, i, is_globalmacro = 0, is_hostmacro = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64 " table:'%s'",
 			__func__, proxy_hostid, table->table);
+
+	if (0 == strcmp(table->table, "globalmacro"))
+	{
+		is_globalmacro = 1;
+		offset = 0;
+	}
+	else if (0 == strcmp(table->table, "hostmacro"))
+	{
+		offset = 1;
+		is_hostmacro = 1;
+	}
 
 	zbx_json_addobject(j, table->table);
 	zbx_json_addarray(j, "fields");
@@ -846,6 +895,50 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 		zbx_json_addarray(j, NULL);
 		proxyconfig_add_row(j, row, table);
 		zbx_json_close(j);
+		if (1 == is_globalmacro || 1 == is_hostmacro)
+		{
+			keys_path_t	*keys_path, keys_path_local;
+			unsigned char	type;
+			char		*path, *key;
+
+			ZBX_STR2UCHAR(type, row[3 + offset]);
+
+			if (ZBX_MACRO_VALUE_VAULT != type)
+				continue;
+
+			zbx_strsplit(row[2 + offset], ':', &path, &key);
+
+			if (NULL == key)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" value \"%s\"",
+						row[1 + offset], row[2 + offset]);
+				goto next;
+			}
+
+			keys_path_local.path = path;
+
+			if (FAIL == (i = zbx_vector_ptr_search(keys_paths, &keys_path_local, compare_keys_path)))
+			{
+				keys_path = zbx_malloc(NULL, sizeof(keys_path_t));
+				keys_path->path = path;
+				zbx_hashset_create(&keys_path->keys, 0, ZBX_DEFAULT_STRING_HASH_FUNC, compare_keys);
+				zbx_hashset_insert(&keys_path->keys, &key, sizeof(char *));
+				zbx_vector_ptr_append(keys_paths, keys_path);
+				path = key = NULL;
+			}
+			else
+			{
+				keys_path = (keys_path_t *)keys_paths->values[i];
+				if (NULL == zbx_hashset_search(&keys_path->keys, &key))
+				{
+					zbx_hashset_insert(&keys_path->keys, &key, sizeof(char *));
+					key = NULL;
+				}
+			}
+next:
+			zbx_free(key);
+			zbx_free(path);
+		}
 	}
 	DBfree_result(result);
 skip_data:
@@ -942,6 +1035,46 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 	zbx_vector_uint64_sort(httptests, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j)
+{
+	int	i;
+
+	zbx_json_addobject(j, "macro.secrets");
+
+	for (i = 0; i < keys_paths->values_num; i++)
+	{
+		keys_path_t		*keys_path;
+		char			*error = NULL, **ptr;
+		zbx_hashset_t		kvs;
+		zbx_hashset_iter_t	iter;
+
+		keys_path = (keys_path_t *)keys_paths->values[i];
+		if (FAIL == zbx_kvs_from_vault_create(keys_path->path, &kvs, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_json_addobject(j, keys_path->path);
+
+		zbx_hashset_iter_reset(&keys_path->keys, &iter);
+		while (NULL != (ptr = (char **)zbx_hashset_iter_next(&iter)))
+		{
+			zbx_kv_t	*kv, kv_local;
+
+			kv_local.key = *ptr;
+
+			if (NULL != (kv = zbx_hashset_search(&kvs, &kv_local)))
+				zbx_json_addstring(j, kv->key, kv->value, ZBX_JSON_TYPE_STRING);
+		}
+		zbx_json_close(j);
+
+		zbx_kvs_from_vault_destroy(&kvs);
+	}
+	zbx_json_close(j);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_proxyconfig_data                                             *
@@ -982,12 +1115,14 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 	const ZBX_TABLE		*table;
 	zbx_vector_uint64_t	hosts, httptests;
 	zbx_hashset_t		itemids;
+	zbx_vector_ptr_t	keys_paths;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy_hostid);
 
 	zbx_hashset_create(&itemids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_create(&hosts);
 	zbx_vector_uint64_create(&httptests);
+	zbx_vector_ptr_create(&keys_paths);
 
 	DBbegin();
 	get_proxy_monitored_hosts(proxy_hostid, &hosts);
@@ -1007,7 +1142,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 				ret = get_proxyconfig_table_items_ext(proxy_hostid, &itemids, j, table);
 		}
 		else
-			ret = get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests);
+			ret = get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests, &keys_paths);
 
 		if (SUCCEED != ret)
 		{
@@ -1016,9 +1151,13 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		}
 	}
 
+	get_macro_secrets(&keys_paths, j);
+
 	ret = SUCCEED;
 out:
 	DBcommit();
+	zbx_vector_ptr_clear_ext(&keys_paths, key_path_free);
+	zbx_vector_ptr_destroy(&keys_paths);
 	zbx_vector_uint64_destroy(&httptests);
 	zbx_vector_uint64_destroy(&hosts);
 	zbx_hashset_destroy(&itemids);

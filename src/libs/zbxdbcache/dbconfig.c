@@ -966,7 +966,10 @@ static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 	zbx_hashset_remove_direct(&kvs_path->kvs, kv);
 
 	if (0 == kvs_path->kvs.num_data)
+	{
+		__config_mem_free_func(kvs_path);
 		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
+	}
 clean:
 	zbx_free(key);
 	zbx_free(path);
