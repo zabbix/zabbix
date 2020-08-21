@@ -2823,6 +2823,8 @@ INSERT INTO lld_override_opseverity (lld_override_operationid, severity) values 
 INSERT INTO lld_override_opstatus (lld_override_operationid, status) values (400, 0);
 
 INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (300, 401, 'tag1', 'value1');
+INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (301, 403, 'name1', 'value1');
+INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (302, 403, 'name2', 'value2');
 
 INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_operationid, templateid) values (300, 403, 99137);
 
@@ -2852,3 +2854,19 @@ INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, descri
 
 -- testFormAdministrationGeneralMacros
 INSERT INTO items (itemid, type, hostid, name, key_, interfaceid, params, description, posts, headers) VALUES (99114, 2, 99134, 'Macro value: {$Z_GLOBAL_MACRO_2_RESOLVE}', 'trap', NULL, '', '', '', '');
+
+-- tags in host prototypes
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (450, 90002, 'host_proto_tag_1', 'value1');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (451, 90002, 'host_proto_tag_2', 'value2');
+
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99450, '{#HOST} prototype with tags for cloning', '{#HOST} prototype with tags for cloning', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99450, 90001);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223000, 99450, '', 4, NULL);
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (452, 99450, 'action', 'clone');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (453, 99450, 'tag', 'host_prototype');
+
+INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99451, '{#HOST} prototype with tags for updating', '{#HOST} prototype with tags for updating', 0, '', 2);
+INSERT INTO host_discovery (hostid, parent_itemid) VALUES (99451, 90001);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (223001, 99451, '', 4, NULL);
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (454, 99451, 'action', 'update');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (455, 99451, 'tag', 'host_prototype');

@@ -4121,26 +4121,6 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
 			],
-			'Test /1/overrides/1/operations/1/optag is is not supported for host prototype object.' => [
-				'discoveryrules' => [
-					$new_lld_overrides([
-						[
-							'name' => 'override',
-							'step' => 1,
-							'operations' => [
-								[
-									'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
-									'operator' => CONDITION_OPERATOR_NOT_REGEXP,
-									'optag' => [
-										['tag' => 'www']
-									]
-								]
-							]
-						]
-					])
-				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optag".'
-			],
 			// LLD rule override operation template
 			'Test /1/overrides/1/operations/1/optemplate cannot be empty.' => [
 				'discoveryrules' => [
@@ -4852,6 +4832,16 @@ class testDiscoveryRule extends CAPITest {
 											'templateid' => '50010'
 										]
 									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									],
 									'opinventory' => [
 										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 									]
@@ -4925,6 +4915,16 @@ class testDiscoveryRule extends CAPITest {
 									'optemplate' => [
 										[
 											'templateid' => '50010'
+										]
+									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
 										]
 									],
 									'opinventory' => [
@@ -5544,6 +5544,16 @@ class testDiscoveryRule extends CAPITest {
 											'templateid' => '50010'
 										]
 									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
+										]
+									],
 									'opinventory' => [
 										'inventory_mode' => HOST_INVENTORY_AUTOMATIC
 									]
@@ -5666,6 +5676,16 @@ class testDiscoveryRule extends CAPITest {
 										],
 										[
 											'templateid' => '50010'
+										]
+									],
+									'optag' => [
+										[
+											'tag' => 'tag1',
+											'value' => 'value1'
+										],
+										[
+											'tag' => 'tag2',
+											'value' => 'value2'
 										]
 									],
 									'opinventory' => [
@@ -5826,6 +5846,16 @@ class testDiscoveryRule extends CAPITest {
 							],
 							[
 								'templateid' => '50010'
+							]
+						],
+						'optag' => [
+							[
+								'tag' => 'tag1',
+								'value' => 'value1'
+							],
+							[
+								'tag' => 'tag2',
+								'value' => 'value2'
 							]
 						],
 						'opinventory' => [
