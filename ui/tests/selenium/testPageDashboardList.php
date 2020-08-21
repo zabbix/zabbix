@@ -226,10 +226,11 @@ class testPageDashboardList extends CWebTest {
 		// Check database.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard'));
 	}
-	
+
+
 	private function getTagText($table, $name, $color) {
 		$row = $table->findRow('Name', $name, true);
-		
+
 		return $row->query('xpath://span[@class="tag '.$color.'-bg"]')->one()->getText();
 	}
 }
