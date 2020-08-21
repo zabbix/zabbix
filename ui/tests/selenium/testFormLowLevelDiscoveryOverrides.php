@@ -1992,6 +1992,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							$fields['Condition']['operator'].' '.
 							$fields['Condition']['value'];
 				}
+				// TODO: remove sort after fix ZBX-18271
 				sort($condition_text);
 
 				// Compare Conditions from table with data.
@@ -1999,6 +2000,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				for ($n = 0; $n < $operation_count - 1; $n++) {
 					$actual_conditions[] = $operation_container->getRow($n)->getColumn('Condition')->getText();
 				}
+				// TODO: remove sort after fix ZBX-18271
 				sort($actual_conditions);
 
 				$this->assertEquals($condition_text, $actual_conditions);
