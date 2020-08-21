@@ -222,7 +222,7 @@ class testPageDashboardList extends CWebTest {
 	/**
 	 * Allows to check tag near Dashboard name.
 	 *
-	 * @param string $table		  Table where to find row
+	 * @param element $table	  Table where to find row
 	 * @param string $column	  Column name
 	 * @param string $color		  Color of tag in the row
 	 */
@@ -235,9 +235,9 @@ class testPageDashboardList extends CWebTest {
 	/**
 	 * Allows to check values in different tables from database.
 	 *
-	 * @param string $ids		  Dashboard ids where to find particular dashboard id
-	 * @param string $dashboard	  Dashboard table from database
-	 * @param string $table       Frontend table
+	 * @param array $ids		  Dashboard ids where to find particular dashboard id
+	 * @param array $dashboard	  Dashboard table from database
+	 * @param element $table      Frontend table
 	 */
 	private function assertDashboardOwner($ids, $dashboard, $table) {
 		foreach ($ids as $id) {
