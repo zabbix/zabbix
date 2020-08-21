@@ -178,19 +178,11 @@ class testPageDashboardList extends CWebTest {
 				$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
 			}
 
-			// Checking that Admin dashboards, shared with groups, has Shared tag	.
-			foreach ($dashboards_usrgrps as $dashboard_usrgrp) {
-				if ($dashboard_usrgrp['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1) {
-					$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
-				}
-			}
+			// Checking that Admin dashboards, shared with groups, has Shared tag.
+			$this->checkDashboardData($dashboards_usrgrps, $dashboard, $table);
 
 			// Checking that Admin dashboards, shared with users, has Shared tag.
-			foreach ($dashboards_users as $dashboard_user) {
-				if ($dashboard_user['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1 ) {
-					$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
-				}
-			}
+			$this->checkDashboardData($dashboards_users, $dashboard, $table);
 		}
 	}
 
@@ -230,13 +222,28 @@ class testPageDashboardList extends CWebTest {
 	/**
 	 * Allows to check tag near Dashboard name.
 	 *
-	 * @param string $table_path     Table where to find row
-	 * @param string $column_name	 Column name
-	 * @param string $color			 Color of tag in the row
+	 * @param string $table		  Table where to find row
+	 * @param string $column	  Column name
+	 * @param string $color		  Color of tag in the row
 	 */
-	private function getTagText($table_path, $column_name, $color) {
-		$row = $table_path->findRow('Name', $column_name, true);
+	private function getTagText($table, $column, $color) {
+		$row = $table->findRow('Name', $column, true);
 
 		return $row->query('xpath://span[@class="tag '.$color.'-bg"]')->one()->getText();
+	}
+
+	/**
+	 * Allows to check values in different tables from database.
+	 *
+	 * @param string $dbtable     Table where to find row
+	 * @param string $dashboard	  Dashboard table from database
+	 * @param string $table       Table where to find row
+	 */
+	private function assertDashboardOwner($dbtable, $dashboard, $table) {
+		foreach ($dbtable as $dbcolumn) {
+			if ($dbcolumn['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1 ) {
+					$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
+			}
+		}
 	}
 }
