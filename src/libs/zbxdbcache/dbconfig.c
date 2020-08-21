@@ -2193,12 +2193,12 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
+static int	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
 	zbx_hashset_iter_t	iter;
-	int			i, j;
+	int			i, j, ret;
 	zbx_vector_ptr_pair_t	diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2212,8 +2212,14 @@ static void	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
 
 		dc_kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
 
-		if (NULL != jp_kvs_paths)
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
+			if (NULL == jp_kvs_paths)
+			{
+				ret = FAIL;
+				goto fail;
+			}
+
 			if (FAIL == zbx_kvs_from_json_create(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
@@ -2277,9 +2283,12 @@ static void	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
 		zbx_vector_ptr_pair_clear(&diff);
 		zbx_kvs_from_vault_destroy(&kvs);
 	}
+	ret = SUCCEED;
+fail:
 	zbx_vector_ptr_pair_destroy(&diff);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
+	return ret;
 }
 
 /******************************************************************************
@@ -5447,7 +5456,11 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	host_tag_sec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
-	DCsync_kvs_path(jp_kvs_paths);
+	if (FAIL == DCsync_kvs_path(jp_kvs_paths))
+	{
+		START_SYNC;
+		goto out;
+	}
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 
