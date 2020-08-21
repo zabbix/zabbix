@@ -54,13 +54,39 @@ static void	kv_clean(void *data)
 	zbx_free(kv->value);
 }
 
+static void	get_kvs_from_json(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
+{
+	char		tmp[MAX_STRING_LEN], *string = NULL;
+	const char	*pnext = NULL;
+	size_t	string_alloc = 0;
+
+	while (NULL != (pnext = zbx_json_pair_next(jp_kvs, pnext, tmp, sizeof(tmp))))
+	{
+		zbx_kv_t	kv_local;
+
+		kv_local.key = tmp;
+		if (NULL != (zbx_hashset_search(kvs, &kv_local)))
+			continue;
+
+		if (NULL == zbx_json_decodevalue_dyn(pnext, &string, &string_alloc, NULL))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "invalid tag value starting with %s", pnext);
+			continue;
+		}
+
+		kv_local.key = zbx_strdup(NULL, tmp);
+		kv_local.value = string;
+		string = NULL;
+		string_alloc = 0;
+		zbx_hashset_insert(kvs, &kv_local, sizeof(zbx_kv_t));
+	}
+}
+
 int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error)
 {
-	char			*out = NULL, tmp[MAX_STRING_LEN], header[MAX_STRING_LEN], *string = NULL, *left, *right;
-	const char		*pnext = NULL;
+	char			*out = NULL, tmp[MAX_STRING_LEN], header[MAX_STRING_LEN], *left, *right;
 	struct zbx_json_parse	jp, jp_data, jp_data_data;
 	int			ret = FAIL, ret_get;
-	size_t			string_alloc = 0;
 
 	if (NULL == CONFIG_VAULTTOKEN)
 	{
@@ -103,34 +129,13 @@ int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error
 
 	zbx_hashset_create_ext(kvs, 100, kv_hash, kv_compare, kv_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 				ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-
-	while (NULL != (pnext = zbx_json_pair_next(&jp_data_data, pnext, tmp, sizeof(tmp))))
-	{
-		zbx_kv_t	kv_local;
-
-		kv_local.key = tmp;
-		if (NULL != (zbx_hashset_search(kvs, &kv_local)))
-			continue;
-
-		if (NULL == zbx_json_decodevalue_dyn(pnext, &string, &string_alloc, NULL))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "invalid tag value starting with %s", pnext);
-			continue;
-		}
-
-		kv_local.key = zbx_strdup(NULL, tmp);
-		kv_local.value = string;
-		string = NULL;
-		string_alloc = 0;
-		zbx_hashset_insert(kvs, &kv_local, sizeof(zbx_kv_t));
-	}
+	get_kvs_from_json(&jp_data_data, kvs);
 
 	ret = SUCCEED;
 fail:
 	if (NULL != out)
 		zbx_guaranteed_memset(out, 0, strlen(out));
 	zbx_free(out);
-	zbx_free(string);
 
 	return ret;
 }
