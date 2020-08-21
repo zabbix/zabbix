@@ -1,8 +1,11 @@
 Changes for 5.2.0alpha2
 
 New features:
+A.F....PS. [ZBXNEXT-6085] added host prototype tag support (agriscenko, wiper)
+..F.....S. [ZBXNEXT-2603] increased user macros values maximum size from 255 to 2048 (agriscenko, arimdjonoks)
 
 Bug fixes:
+..F....... [ZBXNEXT-6052] fixed "Shared" tag being displayed for users that are not the dashboard owners (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 5.2.0alpha1
