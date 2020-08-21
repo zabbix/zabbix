@@ -69,7 +69,8 @@ zabbix_agentd_LDFLAGS = $(AGENT_LDFLAGS)
 zabbix_agentd_CFLAGS = \
 	-DZABBIX_DAEMON \
 	-DDEFAULT_CONFIG_FILE="\"$(AGENT_CONFIG_FILE)\"" \
-	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\""
+	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \
+	-I@top_srcdir@/src/libs/zbxsysinfo/common/
 
 install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(AGENT_CONFIG_FILE).d"

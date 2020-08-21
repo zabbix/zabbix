@@ -121,5 +121,6 @@ typedef enum
 } modbus_datatype_t;
 
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
+int 	zbx_init_modbus(char **error);
 
 #endif /* ZABBIX_SYSINFO_COMMON_MODBUS_H */

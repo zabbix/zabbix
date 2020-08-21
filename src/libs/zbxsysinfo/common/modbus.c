@@ -19,8 +19,11 @@
 
 #include "common.h"
 #include "modbus.h"
+#include "mutexs.h"
 
-extern zbx_mutex_t	modbus_lock;
+#ifdef HAVE_LIBMODBUS
+
+zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
 #define LOCK_MODBUS	zbx_mutex_lock(modbus_lock)
 #define UNLOCK_MODBUS	zbx_mutex_unlock(modbus_lock)
 
@@ -148,6 +151,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		zbx_strsplit(endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP), ':',
 				&endpoint->conn_info.tcp.ip, &tmp);
 
+		///!!!TODO - accept ipv6 and dns here
 		if (SUCCEED == (ret = is_ip4(endpoint->conn_info.tcp.ip)))
 		{
 			if (NULL != tmp)
@@ -241,6 +245,7 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		unsigned short address, unsigned short count, unsigned char type, unsigned char endianness,
 		unsigned short offset, AGENT_RESULT *res, char **error)
 {
+
 	modbus_t	*mdb_ctx;
 	uint8_t		*dest8 = NULL;
 	uint16_t	*dest16 = NULL;
@@ -277,11 +282,24 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 		goto out;
 	}
 
+
+
+#if defined(HAVE_LIBMODBUS_3_0)
+	{
+		struct timeval	tv;
+
+		tv.tv_sec = CONFIG_TIMEOUT;
+		tv.tv_usec = 0;
+		modbus_set_response_timeout(mdb_ctx, &tv);
+
+	}
+#else //HAVE_LIBMODBUS_3_1 at the moment
 	if (0 !=  modbus_set_response_timeout(mdb_ctx, CONFIG_TIMEOUT, 0))
 	{
 		*error = zbx_dsprintf(*error, "modbus_set_response_timeout() failed: %s", modbus_strerror(errno));
 		goto out;
 	}
+#endif
 
 	switch(type)
 	{
@@ -445,10 +463,13 @@ out:
 	zbx_free(dest16);
 
 	return ret;
+
 }
+#endif //HAVE_LIBMODBUS
 
 int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+#ifdef HAVE_LIBMODBUS
 	char			*tmp, *err = NULL;
 	unsigned char		slaveid, function, type, endianess;
 	unsigned short		count, address, offset;
@@ -647,4 +668,31 @@ err:
 		zbx_free(endpoint.conn_info.serial.port);
 
 	return ret;
+#else
+	ZBX_UNUSED(request);
+	ZBX_UNUSED(result);
+	return SYSINFO_RET_FAIL;
+#endif // HAVE_LIBMODBUS
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_init_modbus                                                  *
+ *                                                                            *
+ * Purpose: create modbus mutex                                               *
+ *                                                                            *
+ * Parameters: error      - [OUT] error message in case of failure            *
+ *                                                                            *
+ * Return value: SUCCEED - modbus mutex created successfully                  *
+ *               FAIL    - failed to create modbus mutex                      *
+ *                                                                            *
+ ******************************************************************************/
+int zbx_init_modbus(char **error)
+{
+#ifdef HAVE_LIBMODBUS
+	return zbx_mutex_create(&modbus_lock, ZBX_MUTEX_MODBUS, error);
+#else
+	ZBX_UNUSED(error);
+	return SUCCEED;
+#endif
 }
