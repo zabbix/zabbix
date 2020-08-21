@@ -89,7 +89,7 @@ To utilize the media type, we will create a Zabbix user to represent iLert. We w
 
 7\. Click the **Add** button at the bottom of the user page to save the user.
 
-8\. Use the iLert User in any Actions of your choice. The text from "Action Operations" will be sent to "iLert Alert" when a problem happens. The text from "Action Recovery Operations" and "Action Update Operations" will be sent to "iLert Alert Notes" when a problem is resolved or updated.
+8\. Use the iLert User in any Actions of your choice. The text from "Action Operations" will be sent to "iLert Alert" when a problem happens.
 ​
 For more information use the [Zabbix](https://www.zabbix.com/documentation/current/manual/config/notifications) and [iLert](https://docs.ilert.com/integrations/zabbix/native) documentations.
 ​
