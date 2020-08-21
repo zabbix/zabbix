@@ -1358,6 +1358,7 @@ have_ipmi="no"
 have_ipv6="no"
 have_ssh="no"
 have_tls="no"
+have_libmodbus="no"
 
 
 if test "x$ipv6" = "xyes"; then
@@ -1728,6 +1729,24 @@ SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
 ZBXJS_LDFLAGS="$ZLIB_LDFLAGS $TLS_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $TLS_LIBS"
+
+dnl Check for libmodbus [by default - skip]
+LIBMODBUS_CHECK_CONFIG([no])
+if test "x$want_libmodbus" = "xyes"; then
+	if test "x$found_libmodbus" != "xyes"; then
+		AC_MSG_ERROR([Invalid LIBMODBUS directory - unable to find modbus.h])
+	elif test "x$accept_libmodbus_version" != "xyes"; then
+		AC_MSG_ERROR([LIBMODBUS library version requirement not met (>= 3.0.0)])
+	else
+		have_libmodbus="yes"
+	fi
+fi
+
+LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
+LIBS="$LIBS $LIBMODBUS_LIBS"
+
+AC_SUBST(LIBMODBUS_CFLAGS)
+
 
 if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
@@ -2109,6 +2128,10 @@ if test "x$SSH_CFLAGS" != "x"; then
 	echo "    libssh:                ${SSH_CFLAGS}"
 fi
 
+if test "x$LIBMODBUS_CFLAGS" != "x"; then
+	echo "    libmodbus:                ${LIBMODBUS_CFLAGS}"
+fi
+
 if test "x$TLS_CFLAGS" != "x"; then
 	echo "    TLS:                   ${TLS_CFLAGS}"
 fi
@@ -2187,6 +2210,7 @@ if test "x$agent" != "xno"; then
 
 echo "  Agent details:
     TLS:                   ${have_tls}
+    MODBUS:                ${have_libmodbus}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
     Libraries:             ${AGENT_LIBS} ${LIBS}
     Configuration file:    ${AGENT_CONFIG_FILE}

@@ -2,7 +2,7 @@
 
 noinst_LIBRARIES = libcommonsysinfo.a
 
-libcommonsysinfo_a_CFLAGS = -I$(top_srcdir)/src/zabbix_agent/
+libcommonsysinfo_a_CFLAGS = -I@top_srcdir@/src/zabbix_agent/
 
 libcommonsysinfo_a_SOURCES = \
 	common.c \
@@ -17,6 +17,8 @@ libcommonsysinfo_a_SOURCES = \
 	file.h \
 	http.c \
 	http.h \
+	modbus.c \
+	modbus.h \
 	net.c \
 	net.h \
 	system.c \

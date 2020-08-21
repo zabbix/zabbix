@@ -33,6 +33,7 @@
 	<target name="init-conf-options-2">
 		<property name="conf8" value="--enable-agent2"/>
 		<property name="conf9" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-ssh"/>
+		<property name="conf10" value="--enable-agent --with-libmodbus"/>
 	</target>
 
 	<!-- Cppcheck static analyzer target -->
