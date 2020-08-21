@@ -560,17 +560,20 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
 
 // tags
 $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
-	'source' => 'trigger',
-	'tags' => $data['tags'],
-	'show_inherited_tags' => $data['show_inherited_tags'],
-	'readonly' => $discovered_trigger
-]));
+		'source' => 'trigger',
+		'tags' => $data['tags'],
+		'show_inherited_tags' => $data['show_inherited_tags'],
+		'readonly' => $discovered_trigger
+	]),
+	TAB_INDICATOR_TAGS
+);
 
 /*
  * Dependencies tab
  */
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
+	->setId('dependency-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), $discovered_trigger ? null : _('Action')]);
 
@@ -619,7 +622,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
-$triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
+$triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
 // Append buttons to form list.
 if (!empty($data['triggerid'])) {

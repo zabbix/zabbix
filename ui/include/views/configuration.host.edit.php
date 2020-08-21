@@ -468,6 +468,7 @@ $tmplList = new CFormList();
 // Templates for discovered hosts.
 if ($data['readonly']) {
 	$linkedTemplateTable = (new CTable())
+		->setId('linked-template')
 		->setHeader([_('Name')])
 		->addStyle('width: 100%;');
 
@@ -499,6 +500,7 @@ else {
 	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
+		->setId('linked-template')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
@@ -568,7 +570,7 @@ else {
 		);
 }
 
-$divTabs->addTab('templateTab', _('Templates'), $tmplList);
+$divTabs->addTab('templateTab', _('Templates'), $tmplList, TAB_INDICATOR_LINKED_TEMPLATE);
 
 /*
  * IPMI
@@ -607,10 +609,11 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 // tags
 if (!$data['readonly']) {
 	$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
-		'source' => 'host',
-		'tags' => $data['tags'],
-		'readonly' => false
-	]));
+			'source' => 'host',
+			'tags' => $data['tags'],
+			'readonly' => false
+		]), TAB_INDICATOR_TAGS
+	);
 }
 
 // macros
@@ -625,7 +628,8 @@ $divTabs->addTab('macroTab', _('Macros'),
 		->addRow(null, new CPartial($tmpl, [
 			'macros' => $data['macros'],
 			'readonly' => $data['readonly']
-		]), 'macros_container')
+		]), 'macros_container'),
+	TAB_INDICATOR_MACROS
 );
 
 $inventoryFormList = new CFormList('inventorylist');
@@ -692,7 +696,7 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	$inventoryFormList->addRow($inventoryInfo['title'], [$input, $inventory_item]);
 }
 
-$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
+$divTabs->addTab('inventoryTab', _('Inventory'), $inventoryFormList, TAB_INDICATOR_INVENTORY);
 
 // Encryption form list.
 $encryption_form_list = (new CFormList('encryption'))
@@ -741,7 +745,7 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	);
 
-$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list, TAB_INDICATOR_ENCRYPTION);
 
 /*
  * footer

@@ -259,9 +259,9 @@ $saml_tab = (new CFormList('list_saml'))
 		->addItem((new CTabView())
 			->setSelected($data['form_refresh'] ? null : 0)
 			->addTab('auth', _('Authentication'), $auth_tab)
-			->addTab('http', _('HTTP settings'), $http_tab, 'http')
-			->addTab('ldap', _('LDAP settings'), $ldap_tab, 'ldap')
-			->addTab('saml', _('SAML settings'), $saml_tab, 'saml')
+			->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
+			->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
+			->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update'))),
 				[(new CSubmitButton(_('Test'), 'ldap_test', 1))

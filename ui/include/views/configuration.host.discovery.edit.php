@@ -765,11 +765,12 @@ $tab = (new CTabView())
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
 				getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
-			)
+			),
+		TAB_INDICATOR_PREPROCESSING
 	)
-	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)
-	->addTab('macroTab', _('Filters'), $conditionFormList)
-	->addTab('overridesTab', _('Overrides'), $overrides_form_list);
+	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list, TAB_INDICATOR_LLD_MACROS)
+	->addTab('macroTab', _('Filters'), $conditionFormList, TAB_INDICATOR_FILTERS)
+	->addTab('overridesTab', _('Overrides'), $overrides_form_list, TAB_INDICATOR_OVERRIDES);
 
 if (!hasRequest('form_refresh')) {
 	$tab->setSelected(0);

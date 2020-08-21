@@ -343,6 +343,7 @@ $tmplList = new CFormList();
 $disableids = [];
 
 $linkedTemplateTable = (new CTable())
+	->setId('linked-template')
 	->setHeader([_('Name'), _('Action')])
 	->addStyle('width: 100%;');
 
@@ -411,14 +412,15 @@ $tmplList
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
-$divTabs->addTab('tmplTab', _('Linked templates'), $tmplList, 'linked-template');
+$divTabs->addTab('tmplTab', _('Linked templates'), $tmplList, TAB_INDICATOR_LINKED_TEMPLATE);
 
 // tags
 $divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
-	'source' => 'template',
-	'tags' => $data['tags'],
-	'readonly' => $data['readonly']
-]), 'tags');
+		'source' => 'template',
+		'tags' => $data['tags'],
+		'readonly' => $data['readonly']
+	]), TAB_INDICATOR_TAGS
+);
 
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
@@ -433,7 +435,7 @@ $divTabs->addTab('macroTab', _('Macros'),
 			'macros' => $data['macros'],
 			'readonly' => $data['readonly']
 		]), 'macros_container'),
-	'macros'
+	TAB_INDICATOR_MACROS
 );
 
 // footer
