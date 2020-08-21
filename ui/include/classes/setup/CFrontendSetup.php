@@ -81,6 +81,7 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpXmlWriter();
 		$result[] = $this->checkPhpXmlReader();
 		$result[] = $this->checkPhpLdapModule();
+		$result[] = $this->checkPhpOpenSsl();
 		$result[] = $this->checkPhpCtype();
 		$result[] = $this->checkPhpSession();
 		$result[] = $this->checkPhpSessionAutoStart();
@@ -549,6 +550,23 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
 			'error' => _('PHP LDAP extension missing.')
+		];
+	}
+
+	/**
+	 * Checks for PHP OpenSSL extension.
+	 *
+	 * @return array
+	 */
+	public function checkPhpOpenSsl() {
+		$current = extension_loaded('openssl');
+
+		return [
+			'name' => _('PHP OpenSSL'),
+			'current' => $current ? _('on') : _('off'),
+			'required' => null,
+			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
+			'error' => _('PHP OpenSSL extension missing.')
 		];
 	}
 

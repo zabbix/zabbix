@@ -140,12 +140,8 @@ class CHostPrototype extends CHostBase {
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = [
-				'from' => 'host_inventory hinv',
-				'on' => $this->tableAlias().'.'.$this->pk().'=hinv.hostid'
-			];
-
-			$sqlParts['left_table'] = array_search($this->tableName().' '.$this->tableAlias(), $sqlParts['from']);
+			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		return $sqlParts;

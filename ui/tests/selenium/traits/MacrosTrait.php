@@ -55,8 +55,8 @@ trait MacrosTrait {
 				],
 				$value_column => [
 					'name' => 'value',
-					'selector' => 'xpath:./div/textarea',
-					'class' => 'CElement'
+					'selector' => 'xpath:./div[contains(@class, "input-group")]',
+					'class' => 'CInputGroupElement'
 				],
 				'Description' => [
 					'name' => 'description',
@@ -64,7 +64,7 @@ trait MacrosTrait {
 					'class' => 'CElement'
 				]
 			]
-		])->one();
+		])->one()->waitUntilVisible();
 	}
 
 	/**
@@ -127,5 +127,17 @@ trait MacrosTrait {
 		}
 
 		$this->assertEquals($rows, $this->getMacros(), 'Macros on a page does not match macros in data provider.');
+	}
+
+	/**
+	 * Get value field for the provided macro name.
+	 *
+	 * @param string $macro    macro name for which value field needs to be fetched
+	 *
+	 * @return CElement
+	 */
+	public function getValueField($macro) {
+		return $this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
+				']/../..//div[contains(@class, "macro-value")]')->asInputGroup()->waitUntilVisible()->one();
 	}
 }

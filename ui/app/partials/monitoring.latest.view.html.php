@@ -32,9 +32,18 @@ $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
 // Latest data header.
 
-$col_check_all = (new CColHeader(
+$col_toggle_all = new CColHeader(
+	(new CSimpleButton())
+		->addClass(ZBX_STYLE_TREEVIEW)
+		->addClass('js-toggle-all')
+		->addItem(
+			(new CSpan())->addClass($data['collapsed_all'] ? ZBX_STYLE_ARROW_RIGHT : ZBX_STYLE_ARROW_DOWN)
+		)
+);
+
+$col_check_all = new CColHeader(
 	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
-));
+);
 
 $view_url = $data['view_curl']->getUrl();
 
@@ -43,6 +52,7 @@ $col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['s
 
 if ($data['filter']['show_details']) {
 	$table->setHeader([
+		$col_toggle_all->addStyle('width: 18px'),
 		$col_check_all->addStyle('width: 15px;'),
 		$col_host->addStyle('width: 13%'),
 		$col_name->addStyle('width: 21%'),
@@ -57,10 +67,11 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 
-	$table_columns = 12;
+	$table_columns = 13;
 }
 else {
 	$table->setHeader([
+		$col_toggle_all->addStyle('width: 18px'),
 		$col_check_all->addStyle('width: 15px'),
 		$col_host->addStyle('width: 17%'),
 		$col_name->addStyle('width: 40%'),
@@ -70,7 +81,7 @@ else {
 		(new CColHeader())->addStyle('width: 5%')
 	]);
 
-	$table_columns = 7;
+	$table_columns = 8;
 }
 
 // Latest data rows.
@@ -83,8 +94,12 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $last_hostid = null;
 $last_applicationid = null;
 
-foreach ($data['rows'] as $row) {
+$last_row_index = $data['rows'] ? array_slice(array_keys($data['rows']), -1)[0] : null;
+
+foreach ($data['rows'] as $row_index => $row) {
 	$item = $data['items'][$row['itemid']];
+
+	$is_collapsed = $data['collapsed_index'][$item['hostid']][$row['applicationid']];
 
 	// Secondary header for the next host or application.
 
@@ -105,11 +120,37 @@ foreach ($data['rows'] as $row) {
 			: '- '.('other').' -';
 
 		$application_size = $data['applications_size'][$item['hostid']][$row['applicationid']];
+		$application_index = $data['applications_index'][$item['hostid']][$row['applicationid']];
 
-		$col_name = (new CCol([bold($application_name), ' ('._n('%1$s Item', '%1$s Items', $application_size).')']))
+		if ($application_index['start'] < $row_index || $application_index['end'] > $last_row_index) {
+			$application_stats = _s('displaying %1$s to %2$s of %3$s Items',
+				max(0, $row_index - $application_index['start']) + 1,
+				min($last_row_index, $application_index['end']) - $application_index['start'] + 1,
+				$application_size
+			);
+		}
+		else {
+			$application_stats = _n('%1$s Item', '%1$s Items', $application_size);
+		}
+
+		$col_name = (new CCol([bold($application_name), ' ('.$application_stats.')']))
 			->setColSpan($table_columns - 2);
 
-		$table->addRow(['', $col_host, $col_name]);
+		$toggle_app = (new CSimpleButton())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->addClass('js-toggle')
+			->addItem(
+				(new CSpan())->addClass($is_collapsed ? ZBX_STYLE_ARROW_RIGHT : ZBX_STYLE_ARROW_DOWN)
+			);
+
+		if ($row['applicationid']) {
+			$toggle_app->setAttribute('data-applicationid', $row['applicationid']);
+		}
+		else {
+			$toggle_app->setAttribute('data-hostid', $item['hostid']);
+		}
+
+		$table->addRow([$toggle_app, '', $col_host, $col_name]);
 
 		$last_hostid = $item['hostid'];
 		$last_applicationid = $row['applicationid'];
@@ -240,7 +281,8 @@ foreach ($data['rows'] as $row) {
 			$item_icons[] = makeErrorIcon($item['error']);
 		}
 
-		$row = new CRow([
+		$table_row = new CRow([
+			'',
 			$checkbox,
 			'',
 			(new CCol([$item_name, $item_key]))->addClass($state_css),
@@ -256,7 +298,8 @@ foreach ($data['rows'] as $row) {
 		]);
 	}
 	else {
-		$row = new CRow([
+		$table_row = new CRow([
+			'',
 			$checkbox,
 			'',
 			(new CCol($item_name))->addClass($state_css),
@@ -267,7 +310,18 @@ foreach ($data['rows'] as $row) {
 		]);
 	}
 
-	$table->addRow($row);
+	if ($row['applicationid']) {
+		$table_row->setAttribute('data-applicationid', $row['applicationid']);
+	}
+	else {
+		$table_row->setAttribute('data-hostid', $item['hostid']);
+	}
+
+	if ($is_collapsed) {
+		$table_row->addClass(ZBX_STYLE_DISPLAY_NONE);
+	}
+
+	$table->addRow($table_row);
 }
 
 $form->addItem([

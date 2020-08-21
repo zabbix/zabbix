@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  * @backup widget
  * @backup profiles
  */
-class testCopyWidgets extends CWebTest {
+class testDashboardCopyWidgets extends CWebTest {
 
 	const DASHBOARD_ID = 130;
 	const PASTE_DASHBOARD_ID = 131;
@@ -42,21 +42,21 @@ class testCopyWidgets extends CWebTest {
 	/**
 	 * @dataProvider getCopyWidgetsData
 	 */
-	public function testCopyWidgets_SameDashboard($data) {
+	public function testDashboardCopyWidgets_SameDashboard($data) {
 		$this->copyWidgets($data);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsData
 	 */
-	public function testCopyWidgets_OtherDashboard($data) {
+	public function testDashboardCopyWidgets_OtherDashboard($data) {
 		$this->copyWidgets($data, true);
 	}
 
 	/**
 	 * @dataProvider getCopyWidgetsData
 	 */
-	public function testCopyWidgets_ReplaceWidget($data) {
+	public function testDashboardCopyWidgets_ReplaceWidget($data) {
 		$this->copyWidgets($data, true, true);
 	}
 
@@ -95,7 +95,8 @@ class testCopyWidgets extends CWebTest {
 		$original_form = $fields->asValues();
 		$original_widget_size = $replace
 			? self::$replaced_widget_size
-			: CDBHelper::getRow('SELECT width, height FROM widget WHERE name ='.zbx_dbstr($name));
+			: CDBHelper::getRow('SELECT width, height FROM widget WHERE dashboardid='.zbx_dbstr(self::DASHBOARD_ID).
+					' AND name='.zbx_dbstr($name).' ORDER BY widgetid DESC');
 
 		// Close widget configuration overlay.
 		COverlayDialogElement::find()->one()->close();
@@ -136,9 +137,12 @@ class testCopyWidgets extends CWebTest {
 		$copied_overlay = COverlayDialogElement::find()->one();
 		$copied_overlay->close();
 		$dashboard->save();
+		$this->page->waitUntilReady();
 
 		$copied_widget_size = CDBHelper::getRow('SELECT width, height FROM widget'.
-				' WHERE name ='.zbx_dbstr($name).' ORDER BY widgetid DESC');
+				' WHERE dashboardid='.zbx_dbstr($new_dashboard ? self::PASTE_DASHBOARD_ID : self::DASHBOARD_ID).
+				' AND name='.zbx_dbstr($name).' ORDER BY widgetid DESC'
+		);
 		$this->assertEquals($original_widget_size, $copied_widget_size);
 	}
 }

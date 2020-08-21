@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../traits/FilterTrait.php';
  * @backup widget
  * @backup profiles
  */
-class testProblemsBySeverityWidget extends CWebTest {
+class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 	use FilterTrait;
 
@@ -33,12 +33,13 @@ class testProblemsBySeverityWidget extends CWebTest {
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+	// TODO: add wf.name in select and order by after fix ZBX-18271
+	private $sql = 'SELECT wf.widgetid, wf.type, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid';
 
 	public function getCreateWidgetData() {
@@ -474,7 +475,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 	/**
 	 * @dataProvider getCreateWidgetData
 	 */
-	public function testProblemsBySeverityWidget_Create($data) {
+	public function testDashboardProblemsBySeverityWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -1222,7 +1223,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 	 * @backup widget
 	 * @dataProvider getUpdateWidgetData
 	 */
-	public function testProblemsBySeverityWidget_Update($data) {
+	public function testDashboardProblemsBySeverityWidget_Update($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
@@ -1259,7 +1260,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-	public function testProblemsBySeverityWidget_SimpleUpdate() {
+	public function testDashboardProblemsBySeverityWidget_SimpleUpdate() {
 		$initial_values = CDBHelper::getHash($this->sql);
 
 		// Open a dashboard widget and then save it without applying any changes
@@ -1268,7 +1269,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$dashboard->edit();
 		$form = $dashboard->getWidget('Reference widget')->edit();
 		$form->submit();
-		$this->query('id:overlay-bg')->waitUntilNotVisible();
+		COverlayDialogElement::ensureNotPresent();
 
 		$widget = $dashboard->getWidget('Reference widget');
 		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
@@ -1315,7 +1316,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 	/**
 	 * @dataProvider getCancelActionsData
 	 */
-	public function testProblemsBySeverityWidget_Cancel($data) {
+	public function testDashboardProblemsBySeverityWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
@@ -1366,7 +1367,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testProblemsBySeverityWidget_Delete() {
+	public function testDashboardProblemsBySeverityWidget_Delete() {
 		foreach (['Reference PBS widget to delete', 'Totals reference PBS widget to delete'] as $name) {
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=104');
 			$dashboard = CDashboardElement::find()->one()->edit();
@@ -1404,7 +1405,7 @@ class testProblemsBySeverityWidget extends CWebTest {
 			$this->setTags($data['tags']);
 		}
 		$form->submit();
-		$this->query('id:overlay-bg')->waitUntilNotVisible();
+		COverlayDialogElement::ensureNotPresent();
 		$widget = $dashboard->getWidget($header);
 		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
