@@ -226,28 +226,32 @@ class CMultiselectElement extends CElement {
 		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one();
 		$id = CXPathHelper::escapeQuotes($this->query('class:multiselect')->one()->getAttribute('id'));
 		foreach ($text as $value) {
-			$input->overwrite($value)->fireEvent();
+			$input->overwrite($value)->fireEvent('keyup');
 
-			if (!$value) {
+			if ($value === null || $value === '') {
 				continue;
 			}
 
 			$content = CXPathHelper::escapeQuotes($value);
+			$prefix = '//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li';
+			$query = $this->query('xpath', implode('|', [
+				$prefix.'[@data-label='.$content.']',
+				$prefix.'[contains(@data-label,'.$content.')]/span[contains(@class, "suggest-found") and text()='.$content.']',
+				$prefix.'[contains(@class, "suggest-new")]/span[text()='.$content.']'
+			]));
 
-			try {
-				$element = $this->query('xpath', implode('|', [
-					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
-					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@data-label,'.$content.')]'.
-							'/span[contains(@class, "suggest-found") and text()='.$content.']',
-					'//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]'.
-							'/span[text()='.$content.']'
-				]))->waitUntilPresent();
-			}
-			catch (NoSuchElementException $exception) {
-				throw new Exception('Cannot find value with label "'.$value.'" in multiselect element.');
+			for ($i = 0; $i < 2; $i++) {
+				try {
+					$query->waitUntilPresent();
+				}
+				catch (NoSuchElementException $exception) {
+					if ($i === 1) {
+						throw new Exception('Cannot find value with label "'.$value.'" in multiselect element.');
+					}
+				}
 			}
 
-			$element->one()->click();
+			$query->one()->click();
 		}
 
 		return $this;

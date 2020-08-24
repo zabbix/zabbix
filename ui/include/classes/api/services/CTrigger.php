@@ -449,7 +449,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// return count or grouped counts via direct SQL count
 		if ($options['countOutput'] && !$this->requiresPostSqlFiltering($options)) {
-			$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $options['limit']);
+			$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $options['limit']);
 			while ($trigger = DBfetch($dbRes)) {
 				if ($options['groupCount']) {
 					$result[] = $trigger;
@@ -461,7 +461,7 @@ class CTrigger extends CTriggerGeneral {
 			return $result;
 		}
 
-		$result = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
+		$result = zbx_toHash($this->customFetch(self::createSelectQueryFromParts($sqlParts), $options), 'triggerid');
 
 		// return count for post SQL filtered result sets
 		if ($options['countOutput']) {
@@ -523,10 +523,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$this->validateCreate($triggers);
 		$this->createReal($triggers);
-
-		foreach ($triggers as $trigger) {
-			$this->inherit($trigger);
-		}
+		$this->inherit($triggers);
 
 		// clear all dependencies on inherited triggers
 		$this->deleteDependencies($triggers);
@@ -559,7 +556,6 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	public function update(array $triggers) {
 		$triggers = zbx_toArray($triggers);
-		$db_triggers = [];
 
 		$this->validateUpdate($triggers, $db_triggers);
 
@@ -584,10 +580,9 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		$this->updateReal($triggers, $db_triggers);
+		$this->inherit($triggers);
 
 		foreach ($triggers as $trigger) {
-			$this->inherit($trigger);
-
 			// replace dependencies
 			if (array_key_exists('dependencies', $trigger)) {
 				$this->deleteDependencies($trigger);

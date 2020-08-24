@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[5.0.3rc1])
+AC_INIT([Zabbix],[5.0.3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
@@ -1731,6 +1731,7 @@ if test "x$agent2" = "xyes"; then
 	if test "x$GO" = "xno"; then
 		AC_MSG_ERROR([Unable to find "go" executable in path])
 	fi
+	AC_DEFINE(ZBX_BUILD_AGENT2,1,[Define to 1 if Agent2 is being built.])
 fi
 
 if test "x$java" = "xyes"; then

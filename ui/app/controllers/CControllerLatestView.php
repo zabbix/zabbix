@@ -87,12 +87,16 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::delete('web.latest.filter.show_details');
 		}
 
+		// Force-check "Show items without data" if there are no hosts selected.
+		$filter_hostids = CProfile::getArray('web.latest.filter.hostids');
+		$filter_show_without_data = $filter_hostids ? CProfile::get('web.latest.filter.show_without_data', 1) : 1;
+
 		$filter = [
 			'groupids' => CProfile::getArray('web.latest.filter.groupids'),
-			'hostids' => CProfile::getArray('web.latest.filter.hostids'),
+			'hostids' => $filter_hostids,
 			'application' => CProfile::get('web.latest.filter.application', ''),
 			'select' => CProfile::get('web.latest.filter.select', ''),
-			'show_without_data' => CProfile::get('web.latest.filter.show_without_data', 1),
+			'show_without_data' => $filter_show_without_data,
 			'show_details' => CProfile::get('web.latest.filter.show_details', 0)
 		];
 
@@ -120,6 +124,9 @@ class CControllerLatestView extends CControllerLatest {
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
 		$paging = CPagerHelper::paginate(getRequest('page', 1), $prepared_data['rows'], ZBX_SORT_UP, $view_curl);
+
+		$this->extendData($prepared_data, $filter['show_without_data']);
+		$this->addCollapsedDataFromProfile($prepared_data);
 
 		// display
 		$data = [

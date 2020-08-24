@@ -34,188 +34,459 @@ abstract class CTriggerGeneral extends CApiService {
 	abstract public function get(array $options = []);
 
 	/**
-	 * Updates the children of the trigger on the given hosts and propagates the inheritance to all child hosts.
-	 * If the given trigger was assigned to a different template or a host, all of the child triggers, that became
-	 * obsolete will be deleted.
+	 * Prepares and returns an array of child triggers, inherited from triggers $tpl_triggers on the given hosts.
 	 *
-	 * @param array  $trigger
-	 * @param string $trigger['triggerid']
-	 * @param string $trigger['description']
-	 * @param string $trigger['expression']                  exploded expression
-	 * @param int    $trigger['recovery mode']
-	 * @param string $trigger['recovery_expression']         exploded recovery expression
-	 * @param array  $trigger['dependencies']                (optional)
-	 * @param string $trigger['dependencies'][]['triggerid']
-	 * @param array  $hostids
+	 * @param array  $tpl_triggers
+	 * @param string $tpl_triggers[<tnum>]['triggerid']
 	 */
-	protected function inherit(array $trigger, array $hostids = null) {
-		$templates = API::Template()->get([
-			'output' => [],
-			'triggerids' => [$trigger['triggerid']],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
+	private function prepareInheritedTriggers(array $tpl_triggers, array $hostids = null, array &$ins_triggers = null,
+			array &$upd_triggers = null, array &$db_triggers = null) {
+		$ins_triggers = [];
+		$upd_triggers = [];
+		$db_triggers = [];
 
-		if (!$templates) {
-			// nothing to inherit, just exit
+		$result = DBselect(
+			'SELECT DISTINCT t.triggerid,h.hostid'.
+			' FROM triggers t,functions f,items i,hosts h'.
+			' WHERE t.triggerid=f.triggerid'.
+				' AND f.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionInt('t.triggerid', zbx_objectValues($tpl_triggers, 'triggerid')).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+		);
+
+		$tpl_hostids_by_triggerid = [];
+		$tpl_hostids = [];
+
+		while ($row = DBfetch($result)) {
+			$tpl_hostids_by_triggerid[$row['triggerid']][] = $row['hostid'];
+			$tpl_hostids[$row['hostid']] = true;
+		}
+
+		// Unset host-level triggers.
+		foreach ($tpl_triggers as $tnum => $tpl_trigger) {
+			if (!array_key_exists($tpl_trigger['triggerid'], $tpl_hostids_by_triggerid)) {
+				unset($tpl_triggers[$tnum]);
+			}
+		}
+
+		if (!$tpl_triggers) {
+			// Nothing to inherit, just exit.
 			return;
 		}
 
-		// fetch all of the child hosts
-		$childHosts = API::Host()->get([
-			'output' => ['hostid', 'host'],
-			'hostids' => $hostids,
-			'templateids' => array_keys($templates),
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'templated_hosts' => true
+		$hosts_by_tpl_hostid = self::getLinkedHosts(array_keys($tpl_hostids), $hostids);
+		$chd_triggers_tpl = $this->getHostTriggersByTemplateId(array_keys($tpl_hostids_by_triggerid), $hostids);
+		$tpl_triggers_by_description = [];
+
+		// Preparing list of missing triggers on linked hosts.
+		foreach ($tpl_triggers as $tpl_trigger) {
+			$hostids = [];
+
+			foreach ($tpl_hostids_by_triggerid[$tpl_trigger['triggerid']] as $tpl_hostid) {
+				if (array_key_exists($tpl_hostid, $hosts_by_tpl_hostid)) {
+					foreach ($hosts_by_tpl_hostid[$tpl_hostid] as $host) {
+						if (array_key_exists($host['hostid'], $chd_triggers_tpl)
+								&& array_key_exists($tpl_trigger['triggerid'], $chd_triggers_tpl[$host['hostid']])) {
+							continue;
+						}
+
+						$hostids[$host['hostid']] = true;
+					}
+				}
+			}
+
+			if ($hostids) {
+				$tpl_triggers_by_description[$tpl_trigger['description']][] = [
+					'triggerid' => $tpl_trigger['triggerid'],
+					'expression' => $tpl_trigger['expression'],
+					'recovery_mode' => $tpl_trigger['recovery_mode'],
+					'recovery_expression' => $tpl_trigger['recovery_expression'],
+					'hostids' => $hostids
+				];
+			}
+		}
+
+		$chd_triggers_all = array_replace_recursive($chd_triggers_tpl,
+			$this->getHostTriggersByDescription($tpl_triggers_by_description)
+		);
+
+		$expression_data = new CTriggerExpression(['lldmacros' => $this instanceof CTriggerPrototype]);
+		$recovery_expression_data = new CTriggerExpression(['lldmacros' => $this instanceof CTriggerPrototype]);
+
+		// List of triggers to check for duplicates. Grouped by description.
+		$descriptions = [];
+		$triggerids = [];
+
+		$output = ['url', 'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag',
+			'manual_close', 'opdata'
+		];
+		if ($this instanceof CTriggerPrototype) {
+			$output[] = 'discover';
+		}
+
+		$db_tpl_triggers = DB::select('triggers', [
+			'output' => $output,
+			'triggerids' => array_keys($tpl_hostids_by_triggerid),
+			'preservekeys' => true
 		]);
 
-		foreach ($childHosts as $childHost) {
-			// update the child trigger on the child host
-			$new_trigger = $this->inheritOnHost($trigger, $childHost);
+		foreach ($tpl_triggers as $tpl_trigger) {
+			$db_tpl_trigger = $db_tpl_triggers[$tpl_trigger['triggerid']];
 
-			// propagate the trigger inheritance to all child hosts
-			$this->inherit($new_trigger);
+			$tpl_hostid = $tpl_hostids_by_triggerid[$tpl_trigger['triggerid']][0];
+
+			// expression: {template:item.func()} => {host:item.func()}
+			if (!$expression_data->parse($tpl_trigger['expression'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $expression_data->error);
+			}
+
+			// recovery_expression: {template:item.func()} => {host:item.func()}
+			if ($tpl_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+				if (!$recovery_expression_data->parse($tpl_trigger['recovery_expression'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $recovery_expression_data->error);
+				}
+			}
+
+			$new_trigger = $tpl_trigger;
+			unset($new_trigger['triggerid'], $new_trigger['templateid']);
+
+			if (array_key_exists($tpl_hostid, $hosts_by_tpl_hostid)) {
+				foreach ($hosts_by_tpl_hostid[$tpl_hostid] as $host) {
+					$new_trigger['expression'] = $tpl_trigger['expression'];
+					$expr_part = end($expression_data->expressions);
+					do {
+						$new_trigger['expression'] = substr_replace($new_trigger['expression'],
+							'{'.$host['host'].':'.$expr_part['item'].'.'.$expr_part['function'].'}',
+							$expr_part['pos'], strlen($expr_part['expression'])
+						);
+					}
+					while ($expr_part = prev($expression_data->expressions));
+
+					if ($tpl_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+						$new_trigger['recovery_expression'] = $tpl_trigger['recovery_expression'];
+						$expr_part = end($recovery_expression_data->expressions);
+						do {
+							$new_trigger['recovery_expression'] = substr_replace($new_trigger['recovery_expression'],
+								'{'.$host['host'].':'.$expr_part['item'].'.'.$expr_part['function'].'}',
+								$expr_part['pos'], strlen($expr_part['expression'])
+							);
+						}
+						while ($expr_part = prev($recovery_expression_data->expressions));
+					}
+
+					if (array_key_exists($host['hostid'], $chd_triggers_all)
+							&& array_key_exists($tpl_trigger['triggerid'], $chd_triggers_all[$host['hostid']])) {
+						$chd_trigger = $chd_triggers_all[$host['hostid']][$tpl_trigger['triggerid']];
+
+						$upd_triggers[] = $new_trigger + [
+							'triggerid' => $chd_trigger['triggerid'],
+							'templateid' => $tpl_trigger['triggerid']
+						];
+						$db_triggers[] = $chd_trigger;
+						$triggerids[] = $chd_trigger['triggerid'];
+
+						$check_duplicates = ($chd_trigger['description'] !== $new_trigger['description']
+							|| $chd_trigger['expression'] !== $new_trigger['expression']
+							|| $chd_trigger['recovery_expression'] !== $new_trigger['recovery_expression']);
+					}
+					else {
+						$ins_triggers[] = $new_trigger + $db_tpl_trigger + ['templateid' => $tpl_trigger['triggerid']];
+						$check_duplicates = true;
+					}
+
+					if ($check_duplicates) {
+						$descriptions[$new_trigger['description']][] = [
+							'expression' => $new_trigger['expression'],
+							'recovery_expression' => $new_trigger['recovery_expression'],
+							'hostid' => $host['hostid']
+						];
+					}
+				}
+			}
 		}
+
+		if ($triggerids) {
+			// Add trigger tags.
+			$result = DBselect(
+				'SELECT tt.triggertagid,tt.triggerid,tt.tag,tt.value'.
+				' FROM trigger_tag tt'.
+				' WHERE '.dbConditionInt('tt.triggerid', $triggerids)
+			);
+
+			$trigger_tags = [];
+
+			while ($row = DBfetch($result)) {
+				$trigger_tags[$row['triggerid']][] = [
+					'triggertagid' => $row['triggertagid'],
+					'tag' => $row['tag'],
+					'value' => $row['value']
+				];
+			}
+
+			foreach ($db_triggers as $tnum => $db_trigger) {
+				$db_triggers[$tnum]['tags'] = array_key_exists($db_trigger['triggerid'], $trigger_tags)
+					? $trigger_tags[$db_trigger['triggerid']]
+					: [];
+			}
+
+			// Add discovery rule IDs.
+			if ($this instanceof CTriggerPrototype) {
+				$result = DBselect(
+					'SELECT id.parent_itemid,f.triggerid'.
+						' FROM item_discovery id,functions f'.
+						' WHERE '.dbConditionInt('f.triggerid', $triggerids).
+						' AND f.itemid=id.itemid'
+				);
+
+				$drule_by_triggerid = [];
+
+				while ($row = DBfetch($result)) {
+					$drule_by_triggerid[$row['triggerid']] = $row['parent_itemid'];
+				}
+
+				foreach ($db_triggers as $tnum => $db_trigger) {
+					$db_triggers[$tnum]['discoveryRule']['itemid'] = $drule_by_triggerid[$db_trigger['triggerid']];
+				}
+			}
+		}
+
+		$this->checkDuplicates($descriptions);
 	}
 
 	/**
-	 * Updates the child of the templated trigger on the given host. Trigger inheritance will not propagate to
-	 * child hosts.
+	 * Returns list of linked hosts.
 	 *
-	 * @param array  $trigger
-	 * @param string $trigger['triggerid']
-	 * @param string $trigger['description']
-	 * @param string $trigger['expression']
-	 * @param int    $trigger['recovery mode']
-	 * @param string $trigger['recovery_expression']
-	 * @param array  $trigger['dependencies']                (optional)
-	 * @param string $trigger['dependencies'][]['triggerid']
-	 * @param array  $host
-	 * @param string $host['hostid']
-	 * @param string $host['host']
+	 * Output format:
+	 *   [
+	 *     <tpl_hostid> => [
+	 *       [
+	 *         'hostid' => <hostid>,
+	 *         'host' => <host>
+	 *       ],
+	 *       ...
+	 *     ],
+	 *     ...
+	 *   ]
 	 *
-	 * @return array|mixed  the updated child trigger
+	 * @param array  $tpl_hostids
+	 * @param array  $hostids      The function will return a list of all linked hosts if no hostids are specified.
+	 *
+	 * @return array
 	 */
-	protected function inheritOnHost(array $trigger, array $host) {
-		$class = get_class($this);
+	private static function getLinkedHosts(array $tpl_hostids, array $hostids = null) {
+		// Fetch all child hosts and templates
+		$sql = 'SELECT ht.hostid,ht.templateid,h.host'.
+			' FROM hosts_templates ht,hosts h'.
+			' WHERE ht.hostid=h.hostid'.
+				' AND '.dbConditionInt('ht.templateid', $tpl_hostids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
+		if ($hostids !== null) {
+			$sql .= ' AND '.dbConditionInt('ht.hostid', $hostids);
+		}
+		$result = DBselect($sql);
 
-		$triggerid = $trigger['triggerid'];
-		$trigger['templateid'] = $trigger['triggerid'];
-		unset($trigger['triggerid']);
+		$hosts_by_tpl_hostid = [];
 
-		if (array_key_exists('dependencies', $trigger)) {
-			$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
-			$trigger['dependencies'] = replace_template_dependencies($deps, $host['hostid']);
+		while ($row = DBfetch($result)) {
+			$hosts_by_tpl_hostid[$row['templateid']][] = [
+				'hostid' => $row['hostid'],
+				'host' => $row['host']
+			];
 		}
 
-		$expressionData = new CTriggerExpression();
+		return $hosts_by_tpl_hostid;
+	}
 
-		// expression: {template:item.func()} => {host:item.func()}
-		if (!$expressionData->parse($trigger['expression'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+	/**
+	 * Returns list of already linked triggers.
+	 *
+	 * Output format:
+	 *   [
+	 *     <hostid> => [
+	 *       <tpl_triggerid> => ['triggerid' => <triggerid>],
+	 *       ...
+	 *     ],
+	 *     ...
+	 *   ]
+	 *
+	 * @param array  $tpl_triggerids
+	 * @param array  $hostids         The function will return a list of all linked triggers if no hosts are specified.
+	 *
+	 * @return array
+	 */
+	private function getHostTriggersByTemplateId(array $tpl_triggerids, array $hostids = null) {
+		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
+			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.templateid,i.hostid';
+		if ($this instanceof CTriggerPrototype) {
+			$output .= ',t.discover';
 		}
 
-		$exprPart = end($expressionData->expressions);
-		do {
-			$trigger['expression'] = substr_replace($trigger['expression'],
-					'{'.$host['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}',
-					$exprPart['pos'], strlen($exprPart['expression'])
-			);
-		}
-		while ($exprPart = prev($expressionData->expressions));
-
-		// recovery_expression: {template:item.func()} => {host:item.func()}
-		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-			if (!$expressionData->parse($trigger['recovery_expression'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
-			}
-
-			$exprPart = end($expressionData->expressions);
-			do {
-				$trigger['recovery_expression'] = substr_replace($trigger['recovery_expression'],
-						'{'.$host['host'].':'.$exprPart['item'].'.'.$exprPart['function'].'}',
-						$exprPart['pos'], strlen($exprPart['expression'])
-				);
-			}
-			while ($exprPart = prev($expressionData->expressions));
+		// Preparing list of triggers by templateid.
+		$sql = 'SELECT DISTINCT '.$output.
+			' FROM triggers t,functions f,items i'.
+			' WHERE t.triggerid=f.triggerid'.
+				' AND f.itemid=i.itemid'.
+				' AND '.dbConditionInt('t.templateid', $tpl_triggerids);
+		if ($hostids !== null) {
+			$sql .= ' AND '.dbConditionInt('i.hostid', $hostids);
 		}
 
-		$options = [
-			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
-				'status', 'priority', 'comments', 'type', 'templateid', 'correlation_mode', 'correlation_tag',
-				'manual_close', 'opdata', 'discover'
-			],
-			'hostids' => $host['hostid'],
-			'filter' => ['templateid' => $trigger['templateid']],
-			'nopermissions' => true
-		];
-
-		if ($class === 'CTriggerPrototype') {
-			$options['selectDiscoveryRule'] = ['itemid'];
-		}
-
-		// check if a child trigger already exists on the host
-		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
+		$chd_triggers = DBfetchArray(DBselect($sql));
+		$chd_triggers = CMacrosResolverHelper::resolveTriggerExpressions($chd_triggers,
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		// yes we have a child trigger, just update it
-		if ($_db_triggers) {
-			$trigger['triggerid'] = $_db_triggers[0]['triggerid'];
+		$chd_triggers_tpl = [];
 
-			$this->checkIfExistsOnHost($trigger);
-			$db_trigger = $_db_triggers[0];
+		foreach ($chd_triggers as $chd_trigger) {
+			$hostid = $chd_trigger['hostid'];
+			unset($chd_trigger['hostid']);
+
+			$chd_triggers_tpl[$hostid][$chd_trigger['templateid']] = $chd_trigger;
 		}
-		// no child trigger found
-		else {
-			$options['filter'] = ['description' => $trigger['description']];
 
-			// look for a trigger with the same description and expression
-			$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
+		return $chd_triggers_tpl;
+	}
+
+	/**
+	 * Returns list of not inherited triggers with same name and expression.
+	 *
+	 * Output format:
+	 *   [
+	 *     <hostid> => [
+	 *       <tpl_triggerid> => ['triggerid' => <triggerid>],
+	 *       ...
+	 *     ],
+	 *     ...
+	 *   ]
+	 *
+	 * @param array $tpl_triggers_by_description  The list of hostids, grouped by trigger description and expression.
+	 *
+	 * @return array
+	 */
+	private function getHostTriggersByDescription(array $tpl_triggers_by_description) {
+		$chd_triggers_description = [];
+
+		$expression_data = new CTriggerExpression(['lldmacros' => $this instanceof CTriggerPrototype]);
+		$recovery_expression_data = new CTriggerExpression(['lldmacros' => $this instanceof CTriggerPrototype]);
+
+		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
+			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,i.hostid,h.host';
+		if ($this instanceof CTriggerPrototype) {
+			$output .= ',t.discover';
+		}
+
+		foreach ($tpl_triggers_by_description as $description => $tpl_triggers) {
+			$hostids = [];
+
+			foreach ($tpl_triggers as $tpl_trigger) {
+				$hostids += $tpl_trigger['hostids'];
+			}
+
+			$chd_triggers = DBfetchArray(DBselect(
+				'SELECT DISTINCT '.$output.
+				' FROM triggers t,functions f,items i,hosts h'.
+				' WHERE t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND i.hostid=h.hostid'.
+					' AND '.dbConditionString('t.description', [$description]).
+					' AND '.dbConditionInt('i.hostid', array_keys($hostids))
+			));
+
+			$chd_triggers = CMacrosResolverHelper::resolveTriggerExpressions($chd_triggers,
 				['sources' => ['expression', 'recovery_expression']]
 			);
 
-			foreach ($_db_triggers as $_db_trigger) {
-				if ($_db_trigger['expression'] === $trigger['expression']
-						&& $_db_trigger['recovery_expression'] === $trigger['recovery_expression']) {
-					// we have a trigger with the same description and expressions as the parent
-					// convert it to a template trigger
-					$trigger['triggerid'] = $_db_trigger['triggerid'];
-					$db_trigger = $_db_trigger;
-					break;
+			foreach ($tpl_triggers as $tpl_trigger) {
+				// expression: {template:item.func()} => {host:item.func()}
+				if (!$expression_data->parse($tpl_trigger['expression'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expression_data->error);
+				}
+
+				// recovery_expression: {template:item.func()} => {host:item.func()}
+				if ($tpl_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+					if (!$recovery_expression_data->parse($tpl_trigger['recovery_expression'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $recovery_expression_data->error);
+					}
+				}
+
+				foreach ($chd_triggers as $chd_trigger) {
+					if (!array_key_exists($chd_trigger['hostid'], $tpl_trigger['hostids'])) {
+						continue;
+					}
+
+					if ($chd_trigger['recovery_mode'] != $tpl_trigger['recovery_mode']) {
+						continue;
+					}
+
+					$expression = $tpl_trigger['expression'];
+					$expr_part = end($expression_data->expressions);
+					do {
+						$expression = substr_replace($expression,
+							'{'.$chd_trigger['host'].':'.$expr_part['item'].'.'.$expr_part['function'].'}',
+							$expr_part['pos'], strlen($expr_part['expression'])
+						);
+					}
+					while ($expr_part = prev($expression_data->expressions));
+
+					if ($chd_trigger['expression'] !== $expression) {
+						continue;
+					}
+
+					if ($tpl_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+						$recovery_expression = $tpl_trigger['recovery_expression'];
+						$expr_part = end($recovery_expression_data->expressions);
+						do {
+							$recovery_expression = substr_replace($recovery_expression,
+								'{'.$chd_trigger['host'].':'.$expr_part['item'].'.'.$expr_part['function'].'}',
+								$expr_part['pos'], strlen($expr_part['expression'])
+							);
+						}
+						while ($expr_part = prev($recovery_expression_data->expressions));
+
+						if ($chd_trigger['recovery_expression'] !== $recovery_expression) {
+							continue;
+						}
+					}
+
+					$hostid = $chd_trigger['hostid'];
+					unset($chd_trigger['hostid'], $chd_trigger['host']);
+					$chd_triggers_description[$hostid][$tpl_trigger['triggerid']] = $chd_trigger + ['templateid' => 0];
 				}
 			}
 		}
 
-		if (array_key_exists('triggerid', $trigger)) {
-			$db_trigger['tags'] = API::getApiService()->select('trigger_tag', [
-				'output' => ['triggertagid', 'tag', 'value'],
-				'filter' => ['triggerid' => $db_trigger['triggerid']]
-			]);
+		return $chd_triggers_description;
+	}
 
-			$this->updateReal([$trigger], [$db_trigger], true);
-		}
-		else {
-			$_db_triggers = $this->get([
-				'output' => ['url', 'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag'],
-				'triggerids' => [$triggerid],
-				'nopermissions' => true
-			]);
+	/**
+	 * Updates the children of the triggers on the given hosts and propagates the inheritance to all child hosts.
+	 * If the given triggers was assigned to a different template or a host, all of the child triggers, that became
+	 * obsolete will be deleted.
+	 *
+	 * @param array  $triggers
+	 * @param string $triggers[]['triggerid']
+	 * @param string $triggers[]['description']
+	 * @param string $triggers[]['expression']
+	 * @param int    $triggers[]['recovery mode']
+	 * @param string $triggers[]['recovery_expression']
+	 * @param array  $hostids
+	 */
+	protected function inherit(array $triggers, array $hostids = null) {
+		$this->prepareInheritedTriggers($triggers, $hostids, $ins_triggers, $upd_triggers, $db_triggers);
 
-			foreach ($_db_triggers[0] as $field_name => $value) {
-				if ($field_name !== 'triggerid' && !array_key_exists($field_name, $trigger)) {
-					$trigger[$field_name] = $value;
-				}
-			}
-
-			$triggers = [$trigger];
-			$this->createReal($triggers, true);
-			$trigger = $triggers[0];
+		if ($ins_triggers) {
+			$this->createReal($ins_triggers, true);
 		}
 
-		return $trigger;
+		if ($upd_triggers) {
+			$this->updateReal($upd_triggers, $db_triggers, true);
+		}
+
+		if ($ins_triggers || $upd_triggers) {
+			$this->inherit(array_merge($ins_triggers + $upd_triggers));
+		}
 	}
 
 	/**
@@ -270,6 +541,64 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		return $trigger;
+	}
+
+	/**
+	 * Checks triggers for duplicates.
+	 *
+	 * @param array  $descriptions
+	 * @param string $descriptions[<description>]['expression']
+	 * @param int    $descriptions[<description>]['recovery_mode']
+	 * @param string $descriptions[<description>]['recovery_expression']
+	 * @param string $descriptions[<description>]['hostid']
+	 *
+	 * @throws APIException if at least one trigger exists
+	 */
+	protected function checkDuplicates(array $descriptions) {
+		foreach ($descriptions as $description => $triggers) {
+			$hostids = [];
+			$expressions = [];
+
+			foreach ($triggers as $trigger) {
+				$hostids[$trigger['hostid']] = true;
+				$expressions[$trigger['expression']][$trigger['recovery_expression']] = $trigger['hostid'];
+			}
+
+			$db_triggers = DBfetchArray(DBselect(
+				'SELECT DISTINCT t.expression,t.recovery_mode,t.recovery_expression'.
+				' FROM triggers t,functions f,items i,hosts h'.
+				' WHERE t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND i.hostid=h.hostid'.
+					' AND '.dbConditionString('t.description', [$description]).
+					' AND '.dbConditionInt('i.hostid', array_keys($hostids))
+			));
+
+			$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+
+			foreach ($db_triggers as $db_trigger) {
+				$expression = $db_trigger['expression'];
+				$recovery_expression = $db_trigger['recovery_expression'];
+
+				if (array_key_exists($expression, $expressions)
+						&& array_key_exists($recovery_expression, $expressions[$expression])) {
+					$error_already_exists = ($this instanceof CTrigger)
+						? _('Trigger "%1$s" already exists on "%2$s".')
+						: _('Trigger prototype "%1$s" already exists on "%2$s".');
+
+					$db_hosts = DB::select('hosts', [
+						'output' => ['name'],
+						'hostids' => $expressions[$expression][$recovery_expression]
+					]);
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_params($error_already_exists, [$description, $db_hosts[0]['name']])
+					);
+				}
+			}
+		}
 	}
 
 	/**
@@ -659,7 +988,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException if validation failed.
 	 */
-	protected function validateUpdate(array &$triggers, array &$db_triggers) {
+	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
 		if (!$triggers) {
 			return;
 		}
@@ -960,16 +1289,14 @@ abstract class CTriggerGeneral extends CApiService {
 		unset($new_trigger);
 
 		DB::insert('triggers', $new_triggers, false);
-		DB::insert('functions', $new_functions, false);
+		DB::insertBatch('functions', $new_functions, false);
 
 		if ($new_tags) {
 			DB::insert('trigger_tag', $new_tags);
 		}
 
-		foreach ($triggers as $trigger) {
-			add_audit_ext(AUDIT_ACTION_ADD, $resource, $trigger['triggerid'], $trigger['description'], null, null,
-				null
-			);
+		if (!$inherited) {
+			$this->addAuditBulk(AUDIT_ACTION_ADD, $resource, $triggers);
 		}
 	}
 
@@ -1005,7 +1332,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['comments']                [IN]
 	 * @param int    $db_triggers[<tnum>]['type']                    [IN]
 	 * @param string $db_triggers[<tnum>]['templateid']              [IN]
-	 * @param array  $db_triggers[<tnum>]['discoveryRule']           [IN] For trigger prorotypes only.
+	 * @param array  $db_triggers[<tnum>]['discoveryRule']           [IN] For trigger prototypes only.
 	 * @param string $db_triggers[<tnum>]['discoveryRule']['itemid'] [IN]
 	 * @param array  $db_triggers[<tnum>]['tags']                    [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['tag']           [IN]
@@ -1083,7 +1410,8 @@ abstract class CTriggerGeneral extends CApiService {
 			if (array_key_exists('status', $trigger) && $trigger['status'] != $db_trigger['status']) {
 				$upd_trigger['values']['status'] = $trigger['status'];
 			}
-			if (array_key_exists('discover', $trigger) && $trigger['discover'] != $db_trigger['discover']) {
+			if ($class === 'CTriggerPrototype'
+					&& array_key_exists('discover', $trigger) && $trigger['discover'] != $db_trigger['discover']) {
 				$upd_trigger['values']['discover'] = $trigger['discover'];
 			}
 			if (array_key_exists('priority', $trigger) && $trigger['priority'] != $db_trigger['priority']) {
@@ -1152,7 +1480,7 @@ abstract class CTriggerGeneral extends CApiService {
 			DB::delete('functions', ['triggerid' => $del_functions_triggerids]);
 		}
 		if ($new_functions) {
-			DB::insert('functions', $new_functions, false);
+			DB::insertBatch('functions', $new_functions, false);
 		}
 		if ($del_triggertagids) {
 			DB::delete('trigger_tag', ['triggertagid' => $del_triggertagids]);
@@ -1166,10 +1494,8 @@ abstract class CTriggerGeneral extends CApiService {
 			updateItServices();
 		}
 
-		foreach ($save_triggers as $tnum => $trigger) {
-			add_audit_ext(AUDIT_ACTION_UPDATE, $resource, $trigger['triggerid'], $db_triggers[$tnum]['description'],
-				null, $db_triggers[$tnum], $trigger
-			);
+		if (!$inherited) {
+			$this->addAuditBulk(AUDIT_ACTION_UPDATE, $resource, $save_triggers, zbx_toHash($db_triggers, 'triggerid'));
 		}
 	}
 
@@ -1667,12 +1993,15 @@ abstract class CTriggerGeneral extends CApiService {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
+		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
+			'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
+		];
+		if ($this instanceof CTriggerPrototype) {
+			$output[] = 'discover';
+		}
+
 		$triggers = $this->get([
-			'output' => [
-				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'discover'
-			],
+			'output' => $output,
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
@@ -1682,8 +2011,6 @@ abstract class CTriggerGeneral extends CApiService {
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		foreach ($triggers as $trigger) {
-			$this->inherit($trigger, $data['hostids']);
-		}
+		$this->inherit($triggers, $data['hostids']);
 	}
 }
