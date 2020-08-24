@@ -20,6 +20,7 @@
 #include "common.h"
 #include "modbus.h"
 #include "mutexs.h"
+#include "comms.h"
 
 #ifdef HAVE_LIBMODBUS
 
@@ -140,7 +141,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 {
 #define ZBX_MODBUS_PROTOCOL_PREFIX_TCP	"tcp://"
 #define ZBX_MODBUS_PROTOCOL_PREFIX_RTU	"rtu://"
-	char	*tmp;
+	char	*tmp = NULL;
 	int	ret = SUCCEED;
 
 	if (0 == zbx_strncasecmp(endpoint_str, ZBX_MODBUS_PROTOCOL_PREFIX_TCP,
@@ -148,21 +149,26 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 	{
 		endpoint->protocol = ZBX_MODBUS_PROTOCOL_TCP;
 
-		zbx_strsplit(endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP), ':',
-				&endpoint->conn_info.tcp.ip, &tmp);
-
-		/* TODO - accept ipv6 and dns here */
-		if (SUCCEED == (ret = is_ip4(endpoint->conn_info.tcp.ip)))
+		if (SUCCEED == (ret = parse_serveractive_element(
+				endpoint_str + ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_TCP), &tmp,
+				&endpoint->conn_info.tcp.port, ZBX_MODBUS_TCP_PORT_DEFAULT)))
 		{
-			if (NULL != tmp)
-				ret = is_ushort(tmp, &endpoint->conn_info.tcp.port);
+			if (SUCCEED == is_ip4(tmp) || SUCCEED == is_ip6(tmp))
+			{
+				endpoint->conn_info.tcp.ip = tmp;
+			}
 			else
-				endpoint->conn_info.tcp.port = ZBX_MODBUS_TCP_PORT_DEFAULT;
+			{
+				endpoint->conn_info.tcp.ip = zbx_malloc(NULL, ZBX_MODBUS_IP_LEN_MAX);
+				zbx_getip_by_host(tmp, endpoint->conn_info.tcp.ip, ZBX_MODBUS_IP_LEN_MAX);
+				if ('\0' == *endpoint->conn_info.tcp.ip)
+				{
+					zbx_free(endpoint->conn_info.tcp.ip);
+					ret = FAIL;
+				}
+				zbx_free(tmp);
+			}
 		}
-		else
-			zbx_free(endpoint->conn_info.tcp.ip);
-
-		zbx_free(tmp);
 	}
 	else if (0 == zbx_strncasecmp(endpoint_str, ZBX_MODBUS_PROTOCOL_PREFIX_RTU,
 			ZBX_CONST_STRLEN(ZBX_MODBUS_PROTOCOL_PREFIX_RTU)))
