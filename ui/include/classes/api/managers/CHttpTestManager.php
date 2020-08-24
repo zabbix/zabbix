@@ -169,17 +169,16 @@ class CHttpTestManager {
 			while ($checkitem = DBfetch($dbCheckItems)) {
 				$itemids[] = $checkitem['itemid'];
 
-				if (isset($httptest['name'])) {
-					$updateFields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
-					if ($updateFields['name'] === $checkitem['name']) {
-						unset($updateFields['name']);
-					}
-
-					$updateFields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
-					if ($updateFields['key_'] === $checkitem['key_']) {
-						unset($updateFields['key_']);
-					}
+				$updateFields['name'] = $this->getTestName($checkitem['type'], $httptest['name']);
+				if ($updateFields['name'] === $checkitem['name']) {
+					unset($updateFields['name']);
 				}
+
+				$updateFields['key_'] = $this->getTestKey($checkitem['type'], $httptest['name']);
+				if ($updateFields['key_'] === $checkitem['key_']) {
+					unset($updateFields['key_']);
+				}
+
 				if (isset($httptest['status'])) {
 					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $httptest['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 				}
@@ -225,14 +224,6 @@ class CHttpTestManager {
 
 					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
 				}
-
-				// IF application ID was not set, use the ID from DB so new items can be linked.
-				if (!array_key_exists('applicationid', $httptest)) {
-					$httptest['applicationid'] = $db_httptest['applicationid'];
-				}
-				elseif (bccomp($httptest['applicationid'], $db_httptest['applicationid'])) {
-					unset($httptest['applicationid']);
-				}
 			}
 		}
 
@@ -252,32 +243,7 @@ class CHttpTestManager {
 				}
 			}
 			else {
-				if (isset($httptest['applicationid'])) {
-					$dbStepIds = DBfetchColumn(DBselect(
-						'SELECT i.itemid'.
-						' FROM items i'.
-							' INNER JOIN httpstepitem hi ON hi.itemid=i.itemid'.
-						' WHERE '.dbConditionInt('hi.httpstepid', zbx_objectValues($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid')))
-						, 'itemid'
-					);
-					$this->updateItemsApplications($dbStepIds, $httptest['applicationid']);
-				}
-
-				if (isset($httptest['status'])) {
-					$status = ($httptest['status'] == HTTPTEST_STATUS_ACTIVE) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
-
-					$itemIds = DBfetchColumn(DBselect(
-						'SELECT hsi.itemid'.
-							' FROM httpstep hs,httpstepitem hsi'.
-							' WHERE hs.httpstepid=hsi.httpstepid'.
-								' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
-					), 'itemid');
-
-					DB::update('items', [
-						'values' => ['status' => $status],
-						'where' => ['itemid' => $itemIds]
-					]);
-				}
+				$this->updateStepItems($httptest, $db_httptests);
 			}
 		}
 
@@ -1196,6 +1162,70 @@ class CHttpTestManager {
 		}
 
 		$this->updateHttpStepFields($websteps, 'update');
+	}
+
+	/**
+	 * Update web items after changes in web scenario.
+	 * This should be used, when individual steps are not being updated.
+	 *
+	 * @param array $httptest
+	 * @param array $db_httptests
+	 */
+	protected function updateStepItems(array $httptest, array $db_httptests): void {
+		$has_applicationid = array_key_exists('applicationid', $httptest);
+		$has_status = array_key_exists('status', $httptest);
+		$has_name_changed = ($httptest['name'] !== $db_httptests[$httptest['httptestid']]['name']);
+
+		if (!$has_applicationid && !$has_status && !$has_name_changed) {
+			return;
+		}
+
+		$stepids = zbx_objectValues($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid');
+
+		$stepitems = DBfetchArrayAssoc(DBselect(
+			'SELECT i.itemid, hsi.httpstepid, hsi.type'.
+				' FROM items i,httpstepitem hsi'.
+				' WHERE i.itemid=hsi.itemid'.
+					' AND '.dbConditionInt('hsi.httpstepid', $stepids)
+		), 'itemid');
+
+		$stepitemids = array_keys($stepitems);
+
+		if ($has_applicationid) {
+			$this->updateItemsApplications($stepitemids, $httptest['applicationid']);
+		}
+
+		if ($has_status) {
+			$status = ($httptest['status'] == HTTPTEST_STATUS_ACTIVE)
+				? ITEM_STATUS_ACTIVE
+				: ITEM_STATUS_DISABLED;
+
+			DB::update('items', [
+				'values' => ['status' => $status],
+				'where' => ['itemid' => $stepitemids]
+			]);
+		}
+
+		if ($has_name_changed) {
+			$db_websteps = zbx_toHash($db_httptests[$httptest['httptestid']]['steps'], 'httpstepid');
+			$stepitems_update = [];
+
+			foreach ($stepitems as $stepitem) {
+				$db_webstep = $db_websteps[$stepitem['httpstepid']];
+
+				$stepitems_update[] = [
+					'values' => [
+						'name' => $this->getStepName($stepitem['type'], $httptest['name'], $db_webstep['name']),
+						'key_' => $this->getStepKey($stepitem['type'], $httptest['name'], $db_webstep['name'])
+					],
+					'where' => ['itemid' => $stepitem['itemid']]
+				];
+			}
+
+			if ($stepitems_update) {
+				DB::update('items', $stepitems_update);
+			}
+		}
 	}
 
 	/**
