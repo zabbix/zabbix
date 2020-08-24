@@ -254,6 +254,10 @@ func parseURL(broker string) (out *url.URL, err error) {
 		scheme = "tcp"
 	}
 
+	if urlString == "" {
+		urlString = "localhost"
+	}
+
 	out, err = url.Parse(fmt.Sprintf("%s://%s", scheme, web.EncloseIPv6(urlString)))
 	if err != nil {
 		return
