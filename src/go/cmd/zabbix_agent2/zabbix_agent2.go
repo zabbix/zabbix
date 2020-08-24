@@ -269,8 +269,12 @@ func main() {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		var m *scheduler.Manager
 		var err error
+		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
+			fatalExit("cannot initialize user parameters", err)
+		}
+
+		var m *scheduler.Manager
 		if m, err = scheduler.NewManager(&agent.Options); err != nil {
 			fatalExit("cannot create scheduling manager", err)
 		}
