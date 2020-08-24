@@ -29,8 +29,10 @@ class CYamlImportReader extends CImportReader {
 	/**
 	 * Convert YAML data stream to PHP array.
 	 * Known issues:
-	 *   - Error messages coming from Symbfony YAML are not translatable;
-	 *   - Symfony parser incorrectly interprets YAML as JSON.
+	 *   - Error messages coming from Symfony YAML are not translatable;
+	 *   - Symfony parser incorrectly interprets YAML as JSON;
+	 *   - Symfony parser recognizes patterns (like dates) in unquoted strings which are not supported by Zabbix;
+	 *   - Symfony parser support only one YAML document per file.
 	 *
 	 * @param string $string
 	 *
