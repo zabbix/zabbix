@@ -2025,9 +2025,6 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 		if (0 == strcmp(buf, "macro.secrets"))
 		{
-			if (SUCCEED == zbx_json_object_is_empty(&jp_obj))
-				continue;
-
 			jp_kvs_paths = jp_obj;
 			jp_kvs_paths_ptr = &jp_kvs_paths;
 			continue;

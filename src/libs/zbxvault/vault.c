@@ -99,10 +99,13 @@ int	zbx_kvs_from_json_create(const char *path, const struct zbx_json_parse *jp_k
 		zbx_hashset_create_ext(kvs, 100, kv_hash, kv_compare, kv_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 				ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 		get_kvs_from_json(&jp_kvs, kvs);
+		return SUCCEED;
 	}
-
-	return SUCCEED;
-
+	else
+	{
+		*error = zbx_strdup(*error, "no data");
+		return FAIL;
+	}
 }
 
 int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error)
