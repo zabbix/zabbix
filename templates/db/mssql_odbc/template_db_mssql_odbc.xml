@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-07-27T11:13:59Z</date>
+   <date>2020-08-24T07:29:41Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -2423,14 +2423,6 @@ FROM sys.databases</params>
                      <master_item>
                         <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                      </master_item>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB '{#DBNAME}': Rate of log growths is high (over {$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
-                           <priority>WARNING</priority>
-                           <description>The transaction log for the database has grown too frequently.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>MSSQL DB '{#DBNAME}': Log shrinks</name>
@@ -2453,14 +2445,6 @@ FROM sys.databases</params>
                      <master_item>
                         <key>db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]</key>
                      </master_item>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{min(5m)}&gt;{$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"}</expression>
-                           <name>MSSQL DB '{#DBNAME}': Rate of log shrinks is (over {$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"} time(s) for 5m)</name>
-                           <priority>WARNING</priority>
-                           <description>The transaction log for the database has shrunken too frequently.</description>
-                        </trigger_prototype>
-                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>MSSQL DB '{#DBNAME}': Log truncations</name>
@@ -3585,16 +3569,6 @@ On the primary replica, if a secondary replica is disconnected, its secondary da
                <macro>{$MSSQL.LOG_FLUSH_WAITS.MAX}</macro>
                <value>1</value>
                <description>The maximum log flush waits per second for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$MSSQL.LOG_GROWTHS.MAX}</macro>
-               <value>1</value>
-               <description>The maximum log growths for trigger expression.</description>
-            </macro>
-            <macro>
-               <macro>{$MSSQL.LOG_SHRINKS.MAX}</macro>
-               <value>1</value>
-               <description>The maximum log shrinks for trigger expression.</description>
             </macro>
             <macro>
                <macro>{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}</macro>

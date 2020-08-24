@@ -52,8 +52,6 @@ No specific Zabbix configuration is required.
 |{$MSSQL.LOCK_TIMEOUTS.MAX} |<p>The maximum lock timeouts per second for trigger expression.</p> |`1` |
 |{$MSSQL.LOG_FLUSH_WAITS.MAX} |<p>The maximum log flush waits per second for trigger expression.</p> |`1` |
 |{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX} |<p>The maximum log flush wait time in ms for trigger expression.</p> |`1` |
-|{$MSSQL.LOG_GROWTHS.MAX} |<p>The maximum log growths for trigger expression.</p> |`1` |
-|{$MSSQL.LOG_SHRINKS.MAX} |<p>The maximum log shrinks for trigger expression.</p> |`1` |
 |{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN} |<p>The minimum page life expectancy for trigger expression.</p> |`300` |
 |{$MSSQL.PAGE_READS.MAX} |<p>The maximum page reads per second for trigger expression.</p> |`90` |
 |{$MSSQL.PAGE_WRITES.MAX} |<p>The maximum page writes per second for trigger expression.</p> |`90` |
@@ -226,8 +224,6 @@ There are no template links in this template.
 |MSSQL DB '{#DBNAME}': State is {ITEM.VALUE} |<p>The DB has a non-working state.</p> |`{TEMPLATE_NAME:mssql.db.state["{#DBNAME}"].last()}>1` |HIGH | |
 |MSSQL DB '{#DBNAME}': Number of commits waiting for the log flush is high (over {$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}/sec for 5m) |<p>Too many commits are waiting for the log flush.</p> |`{TEMPLATE_NAME:mssql.db.log_flush_waits_sec.rate["{#DBNAME}"].min(5m)}>{$MSSQL.LOG_FLUSH_WAITS.MAX:"{#DBNAME}"}` |WARNING | |
 |MSSQL DB '{#DBNAME}': Total wait time to flush the log is high (over {$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}ms for 5m) |<p>The wait time to flush the log is too long.</p> |`{TEMPLATE_NAME:mssql.db.log_flush_wait_time["{#DBNAME}"].min(5m)}>{$MSSQL.LOG_FLUSH_WAIT_TIME.MAX:"{#DBNAME}"}` |WARNING | |
-|MSSQL DB '{#DBNAME}': Rate of log growths is high (over {$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"} time(s) for 5m) |<p>The transaction log for the database has grown too frequently.</p> |`{TEMPLATE_NAME:mssql.db.log_growths["{#DBNAME}"].min(5m)}>{$MSSQL.LOG_GROWTHS.MAX:"{#DBNAME}"}` |WARNING | |
-|MSSQL DB '{#DBNAME}': Rate of log shrinks is (over {$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"} time(s) for 5m) |<p>The transaction log for the database has shrunken too frequently.</p> |`{TEMPLATE_NAME:mssql.db.log_shrinks["{#DBNAME}"].min(5m)}>{$MSSQL.LOG_SHRINKS.MAX:"{#DBNAME}"}` |WARNING | |
 |MSSQL DB '{#DBNAME}': Percent of log using is high (over {$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}% for 5m) |<p>There's not enough space left in the log.</p> |`{TEMPLATE_NAME:mssql.db.percent_log_used["{#DBNAME}"].min(5m)}>{$MSSQL.PERCENT_LOG_USED.MAX:"{#DBNAME}"}` |WARNING | |
 |MSSQL AG '{#GROUP_NAME}': Primary replica recovery health in progress |<p>The primary replica is in the synchronization process.</p> |`{TEMPLATE_NAME:mssql.primary_recovery_health["{#GROUP_NAME}"].last()}=0` |WARNING | |
 |MSSQL AG '{#GROUP_NAME}': Secondary replica recovery health in progress |<p>The secondary replica is in the synchronization process.</p> |`{TEMPLATE_NAME:mssql.secondary_recovery_health["{#GROUP_NAME}"].last()}=0` |WARNING | |
