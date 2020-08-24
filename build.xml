@@ -134,16 +134,7 @@
 		</exec>
 	</target>
 
-	<target name="create-db-postgresql">
-		<!-- Drop PostgreSQL database -->
-		<exec executable="psql" failonerror="on">
-			<env key="PGPASSWORD" value="${dbpassword}"/>
-			<arg line="-q"/>
-			<arg line="-h '${dbhost}'"/>
-			<arg line="-U '${dbuser}'"/>
-			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="-c 'drop database if exists ${dbname}'"/>
-		</exec>
+	<target name="create-db-postgresql" depends="drop-db-postgresql">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -283,14 +274,7 @@
 		</exec>
 	</target>
 
-	<target name="create-db-mysql">
-		<!-- Drop MySQL database -->
-		<exec executable="mysql" failonerror="on">
-			<arg line="--host=${dbhost}"/>
-			<arg line="--user=${dbuser}"/>
-			<arg line="--password=${dbpassword}"/>
-			<arg line="--execute='drop database if exists ${dbname}'"/>
-		</exec>
+	<target name="create-db-mysql" depends="drop-db-mysql">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<arg line="--host=${dbhost}"/>
@@ -415,8 +399,8 @@
 	<target name="build-phpunit" depends="test-phpunit"/>
 	<target name="build-mysql" depends="init-frontend-mysql,test-frontend"/>
 	<target name="build-postgresql" depends="init-frontend-postgresql,test-frontend"/>
-	<target name="build-api-mysql" depends="init-api-mysql,test-api,drop-db-mysql"/>
-	<target name="build-api-postgresql" depends="init-api-postgresql,test-api,drop-db-postgresql"/>
+	<target name="build-api-mysql" depends="init-api-mysql,test-api"/>
+	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>
 	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
 
