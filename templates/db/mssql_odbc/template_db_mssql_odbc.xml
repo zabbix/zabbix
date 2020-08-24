@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-08-24T07:29:41Z</date>
+   <date>2020-08-24T08:26:47Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1933,12 +1933,6 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <valuemap>
                   <name>Service state</name>
                </valuemap>
-               <preprocessing>
-                  <step>
-                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                     <params>10m</params>
-                  </step>
-               </preprocessing>
                <triggers>
                   <trigger>
                      <expression>{max(#3)}=0</expression>
@@ -2043,8 +2037,8 @@ FROM sys.dm_hadr_availability_group_states ags JOIN sys.availability_groups ag O
                            <params>$[?(@.group_name=='{#GROUP_NAME}')].primary_replica.first()</params>
                         </step>
                         <step>
-                           <type>DISCARD_UNCHANGED</type>
-                           <params/>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>3h</params>
                         </step>
                      </preprocessing>
                      <master_item>
@@ -2591,6 +2585,34 @@ FROM sys.databases</params>
                            <item>
                               <host>Template DB MSSQL by ODBC</host>
                               <key>mssql.db.log_files_used_size["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+                  <graph_prototype>
+                     <name>MSSQL DB '{#DBNAME}': Number of Log changes</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_growths["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_shrinks["{#DBNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Template DB MSSQL by ODBC</host>
+                              <key>mssql.db.log_truncations["{#DBNAME}"]</key>
                            </item>
                         </graph_item>
                      </graph_items>
