@@ -22,15 +22,44 @@ package web
 import (
 	"bytes"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"strings"
 	"time"
 
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/version"
 )
+
+//RemoveScheme removes scheme from url
+func RemoveScheme(in string) (scheme string, host string, err error) {
+	parts := strings.Split(in, "://")
+	switch len(parts) {
+	case 1:
+		return "", in, nil
+	case 2:
+		return parts[0], parts[1], nil
+	default:
+		return "", in, errors.New("malformed url")
+	}
+}
+
+//EncloseIPv6 encloses the url in ipv6 format if required
+func EncloseIPv6(in string) string {
+	parsedIP := net.ParseIP(in)
+	if parsedIP != nil {
+		ipv6 := parsedIP.To16()
+		if ipv6 != nil {
+			out := ipv6.String()
+			return fmt.Sprintf("[%s]", out)
+		}
+	}
+
+	return in
+}
 
 // Get makes a GET request to the provided web page url, using an http client, provides a response dump if dump
 // parameter is set

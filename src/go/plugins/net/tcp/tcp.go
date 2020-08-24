@@ -274,33 +274,8 @@ func (p *Plugin) validateTelnet(conn net.Conn) error {
 	}
 }
 
-func removeScheme(in string) (scheme string, host string, err error) {
-	parts := strings.Split(in, "://")
-	switch len(parts) {
-	case 1:
-		return "", in, nil
-	case 2:
-		return parts[0], parts[1], nil
-	default:
-		return "", in, errors.New("malformed url")
-	}
-}
-
-func encloseIPv6(in string) string {
-	parsedIP := net.ParseIP(in)
-	if parsedIP != nil {
-		ipv6 := parsedIP.To16()
-		if ipv6 != nil {
-			out := ipv6.String()
-			return fmt.Sprintf("[%s]", out)
-		}
-	}
-
-	return in
-}
-
 func (p *Plugin) httpsExpect(ip string, port string) int {
-	scheme, host, err := removeScheme(ip)
+	scheme, host, err := web.RemoveScheme(ip)
 	if err != nil {
 		log.Debugf("https error: cannot parse the url [%s]: %s", ip, err.Error())
 		return 0
@@ -310,7 +285,7 @@ func (p *Plugin) httpsExpect(ip string, port string) int {
 		return 0
 	}
 
-	rawURL := fmt.Sprintf("%s://%s", "https", encloseIPv6(host))
+	rawURL := fmt.Sprintf("%s://%s", "https", web.EncloseIPv6(host))
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		log.Debugf("https error: cannot parse the combined url [%s]: %s", rawURL, err.Error())

@@ -4,12 +4,15 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
+	"sync"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/watch"
+	"zabbix.com/pkg/web"
 )
 
 type mqttClient struct {
@@ -17,6 +20,7 @@ type mqttClient struct {
 	broker string
 	subs   map[string]*mqttSub
 	opts   *mqtt.ClientOptions
+	subMux *sync.RWMutex
 }
 
 type mqttSub struct {
@@ -30,6 +34,7 @@ type Plugin struct {
 	plugin.Base
 	manager     *watch.Manager
 	mqttClients map[string]*mqttClient
+	clientMux   *sync.RWMutex
 }
 
 var impl Plugin
@@ -44,22 +49,26 @@ func (p *Plugin) createOptions(clientid, username, password, broker string) *mqt
 	}
 	opts.SetTLSConfig(&tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert})
 	opts.OnConnectionLost = func(client mqtt.Client, reason error) {
-		p.Errf("Connection lost to %s, reason: %s", broker, reason.Error())
+		impl.Errf("Connection lost to %s, reason: %s", broker, reason.Error())
 	}
 	opts.OnConnect = func(client mqtt.Client) {
-		p.Infof("Connected to %s", broker)
+		//Will show the query password and username in log
+		impl.Infof("Connected to %s", broker)
+		impl.clientMux.RLock()
 		mc, found := p.mqttClients[broker]
+		impl.clientMux.RUnlock()
 		if found {
 			if mc.broker == broker {
+				mc.subMux.RLock()
 				for _, ms := range mc.subs {
 					if ms.subscribed {
 						err := ms.subscribe(mc)
 						if err != nil {
-							p.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
+							impl.Errf("Failed subscribing to %s after connecting to %s\n", ms.topic, broker)
 						}
 					}
-
 				}
+				mc.subMux.RUnlock()
 			}
 		}
 	}
@@ -77,67 +86,92 @@ func newClient(broker string, options *mqtt.ClientOptions) (mqtt.Client, error) 
 	return c, nil
 }
 
+func (ms *mqttSub) subscribeCallback(client mqtt.Client, msg mqtt.Message) {
+	impl.manager.Lock()
+	resp[msg.Topic()] = string(msg.Payload())
+	impl.Tracef("Received publication from %s: [%s] %s", ms.broker, msg.Topic(),
+		string(msg.Payload()))
+	impl.manager.Notify(ms, msg)
+	impl.manager.Unlock()
+}
+
 func (ms *mqttSub) subscribe(mc *mqttClient) error {
+	impl.Debugf("Subscribing to %s", ms.broker)
 	token := mc.client.Subscribe(
-		ms.topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-			impl.manager.Lock()
-			resp[msg.Topic()] = string(msg.Payload())
-			//add the msg to debug?
-			fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
-			impl.manager.Notify(ms, msg)
-			impl.manager.Unlock()
-		})
+		ms.topic, 0, ms.subscribeCallback)
 
 	if token.Wait() && token.Error() != nil {
 		return error(token.Error())
 	}
 
 	ms.subscribed = true
+	impl.Debugf("Subscribed to %s", ms.broker)
 
 	return nil
 }
 
 //Watch MQTT plugin
 func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
-	p.manager.Lock()
+	impl.manager.Lock()
+	impl.clientMux.Lock()
 	for broker, mc := range impl.mqttClients {
 		if mc != nil && mc.client != nil && !mc.client.IsConnected() {
 			delete(impl.mqttClients, broker)
 		}
 	}
-	p.manager.Update(ctx.ClientID(), ctx.Output(), requests)
-	p.manager.Unlock()
+	impl.clientMux.Unlock()
+	impl.manager.Update(ctx.ClientID(), ctx.Output(), requests)
+	impl.manager.Unlock()
 }
 
 var resp = make(map[string]string)
 
 func (ms *mqttSub) Initialize() (err error) {
+	impl.clientMux.RLock()
 	mc, ok := impl.mqttClients[ms.broker]
+	impl.clientMux.RUnlock()
 	if !ok {
-		return fmt.Errorf("mqtt client missing for broker %s", ms.broker)
+		return fmt.Errorf("client missing for broker %s", ms.broker)
 
 	}
 
 	if mc.client == nil {
+		impl.Debugf("Creating client for %s", ms.broker)
 		mc.client, err = newClient(ms.broker, mc.opts)
 		if err != nil {
 			return err
 		}
 
 	}
+
 	return ms.subscribe(mc)
 }
 
 func (ms *mqttSub) Release() {
+	impl.clientMux.RLock()
 	mc, ok := impl.mqttClients[ms.broker]
+	impl.clientMux.RUnlock()
 	if !ok || mc == nil || mc.client == nil {
-		impl.Errf("MQTT client not found during release for broker %s\n", ms.broker)
+		impl.Errf("Client not found during release for broker %s\n", ms.broker)
 	}
-	mc.client.Unsubscribe(ms.topic)
+
+	impl.Debugf("Unsubscribing topic from %s", ms.topic)
+	token := mc.client.Unsubscribe(ms.topic)
+	if token.Wait() && token.Error() != nil {
+		impl.Errf("Failed to unsubscribe from %s:%s", ms.topic, token.Error())
+	}
+
+	mc.subMux.Lock()
+	defer mc.subMux.Unlock()
 	delete(mc.subs, ms.topic)
+
+	impl.Debugf("Unsubscribed from %s", ms.topic)
 	if len(mc.subs) == 0 {
+		impl.Debugf("Disconnecting from %s", ms.broker)
 		mc.client.Disconnect(200)
+		impl.clientMux.Lock()
 		delete(impl.mqttClients, mc.broker)
+		impl.clientMux.Unlock()
 	}
 }
 
@@ -153,7 +187,6 @@ func (f *respFilter) Process(v interface{}) (value *string, err error) {
 		if f.wildcard {
 			j, err := json.Marshal(map[string]string{m.Topic(): string(m.Payload())})
 			if err != nil {
-				fmt.Println("err", err.Error())
 				return nil, err
 			}
 			tmp = string(j)
@@ -180,14 +213,26 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 			"Incorrect key format for mqtt subscribe. Must be mqtt.get[<broker URL>,<topic>]")
 	}
 
-	broker := params[0]
 	topic := params[1]
-	if _, ok := p.mqttClients[broker]; !ok {
-		//TODO: parse url for options (pwd, username, borker) password and options should be set later to allow multiple different
-		p.mqttClients[broker] = &mqttClient{nil, broker, make(map[string]*mqttSub), p.createOptions("Zabbix Agent 2", "", "", broker)}
+	url, err := parseURL(params[0])
+	if err != nil {
+		return nil, err
 	}
 
+	broker := url.String()
+	impl.clientMux.Lock()
+	defer impl.clientMux.Unlock()
+	if _, ok := p.mqttClients[broker]; !ok {
+		impl.Debugf("Creating client options for %s", broker)
+		p.mqttClients[broker] = &mqttClient{
+			nil, broker, make(map[string]*mqttSub), p.createOptions("Zabbix Agent 2", url.Query().Get("username"),
+				url.Query().Get("password"), broker), &sync.RWMutex{}}
+	}
+
+	p.mqttClients[broker].subMux.Lock()
+	defer p.mqttClients[broker].subMux.Unlock()
 	if _, ok := p.mqttClients[broker].subs[topic]; !ok {
+		impl.Debugf("Creating subscriber for %s", topic)
 		p.mqttClients[broker].subs[topic] = &mqttSub{
 			broker, topic, hasWildCards(topic), false}
 	}
@@ -199,9 +244,32 @@ func hasWildCards(topic string) bool {
 	return strings.Contains(topic, "#") || strings.Contains(topic, "+")
 }
 
+func parseURL(broker string) (out *url.URL, err error) {
+	scheme, urlString, err := web.RemoveScheme(broker)
+	if err != nil {
+		return nil, err
+	}
+
+	if scheme == "" {
+		scheme = "tcp"
+	}
+
+	out, err = url.Parse(fmt.Sprintf("%s://%s", scheme, web.EncloseIPv6(urlString)))
+	if err != nil {
+		return
+	}
+
+	if out.Port() == "" {
+		out.Host = fmt.Sprintf("%s:%d", out.Host, 1883)
+	}
+
+	return
+}
+
 func init() {
 	impl.manager = watch.NewManager(&impl)
 	impl.mqttClients = make(map[string]*mqttClient)
+	impl.clientMux = &sync.RWMutex{}
 
 	plugin.RegisterMetrics(&impl, "MQTT", "mqtt.get", "Listen on MQTT topics for published messages.")
 }
