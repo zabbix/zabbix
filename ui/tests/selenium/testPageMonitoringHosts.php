@@ -33,7 +33,7 @@ class testPageMonitoringHosts extends CWebTest {
 				'Graphs', 'Screens', 'Web'];
 		$buttons = ['Apply', 'Reset'];
 		$tags_buttons = ['Add', 'Remove'];
-		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$fields = ['Name', 'Host groups', 'IP', 'DNS', 'Port', 'Severity', 'Status', 'Tags',
 				'Show hosts in maintenance'];
 		$severity_elements = ['Not classified', 'Warning', 'High', 'Information', 'Average', 'Disaster'];
@@ -43,12 +43,11 @@ class testPageMonitoringHosts extends CWebTest {
 		// Checking Title, Header and Column names.
 		$this->assertPageTitle('Hosts');
 		$this->assertPageHeader('Hosts');
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertSame($headers, $table->getHeadersText());
+		$this->assertSame($headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
 
 		// Check filter buttons.
 		foreach ($buttons as $button) {
-			$this->assertTrue($form->query('button', $button)->one()->isPresent());
+			$this->assertTrue($form->query('button', $button)->exists());
 		}
 
 		// Check all field names.
@@ -67,15 +66,15 @@ class testPageMonitoringHosts extends CWebTest {
 					$tags_container = $form->getFieldContainer($field);
 					foreach ($tags_elements as $tag) {
 						$this->assertTrue(($tags_container->query('xpath://li/label[text() = "'.$tag.'"]'))->
-						one()->isPresent());
+						exists());
 					}
 					foreach ($tags_buttons as $button) {
-						$this->assertTrue($tags_container->query('button', $button)->one()->isPresent());
+						$this->assertTrue($tags_container->query('button', $button)->exists());
 					}
 					break;
 				case 'Show hosts in maintenance':
 					$this->assertTrue($form->getField($field)->getLabel('Show suppressed problems')->isPresent());
-					$this->assertTrue($form->query('class:second-column-label')->one()->isPresent());
+					$this->assertTrue($form->query('class:second-column-label')->exists());
 					break;
 			}
 		}
@@ -323,7 +322,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'expected' => []
 				]
 			],
-			// with name 'maintenance', exists 3 hosts in maintenance status. Unchecking 'Show hosts in maintenance'
+			// With name 'maintenance', exists 3 hosts in maintenance status. Unchecking 'Show hosts in maintenance'.
 			[
 				[
 					'filter' => [
@@ -352,10 +351,8 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @dataProvider getCheckFilterData
 	 */
 	public function testPageMonitoringHosts_CheckFilter($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_name=&filter_ip=&filter_dns=&filter_port=' .
-				'&filter_status=-1&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D=&filter_tags%5B0%5D%5Boperator%5D='.
-				'0&filter_tags%5B0%5D%5Bvalue%5D=&filter_maintenance_status=1&filter_show_suppressed=0&filter_set=1');
-		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter']);
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -482,9 +479,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageMonitoringHosts_TagsFilter($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_name=&filter_ip=&filter_dns=&filter_port=' .
-				'&filter_status=-1&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D=&filter_tags%5B0%5D%5Boperator%5D='.
-				'0&filter_tags%5B0%5D%5Bvalue%5D=&filter_maintenance_status=1&filter_show_suppressed=0&filter_set=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
 		$this->setTags($data['tag_options']['tags']);
@@ -499,7 +494,6 @@ class testPageMonitoringHosts extends CWebTest {
 				'0&filter_tags%5B0%5D%5Bvalue%5D=&filter_maintenance_status=1&filter_show_suppressed=0&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$filtered_contents = ['Empty host'];
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
@@ -511,9 +505,9 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		// Check that filtered count mathces expected.
-		$this->assertEquals(count($filtered_contents), $table->getRows()->count());
-		$this->assertRowCount(count($filtered_contents));
+		// Check that filtered count matches expected.
+		$this->assertEquals(count(['Empty host']), $table->getRows()->count());
+		$this->assertRowCount(count(['Empty host']));
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$form->query('button:Reset')->one()->click();
@@ -523,20 +517,26 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->assertEquals($start_contents, $this->getTableResult($reset_rows_count));
 	}
 
-	public function testPageMonitoringHosts_ShowSuppresedProb() {
-		$this->page->login()->open('zabbix.php?action=host.view');
+	/**
+	 * Checking that Show suppressed problems filter works.
+	 */
+	public function testPageMonitoringHosts_ShowSuppresed() {
+		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form->fill(['Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']]);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$before_show_count = $table->getRows()->count();
-		$form->query('name:filter_show_suppressed')->one()->click();
+		$form->query('id:filter_show_suppressed')->asCheckbox()->one()->check();
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertEquals($table->getRows()->count(), $before_show_count + 1);
 	}
 
+	/**
+	 * @param integer $rows_count	Rows amount whom host name should be checked
+	 */
 	private function getTableResult($rows_count) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$result = [];
