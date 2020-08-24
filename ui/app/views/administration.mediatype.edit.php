@@ -24,6 +24,7 @@
  */
 
 $this->addJsFile('multilineinput.js');
+$this->addJsFile('class.tab-indicators.js');
 
 $this->includeJsFile('administration.mediatype.edit.js.php');
 
@@ -289,7 +290,9 @@ $message_templates_formlist = (new CFormList('messageTemplatesFormlist'))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
-$tabs->addTab('messageTemplatesTab', _('Message templates'), $message_templates_formlist);
+$tabs->addTab('messageTemplatesTab', _('Message templates'), $message_templates_formlist,
+	TAB_INDICATOR_MESSAGE_TEMPLATE
+);
 
 // media options tab
 $max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;

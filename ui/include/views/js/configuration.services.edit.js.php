@@ -108,7 +108,9 @@
 
 			td.appendChild(inputRemove);
 			tr.appendChild(td);
-			document.getElementById('service_children').firstChild.appendChild(tr);
+			document
+				.querySelector('#service_children tbody')
+				.appendChild(tr);
 		}
 	}
 

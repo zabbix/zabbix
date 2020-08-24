@@ -1560,6 +1560,16 @@ define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
 define('TAB_INDICATOR_FILTERS', 'filters');
 define('TAB_INDICATOR_OVERRIDES', 'overrides');
+define('TAB_INDICATOR_STEPS', 'steps');
+define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
+define('TAB_INDICATOR_OPERATIONS', 'operations');
+define('TAB_INDICATOR_SERVICE_DEPENDENCY', 'service-dependency');
+define('TAB_INDICATOR_TIME', 'time');
+define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
+define('TAB_INDICATOR_MEDIA', 'media');
+define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
+define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
+define('TAB_INDICATOR_SHARING', 'sharing');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');

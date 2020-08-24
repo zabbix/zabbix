@@ -171,6 +171,7 @@ $servicesDependenciesFormList->addRow(
 // Service times tab.
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = (new CTable())
+	->setId('time-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Type'), _('Interval'), _('Note'), _('Action')]);
 
@@ -343,8 +344,10 @@ if (!$this->data['form_refresh']) {
 }
 $servicesTab
 	->addTab('servicesTab', _('Service'), $servicesFormList)
-	->addTab('servicesDependenciesTab', _('Dependencies'), $servicesDependenciesFormList)
-	->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
+	->addTab('servicesDependenciesTab', _('Dependencies'), $servicesDependenciesFormList,
+		TAB_INDICATOR_SERVICE_DEPENDENCY
+	)
+	->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList, TAB_INDICATOR_TIME);
 
 // append buttons to form
 if ($service && $service['serviceid']) {

@@ -61,6 +61,14 @@ class TabIndicators {
 		const TRIGGER = document.querySelector('#triggersForm');
 		const TRIGGER_PROTOTYPE = document.querySelector('#triggersPrototypeForm');
 		const HOST_DISCOVERY = document.querySelector('#hostDiscoveryForm');
+		const WEB_SCENARIO = document.querySelector('#httpForm');
+		const ACTION = document.querySelector("[id='action.edit']");
+		const SERVICE = document.querySelector('#servicesForm');
+		const PROXY = document.querySelector('#proxyForm');
+		const USER_GROUP = document.querySelector('#userGroupForm');
+		const USER = document.querySelector('#userForm');
+		const MEDIA_TYPE = document.querySelector('#media_type_form');
+		const MAP = document.querySelector('#mapEditForm');
 
 		switch (true) {
 			case !!TEMPLATE:
@@ -81,6 +89,22 @@ class TabIndicators {
 				return TRIGGER_PROTOTYPE;
 			case !!HOST_DISCOVERY:
 				return HOST_DISCOVERY;
+			case !!WEB_SCENARIO:
+				return WEB_SCENARIO;
+			case !!ACTION:
+				return ACTION;
+			case !!SERVICE:
+				return SERVICE;
+			case !!PROXY:
+				return PROXY;
+			case !!USER_GROUP:
+				return USER_GROUP;
+			case !!USER:
+				return USER;
+			case !!MEDIA_TYPE:
+				return MEDIA_TYPE;
+			case !!MAP:
+				return MAP;
 			default:
 				throw 'Form not found.';
 		}
@@ -115,8 +139,7 @@ class TabIndicators {
 			?.map((value) => value[0].toUpperCase() + value.slice(1))
 			?.join('');
 
-		return TabIndicatorFactory
-			.createTabIndicator(class_name)
+		return TabIndicatorFactory.createTabIndicator(class_name)
 	}
 }
 
@@ -152,6 +175,26 @@ class TabIndicatorFactory {
 				return new FiltersTabIndicator;
 			case 'Overrides':
 				return new OverridesTabIndicator;
+			case 'Steps':
+				return new StepsTabIndicator;
+			case 'HttpAuth':
+				return new HttpAuthTabIndicator;
+			case 'Operations':
+				return new OperationsTabIndicator;
+			case 'ServiceDependency':
+				return new ServiceDependencyTabIndicator;
+			case 'Time':
+				return new TimeTabIndicator;
+			case 'TagFilter':
+				return new TagFilterTabIndicator;
+			case 'Media':
+				return new MediaTabIndicator;
+			case 'MessageTemplate':
+				return new MessageTemplateTabIndicator;
+			case 'FrontendMessage':
+				return new FrontendMessageTabIndicator;
+			case 'Sharing':
+				return new SharingTabIndicator;
 		}
 
 		return null;
@@ -247,7 +290,6 @@ class LinkedTemplateTabIndicator extends TabIndicatorCallback {
 		const target_node = document.querySelector('#add_templates_ .multiselect-list');
 		const observer_options = {
 			childList: true,
-			attributes: false,
 			subtree: true
 		};
 
@@ -457,7 +499,6 @@ class GroupsTabIndicator extends TabIndicatorCallback {
 		const target_node = document.querySelector('#group_links_ .multiselect-list');
 		const observer_options = {
 			childList: true,
-			attributes: false,
 			subtree: true
 		};
 
@@ -495,7 +536,6 @@ class PreprocessingTabIndicator extends TabIndicatorCallback {
 		const target_node = document.querySelector('#preprocessing');
 		const observer_options = {
 			childList: true,
-			attributes: false,
 			subtree: true
 		};
 
@@ -533,7 +573,6 @@ class DependencyTabIndicator extends TabIndicatorCallback {
 		const target_node = document.querySelector('#dependency-table tbody');
 		const observer_options = {
 			childList: true,
-			attributes: false,
 			subtree: true
 		};
 
@@ -608,12 +647,15 @@ class FiltersTabIndicator extends TabIndicatorCallback {
 	}
 
 	initObserver(elem) {
+		// FIXME: not working
+
 		const target_node = document.querySelector('#conditions tbody');
 		const observer_options = {
 			childList: true,
 			attributes: true,
 			// attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
-			subtree: true
+			subtree: true,
+			characterData: true,
 		};
 
 		const observer_callback = (mutationList, observer) => {
@@ -643,11 +685,430 @@ class OverridesTabIndicator extends TabIndicatorCallback {
 
 	getValue() {
 		return document
-			.querySelectorAll('.lld-overrides-table tbody .sortable')
+			.querySelectorAll('.lld-overrides-table tbody [data-index]')
 			.length;
 	}
 
 	initObserver(elem) {
+		const target_node = document.querySelector('.lld-overrides-table tbody');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
 
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class StepsTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumber;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('.httpconf-steps-dynamic-row [data-index]')
+			.length;
+	}
+
+	initObserver(elem) {
+		const target_node = document.querySelector('.httpconf-steps-dynamic-row tbody');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class HttpAuthTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		if (document.querySelector('#authentication').value > 0) {
+			return true;
+		}
+
+		if (document.querySelector('#verify_peer:checked') || document.querySelector('#verify_host:checked')) {
+			return true;
+		}
+
+		if (document.querySelector('#ssl_cert_file').value !== ''
+				|| document.querySelector('#ssl_key_file').value !== ''
+				|| document.querySelector('#ssl_key_password').value !== '') {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver(elem) {
+		document
+			.querySelector('#authentication')
+			?.addEventListener('change', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+
+		[...document.querySelectorAll('#verify_peer, #verify_host')].map((value) => {
+			value.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+		});
+
+		[...document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')].map((value) => {
+			value.addEventListener('change', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+		});
+	}
+}
+
+class OperationsTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumber;
+	}
+
+	getValue() {
+		let count = 0;
+		count += document.querySelectorAll('#op-table tbody tr:not(:last-child)').length;
+		count += document.querySelectorAll('#rec-table tbody tr:not(:last-child)').length;
+		count += document.querySelectorAll('#ack-table tbody tr:not(:last-child)').length;
+
+		return count;
+	}
+
+	initObserver(elem) {
+		const target_node_op = document.querySelector('#op-table tbody');
+		const target_node_rec = document.querySelector('#rec-table tbody');
+		const target_node_ack = document.querySelector('#ack-table tbody');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node_op) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node_op, observer_options);
+		}
+
+		if (target_node_rec) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node_rec, observer_options);
+		}
+
+		if (target_node_ack) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node_ack, observer_options);
+		}
+	}
+}
+
+class ServiceDependencyTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumber;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#service_children tbody tr')
+			.length;
+	}
+
+	initObserver(elem) {
+		const target_node = document.querySelector('#service_children tbody');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class TimeTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumber;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#time-table tbody tr')
+			.length;
+	}
+
+	initObserver(elem) {
+		const target_node = document.querySelector('#time-table tbody');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class TagFilterTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#tag-filter-table tbody tr')
+			.length > 0;
+	}
+
+	initObserver(elem) {
+		// FIXME: table is replaced by ajax.
+
+		const target_node = document.querySelector('#tag-filter-table');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class MediaTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumber;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#media-table tbody tr')
+			.length;
+	}
+
+	initObserver(elem) {
+		const target_node = document.querySelector('#media-table tbody');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class MessageTemplateTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorNumber;
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#message-templates tbody tr:not(:last-child)')
+			.length;
+	}
+
+	initObserver(elem) {
+		const target_node = document.querySelector('#message-templates tbody');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-count', this.getValue());
+						break;
+				}
+			});
+		};
+
+		if (target_node) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node, observer_options);
+		}
+	}
+}
+
+class FrontendMessageTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		return document
+			.querySelector('#messages_enabled')
+			.checked;
+	}
+
+	initObserver(elem) {
+		document
+			.querySelector('#messages_enabled')
+			?.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+	}
+}
+
+class SharingTabIndicator extends TabIndicatorCallback {
+
+	constructor() {
+		super();
+		this.TYPE = new TabIndicatorStatus;
+	}
+
+	getValue() {
+		if (document.querySelector("[name='private']:checked").value > 0) {
+			return true;
+		}
+
+		if (document.querySelectorAll('#user-group-share-table tbody tr:not(:last-child)').length > 0
+				|| document.querySelectorAll('#user-share-table tbody tr:not(:last-child)').length > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver(elem) {
+		[...document.querySelectorAll('[name=private]')].map((value) => {
+			value?.addEventListener('click', () => {
+				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+			});
+		});
+
+		const target_node_group = document.querySelector('#user-group-share-table tbody');
+		const target_node_user = document.querySelector('#user-share-table tbody');
+		const observer_options = {
+			childList: true,
+			subtree: true
+		};
+
+		const observer_callback = (mutationList, observer) => {
+			mutationList.forEach((mutation) => {
+				switch (mutation.type) {
+					case 'childList':
+						elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
+						break;
+				}
+			});
+		};
+
+		if (target_node_group) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node_group, observer_options);
+		}
+
+		if (target_node_user) {
+			const observer = new MutationObserver(observer_callback);
+			observer.observe(target_node_user, observer_options);
+		}
 	}
 }

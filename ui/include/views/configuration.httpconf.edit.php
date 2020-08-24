@@ -230,8 +230,8 @@ $http_step_form_list->addRow((new CLabel(_('Steps'), $steps_table->getId()))->se
 // append tabs to form
 $http_tab = (new CTabView())
 	->addTab('scenarioTab', _('Scenario'), $http_form_list)
-	->addTab('stepTab', _('Steps'), $http_step_form_list)
-	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list);
+	->addTab('stepTab', _('Steps'), $http_step_form_list, TAB_INDICATOR_STEPS)
+	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list, TAB_INDICATOR_HTTP_AUTH);
 if (!$this->data['form_refresh']) {
 	$http_tab->setSelected(0);
 }

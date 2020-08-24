@@ -165,7 +165,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 }
 
 // create operation table
-$operations_table = (new CTable())->setAttribute('style', 'width: 100%;');
+$operations_table = (new CTable())
+	->setId('op-table')
+	->setAttribute('style', 'width: 100%;');
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operations_table->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
 	$delays = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
@@ -312,7 +314,9 @@ $operation_tab->addRow(_('Operations'),
 // Recovery operation tab.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	// Create operation table.
-	$operations_table = (new CTable())->setAttribute('style', 'width: 100%;');
+	$operations_table = (new CTable())
+		->setId('rec-table')
+		->setAttribute('style', 'width: 100%;');
 	$operations_table->setHeader([_('Details'), _('Action')]);
 
 	if ($data['action']['recovery_operations']) {
@@ -395,7 +399,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$action_formname = $actionForm->getName();
 
-	$operations_table = (new CTable())->setAttribute('style', 'width: 100%;');
+	$operations_table = (new CTable())
+		->setId('ack-table')
+		->setAttribute('style', 'width: 100%;');
 	$operations_table->setHeader([_('Details'), _('Action')]);
 
 	if ($data['action']['ack_operations']) {
@@ -467,7 +473,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 // Append tabs to form.
 $action_tabs = (new CTabView())
 	->addTab('actionTab', _('Action'), $action_tab)
-	->addTab('operationTab', _('Operations'), $operation_tab);
+	->addTab('operationTab', _('Operations'), $operation_tab, TAB_INDICATOR_OPERATIONS);
 
 if (!hasRequest('form_refresh')) {
 	$action_tabs->setSelected(0);

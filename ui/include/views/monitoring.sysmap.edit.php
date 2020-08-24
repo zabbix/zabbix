@@ -296,6 +296,7 @@ $tabs->addTab('sysmap_tab', _('Map'), $map_tab);
 
 // User group sharing table.
 $user_group_shares_table = (new CTable())
+	->setId('user-group-share-table')
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
 	->setAttribute('style', 'width: 100%;');
 
@@ -332,6 +333,7 @@ $js_insert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => 
 
 // User sharing table.
 $user_shares_table = (new CTable())
+	->setId('user-share-table')
 	->setHeader([_('Users'), _('Permissions'), _('Action')])
 	->setAttribute('style', 'width: 100%;');
 
@@ -387,7 +389,7 @@ $sharing_tab = (new CFormList('sharing_form'))
 	);
 
 // Append data to form.
-$tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
+$tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab, TAB_INDICATOR_SHARING);
 
 // Append buttons to form.
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'full_clone') {

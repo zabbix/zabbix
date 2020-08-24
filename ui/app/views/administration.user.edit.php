@@ -29,6 +29,7 @@ $this->includeJsFile(($data['action'] === 'user.edit')
 	: 'administration.userprofile.edit.js.php'
 );
 $this->addJsFile('multiselect.js');
+$this->addJsFile('class.tab-indicators.js');
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
@@ -231,6 +232,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 	$user_form->addVar('medias', $data['medias']);
 
 	$media_table_info = (new CTable())
+		->setId('media-table')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), ('Status'), _('Action')]);
 
@@ -317,7 +319,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
-	$tabs->addTab('mediaTab', _('Media'), $media_form_list);
+	$tabs->addTab('mediaTab', _('Media'), $media_form_list, TAB_INDICATOR_MEDIA);
 }
 
 // Permissions tab.
@@ -456,7 +458,7 @@ if ($data['action'] !== 'user.edit') {
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
 		);
 
-	$tabs->addTab('messagingTab', _('Messaging'), $messaging_form_list);
+	$tabs->addTab('messagingTab', _('Messaging'), $messaging_form_list, TAB_INDICATOR_FRONTEND_MESSAGE);
 }
 
 // Append buttons to form.
