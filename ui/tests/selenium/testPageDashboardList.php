@@ -52,32 +52,30 @@ class testPageDashboardList extends CWebTest {
 
 		// Check filter fields.
 		$filter_fields = ['Name', 'Show'];
-		$filter_form = $this->query('name:zbx_filter')->one()->asForm();
+		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$this->assertEquals($filter_fields, $filter_form->getLabels()->asText());
 		foreach (['All', 'Created by me'] as $show_tag) {
-			$this->assertTrue($filter_form->query('xpath://ul[@id="filter_show"]/li/label[text()="'.$show_tag.'"]')
-				->one()->isPresent());
+			$this->assertTrue($filter_form->query('xpath://ul[@id="filter_show"]/li/label[text()="'.$show_tag.'"]')->exists());
 		};
 
 		// Check filter buttons.
 		foreach (['Apply', 'Reset'] as $button) {
-			$this->assertTrue($filter_form->query('button', $button)->one()->isPresent());
+			$this->assertTrue($filter_form->query('button', $button)->exists());
 		}
 
 		// Check dashboard list button.
-		$dashboard_form = $this->query('name:dashboardForm')->one()->asForm();
-		$this->assertTrue($dashboard_form->query('button:Delete')->one()->isPresent());
+		$this->assertTrue(($this->query('name:dashboardForm')->asForm()->one())->query('button:Delete')->exists());
 
 		// Check header buttons.
-		$this->assertTrue($this->query('button:Create dashboard')->one()->isPresent());
-		$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->one()->isPresent());
+		$this->assertTrue($this->query('button:Create dashboard')->exists());
+		$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
 	}
 
 	public static function getCheckFilterData() {
 		return [
 			[
 				[
-					'field' => [
+					'fields' => [
 						'Show' => 'All'
 					],
 					'result_count' => 14
@@ -85,7 +83,7 @@ class testPageDashboardList extends CWebTest {
 			],
 			[
 				[
-					'field' => [
+					'fields' => [
 						'Show' => 'Created by me'
 					],
 					'result_count' => 13
@@ -93,7 +91,7 @@ class testPageDashboardList extends CWebTest {
 			],
 			[
 				[
-					'field' => [
+					'fields' => [
 						'Name' => 'graph',
 						'Show' => 'All'
 					],
@@ -102,7 +100,7 @@ class testPageDashboardList extends CWebTest {
 			],
 			[
 				[
-					'field' => [
+					'fields' => [
 						'Name' => 'widget',
 						'Show' => 'Created by me'
 					],
@@ -111,7 +109,7 @@ class testPageDashboardList extends CWebTest {
 			],
 			[
 				[
-					'field' => [
+					'fields' => [
 						'Name' => '5'
 					],
 					'result_count' => 0
@@ -119,7 +117,7 @@ class testPageDashboardList extends CWebTest {
 			],
 			[
 				[
-					'field' => [
+					'fields' => [
 						'Name' => 'Dashboard for Dynamic item'
 					],
 					'result_count' => 1
@@ -127,7 +125,7 @@ class testPageDashboardList extends CWebTest {
 			],
 			[
 				[
-					'field' => [
+					'fields' => [
 						'Name' => 'Dashboard for Share testing',
 						'Show' => 'Created by me'
 					],
@@ -145,8 +143,8 @@ class testPageDashboardList extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$start_rows_count = $table->getRows()->count();
 		$this->assertRowCount($start_rows_count);
-		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$form->fill($data['field']);
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->fill($data['fields']);
 		$form->submit();
 
 		// Check that filtered count matches expected.
@@ -173,9 +171,10 @@ class testPageDashboardList extends CWebTest {
 		foreach ($dashboards as $dashboard) {
 			if ($dashboard['userid'] == 1) {
 				$this->assertEquals('My', $this->getTagText($table, $dashboard['name'], 'green'));
-			}
-			if ($dashboard['private'] == 0 && $dashboard['userid'] == 1) {
-				$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
+
+				if ($dashboard['private'] == 0) {
+					$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
+				}
 			}
 
 			// Checking that Admin dashboards, shared with groups, has Shared tag.
@@ -241,8 +240,8 @@ class testPageDashboardList extends CWebTest {
 	 */
 	private function assertDashboardOwner($ids, $dashboard, $table) {
 		foreach ($ids as $id) {
-			if ($id['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1 ) {
-					$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
+			if ($id['dashboardid'] == $dashboard['dashboardid'] && $dashboard['userid'] == 1) {
+				$this->assertEquals('Shared', $this->getTagText($table, $dashboard['name'], 'yellow'));
 			}
 		}
 	}

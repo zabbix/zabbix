@@ -537,6 +537,7 @@ class CPage {
 	 * @param string $password  Password on login screen
 	 */
 	public function userLogin($alias, $password) {
+		$this->logout();
 		$this->open('index.php');
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
