@@ -21,6 +21,7 @@ package plugins
 
 import (
 	_ "zabbix.com/plugins/log"
+	_ "zabbix.com/plugins/mqtt"
 	_ "zabbix.com/plugins/net/netif"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/net/udp"

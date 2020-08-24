@@ -6,6 +6,7 @@ require (
 	github.com/alimy/mc/v2 v2.0.3
 	github.com/docker/go-connections v0.4.0
 	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
+	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/go-ole/go-ole v1.2.4
