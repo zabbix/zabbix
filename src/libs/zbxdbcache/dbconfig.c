@@ -5393,6 +5393,12 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (ZBX_SYNC_SECRETS == mode)
+	{
+		DCsync_kvs_path(NULL);
+		goto skip;
+	}
+
 	zbx_dbsync_init_env(config);
 
 	/* global configuration must be synchronized directly with database */
@@ -6053,7 +6059,7 @@ out:
 	zbx_dbsync_clear(&hgroup_host_sync);
 
 	zbx_dbsync_free_env();
-
+skip:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 

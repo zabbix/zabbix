@@ -435,6 +435,7 @@ zbx_graph_yaxis_types_t;
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
+#define ZBX_SECRETS_RELOAD	"secrets_reload"
 #define ZBX_HOUSEKEEPER_EXECUTE	"housekeeper_execute"
 #define ZBX_LOG_LEVEL_INCREASE	"log_level_increase"
 #define ZBX_LOG_LEVEL_DECREASE	"log_level_decrease"
@@ -930,6 +931,7 @@ zbx_task_t;
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
 #define ZBX_RTC_CONFIG_CACHE_RELOAD	8
 #define ZBX_RTC_SNMP_CACHE_RELOAD	9
+#define ZBX_RTC_SECRETS_RELOAD		10
 
 typedef enum
 {

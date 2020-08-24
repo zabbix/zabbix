@@ -221,7 +221,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 						" cannot be performed for a passive proxy");
 				return;
 			}
-
+			ZBX_FALLTHROUGH;
+		case ZBX_RTC_SECRETS_RELOAD:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_CONFSYNCER, 1, flags);
 			break;
 		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
