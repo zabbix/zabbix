@@ -32,8 +32,11 @@ typedef struct
 	CURL			*handle;
 	struct curl_slist	*headers;
 	char			*data;
+	char			*headers_in;
 	size_t			data_alloc;
 	size_t			data_offset;
+	size_t			headers_in_alloc;
+	size_t			headers_in_offset;
 	unsigned char		custom_header;
 }
 zbx_es_httprequest_t;
@@ -52,10 +55,20 @@ zbx_es_httprequest_t;
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
-	size_t				r_size = size * nmemb;
+	size_t			r_size = size * nmemb;
 	zbx_es_httprequest_t	*request = (zbx_es_httprequest_t *)userdata;
 
 	zbx_strncpy_alloc(&request->data, &request->data_alloc, &request->data_offset, (const char *)ptr, r_size);
+
+	return r_size;
+}
+
+static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	size_t			r_size = size * nmemb;
+	zbx_es_httprequest_t	*request = (zbx_es_httprequest_t *)userdata;
+
+	zbx_strncpy_alloc(&request->headers_in, &request->headers_in_alloc, &request->headers_in_offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
@@ -99,6 +112,7 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 		if (NULL != request->handle)
 			curl_easy_cleanup(request->handle);
 		zbx_free(request->data);
+		zbx_free(request->headers_in);
 		zbx_free(request);
 
 		duk_push_pointer(ctx, NULL);
@@ -152,6 +166,8 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYPEER, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT, (long)env->timeout, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
 
 	duk_push_pointer(ctx, request);
 	duk_put_prop_string(ctx, -2, "\xff""\xff""d");
@@ -407,6 +423,81 @@ static duk_ret_t	es_httprequest_status(duk_context *ctx)
 	return 1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: es_obj_put_http_header                                           *
+ *                                                                            *
+ * Purpose: puts http header <field>: <value> as object property/value        *
+ *                                                                            *
+ * Parameters: ctx    - [IN] the duktape context                              *
+ *             idx    - [IN] the object index on duktape stack                *
+ *             header - [IN] the http header to parse and put                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	es_put_header(duk_context *ctx, int idx, char *header)
+{
+	char	*value;
+
+	if (NULL == (value = strchr(header, ':')))
+		return;
+
+	*value++ = '\0';
+	while (' ' == *value || '\t' == *value)
+		value++;
+
+	duk_push_string(ctx, value);
+
+	/* duk_put_prop_string() throws error on failure, no need to check return code */
+	(void)duk_put_prop_string(ctx, idx, header);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: es_httprequest_get_headers                                       *
+ *                                                                            *
+ * Purpose: CurlHttpRequest.GetHeaders method                                 *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
+{
+	zbx_es_httprequest_t	*request;
+	duk_idx_t		idx;
+	char			*ptr, *line = NULL, *header = NULL;
+	size_t			line_alloc = 0, line_offset = 0;
+
+
+	if (NULL == (request = es_httprequest(ctx)))
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+
+	idx = duk_push_object(ctx);
+
+	/* skip status response */
+	header = strchr(request->headers_in, '\r') + 2;
+
+	/* iterate header fields */
+	while (NULL != (ptr = strchr(header, '\r')) && '\0' != *ptr)
+	{
+		if (' ' == *header || '\t' == *header)
+		{
+			zbx_strncpy_alloc(&line, &line_alloc, &line_offset, header + 1, ptr - header);
+		}
+		else
+		{
+			if (0 != line_offset)
+				es_put_header(ctx, idx, line);
+
+			line_offset = 0;
+			zbx_strncpy_alloc(&line, &line_alloc, &line_offset, header, ptr - header);
+		}
+		header = ptr + 2;
+	}
+
+	if (0 != line_offset)
+		es_put_header(ctx, idx, line);
+
+	return 1;
+}
+
 static const duk_function_list_entry	httprequest_methods[] = {
 	{"AddHeader", es_httprequest_add_header, 1},
 	{"ClearHeader", es_httprequest_clear_header, 0},
@@ -416,6 +507,7 @@ static const duk_function_list_entry	httprequest_methods[] = {
 	{"Delete", es_httprequest_delete, 2},
 	{"Status", es_httprequest_status, 0},
 	{"SetProxy", es_httprequest_set_proxy, 1},
+	{"GetHeaders", es_httprequest_get_headers, 0},
 	{NULL, NULL, 0}
 };
 
