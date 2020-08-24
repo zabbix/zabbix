@@ -1382,7 +1382,7 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (513,
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,posts,headers) VALUES ('Item-proto-layout-test-002', 'item-proto-layout-test002', 50007, 3, 40061, 2, 5, '', '','','');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (514, 40061, 40059);
 INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40062,0,50006,'Item-layout-test-001','item-layout-test-001','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50020,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40063,0,50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50019,'',0,'30','','');
+INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (40063,0,50007,'Item-layout-test-002','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50019,'{{$A}}',0,'30','','');
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (100022,'{100022}=0','Trigger-proto-layout-test-001','',0,0,0,0,'','',NULL,0,0,2);
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100022,40060,100022,'last','0');
 INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (100023, '{100023}=0', 'Trigger-proto-layout-test-001', '', 2);
@@ -1768,9 +1768,9 @@ INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastchec
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'Host for different item types', 'Host for different items types', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90281, 50010, 4);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50023,50010,1,1,1,'127.0.0.1','','10050');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99004, 19, 50010, 'Http agent item form', '', 'http-item-form', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99005, 19, 50010, 'Http agent item for update', '', 'http-item-update', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, headers) VALUES (99006, 19, 50010, 'Http agent item for delete', '', 'http-item-delete', 30, 50023, '', '', 'zabbix.com', '', '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99004, 19, 50010, 'Http agent item form', '{$_} {$NONEXISTING}', 'http-item-form', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99005, 19, 50010, 'Http agent item for update', '{$LOCALIP} {$A}', 'http-item-update', 30, 50023, '', '', 'zabbix.com', '', '[{"user":"admin"}]','Content-Type: text/plain');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, headers) VALUES (99006, 19, 50010, 'Http agent item for delete', '{$A} and IP number {$LOCALIP}', 'http-item-delete', 30, 50023, '', '', 'zabbix.com', '', '');
 
 -- testInheritanceApplication
 INSERT INTO applications (applicationid, hostid, name) VALUES (99001, 15000, 'Inheritance application');
@@ -1965,7 +1965,7 @@ INSERT INTO hstgrp (groupid,name,internal) VALUES (50009,'Copy graph to several 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99027, 'Host 1 from first group', 'Host 1 from first group', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99025, 99027, 50009);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50037,99027,1,1,1,'127.0.0.1','','10050');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99020, 2, 99027, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99020, 2, 99027, 'Item to check graph', '{$A}', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50010,'Copy graph to several groups 2',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Host 1 from second group', 'Host 1 from second group', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99026, 99028, 50010);
