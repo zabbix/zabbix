@@ -30,6 +30,7 @@ typedef struct
 }
 zbx_kv_t;
 
+int	init_token_from_env(char **error);
 int	init_database_credentials_from_vault(char **error);
 int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error);
 int	zbx_kvs_from_json_create(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,

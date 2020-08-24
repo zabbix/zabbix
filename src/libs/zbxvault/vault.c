@@ -171,6 +171,27 @@ void	zbx_kvs_from_vault_destroy(zbx_hashset_t *kvs)
 	zbx_hashset_destroy(kvs);
 }
 
+int	init_token_from_env(char **error)
+{
+#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV)
+	char	*ptr;
+
+	if (NULL == (ptr = getenv("VAULT_TOKEN")))
+		return SUCCEED;
+
+	if (NULL != CONFIG_VAULTTOKEN)
+	{
+		*error = zbx_dsprintf(*error, "both \"VaultToken\" configuration parameter"
+				" and \"VAULT_TOKEN\" environment variable are defined");
+		return FAIL;
+	}
+
+	CONFIG_VAULTTOKEN = zbx_strdup(NULL, ptr);
+	unsetenv("VAULT_TOKEN");
+#endif
+	return SUCCEED;
+}
+
 int	init_database_credentials_from_vault(char **error)
 {
 	int		ret = FAIL;
