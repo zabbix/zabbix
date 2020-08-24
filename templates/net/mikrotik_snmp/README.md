@@ -64,13 +64,13 @@ No specific Zabbix configuration is required.
 |Temperature |Device: Temperature |<p>MIB: MIKROTIK-MIB</p><p>(mtxrHlTemperature) Device temperature in Celsius (degrees C). Might be missing in entry models (RB750, RB450G..)</p><p>Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</p> |SNMP |sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p> |
 |Wireless |Interface {#IFNAME}({#IFALIAS}): SSID |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApSsid</p> |SNMP |ssid.name[mtxrWlApSsid.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Wireless |Interface {#IFNAME}({#IFALIAS}): AP band |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApBand</p> |SNMP |ssid.band[mtxrWlApBand.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Wireless |Interface {#IFNAME}({#IFALIAS}): AP noise |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApNoiseFloor</p> |SNMP |ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Wireless |Interface {#IFNAME}({#IFALIAS}): AP regclient |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApClientCount</p> |SNMP |ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}] |
-|Wireless |Interface {#IFNAME}({#IFALIAS}): AP authclient |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApAuthClientCount</p> |SNMP |ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}] |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): AP noise floor |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApNoiseFloor</p> |SNMP |ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): AP registered clients |<p>MIB: MIKROTIK-MIB</p><p>(mtxrWlApClientCount) Client established connection to AP, but didn't finish all authetncation procedures for full connection</p> |SNMP |ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}] |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): AP authenticated clients |<p>MIB: MIKROTIK-MIB</p><p>(mtxrWlApAuthClientCount) Number of authentication clients</p> |SNMP |ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}] |
 |Wireless |Interface {#IFNAME}({#IFALIAS}): AP channel |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMChannel</p> |SNMP |ssid.channel[mtxrWlCMChannel.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Wireless |Interface {#IFNAME}({#IFALIAS}): AP state |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMState</p> |SNMP |ssid.state[mtxrWlCMState.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Wireless |Interface {#IFNAME}({#IFALIAS}): AP regclient |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMRegClientCount</p> |SNMP |ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}] |
-|Wireless |Interface {#IFNAME}({#IFALIAS}): AP authclient |<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMAuthClientCount</p> |SNMP |ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}] |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): AP state |<p>MIB: MIKROTIK-MIB</p><p>(mtxrWlCMState) Wireless interface state</p> |SNMP |ssid.state[mtxrWlCMState.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): AP registered clients |<p>MIB: MIKROTIK-MIB</p><p>(mtxrWlCMRegClientCount) Client established connection to AP, but didn't finish all authetncation procedures for full connection</p> |SNMP |ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}] |
+|Wireless |Interface {#IFNAME}({#IFALIAS}): AP authenticated clients |<p>MIB: MIKROTIK-MIB</p><p>(mtxrWlCMAuthClientCount) Number of authentication clients</p> |SNMP |ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}] |
 
 ## Triggers
 
