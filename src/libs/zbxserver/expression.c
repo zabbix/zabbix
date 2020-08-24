@@ -910,18 +910,9 @@ static int	get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
  *             replace_to - [OUT] expanded item name or key if name is absent *
  *                                                                            *
  ******************************************************************************/
-int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to)
+void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to)
 {
-	int	ret;
 	char	*key;
-
-	if (INTERFACE_TYPE_UNKNOWN == dc_item->interface.type)
-		ret = DCconfig_get_interface(&dc_item->interface, dc_item->host.hostid, 0);
-	else
-		ret = SUCCEED;
-
-	if (ret == FAIL)
-		return FAIL;
 
 	key = zbx_strdup(NULL, dc_item->key_orig);
 	substitute_key_macros_impl(&key, NULL, dc_item, NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
@@ -937,8 +928,6 @@ int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **r
 		zbx_free(*replace_to);
 		*replace_to = key;
 	}
-
-	return ret;
 }
 
 /******************************************************************************
@@ -996,7 +985,10 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
-					ret = zbx_substitute_item_name_macros(&dc_item, row[3], replace_to);
+				{
+					zbx_substitute_item_name_macros(&dc_item, row[3], replace_to);
+					ret = SUCCEED;
+				}
 
 				DCconfig_clean_items(&dc_item, &errcode, 1);
 				break;
@@ -1004,7 +996,10 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
 
 				if (SUCCEED == errcode)
-					ret = zbx_substitute_item_name_macros(&dc_item, NULL, replace_to);
+				{
+					zbx_substitute_item_name_macros(&dc_item, NULL, replace_to);
+					ret = SUCCEED;
+				}
 
 				DCconfig_clean_items(&dc_item, &errcode, 1);
 				break;
