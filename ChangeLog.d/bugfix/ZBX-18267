@@ -1,0 +1,1 @@
+........S. [ZBX-18267] fixed {ITEM.NAME<1-9>} and {ITEM.KEY<1-9>} macro expansion when host is configured without any interfaces (viktors)
