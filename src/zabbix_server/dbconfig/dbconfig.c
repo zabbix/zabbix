@@ -118,8 +118,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		else
 		{
 			DCsync_configuration(ZBX_DBSYNC_UPDATE, NULL);
-			nextcheck = time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 			DCupdate_hosts_availability();
+			nextcheck = time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 		}
 
 		sec = zbx_time() - sec;
