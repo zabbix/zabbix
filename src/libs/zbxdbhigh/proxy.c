@@ -4361,7 +4361,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp), NULL))
 		{
 			port = ZBX_DEFAULT_AGENT_PORT;
-			connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 		}
 		else if (FAIL == is_ushort(tmp, &port))
 		{
