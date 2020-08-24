@@ -2470,7 +2470,7 @@ class C52XmlValidator {
 
 		if (!array_key_exists('elementtype', $data) || !in_array($data['elementtype'], $element_types)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
-				'elementtype', _s('value must be one of %1$s', $element_types)
+				'elementtype', _s('value must be one of %1$s', implode(', ', $element_types))
 			));
 		}
 
