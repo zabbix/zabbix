@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-08-24T08:26:47Z</date>
+   <date>2020-08-24T13:48:10Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1724,7 +1724,7 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                      <dependencies>
                         <dependency>
                            <name>MSSQL: Service is unavailable</name>
-                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].max(#3)}=0</expression>
+                           <expression>{Template DB MSSQL by ODBC:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -1933,9 +1933,15 @@ WHERE a.counter_name = 'Cache Hit Ratio'
                <valuemap>
                   <name>Service state</name>
                </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>10m</params>
+                  </step>
+               </preprocessing>
                <triggers>
                   <trigger>
-                     <expression>{max(#3)}=0</expression>
+                     <expression>{last()}=0</expression>
                      <name>MSSQL: Service is unavailable</name>
                      <priority>DISASTER</priority>
                      <description>The TCP port of the MS SQL Server service is currently unavailable.</description>

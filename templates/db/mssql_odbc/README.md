@@ -85,7 +85,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|MSSQL |MSSQL: Service's TCP port state |<p>Test the availability of MS SQL Server on TCP port.</p> |SIMPLE |net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}] |
+|MSSQL |MSSQL: Service's TCP port state |<p>Test the availability of MS SQL Server on TCP port.</p> |SIMPLE |net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |MSSQL |MSSQL: Version |<p>MS SQL Server version.</p> |DEPENDENT |mssql.version<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}' && @.counter_name=='Version')].instance_name.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |MSSQL |MSSQL: Uptime |<p>MS SQL Server uptime in 'N days, hh:mm:ss' format.</p> |DEPENDENT |mssql.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}' && @.counter_name=='Uptime')].cntr_value.first()`</p> |
 |MSSQL |MSSQL: Forwarded records per second |<p>Number of records per second fetched through forwarded record pointers.</p> |DEPENDENT |mssql.forwarded_records_sec.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.object_name=='{$MSSQL.INSTANCE}:Access Methods' && @.counter_name=='Forwarded Records/sec')].cntr_value.first()`</p><p>- CHANGE_PER_SECOND |
@@ -197,7 +197,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|MSSQL: Service is unavailable |<p>The TCP port of the MS SQL Server service is currently unavailable.</p> |`{TEMPLATE_NAME:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].max(#3)}=0` |DISASTER | |
+|MSSQL: Service is unavailable |<p>The TCP port of the MS SQL Server service is currently unavailable.</p> |`{TEMPLATE_NAME:net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}].last()}=0` |DISASTER | |
 |MSSQL: Version has changed (new version value received: {ITEM.VALUE}) |<p>MSSQL version has changed. Ack to close.</p> |`{TEMPLATE_NAME:mssql.version.diff()}=1 and {TEMPLATE_NAME:mssql.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |MSSQL: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:mssql.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |MSSQL: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:mssql.uptime.nodata(30m)}=1` |INFO |<p>**Depends on**:</p><p>- MSSQL: Service is unavailable</p> |
