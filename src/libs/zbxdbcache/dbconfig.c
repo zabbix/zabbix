@@ -101,6 +101,7 @@ static void	dc_maintenance_precache_nested_groups(void);
 /* by default the macro environment is non-secure and all secret macros are masked with ****** */
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
 extern char		*CONFIG_VAULTDBPATH;
+extern char		*CONFIG_VAULTTOKEN;
 /******************************************************************************
  *                                                                            *
  * Function: dc_strdup                                                        *
@@ -1521,6 +1522,16 @@ done:
 #endif
 		ZBX_STR2UCHAR(host->tls_connect, row[29]);
 		ZBX_STR2UCHAR(host->tls_accept, row[30]);
+
+		if ((HOST_STATUS_PROXY_PASSIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_connect)) ||
+				(HOST_STATUS_PROXY_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_accept)))
+		{
+			if (NULL != CONFIG_VAULTTOKEN)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Zabbix proxy \"%s\" uses unencrypted connection",
+						host->host);
+			}
+		}
 
 		if (0 == found)
 		{
