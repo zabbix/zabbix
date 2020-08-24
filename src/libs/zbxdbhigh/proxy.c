@@ -35,6 +35,7 @@
 #include "zbxvault.h"
 
 extern char	*CONFIG_SERVER;
+extern char	*CONFIG_VAULTDBPATH;
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -910,7 +911,17 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 
 			if (NULL == key)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" value \"%s\"",
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse macro \"%s\" value \"%s\"",
+						row[1 + offset], row[2 + offset]);
+				goto next;
+			}
+
+			if (NULL != CONFIG_VAULTDBPATH && 0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
+							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse macro \"%s\" value \"%s\":"
+						" database credentials should not be used with Vault macros",
 						row[1 + offset], row[2 + offset]);
 				goto next;
 			}

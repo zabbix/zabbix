@@ -100,7 +100,7 @@ static void	dc_maintenance_precache_nested_groups(void);
 
 /* by default the macro environment is non-secure and all secret macros are masked with ****** */
 static unsigned char	macro_env = ZBX_MACRO_ENV_NONSECURE;
-
+extern char		*CONFIG_VAULTDBPATH;
 /******************************************************************************
  *                                                                            *
  * Function: dc_strdup                                                        *
@@ -1945,10 +1945,23 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 			continue;
 		}
 
-		if (ZBX_MACRO_VALUE_VAULT == type && FAIL == (parse_vault_macro_value(row[2], &path, &key)))
+		if (ZBX_MACRO_VALUE_VAULT == type)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" value \"%s\"", row[1], row[2]);
-			continue;
+			if (FAIL == (parse_vault_macro_value(row[2], &path, &key)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" value \"%s\"", row[1], row[2]);
+				continue;
+			}
+
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != CONFIG_VAULTDBPATH &&
+					0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
+							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse macro \"%s\" value \"%s\": database"
+						" credentials should not be used with Vault macros", row[1], row[2]);
+				continue;
+			}
 		}
 
 		gmacro = (ZBX_DC_GMACRO *)DCfind_id(&config->gmacros, globalmacroid, sizeof(ZBX_DC_GMACRO), &found);
@@ -2084,10 +2097,25 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 			continue;
 		}
 
-		if (ZBX_MACRO_VALUE_VAULT == type && FAIL == (parse_vault_macro_value(row[3], &path, &key)))
+		if (ZBX_MACRO_VALUE_VAULT == type)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" value \"%s\"", row[1], row[2], row[3]);
-			continue;
+			if (FAIL == (parse_vault_macro_value(row[3], &path, &key)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" value \"%s\"",
+						row[1], row[2], row[3]);
+				continue;
+			}
+
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && NULL != CONFIG_VAULTDBPATH &&
+					0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+					(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
+							|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" value \"%s\":"
+						" database credentials should not be used with Vault macros", row[1],
+						row[2], row[3]);
+				continue;
+			}
 		}
 
 		hmacro = (ZBX_DC_HMACRO *)DCfind_id(&config->hmacros, hostmacroid, sizeof(ZBX_DC_HMACRO), &found);
