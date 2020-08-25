@@ -51,8 +51,6 @@ void	zbx_vault_kv_clean(void *data)
 	zbx_kv_t	*kv = (zbx_kv_t *)data;
 
 	zbx_free(kv->key);
-
-	zbx_guaranteed_memset(kv->value, 0, strlen(kv->value));
 	zbx_free(kv->value);
 }
 

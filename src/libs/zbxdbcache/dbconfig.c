@@ -925,12 +925,13 @@ static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 {
 	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
 	int			i;
-	char			*path = NULL, *key = NULL;
+	char			*path, *key;
 
 	if (0 != --kv->refcount)
 		return;
 
 	zbx_strsplit(value, ':', &path, &key);
+	zbx_free(key);
 
 	zbx_strpool_release(kv->key);
 	if (NULL != kv->value)
@@ -949,11 +950,11 @@ static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 
 	if (0 == kvs_path->kvs.num_data)
 	{
+		zbx_strpool_release(kvs_path->path);
 		__config_mem_free_func(kvs_path);
 		zbx_vector_ptr_remove_noorder(&config->kvs_paths, i);
 	}
 clean:
-	zbx_free(key);
 	zbx_free(path);
 }
 
@@ -2133,7 +2134,6 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 			update_index = 1;
 		}
 
-
 		if (0 != found && NULL != hmacro->kv)
 			config_kvs_path_remove(hmacro->value, hmacro->kv);
 
@@ -2219,7 +2219,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
+static int	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -2236,7 +2236,7 @@ static int	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
 
 	for (i = 0; i < config->kvs_paths.values_num; i++)
 	{
-		char		*error = NULL;
+		char	*error = NULL;
 
 		dc_kvs_path = (zbx_dc_kvs_path_t *)config->kvs_paths.values[i];
 
@@ -5385,7 +5385,7 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 
 	if (ZBX_SYNC_SECRETS == mode)
 	{
-		DCsync_kvs_path(NULL);
+		DCsync_kvs_paths(NULL);
 		goto skip;
 	}
 
@@ -5491,7 +5491,7 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 	host_tag_sec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
-	if (FAIL == DCsync_kvs_path(jp_kvs_paths))
+	if (FAIL == DCsync_kvs_paths(jp_kvs_paths))
 	{
 		START_SYNC;
 		goto out;
@@ -5905,6 +5905,7 @@ void	DCsync_configuration(unsigned char mode, const struct zbx_json_parse *jp_kv
 				config->hmacros.num_data, config->hmacros.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacros_hm : %d (%d slots)", __func__,
 				config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() kvs_paths : %d", __func__, config->kvs_paths.values_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __func__,
 				config->interfaces.num_data, config->interfaces.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces_snmp : %d (%d slots)", __func__,
