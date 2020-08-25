@@ -56,32 +56,34 @@ void	zbx_vault_kv_clean(void *data)
 	zbx_free(kv->value);
 }
 
-static void	get_kvs_from_json(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
+static void	vault_json_kvs_pairs_get(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
 {
-	char		tmp[MAX_STRING_LEN], *string = NULL;
+	char		key[MAX_STRING_LEN], *value = NULL;
 	const char	*pnext = NULL;
-	size_t	string_alloc = 0;
+	size_t		string_alloc = 0;
 
-	while (NULL != (pnext = zbx_json_pair_next(jp_kvs, pnext, tmp, sizeof(tmp))))
+	while (NULL != (pnext = zbx_json_pair_next(jp_kvs, pnext, key, sizeof(key))))
 	{
 		zbx_kv_t	kv_local;
 
-		kv_local.key = tmp;
+		kv_local.key = key;
 		if (NULL != (zbx_hashset_search(kvs, &kv_local)))
 			continue;
 
-		if (NULL == zbx_json_decodevalue_dyn(pnext, &string, &string_alloc, NULL))
+		if (NULL == zbx_json_decodevalue_dyn(pnext, &value, &string_alloc, NULL))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "invalid tag value starting with %s", pnext);
 			continue;
 		}
 
-		kv_local.key = zbx_strdup(NULL, tmp);
-		kv_local.value = string;
-		string = NULL;
+		kv_local.key = zbx_strdup(NULL, key);
+		kv_local.value = value;
+		value = NULL;
 		string_alloc = 0;
 		zbx_hashset_insert(kvs, &kv_local, sizeof(zbx_kv_t));
 	}
+
+	zbx_free(value);
 }
 
 int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
@@ -98,7 +100,7 @@ int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs
 			return FAIL;
 		}
 
-		get_kvs_from_json(&jp_kvs, kvs);
+		vault_json_kvs_pairs_get(&jp_kvs, kvs);
 		return SUCCEED;
 	}
 	else
@@ -164,7 +166,7 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 		goto fail;
 	}
 
-	get_kvs_from_json(&jp_data_data, kvs);
+	vault_json_kvs_pairs_get(&jp_data_data, kvs);
 
 	ret = SUCCEED;
 fail:
