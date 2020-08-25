@@ -25,6 +25,8 @@
 
 #include "log.h"
 
+#define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
+
 extern char	*CONFIG_VAULTTOKEN;
 extern char	*CONFIG_VAULTURL;
 extern char	*CONFIG_VAULTDBPATH;
@@ -108,28 +110,39 @@ int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs
 
 int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 {
-	char			*out = NULL, tmp[MAX_STRING_LEN], header[MAX_STRING_LEN], *left, *right;
+	char			*out = NULL, *url, header[MAX_STRING_LEN], *left, *right;
 	struct zbx_json_parse	jp, jp_data, jp_data_data;
-	int			ret = FAIL, ret_get;
+	int			ret = FAIL;
+	long			response_code;
 
 	if (NULL == CONFIG_VAULTTOKEN)
 	{
-		*error = zbx_dsprintf(*error, "cannot retrieve secrets, token must be defined");
+		*error = zbx_dsprintf(*error, "\"VaultToken\" configuration parameter or \"VAULT_TOKEN\" environment"
+				" variable should be defined");
 		return FAIL;
 	}
 
 	zbx_strsplit(path, '/', &left, &right);
-	zbx_snprintf(tmp, sizeof(tmp), "%s/v1/%s/data/%s", CONFIG_VAULTURL, left, right);
+	if (NULL == right)
+	{
+		*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
+		free(left);
+		return FAIL;
+	}
+	url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", CONFIG_VAULTURL, left, right);
 	zbx_free(right);
 	zbx_free(left);
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", CONFIG_VAULTTOKEN);
 
-	ret_get = zbx_http_get(tmp, header, &out, error);
-	zbx_guaranteed_memset(header, 0, sizeof(header));
-
-	if (SUCCEED != ret_get)
+	if (SUCCEED != zbx_http_get(url, header, ZBX_VAULT_TIMEOUT, &out, &response_code, error))
 		goto fail;
+
+	if (200 != response_code && 204 != response_code)
+	{
+		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
+		goto fail;
+	}
 
 	if (SUCCEED != zbx_json_open(out, &jp))
 	{
@@ -155,8 +168,7 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 
 	ret = SUCCEED;
 fail:
-	if (NULL != out)
-		zbx_guaranteed_memset(out, 0, strlen(out));
+	zbx_free(url);
 	zbx_free(out);
 
 	return ret;

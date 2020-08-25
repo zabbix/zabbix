@@ -273,15 +273,16 @@ char	*zbx_http_parse_header(char **headers)
 	return NULL;
 }
 
-int	zbx_http_get(const char *url, const char *header, char **out, char **error)
+int	zbx_http_get(const char *url, const char *header, long timeout, char **out, long *response_code, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
 	char			errbuf[CURL_ERROR_SIZE];
 	int			ret = FAIL;
-	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
 	zbx_http_response_t	body = {0}, response_header = {0};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() URL '%s'", __func__, url);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -298,13 +299,19 @@ int	zbx_http_get(const char *url, const char *header, char **out, char **error)
 	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, "", "", "", 1, 1, error))
 		goto clean;
 
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot set user agent: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, "")))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set proxy: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, (long)600)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, timeout)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify timeout: %s", curl_easy_strerror(err));
 		goto clean;
@@ -331,26 +338,23 @@ int	zbx_http_get(const char *url, const char *header, char **out, char **error)
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &response_code)))
+	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, response_code)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot get the response code: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (200 != response_code && 204 != response_code)
+	if (NULL != body.data)
 	{
-		*error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the successful status codes",
-				response_code);
-		goto clean;
+		*out = body.data;
+		body.data = NULL;
 	}
 
-	*out = body.data;
-	body.data = NULL;
+	else
+		*out = zbx_strdup(NULL, "");
+
 	ret = SUCCEED;
 clean:
-	if (NULL != headers_slist)
-		zbx_guaranteed_memset(headers_slist->data, 0, strlen(headers_slist->data));
-
 	curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
 	curl_easy_cleanup(easyhandle);
 	zbx_free(body.data);
