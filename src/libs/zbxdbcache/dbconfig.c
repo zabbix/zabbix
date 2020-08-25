@@ -2259,7 +2259,7 @@ static int	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
 				goto fail;
 			}
 
-			if (FAIL == zbx_kvs_from_json_create(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
+			if (FAIL == zbx_vault_json_kvs_create(dc_kvs_path->path, jp_kvs_paths, &kvs, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s",
 						dc_kvs_path->path, error);
@@ -2268,7 +2268,7 @@ static int	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
 			}
 
 		}
-		else if (FAIL == zbx_kvs_from_vault_create(dc_kvs_path->path, &kvs, &error))
+		else if (FAIL == zbx_vault_kvs_create(dc_kvs_path->path, &kvs, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path, error);
 			zbx_free(error);
@@ -2320,7 +2320,7 @@ static int	DCsync_kvs_path(const struct zbx_json_parse *jp_kvs_paths)
 		}
 
 		zbx_vector_ptr_pair_clear(&diff);
-		zbx_kvs_from_vault_destroy(&kvs);
+		zbx_vault_kvs_destroy(&kvs);
 	}
 	ret = SUCCEED;
 fail:

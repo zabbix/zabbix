@@ -1060,7 +1060,7 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 		zbx_hashset_iter_t	iter;
 
 		keys_path = (keys_path_t *)keys_paths->values[i];
-		if (FAIL == zbx_kvs_from_vault_create(keys_path->path, &kvs, &error))
+		if (FAIL == zbx_vault_kvs_create(keys_path->path, &kvs, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
 			zbx_free(error);
@@ -1081,7 +1081,7 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 		}
 		zbx_json_close(j);
 
-		zbx_kvs_from_vault_destroy(&kvs);
+		zbx_vault_kvs_destroy(&kvs);
 	}
 	zbx_json_close(j);
 }

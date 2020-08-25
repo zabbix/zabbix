@@ -1124,14 +1124,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_token_from_env(&error))
+	if (SUCCEED != zbx_vault_init_token_from_env(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_database_credentials_from_vault(&error))
+	if (SUCCEED != zbx_vault_init_db_credentials(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);

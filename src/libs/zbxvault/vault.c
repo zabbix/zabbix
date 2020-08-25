@@ -82,7 +82,7 @@ static void	get_kvs_from_json(const struct zbx_json_parse *jp_kvs, zbx_hashset_t
 	}
 }
 
-int	zbx_kvs_from_json_create(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
+int	zbx_vault_json_kvs_create(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
 		char **error)
 {
 	const char		*p;
@@ -108,7 +108,7 @@ int	zbx_kvs_from_json_create(const char *path, const struct zbx_json_parse *jp_k
 	}
 }
 
-int	zbx_kvs_from_vault_create(const char *path, zbx_hashset_t *kvs, char **error)
+int	zbx_vault_kvs_create(const char *path, zbx_hashset_t *kvs, char **error)
 {
 	char			*out = NULL, tmp[MAX_STRING_LEN], header[MAX_STRING_LEN], *left, *right;
 	struct zbx_json_parse	jp, jp_data, jp_data_data;
@@ -166,12 +166,12 @@ fail:
 	return ret;
 }
 
-void	zbx_kvs_from_vault_destroy(zbx_hashset_t *kvs)
+void	zbx_vault_kvs_destroy(zbx_hashset_t *kvs)
 {
 	zbx_hashset_destroy(kvs);
 }
 
-int	init_token_from_env(char **error)
+int	zbx_vault_init_token_from_env(char **error)
 {
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV)
 	char	*ptr;
@@ -192,7 +192,7 @@ int	init_token_from_env(char **error)
 	return SUCCEED;
 }
 
-int	init_database_credentials_from_vault(char **error)
+int	zbx_vault_init_db_credentials(char **error)
 {
 	int		ret = FAIL;
 	zbx_hashset_t	kvs;
@@ -215,7 +215,7 @@ int	init_database_credentials_from_vault(char **error)
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_kvs_from_vault_create(CONFIG_VAULTDBPATH, &kvs, error))
+	if (SUCCEED != zbx_vault_kvs_create(CONFIG_VAULTDBPATH, &kvs, error))
 		return FAIL;
 
 	kv_local.key = ZBX_PROTO_TAG_USERNAME;
@@ -239,7 +239,7 @@ int	init_database_credentials_from_vault(char **error)
 
 	ret = SUCCEED;
 fail:
-	zbx_kvs_from_vault_destroy(&kvs);
+	zbx_vault_kvs_destroy(&kvs);
 
 	return ret;
 }
