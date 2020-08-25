@@ -48,43 +48,77 @@ type valueResult struct {
 	data interface{}
 }
 
-// DeviceID is always appended to results which are sorted alphabetically - so it's location is not fixed.
+// Key Qualifier ('Name', 'DeviceID', 'Tag' etc.) is always appended to results which are sorted alphabetically,
+// so it's location is not fixed.
 // The following processing rules will be applied depending on query:
-// * only DeviceID column is returned - it means deviceid was explicitly selected and must be returned
-// * DeviceID and more columns are returned - return value of the first column not named DeviceID
+// * only Key Qualifier column is returned - it means Key Qualifier was explicitly selected and must be returned
+// * Key Qualifier and more columns are returned - return value of the first column not having a 'key' entry in
+//   its Qualifiers_ property list
 func (r *valueResult) write(rs *ole.IDispatch) (err error) {
-	var deviceID interface{}
+	var property_key_field_value interface{}
 	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) (err error) {
 		row := vr.ToIDispatch()
 		defer row.Release()
 
-		raw, err := row.GetProperty("Properties_")
+		raw_props, err := row.GetProperty("Properties_")
 		if err != nil {
 			return
 		}
-		defer raw.Clear()
-		props := raw.ToIDispatch()
+		defer raw_props.Clear()
+
+		props := raw_props.ToIDispatch()
 		defer props.Release()
+
 		err = oleutil.ForEach(props, func(vc *ole.VARIANT) (err error) {
-			col := vc.ToIDispatch()
-			defer col.Release()
+			props_col := vc.ToIDispatch()
+			defer props_col.Release()
 
-			name, err := oleutil.GetProperty(col, "Name")
+			props_name, err := oleutil.GetProperty(props_col, "Name")
 			if err != nil {
 				return
 			}
-			defer name.Clear()
+			defer props_name.Clear()
 
-			val, err := oleutil.GetProperty(col, "Value")
+			props_val, err := oleutil.GetProperty(props_col, "Value")
 			if err != nil {
 				return
 			}
-			if name.Value().(string) != "DeviceID" {
-				r.data = val.Value()
+			defer props_val.Clear()
+
+			raw_quals, err := props_col.GetProperty("Qualifiers_")
+			if err != nil {
+				return
+			}
+			defer raw_quals.Clear()
+
+			quals := raw_quals.ToIDispatch()
+			is_key_property := false
+
+			// loop through Property Qualifiers to find if this Property
+			// is a Key and shold be skipped unless specifically queried for
+			oleutil.ForEach(quals, func(vc2 *ole.VARIANT) (err error) {
+				quals_col := vc2.ToIDispatch()
+				defer quals_col.Release()
+
+				quals_name, err := oleutil.GetProperty(quals_col, "Name")
+				if err != nil {
+					return
+				}
+				defer quals_name.Clear()
+
+				if quals_name.Value().(string) == "key" {
+					is_key_property = true
+					return stopErrorCol
+				}
+				return
+			})
+
+			if !is_key_property {
+				r.data = props_val.Value()
 				return stopErrorCol
 			} else {
-				// remeber deviceid value in the case it was the only selected column
-				deviceID = val.Value()
+				// remember key field value in the case it was the only selected column
+				property_key_field_value = props_val.Value()
 			}
 			return
 		})
@@ -97,7 +131,7 @@ func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 		return oleErr
 	} else {
 		if oleErr == nil || stop == stopErrorRow {
-			r.data = deviceID
+			r.data = property_key_field_value
 		}
 	}
 	return
