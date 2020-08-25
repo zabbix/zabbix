@@ -203,15 +203,15 @@ int	zbx_vault_init_db_credentials(char **error)
 
 	if (NULL != CONFIG_DBUSER)
 	{
-		*error = zbx_dsprintf(*error,
-				"cannot retrieve database user name, both DBName and VaultDBPath are defined");
+		*error = zbx_dsprintf(*error, "\"DBName\" configuration parameter cannot be used when \"VaultDBPath\""
+				" is defined");
 		return FAIL;
 	}
 
 	if (NULL != CONFIG_DBPASSWORD)
 	{
-		*error = zbx_dsprintf(*error,
-				"cannot retrieve database password, both DBPassword and VaultDBPath are defined");
+		*error = zbx_dsprintf(*error, "\"DBPassword\" configuration parameter cannot be used when"
+				" \"VaultDBPath\" is defined");
 		return FAIL;
 	}
 
@@ -234,8 +234,8 @@ int	zbx_vault_init_db_credentials(char **error)
 		goto fail;
 	}
 
-	CONFIG_DBUSER = zbx_strdup(NULL, kv_username->value);		/* TODO encrypt */
-	CONFIG_DBPASSWORD = zbx_strdup(NULL, kv_password->value);	/* TODO encrypt */
+	CONFIG_DBUSER = zbx_strdup(NULL, kv_username->value);
+	CONFIG_DBPASSWORD = zbx_strdup(NULL, kv_password->value);
 
 	ret = SUCCEED;
 fail:
