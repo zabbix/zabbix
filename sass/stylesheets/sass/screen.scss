@@ -1767,6 +1767,136 @@ textarea {
 	}
 }
 
+z-select, z-select-clone {
+	&[readonly] {
+		>button {
+			color: $font-color !important;
+			pointer-events: none;
+			@extend %form-disabled;
+		}
+	}
+
+	>button {
+		position: relative;
+		text-align: left;
+		word-break: break-all;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: pre;
+		height: 24px;
+		padding: 3px 5px;
+		padding-right: 20px;
+		background-color: $form-bg-color;
+		border-radius: 0;
+		cursor: default;
+
+		font: {
+			family: $font-stack;
+			size: $font-form-size;
+		}
+
+		@extend %form-input-style;
+		@extend %webkit-scrollbar;
+
+		&::after {
+			content: '';
+			width: 5px;
+			height: 5px;
+			border-right: 2px solid;
+			transform: rotate(45deg);
+			border-bottom: 2px solid;
+			margin-left: 7px;
+			margin-bottom: 2px;
+			display: inline-block;
+			position: absolute;
+			right: 6px;
+			top: 6px;
+		}
+
+		&:active, &:hover, &:focus {
+			box-shadow: none;
+			border-color: $form-border-color;
+			color: $font-color;
+			background-color: $form-bg-color;
+		}
+
+		&[disabled] {
+			@extend %form-disabled;
+		}
+	}
+
+	>ul.list {
+		&.is-expanded {
+			display: block;
+		}
+
+		&.fall-upwards {
+			box-shadow: 0 -6px 10px 0 $action-shadow-color;
+		}
+
+		display: none;
+		position: fixed;
+		z-index: 20000;
+		border: 1px solid;
+		min-width: 145px;
+		max-height: 332px;
+		overflow-y: auto;
+		@extend %form-input-style;
+		@extend %webkit-scrollbar;
+		box-shadow: 0 6px 10px 0 $action-shadow-color;
+
+		>li {
+			&[optgroup] {
+				&::before {
+					content: attr(optgroup);
+					display: block;
+					font-weight: bold;
+				}
+			}
+
+			display: block;
+
+			>ul {
+				>li {
+					margin: 0 -5px;
+					padding-left: 10px;
+				}
+			}
+		}
+
+
+		li {
+			user-select: none;
+			display: block;
+			height: inherit;
+			line-height: normal;
+			color: $font-color;
+			padding: .4em 5px;
+			text-overflow: ellipsis;
+			word-break: break-all;
+			white-space: pre-wrap;
+
+			&.hover {
+				transition: background-color .2s ease-out;
+				background-color: $action-hover-color;
+			}
+
+			&[disabled] {
+				color: $multiselect-item-disabled-color;
+			}
+
+			&[description] {
+				&::after {
+					content: attr(description);
+					display: block;
+					color: $input-placeholder-color;
+				}
+			}
+		}
+	}
+}
+
+
 select {
 	font: {
 		family: $font-stack;
