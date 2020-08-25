@@ -333,8 +333,8 @@ static void	DCdump_kvs_paths(void)
 		zabbix_log(LOG_LEVEL_TRACE, "kvs_path:'%s'", kvs_path->path);
 
 		zbx_hashset_iter_reset(&kvs_path->kvs, &iter);
-		while (NULL != (kvs = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter))) /* TODO remove value from dump */
-			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s' value:'%s' refcount:%d", kvs->key, kvs->value, kvs->refcount);
+		while (NULL != (kvs = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
+			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s' refcount:%d", kvs->key, kvs->refcount);
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
