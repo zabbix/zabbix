@@ -20,17 +20,25 @@
 
 'use strict';
 
+/**
+ * Main class to initialize tab indicator.
+ */
 class TabIndicators {
 
 	constructor() {
-		// try {
-		this.form = this.getForm();
-		this.activateIndicators();
-		// } catch (error) {
-		// 	return false;
-		// }
+		try {
+			this.form = this.getForm();
+			this.activateIndicators();
+		} catch (error) {
+			return false;
+		}
 	}
 
+	/**
+	 * Get main form
+	 *
+	 * @return {HTMLElement} Main form
+	 */
 	getForm() {
 		const TEMPLATE = document.querySelector('#templatesForm');
 		const HOST = document.querySelector('#hostsForm');
@@ -93,135 +101,189 @@ class TabIndicators {
 		}
 	}
 
+	/**
+	 * Activate tab indicators.
+	 */
 	activateIndicators() {
 		const tabs = this.form.querySelectorAll('#tabs a');
 
 		Object.values(tabs).map((elem) => {
-			const indicator_class = this.getIndicatorClass(elem);
+			const indicator_item = this.getIndicatorItem(this.getIndicatorNameByElement(elem));
 
-			this.addAttribute(elem, indicator_class?.getType(), indicator_class?.getValue());
+			this.addAttribute(elem, indicator_item?.getType(), indicator_item?.getValue());
 
-			indicator_class?.initObserver(elem);
+			indicator_item?.initObserver(elem);
 		});
 	}
 
+	/**
+	 * Add tab indicator attribute to tab element.
+	 *
+	 * @param {HTMLElement} elem  tab element
+	 * @param {null|TabIndicatorStatusType|TabIndicatorNumberType} type
+	 * @param {null|boolean|number} value
+	 */
 	addAttribute(elem, type, value) {
-		if (type instanceof TabIndicatorStatus) {
+		if (type instanceof TabIndicatorStatusType) {
 			elem.setAttribute('data-indicator-status', value ? 'enabled' : 'disabled');
 		}
 
-		if (type instanceof TabIndicatorNumber) {
+		if (type instanceof TabIndicatorNumberType) {
 			elem.setAttribute('data-indicator-count', value);
 		}
 	}
 
-	getIndicatorClass(elem) {
-		const class_name = elem
+	/**
+	 * Get tab indicator name.
+	 *
+	 * @param {HTMLElement} elem  tab element.
+	 *
+	 * @return {?string}
+	 */
+	getIndicatorNameByElement(elem) {
+		return elem
 			.getAttribute('js-indicator')
 			?.split('-')
 			?.map((value) => value[0].toUpperCase() + value.slice(1))
 			?.join('');
+	}
 
-		return TabIndicatorFactory.createTabIndicator(class_name)
+	/**
+	 * Get tab indicator item class.
+	 *
+	 * @param {string} indicator_name
+	 *
+	 * @return {?TabIndicatorItem}
+	 */
+	getIndicatorItem(indicator_name) {
+		return TabIndicatorFactory.createTabIndicator(indicator_name);
 	}
 }
 
+/**
+ * Factory for tab indicator items.
+ */
 class TabIndicatorFactory {
 
+	/**
+	 * Get tab indicator item class.
+	 *
+	 * @param {string} name
+	 *
+	 * @return {?TabIndicatorItem}
+	 */
 	static createTabIndicator(name) {
 		switch (name) {
 			case 'Macros':
-				return new MacrosTabIndicator;
+				return new MacrosTabIndicatorItem;
 			case 'LinkedTemplate':
-				return new LinkedTemplateTabIndicator;
+				return new LinkedTemplateTabIndicatorItem;
 			case 'Tags':
-				return new TagsTabIndicator;
+				return new TagsTabIndicatorItem;
 			case 'Http':
-				return new HttpTabIndicator;
+				return new HttpTabIndicatorItem;
 			case 'Ldap':
-				return new LdapTabIndicator;
+				return new LdapTabIndicatorItem;
 			case 'Saml':
-				return new SamlTabIndicator;
+				return new SamlTabIndicatorItem;
 			case 'Inventory':
-				return new InventoryTabIndicator;
+				return new InventoryTabIndicatorItem;
 			case 'Encryption':
-				return new EncryptionTabIndicator;
+				return new EncryptionTabIndicatorItem;
 			case 'Groups':
-				return new GroupsTabIndicator;
+				return new GroupsTabIndicatorItem;
 			case 'Preprocessing':
-				return new PreprocessingTabIndicator;
+				return new PreprocessingTabIndicatorItem;
 			case 'Dependency':
-				return new DependencyTabIndicator;
+				return new DependencyTabIndicatorItem;
 			case 'LldMacros':
-				return new LldMacrosTabIndicator;
+				return new LldMacrosTabIndicatorItem;
 			case 'Filters':
-				return new FiltersTabIndicator;
+				return new FiltersTabIndicatorItem;
 			case 'Overrides':
-				return new OverridesTabIndicator;
+				return new OverridesTabIndicatorItem;
 			case 'Steps':
-				return new StepsTabIndicator;
+				return new StepsTabIndicatorItem;
 			case 'HttpAuth':
-				return new HttpAuthTabIndicator;
+				return new HttpAuthTabIndicatorItem;
 			case 'Operations':
-				return new OperationsTabIndicator;
+				return new OperationsTabIndicatorItem;
 			case 'ServiceDependency':
-				return new ServiceDependencyTabIndicator;
+				return new ServiceDependencyTabIndicatorItem;
 			case 'Time':
-				return new TimeTabIndicator;
+				return new TimeTabIndicatorItem;
 			case 'TagFilter':
-				return new TagFilterTabIndicator;
+				return new TagFilterTabIndicatorItem;
 			case 'Media':
-				return new MediaTabIndicator;
+				return new MediaTabIndicatorItem;
 			case 'MessageTemplate':
-				return new MessageTemplateTabIndicator;
+				return new MessageTemplateTabIndicatorItem;
 			case 'FrontendMessage':
-				return new FrontendMessageTabIndicator;
+				return new FrontendMessageTabIndicatorItem;
 			case 'Sharing':
-				return new SharingTabIndicator;
+				return new SharingTabIndicatorItem;
 			case 'GraphDataset':
-				return new GraphDatasetTabIndicator;
+				return new GraphDatasetTabIndicatorItem;
 			case 'GraphOptions':
-				return new GraphOptionsTabIndicator;
+				return new GraphOptionsTabIndicatorItem;
 			case 'GraphTime':
-				return new GraphTimeTabIndicator;
+				return new GraphTimeTabIndicatorItem;
 			case 'GraphAxes':
-				return new GraphAxesTabIndicator;
+				return new GraphAxesTabIndicatorItem;
 			case 'GraphLegend':
-				return new GraphLegendTabIndicator;
+				return new GraphLegendTabIndicatorItem;
 			case 'GraphProblems':
-				return new GraphProblemsTabIndicator;
+				return new GraphProblemsTabIndicatorItem;
 			case 'GraphOverrides':
-				return new GraphOverridesTabIndicator;
+				return new GraphOverridesTabIndicatorItem;
 		}
 
 		return null;
 	}
 }
 
-class TabIndicatorNumber { }
+class TabIndicatorNumberType { }
 
-class TabIndicatorStatus { }
+class TabIndicatorStatusType { }
 
-class TabIndicatorCallback {
+/**
+ * Tab indicator item.
+ */
+class TabIndicatorItem {
 
+	/**
+	 * Get tab indicator type.
+	 *
+	 * @return {TabIndicatorNumberType|TabIndicatorStatusType}
+	 */
 	getType() {
 		return this.TYPE;
 	}
 
+	/**
+	 * Get tab indicator value.
+	 *
+	 * @return {boolean|number} Boolean for TabIndicatorStatusType or number for TabIndicatorNumberType
+	 */
 	getValue() {
 		throw 'Fatal error: can not call abstract class.';
 	}
 
+	/**
+	 * Init observer for html changes.
+	 *
+	 * @param {HTMLElement} elem
+	 */
 	initObserver(elem) {
 		throw 'Fatal error: can not call abstract class.';
 	}
 }
 
-class MacrosTabIndicator extends TabIndicatorCallback {
+class MacrosTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -230,9 +292,13 @@ class MacrosTabIndicator extends TabIndicatorCallback {
 			.length;
 	}
 
+	/**
+	 * @inheritdoc
+	 * This observer yet init in include\views\js\common.template.edit.js.php.
+	 *
+	 * @param {HTMLElement} elem
+	 */
 	initObserver(elem) {
-		// FIXME: observer deleted after macro table refreshed by ajax.
-
 		const target_node = document.querySelector('#tbl_macros');
 		const observer_options = {
 			childList: true,
@@ -259,11 +325,11 @@ class MacrosTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class LinkedTemplateTabIndicator extends TabIndicatorCallback {
+class LinkedTemplateTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -307,11 +373,11 @@ class LinkedTemplateTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class TagsTabIndicator extends TabIndicatorCallback {
+class TagsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -345,11 +411,11 @@ class TagsTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class HttpTabIndicator extends TabIndicatorCallback {
+class HttpTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -367,11 +433,11 @@ class HttpTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class LdapTabIndicator extends TabIndicatorCallback {
+class LdapTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -389,11 +455,11 @@ class LdapTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class SamlTabIndicator extends TabIndicatorCallback {
+class SamlTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -411,11 +477,11 @@ class SamlTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class InventoryTabIndicator extends TabIndicatorCallback {
+class InventoryTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -430,16 +496,16 @@ class InventoryTabIndicator extends TabIndicatorCallback {
 		[...document.querySelectorAll('[name=inventory_mode]')]?.map((value) => {
 			value.addEventListener('click', () => {
 				elem.setAttribute('data-indicator-status', !!this.getValue() ? 'enabled' : 'disabled');
-			})
+			});
 		});
 	}
 }
 
-class EncryptionTabIndicator extends TabIndicatorCallback {
+class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -478,11 +544,11 @@ class EncryptionTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class GroupsTabIndicator extends TabIndicatorCallback {
+class GroupsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -516,11 +582,11 @@ class GroupsTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class PreprocessingTabIndicator extends TabIndicatorCallback {
+class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -553,11 +619,11 @@ class PreprocessingTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class DependencyTabIndicator extends TabIndicatorCallback {
+class DependencyTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -590,11 +656,11 @@ class DependencyTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class LldMacrosTabIndicator extends TabIndicatorCallback {
+class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -630,29 +696,26 @@ class LldMacrosTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class FiltersTabIndicator extends TabIndicatorCallback {
+class FiltersTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
 		return document
-			.querySelectorAll('#conditions tbody tr.form_row > td > input.macro:not(:placeholder-shown):not([readonly])')
+			.querySelectorAll('#conditions tbody .form_row > td > input.macro:not(:placeholder-shown):not([readonly])')
 			.length;
 	}
 
 	initObserver(elem) {
-		// FIXME: not working
-
-		const target_node = document.querySelector('#conditions tbody');
+		const target_node = document.querySelector('#conditions');
 		const observer_options = {
 			childList: true,
 			attributes: true,
-			// attributeFilter: ['value', 'style'], // Use style because textarea dont have value attribute.
-			subtree: true,
-			characterData: true,
+			attributeFilter: ['value'],
+			subtree: true
 		};
 
 		const observer_callback = (mutationList, observer) => {
@@ -673,11 +736,11 @@ class FiltersTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class OverridesTabIndicator extends TabIndicatorCallback {
+class OverridesTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -710,11 +773,11 @@ class OverridesTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class StepsTabIndicator extends TabIndicatorCallback {
+class StepsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -747,11 +810,11 @@ class StepsTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class HttpAuthTabIndicator extends TabIndicatorCallback {
+class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -793,11 +856,11 @@ class HttpAuthTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class OperationsTabIndicator extends TabIndicatorCallback {
+class OperationsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -845,11 +908,11 @@ class OperationsTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class ServiceDependencyTabIndicator extends TabIndicatorCallback {
+class ServiceDependencyTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -882,11 +945,11 @@ class ServiceDependencyTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class TimeTabIndicator extends TabIndicatorCallback {
+class TimeTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -919,11 +982,11 @@ class TimeTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class TagFilterTabIndicator extends TabIndicatorCallback {
+class TagFilterTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -933,9 +996,7 @@ class TagFilterTabIndicator extends TabIndicatorCallback {
 	}
 
 	initObserver(elem) {
-		// FIXME: table is replaced by ajax.
-
-		const target_node = document.querySelector('#tag-filter-table');
+		const target_node = document.querySelector('#tagFilterFormList > li');
 		const observer_options = {
 			childList: true,
 			subtree: true
@@ -958,11 +1019,11 @@ class TagFilterTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class MediaTabIndicator extends TabIndicatorCallback {
+class MediaTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -995,11 +1056,11 @@ class MediaTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class MessageTemplateTabIndicator extends TabIndicatorCallback {
+class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -1032,11 +1093,11 @@ class MessageTemplateTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class FrontendMessageTabIndicator extends TabIndicatorCallback {
+class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -1054,11 +1115,11 @@ class FrontendMessageTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class SharingTabIndicator extends TabIndicatorCallback {
+class SharingTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -1110,11 +1171,11 @@ class SharingTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class GraphDatasetTabIndicator extends TabIndicatorCallback {
+class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {
@@ -1147,11 +1208,11 @@ class GraphDatasetTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class GraphOptionsTabIndicator extends TabIndicatorCallback {
+class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -1170,11 +1231,11 @@ class GraphOptionsTabIndicator extends TabIndicatorCallback {
 }
 
 
-class GraphTimeTabIndicator extends TabIndicatorCallback {
+class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -1192,11 +1253,11 @@ class GraphTimeTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class GraphAxesTabIndicator extends TabIndicatorCallback {
+class GraphAxesTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -1219,11 +1280,11 @@ class GraphAxesTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class GraphLegendTabIndicator extends TabIndicatorCallback {
+class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -1241,11 +1302,11 @@ class GraphLegendTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class GraphProblemsTabIndicator extends TabIndicatorCallback {
+class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorStatus;
+		this.TYPE = new TabIndicatorStatusType;
 	}
 
 	getValue() {
@@ -1263,11 +1324,11 @@ class GraphProblemsTabIndicator extends TabIndicatorCallback {
 	}
 }
 
-class GraphOverridesTabIndicator extends TabIndicatorCallback {
+class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super();
-		this.TYPE = new TabIndicatorNumber;
+		this.TYPE = new TabIndicatorNumberType;
 	}
 
 	getValue() {

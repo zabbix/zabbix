@@ -30,11 +30,11 @@ if (hasRequest('conditions')) {
 	$counter = key($conditions) + 1;
 }
 
-include dirname(__FILE__).'/common.item.edit.js.php';
-include dirname(__FILE__).'/item.preprocessing.js.php';
-include dirname(__FILE__).'/editabletable.js.php';
-include dirname(__FILE__).'/itemtest.js.php';
-include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
+// include dirname(__FILE__).'/common.item.edit.js.php';
+// include dirname(__FILE__).'/item.preprocessing.js.php';
+// include dirname(__FILE__).'/editabletable.js.php';
+// include dirname(__FILE__).'/itemtest.js.php';
+// include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="condition-row">
 	<?=
@@ -132,6 +132,9 @@ include dirname(__FILE__).'/configuration.host.discovery.edit.overr.js.php';
 					if ($('#evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 						updateExpression();
 					}
+
+					// Change value attribute to trigger MutationObserver event for tab indicator.
+					$(this).attr('value', $(this).val());
 				})
 				.ready(function() {
 					$('#conditionRow').toggle($('.form_row', $('#conditions')).length > 1);
