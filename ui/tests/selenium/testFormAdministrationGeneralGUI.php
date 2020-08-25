@@ -885,6 +885,135 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		}
 	}
 
+
+	/**
+	 * Test data for settings submit.
+	 */
+	public function getCheckSavedValuesData() {
+		return [
+			[
+				[
+					'field' =>  [
+						'Default theme' => 'High-contrast dark'
+					],
+					'link' => 'templates.php?filter_name=cisco',
+					'color' => 'rgba(224, 224, 224, 1)'
+				]
+			],
+			[
+				[
+					'field' =>  [
+						'Default theme' => 'High-contrast light'
+					],
+					'link' => 'templates.php?filter_name=cisco',
+					'color' => 'rgba(85, 85, 85, 1)'
+				]
+			],
+			[
+				[
+					'field' =>  [
+						'Default theme' => 'Dark'
+					],
+					'link' => 'templates.php?filter_name=cisco',
+					'color' => 'rgba(105, 128, 141, 1)'
+				]
+			],
+			[
+				[
+					'field' =>  [
+						'Limit for search and filter results' => '2'
+					],
+					'link' => 'templates.php?filter_name=cisco',
+					'row_count' => 2,
+				]
+			],
+			[
+				[
+					'field' =>  [
+						'Max number of columns and rows in overview tables' => '5'
+					],
+					'link' => 'overview.php',
+					'row_count' => 6,		// Plus 1 info row in table.
+				]
+			],
+			[
+				[
+					'field' =>  [
+						'Max count of elements to show inside table cell' => '2'
+					],
+					'link' => 'templates.php?filter_name=cisco',
+					'element_count' => 2
+				]
+			],
+			[
+				[
+					'field' =>  [
+						'Time filter default period' => '5h'
+					],
+					'link' => 'zabbix.php?action=dashboard.view&dashboardid=2',
+				]
+			],
+			[
+				[
+					'field' =>  [
+						'Max period' => '1y'
+					],
+					'link' => 'zabbix.php?action=dashboard.view&dashboardid=2',
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCheckSavedValuesData
+	 */
+	public function testFormAdministrationGeneralGUI_CheckSavedValues($data) {
+		$this->page->login()->open('zabbix.php?action=gui.edit');
+		$form = $this->query('xpath://form[contains(@action, "gui.update")]')->waitUntilPresent()->asForm()->one();
+		// Reset form in case of previous test case.
+		$this->resetConfiguration($form, $this->default, 'Reset defaults');
+		// Fill nesessary settings.
+		$form->fill($data['field']);
+		$form->submit();
+		// Check saved settings.
+		$this->page->open($data['link']);
+
+		switch (array_keys($data['field'])) {
+			case 'Default theme':
+				$this->assertEquals($data['color'], $this->query('button:Import')->waitUntilPresent()
+					->one()->getCSSValue('background-color'));
+				break;
+
+			case 'Limit for search and filter results':
+			case 'Max number of columns and rows in overview tables':
+			case 'Max count of elements to show inside table cell':
+				$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
+				break;
+
+			case 'Limit for search and filter results':
+			case 'Max number of columns and rows in overview tables':
+				$this->assertEquals($data['row_count'], $table->getRows()->count());
+				break;
+
+			case 'Max count of elements to show inside table cell':
+					$element_count = $table->findRow('Name', 'Template Module Cisco CISCO-ENVMON-MIB SNMP')
+						->getColumn('Linked to templates')->query('xpath://a[@class="link-alt grey"]')->all()->count();
+					$this->assertEquals(CTestArrayHelper::get($data, 'element_count'), $element_count);
+				break;
+
+			case 'Time filter default period':
+				$this->assertEquals('now-5h', $this->query('id:from')->one()->getValue());
+				break;
+
+			case 'Max period':
+				$this->query('id:from')->one()->fill('now-5y');
+				$this->query('button:Apply')->one()->click();
+				$this->assertEquals('Maximum time period to display is 366 days.',
+						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
+				break;
+		}
+	}
+
 	public function getResetButtonData() {
 		return [
 			[
