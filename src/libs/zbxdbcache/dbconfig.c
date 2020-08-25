@@ -868,25 +868,6 @@ static int	dc_compare_kvs_path(const void *d1, const void *d2)
 	return strcmp(ptr1->path, ptr2->path);
 }
 
-static int	parse_vault_macro_value(const char *value, char **path, char **key)
-{
-	char	*ptr;
-
-	if (NULL == (ptr = strchr(value, ':')))
-		return FAIL;
-
-	zbx_free(*path);
-
-	*path = zbx_malloc(NULL, ptr - value + 1);
-	if (0 != ptr - value)
-		memcpy(*path, value, ptr - value);
-	(*path)[ptr - value] = '\0';
-
-	*key = zbx_strdup(*key, ptr + 1);
-
-	return SUCCEED;
-}
-
 static zbx_hash_t	dc_kv_hash(const void *data)
 {
 	zbx_dc_kv_t	*kv = (zbx_dc_kv_t *)data;
@@ -949,7 +930,7 @@ static void	config_kvs_path_remove(const char *value, zbx_dc_kv_t *kv)
 	if (0 != --kv->refcount)
 		return;
 
-	parse_vault_macro_value(value, &path, &key);
+	zbx_strsplit(value, ':', &path, &key);
 
 	zbx_strpool_release(kv->key);
 	if (NULL != kv->value)
@@ -1958,7 +1939,10 @@ static void	DCsync_gmacros(zbx_dbsync_t *sync)
 
 		if (ZBX_MACRO_VALUE_VAULT == type)
 		{
-			if (FAIL == (parse_vault_macro_value(row[2], &path, &key)))
+			zbx_free(path);
+			zbx_free(key);
+			zbx_strsplit(row[2], ':', &path, &key);
+			if (NULL == key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse user macro \"%s\" value \"%s\"", row[1], row[2]);
 				continue;
@@ -2110,7 +2094,10 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 
 		if (ZBX_MACRO_VALUE_VAULT == type)
 		{
-			if (FAIL == (parse_vault_macro_value(row[3], &path, &key)))
+			zbx_free(path);
+			zbx_free(key);
+			zbx_strsplit(row[3], ':', &path, &key);
+			if (NULL == key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse host \"%s\" macro \"%s\" value \"%s\"",
 						row[1], row[2], row[3]);

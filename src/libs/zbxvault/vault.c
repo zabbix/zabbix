@@ -56,7 +56,7 @@ void	zbx_vault_kv_clean(void *data)
 	zbx_free(kv->value);
 }
 
-static void	vault_json_kvs_pairs_get(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
+static void	vault_json_kvs_parse(const struct zbx_json_parse *jp_kvs, zbx_hashset_t *kvs)
 {
 	char		key[MAX_STRING_LEN], *value = NULL;
 	const char	*pnext = NULL;
@@ -68,7 +68,10 @@ static void	vault_json_kvs_pairs_get(const struct zbx_json_parse *jp_kvs, zbx_ha
 
 		kv_local.key = key;
 		if (NULL != (zbx_hashset_search(kvs, &kv_local)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "key '%s' is multiply defined", key);
 			continue;
+		}
 
 		if (NULL == zbx_json_decodevalue_dyn(pnext, &value, &string_alloc, NULL))
 		{
@@ -100,7 +103,7 @@ int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs
 			return FAIL;
 		}
 
-		vault_json_kvs_pairs_get(&jp_kvs, kvs);
+		vault_json_kvs_parse(&jp_kvs, kvs);
 		return SUCCEED;
 	}
 	else
@@ -166,7 +169,7 @@ int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error)
 		goto fail;
 	}
 
-	vault_json_kvs_pairs_get(&jp_data_data, kvs);
+	vault_json_kvs_parse(&jp_data_data, kvs);
 
 	ret = SUCCEED;
 fail:
@@ -178,7 +181,7 @@ fail:
 
 int	zbx_vault_init_token_from_env(char **error)
 {
-#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV)
+#if defined(HAVE_GETENV) && defined(HAVE_UNSETENV)
 	char	*ptr;
 
 	if (NULL == (ptr = getenv("VAULT_TOKEN")))

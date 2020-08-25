@@ -39,6 +39,5 @@ int	zbx_vault_init_db_credentials(char **error);
 int	zbx_vault_kvs_get(const char *path, zbx_hashset_t *kvs, char **error);
 int	zbx_vault_json_kvs_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_hashset_t *kvs,
 		char **error);
-void	zbx_vault_kvs_destroy(zbx_hashset_t *kvs);
 
 #endif
